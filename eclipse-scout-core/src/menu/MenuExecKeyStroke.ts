@@ -10,7 +10,7 @@
  */
 import {ActionExecKeyStroke, Menu} from '../index';
 
-export default class MenuExecKeyStroke extends ActionExecKeyStroke {
+export class MenuExecKeyStroke extends ActionExecKeyStroke {
 
   constructor(menu: Menu) {
     super(menu);

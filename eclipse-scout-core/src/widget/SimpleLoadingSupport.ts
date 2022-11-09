@@ -14,7 +14,7 @@ import {LoadingSupport} from '../index';
  * This class provides loading support functionality for widgets that simple want to add a CSS class 'loading'
  * when they're in loading state.
  */
-export default class SimpleLoadingSupport extends LoadingSupport {
+export class SimpleLoadingSupport extends LoadingSupport {
 
   protected override _renderLoadingIndicator() {
     if (this.widget.rendered || this.widget.rendering) {

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicFieldAdapter, Event, StringField, StringFieldModel} from '../../../index';
-import {StringFieldSelectionChangeEvent} from './StringFieldEventMap';
+import {BasicFieldAdapter, Event, StringField, StringFieldModel, StringFieldSelectionChangeEvent} from '../../../index';
 
-export default class StringFieldAdapter extends BasicFieldAdapter {
+export class StringFieldAdapter extends BasicFieldAdapter {
   declare widget: StringField;
 
   protected override _initProperties(model: StringFieldModel & { insertText?: boolean }) {

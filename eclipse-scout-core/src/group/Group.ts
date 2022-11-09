@@ -9,14 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, scout, tooltips, Widget} from '../index';
+import {
+  Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, InitModelOf, Insets, KeyStrokeContext, LoadingSupport, ObjectOrChildModel, scout, tooltips, Widget
+} from '../index';
 import $ from 'jquery';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
 import MouseDownEvent = JQuery.MouseDownEvent;
 
 export type GroupCollapseStyle = EnumObject<typeof Group.CollapseStyle>;
 
-export default class Group<TBody extends Widget = Widget> extends Widget implements GroupModel<TBody> {
+export class Group<TBody extends Widget = Widget> extends Widget implements GroupModel<TBody> {
   declare model: GroupModel<TBody>;
   declare eventMap: GroupEventMap;
   declare self: Group;

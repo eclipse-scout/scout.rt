@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldModel} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {FormField, FormFieldModel, ObjectOrChildModel} from '../../../index';
 
-export default interface SplitBoxModel extends FormFieldModel {
+export interface SplitBoxModel extends FormFieldModel {
   firstField?: ObjectOrChildModel<FormField>;
   secondField?: ObjectOrChildModel<FormField>;
   collapsibleField?: FormField | string;

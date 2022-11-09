@@ -9,19 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, BenchColumn, BenchColumnLayoutData, BenchRowLayoutData, Desktop, DesktopBenchEventMap, DesktopBenchModel, DesktopNavigationHandle, DesktopTab, DesktopTabArea, DesktopTabSelectKeyStroke, Event, EventHandler, FlexboxLayout,
-  FlexboxLayoutData, Form, HeaderTabBoxController, HtmlComponent, KeyStrokeContext, Outline, OutlineOverview, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, styles, Table, Widget, widgets
+  arrays, BenchColumn, BenchColumnLayoutData, BenchColumnViewActivateEvent, BenchColumnViewAddEvent, BenchColumnViewDeactivateEvent, BenchColumnViewRemoveEvent, BenchRowLayoutData, CollapseHandleActionEvent, Desktop, DesktopBenchEventMap,
+  DesktopBenchModel, DesktopNavigationHandle, DesktopTab, DesktopTabArea, DesktopTabSelectKeyStroke, DisplayViewId, Event, EventHandler, FlexboxLayout, FlexboxLayoutData, Form, HeaderTabBoxController, HtmlComponent, InitModelOf,
+  KeyStrokeContext, Outline, OutlineOverview, OutlinePageChangedEvent, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, SplitterMoveEvent, styles, Table, TreeNodesSelectedEvent, Widget, widgets
 } from '../../index';
 import $ from 'jquery';
-import {DisplayViewId} from '../../tabbox/SimpleTab';
-import {BenchColumnViewActivateEvent, BenchColumnViewAddEvent, BenchColumnViewDeactivateEvent, BenchColumnViewRemoveEvent} from './BenchColumnEventMap';
-import {CollapseHandleActionEvent} from '../../collapsehandle/CollapseHandleEventMap';
-import {SplitterMoveEvent} from '../../splitter/SplitterEventMap';
-import {TreeNodesSelectedEvent} from '../../tree/TreeEventMap';
-import {OutlinePageChangedEvent} from '../outline/OutlineEventMap';
-import {InitModelOf} from '../../scout';
 
-export default class DesktopBench extends Widget implements DesktopBenchModel {
+export class DesktopBench extends Widget implements DesktopBenchModel {
   declare model: DesktopBenchModel;
   declare eventMap: DesktopBenchEventMap;
   declare self: DesktopBench;

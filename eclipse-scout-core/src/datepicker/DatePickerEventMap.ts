@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormat, DatePicker, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
-import {DatePickerMonth} from './DatePicker';
+import {DateFormat, DatePicker, DatePickerMonth, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export interface DatePickerDateSelectEvent<D extends DatePicker = DatePicker> extends Event<D> {
   date: Date;
 }
 
-export default interface DatePickerEventMap extends WidgetEventMap {
+export interface DatePickerEventMap extends WidgetEventMap {
   'dateSelect': DatePickerDateSelectEvent;
   'propertyChange:dateFormat': PropertyChangeEvent<DateFormat>;
   'propertyChange:months': PropertyChangeEvent<DatePickerMonth[]>;

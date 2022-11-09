@@ -10,6 +10,6 @@
  */
 import {FormMenuModel, TableControl} from '../../index';
 
-export default interface TableControlAdapterMenuModel extends FormMenuModel {
+export interface TableControlAdapterMenuModel extends FormMenuModel {
   tableControl?: TableControl;
 }

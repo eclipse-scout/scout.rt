@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, ModelAdapter, Notification} from '../index';
-import {NotificationAppLinkActionEvent} from './NotificationEventMap';
+import {Event, ModelAdapter, Notification, NotificationAppLinkActionEvent} from '../index';
 
-export default class NotificationAdapter extends ModelAdapter {
+export class NotificationAdapter extends ModelAdapter {
 
   protected _onWidgetClose(event: Event<Notification>) {
     this._send('close');

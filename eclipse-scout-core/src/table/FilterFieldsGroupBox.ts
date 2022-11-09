@@ -8,13 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, FilterFieldsGroupBoxModel, GroupBox, scout, ValueField} from '../index';
-import {ObjectType} from '../ObjectFactory';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {ColumnUserFilter, FilterFieldsGroupBoxModel, GroupBox, InitModelOf, ObjectType, scout, SomeRequired, ValueField} from '../index';
 
 
-export default class FilterFieldsGroupBox extends GroupBox implements FilterFieldsGroupBoxModel {
+export class FilterFieldsGroupBox extends GroupBox implements FilterFieldsGroupBoxModel {
   declare model: FilterFieldsGroupBoxModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'filter'>;
 

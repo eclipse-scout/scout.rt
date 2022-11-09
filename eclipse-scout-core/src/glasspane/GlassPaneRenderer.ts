@@ -8,15 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DeferredGlassPaneTarget, DisplayParent, Event, EventHandler, Form, scout, Session, Widget} from '../index';
+import {arrays, DeferredGlassPaneTarget, DisplayParent, Event, EventHandler, Form, GlassPaneTarget, PopupWindow, scout, Session, Widget} from '../index';
 import $ from 'jquery';
-import {GlassPaneTarget} from '../widget/Widget';
-import PopupWindow from '../desktop/PopupWindow';
 
 /**
  * Renders glassPanes over the 'glassPaneTargets' of a widget.
  */
-export default class GlassPaneRenderer {
+export class GlassPaneRenderer {
   session: Session;
   protected _widget: Widget;
   protected _enabled: boolean;

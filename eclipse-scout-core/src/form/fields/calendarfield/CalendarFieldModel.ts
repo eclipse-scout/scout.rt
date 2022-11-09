@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, FormFieldModel} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {Calendar, FormFieldModel, ObjectOrChildModel} from '../../../index';
 
-export default interface CalendarFieldModel extends FormFieldModel {
+export interface CalendarFieldModel extends FormFieldModel {
   calendar?: ObjectOrChildModel<Calendar>;
 }

@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {BooleanColumn, Cell, Column, NumberColumn, scout} from '../../../src/index';
-import {TableSpecHelper} from '../../../src/testing/index';
-import {triggerImageLoadCapture} from '../../../src/testing/jquery-testing';
+import {JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
 
 describe('Column', () => {
   let session: SandboxSession;
@@ -492,7 +491,7 @@ describe('Column', () => {
       expect(_resizeToFit.calls.count()).toBe(0);
 
       // Simulate image load event
-      triggerImageLoadCapture(table.columns[1].optimalWidthMeasurer.$measurement.find('img'));
+      JQueryTesting.triggerImageLoadCapture(table.columns[1].optimalWidthMeasurer.$measurement.find('img'));
       // Image has been loaded and the promise is resolved -> _resizeToFit will be called
       expect(resizeToFit.calls.count()).toBe(1);
       expect(_resizeToFit.calls.count()).toBe(1);

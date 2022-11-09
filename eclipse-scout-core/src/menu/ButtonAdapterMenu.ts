@@ -8,14 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, ButtonAdapterMenuModel, ButtonModel, Event, EventHandler, GridData, Menu, MenuBar, PropertyChangeEvent} from '../index';
-import {ActionStyle, ActionTextPosition} from '../action/Action';
-import {ButtonDisplayStyle} from '../form/fields/button/Button';
-import {FormFieldLabelPosition} from '../form/fields/FormField';
-import {InitModelOf, ModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {
+  Action, ActionStyle, ActionTextPosition, Button, ButtonAdapterMenuModel, ButtonDisplayStyle, ButtonModel, Event, EventHandler, FormFieldLabelPosition, GridData, InitModelOf, Menu, MenuBar, PropertyChangeEvent, SomeRequired
+} from '../index';
 
-export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenuModel {
+export class ButtonAdapterMenu extends Menu implements ButtonAdapterMenuModel {
   declare model: ButtonAdapterMenuModel;
   declare initModel: SomeRequired<this['model'], 'button' | 'parent'>;
 

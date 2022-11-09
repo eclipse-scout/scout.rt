@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, StatusMenuMappingModel, Widget} from '../../index';
-import {StatusSeverity} from '../../status/Status';
-import {ObjectOrChildModel} from '../../scout';
-import {SomeRequired} from '../../types';
+import {Menu, ObjectOrChildModel, SomeRequired, StatusMenuMappingModel, StatusSeverity, Widget} from '../../index';
 
-export default class StatusMenuMapping extends Widget implements StatusMenuMappingModel {
+export class StatusMenuMapping extends Widget implements StatusMenuMappingModel {
   declare model: StatusMenuMappingModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'menu'>;
 

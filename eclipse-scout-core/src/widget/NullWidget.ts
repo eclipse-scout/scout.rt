@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NullWidgetEventMap, NullWidgetModel, Widget} from '../index';
-import {ObjectOrChildModel} from '../scout';
+import {NullWidgetEventMap, NullWidgetModel, ObjectOrChildModel, Widget} from '../index';
 
-export default class NullWidget extends Widget implements NullWidgetModel {
+export class NullWidget extends Widget implements NullWidgetModel {
   declare model: NullWidgetModel;
   declare eventMap: NullWidgetEventMap;
   declare self: NullWidget;

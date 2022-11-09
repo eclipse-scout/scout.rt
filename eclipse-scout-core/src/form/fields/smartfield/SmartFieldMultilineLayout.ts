@@ -13,7 +13,7 @@ import {AbstractLayout, HtmlComponent, HtmlEnvironment, SmartField} from '../../
 /**
  * This layout only layouts the INPUT and DIV part of the multi-line smart-field, not the entire form-field.
  */
-export default class SmartFieldMultilineLayout extends AbstractLayout {
+export class SmartFieldMultilineLayout extends AbstractLayout {
   smartField: SmartField<any>;
   htmlPropertyChangeHandler: () => void;
   rowHeight: number;

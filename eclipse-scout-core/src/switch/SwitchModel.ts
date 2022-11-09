@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface SwitchModel extends WidgetModel {
+export interface SwitchModel extends WidgetModel {
   /**
    * default is false
    */

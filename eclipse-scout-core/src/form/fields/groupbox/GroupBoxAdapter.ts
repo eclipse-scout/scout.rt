@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeFieldAdapter, FormField, GridData, GroupBox, ResponsiveManager, Widget} from '../../../index';
-import {ChildModelOf, FullModelOf} from '../../../scout';
+import {ChildModelOf, CompositeFieldAdapter, FormField, FullModelOf, GridData, GroupBox, ResponsiveManager, Widget} from '../../../index';
 
-export default class GroupBoxAdapter extends CompositeFieldAdapter {
+export class GroupBoxAdapter extends CompositeFieldAdapter {
   declare widget: GroupBox;
 
   constructor() {

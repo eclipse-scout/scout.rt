@@ -10,7 +10,7 @@
  */
 import {RadioButtonGroup} from '../../index';
 
-export default class SpecRadioButtonGroup extends RadioButtonGroup<any> {
+export class SpecRadioButtonGroup extends RadioButtonGroup<any> {
   override _setGridColumnCount(gridColumnCount: number): boolean {
     return super._setGridColumnCount(gridColumnCount);
   }

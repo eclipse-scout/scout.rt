@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuModel} from '../index';
-import {CalendarDisplayMode} from './Calendar';
+import {CalendarDisplayMode, MenuModel} from '../index';
 
-export default interface CalendarModeMenuModel extends MenuModel {
+export interface CalendarModeMenuModel extends MenuModel {
   displayMode?: CalendarDisplayMode;
 }

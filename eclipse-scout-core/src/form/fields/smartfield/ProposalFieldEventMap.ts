@@ -11,6 +11,6 @@
 
 import {PropertyChangeEvent, SmartFieldEventMap} from '../../../index';
 
-export default interface ProposalFieldEventMap extends SmartFieldEventMap<string> {
+export interface ProposalFieldEventMap extends SmartFieldEventMap<string> {
   'propertyChange:trimText': PropertyChangeEvent<boolean>;
 }

@@ -10,7 +10,7 @@
  */
 import {Button, Dimension, FormFieldLayout, graphics, HtmlCompPrefSizeOptions} from '../../../index';
 
-export default class ButtonLayout extends FormFieldLayout {
+export class ButtonLayout extends FormFieldLayout {
   declare formField: Button;
 
   constructor(button: Button) {

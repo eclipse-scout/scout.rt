@@ -9,16 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, arrays, Desktop, EventHandler, HtmlComponent, icons, KeyStrokeContext, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewMenuOpenKeyStroke, ViewMenuPopup, ViewMenuTabEventMap, ViewMenuTabModel, Widget
+  Action, arrays, Desktop, EventHandler, HtmlComponent, icons, InitModelOf, KeyStrokeContext, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewMenuOpenKeyStroke, ViewMenuPopup, ViewMenuTabEventMap, ViewMenuTabModel, Widget
 } from '../../index';
-import {InitModelOf} from '../../scout';
 
 /**
  * Shows a list of view buttons with displayStyle=MENU
  * and shows the title of the active view button, if the view button is one
  * of the view buttons contained in the menu.
  */
-export default class ViewMenuTab extends Widget implements ViewMenuTabModel {
+export class ViewMenuTab extends Widget implements ViewMenuTabModel {
   declare model: ViewMenuTabModel;
   declare eventMap: ViewMenuTabEventMap;
   declare self: ViewMenuTab;

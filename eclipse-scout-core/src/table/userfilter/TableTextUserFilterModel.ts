@@ -11,6 +11,6 @@
 
 import {TableUserFilterModel} from '../../index';
 
-export default interface TableTextUserFilterModel extends TableUserFilterModel {
+export interface TableTextUserFilterModel extends TableUserFilterModel {
   text?: string;
 }

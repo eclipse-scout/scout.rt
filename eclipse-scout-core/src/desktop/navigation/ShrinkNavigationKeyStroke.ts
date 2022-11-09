@@ -11,7 +11,7 @@
 import {Desktop, DesktopNavigationHandle, keys, KeyStroke, scout, ScoutKeyboardEvent} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class ShrinkNavigationKeyStroke extends KeyStroke {
+export class ShrinkNavigationKeyStroke extends KeyStroke {
   declare field: DesktopNavigationHandle;
   desktop: Desktop;
 

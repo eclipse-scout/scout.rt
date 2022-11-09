@@ -16,7 +16,7 @@ import {Logger, LogLevel, objects, strings} from '../index';
  * because otherwise some errors are hard to track. This is true especially for errors
  * that occur in a Promise. A developer should at least log these errors.
  */
-export default class NullLogger implements Logger {
+export class NullLogger implements Logger {
 
   trace() {
     // NOP - don't log trace, we don't want to spam the browser console

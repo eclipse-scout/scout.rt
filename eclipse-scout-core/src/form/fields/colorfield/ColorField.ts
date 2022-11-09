@@ -10,7 +10,7 @@
  */
 import {ValueField} from '../../../index';
 
-export default class ColorField extends ValueField<string> {
+export class ColorField extends ValueField<string> {
 
   protected override _render() {
     this.addContainer(this.$parent, 'color-field');

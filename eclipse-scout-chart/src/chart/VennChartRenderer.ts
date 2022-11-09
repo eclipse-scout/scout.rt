@@ -13,7 +13,7 @@ import $ from 'jquery';
 import {ChartValueGroup} from './Chart';
 import {LegendPositions} from './AbstractSvgChartRenderer';
 
-export default class VennChartRenderer extends AbstractSvgChartRenderer {
+export class VennChartRenderer extends AbstractSvgChartRenderer {
   animationTriggered: boolean;
 
   data: ChartValueGroup[];

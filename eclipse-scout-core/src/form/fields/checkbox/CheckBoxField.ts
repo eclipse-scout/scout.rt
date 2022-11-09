@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxFieldEventMap, CheckBoxFieldModel, CheckBoxToggleKeyStroke, Device, fields, KeyStrokeContext, styles, tooltips, ValueField} from '../../../index';
-import {AddCellEditorFieldCssClassesOptions} from '../FormField';
-import {InitModelOf} from '../../../scout';
+import {AddCellEditorFieldCssClassesOptions, CheckBoxFieldEventMap, CheckBoxFieldModel, CheckBoxToggleKeyStroke, Device, fields, InitModelOf, KeyStrokeContext, styles, tooltips, ValueField} from '../../../index';
 
-export default class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldModel {
+export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldModel {
   declare model: CheckBoxFieldModel;
   declare eventMap: CheckBoxFieldEventMap;
   declare self: CheckBoxField;

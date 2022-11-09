@@ -11,7 +11,7 @@
 import {InputFieldKeyStrokeContext, keys, KeyStrokeContext, keyStrokeModifier, Outline, scout, SearchOutlineEventMap, SearchOutlineLayout, SearchOutlineModel} from '../../index';
 import $ from 'jquery';
 
-export default class SearchOutline extends Outline implements SearchOutlineModel {
+export class SearchOutline extends Outline implements SearchOutlineModel {
   declare model: SearchOutlineModel;
   declare eventMap: SearchOutlineEventMap;
   declare self: SearchOutline;

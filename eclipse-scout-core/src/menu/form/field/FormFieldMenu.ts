@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnLayout, FormField, FormFieldMenuEventMap, FormFieldMenuModel, GridData, HtmlComponent, LogicalGridData, Menu} from '../../../index';
-import {CloneOptions} from '../../../widget/Widget';
-import {ObjectOrChildModel} from '../../../scout';
-import {SomeRequired} from '../../../types';
+import {CloneOptions, ColumnLayout, FormField, FormFieldMenuEventMap, FormFieldMenuModel, GridData, HtmlComponent, LogicalGridData, Menu, ObjectOrChildModel, SomeRequired} from '../../../index';
 
-export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
+export class FormFieldMenu extends Menu implements FormFieldMenuModel {
   declare model: FormFieldMenuModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
   declare eventMap: FormFieldMenuEventMap;

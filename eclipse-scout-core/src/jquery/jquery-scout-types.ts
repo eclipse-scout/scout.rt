@@ -8,19 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, IconDesc, Logger, Point, Predicate, ResizableModel} from '../index';
+import {Dimension, IconDesc, Logger, OldWheelEvent, Point, Predicate, ResizableModel} from '../index';
 import $ from 'jquery';
-import {OldWheelEvent} from '../types';
 import Deferred = JQuery.Deferred;
 
-interface InjectOptions {
+export interface InjectOptions {
   /**
    * Which document to inject the script to. Default is window.document
    */
   document: Document;
 }
 
-interface InjectScriptOptions extends InjectOptions {
+export interface InjectScriptOptions extends InjectOptions {
   /**
    * Whether to remove the script tag again from the DOM after the script has been loaded. Default is false.
    */

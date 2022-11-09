@@ -10,7 +10,7 @@
  */
 import {ActionModel} from '../../index';
 
-export default interface TableControlModel extends ActionModel {
+export interface TableControlModel extends ActionModel {
   height?: number;
   animateDuration?: number;
   resizerVisible?: boolean;

@@ -11,7 +11,7 @@
 import {keys, KeyStroke, Table} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class TableCopyKeyStroke extends KeyStroke {
+export class TableCopyKeyStroke extends KeyStroke {
   declare field: Table;
 
   constructor(table: Table) {

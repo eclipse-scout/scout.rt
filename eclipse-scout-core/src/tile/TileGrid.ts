@@ -9,17 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractGrid, arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Filter, FilterOrFunction, FilterResult, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGrid,
-  LogicalGridData, Menu, MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Predicate, Range, scout, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig,
-  TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke,
-  TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
+  AbstractGrid, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf, KeyStrokeContext,
+  LoadingSupport, LogicalGrid, LogicalGridData, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range, scout, ScrollToOptions, TextFilter, Tile,
+  TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke,
+  TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
-import {Comparator} from '../types';
-import TileGridModel from './TileGridModel';
-import {MenuFilter} from '../menu/Menu';
-import {ScrollToOptions} from '../scrollbar/scrollbars';
-import {FullModelOf, InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../scout';
 
 /**
  * Only select top-level tile elements. Do not select elements with a 'tile' class deeper in the tree.
@@ -27,7 +22,7 @@ import {FullModelOf, InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../sc
  */
 const TILE_SELECTOR = '> .tile';
 
-export default class TileGrid extends Widget implements TileGridModel {
+export class TileGrid extends Widget implements TileGridModel {
   declare model: TileGridModel;
   declare eventMap: TileGridEventMap;
   declare self: TileGrid;

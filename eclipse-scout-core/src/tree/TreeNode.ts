@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, objects, scout, Session, styles, texts, Tree, TreeNodeModel} from '../index';
+import {icons, InitModelOf, objects, scout, Session, SomeRequired, styles, texts, Tree, TreeNodeModel} from '../index';
 import $ from 'jquery';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 
-export default class TreeNode implements TreeNodeModel {
+export class TreeNode implements TreeNodeModel {
   declare model: TreeNodeModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
 

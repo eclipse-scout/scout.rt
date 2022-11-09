@@ -10,6 +10,6 @@
  */
 import {ActionModel} from '../index';
 
-export default interface BreadcrumbItemModel extends ActionModel {
+export interface BreadcrumbItemModel extends ActionModel {
   ref?: any;
 }

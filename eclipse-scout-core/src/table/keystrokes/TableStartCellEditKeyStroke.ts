@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke, ScoutKeyboardEvent, Table} from '../../index';
-import {TableCellPosition} from '../Table';
+import {keys, KeyStroke, ScoutKeyboardEvent, Table, TableCellPosition} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class TableStartCellEditKeyStroke extends KeyStroke {
+export class TableStartCellEditKeyStroke extends KeyStroke {
   declare field: Table;
 
   constructor(table: Table) {

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, DesktopLogoEventMap, DesktopLogoModel, EventHandler, HtmlComponent, Image, PropertyChangeEvent, scout, Widget} from '../index';
-import {InitModelOf} from '../scout';
+import {Desktop, DesktopLogoEventMap, DesktopLogoModel, EventHandler, HtmlComponent, Image, InitModelOf, PropertyChangeEvent, scout, Widget} from '../index';
 
-export default class DesktopLogo extends Widget implements DesktopLogoModel {
+export class DesktopLogo extends Widget implements DesktopLogoModel {
   declare model: DesktopLogoModel;
   declare eventMap: DesktopLogoEventMap;
   declare self: DesktopLogo;

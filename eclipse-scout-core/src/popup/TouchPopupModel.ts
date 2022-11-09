@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupModel} from '../index';
-import {TouchPopupField} from './TouchPopup';
+import {PopupModel, TouchPopupField} from '../index';
 
-export default interface TouchPopupModel extends PopupModel {
+export interface TouchPopupModel extends PopupModel {
   field?: TouchPopupField;
 }

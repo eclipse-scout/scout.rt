@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Box, Device, strings, TextMap} from '../index';
+import {Box, Device, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
 import $ from 'jquery';
-import LoginAppModel from './LoginAppModel';
-import {InitModelOf} from '../scout';
 
-export default class LoginBox extends Box {
+export class LoginBox extends Box {
   declare model: LoginAppModel;
 
   ajaxOptions: JQuery.AjaxSettings;

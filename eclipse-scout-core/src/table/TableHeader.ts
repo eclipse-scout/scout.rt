@@ -9,15 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, inspector, MenuBar, MenuDestinations, objects, PropertyChangeEvent, scout, scrollbars, strings, styles, Table, TableHeaderEventMap,
-  TableHeaderMenu, TableHeaderModel, tooltips, Widget
+  arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, objects, PropertyChangeEvent, scout, scrollbars, SomeRequired, strings, styles,
+  Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
 } from '../index';
 import $ from 'jquery';
-import {TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent} from './TableEventMap';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 
-export default class TableHeader extends Widget implements TableHeaderModel {
+export class TableHeader extends Widget implements TableHeaderModel {
   declare model: TableHeaderModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'table'>;
   declare eventMap: TableHeaderEventMap;

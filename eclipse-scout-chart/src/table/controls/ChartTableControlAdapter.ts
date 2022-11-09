@@ -10,7 +10,7 @@
  */
 import {TableControlAdapter} from '@eclipse-scout/core';
 
-export default class ChartTableControlAdapter extends TableControlAdapter {
+export class ChartTableControlAdapter extends TableControlAdapter {
 
   constructor() {
     super();

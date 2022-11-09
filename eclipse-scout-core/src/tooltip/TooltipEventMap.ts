@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, PropertyChangeEvent, WidgetEventMap} from '../index';
-import {StatusSeverity} from '../status/Status';
+import {Menu, PropertyChangeEvent, StatusSeverity, WidgetEventMap} from '../index';
 
-export default interface TooltipEventMap extends WidgetEventMap {
+export interface TooltipEventMap extends WidgetEventMap {
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;
   'propertyChange:severity': PropertyChangeEvent<StatusSeverity>;
   'propertyChange:text': PropertyChangeEvent<string>;

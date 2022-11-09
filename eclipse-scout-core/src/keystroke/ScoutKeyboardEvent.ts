@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {KeyStrokeMode} from './KeyStroke';
+import {KeyStrokeMode} from '../index';
 
 /**
  * Common interface between {@link VirtualKeyStrokeEvent} and {@link JQuery.KeyboardEventBase}
  */
-export default interface ScoutKeyboardEvent {
+export interface ScoutKeyboardEvent {
   /**
    * @see JQuery.KeyboardEventBase.which
    */

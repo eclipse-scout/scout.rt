@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, EventHandler, HtmlComponent, OutlineOverview, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOutlineOverviewEventMap, TileOutlineOverviewModel} from '../../../index';
-import {InitModelOf} from '../../../scout';
+import {Desktop, EventHandler, HtmlComponent, InitModelOf, OutlineOverview, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOutlineOverviewEventMap, TileOutlineOverviewModel} from '../../../index';
 
-export default class TileOutlineOverview extends OutlineOverview implements TileOutlineOverviewModel {
+export class TileOutlineOverview extends OutlineOverview implements TileOutlineOverviewModel {
   declare model: TileOutlineOverviewModel;
   declare eventMap: TileOutlineOverviewEventMap;
   declare self: TileOutlineOverview;

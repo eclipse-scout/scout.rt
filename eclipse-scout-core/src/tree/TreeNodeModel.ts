@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Session, Tree, TreeNode} from '../index';
-import {ObjectModel, ObjectOrModel} from '../scout';
+import {ObjectModel, ObjectOrModel, Session, Tree, TreeNode} from '../index';
 
-export default interface TreeNodeModel extends ObjectModel<TreeNode> {
+export interface TreeNodeModel extends ObjectModel<TreeNode> {
   parent?: Tree;
   checked?: boolean;
   childNodes?: ObjectOrModel<TreeNode>[];

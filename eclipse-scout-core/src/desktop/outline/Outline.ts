@@ -9,17 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, GroupBox, GroupBoxMenuItemsOrder, HtmlComponent, Icon, KeyStrokeContext,
-  keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator,
-  OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree,
-  TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, Widget
+  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget, GroupBox, GroupBoxMenuItemsOrder,
+  HtmlComponent, Icon, InitModelOf, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, ObjectOrChildModel,
+  ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel, PropertyChangeEvent, scout, Table,
+  TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke,
+  TreeNavigationUpKeyStroke, Widget
 } from '../../index';
-import DisplayParent from '../DisplayParent';
-import {GlassPaneTarget} from '../../widget/Widget';
-import {OutlineContent} from '../bench/DesktopBench';
-import {FullModelOf, InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../../scout';
 
-export default class Outline extends Tree implements DisplayParent, OutlineModel {
+export class Outline extends Tree implements DisplayParent, OutlineModel {
   declare model: OutlineModel;
   declare eventMap: OutlineEventMap;
   declare self: Outline;

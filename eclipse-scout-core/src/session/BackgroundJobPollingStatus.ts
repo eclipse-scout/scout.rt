@@ -9,10 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-enum BackgroundJobPollingStatus {
+export enum BackgroundJobPollingStatus {
   STOPPED = 'stopped',
   RUNNING = 'running',
   FAILURE = 'failure'
 }
-
-export default BackgroundJobPollingStatus;

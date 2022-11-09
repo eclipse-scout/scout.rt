@@ -11,7 +11,7 @@
 
 import {PropertyChangeEvent, ValueFieldEventMap} from '../../index';
 
-export default interface BasicFieldEventMap<TValue> extends ValueFieldEventMap<TValue> {
+export interface BasicFieldEventMap<TValue> extends ValueFieldEventMap<TValue> {
   'propertyChange:updateDisplayTextOnModify': PropertyChangeEvent<boolean>;
   'propertyChange:updateDisplayTextOnModifyDelay': PropertyChangeEvent<number>;
 }

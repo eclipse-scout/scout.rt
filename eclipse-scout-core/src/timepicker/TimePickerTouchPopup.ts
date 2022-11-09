@@ -8,13 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, ParsingFailedStatus, scout, TimePicker, TouchPopup} from '../index';
-import TimePickerTouchPopupModel from './TimePickerTouchPopupModel';
-import {DateFieldAcceptInputEvent} from '../form/fields/datefield/DateFieldEventMap';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {DateField, DateFieldAcceptInputEvent, InitModelOf, ParsingFailedStatus, scout, SomeRequired, TimePicker, TimePickerTouchPopupModel, TouchPopup} from '../index';
 
-export default class TimePickerTouchPopup extends TouchPopup implements TimePickerTouchPopupModel {
+export class TimePickerTouchPopup extends TouchPopup implements TimePickerTouchPopupModel {
   declare model: TimePickerTouchPopupModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'field' | 'timeResolution'>;
   declare _widget: TimePicker;

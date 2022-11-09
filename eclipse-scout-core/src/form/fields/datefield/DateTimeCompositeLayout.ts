@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, DateField, Dimension, EventHandler, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, Insets, PropertyChangeEvent} from '../../../index';
 
-export default class DateTimeCompositeLayout extends AbstractLayout {
+export class DateTimeCompositeLayout extends AbstractLayout {
   MIN_DATE_FIELD_WIDTH: number;
   PREF_DATE_FIELD_WIDTH: number;
   MIN_TIME_FIELD_WIDTH: number;

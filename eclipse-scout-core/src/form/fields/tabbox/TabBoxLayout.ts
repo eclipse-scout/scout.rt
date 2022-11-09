@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, EventHandler, FormField, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, TabBox} from '../../../index';
 
-export default class TabBoxLayout extends AbstractLayout {
+export class TabBoxLayout extends AbstractLayout {
   htmlPropertyChangeHandler: EventHandler;
   protected _tabBox: TabBox;
   private _statusWidth: number;

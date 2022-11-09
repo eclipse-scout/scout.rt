@@ -10,5 +10,5 @@
  */
 import {ValueFieldAdapter} from '../../../index';
 
-export default class ClipboardFieldAdapter extends ValueFieldAdapter {
+export class ClipboardFieldAdapter extends ValueFieldAdapter {
 }

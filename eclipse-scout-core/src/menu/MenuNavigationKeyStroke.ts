@@ -10,7 +10,7 @@
  */
 import {ContextMenuPopup, KeyStroke, ScoutKeyboardEvent} from '../index';
 
-export default class MenuNavigationKeyStroke extends KeyStroke {
+export class MenuNavigationKeyStroke extends KeyStroke {
   declare field: ContextMenuPopup;
 
   protected _menuItemClass: string;

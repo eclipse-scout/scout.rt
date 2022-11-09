@@ -10,7 +10,7 @@
  */
 import {OutlineModel} from '../../index';
 
-export default interface SearchOutlineModel extends OutlineModel {
+export interface SearchOutlineModel extends OutlineModel {
   hasText?: boolean;
   searchQuery?: string;
   searchStatus?: string;

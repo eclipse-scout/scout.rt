@@ -11,7 +11,7 @@
 import {AbstractLayout, Dimension, EllipsisMenu, EventHandler, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Menu, PropertyChangeEvent, scout, Tab, TabArea} from '../../../index';
 import $ from 'jquery';
 
-export default class TabAreaLayout extends AbstractLayout {
+export class TabAreaLayout extends AbstractLayout {
   tabArea: TabArea;
   overflowTabs: Tab[];
   visibleTabs: Tab[];

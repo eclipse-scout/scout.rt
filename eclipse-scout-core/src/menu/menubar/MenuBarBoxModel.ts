@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, WidgetModel} from '../../index';
-import {TooltipPosition} from '../../tooltip/Tooltip';
-import {ObjectOrChildModel} from '../../scout';
+import {Menu, ObjectOrChildModel, TooltipPosition, WidgetModel} from '../../index';
 
-export default interface MenuBarBoxModel extends WidgetModel {
+export interface MenuBarBoxModel extends WidgetModel {
   menuItems?: ObjectOrChildModel<Menu>[];
   tooltipPosition?: TooltipPosition;
 }

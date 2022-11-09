@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys} from '../../src/index';
-import {TableSpecHelper} from '../../src/testing/index';
-import {triggerKeyDown, triggerKeyDownCapture, triggerKeyUpCapture} from '../../src/testing/jquery-testing';
+import {JQueryTesting, TableSpecHelper} from '../../src/testing/index';
 
 describe('TableKeyStrokes', () => {
   let session: SandboxSession;
@@ -40,11 +39,11 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [row2]);
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [table.rows[1]]);
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -54,7 +53,7 @@ describe('TableKeyStrokes', () => {
 
       table.render();
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [table.rows[4]]);
     });
 
@@ -65,7 +64,7 @@ describe('TableKeyStrokes', () => {
       table.render();
       table.selectAll();
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [table.rows[3]]);
     });
 
@@ -75,13 +74,13 @@ describe('TableKeyStrokes', () => {
 
       table.render();
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -93,7 +92,7 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [rows[0], rows[1]]);
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [rows[0], rows[1]]);
     });
 
@@ -107,7 +106,7 @@ describe('TableKeyStrokes', () => {
 
       table.selectionHandler.lastActionRow = rows[2];
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [rows[1]]);
     });
 
@@ -121,7 +120,7 @@ describe('TableKeyStrokes', () => {
 
       table.selectionHandler.lastActionRow = rows[4];
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -135,7 +134,7 @@ describe('TableKeyStrokes', () => {
 
       table.selectionHandler.lastActionRow = rows[4];
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -153,7 +152,7 @@ describe('TableKeyStrokes', () => {
         accept: row => row !== rows[4]
       });
 
-      triggerKeyDown(table.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.UP);
       helper.assertSelection(table, [rows[0]]);
     });
 
@@ -166,11 +165,11 @@ describe('TableKeyStrokes', () => {
         table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[1], rows[2]]);
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
@@ -184,11 +183,11 @@ describe('TableKeyStrokes', () => {
 
         table.selectionHandler.lastActionRow = rows[4];
 
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[2], rows[3]]);
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[2]]);
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[1], rows[2]]);
       });
 
@@ -202,11 +201,11 @@ describe('TableKeyStrokes', () => {
 
         table.selectionHandler.lastActionRow = rows[5];
 
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[2], rows[4], rows[5]]);
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5]]);
-        triggerKeyDown(table.$data, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.UP, 'shift');
         helper.assertSelection(table, [rows[1], rows[2], rows[3], rows[4], rows[5]]);
       });
 
@@ -223,11 +222,11 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [row2]);
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [table.rows[3]]);
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [table.rows[4]]);
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [table.rows[4]]);
     });
 
@@ -237,7 +236,7 @@ describe('TableKeyStrokes', () => {
 
       table.render();
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -248,7 +247,7 @@ describe('TableKeyStrokes', () => {
       table.render();
       table.selectAll();
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [table.rows[1]]);
     });
 
@@ -258,13 +257,13 @@ describe('TableKeyStrokes', () => {
 
       table.render();
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -276,7 +275,7 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [rows[3], rows[4]]);
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [rows[3], rows[4]]);
     });
 
@@ -290,7 +289,7 @@ describe('TableKeyStrokes', () => {
 
       table.selectionHandler.lastActionRow = rows[2];
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -304,7 +303,7 @@ describe('TableKeyStrokes', () => {
 
       table.selectionHandler.lastActionRow = rows[2];
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -322,7 +321,7 @@ describe('TableKeyStrokes', () => {
         accept: row => row !== rows[1]
       });
 
-      triggerKeyDown(table.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.DOWN);
       helper.assertSelection(table, [rows[5]]);
     });
 
@@ -335,11 +334,11 @@ describe('TableKeyStrokes', () => {
         table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3]]);
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4]]);
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4]]);
       });
 
@@ -353,11 +352,11 @@ describe('TableKeyStrokes', () => {
 
         table.selectionHandler.lastActionRow = rows[2];
 
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[3], rows[4]]);
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[4]]);
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[4], rows[5]]);
       });
 
@@ -371,11 +370,11 @@ describe('TableKeyStrokes', () => {
 
         table.selectionHandler.lastActionRow = rows[2];
 
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[5]]);
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5]]);
-        triggerKeyDown(table.$data, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5], rows[6]]);
       });
 
@@ -392,7 +391,7 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [rows[1]]);
 
-      triggerKeyDown(table.$data, keys.END);
+      JQueryTesting.triggerKeyDown(table.$data, keys.END);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -405,7 +404,7 @@ describe('TableKeyStrokes', () => {
         table.render();
         helper.selectRowsAndAssert(table, [rows[1]]);
 
-        triggerKeyDown(table.$data, keys.END, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[1], rows[2], rows[3]]);
       });
 
@@ -416,7 +415,7 @@ describe('TableKeyStrokes', () => {
         table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
 
-        triggerKeyDown(table.$data, keys.END, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[1], rows[3], rows[4], rows[5]]);
       });
 
@@ -428,7 +427,7 @@ describe('TableKeyStrokes', () => {
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
         table.selectionHandler.lastActionRow = rows[1];
 
-        triggerKeyDown(table.$data, keys.END, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[1], rows[2], rows[3], rows[4], rows[5]]);
       });
 
@@ -446,7 +445,7 @@ describe('TableKeyStrokes', () => {
           accept: row => row !== rows[1]
         });
 
-        triggerKeyDown(table.$data, keys.END, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[3], rows[4], rows[5]]);
       });
 
@@ -457,7 +456,7 @@ describe('TableKeyStrokes', () => {
         table.render();
         helper.selectRowsAndAssert(table, [rows[5]]);
 
-        triggerKeyDown(table.$data, keys.END, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[5]]);
       });
 
@@ -469,7 +468,7 @@ describe('TableKeyStrokes', () => {
         helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
         table.selectionHandler.lastActionRow = rows[0];
 
-        triggerKeyDown(table.$data, keys.END, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.END, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
@@ -486,7 +485,7 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [rows[2]]);
 
-      triggerKeyDown(table.$data, keys.HOME);
+      JQueryTesting.triggerKeyDown(table.$data, keys.HOME);
       helper.assertSelection(table, [rows[0]]);
     });
 
@@ -499,7 +498,7 @@ describe('TableKeyStrokes', () => {
         table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
-        triggerKeyDown(table.$data, keys.HOME, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
@@ -510,7 +509,7 @@ describe('TableKeyStrokes', () => {
         table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[5]]);
 
-        triggerKeyDown(table.$data, keys.HOME, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2], rows[3], rows[5]]);
       });
 
@@ -522,7 +521,7 @@ describe('TableKeyStrokes', () => {
         helper.selectRowsAndAssert(table, [rows[1], rows[2], rows[4]]);
         table.selectionHandler.lastActionRow = rows[4];
 
-        triggerKeyDown(table.$data, keys.HOME, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2], rows[3], rows[4]]);
       });
 
@@ -540,7 +539,7 @@ describe('TableKeyStrokes', () => {
           accept: row => row !== rows[4]
         });
 
-        triggerKeyDown(table.$data, keys.HOME, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[3]]);
       });
 
@@ -551,7 +550,7 @@ describe('TableKeyStrokes', () => {
         table.render();
         helper.selectRowsAndAssert(table, [rows[0]]);
 
-        triggerKeyDown(table.$data, keys.HOME, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0]]);
       });
 
@@ -563,7 +562,7 @@ describe('TableKeyStrokes', () => {
         helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
         table.selectionHandler.lastActionRow = rows[2];
 
-        triggerKeyDown(table.$data, keys.HOME, 'shift');
+        JQueryTesting.triggerKeyDown(table.$data, keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
@@ -581,7 +580,7 @@ describe('TableKeyStrokes', () => {
       table.checkRow(rows[2], true);
       table.render();
 
-      triggerKeyDown(table.$data, keys.SPACE);
+      JQueryTesting.triggerKeyDown(table.$data, keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(true);
@@ -596,7 +595,7 @@ describe('TableKeyStrokes', () => {
       table.render();
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
-      triggerKeyDown(table.$data, keys.SPACE);
+      JQueryTesting.triggerKeyDown(table.$data, keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(true);
       expect(rows[2].checked).toBe(true);
@@ -612,14 +611,14 @@ describe('TableKeyStrokes', () => {
       table.checkRow(rows[2], true);
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
-      triggerKeyDownCapture(table.$data, keys.SPACE);
+      JQueryTesting.triggerKeyDownCapture(table.$data, keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(true);
       expect(rows[2].checked).toBe(true);
       expect(rows[3].checked).toBe(false);
 
-      triggerKeyUpCapture(table.$data, keys.SPACE);
-      triggerKeyDownCapture(table.$data, keys.SPACE);
+      JQueryTesting.triggerKeyUpCapture(table.$data, keys.SPACE);
+      JQueryTesting.triggerKeyDownCapture(table.$data, keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(false);
@@ -638,7 +637,7 @@ describe('TableKeyStrokes', () => {
       table.checkRow(rows[3], true);
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
-      triggerKeyDown(table.$data, keys.SPACE);
+      JQueryTesting.triggerKeyDown(table.$data, keys.SPACE);
       expect(rows[0].checked).toBe(true);
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(false);
@@ -655,13 +654,13 @@ describe('TableKeyStrokes', () => {
 
       table.render();
 
-      triggerKeyDown(table.$data, keys.PAGE_UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.PAGE_UP);
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
-      triggerKeyDown(table.$data, keys.PAGE_UP);
+      JQueryTesting.triggerKeyDown(table.$data, keys.PAGE_UP);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -675,13 +674,13 @@ describe('TableKeyStrokes', () => {
 
       table.render();
 
-      triggerKeyDown(table.$data, keys.PAGE_DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.PAGE_DOWN);
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
-      triggerKeyDown(table.$data, keys.PAGE_DOWN);
+      JQueryTesting.triggerKeyDown(table.$data, keys.PAGE_DOWN);
       helper.assertSelection(table, [table.rows[0]]);
     });
 

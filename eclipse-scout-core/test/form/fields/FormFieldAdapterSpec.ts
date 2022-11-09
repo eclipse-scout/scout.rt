@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldAdapter, Status} from '../../../src/index';
+import {FormField, FormFieldAdapter, RemoteEvent, Status} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
-import RemoteEvent from '../../../src/session/RemoteEvent';
 
 describe('FormFieldAdapter', () => {
   let session: SandboxSession;

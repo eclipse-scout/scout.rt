@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel, TabItem} from '../../../index';
-import {TabAreaStyle} from './TabArea';
-import {ObjectOrChildModel} from '../../../scout';
+import {FormFieldModel, ObjectOrChildModel, TabAreaStyle, TabItem} from '../../../index';
 
-export default interface TabBoxModel extends FormFieldModel {
+export interface TabBoxModel extends FormFieldModel {
   /**
    * The tab, that should be selected initially.
    * If a string is provided, the tab will be resolved automatically.

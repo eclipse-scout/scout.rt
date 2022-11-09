@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, Table, TableRow} from '../index';
-import {ObjectOrModel} from '../scout';
+import {arrays, ObjectOrModel, objects, Table, TableRow} from '../index';
 
-export default class TableUpdateBuffer {
+export class TableUpdateBuffer {
   promises: JQuery.Promise<any>[];
   table: Table;
   protected _rowMap: Record<string, ObjectOrModel<TableRow>>;

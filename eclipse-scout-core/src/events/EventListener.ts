@@ -10,7 +10,7 @@
  */
 import {EventHandler} from '../index';
 
-export default interface EventListener {
+export interface EventListener {
   func: EventHandler;
   type?: string;
   origFunc?: EventHandler;

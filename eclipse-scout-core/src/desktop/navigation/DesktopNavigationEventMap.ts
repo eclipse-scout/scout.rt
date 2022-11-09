@@ -10,7 +10,7 @@
  */
 import {Outline, PropertyChangeEvent, WidgetEventMap} from '../../index';
 
-export default interface DesktopNavigationEventMap extends WidgetEventMap {
+export interface DesktopNavigationEventMap extends WidgetEventMap {
   'propertyChange:handleVisible': PropertyChangeEvent<boolean>;
   'propertyChange:outline': PropertyChangeEvent<Outline>;
   'propertyChange:toolBoxVisible': PropertyChangeEvent<boolean>;

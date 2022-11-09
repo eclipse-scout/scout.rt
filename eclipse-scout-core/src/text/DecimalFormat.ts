@@ -20,7 +20,7 @@ import {Locale, numbers, RoundingMode, scout, strings} from '../index';
  *   <li>%</li>
  * </ul>
  */
-export default class DecimalFormat {
+export class DecimalFormat {
   positivePrefix: string;
   positiveSuffix: string;
   negativePrefix: string;

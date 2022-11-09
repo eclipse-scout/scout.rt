@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import jasmineScoutMatchers from '../../src/testing/scoutMatchers';
-import {RemoteRequestData} from '../../src/session/Session';
+import {jasmineScoutMatchers} from '../../src/testing/index';
+import {RemoteRequestData} from '../../src/index';
 
 describe('JasmineScout', () => {
 

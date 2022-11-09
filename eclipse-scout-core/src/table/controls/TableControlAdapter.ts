@@ -10,7 +10,7 @@
  */
 import {ActionAdapter, TableControl} from '../../index';
 
-export default class TableControlAdapter extends ActionAdapter {
+export class TableControlAdapter extends ActionAdapter {
   declare widget: TableControl;
 
   protected override _goOffline() {

@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonTile, EventHandler, KeyStrokeContext, Outline, Page, PageTileButton, PageTileGridEventMap, PageTileGridModel, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig} from '../../../index';
-import {TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeNodeChangedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent} from '../../../tree/TreeEventMap';
-import {OutlinePageChangedEvent} from '../OutlineEventMap';
-import {InitModelOf} from '../../../scout';
+import {
+  ButtonTile, EventHandler, InitModelOf, KeyStrokeContext, Outline, OutlinePageChangedEvent, Page, PageTileButton, PageTileGridEventMap, PageTileGridModel, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig,
+  TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeNodeChangedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent
+} from '../../../index';
 
-export default class PageTileGrid extends TileGrid implements PageTileGridModel {
+export class PageTileGrid extends TileGrid implements PageTileGridModel {
   declare model: PageTileGridModel;
   declare eventMap: PageTileGridEventMap;
   declare self: PageTileGrid;

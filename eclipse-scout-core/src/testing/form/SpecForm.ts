@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Form, Status} from '../../index';
-import SpecLifecycle from './SpecLifecycle';
+import {SpecLifecycle} from '../index';
 
-export default class SpecForm extends Form {
+export class SpecForm extends Form {
   declare lifecycle: SpecLifecycle;
 
   override _load(): JQuery.Promise<object> {

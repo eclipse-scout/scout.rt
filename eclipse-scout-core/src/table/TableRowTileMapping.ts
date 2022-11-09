@@ -10,7 +10,7 @@
  */
 import {TableRowTileMappingModel, Tile, Widget} from '../index';
 
-export default class TableRowTileMapping extends Widget implements TableRowTileMappingModel {
+export class TableRowTileMapping extends Widget implements TableRowTileMappingModel {
   declare model: TableRowTileMappingModel;
 
   tableRow: string;

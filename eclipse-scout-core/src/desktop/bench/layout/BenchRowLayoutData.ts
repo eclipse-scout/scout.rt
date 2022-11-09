@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BenchRowLayoutDataModel, FlexboxLayoutData, scout} from '../../../index';
-import {InitModelOf} from '../../../scout';
+import {BenchRowLayoutDataModel, FlexboxLayoutData, InitModelOf, scout} from '../../../index';
 
-export default class BenchRowLayoutData extends FlexboxLayoutData implements BenchRowLayoutDataModel {
+export class BenchRowLayoutData extends FlexboxLayoutData implements BenchRowLayoutDataModel {
   declare model: BenchRowLayoutDataModel;
 
   rows: FlexboxLayoutData[];

@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableUserFilterModel} from '@eclipse-scout/core';
-import {TableMatrixKeyAxis} from '@eclipse-scout/core/src/table/TableMatrix';
+import {TableMatrixKeyAxis, TableUserFilterModel} from '@eclipse-scout/core';
 import {TableControlDeterministicKey} from './ChartTableControl';
 
-export default interface ChartTableUserFilterModel extends TableUserFilterModel {
+export interface ChartTableUserFilterModel extends TableUserFilterModel {
   text?: string;
   xAxis?: TableMatrixKeyAxis;
   yAxis?: TableMatrixKeyAxis;

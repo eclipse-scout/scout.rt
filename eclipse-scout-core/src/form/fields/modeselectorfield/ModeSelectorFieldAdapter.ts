@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModeSelector, ModeSelectorField, ValueFieldAdapter, Widget} from '../../../index';
-import {FullModelOf} from '../../../scout';
+import {FullModelOf, ModeSelector, ModeSelectorField, ValueFieldAdapter, Widget} from '../../../index';
 
-export default class ModeSelectorFieldAdapter extends ValueFieldAdapter {
+export class ModeSelectorFieldAdapter extends ValueFieldAdapter {
   declare widget: ModeSelectorField<any>;
 
   protected override _createWidget(model: FullModelOf<ModeSelectorField<any>>): Widget {

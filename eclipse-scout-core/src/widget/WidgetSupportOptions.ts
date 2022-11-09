@@ -1,6 +1,6 @@
 import {Widget} from '../index';
 
-export default interface WidgetSupportOptions {
+export interface WidgetSupportOptions {
   /**
    * Widget that created the support
    */

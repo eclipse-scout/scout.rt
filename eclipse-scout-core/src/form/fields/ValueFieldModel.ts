@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel} from '../../index';
-import {ValueFieldClearable, ValueFieldFormatter, ValueFieldParser, ValueFieldValidator} from './ValueField';
+import {FormFieldModel, ValueFieldClearable, ValueFieldFormatter, ValueFieldParser, ValueFieldValidator} from '../../index';
 
-export default interface ValueFieldModel<TValue extends TModelValue, TModelValue = TValue> extends FormFieldModel {
+export interface ValueFieldModel<TValue extends TModelValue, TModelValue = TValue> extends FormFieldModel {
   validator?: ValueFieldValidator<TValue>;
   validators?: ValueFieldValidator<TValue>[];
   clearable?: ValueFieldClearable;

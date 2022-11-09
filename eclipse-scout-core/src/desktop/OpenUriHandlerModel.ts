@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {OpenUriHandler, Session} from '../index';
-import {ObjectModel} from '../scout';
+import {ObjectModel, OpenUriHandler, Session} from '../index';
 
-export default interface OpenUriHandlerModel extends ObjectModel<OpenUriHandler> {
+export interface OpenUriHandlerModel extends ObjectModel<OpenUriHandler> {
   session?: Session;
 }

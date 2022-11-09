@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, DesktopTab, Form, SimpleTabArea} from '../../index';
-import DesktopTabAreaLayout from './DesktopTabAreaLayout';
+import {AbstractLayout, DesktopTab, DesktopTabAreaLayout, Form, SimpleTabArea} from '../../index';
 
-export default class DesktopTabArea extends SimpleTabArea<Form> {
+export class DesktopTabArea extends SimpleTabArea<Form> {
   declare tabs: DesktopTab[];
 
   protected override _render() {

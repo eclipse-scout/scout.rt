@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, EnumObject, HAlign, Key, keys, KeyStrokeModel, scout, ScoutKeyboardEvent, Widget} from '../index';
+import {Action, EnumObject, HAlign, Key, keys, KeyStrokeFirePolicy, KeyStrokeModel, scout, ScoutKeyboardEvent, Widget} from '../index';
 import $ from 'jquery';
-import {KeyStrokeFirePolicy} from '../action/Action';
 
-export default class KeyStroke implements KeyStrokeModel {
+export class KeyStroke implements KeyStrokeModel {
   declare model: KeyStrokeModel;
 
   field?: Widget;

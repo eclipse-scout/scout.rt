@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BenchColumnLayoutData, Desktop, Event, Form, KeyStroke, Menu, Popup, PropertyChangeEvent, ViewButton, Widget, WidgetEventMap} from '../index';
-import {DesktopDisplayStyle, DesktopHistoryState, NativeNotificationDefaults} from './Desktop';
+import {BenchColumnLayoutData, Desktop, DesktopDisplayStyle, DesktopHistoryState, Event, Form, KeyStroke, Menu, NativeNotificationDefaults, Popup, PropertyChangeEvent, ViewButton, Widget, WidgetEventMap} from '../index';
 
 export interface DesktopCancelFormsEvent<T = Desktop> extends Event<T> {
   forms: Form[];
@@ -23,7 +22,7 @@ export interface DesktopPopupOpenEvent<T = Desktop> extends Event<T> {
   popup: Popup;
 }
 
-export default interface DesktopEventMap extends WidgetEventMap {
+export interface DesktopEventMap extends WidgetEventMap {
   'animationEnd': Event;
   'cancelForms': DesktopCancelFormsEvent;
   'dataChange': Event;

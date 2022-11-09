@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default interface KeyStrokeModel {
+export interface KeyStrokeModel {
   alt?: boolean;
   ctrl?: boolean;
   shift?: boolean;

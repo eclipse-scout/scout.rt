@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Desktop, EventHandler, Form, HtmlComponent, Outline, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOverviewFormEventMap, TileOverviewFormModel} from '../index';
-import {InitModelOf} from '../scout';
+import {Desktop, EventHandler, Form, HtmlComponent, InitModelOf, Outline, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOverviewFormEventMap, TileOverviewFormModel} from '../index';
 
-export default class TileOverviewForm extends Form implements TileOverviewFormModel {
+export class TileOverviewForm extends Form implements TileOverviewFormModel {
   declare model: TileOverviewFormModel;
   declare eventMap: TileOverviewFormEventMap;
   declare self: TileOverviewForm;

@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {ObjectModel} from '../scout';
-import {ViewportScroller} from '../index';
+import {ObjectModel, ViewportScroller} from '../index';
 
-export default interface ViewportScrollerModel extends ObjectModel<ViewportScroller> {
+export interface ViewportScrollerModel extends ObjectModel<ViewportScroller> {
 
   viewportWidth?: number;
 

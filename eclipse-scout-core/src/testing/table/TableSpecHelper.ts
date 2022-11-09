@@ -9,18 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, Cell, CellModel, Column, ColumnModel, comparators, DecimalFormat, Filter, MenuModel, ModelAdapter, NumberColumnModel, ObjectFactory, objects, RemoteEvent, scout, Session, Table, TableModel, TableRow, TableRowModel,
-  TableTextUserFilter, TextColumnUserFilter, Widget
+  arrays, Cell, CellModel, ChildModelOf, Column, ColumnModel, comparators, DecimalFormat, Filter, InitModelOf, MenuModel, ModelAdapter, NumberColumnModel, ObjectFactory, ObjectOrChildModel, ObjectOrModel, objects, ObjectType, Primitive,
+  RemoteEvent, scout, Session, Table, TableModel, TableRow, TableRowModel, TableTextUserFilter, TextColumnUserFilter, Widget
 } from '../../index';
-import {MenuSpecHelper} from '../index';
+import {MenuSpecHelper, SpecTable, SpecTableAdapter} from '../index';
 import $ from 'jquery';
-import {Primitive} from '../../types';
-import {ObjectType} from '../../ObjectFactory';
-import SpecTable from './SpecTable';
-import SpecTableAdapter from './SpecTableAdapter';
-import {ChildModelOf, InitModelOf, ModelOf, ObjectOrChildModel, ObjectOrModel} from '../../scout';
 
-export default class TableSpecHelper {
+export class TableSpecHelper {
   session: Session;
   menuHelper: MenuSpecHelper;
 

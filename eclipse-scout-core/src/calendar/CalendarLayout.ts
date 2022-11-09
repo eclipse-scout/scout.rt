@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Calendar} from '../index';
 
-export default class CalendarLayout extends AbstractLayout {
+export class CalendarLayout extends AbstractLayout {
   calendar: Calendar;
   stacked: boolean;
   compacted: boolean;

@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CancelMenu, Event, Form, FormModel, GroupBox, ListBox, Menu, OkMenu, scout, Status, UnsavedFormChangesFormModel, UnsavedFormsLookupCall} from '../../index';
-import {TableRowsInsertedEvent} from '../../table/TableEventMap';
-import {InitModelOf} from '../../scout';
-import {SomeRequired} from '../../types';
+import {arrays, CancelMenu, Event, Form, FormModel, GroupBox, InitModelOf, ListBox, Menu, OkMenu, scout, SomeRequired, Status, TableRowsInsertedEvent, UnsavedFormChangesFormModel, UnsavedFormsLookupCall} from '../../index';
 
-export default class UnsavedFormChangesForm extends Form implements UnsavedFormChangesFormModel {
+export class UnsavedFormChangesForm extends Form implements UnsavedFormChangesFormModel {
   declare model: UnsavedFormChangesFormModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'unsavedForms'>;
 

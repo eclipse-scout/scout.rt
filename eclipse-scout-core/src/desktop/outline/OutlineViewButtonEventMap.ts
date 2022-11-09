@@ -10,6 +10,6 @@
  */
 import {Outline, PropertyChangeEvent, ViewButtonEventMap} from '../../index';
 
-export default interface OutlineViewButtonEventMap extends ViewButtonEventMap {
+export interface OutlineViewButtonEventMap extends ViewButtonEventMap {
   'propertyChange:outline': PropertyChangeEvent<Outline>;
 }

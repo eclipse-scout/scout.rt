@@ -9,19 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, HtmlComponent, icons, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, scout, strings, tooltips,
-  TreeVisitResult
+  Action, ActionKeyStroke, arrays, CloneOptions, ContextMenuPopup, EnumObject, HtmlComponent, icons, InitModelOf, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, MenuOrder, ObjectOrChildModel,
+  Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TreeVisitor, TreeVisitResult
 } from '../index';
-import {PopupAlignment} from '../popup/Popup';
-import {CloneOptions, TreeVisitor} from '../widget/Widget';
-import {MenuOrder} from './MenuItemsOrder';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
 export type MenuStyle = EnumObject<typeof Menu.MenuStyle>;
 export type MenuFilter = (menus: Menu[], destination: MenuDestinations) => Menu[];
 
-export default class Menu extends Action implements MenuModel {
+export class Menu extends Action implements MenuModel {
   declare model: MenuModel;
   declare eventMap: MenuEventMap;
   declare self: Menu;

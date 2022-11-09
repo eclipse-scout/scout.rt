@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {scout, Status, TableControl} from '../../src/index';
-import {TableSpecHelper} from '../../src/testing/index';
-import {triggerMouseDownCapture} from '../../src/testing/jquery-testing';
+import {JQueryTesting, TableSpecHelper} from '../../src/testing/index';
 
 describe('TableFooterSpec', () => {
   let session: SandboxSession;
@@ -157,7 +156,7 @@ describe('TableFooterSpec', () => {
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
 
       // Check that tooltip is hidden after mouse click on status
-      triggerMouseDownCapture(table.footer._$infoTableStatusIcon);
+      JQueryTesting.triggerMouseDownCapture(table.footer._$infoTableStatusIcon);
       expect(table.footer._tableStatusTooltip).toBe(null);
       expect(table.footer._$infoTableStatus.hasClass('error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
@@ -172,7 +171,7 @@ describe('TableFooterSpec', () => {
       expect(table.tableStatus.uiState).toBe('user-hidden');
 
       // Check that tooltip is shown after second mouse click on status
-      triggerMouseDownCapture(table.footer._$infoTableStatusIcon);
+      JQueryTesting.triggerMouseDownCapture(table.footer._$infoTableStatusIcon);
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.footer._tableStatusTooltip.$container.hasClass('error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('error')).toBe(true);
@@ -222,7 +221,7 @@ describe('TableFooterSpec', () => {
       expect(table.tableStatus.uiState).toBe('auto-hidden');
 
       // Check that tooltip is shown again with a mouse click and _not_ hidden automatically again after 5s
-      triggerMouseDownCapture(table.footer._$infoTableStatusIcon);
+      JQueryTesting.triggerMouseDownCapture(table.footer._$infoTableStatusIcon);
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.footer._tableStatusTooltip.$container.hasClass('info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('info')).toBe(true);
@@ -260,7 +259,7 @@ describe('TableFooterSpec', () => {
       expect(table.tableStatus.uiState).toBe('auto-hidden'); // because auto-removal is already scheduled at INFO level
 
       // Click "outside" (first row)
-      triggerMouseDownCapture(table.$rows().eq(0));
+      JQueryTesting.triggerMouseDownCapture(table.$rows().eq(0));
 
       // Check invisible
       expect(table.footer._tableStatusTooltip).toBe(null);
@@ -283,7 +282,7 @@ describe('TableFooterSpec', () => {
       expect(table.tableStatus.uiState).toBe(undefined);
 
       // Click "outside" (first row)
-      triggerMouseDownCapture(table.$rows().eq(0));
+      JQueryTesting.triggerMouseDownCapture(table.$rows().eq(0));
 
       // Check invisible
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);

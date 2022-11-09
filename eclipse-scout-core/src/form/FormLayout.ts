@@ -11,7 +11,7 @@
 import {AbstractLayout, Dimension, FileChooser, Form, graphics, HtmlComponent, HtmlCompPrefSizeOptions} from '../index';
 import $ from 'jquery';
 
-export default class FormLayout extends AbstractLayout {
+export class FormLayout extends AbstractLayout {
   form: Form | FileChooser;
 
   constructor(form: Form | FileChooser) {

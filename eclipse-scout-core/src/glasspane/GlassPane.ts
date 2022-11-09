@@ -12,7 +12,7 @@ import {Widget} from '../index';
 import $ from 'jquery';
 import MouseDownEvent = JQuery.MouseDownEvent;
 
-export default class GlassPane extends Widget {
+export class GlassPane extends Widget {
 
   protected override _render() {
     this.$container = this.$parent

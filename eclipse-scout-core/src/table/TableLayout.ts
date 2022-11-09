@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, MenuBarLayout, RowLayout, scout, scrollbars, Table} from '../index';
 
-export default class TableLayout extends AbstractLayout {
+export class TableLayout extends AbstractLayout {
   table: Table;
   protected _dataHeightPositive: boolean;
 

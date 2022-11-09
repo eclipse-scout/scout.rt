@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, Widget, WidgetEventMap} from '../index';
 
-export default interface CompositeEventMap extends WidgetEventMap {
+export interface CompositeEventMap extends WidgetEventMap {
   'propertyChange:widgets': PropertyChangeEvent<Widget[]>;
 }

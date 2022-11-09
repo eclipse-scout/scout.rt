@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import * as texts from '../../src/text/texts';
-import TextMap from '../../src/text/TextMap';
+import {TextMap, texts} from '../../src/index';
 
 /* jshint sub:true */
 describe('texts', () => {

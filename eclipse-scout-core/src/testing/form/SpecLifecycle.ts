@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormLifecycle, Status} from '../../index';
-import {ValidationResult} from '../../form/fields/FormField';
+import {FormLifecycle, Status, ValidationResult} from '../../index';
 
-export default class SpecLifecycle extends FormLifecycle {
+export class SpecLifecycle extends FormLifecycle {
   override _validate(): JQuery.Promise<Status> {
     return super._validate();
   }

@@ -10,5 +10,5 @@
  */
 import {ActionAdapter} from '../../index';
 
-export default class ViewButtonAdapter extends ActionAdapter {
+export class ViewButtonAdapter extends ActionAdapter {
 }

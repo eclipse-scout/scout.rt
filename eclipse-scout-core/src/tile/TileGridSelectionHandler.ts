@@ -16,7 +16,7 @@ export interface TileGridSelectionInstruction {
   focusedTile: Tile;
 }
 
-export default class TileGridSelectionHandler {
+export class TileGridSelectionHandler {
   tileGrid: TileGrid;
 
   constructor(tileGrid: TileGrid) {

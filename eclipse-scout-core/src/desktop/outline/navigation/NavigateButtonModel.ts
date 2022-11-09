@@ -10,7 +10,7 @@
  */
 import {KeyStrokeContext, MenuModel, Outline, Page} from '../../../index';
 
-export default interface NavigateButtonModel extends MenuModel {
+export interface NavigateButtonModel extends MenuModel {
   node?: Page;
   outline?: Outline;
   altKeyStrokeContext?: KeyStrokeContext;

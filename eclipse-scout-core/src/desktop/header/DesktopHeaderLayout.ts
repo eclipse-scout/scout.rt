@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Desktop, Dimension, graphics, MenuBoxLayout, SimpleTabArea} from '../../index';
-import DesktopHeader from './DesktopHeader';
-import DesktopTabAreaLayout from '../desktoptab/DesktopTabAreaLayout';
+import {AbstractLayout, Desktop, DesktopHeader, DesktopTabAreaLayout, Dimension, graphics, MenuBoxLayout, SimpleTabArea} from '../../index';
 
-export default class DesktopHeaderLayout extends AbstractLayout {
+export class DesktopHeaderLayout extends AbstractLayout {
   header: DesktopHeader;
   desktop: Desktop;
 

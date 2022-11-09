@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel} from '@eclipse-scout/core';
+import {FormFieldModel, ObjectOrChildModel} from '@eclipse-scout/core';
 import {Chart} from '../../../index';
-import {ObjectOrChildModel} from '@eclipse-scout/core/src/scout';
 
-export default interface ChartFieldModel extends FormFieldModel {
+export interface ChartFieldModel extends FormFieldModel {
   chart?: ObjectOrChildModel<Chart>;
 }

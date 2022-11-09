@@ -16,7 +16,7 @@ import {AbstractLayout, BasicField, Device, Dimension, EventHandler, FormField, 
  * Note: we use optGet() here, since some form-fields have only a bare HTML element as field, other
  * (composite) form-fields work with a HtmlComponent which has its own LayoutManager.
  */
-export default class FormFieldLayout extends AbstractLayout {
+export class FormFieldLayout extends AbstractLayout {
   formField: FormField;
   mandatoryIndicatorWidth: number;
   statusWidth: number;

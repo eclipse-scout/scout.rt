@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, FormFieldEventMap, PropertyChangeEvent, ValueField} from '../../index';
-import {ValueFieldClearable, ValueFieldFormatter, ValueFieldParser, ValueFieldValidator} from './ValueField';
+import {Event, FormFieldEventMap, PropertyChangeEvent, ValueField, ValueFieldClearable, ValueFieldFormatter, ValueFieldParser, ValueFieldValidator} from '../../index';
 
 
 export interface ValueFieldAcceptInputEvent<TValue = any, T = ValueField<TValue>> extends Event<T> {
@@ -26,7 +25,7 @@ export interface ValueFieldParseErrorEvent<TValue = any, T = ValueField<TValue>>
   error: any;
 }
 
-export default interface ValueFieldEventMap<TValue> extends FormFieldEventMap {
+export interface ValueFieldEventMap<TValue> extends FormFieldEventMap {
   'acceptInput': ValueFieldAcceptInputEvent<TValue>;
   'clear': Event<ValueField<TValue>>;
   'parse': ValueFieldParseEvent<TValue>;

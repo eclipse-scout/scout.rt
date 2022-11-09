@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {AbstractGrid, GridData, LogicalGridMatrix, LogicalGridMatrixCell, LogicalGridMatrixCursor, Point, Widget} from '../../../index';
-import {LogicalGridWidget} from '../LogicalGridData';
+import {AbstractGrid, GridData, LogicalGridMatrix, LogicalGridMatrixCell, LogicalGridMatrixCursor, LogicalGridWidget, Point, Widget} from '../../../index';
 
-export default class VerticalGridMatrix extends LogicalGridMatrix {
+export class VerticalGridMatrix extends LogicalGridMatrix {
   protected _widgets: Widget[];
   protected _widgetGridDatas: GridData[];
   protected _widgetIndexes: number[];

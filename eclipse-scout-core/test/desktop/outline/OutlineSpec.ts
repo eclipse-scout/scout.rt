@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {MessageBox, ObjectFactory, objects, OutlineOverview, scout, Status, TileOutlineOverview, Tree} from '../../../src/index';
-import {FormSpecHelper, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '../../../src/testing/index';
-import {triggerMouseDown} from '../../../src/testing/jquery-testing';
+import {FormSpecHelper, JQueryTesting, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '../../../src/testing/index';
 
 describe('Outline', () => {
   let helper: OutlineSpecHelper;
@@ -471,7 +470,7 @@ describe('Outline', () => {
         spyOn(outline, 'selectNodes');
         spyOn(tree, 'selectNodes');
 
-        triggerMouseDown(tree.nodes[0].$node);
+        JQueryTesting.triggerMouseDown(tree.nodes[0].$node);
 
         // Outline must not react to clicks on tree nodes of the detail content tree
         expect(outline.selectNodes).not.toHaveBeenCalled();

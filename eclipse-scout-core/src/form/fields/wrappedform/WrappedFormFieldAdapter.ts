@@ -10,5 +10,5 @@
  */
 import {FormFieldAdapter} from '../../../index';
 
-export default class WrappedFormFieldAdapter extends FormFieldAdapter {
+export class WrappedFormFieldAdapter extends FormFieldAdapter {
 }

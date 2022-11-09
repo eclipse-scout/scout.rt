@@ -10,7 +10,7 @@
  */
 import {BasicFieldEventMap, DecimalFormat, PropertyChangeEvent} from '../../../index';
 
-export default interface NumberFieldEventMap extends BasicFieldEventMap<number> {
+export interface NumberFieldEventMap extends BasicFieldEventMap<number> {
   'propertyChange:decimalFormat': PropertyChangeEvent<DecimalFormat>;
   'propertyChange:maxValue': PropertyChangeEvent<number>;
   'propertyChange:minValue': PropertyChangeEvent<number>;

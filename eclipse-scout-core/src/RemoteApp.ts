@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, defaultValues, ErrorHandler, Session, SessionModel} from './index';
+import {App, AppBootstrapOptions, defaultValues, ErrorHandler, InitModelOf, Session, SessionModel} from './index';
 import $ from 'jquery';
-import {AppBootstrapOptions} from './App';
-import {InitModelOf} from './scout';
 
-export default class RemoteApp extends App {
+export class RemoteApp extends App {
 
   constructor() {
     super();

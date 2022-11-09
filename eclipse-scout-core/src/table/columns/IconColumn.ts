@@ -10,7 +10,7 @@
  */
 import {Cell, Column, TableRow} from '../../index';
 
-export default class IconColumn extends Column<string> {
+export class IconColumn extends Column<string> {
 
   constructor() {
     super();

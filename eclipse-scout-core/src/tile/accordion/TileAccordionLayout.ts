@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {AccordionLayout, HtmlComponent, TileAccordion, TileGrid, TileGridLayout} from '../../index';
-import {RowLayoutOptions} from '../../layout/RowLayout';
+import {AccordionLayout, HtmlComponent, RowLayoutOptions, TileAccordion, TileGrid, TileGridLayout} from '../../index';
 
-export default class TileAccordionLayout extends AccordionLayout {
+export class TileAccordionLayout extends AccordionLayout {
   tileAccordion: TileAccordion;
 
   constructor(tileAccordion: TileAccordion, options?: RowLayoutOptions) {

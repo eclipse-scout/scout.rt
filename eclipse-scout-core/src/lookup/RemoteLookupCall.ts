@@ -12,7 +12,7 @@ import {arrays, LookupCall, LookupFieldAdapter, LookupResult, LookupRow, objects
 import $ from 'jquery';
 import Deferred = JQuery.Deferred;
 
-export default class RemoteLookupCall<TKey> extends LookupCall<TKey> {
+export class RemoteLookupCall<TKey> extends LookupCall<TKey> {
   adapter: LookupFieldAdapter;
   deferred: Deferred<LookupResult<TKey>, { canceled: boolean }> & { requestParameter?: RemoteLookupRequest<string | TKey | void> };
 

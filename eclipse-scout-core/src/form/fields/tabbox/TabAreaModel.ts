@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tab, TabBox, WidgetModel} from '../../../index';
-import {TabAreaStyle} from './TabArea';
+import {Tab, TabAreaStyle, TabBox, WidgetModel} from '../../../index';
 
-export default interface TabAreaModel extends WidgetModel {
+export interface TabAreaModel extends WidgetModel {
   tabBox?: TabBox;
   tabs?: Tab[];
   displayStyle?: TabAreaStyle;

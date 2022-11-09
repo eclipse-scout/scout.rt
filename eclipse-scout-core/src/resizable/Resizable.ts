@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EnumObject, graphics, Insets, Rectangle, ResizableModel, scout} from '../index';
+import {arrays, EnumObject, graphics, InitModelOf, Insets, Rectangle, ResizableModel, scout, SomeRequired} from '../index';
 import $ from 'jquery';
-import arrays from '../util/arrays';
-import {SomeRequired} from '../types';
-import {InitModelOf} from '../scout';
 import MouseDownEvent = JQuery.MouseDownEvent;
 import MouseUpEvent = JQuery.MouseUpEvent;
 import MouseMoveEvent = JQuery.MouseMoveEvent;
@@ -31,7 +28,7 @@ export type ResizableMode = EnumObject<typeof Resizable.MODES>;
 /**
  * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given model.$container. This is primarily used for (modal) dialogs.
  */
-export default class Resizable implements ResizableModel {
+export class Resizable implements ResizableModel {
   declare model: ResizableModel;
   declare initModel: SomeRequired<this['model'], '$container'>;
 

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, PopupLayout, scrollbars} from '../index';
-import ContextMenuPopup from './ContextMenuPopup';
+import {ContextMenuPopup, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, PopupLayout, scrollbars} from '../index';
 
-export default class ContextMenuPopupLayout extends PopupLayout {
+export class ContextMenuPopupLayout extends PopupLayout {
   declare popup: ContextMenuPopup;
 
   constructor(popup: ContextMenuPopup) {

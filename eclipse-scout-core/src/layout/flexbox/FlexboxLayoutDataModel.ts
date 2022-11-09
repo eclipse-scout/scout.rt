@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default interface FlexboxLayoutDataModel {
+export interface FlexboxLayoutDataModel {
   grow?: number;
   initial?: number;
   order?: number;

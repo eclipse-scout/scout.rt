@@ -9,19 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, FilterOrFunction, Group, objects, PropertyChangeEvent, scout, Table, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile,
-  TileAccordion, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
+  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, FilterOrFunction, Group, InitModelOf, ObjectOrChildModel, objects, PropertyChangeEvent, scout, ScrollToOptions, Table, TableAllRowsDeletedEvent, TableFilterAddedEvent,
+  TableFilterRemovedEvent, TableGroupEvent, TableRow, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile,
+  TileAccordion, TileActionEvent, TileClickEvent, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
 } from '../index';
 import $ from 'jquery';
-import {ScrollToOptions} from '../scrollbar/scrollbars';
-import {TableAllRowsDeletedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent} from './TableEventMap';
-import {TileActionEvent, TileClickEvent} from '../tile/TileGridEventMap';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 /**
  * Delegates events between the {@link Table} and it's internal {@link TileGrid}.
  */
-export default class TableTileGridMediator extends Widget implements TableTileGridMediatorModel {
+export class TableTileGridMediator extends Widget implements TableTileGridMediatorModel {
   declare model: TableTileGridMediatorModel;
   declare eventMap: TableTileGridMediatorEventMap;
   declare self: TableTileGridMediator;

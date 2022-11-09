@@ -10,7 +10,7 @@
  */
 import {ButtonKeyStroke, HAlign, RadioButton, ScoutKeyboardEvent} from '../../../index';
 
-export default class RadioButtonKeyStroke extends ButtonKeyStroke {
+export class RadioButtonKeyStroke extends ButtonKeyStroke {
   declare field: RadioButton<any>;
 
   constructor(button: RadioButton<any>, keyStroke: string) {

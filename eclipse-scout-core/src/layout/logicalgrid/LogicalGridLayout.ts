@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlEnvironment, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutInfo, Rectangle, Widget} from '../../index';
+import {
+  AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutConfigModel, LogicalGridLayoutInfo, ObjectOrModel,
+  Rectangle, Widget
+} from '../../index';
 import $ from 'jquery';
-import {HtmlCompPrefSizeOptions} from '../HtmlComponent';
-import {LogicalGridLayoutConfigModel} from './LogicalGridLayoutConfig';
-import {ObjectOrModel} from '../../scout';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
@@ -20,7 +20,7 @@ import {ObjectOrModel} from '../../scout';
  * @param options available options: hgap, vgap, rowHeight, columnWidth, minWidth
  *
  */
-export default class LogicalGridLayout extends AbstractLayout {
+export class LogicalGridLayout extends AbstractLayout {
   validityBasedOnContainerSize: Dimension;
   valid: boolean;
   widget: Widget;

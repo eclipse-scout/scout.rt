@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, DialogLayout, graphics, HtmlComponent, MessageBox, scrollbars} from '../index';
 
-export default class MessageBoxLayout extends AbstractLayout {
+export class MessageBoxLayout extends AbstractLayout {
   messageBox: MessageBox;
 
   constructor(messageBox: MessageBox) {

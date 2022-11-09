@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionExecKeyStroke, TableHeaderMenuButtonModel, TableHeaderMenuGroup} from '../index';
-import {NumberColumnAggregationFunction, NumberColumnBackgroundEffect} from './columns/NumberColumn';
+import {Action, ActionExecKeyStroke, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, TableHeaderMenuButtonModel, TableHeaderMenuGroup} from '../index';
 
-export default class TableHeaderMenuButton extends Action implements TableHeaderMenuButtonModel {
+export class TableHeaderMenuButton extends Action implements TableHeaderMenuButtonModel {
   declare parent: TableHeaderMenuGroup;
   declare model: TableHeaderMenuButtonModel;
 

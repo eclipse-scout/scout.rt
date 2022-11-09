@@ -10,7 +10,7 @@
  */
 import {DesktopTab, DesktopTabArea, Form, scout, SimpleTabBoxController} from '../index';
 
-export default class DesktopTabBoxController extends SimpleTabBoxController<Form> {
+export class DesktopTabBoxController extends SimpleTabBoxController<Form> {
 
   override createTabArea(): DesktopTabArea {
     return scout.create(DesktopTabArea, {

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel, Widget} from '../../index';
-import {ObjectOrChildModel} from '../../scout';
+import {FormFieldModel, ObjectOrChildModel, Widget} from '../../index';
 
-export default interface WidgetFieldModel extends FormFieldModel {
+export interface WidgetFieldModel extends FormFieldModel {
   scrollable?: boolean;
   fieldWidget?: ObjectOrChildModel<Widget>;
 }

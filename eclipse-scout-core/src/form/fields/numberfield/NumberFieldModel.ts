@@ -10,7 +10,7 @@
  */
 import {BasicFieldModel, DecimalFormat} from '../../../index';
 
-export default interface NumberFieldModel extends BasicFieldModel<number, number | string> {
+export interface NumberFieldModel extends BasicFieldModel<number, number | string> {
   minValue?: number;
   maxValue?: number;
   decimalFormat?: string | DecimalFormat;

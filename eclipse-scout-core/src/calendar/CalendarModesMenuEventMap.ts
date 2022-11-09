@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuEventMap, PropertyChangeEvent} from '../index';
-import {CalendarDisplayMode} from './Calendar';
+import {CalendarDisplayMode, MenuEventMap, PropertyChangeEvent} from '../index';
 
-export default interface CalendarModesMenuEventMap extends MenuEventMap {
+export interface CalendarModesMenuEventMap extends MenuEventMap {
   'propertyChange:displayMode': PropertyChangeEvent<CalendarDisplayMode>;
 }

@@ -10,7 +10,7 @@
  */
 import {DatePickerPopup, Dimension, HtmlCompPrefSizeOptions, PopupLayout} from '../index';
 
-export default class DatePickerPopupLayout extends PopupLayout {
+export class DatePickerPopupLayout extends PopupLayout {
   declare popup: DatePickerPopup;
 
   constructor(popup: DatePickerPopup) {

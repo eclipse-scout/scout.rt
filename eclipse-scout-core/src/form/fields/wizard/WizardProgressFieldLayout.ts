@@ -10,7 +10,7 @@
  */
 import {FormFieldLayout, WizardProgressField} from '../../../index';
 
-export default class WizardProgressFieldLayout extends FormFieldLayout {
+export class WizardProgressFieldLayout extends FormFieldLayout {
   declare formField: WizardProgressField;
 
   constructor(formField: WizardProgressField) {

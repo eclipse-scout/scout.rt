@@ -11,8 +11,9 @@
 
 import {CachedElement} from '../index';
 
-export default class HtmlEncoder {
+export class HtmlEncoder {
   cache: CachedElement;
+
   constructor() {
     this.cache = new CachedElement('div');
   }

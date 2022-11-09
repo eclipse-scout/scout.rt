@@ -26,7 +26,7 @@ export interface SplitterPositionChangeEvent<S extends Splitter = Splitter> exte
   position: number;
 }
 
-export default interface SplitterEventMap extends WidgetEventMap {
+export interface SplitterEventMap extends WidgetEventMap {
   'move': SplitterMoveEvent;
   'moveEnd': SplitterMoveEndEvent;
   'moveStart': SplitterMoveStartEvent;

@@ -14,6 +14,6 @@ export interface AppLinkActionEvent<T = BeanField<object>> extends Event<T> {
   ref: string;
 }
 
-export default interface BeanFieldEventMap<TValue extends object> extends ValueFieldEventMap<TValue> {
+export interface BeanFieldEventMap<TValue extends object> extends ValueFieldEventMap<TValue> {
   'appLinkAction': AppLinkActionEvent;
 }

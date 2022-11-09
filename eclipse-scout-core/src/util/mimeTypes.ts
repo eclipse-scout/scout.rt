@@ -10,60 +10,46 @@
  */
 import {scout} from '../index';
 
-/**
- * Pendant for org.eclipse.scout.rt.platform.resource.MimeType enumeration.
- */
-
-
-const TEXT_PLAIN = 'text/plain';
-const TEXT_HTML = 'text/html';
-const TEXT_CSS = 'text/css';
-const TEXT_JAVASCRIPT = 'text/javascript';
-
-const IMAGE_PNG = 'image/png';
-const IMAGE_JPG = 'image/jpg';
-const IMAGE_JPEG = 'image/jpeg';
-const IMAGE_GIF = 'image/gif';
-
 const APPLICATION_JSON = 'application/json';
 const APPLICATION_JAVASCRIPT = 'application/javascript';
 const APPLICATION_ZIP = 'application/zip';
 
-const JSON = APPLICATION_JSON;
-const JAVASCRIPT = APPLICATION_JAVASCRIPT;
-const ZIP = APPLICATION_ZIP;
+/**
+ * Pendant for org.eclipse.scout.rt.platform.resource.MimeType enumeration.
+ */
+export const mimeTypes = {
 
-export function isTextMimeType(mimeType: string): boolean {
-  return scout.isOneOf(mimeType,
-    TEXT_PLAIN,
-    TEXT_HTML,
-    TEXT_CSS,
-    TEXT_JAVASCRIPT,
-    APPLICATION_JAVASCRIPT,
-    APPLICATION_JSON);
-}
+  TEXT_PLAIN: 'text/plain',
+  TEXT_HTML: 'text/html',
+  TEXT_CSS: 'text/css',
+  TEXT_JAVASCRIPT: 'text/javascript',
 
-export function isJavaScript(mimeType: string): boolean {
-  return scout.isOneOf(mimeType,
-    TEXT_JAVASCRIPT,
-    APPLICATION_JAVASCRIPT);
-}
+  IMAGE_PNG: 'image/png',
+  IMAGE_JPG: 'image/jpg',
+  IMAGE_JPEG: 'image/jpeg',
+  IMAGE_GIF: 'image/gif',
 
-export default {
-  APPLICATION_JAVASCRIPT,
   APPLICATION_JSON,
+  APPLICATION_JAVASCRIPT,
   APPLICATION_ZIP,
-  IMAGE_GIF,
-  IMAGE_JPEG,
-  IMAGE_JPG,
-  IMAGE_PNG,
-  JAVASCRIPT,
-  JSON,
-  TEXT_CSS,
-  TEXT_HTML,
-  TEXT_JAVASCRIPT,
-  TEXT_PLAIN,
-  ZIP,
-  isJavaScript,
-  isTextMimeType
+
+  JSON: APPLICATION_JSON,
+  JAVASCRIPT: APPLICATION_JAVASCRIPT,
+  ZIP: APPLICATION_ZIP,
+
+  isTextMimeType(mimeType: string): boolean {
+    return scout.isOneOf(mimeType,
+      mimeTypes.TEXT_PLAIN,
+      mimeTypes.TEXT_HTML,
+      mimeTypes.TEXT_CSS,
+      mimeTypes.TEXT_JAVASCRIPT,
+      mimeTypes.APPLICATION_JAVASCRIPT,
+      mimeTypes.APPLICATION_JSON);
+  },
+
+  isJavaScript(mimeType: string): boolean {
+    return scout.isOneOf(mimeType,
+      mimeTypes.TEXT_JAVASCRIPT,
+      mimeTypes.APPLICATION_JAVASCRIPT);
+  }
 };

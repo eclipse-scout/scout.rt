@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionEventMap, Filter, PropertyChangeEvent, Tile, TileAccordion} from '../../index';
-import {TileActionEvent, TileClickEvent} from '../TileGridEventMap';
+import {AccordionEventMap, Filter, PropertyChangeEvent, Tile, TileAccordion, TileActionEvent, TileClickEvent} from '../../index';
 
-export default interface TileAccordionEventMap extends AccordionEventMap {
+export interface TileAccordionEventMap extends AccordionEventMap {
   'tileAction': TileActionEvent<TileAccordion>;
   'tileClick': TileClickEvent<TileAccordion>;
   'propertyChange:filters': PropertyChangeEvent<Filter<Tile>[]>;

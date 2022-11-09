@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import ColumnUserFilterModel from './ColumnUserFilterModel';
+import {ColumnUserFilterModel} from '../../index';
 
-export default interface NumberColumnUserFilterModel extends ColumnUserFilterModel {
+export interface NumberColumnUserFilterModel extends ColumnUserFilterModel {
   numberFrom?: number;
   numberTo?: number;
 }

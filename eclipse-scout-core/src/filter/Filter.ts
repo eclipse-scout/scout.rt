@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Predicate} from '../types';
+import {Predicate} from '../index';
 
 /**
  * A filter is used to only accept specific elements and to hide all others.
  */
-export default interface Filter<TElem extends FilterElement> {
+export interface Filter<TElem extends FilterElement> {
   /**
    * A function that returns true or false, whether the filter accepts the element or not.
    */

@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, CalendarComponent, DateRange, Event, GroupBox, Menu, PropertyChangeEvent, WidgetEventMap} from '../index';
-import {CalendarDisplayMode} from './Calendar';
+import {Calendar, CalendarComponent, CalendarDisplayMode, DateRange, Event, GroupBox, Menu, PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export interface CalendarComponentMoveEvent<C extends Calendar = Calendar> extends Event<C> {
   component: CalendarComponent;
 }
 
-export default interface CalendarEventMap extends WidgetEventMap {
+export interface CalendarEventMap extends WidgetEventMap {
   'componentMove': CalendarComponentMoveEvent;
   'modelChange': Event<Calendar>;
   'selectionChange': Event<Calendar>;

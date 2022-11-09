@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, arrays, LookupCall, LookupRow, objects, RestLookupCallModel, scout} from '../index';
+import {AjaxCall, arrays, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout} from '../index';
 import $ from 'jquery';
-import LookupResult from './LookupResult';
-import {InitModelOf} from '../scout';
 import Deferred = JQuery.Deferred;
 
 /**
@@ -43,7 +41,7 @@ import Deferred = JQuery.Deferred;
  * 4. Hard-coded properties that are fundamental to the respective queryBy mode (cannot be overridden).
  *    These are: 'ids' (KEY, KEYS) and 'text' (TEXT)
  */
-export default class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookupCallModel<TKey> {
+export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookupCallModel<TKey> {
   declare model: RestLookupCallModel<TKey>;
 
   resourceUrl: string;

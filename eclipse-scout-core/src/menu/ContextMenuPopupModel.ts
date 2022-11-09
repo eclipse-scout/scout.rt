@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, PopupModel} from '../index';
-import {MenuFilter} from './Menu';
-import {ObjectOrChildModel} from '../scout';
+import {Menu, MenuFilter, ObjectOrChildModel, PopupModel} from '../index';
 
-export default interface ContextMenuPopupModel extends PopupModel {
+export interface ContextMenuPopupModel extends PopupModel {
   menuItems?: ObjectOrChildModel<Menu>[];
   cloneMenuItems?: boolean;
   animationDuration?: number;

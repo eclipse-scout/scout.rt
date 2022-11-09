@@ -10,6 +10,6 @@
  */
 import {BreadcrumbBar, FormFieldEventMap, PropertyChangeEvent} from '../../../index';
 
-export default interface BreadcrumbBarFieldEventMap extends FormFieldEventMap {
+export interface BreadcrumbBarFieldEventMap extends FormFieldEventMap {
   'propertyChange:breadcrumbBar': PropertyChangeEvent<BreadcrumbBar>;
 }

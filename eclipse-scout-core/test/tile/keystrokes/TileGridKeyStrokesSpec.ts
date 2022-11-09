@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, keys, scout, Tile, TileGrid, TileGridModel} from '../../../src/index';
-import {triggerKeyDownCapture, triggerKeyInputCapture, triggerKeyUpCapture} from '../../../src/testing/jquery-testing';
-import {InitModelOf} from '../../../src/scout';
+import {arrays, InitModelOf, keys, scout, Tile, TileGrid, TileGridModel} from '../../../src/index';
+import {JQueryTesting} from '../../../src/testing/index';
 
 describe('TileGridKeyStrokes', () => {
   let session: SandboxSession;
@@ -52,16 +51,16 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
       expect(tileGrid.selectedTiles.length).toBe(3);
-      triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
 
       tileGrid.selectTile(tiles[0]);
       expect(tileGrid.selectedTiles.length).toBe(1);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
       expect(tileGrid.selectedTiles.length).toBe(3);
-      triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
     });
 
     it('deselects all tiles if tiles are already selected', () => {
@@ -72,17 +71,17 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectAllTiles();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
       expect(tileGrid.selectedTiles.length).toBe(0);
-      triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
 
-      triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
       expect(tileGrid.selectedTiles.length).toBe(3);
-      triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
 
-      triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.A, 'ctrl');
       expect(tileGrid.selectedTiles.length).toBe(0);
-      triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.A, 'ctrl');
     });
 
   });
@@ -97,13 +96,13 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[1]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
     });
 
     it('selects the first tile if no tile is selected yet', () => {
@@ -114,9 +113,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
     });
 
     it('does nothing if the last tile is already selected', () => {
@@ -128,9 +127,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(arrays.last(tiles));
 
-      triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([arrays.last(tiles)]);
-      triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -141,19 +140,19 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
 
       tileGrid.deselectAllTiles();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
     });
 
     describe('with shift', () => {
@@ -166,13 +165,13 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
 
-        triggerKeyDownCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
-        triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
 
-        triggerKeyDownCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
-        triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
       });
 
       it('removes the next tile from the selection if the focused tile is the first tile of the selection', () => {
@@ -185,13 +184,13 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[0], tiles[1], tiles[2]]);
         tileGrid.focusedTile = tiles[0];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
       });
 
@@ -204,13 +203,13 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[2]);
 
-        triggerKeyDownCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
-        triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
 
-        triggerKeyDownCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
-        triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT, 'shift');
       });
 
       it('adds the correct tile to the selection if the focused tile gets invisible', () => {
@@ -232,7 +231,7 @@ describe('TileGridKeyStrokes', () => {
         expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
         expect(tileGrid.focusedTile).toBe(null);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
       });
 
@@ -246,16 +245,16 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[1], tiles[4]]);
         tileGrid.focusedTile = tiles[1];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[4]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.RIGHT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
       });
     });
@@ -271,13 +270,13 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[2]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
     });
 
     it('selects the last tile if no tile is selected yet', () => {
@@ -288,9 +287,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([arrays.last(tiles)]);
-      triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
     });
 
     it('does nothing if the first tile is already selected', () => {
@@ -302,9 +301,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -315,19 +314,19 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
 
       tileGrid.deselectAllTiles();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
     });
 
     describe('with shift', () => {
@@ -340,13 +339,13 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[3]);
 
-        triggerKeyDownCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
-        triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
 
-        triggerKeyDownCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
-        triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
       });
 
       it('does nothing if the first tile is already selected', () => {
@@ -358,13 +357,13 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
 
-        triggerKeyDownCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
-        triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
 
-        triggerKeyDownCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
-        triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT, 'shift');
       });
 
       it('removes the previous tile from the selection if the next tile is already selected', () => {
@@ -377,13 +376,13 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
         tileGrid.focusedTile = tiles[3];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
       });
 
@@ -406,7 +405,7 @@ describe('TileGridKeyStrokes', () => {
         expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
         expect(tileGrid.focusedTile).toBe(null);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
       });
 
@@ -420,16 +419,16 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[1], tiles[4]]);
         tileGrid.focusedTile = tiles[4];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[3], tiles[4]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
       });
 
@@ -448,13 +447,13 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[6]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
     });
 
     it('selects the first tile if no tile is selected yet', () => {
@@ -466,9 +465,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
     });
 
     it('does nothing if a tile in the last row is already selected', () => {
@@ -481,16 +480,16 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[6]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[6]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
 
       tileGrid.selectTile(arrays.last(tiles));
       expect(tileGrid.selectedTiles).toEqual([arrays.last(tiles)]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([arrays.last(tiles)]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -502,19 +501,19 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
 
       tileGrid.deselectAllTiles();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
     });
 
     it('selects the last tile if below the focused tile is no tile', () => {
@@ -527,9 +526,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
       expect(tileGrid.selectedTiles).toEqual([tiles[4]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
     });
 
     describe('with shift', () => {
@@ -543,10 +542,10 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
       });
 
@@ -561,10 +560,10 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
         tileGrid.focusedTile = tiles[1];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5], tiles[6], tiles[7]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[7]]);
       });
 
@@ -578,7 +577,7 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
       });
 
@@ -602,7 +601,7 @@ describe('TileGridKeyStrokes', () => {
         expect(tileGrid.selectedTiles).toEqual([tiles[3], tiles[4]]);
         expect(tileGrid.focusedTile).toBe(null);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
       });
 
@@ -617,13 +616,13 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[0], tiles[1], tiles[5]]);
         tileGrid.focusedTile = tiles[1];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.DOWN, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
       });
     });
@@ -641,13 +640,13 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(arrays.last(tiles));
 
-      triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[4]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
     });
 
     it('selects the last tile if no tile is selected yet', () => {
@@ -659,9 +658,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([arrays.last(tiles)]);
-      triggerKeyUpCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
     });
 
     it('does nothing if a tile in the first row is already selected', () => {
@@ -674,16 +673,16 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[2]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
 
       tileGrid.selectTile(tiles[0]);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -695,19 +694,19 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
 
       tileGrid.deselectAllTiles();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.UP);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
     });
 
     describe('with shift', () => {
@@ -721,10 +720,10 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[7]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5], tiles[6], tiles[7]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
       });
 
@@ -739,10 +738,10 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
         tileGrid.focusedTile = tiles[7];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
       });
 
@@ -757,7 +756,7 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
         tileGrid.focusedTile = tiles[2];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
       });
 
@@ -781,7 +780,7 @@ describe('TileGridKeyStrokes', () => {
         expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5]]);
         expect(tileGrid.focusedTile).toBe(null);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]]);
       });
 
@@ -796,13 +795,13 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.selectTiles([tiles[3], tiles[7], tiles[8]]);
         tileGrid.focusedTile = tiles[7];
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.UP, 'shift');
         expect(arrays.equalsIgnoreOrder(tileGrid.selectedTiles, [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
       });
     });
@@ -819,9 +818,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[1]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.HOME);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.HOME);
     });
 
     it('does nothing if the first tile is already selected', () => {
@@ -833,9 +832,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.HOME);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.HOME);
     });
 
     it('selects only the first tile if first and other tiles are selected', () => {
@@ -849,9 +848,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.selectTiles([tiles[0], tiles[1]]);
       tileGrid.focusedTile = tiles[1];
 
-      triggerKeyDownCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.HOME);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.HOME);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -863,19 +862,19 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.HOME);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.HOME);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.HOME);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.HOME);
 
       tileGrid.deselectAllTiles();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.HOME);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.HOME);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.HOME);
     });
 
     describe('with shift', () => {
@@ -889,7 +888,7 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[6], tiles[7]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.HOME, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.HOME, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
       });
     });
@@ -906,9 +905,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.END);
       expect(tileGrid.selectedTiles).toEqual([arrays.last(tiles)]);
-      triggerKeyUpCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.END);
     });
 
     it('does nothing if the first tile is already selected', () => {
@@ -920,9 +919,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.validateLayout();
       tileGrid.selectTile(arrays.last(tiles));
 
-      triggerKeyDownCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.END);
       expect(tileGrid.selectedTiles).toEqual([arrays.last(tiles)]);
-      triggerKeyUpCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.END);
     });
 
     it('selects only the last tile if last and other tiles are selected', () => {
@@ -936,9 +935,9 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.selectTiles([tiles[2], tiles[3]]);
       tileGrid.focusedTile = tiles[2];
 
-      triggerKeyDownCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.END);
       expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.END);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -950,19 +949,19 @@ describe('TileGridKeyStrokes', () => {
       tileGrid.render();
       tileGrid.validateLayout();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.END);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.END);
 
-      triggerKeyDownCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.END);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.END);
 
       tileGrid.deselectAllTiles();
 
-      triggerKeyDownCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.END);
       expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
-      triggerKeyUpCapture(tileGrid.$container, keys.END);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.END);
     });
 
     describe('with shift', () => {
@@ -976,11 +975,11 @@ describe('TileGridKeyStrokes', () => {
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[4], tiles[5]]);
 
-        triggerKeyInputCapture(tileGrid.$container, keys.END, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.END, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]]);
 
         // After pressing shift home afterwards all tiles should be selected
-        triggerKeyInputCapture(tileGrid.$container, keys.HOME, 'shift');
+        JQueryTesting.triggerKeyInputCapture(tileGrid.$container, keys.HOME, 'shift');
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]]);
       });
     });

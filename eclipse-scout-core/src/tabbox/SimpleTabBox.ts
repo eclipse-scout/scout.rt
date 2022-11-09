@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, EventHandler, HtmlComponent, LayoutData, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabViewContentLayout, Widget} from '../index';
-import {SimpleTabView} from './SimpleTab';
-import {InitModelOf} from '../scout';
+import {
+  arrays, Event, EventHandler, HtmlComponent, InitModelOf, LayoutData, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabView, SimpleTabViewContentLayout, Widget
+} from '../index';
 
-export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabBoxModel<TView> {
+export class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabBoxModel<TView> {
   declare model: SimpleTabBoxModel<TView>;
   declare eventMap: SimpleTabBoxEventMap<TView>;
   declare self: SimpleTabBox<any>;

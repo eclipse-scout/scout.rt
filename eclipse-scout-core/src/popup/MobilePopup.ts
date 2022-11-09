@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, HtmlComponent, icons, MobilePopupLayout, MobilePopupModel, Point, PopupLayout, scout, WidgetPopup} from '../index';
-import {PopupAlignment} from './Popup';
+import {Action, HtmlComponent, icons, MobilePopupLayout, MobilePopupModel, Point, PopupAlignment, PopupLayout, scout, WidgetPopup} from '../index';
 
-export default class MobilePopup extends WidgetPopup implements MobilePopupModel {
+export class MobilePopup extends WidgetPopup implements MobilePopupModel {
   declare model: MobilePopupModel;
 
   title: string;

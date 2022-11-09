@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldTile} from '@eclipse-scout/core';
+import {FormFieldTile, PropertyChangeEvent} from '@eclipse-scout/core';
 import {Chart, ChartField, ChartFieldTileModel} from '../index';
 import {ChartConfig} from '../chart/Chart';
-import {PropertyChangeEvent} from '@eclipse-scout/core/src';
 
-export default class ChartFieldTile extends FormFieldTile implements ChartFieldTileModel {
+export class ChartFieldTile extends FormFieldTile implements ChartFieldTileModel {
   declare model: ChartFieldTileModel;
   declare tileWidget: ChartField;
 

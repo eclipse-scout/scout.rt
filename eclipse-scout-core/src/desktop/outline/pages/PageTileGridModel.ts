@@ -10,7 +10,7 @@
  */
 import {Outline, Page, TileGridLayoutConfig, TileGridModel} from '../../../index';
 
-export default interface PageTileGridModel extends TileGridModel {
+export interface PageTileGridModel extends TileGridModel {
   compact?: boolean;
   compactLayoutConfig?: TileGridLayoutConfig;
   outline?: Outline;

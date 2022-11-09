@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface CalendarComponentEventMap extends WidgetEventMap {
+export interface CalendarComponentEventMap extends WidgetEventMap {
   'propertyChange:selected': PropertyChangeEvent<boolean>;
 }

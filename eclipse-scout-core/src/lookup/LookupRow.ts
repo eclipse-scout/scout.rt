@@ -9,12 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import objects from '../util/objects';
-import LookupRowModel from './LookupRowModel';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {InitModelOf, LookupRowModel, objects, SomeRequired} from '../index';
 
-export default class LookupRow<TKey> implements LookupRowModel<TKey> {
+export class LookupRow<TKey> implements LookupRowModel<TKey> {
   declare model: LookupRowModel<TKey>;
   declare initModel: SomeRequired<this['model'], 'key' | 'text'>;
 

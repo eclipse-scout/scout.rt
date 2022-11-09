@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, MenuBar, Page, scout, Table, TableRow} from '../../../index';
+import {Column, MenuBar, Page, scout, Table, TableRow, TableRowActionEvent} from '../../../index';
 import $ from 'jquery';
-import {TableRowActionEvent} from '../../../table/TableEventMap';
 
-export default class PageWithNodes extends Page {
+export class PageWithNodes extends Page {
 
   constructor() {
     super();

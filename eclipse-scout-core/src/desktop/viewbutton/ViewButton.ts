@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionKeyStroke, Desktop, EventHandler, HtmlComponent, PropertyChangeEvent, ViewButtonActionKeyStroke, ViewButtonEventMap, ViewButtonModel} from '../../index';
-import {ViewButtonDisplayStyle} from './ViewButtonModel';
-import {InitModelOf} from '../../scout';
+import {Action, ActionKeyStroke, Desktop, EventHandler, HtmlComponent, InitModelOf, PropertyChangeEvent, ViewButtonActionKeyStroke, ViewButtonDisplayStyle, ViewButtonEventMap, ViewButtonModel} from '../../index';
 
-export default class ViewButton extends Action implements ViewButtonModel {
+export class ViewButton extends Action implements ViewButtonModel {
   declare model: ViewButtonModel;
   declare eventMap: ViewButtonEventMap;
   declare self: ViewButton;

@@ -10,5 +10,5 @@
  */
 import {TileAdapter} from '../index';
 
-export default class WidgetTileAdapter extends TileAdapter {
+export class WidgetTileAdapter extends TileAdapter {
 }

@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SimpleTabBox, WidgetModel} from '../../index';
-import BenchRowLayoutData from './layout/BenchRowLayoutData';
-import {OutlineContent} from './DesktopBench';
-import {ObjectOrChildModel} from '../../scout';
+import {BenchRowLayoutData, ObjectOrChildModel, OutlineContent, SimpleTabBox, WidgetModel} from '../../index';
 
-export default interface BenchColumnModel extends WidgetModel {
+export interface BenchColumnModel extends WidgetModel {
   layoutData?: BenchRowLayoutData;
   tabBoxes?: ObjectOrChildModel<SimpleTabBox<OutlineContent>>[];
   cacheKey?: string[];

@@ -11,5 +11,5 @@
 
 import {ModelAdapter} from '../index';
 
-export default class BreadcrumbBarAdapter extends ModelAdapter {
+export class BreadcrumbBarAdapter extends ModelAdapter {
 }

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Filterable, FilterElement, FilterResult, TextFilter} from './Filter';
-import {Widget, WidgetSupportOptions} from '../index';
+import {Filterable, FilterElement, FilterResult, TextFilter, Widget, WidgetSupportOptions} from '../index';
 
-export default interface FilterSupportOptions<TElem extends FilterElement> extends WidgetSupportOptions {
+export interface FilterSupportOptions<TElem extends FilterElement> extends WidgetSupportOptions {
   widget: Widget & Filterable<TElem>;
 
   /**

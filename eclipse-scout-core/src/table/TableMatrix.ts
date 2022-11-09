@@ -10,7 +10,7 @@
  */
 import {arrays, BooleanColumn, Column, comparators, DateColumn, DateFormat, dates, EnumObject, IconColumn, Locale, NumberColumn, objects, scout, Session, Table, TableRow} from '../index';
 
-export default class TableMatrix {
+export class TableMatrix {
   session: Session;
   locale: Locale;
 

@@ -10,7 +10,7 @@
  */
 import {FormFieldLayout, ImageField, scrollbars} from '../../../index';
 
-export default class ImageFieldLayout extends FormFieldLayout {
+export class ImageFieldLayout extends FormFieldLayout {
   declare formField: ImageField;
 
   constructor(imageField: ImageField) {

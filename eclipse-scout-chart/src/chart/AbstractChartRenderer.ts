@@ -13,7 +13,7 @@ import {Chart} from '../index';
 import {Session} from '@eclipse-scout/core';
 import {UpdateChartOptions} from './Chart';
 
-export default class AbstractChartRenderer {
+export class AbstractChartRenderer {
   chart: Chart;
   session: Session;
 

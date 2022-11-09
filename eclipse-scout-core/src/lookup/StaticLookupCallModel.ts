@@ -10,7 +10,7 @@
  */
 import {LookupCallModel} from '../index';
 
-export default interface StaticLookupCallModel<TKey> extends LookupCallModel<TKey> {
+export interface StaticLookupCallModel<TKey> extends LookupCallModel<TKey> {
   /** delay in [ms]. By default that value is 0. */
   delay?: number;
   data?: any[];

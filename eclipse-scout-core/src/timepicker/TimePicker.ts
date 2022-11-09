@@ -8,14 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, Device, HtmlComponent, scrollbars, TimePickerModel, TimePickerTouchPopup, Widget} from '../index';
+import {dates, Device, HtmlComponent, InitModelOf, ScrollbarInstallOptions, scrollbars, SomeRequired, TimePickerEventMap, TimePickerModel, TimePickerTouchPopup, Widget} from '../index';
 import $ from 'jquery';
-import {ScrollbarInstallOptions} from '../scrollbar/scrollbars';
-import TimePickerEventMap from './TimePickerEventMap';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 
-export default class TimePicker extends Widget implements TimePickerModel {
+export class TimePicker extends Widget implements TimePickerModel {
   declare model: TimePickerModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'timeResolution'>;
   declare eventMap: TimePickerEventMap;

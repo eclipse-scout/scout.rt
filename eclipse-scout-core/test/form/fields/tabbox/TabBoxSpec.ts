@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys, scout, TabBox, TabItem} from '../../../../src/index';
-import {TabBoxSpecHelper} from '../../../../src/testing/index';
-import {triggerKeyDownCapture} from '../../../../src/testing/jquery-testing';
+import {JQueryTesting, TabBoxSpecHelper} from '../../../../src/testing/index';
 
 describe('TabBox', () => {
   let session: SandboxSession;
@@ -87,18 +86,18 @@ describe('TabBox', () => {
       tabItemA.focus();
       // check right/left keys
       expect(tabBox.selectedTab).toBe(tabItemA);
-      triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.RIGHT);
       expect(tabBox.selectedTab).toBe(tabItemB);
-      triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.LEFT);
       expect(tabBox.selectedTab).toBe(tabItemA);
 
       // make sure that nothing happens when first or last tab is selected and left/right is pressed
       tabBox.setSelectedTab(tabItemA);
-      triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.LEFT);
+      JQueryTesting.triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.LEFT);
       expect(tabBox.selectedTab).toBe(tabItemA); // still A
 
       tabBox.setSelectedTab(tabItemB);
-      triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.RIGHT);
+      JQueryTesting.triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.RIGHT);
       expect(tabBox.selectedTab).toBe(tabItemB); // still B
     });
 

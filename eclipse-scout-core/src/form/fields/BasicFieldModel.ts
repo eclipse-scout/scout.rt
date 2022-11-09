@@ -10,7 +10,7 @@
  */
 import {ValueFieldModel} from '../../index';
 
-export default interface BasicFieldModel<TValue extends TModelValue, TModelValue = TValue> extends ValueFieldModel<TValue, TModelValue> {
+export interface BasicFieldModel<TValue extends TModelValue, TModelValue = TValue> extends ValueFieldModel<TValue, TModelValue> {
   /**
    * Indicates whether the property {@link FormFieldModel.displayText} should be updated while the user types.
    *

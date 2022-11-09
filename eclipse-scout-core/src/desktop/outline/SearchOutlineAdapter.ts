@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, OutlineAdapter, SearchOutline, SearchOutlineModel} from '../../index';
-import {SearchOutlineSearchEvent} from './SearchOutlineEventMap';
+import {Event, OutlineAdapter, SearchOutline, SearchOutlineModel, SearchOutlineSearchEvent} from '../../index';
 
-export default class SearchOutlineAdapter extends OutlineAdapter {
+export class SearchOutlineAdapter extends OutlineAdapter {
   declare widget: SearchOutline;
 
   protected override _initProperties(model: SearchOutlineModel & { requestFocusQueryField?: boolean }) {

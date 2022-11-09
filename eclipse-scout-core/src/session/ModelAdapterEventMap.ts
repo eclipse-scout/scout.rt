@@ -10,7 +10,7 @@
  */
 import {Event, EventMap, ModelAdapter} from '../index';
 
-export default interface ModelAdapterEventMap extends EventMap {
+export interface ModelAdapterEventMap extends EventMap {
   'attach': Event<ModelAdapter>;
   'detach': Event<ModelAdapter>;
 }

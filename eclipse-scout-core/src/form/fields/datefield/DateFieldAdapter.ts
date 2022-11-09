@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, DateField, dates, objects, ParsingFailedStatus, RemoteEvent, ValueFieldAdapter} from '../../../index';
-import {ValueFieldAcceptInputEvent} from '../ValueFieldEventMap';
+import {App, arrays, DateField, dates, objects, ParsingFailedStatus, RemoteEvent, ValueFieldAcceptInputEvent, ValueFieldAdapter} from '../../../index';
 
-export default class DateFieldAdapter extends ValueFieldAdapter {
+export class DateFieldAdapter extends ValueFieldAdapter {
 
   static PROPERTIES_ORDER = ['hasTime', 'hasDate'];
 

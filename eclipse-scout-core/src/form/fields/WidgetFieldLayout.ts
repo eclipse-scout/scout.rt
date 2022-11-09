@@ -10,7 +10,7 @@
  */
 import {FormFieldLayout, scrollbars, WidgetField} from '../../index';
 
-export default class WidgetFieldLayout extends FormFieldLayout {
+export class WidgetFieldLayout extends FormFieldLayout {
   declare formField: WidgetField;
 
   constructor(formField: WidgetField) {

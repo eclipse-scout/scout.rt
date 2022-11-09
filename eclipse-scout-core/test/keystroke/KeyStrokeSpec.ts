@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys, KeyStroke} from '../../src/index';
-import {triggerKeyDownCapture, triggerKeyUpCapture} from '../../src/testing/jquery-testing';
+import {JQueryTesting} from '../../src/testing';
 
 describe('KeyStroke', () => {
   let session: SandboxSession;
@@ -49,9 +49,9 @@ describe('KeyStroke', () => {
       spyOn(keyStroke, 'handle');
 
       while (keyDownCount-- > 0) {
-        triggerKeyDownCapture(session.desktop.$container, keys.ENTER);
+        JQueryTesting.triggerKeyDownCapture(session.desktop.$container, keys.ENTER);
       }
-      triggerKeyUpCapture(session.desktop.$container, keys.ENTER);
+      JQueryTesting.triggerKeyUpCapture(session.desktop.$container, keys.ENTER);
 
       // @ts-expect-error
       expect(keyStroke.handle.calls.count())

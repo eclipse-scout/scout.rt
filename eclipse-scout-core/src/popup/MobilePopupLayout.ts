@@ -10,7 +10,7 @@
  */
 import {Dimension, graphics, HtmlCompPrefSizeOptions, MobilePopup, Point, PopupLayout} from '../index';
 
-export default class MobilePopupLayout extends PopupLayout {
+export class MobilePopupLayout extends PopupLayout {
 
   declare popup: MobilePopup;
 

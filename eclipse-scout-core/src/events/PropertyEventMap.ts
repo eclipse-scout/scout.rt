@@ -10,6 +10,6 @@
  */
 import {EventMap, PropertyChangeEvent} from '../index';
 
-export default interface PropertyEventMap extends EventMap {
+export interface PropertyEventMap extends EventMap {
   'propertyChange': PropertyChangeEvent;
 }

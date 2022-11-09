@@ -10,6 +10,6 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface DesktopLogoModel extends WidgetModel {
+export interface DesktopLogoModel extends WidgetModel {
   url?: string;
 }

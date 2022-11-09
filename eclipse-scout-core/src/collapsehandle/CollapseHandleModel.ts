@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {WidgetModel} from '../index';
-import {CollapseHandleHorizontalAlignment} from './CollapseHandle';
+import {CollapseHandleHorizontalAlignment, WidgetModel} from '../index';
 
-export default interface CollapseHandleModel extends WidgetModel {
+export interface CollapseHandleModel extends WidgetModel {
   leftVisible?: boolean;
   rightVisible?: boolean;
   horizontalAlignment?: CollapseHandleHorizontalAlignment;

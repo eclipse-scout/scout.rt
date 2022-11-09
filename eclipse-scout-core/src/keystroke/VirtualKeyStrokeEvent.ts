@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStrokeMode} from './KeyStroke';
-import {ScoutKeyboardEvent} from '../index';
+import {KeyStrokeMode, ScoutKeyboardEvent} from '../index';
 
-export default class VirtualKeyStrokeEvent implements ScoutKeyboardEvent {
+export class VirtualKeyStrokeEvent implements ScoutKeyboardEvent {
   which: number;
   ctrlKey: boolean;
   metaKey: boolean;

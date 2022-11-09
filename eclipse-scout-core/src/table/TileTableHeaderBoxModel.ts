@@ -10,6 +10,6 @@
  */
 import {GroupBoxModel, Table} from '../index';
 
-export default interface TileTableHeaderBoxModel extends GroupBoxModel {
+export interface TileTableHeaderBoxModel extends GroupBoxModel {
   parent?: Table;
 }

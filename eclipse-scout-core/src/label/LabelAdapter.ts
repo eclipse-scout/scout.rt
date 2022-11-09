@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Label, ModelAdapter} from '../index';
-import {LabelAppLinkActionEvent} from './LabelEventMap';
+import {Event, Label, LabelAppLinkActionEvent, ModelAdapter} from '../index';
 
-export default class LabelAdapter extends ModelAdapter {
+export class LabelAdapter extends ModelAdapter {
 
   protected _onWidgetAppLinkAction(event: LabelAppLinkActionEvent) {
     this._send('appLinkAction', {

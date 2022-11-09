@@ -11,7 +11,7 @@
 
 import {Insets} from '../index';
 
-export default class Dimension {
+export class Dimension {
   width: number;
   height: number;
 

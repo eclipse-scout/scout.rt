@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PropertyChangeEvent, WidgetEventMap} from '../../index';
-import {OutlineContent} from '../bench/DesktopBench';
+import {OutlineContent, PropertyChangeEvent, WidgetEventMap} from '../../index';
 
-export default interface DesktopHeaderEventMap extends WidgetEventMap {
+export interface DesktopHeaderEventMap extends WidgetEventMap {
   'propertyChange:logoUrl': PropertyChangeEvent<string>;
   'propertyChange:outlineContent': PropertyChangeEvent<OutlineContent>;
   'propertyChange:toolBoxVisible': PropertyChangeEvent<boolean>;

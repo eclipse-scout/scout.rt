@@ -11,8 +11,7 @@
 
 /* eslint-disable no-multi-assign */
 import {keys} from '../../src/index';
-import {TreeSpecHelper} from '../../src/testing/index';
-import {triggerKeyDown} from '../../src/testing/jquery-testing';
+import {JQueryTesting, TreeSpecHelper} from '../../src/testing/index';
 
 describe('TreeKeyStrokes', () => {
   let session: SandboxSession;
@@ -45,11 +44,11 @@ describe('TreeKeyStrokes', () => {
       tree.render();
       helper.selectNodesAndAssert(tree, [node2]);
 
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node1]);
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node0]);
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node0]);
     });
 
@@ -66,11 +65,11 @@ describe('TreeKeyStrokes', () => {
       tree.render();
       helper.selectNodesAndAssert(tree, [node1Child1]);
 
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node1Child0]);
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node1]);
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node0Child2]);
     });
 
@@ -81,7 +80,7 @@ describe('TreeKeyStrokes', () => {
       let node2 = tree.nodes[2];
 
       tree.render();
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node2]);
     });
 
@@ -91,17 +90,17 @@ describe('TreeKeyStrokes', () => {
 
       let node0 = tree.nodes[0];
       tree.render();
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node0]);
 
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node0]);
 
       tree.deselectAll();
 
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node0]);
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node0]);
     });
     it('does nothing if first node already is selected', () => {
@@ -111,7 +110,7 @@ describe('TreeKeyStrokes', () => {
       tree.render();
       let node0 = tree.nodes[0];
       helper.selectNodesAndAssert(tree, [node0]);
-      triggerKeyDown(tree.$data, keys.UP);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.UP);
       helper.assertSelection(tree, [node0]);
     });
   });
@@ -128,11 +127,11 @@ describe('TreeKeyStrokes', () => {
       tree.render();
       helper.selectNodesAndAssert(tree, [node0]);
 
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node1]);
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node2]);
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node2]);
     });
 
@@ -144,7 +143,7 @@ describe('TreeKeyStrokes', () => {
 
       tree.render();
 
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node0]);
     });
 
@@ -161,11 +160,11 @@ describe('TreeKeyStrokes', () => {
       tree.render();
       helper.selectNodesAndAssert(tree, [node0Child2]);
 
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node1]);
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node1Child0]);
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node1Child1]);
     });
 
@@ -175,17 +174,17 @@ describe('TreeKeyStrokes', () => {
 
       let node0 = tree.nodes[0];
       tree.render();
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node0]);
 
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node0]);
 
       tree.deselectAll();
 
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node0]);
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node0]);
     });
 
@@ -198,7 +197,7 @@ describe('TreeKeyStrokes', () => {
       tree.render();
       helper.selectNodesAndAssert(tree, [node2]);
 
-      triggerKeyDown(tree.$data, keys.DOWN);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.DOWN);
       helper.assertSelection(tree, [node2]);
     });
   });
@@ -214,7 +213,7 @@ describe('TreeKeyStrokes', () => {
       tree.render();
       helper.selectNodesAndAssert(tree, [node2]);
 
-      triggerKeyDown(tree.$data, keys.HOME);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.HOME);
       helper.assertSelection(tree, [node0]);
     });
     it('selects first node in expanded tree', () => {
@@ -227,7 +226,7 @@ describe('TreeKeyStrokes', () => {
       tree.render();
       helper.selectNodesAndAssert(tree, [node0Child2]);
 
-      triggerKeyDown(tree.$data, keys.HOME);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.HOME);
       helper.assertSelection(tree, [node0]);
       tree.visitNodes(node => {
         expect(node.expanded).toBeFalsy();
@@ -247,7 +246,7 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeTruthy();
 
-      triggerKeyDown(tree.$data, keys.SUBTRACT);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SUBTRACT);
       expect(node0.expanded).toBeFalsy();
     });
 
@@ -262,12 +261,12 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0Child0]);
       expect(node0Child0.expanded).toBeTruthy();
 
-      triggerKeyDown(tree.$data, keys.SUBTRACT);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SUBTRACT);
       expect(node0Child0.expanded).toBeFalsy();
-      triggerKeyDown(tree.$data, keys.SUBTRACT);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SUBTRACT);
       helper.assertSelection(tree, [node0]);
       expect(node0.expanded).toBeTruthy();
-      triggerKeyDown(tree.$data, keys.SUBTRACT);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SUBTRACT);
       expect(node0.expanded).toBeFalsy();
     });
 
@@ -284,7 +283,7 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeFalsy();
 
-      triggerKeyDown(tree.$data, keys.ADD);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.ADD);
       expect(node0.expanded).toBeTruthy();
     });
 
@@ -298,9 +297,9 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeFalsy();
 
-      triggerKeyDown(tree.$data, keys.ADD);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.ADD);
       expect(node0.expanded).toBeTruthy();
-      triggerKeyDown(tree.$data, keys.ADD);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.ADD);
       helper.assertSelection(tree, [node0.childNodes[0]]);
     });
   });
@@ -317,7 +316,7 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeFalsy();
 
-      triggerKeyDown(tree.$data, keys.END);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.END);
       helper.assertSelection(tree, [node2]);
     });
 
@@ -334,7 +333,7 @@ describe('TreeKeyStrokes', () => {
       tree.checkNode(node0, true);
       expect(node0.checked).toBeTruthy();
       tree.render();
-      triggerKeyDown(tree.$data, keys.SPACE);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SPACE);
 
       tree.visitNodes(node => {
         if (node === node0) {
@@ -355,7 +354,7 @@ describe('TreeKeyStrokes', () => {
       expect(node0.checked).toBeFalsy();
       helper.selectNodesAndAssert(tree, [node0]);
 
-      triggerKeyDown(tree.$data, keys.SPACE);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SPACE);
 
       tree.visitNodes(node => {
         if (node === node0) {
@@ -377,7 +376,7 @@ describe('TreeKeyStrokes', () => {
       expect(node0.checked).toBeTruthy();
       helper.selectNodesAndAssert(tree, [node0]);
 
-      triggerKeyDown(tree.$data, keys.SPACE);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.SPACE);
 
       tree.visitNodes(node => {
         expect(node.checked).toBeFalsy();

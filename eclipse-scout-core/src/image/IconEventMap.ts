@@ -10,7 +10,7 @@
  */
 import {Event, Icon, IconDesc, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface IconEventMap extends WidgetEventMap {
+export interface IconEventMap extends WidgetEventMap {
   'error': Event<Icon>;
   'load': Event<Icon>;
   'propertyChange:autoFit': PropertyChangeEvent<boolean>;

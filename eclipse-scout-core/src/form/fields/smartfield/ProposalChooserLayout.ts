@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, ProposalChooser, scrollbars} from '../../../index';
-import {ProposalChooserLayoutResetter} from './ProposalChooser';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, ProposalChooser, ProposalChooserLayoutResetter, scrollbars} from '../../../index';
 
-export default class ProposalChooserLayout extends AbstractLayout {
+export class ProposalChooserLayout extends AbstractLayout {
   protected _proposalChooser: ProposalChooser<any, any, any>;
   protected _layoutResetter: ProposalChooserLayoutResetter;
 

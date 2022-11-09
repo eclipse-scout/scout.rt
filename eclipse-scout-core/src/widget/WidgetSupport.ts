@@ -10,7 +10,7 @@
  */
 import {scout, Widget, WidgetSupportOptions} from '../index';
 
-export default class WidgetSupport {
+export class WidgetSupport {
   options$Container: JQuery | (() => JQuery);
   widget: Widget;
   $container: JQuery;

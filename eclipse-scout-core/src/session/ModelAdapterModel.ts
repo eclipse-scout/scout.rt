@@ -10,7 +10,7 @@
  */
 import {ObjectWithType, Session} from '../index';
 
-export default interface ModelAdapterModel extends Partial<ObjectWithType> {
+export interface ModelAdapterModel extends Partial<ObjectWithType> {
   id?: string;
   session?: Session;
 }

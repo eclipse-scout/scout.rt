@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, EventHandler, Popup, PropertyChangeEvent, TagBar, TagBarOverflowPopupLayout, TagField, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
-import {TagFieldKeyStrokeAdapter} from '../form/fields/tagfield/TagField';
-import {InitModelOf} from '../scout';
+import {AbstractLayout, arrays, EventHandler, InitModelOf, Popup, PropertyChangeEvent, TagBar, TagBarOverflowPopupLayout, TagField, TagFieldDeleteKeyStroke, TagFieldKeyStrokeAdapter, TagFieldNavigationKeyStroke} from '../index';
 
-export default class TagBarOverflowPopup extends Popup {
+export class TagBarOverflowPopup extends Popup {
   declare parent: TagBar;
 
   $body: JQuery;

@@ -10,7 +10,7 @@
  */
 import {CollapseHandle, EnlargeNavigationKeyStroke, KeyStrokeContext, ShrinkNavigationKeyStroke} from '../../index';
 
-export default class DesktopNavigationHandle extends CollapseHandle {
+export class DesktopNavigationHandle extends CollapseHandle {
 
   desktopKeyStrokeContext: KeyStrokeContext;
 

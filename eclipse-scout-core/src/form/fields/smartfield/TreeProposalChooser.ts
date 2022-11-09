@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupRow, objects, ProposalChooser, ProposalTreeNode, scout, Tree, TreeLayoutResetter, TreeNode} from '../../../index';
-import {TreeNodeClickEvent} from '../../../tree/TreeEventMap';
-import {SmartFieldLookupResult} from './SmartField';
+import {arrays, LookupRow, objects, ProposalChooser, ProposalTreeNode, scout, SmartFieldLookupResult, Tree, TreeLayoutResetter, TreeNode, TreeNodeClickEvent} from '../../../index';
 
-export default class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, ProposalTreeNode<TValue>> {
+export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, ProposalTreeNode<TValue>> {
 
   protected override _createContent(): Tree {
     let tree = scout.create(Tree, {

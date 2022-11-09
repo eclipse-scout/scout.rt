@@ -10,7 +10,7 @@
  */
 import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface DesktopLogoEventMap extends WidgetEventMap {
+export interface DesktopLogoEventMap extends WidgetEventMap {
   'propertyChange:clickable': PropertyChangeEvent<boolean>;
   'propertyChange:url': PropertyChangeEvent<string>;
 }

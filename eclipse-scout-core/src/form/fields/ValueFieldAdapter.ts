@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, FormFieldAdapter, ValueField} from '../../index';
-import {AdapterData} from '../../session/Session';
-import {ValueFieldAcceptInputEvent} from './ValueFieldEventMap';
+import {AdapterData, Event, FormFieldAdapter, ValueField, ValueFieldAcceptInputEvent} from '../../index';
 
-export default class ValueFieldAdapter extends FormFieldAdapter {
+export class ValueFieldAdapter extends FormFieldAdapter {
   declare widget: ValueField<any>;
 
   protected _onWidgetAcceptInput(event: ValueFieldAcceptInputEvent) {

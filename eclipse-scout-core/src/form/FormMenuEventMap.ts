@@ -10,6 +10,6 @@
  */
 import {Form, MenuEventMap, PropertyChangeEvent} from '../index';
 
-export default interface FormMenuEventMap extends MenuEventMap {
+export interface FormMenuEventMap extends MenuEventMap {
   'propertyChange:form': PropertyChangeEvent<Form>;
 }

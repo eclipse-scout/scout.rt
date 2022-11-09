@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData, WidgetModel} from '../index';
-import {TileDisplayStyle} from './Tile';
-import {ColorScheme} from '../util/colorSchemes';
+import {ColorScheme, GridData, TileDisplayStyle, WidgetModel} from '../index';
 
-export default interface TileModel extends WidgetModel {
+export interface TileModel extends WidgetModel {
   /**
    * Specifies the color scheme of the tile.
    *

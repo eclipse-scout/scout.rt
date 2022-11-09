@@ -9,14 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  HtmlComponent, LookupRow, objects, ProposalChooserEventMap, ProposalChooserLayout, ProposalChooserModel, ProposalField, RadioButton, RadioButtonGroup, scout, ScoutKeyboardEvent, SmartField, SmartFieldPopup, Status, Table, Widget
+  HtmlComponent, InitModelOf, LookupRow, objects, ProposalChooserEventMap, ProposalChooserLayout, ProposalChooserModel, ProposalField, RadioButton, RadioButtonGroup, scout, ScoutKeyboardEvent, SmartField, SmartFieldLookupResult,
+  SmartFieldPopup, Status, StatusOrModel, Table, Widget
 } from '../../../index';
 import $ from 'jquery';
-import {SmartFieldLookupResult} from './SmartField';
-import {StatusOrModel} from '../../../status/Status';
-import {InitModelOf} from '../../../scout';
 
-export default abstract class ProposalChooser<TValue, TContent extends ProposalChooserContent, TContentRow extends ProposalChooserContentRow<TValue>> extends Widget implements ProposalChooserModel<TValue> {
+export abstract class ProposalChooser<TValue, TContent extends ProposalChooserContent, TContentRow extends ProposalChooserContentRow<TValue>> extends Widget implements ProposalChooserModel<TValue> {
   declare model: ProposalChooserModel<TValue>;
   declare eventMap: ProposalChooserEventMap<TValue, TContent, TContentRow>;
   declare self: ProposalChooser<any, any, any>;

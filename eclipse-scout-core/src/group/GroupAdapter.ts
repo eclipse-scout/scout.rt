@@ -10,7 +10,7 @@
  */
 import {ModelAdapter} from '../index';
 
-export default class GroupAdapter extends ModelAdapter {
+export class GroupAdapter extends ModelAdapter {
 
   constructor() {
     super();

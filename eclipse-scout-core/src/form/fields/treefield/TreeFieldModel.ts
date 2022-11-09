@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel, Tree} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {FormFieldModel, ObjectOrChildModel, Tree} from '../../../index';
 
-export default interface TreeFieldModel extends FormFieldModel {
+export interface TreeFieldModel extends FormFieldModel {
   tree?: ObjectOrChildModel<Tree>;
 }

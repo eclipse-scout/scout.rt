@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BeanField, Event, ValueFieldAdapter} from '../../../index';
-import {AppLinkActionEvent} from './BeanFieldEventMap';
+import {AppLinkActionEvent, BeanField, Event, ValueFieldAdapter} from '../../../index';
 
-export default class BeanFieldAdapter extends ValueFieldAdapter {
+export class BeanFieldAdapter extends ValueFieldAdapter {
   protected _onWidgetAppLinkAction(event: AppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref

@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {graphics, NullWidget, scrollbars} from '../../src/index';
-import {_onScrollableVisibleChange, _processDomMutation} from '../../src/scrollbar/scrollbars';
 
 describe('scrollbars', () => {
   let session: SandboxSession;
@@ -260,7 +259,7 @@ describe('scrollbars', () => {
 
       // MutationObserver is sometimes not executed when running headless, even when using setTimeout -> call processing explicitly
       // @ts-expect-error
-      _processDomMutation({addedNodes: [$container[0]]});
+      scrollbars._processDomMutation({addedNodes: [$container[0]]});
       expect($scrollShadow[0]).toBe($container.next()[0]);
       expect($scrollShadow.next()[0]).toBeFalsy();
       scrollbars.uninstall($container, session);
@@ -276,15 +275,15 @@ describe('scrollbars', () => {
       createContent($container);
 
       let $scrollShadow = $container.data('scroll-shadow');
-      _onScrollableVisibleChange($container[0], false);
+      scrollbars._onScrollableVisibleChange($container[0], false);
       expect($scrollShadow.isVisible()).toBe(false);
 
       $container.setVisible(true);
-      _onScrollableVisibleChange($container[0], true);
+      scrollbars._onScrollableVisibleChange($container[0], true);
       expect($scrollShadow.isVisible()).toBe(true);
 
       $container.setVisible(false);
-      _onScrollableVisibleChange($container[0], false);
+      scrollbars._onScrollableVisibleChange($container[0], false);
       expect($scrollShadow.isVisible()).toBe(false);
       scrollbars.uninstall($container, session);
     });

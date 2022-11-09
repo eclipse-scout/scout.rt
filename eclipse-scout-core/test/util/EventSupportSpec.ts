@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventListener, EventSupport, Event} from '../../src/index';
+import {Event, EventListener, EventSupport} from '../../src/index';
 
 describe('EventSupport', () => {
 

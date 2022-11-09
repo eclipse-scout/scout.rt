@@ -10,7 +10,7 @@
  */
 import {ValueFieldModel} from '../../../index';
 
-export default interface ClipboardFieldModel extends ValueFieldModel<string> {
+export interface ClipboardFieldModel extends ValueFieldModel<string> {
   /**
    * Configures the allowed mime types for the clipboard paste event.
    * Default is null which does not restrict the allowed types.

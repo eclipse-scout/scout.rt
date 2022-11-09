@@ -1,6 +1,6 @@
 import {WidgetSupportOptions} from '../index';
 
-export default interface LoadingSupportOptions extends WidgetSupportOptions {
+export interface LoadingSupportOptions extends WidgetSupportOptions {
 
   /**
    * If not set: 250 ms

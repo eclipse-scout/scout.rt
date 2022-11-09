@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, PropertyChangeEvent, WidgetEventMap} from '../../index';
-import {TooltipPosition} from '../../tooltip/Tooltip';
+import {Menu, PropertyChangeEvent, TooltipPosition, WidgetEventMap} from '../../index';
 
-export default interface MenuBarBoxEventMap extends WidgetEventMap {
+export interface MenuBarBoxEventMap extends WidgetEventMap {
   'propertyChange:menuItems': PropertyChangeEvent<Menu[]>;
   'propertyChange:tooltipPosition': PropertyChangeEvent<TooltipPosition>;
 }

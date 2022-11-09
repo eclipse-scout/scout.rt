@@ -10,7 +10,7 @@
  */
 import {DecimalFormat, Locale, NumberField, objects} from '../../../index';
 
-export default class IntegerField extends NumberField {
+export class IntegerField extends NumberField {
 
   static MIN_VALUE = Number.MIN_SAFE_INTEGER;
   static MAX_VALUE = Number.MAX_SAFE_INTEGER;

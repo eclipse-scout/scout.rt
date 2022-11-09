@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateRange, Event, Menu, Planner, PropertyChangeEvent, WidgetEventMap} from '../index';
-import {PlannerActivity, PlannerDisplayMode, PlannerDisplayModeOptions, PlannerResource} from './Planner';
+import {DateRange, Event, Menu, Planner, PlannerActivity, PlannerDisplayMode, PlannerDisplayModeOptions, PlannerResource, PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export interface PlannerResourcesSelectedEvent<P extends Planner = Planner> extends Event<P> {
   resources: PlannerResource[];
 }
 
-export default interface PlannerEventMap extends WidgetEventMap {
+export interface PlannerEventMap extends WidgetEventMap {
   'resourcesSelected': PlannerResourcesSelectedEvent;
   'propertyChange:availableDisplayModes': PropertyChangeEvent<PlannerDisplayMode[]>;
   'propertyChange:displayMode': PropertyChangeEvent<PlannerDisplayMode>;

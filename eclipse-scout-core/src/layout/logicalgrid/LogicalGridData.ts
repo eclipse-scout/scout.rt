@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeField, FormField, graphics, GridData, LayoutData, objects, Widget} from '../../index';
-import {FormFieldLabelPosition} from '../../form/fields/FormField';
+import {CompositeField, FormField, FormFieldLabelPosition, graphics, GridData, LayoutData, objects, Widget} from '../../index';
 
 export interface LogicalGridWidget extends Widget {
   gridData: GridData;
@@ -29,7 +28,7 @@ function isLogicalGridWidget(widget): widget is LogicalGridWidget {
  * Merged with the base class LogicalGridData (for the default values). We don't need the base
  * class standalone, since we only used LGL for the group-box body in Html UI.
  */
-export default class LogicalGridData implements LayoutData {
+export class LogicalGridData implements LayoutData {
   fillHorizontal: boolean;
   fillVertical: boolean;
   gridh: number;

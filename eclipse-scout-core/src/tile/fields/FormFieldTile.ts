@@ -12,7 +12,7 @@ import {BrowserField, Device, EnumObject, FormFieldLayout, PropertyChangeEvent, 
 
 export type FormFieldTileDisplayStyle = EnumObject<typeof FormFieldTile.DisplayStyle>;
 
-export default class FormFieldTile extends WidgetTile {
+export class FormFieldTile extends WidgetTile {
   declare displayStyle: FormFieldTileDisplayStyle;
 
   constructor() {

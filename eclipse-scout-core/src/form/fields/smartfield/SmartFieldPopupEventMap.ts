@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupEventMap, PropertyChangeEvent} from '../../../index';
-import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
-import {SmartFieldLookupResult} from './SmartField';
+import {PopupEventMap, PropertyChangeEvent, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, SmartFieldLookupResult} from '../../../index';
 
-export default interface SmartFieldPopupEventMap<TValue> extends PopupEventMap {
+export interface SmartFieldPopupEventMap<TValue> extends PopupEventMap {
   'activeFilterSelected': ProposalChooserActiveFilterSelectedEvent<TValue>;
   'lookupRowSelected': ProposalChooserLookupRowSelectedEvent<TValue>;
   'propertyChange:lookupResult': PropertyChangeEvent<SmartFieldLookupResult<TValue>>;

@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, Rectangle, WidgetModel} from '../index';
-import {StatusSeverity} from '../status/Status';
-import {TooltipDirection, TooltipPosition, TooltipScrollType} from './Tooltip';
-import {ObjectOrChildModel} from '../scout';
+import {Menu, ObjectOrChildModel, Rectangle, StatusSeverity, TooltipDirection, TooltipPosition, TooltipScrollType, WidgetModel} from '../index';
 
-export default interface TooltipModel extends WidgetModel {
+export interface TooltipModel extends WidgetModel {
   /**
    * Default is no text.
    */

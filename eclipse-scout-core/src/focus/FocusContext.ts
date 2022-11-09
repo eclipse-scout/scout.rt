@@ -18,7 +18,7 @@ import TriggeredEvent = JQuery.TriggeredEvent;
 /**
  * A focus context is associated with a $container, and controls how to focus elements within that $container.
  */
-export default class FocusContext {
+export class FocusContext {
   focusManager: FocusManager;
 
   /** variable to store the last valid focus position; used to restore focus once being re-activated. */

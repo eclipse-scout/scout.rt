@@ -98,7 +98,7 @@ describe('FormFieldLayout', () => {
     if (origPrefSize) {
       unspyForWidthHint();
     }
-    origPrefSize = graphics.prefSize;
+    origPrefSize = graphics.prefSize.bind(graphics);
     graphics.prefSize = ($elem: JQuery, options: PrefSizeOptions) => {
       if ($elem[0] === formField.$fieldContainer[0]) {
         func(options.widthHint, options.heightHint);

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicField, Calculator, DecimalFormat, fields, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
-import {InitModelOf} from '../../../scout';
+import {BasicField, Calculator, DecimalFormat, fields, InitModelOf, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
 
-export default class NumberField extends BasicField<number, number | string> implements NumberFieldModel {
+export class NumberField extends BasicField<number, number | string> implements NumberFieldModel {
   declare model: NumberFieldModel;
   declare eventMap: NumberFieldEventMap;
   declare self: NumberField;

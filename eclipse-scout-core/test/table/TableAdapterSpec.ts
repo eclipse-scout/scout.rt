@@ -8,12 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues, RemoteEvent, Table, TableAdapter, TableRow, TableTextUserFilter} from '../../src/index';
-import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
-import SpecTable from '../../src/testing/table/SpecTable';
-import {TableModelWithCells} from '../../src/testing/table/TableSpecHelper';
-import {RemoteResponse} from '../../src/session/Session';
-import SpecTableAdapter from '../../src/testing/table/SpecTableAdapter';
+import {defaultValues, RemoteEvent, RemoteResponse, Table, TableAdapter, TableRow, TableTextUserFilter} from '../../src/index';
+import {LocaleSpecHelper, SpecTable, SpecTableAdapter, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
 
 describe('TableAdapter', () => {
   let session: SandboxSession;
@@ -265,7 +261,7 @@ describe('TableAdapter', () => {
     describe('allRowsDeleted event', () => {
       let model, table, adapter;
 
-      function createAllRowsDeletedEvent(model: {id: string}) {
+      function createAllRowsDeletedEvent(model: { id: string }) {
         return {
           target: model.id,
           type: 'allRowsDeleted'

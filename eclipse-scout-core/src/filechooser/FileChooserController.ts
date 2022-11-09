@@ -15,7 +15,7 @@ import {arrays, DisplayParent, FileChooser, Form, scout, Session} from '../index
  *
  * The file choosers are put into the list fileChoosers contained in 'displayParent'.
  */
-export default class FileChooserController {
+export class FileChooserController {
   displayParent: DisplayParent;
   session: Session;
 

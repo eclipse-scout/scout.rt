@@ -9,17 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, CloseKeyStroke, DialogLayout, Dimension, EnumObject, Event, EventHandler, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStroke, KeyStrokeContext, Point, PopupEventMap, PopupLayout, Rectangle, scout,
-  scrollbars, strings, Widget, widgets
+  AbstractLayout, CloseKeyStroke, DesktopPopupOpenEvent, DialogLayout, Dimension, EnumObject, Event, EventHandler, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, InitModelOf, Insets, KeyStroke, KeyStrokeContext, Point,
+  PopupEventMap, PopupLayout, PopupModel, Rectangle, scout, scrollbars, strings, Widget, widgets
 } from '../index';
 import $ from 'jquery';
-import PopupModel from './PopupModel';
-import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
-import {InitModelOf} from '../scout';
 
 export type PopupAlignment = EnumObject<typeof Popup.Alignment>;
 
-export default class Popup extends Widget implements PopupModel {
+export class Popup extends Widget implements PopupModel {
   declare model: PopupModel;
   declare eventMap: PopupEventMap;
   declare self: Popup;

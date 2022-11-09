@@ -11,7 +11,7 @@
 import {arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LogicalGridLayout, PlaceholderTile, Point, Rectangle, scout, scrollbars, styles, Tile, TileGrid, TileGridLayoutConfig, Widget} from '../index';
 import $ from 'jquery';
 
-export default class TileGridLayout extends LogicalGridLayout {
+export class TileGridLayout extends LogicalGridLayout {
   declare widget: TileGrid;
   containerPos: Point;
   containerScrollTop: number;

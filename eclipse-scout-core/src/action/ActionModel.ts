@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {WidgetModel} from '../index';
-import {ActionStyle, ActionTextPosition, KeyStrokeFirePolicy} from './Action';
-import {Alignment} from '../cell/Cell';
+import {ActionStyle, ActionTextPosition, Alignment, KeyStrokeFirePolicy, WidgetModel} from '../index';
 
-export default interface ActionModel extends WidgetModel {
+export interface ActionModel extends WidgetModel {
   /**
    * Default is {@link Action.ActionStyle.DEFAULT}.
    */

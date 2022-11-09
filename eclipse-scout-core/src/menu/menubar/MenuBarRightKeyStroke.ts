@@ -11,7 +11,7 @@
 import {keys, KeyStroke, MenuBar} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class MenuBarRightKeyStroke extends KeyStroke {
+export class MenuBarRightKeyStroke extends KeyStroke {
   declare field: MenuBar;
 
   constructor(menuBar: MenuBar) {

@@ -11,7 +11,7 @@
 import {DummyLookupCall} from '../index';
 import {LookupRow} from '../../index';
 
-export default class ColumnDescriptorDummyLookupCall extends DummyLookupCall {
+export class ColumnDescriptorDummyLookupCall extends DummyLookupCall {
   constructor() {
     super();
     this.multiline = false;

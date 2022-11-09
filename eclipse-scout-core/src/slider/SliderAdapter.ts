@@ -10,7 +10,7 @@
  */
 import {ModelAdapter} from '../index';
 
-export default class SliderAdapter extends ModelAdapter {
+export class SliderAdapter extends ModelAdapter {
 
   constructor() {
     super();

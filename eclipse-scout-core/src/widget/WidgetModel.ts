@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DisabledStyle, DisplayParent, LogicalGrid, Session, Widget} from '../index';
-import {ObjectModel} from '../scout';
+import {DisabledStyle, DisplayParent, LogicalGrid, ObjectModel, Session, Widget} from '../index';
 
-export default interface WidgetModel extends ObjectModel<Widget> {
+export interface WidgetModel extends ObjectModel<Widget> {
   /**
    * The parent widget.
    */

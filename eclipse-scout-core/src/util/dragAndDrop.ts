@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dragAndDrop, DragAndDropHandler, EnumObject, Widget} from '../index';
+import {arrays, DragAndDropHandler, EnumObject, Widget} from '../index';
 
 const SCOUT_TYPES = {
   FILE_TRANSFER: 1 << 0, // IDNDSupport.TYPE_FILE_TRANSFER (NOSONAR)
@@ -17,185 +17,176 @@ const SCOUT_TYPES = {
   IMAGE_TRANSFER: 1 << 3 // IDNDSupport.TYPE_IMAGE_TRANSFER (NOSONAR)
 } as const;
 
-export type DropType = EnumObject<typeof SCOUT_TYPES>;
+export const dragAndDrop = {
 
-const DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // 50 MB
+  SCOUT_TYPES,
+  DEFAULT_DROP_MAXIMUM_SIZE: 50 * 1024 * 1024, // 50 MiB
 
-/**
- * Mapping function from scout drag types to browser drag types.
- *
- * @param scoutTypesArray array of SCOUT_TYPES
- */
-export function scoutTypeToDragTypeMapping(scoutTypesArray: DropType | DropType[]): Array<string> {
-  scoutTypesArray = arrays.ensure(scoutTypesArray);
-  let ret = [];
-  if (scoutTypesArray.indexOf(SCOUT_TYPES.FILE_TRANSFER) >= 0) {
-    ret.push('Files');
-  }
-  return ret;
-}
+  /**
+   * Mapping function from scout drag types to browser drag types.
+   *
+   * @param scoutTypesArray array of SCOUT_TYPES
+   */
+  scoutTypeToDragTypeMapping(scoutTypesArray: DropType | DropType[]): Array<string> {
+    scoutTypesArray = arrays.ensure(scoutTypesArray);
+    let ret = [];
+    if (scoutTypesArray.indexOf(dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0) {
+      ret.push('Files');
+    }
+    return ret;
+  },
 
-/**
- * Check if specific scout type is supported by dataTransfer, if event is not handled by this field (desktop might handle it)
- *
- * @param event including event.originalEvent.dataTransfer
- * @param fieldAllowedTypes allowed types on field (integer, bitwise comparison used)
- * @param scoutTypeArray e.g. FILE_TRANSFER
- */
-export function verifyDataTransferTypesScoutTypes(event: JQuery.DragEventBase, scoutTypeArray: DropType | DropType[], fieldAllowedTypes: number) {
-  scoutTypeArray = arrays.ensure(scoutTypeArray);
-  let dragTypeArray = [];
+  /**
+   * Check if specific scout type is supported by dataTransfer, if event is not handled by this field (desktop might handle it)
+   *
+   * @param event including event.originalEvent.dataTransfer
+   * @param fieldAllowedTypes allowed types on field (integer, bitwise comparison used)
+   * @param scoutTypeArray e.g. FILE_TRANSFER
+   */
+  verifyDataTransferTypesScoutTypes(event: JQuery.DragEventBase, scoutTypeArray: DropType | DropType[], fieldAllowedTypes: number) {
+    scoutTypeArray = arrays.ensure(scoutTypeArray);
+    let dragTypeArray = [];
 
-  // check if any scout type is allowed for field allowed types (or no field allowed types defined)
-  if (fieldAllowedTypes !== undefined) {
-    scoutTypeArray.forEach(scoutType => {
-      if ((fieldAllowedTypes & scoutType) === scoutType) { // NOSONAR
-        arrays.pushAll(dragTypeArray, scoutTypeToDragTypeMapping(scoutTypeArray));
-      }
-    });
-  } else {
-    dragTypeArray = scoutTypeToDragTypeMapping(scoutTypeArray);
-  }
+    // check if any scout type is allowed for field allowed types (or no field allowed types defined)
+    if (fieldAllowedTypes !== undefined) {
+      scoutTypeArray.forEach(scoutType => {
+        if ((fieldAllowedTypes & scoutType) === scoutType) { // NOSONAR
+          arrays.pushAll(dragTypeArray, dragAndDrop.scoutTypeToDragTypeMapping(scoutTypeArray));
+        }
+      });
+    } else {
+      dragTypeArray = dragAndDrop.scoutTypeToDragTypeMapping(scoutTypeArray);
+    }
 
-  if (Array.isArray(dragTypeArray) && dragTypeArray.length > 0) {
-    verifyDataTransferTypes(event, dragTypeArray);
-  }
-}
+    if (Array.isArray(dragTypeArray) && dragTypeArray.length > 0) {
+      dragAndDrop.verifyDataTransferTypes(event, dragTypeArray);
+    }
+  },
 
-/**
- * Check if specific type is supported by dataTransfer, if event is not handled by this field (upstream field might handle it, at the latest desktop)
- *
- * @param dataTransfer dataTransfer object (not dataTransfer.types)
- * @param needleArray e.g. 'Files'
- */
-export function verifyDataTransferTypes(event: JQuery.DragEventBase, needleArray: string | string[]): boolean {
-  let dataTransfer = event.originalEvent.dataTransfer;
+  /**
+   * Check if specific type is supported by dataTransfer, if event is not handled by this field (upstream field might handle it, at the latest desktop)
+   *
+   * @param dataTransfer dataTransfer object (not dataTransfer.types)
+   * @param needleArray e.g. 'Files'
+   */
+  verifyDataTransferTypes(event: JQuery.DragEventBase, needleArray: string | string[]): boolean {
+    let dataTransfer = event.originalEvent.dataTransfer;
 
-  if (dataTransferTypesContains(dataTransfer, needleArray)) {
-    event.stopPropagation();
-    event.preventDefault();
-    return true;
-  }
-  return false;
-}
-
-/**
- * dataTransfer.types might be an array (Chrome, IE) or a DOMStringList.
- *
- * Unfortunately there is no intersecting contains method for both types.
- *
- * @param dataTransfer dataTransfer object (not dataTransfer.types)
- * @param scoutTypesArray e.g. FILE_TRANSFER
- */
-export function dataTransferTypesContainsScoutTypes(dataTransfer: DataTransfer, scoutTypesArray: DropType | DropType[]): boolean {
-  scoutTypesArray = arrays.ensure(scoutTypesArray);
-  let dragTypesArray = scoutTypeToDragTypeMapping(scoutTypesArray);
-  return dataTransferTypesContains(dataTransfer, dragTypesArray);
-}
-
-/**
- * dataTransfer.types might be an array (Chrome, IE) or a DOMStringList.
- *
- * Unfortunately there is no intersecting contains method for both types.
- *
- * @param dataTransfer dataTransfer object (not dataTransfer.types)
- * @param needleArray e.g. 'Files'
- */
-export function dataTransferTypesContains(dataTransfer: DataTransfer, needleArray: string | string[]): boolean {
-  needleArray = arrays.ensure(needleArray);
-  if (dataTransfer && dataTransfer.types) {
-    if (Array.isArray(dataTransfer.types) && arrays.containsAny(dataTransfer.types, needleArray)) {
-      // Array: indexOf function
+    if (dragAndDrop.dataTransferTypesContains(dataTransfer, needleArray)) {
+      event.stopPropagation();
+      event.preventDefault();
       return true;
     }
+    return false;
+  },
 
-    if (dataTransfer.types['contains']) {
-      // DOMStringList: contains function
-      return needleArray.some(element => {
-        return dataTransfer.types['contains'](element);
-      });
+  /**
+   * dataTransfer.types might be an array (Chrome, IE) or a DOMStringList.
+   *
+   * Unfortunately there is no intersecting contains method for both types.
+   *
+   * @param dataTransfer dataTransfer object (not dataTransfer.types)
+   * @param scoutTypesArray e.g. FILE_TRANSFER
+   */
+  dataTransferTypesContainsScoutTypes(dataTransfer: DataTransfer, scoutTypesArray: DropType | DropType[]): boolean {
+    scoutTypesArray = arrays.ensure(scoutTypesArray);
+    let dragTypesArray = dragAndDrop.scoutTypeToDragTypeMapping(scoutTypesArray);
+    return dragAndDrop.dataTransferTypesContains(dataTransfer, dragTypesArray);
+  },
+
+  /**
+   * dataTransfer.types might be an array (Chrome, IE) or a DOMStringList.
+   *
+   * Unfortunately there is no intersecting contains method for both types.
+   *
+   * @param dataTransfer dataTransfer object (not dataTransfer.types)
+   * @param needleArray e.g. 'Files'
+   */
+  dataTransferTypesContains(dataTransfer: DataTransfer, needleArray: string | string[]): boolean {
+    needleArray = arrays.ensure(needleArray);
+    if (dataTransfer && dataTransfer.types) {
+      if (Array.isArray(dataTransfer.types) && arrays.containsAny(dataTransfer.types, needleArray)) {
+        // Array: indexOf function
+        return true;
+      }
+
+      if (dataTransfer.types['contains']) {
+        // DOMStringList: contains function
+        return needleArray.some(element => {
+          return dataTransfer.types['contains'](element);
+        });
+      }
     }
-  }
-  return false;
-}
+    return false;
+  },
 
-export function handler(options: DragAndDropOptions): DragAndDropHandler {
-  if (!options || !options.target) {
-    return null;
-  }
-  return new DragAndDropHandler(options);
-}
-
-/**
- * installs or uninstalls a {@link DragAndDropHandler} on the target.
- */
-export function installOrUninstallDragAndDropHandler(options: DragAndDropOptions) {
-  if (!options.target) {
-    return;
-  }
-  options = $.extend({}, _createDragAndDropHandlerOptions(options.target), options);
-  if (options.doInstall()) {
-    _installDragAndDropHandler(options);
-  } else {
-    uninstallDragAndDropHandler(options.target);
-  }
-}
-
-export function _installDragAndDropHandler(options: DragAndDropOptions) {
-  if (options.target.dragAndDropHandler) {
-    return;
-  }
-  options.target.dragAndDropHandler = handler(options);
-  if (!options.target.dragAndDropHandler) {
-    return;
-  }
-  let $container = options.container();
-  if (!$container) {
-    return;
-  }
-  options.target.dragAndDropHandler.install($container, options.selector);
-}
-
-export function _createDragAndDropHandlerOptions(target: DragAndDropTarget): DragAndDropOptions {
-  return {
-    target: target,
-    supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-    validateFiles: (files, defaultValidator) => defaultValidator(files),
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onDrop: event => {
-    },
-    dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-    dropMaximumSize: () => target.dropMaximumSize,
-    doInstall: () => target.enabledComputed,
-    container: () => target.$container,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    additionalDropProperties: event => {
+  handler(options: DragAndDropOptions): DragAndDropHandler {
+    if (!options || !options.target) {
+      return null;
     }
-  };
-}
+    return new DragAndDropHandler(options);
+  },
 
-/**
- * uninstalls a {@link DragAndDropHandler} from the target. If no handler is installed, this function does nothing.
- */
-export function uninstallDragAndDropHandler(target: DragAndDropTarget) {
-  if (!target || !target.dragAndDropHandler) {
-    return;
+  /**
+   * installs or uninstalls a {@link DragAndDropHandler} on the target.
+   */
+  installOrUninstallDragAndDropHandler(options: DragAndDropOptions) {
+    if (!options.target) {
+      return;
+    }
+    options = $.extend({}, dragAndDrop._createDragAndDropHandlerOptions(options.target), options);
+    if (options.doInstall()) {
+      dragAndDrop._installDragAndDropHandler(options);
+    } else {
+      dragAndDrop.uninstallDragAndDropHandler(options.target);
+    }
+  },
+
+  /** @internal */
+  _installDragAndDropHandler(options: DragAndDropOptions) {
+    if (options.target.dragAndDropHandler) {
+      return;
+    }
+    options.target.dragAndDropHandler = dragAndDrop.handler(options);
+    if (!options.target.dragAndDropHandler) {
+      return;
+    }
+    let $container = options.container();
+    if (!$container) {
+      return;
+    }
+    options.target.dragAndDropHandler.install($container, options.selector);
+  },
+
+  /** @internal */
+  _createDragAndDropHandlerOptions(target: DragAndDropTarget): DragAndDropOptions {
+    return {
+      target: target,
+      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      validateFiles: (files, defaultValidator) => defaultValidator(files),
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      onDrop: event => {
+      },
+      dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      dropMaximumSize: () => target.dropMaximumSize,
+      doInstall: () => target.enabledComputed,
+      container: () => target.$container,
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      additionalDropProperties: event => {
+      }
+    };
+  },
+
+  /**
+   * uninstalls a {@link DragAndDropHandler} from the target. If no handler is installed, this function does nothing.
+   */
+  uninstallDragAndDropHandler(target: DragAndDropTarget) {
+    if (!target || !target.dragAndDropHandler) {
+      return;
+    }
+    target.dragAndDropHandler.uninstall();
+    target.dragAndDropHandler = null;
   }
-  target.dragAndDropHandler.uninstall();
-  target.dragAndDropHandler = null;
-}
-
-export default {
-  DEFAULT_DROP_MAXIMUM_SIZE,
-  SCOUT_TYPES,
-  dataTransferTypesContains,
-  dataTransferTypesContainsScoutTypes,
-  handler,
-  installOrUninstallDragAndDropHandler,
-  scoutTypeToDragTypeMapping,
-  uninstallDragAndDropHandler,
-  verifyDataTransferTypes,
-  verifyDataTransferTypesScoutTypes
 };
 
 export type DragAndDropTarget = Widget & {
@@ -288,3 +279,5 @@ export interface DragAndDropOptions {
    */
   additionalDropProperties?: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => any;
 }
+
+export type DropType = EnumObject<typeof SCOUT_TYPES>;

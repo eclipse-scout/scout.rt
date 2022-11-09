@@ -11,7 +11,7 @@
 import {AbstractLayout, HtmlComponent} from '../index';
 import $ from 'jquery';
 
-export default class NullLayout extends AbstractLayout {
+export class NullLayout extends AbstractLayout {
 
   override layout($container: JQuery) {
     $container.children().each(function() {

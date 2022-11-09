@@ -13,7 +13,7 @@ import {FormFieldLayout, SmartField} from '../../../index';
 /**
  * SmartFieldLayout works like FormLayout but additionally layouts its proposal-chooser popup.
  */
-export default class SmartFieldLayout extends FormFieldLayout {
+export class SmartFieldLayout extends FormFieldLayout {
   protected _smartField: SmartField<any>;
 
   constructor(smartField: SmartField<any>) {

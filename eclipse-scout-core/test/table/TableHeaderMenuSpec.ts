@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Column, ColumnUserFilter, Table, TableHeaderMenu} from '../../src/index';
-import {TableSpecHelper} from '../../src/testing/index';
-import {triggerClick} from '../../src/testing/jquery-testing';
+import {JQueryTesting, TableSpecHelper} from '../../src/testing/index';
 
 describe('TableHeaderMenu', () => {
   let session: SandboxSession;
@@ -179,10 +178,10 @@ describe('TableHeaderMenu', () => {
         let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'Value');
         expectTableRowText($filterItems, 1, 'Value2');
-        triggerClick($filterItems.eq(0));
+        JQueryTesting.triggerClick($filterItems.eq(0));
         let filter = table.getFilter(table.columns[0].id) as ColumnUserFilter;
         expect(filter.selectedValues).toEqual(['Value']);
-        triggerClick($filterItems.eq(1));
+        JQueryTesting.triggerClick($filterItems.eq(1));
         expect(filter.selectedValues).toEqual(['Value', 'Value2']);
         table.header.closeHeaderMenu();
       });
@@ -200,7 +199,7 @@ describe('TableHeaderMenu', () => {
         let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'Value');
         expectTableRowText($filterItems, 1, '-empty-');
-        triggerClick($filterItems.eq(1));
+        JQueryTesting.triggerClick($filterItems.eq(1));
         table.header.closeHeaderMenu();
 
         let filter = table.getFilter(table.columns[0].id) as ColumnUserFilter;

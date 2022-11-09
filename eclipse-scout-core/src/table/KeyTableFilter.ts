@@ -10,7 +10,7 @@
  */
 import {arrays, Filter, TableRow} from '../index';
 
-export default class KeyTableFilter implements Filter<TableRow> {
+export class KeyTableFilter implements Filter<TableRow> {
   acceptedKeys: any[];
   keySupplier: (row: TableRow) => any;
   active: boolean;

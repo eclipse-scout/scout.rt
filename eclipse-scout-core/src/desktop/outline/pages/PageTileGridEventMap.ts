@@ -10,7 +10,7 @@
  */
 import {Outline, Page, PropertyChangeEvent, TileGridEventMap, TileGridLayoutConfig} from '../../../index';
 
-export default interface PageTileGridEventMap extends TileGridEventMap {
+export interface PageTileGridEventMap extends TileGridEventMap {
   'propertyChange:compact': PropertyChangeEvent<boolean>;
   'propertyChange:compactLayoutConfig': PropertyChangeEvent<TileGridLayoutConfig>;
   'propertyChange:nodes': PropertyChangeEvent<Page[]>;

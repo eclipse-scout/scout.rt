@@ -8,13 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../index';
-import {DeviceType} from '../util/Device';
-import UserAgentModel from './UserAgentModel';
-import {SomeRequired} from '../types';
-import {InitModelOf} from '../scout';
+import {DeviceType, InitModelOf, scout, SomeRequired, UserAgentModel} from '../index';
 
-export default class UserAgent implements UserAgentModel {
+export class UserAgent implements UserAgentModel {
   declare model: UserAgentModel;
   declare initModel: SomeRequired<this['model'], 'deviceType'>;
 

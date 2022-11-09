@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../index';
-import {KeystrokeRenderAreaProvider} from './KeyStroke';
-import {CloseableWidget} from '../types';
+import {CloseableWidget, keys, KeyStroke, KeystrokeRenderAreaProvider} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class CloseKeyStroke extends KeyStroke {
+export class CloseKeyStroke extends KeyStroke {
 
   declare field: CloseableWidget;
 

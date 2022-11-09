@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, DateRange, WidgetModel} from '../index';
-import {CalendarItem} from './CalendarComponent';
-import {JsonDateRange} from '../util/dates';
+import {Calendar, CalendarItem, DateRange, JsonDateRange, WidgetModel} from '../index';
 
-export default interface CalendarComponentModel extends WidgetModel {
+export interface CalendarComponentModel extends WidgetModel {
   parent?: Calendar;
   fromDate?: string;
   toDate?: string;

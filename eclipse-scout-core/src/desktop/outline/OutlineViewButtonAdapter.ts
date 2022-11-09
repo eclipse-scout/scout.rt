@@ -10,7 +10,7 @@
  */
 import {OutlineViewButton, ViewButtonAdapter} from '../../index';
 
-export default class OutlineViewButtonAdapter extends ViewButtonAdapter {
+export class OutlineViewButtonAdapter extends ViewButtonAdapter {
   declare widget: OutlineViewButton;
 
   protected override _goOffline() {

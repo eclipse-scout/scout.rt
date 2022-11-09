@@ -8,14 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompactTree, ModelAdapter, ObjectFactory, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
+import {arrays, CompactTree, InitModelOf, ModelAdapter, ObjectFactory, ObjectType, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
+import {SpecTree, SpecTreeAdapter} from '../index';
 import $ from 'jquery';
-import {ObjectType} from '../../ObjectFactory';
-import SpecTree from './SpecTree';
-import SpecTreeAdapter from './SpecTreeAdapter';
-import {InitModelOf} from '../../scout';
 
-export default class TreeSpecHelper {
+export class TreeSpecHelper {
   session: Session;
 
   constructor(session: Session) {

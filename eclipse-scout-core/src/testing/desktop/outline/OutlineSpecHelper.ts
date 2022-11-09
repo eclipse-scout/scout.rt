@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter, Outline, OutlineAdapter, OutlineModel, Page, PageModel, Session} from '../../../index';
+import {FullModelOf, InitModelOf, ModelAdapter, ObjectOrModel, Outline, OutlineAdapter, OutlineModel, Page, PageModel, Session} from '../../../index';
 import {FormSpecHelper, TableSpecHelper} from '../../index';
 import $ from 'jquery';
-import {FullModelOf, InitModelOf, ObjectOrModel} from '../../../scout';
 
-export default class OutlineSpecHelper {
+export class OutlineSpecHelper {
   session: Session;
 
   constructor(session: Session) {

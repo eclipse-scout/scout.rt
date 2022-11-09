@@ -8,14 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, Column, Form, FormField, FormModel, GroupBox, Mode, ModeSelector, RadioButton, scout, Session, StringField, TabBox, TabItem, Table, TableField, Widget} from '../../index';
+import {SpecForm, SpecRadioButtonGroup} from '../index';
+import {Action, arrays, Column, Form, FormField, FormModel, FullModelOf, GroupBox, InitModelOf, Mode, ModeSelector, ObjectType, RadioButton, scout, Session, StringField, TabBox, TabItem, Table, TableField, Widget} from '../../index';
 import $ from 'jquery';
-import {ObjectType} from '../../ObjectFactory';
-import {FullModelOf, InitModelOf} from '../../scout';
-import SpecForm from './SpecForm';
-import SpecRadioButtonGroup from './SpecRadioButtonGroup';
 
-export default class FormSpecHelper {
+export class FormSpecHelper {
   session: Session;
 
   constructor(session: Session) {

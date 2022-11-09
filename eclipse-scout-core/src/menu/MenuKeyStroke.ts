@@ -10,7 +10,7 @@
  */
 import {ActionKeyStroke, Menu} from '../index';
 
-export default class MenuKeyStroke extends ActionKeyStroke {
+export class MenuKeyStroke extends ActionKeyStroke {
 
   declare field: Menu;
 

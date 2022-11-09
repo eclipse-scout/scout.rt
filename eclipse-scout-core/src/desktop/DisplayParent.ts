@@ -10,7 +10,7 @@
  */
 import {FileChooser, FileChooserController, Form, FormController, MessageBox, MessageBoxController, Widget} from '../index';
 
-export default interface DisplayParent extends Widget {
+export interface DisplayParent extends Widget {
 
   views: Form[];
   dialogs: Form[];

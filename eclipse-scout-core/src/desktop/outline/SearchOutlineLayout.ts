@@ -10,7 +10,7 @@
  */
 import {graphics, OutlineLayout, SearchOutline} from '../../index';
 
-export default class SearchOutlineLayout extends OutlineLayout {
+export class SearchOutlineLayout extends OutlineLayout {
   declare outline: SearchOutline;
 
   constructor(outline: SearchOutline) {

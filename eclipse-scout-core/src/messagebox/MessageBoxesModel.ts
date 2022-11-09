@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBoxes, Widget} from '../index';
-import {StatusSeverity} from '../status/Status';
-import {ObjectModel} from '../scout';
+import {MessageBoxes, ObjectModel, StatusSeverity, Widget} from '../index';
 
-export default interface MessageBoxesModel extends ObjectModel<MessageBoxes> {
+export interface MessageBoxesModel extends ObjectModel<MessageBoxes> {
   parent?: Widget;
   yesText?: string;
   noText?: string;

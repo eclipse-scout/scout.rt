@@ -19,7 +19,7 @@ import {Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnviron
  *
  * The proposal-chooser DIV is not always present.
  */
-export default class SmartFieldPopupLayout extends PopupLayout {
+export class SmartFieldPopupLayout extends PopupLayout {
   declare popup: SmartFieldPopup<any>;
 
   animating: boolean;

@@ -19,7 +19,7 @@ export interface TagBarTagRemoveEvent<T = TagBar> extends Event<T> {
   $tag: JQuery;
 }
 
-export default interface TagBarEventMap extends WidgetEventMap {
+export interface TagBarEventMap extends WidgetEventMap {
   'tagClick': TagBarTagClickEvent;
   'tagRemove': TagBarTagRemoveEvent;
   'propertyChange:clickable': PropertyChangeEvent<boolean>;

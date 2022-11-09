@@ -10,5 +10,5 @@
  */
 import {FormFieldAdapter} from '../../index';
 
-export default class OutlineTileFieldAdapter extends FormFieldAdapter {
+export class OutlineTileFieldAdapter extends FormFieldAdapter {
 }

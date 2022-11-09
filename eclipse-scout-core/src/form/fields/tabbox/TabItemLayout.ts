@@ -10,7 +10,7 @@
  */
 import {Dimension, GroupBoxLayout, HtmlComponent, MenuBarLayout, TabItem} from '../../../index';
 
-export default class TabItemLayout extends GroupBoxLayout {
+export class TabItemLayout extends GroupBoxLayout {
   declare groupBox: TabItem;
 
   constructor(tabItem: TabItem) {

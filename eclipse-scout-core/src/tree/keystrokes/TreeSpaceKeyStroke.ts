@@ -11,7 +11,7 @@
 import {keys, KeyStroke, ScoutKeyboardEvent, Tree} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class TreeSpaceKeyStroke extends KeyStroke {
+export class TreeSpaceKeyStroke extends KeyStroke {
   declare field: Tree;
 
   constructor(tree: Tree) {

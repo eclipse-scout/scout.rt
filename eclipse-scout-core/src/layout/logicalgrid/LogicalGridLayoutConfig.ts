@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridLayout} from '../../index';
-import {InitModelOf, ObjectOrModel} from '../../scout';
+import {InitModelOf, LogicalGridLayout, ObjectOrModel} from '../../index';
 
 export interface LogicalGridLayoutConfigModel {
   /**
@@ -43,7 +42,7 @@ export interface LogicalGridLayoutConfigModel {
  * The configured hints only have an effect if theirs value is >=0.
  * Otherwise, the default values specified by CSS are applied (see {@link LogicalGridLayout._initDefaults}).
  */
-export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigModel {
+export class LogicalGridLayoutConfig implements LogicalGridLayoutConfigModel {
   declare model: LogicalGridLayoutConfigModel;
 
   hgap: number;

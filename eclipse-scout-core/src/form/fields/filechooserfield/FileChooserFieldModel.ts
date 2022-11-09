@@ -10,7 +10,7 @@
  */
 import {ValueFieldModel} from '../../../index';
 
-export default interface FileChooserFieldModel extends ValueFieldModel<File> {
+export interface FileChooserFieldModel extends ValueFieldModel<File> {
   /**
    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept
    */

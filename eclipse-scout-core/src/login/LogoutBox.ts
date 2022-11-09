@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Box, LogoutAppModel, strings, TextMap, webstorage} from '../index';
+import {Box, InitModelOf, LogoutAppModel, strings, TextMap, webstorage} from '../index';
 import $ from 'jquery';
-import {InitModelOf} from '../scout';
 
-export default class LogoutBox extends Box {
+export class LogoutBox extends Box {
   declare model: LogoutAppModel;
 
   texts: TextMap;

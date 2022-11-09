@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, AccordionFieldEventMap, AccordionFieldModel, EventDelegator, FormField, LoadingSupport} from '../../../index';
-import {InitModelOf, ObjectOrChildModel} from '../../../scout';
+import {Accordion, AccordionFieldEventMap, AccordionFieldModel, EventDelegator, FormField, InitModelOf, LoadingSupport, ObjectOrChildModel} from '../../../index';
 
-export default class AccordionField extends FormField implements AccordionFieldModel {
+export class AccordionField extends FormField implements AccordionFieldModel {
   declare model: AccordionFieldModel;
   declare eventMap: AccordionFieldEventMap;
   declare self: AccordionField;

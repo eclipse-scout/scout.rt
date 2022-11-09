@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, MessageBox, ModelAdapter} from '../index';
-import {MessageBoxActionEvent} from './MessageBoxEventMap';
+import {Event, MessageBox, MessageBoxActionEvent, ModelAdapter} from '../index';
 
-export default class MessageBoxAdapter extends ModelAdapter {
+export class MessageBoxAdapter extends ModelAdapter {
   declare widget: MessageBox;
 
   protected _onWidgetAction(event: MessageBoxActionEvent) {

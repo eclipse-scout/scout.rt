@@ -10,7 +10,7 @@
  */
 import {PropertyChangeEvent, ValueFieldEventMap} from '../../../index';
 
-export default interface CheckBoxFieldEventMap extends ValueFieldEventMap<boolean> {
+export interface CheckBoxFieldEventMap extends ValueFieldEventMap<boolean> {
   'propertyChange:keyStroke': PropertyChangeEvent<string>;
   'propertyChange:triStateEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:wrapText': PropertyChangeEvent<boolean>;

@@ -13,7 +13,7 @@ import {arrays, Event, EventDelegatorOptions, EventEmitter, EventHandler, EventL
 /**
  * Delegates events between two {@link EventEmitter}s.
  */
-export default class EventDelegator {
+export class EventDelegator {
   source: EventEmitter;
   target: EventEmitter;
   callSetter: boolean;

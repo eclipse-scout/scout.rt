@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface TagBarModel extends WidgetModel {
+export interface TagBarModel extends WidgetModel {
   /**
    * Default is true
    */

@@ -10,7 +10,7 @@
  */
 import {CheckBoxField, HAlign, keys, KeyStroke} from '../../../index';
 
-export default class CheckBoxToggleKeyStroke extends KeyStroke {
+export class CheckBoxToggleKeyStroke extends KeyStroke {
   declare field: CheckBoxField;
 
   constructor(checkbox: CheckBoxField) {

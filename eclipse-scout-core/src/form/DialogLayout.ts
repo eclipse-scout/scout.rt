@@ -10,7 +10,7 @@
  */
 import {Dimension, Form, FormLayout, graphics, HtmlComponent, Insets, Point, Rectangle} from '../index';
 
-export default class DialogLayout extends FormLayout {
+export class DialogLayout extends FormLayout {
   declare form: Form;
 
   autoSize: boolean;

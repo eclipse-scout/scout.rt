@@ -10,7 +10,7 @@
  */
 import {Filter, Page} from '../../index';
 
-export default class DetailTableTreeFilter implements Filter<Page> {
+export class DetailTableTreeFilter implements Filter<Page> {
 
   /**
    * Must correspond with logic in P_TableFilterBasedTreeNodeFilter

@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionModel, BoxButtonsEventMap, BoxButtonsModel, scout, Widget} from '../index';
-import {ObjectFactoryOptions} from '../ObjectFactory';
-import {InitModelOf} from '../scout';
+import {Action, ActionModel, BoxButtonsEventMap, BoxButtonsModel, InitModelOf, ObjectFactoryOptions, scout, Widget} from '../index';
 
 /**
  * Widget to render a set of Actions that look like Buttons.
  */
-export default class BoxButtons extends Widget implements BoxButtonsModel {
+export class BoxButtons extends Widget implements BoxButtonsModel {
   declare model: BoxButtonsModel;
   declare eventMap: BoxButtonsEventMap;
   declare self: BoxButtons;

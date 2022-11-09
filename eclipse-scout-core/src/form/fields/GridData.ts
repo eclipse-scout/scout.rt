@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField} from '../../index';
+import {Alignment, FormField, LogicalGridWidget} from '../../index';
 import $ from 'jquery';
-import {Alignment} from '../../cell/Cell';
-import {LogicalGridWidget} from '../../layout/logicalgrid/LogicalGridData';
 
-export default class GridData {
+export class GridData {
   x?: number;
   y?: number;
   w?: number;

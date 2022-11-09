@@ -10,7 +10,7 @@
  */
 import {scout, strings} from '../../index';
 
-export default class CompactLineBlock {
+export class CompactLineBlock {
   text: string;
   icon: string;
   encodeHtmlEnabled: boolean;

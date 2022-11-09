@@ -11,7 +11,7 @@
 
 import {CompactLine, scout, strings} from '../../index';
 
-export default class CompactBean {
+export class CompactBean {
   title: string;
   titleLine: CompactLine;
 

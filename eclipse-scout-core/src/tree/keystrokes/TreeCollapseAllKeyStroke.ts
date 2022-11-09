@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractTreeNavigationKeyStroke, HAlign, keys, Tree} from '../../index';
-import {TreeEventCurrentNode} from './AbstractTreeNavigationKeyStroke';
+import {AbstractTreeNavigationKeyStroke, HAlign, keys, Tree, TreeEventCurrentNode} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class TreeCollapseAllKeyStroke extends AbstractTreeNavigationKeyStroke {
+export class TreeCollapseAllKeyStroke extends AbstractTreeNavigationKeyStroke {
 
   constructor(tree: Tree, keyStrokeModifier: number) {
     super(tree, keyStrokeModifier);

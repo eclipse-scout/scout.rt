@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, ColumnUserFilterEventMap, comparators, FilterFieldsGroupBox, strings, TableMatrix, TableRow, TableUserFilter} from '../../index';
-import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup} from '../TableMatrix';
-import {TableUserFilterAddedEventData, TableUserFilterRemovedEventData} from './TableUserFilter';
-import {ColumnComparator} from '../columns/comparators';
-import ColumnUserFilterModel from './ColumnUserFilterModel';
-import {SomeRequired} from '../../types';
+import {
+  Column, ColumnComparator, ColumnUserFilterEventMap, ColumnUserFilterModel, comparators, FilterFieldsGroupBox, SomeRequired, strings, TableMatrix, TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableRow, TableUserFilter,
+  TableUserFilterAddedEventData, TableUserFilterRemovedEventData
+} from '../../index';
 
-export default class ColumnUserFilter extends TableUserFilter implements ColumnUserFilterModel {
+export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilterModel {
   declare model: ColumnUserFilterModel;
   declare initModel: SomeRequired<this['model'], 'session' | 'table' | 'column'>;
   declare eventMap: ColumnUserFilterEventMap;

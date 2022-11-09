@@ -10,6 +10,6 @@
  */
 import {ContextMenuPopupModel, Menu} from '../../index';
 
-export default interface MenuBarPopupModel extends ContextMenuPopupModel {
+export interface MenuBarPopupModel extends ContextMenuPopupModel {
   menu?: Menu;
 }

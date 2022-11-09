@@ -14,7 +14,7 @@ let instance;
 /**
  * @singleton
  */
-export default class HtmlEnvironment extends EventEmitter {
+export class HtmlEnvironment extends EventEmitter {
   declare eventMap: HtmlEnvironmentEventMap;
   declare self: HtmlEnvironment;
 

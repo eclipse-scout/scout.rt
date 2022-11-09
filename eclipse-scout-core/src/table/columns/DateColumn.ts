@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, comparators, DateColumnEventMap, DateColumnModel, DateField, DateFormat, dates, Locale, scout, TableRow} from '../../index';
-import {InitModelOf} from '../../scout';
+import {Column, comparators, DateColumnEventMap, DateColumnModel, DateField, DateFormat, dates, InitModelOf, Locale, scout, TableRow} from '../../index';
 
-export default class DateColumn extends Column<Date> implements DateColumnModel {
+export class DateColumn extends Column<Date> implements DateColumnModel {
   declare model: DateColumnModel;
   declare eventMap: DateColumnEventMap;
   declare self: DateColumn;

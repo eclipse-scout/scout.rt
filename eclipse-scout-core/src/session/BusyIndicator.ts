@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, BoxButtons, BusyIndicatorEventMap, ClickActiveElementKeyStroke, CloseKeyStroke, Event, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
-import {InitModelOf} from '../scout';
+import {Action, BoxButtons, BusyIndicatorEventMap, ClickActiveElementKeyStroke, CloseKeyStroke, Event, FocusRule, GlassPaneRenderer, InitModelOf, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
 
 export interface BusyIndicatorModel extends WidgetModel {
   cancellable?: boolean;
@@ -18,7 +17,7 @@ export interface BusyIndicatorModel extends WidgetModel {
   details?: string;
 }
 
-export default class BusyIndicator extends Widget implements BusyIndicatorModel {
+export class BusyIndicator extends Widget implements BusyIndicatorModel {
   declare model: BusyIndicatorModel;
   declare eventMap: BusyIndicatorEventMap;
   declare self: BusyIndicator;

@@ -10,6 +10,6 @@
  */
 import {LookupCallModel, Table} from '../index';
 
-export default interface TileTableHeaderSortByLookupCallModel extends LookupCallModel<any> {
+export interface TileTableHeaderSortByLookupCallModel extends LookupCallModel<any> {
   table?: Table;
 }

@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Cell, Column, ListBoxLayout, ListBoxModel, LookupBox, LookupResult, LookupRow, scout, Table, TableRowModel, Widget} from '../../../index';
-import {TableRowsCheckedEvent} from '../../../table/TableEventMap';
-import {InitModelOf} from '../../../scout';
+import {arrays, Cell, Column, InitModelOf, ListBoxLayout, ListBoxModel, LookupBox, LookupResult, LookupRow, scout, Table, TableRowModel, TableRowsCheckedEvent, Widget} from '../../../index';
 
-export default class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
+export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
   declare model: ListBoxModel<TValue>;
 
   table: Table;

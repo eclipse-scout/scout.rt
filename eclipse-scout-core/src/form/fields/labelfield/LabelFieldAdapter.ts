@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, LabelField, ValueFieldAdapter} from '../../../index';
-import {LabelFieldAppLinkActionEvent} from './LabelFieldEventMap';
+import {Event, LabelField, LabelFieldAppLinkActionEvent, ValueFieldAdapter} from '../../../index';
 
-export default class LabelFieldAdapter extends ValueFieldAdapter {
+export class LabelFieldAdapter extends ValueFieldAdapter {
 
   protected _onWidgetAppLinkAction(event: LabelFieldAppLinkActionEvent) {
     this._send('appLinkAction', {

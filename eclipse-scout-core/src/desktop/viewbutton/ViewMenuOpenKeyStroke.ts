@@ -14,7 +14,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
 /**
  * Keystroke to open the 'ViewMenuPopup' on 'F2'.
  */
-export default class ViewMenuOpenKeyStroke extends KeyStroke {
+export class ViewMenuOpenKeyStroke extends KeyStroke {
   declare field: ViewMenuTab;
 
   constructor(viewMenuTab: ViewMenuTab) {

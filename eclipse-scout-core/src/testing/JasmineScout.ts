@@ -8,13 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, Desktop, DesktopModel, ModelAdapter, ModelAdapterModel, ObjectFactory, RemoteEvent, scout, Session, SessionModel, Widget, WidgetModel} from '../index';
-import {LocaleSpecHelper, TestingApp} from './index';
-import {AdapterData, RemoteRequest, RemoteResponse, SessionStartupResponse} from '../session/Session';
+import {
+  AdapterData, App, arrays, Desktop, FullModelOf, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectFactory, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session, SessionStartupResponse, Widget, WidgetModel
+} from '../index';
+import {jasmineScoutMatchers, LocaleSpecHelper, TestingApp} from './index';
 import 'jasmine-jquery';
-import jasmineScoutMatchers from './scoutMatchers';
-import {JsonErrorResponse} from '../App';
-import {FullModelOf, InitModelOf} from '../scout';
 
 declare global {
 
@@ -36,7 +34,7 @@ declare global {
     override _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string, request: RemoteRequest);
   }
 
-  function sandboxSession(options?: SandboxSessionOptions & SessionModel): SandboxSession;
+  function sandboxSession(options?: SandboxSessionOptions & ModelOf<Session>): SandboxSession;
 
   function linkWidgetAndAdapter(widget: Widget, adapterClass: (new() => ModelAdapter) | string);
 
@@ -60,17 +58,15 @@ declare global {
   function uninstallUnloadHandlers(session: Session);
 
   function createPropertyChangeEvent(model: { id: string }, properties: object);
-
-  function createAdapterModel(widgetModel: ModelAdapterModel): ModelAdapterModel;
 }
 
 export interface SandboxSessionOptions {
-  desktop?: DesktopModel;
+  desktop?: ModelOf<Desktop>;
   renderDesktop?: boolean;
 }
 
 window.sandboxSession = options => {
-  options = options || {} as SessionModel;
+  options = options || {} as ModelOf<Session>;
   let $sandbox = $('#sandbox')
     .addClass('scout');
 
@@ -229,28 +225,9 @@ window.createPropertyChangeEvent = (model, properties) => ({
   type: 'property'
 });
 
-/**
- * Returns a new object instance having two properties id, objectType from the given widgetModel.
- * this function is required because the model object passed to the scout.create() function is modified
- * --> model.objectType is changed to whatever string is passed as parameter objectType
- *
- * @param widgetModel
- */
-
-export function startApp(App: new() => App) {
-  // App initialization uses promises which are executed asynchronously
-  // -> Use the clock to make sure all promise callbacks are executed before any test starts.
-  jasmine.clock().install();
-
-  new App().init();
-
-  jasmine.clock().tick(1000);
-  jasmine.clock().uninstall();
-}
-
-export default {
-  runTestSuite: context => {
-    startApp(TestingApp);
+export const JasmineScout = {
+  runTestSuite(context) {
+    this.startApp(TestingApp);
 
     beforeEach(() => {
       jasmine.addMatchers(jasmineScoutMatchers);
@@ -258,5 +235,14 @@ export default {
 
     context.keys().forEach(context);
   },
-  startApp
+  startApp(App: new() => App) {
+    // App initialization uses promises which are executed asynchronously
+    // -> Use the clock to make sure all promise callbacks are executed before any test starts.
+    jasmine.clock().install();
+
+    new App().init();
+
+    jasmine.clock().tick(1000);
+    jasmine.clock().uninstall();
+  }
 };

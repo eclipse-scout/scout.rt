@@ -10,7 +10,7 @@
  */
 import {arrays} from '../index';
 
-export default class Range {
+export class Range {
   from: number;
   to: number;
 

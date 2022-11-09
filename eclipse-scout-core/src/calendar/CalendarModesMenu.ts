@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Calendar, CalendarModeMenu, CalendarModesMenuEventMap, CalendarModesMenuModel, Menu, PropertyChangeEvent, scout} from '../index';
-import {CalendarDisplayMode} from './Calendar';
-import {InitModelOf} from '../scout';
+import {arrays, Calendar, CalendarDisplayMode, CalendarModeMenu, CalendarModesMenuEventMap, CalendarModesMenuModel, InitModelOf, Menu, PropertyChangeEvent, scout} from '../index';
 
-export default class CalendarModesMenu extends Menu implements CalendarModesMenuModel {
+export class CalendarModesMenu extends Menu implements CalendarModesMenuModel {
   declare model: CalendarModesMenuModel;
   declare eventMap: CalendarModesMenuEventMap;
   declare self: CalendarModesMenu;

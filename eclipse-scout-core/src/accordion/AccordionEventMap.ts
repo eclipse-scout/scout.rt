@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupCollapseStyle} from '../group/Group';
-import {PropertyChangeEvent, WidgetEventMap} from '../index';
+import {GroupCollapseStyle, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface AccordionEventMap extends WidgetEventMap {
+export interface AccordionEventMap extends WidgetEventMap {
   'propertyChange:collapseStyle': PropertyChangeEvent<GroupCollapseStyle>;
   'propertyChange:exclusiveExpand': PropertyChangeEvent<boolean>;
   'propertyChange:scrollable': PropertyChangeEvent<boolean>;

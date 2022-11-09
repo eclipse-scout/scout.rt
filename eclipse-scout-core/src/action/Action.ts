@@ -8,18 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionEventMap, ActionKeyStroke, ActionModel, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, TooltipSupport, Widget} from '../index';
+import {
+  AbstractLayout, ActionEventMap, ActionKeyStroke, ActionModel, Alignment, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, NullLayout, scout, TooltipPosition, tooltips, TooltipSupport, Widget
+} from '../index';
 import $ from 'jquery';
-import AbstractLayout from '../layout/AbstractLayout';
-import {TooltipPosition} from '../tooltip/Tooltip';
-import {Alignment} from '../cell/Cell';
-import {InitModelOf} from '../scout';
 
 export type ActionStyle = EnumObject<typeof Action.ActionStyle>;
 export type KeyStrokeFirePolicy = EnumObject<typeof Action.KeyStrokeFirePolicy>;
 export type ActionTextPosition = EnumObject<typeof Action.TextPosition>;
 
-export default class Action extends Widget implements ActionModel {
+export class Action extends Widget implements ActionModel {
   declare model: ActionModel;
   declare eventMap: ActionEventMap;
   declare self: Action;

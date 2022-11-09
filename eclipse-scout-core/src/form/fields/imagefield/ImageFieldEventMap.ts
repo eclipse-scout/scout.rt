@@ -14,7 +14,7 @@ export interface ImageFieldFileUploadEvent<T = ImageField> extends Event<T> {
   file: File;
 }
 
-export default interface ImageFieldEventMap extends FormFieldEventMap {
+export interface ImageFieldEventMap extends FormFieldEventMap {
   'fileUpload': ImageFieldFileUploadEvent;
   'propertyChange:autoFit': PropertyChangeEvent<boolean>;
   'propertyChange:imageUrl': PropertyChangeEvent<string>;

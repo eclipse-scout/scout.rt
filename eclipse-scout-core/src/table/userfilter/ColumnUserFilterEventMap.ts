@@ -10,6 +10,6 @@
  */
 import {ColumnUserFilter, Event, PropertyEventMap} from '../../index';
 
-export default interface ColumnUserFilterEventMap extends PropertyEventMap {
+export interface ColumnUserFilterEventMap extends PropertyEventMap {
   'filterFieldsChanged': Event<ColumnUserFilter>;
 }

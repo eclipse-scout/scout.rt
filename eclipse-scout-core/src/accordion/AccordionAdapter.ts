@@ -10,5 +10,5 @@
  */
 import {ModelAdapter} from '../index';
 
-export default class AccordionAdapter extends ModelAdapter {
+export class AccordionAdapter extends ModelAdapter {
 }

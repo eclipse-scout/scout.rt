@@ -10,7 +10,7 @@
  */
 import {App, ModelAdapter, objects, TableTileGridMediator} from '../index';
 
-export default class TableTileGridMediatorAdapter extends ModelAdapter {
+export class TableTileGridMediatorAdapter extends ModelAdapter {
   /**
    * Static method to modify the prototype of TableTileGridMediatorAdapter.
    */

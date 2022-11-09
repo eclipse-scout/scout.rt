@@ -10,7 +10,7 @@
  */
 import {Action, ActionKeyStroke} from '../../index';
 
-export default class ViewButtonActionKeyStroke extends ActionKeyStroke {
+export class ViewButtonActionKeyStroke extends ActionKeyStroke {
 
   constructor(action: Action) {
     super(action);

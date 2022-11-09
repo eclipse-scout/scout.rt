@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, EllipsisMenu, graphics, HtmlCompPrefSizeOptions, Menu, MenuBox, menus as menuUtil} from '../../index';
 
-export default class MenuBoxLayout extends AbstractLayout {
+export class MenuBoxLayout extends AbstractLayout {
   menuBox: MenuBox;
   /** References to prevent too many DOM updates */
   firstMenu: Menu;

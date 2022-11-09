@@ -10,5 +10,5 @@
  */
 import {FormFieldAdapter} from '../../../index';
 
-export default class TableFieldAdapter extends FormFieldAdapter {
+export class TableFieldAdapter extends FormFieldAdapter {
 }

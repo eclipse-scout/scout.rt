@@ -9,16 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CodeLookupCall, ColumnDescriptor, Device, EnumObject, fields, FormField, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport, LookupCall, LookupResult, LookupRow, MaxLengthHandler, objects, QueryBy, scout,
-  SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldEventMap, SmartFieldLayout, SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValueField
+  arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport, LookupCall, LookupCallOrModel,
+  LookupResult, LookupRow, MaxLengthHandler, objects, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldEventMap, SmartFieldLayout,
+  SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValueField
 } from '../../../index';
 import $ from 'jquery';
-import CellEditorPopup, {CellEditorRenderedOptions} from '../../../table/editor/CellEditorPopup';
-import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
-import {LookupCallOrModel} from '../../../lookup/LookupCall';
-import {InitModelOf} from '../../../scout';
 
-export default class SmartField<TValue> extends ValueField<TValue> implements SmartFieldModel<TValue> {
+export class SmartField<TValue> extends ValueField<TValue> implements SmartFieldModel<TValue> {
   declare model: SmartFieldModel<TValue>;
   declare eventMap: SmartFieldEventMap<TValue>;
   declare self: SmartField<any>;

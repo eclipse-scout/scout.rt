@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ModeModel} from '../index';
-import {InitModelOf} from '../scout';
+import {Action, InitModelOf, ModeModel} from '../index';
 
-export default class Mode<TRef = any> extends Action implements ModeModel<TRef> {
+export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
   declare model: ModeModel<TRef>;
 
   ref: TRef;

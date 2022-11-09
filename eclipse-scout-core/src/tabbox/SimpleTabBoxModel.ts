@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LayoutData, SimpleTabArea, SimpleTabBoxController, WidgetModel} from '../index';
-import {SimpleTabView} from './SimpleTab';
-import {ObjectOrChildModel} from '../scout';
+import {LayoutData, ObjectOrChildModel, SimpleTabArea, SimpleTabBoxController, SimpleTabView, WidgetModel} from '../index';
 
-export default interface SimpleTabBoxModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
+export interface SimpleTabBoxModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
   tabArea?: ObjectOrChildModel<SimpleTabArea<TView>>;
   viewStack?: TView[];
   currentView?: TView;

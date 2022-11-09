@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Icon, NotificationEventMap, NotificationModel, scout, Status, strings, texts, Widget} from '../index';
+import {HtmlComponent, Icon, InitModelOf, NotificationEventMap, NotificationModel, scout, Status, StatusOrModel, strings, texts, Widget} from '../index';
 import $ from 'jquery';
-import {StatusOrModel} from '../status/Status';
-import {InitModelOf} from '../scout';
 
-export default class Notification extends Widget implements NotificationModel {
+export class Notification extends Widget implements NotificationModel {
   declare model: NotificationModel;
   declare eventMap: NotificationEventMap;
   declare self: Notification;

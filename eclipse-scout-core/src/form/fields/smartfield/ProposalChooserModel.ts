@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SmartField, WidgetModel} from '../../../index';
-import {StatusOrModel} from '../../../status/Status';
+import {SmartField, StatusOrModel, WidgetModel} from '../../../index';
 
-export default interface ProposalChooserModel<TValue> extends WidgetModel {
+export interface ProposalChooserModel<TValue> extends WidgetModel {
   smartField?: SmartField<TValue>;
   status?: StatusOrModel;
   /**

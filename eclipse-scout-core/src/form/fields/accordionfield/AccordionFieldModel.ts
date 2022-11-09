@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, FormFieldModel} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {Accordion, FormFieldModel, ObjectOrChildModel} from '../../../index';
 
-export default interface AccordionFieldModel extends FormFieldModel {
+export interface AccordionFieldModel extends FormFieldModel {
   accordion?: ObjectOrChildModel<Accordion>;
 }

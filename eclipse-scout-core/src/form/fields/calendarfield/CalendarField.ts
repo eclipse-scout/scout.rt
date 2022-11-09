@@ -10,7 +10,7 @@
  */
 import {Calendar, CalendarFieldModel, Device, FormField} from '../../../index';
 
-export default class CalendarField extends FormField implements CalendarFieldModel {
+export class CalendarField extends FormField implements CalendarFieldModel {
   declare model: CalendarFieldModel;
 
   calendar: Calendar;

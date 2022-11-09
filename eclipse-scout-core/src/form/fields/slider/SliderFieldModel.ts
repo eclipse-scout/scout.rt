@@ -10,6 +10,6 @@
  */
 import {SliderModel, ValueFieldModel} from '../../../index';
 
-export default interface SliderFieldModel extends ValueFieldModel<number>, SliderModel {
+export interface SliderFieldModel extends ValueFieldModel<number>, SliderModel {
   // all properties are inherited from SliderModel
 }

@@ -9,12 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Desktop, DesktopHeaderEventMap, DesktopHeaderLayout, DesktopHeaderModel, DesktopLogo, DesktopTabArea, DesktopToolBox, Event, EventHandler, Form, HtmlComponent, Menu, MenuBar, PropertyChangeEvent, scout, ViewButtonBox, Widget
+  Desktop, DesktopHeaderEventMap, DesktopHeaderLayout, DesktopHeaderModel, DesktopLogo, DesktopTabArea, DesktopToolBox, Event, EventHandler, Form, HtmlComponent, InitModelOf, Menu, MenuBar, ObjectOrChildModel, OutlineContent,
+  PropertyChangeEvent, scout, ViewButtonBox, Widget
 } from '../../index';
-import {OutlineContent} from '../bench/DesktopBench';
-import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
-export default class DesktopHeader extends Widget implements DesktopHeaderModel {
+export class DesktopHeader extends Widget implements DesktopHeaderModel {
   declare model: DesktopHeaderModel;
   declare eventMap: DesktopHeaderEventMap;
   declare self: DesktopHeader;

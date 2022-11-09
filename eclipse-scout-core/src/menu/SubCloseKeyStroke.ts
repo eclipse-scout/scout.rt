@@ -11,7 +11,7 @@
 import {ContextMenuPopup, keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes, ScoutKeyboardEvent} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class SubCloseKeyStroke extends MenuNavigationExecKeyStroke {
+export class SubCloseKeyStroke extends MenuNavigationExecKeyStroke {
 
   constructor(popup: ContextMenuPopup, menuItemClass: string) {
     super(popup, menuItemClass);

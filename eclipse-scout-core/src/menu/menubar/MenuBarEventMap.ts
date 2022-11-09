@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, PropertyChangeEvent, WidgetEventMap} from '../../index';
-import {MenuBarEllipsisPosition, MenuBarPosition} from './MenuBar';
+import {Menu, MenuBarEllipsisPosition, MenuBarPosition, PropertyChangeEvent, WidgetEventMap} from '../../index';
 
-export default interface MenuBarEventMap extends WidgetEventMap {
+export interface MenuBarEventMap extends WidgetEventMap {
   'propertyChange:defaultMenu': PropertyChangeEvent<Menu>;
   'propertyChange:ellipsisPosition': PropertyChangeEvent<MenuBarEllipsisPosition>;
   'propertyChange:hiddenByUi': PropertyChangeEvent<boolean>;

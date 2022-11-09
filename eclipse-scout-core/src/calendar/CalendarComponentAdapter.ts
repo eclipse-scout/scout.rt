@@ -10,7 +10,7 @@
  */
 import {ModelAdapter} from '../index';
 
-export default class CalendarComponentAdapter extends ModelAdapter {
+export class CalendarComponentAdapter extends ModelAdapter {
 
   protected _onWidgetAppLinkAction(event) {
     this._send('appLinkAction', {

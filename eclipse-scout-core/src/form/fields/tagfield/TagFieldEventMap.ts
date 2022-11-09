@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, LookupCall, LookupResult, PropertyChangeEvent, TagField, ValueFieldEventMap} from '../../../index';
-import {ValueFieldAcceptInputEvent} from '../ValueFieldEventMap';
+import {Event, LookupCall, LookupResult, PropertyChangeEvent, TagField, ValueFieldAcceptInputEvent, ValueFieldEventMap} from '../../../index';
 
 export interface TagFieldAcceptInputEvent<T = TagField> extends ValueFieldAcceptInputEvent<string[], T> {
   value: string[];
@@ -23,7 +22,7 @@ export interface TagFieldPrepareLookupCallEvent<T = TagField> extends Event<T> {
   lookupCall: LookupCall<string>;
 }
 
-export default interface TagFieldEventMap extends ValueFieldEventMap<string[]> {
+export interface TagFieldEventMap extends ValueFieldEventMap<string[]> {
   'acceptInput': TagFieldAcceptInputEvent;
   'lookupCallDone': TagFieldLookupCallDoneEvent;
   'prepareLookupCall': TagFieldPrepareLookupCallEvent;

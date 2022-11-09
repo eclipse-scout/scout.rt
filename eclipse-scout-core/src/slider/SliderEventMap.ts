@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface SliderEventMap extends WidgetEventMap {
+export interface SliderEventMap extends WidgetEventMap {
   'propertyChange:value': PropertyChangeEvent<number>;
 }

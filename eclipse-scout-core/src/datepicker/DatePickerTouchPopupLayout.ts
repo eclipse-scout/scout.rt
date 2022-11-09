@@ -10,7 +10,7 @@
  */
 import {DatePickerTouchPopup, TouchPopupLayout} from '../index';
 
-export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
+export class DatePickerTouchPopupLayout extends TouchPopupLayout {
   declare popup: DatePickerTouchPopup;
 
   constructor(popup: DatePickerTouchPopup) {

@@ -10,7 +10,7 @@
  */
 import {FormFieldAdapter} from '../../index';
 
-export default class CompositeFieldAdapter extends FormFieldAdapter {
+export class CompositeFieldAdapter extends FormFieldAdapter {
   constructor() {
     super();
     this.enabledWhenOffline = true;

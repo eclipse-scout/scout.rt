@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, KeyStrokeContext, Menu, NavigateButtonModel, Outline, Page} from '../../../index';
+import {Action, KeyStrokeContext, Menu, NavigateButtonModel, Outline, Page, SomeRequired} from '../../../index';
 import $ from 'jquery';
-import {SomeRequired} from '../../../types';
 
 /**
  * The outline navigation works mostly browser-side. The navigation logic is implemented in JavaScript.
@@ -18,7 +17,7 @@ import {SomeRequired} from '../../../types';
  * the server which nodes have been selected. We do that for better user experience. In a first attempt
  * the whole navigation logic was on the server, which caused a lag and flickering in the UI.
  */
-export default abstract class NavigateButton extends Menu implements NavigateButtonModel {
+export abstract class NavigateButton extends Menu implements NavigateButtonModel {
   declare model: NavigateButtonModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'node' | 'outline'>;
 

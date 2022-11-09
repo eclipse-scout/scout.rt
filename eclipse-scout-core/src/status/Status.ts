@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DefaultStatus, EnumObject, ObjectFactory, objects, ObjectWithType, ParsingFailedStatus, Predicate, StatusModel, strings, ValidationFailedStatus} from '../index';
+import {arrays, DefaultStatus, EnumObject, FullModelOf, InitModelOf, ObjectFactory, ObjectOrModel, objects, ObjectWithType, ParsingFailedStatus, Predicate, StatusModel, strings, ValidationFailedStatus} from '../index';
 import $ from 'jquery';
-import {FullModelOf, InitModelOf, ObjectOrModel} from '../scout';
 
-export default class Status implements StatusModel, ObjectWithType {
+export class Status implements StatusModel, ObjectWithType {
   declare model: StatusModel;
 
   objectType: string;

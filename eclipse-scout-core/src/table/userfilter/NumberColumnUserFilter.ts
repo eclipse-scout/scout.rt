@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, FilterFieldsGroupBox, NumberColumn, NumberColumnUserFilterModel, NumberField, objects, PropertyChangeEvent, TableRow} from '../../index';
+import {ColumnUserFilter, FilterFieldsGroupBox, NumberColumn, NumberColumnUserFilterModel, NumberField, objects, PropertyChangeEvent, TableRow, TableUserFilterAddedEventData} from '../../index';
 import $ from 'jquery';
-import {TableUserFilterAddedEventData} from './TableUserFilter';
 
-export default class NumberColumnUserFilter extends ColumnUserFilter implements NumberColumnUserFilterModel {
+export class NumberColumnUserFilter extends ColumnUserFilter implements NumberColumnUserFilterModel {
   declare model: NumberColumnUserFilterModel;
   declare column: NumberColumn;
 

@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, FormFieldEventMap, PropertyChangeEvent, WizardProgressField} from '../../../index';
-import {WizardStep} from './WizardProgressField';
+import {Event, FormFieldEventMap, PropertyChangeEvent, WizardProgressField, WizardStep} from '../../../index';
 
 export interface WizardProgressFieldStepActionEvent<T = WizardProgressField> extends Event<T> {
   stepIndex: number;
 }
 
-export default interface WizardProgressFieldEventMap extends FormFieldEventMap {
+export interface WizardProgressFieldEventMap extends FormFieldEventMap {
   'stepAction': WizardProgressFieldStepActionEvent;
   'propertyChange:activeStepIndex': PropertyChangeEvent<number>;
   'propertyChange:steps': PropertyChangeEvent<WizardStep[]>;

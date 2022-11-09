@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ResizableMode} from './Resizable';
-import {Insets, Resizable} from '../index';
-import {ObjectModel} from '../scout';
+import {Insets, ObjectModel, Resizable, ResizableMode} from '../index';
 
-export default interface ResizableModel extends ObjectModel<Resizable> {
+export interface ResizableModel extends ObjectModel<Resizable> {
   $container?: JQuery;
   modes?: ResizableMode[];
   boundaries?: Insets;

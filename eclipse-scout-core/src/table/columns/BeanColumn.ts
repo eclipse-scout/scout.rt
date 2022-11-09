@@ -11,7 +11,7 @@
 import {Cell, Column, strings, TableRow} from '../../index';
 import $ from 'jquery';
 
-export default class BeanColumn<TBean> extends Column<TBean> {
+export class BeanColumn<TBean> extends Column<TBean> {
 
   override buildCellForRow(row: TableRow): string {
     let cell = this.cell(row);

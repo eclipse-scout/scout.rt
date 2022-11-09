@@ -11,57 +11,45 @@
 
 import {ScoutKeyboardEvent} from '../index';
 
-/**
- * Modifier like shift, ctrl or alt used in keystrokes.
- *
- * A keystroke can consist of multiple modifierBitMask, which can be represented by bitwise OR'ing them together.
- */
+export const keyStrokeModifier = {
+  /**
+   * Modifier like shift, ctrl or alt used in keystrokes.
+   *
+   * A keystroke can consist of multiple modifierBitMask, which can be represented by bitwise OR them together.
+   */
+  NONE: 0, // without any modifier
+  CTRL: 1 << 0, // with the ctrl modifier (NOSONAR)
+  CTRL_UNDEFINED: 1 << 1, // with or without the ctrl modifier (NOSONAR)
+  SHIFT: 1 << 2, // with the shift modifier (NOSONAR)
+  SHIFT_UNDEFINED: 1 << 3, // with or without the shift modifier (NOSONAR)
+  ALT: 1 << 4, // with the alt modifier (NOSONAR)
+  ALT_UNDEFINED: 1 << 5, // with or without the alt modifier (NOSONAR)
 
-const NONE = 0; // without any modifier
-const CTRL = 1 << 0; // with the ctrl modifier (NOSONAR)
-const CTRL_UNDEFINED = 1 << 1; // with or without the ctrl modifier (NOSONAR)
-const SHIFT = 1 << 2; // with the shift modifier (NOSONAR)
-const SHIFT_UNDEFINED = 1 << 3; // with or without the shift modifier (NOSONAR)
-const ALT = 1 << 4; // with the alt modifier (NOSONAR)
-const ALT_UNDEFINED = 1 << 5; // with or without the alt modifier (NOSONAR)
+  isCtrl(modifierBitMask: number): boolean {
+    return keyStrokeModifier._eval(modifierBitMask, keyStrokeModifier.CTRL, keyStrokeModifier.CTRL_UNDEFINED);
+  },
 
-export function isCtrl(modifierBitMask: number): boolean {
-  return _eval(modifierBitMask, CTRL, CTRL_UNDEFINED);
-}
+  isShift(modifierBitMask: number): boolean {
+    return keyStrokeModifier._eval(modifierBitMask, keyStrokeModifier.SHIFT, keyStrokeModifier.SHIFT_UNDEFINED);
+  },
 
-export function isShift(modifierBitMask: number): boolean {
-  return _eval(modifierBitMask, SHIFT, SHIFT_UNDEFINED);
-}
+  isAlt(modifierBitMask: number): boolean {
+    return keyStrokeModifier._eval(modifierBitMask, keyStrokeModifier.ALT, keyStrokeModifier.ALT_UNDEFINED);
+  },
 
-export function isAlt(modifierBitMask: number): boolean {
-  return _eval(modifierBitMask, ALT, ALT_UNDEFINED);
-}
+  /** @internal */
+  _eval(testee: number, modifier: number, modifierUndefined: number): boolean {
+    if ((modifierUndefined & testee) > 0) { // NOSONAR
+      return undefined;
+    }
+    return (modifier & testee) > 0; // NOSONAR
+  },
 
-export function _eval(testee: number, modifier: number, modifierUndefined: number): boolean {
-  if ((modifierUndefined & testee) > 0) { // NOSONAR
-    return undefined;
+  toModifierBitMask(event: ScoutKeyboardEvent): number {
+    let modifierBitMask = 0;
+    modifierBitMask |= event.ctrlKey ? keyStrokeModifier.CTRL : 0; // NOSONAR
+    modifierBitMask |= event.altKey ? keyStrokeModifier.ALT : 0; // NOSONAR
+    modifierBitMask |= event.shiftKey ? keyStrokeModifier.SHIFT : 0; // NOSONAR
+    return modifierBitMask;
   }
-  return (modifier & testee) > 0; // NOSONAR
-}
-
-export function toModifierBitMask(event: ScoutKeyboardEvent): number {
-  let modifierBitMask = 0;
-  modifierBitMask |= event.ctrlKey ? CTRL : 0; // NOSONAR
-  modifierBitMask |= event.altKey ? ALT : 0; // NOSONAR
-  modifierBitMask |= event.shiftKey ? SHIFT : 0; // NOSONAR
-  return modifierBitMask;
-}
-
-export default {
-  ALT,
-  ALT_UNDEFINED,
-  CTRL,
-  CTRL_UNDEFINED,
-  NONE,
-  SHIFT,
-  SHIFT_UNDEFINED,
-  isAlt,
-  isCtrl,
-  isShift,
-  toModifierBitMask
 };

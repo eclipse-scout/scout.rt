@@ -11,7 +11,7 @@
 
 import {SmartFieldModel} from '../../../index';
 
-export default interface ProposalFieldModel extends SmartFieldModel<string> {
+export interface ProposalFieldModel extends SmartFieldModel<string> {
   /**
    * true if leading and trailing whitespace should be stripped from the entered text while validating the value.
    *

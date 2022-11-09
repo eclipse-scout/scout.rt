@@ -11,7 +11,7 @@
 
 import $ from 'jquery';
 
-export default class FocusManagerSpecHelper {
+export class FocusManagerSpecHelper {
   handlersRegistered($comp: JQuery): boolean {
     let i,
       expectedHandlers = ['keydown', 'focusin', 'focusout', 'hide'],

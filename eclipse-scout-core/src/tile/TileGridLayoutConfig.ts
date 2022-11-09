@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridLayoutConfig, TileGridLayout} from '../index';
-import {LogicalGridLayoutConfigModel} from '../layout/logicalgrid/LogicalGridLayoutConfig';
-import {InitModelOf, ObjectOrModel} from '../scout';
+import {InitModelOf, LogicalGridLayoutConfig, LogicalGridLayoutConfigModel, ObjectOrModel, TileGridLayout} from '../index';
 
 export interface TileGridLayoutConfigModel extends LogicalGridLayoutConfigModel {
   /**
@@ -28,7 +26,7 @@ export interface TileGridLayoutConfigModel extends LogicalGridLayoutConfigModel 
  * The configured hints only have an effect if theirs value is >=0.
  * Otherwise, the default values specified by CSS are applied (see {@link TileGridLayout._initDefaults}).
  */
-export default class TileGridLayoutConfig extends LogicalGridLayoutConfig implements TileGridLayoutConfigModel {
+export class TileGridLayoutConfig extends LogicalGridLayoutConfig implements TileGridLayoutConfigModel {
   declare model: TileGridLayoutConfigModel;
 
   maxWidth: number;

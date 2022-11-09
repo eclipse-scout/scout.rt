@@ -10,7 +10,7 @@
  */
 import {FormFieldModel} from '../../../index';
 
-export default interface BrowserFieldModel extends FormFieldModel {
+export interface BrowserFieldModel extends FormFieldModel {
   /**
    * Configures whether the external window should be auto closed when this field gets removed.
    *

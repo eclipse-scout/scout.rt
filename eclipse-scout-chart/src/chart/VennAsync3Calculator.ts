@@ -13,7 +13,7 @@
 // find angle and distance (to a) and radius where "error" is minimal
 import {VennCircle, VennCircleHelper} from '../index';
 
-export default class VennAsync3Calculator {
+export class VennAsync3Calculator {
   helper: VennCircleHelper;
   venn1: VennCircle;
   venn2: VennCircle;

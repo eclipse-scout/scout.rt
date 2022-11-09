@@ -10,7 +10,7 @@
  */
 import {Tree, TreeNode} from '../index';
 
-export default class TreeBreadcrumbFilter {
+export class TreeBreadcrumbFilter {
   tree: Tree;
 
   constructor(tree: Tree) {

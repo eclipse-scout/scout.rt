@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class CachedElement {
+export class CachedElement {
   tagName: string;
   cachedElement: HTMLElement;
 

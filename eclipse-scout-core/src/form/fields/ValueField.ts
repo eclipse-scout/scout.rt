@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, EnumObject, focusUtils, FormField, objects, ParsingFailedStatus, scout, Status, strings, ValidationFailedStatus, ValueFieldEventMap, ValueFieldModel} from '../../index';
+import {
+  AbstractLayout, arrays, EnumObject, focusUtils, FormField, InitModelOf, objects, ParsingFailedStatus, scout, Status, StatusSeverity, StatusType, strings, ValidationFailedStatus, ValueFieldEventMap, ValueFieldModel
+} from '../../index';
 import $ from 'jquery';
-import {StatusSeverity, StatusType} from '../../status/Status';
-import {InitModelOf} from '../../scout';
 
-export default abstract class ValueField<TValue extends TModelValue, TModelValue = TValue> extends FormField implements ValueFieldModel<TValue, TModelValue> {
+export abstract class ValueField<TValue extends TModelValue, TModelValue = TValue> extends FormField implements ValueFieldModel<TValue, TModelValue> {
   declare model: ValueFieldModel<TValue, TModelValue>;
   declare eventMap: ValueFieldEventMap<TValue>;
   declare self: ValueField<any>;

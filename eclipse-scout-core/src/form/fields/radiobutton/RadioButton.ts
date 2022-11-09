@@ -10,7 +10,7 @@
  */
 import {Button, Device, fields, LookupRow, RadioButtonEventMap, RadioButtonKeyStroke, RadioButtonLayout, RadioButtonModel, tooltips} from '../../../index';
 
-export default class RadioButton<TValue> extends Button implements RadioButtonModel<TValue> {
+export class RadioButton<TValue> extends Button implements RadioButtonModel<TValue> {
   declare model: RadioButtonModel<TValue>;
   declare eventMap: RadioButtonEventMap<TValue>;
   declare self: RadioButton<any>;

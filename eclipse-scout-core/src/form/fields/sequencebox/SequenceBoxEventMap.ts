@@ -10,7 +10,7 @@
  */
 import {FormField, FormFieldEventMap, LogicalGridLayoutConfig, PropertyChangeEvent} from '../../../index';
 
-export default interface SequenceBoxEventMap extends FormFieldEventMap {
+export interface SequenceBoxEventMap extends FormFieldEventMap {
   'propertyChange:fields': PropertyChangeEvent<FormField[]>;
   'propertyChange:layoutConfig': PropertyChangeEvent<LogicalGridLayoutConfig>;
 }

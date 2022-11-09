@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, DateFieldModel, dates, keys, RemoteEvent, scout} from '../../../../src/index';
-import {triggerClick, triggerKeyDown, triggerMouseDown} from '../../../../src/testing/jquery-testing';
-import {InitModelOf} from '../../../../src/scout';
+import {DateField, DateFieldModel, dates, InitModelOf, keys, RemoteEvent, scout} from '../../../../src/index';
+import {JQueryTesting} from '../../../../src/testing/index';
 
 describe('DateFieldAdapter', () => {
   let session: SandboxSession;
@@ -54,7 +53,7 @@ describe('DateFieldAdapter', () => {
   }
 
   function openDatePicker(dateField) {
-    triggerMouseDown(dateField.$dateField);
+    JQueryTesting.triggerMouseDown(dateField.$dateField);
     expect(findDatePicker().length).toBe(1);
   }
 
@@ -115,11 +114,11 @@ describe('DateFieldAdapter', () => {
       expect(field.errorStatus.children[0].message).toBe('error status from server');
 
       // Enter another date, but don't press enter
-      triggerKeyDown(field.$dateField, keys.DOWN);
+      JQueryTesting.triggerKeyDown(field.$dateField, keys.DOWN);
       expect(field.displayText).toBe('24.05.2017');
 
       // Revert to the old date and press enter -> send the event so that server may validate again
-      triggerKeyDown(field.$dateField, keys.UP);
+      JQueryTesting.triggerKeyDown(field.$dateField, keys.UP);
       expect(field.displayText).toBe('23.05.2017');
       field.acceptInput();
       expect(field.errorStatus.children.length).toBe(1);
@@ -141,7 +140,7 @@ describe('DateFieldAdapter', () => {
 
       // Open picker and select invalid date again -> error status must not vanish
       openDatePicker(field);
-      triggerClick(find$Day(field.getDatePicker(), new Date(2017, 4, 23)));
+      JQueryTesting.triggerClick(find$Day(field.getDatePicker(), new Date(2017, 4, 23)));
       expect(field.$dateField.val()).toBe('23.05.2017');
       expect(field.errorStatus.children.length).toBe(1);
       expect(field.errorStatus.children[0].message).toBe('error status from server');
@@ -172,7 +171,7 @@ describe('DateFieldAdapter', () => {
       focusDate(field);
       openDatePicker(field);
 
-      triggerClick(find$Day(field.getDatePicker(), new Date(2016, 1, 1)));
+      JQueryTesting.triggerClick(find$Day(field.getDatePicker(), new Date(2016, 1, 1)));
       expect(field.$dateField.val()).toBe('01.02.2016');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);

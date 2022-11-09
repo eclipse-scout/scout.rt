@@ -9,19 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Cell, CellEditorPopup, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, objects, PropertyEventEmitter, scout, Session, Status, StringField, strings,
-  styles, Table, TableHeader, TableHeaderMenu, TableRow, texts, ValueField
+  AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf, objects,
+  ObjectType, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, ValueField
 } from '../../index';
 import $ from 'jquery';
-import {Alignment} from '../../cell/Cell';
-import {ColumnComparator} from './comparators';
-import {AggregateTableRow} from '../Table';
-import {ObjectType} from '../../ObjectFactory';
-import {TableColumnMovedEvent} from '../TableEventMap';
-import {SomeRequired} from '../../types';
-import {InitModelOf} from '../../scout';
 
-export default class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue> {
+export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue> {
   declare model: ColumnModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'session'>;
   declare eventMap: ColumnEventMap;

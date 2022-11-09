@@ -10,7 +10,7 @@
  */
 import {Event, Scrollbar, WidgetEventMap} from '../index';
 
-export default interface ScrollbarEventMap extends WidgetEventMap {
+export interface ScrollbarEventMap extends WidgetEventMap {
   'scrollStart': Event<Scrollbar>;
   'scrollEnd': Event<Scrollbar>;
 }

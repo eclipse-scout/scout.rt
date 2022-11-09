@@ -14,7 +14,7 @@ export interface FileInputChangeEvent<F extends FileInput = FileInput> extends E
   files: File[];
 }
 
-export default interface FileInputEventMap extends WidgetEventMap {
+export interface FileInputEventMap extends WidgetEventMap {
   'change': FileInputChangeEvent;
   'propertyChange:acceptTypes': PropertyChangeEvent<string>;
   'propertyChange:maximumUploadSize': PropertyChangeEvent<number>;

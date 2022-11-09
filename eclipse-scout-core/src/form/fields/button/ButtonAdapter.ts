@@ -10,7 +10,7 @@
  */
 import {Button, Event, FormFieldAdapter} from '../../../index';
 
-export default class ButtonAdapter extends FormFieldAdapter {
+export class ButtonAdapter extends FormFieldAdapter {
   declare widget: Button;
 
   constructor() {

@@ -17,7 +17,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
  * See DisableBrowserTabSwitchingKeyStroke.js where switching between views is implemented, but only up to the current number of open views.
  * That means, that if 3 views are open, ctrl-4 is prevented by this keystroke.
  */
-export default class DisableBrowserTabSwitchingKeyStroke extends RangeKeyStroke {
+export class DisableBrowserTabSwitchingKeyStroke extends RangeKeyStroke {
   declare field: Desktop;
 
   constructor(desktop: Desktop) {

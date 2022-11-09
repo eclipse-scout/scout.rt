@@ -12,7 +12,7 @@ import {Event, ModelAdapter} from '@eclipse-scout/core';
 import {Chart} from '../index';
 import {ChartValueClickEvent} from './ChartEventMap';
 
-export default class ChartAdapter extends ModelAdapter {
+export class ChartAdapter extends ModelAdapter {
   protected _onWidgetValueClick(event: ChartValueClickEvent) {
     this._send('valueClick', event.data);
   }

@@ -13,7 +13,7 @@ import {Key, KeyStroke, ScoutKeyboardEvent} from '../index';
 /**
  * KeyStroke which is bound to a range of keys, e.g. ctrl-1 ... ctrl-9.
  */
-export default class RangeKeyStroke extends KeyStroke {
+export class RangeKeyStroke extends KeyStroke {
   ranges: KeyStrokeRange[];
 
   constructor() {

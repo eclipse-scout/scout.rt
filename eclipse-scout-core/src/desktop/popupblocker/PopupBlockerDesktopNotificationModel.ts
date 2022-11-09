@@ -10,7 +10,7 @@
  */
 import {DesktopNotificationModel} from '../../index';
 
-export default interface PopupBlockerDesktopNotificationModel extends DesktopNotificationModel {
+export interface PopupBlockerDesktopNotificationModel extends DesktopNotificationModel {
   preserveOpener?: boolean;
   linkUrl?: string;
   linkText?: string;

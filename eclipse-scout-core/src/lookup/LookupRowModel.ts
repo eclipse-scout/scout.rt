@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default interface LookupRowModel<Key> {
+export interface LookupRowModel<Key> {
   key?: Key;
   text?: string;
   parentKey?: Key;

@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BenchRowLayoutData} from '../../../index';
+import {BenchColumnLayoutDataModel, BenchRowLayoutData, InitModelOf, ObjectOrModel} from '../../../index';
 import $ from 'jquery';
-import BenchColumnLayoutDataModel from './BenchColumnLayoutDataModel';
-import {InitModelOf, ObjectOrModel} from '../../../scout';
 
-export default class BenchColumnLayoutData implements BenchColumnLayoutDataModel {
+export class BenchColumnLayoutData implements BenchColumnLayoutDataModel {
   declare model: BenchColumnLayoutDataModel;
 
   columns: BenchRowLayoutData[];

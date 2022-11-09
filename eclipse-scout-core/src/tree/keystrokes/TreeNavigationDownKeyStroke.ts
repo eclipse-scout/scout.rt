@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractTreeNavigationKeyStroke, keys, ScoutKeyboardEvent, Tree, TreeNode} from '../../index';
-import {TreeEventCurrentNode} from './AbstractTreeNavigationKeyStroke';
+import {AbstractTreeNavigationKeyStroke, keys, ScoutKeyboardEvent, Tree, TreeEventCurrentNode, TreeNode} from '../../index';
 
-export default class TreeNavigationDownKeyStroke extends AbstractTreeNavigationKeyStroke {
+export class TreeNavigationDownKeyStroke extends AbstractTreeNavigationKeyStroke {
 
   constructor(tree: Tree, modifierBitMask: number) {
     super(tree, modifierBitMask);

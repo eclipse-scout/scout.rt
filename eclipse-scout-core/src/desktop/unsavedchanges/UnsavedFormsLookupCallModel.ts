@@ -10,6 +10,6 @@
  */
 import {Form, StaticLookupCallModel} from '../../index';
 
-export default interface UnsavedFormsLookupCallModel extends StaticLookupCallModel<Form> {
+export interface UnsavedFormsLookupCallModel extends StaticLookupCallModel<Form> {
   unsavedForms?: Form[];
 }

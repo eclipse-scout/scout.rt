@@ -11,7 +11,7 @@
 import {icons, NavigateButton} from '../../../index';
 import $ from 'jquery';
 
-export default class NavigateUpButton extends NavigateButton {
+export class NavigateUpButton extends NavigateButton {
 
   constructor() {
     super();

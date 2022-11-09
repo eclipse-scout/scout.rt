@@ -11,7 +11,7 @@
 import $ from 'jquery';
 import {Session} from '../index';
 
-export default class Reconnector {
+export class Reconnector {
   session: Session;
   started: boolean;
 

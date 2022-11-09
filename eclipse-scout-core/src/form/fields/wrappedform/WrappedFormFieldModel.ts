@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormFieldModel} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {Form, FormFieldModel, ObjectOrChildModel} from '../../../index';
 
-export default interface WrappedFormFieldModel extends FormFieldModel {
+export interface WrappedFormFieldModel extends FormFieldModel {
   innerForm?: ObjectOrChildModel<Form>;
   /**
    * true if the inner form should request the initial focus once loaded, false if not.

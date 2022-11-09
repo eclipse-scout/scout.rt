@@ -10,7 +10,7 @@
  */
 import {Event, FileChooser, ModelAdapter} from '../index';
 
-export default class FileChooserAdapter extends ModelAdapter {
+export class FileChooserAdapter extends ModelAdapter {
   declare widget: FileChooser;
 
   protected _onWidgetCancel(event: Event<FileChooser>) {

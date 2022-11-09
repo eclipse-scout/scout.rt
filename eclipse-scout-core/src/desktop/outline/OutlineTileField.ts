@@ -10,7 +10,7 @@
  */
 import {FormField, Outline, scout, TileOutlineOverview} from '../../index';
 
-export default class OutlineTileField extends FormField {
+export class OutlineTileField extends FormField {
   /** outline is not a widget, because at the time where _init runs, outline is not yet available */
   outline: string;
   tileOutlineOverview: TileOutlineOverview;

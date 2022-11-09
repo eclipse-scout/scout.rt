@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, DateField, DatePicker, DatePickerPopupLayout, DatePickerPopupModel, FormField, HtmlComponent, Popup, scout} from '../index';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {AbstractLayout, DateField, DatePicker, DatePickerPopupLayout, DatePickerPopupModel, FormField, HtmlComponent, InitModelOf, Popup, scout, SomeRequired} from '../index';
 
-export default class DatePickerPopup extends Popup implements DatePickerPopupModel {
+export class DatePickerPopup extends Popup implements DatePickerPopupModel {
   declare model: DatePickerPopupModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
 

@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractTreeNavigationKeyStroke, keys, ScoutKeyboardEvent, Tree} from '../../index';
-import {TreeEventCurrentNode} from './AbstractTreeNavigationKeyStroke';
+import {AbstractTreeNavigationKeyStroke, keys, ScoutKeyboardEvent, Tree, TreeEventCurrentNode} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigationKeyStroke {
+export class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigationKeyStroke {
 
   constructor(tree: Tree, modifierBitMask: number) {
     super(tree, modifierBitMask);

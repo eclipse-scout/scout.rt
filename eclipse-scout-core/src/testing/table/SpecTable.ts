@@ -10,7 +10,7 @@
  */
 import {Column, DoubleClickSupport, EventListener, EventSupport, Range, Table, TableControl, TableFooter, TableRow} from '../../index';
 
-export default class SpecTable extends Table {
+export class SpecTable extends Table {
   declare _filteredRows: TableRow[];
   declare _animationRowLimit: number;
   declare events: EventSupport & { _eventListeners: EventListener[] };

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dragAndDrop, DragAndDropHandler, FileInputEventMap, FileInputModel, files as fileUtil, Widget} from '../index';
-import {InitModelOf} from '../scout';
+import {arrays, dragAndDrop, DragAndDropHandler, FileInputEventMap, FileInputModel, files as fileUtil, InitModelOf, Widget} from '../index';
 
-export default class FileInput extends Widget implements FileInputModel {
+export class FileInput extends Widget implements FileInputModel {
   declare model: FileInputModel;
   declare eventMap: FileInputEventMap;
   declare self: FileInput;

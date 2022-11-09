@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, EventDelegator, FormField, objects, scout, Table, TableFieldEventMap, TableFieldModel, TableRow, Widget} from '../../../index';
-import {ValidationResult} from '../FormField';
-import {TableAllRowsDeletedEvent, TableRowsCheckedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../../../table/TableEventMap';
-import {InitModelOf, ObjectOrChildModel} from '../../../scout';
+import {
+  arrays, Event, EventDelegator, FormField, InitModelOf, ObjectOrChildModel, objects, scout, Table, TableAllRowsDeletedEvent, TableFieldEventMap, TableFieldModel, TableRow, TableRowsCheckedEvent, TableRowsDeletedEvent,
+  TableRowsInsertedEvent, TableRowsUpdatedEvent, ValidationResult, Widget
+} from '../../../index';
 
-export default class TableField extends FormField implements TableFieldModel {
+export class TableField extends FormField implements TableFieldModel {
   declare model: TableFieldModel;
   declare eventMap: TableFieldEventMap;
   declare self: TableField;

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventEmitter, objects, PropertyChangeEvent, scout, strings} from '../index';
-import PropertyEventMap from './PropertyEventMap';
+import {EventEmitter, objects, PropertyChangeEvent, PropertyEventMap, scout, strings} from '../index';
 
-export default class PropertyEventEmitter extends EventEmitter {
+export class PropertyEventEmitter extends EventEmitter {
   declare eventMap: PropertyEventMap;
   declare self: PropertyEventEmitter;
 

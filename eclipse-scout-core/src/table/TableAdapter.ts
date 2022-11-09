@@ -9,18 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  App, arrays, BooleanColumn, Cell, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, objects, scout, Table, TableModel, TableRow, TableRowModel, TableUserFilter, ValueField
+  AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, scout, Table, TableAggregationFunctionChangedEvent,
+  TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent, TableColumnResizedEvent, TableCompleteCellEditEvent, TableDropEvent, TableFilterAddedEvent,
+  TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent,
+  TableSortEvent, TableUserFilter, ValueField
 } from '../index';
 import $ from 'jquery';
-import {
-  TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent, TableColumnResizedEvent, TableCompleteCellEditEvent,
-  TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TablePrepareCellEditEvent, TableReloadEvent, TableRowActionEvent, TableRowClickEvent, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent,
-  TableSortEvent
-} from './TableEventMap';
-import {AdapterData} from '../session/Session';
-import {ChildModelOf, ModelOf, ObjectOrModel} from '../scout';
 
-export default class TableAdapter extends ModelAdapter {
+export class TableAdapter extends ModelAdapter {
   declare widget: Table;
 
   /** @internal */

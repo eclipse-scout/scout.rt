@@ -11,7 +11,7 @@
 import {Dimension, EventEmitter, Form, HtmlComponent, PopupWindowEventMap, Rectangle, scout, Session, SingleLayout} from '../index';
 import $ from 'jquery';
 
-export default class PopupWindow extends EventEmitter {
+export class PopupWindow extends EventEmitter {
   declare eventMap: PopupWindowEventMap;
   declare self: PopupWindow;
 

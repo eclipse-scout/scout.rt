@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DisplayParent, Event, Form, GroupBox, PropertyChangeEvent, Status, WidgetEventMap} from '../index';
-import {DisplayHint} from './Form';
-import {ValidationResult} from './fields/FormField';
+import {DisplayHint, DisplayParent, Event, Form, GroupBox, PropertyChangeEvent, Status, ValidationResult, WidgetEventMap} from '../index';
 
 export interface FormRevealInvalidFieldEvent<F extends Form = Form> extends Event<F> {
   validationResult: ValidationResult;
@@ -21,7 +19,7 @@ export interface FormMoveEvent<F extends Form = Form> extends Event<F> {
   top: number;
 }
 
-export default interface FormEventMap extends WidgetEventMap {
+export interface FormEventMap extends WidgetEventMap {
   'abort': Event<Form>;
   'close': Event<Form>;
   'load': Event<Form>;

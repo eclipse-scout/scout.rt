@@ -10,7 +10,7 @@
  */
 import {TabItem, WidgetModel} from '../../../index';
 
-export default interface TabModel extends WidgetModel {
+export interface TabModel extends WidgetModel {
   tabItem?: TabItem;
   selected?: boolean;
 }

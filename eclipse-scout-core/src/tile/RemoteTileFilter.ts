@@ -14,7 +14,7 @@ export interface RemoteTileFilterOptions {
   tileIds?: string[];
 }
 
-export default class RemoteTileFilter {
+export class RemoteTileFilter {
   synthetic: boolean;
   tileMap: Record<string, string>;
 

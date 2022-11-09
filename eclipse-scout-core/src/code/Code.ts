@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {codes, Locale, scout, texts, TreeVisitResult} from '../index';
-import CodeModel from './CodeModel';
-import {TreeVisitor} from '../widget/Widget';
-import {InitModelOf} from '../scout';
+import {CodeModel, codes, InitModelOf, Locale, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
-export default class Code<TCodeId> {
+export class Code<TCodeId> {
   declare model: CodeModel<TCodeId>;
 
   active: boolean;

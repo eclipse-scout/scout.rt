@@ -11,7 +11,7 @@
 
 import {Action, BreadcrumbItemModel, HtmlComponent} from '../index';
 
-export default class BreadcrumbItem extends Action implements BreadcrumbItemModel {
+export class BreadcrumbItem extends Action implements BreadcrumbItemModel {
   declare model: BreadcrumbItemModel;
 
   /** Arbitrary reference value, can be used to find and select modes (see BreadcrumbBar.js) */

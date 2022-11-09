@@ -10,5 +10,5 @@
  */
 import {ModelAdapter} from '../index';
 
-export default class PopupManagerAdapter extends ModelAdapter {
+export class PopupManagerAdapter extends ModelAdapter {
 }

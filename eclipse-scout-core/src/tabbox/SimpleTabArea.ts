@@ -8,13 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, Widget, widgets} from '../index';
-import {SimpleTabView} from './SimpleTab';
-import {InitModelOf} from '../scout';
+import {AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, InitModelOf, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, SimpleTabView, Widget, widgets} from '../index';
 
 export type SimpleTabAreaDisplayStyle = EnumObject<typeof SimpleTabArea.DisplayStyle>;
 
-export default class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabAreaModel<TView> {
+export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabAreaModel<TView> {
   declare model: SimpleTabAreaModel<TView>;
   declare eventMap: SimpleTabAreaEventMap<TView>;
   declare self: SimpleTabArea<any>;

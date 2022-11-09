@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, PropertyChangeEvent, scout, Status, strings, TabItem, TabModel, tooltips, Widget} from '../../../index';
-import TabEventMap from './TabEventMap';
-import {InitModelOf} from '../../../scout';
-import {SomeRequired} from '../../../types';
+import {Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, InitModelOf, PropertyChangeEvent, scout, SomeRequired, Status, strings, TabEventMap, TabItem, TabModel, tooltips, Widget} from '../../../index';
 
-export default class Tab extends Widget implements TabModel {
+export class Tab extends Widget implements TabModel {
   declare model: TabModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'tabItem'>;
   declare eventMap: TabEventMap;

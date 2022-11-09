@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Dimension, TreeNode, TreeNodeModel} from '../../src/index';
-import {TreeSpecHelper} from '../../src/testing/index';
-import SpecTree from '../../src/testing/tree/SpecTree';
+import {SpecTree, TreeSpecHelper} from '../../src/testing/index';
 
 describe('TreeNodePosition', () => {
 

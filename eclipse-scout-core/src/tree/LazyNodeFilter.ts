@@ -13,7 +13,7 @@ import {Tree, TreeNode} from '../index';
 
 export type LazyNodeFilterTreeNode = TreeNode & { _lazyNodeFilterAccepted?: boolean };
 
-export default class LazyNodeFilter {
+export class LazyNodeFilter {
   tree: Tree;
 
   constructor(tree: Tree) {

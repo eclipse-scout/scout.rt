@@ -11,7 +11,7 @@
 import {AbstractLayout, graphics, TableFooter} from '../index';
 import $ from 'jquery';
 
-export default class TableFooterLayout extends AbstractLayout {
+export class TableFooterLayout extends AbstractLayout {
   protected _tableFooter: TableFooter;
 
   constructor(tableFooter: TableFooter) {

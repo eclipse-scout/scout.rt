@@ -10,7 +10,7 @@
  */
 import {Table, WidgetModel} from '../index';
 
-export default interface TableFooterModel extends WidgetModel {
+export interface TableFooterModel extends WidgetModel {
   table?: Table;
   filterText?: string;
 }

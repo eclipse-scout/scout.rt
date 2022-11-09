@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Alignment} from '../../cell/Cell';
+import {Alignment} from '../../index';
 
 /**
  * The ColumnDescriptor is used to define texts, widths and order of columns.
  * It is typically used for smart fields with a proposal chooser of type table.
  */
-export default interface ColumnDescriptor {
+export interface ColumnDescriptor {
   /**
    * Name of the corresponding property in the "additional table row data" or <code>null</code> if this descriptor describes the first (default) column.
    */

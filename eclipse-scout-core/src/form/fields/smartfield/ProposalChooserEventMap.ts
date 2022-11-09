@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, LookupRow, PropertyChangeEvent, ProposalChooser, Status, WidgetEventMap} from '../../../index';
-import {ProposalChooserContent, ProposalChooserContentRow} from './ProposalChooser';
-import {SmartFieldActiveFilter} from './SmartField';
+import {Event, LookupRow, PropertyChangeEvent, ProposalChooser, ProposalChooserContent, ProposalChooserContentRow, SmartFieldActiveFilter, Status, WidgetEventMap} from '../../../index';
 
 export interface ProposalChooserActiveFilterSelectedEvent<TValue = any,
   TContent extends ProposalChooserContent = any,
@@ -26,7 +24,7 @@ export interface ProposalChooserLookupRowSelectedEvent<TValue = any,
   lookupRow: LookupRow<TValue>;
 }
 
-export default interface ProposalChooserEventMap<TValue, TContent extends ProposalChooserContent, TContentRow extends ProposalChooserContentRow<TValue>> extends WidgetEventMap {
+export interface ProposalChooserEventMap<TValue, TContent extends ProposalChooserContent, TContentRow extends ProposalChooserContentRow<TValue>> extends WidgetEventMap {
   'activeFilterSelected': ProposalChooserActiveFilterSelectedEvent<TValue, TContent, TContentRow>;
   'lookupRowSelected': ProposalChooserLookupRowSelectedEvent<TValue, TContent, TContentRow>;
   'propertyChange:status': PropertyChangeEvent<Status>;

@@ -10,7 +10,7 @@
  */
 import {arrays, fields, graphics, HtmlComponent, Rectangle, SmartField, SmartFieldLayout, SmartFieldMultilineLayout} from '../../../index';
 
-export default class SmartFieldMultiline<TValue> extends SmartField<TValue> {
+export class SmartFieldMultiline<TValue> extends SmartField<TValue> {
   protected _$multilineLines: JQuery;
 
   constructor() {

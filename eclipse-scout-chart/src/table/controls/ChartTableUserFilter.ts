@@ -8,14 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, TableMatrix, TableUserFilter} from '@eclipse-scout/core';
+import {arrays, TableMatrix, TableMatrixKeyAxis, TableRow, TableUserFilter, TableUserFilterAddedEventData} from '@eclipse-scout/core';
 import {ChartTableUserFilterModel} from '../../index';
-import {TableMatrixKeyAxis} from '@eclipse-scout/core/src/table/TableMatrix';
-import {TableRow} from '@eclipse-scout/core/src';
-import {TableUserFilterAddedEventData} from '@eclipse-scout/core/src/table/userfilter/TableUserFilter';
 import {TableControlDeterministicKey} from './ChartTableControl';
 
-export default class ChartTableUserFilter extends TableUserFilter implements ChartTableUserFilterModel {
+export class ChartTableUserFilter extends TableUserFilter implements ChartTableUserFilterModel {
   declare model: ChartTableUserFilterModel;
 
   text: string;

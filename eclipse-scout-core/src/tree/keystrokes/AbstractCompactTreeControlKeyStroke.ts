@@ -15,7 +15,7 @@ export type CompactTreeEventNode = {
   _nextNode?: CompactTreeNode;
 };
 
-export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
+export class AbstractCompactTreeControlKeyStroke extends KeyStroke {
   declare field: CompactTree;
 
   constructor(compactProcessTree: CompactTree) {

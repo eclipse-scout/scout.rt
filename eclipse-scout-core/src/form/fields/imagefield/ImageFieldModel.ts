@@ -10,7 +10,7 @@
  */
 import {FormFieldModel} from '../../../index';
 
-export default interface ImageFieldModel extends FormFieldModel {
+export interface ImageFieldModel extends FormFieldModel {
   autoFit?: boolean;
   imageUrl?: string;
   scrollBarEnabled?: boolean;

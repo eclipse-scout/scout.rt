@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateRange, Event, PropertyChangeEvent, WidgetEventMap, YearPanel} from '../index';
-import {PlannerDisplayMode} from '../planner/Planner';
+import {DateRange, Event, PlannerDisplayMode, PropertyChangeEvent, WidgetEventMap, YearPanel} from '../index';
 
 export interface YearPanelDateSelectEvent<Y extends YearPanel = YearPanel> extends Event<Y> {
   date: Date;
 }
 
-export default interface YearPanelEventMap extends WidgetEventMap {
+export interface YearPanelEventMap extends WidgetEventMap {
   'dateSelect': YearPanelDateSelectEvent;
   'propertyChange:displayMode': PropertyChangeEvent<PlannerDisplayMode>;
   'propertyChange:viewRange': PropertyChangeEvent<DateRange>;

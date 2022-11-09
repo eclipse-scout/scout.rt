@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuModel} from '../../index';
-import {ButtonSystemType} from '../fields/button/Button';
+import {ButtonSystemType, MenuModel} from '../../index';
 
-export default interface FormLifecycleMenuModel extends MenuModel {
+export interface FormLifecycleMenuModel extends MenuModel {
   systemType?: ButtonSystemType;
 }

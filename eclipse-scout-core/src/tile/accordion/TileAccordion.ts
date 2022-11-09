@@ -9,13 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Accordion, arrays, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, KeyStrokeContext, objects, PropertyChangeEvent, scout, TextFilter, Tile, TileAccordionEventMap, TileAccordionLayout,
-  TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
+  Accordion, arrays, Comparator, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, InitModelOf, KeyStrokeContext, ObjectOrChildModel, objects, PropertyChangeEvent, scout, TextFilter, Tile,
+  TileAccordionEventMap, TileAccordionLayout, TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
 } from '../../index';
-import {Comparator} from '../../types';
-import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
-export default class TileAccordion extends Accordion implements TileAccordionModel {
+export class TileAccordion extends Accordion implements TileAccordionModel {
   declare model: TileAccordionModel;
   declare eventMap: TileAccordionEventMap;
   declare self: TileAccordion;

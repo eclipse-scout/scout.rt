@@ -12,7 +12,7 @@ import {objects} from '../index';
 
 export type PropertyChangeEventFilterType = ((propertyName: string, value: any) => boolean);
 
-export default class PropertyChangeEventFilter {
+export class PropertyChangeEventFilter {
 
   filters: PropertyChangeEventFilterType[];
   protected _filterProperties: Record<string, any>;

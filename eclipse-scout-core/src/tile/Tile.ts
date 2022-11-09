@@ -8,16 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {colorSchemes, EnumObject, GridData, HtmlComponent, LoadingSupport, scrollbars, SingleLayout, Widget} from '../index';
+import {ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
 import $ from 'jquery';
-import {ColorScheme} from '../util/colorSchemes';
-import TileModel from './TileModel';
-import TileEventMap from './TileEventMap';
-import {InitModelOf} from '../scout';
 
 export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
 
-export default class Tile extends Widget implements TileModel {
+export class Tile extends Widget implements TileModel {
   declare model: TileModel;
   declare eventMap: TileEventMap;
   declare self: Tile;

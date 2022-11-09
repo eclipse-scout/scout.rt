@@ -10,6 +10,6 @@
  */
 import {ColumnUserFilter, GroupBoxModel} from '../index';
 
-export default interface FilterFieldsGroupBoxModel extends GroupBoxModel {
+export interface FilterFieldsGroupBoxModel extends GroupBoxModel {
   filter?: ColumnUserFilter;
 }

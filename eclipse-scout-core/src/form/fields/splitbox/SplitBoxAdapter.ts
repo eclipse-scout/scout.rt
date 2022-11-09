@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeFieldAdapter, Event, SplitBox} from '../../../index';
-import {SplitBoxPositionChangeEvent} from './SplitBoxEventMap';
+import {CompositeFieldAdapter, Event, SplitBox, SplitBoxPositionChangeEvent} from '../../../index';
 
-export default class SplitBoxAdapter extends CompositeFieldAdapter {
+export class SplitBoxAdapter extends CompositeFieldAdapter {
 
   constructor() {
     super();

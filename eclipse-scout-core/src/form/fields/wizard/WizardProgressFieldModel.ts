@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel} from '../../../index';
-import {WizardStep} from './WizardProgressField';
+import {FormFieldModel, WizardStep} from '../../../index';
 
-export default interface WizardProgressFieldModel extends FormFieldModel {
+export interface WizardProgressFieldModel extends FormFieldModel {
   activeStepIndex?: number;
   steps?: WizardStep[];
 }

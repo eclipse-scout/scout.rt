@@ -9,20 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbortKeyStroke, Button, DialogLayout, DisabledStyle, DisplayParent, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout, FormLifecycle, FormModel, GlassPaneRenderer,
-  GroupBox, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, scout, Status, strings, tooltips, TreeVisitResult, webstorage, Widget, WrappedFormField
+  AbortKeyStroke, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout, FormLifecycle,
+  FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, ObjectOrChildModel, Point, PopupWindow, Rectangle, scout, Status,
+  StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
-import {FormRevealInvalidFieldEvent} from './FormEventMap';
-import {DisplayViewId} from '../tabbox/SimpleTab';
-import {ValidationResult} from './fields/FormField';
-import {ButtonSystemType} from './fields/button/Button';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
-import {StatusOrModel} from '../status/Status';
 
 export type DisplayHint = EnumObject<typeof Form.DisplayHint>;
 
-export default class Form extends Widget implements FormModel, DisplayParent {
+export class Form extends Widget implements FormModel, DisplayParent {
   declare model: FormModel;
   declare eventMap: FormEventMap;
   declare self: Form;

@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, EventHandler, graphics, icons, TableControl, TableRow, tooltips} from '../../index';
+import {arrays, Device, EventHandler, graphics, icons, InitModelOf, TableColumnMovedEvent, TableControl, TableRow, tooltips} from '../../index';
 import $ from 'jquery';
-import {TableColumnMovedEvent} from '../TableEventMap';
-import {InitModelOf} from '../../scout';
 
-export default class AggregateTableControl extends TableControl {
+export class AggregateTableControl extends TableControl {
 
   aggregateRow: any[] & { selection?: boolean };
 

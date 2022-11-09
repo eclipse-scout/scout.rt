@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent, GroupBox, Menu, WidgetModel} from '../index';
-import {CalendarDisplayMode} from './Calendar';
-import {ObjectOrChildModel} from '../scout';
+import {CalendarComponent, CalendarDisplayMode, GroupBox, Menu, ObjectOrChildModel, WidgetModel} from '../index';
 
-export default interface CalendarModel extends WidgetModel {
+export interface CalendarModel extends WidgetModel {
   monthViewNumberOfWeeks?: number;
   numberOfHourDivisions?: number;
   heightPerDivision?: number;

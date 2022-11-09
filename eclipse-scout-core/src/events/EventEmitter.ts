@@ -18,7 +18,7 @@ export type EventMapOf<T> = T extends { eventMap: infer TMap } ? TMap : object;
 /** Omits all properties that cannot be passed as part of the event model when the event is triggered. */
 export type EventModel<T> = Omit<T, 'source' | 'defaultPrevented' | 'type' | 'preventDefault'>;
 
-export default class EventEmitter {
+export class EventEmitter {
   events: EventSupport;
   declare eventMap: EventMap;
   declare self: EventEmitter; // Reading the event map with this does not work when the class has a generic -> The class has to define self with any as generic value

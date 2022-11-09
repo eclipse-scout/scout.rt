@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Code, scout, TreeVisitResult} from '../index';
-import CodeTypeModel from './CodeTypeModel';
-import {TreeVisitor} from '../widget/Widget';
-import {FullModelOf, InitModelOf, ObjectOrModel} from '../scout';
+import {Code, CodeTypeModel, FullModelOf, InitModelOf, ObjectOrModel, scout, TreeVisitor, TreeVisitResult} from '../index';
 
-export default class CodeType<TCodeId> {
+export class CodeType<TCodeId> {
 
   declare model: CodeTypeModel<TCodeId>;
 

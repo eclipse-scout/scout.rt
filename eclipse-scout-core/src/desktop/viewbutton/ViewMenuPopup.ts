@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeTile, Icon, Label, scout, Tile, TileGrid, ViewButton, ViewMenuPopupEnterKeyStroke, ViewMenuPopupModel, WidgetPopup} from '../../index';
-import {CompositeTileModel} from '../../tile/CompositeTile';
-import {ChildModelOf, InitModelOf} from '../../scout';
+import {ChildModelOf, CompositeTile, CompositeTileModel, Icon, InitModelOf, Label, scout, Tile, TileGrid, ViewButton, ViewMenuPopupEnterKeyStroke, ViewMenuPopupModel, WidgetPopup} from '../../index';
 
 /**
  * Popup menu to switch between outlines.
  */
-export default class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
+export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
   declare model: ViewMenuPopupModel;
   declare content: TileGrid;
 

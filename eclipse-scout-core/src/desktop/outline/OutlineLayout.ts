@@ -10,7 +10,7 @@
  */
 import {Dimension, graphics, Outline, TreeLayout} from '../../index';
 
-export default class OutlineLayout extends TreeLayout {
+export class OutlineLayout extends TreeLayout {
   outline: Outline;
 
   constructor(outline: Outline) {

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, Event, FormField, FormFieldModel, ModelAdapter, objects} from '../../index';
-import {FileDropEvent} from '../../util/dragAndDrop';
+import {App, arrays, Event, FileDropEvent, FormField, FormFieldModel, ModelAdapter, objects} from '../../index';
 
-export default class FormFieldAdapter extends ModelAdapter {
+export class FormFieldAdapter extends ModelAdapter {
   declare widget: FormField;
 
   /**

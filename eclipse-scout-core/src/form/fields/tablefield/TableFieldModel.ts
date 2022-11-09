@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel, Table} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {FormFieldModel, ObjectOrChildModel, Table} from '../../../index';
 
-export default interface TableFieldModel extends FormFieldModel {
+export interface TableFieldModel extends FormFieldModel {
   table?: ObjectOrChildModel<Table>;
 }

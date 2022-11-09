@@ -10,6 +10,6 @@
  */
 import {Desktop, ResponsiveHandlerModel} from '../index';
 
-export default interface DesktopResponsiveHandlerModel extends ResponsiveHandlerModel {
+export interface DesktopResponsiveHandlerModel extends ResponsiveHandlerModel {
   widget?: Desktop;
 }

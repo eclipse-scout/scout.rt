@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues, ObjectFactory, PlannerAdapter} from '../../src';
-import Planner, {PlannerResource} from '../../src/planner/Planner';
-import {FullModelOf} from '../../src/scout';
+import {defaultValues, FullModelOf, ObjectFactory, Planner, PlannerAdapter, PlannerResource} from '../../src/index';
 
 describe('PlannerAdapter', () => {
   let session: SandboxSession;

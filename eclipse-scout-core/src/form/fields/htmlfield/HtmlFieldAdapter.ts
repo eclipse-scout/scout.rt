@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, HtmlField, HtmlFieldModel, ValueFieldAdapter} from '../../../index';
-import {HtmlFieldAppLinkActionEvent} from './HtmlFieldEventMap';
+import {Event, HtmlField, HtmlFieldAppLinkActionEvent, HtmlFieldModel, ValueFieldAdapter} from '../../../index';
 
-export default class HtmlFieldAdapter extends ValueFieldAdapter {
+export class HtmlFieldAdapter extends ValueFieldAdapter {
 
   protected override _initProperties(model: HtmlFieldModel & { scrollToEnd?: boolean }) {
     if (model.scrollToEnd !== undefined) {

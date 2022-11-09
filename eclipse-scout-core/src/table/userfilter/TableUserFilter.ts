@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventEmitter, Filter, objects, Session, Table, TableRow, TableUserFilterModel} from '../../index';
+import {EventEmitter, Filter, InitModelOf, objects, Session, SomeRequired, Table, TableRow, TableUserFilterModel} from '../../index';
 import $ from 'jquery';
-import {InitModelOf} from '../../scout';
-import {SomeRequired} from '../../types';
 
-export default abstract class TableUserFilter extends EventEmitter implements Filter<TableRow>, TableUserFilterModel {
+export abstract class TableUserFilter extends EventEmitter implements Filter<TableRow>, TableUserFilterModel {
   declare model: TableUserFilterModel;
   declare initModel: SomeRequired<this['model'], 'session' | 'table'>;
 

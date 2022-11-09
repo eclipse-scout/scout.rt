@@ -11,7 +11,7 @@
 import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, TagBar} from '../index';
 import $ from 'jquery';
 
-export default class TagBarLayout extends AbstractLayout {
+export class TagBarLayout extends AbstractLayout {
   tagBar: TagBar;
 
   constructor(tagBar: TagBar) {

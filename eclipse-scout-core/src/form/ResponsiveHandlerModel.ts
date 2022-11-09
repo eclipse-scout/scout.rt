@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ResponsiveHandler, Widget} from '../index';
-import {ResponsiveState} from './ResponsiveManager';
-import {ObjectModel} from '../scout';
+import {ObjectModel, ResponsiveHandler, ResponsiveState, Widget} from '../index';
 
-export default interface ResponsiveHandlerModel extends ObjectModel<ResponsiveHandler> {
+export interface ResponsiveHandlerModel extends ObjectModel<ResponsiveHandler> {
   widget?: Widget;
   /**
    * Default is -1.

@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, Insets, LayoutData, NullLayout, Point, Rectangle, scout, Session} from '../index';
+import {AbstractLayout, BoundsOptions, Dimension, graphics, Insets, InsetsOptions, LayoutData, NullLayout, Point, PrefSizeOptions, Rectangle, scout, Session, SizeOptions} from '../index';
 import $ from 'jquery';
-import {BoundsOptions, InsetsOptions, PrefSizeOptions, SizeOptions} from './graphics';
 
 export interface HtmlCompPrefSizeOptions extends PrefSizeOptions {
   /**
@@ -54,7 +53,7 @@ export interface HtmlCompPrefSizeOptions extends PrefSizeOptions {
  * If a child component is modified, e.g. changes its visibility or another attribute that impacts the size or position, it needs to be invalidated. Since this not only affects the parent component but possibly every ancestor,
  * the whole ancestor component tree needs to be invalidated. This is done by using {@link invalidateLayoutTree}. So the invalidation happens bottom-up.
  */
-export default class HtmlComponent {
+export class HtmlComponent {
   $comp: JQuery;
   layout: AbstractLayout;
   layoutData: LayoutData;

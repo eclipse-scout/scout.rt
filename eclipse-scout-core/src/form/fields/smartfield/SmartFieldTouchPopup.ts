@@ -8,17 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, LookupRow, PropertyChangeEvent, ProposalChooser, scout, ScoutKeyboardEvent, SmartField, SmartFieldTouchPopupEventMap, SmartFieldTouchPopupModel, TouchPopup} from '../../../index';
-import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
-import {SmartFieldLookupResult} from './SmartField';
-import {StatusOrModel} from '../../../status/Status';
-import {InitModelOf} from '../../../scout';
+import {
+  Event, InitModelOf, LookupRow, PropertyChangeEvent, ProposalChooser, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, scout, ScoutKeyboardEvent, SmartField, SmartFieldLookupResult,
+  SmartFieldTouchPopupEventMap, SmartFieldTouchPopupModel, StatusOrModel, TouchPopup
+} from '../../../index';
 
 /**
  * Info: this class must have the same interface as SmartFieldPopup. That's why there's some
  * copy/pasted code here, because we don't have multi inheritance.
  */
-export default class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFieldTouchPopupModel<TValue> {
+export class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFieldTouchPopupModel<TValue> {
   declare model: SmartFieldTouchPopupModel<TValue>;
   declare eventMap: SmartFieldTouchPopupEventMap<TValue>;
   declare self: SmartFieldTouchPopup<any>;

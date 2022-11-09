@@ -10,6 +10,6 @@
  */
 import {WidgetPopupModel} from '../index';
 
-export default interface MobilePopupModel extends WidgetPopupModel {
+export interface MobilePopupModel extends WidgetPopupModel {
   title?: string;
 }

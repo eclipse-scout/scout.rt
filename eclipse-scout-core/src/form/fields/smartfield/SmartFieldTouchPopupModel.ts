@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SmartField, TouchPopupModel} from '../../../index';
-import {SmartFieldLookupResult} from './SmartField';
-import {StatusOrModel} from '../../../status/Status';
+import {SmartField, SmartFieldLookupResult, StatusOrModel, TouchPopupModel} from '../../../index';
 
-export default interface SmartFieldTouchPopupModel<TValue> extends TouchPopupModel {
+export interface SmartFieldTouchPopupModel<TValue> extends TouchPopupModel {
   lookupResult?: SmartFieldLookupResult<TValue>;
   smartField?: SmartField<TValue>;
   status?: StatusOrModel;

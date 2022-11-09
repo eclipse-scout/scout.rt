@@ -10,7 +10,7 @@
  */
 import {FormField, Planner, PlannerFieldModel} from '../../../index';
 
-export default class PlannerField extends FormField implements PlannerFieldModel {
+export class PlannerField extends FormField implements PlannerFieldModel {
   declare model: PlannerFieldModel;
 
   planner: Planner;

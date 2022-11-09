@@ -10,5 +10,5 @@
  */
 import {ModelAdapter} from '../index';
 
-export default class NullWidgetAdapter extends ModelAdapter {
+export class NullWidgetAdapter extends ModelAdapter {
 }

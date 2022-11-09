@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, Form, FormField, GroupBox, WrappedFormFieldEventMap, WrappedFormFieldModel} from '../../../index';
-import {InitModelOf, ObjectOrChildModel} from '../../../scout';
+import {Event, EventHandler, Form, FormField, GroupBox, InitModelOf, ObjectOrChildModel, WrappedFormFieldEventMap, WrappedFormFieldModel} from '../../../index';
 
-export default class WrappedFormField extends FormField implements WrappedFormFieldModel {
+export class WrappedFormField extends FormField implements WrappedFormFieldModel {
   declare model: WrappedFormFieldModel;
   declare eventMap: WrappedFormFieldEventMap;
   declare self: WrappedFormField;

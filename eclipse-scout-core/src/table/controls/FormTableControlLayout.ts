@@ -11,7 +11,7 @@
 import {AbstractLayout, FormTableControl, graphics, scrollbars, TabBox} from '../../index';
 import $ from 'jquery';
 
-export default class FormTableControlLayout extends AbstractLayout {
+export class FormTableControlLayout extends AbstractLayout {
   control: FormTableControl;
 
   constructor(control: FormTableControl) {

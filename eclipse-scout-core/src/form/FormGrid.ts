@@ -13,7 +13,7 @@ import {Form, GridData, LogicalGrid} from '../index';
 /**
  * Dummy grid for the form which actually just creates the actual grid data for the root group box from the hints.
  */
-export default class FormGrid extends LogicalGrid {
+export class FormGrid extends LogicalGrid {
   protected _validate(form: Form) {
     // The form does not have a real logical grid but needs the gridData anyway (widthInPixel, heightInPixel, see GroupBoxLayout).
     // Grid.w is not relevant for the form, no need to pass a gridColumnCount

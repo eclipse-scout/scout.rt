@@ -9,12 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ObjectFactory} from '@eclipse-scout/core';
+
+export * from './svg/SvgField';
+export * from './svg/SvgFieldModel';
+export * from './svg/SvgFieldEventMap';
+export * from './svg/SvgFieldAdapter';
+
 import * as self from './index';
 
-export {default as SvgField} from './svg/SvgField';
-export {default as SvgFieldModel} from './svg/SvgFieldModel';
-export {default as SvgFieldEventMap} from './svg/SvgFieldEventMap';
-export {default as SvgFieldAdapter} from './svg/SvgFieldAdapter';
-
 export default self;
+
 ObjectFactory.get().registerNamespace('scout', self);

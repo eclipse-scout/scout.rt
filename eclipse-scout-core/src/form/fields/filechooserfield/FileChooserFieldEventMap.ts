@@ -10,7 +10,7 @@
  */
 import {PropertyChangeEvent, ValueFieldEventMap} from '../../../index';
 
-export default interface FileChooserFieldEventMap extends ValueFieldEventMap<File> {
+export interface FileChooserFieldEventMap extends ValueFieldEventMap<File> {
   'propertyChange:acceptTypes': PropertyChangeEvent<string>;
   'propertyChange:maximumUploadSize': PropertyChangeEvent<number>;
 }

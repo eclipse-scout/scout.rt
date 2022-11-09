@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeFieldAdapter, Widget} from '../../../index';
-import {ChildModelOf, FullModelOf} from '../../../scout';
+import {ChildModelOf, CompositeFieldAdapter, FullModelOf, Widget} from '../../../index';
 
-export default class SequenceBoxAdapter extends CompositeFieldAdapter {
+export class SequenceBoxAdapter extends CompositeFieldAdapter {
 
 
   protected override _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {

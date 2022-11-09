@@ -8,16 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, IconDesc, IconModel, Image, scout, Widget} from '../index';
-import IconEventMap from './IconEventMap';
-import {InitModelOf} from '../scout';
+import {HtmlComponent, IconDesc, IconEventMap, IconModel, Image, InitModelOf, scout, Widget} from '../index';
 
 /**
  * Widget representing an icon. It may be a font icon or an image icon. Depending on the type, either a span or an img tag will be rendered.
  * <p>
  * See also {@link JQuery.icon} and {@link JQuery.appendIcon}. Main difference to these implementations is that the image loading will invalidate the layout by using {@link Image}.
  */
-export default class Icon extends Widget implements IconModel {
+export class Icon extends Widget implements IconModel {
   declare model: IconModel;
   declare eventMap: IconEventMap;
   declare self: Icon;

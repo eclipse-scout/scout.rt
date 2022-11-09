@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldEventMap, PropertyChangeEvent} from '../../../index';
-import TabItem from './TabItem';
-import {TabAreaStyle} from './TabArea';
+import {FormFieldEventMap, PropertyChangeEvent, TabAreaStyle, TabItem} from '../../../index';
 
-export default interface TabBoxEventMap extends FormFieldEventMap {
+export interface TabBoxEventMap extends FormFieldEventMap {
   'propertyChange:selectedTab': PropertyChangeEvent<TabItem>;
   'propertyChange:tabAreaStyle': PropertyChangeEvent<TabAreaStyle>;
   'propertyChange:tabItems': PropertyChangeEvent<TabItem[]>;

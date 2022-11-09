@@ -9,15 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, arrays, Cell, Column, ColumnUserFilter, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, NumberColumn, Point, Popup, RowLayout, scout, scrollbars, Table, TableHeader,
-  TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuLayout, TableHeaderMenuModel, TableRowModel
+  AbstractLayout, arrays, Cell, Column, ColumnUserFilter, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, NumberColumn, NumberColumnAggregationFunction, Point, Popup, RowLayout, scout,
+  scrollbars, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuLayout, TableHeaderMenuModel, TableRowModel, TableRowsCheckedEvent
 } from '../index';
-import {NumberColumnAggregationFunction} from './columns/NumberColumn';
-import {TableRowsCheckedEvent} from './TableEventMap';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 
-export default class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
+export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   declare model: TableHeaderMenuModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'column' | 'tableHeader'>;
   declare eventMap: TableHeaderMenuEventMap;

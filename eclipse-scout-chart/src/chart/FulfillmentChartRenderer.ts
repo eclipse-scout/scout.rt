@@ -13,7 +13,7 @@ import {AbstractSvgChartRenderer, Chart} from '../index';
 import $ from 'jquery';
 import {UpdateChartOptions} from './Chart';
 
-export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
+export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
   animationTriggered: boolean;
   segmentSelectorForAnimation: string;
   r: number;

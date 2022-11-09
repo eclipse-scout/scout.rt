@@ -10,7 +10,7 @@
  */
 import {ValueFieldAdapter} from '../../../index';
 
-export default class CheckBoxFieldAdapter extends ValueFieldAdapter {
+export class CheckBoxFieldAdapter extends ValueFieldAdapter {
 
   constructor() {
     super();

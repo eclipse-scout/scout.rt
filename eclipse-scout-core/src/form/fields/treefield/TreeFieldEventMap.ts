@@ -10,6 +10,6 @@
  */
 import {FormFieldEventMap, PropertyChangeEvent, Tree} from '../../../index';
 
-export default interface TreeFieldEventMap extends FormFieldEventMap {
+export interface TreeFieldEventMap extends FormFieldEventMap {
   'propertyChange:tree': PropertyChangeEvent<Tree>;
 }

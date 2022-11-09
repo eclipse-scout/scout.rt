@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ChartField} from '../index';
-import {WidgetTileModel} from '@eclipse-scout/core/src/tile/WidgetTile';
+import {WidgetTileModel} from '@eclipse-scout/core';
 
-export default interface ChartFieldTileModel extends WidgetTileModel {
+export interface ChartFieldTileModel extends WidgetTileModel {
   tileWidget?: ChartField;
 }

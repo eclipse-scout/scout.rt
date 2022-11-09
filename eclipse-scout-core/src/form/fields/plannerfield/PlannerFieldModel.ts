@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel, Planner} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {FormFieldModel, ObjectOrChildModel, Planner} from '../../../index';
 
-export default interface PlannerFieldModel extends FormFieldModel {
+export interface PlannerFieldModel extends FormFieldModel {
   planner?: ObjectOrChildModel<Planner>;
 }

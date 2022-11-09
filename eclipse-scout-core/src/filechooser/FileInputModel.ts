@@ -10,7 +10,7 @@
  */
 import {Widget, WidgetModel} from '../index';
 
-export default interface FileInputModel extends WidgetModel {
+export interface FileInputModel extends WidgetModel {
   /**
    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept
    */

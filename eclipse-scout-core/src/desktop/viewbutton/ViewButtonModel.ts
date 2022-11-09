@@ -10,7 +10,7 @@
  */
 import {ActionModel} from '../../index';
 
-export default interface ViewButtonModel extends ActionModel {
+export interface ViewButtonModel extends ActionModel {
   /**
    * Indicates if this view button is currently the "selected button" in the ViewMenuTab widget,
    * i.e. if it was the last view button of type MENU to have been selected. Note that the

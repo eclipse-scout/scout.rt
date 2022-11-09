@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, objects, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel} from '../index';
+import {
+  EventHandler, InitModelOf, objects, scout, SimpleTab, SimpleTabArea, SimpleTabAreaTabSelectEvent, SimpleTabBox, SimpleTabBoxControllerModel, SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent,
+  SimpleTabBoxViewRemoveEvent, SimpleTabView
+} from '../index';
 import $ from 'jquery';
-import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from './SimpleTabBoxEventMap';
-import {SimpleTabAreaTabSelectEvent} from './SimpleTabAreaEventMap';
-import {SimpleTabView} from './SimpleTab';
-import {InitModelOf} from '../scout';
 
 /**
  * The {@link SimpleTabBoxController} is used to link a {@link SimpleTabBox} with a {@link SimpleTabArea}.
@@ -22,7 +21,7 @@ import {InitModelOf} from '../scout';
  * The controller basically listens to 'viewAdd', 'viewRemove', 'viewActivate', 'viewDeactivate' on the {@link SimpleTabBox} and
  * updates the {@link SimpleTabArea}.
  */
-export default class SimpleTabBoxController<TView extends SimpleTabView = SimpleTabView> implements SimpleTabBoxControllerModel<TView> {
+export class SimpleTabBoxController<TView extends SimpleTabView = SimpleTabView> implements SimpleTabBoxControllerModel<TView> {
   declare model: SimpleTabBoxControllerModel<TView>;
 
   tabBox: SimpleTabBox<TView>;

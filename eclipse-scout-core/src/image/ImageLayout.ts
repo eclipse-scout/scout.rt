@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, HtmlCompPrefSizeOptions, Image} from '../index';
 
-export default class ImageLayout extends AbstractLayout {
+export class ImageLayout extends AbstractLayout {
   image: Image;
 
   constructor(image: Image) {

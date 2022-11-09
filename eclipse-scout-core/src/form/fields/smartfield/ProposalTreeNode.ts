@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupRow, TreeNode, TreeProposalChooser} from '../../../index';
+import {LookupRow, ProposalTreeNodeModel, SmartFieldLookupResult, TreeNode, TreeProposalChooser} from '../../../index';
 import $ from 'jquery';
-import ProposalTreeNodeModel from './ProposalTreeNodeModel';
-import {SmartFieldLookupResult} from './SmartField';
 
-export default class ProposalTreeNode<TValue> extends TreeNode implements ProposalTreeNodeModel<TValue> {
+export class ProposalTreeNode<TValue> extends TreeNode implements ProposalTreeNodeModel<TValue> {
   declare model: ProposalTreeNodeModel<TValue>;
 
   lookupRow: LookupRow<TValue>;

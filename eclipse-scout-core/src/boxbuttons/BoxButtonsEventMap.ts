@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface BoxButtonsEventMap extends WidgetEventMap {
+export interface BoxButtonsEventMap extends WidgetEventMap {
   'propertyChange:defaultButtonIndex': PropertyChangeEvent<number>;
 }

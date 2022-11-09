@@ -10,7 +10,7 @@
  */
 import {ListBox, LookupBoxLayout, Table, Widget} from '../../../index';
 
-export default class ListBoxLayout extends LookupBoxLayout {
+export class ListBoxLayout extends LookupBoxLayout {
 
   constructor(listBox: ListBox<any>, table: Table, filterBox: Widget) {
     super(listBox, table, filterBox);

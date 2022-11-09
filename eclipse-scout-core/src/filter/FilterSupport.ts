@@ -9,15 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, Predicate, PropertyChangeEvent, scout, SetFiltersResult, StringField, strings, styles,
-  UpdateFilteredElementsOptions, ValueField, Widget, WidgetSupport
+  arrays, EventHandler, Filter, Filterable, FilterElement, FilterResult, FilterSupportOptions, FocusFilterFieldKeyStroke, FormField, HAlign, keys, KeyStroke, objects, Predicate, PropertyChangeEvent, scout, SetFiltersResult, StringField,
+  strings, styles, TextFilter, UpdateFilteredElementsOptions, ValueField, Widget, WidgetSupport
 } from '../index';
-import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
-import {FilterElement, TextFilter} from './Filter';
 
 export type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | Predicate<TElem>;
 
-export default class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
+export class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
   declare widget: Widget & Filterable<TElem>;
   protected _cancelFilterFieldKeyStroke: KeyStroke;
   protected _createTextFilter: () => TextFilter<TElem>;

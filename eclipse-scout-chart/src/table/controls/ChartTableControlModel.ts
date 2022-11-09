@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableControlModel} from '@eclipse-scout/core/src';
+import {TableControlModel} from '@eclipse-scout/core';
 import {TableControlChartAggregation, TableControlChartGroup, TableControlChartType} from './ChartTableControl';
 
-export default interface ChartTableControlModel extends TableControlModel {
+export interface ChartTableControlModel extends TableControlModel {
   chartAggregation?: TableControlChartAggregation;
   chartGroup1?: TableControlChartGroup;
   chartGroup2?: TableControlChartGroup;

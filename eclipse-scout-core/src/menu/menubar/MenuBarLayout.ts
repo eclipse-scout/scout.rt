@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, arrays, Dimension, EllipsisMenu, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Menu, MenuBar, scout} from '../../index';
 
-export default class MenuBarLayout extends AbstractLayout {
+export class MenuBarLayout extends AbstractLayout {
   collapsed: boolean;
   protected _menuBar: MenuBar;
   protected _overflowMenuItems: Menu[];

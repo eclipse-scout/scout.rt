@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DisabledStyle, Event, LogicalGrid, PropertyChangeEvent, Widget} from '../index';
-import {GlassPaneContribution} from './Widget';
-import PropertyEventMap from '../events/PropertyEventMap';
+import {DisabledStyle, Event, GlassPaneContribution, LogicalGrid, PropertyChangeEvent, PropertyEventMap, Widget} from '../index';
 
 export interface HierarchyChangeEvent<T = Widget> extends Event<T> {
   oldParent: Widget;
@@ -21,7 +19,7 @@ export interface GlassPaneContributionEvent<T = Widget> extends Event<T> {
   contribution: GlassPaneContribution;
 }
 
-export default interface WidgetEventMap extends PropertyEventMap {
+export interface WidgetEventMap extends PropertyEventMap {
   'init': Event;
   'destroy': Event;
   'render': Event;

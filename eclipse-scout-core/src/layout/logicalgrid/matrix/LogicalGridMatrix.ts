@@ -10,7 +10,7 @@
  */
 import {LogicalGridMatrixCell, LogicalGridMatrixCursor, Point} from '../../../index';
 
-export default class LogicalGridMatrix {
+export class LogicalGridMatrix {
   protected _cursor: LogicalGridMatrixCursor;
   protected _assignedCells: LogicalGridMatrixCell[][];
 

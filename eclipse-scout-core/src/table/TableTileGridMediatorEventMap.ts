@@ -10,7 +10,7 @@
  */
 import {PropertyChangeEvent, TableRowTileMapping, Tile, TileGridLayoutConfig, WidgetEventMap} from '../index';
 
-export default interface TableTileGridMediatorEventMap extends WidgetEventMap {
+export interface TableTileGridMediatorEventMap extends WidgetEventMap {
   'propertyChange:gridColumnCount': PropertyChangeEvent<number>;
   'propertyChange:tileGridLayoutConfig': PropertyChangeEvent<TileGridLayoutConfig>;
   'propertyChange:tileMappings': PropertyChangeEvent<TableRowTileMapping[]>;

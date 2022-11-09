@@ -30,7 +30,7 @@ export interface RowLayoutOptions {
  * |                 |
  * +-----------------+
  */
-export default class RowLayout extends AbstractLayout implements RowLayoutOptions {
+export class RowLayout extends AbstractLayout implements RowLayoutOptions {
   stretch: boolean;
   pixelBasedSizing: boolean;
 

@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserField, Event, FormFieldEventMap, PropertyChangeEvent} from '../../../index';
-import {BrowserFieldWindowStates} from './BrowserField';
+import {BrowserField, BrowserFieldWindowStates, Event, FormFieldEventMap, PropertyChangeEvent} from '../../../index';
 
 export interface BrowserFieldExternalWindowStateChangeEvent<T = BrowserField> extends Event<T> {
   windowState: BrowserFieldWindowStates;
@@ -42,7 +41,7 @@ export interface BrowserFieldMessageEvent<T = BrowserField> extends Event<T> {
   origin: string;
 }
 
-export default interface BrowserFieldEventMap extends FormFieldEventMap {
+export interface BrowserFieldEventMap extends FormFieldEventMap {
   'externalWindowStateChange': BrowserFieldExternalWindowStateChangeEvent;
   'message': BrowserFieldMessageEvent;
   'propertyChange:autoCloseExternalWindow': PropertyChangeEvent<boolean>;

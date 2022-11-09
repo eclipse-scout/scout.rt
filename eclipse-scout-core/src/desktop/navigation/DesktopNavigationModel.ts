@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, Outline, WidgetModel} from '../../index';
-import {DesktopNavigationLayoutData} from './DesktopNavigation';
+import {Desktop, DesktopNavigationLayoutData, Outline, WidgetModel} from '../../index';
 
-export default interface DesktopNavigationModel extends WidgetModel {
+export interface DesktopNavigationModel extends WidgetModel {
   parent?: Desktop;
   outline?: Outline;
   toolBoxVisible?: boolean;

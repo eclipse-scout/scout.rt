@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionEventMap, PropertyChangeEvent} from '../../index';
-import {ViewButtonDisplayStyle} from './ViewButtonModel';
+import {ActionEventMap, PropertyChangeEvent, ViewButtonDisplayStyle} from '../../index';
 
-export default interface ViewButtonEventMap extends ActionEventMap {
+export interface ViewButtonEventMap extends ActionEventMap {
   'propertyChange:displayStyle': PropertyChangeEvent<ViewButtonDisplayStyle>;
 }

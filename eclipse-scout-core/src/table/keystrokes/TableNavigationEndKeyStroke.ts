@@ -11,7 +11,7 @@
 import {AbstractTableNavigationKeyStroke, arrays, keys, Table, TableRow} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class TableNavigationEndKeyStroke extends AbstractTableNavigationKeyStroke {
+export class TableNavigationEndKeyStroke extends AbstractTableNavigationKeyStroke {
 
   constructor(table: Table) {
     super(table);

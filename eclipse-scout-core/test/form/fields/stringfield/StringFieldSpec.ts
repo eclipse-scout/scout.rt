@@ -9,11 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {RemoteEvent, scout, StringField} from '../../../../src/index';
-import {FormSpecHelper} from '../../../../src/testing/index';
-import {triggerClick} from '../../../../src/testing/jquery-testing';
-import {StringFieldSelection} from '../../../../src/form/fields/stringfield/StringField';
-import {InitModelOf} from '../../../../src/scout';
+import {InitModelOf, RemoteEvent, scout, StringField, StringFieldSelection} from '../../../../src/index';
+import {FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 
 describe('StringField', () => {
   let session: SandboxSession, helper: FormSpecHelper, field: SpecStringField;
@@ -311,7 +308,7 @@ describe('StringField', () => {
         label: 'label'
       });
       field.render();
-      triggerClick(field.$label);
+      JQueryTesting.triggerClick(field.$label);
       expect(field.$field).toBeFocused();
     });
 

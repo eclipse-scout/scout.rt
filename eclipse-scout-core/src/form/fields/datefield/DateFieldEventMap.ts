@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PropertyChangeEvent, Status, ValueFieldEventMap} from '../../../index';
-import {ValueFieldAcceptInputEvent} from '../ValueFieldEventMap';
+import {PropertyChangeEvent, Status, ValueFieldAcceptInputEvent, ValueFieldEventMap} from '../../../index';
 
 export interface DateFieldAcceptInputEvent extends ValueFieldAcceptInputEvent<Date> {
   errorStatus: Status;
   value: Date;
 }
 
-export default interface DateFieldEventMap extends ValueFieldEventMap<Date> {
+export interface DateFieldEventMap extends ValueFieldEventMap<Date> {
   'acceptInput': DateFieldAcceptInputEvent;
   'propertyChange:allowedDates': PropertyChangeEvent<Date[]>;
   'propertyChange:autoDate': PropertyChangeEvent<Date>;

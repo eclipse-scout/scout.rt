@@ -15,7 +15,7 @@ import {arrays, DisplayParent, Form, MessageBox, scout, Session} from '../index'
  *
  * The message boxes are put into the list 'messageBoxes' contained in 'displayParent'.
  */
-export default class MessageBoxController {
+export class MessageBoxController {
   displayParent: DisplayParent;
   session: Session;
 

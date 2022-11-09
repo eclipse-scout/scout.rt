@@ -10,7 +10,7 @@
  */
 import {FileChooserButton, PropertyChangeEvent, ValueFieldAdapter} from '../../../index';
 
-export default class FileChooserButtonAdapter extends ValueFieldAdapter {
+export class FileChooserButtonAdapter extends ValueFieldAdapter {
   declare widget: FileChooserButton;
 
   protected override _onWidgetPropertyChange(event: PropertyChangeEvent<any, FileChooserButton>) {

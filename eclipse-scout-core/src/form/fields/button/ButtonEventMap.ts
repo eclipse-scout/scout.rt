@@ -10,7 +10,7 @@
  */
 import {Button, Event, FormFieldEventMap, PropertyChangeEvent, Widget} from '../../../index';
 
-export default interface ButtonEventMap extends FormFieldEventMap {
+export interface ButtonEventMap extends FormFieldEventMap {
   'click': Event<Button>;
   'propertyChange:defaultButton': PropertyChangeEvent<boolean>;
   'propertyChange:iconId': PropertyChangeEvent<string>;

@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface IFrameModel extends WidgetModel {
+export interface IFrameModel extends WidgetModel {
   location?: string;
   /**
    * Configures whether the sandbox mode is enabled. Default is true.

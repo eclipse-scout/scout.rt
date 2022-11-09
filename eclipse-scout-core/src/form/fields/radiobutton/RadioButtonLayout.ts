@@ -10,7 +10,7 @@
  */
 import {ButtonLayout, RadioButton} from '../../../index';
 
-export default class RadioButtonLayout extends ButtonLayout {
+export class RadioButtonLayout extends ButtonLayout {
   radioButton: RadioButton<any>;
 
   constructor(radioButton: RadioButton<any>) {

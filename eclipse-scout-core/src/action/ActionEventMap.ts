@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
-import {ActionStyle, ActionTextPosition} from './Action';
-import {TooltipPosition} from '../tooltip/Tooltip';
-import {Alignment} from '../cell/Cell';
+import {Action, ActionStyle, ActionTextPosition, Alignment, Event, PropertyChangeEvent, TooltipPosition, WidgetEventMap} from '../index';
 
-export default interface ActionEventMap extends WidgetEventMap {
+export interface ActionEventMap extends WidgetEventMap {
   'action': Event<Action>;
   'propertyChange:actionStyle': PropertyChangeEvent<ActionStyle>;
   'propertyChange:horizontalAlignment': PropertyChangeEvent<Alignment>;

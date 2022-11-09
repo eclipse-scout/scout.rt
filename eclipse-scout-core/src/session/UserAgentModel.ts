@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DeviceType} from '../util/Device';
+import {DeviceType} from '../index';
 
-export default interface UserAgentModel {
+export interface UserAgentModel {
   deviceType?: DeviceType;
   /**
    * Default is false.

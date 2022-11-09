@@ -10,7 +10,7 @@
  */
 import {LookupRow, TreeNodeModel, TreeProposalChooser} from '../../../index';
 
-export default interface ProposalTreeNodeModel<TValue> extends TreeNodeModel {
+export interface ProposalTreeNodeModel<TValue> extends TreeNodeModel {
   lookupRow?: LookupRow<TValue>;
   parentId?: string;
   proposalChooser?: TreeProposalChooser<TValue>;

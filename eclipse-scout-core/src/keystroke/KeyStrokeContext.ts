@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, EventHandler, KeyStroke, keyStrokeModifier, scout, ScoutKeyboardEvent} from '../index';
+import {Action, arrays, EventHandler, KeyboardEventWithMetaData, KeyStroke, KeyStrokeContextOptions, keyStrokeModifier, scout, ScoutKeyboardEvent} from '../index';
 import $ from 'jquery';
-import KeyStrokeContextOptions from './KeyStrokeContextOptions';
-import {KeyboardEventWithMetaData} from './KeyStrokeManager';
 
-export default class KeyStrokeContext implements KeyStrokeContextOptions {
+export class KeyStrokeContext implements KeyStrokeContextOptions {
   invokeAcceptInputOnActiveValueField: boolean;
   keyStrokes: KeyStroke[];
   stopPropagationInterceptors: ((event: ScoutKeyboardEvent) => void)[];

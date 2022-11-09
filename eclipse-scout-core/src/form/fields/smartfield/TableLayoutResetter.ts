@@ -9,13 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {Table} from '../../../index';
-import {ProposalChooserLayoutResetter} from './ProposalChooser';
+import {ProposalChooserLayoutResetter, Table} from '../../../index';
 
 /**
  * This class is used to reset and restore styles in the DOM, so we can measure the preferred size of the table.
  */
-export default class TableLayoutResetter implements ProposalChooserLayoutResetter {
+export class TableLayoutResetter implements ProposalChooserLayoutResetter {
   cssSelector: string;
   protected _table: Table;
   protected _fillerWidth: string;

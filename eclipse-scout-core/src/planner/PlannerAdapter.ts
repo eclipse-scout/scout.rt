@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner} from '../index';
-import {PlannerResourcesSelectedEvent} from './PlannerEventMap';
-import {PlannerActivity, PlannerResource} from './Planner';
+import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner, PlannerActivity, PlannerResource, PlannerResourcesSelectedEvent} from '../index';
 
-export default class PlannerAdapter extends ModelAdapter {
+export class PlannerAdapter extends ModelAdapter {
   declare widget: Planner;
 
   constructor() {

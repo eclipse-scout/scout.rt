@@ -10,7 +10,7 @@
  */
 import {Event, Image, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface ImageEventMap extends WidgetEventMap {
+export interface ImageEventMap extends WidgetEventMap {
   'error': Event<Image>;
   'load': Event<Image>;
   'propertyChange:autoFit': PropertyChangeEvent<boolean>;

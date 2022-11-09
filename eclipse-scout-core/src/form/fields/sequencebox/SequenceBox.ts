@@ -9,15 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  CheckBoxField, CompositeField, DateField, dates, EventHandler, FormField, HorizontalGrid, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, PropertyChangeEvent, scout, SequenceBoxEventMap,
-  SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, ValueField, Widget
+  CheckBoxField, CloneOptions, CompositeField, DateField, dates, EventHandler, FormField, FormFieldSuppressStatus, HorizontalGrid, HtmlComponent, InitModelOf, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu,
+  ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, StatusOrModel, ValueField, Widget
 } from '../../../index';
-import {FormFieldSuppressStatus} from '../FormField';
-import {StatusOrModel} from '../../../status/Status';
-import {CloneOptions} from '../../../widget/Widget';
-import {InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
-export default class SequenceBox extends CompositeField implements SequenceBoxModel {
+export class SequenceBox extends CompositeField implements SequenceBoxModel {
   declare model: SequenceBoxModel;
   declare eventMap: SequenceBoxEventMap;
   declare self: SequenceBox;

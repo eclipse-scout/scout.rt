@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import * as strings from './../../src/util/strings';
+import {strings} from './../../src/util/strings';
 
 describe('strings', () => {
 

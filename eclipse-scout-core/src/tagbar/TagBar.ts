@@ -11,7 +11,7 @@
 import {arrays, Device, HtmlComponent, scout, TagBarEventMap, TagBarLayout, TagBarModel, TagBarOverflowPopup, tooltips, Widget} from '../index';
 import $ from 'jquery';
 
-export default class TagBar extends Widget implements TagBarModel {
+export class TagBar extends Widget implements TagBarModel {
   declare model: TagBarModel;
   declare eventMap: TagBarEventMap;
   declare self: TagBar;

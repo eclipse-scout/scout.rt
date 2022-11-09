@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, EventHandler, Form, objects, Outline, Page, scout, Table, TableAdapter, TableRow, TreeAdapter} from '../../index';
-import {TableFilterRemovedEvent, TableRowInitEvent, TableRowsInsertedEvent} from '../../table/TableEventMap';
+import {App, EventHandler, Form, objects, Outline, Page, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter} from '../../index';
 
-export default class OutlineAdapter extends TreeAdapter {
+export class OutlineAdapter extends TreeAdapter {
   declare widget: Outline;
   protected _filterDirty: boolean;
   protected _nodeIdToRowMap: Record<string, TableRow>;

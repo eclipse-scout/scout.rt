@@ -14,7 +14,7 @@ export interface LocaleSwitchEvent<T = Session> extends Event<T> {
   locale: Locale;
 }
 
-export default interface SessionEventMap extends EventMap {
+export interface SessionEventMap extends EventMap {
   'eventsProcessed': Event<Session>;
   'localeSwitch': LocaleSwitchEvent;
 }

@@ -10,9 +10,8 @@
  */
 // eslint-disable-next-line max-classes-per-file
 import {fields, keys, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, Status, strings} from '../../../../src/index';
-import {AbortableMicrotaskStaticLookupCall, ColumnDescriptorDummyLookupCall, DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
-import {triggerClick, triggerKeyDown} from '../../../../src/testing/jquery-testing';
-import LookupCall from '../../../../src/lookup/LookupCall';
+import {AbortableMicrotaskStaticLookupCall, ColumnDescriptorDummyLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
+import {LookupCall} from '../../../../src/lookup/LookupCall';
 import {SmartFieldLookupResult} from '../../../../src/form/fields/smartfield/SmartField';
 import {FullModelOf, InitModelOf, ObjectOrModel} from '../../../../src/scout';
 
@@ -207,7 +206,7 @@ describe('SmartField', () => {
       field.$field.focus();
       field.setValue(1);
       jasmine.clock().tick(500);
-      triggerClick(field.$field);
+      JQueryTesting.triggerClick(field.$field);
       jasmine.clock().tick(500);
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
@@ -230,7 +229,7 @@ describe('SmartField', () => {
       field.render();
       field.setValue(1);
       jasmine.clock().tick(500);
-      triggerClick(field.$field);
+      JQueryTesting.triggerClick(field.$field);
       jasmine.clock().tick(500);
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
@@ -305,7 +304,7 @@ describe('SmartField', () => {
       field.$field.focus();
       field.setValue(1);
       jasmine.clock().tick(500);
-      triggerClick(field.$field);
+      JQueryTesting.triggerClick(field.$field);
       jasmine.clock().tick(500);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup).not.toBe(null);
@@ -320,7 +319,7 @@ describe('SmartField', () => {
       });
       field.render();
       jasmine.clock().tick(500);
-      triggerClick(field.$field);
+      JQueryTesting.triggerClick(field.$field);
       jasmine.clock().tick(500);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       popup._widget.activeFilterGroup.radioButtons[1].select();
@@ -336,14 +335,14 @@ describe('SmartField', () => {
       });
       field.render();
       jasmine.clock().tick(500);
-      triggerClick(field.$field);
+      JQueryTesting.triggerClick(field.$field);
       jasmine.clock().tick(500);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       popup._widget.activeFilterGroup.radioButtons[1].select();
       // Simulate that lookup call does not return any data (happens if user clicks 'inactive' radio button and there are no inactive rows
       popup._field.lookupCall['data'] = [];
       popup._field.$field.focus();
-      triggerKeyDown(popup._field.$field, keys.BACKSPACE);
+      JQueryTesting.triggerKeyDown(popup._field.$field, keys.BACKSPACE);
       // @ts-expect-error
       popup._field._onFieldKeyUp({});
       jasmine.clock().tick(500);
@@ -359,7 +358,7 @@ describe('SmartField', () => {
       });
       field.render();
       jasmine.clock().tick(500);
-      triggerClick(field.$field);
+      JQueryTesting.triggerClick(field.$field);
       jasmine.clock().tick(500);
       expect(field.tooltip().rendered).toBe(false);
       let popup = field.popup as SpecSmartFieldTouchPopup;
@@ -380,7 +379,7 @@ describe('SmartField', () => {
       });
       field.render();
       jasmine.clock().tick(500);
-      triggerClick(field.$field);
+      JQueryTesting.triggerClick(field.$field);
       jasmine.clock().tick(500);
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup._field.tooltip().rendered).toBe(true);
@@ -1009,7 +1008,7 @@ describe('SmartField', () => {
         lookupCall: 'DummyLookupCall'
       });
       smartField.render();
-      triggerClick(smartField.$label);
+      JQueryTesting.triggerClick(smartField.$label);
       jasmine.clock().tick(500);
       expect(smartField.popup).toBeTruthy();
 
@@ -1033,7 +1032,7 @@ describe('SmartField', () => {
         lookupCall: 'DummyLookupCall'
       });
       smartField.render();
-      triggerClick(smartField.$label);
+      JQueryTesting.triggerClick(smartField.$label);
       jasmine.clock().tick(500);
       expect(smartField.popup).toBeTruthy();
 

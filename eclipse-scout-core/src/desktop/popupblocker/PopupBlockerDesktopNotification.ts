@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopNotification, PopupBlockerDesktopNotificationEventMap, PopupBlockerDesktopNotificationModel, scout, Status} from '../../index';
-import {InitModelOf} from '../../scout';
+import {DesktopNotification, InitModelOf, PopupBlockerDesktopNotificationEventMap, PopupBlockerDesktopNotificationModel, scout, Status} from '../../index';
 
-export default class PopupBlockerDesktopNotification extends DesktopNotification implements PopupBlockerDesktopNotificationModel {
+export class PopupBlockerDesktopNotification extends DesktopNotification implements PopupBlockerDesktopNotificationModel {
   declare model: PopupBlockerDesktopNotificationModel;
   declare eventMap: PopupBlockerDesktopNotificationEventMap;
   declare self: PopupBlockerDesktopNotification;

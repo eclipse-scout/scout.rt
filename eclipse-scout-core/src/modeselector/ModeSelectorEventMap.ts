@@ -10,7 +10,7 @@
  */
 import {Mode, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface ModeSelectorEventMap<T> extends WidgetEventMap {
+export interface ModeSelectorEventMap<T> extends WidgetEventMap {
   'propertyChange:modes': PropertyChangeEvent<Mode<T>[]>;
   'propertyChange:selectedMode': PropertyChangeEvent<Mode<T>>;
 }

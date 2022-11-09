@@ -11,7 +11,7 @@
 import {keys, KeyStroke, Session, Widget} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class FocusAdjacentElementKeyStroke extends KeyStroke {
+export class FocusAdjacentElementKeyStroke extends KeyStroke {
   session: Session;
 
   constructor(session: Session, field: Widget) {

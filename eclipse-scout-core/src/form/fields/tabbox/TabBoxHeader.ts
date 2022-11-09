@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, PropertyChangeEvent, scout, TabArea, TabBoxHeaderLayout, TabItem, Widget, WidgetEventMap, WidgetModel} from '../../../index';
-import TabBox from './TabBox';
-import Tab from './Tab';
-import {InitModelOf} from '../../../scout';
+import {EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, MenuBar, PropertyChangeEvent, scout, Tab, TabArea, TabBox, TabBoxHeaderLayout, TabItem, Widget, WidgetEventMap, WidgetModel} from '../../../index';
 
 export interface TabBoxHeaderModel extends WidgetModel {
   tabBox: TabBox;
@@ -21,7 +18,7 @@ export interface TabBoxHeaderEventMap extends WidgetEventMap {
   'propertyChange:selectedTabItem': PropertyChangeEvent<TabItem>;
 }
 
-export default class TabBoxHeader extends Widget implements TabBoxHeaderModel {
+export class TabBoxHeader extends Widget implements TabBoxHeaderModel {
   declare model: TabBoxHeaderModel;
   declare eventMap: TabBoxHeaderEventMap;
   declare self: TabBoxHeader;

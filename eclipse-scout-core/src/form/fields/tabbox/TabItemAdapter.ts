@@ -10,5 +10,5 @@
  */
 import {GroupBoxAdapter} from '../../../index';
 
-export default class TabItemAdapter extends GroupBoxAdapter {
+export class TabItemAdapter extends GroupBoxAdapter {
 }

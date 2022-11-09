@@ -9,15 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, Column, EventHandler, FormField, GroupBox, LogicalGridLayoutConfig, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, Table, TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall,
-  TileTableHeaderSortByLookupCall, ValueField
+  arrays, Column, EventHandler, FormField, GroupBox, InitModelOf, LogicalGridLayoutConfig, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, StaticLookupCall, Table, TableGroupEvent, TableSortEvent,
+  TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall, TileTableHeaderSortByLookupCall, TileTableHeaderSortKey, ValueField
 } from '../index';
-import {TileTableHeaderSortKey} from './TileTableHeaderSortByLookupCall';
-import StaticLookupCall from '../lookup/StaticLookupCall';
-import {TableGroupEvent, TableSortEvent} from './TableEventMap';
-import {InitModelOf} from '../scout';
 
-export default class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxModel {
+export class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxModel {
   declare model: TileTableHeaderBoxModel;
   declare parent: Table;
 

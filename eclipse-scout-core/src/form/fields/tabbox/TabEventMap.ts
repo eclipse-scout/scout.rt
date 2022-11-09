@@ -10,7 +10,7 @@
  */
 import {PropertyChangeEvent, Status, WidgetEventMap} from '../../../index';
 
-export default interface TabEventMap extends WidgetEventMap {
+export interface TabEventMap extends WidgetEventMap {
   'propertyChange:errorStatus': PropertyChangeEvent<Status>;
   'propertyChange:label': PropertyChangeEvent<string>;
   'propertyChange:marked': PropertyChangeEvent<boolean>;

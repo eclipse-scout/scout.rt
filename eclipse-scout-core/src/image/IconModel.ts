@@ -10,7 +10,7 @@
  */
 import {IconDesc, WidgetModel} from '../index';
 
-export default interface IconModel extends WidgetModel {
+export interface IconModel extends WidgetModel {
   autoFit?: boolean;
   iconDesc?: IconDesc | string;
   prepend?: boolean;

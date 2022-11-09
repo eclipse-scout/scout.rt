@@ -10,7 +10,7 @@
  */
 import {VennCircle} from '../index';
 
-export default class VennCircleHelper {
+export class VennCircleHelper {
   distR: number;
   maxR: number;
   minR: number;

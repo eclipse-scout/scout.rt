@@ -10,7 +10,7 @@
  */
 import {FormFieldEventMap, PropertyChangeEvent, Widget} from '../../index';
 
-export default interface WidgetFieldEventMap extends FormFieldEventMap {
+export interface WidgetFieldEventMap extends FormFieldEventMap {
   'propertyChange:fieldWidget': PropertyChangeEvent<Widget>;
   'propertyChange:scrollable': PropertyChangeEvent<boolean>;
 }

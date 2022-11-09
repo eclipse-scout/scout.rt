@@ -9,21 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation, DesktopNotification, Device,
-  DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, Menu,
-  MessageBox, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, strings, styles, Tooltip, Tree, UnsavedFormChangesForm, URL,
+  AbstractLayout, Action, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopBenchViewActivateEvent, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation,
+  DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, GlassPaneTarget, HtmlComponent,
+  HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectOrChildModel, ObjectOrModel, objects, OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, Popup,
+  ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent, SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL,
   ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
-import {NativeNotificationVisibility} from './notification/DesktopNotification';
-import {DesktopBenchViewActivateEvent} from './bench/DesktopBenchEventMap';
-import {SplitterMoveEndEvent, SplitterMoveEvent, SplitterPositionChangeEvent} from '../splitter/SplitterEventMap';
-import {TreeDisplayStyle} from '../tree/Tree';
-import {GlassPaneTarget} from '../widget/Widget';
-import {InitModelOf, ObjectOrChildModel, ObjectOrModel, ReloadPageOptions} from '../scout';
-import {OutlineContent} from './bench/DesktopBench';
 
-export default class Desktop extends Widget implements DesktopModel, DisplayParent {
+export class Desktop extends Widget implements DesktopModel, DisplayParent {
   declare model: DesktopModel;
   declare eventMap: DesktopEventMap;
   declare self: Desktop;

@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, LookupCall, LookupRow, PropertyChangeEvent, SmartField, Status, ValueFieldEventMap} from '../../../index';
-import {SmartFieldActiveFilter, SmartFieldLookupResult} from './SmartField';
-import {ValueFieldAcceptInputEvent} from '../ValueFieldEventMap';
+import {Event, LookupCall, LookupRow, PropertyChangeEvent, SmartField, SmartFieldActiveFilter, SmartFieldLookupResult, Status, ValueFieldAcceptInputEvent, ValueFieldEventMap} from '../../../index';
 
 export interface SmartFieldAcceptByTextEvent<TValue = any, T = SmartField<TValue>> extends Event<T> {
   searchText: string;
@@ -34,7 +32,7 @@ export interface SmartFieldPrepareLookupCallEvent<TValue = any, T = SmartField<T
   lookupCall: LookupCall<TValue>;
 }
 
-export default interface SmartFieldEventMap<TValue> extends ValueFieldEventMap<TValue> {
+export interface SmartFieldEventMap<TValue> extends ValueFieldEventMap<TValue> {
   'acceptByText': SmartFieldAcceptByTextEvent<TValue>;
   'acceptInput': SmartFieldAcceptInputEvent<TValue>;
   'lookupCallDone': SmartFieldLookupCallDoneEvent<TValue>;

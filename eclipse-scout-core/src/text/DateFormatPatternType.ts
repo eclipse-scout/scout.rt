@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EnumObject} from '../types';
+import {EnumObject} from '../index';
 
 /**
  * Custom JavaScript Date Format
@@ -31,7 +31,7 @@ import {EnumObject} from '../types';
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
-const DateFormatPatternType = {
+export const DateFormatPatternType = {
   YEAR: 'year',
   MONTH: 'month',
   WEEK_IN_YEAR: 'week_in_year',
@@ -47,5 +47,3 @@ const DateFormatPatternType = {
 } as const;
 
 export type DateFormatPatternTypes = EnumObject<typeof DateFormatPatternType>;
-
-export default DateFormatPatternType;

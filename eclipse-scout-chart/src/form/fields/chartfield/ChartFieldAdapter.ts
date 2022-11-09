@@ -10,5 +10,5 @@
  */
 import {FormFieldAdapter} from '@eclipse-scout/core';
 
-export default class ChartFieldAdapter extends FormFieldAdapter {
+export class ChartFieldAdapter extends FormFieldAdapter {
 }

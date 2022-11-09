@@ -19,7 +19,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
  *       b) there is no need to evaluate a concrete key's propagation status when being rendered (because of (a))
  *
  */
-export default class FocusFilterFieldKeyStroke extends KeyStroke {
+export class FocusFilterFieldKeyStroke extends KeyStroke {
   virtualKeyStrokeWhich: string;
 
   constructor(field: Widget) {

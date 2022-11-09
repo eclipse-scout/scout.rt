@@ -31,7 +31,7 @@ export interface PlainTextEncoderOptions {
 /**
  * Replaces character HTML entities (e.g. &amp;nbsp;, &amp;gt;, etc.).
  */
-export default class PlainTextEncoder {
+export class PlainTextEncoder {
   cache: CachedElement;
 
   constructor() {

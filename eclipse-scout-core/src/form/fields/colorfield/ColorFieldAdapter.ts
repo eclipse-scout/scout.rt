@@ -10,5 +10,5 @@
  */
 import {ValueFieldAdapter} from '../../../index';
 
-export default class ColorFieldAdapter extends ValueFieldAdapter {
+export class ColorFieldAdapter extends ValueFieldAdapter {
 }

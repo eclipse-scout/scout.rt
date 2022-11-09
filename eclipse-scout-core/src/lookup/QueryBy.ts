@@ -12,12 +12,10 @@
 /**
  * @see: org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy
  */
-enum QueryBy {
+export enum QueryBy {
   ALL = 'ALL',
   TEXT = 'TEXT',
   KEY = 'KEY',
   KEYS = 'KEYS',
   REC = 'REC'
 }
-
-export default QueryBy;

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusRule, Widget, WidgetModel} from '../index';
-import {PopupAlignment, PopupScrollType, PopupWindowResizeType} from './Popup';
+import {FocusRule, PopupAlignment, PopupScrollType, PopupWindowResizeType, Widget, WidgetModel} from '../index';
 
-export default interface PopupModel extends WidgetModel {
+export interface PopupModel extends WidgetModel {
   /**
    * Default is false.
    */

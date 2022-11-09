@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, Outline, Page, Table, TreeNodeModel} from '../../../index';
-import {ObjectOrChildModel, ObjectOrModel} from '../../../scout';
+import {Form, ObjectOrChildModel, ObjectOrModel, Outline, Page, Table, TreeNodeModel} from '../../../index';
 
-export default interface PageModel extends TreeNodeModel {
+export interface PageModel extends TreeNodeModel {
   parent?: Outline;
   childNodes?: ObjectOrModel<Page>[];
   compactRoot?: boolean;

@@ -9,15 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, FormField, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap,
-  RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout, Status, TreeVisitResult, ValueField
+  arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow, ObjectOrChildModel, ObjectOrModel,
+  objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout, Status,
+  TreeVisitResult, ValueField
 } from '../../../index';
 import $ from 'jquery';
-import {CloneOptions} from '../../../widget/Widget';
-import {LookupCallOrModel} from '../../../lookup/LookupCall';
-import {InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
-export default class RadioButtonGroup<TValue> extends ValueField<TValue> implements RadioButtonGroupModel<TValue> {
+export class RadioButtonGroup<TValue> extends ValueField<TValue> implements RadioButtonGroupModel<TValue> {
   declare model: RadioButtonGroupModel<TValue>;
   declare eventMap: RadioButtonGroupEventMap<TValue>;
   declare self: RadioButtonGroup<any>;

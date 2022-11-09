@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status} from '../index';
-import {Alignment} from './Cell';
+import {Alignment, Status} from '../index';
 
-export default interface CellModel<TValue = any> {
+export interface CellModel<TValue = any> {
   cssClass?: string;
   editable?: boolean;
   errorStatus?: Status;

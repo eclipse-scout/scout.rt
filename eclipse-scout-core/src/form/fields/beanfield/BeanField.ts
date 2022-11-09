@@ -14,7 +14,7 @@ import $ from 'jquery';
 /**
  * Base class for fields where the value should be visualized.
  */
-export default class BeanField<TValue extends object> extends ValueField<TValue> implements BeanFieldModel<TValue> {
+export class BeanField<TValue extends object> extends ValueField<TValue> implements BeanFieldModel<TValue> {
 
   constructor() {
     super();

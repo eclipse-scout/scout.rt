@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, HtmlComponent, objects, scout, SliderEventMap, SliderLayout, SliderModel, Widget} from '../index';
-import {InitModelOf} from '../scout';
+import {Device, HtmlComponent, InitModelOf, objects, scout, SliderEventMap, SliderLayout, SliderModel, Widget} from '../index';
 
-export default class Slider extends Widget implements SliderModel {
+export class Slider extends Widget implements SliderModel {
   declare model: SliderModel;
   declare eventMap: SliderEventMap;
   declare self: Slider;

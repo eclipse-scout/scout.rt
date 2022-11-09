@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarModeMenuModel, Menu} from '../index';
-import {CalendarDisplayMode} from './Calendar';
+import {CalendarDisplayMode, CalendarModeMenuModel, Menu} from '../index';
 
-export default class CalendarModeMenu extends Menu implements CalendarModeMenuModel {
+export class CalendarModeMenu extends Menu implements CalendarModeMenuModel {
   declare model: CalendarModeMenuModel;
 
   displayMode: CalendarDisplayMode;

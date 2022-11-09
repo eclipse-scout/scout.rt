@@ -13,7 +13,7 @@ import {objects, QueryBy, strings, ValueFieldAdapter} from '../../../index';
 /**
  * Use this base class for field-adapters that work with lookup-calls like SmartField and TagField.
  */
-export default class LookupFieldAdapter extends ValueFieldAdapter {
+export class LookupFieldAdapter extends ValueFieldAdapter {
 
   /**
    * @param queryData optional data (text, key, rec)

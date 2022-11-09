@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormLifecycleMenuModel, Menu} from '../../index';
-import {ButtonSystemType} from '../fields/button/Button';
+import {ButtonSystemType, FormLifecycleMenuModel, Menu} from '../../index';
 
-export default class FormLifecycleMenu extends Menu implements FormLifecycleMenuModel {
+export class FormLifecycleMenu extends Menu implements FormLifecycleMenuModel {
   declare model: FormLifecycleMenuModel;
 
   systemType: ButtonSystemType;

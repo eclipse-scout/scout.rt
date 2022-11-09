@@ -10,7 +10,7 @@
  */
 import {ButtonModel} from '../../../index';
 
-export default interface RadioButtonModel<TValue> extends ButtonModel {
+export interface RadioButtonModel<TValue> extends ButtonModel {
   /**
    * Default is true.
    */

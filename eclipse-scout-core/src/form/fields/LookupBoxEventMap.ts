@@ -18,7 +18,7 @@ export interface LookupBoxPrepareLookupCallEvent<TValue = any, T = LookupBox<TVa
   lookupCall: LookupCall<TValue>;
 }
 
-export default interface LookupBoxEventMap<TValue> extends ValueFieldEventMap<TValue[]> {
+export interface LookupBoxEventMap<TValue> extends ValueFieldEventMap<TValue[]> {
   'lookupCallDone': LookupBoxLookupCallDoneEvent<TValue>;
   'prepareLookupCall': LookupBoxPrepareLookupCallEvent<TValue>;
   'propertyChange:lookupCall': PropertyChangeEvent<LookupCall<TValue>>;

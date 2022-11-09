@@ -9,25 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop,
-  DragAndDropHandler, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus,
-  NumberColumn, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
+  Action, AggregateTableControl, Alignment, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, Desktop, DesktopPopupOpenEvent,
+  Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HtmlComponent, IconColumn, InitModelOf, Insets,
+  KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate,
+  PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
   TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
   TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip,
   TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, UpdateFilteredElementsOptions, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
-import {ScrollToOptions} from '../scrollbar/scrollbars';
-import {NumberColumnAggregationFunction, NumberColumnBackgroundEffect} from './columns/NumberColumn';
-import {Comparator} from '../types';
-import {StatusOrModel} from '../status/Status';
-import {Alignment} from '../cell/Cell';
-import {DropType} from '../util/dragAndDrop';
-import {DisplayViewId} from '../tabbox/SimpleTab';
-import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
-import {FullModelOf, InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../scout';
 
-export default class Table extends Widget implements TableModel {
+export class Table extends Widget implements TableModel {
   declare model: TableModel;
   declare eventMap: TableEventMap;
   declare self: Table;

@@ -10,7 +10,7 @@
  */
 import {Dimension, HtmlCompPrefSizeOptions, PopupLayout, scout, TableLayoutResetter, TagChooserPopup} from '../../../index';
 
-export default class TagChooserPopupLayout extends PopupLayout {
+export class TagChooserPopupLayout extends PopupLayout {
   declare popup: TagChooserPopup;
 
   constructor(popup: TagChooserPopup) {

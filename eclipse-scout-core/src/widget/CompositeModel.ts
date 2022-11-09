@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {ObjectOrChildModel} from '../scout';
+import {ObjectOrChildModel, Widget, WidgetModel} from '../index';
 
-export default interface CompositeModel extends WidgetModel {
+export interface CompositeModel extends WidgetModel {
   widgets?: ObjectOrChildModel<Widget>[];
 }

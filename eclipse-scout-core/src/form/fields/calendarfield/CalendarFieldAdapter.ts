@@ -10,5 +10,5 @@
  */
 import {FormFieldAdapter} from '../../../index';
 
-export default class CalendarFieldAdapter extends FormFieldAdapter {
+export class CalendarFieldAdapter extends FormFieldAdapter {
 }

@@ -10,6 +10,6 @@
  */
 import {MenuEventMap, PropertyChangeEvent} from '../index';
 
-export default interface EllipsisMenuEventMap extends MenuEventMap {
+export interface EllipsisMenuEventMap extends MenuEventMap {
   'propertyChange:hidden': PropertyChangeEvent<boolean>;
 }

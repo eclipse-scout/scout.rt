@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NotificationEventMap, PropertyChangeEvent, Status} from '../../index';
-import {NativeNotificationVisibility} from './DesktopNotification';
+import {NativeNotificationVisibility, NotificationEventMap, PropertyChangeEvent, Status} from '../../index';
 
-export default interface DesktopNotificationEventMap extends NotificationEventMap {
+export interface DesktopNotificationEventMap extends NotificationEventMap {
   'propertyChange:nativeNotificationShown': PropertyChangeEvent<boolean>;
   'propertyChange:nativeNotificationStatus': PropertyChangeEvent<Status>;
   'propertyChange:nativeNotificationTitle': PropertyChangeEvent<string>;

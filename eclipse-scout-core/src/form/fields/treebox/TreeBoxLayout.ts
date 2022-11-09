@@ -10,7 +10,7 @@
  */
 import {LookupBoxLayout, Tree, TreeBox, Widget} from '../../../index';
 
-export default class TreeBoxLayout extends LookupBoxLayout {
+export class TreeBoxLayout extends LookupBoxLayout {
 
   constructor(treeBox: TreeBox<any>, tree: Tree, filterBox: Widget) {
     super(treeBox, tree, filterBox);

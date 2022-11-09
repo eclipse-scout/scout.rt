@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {scout, Session, TabBox, TabBoxModel, TabItem, TabItemModel} from '../../../../index';
-import {InitModelOf} from '../../../../scout';
+import {InitModelOf, scout, Session, TabBox, TabBoxModel, TabItem, TabItemModel} from '../../../../index';
 
-export default class TabBoxSpecHelper {
+export class TabBoxSpecHelper {
   session: Session;
 
   constructor(session: Session) {

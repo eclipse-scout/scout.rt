@@ -70,7 +70,7 @@ $.extend(true, ChartJs.overrides, {
 let chartJsGlobalsInitialized = false;
 const PHI = (1 + Math.sqrt(5)) / 2; // golden ratio
 
-export default class ChartJsRenderer extends AbstractChartRenderer {
+export class ChartJsRenderer extends AbstractChartRenderer {
   static ARROW_LEFT_RIGHT = '\u2194';
   static ARROW_UP_DOWN = '\u2195';
 

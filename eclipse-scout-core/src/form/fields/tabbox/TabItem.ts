@@ -18,7 +18,7 @@ export interface TabItemEventMap extends GroupBoxEventMap {
   'propertyChange:marked': PropertyChangeEvent<boolean>;
 }
 
-export default class TabItem extends GroupBox implements TabItemModel {
+export class TabItem extends GroupBox implements TabItemModel {
   declare model: TabItemModel;
   declare eventMap: TabItemEventMap;
   declare self: TabItem;

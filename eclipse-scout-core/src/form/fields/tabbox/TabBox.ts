@@ -8,17 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompositeField, fields, FormField, HtmlComponent, Menu, PropertyChangeEvent, scout, SingleLayout, TabArea, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem} from '../../../index';
+import {
+  arrays, CompositeField, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectOrChildModel, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem
+} from '../../../index';
 import $ from 'jquery';
-import {TabAreaStyle} from './TabArea';
-import Tab from './Tab';
-import {InitModelOf, ObjectOrChildModel} from '../../../scout';
 
 /**
  * Tab-area = where the 1-n tabs are placed (may have multiple runs = lines).
  * Tab-content = where the content of a single tab is displayed.
  */
-export default class TabBox extends CompositeField implements TabBoxModel {
+export class TabBox extends CompositeField implements TabBoxModel {
   declare model: TabBoxModel;
   declare eventMap: TabBoxEventMap;
   declare self: TabBox;

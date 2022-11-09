@@ -11,7 +11,7 @@
 
 import {GridData} from '../../../../index';
 
-export default class GroupBoxSpecHelper {
+export class GroupBoxSpecHelper {
   static assertGridData(x: number, y: number, w: number, h: number, gd: GridData) {
     expect(gd.x).toEqual(x); // GridData[x]
     expect(gd.y).toEqual(y); // GridData[y]

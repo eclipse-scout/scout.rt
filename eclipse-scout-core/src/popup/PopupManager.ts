@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Popup, PopupManagerModel, Widget} from '../index';
-import {InitModelOf} from '../scout';
+import {arrays, InitModelOf, Popup, PopupManagerModel, Widget} from '../index';
 
-export default class PopupManager extends Widget implements PopupManagerModel {
+export class PopupManager extends Widget implements PopupManagerModel {
   popups: Popup[];
 
   constructor() {

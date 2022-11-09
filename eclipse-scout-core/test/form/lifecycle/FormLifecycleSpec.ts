@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormSpecHelper} from '../../../src/testing/index';
-import {FormLifecycle, scout, Status, StringField, TabBox, TabItem, TableField} from '../../../src';
-import SpecForm from '../../../src/testing/form/SpecForm';
-import SpecLifecycle from '../../../src/testing/form/SpecLifecycle';
+import {FormSpecHelper, SpecForm, SpecLifecycle} from '../../../src/testing/index';
+import {FormLifecycle, scout, Status, StringField, TabBox, TabItem, TableField} from '../../../src/index';
 
 describe('FormLifecycle', () => {
 

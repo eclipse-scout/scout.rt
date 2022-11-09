@@ -37,7 +37,7 @@ export interface RequestFocusOptions {
  * which is natively focusable and which is not covert by a glass pane. Furthermore, if a context is uninstalled,
  * the previously active focus context is activated and its focus position restored.
  */
-export default class FocusManager implements FocusManagerOptions {
+export class FocusManager implements FocusManagerOptions {
   session: Session;
   active: boolean;
   restrictedFocusGain: boolean;

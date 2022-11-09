@@ -14,7 +14,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
 /**
  * Composite keystroke to provide a numeric keystroke to select view tabs.
  */
-export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
+export class DesktopTabSelectKeyStroke extends RangeKeyStroke {
   declare field: Desktop;
 
   constructor(desktop: Desktop) {

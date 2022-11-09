@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Desktop, DesktopFormControllerModel, Dimension, Event, Form, FormController, PopupBlockerHandler, PopupWindow, scout} from '../index';
+import {arrays, Desktop, DesktopFormControllerModel, Dimension, Event, Form, FormController, InitModelOf, PopupBlockerHandler, PopupWindow, scout} from '../index';
 import $ from 'jquery';
-import {InitModelOf} from '../scout';
 
-export default class DesktopFormController extends FormController implements DesktopFormControllerModel {
+export class DesktopFormController extends FormController implements DesktopFormControllerModel {
   declare model: DesktopFormControllerModel;
   declare displayParent: Desktop;
 

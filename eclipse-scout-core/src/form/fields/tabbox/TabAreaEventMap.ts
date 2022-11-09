@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PropertyChangeEvent, Tab, WidgetEventMap} from '../../../index';
-import {TabAreaStyle} from './TabArea';
+import {PropertyChangeEvent, Tab, TabAreaStyle, WidgetEventMap} from '../../../index';
 
-export default interface TabAreaEventMap extends WidgetEventMap {
+export interface TabAreaEventMap extends WidgetEventMap {
   'propertyChange:displayStyle': PropertyChangeEvent<TabAreaStyle>;
   'propertyChange:hasSubLabel': PropertyChangeEvent<boolean>;
   'propertyChange:selectedTab': PropertyChangeEvent<Tab>;

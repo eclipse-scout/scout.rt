@@ -10,7 +10,7 @@
  */
 import {Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Popup, PopupLayout, TableHeaderMenu} from '../index';
 
-export default class TableHeaderMenuLayout extends PopupLayout {
+export class TableHeaderMenuLayout extends PopupLayout {
   declare popup: TableHeaderMenu;
 
   constructor(popup: Popup) {

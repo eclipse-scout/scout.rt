@@ -14,7 +14,7 @@ import $ from 'jquery';
 import {ChartValueGroup, ClickObject} from './Chart';
 import {LegendPositions} from './AbstractSvgChartRenderer';
 
-export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
+export class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
   segmentSelectorForAnimation: string;
   widthThresholdMedium: number;
   widthThresholdSmall: number;

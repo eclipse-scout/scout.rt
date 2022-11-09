@@ -9,14 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, Menu, MenuDestinations, menuNavigationKeyStrokes, Popup, PopupLayout, PropertyChangeEvent, Rectangle, RowLayout, scout
+  AbstractLayout, Action, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, InitModelOf, Menu, MenuDestinations, MenuFilter, menuNavigationKeyStrokes, Popup, PopupLayout, PropertyChangeEvent, Rectangle,
+  RowLayout, scout, ScrollbarInstallOptions
 } from '../index';
 import $ from 'jquery';
-import {ScrollbarInstallOptions} from '../scrollbar/scrollbars';
-import {MenuFilter} from './Menu';
-import {InitModelOf} from '../scout';
 
-export default class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
+export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
   declare model: ContextMenuPopupModel;
 
   menuItems: Menu[];

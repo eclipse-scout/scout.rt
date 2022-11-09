@@ -8,35 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
 import {arrays} from '../index';
 
-/**
- * Checks if the combined total size of the given files does not exceed the maximum upload size.
- *
- * @param files array of files
- * @param maximumUploadSize maximum combined file size. null disables the size check
- * @returns true if the total size does not exceed maximumUploadSize, otherwise false
- */
-export function validateMaximumUploadSize(files: Blob | Blob[], maximumUploadSize: number): boolean {
-  files = arrays.ensure(files);
-  if (files.length === 0 || maximumUploadSize == null) {
-    return true;
+export const files = {
+  /**
+   * Checks if the combined total size of the given files does not exceed the maximum upload size.
+   *
+   * @param files array of files
+   * @param maximumUploadSize maximum combined file size. null disables the size check
+   * @returns true if the total size does not exceed maximumUploadSize, otherwise false
+   */
+  validateMaximumUploadSize(files: Blob | Blob[], maximumUploadSize: number): boolean {
+    files = arrays.ensure(files);
+    if (files.length === 0 || maximumUploadSize == null) {
+      return true;
+    }
+
+    let totalSize = files.reduce((total, file) => total + file.size, 0);
+    return totalSize <= maximumUploadSize;
+  },
+
+  fileListToArray(fileList: FileList): File[] {
+    let files = [];
+    for (let i = 0; i < fileList.length; i++) {
+      files.push(fileList[i]);
+    }
+    return files;
   }
-
-  let totalSize = files.reduce((total, file) => total + file.size, 0);
-  return totalSize <= maximumUploadSize;
-}
-
-export function fileListToArray(fileList: FileList): File[] {
-  let files = [];
-  for (let i = 0; i < fileList.length; i++) {
-    files.push(fileList[i]);
-  }
-  return files;
-}
-
-export default {
-  fileListToArray,
-  validateMaximumUploadSize
 };

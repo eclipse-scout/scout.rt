@@ -11,7 +11,7 @@
 import {LookupCall, LookupRow, objects, scout} from '../index';
 import $ from 'jquery';
 
-export default class HierarchicalLookupResultBuilder<TKey> {
+export class HierarchicalLookupResultBuilder<TKey> {
 
   lookupCall: LookupCall<TKey>;
   protected _lookupRowMap: Record<PropertyKey, LookupRow<TKey>>;

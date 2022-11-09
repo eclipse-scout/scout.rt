@@ -10,7 +10,7 @@
  */
 import {App, arrays, Device, HtmlComponent} from '../index';
 
-export default class LayoutValidator {
+export class LayoutValidator {
   /** @internal */
   _invalidComponents: HtmlComponent[];
 

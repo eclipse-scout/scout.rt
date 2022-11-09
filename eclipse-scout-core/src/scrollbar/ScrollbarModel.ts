@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface ScrollbarModel extends WidgetModel {
+export interface ScrollbarModel extends WidgetModel {
   borderless?: boolean;
   axis?: 'x' | 'y';
   mouseWheelNeedsShift?: boolean;

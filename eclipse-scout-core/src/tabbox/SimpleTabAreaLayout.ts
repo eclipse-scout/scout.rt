@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, ContextMenuPopup, Dimension, graphics, Menu, scout, SimpleTabArea, styles, widgets} from '../index';
+import {AbstractLayout, ContextMenuPopup, Dimension, graphics, Menu, PrefSizeOptions, scout, SimpleTabArea, styles, widgets} from '../index';
 import $ from 'jquery';
-import {PrefSizeOptions} from '../layout/graphics';
 
-export default class SimpleTabAreaLayout extends AbstractLayout {
+export class SimpleTabAreaLayout extends AbstractLayout {
   tabArea: SimpleTabArea;
   tabWidth: number;
   tabMinWidth: number;

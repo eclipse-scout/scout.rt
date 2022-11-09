@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys, RadioButton, scout} from '../../../../src/index';
-import {triggerKeyInputCapture} from '../../../../src/testing/jquery-testing';
+import {JQueryTesting} from '../../../../src/testing';
 
 describe('RadioButton', () => {
   let session: SandboxSession;
@@ -43,25 +43,25 @@ describe('RadioButton', () => {
       field.render();
       expect(field.selected).toBe(false);
 
-      triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.selected).toBe(true);
 
       // Another execution does not change the selection state
-      triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.selected).toBe(true);
 
       // Set another keystroke -> only the new one has to be active
       field.setKeyStroke('ctrl-g');
       field.setSelected(false);
-      triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.selected).toBe(false);
-      triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
       expect(field.selected).toBe(true);
 
       // Remove keystroke -> selected property should stay unchanged because keystroke must not be executed
       field.setKeyStroke(null);
       field.setSelected(false);
-      triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
       expect(field.selected).toBe(false);
     });
 
@@ -73,7 +73,7 @@ describe('RadioButton', () => {
       field.render();
       expect(field.selected).toBe(false);
 
-      triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.selected).toBe(true);
       expect(field.isFocused()).toBe(false);
     });

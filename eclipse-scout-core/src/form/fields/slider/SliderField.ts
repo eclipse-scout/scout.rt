@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Slider, SliderFieldModel, ValueField} from '../../../index';
+import {InitModelOf, scout, Slider, SliderFieldModel, ValueField} from '../../../index';
 import $ from 'jquery';
-import {InitModelOf} from '../../../scout';
 
-export default class SliderField extends ValueField<number> {
+export class SliderField extends ValueField<number> {
   declare model: SliderFieldModel;
 
   slider: Slider;

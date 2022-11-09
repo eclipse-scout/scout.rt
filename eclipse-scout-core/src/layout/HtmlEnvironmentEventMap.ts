@@ -10,6 +10,6 @@
  */
 import {Event, EventMap, HtmlEnvironment} from '../index';
 
-export default interface HtmlEnvironmentEventMap extends EventMap {
+export interface HtmlEnvironmentEventMap extends EventMap {
   'propertyChange': Event<HtmlEnvironment>;
 }

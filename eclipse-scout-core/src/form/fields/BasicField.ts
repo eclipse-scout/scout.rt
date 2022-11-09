@@ -13,7 +13,7 @@ import {BasicFieldEventMap, BasicFieldModel, ValueField} from '../../index';
 /**
  * Common base class for ValueFields having an HTML input field.
  */
-export default abstract class BasicField<TValue extends TModelValue, TModelValue = TValue> extends ValueField<TValue, TModelValue> implements BasicFieldModel<TValue, TModelValue> {
+export abstract class BasicField<TValue extends TModelValue, TModelValue = TValue> extends ValueField<TValue, TModelValue> implements BasicFieldModel<TValue, TModelValue> {
   declare model: BasicFieldModel<TValue, TModelValue>;
   declare eventMap: BasicFieldEventMap<TValue>;
   declare self: BasicField<any>;

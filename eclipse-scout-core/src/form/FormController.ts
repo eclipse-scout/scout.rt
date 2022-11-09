@@ -8,16 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Desktop, DisplayParent, Form, FormControllerModel, Outline, scout, Session} from '../index';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {arrays, Desktop, DisplayParent, Form, FormControllerModel, InitModelOf, Outline, scout, Session, SomeRequired} from '../index';
 
 /**
  * Controller with functionality to register and render views and dialogs.
  *
  * The forms are put into the list 'views' and 'dialogs' contained in 'displayParent'.
  */
-export default class FormController implements FormControllerModel {
+export class FormController implements FormControllerModel {
   declare model: FormControllerModel;
   declare initModel: SomeRequired<this['model'], 'displayParent' | 'session'>;
 

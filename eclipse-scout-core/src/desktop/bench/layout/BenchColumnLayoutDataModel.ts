@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BenchRowLayoutData} from '../../../index';
-import {ObjectOrModel} from '../../../scout';
+import {BenchRowLayoutData, ObjectOrModel} from '../../../index';
 
-export default interface BenchColumnLayoutDataModel {
+export interface BenchColumnLayoutDataModel {
   columns?: ObjectOrModel<BenchRowLayoutData>[];
 }

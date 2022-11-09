@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, LookupRow, Table, TableRow} from '../index';
-import {Primitive} from '../types';
-import {ObjectModel, ObjectOrModel} from '../scout';
+import {Cell, LookupRow, ObjectModel, ObjectOrModel, Primitive, Table, TableRow} from '../index';
 
-export default interface TableRowModel extends ObjectModel<TableRow> {
+export interface TableRowModel extends ObjectModel<TableRow> {
   parent?: Table;
   /**
    * Cell instances or cell values.

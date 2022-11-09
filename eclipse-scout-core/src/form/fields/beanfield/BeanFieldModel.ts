@@ -11,5 +11,5 @@
  */
 import {ValueFieldModel} from '../../../index';
 
-export default interface BeanFieldModel<TValue extends object> extends ValueFieldModel<TValue> {
+export interface BeanFieldModel<TValue extends object> extends ValueFieldModel<TValue> {
 }

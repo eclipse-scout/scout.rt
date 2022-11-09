@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldEventMap, LogicalGridLayoutConfig, Menu, PropertyChangeEvent} from '../../../index';
-import {GroupBoxBorderDecoration, GroupBoxMenuBarPosition} from './GroupBox';
-import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
+import {FormField, FormFieldEventMap, GroupBoxBorderDecoration, GroupBoxMenuBarPosition, LogicalGridLayoutConfig, Menu, MenuBarEllipsisPosition, PropertyChangeEvent} from '../../../index';
 
-export default interface GroupBoxEventMap extends FormFieldEventMap {
+export interface GroupBoxEventMap extends FormFieldEventMap {
   'propertyChange:bodyLayoutConfig': PropertyChangeEvent<LogicalGridLayoutConfig>;
   'propertyChange:borderDecoration': PropertyChangeEvent<GroupBoxBorderDecoration>;
   'propertyChange:borderVisible': PropertyChangeEvent<boolean>;

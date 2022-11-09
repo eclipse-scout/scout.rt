@@ -8,25 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
-/**
- * Adds inspector info (e.g. classId) from the given 'model' to the DOM. The target element
- * is either the given '$container' or model.$container. Nothing happens if model or target
- * element is undefined.
- */
-export function applyInfo(model: { $container?: JQuery; id?: string; modelClass?: string; classId?: string }, $container?: JQuery) {
-  if (!model) {
-    return;
+export const inspector = {
+  /**
+   * Adds inspector info (e.g. classId) from the given 'model' to the DOM. The target element
+   * is either the given '$container' or model.$container. Nothing happens if model or target
+   * element is undefined.
+   */
+  applyInfo(model: { $container?: JQuery; id?: string; modelClass?: string; classId?: string }, $container?: JQuery) {
+    if (!model) {
+      return;
+    }
+    $container = $container || model.$container;
+    if (!$container) {
+      return;
+    }
+    $container.toggleAttr('data-id', !!model.id, model.id);
+    $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
+    $container.toggleAttr('data-classid', !!model.classId, model.classId);
   }
-  $container = $container || model.$container;
-  if (!$container) {
-    return;
-  }
-  $container.toggleAttr('data-id', !!model.id, model.id);
-  $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
-  $container.toggleAttr('data-classid', !!model.classId, model.classId);
-}
-
-export default {
-  applyInfo
 };

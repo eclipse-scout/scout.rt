@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel, Widget} from '../../../index';
-import {ButtonDisplayStyle, ButtonSystemType} from './Button';
+import {ButtonDisplayStyle, ButtonSystemType, FormFieldModel, Widget} from '../../../index';
 
-export default interface ButtonModel extends FormFieldModel {
+export interface ButtonModel extends FormFieldModel {
   /**
    * Configures whether this button is a default button.
    * Default buttons typically have a dedicated look.

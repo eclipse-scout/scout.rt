@@ -11,7 +11,7 @@
 import {keys, KeyStroke, RadioButtonGroup} from '../../../index';
 import $ from 'jquery';
 
-export default class RadioButtonGroupLeftOrUpKeyStroke extends KeyStroke {
+export class RadioButtonGroupLeftOrUpKeyStroke extends KeyStroke {
   declare field: RadioButtonGroup<any>;
 
   constructor(radioButtonGroup: RadioButtonGroup<any>) {

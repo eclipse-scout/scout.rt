@@ -14,7 +14,7 @@ export interface LabelFieldAppLinkActionEvent<T = LabelField> extends Event<T> {
   ref: string;
 }
 
-export default interface LabelFieldEventMap extends ValueFieldEventMap<string> {
+export interface LabelFieldEventMap extends ValueFieldEventMap<string> {
   'appLinkAction': LabelFieldAppLinkActionEvent;
   'propertyChange:htmlEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:selectable': PropertyChangeEvent<boolean>;

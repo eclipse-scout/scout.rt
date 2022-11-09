@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Code} from '../index';
-import {FullModelOf, ObjectModel} from '../scout';
+import {Code, FullModelOf, ObjectModel} from '../index';
 
-export default interface CodeModel<TCodeId> extends ObjectModel<Code<TCodeId>, TCodeId> {
+export interface CodeModel<TCodeId> extends ObjectModel<Code<TCodeId>, TCodeId> {
   active?: boolean;
   sortCode?: number;
   modelClass?: string;

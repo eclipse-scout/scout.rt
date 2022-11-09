@@ -10,7 +10,7 @@
  */
 import {LookupCallModel} from '../index';
 
-export default interface RestLookupCallModel<TKey> extends LookupCallModel<TKey> {
+export interface RestLookupCallModel<TKey> extends LookupCallModel<TKey> {
   resourceUrl?: string;
   maxTextLength?: number;
   /**

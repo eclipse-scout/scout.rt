@@ -10,7 +10,7 @@
  */
 import {FormFieldMenu, GridData, MenuAdapter} from '../../../index';
 
-export default class FormFieldMenuAdapter extends MenuAdapter {
+export class FormFieldMenuAdapter extends MenuAdapter {
   declare widget: FormFieldMenu;
 
   /** @internal */

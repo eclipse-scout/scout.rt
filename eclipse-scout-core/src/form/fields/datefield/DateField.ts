@@ -9,19 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CellEditorPopup, DateFieldEventMap, DateFieldModel, DateFormat, DatePicker, DatePickerPopup, DatePickerTouchPopup, DatePredictionFailedStatus, dates, DateTimeCompositeLayout, Device, Event, fields, focusUtils, FormField,
-  HtmlComponent, InputFieldKeyStrokeContext, keys, KeyStrokeContext, objects, ParsingFailedStatus, Popup, Predicate, scout, Status, strings, styles, TimePicker, TimePickerPopup, TimePickerTouchPopup, ValueField
+  AddCellEditorFieldCssClassesOptions, arrays, CellEditorPopup, CellEditorRenderedOptions, DateFieldEventMap, DateFieldModel, DateFormat, DateFormatAnalyzeInfo, DatePicker, DatePickerDateSelectEvent, DatePickerPopup, DatePickerTouchPopup,
+  DatePredictionFailedStatus, dates, DateTimeCompositeLayout, Device, Event, fields, focusUtils, FormField, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, objects, ParsingFailedStatus, Popup, Predicate,
+  scout, Status, StatusType, strings, styles, TimePicker, TimePickerPopup, TimePickerTimeSelectEvent, TimePickerTouchPopup, ValueField, ValueFieldWithCellEditorRenderedCallback
 } from '../../../index';
 import $ from 'jquery';
-import {DatePickerDateSelectEvent} from '../../../datepicker/DatePickerEventMap';
-import {TimePickerTimeSelectEvent} from '../../../timepicker/TimePickerEventMap';
-import {DateFormatAnalyzeInfo} from '../../../text/DateFormat';
-import {StatusType} from '../../../status/Status';
-import {CellEditorRenderedOptions, ValueFieldWithCellEditorRenderedCallback} from '../../../table/editor/CellEditorPopup';
-import {AddCellEditorFieldCssClassesOptions} from '../FormField';
-import {InitModelOf} from '../../../scout';
 
-export default class DateField extends ValueField<Date, Date | string> implements DateFieldModel, ValueFieldWithCellEditorRenderedCallback<Date, Date | string> {
+export class DateField extends ValueField<Date, Date | string> implements DateFieldModel, ValueFieldWithCellEditorRenderedCallback<Date, Date | string> {
   declare model: DateFieldModel;
   declare eventMap: DateFieldEventMap;
   declare self: DateField;

@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, Table, TableRow, TableTooltipModel, Tooltip} from '../index';
-import {TableRowOrderChangedEvent} from './TableEventMap';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {EventHandler, InitModelOf, SomeRequired, Table, TableRow, TableRowOrderChangedEvent, TableTooltipModel, Tooltip} from '../index';
 
-export default class TableTooltip extends Tooltip implements TableTooltipModel {
+export class TableTooltip extends Tooltip implements TableTooltipModel {
   declare model: TableTooltipModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'table'>;
 

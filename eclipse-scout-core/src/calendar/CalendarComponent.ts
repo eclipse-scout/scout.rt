@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, , dates, icons, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
+import {Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, InitModelOf, JsonDateRange, icons, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
-import {JsonDateRange} from '../util/dates';
-import {InitModelOf} from '../scout';
 
 /**
  * See JsonCalendarItem.java
@@ -49,7 +47,7 @@ export type CalendarItem = {
   };
 };
 
-export default class CalendarComponent extends Widget implements CalendarComponentModel {
+export class CalendarComponent extends Widget implements CalendarComponentModel {
   declare model: CalendarComponentModel;
   declare eventMap: CalendarComponentEventMap;
   declare self: CalendarComponent;

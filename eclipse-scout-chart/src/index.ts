@@ -9,39 +9,38 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ObjectFactory} from '@eclipse-scout/core';
+
+export * from './chart/Chart';
+export * from './chart/ChartAdapter';
+export * from './chart/ChartEventMap';
+export * from './chart/ChartLayout';
+export * from './chart/ChartModel';
+export * from './chart/AbstractChartRenderer';
+export * from './chart/AbstractSvgChartRenderer';
+export * from './chart/ChartJsRenderer';
+export * from './chart/FulfillmentChartRenderer';
+export * from './chart/SpeedoChartRenderer';
+export * from './chart/SalesfunnelChartRenderer';
+export * from './chart/VennAsync3Calculator';
+export * from './chart/VennCircleHelper';
+export * from './chart/VennChartRenderer';
+export * from './chart/VennCircle';
+export * from './form/fields/chartfield/ChartField';
+export * from './form/fields/chartfield/ChartFieldAdapter';
+export * from './form/fields/chartfield/ChartFieldModel';
+export * from './tile/ChartFieldTile';
+export * from './tile/ChartFieldTileAdapter';
+export * from './tile/ChartFieldTileModel';
+export * from './table/controls/ChartTableControl';
+export * from './table/controls/ChartTableControlEventMap';
+export * from './table/controls/ChartTableControlModel';
+export * from './table/controls/ChartTableUserFilter';
+export * from './table/controls/ChartTableUserFilterModel';
+export * from './table/controls/ChartTableControlAdapter';
+export * from './table/controls/ChartTableControlLayout';
+
 import * as self from './index';
 
-export {default as Chart} from './chart/Chart';
-export {ChartAxis, ChartConfig, ChartData, ChartPosition, ChartType, ChartValueGroup, ClickObject, NumberFormatter, UpdateChartOptions} from './chart/Chart';
-export {default as ChartAdapter} from './chart/ChartAdapter';
-export {default as ChartEventMap} from './chart/ChartEventMap';
-export {ChartValueClickEvent} from './chart/ChartEventMap';
-export {default as ChartLayout} from './chart/ChartLayout';
-export {default as ChartModel} from './chart/ChartModel';
-export {default as AbstractChartRenderer} from './chart/AbstractChartRenderer';
-export {default as AbstractSvgChartRenderer} from './chart/AbstractSvgChartRenderer';
-export {default as ChartJsRenderer} from './chart/ChartJsRenderer';
-export {default as FulfillmentChartRenderer} from './chart/FulfillmentChartRenderer';
-export {default as SpeedoChartRenderer} from './chart/SpeedoChartRenderer';
-export {GreenAreaPosition} from './chart/SpeedoChartRenderer';
-export {default as SalesfunnelChartRenderer} from './chart/SalesfunnelChartRenderer';
-export {default as VennAsync3Calculator} from './chart/VennAsync3Calculator';
-export {default as VennCircleHelper} from './chart/VennCircleHelper';
-export {default as VennChartRenderer} from './chart/VennChartRenderer';
-export {default as VennCircle} from './chart/VennCircle';
-export {default as ChartField} from './form/fields/chartfield/ChartField';
-export {default as ChartFieldAdapter} from './form/fields/chartfield/ChartFieldAdapter';
-export {default as ChartFieldModel} from './form/fields/chartfield/ChartFieldModel';
-export {default as ChartFieldTile} from './tile/ChartFieldTile';
-export {default as ChartFieldTileAdapter} from './tile/ChartFieldTileAdapter';
-export {default as ChartFieldTileModel} from './tile/ChartFieldTileModel';
-export {default as ChartTableControl} from './table/controls/ChartTableControl';
-export {default as ChartTableControlEventMap} from './table/controls/ChartTableControlEventMap';
-export {default as ChartTableControlModel} from './table/controls/ChartTableControlModel';
-export {default as ChartTableUserFilter} from './table/controls/ChartTableUserFilter';
-export {default as ChartTableUserFilterModel} from './table/controls/ChartTableUserFilterModel';
-export {default as ChartTableControlAdapter} from './table/controls/ChartTableControlAdapter';
-export {default as ChartTableControlLayout} from './table/controls/ChartTableControlLayout';
-
 export default self;
+
 ObjectFactory.get().registerNamespace('scout', self);

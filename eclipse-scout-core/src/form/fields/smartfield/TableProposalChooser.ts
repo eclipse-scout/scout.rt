@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Cell, Column, ColumnDescriptor, lookupField, LookupRow, objects, ProposalChooser, scout, Table, TableLayoutResetter, TableRow, TableRowModel} from '../../../index';
-import {TableRowClickEvent} from '../../../table/TableEventMap';
-import {SmartFieldLookupResult} from './SmartField';
-import {ModelOf} from '../../../scout';
+import {arrays, Cell, Column, ColumnDescriptor, lookupField, LookupRow, objects, ProposalChooser, scout, SmartFieldLookupResult, Table, TableLayoutResetter, TableRow, TableRowClickEvent, TableRowModel} from '../../../index';
 
-export default class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table, TableRow> {
+export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table, TableRow> {
 
   protected override _createContent(): Table {
     let headerVisible = false,

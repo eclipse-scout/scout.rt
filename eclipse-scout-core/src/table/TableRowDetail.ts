@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, EventHandler, HtmlComponent, Page, strings, Table, TableRow, TableRowDetailModel, Widget} from '../index';
-import {TableRowsInsertedEvent, TableRowsUpdatedEvent} from './TableEventMap';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {arrays, Column, EventHandler, HtmlComponent, InitModelOf, Page, SomeRequired, strings, Table, TableRow, TableRowDetailModel, TableRowsInsertedEvent, TableRowsUpdatedEvent, Widget} from '../index';
 
-export default class TableRowDetail extends Widget implements TableRowDetailModel {
+export class TableRowDetail extends Widget implements TableRowDetailModel {
   declare model: TableRowDetailModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'table' | 'page'>;
 

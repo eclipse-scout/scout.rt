@@ -10,7 +10,7 @@
  */
 import {Event, EventMap, Lifecycle} from '../index';
 
-export default interface LifecycleEventMap<TValidationResult> extends EventMap {
+export interface LifecycleEventMap<TValidationResult> extends EventMap {
   'load': Event<Lifecycle<TValidationResult>>;
   'postLoad': Event<Lifecycle<TValidationResult>>;
   'save': Event<Lifecycle<TValidationResult>>;

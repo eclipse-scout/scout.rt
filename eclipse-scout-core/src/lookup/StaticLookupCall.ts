@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HierarchicalLookupResultBuilder, LookupCall, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
+import {arrays, HierarchicalLookupResultBuilder, InitModelOf, LookupCall, LookupResult, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
 import $ from 'jquery';
-import LookupResult from './LookupResult';
-import {InitModelOf} from '../scout';
 import Deferred = JQuery.Deferred;
 
 /**
@@ -19,7 +17,7 @@ import Deferred = JQuery.Deferred;
  * functions to provide data for lookup calls. Results are resolved as a Promise, the delay
  * property controls how long it takes until the promise is resolved. You can set it to a higher value for testing purposes.
  */
-export default class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLookupCallModel<TKey> {
+export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLookupCallModel<TKey> {
   declare model: StaticLookupCallModel<TKey>;
 
   delay: number;

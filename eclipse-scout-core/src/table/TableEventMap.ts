@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, Column, Event, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableControl, TableRow, Tile, TileTableHeaderBox, ValueField, WidgetEventMap} from '../index';
-import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
-import {DropType, FileDropEvent} from '../util/dragAndDrop';
+import {
+  Cell, Column, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableCheckableStyle, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableRow, Tile, TileTableHeaderBox,
+  ValueField, WidgetEventMap
+} from '../index';
 
 export interface TableColumnBackgroundEffectChangedEvent<T = Table> extends Event<T> {
   column: NumberColumn;
@@ -156,7 +157,7 @@ export interface TableColumnOrganizeActionEvent<TValue = any, T = Table> extends
   column: Column<TValue>;
 }
 
-export default interface TableEventMap extends WidgetEventMap {
+export interface TableEventMap extends WidgetEventMap {
   'aggregationFunctionChanged': TableAggregationFunctionChangedEvent;
   'allRowsDeleted': TableAllRowsDeletedEvent;
   'appLinkAction': TableAppLinkActionEvent;

@@ -17,7 +17,7 @@
  * until the next() function is called. Typically the next function is not called until the previous
  * (one or more) promises have been executed.
  */
-export default class PromiseCreator {
+export class PromiseCreator {
   results: any[];
   error: any;
   items: (() => JQuery.Promise<any>)[];

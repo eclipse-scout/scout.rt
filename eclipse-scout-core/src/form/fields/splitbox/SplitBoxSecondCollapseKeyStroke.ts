@@ -10,7 +10,7 @@
  */
 import {KeyStroke, SplitBox} from '../../../index';
 
-export default class SplitBoxSecondCollapseKeyStroke extends KeyStroke {
+export class SplitBoxSecondCollapseKeyStroke extends KeyStroke {
   declare field: SplitBox;
 
   constructor(splitBox: SplitBox, keyStroke: string) {

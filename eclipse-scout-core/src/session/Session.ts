@@ -9,21 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale,
-  LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterModel, NullWidget, ObjectFactory, objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionEventMap, SessionModel, Status, strings, TextMap, texts,
-  TypeDescriptor, URL, UserAgent, webstorage, Widget
+  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, InitModelOf, JsonErrorResponse,
+  KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType, Reconnector, RemoteEvent,
+  ResponseQueue, scout, SessionEventMap, SessionModel, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
-import {AjaxCallModel} from '../ajax/AjaxCall';
-import {ObjectFactoryOptions} from '../ObjectFactory';
-import {JsonErrorResponse} from '../App';
-import {ModelAdapterLike} from './ModelAdapter';
-import {StatusSeverity} from '../status/Status';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 
-export default class Session extends EventEmitter implements SessionModel, ModelAdapterLike {
+export class Session extends EventEmitter implements SessionModel, ModelAdapterLike {
   declare model: SessionModel;
   declare initModel: SomeRequired<this['model'], '$entryPoint'>;
   declare eventMap: SessionEventMap;

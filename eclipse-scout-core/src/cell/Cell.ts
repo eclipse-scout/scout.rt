@@ -8,17 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status, strings, ValueField} from '../index';
+import {CellModel, InitModelOf, Status, strings, ValueField} from '../index';
 import $ from 'jquery';
-import CellModel from './CellModel';
-import {InitModelOf} from '../scout';
 
 /**
  * -1 for left, 0 for center and 1 for right.
  */
 export type Alignment = -1 | 0 | 1;
 
-export default class Cell<TValue = any> implements CellModel<TValue> {
+export class Cell<TValue = any> implements CellModel<TValue> {
   declare model: CellModel<TValue>;
 
   cssClass: string;
@@ -92,8 +90,7 @@ export default class Cell<TValue = any> implements CellModel<TValue> {
     let oldText = this.text;
     this.text = text;
 
-    // reset cached encodedText, so when encodedText() is called the next time
-    // it will be set to the a new value
+    // reset cached encodedText, so when encodedText() is called the next time, it will be set to the new value
     if (oldText !== this.text) {
       this._cachedEncodedText = null;
     }

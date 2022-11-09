@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusRule, keys, KeyStrokeContext, scout, ScoutKeyboardEvent, Tooltip, Widget, WidgetTooltipEventMap, WidgetTooltipModel} from '../index';
-import {ObjectOrChildModel} from '../scout';
+import {FocusRule, keys, KeyStrokeContext, ObjectOrChildModel, scout, ScoutKeyboardEvent, Tooltip, Widget, WidgetTooltipEventMap, WidgetTooltipModel} from '../index';
 
-export default class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
+export class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
   declare model: WidgetTooltipModel;
   declare eventMap: WidgetTooltipEventMap;
   declare self: WidgetTooltip;

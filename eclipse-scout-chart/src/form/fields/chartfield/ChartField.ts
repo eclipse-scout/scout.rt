@@ -11,7 +11,7 @@
 import {FormField} from '@eclipse-scout/core';
 import {Chart, ChartFieldModel} from '../../../index';
 
-export default class ChartField extends FormField implements ChartFieldModel {
+export class ChartField extends FormField implements ChartFieldModel {
   declare model: ChartFieldModel;
 
   chart: Chart;

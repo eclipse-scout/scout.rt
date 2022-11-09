@@ -10,7 +10,7 @@
  */
 import {KeyStrokeContext, Outline, ScoutKeyboardEvent} from '../../../index';
 
-export default class OutlineKeyStrokeContext extends KeyStrokeContext {
+export class OutlineKeyStrokeContext extends KeyStrokeContext {
   protected _outline: Outline;
 
   constructor(outline: Outline) {

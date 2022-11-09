@@ -11,7 +11,7 @@
 import {AppLinkKeyStroke, HtmlFieldEventMap, HtmlFieldModel, scrollbars, ValueField} from '../../../index';
 import $ from 'jquery';
 
-export default class HtmlField extends ValueField<string> implements HtmlFieldModel {
+export class HtmlField extends ValueField<string> implements HtmlFieldModel {
   declare model: HtmlFieldModel;
   declare eventMap: HtmlFieldEventMap;
   declare self: HtmlField;

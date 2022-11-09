@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FieldStatus, GroupBox, Menu, scout, SmartField, Status, StringField} from '../../../src/index';
-import {FormSpecHelper} from '../../../src/testing/index';
-import {triggerMouseDownCapture} from '../../../src/testing/jquery-testing';
+import {FormSpecHelper, JQueryTesting} from '../../../src/testing/index';
 
 describe('FieldStatus', () => {
   let session: SandboxSession, helper: FormSpecHelper;
@@ -158,7 +157,7 @@ describe('FieldStatus', () => {
     expect(tooltip.rendered).toBeTrue();
     expect(popup.rendered).toBeTrue();
 
-    triggerMouseDownCapture($outside);
+    JQueryTesting.triggerMouseDownCapture($outside);
     expect(tooltip.rendered).toBeFalse();
     expect(popup.rendered).toBeFalse();
     expect(popup.destroyed).toBe(true);

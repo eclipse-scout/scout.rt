@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NotificationModel} from '../../index';
-import {NativeNotificationVisibility} from './DesktopNotification';
-import {StatusOrModel} from '../../status/Status';
+import {NativeNotificationVisibility, NotificationModel, StatusOrModel} from '../../index';
 
-export default interface DesktopNotificationModel extends NotificationModel {
+export interface DesktopNotificationModel extends NotificationModel {
   /**
    * The duration in milliseconds until the notification is automatically removed.
    * Use {@link DesktopNotification.INFINITE} to disable automatic removal.

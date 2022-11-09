@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, PlannerHeader, PropertyChangeEvent, WidgetEventMap} from '../index';
-import {PlannerDisplayMode} from './Planner';
+import {Event, PlannerDisplayMode, PlannerHeader, PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export interface PlannerHeaderDisplayModeClickEvent<P extends PlannerHeader = PlannerHeader> extends Event<P> {
   displayMode: PlannerDisplayMode;
 }
 
-export default interface PlannerHeaderEventMap extends WidgetEventMap {
+export interface PlannerHeaderEventMap extends WidgetEventMap {
   'displayModeClick': PlannerHeaderDisplayModeClickEvent;
   'nextClick': Event<PlannerHeader>;
   'previousClick': Event<PlannerHeader>;

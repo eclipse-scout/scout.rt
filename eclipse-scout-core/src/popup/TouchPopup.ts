@@ -9,14 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, Event, EventHandler, FormField, HtmlComponent, Menu, Point, Popup, PropertyChangeEvent, scout, SingleLayout, SmartField, Tooltip, TouchPopupLayout, TouchPopupModel, ValueField, ValueFieldModel, Widget
+  AbstractLayout, Action, Event, EventHandler, FormField, HtmlComponent, InitModelOf, Menu, Point, Popup, PopupAlignment, PropertyChangeEvent, RowLayout, scout, SingleLayout, SmartField, SomeRequired, Tooltip, TouchPopupLayout,
+  TouchPopupModel, ValueField, ValueFieldModel, Widget
 } from '../index';
-import RowLayout from '../layout/RowLayout';
-import {PopupAlignment} from './Popup';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 
-export default class TouchPopup extends Popup {
+export class TouchPopup extends Popup {
   declare model: TouchPopupModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
 

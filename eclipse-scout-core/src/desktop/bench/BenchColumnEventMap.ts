@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BenchColumn, Event, WidgetEventMap} from '../../index';
-import {OutlineContent} from './DesktopBench';
+import {BenchColumn, Event, OutlineContent, WidgetEventMap} from '../../index';
 
 export interface BenchColumnViewActivateEvent<B extends BenchColumn = BenchColumn> extends Event<B> {
   view: OutlineContent;
@@ -27,7 +26,7 @@ export interface BenchColumnViewRemoveEvent<B extends BenchColumn = BenchColumn>
   view: OutlineContent;
 }
 
-export default interface BenchColumnEventMap extends WidgetEventMap {
+export interface BenchColumnEventMap extends WidgetEventMap {
   'viewActivate': BenchColumnViewActivateEvent;
   'viewAdd': BenchColumnViewAddEvent;
   'viewDeactivate': BenchColumnViewDeactivateEvent;

@@ -10,5 +10,5 @@
  */
 import {FormAdapter} from '../index';
 
-export default class TileOverviewFormAdapter extends FormAdapter {
+export class TileOverviewFormAdapter extends FormAdapter {
 }

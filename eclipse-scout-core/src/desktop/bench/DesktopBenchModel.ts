@@ -10,7 +10,7 @@
  */
 import {DesktopTabArea, WidgetModel} from '../../index';
 
-export default interface DesktopBenchModel extends WidgetModel {
+export interface DesktopBenchModel extends WidgetModel {
   headerTabArea?: DesktopTabArea;
   outlineContentVisible?: boolean;
   navigationHandleVisible?: boolean;

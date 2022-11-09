@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopBench, DesktopTab, DesktopTabArea, DesktopTabBoxController, Form, scout, SimpleTabBox} from '../../index';
-import {SimpleTabAreaTabSelectEvent} from '../../tabbox/SimpleTabAreaEventMap';
+import {DesktopBench, DesktopTab, DesktopTabArea, DesktopTabBoxController, Form, scout, SimpleTabAreaTabSelectEvent, SimpleTabBox} from '../../index';
 
 /**
  * The {@link HeaderTabBoxController} is used to link the center {@link SimpleTabBox} (all forms with displayViewId='C')
@@ -17,7 +16,7 @@ import {SimpleTabAreaTabSelectEvent} from '../../tabbox/SimpleTabAreaEventMap';
  *
  * @see SimpleTabBoxController
  */
-export default class HeaderTabBoxController extends DesktopTabBoxController {
+export class HeaderTabBoxController extends DesktopTabBoxController {
   declare tabArea: DesktopTabArea;
 
   bench: DesktopBench;

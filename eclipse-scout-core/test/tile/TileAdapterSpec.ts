@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Tile, TileGrid, TileGridModel} from '../../src/index';
-import {AdapterData} from '../../src/session/Session';
-import TileModel from '../../src/tile/TileModel';
-import {ObjectType} from '../../src/ObjectFactory';
-import {InitModelOf} from '../../src/scout';
+import {AdapterData, InitModelOf, ObjectType, scout, Tile, TileGrid, TileGridModel, TileModel} from '../../src/index';
 
 describe('TileGridAdapter', () => {
   let session: SandboxSession;

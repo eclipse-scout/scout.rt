@@ -10,6 +10,6 @@
  */
 import {Outline, WidgetModel} from '../../../index';
 
-export default interface OutlineOverviewModel extends WidgetModel {
+export interface OutlineOverviewModel extends WidgetModel {
   outline?: Outline;
 }

@@ -25,7 +25,7 @@ export interface TypeDescriptorOptions {
 /**
  * This class contains a structured type description for a Scout class.
  */
-export default class TypeDescriptor {
+export class TypeDescriptor {
   typeDescriptor: string;
   objectType: ObjectTypePart;
   modelVariant: ObjectTypePart;

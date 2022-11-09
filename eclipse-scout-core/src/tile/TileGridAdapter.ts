@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, ModelAdapter, objects, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel} from '../index';
-import {TileActionEvent, TileClickEvent} from './TileGridEventMap';
+import {Event, ModelAdapter, objects, RemoteTileFilter, scout, Tile, TileActionEvent, TileClickEvent, TileGrid, TileGridModel} from '../index';
 
-export default class TileGridAdapter extends ModelAdapter {
+export class TileGridAdapter extends ModelAdapter {
   declare widget: TileGrid;
   tileFilter: RemoteTileFilter;
 

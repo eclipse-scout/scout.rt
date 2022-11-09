@@ -58,8 +58,8 @@ export const JasmineScoutUtil = {
   } = {}) {
     scout.assertParameter('resourceUrlToMock', resourceUrlToMock);
 
-    this.loadJsonResource(jsonResourceUrl, options)
-      .then(json => this.mockRestCall(resourceUrlToMock, json, options));
+    JasmineScoutUtil.loadJsonResource(jsonResourceUrl, options)
+      .then(json => JasmineScoutUtil.mockRestCall(resourceUrlToMock, json, options));
   },
 
   mockRestLookupCall(resourceUrlToMock: string, lookupRows: any[], parentRestriction?: any) {
@@ -73,7 +73,7 @@ export const JasmineScoutUtil = {
     }, lookupRow));
 
     // getAll()
-    this.mockRestCall(resourceUrlToMock, {
+    JasmineScoutUtil.mockRestCall(resourceUrlToMock, {
       rows: lookupRows
     }, {
       restriction: parentRestriction
@@ -81,7 +81,7 @@ export const JasmineScoutUtil = {
 
     // getKey()
     lookupRows.forEach(lookupRow => {
-      this.mockRestCall(resourceUrlToMock, {
+      JasmineScoutUtil.mockRestCall(resourceUrlToMock, {
         rows: [lookupRow]
       }, {
         restriction: lookupRow.id

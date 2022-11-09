@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormModel, Outline, Page, TileGrid} from '../index';
-import {ObjectOrChildModel} from '../scout';
+import {FormModel, ObjectOrChildModel, Outline, Page, TileGrid} from '../index';
 
-export default interface TileOverviewFormModel extends FormModel {
+export interface TileOverviewFormModel extends FormModel {
   outline?: Outline;
   nodes?: Page[];
   tileOverviewTitle?: string;

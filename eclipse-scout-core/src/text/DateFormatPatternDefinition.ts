@@ -9,9 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {DateFormatPatternTypes} from './DateFormatPatternType';
-import {DateFormat} from '../index';
-import {DateFormatContext, DateFormatParseContext} from './DateFormat';
+import {DateFormat, DateFormatContext, DateFormatParseContext, DateFormatPatternTypes} from '../index';
 
 export interface DateFormatPatternDefinitionOptions {
   /**
@@ -76,7 +74,7 @@ export interface DateFormatPatternDefinitionOptions {
 /**
  * Definition of a date format pattern.
  */
-export default class DateFormatPatternDefinition implements DateFormatPatternDefinitionOptions {
+export class DateFormatPatternDefinition implements DateFormatPatternDefinitionOptions {
   type: DateFormatPatternTypes;
   terms: string[];
   dateFormat: DateFormat;

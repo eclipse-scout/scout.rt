@@ -14,7 +14,7 @@ import $ from 'jquery';
 /**
  * A layout is responsible to layout the children of a container and is able to return its preferred size.
  */
-export default class AbstractLayout {
+export class AbstractLayout {
   animateClasses: string[];
   cssClass?: string;
 

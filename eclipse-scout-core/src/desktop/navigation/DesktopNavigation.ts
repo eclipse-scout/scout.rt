@@ -9,13 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  CollapseHandle, Desktop, DesktopNavigationEventMap, DesktopNavigationHandle, DesktopNavigationLayout, DesktopNavigationModel, DesktopToolBox, EventHandler, HtmlComponent, LayoutData, Outline, PropertyChangeEvent, scout, SingleLayout,
-  styles, Tree, ViewButtonBox, Widget
+  CollapseHandle, CollapseHandleActionEvent, Desktop, DesktopNavigationEventMap, DesktopNavigationHandle, DesktopNavigationLayout, DesktopNavigationModel, DesktopToolBox, EventHandler, HtmlComponent, InitModelOf, LayoutData, Outline,
+  PropertyChangeEvent, scout, SingleLayout, styles, Tree, ViewButtonBox, Widget
 } from '../../index';
-import {CollapseHandleActionEvent} from '../../collapsehandle/CollapseHandleEventMap';
-import {InitModelOf} from '../../scout';
 
-export default class DesktopNavigation extends Widget implements DesktopNavigationModel {
+export class DesktopNavigation extends Widget implements DesktopNavigationModel {
   declare model: DesktopNavigationModel;
   declare eventMap: DesktopNavigationEventMap;
   declare self: DesktopNavigation;

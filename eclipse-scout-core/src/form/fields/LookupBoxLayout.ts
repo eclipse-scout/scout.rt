@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, FormField, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, LookupBox, Widget} from '../../index';
 
-export default class LookupBoxLayout extends AbstractLayout {
+export class LookupBoxLayout extends AbstractLayout {
   box: LookupBox<any>;
   structure: Widget;
   filterBox: Widget;

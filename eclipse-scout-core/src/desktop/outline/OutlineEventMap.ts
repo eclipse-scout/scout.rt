@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Form, Outline, OutlineOverview, Page, PropertyChangeEvent, TableRow, TableRowDetail, TreeEventMap} from '../../index';
-import {OutlineContent} from '../bench/DesktopBench';
+import {Event, Form, Outline, OutlineContent, OutlineOverview, Page, PropertyChangeEvent, TableRow, TableRowDetail, TreeEventMap} from '../../index';
 
 export interface OutlinePageChangedEvent<T = Outline> extends Event<T> {
   page: Page;
@@ -24,7 +23,7 @@ export interface OutlinePageRowLinkEvent<T = Outline> extends Event<T> {
   row: TableRow;
 }
 
-export default interface OutlineEventMap extends TreeEventMap {
+export interface OutlineEventMap extends TreeEventMap {
   'pageChanged': OutlinePageChangedEvent;
   'pageInit': OutlinePageInitEvent;
   'pageRowLink': OutlinePageRowLinkEvent;

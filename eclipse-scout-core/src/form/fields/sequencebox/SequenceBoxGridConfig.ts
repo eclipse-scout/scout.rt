@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridConfig, SequenceBox} from '../../../index';
-import {LogicalGridWidget} from '../../../layout/logicalgrid/LogicalGridData';
+import {LogicalGridConfig, LogicalGridWidget, SequenceBox} from '../../../index';
 
-export default class SequenceBoxGridConfig extends LogicalGridConfig {
+export class SequenceBoxGridConfig extends LogicalGridConfig {
 
   declare widget: SequenceBox;
 

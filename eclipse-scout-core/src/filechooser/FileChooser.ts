@@ -9,13 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, arrays, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, Device, DisplayParent, dragAndDrop, DragAndDropHandler, Event, FileChooserEventMap, FileChooserModel, FileInput, files as fileUtil, FocusAdjacentElementKeyStroke,
-  FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget
+  Action, arrays, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, Device, DisplayParent, dragAndDrop, DragAndDropHandler, Event, FileChooserEventMap, FileChooserModel, FileInput, FileInputChangeEvent, files as fileUtil,
+  FocusAdjacentElementKeyStroke, FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, InitModelOf, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget
 } from '../index';
-import {FileInputChangeEvent} from './FileInputEventMap';
-import {InitModelOf} from '../scout';
 
-export default class FileChooser extends Widget implements FileChooserModel {
+export class FileChooser extends Widget implements FileChooserModel {
   declare model: FileChooserModel;
   declare eventMap: FileChooserEventMap;
   declare self: FileChooser;

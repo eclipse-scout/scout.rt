@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Group, WidgetModel} from '../index';
-import {Comparator} from '../types';
-import {GroupCollapseStyle} from '../group/Group';
-import {ObjectOrChildModel} from '../scout';
+import {Comparator, Group, GroupCollapseStyle, ObjectOrChildModel, WidgetModel} from '../index';
 
-export default interface AccordionModel extends WidgetModel {
+export interface AccordionModel extends WidgetModel {
   /**
    * The comparator used to sort the groups. If no comparator is set, the groups will be displayed according to theirs insertion order.
    *

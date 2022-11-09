@@ -10,7 +10,7 @@
  */
 import {SmartFieldAdapter} from '../../../index';
 
-export default class ProposalFieldAdapter extends SmartFieldAdapter {
+export class ProposalFieldAdapter extends SmartFieldAdapter {
 
   constructor() {
     super();

@@ -11,6 +11,6 @@
 
 import {ActionAdapter} from '../index';
 
-export default class BreadcrumbItemAdapter extends ActionAdapter {
+export class BreadcrumbItemAdapter extends ActionAdapter {
 }
 

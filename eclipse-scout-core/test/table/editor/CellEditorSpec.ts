@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Cell, CellEditorPopup, Column, keys, scout, SmartColumn, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
-import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
-import {triggerClick, triggerKeyInputCapture, triggerMouseDown, triggerMouseUp} from '../../../src/testing/jquery-testing';
+import {FormSpecHelper, JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
 
 describe('CellEditor', () => {
   let session: SandboxSession;
@@ -91,9 +90,9 @@ describe('CellEditor', () => {
       table.rows[1].cells[0].editable = false;
 
       spyOn(table, 'prepareCellEdit');
-      triggerClick($cell1_0);
+      JQueryTesting.triggerClick($cell1_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
-      triggerClick($cell0_0);
+      JQueryTesting.triggerClick($cell0_0);
       expect(table.prepareCellEdit).toHaveBeenCalled();
     });
 
@@ -101,7 +100,7 @@ describe('CellEditor', () => {
       table.rows[0].cells[0].editable = false;
 
       spyOn(table, 'prepareCellEdit');
-      triggerClick($cell0_0);
+      JQueryTesting.triggerClick($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -110,7 +109,7 @@ describe('CellEditor', () => {
       table.rows[0].enabled = false;
 
       spyOn(table, 'prepareCellEdit');
-      triggerClick($cell0_0);
+      JQueryTesting.triggerClick($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -120,7 +119,7 @@ describe('CellEditor', () => {
       table.recomputeEnabled();
 
       spyOn(table, 'prepareCellEdit');
-      triggerClick($cell0_0);
+      JQueryTesting.triggerClick($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -129,7 +128,7 @@ describe('CellEditor', () => {
       table.enabledComputed = false;
 
       spyOn(table, 'prepareCellEdit');
-      triggerClick($cell0_0);
+      JQueryTesting.triggerClick($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -138,8 +137,8 @@ describe('CellEditor', () => {
       table.rows[0].cells[1].editable = true;
 
       spyOn(table, 'prepareCellEdit');
-      triggerMouseDown($cell0_1);
-      triggerMouseUp($cell0_0);
+      JQueryTesting.triggerMouseDown($cell0_1);
+      JQueryTesting.triggerMouseUp($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -147,8 +146,8 @@ describe('CellEditor', () => {
       table.rows[0].cells[0].editable = true;
 
       spyOn(table, 'prepareCellEdit');
-      triggerMouseDown($cell0_0, {which: 3});
-      triggerMouseUp($cell0_0, {which: 3});
+      JQueryTesting.triggerMouseDown($cell0_0, {which: 3});
+      JQueryTesting.triggerMouseUp($cell0_0, {which: 3});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -156,8 +155,8 @@ describe('CellEditor', () => {
       table.rows[0].cells[0].editable = true;
 
       spyOn(table, 'prepareCellEdit');
-      triggerMouseDown($cell0_0, {which: 2});
-      triggerMouseUp($cell0_0, {which: 2});
+      JQueryTesting.triggerMouseDown($cell0_0, {which: 2});
+      JQueryTesting.triggerMouseUp($cell0_0, {which: 2});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -168,10 +167,10 @@ describe('CellEditor', () => {
       spyOn(table, 'prepareCellEdit');
       // row 0 is selected, user presses shift and clicks row 2
       table.selectRows([table.rows[0]]);
-      triggerClick($cell1_0, {modifier: 'shift'});
+      JQueryTesting.triggerClick($cell1_0, {modifier: 'shift'});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
 
-      triggerClick($cell1_0, {modifier: 'ctrl'});
+      JQueryTesting.triggerClick($cell1_0, {modifier: 'ctrl'});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
   });
@@ -195,7 +194,7 @@ describe('CellEditor', () => {
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
-      triggerKeyInputCapture($(document.activeElement as HTMLElement), keys.TAB);
+      JQueryTesting.triggerKeyInputCapture($(document.activeElement as HTMLElement), keys.TAB);
       jasmine.clock().tick(0);
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[1]);
@@ -212,7 +211,7 @@ describe('CellEditor', () => {
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
-      triggerKeyInputCapture($(document.activeElement as HTMLElement), keys.TAB);
+      JQueryTesting.triggerKeyInputCapture($(document.activeElement as HTMLElement), keys.TAB);
       jasmine.clock().tick(0);
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[2], table.rows[1]);

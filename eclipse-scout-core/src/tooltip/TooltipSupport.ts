@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Tooltip, tooltips} from '../index';
+import {InitModelOf, scout, SomeRequired, Tooltip, TooltipModel, tooltips} from '../index';
 import $ from 'jquery';
-import TooltipModel from './TooltipModel';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 import MouseEnterEvent = JQuery.MouseEnterEvent;
 import MouseLeaveEvent = JQuery.MouseLeaveEvent;
 
@@ -34,7 +31,7 @@ export interface TooltipSupportOptions extends TooltipModel {
   $anchor?: JQuery;
 }
 
-export default class TooltipSupport {
+export class TooltipSupport {
   declare model: TooltipSupportOptions;
   declare initModel: SomeRequired<this['model'], 'parent'>;
   declare self: TooltipSupport;

@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BooleanColumn, Cell, Column, CompactBean, CompactLine, Event, EventHandler, objects, Table, TableCompactHandlerModel, TableRow} from '../index';
-import {TableRowsInsertedEvent, TableRowsUpdatedEvent} from './TableEventMap';
-import {SomeRequired} from '../types';
-import {InitModelOf} from '../scout';
+import {BooleanColumn, Cell, Column, CompactBean, CompactLine, Event, EventHandler, InitModelOf, objects, SomeRequired, Table, TableCompactHandlerModel, TableRow, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../index';
 
-export default class TableCompactHandler implements TableCompactHandlerModel {
+export class TableCompactHandler implements TableCompactHandlerModel {
   declare model: TableCompactHandlerModel;
   declare initModel: SomeRequired<this['model'], 'table'>;
 

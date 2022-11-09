@@ -12,7 +12,7 @@ import {EnumObject, Point} from '../../../index';
 
 export type LogicalGridMatrixOrientation = EnumObject<typeof LogicalGridMatrixCursor.Orientation>;
 
-export default class LogicalGridMatrixCursor {
+export class LogicalGridMatrixCursor {
   startX: number;
   startY: number;
   columnCount: number;

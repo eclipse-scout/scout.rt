@@ -8,19 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {aggregation, Cell, Column, comparators, DecimalFormat, Locale, NumberColumnEventMap, NumberColumnModel, NumberField, numbers, objects, scout, strings, styles, TableRow} from '../../index';
+import {
+  aggregation, AvgAggregationState, Cell, Column, comparators, DecimalFormat, DecimalFormatOptions, InitModelOf, Locale, NumberColumnEventMap, NumberColumnModel, NumberField, numbers, objects, Rgba, scout, strings, styles, TableRow
+} from '../../index';
 import $ from 'jquery';
-import {DecimalFormatOptions} from '../../text/DecimalFormat';
-import {AvgAggregationState} from '../../util/aggregation';
-import {Rgba} from '../../util/styles';
-import {InitModelOf} from '../../scout';
 
 export type NumberColumnAggregationFunction = 'sum' | 'avg' | 'min' | 'max' | 'none';
 export type NumberColumnBackgroundEffect = 'colorGradient1' | 'colorGradient2' | 'barChart';
 export type NumberColumnBackgroundStyle = { backgroundColor?: string; backgroundImage?: string };
 export type NumberColumnBackgroundEffectFunc = (value: number) => NumberColumnBackgroundStyle;
 
-export default class NumberColumn extends Column<number> implements NumberColumnModel {
+export class NumberColumn extends Column<number> implements NumberColumnModel {
   declare model: NumberColumnModel;
   declare eventMap: NumberColumnEventMap;
   declare self: NumberColumn;

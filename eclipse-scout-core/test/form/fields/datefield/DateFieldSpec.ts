@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, DateFieldModel, DateFormat, DatePicker, DatePickerTouchPopup, dates, keys, Popup, RemoteEvent, scout, Status, TimePicker, TimePickerTouchPopup, ValidationFailedStatus} from '../../../../src/index';
-import {FormSpecHelper} from '../../../../src/testing/index';
-import {triggerClick, triggerKeyDown, triggerMouseDown} from '../../../../src/testing/jquery-testing';
-import {Optional} from '../../../../src/types';
-import {DateFieldPredictionResult} from '../../../../src/form/fields/datefield/DateField';
-import {FullModelOf} from '../../../../src/scout';
+import {
+  DateField, DateFieldModel, DateFieldPredictionResult, DateFormat, DatePicker, DatePickerTouchPopup, dates, FullModelOf, keys, Popup, RemoteEvent, scout, Status, TimePicker, TimePickerTouchPopup, ValidationFailedStatus
+} from '../../../../src/index';
+import {FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 
 describe('DateField', () => {
   let session: SandboxSession;
@@ -74,7 +72,7 @@ describe('DateField', () => {
     return session.getOrCreateWidget(model.id, session.desktop) as SpecDateField;
   }
 
-  function createFieldAndFocusAndOpenPicker(modelProperties?: Optional<DateFieldModel, 'parent'>): SpecDateField {
+  function createFieldAndFocusAndOpenPicker(modelProperties?: DateFieldModel): SpecDateField {
     let dateField = createField(modelProperties);
     dateField.render();
 
@@ -95,7 +93,7 @@ describe('DateField', () => {
   }
 
   function openDatePicker(dateField: DateField) {
-    triggerMouseDown(dateField.$dateField);
+    JQueryTesting.triggerMouseDown(dateField.$dateField);
     expect(findDatePicker().length).toBe(1);
   }
 
@@ -128,14 +126,14 @@ describe('DateField', () => {
   function selectFirstDayInPicker($picker: JQuery) {
     let $day = $picker.find('.date-picker-day').first();
     let date = $day.data('date');
-    triggerClick($day);
+    JQueryTesting.triggerClick($day);
     return date;
   }
 
   function selectFirstTimeInPicker($picker: JQuery) {
     let $time = $picker.find('.cell.minutes').first();
     let date = $time.data('time');
-    triggerClick($time);
+    JQueryTesting.triggerClick($time);
     return date;
   }
 
@@ -376,7 +374,7 @@ describe('DateField', () => {
       dateField.render();
       expect(findDatePicker().length).toBe(0);
 
-      triggerMouseDown(dateField.$dateField);
+      JQueryTesting.triggerMouseDown(dateField.$dateField);
       expect(findDatePicker().length).toBe(1);
     });
 
@@ -386,13 +384,13 @@ describe('DateField', () => {
       });
       dateField.render();
       dateField.setValue(dates.create('2017-05-23 00:00:00.000'));
-      triggerMouseDown(dateField.$dateField);
+      JQueryTesting.triggerMouseDown(dateField.$dateField);
 
       expect(dates.isSameDay(dateField.getDatePicker().selectedDate, dates.create('2017-05-23 00:00:00.000'))).toBe(true);
       dateField.popup.close();
 
       dateField.clear();
-      triggerMouseDown(dateField.$dateField);
+      JQueryTesting.triggerMouseDown(dateField.$dateField);
       expect(dateField.getDatePicker().selectedDate).toBe(null);
       expect(dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
       expect(dateField.value).toBe(null);
@@ -534,7 +532,7 @@ describe('DateField', () => {
       dateField.render();
       focusAndOpenDatePicker(dateField);
 
-      triggerClick(find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)));
+      JQueryTesting.triggerClick(find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)));
       expect(dateField.$dateField.val()).toBe('01.02.2016');
       expect(dateField.displayText).toBe('01.02.2016');
       expect(dateField.value.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
@@ -547,7 +545,7 @@ describe('DateField', () => {
       });
       dateField.render();
       focusAndOpenDatePicker(dateField);
-      triggerClick(find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)));
+      JQueryTesting.triggerClick(find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)));
       openDatePicker(dateField);
       expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
 
@@ -575,7 +573,7 @@ describe('DateField', () => {
       expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(dates.create('2016-02-02 00:00:00.000').toISOString());
 
       // Click the date which was selected when the picker opened
-      triggerClick(find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)));
+      JQueryTesting.triggerClick(find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)));
       expect(dateField.$dateField.val()).toBe('01.02.2016');
       expect(dateField.displayText).toBe('01.02.2016');
       expect(dateField.value.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
@@ -592,7 +590,7 @@ describe('DateField', () => {
         let dateField = createFieldAndFocusAndOpenPicker(model);
         expect(findDatePicker().length).toBe(1);
 
-        triggerKeyDown(dateField.$dateField, keys.ESC);
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.ESC);
         expect(findDatePicker().length).toBe(0);
       });
 
@@ -614,7 +612,7 @@ describe('DateField', () => {
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        triggerKeyDown(dateField.$dateField, keys.ENTER);
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.ENTER);
         let date = dateField.value;
         expectDate(date, 2015, 2, 11);
         expect(findDatePicker().length).toBe(0);
@@ -638,7 +636,7 @@ describe('DateField', () => {
           hasTime: true
         });
         dateField.render();
-        triggerKeyDown(dateField.$dateField, keys.DOWN);
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
 
         let expectedTime = dates.ceil(new Date(), dateField.timePickerResolution);
         expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
@@ -658,7 +656,7 @@ describe('DateField', () => {
         });
         dateField.render();
         focusDate(dateField);
-        triggerKeyDown(dateField.$dateField, keys.DOWN);
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
         expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
         expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
@@ -671,7 +669,7 @@ describe('DateField', () => {
         expect(dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
 
         // Assert that current date is selected
-        triggerKeyDown(dateField.$dateField, keys.DOWN);
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
         expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
         expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
@@ -686,7 +684,7 @@ describe('DateField', () => {
         dateField.render();
         dateField.acceptInput();
         expect(dateField.errorStatus instanceof Status).toBe(true);
-        triggerKeyDown(dateField.$dateField, keys.DOWN);
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
 
         expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
         expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
@@ -703,7 +701,7 @@ describe('DateField', () => {
         let dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        triggerKeyDown(dateField.$dateField, keys.DOWN);
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -720,7 +718,7 @@ describe('DateField', () => {
         let dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        triggerKeyDown(dateField.$dateField, keys.DOWN, 'shift');
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN, 'shift');
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
         expect(dateField.$dateField.val()).toBe('01.11.2014');
@@ -731,7 +729,7 @@ describe('DateField', () => {
         let dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        triggerKeyDown(dateField.$dateField, keys.DOWN, 'ctrl');
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN, 'ctrl');
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -745,7 +743,7 @@ describe('DateField', () => {
           value: dates.create('2017-04-14 12:18:00.000')
         });
         dateField.render();
-        triggerKeyDown(dateField.$timeField, keys.DOWN);
+        JQueryTesting.triggerKeyDown(dateField.$timeField, keys.DOWN);
 
         expectTime(dateField.value, 12, 18, 0);
         expect(dateField.$timeField.val()).toBe('12:30');
@@ -773,7 +771,7 @@ describe('DateField', () => {
         let dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        triggerKeyDown(dateField.$dateField, keys.UP);
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.UP);
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -785,7 +783,7 @@ describe('DateField', () => {
         let dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        triggerKeyDown(dateField.$dateField, keys.UP, 'shift');
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.UP, 'shift');
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -797,7 +795,7 @@ describe('DateField', () => {
         let dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        triggerKeyDown(dateField.$dateField, keys.UP, 'ctrl');
+        JQueryTesting.triggerKeyDown(dateField.$dateField, keys.UP, 'ctrl');
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -952,7 +950,7 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
         expect($('.touch-popup').length).toBe(1);
         expect(scout.widget($('.touch-popup')) instanceof DatePickerTouchPopup).toBe(true);
@@ -967,7 +965,7 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
 
         selectFirstDayInPicker(dateField.popup['_widget'].currentMonth.$container);
@@ -981,7 +979,7 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
 
         // Popup creates a clone -> validate that it will be destroyed when popup closes
@@ -999,7 +997,7 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
 
         let selectedDate = selectFirstDayInPicker(dateField.popup['_widget'].currentMonth.$container);
@@ -1016,11 +1014,11 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup['_field'].$dateField.val('11.02.2015');
-        triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
+        JQueryTesting.triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
         expect(dateField.popup).toBe(null);
         expectDate(dateField.value, 2015, 2, 11);
         expect(dateField.displayText).toBe('11.02.2015');
@@ -1035,18 +1033,18 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup['_field'].$dateField.val('29.02.2016');
-        triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
+        JQueryTesting.triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
 
         expect(dateField.popup).toBe(null);
-        triggerClick(dateField.$timeField);
+        JQueryTesting.triggerClick(dateField.$timeField);
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup['_field'].$timeField.val('10:42');
-        triggerKeyDown(dateField.popup['_field'].$timeField, keys.ENTER);
+        JQueryTesting.triggerKeyDown(dateField.popup['_field'].$timeField, keys.ENTER);
 
         expect(dateField.popup).toBe(null);
 
@@ -1066,7 +1064,7 @@ describe('DateField', () => {
         dateField.render();
 
         expect(dateField.$dateField.text()).toBe(dateField.displayText);
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
         let field = dateField.popup['_field'];
         expect(field.value).toEqual(dateField.value);
@@ -1082,17 +1080,17 @@ describe('DateField', () => {
         dateField.render();
 
         // Open
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
 
         // Enter date and close
         dateField.popup['_field'].$dateField.val('11.02.2015');
-        triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
+        JQueryTesting.triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
         expect(dateField.popup).toBe(null);
         expect(dateField.displayText).toBe('11.02.2015');
 
         // Reopen and verify
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup['_field'].value).toEqual(dateField.value);
         expect(dateField.popup['_field'].displayText).toBe(dateField.displayText);
@@ -1108,12 +1106,12 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup['_field'].$dateField.val()).toBe(dateField.displayText);
 
         dateField.popup['_field'].$dateField.val('');
-        triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
+        JQueryTesting.triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
         expect(dateField.popup).toBe(null);
         expect(dateField.value).toBe(null);
         expect(dateField.displayText).toBe('');
@@ -1130,18 +1128,18 @@ describe('DateField', () => {
         dateField.render();
 
         // Open and check display text
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup['_field'].$dateField.val()).toBe(dateField.displayText);
 
         // Clear text
         dateField.popup['_field'].$dateField.val('');
-        triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
+        JQueryTesting.triggerKeyDown(dateField.popup['_field'].$dateField, keys.ENTER);
         expect(dateField.popup).toBe(null);
         expect(dateField.$dateField.text()).toBe('');
 
         // Open again
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup['_field'].$dateField.val()).toBe(dateField.displayText);
 
@@ -1153,7 +1151,7 @@ describe('DateField', () => {
         expect(dateField.$dateField.text()).toBe(dateField.displayText);
 
         // Open again and verify
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup['_field'].$dateField.val()).toBe(dateField.displayText);
       });
@@ -1170,7 +1168,7 @@ describe('DateField', () => {
         expect(dateField.$timeField.text()).toBe('05:50');
 
         // Open and check display text
-        triggerClick(dateField.$dateField);
+        JQueryTesting.triggerClick(dateField.$dateField);
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup['_field'].$dateField.val()).toBe('01.05.2017');
 
@@ -1201,7 +1199,7 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$timeField);
+        JQueryTesting.triggerClick(dateField.$timeField);
         expect(dateField.popup.rendered).toBe(true);
         expect($('.touch-popup').length).toBe(1);
         expect(scout.widget($('.touch-popup')) instanceof TimePickerTouchPopup).toBe(true);
@@ -1218,7 +1216,7 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$timeField);
+        JQueryTesting.triggerClick(dateField.$timeField);
         expect(dateField.popup.rendered).toBe(true);
 
         selectFirstTimeInPicker(dateField.popup['_widget'].$container);
@@ -1234,7 +1232,7 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$timeField);
+        JQueryTesting.triggerClick(dateField.$timeField);
         expect(dateField.popup.rendered).toBe(true);
 
         let selectedDate = selectFirstTimeInPicker(dateField.popup['_widget'].$container);
@@ -1253,11 +1251,11 @@ describe('DateField', () => {
         });
         dateField.render();
 
-        triggerClick(dateField.$timeField);
+        JQueryTesting.triggerClick(dateField.$timeField);
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup['_field'].$timeField.val('05:13');
-        triggerKeyDown(dateField.popup['_field'].$timeField, keys.ENTER);
+        JQueryTesting.triggerKeyDown(dateField.popup['_field'].$timeField, keys.ENTER);
         expect(dateField.popup).toBe(null);
         expectTime(dateField.value, 5, 13, 0);
         expect(dateField.displayText).toBe('05:13');
@@ -1276,7 +1274,7 @@ describe('DateField', () => {
         expect(dateField.$timeField.text()).toBe('05:50');
 
         // Open and check display text
-        triggerClick(dateField.$timeField);
+        JQueryTesting.triggerClick(dateField.$timeField);
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup['_field'].$timeField.val()).toBe('05:50');
 
@@ -1518,7 +1516,7 @@ describe('DateField', () => {
         label: 'label'
       });
       field.render();
-      triggerClick(field.$label);
+      JQueryTesting.triggerClick(field.$label);
       expect(field.$dateField).toBeFocused();
       expect(field.popup.rendered).toBe(true);
 
@@ -1533,7 +1531,7 @@ describe('DateField', () => {
         hasTime: true
       });
       field.render();
-      triggerClick(field.$label);
+      JQueryTesting.triggerClick(field.$label);
       expect(field.$timeField).toBeFocused();
       expect(field.popup.rendered).toBe(true);
 

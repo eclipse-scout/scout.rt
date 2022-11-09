@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Session, strings} from '../index';
-import {RemoteRequest, RemoteResponse} from './Session';
+import {RemoteRequest, RemoteResponse, Session, strings} from '../index';
 
-export default class ResponseQueue {
+export class ResponseQueue {
   session: Session;
   queue: RemoteResponse[];
   lastProcessedSequenceNo: number;

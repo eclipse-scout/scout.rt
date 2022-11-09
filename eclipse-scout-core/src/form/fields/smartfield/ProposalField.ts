@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupRow, objects, ProposalFieldEventMap, ProposalFieldModel, scout, SmartField, strings} from '../../../index';
+import {LookupRow, objects, ProposalFieldEventMap, ProposalFieldModel, scout, SmartField, SmartFieldLookupResult, strings} from '../../../index';
 import $ from 'jquery';
-import {SmartFieldLookupResult} from './SmartField';
 
-export default class ProposalField extends SmartField<string> implements ProposalFieldModel {
+export class ProposalField extends SmartField<string> implements ProposalFieldModel {
   declare model: ProposalFieldModel;
   declare eventMap: ProposalFieldEventMap;
   declare self: ProposalField;

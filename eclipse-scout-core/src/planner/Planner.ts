@@ -9,18 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CellModel, ContextMenuPopup, DateFormat, DateRange, dates, EnumObject, Event, graphics, HtmlComponent, KeyStrokeContext, Menu, MenuBar, menus as menuUtil, objects, PlannerHeader, PlannerLayout, PlannerMenuItemsOrder, Range, scout,
-  scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel
+  arrays, CellModel, ContextMenuPopup, DateFormat, DateRange, dates, EnumObject, Event, graphics, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, MenuBar, menus as menuUtil, objects, PlannerEventMap, PlannerHeader,
+  PlannerHeaderDisplayModeClickEvent, PlannerLayout, PlannerMenuItemsOrder, PlannerModel, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
-import PlannerModel from './PlannerModel';
-import {YearPanelDateSelectEvent} from '../calendar/YearPanelEventMap';
-import {PlannerHeaderDisplayModeClickEvent} from './PlannerHeaderEventMap';
-import PlannerEventMap from './PlannerEventMap';
-import {JsonDateRange} from '../util/dates';
-import {InitModelOf} from '../scout';
 
-export default class Planner extends Widget implements PlannerModel {
+export class Planner extends Widget implements PlannerModel {
   declare model: PlannerModel;
   declare eventMap: PlannerEventMap;
   declare self: Planner;

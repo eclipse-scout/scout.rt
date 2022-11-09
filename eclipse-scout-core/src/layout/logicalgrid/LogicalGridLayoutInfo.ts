@@ -8,15 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LayoutConstants, LogicalGridData, Rectangle, TreeSet} from '../../index';
+import {arrays, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, InitModelOf, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutInfoModel, Rectangle, TreeSet} from '../../index';
 import $ from 'jquery';
-import {LogicalGridLayoutInfoModel} from './LogicalGridLayoutInfoModel';
-import {InitModelOf} from '../../scout';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.
  */
-export default class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
+export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
   declare model: LogicalGridLayoutInfoModel;
 
   gridDatas: LogicalGridData[];

@@ -10,7 +10,7 @@
  */
 import {strings, styles, TreeNode} from '../index';
 
-export default class CompactTreeNode extends TreeNode {
+export class CompactTreeNode extends TreeNode {
   declare childNodes: CompactTreeNode[];
   declare parentNode: CompactTreeNode;
 

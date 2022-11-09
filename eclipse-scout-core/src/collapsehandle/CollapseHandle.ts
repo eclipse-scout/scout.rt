@@ -12,7 +12,7 @@ import {CollapseHandleEventMap, CollapseHandleModel, EnumObject, Widget} from '.
 
 export type CollapseHandleHorizontalAlignment = EnumObject<typeof CollapseHandle.HorizontalAlignment>;
 
-export default class CollapseHandle extends Widget implements CollapseHandleModel {
+export class CollapseHandle extends Widget implements CollapseHandleModel {
   declare model: CollapseHandleModel;
   declare eventMap: CollapseHandleEventMap;
   declare self: CollapseHandle;

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-export default class Insets {
+export class Insets {
   top: number;
   right: number;
   bottom: number;

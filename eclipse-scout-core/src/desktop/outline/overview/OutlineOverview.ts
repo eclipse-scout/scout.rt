@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Outline, OutlineOverviewModel, scout, Widget} from '../../../index';
-import {DisplayViewId} from '../../../tabbox/SimpleTab';
-import {InitModelOf} from '../../../scout';
+import {DisplayViewId, HtmlComponent, InitModelOf, Outline, OutlineOverviewModel, scout, Widget} from '../../../index';
 
-export default class OutlineOverview extends Widget implements OutlineOverviewModel {
+export class OutlineOverview extends Widget implements OutlineOverviewModel {
   declare model: OutlineOverviewModel;
 
   outline: Outline;

@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../index';
-import CellEditorPopup from './CellEditorPopup';
+import {CellEditorPopup, keys, KeyStroke} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class CellEditorCancelEditKeyStroke extends KeyStroke {
+export class CellEditorCancelEditKeyStroke extends KeyStroke {
   declare field: CellEditorPopup<any>;
 
   constructor(popup: CellEditorPopup<any>) {

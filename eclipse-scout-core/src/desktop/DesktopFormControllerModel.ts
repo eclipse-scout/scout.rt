@@ -10,6 +10,6 @@
  */
 import {Desktop, FormControllerModel} from '../index';
 
-export default interface DesktopFormControllerModel extends FormControllerModel {
+export interface DesktopFormControllerModel extends FormControllerModel {
   displayParent?: Desktop;
 }

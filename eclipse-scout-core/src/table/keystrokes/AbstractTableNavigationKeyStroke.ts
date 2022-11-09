@@ -10,7 +10,7 @@
  */
 import {arrays, graphics, KeyStroke, Rectangle, ScoutKeyboardEvent, Table, TableRow} from '../../index';
 
-export default abstract class AbstractTableNavigationKeyStroke extends KeyStroke {
+export abstract class AbstractTableNavigationKeyStroke extends KeyStroke {
   declare field: Table;
 
   constructor(table: Table) {

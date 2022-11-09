@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateRange, Menu, WidgetModel} from '../index';
-import {PlannerActivity, PlannerDisplayMode, PlannerDisplayModeOptions, PlannerResource, PlannerSelectionMode} from './Planner';
-import {JsonDateRange} from '../util/dates';
-import {ObjectOrChildModel} from '../scout';
+import {DateRange, JsonDateRange, Menu, ObjectOrChildModel, PlannerActivity, PlannerDisplayMode, PlannerDisplayModeOptions, PlannerResource, PlannerSelectionMode, WidgetModel} from '../index';
 
-export default interface PlannerModel extends WidgetModel {
+export interface PlannerModel extends WidgetModel {
   resources?: PlannerResource[];
   displayMode?: PlannerDisplayMode;
   availableDisplayModes?: PlannerDisplayMode[];

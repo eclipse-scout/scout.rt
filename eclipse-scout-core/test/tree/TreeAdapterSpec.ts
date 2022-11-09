@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {defaultValues, RemoteEvent, Tree} from '../../src/index';
-import {TreeSpecHelper} from '../../src/testing/index';
-import {triggerClick, triggerDoubleClick, triggerMouseDown, triggerMouseUp} from '../../src/testing/jquery-testing';
+import {JQueryTesting, TreeSpecHelper} from '../../src/testing/index';
 
 describe('TreeAdapter', () => {
   let session: SandboxSession;
@@ -56,7 +55,7 @@ describe('TreeAdapter', () => {
       tree.render();
 
       let $node = tree.$container.find('.tree-node:first');
-      triggerClick($node);
+      JQueryTesting.triggerClick($node);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -74,7 +73,7 @@ describe('TreeAdapter', () => {
 
       let $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
         .children('div');
-      triggerClick($checkbox);
+      JQueryTesting.triggerClick($checkbox);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -91,8 +90,8 @@ describe('TreeAdapter', () => {
 
       let $node0 = tree.nodes[0].$node;
       let $node1 = tree.nodes[1].$node;
-      triggerMouseDown($node0);
-      triggerMouseUp($node1);
+      JQueryTesting.triggerMouseDown($node0);
+      JQueryTesting.triggerMouseUp($node1);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -114,9 +113,9 @@ describe('TreeAdapter', () => {
       tree.render();
 
       let $node0 = tree.nodes[0].$node;
-      triggerMouseDown($node0);
+      JQueryTesting.triggerMouseDown($node0);
       // @ts-expect-error
-      triggerMouseUp($(window), {
+      JQueryTesting.triggerMouseUp($(window), {
         position: {
           left: 0,
           top: 0
@@ -138,13 +137,13 @@ describe('TreeAdapter', () => {
       jasmine.Ajax.install();
 
       // @ts-expect-error
-      triggerMouseDown($(window), {
+      JQueryTesting.triggerMouseDown($(window), {
         position: {
           left: 0,
           top: 0
         }
       });
-      triggerMouseUp($node0);
+      JQueryTesting.triggerMouseUp($node0);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -159,7 +158,7 @@ describe('TreeAdapter', () => {
       tree.render();
 
       let $node = tree.$container.find('.tree-node:first');
-      triggerDoubleClick($node);
+      JQueryTesting.triggerDoubleClick($node);
 
       sendQueuedAjaxCalls();
 
@@ -175,7 +174,7 @@ describe('TreeAdapter', () => {
       tree.render();
 
       let $node = tree.$container.find('.tree-node:first');
-      triggerDoubleClick($node);
+      JQueryTesting.triggerDoubleClick($node);
 
       sendQueuedAjaxCalls();
 

@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, DesktopNavigation, Dimension, HtmlCompPrefSizeOptions} from '../../index';
 
-export default class DesktopNavigationLayout extends AbstractLayout {
+export class DesktopNavigationLayout extends AbstractLayout {
   navigation: DesktopNavigation;
 
   constructor(navigation: DesktopNavigation) {

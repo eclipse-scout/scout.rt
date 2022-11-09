@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionKeyStroke, HtmlComponent, KeyStrokeContext, NullLayout, scout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke, TableControlModel, TableFooter, TooltipSupport} from '../../index';
-import AbstractLayout from '../../layout/AbstractLayout';
-import {InitModelOf} from '../../scout';
+import {
+  AbstractLayout, Action, ActionKeyStroke, HtmlComponent, InitModelOf, KeyStrokeContext, NullLayout, scout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke, TableControlModel, TableFooter, TooltipSupport
+} from '../../index';
 
-export default class TableControl extends Action implements TableControlModel {
+export class TableControl extends Action implements TableControlModel {
   declare model: TableControlModel;
 
   tableFooter: TableFooter;

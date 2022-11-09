@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import Table from '../Table';
-import {Filter, Session, TableRow} from '../../index';
-import {ObjectModel} from '../../scout';
+import {Filter, ObjectModel, Session, Table, TableRow} from '../../index';
 
-export default interface TableUserFilterModel extends ObjectModel<Filter<TableRow>> {
+export interface TableUserFilterModel extends ObjectModel<Filter<TableRow>> {
   table?: Table;
   session?: Session;
   filterType?: string;

@@ -10,7 +10,7 @@
  */
 import {LookupRow, QueryBy} from '../index';
 
-export default interface LookupResult<Key> {
+export interface LookupResult<Key> {
   lookupRows: LookupRow<Key>[];
   queryBy: QueryBy;
 

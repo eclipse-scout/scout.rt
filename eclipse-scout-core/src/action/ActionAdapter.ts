@@ -10,7 +10,7 @@
  */
 import {Action, Event, ModelAdapter} from '../index';
 
-export default class ActionAdapter extends ModelAdapter {
+export class ActionAdapter extends ModelAdapter {
   declare widget: Action;
 
   constructor() {

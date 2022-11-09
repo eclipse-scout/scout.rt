@@ -14,7 +14,7 @@ export type ResponsiveState = EnumObject<typeof ResponsiveManager.ResponsiveStat
 
 let instance: ResponsiveManager;
 
-export default class ResponsiveManager {
+export class ResponsiveManager {
   active: boolean;
   globalState: ResponsiveState;
   protected _responsiveHandlers: ResponsiveHandler[];

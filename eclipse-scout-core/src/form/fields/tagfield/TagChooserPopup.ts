@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Column, lookupField, LookupResult, Popup, scout, ScoutKeyboardEvent, Table, TableRow, TagChooserPopupEventMap, TagChooserPopupLayout, TagChooserPopupModel, TagField} from '../../../index';
-import {TableRowClickEvent} from '../../../table/TableEventMap';
-import {InitModelOf} from '../../../scout';
-import {SomeRequired} from '../../../types';
+import {
+  AbstractLayout, Column, InitModelOf, lookupField, LookupResult, Popup, scout, ScoutKeyboardEvent, SomeRequired, Table, TableRow, TableRowClickEvent, TagChooserPopupEventMap, TagChooserPopupLayout, TagChooserPopupModel, TagField
+} from '../../../index';
 
-export default class TagChooserPopup extends Popup implements TagChooserPopupModel {
+export class TagChooserPopup extends Popup implements TagChooserPopupModel {
   declare model: TagChooserPopupModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
   declare eventMap: TagChooserPopupEventMap;

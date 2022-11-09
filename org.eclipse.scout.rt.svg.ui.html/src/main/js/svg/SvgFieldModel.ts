@@ -10,6 +10,6 @@
  */
 import {FormFieldModel} from '@eclipse-scout/core';
 
-export default interface SvgFieldModel extends FormFieldModel {
+export interface SvgFieldModel extends FormFieldModel {
   svgDocument?: string;
 }

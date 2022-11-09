@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Locale, Session, UserAgent} from '../index';
-import {ObjectModel, ObjectOrModel} from '../scout';
-import {AjaxCallModel} from '../ajax/AjaxCall';
+import {AjaxCallModel, Locale, ObjectModel, ObjectOrModel, Session, UserAgent} from '../index';
 
-export default interface SessionModel extends ObjectModel<Session> {
+export interface SessionModel extends ObjectModel<Session> {
   /**
    * The HTML element that is used by the {@link Desktop} to render its content.
    */

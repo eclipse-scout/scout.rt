@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {CheckBoxField, keys, scout, ValueField} from '../../../../src/index';
-import {triggerKeyInputCapture} from '../../../../src/testing/jquery-testing';
+import {JQueryTesting} from '../../../../src/testing';
 
 describe('CheckBoxField', () => {
   let session: SandboxSession;
@@ -82,22 +82,22 @@ describe('CheckBoxField', () => {
       field.render();
       expect(field.value).toBe(null);
 
-      triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.value).toBe(true);
 
-      triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.value).toBe(false);
 
       // Set another keystroke -> only the new one has to be active
       field.setKeyStroke('ctrl-g');
-      triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.value).toBe(false);
-      triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
       expect(field.value).toBe(true);
 
       // Remove keystroke -> value should stay unchanged because keystroke must not be executed
       field.setKeyStroke(null);
-      triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
+      JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
       expect(field.value).toBe(true);
     });
 

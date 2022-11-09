@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LookupRow, QueryBy, RemoteEvent, scout, SmartField, SmartFieldPopup, Status} from '../../../../src/index';
-import {FormSpecHelper} from '../../../../src/testing/index';
-import {triggerClick} from '../../../../src/testing/jquery-testing';
+import {FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 
 /* global linkWidgetAndAdapter */
 describe('SmartFieldRemote', () => {
@@ -214,7 +213,7 @@ describe('SmartFieldRemote', () => {
         lookupCallClone = event.lookupCall;
       });
 
-      triggerClick(smartField.$field);
+      JQueryTesting.triggerClick(smartField.$field);
       resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect($('.touch-popup').length).toBe(1);
@@ -226,7 +225,7 @@ describe('SmartFieldRemote', () => {
       expect($('.smart-field-popup').length).toBe(0);
 
       // Expect same behavior after a second click
-      triggerClick(smartField.$field);
+      JQueryTesting.triggerClick(smartField.$field);
       resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect($('.touch-popup').length).toBe(1);
@@ -242,7 +241,7 @@ describe('SmartFieldRemote', () => {
       smartField.on('prepareLookupCall', event => {
         lookupCallClone = event.lookupCall;
       });
-      triggerClick(smartField.$field);
+      JQueryTesting.triggerClick(smartField.$field);
       resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect(smartField.popup._field.displayText).toBe(smartField.displayText);

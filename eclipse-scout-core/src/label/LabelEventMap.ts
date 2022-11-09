@@ -14,7 +14,7 @@ export interface LabelAppLinkActionEvent<L extends Label = Label> extends Event<
   ref: string;
 }
 
-export default interface LabelEventMap extends WidgetEventMap {
+export interface LabelEventMap extends WidgetEventMap {
   'appLinkAction': LabelAppLinkActionEvent;
   'propertyChange:htmlEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:scrollable': PropertyChangeEvent<boolean>;

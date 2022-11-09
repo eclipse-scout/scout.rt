@@ -9,14 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  CollapseHandle, CompositeField, Dimension, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, KeyStroke, PropertyChangeEvent, scout, SplitBoxCollapseKeyStroke, SplitBoxEventMap, SplitBoxFirstCollapseKeyStroke, SplitBoxLayout,
-  SplitBoxModel, SplitBoxSecondCollapseKeyStroke
+  CollapseHandle, CollapseHandleHorizontalAlignment, CompositeField, Dimension, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStroke, PropertyChangeEvent, scout, SplitBoxCollapseKeyStroke, SplitBoxEventMap,
+  SplitBoxFirstCollapseKeyStroke, SplitBoxLayout, SplitBoxModel, SplitBoxSecondCollapseKeyStroke
 } from '../../../index';
 import $ from 'jquery';
-import {CollapseHandleHorizontalAlignment} from '../../../collapsehandle/CollapseHandle';
-import {InitModelOf} from '../../../scout';
 
-export default class SplitBox extends CompositeField {
+export class SplitBox extends CompositeField {
   declare model: SplitBoxModel;
   declare eventMap: SplitBoxEventMap;
   declare self: SplitBox;

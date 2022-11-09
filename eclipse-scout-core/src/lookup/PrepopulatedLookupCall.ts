@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupCall, LookupRow, QueryBy, scout, strings} from '../index';
+import {arrays, LookupCall, LookupResult, LookupRow, QueryBy, scout, strings} from '../index';
 import $ from 'jquery';
-import LookupResult from './LookupResult';
 import Deferred = JQuery.Deferred;
 
-export default class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
+export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
 
   lookupRows: LookupRow<TKey>[];
 

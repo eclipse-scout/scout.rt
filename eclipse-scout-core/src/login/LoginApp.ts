@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, LoginAppModel, LoginBox, ObjectFactory, scout, texts} from '../index';
+import {App, AppBootstrapOptions, InitModelOf, LoginAppModel, LoginBox, ObjectFactory, scout, texts} from '../index';
 import $ from 'jquery';
-import {AppBootstrapOptions} from '../App';
-import {InitModelOf} from '../scout';
 
-export default class LoginApp extends App {
+export class LoginApp extends App {
 
   declare model: LoginAppModel;
 

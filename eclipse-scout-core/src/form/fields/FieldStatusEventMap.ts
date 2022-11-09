@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, FieldStatus, Menu, PropertyChangeEvent, Status, WidgetEventMap} from '../../index';
-import {FormFieldStatusPosition} from './FormField';
+import {Event, FieldStatus, FormFieldStatusPosition, Menu, PropertyChangeEvent, Status, WidgetEventMap} from '../../index';
 
-export default interface FieldStatusEventMap extends WidgetEventMap {
+export interface FieldStatusEventMap extends WidgetEventMap {
   'hideTooltip': Event<FieldStatus>;
   'showTooltip': Event<FieldStatus>;
   'statusMouseDown': Event<FieldStatus> & JQuery.MouseDownEvent;

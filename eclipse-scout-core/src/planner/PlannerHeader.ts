@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Planner, PlannerHeaderEventMap, Widget} from '../index';
+import {Planner, PlannerDisplayMode, PlannerHeaderEventMap, Widget} from '../index';
 import $ from 'jquery';
-import {PlannerDisplayMode} from './Planner';
 
-export default class PlannerHeader extends Widget {
+export class PlannerHeader extends Widget {
   declare eventMap: PlannerHeaderEventMap;
   declare self: PlannerHeader;
 

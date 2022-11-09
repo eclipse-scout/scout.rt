@@ -19,7 +19,7 @@ export interface SmartColumnPrepareLookupCallEvent<TValue = any, S extends Smart
   row?: TableRow;
 }
 
-export default interface SmartColumnEventMap<TValue> extends ColumnEventMap {
+export interface SmartColumnEventMap<TValue> extends ColumnEventMap {
   'lookupCallDone': SmartColumnCallDoneEvent<TValue>;
   'prepareLookupCall': SmartColumnPrepareLookupCallEvent<TValue>;
   'propertyChange:activeFilterEnabled': PropertyChangeEvent<boolean>;

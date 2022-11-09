@@ -10,7 +10,7 @@
  */
 import {DateField, DateFormat, TouchPopupModel} from '../index';
 
-export default interface DatePickerTouchPopupModel extends TouchPopupModel {
+export interface DatePickerTouchPopupModel extends TouchPopupModel {
   field?: DateField;
   dateFormat?: DateFormat;
   allowedDates?: Date[];

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tile, WidgetModel} from '../index';
-import {ObjectOrChildModel} from '../scout';
+import {ObjectOrChildModel, Tile, WidgetModel} from '../index';
 
-export default interface TableRowTileMappingModel extends WidgetModel {
+export interface TableRowTileMappingModel extends WidgetModel {
   tableRow?: string;
   tile?: ObjectOrChildModel<Tile>;
 }

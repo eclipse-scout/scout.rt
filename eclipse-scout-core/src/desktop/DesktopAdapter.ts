@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, Outline, Widget} from '../index';
-import {DesktopHistoryState} from './Desktop';
-import {DesktopCancelFormsEvent, DesktopFormActivateEvent} from './DesktopEventMap';
+import {
+  Desktop, DesktopCancelFormsEvent, DesktopFormActivateEvent, DesktopHistoryState, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, Outline, Widget
+} from '../index';
 
-export default class DesktopAdapter extends ModelAdapter {
+export class DesktopAdapter extends ModelAdapter {
   declare widget: Desktop;
 
   constructor() {

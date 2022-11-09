@@ -10,6 +10,6 @@
  */
 import {BreadcrumbItem, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface BreadcrumbBarEventMap extends WidgetEventMap {
+export interface BreadcrumbBarEventMap extends WidgetEventMap {
   'propertyChange:breadcrumbItems': PropertyChangeEvent<BreadcrumbItem[]>;
 }

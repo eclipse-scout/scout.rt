@@ -10,7 +10,7 @@
  */
 import {FormField} from '../../../index';
 
-export default class PlaceholderField extends FormField {
+export class PlaceholderField extends FormField {
 
   protected override _render() {
     this.addContainer(this.$parent, 'placeholder-field');

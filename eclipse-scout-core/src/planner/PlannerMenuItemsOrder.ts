@@ -10,7 +10,7 @@
  */
 import {MenuItemsOrder, Session} from '../index';
 
-export default class PlannerMenuItemsOrder extends MenuItemsOrder {
+export class PlannerMenuItemsOrder extends MenuItemsOrder {
 
   constructor(session: Session, objectType: string) {
     super(session, objectType);

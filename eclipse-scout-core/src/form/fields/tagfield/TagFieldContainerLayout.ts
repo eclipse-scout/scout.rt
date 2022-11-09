@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, HtmlComponent, TagField} from '../../../index';
 
-export default class TagFieldContainerLayout extends AbstractLayout {
+export class TagFieldContainerLayout extends AbstractLayout {
   tagField: TagField;
 
   constructor(tagField: TagField) {

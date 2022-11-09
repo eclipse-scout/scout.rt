@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Menu, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, Widget} from '../../index';
-import {InitModelOf, ObjectOrChildModel} from '../../scout';
+import {HtmlComponent, InitModelOf, Menu, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, ObjectOrChildModel, Widget} from '../../index';
 
-export default class MenuBox extends Widget implements MenuBoxModel {
+export class MenuBox extends Widget implements MenuBoxModel {
   declare model: MenuBoxModel;
   declare eventMap: MenuBoxEventMap;
   declare self: MenuBox;

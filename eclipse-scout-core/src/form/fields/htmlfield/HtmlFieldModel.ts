@@ -10,7 +10,7 @@
  */
 import {ValueFieldModel} from '../../../index';
 
-export default interface HtmlFieldModel extends ValueFieldModel<string> {
+export interface HtmlFieldModel extends ValueFieldModel<string> {
   scrollBarEnabled?: boolean;
   selectable?: boolean;
   scrollToAnchor?: string;

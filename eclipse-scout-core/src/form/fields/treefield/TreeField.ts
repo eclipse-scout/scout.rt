@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, Tree, TreeFieldEventMap, TreeFieldModel, Widget} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {FormField, ObjectOrChildModel, Tree, TreeFieldEventMap, TreeFieldModel, Widget} from '../../../index';
 
-export default class TreeField extends FormField implements TreeFieldModel {
+export class TreeField extends FormField implements TreeFieldModel {
   declare model: TreeFieldModel;
   declare eventMap: TreeFieldEventMap;
   declare self: TreeField;

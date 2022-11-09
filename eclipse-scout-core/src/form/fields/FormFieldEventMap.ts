@@ -8,15 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, FormField, GridData, KeyStroke, Menu, PropertyChangeEvent, Status, WidgetEventMap} from '../../index';
-import {DropType, FileDropEvent} from '../../util/dragAndDrop';
-import {FormFieldLabelPosition, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor} from './FormField';
+import {
+  DropType, Event, FileDropEvent, FormField, FormFieldLabelPosition, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor, GridData, KeyStroke, Menu, PropertyChangeEvent, Status, WidgetEventMap
+} from '../../index';
 
 export interface FormFieldClipboardExportEvent<T = FormField> extends Event<T> {
   text: string;
 }
 
-export default interface FormFieldEventMap extends WidgetEventMap {
+export interface FormFieldEventMap extends WidgetEventMap {
   'clipboardExport': FormFieldClipboardExportEvent;
   'drop': Event<FormField> & FileDropEvent;
   'propertyChange:backgroundColor': PropertyChangeEvent<string>;

@@ -11,7 +11,7 @@
 import {ContextMenuPopup, HAlign, keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes, ScoutKeyboardEvent} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
+export class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
 
   constructor(popup: ContextMenuPopup, menuItemClass: string) {
     super(popup, menuItemClass);

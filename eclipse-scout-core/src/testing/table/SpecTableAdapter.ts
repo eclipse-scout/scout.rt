@@ -10,7 +10,7 @@
  */
 import {TableAdapter, TableRowModel} from '../../index';
 
-export default class SpecTableAdapter extends TableAdapter {
+export class SpecTableAdapter extends TableAdapter {
   override _onRowsDeleted(rowIds: string[]) {
     super._onRowsDeleted(rowIds);
   }

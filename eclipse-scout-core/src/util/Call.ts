@@ -8,16 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CallModel, objects, scout, strings} from '../index';
+import {arrays, CallModel, InitModelOf, objects, scout, strings} from '../index';
 import $ from 'jquery';
-import {InitModelOf} from '../scout';
 
 /**
  * Represents a robust "call" that, when it fails, is retried automatically for a specific
  * number of times, before failing ultimately. The call implementation must be provided
  * by a subclass by overriding the _callImpl() method.
  */
-export default abstract class Call implements CallModel {
+export abstract class Call implements CallModel {
   declare model: CallModel;
 
   retryIntervals: number[];

@@ -8,13 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Event, graphics, icons, Insets, Point, Popup, PopupLayout, Resizable, scout, Widget, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel} from '../index';
+import {Action, Event, graphics, icons, InitModelOf, Insets, ObjectOrChildModel, Point, Popup, PopupAlignment, PopupLayout, Resizable, ResizableMode, scout, Widget, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel} from '../index';
 import $ from 'jquery';
-import {ResizableMode} from '../resizable/Resizable';
-import {PopupAlignment} from './Popup';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
 
-export default class WidgetPopup<TContent extends Widget = Widget> extends Popup implements WidgetPopupModel<TContent> {
+export class WidgetPopup<TContent extends Widget = Widget> extends Popup implements WidgetPopupModel<TContent> {
   declare model: WidgetPopupModel<TContent>;
   declare eventMap: WidgetPopupEventMap;
   declare self: WidgetPopup;

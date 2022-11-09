@@ -10,7 +10,7 @@
  */
 import {Button, HAlign, KeyStroke, ScoutKeyboardEvent} from '../../../index';
 
-export default class ButtonKeyStroke extends KeyStroke {
+export class ButtonKeyStroke extends KeyStroke {
   declare field: Button;
 
   constructor(button: Button, keyStroke: string) {

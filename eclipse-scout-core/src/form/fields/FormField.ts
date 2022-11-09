@@ -9,20 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, arrays, clipboard, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, fields, FieldStatus, FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HtmlComponent,
-  KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, objects, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitResult, Widget
+  AbstractLayout, Action, arrays, clipboard, CloneOptions, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
+  FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel, objects, Predicate, PropertyChangeEvent, scout, Status,
+  StatusMenuMapping, StatusOrModel, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
-import {DragAndDropOptions, DropType} from '../../util/dragAndDrop';
-import {StatusOrModel} from '../../status/Status';
-import {CloneOptions} from '../../widget/Widget';
-import {FormFieldClipboardExportEvent} from './FormFieldEventMap';
-import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
 /**
  * Base class for all form-fields.
  */
-export default class FormField extends Widget implements FormFieldModel {
+export class FormField extends Widget implements FormFieldModel {
   declare model: FormFieldModel;
   declare eventMap: FormFieldEventMap;
   declare self: FormField;

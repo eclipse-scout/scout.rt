@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CarouselLayout, CarouselModel, events, GridData, HtmlComponent, SingleLayout, Widget} from '../index';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
+import {arrays, CarouselLayout, CarouselModel, events, GridData, HtmlComponent, InitModelOf, ObjectOrChildModel, SingleLayout, Widget} from '../index';
 
-export default class Carousel extends Widget implements CarouselModel {
+export class Carousel extends Widget implements CarouselModel {
   declare model: CarouselModel;
 
   statusEnabled: boolean;

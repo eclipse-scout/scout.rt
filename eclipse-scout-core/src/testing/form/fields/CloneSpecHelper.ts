@@ -10,7 +10,7 @@
  */
 import {Widget} from '../../../index';
 
-export default class CloneSpecHelper {
+export class CloneSpecHelper {
 
   validateClone(original: Widget, clone: Widget) {
     let properties = original._cloneProperties.filter(prop => {

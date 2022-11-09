@@ -8,13 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, Device, OpenUriHandlerModel, PopupBlockerHandler, scout, Session} from '../index';
+import {Desktop, DesktopUriAction, Device, InitModelOf, OpenUriHandlerModel, PopupBlockerHandler, scout, Session, SomeRequired} from '../index';
 import $ from 'jquery';
-import {DesktopUriAction} from './Desktop';
-import {SomeRequired} from '../types';
-import {InitModelOf} from '../scout';
 
-export default class OpenUriHandler implements OpenUriHandlerModel {
+export class OpenUriHandler implements OpenUriHandlerModel {
   declare model: OpenUriHandlerModel;
   declare initModel: SomeRequired<this['model'], 'session'>;
 

@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopup, EventHandler, FieldStatusEventMap, FieldStatusModel, FormField, HierarchyChangeEvent, HtmlComponent, Menu, PropertyChangeEvent, scout, Status, strings, Tooltip, Widget} from '../../index';
-import {FormFieldStatusPosition} from './FormField';
-import {StatusOrModel} from '../../status/Status';
+import {
+  arrays, ContextMenuPopup, EventHandler, FieldStatusEventMap, FieldStatusModel, FormField, FormFieldStatusPosition, HierarchyChangeEvent, HtmlComponent, Menu, PropertyChangeEvent, scout, Status, StatusOrModel, strings, Tooltip, Widget
+} from '../../index';
 
-export default class FieldStatus extends Widget implements FieldStatusModel {
+export class FieldStatus extends Widget implements FieldStatusModel {
   declare model: FieldStatusModel;
   declare eventMap: FieldStatusEventMap;
   declare self: FieldStatus;

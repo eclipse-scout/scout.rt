@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {BooleanColumn, Cell, TableRow} from '../../../src/index';
-import {TableSpecHelper} from '../../../src/testing/index';
-import {triggerClick} from '../../../src/testing/jquery-testing';
+import {JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
 
 describe('BooleanColumn', () => {
   let session: SandboxSession;
@@ -112,7 +111,7 @@ describe('BooleanColumn', () => {
         expect(event.mouseButton).toBe(1);
         expect(event.column).toBe(column0);
       });
-      triggerClick(table.$cell(0, table.rows[1].$row));
+      JQueryTesting.triggerClick(table.$cell(0, table.rows[1].$row));
     });
 
     describe('setCellValue', () => {

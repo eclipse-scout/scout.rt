@@ -16,7 +16,7 @@ export interface MenuOrder {
 
 export type OrderedMenuItems = { left: Menu[]; right: Menu[]; all: Menu[] };
 
-export default class MenuItemsOrder implements MenuOrder, ObjectWithType {
+export class MenuItemsOrder implements MenuOrder, ObjectWithType {
   session: Session;
   objectType: string;
   emptySpaceTypes: string[];

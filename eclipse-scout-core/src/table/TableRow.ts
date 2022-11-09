@@ -9,14 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {AggregateTableRow} from './Table';
-import {Cell, EnumObject, LookupRow, Page, Table, TableRowModel} from '../index';
-import {SomeRequired} from '../types';
-import {InitModelOf} from '../scout';
+import {AggregateTableRow, Cell, EnumObject, InitModelOf, LookupRow, Page, SomeRequired, Table, TableRowModel} from '../index';
 
 export type TableRowStatus = EnumObject<typeof TableRow.Status>;
 
-export default class TableRow implements TableRowModel {
+export class TableRow implements TableRowModel {
   declare model: TableRowModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
 

@@ -10,7 +10,7 @@
  */
 import {ValueFieldModel} from '../../../index';
 
-export default interface CheckBoxFieldModel extends ValueFieldModel<boolean> {
+export interface CheckBoxFieldModel extends ValueFieldModel<boolean> {
   /**
    * <ul>
    * <li>true: the check box can have a value of true, false and null. Null is the third state that represents "undefined".

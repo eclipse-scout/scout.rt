@@ -10,6 +10,6 @@
  */
 import {Outline, ViewButtonModel} from '../../index';
 
-export default interface OutlineViewButtonModel extends ViewButtonModel {
+export interface OutlineViewButtonModel extends ViewButtonModel {
   outline?: Outline;
 }

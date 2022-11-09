@@ -10,7 +10,7 @@
  */
 import {ActionModel} from '../index';
 
-export default interface ModeModel<TRef = any> extends ActionModel {
+export interface ModeModel<TRef = any> extends ActionModel {
   /**
    *  Arbitrary reference value, can be used to find and select modes (see {@link ModeSelector}).
    *  Default is null.

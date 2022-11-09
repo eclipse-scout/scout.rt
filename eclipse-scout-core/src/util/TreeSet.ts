@@ -13,7 +13,7 @@ import {comparators, objects} from '../index';
 /**
  * JavaScript port from java.util.TreeSet.
  */
-export default class TreeSet<T extends string | number> {
+export class TreeSet<T extends string | number> {
   array: T[];
   properties: { [key: string | number]: boolean };
   comparator: { compare: (a: T, b: T) => number };

@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dragAndDrop, files as fileUtil, MessageBoxes, Status, Widget} from '../index';
+import {arrays, dragAndDrop, DragAndDropOptions, DropType, DropValidationErrorMessage, FileDropEvent, files as fileUtil, MessageBoxes, MessageBoxOption, Status, Widget} from '../index';
 import $ from 'jquery';
-import {DragAndDropOptions, DropType, DropValidationErrorMessage, FileDropEvent} from './dragAndDrop';
-import {MessageBoxOption} from '../messagebox/MessageBox';
 
-export default class DragAndDropHandler {
+export class DragAndDropHandler {
   additionalDropProperties: (event: JQuery.DropEvent) => Record<string, string | Blob>;
   allowedTypes: () => string[];
   dropType: () => DropType;

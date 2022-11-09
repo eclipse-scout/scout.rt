@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionModel} from '../index';
-import {PopupAlignment} from '../popup/Popup';
-import Menu, {MenuFilter, SubMenuVisibility} from './Menu';
-import {ObjectOrChildModel} from '../scout';
+import {ActionModel, Menu, MenuFilter, ObjectOrChildModel, PopupAlignment, SubMenuVisibility} from '../index';
 
-export default interface MenuModel extends ActionModel {
+export interface MenuModel extends ActionModel {
   childActions?: ObjectOrChildModel<Menu>[];
   /**
    * A menu type provides a way to control the visibility of a menu for common use cases.

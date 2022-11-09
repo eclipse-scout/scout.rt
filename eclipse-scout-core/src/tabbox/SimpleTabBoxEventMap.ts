@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, SimpleTabBox, WidgetEventMap} from '../index';
-import {SimpleTabView} from './SimpleTab';
+import {Event, SimpleTabBox, SimpleTabView, WidgetEventMap} from '../index';
 
 export interface SimpleTabBoxViewActivateEvent<TView extends SimpleTabView = SimpleTabView, S extends SimpleTabBox<TView> = SimpleTabBox<TView>> extends Event<S> {
   view: TView;
@@ -28,7 +27,7 @@ export interface SimpleTabBoxViewRemoveEvent<TView extends SimpleTabView = Simpl
   view: TView;
 }
 
-export default interface SimpleTabBoxEventMap<TView extends SimpleTabView = SimpleTabView> extends WidgetEventMap {
+export interface SimpleTabBoxEventMap<TView extends SimpleTabView = SimpleTabView> extends WidgetEventMap {
   'viewActivate': SimpleTabBoxViewActivateEvent<TView>;
   'viewAdd': SimpleTabBoxViewAddEvent<TView>;
   'viewDeactivate': SimpleTabBoxViewDeactivateEvent<TView>;

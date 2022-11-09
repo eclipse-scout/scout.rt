@@ -10,7 +10,7 @@
  */
 import {Cell, CompactLineBlock, scout} from '../../index';
 
-export default class CompactLine {
+export class CompactLine {
 
   labelBlock: CompactLineBlock;
   textBlock: CompactLineBlock;

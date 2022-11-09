@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import * as models from '../../src/util/models';
+import {models} from '../../src/index';
 
 describe('scout.models', () => {
 

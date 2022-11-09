@@ -14,7 +14,7 @@ export interface TimePickerTimeSelectEvent<T = TimePicker> extends Event<T> {
   time: Date;
 }
 
-export default interface TimePickerEventMap extends WidgetEventMap {
+export interface TimePickerEventMap extends WidgetEventMap {
   'timeSelect': TimePickerTimeSelectEvent;
   'propertyChange:preselectedTime': PropertyChangeEvent<Date>;
   'propertyChange:selectedTime': PropertyChangeEvent<Date>;

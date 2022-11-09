@@ -10,7 +10,7 @@
  */
 import {Event, EventMap, PopupWindow} from '../index';
 
-export default interface PopupWindowEventMap extends EventMap {
+export interface PopupWindowEventMap extends EventMap {
   'init': Event;
   'popupWindowUnload': Event & PopupWindow;
 }

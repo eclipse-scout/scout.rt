@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, FilterOrFunction, Menu, TreeNode, WidgetModel} from '../index';
-import {TreeCheckableStyle, TreeDisplayStyle} from './Tree';
-import {ObjectOrChildModel, ObjectOrModel} from '../scout';
+import {Action, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, TreeCheckableStyle, TreeDisplayStyle, TreeNode, WidgetModel} from '../index';
 
-export default interface TreeModel extends WidgetModel {
+export interface TreeModel extends WidgetModel {
   /**
    * Default is false.
    */

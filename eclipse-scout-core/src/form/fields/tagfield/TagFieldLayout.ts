@@ -10,7 +10,7 @@
  */
 import {FormFieldLayout, TagField} from '../../../index';
 
-export default class TagFieldLayout extends FormFieldLayout {
+export class TagFieldLayout extends FormFieldLayout {
   declare formField: TagField;
 
   constructor(field: TagField) {

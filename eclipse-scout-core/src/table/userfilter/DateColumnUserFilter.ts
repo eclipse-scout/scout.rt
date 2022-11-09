@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, DateColumn, DateColumnUserFilterModel, DateField, dates, FilterFieldsGroupBox, PropertyChangeEvent, TableMatrix, TableRow} from '../../index';
+import {
+  ColumnUserFilter, ColumnUserFilterModel, DateColumn, DateColumnUserFilterModel, DateField, dates, FilterFieldsGroupBox, InitModelOf, PropertyChangeEvent, TableMatrix, TableMatrixDateGroup, TableMatrixNumberGroup, TableRow,
+  TableUserFilterAddedEventData
+} from '../../index';
 import $ from 'jquery';
-import {TableMatrixDateGroup, TableMatrixNumberGroup} from '../TableMatrix';
-import {TableUserFilterAddedEventData} from './TableUserFilter';
-import ColumnUserFilterModel from './ColumnUserFilterModel';
-import {InitModelOf} from '../../scout';
 
-export default class DateColumnUserFilter extends ColumnUserFilter implements ColumnUserFilterModel {
+export class DateColumnUserFilter extends ColumnUserFilter implements ColumnUserFilterModel {
   declare model: DateColumnUserFilterModel;
   declare column: DateColumn;
 

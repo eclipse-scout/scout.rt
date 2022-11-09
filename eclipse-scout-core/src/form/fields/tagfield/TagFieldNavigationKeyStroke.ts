@@ -8,16 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke, ScoutKeyboardEvent, TagBar} from '../../../index';
+import {Alignment, keys, KeyStroke, ScoutKeyboardEvent, TagBar, TagFieldKeyStrokeAdapter} from '../../../index';
 import $ from 'jquery';
-import {TagFieldKeyStrokeAdapter} from './TagField';
-import {Alignment} from '../../../cell/Cell';
 
 /**
  * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagBarOverflowPopup.
  *
  */
-export default class TagFieldNavigationKeyStroke extends KeyStroke {
+export class TagFieldNavigationKeyStroke extends KeyStroke {
   fieldAdapter: TagFieldKeyStrokeAdapter;
 
   constructor(fieldAdapter: TagFieldKeyStrokeAdapter) {

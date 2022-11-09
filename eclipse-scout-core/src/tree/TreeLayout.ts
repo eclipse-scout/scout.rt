@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, MenuBarLayout, scrollbars, Tree} from '../index';
 
-export default class TreeLayout extends AbstractLayout {
+export class TreeLayout extends AbstractLayout {
   tree: Tree;
   nodeDimensionsDirty: boolean;
 

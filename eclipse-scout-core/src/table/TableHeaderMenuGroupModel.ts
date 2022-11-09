@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface TableHeaderMenuGroupModel extends WidgetModel {
+export interface TableHeaderMenuGroupModel extends WidgetModel {
   text?: string;
   textKey?: string;
   last?: boolean;

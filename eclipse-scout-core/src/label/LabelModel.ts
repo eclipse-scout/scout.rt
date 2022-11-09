@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface LabelModel extends WidgetModel {
+export interface LabelModel extends WidgetModel {
   value?: string;
   /**
    * Configures, if HTML rendering is enabled.

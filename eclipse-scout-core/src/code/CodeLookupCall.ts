@@ -10,7 +10,7 @@
  */
 import {Code, codes, LookupCallModel, LookupRow, Predicate, scout, StaticLookupCall, strings} from '../index';
 
-export default class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
+export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
   declare model: CodeLookupCallModel<TCodeId>;
   codeType: string;
 

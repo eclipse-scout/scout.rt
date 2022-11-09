@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Page, PageWithTable, Table, TableRow} from '../../index';
-import {TableRowActionEvent, TableRowOrderChangedEvent, TableRowsUpdatedEvent} from '../../table/TableEventMap';
-import {InitModelOf} from '../../scout';
+import {Event, InitModelOf, Page, PageWithTable, Table, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsUpdatedEvent} from '../../index';
 
-export default class OutlineMediator {
+export class OutlineMediator {
 
   init(model: InitModelOf<this>) {
     // NOP

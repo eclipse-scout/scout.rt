@@ -10,7 +10,7 @@
  */
 import {Dimension, HtmlCompPrefSizeOptions, HtmlEnvironment, PopupLayout, TouchPopup} from '../index';
 
-export default class TouchPopupLayout extends PopupLayout {
+export class TouchPopupLayout extends PopupLayout {
 
   declare popup: TouchPopup;
 

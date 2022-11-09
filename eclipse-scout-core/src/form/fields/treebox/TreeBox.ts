@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupBox, LookupResult, LookupRow, objects, scout, Tree, TreeBoxLayout, TreeBoxModel, TreeNode, Widget} from '../../../index';
-import {TreeNodesCheckedEvent} from '../../../tree/TreeEventMap';
-import {TreeNodeUncheckOptions} from '../../../tree/Tree';
-import {InitModelOf} from '../../../scout';
+import {arrays, InitModelOf, LookupBox, LookupResult, LookupRow, objects, scout, Tree, TreeBoxLayout, TreeBoxModel, TreeNode, TreeNodesCheckedEvent, TreeNodeUncheckOptions, Widget} from '../../../index';
 
-export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<TValue> {
+export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<TValue> {
   tree: Tree;
   protected _populating: boolean;
 

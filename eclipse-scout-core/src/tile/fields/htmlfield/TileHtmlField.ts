@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlField} from '../../../index';
-import {ScrollbarInstallOptions} from '../../../scrollbar/scrollbars';
+import {HtmlField, ScrollbarInstallOptions} from '../../../index';
 
-export default class TileHtmlField extends HtmlField {
+export class TileHtmlField extends HtmlField {
 
   protected override _render() {
     super._render();

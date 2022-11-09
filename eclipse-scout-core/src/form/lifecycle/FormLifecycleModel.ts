@@ -10,6 +10,6 @@
  */
 import {Form, LifecycleModel} from '../../index';
 
-export default interface FormLifecycleModel extends LifecycleModel {
+export interface FormLifecycleModel extends LifecycleModel {
   widget?: Form;
 }

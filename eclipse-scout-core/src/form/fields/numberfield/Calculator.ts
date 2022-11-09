@@ -18,7 +18,7 @@
  * no grouping character
  * no whitespace
  */
-export default class Calculator {
+export class Calculator {
 
   protected _tokens: string[];
 

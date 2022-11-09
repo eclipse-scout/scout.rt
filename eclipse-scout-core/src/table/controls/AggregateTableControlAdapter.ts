@@ -10,7 +10,7 @@
  */
 import {AggregateTableControl, App, objects, TableControlAdapter} from '../../index';
 
-export default class AggregateTableControlAdapter extends TableControlAdapter {
+export class AggregateTableControlAdapter extends TableControlAdapter {
   static modifyAggregateTableControlPrototype() {
     if (!App.get().remote) {
       return;

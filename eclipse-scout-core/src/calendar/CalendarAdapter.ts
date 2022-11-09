@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, dates, Event, ModelAdapter} from '../index';
-import {JsonDateRange} from '../util/dates';
-import {CalendarComponentMoveEvent} from './CalendarEventMap';
+import {Calendar, CalendarComponentMoveEvent, dates, Event, JsonDateRange, ModelAdapter} from '../index';
 
-export default class CalendarAdapter extends ModelAdapter {
+export class CalendarAdapter extends ModelAdapter {
   declare widget: Calendar;
 
   /**

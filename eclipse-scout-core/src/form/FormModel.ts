@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FileChooser, FileChooserController, Form, FormController, GroupBox, KeyStroke, MessageBox, MessageBoxController, Widget, WidgetModel} from '../index';
-import {DisplayHint} from './Form';
-import {ObjectOrChildModel} from '../scout';
-import {StatusOrModel} from '../status/Status';
+import {DisplayHint, FileChooser, FileChooserController, Form, FormController, GroupBox, KeyStroke, MessageBox, MessageBoxController, ObjectOrChildModel, StatusOrModel, Widget, WidgetModel} from '../index';
 
-export default interface FormModel extends WidgetModel {
+export interface FormModel extends WidgetModel {
   /**
    * Default is true.
    */

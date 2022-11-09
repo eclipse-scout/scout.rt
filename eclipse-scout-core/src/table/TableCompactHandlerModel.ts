@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Table, TableCompactHandler} from '../index';
-import {ObjectModel} from '../scout';
+import {ObjectModel, Table, TableCompactHandler} from '../index';
 
-export default interface TableCompactHandlerModel extends ObjectModel<TableCompactHandler> {
+export interface TableCompactHandlerModel extends ObjectModel<TableCompactHandler> {
   table?: Table;
   useOnlyVisibleColumns?: boolean;
   maxContentLines?: number;

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default interface LocaleModel {
+export interface LocaleModel {
   languageTag?: string;
   decimalFormatPatternDefault?: string;
   dateFormatPatternDefault?: string;

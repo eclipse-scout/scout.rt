@@ -10,7 +10,7 @@
  */
 import {DisplayParent, Event, FileChooser, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface FileChooserEventMap extends WidgetEventMap {
+export interface FileChooserEventMap extends WidgetEventMap {
   'cancel': Event<FileChooser>;
   'upload': Event<FileChooser>;
   'propertyChange:acceptTypes': PropertyChangeEvent<string>;

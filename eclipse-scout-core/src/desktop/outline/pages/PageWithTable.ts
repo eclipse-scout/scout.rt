@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, Page, PageWithTableModel, scout, Status, Table, TableRow} from '../../../index';
+import {
+  arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, InitModelOf, Page, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowOrderChangedEvent,
+  TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+} from '../../../index';
 import $ from 'jquery';
-import {TableAllRowsDeletedEvent, TableReloadEvent, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../../../table/TableEventMap';
-import {InitModelOf} from '../../../scout';
 
-export default class PageWithTable extends Page implements PageWithTableModel {
+export class PageWithTable extends Page implements PageWithTableModel {
   declare model: PageWithTableModel;
 
   alwaysCreateChildPage: boolean;

@@ -16,7 +16,7 @@ export type TreeEventCurrentNode = {
   _$treeCurrentNode?: JQuery;
 };
 
-export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
+export class AbstractTreeNavigationKeyStroke extends KeyStroke {
   declare field: Tree;
 
   constructor(tree: Tree, modifierBitMask: number) {

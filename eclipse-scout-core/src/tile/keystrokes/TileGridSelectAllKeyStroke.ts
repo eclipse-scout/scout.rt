@@ -10,7 +10,7 @@
  */
 import {keys, ScoutKeyboardEvent, TileGrid, TileGridSelectKeyStroke} from '../../index';
 
-export default class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke {
+export class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke {
 
   constructor(tileGrid: TileGrid) {
     super(tileGrid);

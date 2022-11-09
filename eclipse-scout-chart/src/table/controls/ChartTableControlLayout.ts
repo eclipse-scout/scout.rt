@@ -11,7 +11,7 @@
 import {AbstractLayout, scrollbars} from '@eclipse-scout/core';
 import {ChartTableControl} from '../../index';
 
-export default class ChartTableControlLayout extends AbstractLayout {
+export class ChartTableControlLayout extends AbstractLayout {
   control: ChartTableControl;
 
   constructor(control: ChartTableControl) {

@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, CodeLookupCall, codes, Column, LookupCall, LookupRow, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
-import objects from '../../util/objects';
-import {LookupCallOrModel} from '../../lookup/LookupCall';
-import {InitModelOf} from '../../scout';
+import {Cell, CodeLookupCall, codes, Column, InitModelOf, LookupCall, LookupCallOrModel, LookupRow, objects, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
 
 /**
  * Column where each cell fetches its value using a lookup call.
@@ -21,7 +18,7 @@ import {InitModelOf} from '../../scout';
  * It should be used instead of the property selectedRows from Table.js which must not be used here.
  * 'row' can be null or undefined in some cases. Hence some care is needed when listening to this event.
  */
-export default class SmartColumn<TValue> extends Column<TValue> {
+export class SmartColumn<TValue> extends Column<TValue> {
   declare model: SmartColumnModel<TValue>;
   declare eventMap: SmartColumnEventMap<TValue>;
   declare self: SmartColumn<any>;

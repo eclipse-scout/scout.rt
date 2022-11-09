@@ -12,7 +12,7 @@ import {EnumObject, icons} from '../index';
 
 export type IconType = EnumObject<typeof IconDesc.IconType>;
 
-export default class IconDesc {
+export class IconDesc {
   iconType: IconType;
   font: string;
   iconCharacter: string;

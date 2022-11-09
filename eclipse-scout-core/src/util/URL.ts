@@ -14,7 +14,7 @@ import {arrays} from '../index';
  * Input is expected to be encoded. Output (toString()) is also encoded.
  * If no URL is passed, 'window.location.href' is used as input.
  */
-export default class URL {
+export class URL {
   baseUrlRaw: string;
   queryPartRaw: string;
   hashPartRaw: string;

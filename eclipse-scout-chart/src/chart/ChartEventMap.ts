@@ -17,7 +17,7 @@ export interface ChartValueClickEvent<C = Chart> extends ScoutEvent<C> {
   originalEvent?: Event;
 }
 
-export default interface ChartEventMap extends WidgetEventMap {
+export interface ChartEventMap extends WidgetEventMap {
   'chartRender': ScoutEvent<Chart>;
   'valueClick': ChartValueClickEvent;
   'propertyChange:chartRenderer': PropertyChangeEvent<AbstractChartRenderer>;

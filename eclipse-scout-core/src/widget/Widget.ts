@@ -9,15 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke,
+  KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session,
+  SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import * as $ from 'jquery';
-import {ScrollbarInstallOptions, ScrollOptions, ScrollToOptions} from '../scrollbar/scrollbars';
-import {SomeRequired} from '../types';
-import {FullModelOf, InitModelOf, ObjectOrChildModel} from '../scout';
 
-export default class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
+export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
   declare model: WidgetModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
   declare eventMap: WidgetEventMap;

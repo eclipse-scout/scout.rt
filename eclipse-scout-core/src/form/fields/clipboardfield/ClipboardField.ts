@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ClipboardFieldModel, Device, InputFieldKeyStrokeContext, keys, KeyStrokeContext, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
+import {arrays, BlobWithName, ClipboardFieldModel, Device, DragAndDropOptions, FatalMessageOptions, InputFieldKeyStrokeContext, keys, KeyStrokeContext, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
 import $ from 'jquery';
-import {DragAndDropOptions} from '../../../util/dragAndDrop';
-import {BlobWithName, FatalMessageOptions} from '../../../session/Session';
 
-export default class ClipboardField extends ValueField<string> implements ClipboardFieldModel {
+export class ClipboardField extends ValueField<string> implements ClipboardFieldModel {
   declare model: ClipboardFieldModel;
 
   allowedMimeTypes: string[];

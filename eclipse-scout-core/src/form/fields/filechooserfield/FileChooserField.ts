@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, objects, scout, ValueField} from '../../../index';
-import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
-import {InitModelOf} from '../../../scout';
+import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, FileInputChangeEvent, InitModelOf, objects, scout, ValueField} from '../../../index';
 
-export default class FileChooserField extends ValueField<File> implements FileChooserFieldModel {
+export class FileChooserField extends ValueField<File> implements FileChooserFieldModel {
   declare model: FileChooserFieldModel;
   declare eventMap: FileChooserFieldEventMap;
   declare self: FileChooserField;

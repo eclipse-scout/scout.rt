@@ -17,7 +17,7 @@ import {scout, Table, TableRow} from '../index';
  * If mouseMoveSelectionEnabled is set to true, the user can select the rows by moving the mouse with pressed left mouse button.
  *
  */
-export default class TableSelectionHandler {
+export class TableSelectionHandler {
   table: Table;
   mouseMoveSelectionEnabled: boolean;
   lastActionRow: TableRow;

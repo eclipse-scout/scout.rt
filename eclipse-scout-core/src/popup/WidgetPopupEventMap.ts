@@ -15,7 +15,7 @@ export interface WidgetPopupMoveEvent<T = WidgetPopup> extends Event<T> {
   left: number;
 }
 
-export default interface WidgetPopupEventMap extends PopupEventMap {
+export interface WidgetPopupEventMap extends PopupEventMap {
   'move': WidgetPopupMoveEvent;
   'propertyChange:closable': PropertyChangeEvent<boolean>;
   'propertyChange:content': PropertyChangeEvent<Widget>;

@@ -15,6 +15,6 @@ export interface SvgFieldAppLinkActionEvent<T = SvgField> extends Event<T> {
   ref: string;
 }
 
-export default interface SvgFieldEventMap extends FormFieldEventMap {
+export interface SvgFieldEventMap extends FormFieldEventMap {
   'appLinkAction': SvgFieldAppLinkActionEvent;
 }

@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxError, Call, CallModel, URL} from '../index';
+import {AjaxError, Call, CallModel, InitModelOf, URL} from '../index';
 import $ from 'jquery';
-import {InitModelOf} from '../scout';
 
-export default class AjaxCall extends Call implements AjaxCallModel {
+export class AjaxCall extends Call implements AjaxCallModel {
   declare model: AjaxCallModel;
   declare pendingCall: JQuery.jqXHR;
 

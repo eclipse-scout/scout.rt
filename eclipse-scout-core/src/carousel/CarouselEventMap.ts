@@ -10,7 +10,7 @@
  */
 import {GridData, PropertyChangeEvent, Widget, WidgetEventMap} from '../index';
 
-export default interface CarouselEventMap extends WidgetEventMap {
+export interface CarouselEventMap extends WidgetEventMap {
   'propertyChange:currentItem': PropertyChangeEvent<number>;
   'propertyChange:gridData': PropertyChangeEvent<GridData>;
   'propertyChange:statusEnabled': PropertyChangeEvent<boolean>;

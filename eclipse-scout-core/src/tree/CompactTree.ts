@@ -9,12 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CompactTreeDownKeyStroke, CompactTreeLeftKeyStroke, CompactTreeNode, CompactTreeRightKeyStroke, CompactTreeUpKeyStroke, HtmlComponent, MenuBar, MenuItemsOrder, Range, scout, Tree, TreeLayout, TreeNode, TreeNodeModel
+  arrays, CompactTreeDownKeyStroke, CompactTreeLeftKeyStroke, CompactTreeNode, CompactTreeRightKeyStroke, CompactTreeUpKeyStroke, HtmlComponent, InitModelOf, MenuBar, MenuItemsOrder, Range, scout, Tree, TreeLayout, TreeNode, TreeNodeModel,
+  TreeRenderExpansionOptions
 } from '../index';
-import {TreeRenderExpansionOptions} from './Tree';
-import {InitModelOf} from '../scout';
 
-export default class CompactTree extends Tree {
+export class CompactTree extends Tree {
 
   $nodesContainer: JQuery;
 

@@ -8,20 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupRow, objects, QueryBy, scout, Session} from '../index';
+import {arrays, ChildModelOf, FullModelOf, InitModelOf, LookupCallModel, LookupResult, LookupRow, objects, ObjectType, QueryBy, scout, Session, SomeRequired} from '../index';
 import $ from 'jquery';
-import LookupCallModel from './LookupCallModel';
-import LookupResult from './LookupResult';
-import {SomeRequired} from '../types';
-import {ObjectType} from '../ObjectFactory';
-import {ChildModelOf, FullModelOf, InitModelOf} from '../scout';
 
 /**
  * Base class for lookup calls. A concrete implementation of LookupCall.js which uses resources over a network
  * must deal with I/O errors and set, in case of an error, the 'exception' property on the returned lookup result.
  * The lookup call must _always_ return a result, otherwise the SmartField cannot work properly.
  */
-export default class LookupCall<TKey> implements LookupCallModel<TKey> {
+export class LookupCall<TKey> implements LookupCallModel<TKey> {
   declare model: LookupCallModel<TKey>;
   declare initModel: SomeRequired<this['model'], 'session'>;
 

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuOrder, OrderedMenuItems} from '../../../menu/MenuItemsOrder';
-import {Menu} from '../../../index';
+import {Menu, MenuOrder, OrderedMenuItems} from '../../../index';
 
-export default class GroupBoxMenuItemsOrder implements MenuOrder {
+export class GroupBoxMenuItemsOrder implements MenuOrder {
 
   /**
    * Sorts the given menus item by horizontal alignment and divides the items in two groups for each alignment.

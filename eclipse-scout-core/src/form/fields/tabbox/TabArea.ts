@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EllipsisMenu, EnumObject, EventHandler, HtmlComponent, KeyStrokeContext, PropertyChangeEvent, scout, strings, Tab, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaRightKeyStroke, TabBox, TabItem, Widget} from '../../../index';
-import TabAreaModel from './TabAreaModel';
-import TabAreaEventMap from './TabAreaEventMap';
-import {InitModelOf} from '../../../scout';
-import {SomeRequired} from '../../../types';
+import {
+  arrays, EllipsisMenu, EnumObject, EventHandler, HtmlComponent, InitModelOf, KeyStrokeContext, PropertyChangeEvent, scout, SomeRequired, strings, Tab, TabAreaEventMap, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaModel,
+  TabAreaRightKeyStroke, TabBox, TabItem, Widget
+} from '../../../index';
 
 export type TabAreaStyle = EnumObject<typeof TabArea.DisplayStyle>;
 
-export default class TabArea extends Widget implements TabAreaModel {
+export class TabArea extends Widget implements TabAreaModel {
   declare model: TabAreaModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'tabBox'>;
   declare eventMap: TabAreaEventMap;

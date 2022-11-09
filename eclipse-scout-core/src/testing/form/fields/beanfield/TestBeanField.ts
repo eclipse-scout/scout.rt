@@ -10,7 +10,7 @@
  */
 import {BeanField} from '../../../../index';
 
-export default class TestBeanField extends BeanField<{ sender: string; message: string }> {
+export class TestBeanField extends BeanField<{ sender: string; message: string }> {
   protected override _render() {
     super._render();
     this.$container.addClass('test-bean-field');

@@ -10,7 +10,7 @@
  */
 import {StaticLookupCall} from '../../index';
 
-export default class LanguageDummyLookupCall extends StaticLookupCall<number> {
+export class LanguageDummyLookupCall extends StaticLookupCall<number> {
   multiline: boolean;
   showText: boolean;
 

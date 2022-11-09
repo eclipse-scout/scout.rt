@@ -9,13 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  ButtonTile, EnumObject, Event, EventHandler, EventListener, EventSupport, Form, HtmlComponent, icons, inspector, MenuBar, Outline, PageEventMap, PageModel, PropertyChangeEvent, scout, Table, TableRow, TileOutlineOverview,
-  TileOverviewForm, TreeNode, Widget
+  ButtonTile, ChildModelOf, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, MenuBar, Outline, PageEventMap, PageModel, PropertyChangeEvent, scout,
+  Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
-import {TableRowClickEvent} from '../../../table/TableEventMap';
-import {EventMapOf, EventModel} from '../../../events/EventEmitter';
-import {ChildModelOf, InitModelOf} from '../../../scout';
 
 /**
  * This class is used differently in online and JS-only case. In the online case we only have instances
@@ -24,7 +21,7 @@ import {ChildModelOf, InitModelOf} from '../../../scout';
  * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
  * Implementations of these classes contain code which loads table data or child nodes.
  */
-export default class Page extends TreeNode implements PageModel {
+export class Page extends TreeNode implements PageModel {
   declare model: PageModel;
   declare eventMap: PageEventMap;
   declare self: Page;

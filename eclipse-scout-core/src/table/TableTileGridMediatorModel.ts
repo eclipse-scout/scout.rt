@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Table, TableRowTileMapping, Tile, TileAccordion, TileGridLayoutConfig, WidgetModel} from '../index';
-import {ObjectOrChildModel} from '../scout';
+import {ObjectOrChildModel, Table, TableRowTileMapping, Tile, TileAccordion, TileGridLayoutConfig, WidgetModel} from '../index';
 
-export default interface TableTileGridMediatorModel extends WidgetModel {
+export interface TableTileGridMediatorModel extends WidgetModel {
   parent?: Table;
   tileAccordion?: ObjectOrChildModel<TileAccordion>;
   gridColumnCount?: number;

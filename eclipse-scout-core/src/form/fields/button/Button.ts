@@ -9,11 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  ButtonAdapterMenu, ButtonEventMap, ButtonKeyStroke, ButtonLayout, ButtonModel, ContextMenuPopup, Device, DoubleClickSupport, EnumObject, FormField, icons, KeyStrokeContext, LoadingSupport, Menu, scout, styles, tooltips, Widget
+  ButtonAdapterMenu, ButtonEventMap, ButtonKeyStroke, ButtonLayout, ButtonModel, ContextMenuPopup, Device, DoubleClickSupport, EnumObject, FormField, icons, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, scout, styles, tooltips,
+  Widget
 } from '../../../index';
-import {InitModelOf} from '../../../scout';
 
-export default class Button extends FormField implements ButtonModel {
+export class Button extends FormField implements ButtonModel {
   declare model: ButtonModel;
   declare eventMap: ButtonEventMap;
   declare self: Button;

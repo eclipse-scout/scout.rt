@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ContextMenuPopup, Menu, MenuBarPopupModel} from '../../index';
-import {InitModelOf} from '../../scout';
+import {ContextMenuPopup, InitModelOf, Menu, MenuBarPopupModel} from '../../index';
 
 /**
  * The MenuBarPopup is a special Popup that is used in the menu-bar. It is tightly coupled with a menu-item.
  */
-export default class MenuBarPopup extends ContextMenuPopup implements MenuBarPopupModel {
+export class MenuBarPopup extends ContextMenuPopup implements MenuBarPopupModel {
   declare model: MenuBarPopupModel;
 
   menu: Menu;

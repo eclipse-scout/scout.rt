@@ -91,7 +91,7 @@ export type AnyWidget =
   | TableHeaderMenuButton
   | TableControl
   | ViewButton
-  | Mode<any>
+  | Mode
   | BreadcrumbItem
   | IFrame
   | Slider
@@ -137,12 +137,10 @@ export type AnyWidget =
   | TimePicker
   | FileInput
   | FileChooser
-  | ModeSelector<any>
+  | ModeSelector
   | Notification
   | BreadcrumbBar
   | CollapseHandle
   | DesktopNavigationHandle
   | unknown
   );
-
-export default AnyWidget;

@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Form, FormField, FormFieldLayout, GroupBox, icons, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel} from '../../../index';
+import {Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel} from '../../../index';
 import $ from 'jquery';
-import {InitModelOf} from '../../../scout';
 
-export default class WizardProgressField extends FormField implements WizardProgressFieldModel {
+export class WizardProgressField extends FormField implements WizardProgressFieldModel {
   declare model: WizardProgressFieldModel;
   declare eventMap: WizardProgressFieldEventMap;
   declare self: WizardProgressField;

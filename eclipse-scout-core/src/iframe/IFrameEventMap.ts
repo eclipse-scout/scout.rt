@@ -10,7 +10,7 @@
  */
 import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface IFrameEventMap extends WidgetEventMap {
+export interface IFrameEventMap extends WidgetEventMap {
   'propertyChange:location': PropertyChangeEvent<string>;
   'propertyChange:sandboxEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:sandboxPermissions': PropertyChangeEvent<string>;

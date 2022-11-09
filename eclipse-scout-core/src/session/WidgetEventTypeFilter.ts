@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Predicate} from '../types';
-import {Event} from '../index';
+import {Event, Predicate} from '../index';
 
-export default class WidgetEventTypeFilter {
+export class WidgetEventTypeFilter {
   filters: Predicate<Event>[];
 
   constructor() {

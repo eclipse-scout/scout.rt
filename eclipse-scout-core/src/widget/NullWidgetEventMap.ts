@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, Widget, WidgetEventMap} from '../index';
 
-export default interface NullWidgetEventMap extends WidgetEventMap {
+export interface NullWidgetEventMap extends WidgetEventMap {
   'propertyChange:childWidget': PropertyChangeEvent<Widget>;
 }

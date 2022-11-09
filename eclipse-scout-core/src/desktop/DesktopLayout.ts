@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Desktop, DesktopNavigation, Dimension, HtmlComponent, ResponsiveManager, Tree} from '../index';
 
-export default class DesktopLayout extends AbstractLayout {
+export class DesktopLayout extends AbstractLayout {
   desktop: Desktop;
 
   constructor(desktop: Desktop) {

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, FormFieldAdapter, WizardProgressField} from '../../../index';
-import {WizardProgressFieldStepActionEvent} from './WizardProgressFieldEventMap';
+import {Event, FormFieldAdapter, WizardProgressField, WizardProgressFieldStepActionEvent} from '../../../index';
 
-export default class WizardProgressFieldAdapter extends FormFieldAdapter {
+export class WizardProgressFieldAdapter extends FormFieldAdapter {
 
   protected _onWidgetStepAction(event: WizardProgressFieldStepActionEvent) {
     this._send('doStepAction', {

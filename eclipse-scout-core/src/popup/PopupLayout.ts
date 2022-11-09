@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, graphics, Insets, Popup, Rectangle, scout} from '../index';
 
-export default class PopupLayout extends AbstractLayout {
+export class PopupLayout extends AbstractLayout {
   popup: Popup;
   /** enables popups with a height which depends on the width (= popups with wrapping content) */
   doubleCalcPrefSize: boolean;

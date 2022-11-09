@@ -10,7 +10,7 @@
  */
 import {LayoutData, WidgetModel} from '../index';
 
-export default interface SplitterModel extends WidgetModel {
+export interface SplitterModel extends WidgetModel {
   /**
    * Default is true
    */

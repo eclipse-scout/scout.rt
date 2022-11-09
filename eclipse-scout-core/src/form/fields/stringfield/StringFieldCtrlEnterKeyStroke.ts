@@ -10,7 +10,7 @@
  */
 import {keys, KeyStroke, ScoutKeyboardEvent, StringField} from '../../../index';
 
-export default class StringFieldCtrlEnterKeyStroke extends KeyStroke {
+export class StringFieldCtrlEnterKeyStroke extends KeyStroke {
   declare field: StringField;
 
   constructor(stringField: StringField) {

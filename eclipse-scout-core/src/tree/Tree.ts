@@ -9,19 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier,
-  LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke,
-  TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
+  Action, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics,
+  HtmlComponent, InitModelOf, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, scout, scrollbars, ScrollDirection,
+  ScrollToOptions, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke,
+  TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
-import {MenuFilter} from '../menu/Menu';
-import {ScrollDirection, ScrollToOptions} from '../scrollbar/scrollbars';
-import TreeEventMap from './TreeEventMap';
-import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
-import {DropType} from '../util/dragAndDrop';
-import {FullModelOf, InitModelOf, ObjectOrModel} from '../scout';
 
-export default class Tree extends Widget implements TreeModel {
+export class Tree extends Widget implements TreeModel {
   declare model: TreeModel;
   declare eventMap: TreeEventMap;
   declare self: Tree;

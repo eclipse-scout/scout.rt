@@ -14,7 +14,7 @@ export interface HtmlFieldAppLinkActionEvent<T = HtmlField> extends Event<T> {
   ref: string;
 }
 
-export default interface HtmlFieldEventMap extends ValueFieldEventMap<string> {
+export interface HtmlFieldEventMap extends ValueFieldEventMap<string> {
   'appLinkAction': HtmlFieldAppLinkActionEvent;
   'propertyChange:scrollBarEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:selectable': PropertyChangeEvent<boolean>;

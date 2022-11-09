@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, WidgetEventMap} from '../../../index';
 
-export default interface TileOutlineOverviewEventMap extends WidgetEventMap {
+export interface TileOutlineOverviewEventMap extends WidgetEventMap {
   'propertyChange:scrollable': PropertyChangeEvent<boolean>;
 }

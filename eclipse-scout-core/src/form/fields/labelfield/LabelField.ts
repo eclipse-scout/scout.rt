@@ -10,7 +10,7 @@
  */
 import {LabelFieldEventMap, LabelFieldModel, strings, texts, ValueField} from '../../../index';
 
-export default class LabelField extends ValueField<string> implements LabelFieldModel {
+export class LabelField extends ValueField<string> implements LabelFieldModel {
   declare model: LabelFieldModel;
   declare eventMap: LabelFieldEventMap;
   declare self: LabelField;

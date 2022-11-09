@@ -10,7 +10,7 @@
  */
 import {Column, PopupModel, TableHeader} from '../index';
 
-export default interface TableHeaderMenuModel extends PopupModel {
+export interface TableHeaderMenuModel extends PopupModel {
   column?: Column<any>;
   tableHeader?: TableHeader;
   compact?: boolean;

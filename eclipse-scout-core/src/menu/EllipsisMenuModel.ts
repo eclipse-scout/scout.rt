@@ -10,7 +10,7 @@
  */
 import {MenuModel} from '../index';
 
-export default interface EllipsisMenuModel extends MenuModel {
+export interface EllipsisMenuModel extends MenuModel {
   /**
    * Default is true.
    */

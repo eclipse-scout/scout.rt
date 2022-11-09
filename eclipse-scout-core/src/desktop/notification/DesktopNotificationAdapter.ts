@@ -10,7 +10,7 @@
  */
 import {NotificationAdapter} from '../../index';
 
-export default class DesktopNotificationAdapter extends NotificationAdapter {
+export class DesktopNotificationAdapter extends NotificationAdapter {
 
   constructor() {
     super();

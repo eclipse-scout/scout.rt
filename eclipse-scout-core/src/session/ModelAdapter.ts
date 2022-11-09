@@ -9,20 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  App, arrays, comparators, defaultValues, Event, EventEmitter, ModelAdapterEventMap, ModelAdapterModel, objects, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, strings, Widget, WidgetEventTypeFilter
+  AdapterData, App, arrays, ChildModelOf, comparators, defaultValues, Event, EventEmitter, EventListener, FullModelOf, InitModelOf, ModelAdapterEventMap, ModelAdapterModel, objects, Predicate, PropertyChangeEvent, PropertyChangeEventFilter,
+  RemoteEvent, scout, Session, SomeRequired, strings, Widget, WidgetEventTypeFilter, WidgetModel
 } from '../index';
 import $ from 'jquery';
-import EventListener from '../events/EventListener';
-import WidgetModel from '../widget/WidgetModel';
-import {AdapterData} from './Session';
-import {ChildModelOf, FullModelOf, InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.
  */
-export default class ModelAdapter extends EventEmitter implements ModelAdapterModel, ModelAdapterLike {
+export class ModelAdapter extends EventEmitter implements ModelAdapterModel, ModelAdapterLike {
   declare model: ModelAdapterModel;
   declare initModel: SomeRequired<this['model'], 'session' | 'id'>;
   declare eventMap: ModelAdapterEventMap;

@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DateField, dates, FormField, LabelField, Menu, scout, SequenceBox, SequenceBoxGridConfig, SequenceBoxModel, Status, StringField} from '../../../../src/index';
-import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
-import {triggerClick} from '../../../../src/testing/jquery-testing';
+import {CloneSpecHelper, FormSpecHelper, JQueryTesting, MenuSpecHelper} from '../../../../src/testing/index';
 
 describe('SequenceBox', () => {
   let session: SandboxSession, helper: FormSpecHelper, menuHelper: MenuSpecHelper;
@@ -540,11 +539,11 @@ describe('SequenceBox', () => {
       let field = createField();
       field.render();
       field.setLabel('box label');
-      triggerClick(field.$label);
+      JQueryTesting.triggerClick(field.$label);
       expect(field.fields[0].$field).toBeFocused();
 
       field.fields[0].setVisible(false);
-      triggerClick(field.$label);
+      JQueryTesting.triggerClick(field.$label);
       let dateField = field.fields[1] as DateField;
       expect(dateField.$dateField).toBeFocused();
     });

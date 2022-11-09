@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, DateField, FormField, HtmlComponent, Popup, scout, TimePicker, TimePickerPopupLayout, TimePickerPopupModel} from '../index';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
+import {AbstractLayout, DateField, FormField, HtmlComponent, InitModelOf, Popup, scout, SomeRequired, TimePicker, TimePickerPopupLayout, TimePickerPopupModel} from '../index';
 
-export default class TimePickerPopup extends Popup implements TimePickerPopupModel {
+export class TimePickerPopup extends Popup implements TimePickerPopupModel {
   declare model: TimePickerPopupModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'timeResolution' | 'field'>;
 

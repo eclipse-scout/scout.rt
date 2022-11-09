@@ -11,7 +11,7 @@
 import {keys, KeyStroke, ScoutKeyboardEvent, Widget} from '../../index';
 import $ from 'jquery';
 
-export default class AppLinkKeyStroke extends KeyStroke {
+export class AppLinkKeyStroke extends KeyStroke {
 
   appLinkTriggerFunction: AppLinkTriggerFunction;
 

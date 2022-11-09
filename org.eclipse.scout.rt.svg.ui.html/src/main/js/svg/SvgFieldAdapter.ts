@@ -12,7 +12,7 @@ import {Event, FormFieldAdapter} from '@eclipse-scout/core';
 import {SvgFieldAppLinkActionEvent} from './SvgFieldEventMap';
 import {SvgField} from '../index';
 
-export default class SvgFieldAdapter extends FormFieldAdapter {
+export class SvgFieldAdapter extends FormFieldAdapter {
 
   protected _onWidgetAppLinkAction(event: SvgFieldAppLinkActionEvent) {
     this._send('appLinkAction', {

@@ -9,13 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, KeyStrokeContext, Menu,
-  menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel
+  CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf,
+  JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
-import {YearPanelDateSelectEvent} from './YearPanelEventMap';
-import {JsonDateRange} from '../util/dates';
-import {InitModelOf} from '../scout';
 
 export type CalendarDisplayMode = EnumObject<typeof Calendar.DisplayMode>;
 export type CalendarDirection = EnumObject<typeof Calendar.Direction>;
@@ -41,7 +38,7 @@ export type CalendarMoveData = {
   onUp?: (event: JQuery.MouseUpEvent) => void;
 };
 
-export default class Calendar extends Widget implements CalendarModel {
+export class Calendar extends Widget implements CalendarModel {
   declare model: CalendarModel;
   declare eventMap: CalendarEventMap;
   declare self: Calendar;

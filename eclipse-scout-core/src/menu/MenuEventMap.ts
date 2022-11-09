@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionEventMap, Event, Menu, PropertyChangeEvent} from '../index';
-import {MenuFilter, MenuStyle, SubMenuVisibility} from './Menu';
+import {ActionEventMap, Event, Menu, MenuFilter, MenuStyle, PropertyChangeEvent, SubMenuVisibility} from '../index';
 
 
-export default interface MenuEventMap extends ActionEventMap {
+export interface MenuEventMap extends ActionEventMap {
   'focus': Event<Menu>;
   'propertyChange:childActions': PropertyChangeEvent<Menu[]>;
   'propertyChange:defaultMenu': PropertyChangeEvent<boolean>;

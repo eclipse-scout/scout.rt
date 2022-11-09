@@ -34,7 +34,7 @@ export interface DoubleClickSupportOptions {
  *    each other that hey should be considered a 'double click'. If the distance or interval between
  *    the last two events is too large, false is returned.
  */
-export default class DoubleClickSupport {
+export class DoubleClickSupport {
   protected _lastPosX: number;
   protected _lastPosY: number;
   protected _lastTimestamp: number;

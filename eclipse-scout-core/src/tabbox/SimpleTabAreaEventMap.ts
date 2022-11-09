@@ -8,15 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, PropertyChangeEvent, SimpleTab, SimpleTabArea, WidgetEventMap} from '../index';
-import {SimpleTabAreaDisplayStyle} from './SimpleTabArea';
-import {SimpleTabView} from './SimpleTab';
+import {Event, PropertyChangeEvent, SimpleTab, SimpleTabArea, SimpleTabAreaDisplayStyle, SimpleTabView, WidgetEventMap} from '../index';
 
 export interface SimpleTabAreaTabSelectEvent<TView extends SimpleTabView = SimpleTabView, S extends SimpleTabArea<TView> = SimpleTabArea<TView>> extends Event<S> {
   viewTab: SimpleTab<TView>;
 }
 
-export default interface SimpleTabAreaEventMap<TView extends SimpleTabView = SimpleTabView> extends WidgetEventMap {
+export interface SimpleTabAreaEventMap<TView extends SimpleTabView = SimpleTabView> extends WidgetEventMap {
   'tabSelect': SimpleTabAreaTabSelectEvent<TView>;
   'propertyChange:displayStyle': PropertyChangeEvent<SimpleTabAreaDisplayStyle>;
 }

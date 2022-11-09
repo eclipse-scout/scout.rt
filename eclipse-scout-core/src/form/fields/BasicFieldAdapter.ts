@@ -10,7 +10,7 @@
  */
 import {ValueFieldAdapter} from '../../index';
 
-export default class BasicFieldAdapter extends ValueFieldAdapter {
+export class BasicFieldAdapter extends ValueFieldAdapter {
   constructor() {
     super();
     this.enabledWhenOffline = true;

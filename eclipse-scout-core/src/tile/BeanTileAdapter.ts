@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BeanTile, Event, TileAdapter} from '../index';
-import {BeanTileAppLinkActionEvent} from './BeanTile';
+import {BeanTile, BeanTileAppLinkActionEvent, Event, TileAdapter} from '../index';
 
-export default class BeanTileAdapter extends TileAdapter {
+export class BeanTileAdapter extends TileAdapter {
   protected _onWidgetAppLinkAction(event: BeanTileAppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref

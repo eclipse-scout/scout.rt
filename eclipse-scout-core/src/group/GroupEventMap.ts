@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Group, PropertyChangeEvent, Widget, WidgetEventMap} from '../index';
-import {GroupCollapseStyle} from './Group';
+import {Event, Group, GroupCollapseStyle, PropertyChangeEvent, Widget, WidgetEventMap} from '../index';
 
-export default interface GroupEventMap extends WidgetEventMap {
+export interface GroupEventMap extends WidgetEventMap {
   'bodyHeightChange': Event<Group>;
   'bodyHeightChangeDone': Event<Group>;
   'propertyChange:body': PropertyChangeEvent<Widget>;

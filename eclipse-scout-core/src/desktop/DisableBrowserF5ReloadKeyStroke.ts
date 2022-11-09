@@ -24,7 +24,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
  * To reload the page, the general key stroke 'Ctrl-R' ('Command-R' on Macintosh, respectively)
  * should be used instead.
  */
-export default class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
+export class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
   declare field: Desktop;
 
   constructor(desktop: Desktop) {

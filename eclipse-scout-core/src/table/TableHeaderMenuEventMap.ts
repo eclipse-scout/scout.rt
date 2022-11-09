@@ -10,6 +10,6 @@
  */
 import {PopupEventMap, PropertyChangeEvent} from '../index';
 
-export default interface TableHeaderMenuEventMap extends PopupEventMap {
+export interface TableHeaderMenuEventMap extends PopupEventMap {
   'propertyChange:compact': PropertyChangeEvent<boolean>;
 }

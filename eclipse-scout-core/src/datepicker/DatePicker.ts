@@ -8,16 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DateFormat, DatePickerEventMap, DatePickerModel, dates, Device, events, graphics, HtmlComponent, objects, scout, Widget} from '../index';
+import {arrays, DateFormat, DatePickerEventMap, DatePickerModel, dates, Device, events, graphics, HtmlComponent, InitModelOf, JQueryMouseWheelEvent, objects, OldWheelEvent, scout, SwipeCallbackEvent, Widget} from '../index';
 import $ from 'jquery';
-import {SwipeCallbackEvent} from '../util/events';
-import {JQueryMouseWheelEvent} from '../jquery/jquery-scout-types';
-import {OldWheelEvent} from '../types';
-import {InitModelOf} from '../scout';
 
 export type DatePickerMonth = { viewDate: Date; rendered: boolean; $container: JQuery; $weekendSeparator?: JQuery };
 
-export default class DatePicker extends Widget implements DatePickerModel {
+export class DatePicker extends Widget implements DatePickerModel {
   declare model: DatePickerModel;
   declare eventMap: DatePickerEventMap;
   declare self: DatePicker;

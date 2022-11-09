@@ -10,7 +10,7 @@
  */
 import {BackgroundJobPollingStatus} from '../index';
 
-export default class BackgroundJobPollingSupport {
+export class BackgroundJobPollingSupport {
   enabled: boolean;
   status: BackgroundJobPollingStatus;
 

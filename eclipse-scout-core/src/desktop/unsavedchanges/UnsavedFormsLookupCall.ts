@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, StaticLookupCall, UnsavedFormChangesForm, UnsavedFormsLookupCallModel} from '../../index';
-import {SomeRequired} from '../../types';
+import {Form, SomeRequired, StaticLookupCall, UnsavedFormChangesForm, UnsavedFormsLookupCallModel} from '../../index';
 
-export default class UnsavedFormsLookupCall extends StaticLookupCall<Form> implements UnsavedFormsLookupCallModel {
+export class UnsavedFormsLookupCall extends StaticLookupCall<Form> implements UnsavedFormsLookupCallModel {
   declare model: UnsavedFormsLookupCallModel;
   declare initModel: SomeRequired<this['model'], 'session' | 'unsavedForms'>;
 

@@ -56,7 +56,7 @@ declare global {
   }
 }
 
-const jasmineScoutMatchers = {
+export const jasmineScoutMatchers = {
 
   toContainEvents: (util: MatchersUtil, customEqualityTesters?: ReadonlyArray<CustomEqualityTester>): CustomMatcher => ({
     compare: (actual, expected) => {
@@ -258,5 +258,3 @@ const jasmineScoutMatchers = {
     }
   })
 };
-
-export default jasmineScoutMatchers;

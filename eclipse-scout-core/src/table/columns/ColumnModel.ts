@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, Session, Table} from '../../index';
-import {Alignment} from '../../cell/Cell';
-import {ColumnComparator} from './comparators';
-import {ObjectModel} from '../../scout';
+import {Alignment, Column, ColumnComparator, ObjectModel, Session, Table} from '../../index';
 
-export default interface ColumnModel<TValue = string> extends ObjectModel<Column<TValue>> {
+export interface ColumnModel<TValue = string> extends ObjectModel<Column<TValue>> {
   session?: Session;
   /**
    * Configures whether the column width is auto optimized.

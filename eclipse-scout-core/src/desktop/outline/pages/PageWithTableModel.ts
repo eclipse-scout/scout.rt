@@ -10,7 +10,7 @@
  */
 import {PageModel} from '../../../index';
 
-export default interface PageWithTableModel extends PageModel {
+export interface PageWithTableModel extends PageModel {
   /**
    * Configures whether a default child page should be created for each table row if no page is created. Default is false.
    */

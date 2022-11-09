@@ -13,7 +13,7 @@ import $ from 'jquery';
 import {AbstractChartRenderer, Chart} from '../index';
 import {ClickObject} from './Chart';
 
-export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
+export class AbstractSvgChartRenderer extends AbstractChartRenderer {
   chartBox: ChartBox;
 
   /** Clipping and masking */

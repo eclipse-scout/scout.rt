@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppModel} from '../App';
+import {AppModel} from '../index';
 
-export default interface LoginAppModel extends AppModel {
+export interface LoginAppModel extends AppModel {
   /**
    * The url to the logo. Default is 'logo.png'.
    */

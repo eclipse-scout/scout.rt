@@ -10,7 +10,7 @@
  */
 import {Carousel, CarouselFieldModel, FormField} from '../../../index';
 
-export default class CarouselField extends FormField implements CarouselFieldModel {
+export class CarouselField extends FormField implements CarouselFieldModel {
   declare model: CarouselFieldModel;
 
   carousel: Carousel;

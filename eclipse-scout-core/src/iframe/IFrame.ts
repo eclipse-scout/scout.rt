@@ -10,7 +10,7 @@
  */
 import {Device, events, HtmlComponent, IFrameEventMap, IFrameModel, keys, scout, Widget} from '../index';
 
-export default class IFrame extends Widget implements IFrameModel {
+export class IFrame extends Widget implements IFrameModel {
   declare model: IFrameModel;
   declare eventMap: IFrameEventMap;
   declare self: IFrame;

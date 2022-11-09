@@ -11,7 +11,7 @@
 import {AbstractLayout, Dimension, EventHandler, FormField, graphics, GroupBox, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, MenuBarLayout, PropertyChangeEvent, ResponsiveManager, scrollbars} from '../../../index';
 import $ from 'jquery';
 
-export default class GroupBoxLayout extends AbstractLayout {
+export class GroupBoxLayout extends AbstractLayout {
   groupBox: GroupBox;
   protected _htmlPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, HtmlEnvironment>>;
   protected _statusWidth: number;

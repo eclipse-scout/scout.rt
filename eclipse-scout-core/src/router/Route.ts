@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class Route {
+export class Route {
   location: string;
 
   constructor() {

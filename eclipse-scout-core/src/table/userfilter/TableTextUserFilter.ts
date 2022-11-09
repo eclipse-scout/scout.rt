@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, TableRow, TableTextUserFilterModel, TableUserFilter} from '../../index';
-import {TableUserFilterAddedEventData} from './TableUserFilter';
+import {scout, TableRow, TableTextUserFilterModel, TableUserFilter, TableUserFilterAddedEventData} from '../../index';
 
-export default class TableTextUserFilter extends TableUserFilter implements TableTextUserFilterModel {
+export class TableTextUserFilter extends TableUserFilter implements TableTextUserFilterModel {
   declare model: TableTextUserFilterModel;
 
   text: string;

@@ -11,7 +11,7 @@
 import {WidgetModel} from '@eclipse-scout/core';
 import {ChartConfig, ChartData, ClickObject} from './Chart';
 
-export default interface ChartModel extends WidgetModel {
+export interface ChartModel extends WidgetModel {
   data?: ChartData;
   config?: ChartConfig;
   /**

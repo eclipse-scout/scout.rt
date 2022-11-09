@@ -10,7 +10,7 @@
  */
 import {Menu, PropertyChangeEvent, WidgetEventMap} from '../../index';
 
-export default interface MenuBoxEventMap extends WidgetEventMap {
+export interface MenuBoxEventMap extends WidgetEventMap {
   'propertyChange:compact': PropertyChangeEvent<boolean>;
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;
 }

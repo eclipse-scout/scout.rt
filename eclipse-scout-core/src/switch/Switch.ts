@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings, SwitchEventMap, SwitchModel, tooltips, Widget} from '../index';
-import {InitModelOf} from '../scout';
+import {InitModelOf, strings, SwitchEventMap, SwitchModel, tooltips, Widget} from '../index';
 
-export default class Switch extends Widget implements SwitchModel {
+export class Switch extends Widget implements SwitchModel {
   declare model: SwitchModel;
   declare eventMap: SwitchEventMap;
   declare self: Switch;

@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Group, GroupModel, scout, Tile, TileAccordion, TileAccordionModel, TileGrid, TileGridLayoutConfig} from '../../../src/index';
-import {triggerClick, triggerDoubleClick} from '../../../src/testing/jquery-testing';
-import TileModel from '../../../src/tile/TileModel';
-import {InitModelOf} from '../../../src/scout';
+import {Group, GroupModel, InitModelOf, scout, Tile, TileAccordion, TileAccordionModel, TileGrid, TileGridLayoutConfig, TileModel} from '../../../src/index';
+import {JQueryTesting} from '../../../src/testing/index';
 
 describe('TileAccordion', () => {
   let session: SandboxSession;
@@ -303,7 +301,7 @@ describe('TileAccordion', () => {
       expect(tile0.selected).toBe(false);
       expect(clickEventCount).toBe(0);
 
-      triggerClick(tile0.$container);
+      JQueryTesting.triggerClick(tile0.$container);
       expect(tile0.selected).toBe(false);
       expect(clickEventCount).toBe(1);
     });
@@ -337,7 +335,7 @@ describe('TileAccordion', () => {
       expect(selectEventCount).toBe(0);
       expect(clickEventCount).toBe(0);
 
-      triggerClick(tile0.$container);
+      JQueryTesting.triggerClick(tile0.$container);
       expect(tile0.selected).toBe(true);
       expect(selectEventCount).toBe(1);
       expect(clickEventCount).toBe(1);
@@ -383,7 +381,7 @@ describe('TileAccordion', () => {
       expect(clickEventCount).toBe(0);
       expect(actionEventCount).toBe(0);
 
-      triggerDoubleClick(tile0.$container);
+      JQueryTesting.triggerDoubleClick(tile0.$container);
       expect(tile0.selected).toBe(true);
       expect(selectEventCount).toBe(1);
       expect(clickEventCount).toBe(1);
@@ -433,7 +431,7 @@ describe('TileAccordion', () => {
       expect(group0.rendered).toBe(true);
 
       // First accordion must not delegate anymore but second has to
-      triggerClick(tile0.$container);
+      JQueryTesting.triggerClick(tile0.$container);
       expect(clickEventCount).toBe(0);
       expect(clickEventCount2).toBe(1);
     });

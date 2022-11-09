@@ -14,6 +14,6 @@ export interface TagChooserPopupLookupRowSelectedEvent<T = TagChooserPopup> exte
   lookupRow: LookupRow<string>;
 }
 
-export default interface TagChooserPopupEventMap extends PopupEventMap {
+export interface TagChooserPopupEventMap extends PopupEventMap {
   'lookupRowSelected': TagChooserPopupLookupRowSelectedEvent;
 }

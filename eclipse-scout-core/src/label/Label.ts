@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppLinkKeyStroke, HtmlComponent, KeyStrokeContext, LabelEventMap, LabelModel, strings, Widget} from '../index';
+import {AppLinkKeyStroke, HtmlComponent, InitModelOf, KeyStrokeContext, LabelEventMap, LabelModel, strings, Widget} from '../index';
 import $ from 'jquery';
-import {InitModelOf} from '../scout';
 
-export default class Label extends Widget implements LabelModel {
+export class Label extends Widget implements LabelModel {
   declare model: LabelModel;
   declare eventMap: LabelEventMap;
   declare self: Label;

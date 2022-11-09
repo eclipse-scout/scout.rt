@@ -1,5 +1,5 @@
 import {Event} from '../index';
 
-export default interface EventMap {
+export interface EventMap {
   [type: string]: Event;
 }

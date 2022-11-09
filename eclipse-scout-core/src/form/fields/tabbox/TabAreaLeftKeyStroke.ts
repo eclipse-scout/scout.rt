@@ -11,7 +11,7 @@
 import {keys, KeyStroke, TabArea} from '../../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class TabAreaLeftKeyStroke extends KeyStroke {
+export class TabAreaLeftKeyStroke extends KeyStroke {
   declare field: TabArea;
 
   constructor(tabArea: TabArea) {

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, FormMenu, PropertyChangeEvent, TableControl, TableControlAdapterMenuModel, TableControlModel} from '../../index';
-import {InitModelOf} from '../../scout';
+import {Event, EventHandler, FormMenu, InitModelOf, PropertyChangeEvent, TableControl, TableControlAdapterMenuModel, TableControlModel} from '../../index';
 
-export default class TableControlAdapterMenu extends FormMenu implements TableControlAdapterMenuModel {
+export class TableControlAdapterMenu extends FormMenu implements TableControlAdapterMenuModel {
   declare model: TableControlAdapterMenuModel;
 
   tableControl: TableControl;

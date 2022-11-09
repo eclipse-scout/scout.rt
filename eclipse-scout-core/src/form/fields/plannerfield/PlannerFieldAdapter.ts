@@ -10,5 +10,5 @@
  */
 import {FormFieldAdapter} from '../../../index';
 
-export default class PlannerFieldAdapter extends FormFieldAdapter {
+export class PlannerFieldAdapter extends FormFieldAdapter {
 }

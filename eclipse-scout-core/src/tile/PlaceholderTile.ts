@@ -10,7 +10,7 @@
  */
 import {Tile} from '../index';
 
-export default class PlaceholderTile extends Tile {
+export class PlaceholderTile extends Tile {
 
   constructor() {
     super();

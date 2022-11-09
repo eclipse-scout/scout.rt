@@ -10,7 +10,7 @@
  */
 import {ViewButton, WidgetModel} from '../../index';
 
-export default interface ViewMenuTabModel extends WidgetModel {
+export interface ViewMenuTabModel extends WidgetModel {
   selected?: boolean;
   selectedButtonVisible?: boolean;
   defaultIconId?: string;

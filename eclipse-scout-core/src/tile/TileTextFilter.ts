@@ -11,7 +11,7 @@
 
 import {EventHandler, HtmlTile, objects, PropertyChangeEvent, strings, Tile} from '../index';
 
-export default class TileTextFilter {
+export class TileTextFilter {
   text: string;
   protected _htmlTileContentChangeHandler: EventHandler<PropertyChangeEvent<string, HtmlTile>>;
   protected _tilePropertyChangeHandler: EventHandler<PropertyChangeEvent>;

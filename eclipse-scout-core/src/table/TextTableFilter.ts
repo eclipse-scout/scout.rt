@@ -10,7 +10,7 @@
  */
 import {strings, TableRow, TextFilter} from '../index';
 
-export default class TextTableFilter implements TextFilter<TableRow> {
+export class TextTableFilter implements TextFilter<TableRow> {
   acceptedText: string;
   textSupplier: (row: TableRow) => string;
   active: boolean;

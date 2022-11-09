@@ -11,142 +11,132 @@
 import {arrays, Locale, LocaleModel, objects, scout, texts} from '../index';
 import $ from 'jquery';
 
-let localesMap = {};
+export const locales = {
+  localesMap: {},
 
-export function bootstrap(url: string): JQuery.Promise<void> {
-  let promise: JQuery.PromiseBase<any, any, any, any, any, any, any, any, any, any, any, any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
-  return promise.then(_preInit.bind(this, url));
-}
+  bootstrap(url: string): JQuery.Promise<void> {
+    let promise: JQuery.PromiseBase<any, any, any, any, any, any, any, any, any, any, any, any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
+    return promise.then(locales._preInit.bind(this, url));
+  },
 
-export function _preInit(url: string, data: any) {
-  if (data && data.error) {
-    // The result may contain a json error (e.g. session timeout) -> abort processing
-    throw {
-      error: data.error,
-      url: url
-    };
-  }
-  init(data);
-}
+  /** @internal */
+  _preInit(url: string, data: any) {
+    if (data && data.error) {
+      // The result may contain a json error (e.g. session timeout) -> abort processing
+      throw {
+        error: data.error,
+        url: url
+      };
+    }
+    locales.init(data);
+  },
 
-export function init(data: LocaleModel[]) {
-  data.forEach(locale => {
-    localesMap[locale.languageTag] = new Locale(locale);
-  }, this);
-}
+  init(data: LocaleModel[]) {
+    data.forEach(locale => {
+      locales.localesMap[locale.languageTag] = new Locale(locale);
+    });
+  },
 
-export function _get(languageTag: string): Locale {
-  return localesMap[languageTag];
-}
+  /** @internal */
+  _get(languageTag: string): Locale {
+    return locales.localesMap[languageTag];
+  },
 
-/**
- * Checks whether there is a locale definition for the given language tag.
- * @param explicit if true, the country code is considered, meaning if languageTag is 'de-CH'
- *   and there is a locale for 'de' but not for 'de-CH', true will be returned nonetheless. Default false (consistent to #get).
- */
-export function has(languageTag: string, explicit?: boolean): boolean {
-  explicit = scout.nvl(explicit, false);
-  if (explicit) {
-    return !!_get(languageTag);
-  }
-  return !!get(languageTag);
-}
+  /**
+   * Checks whether there is a locale definition for the given language tag.
+   * @param explicit if true, the country code is considered, meaning if languageTag is 'de-CH'
+   *   and there is a locale for 'de' but not for 'de-CH', true will be returned nonetheless. Default false (consistent to #get).
+   */
+  has(languageTag: string, explicit?: boolean): boolean {
+    explicit = scout.nvl(explicit, false);
+    if (explicit) {
+      return !!locales._get(languageTag);
+    }
+    return !!locales.get(languageTag);
+  },
 
-/**
- * @returns the locale for the given languageTag.
- * If there is no locale found for the given tag, it tries to load the locale without the country code.
- * If there is still no locale found, null is returned.
- */
-export function get(languageTag: string): Locale {
-  let locale,
-    tags = texts.createOrderedLanguageTags(languageTag);
+  /**
+   * @returns the locale for the given languageTag.
+   * If there is no locale found for the given tag, it tries to load the locale without the country code.
+   * If there is still no locale found, null is returned.
+   */
+  get(languageTag: string): Locale {
+    let locale,
+      tags = texts.createOrderedLanguageTags(languageTag);
 
-  tags.some(tag => {
-    locale = _get(tag);
-    return !!locale;
-  }, this);
+    tags.some(tag => {
+      locale = locales._get(tag);
+      return !!locale;
+    }, this);
 
-  if (!locale) {
-    return null;
-  }
+    if (!locale) {
+      return null;
+    }
 
-  return locale;
-}
+    return locale;
+  },
 
-export function getNavigatorLanguage(): string {
-  return navigator.language || navigator['userLanguage'];
-}
+  getNavigatorLanguage(): string {
+    return navigator.language || navigator['userLanguage'];
+  },
 
-/**
- * @returns for the language returned by the navigator.
- * If no locale is found, the first locale with the language of the navigator is returned.
- * (e.g. if browser returns 'de' and there is no locale for 'de', check if there is one for 'de-CH', 'de-DE' etc. and take the first.)
- * If still no locale is found, the default locale {@link Locale.DEFAULT} is returned.
- */
-export function getNavigatorLocale(): Locale {
-  let languageTag = getNavigatorLanguage();
-  if (!languageTag) {
-    //  No language returned by the browser, using default locale (should not happen with modern browsers, but we never know...)
-    $.log.warn('Browser returned no language. Using default locale.');
+  /**
+   * @returns for the language returned by the navigator.
+   * If no locale is found, the first locale with the language of the navigator is returned.
+   * (e.g. if browser returns 'de' and there is no locale for 'de', check if there is one for 'de-CH', 'de-DE' etc. and take the first.)
+   * If still no locale is found, the default locale {@link Locale.DEFAULT} is returned.
+   */
+  getNavigatorLocale(): Locale {
+    let languageTag = locales.getNavigatorLanguage();
+    if (!languageTag) {
+      //  No language returned by the browser, using default locale (should not happen with modern browsers, but we never know...)
+      $.log.warn('Browser returned no language. Using default locale.');
+      return new Locale();
+    }
+
+    let locale = locales.get(languageTag);
+    if (locale) {
+      // If a locale was found for the language returned by the navigator, use that one
+      return locale;
+    }
+
+    // Otherwise search a locale with the same language
+    $.log.isInfoEnabled() && $.log.info('Locale for languageTag ' + languageTag + ' not found. Trying to load best match.');
+    let language = locales.splitLanguageTag(languageTag)[0];
+    locale = locales.findFirstForLanguage(language);
+    if (locale) {
+      return locale;
+    }
+
+    // If still not found, use the default locale
+    $.log.isInfoEnabled() && $.log.info('Still no matching locale for languageTag ' + languageTag + ' found. Using default locale.');
     return new Locale();
+  },
+
+  getAll(): Locale[] {
+    return objects.values(locales.localesMap);
+  },
+
+  getAllLanguageTags(): string[] {
+    return Object.keys(locales.localesMap);
+  },
+
+  /**
+   * Returns the first locale for the given language.
+   * @param language a language without country code (e.g. en or de)
+   */
+  findFirstForLanguage(language: string): Locale {
+    scout.assertParameter('language', language);
+    return arrays.find(locales.getAll(), locale => locale.language === language, this);
+  },
+
+  /**
+   * Splits the language tag and returns an array containing the language and the country.
+   */
+  splitLanguageTag(languageTag: string): string[] {
+    if (!languageTag) {
+      return [];
+    }
+    return languageTag.split('-');
   }
-
-  let locale = get(languageTag);
-  if (locale) {
-    // If a locale was found for the language returned by the navigator, use that one
-    return locale;
-  }
-
-  // Otherwise search a locale with the same language
-  $.log.isInfoEnabled() && $.log.info('Locale for languageTag ' + languageTag + ' not found. Trying to load best match.');
-  let language = splitLanguageTag(languageTag)[0];
-  locale = findFirstForLanguage(language);
-  if (locale) {
-    return locale;
-  }
-
-  // If still not found, use the default locale
-  $.log.isInfoEnabled() && $.log.info('Still no matching locale for languageTag ' + languageTag + ' found. Using default locale.');
-  return new Locale();
-}
-
-export function getAll(): Locale[] {
-  return objects.values(localesMap);
-}
-
-export function getAllLanguageTags(): string[] {
-  return Object.keys(localesMap);
-}
-
-/**
- * Returns the first locale for the given language.
- * @param language a language without country code (e.g. en or de)
- */
-export function findFirstForLanguage(language: string): Locale {
-  scout.assertParameter('language', language);
-  return arrays.find(getAll(), locale => locale.language === language, this);
-}
-
-/**
- * Splits the language tag and returns an array containing the language and the country.
- */
-export function splitLanguageTag(languageTag: string): string[] {
-  if (!languageTag) {
-    return [];
-  }
-  return languageTag.split('-');
-}
-
-export default {
-  bootstrap,
-  findFirstForLanguage,
-  get,
-  getAll,
-  getAllLanguageTags,
-  getNavigatorLanguage,
-  getNavigatorLocale,
-  has,
-  init,
-  localesMap,
-  splitLanguageTag
 };

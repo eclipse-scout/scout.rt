@@ -10,7 +10,7 @@
  */
 import {DateFormat, WidgetModel} from '../index';
 
-export default interface DatePickerModel extends WidgetModel {
+export interface DatePickerModel extends WidgetModel {
   /**
    * Preselected date can only be set if selectedDate is null. The preselected date is rendered differently, but
    * has no function otherwise. (It is used to indicate the day that will be selected when the user presses

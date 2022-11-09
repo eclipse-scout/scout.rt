@@ -10,7 +10,7 @@
  */
 import {RowLayout, scrollbars} from '../index';
 
-export default class AccordionLayout extends RowLayout {
+export class AccordionLayout extends RowLayout {
 
   protected override _getChildren($container: JQuery): JQuery {
     return $container.children('.group');

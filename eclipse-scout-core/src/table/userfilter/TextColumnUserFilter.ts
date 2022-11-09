@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, FilterFieldsGroupBox, scout, StringField, strings, TableRow, TextColumnUserFilterModel} from '../../index';
+import {ColumnUserFilter, FilterFieldsGroupBox, scout, StringField, strings, TableRow, TableUserFilterAddedEventData, TextColumnUserFilterModel, ValueFieldAcceptInputEvent} from '../../index';
 import $ from 'jquery';
-import {TableUserFilterAddedEventData} from './TableUserFilter';
-import {ValueFieldAcceptInputEvent} from '../../form/fields/ValueFieldEventMap';
 
-export default class TextColumnUserFilter extends ColumnUserFilter {
+export class TextColumnUserFilter extends ColumnUserFilter {
   declare model: TextColumnUserFilterModel;
 
   freeText: string;

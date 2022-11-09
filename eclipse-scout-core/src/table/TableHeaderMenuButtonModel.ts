@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionModel} from '../index';
-import {NumberColumnAggregationFunction, NumberColumnBackgroundEffect} from './columns/NumberColumn';
+import {ActionModel, NumberColumnAggregationFunction, NumberColumnBackgroundEffect} from '../index';
 
-export default interface TableHeaderMenuButtonModel extends ActionModel {
+export interface TableHeaderMenuButtonModel extends ActionModel {
   aggregation?: NumberColumnAggregationFunction;
   backgroundEffect?: NumberColumnBackgroundEffect;
   direction?: string;

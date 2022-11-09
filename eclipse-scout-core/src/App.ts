@@ -10,12 +10,10 @@
  */
 
 import {
-  AppEventMap, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, fonts, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, SessionModel, texts, webstorage, Widget
+  AppEventMap, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, SessionModel,
+  texts, webstorage, Widget
 } from './index';
 import $ from 'jquery';
-import {FontSpec} from './util/fonts';
-import {EventMapOf} from './events/EventEmitter';
-import {InitModelOf, ModelOf} from './scout';
 
 let instance: App = null;
 let listeners: EventListener[] = [];
@@ -47,7 +45,7 @@ export interface AppBootstrapOptions {
    * If no fonts are specified, the list of fonts to preload is automatically calculated from the available CSS "@font-face" definitions. This is the default.<br>
    * To disable preloading entirely, set fonts to an empty array.
    */
-  fonts?: FontSpec[];
+  fonts?: FontDescriptor[];
 
   /**
    *  URL or multiple URLs pointing to a json resource containing texts that will be available through {@link texts}.
@@ -65,7 +63,7 @@ export interface AppBootstrapOptions {
   codesUrl?: string;
 }
 
-export default class App extends EventEmitter {
+export class App extends EventEmitter {
   static addListener<K extends string & keyof EventMapOf<App>>(type: K, handler: EventHandler<(EventMapOf<App>)[K] & Event<App>>): EventListener {
     let listener = {
       type: type,

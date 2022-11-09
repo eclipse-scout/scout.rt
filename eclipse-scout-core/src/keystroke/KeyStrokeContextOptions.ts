@@ -10,7 +10,7 @@
  */
 import {KeyStroke, ScoutKeyboardEvent} from '../index';
 
-export default interface KeyStrokeContextOptions {
+export interface KeyStrokeContextOptions {
   /**
    * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
    */

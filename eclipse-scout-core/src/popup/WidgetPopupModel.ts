@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupModel, Widget} from '../index';
-import {ResizableMode} from '../resizable/Resizable';
-import {ObjectOrChildModel} from '../scout';
+import {ObjectOrChildModel, PopupModel, ResizableMode, Widget} from '../index';
 
-export default interface WidgetPopupModel<TContent extends Widget = Widget> extends PopupModel {
+export interface WidgetPopupModel<TContent extends Widget = Widget> extends PopupModel {
   /**
    * Default is false.
    */

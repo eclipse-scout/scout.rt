@@ -8,15 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BenchColumnEventMap, BenchColumnModel, DesktopTabBoxController, EventHandler, FlexboxLayout, FlexboxLayoutData, HtmlComponent, scout, SimpleTabBox, Splitter, strings, Widget, widgets} from '../../index';
-import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from '../../tabbox/SimpleTabBoxEventMap';
-import BenchRowLayoutData from './layout/BenchRowLayoutData';
-import {DisplayViewId} from '../../tabbox/SimpleTab';
-import {SplitterMoveEvent} from '../../splitter/SplitterEventMap';
-import {OutlineContent} from './DesktopBench';
-import {InitModelOf} from '../../scout';
+import {
+  arrays, BenchColumnEventMap, BenchColumnModel, BenchRowLayoutData, DesktopTabBoxController, DisplayViewId, EventHandler, FlexboxLayout, FlexboxLayoutData, HtmlComponent, InitModelOf, OutlineContent, scout, SimpleTabBox,
+  SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent, Splitter, SplitterMoveEvent, strings, Widget, widgets
+} from '../../index';
 
-export default class BenchColumn extends Widget implements BenchColumnModel {
+export class BenchColumn extends Widget implements BenchColumnModel {
   declare model: BenchColumnModel;
   declare eventMap: BenchColumnEventMap;
   declare self: BenchColumn;

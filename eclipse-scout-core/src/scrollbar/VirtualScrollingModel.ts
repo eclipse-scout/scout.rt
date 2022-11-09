@@ -10,7 +10,7 @@
  */
 import {Range, Widget} from '../index';
 
-export default interface VirtualScrollingModel {
+export interface VirtualScrollingModel {
   enabled?: boolean;
   minRowHeight?: number;
   viewRangeSize?: number;

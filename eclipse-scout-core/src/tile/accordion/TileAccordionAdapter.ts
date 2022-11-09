@@ -10,7 +10,7 @@
  */
 import {AccordionAdapter, TileAccordionModel} from '../../index';
 
-export default class TileAccordionAdapter extends AccordionAdapter {
+export class TileAccordionAdapter extends AccordionAdapter {
   protected override _initProperties(model: TileAccordionModel & { takeTileFiltersFromGroup: boolean }) {
     super._initProperties(model);
     // TileGridAdapter creates a RemoteTileFilter for each grid.

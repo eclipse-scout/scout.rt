@@ -10,6 +10,6 @@
  */
 import {FormEventMap, PropertyChangeEvent} from '../index';
 
-export default interface TileOverviewFormEventMap extends FormEventMap {
+export interface TileOverviewFormEventMap extends FormEventMap {
   'propertyChange:scrollable': PropertyChangeEvent<boolean>;
 }

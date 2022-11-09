@@ -10,7 +10,7 @@
  */
 import {Dimension, HtmlCompPrefSizeOptions, PopupLayout, TimePickerPopup} from '../index';
 
-export default class TimePickerPopupLayout extends PopupLayout {
+export class TimePickerPopupLayout extends PopupLayout {
   declare popup: TimePickerPopup;
 
   constructor(popup: TimePickerPopup) {

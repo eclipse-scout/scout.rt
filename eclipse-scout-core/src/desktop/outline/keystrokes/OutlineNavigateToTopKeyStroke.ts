@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractTreeNavigationKeyStroke, HAlign, keys, Outline} from '../../../index';
-import {TreeEventCurrentNode} from '../../../tree/keystrokes/AbstractTreeNavigationKeyStroke';
+import {AbstractTreeNavigationKeyStroke, HAlign, keys, Outline, TreeEventCurrentNode} from '../../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class OutlineNavigateToTopKeyStroke extends AbstractTreeNavigationKeyStroke {
+export class OutlineNavigateToTopKeyStroke extends AbstractTreeNavigationKeyStroke {
   declare field: Outline;
 
   constructor(tree: Outline, modifierBitMask: number) {

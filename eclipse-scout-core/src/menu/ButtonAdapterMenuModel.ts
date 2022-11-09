@@ -10,7 +10,7 @@
  */
 import {Button, MenuBar, MenuModel} from '../index';
 
-export default interface ButtonAdapterMenuModel extends MenuModel {
+export interface ButtonAdapterMenuModel extends MenuModel {
   button?: Button;
   menubar?: MenuBar;
 }

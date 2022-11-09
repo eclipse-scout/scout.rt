@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionModel, Filter, FilterSupport, TextFilter, Tile, TileAccordionSelectionHandler, TileGridLayoutConfig} from '../../index';
-import {Comparator} from '../../types';
-import {ObjectOrModel} from '../../scout';
+import {AccordionModel, Comparator, Filter, FilterSupport, ObjectOrModel, TextFilter, Tile, TileAccordionSelectionHandler, TileGridLayoutConfig} from '../../index';
 
-export default interface TileAccordionModel extends AccordionModel {
+export interface TileAccordionModel extends AccordionModel {
   /** @see TileGridModel.gridColumnCount */
   gridColumnCount?: number;
   /** @see TileGridModel.multiSelect */

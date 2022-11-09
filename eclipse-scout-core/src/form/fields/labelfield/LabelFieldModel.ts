@@ -10,7 +10,7 @@
  */
 import {ValueFieldModel} from '../../../index';
 
-export default interface LabelFieldModel extends ValueFieldModel<string> {
+export interface LabelFieldModel extends ValueFieldModel<string> {
   /**
    * Default is false.
    */

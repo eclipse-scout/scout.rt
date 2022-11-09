@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnModel, DecimalFormat} from '../../index';
-import {DecimalFormatOptions} from '../../text/DecimalFormat';
-import {NumberColumnAggregationFunction} from './NumberColumn';
+import {ColumnModel, DecimalFormat, DecimalFormatOptions, NumberColumnAggregationFunction} from '../../index';
 
-export default interface NumberColumnModel extends ColumnModel<number> {
+export interface NumberColumnModel extends ColumnModel<number> {
   aggregationFunction?: NumberColumnAggregationFunction;
   backgroundEffect?: 'colorGradient1' | 'colorGradient2' | 'barChart';
   decimalFormat?: DecimalFormat | string | DecimalFormatOptions;

@@ -10,7 +10,7 @@
  */
 import {keys, KeyStroke, Widget} from '../index';
 
-export default class ContextMenuKeyStroke extends KeyStroke {
+export class ContextMenuKeyStroke extends KeyStroke {
 
   protected _contextFunction: (event: JQuery.KeyboardEventBase) => void;
   protected _bindObject: any;

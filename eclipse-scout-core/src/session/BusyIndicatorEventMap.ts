@@ -10,7 +10,7 @@
  */
 import {BusyIndicator, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface BusyIndicatorEventMap extends WidgetEventMap {
+export interface BusyIndicatorEventMap extends WidgetEventMap {
   'cancel': Event<BusyIndicator>;
   'propertyChange:details': PropertyChangeEvent<string>;
   'propertyChange:label': PropertyChangeEvent<string>;

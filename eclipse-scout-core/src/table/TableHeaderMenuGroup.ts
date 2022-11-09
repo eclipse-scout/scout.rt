@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, TableHeaderMenuGroupEventMap, TableHeaderMenuGroupModel, Widget, widgets} from '../index';
-import {InitModelOf} from '../scout';
+import {InitModelOf, scout, TableHeaderMenuGroupEventMap, TableHeaderMenuGroupModel, Widget, widgets} from '../index';
 
-export default class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroupModel {
+export class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroupModel {
   declare model: TableHeaderMenuGroupModel;
   declare eventMap: TableHeaderMenuGroupEventMap;
   declare self: TableHeaderMenuGroup;

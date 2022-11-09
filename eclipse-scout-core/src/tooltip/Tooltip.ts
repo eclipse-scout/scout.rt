@@ -8,17 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, graphics, keys, Menu, Rectangle, scout, scrollbars, Status, strings, TooltipEventMap, TooltipModel, Widget} from '../index';
+import {arrays, Form, graphics, keys, Menu, ObjectOrChildModel, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget} from '../index';
 import $ from 'jquery';
-import {StatusSeverity} from '../status/Status';
-import {ObjectOrChildModel} from '../scout';
 import KeyDownEvent = JQuery.KeyDownEvent;
 
 export type TooltipPosition = 'top' | 'bottom';
 export type TooltipDirection = 'right' | 'left';
 export type TooltipScrollType = 'position' | 'remove';
 
-export default class Tooltip extends Widget implements TooltipModel {
+export class Tooltip extends Widget implements TooltipModel {
   declare model: TooltipModel;
   declare eventMap: TooltipEventMap;
   declare self: Tooltip;

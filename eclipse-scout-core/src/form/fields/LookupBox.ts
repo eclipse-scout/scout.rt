@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, HtmlComponent, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, Status, strings, ValueField, Widget} from '../../index';
+import {AbstractLayout, arrays, HtmlComponent, InitModelOf, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupCallOrModel, LookupResult, LookupRow, objects, PropertyChangeEvent, Status, strings, ValueField, Widget} from '../../index';
 import $ from 'jquery';
-import {LookupCallOrModel} from '../../lookup/LookupCall';
-import {InitModelOf} from '../../scout';
 
-export default abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
+export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
   declare model: LookupBoxModel<TValue>;
   declare eventMap: LookupBoxEventMap<TValue>;
   declare self: LookupBox<any>;

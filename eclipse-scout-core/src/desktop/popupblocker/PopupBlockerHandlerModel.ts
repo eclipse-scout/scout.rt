@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupBlockerHandler, Session} from '../../index';
-import {ObjectModel} from '../../scout';
+import {ObjectModel, PopupBlockerHandler, Session} from '../../index';
 
-export default interface PopupBlockerHandlerModel extends ObjectModel<PopupBlockerHandler> {
+export interface PopupBlockerHandlerModel extends ObjectModel<PopupBlockerHandler> {
   session?: Session;
 
   /**

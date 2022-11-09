@@ -13,7 +13,7 @@ import $ from 'jquery';
 
 export type FlexboxDirection = EnumObject<typeof FlexboxLayout.Direction>;
 
-export default class FlexboxLayout extends AbstractLayout {
+export class FlexboxLayout extends AbstractLayout {
   childrenLayoutDatas: FlexboxLayoutData[];
   cacheKey: string[];
   protected _getDimensionValue: (dimension: Dimension) => number;

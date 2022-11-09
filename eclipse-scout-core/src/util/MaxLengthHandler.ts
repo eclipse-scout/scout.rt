@@ -8,13 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DesktopNotification, MaxLengthHandlerModel, objects, scout, Status} from '../index';
+import {arrays, DesktopNotification, InitModelOf, MaxLengthHandlerModel, MaxLengthHandlerTarget, objects, scout, SomeRequired, Status} from '../index';
 import $ from 'jquery';
-import {assertValue, InitModelOf} from '../scout';
-import {MaxLengthHandlerTarget} from './MaxLengthHandlerModel';
-import {SomeRequired} from '../types';
 
-export default class MaxLengthHandler implements MaxLengthHandlerModel {
+export class MaxLengthHandler implements MaxLengthHandlerModel {
   declare model: MaxLengthHandlerModel;
   declare initModel: SomeRequired<this['model'], 'target'>;
 
@@ -25,7 +22,7 @@ export default class MaxLengthHandler implements MaxLengthHandlerModel {
   constructor(options: InitModelOf<MaxLengthHandler>) {
     // @ts-expect-error
     options = options || {};
-    assertValue(options.target, 'target is mandatory');
+    scout.assertValue(options.target, 'target is mandatory');
 
     this.$textInputField = null;
     this.onInputFieldPaste = this._onInputFieldPaste.bind(this);

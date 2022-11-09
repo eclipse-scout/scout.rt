@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EventHandler, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, Widget} from '../index';
-import {SwipeCallbackEvent} from '../util/events';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
+import {arrays, EventHandler, events, graphics, HtmlComponent, InitModelOf, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, ObjectOrChildModel, PropertyChangeEvent, SwipeCallbackEvent, Widget} from '../index';
 
-export default class ModeSelector<TModeRef = any> extends Widget implements ModeSelectorModel<TModeRef> {
+export class ModeSelector<TModeRef = any> extends Widget implements ModeSelectorModel<TModeRef> {
   declare model: ModeSelectorModel<TModeRef>;
   declare eventMap: ModeSelectorEventMap<TModeRef>;
   declare self: ModeSelector;

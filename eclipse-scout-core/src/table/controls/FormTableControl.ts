@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, Form, FormTableControlEventMap, FormTableControlLayout, FormTableControlModel, GroupBox, TabBox, TableControl} from '../../index';
-import AbstractLayout from '../../layout/AbstractLayout';
-import {InitModelOf} from '../../scout';
+import {AbstractLayout, Event, EventHandler, Form, FormTableControlEventMap, FormTableControlLayout, FormTableControlModel, GroupBox, InitModelOf, TabBox, TableControl} from '../../index';
 
-export default class FormTableControl extends TableControl implements FormTableControlModel {
+export class FormTableControl extends TableControl implements FormTableControlModel {
   declare model: FormTableControlModel;
   declare eventMap: FormTableControlEventMap;
   declare self: FormTableControl;

@@ -10,7 +10,7 @@
  */
 import {FormFieldLayout, graphics, Rectangle, StringField} from '../../../index';
 
-export default class StringFieldLayout extends FormFieldLayout {
+export class StringFieldLayout extends FormFieldLayout {
 
   constructor(stringField: StringField) {
     super(stringField);

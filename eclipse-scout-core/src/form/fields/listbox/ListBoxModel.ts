@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupBoxModel, Table} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {LookupBoxModel, ObjectOrChildModel, Table} from '../../../index';
 
-export default interface ListBoxModel<TValue> extends LookupBoxModel<TValue> {
+export interface ListBoxModel<TValue> extends LookupBoxModel<TValue> {
   table?: ObjectOrChildModel<Table>;
 }

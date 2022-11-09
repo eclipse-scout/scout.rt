@@ -11,7 +11,7 @@
 import {HAlign, KeyStroke, ScoutKeyboardEvent, TabItem} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class TabItemKeyStroke extends KeyStroke {
+export class TabItemKeyStroke extends KeyStroke {
   declare field: TabItem;
 
   constructor(keyStroke: string, field: TabItem) {

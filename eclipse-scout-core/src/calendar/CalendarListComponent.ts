@@ -18,7 +18,7 @@ import {CalendarComponent, EventListener, PropertyChangeEvent} from '../index';
  * new instances of CalendarListComponent are created every time we click on a date
  * in the calendar, but the CalendarComponent instance is always the same.
  */
-export default class CalendarListComponent {
+export class CalendarListComponent {
   partDay: Date;
   source: CalendarComponent;
   $container: JQuery;

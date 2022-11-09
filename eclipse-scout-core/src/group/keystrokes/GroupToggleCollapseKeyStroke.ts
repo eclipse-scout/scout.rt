@@ -10,7 +10,7 @@
  */
 import {Group, keys, KeyStroke} from '../../index';
 
-export default class GroupToggleCollapseKeyStroke extends KeyStroke {
+export class GroupToggleCollapseKeyStroke extends KeyStroke {
   declare field: Group;
 
   constructor(group: Group) {

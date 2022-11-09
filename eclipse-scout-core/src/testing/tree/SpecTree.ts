@@ -10,7 +10,7 @@
  */
 import {DoubleClickSupport, Range, Tree, TreeNode} from '../../index';
 
-export default class SpecTree extends Tree {
+export class SpecTree extends Tree {
   declare _doubleClickSupport: DoubleClickSupport & { _lastTimestamp: number };
 
   override _calculateCurrentViewRange(): Range {

@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, SimpleTabBox} from '../index';
 
-export default class SimpleTabViewContentLayout extends AbstractLayout {
+export class SimpleTabViewContentLayout extends AbstractLayout {
   tabBox: SimpleTabBox;
 
   constructor(tabBox: SimpleTabBox) {

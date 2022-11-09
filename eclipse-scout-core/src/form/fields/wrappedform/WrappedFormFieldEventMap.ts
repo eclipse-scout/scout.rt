@@ -10,6 +10,6 @@
  */
 import {Form, FormFieldEventMap, PropertyChangeEvent} from '../../../index';
 
-export default interface WrappedFormFieldEventMap extends FormFieldEventMap {
+export interface WrappedFormFieldEventMap extends FormFieldEventMap {
   'propertyChange:innerForm': PropertyChangeEvent<Form>;
 }

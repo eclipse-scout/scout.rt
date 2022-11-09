@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormSpecHelper} from '../../src/testing/index';
+import {FormSpecHelper, JQueryTesting} from '../../src/testing/index';
 import {tooltips, ValueField} from '../../src/index';
-import {triggerMouseEnter, triggerMouseLeave} from '../../src/testing/jquery-testing';
 
 describe('scout.tooltips', () => {
 
@@ -64,7 +63,7 @@ describe('scout.tooltips', () => {
     });
     expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
-    triggerMouseEnter(formField.$container);
+    JQueryTesting.triggerMouseEnter(formField.$container);
     jasmine.clock().tick(100);
 
     let tooltip = $('body').find('.tooltip');
@@ -73,7 +72,7 @@ describe('scout.tooltips', () => {
     expect(tooltip.length).toBe(1);
     expect(tooltipContent.text()).toBe('Test2');
 
-    triggerMouseLeave(formField.$container);
+    JQueryTesting.triggerMouseLeave(formField.$container);
 
     tooltip = $('body').find('.tooltip');
     expect(tooltip).not.toBeUndefined();
@@ -93,7 +92,7 @@ describe('scout.tooltips', () => {
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
-      triggerMouseEnter(formField.$container);
+      JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
       let tooltip = $('body').find('.tooltip');
@@ -112,7 +111,7 @@ describe('scout.tooltips', () => {
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
-      triggerMouseEnter(formField.$container);
+      JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
       let tooltip = $('body').find('.tooltip');
@@ -133,7 +132,7 @@ describe('scout.tooltips', () => {
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
-      triggerMouseEnter(formField.$container);
+      JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
       let tooltip = $('body').find('.tooltip');
@@ -152,7 +151,7 @@ describe('scout.tooltips', () => {
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
       formField.$container.data('tooltipText', 'Test4');
-      triggerMouseEnter(formField.$container);
+      JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
       let tooltip = $('body').find('.tooltip');
@@ -175,7 +174,7 @@ describe('scout.tooltips', () => {
       formField.$container.data('tooltipText', () => {
         return 'Test5';
       });
-      triggerMouseEnter(formField.$container);
+      JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
       let tooltip = $('body').find('.tooltip');
@@ -197,7 +196,7 @@ describe('scout.tooltips', () => {
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
       formField.$container.data('tooltipText', 'Test7');
-      triggerMouseEnter(formField.$container);
+      JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
       let tooltip = $('body').find('.tooltip');
@@ -220,7 +219,7 @@ describe('scout.tooltips', () => {
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
-      triggerMouseEnter(formField.$container);
+      JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
       let tooltip = $('body').find('.tooltip');
@@ -248,7 +247,7 @@ describe('scout.tooltips', () => {
     let tooltip = $('body').find('.tooltip');
     expect(tooltip.length).toBe(0);
 
-    triggerMouseEnter($testElement);
+    JQueryTesting.triggerMouseEnter($testElement);
     jasmine.clock().tick(100);
 
     tooltip = $('body').find('.tooltip');
@@ -290,7 +289,7 @@ describe('scout.tooltips', () => {
       text: 'hard coded text'
     });
 
-    triggerMouseEnter($testElement);
+    JQueryTesting.triggerMouseEnter($testElement);
     jasmine.clock().tick(150);
 
     tooltip = $('body').find('.tooltip');
@@ -306,12 +305,12 @@ describe('scout.tooltips', () => {
     expect(tooltip.length).toBe(1);
     expect(tooltip.text()).toBe('my new text');
 
-    triggerMouseLeave($testElement);
+    JQueryTesting.triggerMouseLeave($testElement);
 
     tooltip = $('body').find('.tooltip');
     expect(tooltip.length).toBe(0);
 
-    triggerMouseEnter($testElement);
+    JQueryTesting.triggerMouseEnter($testElement);
     jasmine.clock().tick(80);
 
     tooltip = $('body').find('.tooltip');

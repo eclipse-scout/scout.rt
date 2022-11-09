@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, Widget, widgets} from '../index';
-import {Comparator} from '../types';
-import {GroupCollapseStyle} from '../group/Group';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
+import {AccordionLayout, AccordionModel, arrays, Comparator, EventHandler, Group, GroupCollapseStyle, HtmlComponent, InitModelOf, LoadingSupport, ObjectOrChildModel, objects, PropertyChangeEvent, Widget, widgets} from '../index';
 
-export default class Accordion extends Widget implements AccordionModel {
+export class Accordion extends Widget implements AccordionModel {
   declare model: AccordionModel;
   comparator: Comparator<Group>;
   collapseStyle: GroupCollapseStyle;

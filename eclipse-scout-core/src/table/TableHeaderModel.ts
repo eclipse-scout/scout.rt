@@ -10,7 +10,7 @@
  */
 import {Table, WidgetModel} from '../index';
 
-export default interface TableHeaderModel extends WidgetModel {
+export interface TableHeaderModel extends WidgetModel {
   table?: Table;
   headerMenusEnabled?: boolean;
 }

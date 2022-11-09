@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormSpecHelper, LocaleSpecHelper} from '../../../../src/testing/index';
+import {FormSpecHelper, JQueryTesting, LocaleSpecHelper} from '../../../../src/testing/index';
 import {DecimalFormat, Locale, NumberField, scout, Status} from '../../../../src/index';
-import {triggerClick} from '../../../../src/testing/jquery-testing';
 
 describe('NumberField', () => {
   let session: SandboxSession;
@@ -565,7 +564,7 @@ describe('NumberField', () => {
         label: 'label'
       });
       field.render();
-      triggerClick(field.$label);
+      JQueryTesting.triggerClick(field.$label);
       expect(field.$field).toBeFocused();
     });
 

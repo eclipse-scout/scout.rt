@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, Event, FormLifecycleMenu, scout} from '../../index';
-import {InitModelOf} from '../../scout';
+import {Action, Button, Event, FormLifecycleMenu, InitModelOf, scout} from '../../index';
 
-export default class OkMenu extends FormLifecycleMenu {
+export class OkMenu extends FormLifecycleMenu {
 
   constructor() {
     super();

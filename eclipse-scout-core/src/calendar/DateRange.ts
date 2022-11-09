@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates} from '../index';
-import {JsonDateRange} from '../util/dates';
+import {dates, JsonDateRange} from '../index';
 
-export default class DateRange {
+export class DateRange {
   from: Date;
   to: Date;
 

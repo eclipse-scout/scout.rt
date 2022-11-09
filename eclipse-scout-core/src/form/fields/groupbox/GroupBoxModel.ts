@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldModel, LogicalGridLayoutConfig, Menu, Notification} from '../../../index';
-import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
-import {GroupBoxBorderDecoration, GroupBoxMenuBarPosition} from './GroupBox';
-import {ObjectOrChildModel, ObjectOrModel} from '../../../scout';
+import {FormField, FormFieldModel, GroupBoxBorderDecoration, GroupBoxMenuBarPosition, LogicalGridLayoutConfig, Menu, MenuBarEllipsisPosition, Notification, ObjectOrChildModel, ObjectOrModel} from '../../../index';
 
-export default interface GroupBoxModel extends FormFieldModel {
+export interface GroupBoxModel extends FormFieldModel {
   fields?: ObjectOrChildModel<FormField>[];
   menuBarVisible?: boolean;
   menuBarPosition?: GroupBoxMenuBarPosition;

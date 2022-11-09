@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, DateField, DatePicker, DatePickerTouchPopupLayout, DatePickerTouchPopupModel, ParsingFailedStatus, scout, TouchPopup} from '../index';
-import {DateFieldAcceptInputEvent} from '../form/fields/datefield/DateFieldEventMap';
-import {InitModelOf} from '../scout';
+import {AbstractLayout, DateField, DateFieldAcceptInputEvent, DatePicker, DatePickerTouchPopupLayout, DatePickerTouchPopupModel, InitModelOf, ParsingFailedStatus, scout, TouchPopup} from '../index';
 
-export default class DatePickerTouchPopup extends TouchPopup {
+export class DatePickerTouchPopup extends TouchPopup {
   declare model: DatePickerTouchPopupModel;
   declare _widget: DatePicker;
   declare _field: DateField;

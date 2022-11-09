@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status} from '../index';
-import {InitModelOf} from '../scout';
+import {InitModelOf, Status} from '../index';
 
-export default class ValidationFailedStatus extends Status {
+export class ValidationFailedStatus extends Status {
 
   constructor(model?: InitModelOf<ValidationFailedStatus>) {
     super(model);

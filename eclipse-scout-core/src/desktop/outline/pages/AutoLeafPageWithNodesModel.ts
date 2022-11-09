@@ -10,6 +10,6 @@
  */
 import {PageModel, TableRow} from '../../../index';
 
-export default interface AutoLeafPageWithNodesModel extends PageModel {
+export interface AutoLeafPageWithNodesModel extends PageModel {
   row?: TableRow;
 }

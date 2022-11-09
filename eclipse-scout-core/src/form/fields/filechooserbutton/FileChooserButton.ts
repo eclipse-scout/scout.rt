@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Button, Device, Event, FileChooserButtonEventMap, FileChooserButtonModel, FileInput, HtmlComponent, scout, SingleLayout, strings, ValueField} from '../../../index';
-import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
-import {InitModelOf} from '../../../scout';
+import {arrays, Button, Device, Event, FileChooserButtonEventMap, FileChooserButtonModel, FileInput, FileInputChangeEvent, HtmlComponent, InitModelOf, scout, SingleLayout, strings, ValueField} from '../../../index';
 
-export default class FileChooserButton extends ValueField<File> implements FileChooserButtonModel {
+export class FileChooserButton extends ValueField<File> implements FileChooserButtonModel {
   declare model: FileChooserButtonModel;
   declare eventMap: FileChooserButtonEventMap;
   declare self: FileChooserButton;

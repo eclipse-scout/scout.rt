@@ -10,6 +10,6 @@
  */
 import {ButtonEventMap, PropertyChangeEvent} from '../../../index';
 
-export default interface RadioButtonEventMap<TValue> extends ButtonEventMap {
+export interface RadioButtonEventMap<TValue> extends ButtonEventMap {
   'propertyChange:wrapText': PropertyChangeEvent<boolean>;
 }

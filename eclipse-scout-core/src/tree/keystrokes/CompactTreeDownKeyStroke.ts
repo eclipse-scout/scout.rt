@@ -10,7 +10,7 @@
  */
 import {AbstractCompactTreeControlKeyStroke, arrays, CompactTree, CompactTreeNode, keys} from '../../index';
 
-export default class CompactTreeDownKeyStroke extends AbstractCompactTreeControlKeyStroke {
+export class CompactTreeDownKeyStroke extends AbstractCompactTreeControlKeyStroke {
 
   constructor(compactProcessTree: CompactTree) {
     super(compactProcessTree);

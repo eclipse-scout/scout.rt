@@ -10,7 +10,7 @@
  */
 import {Button, FormFieldTile, NullLayout, strings, tooltips} from '../../../index';
 
-export default class TileButton extends Button {
+export class TileButton extends Button {
   $iconContainer: JQuery;
 
   constructor() {

@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, GlassPaneContribution, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
-import {InitModelOf} from '../scout';
+import {Event, EventHandler, GlassPaneContribution, InitModelOf, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
 
 export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C' | 'OUTLINE' | 'OUTLINE_SELECTOR' | 'PAGE_DETAIL' | 'PAGE_SEARCH' | 'PAGE_TABLE';
 
-export default class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabModel<TView> {
+export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabModel<TView> {
   declare model: SimpleTabModel<TView>;
   declare eventMap: SimpleTabEventMap<TView>;
   declare self: SimpleTab<any>;

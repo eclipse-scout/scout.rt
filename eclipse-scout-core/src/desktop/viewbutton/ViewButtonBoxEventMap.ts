@@ -10,7 +10,7 @@
  */
 import {PropertyChangeEvent, ViewButton, WidgetEventMap} from '../../index';
 
-export default interface ViewButtonBoxEventMap extends WidgetEventMap {
+export interface ViewButtonBoxEventMap extends WidgetEventMap {
   'propertyChange:menuButtons': PropertyChangeEvent<ViewButton[]>;
   'propertyChange:selectedMenuButtonAlwaysVisible': PropertyChangeEvent<boolean>;
   'propertyChange:tabButtons': PropertyChangeEvent<ViewButton[]>;

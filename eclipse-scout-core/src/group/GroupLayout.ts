@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, Group, HtmlComponent, HtmlCompPrefSizeOptions} from '../index';
 
-export default class GroupLayout extends AbstractLayout {
+export class GroupLayout extends AbstractLayout {
   group: Group;
 
   constructor(group: Group) {

@@ -10,7 +10,7 @@
  */
 import {FileChooserField, PropertyChangeEvent, ValueFieldAdapter} from '../../../index';
 
-export default class FileChooserFieldAdapter extends ValueFieldAdapter {
+export class FileChooserFieldAdapter extends ValueFieldAdapter {
   declare widget: FileChooserField;
 
   static PROPERTIES_ORDER = ['value', 'displayText'];

@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, graphics, Table, TableRow} from '../../index';
+import {AggregateTableRow, Column, graphics, Table, TableRow} from '../../index';
 import $ from 'jquery';
-import {AggregateTableRow} from '../Table';
 
-export default class ColumnOptimalWidthMeasurer {
+export class ColumnOptimalWidthMeasurer {
   column: Column<any>;
   table: Table;
   deferred: JQuery.Deferred<number>;

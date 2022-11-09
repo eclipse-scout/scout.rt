@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-enum MenuDestinations {
+export enum MenuDestinations {
   MENU_BAR = 1,
   CONTEXT_MENU = 2,
   HEADER = 3
 }
-
-export default MenuDestinations;

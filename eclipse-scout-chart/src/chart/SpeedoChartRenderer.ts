@@ -11,7 +11,7 @@
 import {EnumObject, numbers, RoundingMode} from '@eclipse-scout/core';
 import {AbstractSvgChartRenderer, Chart} from '../index';
 
-export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
+export class SpeedoChartRenderer extends AbstractSvgChartRenderer {
 
   segmentSelectorForAnimation: string;
 

@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, KeyStroke, Menu, PropertyChangeEvent, Tree, TreeNode, WidgetEventMap} from '../index';
-import {TreeCheckableStyle, TreeDisplayStyle} from './Tree';
-import {FileDropEvent} from '../util/dragAndDrop';
+import {Event, FileDropEvent, KeyStroke, Menu, PropertyChangeEvent, Tree, TreeCheckableStyle, TreeDisplayStyle, TreeNode, WidgetEventMap} from '../index';
 
 export interface TreeAllChildNodesDeletedEvent<T = Tree> extends Event<T> {
   parentNode: TreeNode;
@@ -63,7 +61,7 @@ export interface TreeNodesUpdatedEvent<T = Tree> extends Event<T> {
   nodes: TreeNode[];
 }
 
-export default interface TreeEventMap extends WidgetEventMap {
+export interface TreeEventMap extends WidgetEventMap {
   'allChildNodesDeleted': TreeAllChildNodesDeletedEvent;
   'childNodeOrderChanged': TreeChildNodeOrderChangedEvent;
   'drop': TreeDropEvent;

@@ -9,13 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractChartRenderer, ChartEventMap, ChartJsRenderer, ChartLayout, ChartModel, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
-import {arrays, colorSchemes, EnumObject, HtmlComponent, objects, Widget} from '@eclipse-scout/core';
-import {ColorScheme} from '@eclipse-scout/core/src/util/colorSchemes';
+import {arrays, ColorScheme, colorSchemes, EnumObject, HtmlComponent, InitModelOf, objects, Widget} from '@eclipse-scout/core';
 import {GreenAreaPosition} from './SpeedoChartRenderer';
 import {ChartConfiguration, LinearScaleOptions, RadialLinearScaleOptions} from 'chart.js';
-import {InitModelOf} from '@eclipse-scout/core/src/scout';
 
-export default class Chart extends Widget implements ChartModel {
+export class Chart extends Widget implements ChartModel {
   declare model: ChartModel;
   declare eventMap: ChartEventMap;
   declare self: Chart;
@@ -89,7 +87,7 @@ export default class Chart extends Widget implements ChartModel {
     this.htmlComp.setLayout(new ChartLayout(this));
 
     // !!! Do _not_ update the chart here, because usually the container size
-    // !!! is not correct anyways during the render phase. The ChartLayout
+    // !!! is not correct anyway during the render phase. The ChartLayout
     // !!! will eventually call updateChart() when the layout is validated.
   }
 
@@ -174,7 +172,7 @@ export default class Chart extends Widget implements ChartModel {
       delete oldConfigWithNewData.data;
     }
 
-    // the label map is technically part of the config, but it is handled as data. Therefore it is excluded from this check.
+    // the label map is technically part of the config, but it is handled as data. Therefore, it is excluded from this check.
     let transferLabelMap = (source, target, identifier) => {
       if (!source || !target || !identifier) {
         return;

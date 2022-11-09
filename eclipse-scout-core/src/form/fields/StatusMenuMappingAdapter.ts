@@ -10,5 +10,5 @@
  */
 import {ModelAdapter} from '../../index';
 
-export default class StatusMenuMappingAdapter extends ModelAdapter {
+export class StatusMenuMappingAdapter extends ModelAdapter {
 }

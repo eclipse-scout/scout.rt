@@ -14,6 +14,6 @@ export interface SearchOutlineSearchEvent<T = SearchOutline> extends Event<T> {
   query: string;
 }
 
-export default interface SearchOutlineEventMap extends OutlineEventMap {
+export interface SearchOutlineEventMap extends OutlineEventMap {
   'search': SearchOutlineSearchEvent;
 }

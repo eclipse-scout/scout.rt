@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Device, FileChooserField, scout, Status} from '../../../../src/index';
-import {FormSpecHelper} from '../../../../src/testing/index';
-import {triggerClick} from '../../../../src/testing/jquery-testing';
+import {FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 
 describe('FileChooserField', () => {
   let session: SandboxSession;
@@ -126,7 +125,7 @@ describe('FileChooserField', () => {
         label: 'label'
       });
       field.render();
-      triggerClick(field.$label);
+      JQueryTesting.triggerClick(field.$label);
       expect(field.$field).toBeFocused();
     });
 

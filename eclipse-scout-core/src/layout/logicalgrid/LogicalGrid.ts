@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridConfig, LogicalGridContainer, scout} from '../../index';
-import {ObjectModel, ObjectWithType} from '../../scout';
+import {LogicalGridConfig, LogicalGridContainer, ObjectModel, ObjectWithType, scout} from '../../index';
 
 export interface LogicalGridOptions extends ObjectModel<LogicalGrid> {
   gridConfig?: LogicalGridConfig | object;
@@ -18,7 +17,7 @@ export interface LogicalGridOptions extends ObjectModel<LogicalGrid> {
 /**
  * Base class for every logical grid. The concrete grids should implement {@link _validate}.
  */
-export default abstract class LogicalGrid implements ObjectWithType {
+export abstract class LogicalGrid implements ObjectWithType {
   declare model: LogicalGridOptions;
 
   dirty: boolean;

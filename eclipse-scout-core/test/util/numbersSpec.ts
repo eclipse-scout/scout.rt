@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import * as numbers from '../../src/util/numbers';
-import RoundingMode from '../../src/util/RoundingMode';
+import {numbers, RoundingMode} from '../../src/index';
 
 describe('scout.numbers', () => {
 

@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface SliderModel extends WidgetModel {
+export interface SliderModel extends WidgetModel {
   /**
    * Default is 0.
    */

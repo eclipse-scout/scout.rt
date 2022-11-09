@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout, TypeDescriptor} from './index';
+import {FullModelOf, InitModelOf, ModelOf, ObjectModel, objects, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
 import $ from 'jquery';
-import {FullModelOf, InitModelOf, ModelOf, ObjectModel} from './scout';
-import {TypeDescriptorOptions} from './TypeDescriptor';
 
 export type ObjectCreator = (model?: any) => object;
 export type ObjectType<TObject = object, TModel = ModelOf<TObject>> = string | (new(model?: TModel) => TObject);
@@ -40,7 +38,7 @@ export interface RegisterNamespaceOptions {
 /**
  * @singleton
  */
-export default class ObjectFactory {
+export class ObjectFactory {
   /** use {@link createUniqueId} to generate a new ID */
   uniqueIdSeqNo: number;
 

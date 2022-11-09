@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Group, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel} from '../../src/index';
-import {triggerClick, triggerDoubleClick, triggerMouseDown} from '../../src/testing/jquery-testing';
-import TileModel from '../../src/tile/TileModel';
-import {InitModelOf} from '../../src/scout';
+import {Group, InitModelOf, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel} from '../../src/index';
+import {JQueryTesting} from '../../src/testing/index';
 
 describe('TileGrid', () => {
   let session: SandboxSession;
@@ -602,7 +600,7 @@ describe('TileGrid', () => {
         tileGrid.render();
         let tile0 = tileGrid.tiles[0];
 
-        triggerMouseDown(tile0.$container);
+        JQueryTesting.triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
@@ -617,7 +615,7 @@ describe('TileGrid', () => {
         tileGrid.selectTile(tile1);
         expect(tile1.selected).toBe(true);
 
-        triggerMouseDown(tile0.$container);
+        JQueryTesting.triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
         expect(tileGrid.selectedTiles.length).toBe(1);
@@ -639,7 +637,7 @@ describe('TileGrid', () => {
           }
         });
 
-        triggerMouseDown(tile0.$container);
+        JQueryTesting.triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
         expect(eventTriggered).toBe(false);
@@ -652,7 +650,7 @@ describe('TileGrid', () => {
         tileGrid.render();
         let tile0 = tileGrid.tiles[0];
 
-        triggerMouseDown(tile0.$container);
+        JQueryTesting.triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.focusedTile).toBe(tile0);
       });
@@ -669,7 +667,7 @@ describe('TileGrid', () => {
         tileGrid.render();
         let tile0 = tileGrid.tiles[0];
 
-        triggerMouseDown(tile0.$container);
+        JQueryTesting.triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
@@ -685,7 +683,7 @@ describe('TileGrid', () => {
         tileGrid.selectTile(tile1);
         expect(tile1.selected).toBe(true);
 
-        triggerMouseDown(tile0.$container);
+        JQueryTesting.triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
         expect(tileGrid.selectedTiles.length).toBe(1);
@@ -708,7 +706,7 @@ describe('TileGrid', () => {
           }
         });
 
-        triggerMouseDown(tile0.$container);
+        JQueryTesting.triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
         expect(eventTriggered).toBe(false);
@@ -726,7 +724,7 @@ describe('TileGrid', () => {
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(true);
 
-        triggerMouseDown(tile0.$container);
+        JQueryTesting.triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
         expect(tileGrid.selectedTiles.length).toBe(1);
@@ -746,7 +744,7 @@ describe('TileGrid', () => {
           expect(tile0.selected).toBe(false);
           expect(tile1.selected).toBe(true);
 
-          triggerMouseDown(tile0.$container, {
+          JQueryTesting.triggerMouseDown(tile0.$container, {
             modifier: 'ctrl'
           });
           expect(tile0.selected).toBe(true);
@@ -766,7 +764,7 @@ describe('TileGrid', () => {
           expect(tile0.selected).toBe(true);
           expect(tile1.selected).toBe(true);
 
-          triggerMouseDown(tile0.$container, {
+          JQueryTesting.triggerMouseDown(tile0.$container, {
             modifier: 'ctrl'
           });
           expect(tile0.selected).toBe(false);
@@ -783,7 +781,7 @@ describe('TileGrid', () => {
           tileGrid.selectTile(tile0);
           expect(tile0.selected).toBe(true);
 
-          triggerMouseDown(tile0.$container, {
+          JQueryTesting.triggerMouseDown(tile0.$container, {
             modifier: 'ctrl'
           });
           expect(tile0.selected).toBe(false);
@@ -812,7 +810,7 @@ describe('TileGrid', () => {
       expect(tile0.selected).toBe(false);
       expect(clickEventCount).toBe(0);
 
-      triggerClick(tile0.$container);
+      JQueryTesting.triggerClick(tile0.$container);
       expect(tile0.selected).toBe(false);
       expect(clickEventCount).toBe(1);
     });
@@ -842,7 +840,7 @@ describe('TileGrid', () => {
       expect(selectEventCount).toBe(0);
       expect(clickEventCount).toBe(0);
 
-      triggerClick(tile0.$container);
+      JQueryTesting.triggerClick(tile0.$container);
       expect(tile0.selected).toBe(true);
       expect(selectEventCount).toBe(1);
       expect(clickEventCount).toBe(1);
@@ -884,7 +882,7 @@ describe('TileGrid', () => {
       expect(clickEventCount).toBe(0);
       expect(actionEventCount).toBe(0);
 
-      triggerDoubleClick(tile0.$container);
+      JQueryTesting.triggerDoubleClick(tile0.$container);
       expect(tile0.selected).toBe(true);
       expect(selectEventCount).toBe(1);
       expect(clickEventCount).toBe(1);

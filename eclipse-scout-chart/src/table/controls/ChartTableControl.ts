@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, DateColumn, EventListener, Icon, icons, NumberColumn, objects, scout, scrollbars, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
+import {
+  arrays, Column, DateColumn, Event, EventListener, Icon, IconDesc, icons, InitModelOf, NumberColumn, objects, scout, scrollbars, strings, styles, Table, TableControl, TableMatrix, TableMatrixDateGroup, TableMatrixKeyAxis,
+  TableMatrixNumberGroup, TableMatrixResult, tooltips
+} from '@eclipse-scout/core';
 import {Chart, ChartTableControlEventMap, ChartTableControlLayout, ChartTableControlModel, ChartTableUserFilter} from '../../index';
 import $ from 'jquery';
-import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableMatrixResult} from '@eclipse-scout/core/src/table/TableMatrix';
 import {BubbleDataPoint, ChartData, ChartType as ChartJsType} from 'chart.js';
 import {ChartConfig, ClickObject} from '../../chart/Chart';
-import {Event, IconDesc, Table} from '@eclipse-scout/core/src';
-import {InitModelOf} from '@eclipse-scout/core/src/scout';
 
-export default class ChartTableControl extends TableControl implements ChartTableControlModel {
+export class ChartTableControl extends TableControl implements ChartTableControlModel {
   declare model: ChartTableControlModel;
   declare eventMap: ChartTableControlEventMap;
   declare self: ChartTableControl;
@@ -458,7 +458,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     this._chartGroup1Map = {};
     this._chartGroup2Map = {};
 
-    // find best x and y axis: best is 9 different entries
+    // find best x- and y-axis: best is 9 different entries
     let matrix = new TableMatrix(this.table, this.session),
       columnCount = matrix.columnCount(false); // filterNumberColumns false: number columns will be filtered below
     columnCount.sort((a, b) => {
@@ -482,7 +482,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
       // probably not a good idea, because with a lot of data, the chart fails to provide an oversight over the data
       // when the user must scroll and only sees a small part of the chart.
       if (column1 instanceof DateColumn) {
-        // dates are always aggregated and thus we must not check if the chart has "too much data".
+        // dates are always aggregated, and thus we must not check if the chart has "too much data".
         enabled = true;
       } else {
         axisCount = this._axisCount(columnCount, column1);
@@ -608,7 +608,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     }
     if (!this.chartGroup2 || !this.chartGroup2.id || !this._chartGroup2Map[this.chartGroup2.id]) {
       $axisColumns = this.$yAxisSelect.children(':not(.disabled)');
-      this._setDefaultSelectionForGroup(2, columnCount, $axisColumns, 1 /* try to use the second column for the second group (if available). Otherwise the first column is used. */);
+      this._setDefaultSelectionForGroup(2, columnCount, $axisColumns, 1 /* try to use the second column for the second group (if available). Otherwise, the first column is used. */);
     }
   }
 

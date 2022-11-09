@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, DateRange, dates, Planner, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
+import {Calendar, DateRange, dates, InitModelOf, Planner, PlannerDisplayMode, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
 import $ from 'jquery';
-import {PlannerDisplayMode} from '../planner/Planner';
-import {InitModelOf} from '../scout';
 
-export default class YearPanel extends Widget implements YearPanelModel {
+export class YearPanel extends Widget implements YearPanelModel {
   declare model: YearPanelModel;
   declare eventMap: YearPanelEventMap;
   declare self: YearPanel;

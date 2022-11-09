@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, graphics, Slider} from '../index';
 
-export default class SliderLayout extends AbstractLayout {
+export class SliderLayout extends AbstractLayout {
   slider: Slider;
 
   constructor(slider: Slider) {

@@ -11,7 +11,7 @@
 import {Action, ActionKeyStroke} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class FormMenuActionKeyStroke extends ActionKeyStroke {
+export class FormMenuActionKeyStroke extends ActionKeyStroke {
 
   constructor(action: Action) {
     super(action);

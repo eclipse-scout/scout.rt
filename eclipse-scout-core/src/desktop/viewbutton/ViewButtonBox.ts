@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, Event, EventHandler, HtmlComponent, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewMenuTab, Widget, widgets} from '../../index';
-import {InitModelOf, ObjectOrChildModel} from '../../scout';
+import {Desktop, Event, EventHandler, HtmlComponent, InitModelOf, ObjectOrChildModel, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewMenuTab, Widget, widgets} from '../../index';
 
-export default class ViewButtonBox extends Widget implements ViewButtonBoxModel {
+export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   declare model: ViewButtonBoxModel;
   declare eventMap: ViewButtonBoxEventMap;
   declare self: ViewButtonBox;

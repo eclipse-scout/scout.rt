@@ -10,7 +10,7 @@
  */
 import {PropertyChangeEvent, ValueFieldEventMap} from '../../../index';
 
-export default interface FileChooserButtonEventMap extends ValueFieldEventMap<File> {
+export interface FileChooserButtonEventMap extends ValueFieldEventMap<File> {
   'propertyChange:acceptTypes': PropertyChangeEvent<string>;
   'propertyChange:fileExtensions': PropertyChangeEvent<string | string[]>;
   'propertyChange:iconId': PropertyChangeEvent<string>;

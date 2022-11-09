@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {FlexboxLayoutDataModel, LayoutData} from '../../index';
-import {InitModelOf} from '../../scout';
+import {FlexboxLayoutDataModel, InitModelOf, LayoutData} from '../../index';
 
-export default class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
+export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
   declare model: FlexboxLayoutDataModel;
 
   grow: number;

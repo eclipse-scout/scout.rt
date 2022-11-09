@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface TableHeaderEventMap extends WidgetEventMap {
+export interface TableHeaderEventMap extends WidgetEventMap {
   'propertyChange:headerMenusEnabled': PropertyChangeEvent<boolean>;
 }

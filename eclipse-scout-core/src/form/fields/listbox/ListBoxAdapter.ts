@@ -10,5 +10,5 @@
  */
 import {ValueFieldAdapter} from '../../../index';
 
-export default class ListBoxAdapter extends ValueFieldAdapter {
+export class ListBoxAdapter extends ValueFieldAdapter {
 }

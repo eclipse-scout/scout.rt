@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Column, FilterOrFunction, Menu, TableCompactHandler, TableControl, TableRow, TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel} from '../index';
-import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
-import {DropType} from '../util/dragAndDrop';
-import {StatusOrModel} from '../status/Status';
-import {ObjectOrChildModel, ObjectOrModel} from '../scout';
+import {
+  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableRow, TableSelectionHandler,
+  TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
+} from '../index';
 
-export default interface TableModel extends WidgetModel {
+export interface TableModel extends WidgetModel {
   /**
    * Configures whether the columns are auto resized. Default is false.
    * If true, all columns are resized so that the table never needs horizontal scrolling.

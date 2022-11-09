@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, WidgetModel} from '../../index';
-import {StatusSeverity} from '../../status/Status';
-import {ObjectOrChildModel} from '../../scout';
+import {Menu, ObjectOrChildModel, StatusSeverity, WidgetModel} from '../../index';
 
-export default interface StatusMenuMappingModel extends WidgetModel {
+export interface StatusMenuMappingModel extends WidgetModel {
   codes?: number[];
   severities?: StatusSeverity[];
   menu?: ObjectOrChildModel<Menu>;

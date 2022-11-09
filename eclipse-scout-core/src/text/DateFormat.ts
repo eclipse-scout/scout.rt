@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormatPatternDefinition, DateFormatPatternType, dates, Locale, numbers, objects, scout, strings} from '../index';
-import {DateFormatSymbols} from '../session/LocaleModel';
+import {DateFormatPatternDefinition, DateFormatPatternType, DateFormatSymbols, dates, Locale, numbers, objects, scout, strings} from '../index';
 
 /**
  * Custom JavaScript Date Format
@@ -32,7 +31,7 @@ import {DateFormatSymbols} from '../session/LocaleModel';
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
-export default class DateFormat {
+export class DateFormat {
   locale: Locale;
   pattern: string;
   symbols: DateFormatSymbols;

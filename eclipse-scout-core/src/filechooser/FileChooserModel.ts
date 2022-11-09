@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 
-export default interface FileChooserModel extends WidgetModel {
+export interface FileChooserModel extends WidgetModel {
   /**
    * Default is {@link FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE}
    */

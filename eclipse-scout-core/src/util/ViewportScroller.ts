@@ -9,11 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Point, ViewportScrollerModel} from '../index';
-import {SomeRequired} from '../types';
-import {InitModelOf} from '../scout';
+import {InitModelOf, Point, SomeRequired, ViewportScrollerModel} from '../index';
 
-export default class ViewportScroller implements ViewportScrollerModel {
+export class ViewportScroller implements ViewportScrollerModel {
   declare model: ViewportScrollerModel;
   declare initModel: SomeRequired<this['model'], 'viewportWidth' | 'viewportHeight'>;
 

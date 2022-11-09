@@ -10,6 +10,6 @@
  */
 import {ActionEventMap, Form, PropertyChangeEvent} from '../../index';
 
-export default interface FormTableControlEventMap extends ActionEventMap {
+export interface FormTableControlEventMap extends ActionEventMap {
   'propertyChange:form': PropertyChangeEvent<Form>;
 }

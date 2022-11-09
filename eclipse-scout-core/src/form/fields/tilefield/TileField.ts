@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventDelegator, FormField, LoadingSupport, TileFieldEventMap, TileFieldModel, TileGrid, Widget} from '../../../index';
-import {InitModelOf, ObjectOrChildModel} from '../../../scout';
+import {EventDelegator, FormField, InitModelOf, LoadingSupport, ObjectOrChildModel, TileFieldEventMap, TileFieldModel, TileGrid, Widget} from '../../../index';
 
-export default class TileField extends FormField implements TileFieldModel {
+export class TileField extends FormField implements TileFieldModel {
   declare model: TileFieldModel;
   declare eventMap: TileFieldEventMap;
   declare self: TileField;

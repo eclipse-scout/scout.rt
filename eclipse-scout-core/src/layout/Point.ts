@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-export default class Point {
+export class Point {
   x: number;
   y: number;
 

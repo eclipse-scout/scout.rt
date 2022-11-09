@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, Desktop, Event, EventMap, Session} from './index';
-import {AppBootstrapOptions, AppModel} from './App';
-import {ModelOf} from './scout';
+import {App, AppBootstrapOptions, AppModel, Desktop, Event, EventMap, Session} from './index';
 
 export interface AppInitEvent<T = App> extends Event<T> {
   options: AppModel;
@@ -28,7 +26,7 @@ export interface AppSessionReadyEvent<T = App> extends Event<T> {
   session: Session;
 }
 
-export default interface AppEventMap extends EventMap {
+export interface AppEventMap extends EventMap {
   'prepare': AppInitEvent;
   'init': AppInitEvent;
   'bootstrap': AppBootstrapEvent;

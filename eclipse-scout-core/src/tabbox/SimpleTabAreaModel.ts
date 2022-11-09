@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SimpleTab, WidgetModel} from '../index';
-import {SimpleTabAreaDisplayStyle} from './SimpleTabArea';
-import {SimpleTabView} from './SimpleTab';
+import {SimpleTab, SimpleTabAreaDisplayStyle, SimpleTabView, WidgetModel} from '../index';
 
-export default interface SimpleTabAreaModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
+export interface SimpleTabAreaModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
   displayStyle?: SimpleTabAreaDisplayStyle;
   tabs?: SimpleTab<TView>[];
 }

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Outline, OutlineViewButtonEventMap, OutlineViewButtonModel, ViewButton} from '../../index';
-import {InitModelOf} from '../../scout';
+import {InitModelOf, Outline, OutlineViewButtonEventMap, OutlineViewButtonModel, ViewButton} from '../../index';
 
-export default class OutlineViewButton extends ViewButton implements OutlineViewButtonModel {
+export class OutlineViewButton extends ViewButton implements OutlineViewButtonModel {
   declare model: OutlineViewButtonModel;
   declare eventMap: OutlineViewButtonEventMap;
   declare self: OutlineViewButton;

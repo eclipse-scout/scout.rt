@@ -29,7 +29,7 @@ export interface ColumnLayoutOptions {
  * |      |   |      |
  * +------+---+------+
  */
-export default class ColumnLayout extends AbstractLayout implements ColumnLayoutOptions {
+export class ColumnLayout extends AbstractLayout implements ColumnLayoutOptions {
   stretch: boolean;
   useCssWidth: number;
 

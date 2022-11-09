@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, TooltipEventMap, Widget} from '../index';
 
-export default interface WidgetTooltipEventMap extends TooltipEventMap {
+export interface WidgetTooltipEventMap extends TooltipEventMap {
   'propertyChange:content': PropertyChangeEvent<Widget>;
 }

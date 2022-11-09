@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Range} from '../../src/index';
-import {TreeSpecHelper} from '../../src/testing/index';
-import {triggerMouseDown} from '../../src/testing/jquery-testing';
+import {JQueryTesting, TreeSpecHelper} from '../../src/testing/index';
 
 describe('CompactTree', () => {
   let session: SandboxSession;
@@ -122,7 +121,7 @@ describe('CompactTree', () => {
       spyOn(tree, 'selectNodes');
       tree.render();
 
-      triggerMouseDown(tree.nodes[0].childNodes[0].$node);
+      JQueryTesting.triggerMouseDown(tree.nodes[0].childNodes[0].$node);
       expect(tree.selectNodes).toHaveBeenCalled();
     });
   });

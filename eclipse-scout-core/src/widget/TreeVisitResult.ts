@@ -11,7 +11,7 @@
 /**
  * Controls how the tree visiting should continue.
  */
-enum TreeVisitResult {
+export enum TreeVisitResult {
   /**
    * Normally continue visiting. Nothing will be skipped.
    */
@@ -27,5 +27,3 @@ enum TreeVisitResult {
    */
   SKIP_SUBTREE = 'skip_subtree'
 }
-
-export default TreeVisitResult;

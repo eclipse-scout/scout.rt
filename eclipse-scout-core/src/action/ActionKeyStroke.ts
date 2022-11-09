@@ -11,7 +11,7 @@
 import {Action, KeyStroke} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class ActionKeyStroke extends KeyStroke {
+export class ActionKeyStroke extends KeyStroke {
   declare field: Action;
 
   constructor(action: Action) {

@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, ContextMenuPopup, EllipsisMenu, Menu, scout, tooltips} from '../../src/index';
-import {MenuSpecHelper} from '../../src/testing/index';
-import {triggerMouseEnter, triggerMouseLeave} from '../../src/testing/jquery-testing';
+import {JQueryTesting, MenuSpecHelper} from '../../src/testing/index';
 
 describe('Menu', () => {
   let session: SandboxSession, $sandbox: JQuery, menu1: Menu, menu2: Menu;
@@ -141,7 +140,7 @@ describe('Menu', () => {
       let $tooltip = find$Tooltips();
       expect($tooltip.length).toBe(0);
 
-      triggerMouseEnter(testMenu.$container);
+      JQueryTesting.triggerMouseEnter(testMenu.$container);
       jasmine.clock().tick(1000);
 
       $tooltip = find$Tooltips();
@@ -154,8 +153,8 @@ describe('Menu', () => {
       expect($tooltip.length).toBe(1);
       expect($tooltip.text()).toBe('quack');
 
-      triggerMouseLeave(testMenu.$container);
-      triggerMouseEnter(testMenu.$container);
+      JQueryTesting.triggerMouseLeave(testMenu.$container);
+      JQueryTesting.triggerMouseEnter(testMenu.$container);
       jasmine.clock().tick(1000);
 
       $tooltip = find$Tooltips();

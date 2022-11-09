@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Locale, LocaleModel} from '../../index';
-import {DateFormatSymbols, DecimalFormatSymbols} from '../../session/LocaleModel';
+import {DateFormatSymbols, DecimalFormatSymbols, Locale, LocaleModel} from '../../index';
 
-export default class LocaleSpecHelper {
+export class LocaleSpecHelper {
   static DEFAULT_LOCALE = 'de-CH';
   static GERMAN_LOCALE = 'de-DE';
   static DEFAULT_DATE_FORMAT_PATTERN = 'dd.MM.yyyy';

@@ -10,7 +10,7 @@
  */
 import {Table, TableRow, TooltipModel} from '../index';
 
-export default interface TableTooltipModel extends TooltipModel {
+export interface TableTooltipModel extends TooltipModel {
   table?: Table;
   row?: TableRow;
 }

@@ -10,7 +10,7 @@
  */
 import {EventHandler, HtmlComponent, Menu, PropertyChangeEvent, widgets} from '../index';
 
-export default class ComboMenu extends Menu {
+export class ComboMenu extends Menu {
   protected _childVisibleChangeHandler: EventHandler<PropertyChangeEvent<boolean>>;
 
   constructor() {

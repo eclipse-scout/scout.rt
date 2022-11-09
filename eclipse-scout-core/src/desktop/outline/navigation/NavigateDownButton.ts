@@ -8,13 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, icons, NavigateButton, Page} from '../../../index';
+import {EventHandler, icons, InitModelOf, NavigateButton, OutlinePageRowLinkEvent, Page, TableRowsSelectedEvent} from '../../../index';
 import $ from 'jquery';
-import {TableRowsSelectedEvent} from '../../../table/TableEventMap';
-import {OutlinePageRowLinkEvent} from '../OutlineEventMap';
-import {InitModelOf} from '../../../scout';
 
-export default class NavigateDownButton extends NavigateButton {
+export class NavigateDownButton extends NavigateButton {
   protected _detailTableRowsSelectedHandler: EventHandler<TableRowsSelectedEvent>;
   protected _outlinePageRowLinkHandler: EventHandler<OutlinePageRowLinkEvent>;
 

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopBench, Event, Outline, PropertyChangeEvent, WidgetEventMap} from '../../index';
-import {OutlineContent} from './DesktopBench';
+import {DesktopBench, Event, Outline, OutlineContent, PropertyChangeEvent, WidgetEventMap} from '../../index';
 
-export default interface DesktopBenchEventMap extends WidgetEventMap {
+export interface DesktopBenchEventMap extends WidgetEventMap {
   'viewActivate': DesktopBenchViewActivateEvent;
   'viewAdd': DesktopBenchViewAddEvent;
   'viewDeactivate': DesktopBenchViewDeactivateEvent;

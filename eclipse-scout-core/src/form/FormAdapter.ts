@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Form, FormField, ModelAdapter, Widget} from '../index';
-import {ChildModelOf, FullModelOf} from '../scout';
+import {ChildModelOf, Event, Form, FormField, FullModelOf, ModelAdapter, Widget} from '../index';
 
-export default class FormAdapter extends ModelAdapter {
+export class FormAdapter extends ModelAdapter {
   declare widget: Form;
 
   protected override _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {

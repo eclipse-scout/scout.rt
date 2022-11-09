@@ -9,16 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, FormField, graphics, KeyStroke, Point, Popup,
-  Rectangle, scout, Table, TableRow, ValueField
+  AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, FormField, graphics, InitModelOf, KeyStroke,
+  KeyStrokeManagerKeyStrokeEvent, Point, Popup, Rectangle, scout, SomeRequired, Table, TableRow, TableRowOrderChangedEvent, ValueField
 } from '../../index';
 import $ from 'jquery';
-import {KeyStrokeManagerKeyStrokeEvent} from '../../keystroke/KeyStrokeManagerEventMap';
-import {TableRowOrderChangedEvent} from '../TableEventMap';
-import {InitModelOf} from '../../scout';
-import {SomeRequired} from '../../types';
 
-export default class CellEditorPopup<TValue> extends Popup implements CellEditorPopupModel<TValue> {
+export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupModel<TValue> {
   declare model: CellEditorPopupModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'parent' | 'column' | 'cell'>;
 

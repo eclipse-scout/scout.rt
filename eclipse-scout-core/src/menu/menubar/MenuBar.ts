@@ -9,18 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, ComboMenu, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
-  MenuBarRightKeyStroke, MenuDestinations, menus, PropertyChangeEvent, scout, Widget, widgets
+  arrays, ComboMenu, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
+  MenuBarRightKeyStroke, MenuDestinations, MenuFilter, MenuOrder, menus, ObjectOrChildModel, OrderedMenuItems, PropertyChangeEvent, scout, TooltipPosition, Widget, widgets
 } from '../../index';
-import {MenuOrder, OrderedMenuItems} from '../MenuItemsOrder';
-import {MenuFilter} from '../Menu';
-import {TooltipPosition} from '../../tooltip/Tooltip';
-import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
 export type MenuBarEllipsisPosition = EnumObject<typeof MenuBar.EllipsisPosition>;
 export type MenuBarPosition = EnumObject<typeof MenuBar.Position>;
 
-export default class MenuBar extends Widget implements MenuBarModel {
+export class MenuBar extends Widget implements MenuBarModel {
   declare model: MenuBarModel;
   declare eventMap: MenuBarEventMap;
   declare self: MenuBar;

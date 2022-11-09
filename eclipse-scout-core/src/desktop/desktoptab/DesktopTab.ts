@@ -10,7 +10,7 @@
  */
 import {arrays, ContextMenuPopup, DesktopTabArea, Form, HAlign, Menu, scout, SimpleTab} from '../../index';
 
-export default class DesktopTab extends SimpleTab<Form> {
+export class DesktopTab extends SimpleTab<Form> {
   declare parent: DesktopTabArea;
 
   protected override _render() {

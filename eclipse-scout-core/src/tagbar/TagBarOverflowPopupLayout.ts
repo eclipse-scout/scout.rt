@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Dimension, graphics, HtmlCompPrefSizeOptions, PopupLayout, TagBarOverflowPopup} from '../index';
+
 /*
  * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -19,7 +20,7 @@ import {Dimension, graphics, HtmlCompPrefSizeOptions, PopupLayout, TagBarOverflo
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class TagBarOverflowPopupLayout extends PopupLayout {
+export class TagBarOverflowPopupLayout extends PopupLayout {
   declare popup: TagBarOverflowPopup;
 
   override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {

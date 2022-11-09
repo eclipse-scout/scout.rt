@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusRule, ScoutKeyboardEvent, TooltipModel, Widget} from '../index';
-import {ObjectOrChildModel} from '../scout';
+import {FocusRule, ObjectOrChildModel, ScoutKeyboardEvent, TooltipModel, Widget} from '../index';
 
-export default interface WidgetTooltipModel extends TooltipModel {
+export interface WidgetTooltipModel extends TooltipModel {
   /**
    * The default interceptor stops the propagation for all keystrokes except ESCAPE and ENTER.
    * Otherwise, the tooltip would be destroyed for all keystrokes that bubble up to the

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DisplayParent, FormController, Session} from '../index';
-import {ObjectModel} from '../scout';
+import {DisplayParent, FormController, ObjectModel, Session} from '../index';
 
-export default interface FormControllerModel extends ObjectModel<FormController> {
+export interface FormControllerModel extends ObjectModel<FormController> {
   displayParent?: DisplayParent;
   session?: Session;
 }

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupCall, QueryBy, Session} from '../index';
-import {ObjectModel} from '../scout';
+import {LookupCall, ObjectModel, QueryBy, Session} from '../index';
 
-export default interface LookupCallModel<TKey> extends ObjectModel<LookupCall<TKey>> {
+export interface LookupCallModel<TKey> extends ObjectModel<LookupCall<TKey>> {
   session?: Session;
   hierarchical?: boolean;
   loadIncremental?: boolean;

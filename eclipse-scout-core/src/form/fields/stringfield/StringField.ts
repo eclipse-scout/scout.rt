@@ -9,13 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  BasicField, DesktopNotification, EnumObject, fields, InputFieldKeyStrokeContext, MaxLengthHandler, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldEventMap, StringFieldLayout, StringFieldModel,
-  strings, texts
+  BasicField, DesktopNotification, EnumObject, fields, InitModelOf, InputFieldKeyStrokeContext, MaxLengthHandler, objects, OldWheelEvent, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldEventMap,
+  StringFieldLayout, StringFieldModel, strings, texts
 } from '../../../index';
-import {OldWheelEvent} from '../../../types';
-import {InitModelOf} from '../../../scout';
 
-export default class StringField extends BasicField<string> {
+export class StringField extends BasicField<string> {
   declare model: StringFieldModel;
   declare eventMap: StringFieldEventMap;
   declare self: StringField;

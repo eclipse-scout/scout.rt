@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, Menu, MenuBarBoxEventMap, MenuBarBoxLayout, MenuBarBoxModel, Widget} from '../../index';
-import {TooltipPosition} from '../../tooltip/Tooltip';
-import {ObjectOrChildModel} from '../../scout';
+import {arrays, HtmlComponent, Menu, MenuBarBoxEventMap, MenuBarBoxLayout, MenuBarBoxModel, ObjectOrChildModel, TooltipPosition, Widget} from '../../index';
 
-export default class MenuBarBox extends Widget implements MenuBarBoxModel {
+export class MenuBarBox extends Widget implements MenuBarBoxModel {
   declare model: MenuBarBoxModel;
   declare eventMap: MenuBarBoxEventMap;
   declare self: MenuBarBox;

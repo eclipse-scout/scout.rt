@@ -11,7 +11,7 @@
 import {KeyStroke, ScoutKeyboardEvent, Widget} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class ClickActiveElementKeyStroke extends KeyStroke {
+export class ClickActiveElementKeyStroke extends KeyStroke {
 
   constructor(field: Widget, which: number[]) {
     super();

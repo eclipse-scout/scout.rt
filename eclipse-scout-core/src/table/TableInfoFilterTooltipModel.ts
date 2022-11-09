@@ -10,6 +10,6 @@
  */
 import {TableFooter, TooltipModel} from '../index';
 
-export default interface TableInfoFilterTooltipModel extends TooltipModel {
+export interface TableInfoFilterTooltipModel extends TooltipModel {
   tableFooter?: TableFooter;
 }

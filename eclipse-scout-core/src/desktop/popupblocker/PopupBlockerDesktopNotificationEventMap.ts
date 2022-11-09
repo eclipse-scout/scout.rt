@@ -10,6 +10,6 @@
  */
 import {DesktopNotificationEventMap, Event} from '../../index';
 
-export default interface PopupBlockerDesktopNotificationEventMap extends DesktopNotificationEventMap {
+export interface PopupBlockerDesktopNotificationEventMap extends DesktopNotificationEventMap {
   'linkClick': Event;
 }

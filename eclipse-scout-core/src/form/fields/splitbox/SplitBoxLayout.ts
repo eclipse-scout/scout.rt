@@ -11,7 +11,7 @@
 import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Rectangle, SplitBox} from '../../../index';
 import $ from 'jquery';
 
-export default class SplitBoxLayout extends AbstractLayout {
+export class SplitBoxLayout extends AbstractLayout {
   splitBox: SplitBox;
 
   constructor(splitBox: SplitBox) {

@@ -10,7 +10,7 @@
  */
 import {EventMap, Form, PropertyChangeEvent, Table} from '../../../index';
 
-export default interface PageEventMap extends EventMap {
+export interface PageEventMap extends EventMap {
   'propertyChange:detailForm': PropertyChangeEvent<Form>;
   'propertyChange:detailTable': PropertyChangeEvent<Table>;
 }

@@ -9,18 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbortKeyStroke, Action, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, DisplayParent, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, keys, KeyStrokeContext,
-  MessageBoxLayout, objects, scout, Status, strings, Widget
+  AbortKeyStroke, Action, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, DisplayParent, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, InitModelOf, keys,
+  KeyStrokeContext, MessageBoxEventMap, MessageBoxLayout, MessageBoxModel, objects, scout, Status, StatusSeverity, strings, Widget
 } from '../index';
-import {StatusSeverity} from '../status/Status';
-import MessageBoxModel from './MessageBoxModel';
-import MessageBoxEventMap from './MessageBoxEventMap';
-import {InitModelOf} from '../scout';
 import TriggeredEvent = JQuery.TriggeredEvent;
 
 export type MessageBoxOption = EnumObject<typeof MessageBox.Buttons>;
 
-export default class MessageBox extends Widget implements MessageBoxModel {
+export class MessageBox extends Widget implements MessageBoxModel {
   declare model: MessageBoxModel;
   declare eventMap: MessageBoxEventMap;
   declare self: MessageBox;

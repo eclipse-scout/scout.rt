@@ -10,5 +10,5 @@
  */
 import {ModelAdapter} from '../index';
 
-export default class TileAdapter extends ModelAdapter {
+export class TileAdapter extends ModelAdapter {
 }

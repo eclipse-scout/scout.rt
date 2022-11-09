@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, BreadcrumbItem, HtmlComponent, scout, Widget} from '../index';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
+import {arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, BreadcrumbItem, HtmlComponent, InitModelOf, ObjectOrChildModel, scout, Widget} from '../index';
 
-export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
+export class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
   declare model: BreadcrumbBarModel;
   declare eventMap: BreadcrumbBarEventMap;
   declare self: BreadcrumbBar;

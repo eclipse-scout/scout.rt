@@ -9,10 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Column, Device, NumberColumn, Range, Table} from '../../src/index';
-import {TableSpecHelper} from '../../src/testing/index';
-import {TableModelWithCells, TableRowModelWithCells} from '../../src/testing/table/TableSpecHelper';
-import SpecTable from '../../src/testing/table/SpecTable';
-import SpecTableAdapter from '../../src/testing/table/SpecTableAdapter';
+import {SpecTable, SpecTableAdapter, TableModelWithCells, TableRowModelWithCells, TableSpecHelper} from '../../src/testing/index';
 
 describe('Table Grouping', () => {
 

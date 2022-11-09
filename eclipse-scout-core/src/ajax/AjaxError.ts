@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {InitModelOf} from '../scout';
+import {InitModelOf} from '../index';
 
 export interface AjaxErrorModel {
   jqXHR: JQuery.jqXHR;
@@ -18,7 +18,7 @@ export interface AjaxErrorModel {
   requestOptions: JQuery.AjaxSettings;
 }
 
-export default class AjaxError implements AjaxErrorModel {
+export class AjaxError implements AjaxErrorModel {
   declare model: AjaxErrorModel;
 
   jqXHR: JQuery.jqXHR;

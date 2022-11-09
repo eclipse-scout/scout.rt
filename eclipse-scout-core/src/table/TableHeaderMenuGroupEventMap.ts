@@ -10,6 +10,6 @@
  */
 import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface TableHeaderMenuGroupEventMap extends WidgetEventMap {
+export interface TableHeaderMenuGroupEventMap extends WidgetEventMap {
   'propertyChange:last': PropertyChangeEvent<boolean>;
 }

@@ -14,7 +14,7 @@ export interface SplitBoxPositionChangeEvent<T = SplitBox> extends Event<T> {
   position: number;
 }
 
-export default interface SplitBoxEventMap extends FormFieldEventMap {
+export interface SplitBoxEventMap extends FormFieldEventMap {
   'positionChange': SplitBoxPositionChangeEvent;
   'propertyChange:collapsibleField': PropertyChangeEvent<FormField>;
   'propertyChange:fieldCollapsed': PropertyChangeEvent<boolean>;

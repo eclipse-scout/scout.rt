@@ -13,7 +13,7 @@ import {keys, KeyStroke, ScoutKeyboardEvent, SmartField} from '../../../index';
 /**
  * Closes the popup without accepting the proposal
  */
-export default class SmartFieldCancelKeyStroke extends KeyStroke {
+export class SmartFieldCancelKeyStroke extends KeyStroke {
   declare field: SmartField<any>;
 
   constructor(field: SmartField<any>) {

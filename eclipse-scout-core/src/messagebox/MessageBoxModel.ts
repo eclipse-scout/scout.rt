@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {WidgetModel} from '../index';
-import {StatusSeverity} from '../status/Status';
+import {StatusSeverity, WidgetModel} from '../index';
 
-export default interface MessageBoxModel extends WidgetModel {
+export interface MessageBoxModel extends WidgetModel {
   header?: string;
   body?: string;
   severity?: StatusSeverity;

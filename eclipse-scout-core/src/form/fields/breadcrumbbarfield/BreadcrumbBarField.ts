@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {BreadcrumbBar, BreadcrumbBarFieldEventMap, BreadcrumbBarFieldModel, BreadcrumbItem, FormField} from '../../../index';
-import {ObjectOrChildModel} from '../../../scout';
+import {BreadcrumbBar, BreadcrumbBarFieldEventMap, BreadcrumbBarFieldModel, BreadcrumbItem, FormField, ObjectOrChildModel} from '../../../index';
 
-export default class BreadcrumbBarField extends FormField implements BreadcrumbBarFieldModel {
+export class BreadcrumbBarField extends FormField implements BreadcrumbBarFieldModel {
   declare model: BreadcrumbBarFieldModel;
   declare eventMap: BreadcrumbBarFieldEventMap;
   declare self: BreadcrumbBarField;

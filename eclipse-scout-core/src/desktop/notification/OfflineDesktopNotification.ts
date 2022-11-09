@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopNotification, Status} from '../../index';
-import {InitModelOf} from '../../scout';
+import {DesktopNotification, InitModelOf, Status} from '../../index';
 
-export default class OfflineDesktopNotification extends DesktopNotification {
+export class OfflineDesktopNotification extends DesktopNotification {
   connectFailedReset: number;
   connectionInterruptedStatus: Status;
   reconnectingStatus: Status;

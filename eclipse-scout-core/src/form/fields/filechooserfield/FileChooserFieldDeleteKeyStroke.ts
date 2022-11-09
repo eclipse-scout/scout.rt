@@ -10,7 +10,7 @@
  */
 import {FileChooserField, HAlign, keys, KeyStroke} from '../../../index';
 
-export default class FileChooserFieldDeleteKeyStroke extends KeyStroke {
+export class FileChooserFieldDeleteKeyStroke extends KeyStroke {
   declare field: FileChooserField;
 
   constructor(field: FileChooserField) {

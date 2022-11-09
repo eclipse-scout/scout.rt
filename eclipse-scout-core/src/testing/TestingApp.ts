@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteApp, Session} from '../index';
-import {InitModelOf} from '../scout';
+import {InitModelOf, RemoteApp, Session} from '../index';
 
-export default class TestingApp extends RemoteApp {
+export class TestingApp extends RemoteApp {
 
   protected override _doBootstrapDefaultValues(): JQuery.Promise<void> {
     // nop for testing

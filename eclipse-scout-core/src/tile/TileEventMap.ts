@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData, PropertyChangeEvent, WidgetEventMap} from '../index';
-import {ColorScheme} from '../util/colorSchemes';
+import {ColorScheme, GridData, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface TileEventMap extends WidgetEventMap {
+export interface TileEventMap extends WidgetEventMap {
   'propertyChange:colorScheme': PropertyChangeEvent<ColorScheme>;
   'propertyChange:filterAccepted': PropertyChangeEvent<boolean>;
   'propertyChange:gridDataHints': PropertyChangeEvent<GridData>;

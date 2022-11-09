@@ -20,7 +20,7 @@ export interface SingleLayoutOptions {
  * Resizes the child so it has the same size as the container.<br>
  * If no child is provided, the first child in the container is used.
  */
-export default class SingleLayout extends AbstractLayout implements SingleLayoutOptions {
+export class SingleLayout extends AbstractLayout implements SingleLayoutOptions {
   exact: boolean;
   protected _htmlChild: HtmlComponent;
 

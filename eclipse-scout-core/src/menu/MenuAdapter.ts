@@ -10,5 +10,5 @@
  */
 import {ActionAdapter} from '../index';
 
-export default class MenuAdapter extends ActionAdapter {
+export class MenuAdapter extends ActionAdapter {
 }

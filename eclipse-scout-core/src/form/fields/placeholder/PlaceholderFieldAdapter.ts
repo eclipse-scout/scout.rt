@@ -10,5 +10,5 @@
  */
 import {FormFieldAdapter} from '../../../index';
 
-export default class PlaceholderFieldAdapter extends FormFieldAdapter {
+export class PlaceholderFieldAdapter extends FormFieldAdapter {
 }

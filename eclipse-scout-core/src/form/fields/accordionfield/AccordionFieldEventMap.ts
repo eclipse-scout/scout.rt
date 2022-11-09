@@ -10,6 +10,6 @@
  */
 import {Accordion, FormFieldEventMap, PropertyChangeEvent} from '../../../index';
 
-export default interface AccordionEventMap extends FormFieldEventMap {
+export interface AccordionFieldEventMap extends FormFieldEventMap {
   'propertyChange:accordion': PropertyChangeEvent<Accordion>;
 }

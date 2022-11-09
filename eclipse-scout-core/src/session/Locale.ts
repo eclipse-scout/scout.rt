@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormat, DecimalFormat, locales, scout} from '../index';
-import LocaleModel, {DateFormatSymbols, DecimalFormatSymbols} from './LocaleModel';
-import {InitModelOf} from '../scout';
+import {DateFormat, DateFormatSymbols, DecimalFormat, DecimalFormatSymbols, InitModelOf, LocaleModel, locales, scout} from '../index';
 
-export default class Locale implements LocaleModel {
+export class Locale implements LocaleModel {
   declare model: LocaleModel;
 
   languageTag: string;

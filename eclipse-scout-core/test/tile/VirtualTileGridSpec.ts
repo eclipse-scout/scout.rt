@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Group, Range, scout, Tile, TileAccordion, TileGrid, TileGridModel} from '../../src/index';
-import {triggerMouseDown} from '../../src/testing/jquery-testing';
-import TileModel from '../../src/tile/TileModel';
-import {InitModelOf} from '../../src/scout';
+import {Group, InitModelOf, Range, scout, Tile, TileAccordion, TileGrid, TileGridModel, TileModel} from '../../src/index';
+import {JQueryTesting} from '../../src/testing/index';
 
 describe('VirtualTileGrid', () => {
   let session: SandboxSession;
@@ -509,7 +507,7 @@ describe('VirtualTileGrid', () => {
 
           tileGrid._renderViewRange(new Range(1, 2));
           expect(tile0.rendered).toBe(false);
-          triggerMouseDown(tile2.$container, {
+          JQueryTesting.triggerMouseDown(tile2.$container, {
             modifier: 'ctrl'
           });
           expect(tile0.selected).toBe(true);

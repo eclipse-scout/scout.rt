@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData, Widget, WidgetModel} from '../index';
-import {ObjectOrChildModel} from '../scout';
+import {GridData, ObjectOrChildModel, Widget, WidgetModel} from '../index';
 
-export default interface CarouselModel extends WidgetModel {
+export interface CarouselModel extends WidgetModel {
   /**
    * Default is true
    */

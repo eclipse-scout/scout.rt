@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Form, FormAdapter, JsFormModel, Widget} from '../../index';
-import {ChildModelOf, FullModelOf} from '../../scout';
+import {ChildModelOf, Event, Form, FormAdapter, FullModelOf, JsFormModel, Widget} from '../../index';
 
-export default class JsFormAdapter extends FormAdapter {
+export class JsFormAdapter extends FormAdapter {
 
   protected override _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {
     let model = super._initModel(m, parent) as JsFormModel;

@@ -9,18 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CompositeField, EnumObject, fields, Form, FormField, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxModel, GroupBoxResponsiveHandler,
-  HAlign, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, Notification, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid,
-  WrappedFormField
+  AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CloneOptions, CompositeField, EnumObject, fields, Form, FormField, FormFieldStatusPosition, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder,
+  GroupBoxModel, GroupBoxResponsiveHandler, HAlign, HtmlComponent, InitModelOf, KeyStrokeRenderingHints, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, MenuBarEllipsisPosition, Notification,
+  ObjectOrChildModel, ObjectOrModel, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid, WrappedFormField
 } from '../../../index';
 import $ from 'jquery';
-import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
-import {FormFieldStatusPosition} from '../FormField';
-import {KeyStrokeRenderingHints} from '../../../keystroke/KeyStroke';
-import {CloneOptions} from '../../../widget/Widget';
-import {InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
-export default class GroupBox extends CompositeField implements GroupBoxModel {
+export class GroupBox extends CompositeField implements GroupBoxModel {
   declare model: GroupBoxModel;
   declare eventMap: GroupBoxEventMap;
   declare self: GroupBox;

@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionKeyStroke, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, Menu, MobilePopup, Popup, scout, WidgetPopup} from '../index';
-import {CloneOptions} from '../widget/Widget';
-import {InitModelOf, ObjectOrChildModel} from '../scout';
+import {
+  ActionKeyStroke, CloneOptions, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, InitModelOf, Menu, MobilePopup, ObjectOrChildModel, Popup, scout,
+  WidgetPopup
+} from '../index';
 
-export default class FormMenu extends Menu implements FormMenuModel {
+export class FormMenu extends Menu implements FormMenuModel {
   declare model: FormMenuModel;
   declare eventMap: FormMenuEventMap;
   declare self: FormMenu;

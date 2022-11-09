@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout} from '@eclipse-scout/core';
-import {Chart} from '../index';
-import {UpdateChartOptions} from './Chart';
+import {UpdateChartOptions, Chart} from '../index';
 
-export default class ChartLayout extends AbstractLayout {
+export class ChartLayout extends AbstractLayout {
   chart: Chart;
 
   constructor(chart: Chart) {

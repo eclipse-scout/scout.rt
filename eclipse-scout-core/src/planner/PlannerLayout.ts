@@ -11,7 +11,7 @@
 import {AbstractLayout, graphics, HtmlComponent, MenuBarLayout, Planner, scout, scrollbars} from '../index';
 import $ from 'jquery';
 
-export default class PlannerLayout extends AbstractLayout {
+export class PlannerLayout extends AbstractLayout {
   planner: Planner;
 
   constructor(planner: Planner) {

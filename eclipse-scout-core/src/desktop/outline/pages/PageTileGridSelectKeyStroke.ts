@@ -11,7 +11,7 @@
 import {ButtonTile, keys, PageTileGrid, RangeKeyStroke, ScoutKeyboardEvent, TileButton} from '../../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
+export class PageTileGridSelectKeyStroke extends RangeKeyStroke {
   declare field: PageTileGrid;
 
   constructor(pageTileGrid: PageTileGrid) {

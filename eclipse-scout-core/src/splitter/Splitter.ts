@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, HtmlComponent, LayoutData, SplitterEventMap, SplitterModel, Widget} from '../index';
+import {graphics, HtmlComponent, InitModelOf, LayoutData, SplitterEventMap, SplitterModel, SplitterMoveEvent, Widget} from '../index';
 import $ from 'jquery';
-import {SplitterMoveEvent} from './SplitterEventMap';
-import {InitModelOf} from '../scout';
 
-export default class Splitter extends Widget implements SplitterModel {
+export class Splitter extends Widget implements SplitterModel {
   declare model: SplitterModel;
   declare eventMap: SplitterEventMap;
   declare self: Splitter;

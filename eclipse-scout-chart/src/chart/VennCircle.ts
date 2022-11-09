@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// circle
-
-export default class VennCircle {
+export class VennCircle {
   labels: Label[];
   $circle: JQuery<SVGElement>;
   x: number;

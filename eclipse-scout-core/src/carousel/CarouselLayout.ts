@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Carousel, Dimension, HtmlComponent, HtmlCompPrefSizeOptions} from '../index';
 
-export default class CarouselLayout extends AbstractLayout {
+export class CarouselLayout extends AbstractLayout {
   carousel: Carousel;
 
   constructor(carousel: Carousel) {

@@ -1,18 +1,17 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StaticLookupCall} from '../../index';
+import {LookupResult, StaticLookupCall} from '../../index';
 import $ from 'jquery';
-import LookupResult from '../../lookup/LookupResult';
 
-export default class AbortableMicrotaskStaticLookupCall<TKey> extends StaticLookupCall<TKey> {
+export class AbortableMicrotaskStaticLookupCall<TKey> extends StaticLookupCall<TKey> {
   protected _deferred: JQuery.Deferred<LookupResult<TKey>>;
 
   constructor() {

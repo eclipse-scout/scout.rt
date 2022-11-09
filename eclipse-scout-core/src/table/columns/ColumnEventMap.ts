@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Column, Event, PropertyChangeEvent, PropertyEventMap, TableHeaderMenu} from '../../index';
-import {Alignment} from '../../cell/Cell';
+import {Alignment, Column, Event, PropertyChangeEvent, PropertyEventMap, TableHeaderMenu} from '../../index';
 
 export interface ColumnHeaderMenuOpenEvent<T = Column> extends Event<T> {
   menu: TableHeaderMenu;
@@ -20,7 +19,7 @@ export interface ColumnHeaderMenuCloseEvent<T = Column> extends Event<T> {
   menu: TableHeaderMenu;
 }
 
-export default interface ColumnEventMap extends PropertyEventMap {
+export interface ColumnEventMap extends PropertyEventMap {
   'headerMenuOpen': ColumnHeaderMenuOpenEvent;
   'headerMenuClose': ColumnHeaderMenuCloseEvent;
   'propertyChange:autoOptimizeWidth': PropertyChangeEvent<boolean>;

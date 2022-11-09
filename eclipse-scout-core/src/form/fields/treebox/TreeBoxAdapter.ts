@@ -10,5 +10,5 @@
  */
 import {ValueFieldAdapter} from '../../../index';
 
-export default class TreeBoxAdapter extends ValueFieldAdapter {
+export class TreeBoxAdapter extends ValueFieldAdapter {
 }

@@ -14,7 +14,7 @@ export interface NotificationAppLinkActionEvent<N extends Notification = Notific
   ref: string;
 }
 
-export default interface NotificationEventMap extends WidgetEventMap {
+export interface NotificationEventMap extends WidgetEventMap {
   'appLinkAction': NotificationAppLinkActionEvent;
   'close': Event<Notification>;
   'propertyChange:closable': PropertyChangeEvent<boolean>;

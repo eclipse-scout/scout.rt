@@ -10,6 +10,6 @@
  */
 import {FormFieldEventMap, PropertyChangeEvent, TileGrid} from '../../../index';
 
-export default interface TileFieldEventMap extends FormFieldEventMap {
+export interface TileFieldEventMap extends FormFieldEventMap {
   'propertyChange:tileGrid': PropertyChangeEvent<TileGrid>;
 }

@@ -10,7 +10,7 @@
  */
 import {Dimension, Insets, Point} from '../index';
 
-export default class Rectangle {
+export class Rectangle {
   x: number;
   y: number;
   width: number;

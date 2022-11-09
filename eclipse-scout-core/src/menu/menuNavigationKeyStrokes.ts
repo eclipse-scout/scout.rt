@@ -10,25 +10,23 @@
  */
 import {ContextMenuPopup, KeyStrokeContext, MenuExecByNumberKeyStroke, MenuNavigationDownKeyStroke, MenuNavigationExecKeyStroke, MenuNavigationUpKeyStroke, SubCloseKeyStroke} from '../index';
 
-export function registerKeyStrokes(keyStrokeContext: KeyStrokeContext, popup: ContextMenuPopup, menuItemClass: string) {
-  keyStrokeContext.registerKeyStrokes([
-    new MenuNavigationUpKeyStroke(popup, menuItemClass),
-    new MenuNavigationDownKeyStroke(popup, menuItemClass),
-    new MenuNavigationExecKeyStroke(popup, menuItemClass),
-    new MenuExecByNumberKeyStroke(popup, menuItemClass),
-    new SubCloseKeyStroke(popup, menuItemClass)
-  ]);
-}
+export const menuNavigationKeyStrokes = {
+  registerKeyStrokes(keyStrokeContext: KeyStrokeContext, popup: ContextMenuPopup, menuItemClass: string) {
+    keyStrokeContext.registerKeyStrokes([
+      new MenuNavigationUpKeyStroke(popup, menuItemClass),
+      new MenuNavigationDownKeyStroke(popup, menuItemClass),
+      new MenuNavigationExecKeyStroke(popup, menuItemClass),
+      new MenuExecByNumberKeyStroke(popup, menuItemClass),
+      new SubCloseKeyStroke(popup, menuItemClass)
+    ]);
+  },
 
-export function _findMenuItems(popup: ContextMenuPopup, menuItemClass: string): { $all: JQuery; $allVisible: JQuery; $selected: JQuery } {
-  return {
-    $all: popup.$body.find('.' + menuItemClass),
-    $allVisible: popup.$body.find('.' + menuItemClass + ':visible'),
-    $selected: popup.$body.find('.' + menuItemClass + '.selected')
-  };
-}
-
-export default {
-  registerKeyStrokes,
-  _findMenuItems
+  /** @internal */
+  _findMenuItems(popup: ContextMenuPopup, menuItemClass: string): { $all: JQuery; $allVisible: JQuery; $selected: JQuery } {
+    return {
+      $all: popup.$body.find('.' + menuItemClass),
+      $allVisible: popup.$body.find('.' + menuItemClass + ':visible'),
+      $selected: popup.$body.find('.' + menuItemClass + '.selected')
+    };
+  }
 };

@@ -11,5 +11,5 @@
 
 import {FormFieldAdapter} from '../../../index';
 
-export default class BreadcrumbBarFieldAdapter extends FormFieldAdapter {
+export class BreadcrumbBarFieldAdapter extends FormFieldAdapter {
 }

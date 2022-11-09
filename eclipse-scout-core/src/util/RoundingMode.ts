@@ -14,7 +14,7 @@
  *
  * @see RoundingMode.java
  */
-enum RoundingMode {
+export enum RoundingMode {
   UP = 'UP',
   DOWN = 'DOWN',
   CEILING = 'CEILING',
@@ -24,5 +24,3 @@ enum RoundingMode {
   HALF_EVEN = 'HALF_EVEN',
   UNNECESSARY = 'UNNECESSARY'
 }
-
-export default RoundingMode;

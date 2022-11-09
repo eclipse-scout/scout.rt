@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, graphics, HtmlCompPrefSizeOptions, Outline, Page} from '../../index';
 
-export default class PageLayout extends AbstractLayout {
+export class PageLayout extends AbstractLayout {
   outline: Outline;
   page: Page;
 

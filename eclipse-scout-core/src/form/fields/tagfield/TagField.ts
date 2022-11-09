@@ -9,15 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, Event, fields, HtmlComponent, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LookupCall, LookupResult, MaxLengthHandler, Popup, PropertyChangeEvent, scout, strings, TagBar, TagChooserPopup, TagFieldContainerLayout,
-  TagFieldDeleteKeyStroke, TagFieldEnterKeyStroke, TagFieldEventMap, TagFieldLayout, TagFieldModel, TagFieldNavigationKeyStroke, TagFieldOpenPopupKeyStroke, ValueField
+  arrays, Event, fields, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LookupCall, LookupCallOrModel, LookupResult, MaxLengthHandler, Popup, PropertyChangeEvent, scout, strings, TagBar,
+  TagBarTagRemoveEvent, TagChooserPopup, TagChooserPopupLookupRowSelectedEvent, TagFieldContainerLayout, TagFieldDeleteKeyStroke, TagFieldEnterKeyStroke, TagFieldEventMap, TagFieldLayout, TagFieldModel, TagFieldNavigationKeyStroke,
+  TagFieldOpenPopupKeyStroke, ValueField
 } from '../../../index';
-import {TagBarTagRemoveEvent} from '../../../tagbar/TagBarEventMap';
-import {TagChooserPopupLookupRowSelectedEvent} from './TagChooserPopupEventMap';
-import {LookupCallOrModel} from '../../../lookup/LookupCall';
-import {InitModelOf} from '../../../scout';
 
-export default class TagField extends ValueField<string[]> implements TagFieldModel {
+export class TagField extends ValueField<string[]> implements TagFieldModel {
   declare model: TagFieldModel;
   declare eventMap: TagFieldEventMap;
   declare self: TagField;

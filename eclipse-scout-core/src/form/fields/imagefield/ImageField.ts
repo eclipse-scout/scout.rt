@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, EnumObject, Event, FileInput, FormField, HtmlComponent, Icon, ImageFieldEventMap, ImageFieldLayout, ImageFieldModel, scout, scrollbars, SingleLayout} from '../../../index';
+import {
+  arrays, Device, DragAndDropOptions, EnumObject, Event, FileInput, FileInputChangeEvent, FormField, HtmlComponent, Icon, ImageFieldEventMap, ImageFieldLayout, ImageFieldModel, InitModelOf, scout, scrollbars, SingleLayout
+} from '../../../index';
 import $ from 'jquery';
-import {DragAndDropOptions} from '../../../util/dragAndDrop';
-import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
-import {InitModelOf} from '../../../scout';
 
-export default class ImageField extends FormField implements ImageFieldModel {
+export class ImageField extends FormField implements ImageFieldModel {
   declare model: ImageFieldModel;
   declare eventMap: ImageFieldEventMap;
   declare self: ImageField;

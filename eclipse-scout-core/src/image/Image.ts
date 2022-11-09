@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, HtmlComponent, ImageLayout, Widget} from '../index';
-import ImageModel from './ImageModel';
-import ImageEventMap from './ImageEventMap';
+import {Device, HtmlComponent, ImageEventMap, ImageLayout, ImageModel, Widget} from '../index';
 
-export default class Image extends Widget implements ImageModel {
+export class Image extends Widget implements ImageModel {
   declare model: ImageModel;
   declare eventMap: ImageEventMap;
   declare self: Image;

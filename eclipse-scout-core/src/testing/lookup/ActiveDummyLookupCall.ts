@@ -10,7 +10,7 @@
  */
 import {LookupRow, StaticLookupCall} from '../../index';
 
-export default class ActiveDummyLookupCall extends StaticLookupCall<number> {
+export class ActiveDummyLookupCall extends StaticLookupCall<number> {
   constructor() {
     super();
     this.setDelay(250);

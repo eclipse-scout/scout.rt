@@ -14,7 +14,7 @@ import $ from 'jquery';
 /**
  * Keystroke context used for input fields.
  */
-export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
+export class InputFieldKeyStrokeContext extends KeyStrokeContext {
 
   constructor(multiline?: boolean) {
     super();

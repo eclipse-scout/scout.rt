@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, CellModel, defaultValues, Event, ModelAdapter, objects, RemoteEvent, scout, Tree, TreeNode, TreeNodeModel} from '../index';
-import {TreeDropEvent, TreeNodeActionEvent, TreeNodeClickEvent, TreeNodeExpandedEvent, TreeNodesCheckedEvent, TreeNodesSelectedEvent} from './TreeEventMap';
-import {ChildModelOf} from '../scout';
+import {
+  App, arrays, CellModel, ChildModelOf, defaultValues, Event, ModelAdapter, objects, RemoteEvent, scout, Tree, TreeDropEvent, TreeNode, TreeNodeActionEvent, TreeNodeClickEvent, TreeNodeExpandedEvent, TreeNodeModel, TreeNodesCheckedEvent,
+  TreeNodesSelectedEvent
+} from '../index';
 
-export default class TreeAdapter extends ModelAdapter {
+export class TreeAdapter extends ModelAdapter {
   declare widget: Tree;
 
   constructor() {

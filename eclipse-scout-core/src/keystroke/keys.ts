@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import Device from '../util/Device';
+import {Device} from '../index';
 
-const keys = {
+export const keys = {
   BACKSPACE: 8,
   TAB: 9,
   ENTER: 13,
@@ -86,8 +86,8 @@ const keys = {
   F10: 121,
   F11: 122,
   F12: 123,
-  WIN_LEFT: 91, // Left windows key / left command key
-  WIN_RIGHT: 92, // Right windows key / right command key
+  WIN_LEFT: 91, // Left Windows key / left command key
+  WIN_RIGHT: 92, // Right Windows key / right command key
   SELECT: 93, // Menu key
   NUMPAD_0: 96,
   NUMPAD_1: 97,
@@ -272,5 +272,3 @@ for (let browser in keys.browserMap) {
   }
   keys.browserMapReverse[browser] = reverseMap;
 }
-
-export default keys;

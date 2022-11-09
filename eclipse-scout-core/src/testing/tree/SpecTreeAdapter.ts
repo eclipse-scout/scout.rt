@@ -10,7 +10,7 @@
  */
 import {TreeAdapter} from '../../index';
 
-export default class SpecTreeAdapter extends TreeAdapter {
+export class SpecTreeAdapter extends TreeAdapter {
   override _onNodesSelected(nodeIds: string[]) {
     super._onNodesSelected(nodeIds);
   }

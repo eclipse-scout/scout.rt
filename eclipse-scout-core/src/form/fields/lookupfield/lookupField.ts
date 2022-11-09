@@ -10,65 +10,62 @@
  */
 import {Cell, LookupRow, scout, TableRowModel} from '../../../index';
 
-/**
- * Creates a table-row for the given lookup-row.
- */
-export function createTableRow(lookupRow: LookupRow<any>, multipleColumns?: boolean): TableRowModel {
-  multipleColumns = scout.nvl(multipleColumns, false);
-  let cells: Cell[] = [],
-    row: TableRowModel = {
-      cells: cells,
-      lookupRow: lookupRow
-    };
-  if (lookupRow.enabled === false) {
-    row.enabled = false;
-  }
-  if (lookupRow.cssClass) {
-    row.cssClass = lookupRow.cssClass;
-  }
-  if (lookupRow.active === false) {
-    row.cssClass = (row.cssClass ? (row.cssClass + ' ') : '') + 'inactive';
-  }
-
-  if (!multipleColumns) {
-    cells.push(createTableCell(lookupRow, null, null));
-  }
-
-  return row;
-}
-
-/**
- * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
- */
-export function createTableCell<T>(lookupRow: LookupRow<T>, desc?: { propertyName?: string }, tableRowData?: object): Cell<T> {
-  let cell = scout.create(Cell);
-
-  // default column descriptor (first column) has propertyName null
-  if (!(desc && desc.propertyName)) {
-    cell.text = lookupRow.text;
-    if (lookupRow.iconId) {
-      cell.iconId = lookupRow.iconId;
+export const lookupField = {
+  /**
+   * Creates a table-row for the given lookup-row.
+   */
+  createTableRow(lookupRow: LookupRow<any>, multipleColumns?: boolean): TableRowModel {
+    multipleColumns = scout.nvl(multipleColumns, false);
+    let cells: Cell[] = [],
+      row: TableRowModel = {
+        cells: cells,
+        lookupRow: lookupRow
+      };
+    if (lookupRow.enabled === false) {
+      row.enabled = false;
     }
-    if (lookupRow.tooltipText) {
-      cell.tooltipText = lookupRow.tooltipText;
+    if (lookupRow.cssClass) {
+      row.cssClass = lookupRow.cssClass;
     }
-    if (lookupRow.backgroundColor) {
-      cell.backgroundColor = lookupRow.backgroundColor;
+    if (lookupRow.active === false) {
+      row.cssClass = (row.cssClass ? (row.cssClass + ' ') : '') + 'inactive';
     }
-    if (lookupRow.foregroundColor) {
-      cell.foregroundColor = lookupRow.foregroundColor;
+
+    if (!multipleColumns) {
+      cells.push(lookupField.createTableCell(lookupRow, null, null));
     }
-    if (lookupRow.font) {
-      cell.font = lookupRow.font;
+
+    return row;
+  },
+
+  /**
+   * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
+   */
+  createTableCell<T>(lookupRow: LookupRow<T>, desc?: { propertyName?: string }, tableRowData?: object): Cell<T> {
+    let cell = scout.create(Cell);
+
+    // default column descriptor (first column) has propertyName null
+    if (!(desc && desc.propertyName)) {
+      cell.text = lookupRow.text;
+      if (lookupRow.iconId) {
+        cell.iconId = lookupRow.iconId;
+      }
+      if (lookupRow.tooltipText) {
+        cell.tooltipText = lookupRow.tooltipText;
+      }
+      if (lookupRow.backgroundColor) {
+        cell.backgroundColor = lookupRow.backgroundColor;
+      }
+      if (lookupRow.foregroundColor) {
+        cell.foregroundColor = lookupRow.foregroundColor;
+      }
+      if (lookupRow.font) {
+        cell.font = lookupRow.font;
+      }
+    } else {
+      cell.text = tableRowData[desc.propertyName];
     }
-  } else {
-    cell.text = tableRowData[desc.propertyName];
+
+    return cell;
   }
-
-  return cell;
-}
-
-export default {
-  createTableCell,
-  createTableRow
 };

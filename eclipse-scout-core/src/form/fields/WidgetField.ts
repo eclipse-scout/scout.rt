@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, Widget, WidgetFieldEventMap, WidgetFieldLayout, WidgetFieldModel} from '../../index';
-import {InitModelOf, ObjectOrChildModel} from '../../scout';
+import {FormField, InitModelOf, ObjectOrChildModel, Widget, WidgetFieldEventMap, WidgetFieldLayout, WidgetFieldModel} from '../../index';
 
-export default class WidgetField extends FormField implements WidgetFieldModel {
+export class WidgetField extends FormField implements WidgetFieldModel {
   declare model: WidgetFieldModel;
   declare eventMap: WidgetFieldEventMap;
   declare self: WidgetField;

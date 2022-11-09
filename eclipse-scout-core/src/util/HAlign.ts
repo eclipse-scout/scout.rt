@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
-enum HAlign {
+export enum HAlign {
   LEFT = 'left',
   RIGHT = 'right',
   CENTER = 'center'
 }
-
-export default HAlign;

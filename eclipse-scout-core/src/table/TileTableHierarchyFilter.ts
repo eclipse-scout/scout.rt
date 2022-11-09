@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Filter, Table, TableRow} from '../index';
+import {Filter, InitModelOf, Table, TableRow} from '../index';
 import $ from 'jquery';
-import {InitModelOf} from '../scout';
 
 export interface TileTableHierarchyFilterModel {
   table: Table;
 }
 
-export default class TileTableHierarchyFilter implements TileTableHierarchyFilterModel, Filter<TableRow> {
+export class TileTableHierarchyFilter implements TileTableHierarchyFilterModel, Filter<TableRow> {
   declare model: TileTableHierarchyFilterModel;
 
   table: Table;

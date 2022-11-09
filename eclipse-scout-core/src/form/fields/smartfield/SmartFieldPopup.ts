@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Device, Event, FormField, LookupRow, Popup, ProposalChooser, scout, ScoutKeyboardEvent, SmartField, SmartFieldPopupEventMap, SmartFieldPopupLayout, SmartFieldPopupModel} from '../../../index';
-import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
-import {SmartFieldLookupResult} from './SmartField';
-import {StatusOrModel} from '../../../status/Status';
-import {InitModelOf} from '../../../scout';
-import {SomeRequired} from '../../../types';
+import {
+  AbstractLayout, Device, Event, FormField, InitModelOf, LookupRow, Popup, ProposalChooser, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, scout, ScoutKeyboardEvent, SmartField, SmartFieldLookupResult,
+  SmartFieldPopupEventMap, SmartFieldPopupLayout, SmartFieldPopupModel, SomeRequired, StatusOrModel
+} from '../../../index';
 
-export default class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupModel<TValue> {
+export class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupModel<TValue> {
   declare model: SmartFieldPopupModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
   declare eventMap: SmartFieldPopupEventMap<TValue>;

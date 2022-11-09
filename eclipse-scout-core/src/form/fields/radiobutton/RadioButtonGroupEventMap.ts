@@ -19,7 +19,7 @@ export interface RadioButtonGroupPrepareLookupCallEvent<TValue, T = RadioButtonG
   lookupCall: LookupCall<TValue>;
 }
 
-export default interface RadioButtonGroupEventMap<TValue> extends ValueFieldEventMap<TValue> {
+export interface RadioButtonGroupEventMap<TValue> extends ValueFieldEventMap<TValue> {
   'lookupCallDone': RadioButtonGroupLookupCallDoneEvent<TValue>;
   'prepareLookupCall': RadioButtonGroupPrepareLookupCallEvent<TValue>;
   'propertyChange:fields': PropertyChangeEvent<FormField[]>;

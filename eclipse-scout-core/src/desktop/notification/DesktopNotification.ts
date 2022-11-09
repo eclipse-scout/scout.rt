@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopNotificationEventMap, DesktopNotificationModel, Device, EnumObject, Notification as ScoutNotification, scout, Status, strings} from '../../index';
-import {StatusOrModel} from '../../status/Status';
-import {InitModelOf} from '../../scout';
+import {DesktopNotificationEventMap, DesktopNotificationModel, Device, EnumObject, InitModelOf, Notification as ScoutNotification, scout, Status, StatusOrModel, strings} from '../../index';
 
-export default class DesktopNotification extends ScoutNotification implements DesktopNotificationModel {
+export class DesktopNotification extends ScoutNotification implements DesktopNotificationModel {
   declare model: DesktopNotificationModel;
   declare eventMap: DesktopNotificationEventMap;
   declare self: DesktopNotification;

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBox, LogicalGridConfig, scout} from '../../../index';
-import {LogicalGridWidget} from '../../../layout/logicalgrid/LogicalGridData';
+import {GroupBox, LogicalGridConfig, LogicalGridWidget, scout} from '../../../index';
 
-export default class GroupBoxGridConfig extends LogicalGridConfig {
+export class GroupBoxGridConfig extends LogicalGridConfig {
   declare widget: GroupBox;
 
   override getGridWidgets(): LogicalGridWidget[] {

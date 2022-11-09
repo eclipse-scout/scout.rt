@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, arrays, BreadcrumbBar, BreadcrumbItem, Dimension, graphics, HtmlCompPrefSizeOptions} from '../index';
 
-export default class BreadcrumbBarLayout extends AbstractLayout {
+export class BreadcrumbBarLayout extends AbstractLayout {
   protected _breadcrumbBar: BreadcrumbBar;
 
   constructor(breadcrumbBar: BreadcrumbBar) {

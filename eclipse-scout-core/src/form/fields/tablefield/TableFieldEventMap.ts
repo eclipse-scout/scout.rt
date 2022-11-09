@@ -10,6 +10,6 @@
  */
 import {FormFieldEventMap, PropertyChangeEvent, Table} from '../../../index';
 
-export default interface TableFieldEventMap extends FormFieldEventMap {
+export interface TableFieldEventMap extends FormFieldEventMap {
   'propertyChange:table': PropertyChangeEvent<Table>;
 }

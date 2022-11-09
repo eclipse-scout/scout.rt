@@ -36,7 +36,7 @@ import {scout} from './index';
  *
  *   extended: is the extended or original object.
  */
-export default class Extension<E> {
+export class Extension<E> {
   extended: E;
   next: (...args: any[]) => any;
 

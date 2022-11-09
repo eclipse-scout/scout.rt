@@ -10,7 +10,7 @@
  */
 import {Dimension, HtmlCompPrefSizeOptions, PopupLayout, WidgetPopup} from '../index';
 
-export default class WidgetPopupLayout extends PopupLayout {
+export class WidgetPopupLayout extends PopupLayout {
 
   declare popup: WidgetPopup;
 

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, MenuModel, scout, Session} from '../../index';
-import {FullModelOf} from '../../scout';
+import {FullModelOf, Menu, MenuModel, scout, Session} from '../../index';
 
-export default class MenuSpecHelper {
+export class MenuSpecHelper {
   session: Session;
 
   constructor(session: Session) {

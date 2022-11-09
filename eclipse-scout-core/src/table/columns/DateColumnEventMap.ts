@@ -10,7 +10,7 @@
  */
 import {ColumnEventMap, DateFormat, PropertyChangeEvent} from '../../index';
 
-export default interface DateColumnEventMap extends ColumnEventMap {
+export interface DateColumnEventMap extends ColumnEventMap {
   'propertyChange:format': PropertyChangeEvent<DateFormat>;
   'propertyChange:groupFormat': PropertyChangeEvent<DateFormat>;
 }

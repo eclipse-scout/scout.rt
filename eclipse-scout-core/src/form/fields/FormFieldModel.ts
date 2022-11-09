@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, FormField, GridData, Menu, StatusMenuMapping, WidgetModel} from '../../index';
-import {DropType} from '../../util/dragAndDrop';
-import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
-import {FormFieldLabelPosition, FormFieldMode, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor} from './FormField';
-import {StatusOrModel} from '../../status/Status';
-import {ObjectOrChildModel} from '../../scout';
+import {
+  Action, DropType, FormField, FormFieldLabelPosition, FormFieldMode, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor, GridData, Menu, ObjectOrChildModel, StatusMenuMapping, StatusOrModel,
+  TooltipSupportOptions, WidgetModel
+} from '../../index';
 
-export default interface FormFieldModel extends WidgetModel {
+export interface FormFieldModel extends WidgetModel {
   dropType?: DropType;
   dropMaximumSize?: number;
   errorStatus?: StatusOrModel;

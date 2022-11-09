@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicFieldEventMap, Event, PropertyChangeEvent, StringField} from '../../../index';
-import {StringFieldFormat} from './StringField';
+import {BasicFieldEventMap, Event, PropertyChangeEvent, StringField, StringFieldFormat} from '../../../index';
 
 export interface StringFieldSelectionChangeEvent<TStringField = StringField> extends Event<TStringField> {
   selectionStart: number;
   selectionEnd: number;
 }
 
-export default interface StringFieldEventMap extends BasicFieldEventMap<string> {
+export interface StringFieldEventMap extends BasicFieldEventMap<string> {
   'action': Event<StringField>;
   'selectionChange': StringFieldSelectionChangeEvent;
   'propertyChange:format': PropertyChangeEvent<StringFieldFormat>;

@@ -14,7 +14,7 @@
  *
  * @see FocusManager
  */
-enum FocusRule {
+export enum FocusRule {
   /**
    * Indicates to focus the first focusable element.
    */
@@ -33,5 +33,3 @@ enum FocusRule {
    */
   PREPARE = 'prepare'
 }
-
-export default FocusRule;

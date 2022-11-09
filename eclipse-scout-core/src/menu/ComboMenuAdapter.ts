@@ -10,5 +10,5 @@
  */
 import {MenuAdapter} from '../index';
 
-export default class ComboMenuAdapter extends MenuAdapter {
+export class ComboMenuAdapter extends MenuAdapter {
 }

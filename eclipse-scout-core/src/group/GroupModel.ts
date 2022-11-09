@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {GroupCollapseStyle} from './Group';
-import {ObjectOrChildModel} from '../scout';
+import {GroupCollapseStyle, ObjectOrChildModel, Widget, WidgetModel} from '../index';
 
-export default interface GroupModel<TBody extends Widget = Widget> extends WidgetModel {
+export interface GroupModel<TBody extends Widget = Widget> extends WidgetModel {
   collapsed?: boolean;
   collapsible?: boolean;
   title?: string;

@@ -9,16 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Event, EventHandler, fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, PropertyChangeEvent, scout, Status, strings, Table, TableControl, TableFooterLayout, TableFooterModel, TableTextUserFilter, TableUserFilter,
-  Tooltip, Widget
+  Event, EventHandler, fields, FocusFilterFieldKeyStroke, graphics, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, MenuBarLayout, PropertyChangeEvent, scout, SomeRequired, Status, strings, Table, TableControl,
+  TableFilterAddedEvent, TableFilterRemovedEvent, TableFooterLayout, TableFooterModel, TableRowsInsertedEvent, TableRowsSelectedEvent, TableTextUserFilter, TableUserFilter, Tooltip, Widget
 } from '../index';
 import $ from 'jquery';
-import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
-import {TableFilterAddedEvent, TableFilterRemovedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent} from './TableEventMap';
-import {InitModelOf} from '../scout';
-import {SomeRequired} from '../types';
 
-export default class TableFooter extends Widget implements TableFooterModel {
+export class TableFooter extends Widget implements TableFooterModel {
   declare model: TableFooterModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'table'>;
 

@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionEventMap, PropertyChangeEvent} from '@eclipse-scout/core/src';
+import {ActionEventMap, PropertyChangeEvent} from '@eclipse-scout/core';
 import {TableControlChartAggregation, TableControlChartGroup, TableControlChartType} from './ChartTableControl';
 
-export default interface ChartTableControlEventMap extends ActionEventMap {
+export interface ChartTableControlEventMap extends ActionEventMap {
   'propertyChange:chartAggregation': PropertyChangeEvent<TableControlChartAggregation>;
   'propertyChange:chartGroup1': PropertyChangeEvent<TableControlChartGroup>;
   'propertyChange:chartGroup2': PropertyChangeEvent<TableControlChartGroup>;

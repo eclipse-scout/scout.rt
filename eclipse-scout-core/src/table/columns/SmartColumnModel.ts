@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnModel} from '../../index';
-import {LookupCallOrModel} from '../../lookup/LookupCall';
+import {ColumnModel, LookupCallOrModel} from '../../index';
 
-export default interface SmartColumnModel<TValue> extends ColumnModel<TValue> {
+export interface SmartColumnModel<TValue> extends ColumnModel<TValue> {
   /**
    * @see codes.get
    */

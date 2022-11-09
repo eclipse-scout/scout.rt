@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ViewButton, WidgetModel} from '../../index';
-import {ObjectOrChildModel} from '../../scout';
+import {ObjectOrChildModel, ViewButton, WidgetModel} from '../../index';
 
-export default interface ViewButtonBoxModel extends WidgetModel {
+export interface ViewButtonBoxModel extends WidgetModel {
   viewButtons?: ObjectOrChildModel<ViewButton>[];
   /**
    * Default is false.

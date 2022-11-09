@@ -8,16 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserFieldLayout, EnumObject, FormField, IFrame, numbers, PopupBlockerHandler, PropertyChangeEvent, Rectangle, scout, strings} from '../../../index';
+import {BrowserFieldEventMap, BrowserFieldLayout, BrowserFieldModel, EnumObject, FormField, IFrame, InitModelOf, numbers, PopupBlockerHandler, PropertyChangeEvent, Rectangle, scout, strings} from '../../../index';
 import $ from 'jquery';
-import BrowserFieldModel from './BrowserFieldModel';
-import BrowserFieldEventMap from './BrowserFieldEventMap';
-import {InitModelOf} from '../../../scout';
 import TriggeredEvent = JQuery.TriggeredEvent;
 
 export type BrowserFieldWindowStates = EnumObject<typeof BrowserField.WindowStates>;
 
-export default class BrowserField extends FormField implements BrowserFieldModel {
+export class BrowserField extends FormField implements BrowserFieldModel {
   declare model: BrowserFieldModel;
   declare eventMap: BrowserFieldEventMap;
   declare self: BrowserField;

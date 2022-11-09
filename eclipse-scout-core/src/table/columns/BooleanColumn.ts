@@ -14,7 +14,7 @@ import {Cell, CheckBoxField, Column, comparators, scout, TableRow} from '../../i
  * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)
  * Difference: the table's checkable column represents the row.checked state, other boolean columns represent their own value.
  */
-export default class BooleanColumn extends Column<boolean> {
+export class BooleanColumn extends Column<boolean> {
   triStateEnabled: boolean;
 
   constructor() {

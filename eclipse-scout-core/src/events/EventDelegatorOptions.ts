@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default interface EventDelegatorOptions {
+export interface EventDelegatorOptions {
   /** True, to call the setter on the target on a property change event. */
   callSetter?: boolean;
   /** An array of all properties to be delegated from the source to the target when changed on the source. Default is []; */

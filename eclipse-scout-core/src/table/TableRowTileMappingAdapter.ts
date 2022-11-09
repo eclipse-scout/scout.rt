@@ -10,5 +10,5 @@
  */
 import {ModelAdapter} from '../index';
 
-export default class TableRowTileMappingAdapter extends ModelAdapter {
+export class TableRowTileMappingAdapter extends ModelAdapter {
 }

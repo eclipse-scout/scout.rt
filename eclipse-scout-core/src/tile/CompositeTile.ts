@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, PropertyChangeEvent, Tile, Widget} from '../index';
-import TileModel from './TileModel';
-import TileEventMap from './TileEventMap';
-import {ObjectOrChildModel} from '../scout';
+import {HtmlComponent, ObjectOrChildModel, PropertyChangeEvent, Tile, TileEventMap, TileModel, Widget} from '../index';
 
 export interface CompositeTileModel extends TileModel {
   widgets?: ObjectOrChildModel<Widget>[];
@@ -21,7 +18,7 @@ export interface CompositeTileEventMap extends TileEventMap {
   'propertyChange:widgets': PropertyChangeEvent<Widget[], CompositeTile>;
 }
 
-export default class CompositeTile extends Tile implements CompositeTileModel {
+export class CompositeTile extends Tile implements CompositeTileModel {
   declare model: CompositeTileModel;
   declare eventMap: CompositeTileEventMap;
   declare self: CompositeTile;

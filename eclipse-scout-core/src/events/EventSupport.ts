@@ -13,7 +13,7 @@ import $ from 'jquery';
 
 type EventSubTypePredicate = (type, subType) => boolean;
 
-export default class EventSupport {
+export class EventSupport {
   protected _eventListeners: EventListener[];
   protected _subTypePredicates: EventSubTypePredicate[];
 

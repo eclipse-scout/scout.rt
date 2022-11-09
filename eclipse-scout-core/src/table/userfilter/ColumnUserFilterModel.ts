@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, TableUserFilterModel} from '../../index';
-import {ColumnUserFilterValues} from './ColumnUserFilter';
+import {Column, ColumnUserFilterValues, TableUserFilterModel} from '../../index';
 
-export default interface ColumnUserFilterModel extends TableUserFilterModel {
+export interface ColumnUserFilterModel extends TableUserFilterModel {
   column?: Column<any> | string;
 
   /**

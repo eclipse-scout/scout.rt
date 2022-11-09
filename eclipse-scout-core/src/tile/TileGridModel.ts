@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Filter, FilterSupport, Menu, TextFilter, Tile, TileGridLayoutConfig, TileGridSelectionHandler, VirtualScrolling, WidgetModel} from '../index';
-import {Comparator} from '../types';
-import {ObjectOrChildModel, ObjectOrModel} from '../scout';
+import {Comparator, Filter, FilterSupport, Menu, ObjectOrChildModel, ObjectOrModel, TextFilter, Tile, TileGridLayoutConfig, TileGridSelectionHandler, VirtualScrolling, WidgetModel} from '../index';
 
-export default interface TileGridModel extends WidgetModel {
+export interface TileGridModel extends WidgetModel {
   /**
    * Specifies whether tiles should be animated when they are deleted. Default is true.
    */

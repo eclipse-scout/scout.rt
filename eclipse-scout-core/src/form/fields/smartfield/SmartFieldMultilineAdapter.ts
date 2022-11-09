@@ -10,5 +10,5 @@
  */
 import {SmartFieldAdapter} from '../../../index';
 
-export default class SmartFieldMultilineAdapter extends SmartFieldAdapter {
+export class SmartFieldMultilineAdapter extends SmartFieldAdapter {
 }

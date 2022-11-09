@@ -11,7 +11,7 @@
 import $ from 'jquery';
 import {Predicate, scout} from '../index';
 
-export default class RemoteEvent {
+export class RemoteEvent {
   target: string;
   type: string;
   showBusyIndicator?: boolean;

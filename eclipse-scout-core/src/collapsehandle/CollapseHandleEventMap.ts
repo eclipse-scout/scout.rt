@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CollapseHandle, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
-import {CollapseHandleHorizontalAlignment} from './CollapseHandle';
+import {CollapseHandle, CollapseHandleHorizontalAlignment, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export interface CollapseHandleActionEvent<T = CollapseHandle> extends Event<T> {
   left?: boolean;
   right?: boolean;
 }
 
-export default interface CollapseHandleEventMap extends WidgetEventMap {
+export interface CollapseHandleEventMap extends WidgetEventMap {
   'action': CollapseHandleActionEvent;
   'propertyChange:horizontalAlignment': PropertyChangeEvent<CollapseHandleHorizontalAlignment>;
   'propertyChange:leftVisible': PropertyChangeEvent<boolean>;

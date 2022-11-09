@@ -12,7 +12,7 @@
 import {keys, KeyStroke, ScoutKeyboardEvent, ViewMenuPopup} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class ViewMenuPopupEnterKeyStroke extends KeyStroke {
+export class ViewMenuPopupEnterKeyStroke extends KeyStroke {
   declare field: ViewMenuPopup;
 
   constructor(popup: ViewMenuPopup) {

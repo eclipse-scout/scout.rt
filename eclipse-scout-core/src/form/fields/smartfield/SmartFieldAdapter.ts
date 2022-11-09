@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, LookupFieldAdapter, RemoteLookupCall, scout, SmartField, SmartFieldTouchPopup, strings} from '../../../index';
-import {SmartFieldAcceptByTextEvent, SmartFieldAcceptInputEvent} from './SmartFieldEventMap';
-import {SmartFieldLookupResult} from './SmartField';
+import {Event, LookupFieldAdapter, RemoteLookupCall, scout, SmartField, SmartFieldAcceptByTextEvent, SmartFieldAcceptInputEvent, SmartFieldLookupResult, SmartFieldTouchPopup, strings} from '../../../index';
 
-export default class SmartFieldAdapter extends LookupFieldAdapter {
+export class SmartFieldAdapter extends LookupFieldAdapter {
   declare widget: SmartField<any>;
 
   constructor() {

@@ -9,13 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Tree} from '../../../index';
-import {ProposalChooserLayoutResetter} from './ProposalChooser';
+import {ProposalChooserLayoutResetter, Tree} from '../../../index';
 
 /**
  * This class is used to reset and restore styles in the DOM, so we can measure the preferred size of the tree.
  */
-export default class TreeLayoutResetter implements ProposalChooserLayoutResetter {
+export class TreeLayoutResetter implements ProposalChooserLayoutResetter {
   cssSelector: string;
   protected _tree: Tree;
 

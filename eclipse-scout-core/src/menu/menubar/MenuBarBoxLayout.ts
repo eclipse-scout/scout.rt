@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension, HtmlCompPrefSizeOptions, MenuBarBox} from '../../index';
 
-export default class MenuBarBoxLayout extends AbstractLayout {
+export class MenuBarBoxLayout extends AbstractLayout {
   menubox: MenuBarBox;
 
   constructor(menubox: MenuBarBox) {

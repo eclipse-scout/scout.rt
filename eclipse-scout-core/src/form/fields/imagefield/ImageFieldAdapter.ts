@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, FormFieldAdapter, ImageField} from '../../../index';
-import {ImageFieldFileUploadEvent} from './ImageFieldEventMap';
+import {Event, FormFieldAdapter, ImageField, ImageFieldFileUploadEvent} from '../../../index';
 
-export default class ImageFieldAdapter extends FormFieldAdapter {
+export class ImageFieldAdapter extends FormFieldAdapter {
   declare widget: ImageField;
 
   protected override _onWidgetEvent(event: Event<ImageField>) {

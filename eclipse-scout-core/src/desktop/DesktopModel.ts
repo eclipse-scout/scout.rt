@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, BenchColumnLayoutData, DesktopNotification, Menu, Outline, ViewButton, Widget, WidgetModel} from '../index';
-import {DesktopDisplayStyle, NativeNotificationDefaults} from './Desktop';
-import {ObjectOrChildModel} from '../scout';
+import {Action, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, Menu, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel} from '../index';
 
-export default interface DesktopModel extends WidgetModel {
+export interface DesktopModel extends WidgetModel {
   nativeNotificationDefaults?: NativeNotificationDefaults;
   displayStyle?: DesktopDisplayStyle;
   title?: string;

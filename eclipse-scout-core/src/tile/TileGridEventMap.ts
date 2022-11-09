@@ -20,7 +20,7 @@ export interface TileClickEvent<T = TileGrid> extends Event<T> {
   originalEvent: JQuery.ClickEvent;
 }
 
-export default interface TileGridEventMap extends WidgetEventMap {
+export interface TileGridEventMap extends WidgetEventMap {
   'tileAction': TileActionEvent;
   'tileClick': TileClickEvent;
   'layoutAnimationDone': Event;

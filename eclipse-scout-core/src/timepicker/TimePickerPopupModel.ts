@@ -10,7 +10,7 @@
  */
 import {DateField, PopupModel} from '../index';
 
-export default interface TimePickerPopupModel extends PopupModel {
+export interface TimePickerPopupModel extends PopupModel {
   field?: DateField;
   timeResolution?: number;
 }

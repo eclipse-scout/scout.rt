@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import HtmlEncoder from '../../src/encoder/HtmlEncoder';
+import {HtmlEncoder} from '../../src/encoder/HtmlEncoder';
 
 describe('HtmlEncoder', () => {
 

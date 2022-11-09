@@ -12,7 +12,7 @@ import {AppLinkKeyStroke, FormField} from '@eclipse-scout/core';
 import $ from 'jquery';
 import {SvgFieldEventMap, SvgFieldModel} from '../index';
 
-export default class SvgField extends FormField implements SvgFieldModel {
+export class SvgField extends FormField implements SvgFieldModel {
   declare model: SvgFieldModel;
   declare eventMap: SvgFieldEventMap;
 

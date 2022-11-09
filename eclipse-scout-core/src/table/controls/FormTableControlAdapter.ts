@@ -10,5 +10,5 @@
  */
 import {TableControlAdapter} from '../../index';
 
-export default class FormTableControlAdapter extends TableControlAdapter {
+export class FormTableControlAdapter extends TableControlAdapter {
 }

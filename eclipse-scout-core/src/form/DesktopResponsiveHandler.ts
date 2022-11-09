@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, DesktopResponsiveHandlerModel, ResponsiveHandler, ResponsiveManager} from '../index';
-import {InitModelOf} from '../scout';
+import {Desktop, DesktopResponsiveHandlerModel, InitModelOf, ResponsiveHandler, ResponsiveManager} from '../index';
 
-export default class DesktopResponsiveHandler extends ResponsiveHandler implements DesktopResponsiveHandlerModel {
+export class DesktopResponsiveHandler extends ResponsiveHandler implements DesktopResponsiveHandlerModel {
   declare model: DesktopResponsiveHandlerModel;
   declare widget: Desktop;
 

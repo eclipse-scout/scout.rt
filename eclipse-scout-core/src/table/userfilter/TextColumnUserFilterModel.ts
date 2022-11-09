@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import ColumnUserFilterModel from './ColumnUserFilterModel';
+import {ColumnUserFilterModel} from '../../index';
 
-export default interface TextColumnUserFilterModel extends ColumnUserFilterModel {
+export interface TextColumnUserFilterModel extends ColumnUserFilterModel {
   freeText?: string;
 }
