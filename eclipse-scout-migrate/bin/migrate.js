@@ -13,14 +13,15 @@ import methodsPlugin from '../src/methodsPlugin.js';
 import countMethodsPlugin from '../src/countMethodsPlugin.js';
 import printEventMapsPlugin from '../src/printEventMapsPlugin.js';
 import typedObjectTypePlugin from '../src/typedObjectTypePlugin.js';
+import widgetColumnMapPlugin from '../src/widgetColumnMapPlugin.js';
 
 const rename = renameModule.default; // Default imports don't work as expected when importing from cjs modules
 
 const yargsOptions = {
-  boolean: ['count', 'printEventMaps', 'rename-ts'],
+  boolean: ['count', 'printEventMaps', 'rename-ts', 'widgetColumnMap'],
   array: ['sources'],
   string: ['migrate', 'moduleMap', 'jsDocTypeMap', 'paramTypeMap', 'returnTypeMap'],
-  default: {'migrate': '', 'rename': null, 'jsDocTypeMap': {}, 'count': false, 'printEventMaps': false},
+  default: {'migrate': '', 'rename': null, 'jsDocTypeMap': {}, 'count': false, 'printEventMaps': false, 'widgetColumnMap': false},
   choices: ['migrate', ['ts', 'objectType']]
 };
 const args = parser(process.argv, yargsOptions);
@@ -35,7 +36,7 @@ if (args.rename === null) {
 if (renameToTs) {
   rename({rootDir, sources});
 }
-if (!args.migrate && !args.count && !args.printEventMaps) {
+if (!args.migrate && !args.count && !args.printEventMaps && !args.widgetColumnMap) {
   process.exit(-1);
 }
 
@@ -53,6 +54,12 @@ if (args.count) {
 }
 if (args.printEventMaps) {
   config.addPlugin(printEventMapsPlugin, {});
+}
+if (args.widgetColumnMap) {
+  config
+    .addPlugin(convertToCRLFPlugin, {})
+    .addPlugin(widgetColumnMapPlugin, {})
+    .addPlugin(convertToLFPlugin, {});
 }
 migrate({rootDir, config, sources}).then(exitCode => process.exit(exitCode));
 
