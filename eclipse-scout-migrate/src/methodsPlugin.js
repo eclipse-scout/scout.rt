@@ -1,5 +1,5 @@
 import jscodeshift from 'jscodeshift';
-import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, defaultReturnTypeMap, findTypeByName, insertMissingImportsForTypes, mapType, methodFilter} from './common.js';
+import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, defaultReturnTypeMap, findTypeByName, insertMissingImportsForTypes, mapType, methodFilter, removeEmptyLinesBetweenImports} from './common.js';
 
 const j = jscodeshift.withParser('ts');
 let referencedTypes;
@@ -20,7 +20,7 @@ let referencedTypes;
 const methodsPlugin = {
   name: 'methods-plugin',
 
-  async run({text, options}) {
+  async run({text, options, sourceFile}) {
     let root = j(text);
     const paramTypeMap = {...defaultParamTypeMap, ...options.paramTypeMap};
     const returnTypeMap = {...defaultReturnTypeMap, ...options.returnTypeMap};
@@ -42,8 +42,8 @@ const methodsPlugin = {
         removeJsDocTypes(node);
       });
 
-    insertMissingImportsForTypes(j, root, Array.from(referencedTypes), moduleMap);
-    return root.toSource(defaultRecastOptions);
+    insertMissingImportsForTypes(j, root, Array.from(referencedTypes), moduleMap, sourceFile.fileName);
+    return removeEmptyLinesBetweenImports(root.toSource(defaultRecastOptions));
   }
 };
 

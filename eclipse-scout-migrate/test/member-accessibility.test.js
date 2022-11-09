@@ -28,4 +28,40 @@ class C {
     public _looksProtected() {}
 }`);
   });
+
+  it('ignores elements marked as @internal', async () => {
+    let text = `\
+class C {
+    _protectedProperty: any;
+    static _protectedStaticProperty: any;
+    /** @internal */
+    _protectedMethod() {}
+    get _protectedGetter() {}
+    /**
+     * Abc
+     * @internal Don't use this method
+     */
+    set _protectedSetter(v) {}
+    public _looksProtected() {}
+}`;
+    let result = await memberAccessModifierPlugin.run(
+      mockPluginParams({text, fileName: 'file.ts', options: {}})
+    );
+
+    result = crlfToLf(result);
+    expect(result).toBe(`\
+class C {
+    protected _protectedProperty: any;
+    protected static _protectedStaticProperty: any;
+    /** @internal */
+    _protectedMethod() {}
+    protected get _protectedGetter() {}
+    /**
+     * Abc
+     * @internal Don't use this method
+     */
+    set _protectedSetter(v) {}
+    public _looksProtected() {}
+}`);
+  });
 });

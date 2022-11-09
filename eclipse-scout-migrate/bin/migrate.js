@@ -12,43 +12,59 @@ import declareMissingClassPropertiesPlugin from '../src/declareMissingClassPrope
 import methodsPlugin from '../src/methodsPlugin.js';
 import countMethodsPlugin from '../src/countMethodsPlugin.js';
 import printEventMapsPlugin from '../src/printEventMapsPlugin.js';
+import typedObjectTypePlugin from '../src/typedObjectTypePlugin.js';
 
 const rename = renameModule.default; // Default imports don't work as expected when importing from cjs modules
 
 const yargsOptions = {
-  boolean: ['rename', 'migrate', 'count', 'printEventMaps'],
+  boolean: ['count', 'printEventMaps', 'rename-ts'],
   array: ['sources'],
-  default: {'rename': true, 'migrate': true, 'count': false, 'printEventMaps': false}
+  string: ['migrate', 'moduleMap', 'jsDocTypeMap', 'paramTypeMap', 'returnTypeMap'],
+  default: {'migrate': '', 'rename': null, 'jsDocTypeMap': {}, 'count': false, 'printEventMaps': false},
+  choices: ['migrate', ['ts', 'objectType']]
 };
 const args = parser(process.argv, yargsOptions);
 
 const rootDir = path.resolve(process.cwd());
 let sources = args.sources;
-
-if (args.rename) {
+let renameToTs = args.rename;
+if (args.rename === null) {
+  // Rename if migrate to ts is enabled and renaming not explicitly disabled
+  renameToTs = args.migrate === 'ts';
+}
+if (renameToTs) {
   rename({rootDir, sources});
 }
 if (!args.migrate && !args.count && !args.printEventMaps) {
   process.exit(-1);
 }
 
-const jsDocTypeMap = {
-  function: {
-    tsName: 'Function',
-    acceptsTypeParameters: false
-  },
-  $: {
-    tsName: 'JQuery',
-    acceptsTypeParameters: false
-  }
-};
-
-const moduleMap = {
-  scout: name => name.indexOf('index') > -1
-};
+let moduleMap = args.moduleMap;
 
 const config = new MigrateConfig();
-if (args.migrate) {
+if (args.migrate === 'objectType') {
+  configObjectType();
+}
+if (args.migrate === 'ts') {
+  configTypeScript();
+}
+if (args.count) {
+  config.addPlugin(countMethodsPlugin, {});
+}
+if (args.printEventMaps) {
+  config.addPlugin(printEventMapsPlugin, {});
+}
+migrate({rootDir, config, sources}).then(exitCode => process.exit(exitCode));
+
+function configObjectType() {
+  config
+    .addPlugin(convertToCRLFPlugin, {})
+    .addPlugin(typedObjectTypePlugin, {moduleMap})
+    .addPlugin(convertToLFPlugin, {})
+    .addPlugin(eslintFixPlugin, {});
+}
+
+function configTypeScript() {
   // Only consider .ts files for migration, no .less or .js files
   if (sources) {
     sources = sources.map(source => {
@@ -60,19 +76,25 @@ if (args.migrate) {
     });
   }
 
+  const jsDocTypeMap = Object.assign({
+    function: {
+      tsName: 'Function',
+      acceptsTypeParameters: false
+    },
+    $: {
+      tsName: 'JQuery',
+      acceptsTypeParameters: false
+    }
+  }, args.jsDocTypeMap);
+  const paramTypeMap = args.paramTypeMap;
+  const returnTypeMap = args.returnTypeMap;
+
   config
     .addPlugin(convertToCRLFPlugin, {})
     .addPlugin(jsDocPlugin, {typeMap: jsDocTypeMap, annotateReturns: true})
     .addPlugin(declareMissingClassPropertiesPlugin, {moduleMap})
     .addPlugin(memberAccessModifierPlugin, {})
-    .addPlugin(methodsPlugin, {moduleMap})
+    .addPlugin(methodsPlugin, {moduleMap, paramTypeMap, returnTypeMap})
     .addPlugin(convertToLFPlugin, {})
     .addPlugin(eslintFixPlugin, {});
 }
-if (args.count) {
-  config.addPlugin(countMethodsPlugin, {});
-}
-if (args.printEventMaps) {
-  config.addPlugin(printEventMapsPlugin, {});
-}
-migrate({rootDir, config, sources}).then(exitCode => process.exit(exitCode));

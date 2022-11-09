@@ -5,7 +5,7 @@
 import jscodeshift from 'jscodeshift';
 import {validateAnyAliasOptions} from 'ts-migrate-plugins/build/src/utils/validateOptions.js';
 import {isDiagnosticWithLinePosition} from 'ts-migrate-plugins/build/src/utils/type-guards.js';
-import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, findClassProperty, findIndex, findParentClassBody, findParentPath, getTypeFor, inConstructor, insertMissingImportsForTypes, transformCommentLinesToJsDoc} from './common.js';
+import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, findClassProperty, findIndex, findParentClassBody, findParentPath, getTypeFor, inConstructor, insertMissingImportsForTypes, removeEmptyLinesBetweenImports, transformCommentLinesToJsDoc} from './common.js';
 
 const j = jscodeshift.withParser('ts');
 let root;
@@ -33,7 +33,7 @@ const propertyComparator = (a, b) => {
 const declareMissingClassPropertiesPlugin = {
   name: 'declare-missing-class-properties',
 
-  async run({text, fileName, getLanguageService, options}) {
+  async run({text, fileName, getLanguageService, options, sourceFile}) {
     const diagnostics = getLanguageService()
       .getSemanticDiagnostics(fileName)
       .filter(isDiagnosticWithLinePosition)
@@ -119,9 +119,8 @@ const declareMissingClassPropertiesPlugin = {
       );
     });
 
-    insertMissingImportsForTypes(j, root, Array.from(referencedTypes), moduleMap);
-
-    return root.toSource(defaultRecastOptions);
+    insertMissingImportsForTypes(j, root, Array.from(referencedTypes), moduleMap, sourceFile.fileName);
+    return removeEmptyLinesBetweenImports(root.toSource(defaultRecastOptions));
   },
 
   validate: validateAnyAliasOptions

@@ -26,10 +26,11 @@
     "src"
   ],
   "scripts": {
-    "ts-rename": "ts-migrate --migrate false --sources src/form/fields/tabbox/**/*",
-    "ts-migrate": "ts-migrate --rename false --sources src/**/*",
-    "ts-event-maps": "ts-migrate --rename false --migrate false --print-event-maps --sources src/form/fields/tabbox/**/*.ts",
-    "ts-count": "ts-migrate --rename false --migrate false --count --sources src/**/*.ts --sources ../eclipse-scout-chart/src/**/*.ts",
+    "ts-rename": "migrate --rename --sources src/**/*",
+    "ts-migrate": "migrate --migrate ts --rename false --sources src/form/fields/FormField.ts --moduleMap.scout path:src/index.ts",
+    "ts-event-maps": "migrate --print-event-maps --sources src/form/fields/tabbox/**/*.ts",
+    "ts-count": "migrate --count --sources src/**/*.ts --sources ../eclipse-scout-chart/src/**/*.ts",
+    "ts-migrate-objectType": "migrate --migrate objectType --sources src/**/*.js --moduleMap.scout path:src/index.ts",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",
     "test:ci": "scout-scripts test:ci",
@@ -54,7 +55,7 @@
     "@types/jasmine-ajax": "3.3.3",
     "@types/jasmine-jquery": "1.5.34",
     "karma": "6.4.0",
-    "@eclipse-scout/ts-migrate": ">=23.1.0-snapshot <23.1.0"
+    "@eclipse-scout/migrate": ">=23.1.0-snapshot <23.1.0"
   },
   "dependencies": {
     "jquery": "3.6.0",

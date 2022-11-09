@@ -1,18 +1,17 @@
 import jscodeshift from 'jscodeshift';
-import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, defaultReturnTypeMap, findClassName, findClassProperty, findParentClassBody, findParentPath, findTypeByName, getNameForType, insertMissingImportsForTypes, mapType, methodFilter} from './common.js';
+import {defaultModuleMap, defaultRecastOptions, findClassName, findClassProperty, findParentClassBody, insertMissingImportsForTypes, mapType, removeEmptyLinesBetweenImports} from './common.js';
 
 const j = jscodeshift.withParser('ts');
 let referencedTypes;
 
 /**
- * @type import('ts-migrate-server').Plugin<{paramTypeMap?: object, moduleMap?: object, defaultParamType?: string}>
+ * @type import('ts-migrate-server').Plugin<{moduleMap?: object, defaultParamType?: string}>
  */
 const widgetPropertiesPlugin = {
   name: 'widget-properties-plugin',
 
-  async run({text, options}) {
+  async run({text, options, sourceFile}) {
     let root = j(text);
-    const paramTypeMap = {...defaultParamTypeMap, ...options.paramTypeMap};
     const moduleMap = {...defaultModuleMap, ...options.moduleMap};
     referencedTypes = new Set();
 
@@ -84,8 +83,8 @@ const widgetPropertiesPlugin = {
         referencedTypes.add(newType);
       });
 
-    insertMissingImportsForTypes(j, root, Array.from(referencedTypes), moduleMap);
-    return root.toSource(defaultRecastOptions);
+    insertMissingImportsForTypes(j, root, Array.from(referencedTypes), moduleMap, sourceFile.fileName);
+    return removeEmptyLinesBetweenImports(root.toSource(defaultRecastOptions));
   }
 };
 

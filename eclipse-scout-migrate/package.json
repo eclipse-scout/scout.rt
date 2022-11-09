@@ -1,5 +1,5 @@
 {
-  "name": "@eclipse-scout/ts-migrate",
+  "name": "@eclipse-scout/migrate",
   "version": "23.1.0-snapshot",
   "description": "TypeScript migration module",
   "author": "BSI Business Systems Integration AG",
@@ -17,18 +17,19 @@
   "keywords": [
     "scout",
     "eclipse-scout",
+    "migrate",
     "typescript"
   ],
   "files": [
     "bin",
-    "scripts"
+    "src"
   ],
   "type": "module",
   "bin": {
-    "ts-migrate": "bin/ts-migrate.js"
+    "migrate": "bin/migrate.js"
   },
   "scripts": {
-    "ts-migrate": "node bin/ts-migrate",
+    "migrate": "node bin/migrate",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest-config.json"
   },
   "dependencies": {

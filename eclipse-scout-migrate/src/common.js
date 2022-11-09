@@ -11,6 +11,8 @@
 
 /* eslint-disable @typescript-eslint/indent */
 
+import path from 'path';
+
 export function lfToCrlf(text) {
   return text.replace(/(?!\r)\n/gm, '\r\n');
 }
@@ -207,6 +209,19 @@ export function findIndex(arr, predicate) {
   return -1;
 }
 
+export function findLastIndex(arr, predicate) {
+  if (!arr || !predicate) {
+    return -1;
+  }
+  let index = -1;
+  for (let i = 0; i < arr.length; i++) {
+    if (predicate(arr[i], i, arr)) {
+      index = i;
+    }
+  }
+  return index;
+}
+
 /**
  * @returns {Collection<ImportDeclaration>}
  */
@@ -281,7 +296,7 @@ export function sortImportSpecifiers(specifiers) {
  * @param {TypeDesc[]} typeDescriptors
  * @param moduleMap
  */
-export function insertMissingImportsForTypes(j, source, typeDescriptors, moduleMap) {
+export function insertMissingImportsForTypes(j, source, typeDescriptors, moduleMap, currentFilePath) {
   let modules = typeDescriptors.map(typeDesc => typeDesc.module);
   if (modules.length === 0) {
     return;
@@ -292,11 +307,19 @@ export function insertMissingImportsForTypes(j, source, typeDescriptors, moduleM
   const {comments} = firstNode;
   const className = getClassName(j, source);
 
-  for (let module of modules) {
+  for (let i = 0; i < modules.length; i++) {
+    let module = modules[i];
     let moduleName = moduleMap[module];
     let predicate = name => name === moduleName;
     if (typeof moduleName === 'function') {
       predicate = moduleName;
+    } else if (typeof moduleName === 'string' && moduleName.startsWith('path:')) {
+      // Get relative path from current fiel to module
+      moduleName = path.relative(path.parse(currentFilePath).dir, path.resolve(moduleName.substring(moduleName.indexOf(':') + 1)));
+      // Remove file ending
+      moduleName = moduleName.substring(0, moduleName.lastIndexOf('.'));
+      // Always use forward slashes
+      moduleName = moduleName.replaceAll('\\', '/');
     }
     let declarations = findImportDeclarations(j, source, predicate);
     if (declarations.length === 0) {
@@ -304,11 +327,10 @@ export function insertMissingImportsForTypes(j, source, typeDescriptors, moduleM
       declarations = findImportDeclarations(j, source, predicate);
     }
 
-    for (const typeDesc of typeDescriptors) {
-      let typeName = getTypeName(typeDesc.type);
-      if (typeName !== className && !hasImportSpecifier(j, declarations, typeName)) {
-        insertImportSpecifier(j, declarations, typeName);
-      }
+    let typeDesc = typeDescriptors[i];
+    let typeName = getTypeName(typeDesc.type);
+    if (typeName !== className && !hasImportSpecifier(j, declarations, typeName)) {
+      insertImportSpecifier(j, declarations, typeName);
     }
   }
 
@@ -330,8 +352,30 @@ export function insertImportDeclaration(j, source, moduleName) {
     j.stringLiteral(moduleName)
   );
 
-  // Insert it at the top of the file
-  source.get().node.program.body.unshift(declaration);
+  let body = source.get().node.program.body;
+  let index = -1;
+  if (isFileImport(moduleName)) {
+    // Put file imports at the end (after imports form node_modules)
+    index = findLastIndex(body, node => node.type === 'ImportDeclaration');
+  } else {
+    // Put imports from node_modules before file imports
+    index = findLastIndex(body, node =>
+      node.type === 'ImportDeclaration' && !isFileImport(node.source.value));
+  }
+  if (index >= 0) {
+    body.splice(index + 1, 0, declaration);
+  } else {
+    // Insert it at the top of the file
+    body.unshift(declaration);
+  }
+}
+
+function isFileImport(importName) {
+  return importName.includes('./') || importName.includes('../');
+}
+
+export function removeEmptyLinesBetweenImports(text) {
+  return text.replaceAll(/\r\n\r\nimport /g, '\r\nimport ');
 }
 
 function getTypeName(type) {

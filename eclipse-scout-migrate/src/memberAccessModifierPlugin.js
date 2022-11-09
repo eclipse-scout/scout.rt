@@ -19,11 +19,24 @@ const memberAccessModifierPlugin = {
           return;
         }
         let name = expression.node.key.name;
-        if (name && name.startsWith('_')) {
+        if (name && name.startsWith('_') && !containsInternalInJsDoc(expression.node)) {
           expression.node.accessibility = 'protected';
         }
       }).toSource(defaultRecastOptions);
   }
 };
+
+function containsInternalInJsDoc(node) {
+  let comments = node.comments;
+  if (!comments) {
+    return false;
+  }
+  return comments.some(comment => {
+    if (comment.type !== 'CommentBlock') {
+      return false;
+    }
+    return comment.value.includes('@internal');
+  });
+}
 
 export default memberAccessModifierPlugin;

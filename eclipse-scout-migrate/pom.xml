@@ -21,7 +21,7 @@
     <relativePath>../org.eclipse.scout.rt</relativePath>
   </parent>
 
-  <artifactId>eclipse-scout-ts-migrate</artifactId>
+  <artifactId>eclipse-scout-migrate</artifactId>
 
   <properties>
     <master_skip_npm_build_dev>true</master_skip_npm_build_dev>

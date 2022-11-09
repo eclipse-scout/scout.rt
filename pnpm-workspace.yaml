@@ -2,7 +2,7 @@ packages:
   - 'eclipse-scout-cli'
   - 'eclipse-scout-core'
   - 'eclipse-scout-chart'
-  - 'eclipse-scout-ts-migrate'
+  - 'eclipse-scout-migrate'
   - 'eclipse-scout-tsconfig'
   - 'eslint-config'
   - 'karma-jasmine-scout'
