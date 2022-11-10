@@ -8,17 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {InitModelOf, MessageBox, MessageBoxesModel, MessageBoxOption, scout, SomeRequired, Status, StatusSeverity, strings, Widget} from '../index';
+import {InitModelOf, MessageBox, MessageBoxesModel, MessageBoxOption, ObjectWithType, scout, SomeRequired, Status, StatusSeverity, strings, Widget} from '../index';
 import $ from 'jquery';
 
 /**
  * This class is a convenient builder for creating message boxes. Use the static functions to
  * create and open simple and often used message boxes.
  */
-export class MessageBoxes implements MessageBoxesModel {
+export class MessageBoxes implements MessageBoxesModel, ObjectWithType {
   declare model: MessageBoxesModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
 
+  objectType: string;
   parent: Widget;
   yesText: string;
   noText: string;

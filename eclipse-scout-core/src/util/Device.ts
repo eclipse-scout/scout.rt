@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, EnumObject, InitModelOf, ObjectModel, objects, Predicate, scout} from '../index';
+import {App, EnumObject, InitModelOf, ObjectModel, objects, ObjectWithType, Predicate, scout} from '../index';
 import $ from 'jquery';
 import TypeOrArray = JQuery.TypeOrArray;
 
@@ -28,8 +28,9 @@ export type DeviceBrowser = EnumObject<typeof Device.Browser>;
  *
  * @singleton
  */
-export class Device implements DeviceModel {
+export class Device implements DeviceModel, ObjectWithType {
   declare model: DeviceModel;
+  objectType: string;
   userAgent: string;
   features: Record<string, boolean>;
   system: DeviceSystem;

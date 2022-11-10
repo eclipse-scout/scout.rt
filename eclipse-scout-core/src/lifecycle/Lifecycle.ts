@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, MessageBox, MessageBoxes, objects, scout, Session, SomeRequired, Status, Widget} from '../index';
+import {arrays, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, MessageBox, MessageBoxes, objects, ObjectWithType, scout, Session, SomeRequired, Status, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -18,12 +18,13 @@ import $ from 'jquery';
  * - invalidElementsTextKey
  * - saveChangesQuestionTextKey
  */
-export abstract class Lifecycle<TValidationResult> extends EventEmitter implements LifecycleModel {
+export abstract class Lifecycle<TValidationResult> extends EventEmitter implements LifecycleModel, ObjectWithType {
   declare model: LifecycleModel;
   declare initModel: SomeRequired<this['model'], 'widget'>;
   declare eventMap: LifecycleEventMap<TValidationResult>;
   declare self: Lifecycle<any>;
 
+  objectType: string;
   widget: Widget;
   validationFailedTextKey: string;
   validationFailedText: string;

@@ -1582,8 +1582,8 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
 export type DesktopDisplayStyle = EnumObject<typeof Desktop.DisplayStyle>;
 export type DesktopUriAction = EnumObject<typeof Desktop.UriAction>;
 export type NativeNotificationDefaults = {
-  title: string;
-  iconId: string;
+  title?: string;
+  iconId?: string;
   visibility?: NativeNotificationVisibility;
 };
 export type BrowserHistoryEntry = {

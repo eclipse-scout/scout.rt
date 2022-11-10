@@ -58,7 +58,8 @@ export class Page extends TreeNode implements PageModel {
   protected _tableFilterHandler: EventHandler<Event<Table>>;
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
   protected _detailTableModel: ChildModelOf<Table>;
-  protected _detailFormModel: ChildModelOf<Form>;
+  /** @internal */
+  _detailFormModel: ChildModelOf<Form>;
 
   constructor() {
     super();

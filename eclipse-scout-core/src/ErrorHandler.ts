@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxError, App, arrays, icons, InitModelOf, LogLevel, NullLogger, ObjectModel, scout, Session, strings} from './index';
+import {AjaxError, App, arrays, icons, InitModelOf, LogLevel, NullLogger, ObjectModel, ObjectWithType, scout, Session, strings} from './index';
 import $ from 'jquery';
 import sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
@@ -43,8 +43,9 @@ export interface ErrorInfo {
   debugInfo?: string;
 }
 
-export class ErrorHandler implements ErrorHandlerModel {
+export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   declare model: ErrorHandlerModel;
+  objectType: string;
   logError: boolean;
   displayError: boolean;
   sendError: boolean;

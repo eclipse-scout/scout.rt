@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, InitModelOf, objects, ResponsiveHandlerModel, ResponsiveManager, ResponsiveState, SomeRequired, Widget} from '../index';
+import {arrays, Event, InitModelOf, objects, ObjectWithType, ResponsiveHandlerModel, ResponsiveManager, ResponsiveState, SomeRequired, Widget} from '../index';
 import $ from 'jquery';
 
-export class ResponsiveHandler implements ResponsiveHandlerModel {
+export class ResponsiveHandler implements ResponsiveHandlerModel, ObjectWithType {
   declare model: ResponsiveHandlerModel;
   declare initModel: SomeRequired<this['model'], 'widget'>;
 
+  objectType: string;
   widget: Widget;
   compactThreshold: number;
   condensedThreshold: number;

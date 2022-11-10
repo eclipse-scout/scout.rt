@@ -77,7 +77,7 @@ export class Notification extends Widget implements NotificationModel {
     if (this.rendered) {
       this._removeStatus();
     }
-    status = Status.ensure(status);
+    status = Status.ensure(status) || Status.info();
     this._setProperty('status', status);
   }
 

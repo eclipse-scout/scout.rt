@@ -16,12 +16,13 @@ import {
 import $ from 'jquery';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 
-export class Session extends EventEmitter implements SessionModel, ModelAdapterLike {
+export class Session extends EventEmitter implements SessionModel, ModelAdapterLike, ObjectWithType {
   declare model: SessionModel;
   declare initModel: SomeRequired<this['model'], '$entryPoint'>;
   declare eventMap: SessionEventMap;
   declare self: Session;
 
+  objectType: string;
   partId: string;
   url: URL;
   userAgent: UserAgent;

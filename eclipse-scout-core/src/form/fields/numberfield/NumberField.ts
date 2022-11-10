@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicField, Calculator, DecimalFormat, fields, InitModelOf, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
+import {BasicField, Calculator, DecimalFormat, DecimalFormatOptions, fields, InitModelOf, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
 
 export class NumberField extends BasicField<number, number | string> implements NumberFieldModel {
   declare model: NumberFieldModel;
@@ -77,11 +77,11 @@ export class NumberField extends BasicField<number, number | string> implements 
     return locale.decimalFormatPatternDefault;
   }
 
-  setDecimalFormat(decimalFormat: string | DecimalFormat) {
+  setDecimalFormat(decimalFormat: string | DecimalFormat | DecimalFormatOptions) {
     this.setProperty('decimalFormat', decimalFormat);
   }
 
-  protected _setDecimalFormat(decimalFormat: string | DecimalFormat) {
+  protected _setDecimalFormat(decimalFormat: string | DecimalFormat | DecimalFormatOptions) {
     if (!decimalFormat) {
       decimalFormat = this._getDefaultFormat(this.session.locale);
     }

@@ -9,11 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {InitModelOf, Point, SomeRequired, ViewportScrollerModel} from '../index';
+import {InitModelOf, ObjectWithType, Point, SomeRequired, ViewportScrollerModel} from '../index';
 
-export class ViewportScroller implements ViewportScrollerModel {
+export class ViewportScroller implements ViewportScrollerModel, ObjectWithType {
   declare model: ViewportScrollerModel;
   declare initModel: SomeRequired<this['model'], 'viewportWidth' | 'viewportHeight'>;
+  objectType: string;
 
   static SPEED_FACTOR_SLOW = 1 / 20;
   static SPEED_FACTOR_MEDIUM = 1 / 10;

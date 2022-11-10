@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ErrorHandler, Event, EventHandler, InitModelOf, MessageBoxes, PopupBlockerDesktopNotification, PopupBlockerHandlerModel, scout, Session, SomeRequired, Status} from '../../index';
+import {ErrorHandler, Event, EventHandler, InitModelOf, MessageBoxes, ObjectWithType, PopupBlockerDesktopNotification, PopupBlockerHandlerModel, scout, Session, SomeRequired, Status} from '../../index';
 import $ from 'jquery';
 
-export class PopupBlockerHandler implements PopupBlockerHandlerModel {
+export class PopupBlockerHandler implements PopupBlockerHandlerModel, ObjectWithType {
   declare model: PopupBlockerHandlerModel;
   declare initModel: SomeRequired<this['model'], 'session'>;
 
+  objectType: string;
   session: Session;
   preserveOpener: boolean;
 

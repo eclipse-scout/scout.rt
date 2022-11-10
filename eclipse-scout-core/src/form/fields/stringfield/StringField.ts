@@ -409,6 +409,10 @@ export class StringField extends BasicField<string> {
     // nop, property used in _validateDisplayText()
   }
 
+  setMultilineText(multilineText: boolean) {
+    this.setProperty('multilineText', multilineText);
+  }
+
   protected _setMultilineText(multilineText: boolean) {
     this._setProperty('multilineText', multilineText);
     this.keyStrokeContext.setMultiline(this.multilineText);

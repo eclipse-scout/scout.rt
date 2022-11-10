@@ -462,7 +462,8 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
-  protected _prepareFields() {
+  /** @internal */
+  _prepareFields() {
     this.processButtons.forEach(this._unregisterButtonKeyStrokes.bind(this));
 
     this.controls = [];
@@ -766,7 +767,8 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     }
   }
 
-  protected _updateMenuBar() {
+  /** @internal */
+  _updateMenuBar() {
     if (!this.menuBarVisible) {
       // Do not update menuBar while it is invisible, the menus may now be managed by another widget.
       // -> this makes sure the parent is not accidentally set to the group box, the other widget should remain responsible

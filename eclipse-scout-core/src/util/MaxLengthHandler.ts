@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DesktopNotification, InitModelOf, MaxLengthHandlerModel, MaxLengthHandlerTarget, objects, scout, SomeRequired, Status} from '../index';
+import {arrays, DesktopNotification, InitModelOf, MaxLengthHandlerModel, MaxLengthHandlerTarget, objects, ObjectWithType, scout, SomeRequired, Status} from '../index';
 import $ from 'jquery';
 
-export class MaxLengthHandler implements MaxLengthHandlerModel {
+export class MaxLengthHandler implements MaxLengthHandlerModel, ObjectWithType {
   declare model: MaxLengthHandlerModel;
   declare initModel: SomeRequired<this['model'], 'target'>;
+  objectType: string;
 
   onInputFieldPaste: (event: JQuery.TriggeredEvent<HTMLInputElement, undefined, HTMLInputElement, HTMLInputElement>) => void;
   target: MaxLengthHandlerTarget;
