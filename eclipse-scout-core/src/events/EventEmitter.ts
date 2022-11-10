@@ -61,7 +61,7 @@ export class EventEmitter {
    * @param type One or more event names separated by space.
    * @param handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter.
    **/
-  on<K extends string & keyof EventMapOf<this['self']>>(type: K, handler: EventHandler<(EventMapOf<this>)[K] & Event<this>>): EventListener {
+  on<K extends string & keyof EventMapOf<this['self']>>(type: K, handler: EventHandler<EventMapOf<this>[K] & Event<this>>): EventListener {
     return this.events.on(type, handler);
   }
 
@@ -73,7 +73,7 @@ export class EventEmitter {
    * @param handler The exact same event handler that was used for registration using {@link on} or {@link one}.
    *      If no handler is specified, all handlers are de-registered for the given type.
    */
-  off<K extends string & keyof EventMapOf<this['self']>>(type: K, handler?: EventHandler<EventMapOf<this>[K]>) {
+  off<K extends string & keyof EventMapOf<this['self']>>(type: K, handler?: EventHandler<EventMapOf<this>[K] & Event<this>>) {
     this.events.off(type, handler);
   }
 
