@@ -18,7 +18,7 @@ import widgetColumnMapPlugin from '../src/widgetColumnMapPlugin.js';
 const rename = renameModule.default; // Default imports don't work as expected when importing from cjs modules
 
 const yargsOptions = {
-  boolean: ['count', 'printEventMaps', 'rename-ts', 'widgetColumnMap'],
+  boolean: ['count', 'printEventMaps', 'rename', 'widgetColumnMap'],
   array: ['sources'],
   string: ['migrate', 'moduleMap', 'jsDocTypeMap', 'paramTypeMap', 'returnTypeMap'],
   default: {'migrate': '', 'rename': null, 'jsDocTypeMap': {}, 'count': false, 'printEventMaps': false, 'widgetColumnMap': false},
