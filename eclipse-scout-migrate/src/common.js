@@ -334,10 +334,11 @@ export function insertMissingImportsForTypes(j, source, typeDescriptors, moduleM
     }
   }
 
-  // When the imports are replaced, the comment on the first node (likely the copy right header) -> Attach comment again
+  // When the imports are replaced, the comment on the first node (likely the copy right header) is removed -> Attach comment again
   // See also https://github.com/facebook/jscodeshift/blob/master/recipes/retain-first-comment.md
   const newFirstNode = getFirstNode(j, source);
   if (newFirstNode !== firstNode) {
+    firstNode.comments = null; // Delete comment if another import was added before that will receive it
     newFirstNode.comments = comments;
   }
 }
