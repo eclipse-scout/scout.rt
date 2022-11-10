@@ -46,6 +46,24 @@ export interface ExtensionModel {
   extensions: ExtensionAction[];
 }
 
+
+function get<T>(modelFunc: () => T): T;
+function get<T, P>(modelFunc: () => T, parent: P): T & { parent: P };
+
+/**
+ * Returns a new instance of a model supplied by the given model func
+ *
+ * @param modelFunc A function that returns the model instance.
+ * @param parent Optional parent that is set on the returned object.
+ */
+function get<T, P>(modelFunc: () => T, parent?: P): T & { parent?: P } {
+  let model = modelFunc();
+  if (parent) {
+    (model as T & { parent?: P }).parent = parent;
+  }
+  return model;
+}
+
 export const models = {
 
   modelMap: {},
@@ -54,19 +72,7 @@ export const models = {
     models.modelMap = data;
   },
 
-  /**
-   * Returns a new instance of a model supplied by the given model func
-   *
-   * @param modelFunc A function that returns the model instance.
-   * @param parent Optional parent that is set on the returned object.
-   */
-  get<T>(modelFunc: () => T, parent?: any): T & { parent?: any } {
-    let model = modelFunc();
-    if (parent) {
-      (model as T & { parent?: object }).parent = parent;
-    }
-    return model;
-  },
+  get,
 
   /**
    * Returns a new instance of an extension from the global modelMap.
