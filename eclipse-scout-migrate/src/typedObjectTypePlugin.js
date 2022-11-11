@@ -1,5 +1,5 @@
 import jscodeshift from 'jscodeshift';
-import {defaultModuleMap, defaultRecastOptions, insertMissingImportsForTypes, mapType, removeEmptyLinesBetweenImports} from './common.js';
+import {defaultModuleMap, defaultRecastOptions, insertMissingImportsForTypes, isOneOf, mapType, removeEmptyLinesBetweenImports} from './common.js';
 
 const j = jscodeshift.withParser('ts');
 let referencedTypes;
@@ -17,7 +17,7 @@ const typedObjectTypePlugin = {
 
     root.find(j.ObjectProperty)
       .filter(path =>
-        path.value.key.name === 'objectType' &&
+        isOneOf(path.value.key.name, 'objectType', 'logicalGrid', 'lookupCall') &&
         path.value.value.type === j.StringLiteral.name)
       .forEach(path => {
         let objectType = path.value.value.value;

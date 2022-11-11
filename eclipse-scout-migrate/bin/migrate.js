@@ -41,6 +41,9 @@ if (!args.migrate && !args.count && !args.printEventMaps && !args.widgetColumnMa
 }
 
 let moduleMap = args.moduleMap;
+if (moduleMap) {
+  console.log('Using moduleMap: ' + JSON.stringify(moduleMap));
+}
 
 const config = new MigrateConfig();
 if (args.migrate === 'objectType') {

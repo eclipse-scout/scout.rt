@@ -11,11 +11,16 @@ export default () => ({
   rootGroupBox: {
     id: 'MainBox',
     objectType: 'GroupBox',
+    logicalGrid: 'scout.HorizontalGrid',
     fields: [
       {
         id: 'DetailBox',
         objectType: 'StringField',
         gridColumnCount: 2
+      },
+      {
+        objectType: SmartField,
+        lookupCall: 'StaticLookupCall'
       }
     ]
   }
@@ -26,18 +31,23 @@ export default () => ({
 
     result = crlfToLf(result);
     expect(result).toBe(`\
-import {GroupBox, StringField} from '@eclipse-scout/core';
+import {GroupBox, HorizontalGrid, StaticLookupCall, StringField} from '@eclipse-scout/core';
 export default () => ({
   id: 'jswidgets.AccordionForm',
   displayHint: 'view',
   rootGroupBox: {
     id: 'MainBox',
     objectType: GroupBox,
+    logicalGrid: HorizontalGrid,
     fields: [
       {
         id: 'DetailBox',
         objectType: StringField,
         gridColumnCount: 2
+      },
+      {
+        objectType: SmartField,
+        lookupCall: StaticLookupCall
       }
     ]
   }
