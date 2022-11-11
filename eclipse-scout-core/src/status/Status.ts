@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DefaultStatus, EnumObject, FullModelOf, InitModelOf, ObjectFactory, ObjectOrModel, objects, ObjectWithType, ParsingFailedStatus, Predicate, StatusModel, strings, ValidationFailedStatus} from '../index';
+import {arrays, DefaultStatus, EnumObject, FullModelOf, InitModelOf, ObjectOrModel, objects, ObjectWithType, ParsingFailedStatus, Predicate, scout, StatusModel, strings, ValidationFailedStatus} from '../index';
 import $ from 'jquery';
 
 export class Status implements StatusModel, ObjectWithType {
@@ -324,9 +324,9 @@ export class Status implements StatusModel, ObjectWithType {
     }
     // May return a specialized subclass of Status
     if (!status.objectType) {
-      status.objectType = 'Status';
+      status.objectType = Status;
     }
-    return ObjectFactory.get().create(status as FullModelOf<T>);
+    return scout.create(status as FullModelOf<T>);
   }
 }
 

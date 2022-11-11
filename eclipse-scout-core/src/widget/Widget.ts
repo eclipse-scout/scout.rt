@@ -10,8 +10,8 @@
  */
 import {
   Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke,
-  KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session,
-  SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, Predicate, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions,
+  Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import * as $ from 'jquery';
 
@@ -1257,12 +1257,12 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * @param logicalGrid an instance of {@link LogicalGrid} or a string representing the objectType of a logical grid.
    */
-  setLogicalGrid(logicalGrid: LogicalGrid | string) {
+  setLogicalGrid(logicalGrid: LogicalGrid | ObjectType<LogicalGrid>) {
     this.setProperty('logicalGrid', logicalGrid);
   }
 
-  protected _setLogicalGrid(logicalGrid: LogicalGrid | string) {
-    if (typeof logicalGrid === 'string') {
+  protected _setLogicalGrid(logicalGrid: LogicalGrid | ObjectType<LogicalGrid>) {
+    if (typeof logicalGrid === 'string' || typeof logicalGrid === 'function') {
       logicalGrid = scout.create(logicalGrid);
     }
     this._setProperty('logicalGrid', logicalGrid);

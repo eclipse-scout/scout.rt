@@ -323,20 +323,20 @@ export class LookupCall<TKey> implements LookupCallModel<TKey> {
 
   // ---- static helpers ----
 
-  static ensure<K>(lookupCall: LookupCallOrModel<K>, session: Session): LookupCall<K> {
+  static ensure<TKey, TLookupCall extends LookupCall<TKey>>(lookupCall: LookupCallOrModel<TKey, TLookupCall>, session: Session): TLookupCall {
+    if (!lookupCall) {
+      return lookupCall as TLookupCall;
+    }
     if (lookupCall instanceof LookupCall) {
       return lookupCall;
     }
-    if (objects.isPlainObject(lookupCall)) {
-      lookupCall.session = session;
-      return scout.create(lookupCall as FullModelOf<LookupCall<K>>);
-    }
-    if (typeof lookupCall === 'string') {
-      lookupCall = scout.create(lookupCall, {
+    if (typeof lookupCall === 'string' || typeof lookupCall === 'function') {
+      return scout.create(lookupCall, {
         session: session
-      });
+      } as InitModelOf<TLookupCall>);
     }
-    return lookupCall as LookupCall<K>;
+    lookupCall.session = session;
+    return scout.create(lookupCall as FullModelOf<TLookupCall>);
   }
 
   static firstLookupRow<K>(result: LookupResult<K>): LookupRow<K> {
@@ -356,4 +356,4 @@ export class LookupCall<TKey> implements LookupCallModel<TKey> {
 /**
  * A LookupCall, a LookupCallModel or a string with a LookupCall class name.
  */
-export type LookupCallOrModel<K> = LookupCall<K> | ChildModelOf<LookupCall<K>> | string;
+export type LookupCallOrModel<TKey, TLookupCall extends LookupCall<TKey> = LookupCall<TKey>> = TLookupCall | ChildModelOf<TLookupCall> | ObjectType<TLookupCall>;

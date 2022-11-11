@@ -319,6 +319,18 @@ describe('GroupBox', () => {
 
       groupBox = scout.create(GroupBox, {
         parent: session.desktop,
+        logicalGrid: HorizontalGrid
+      });
+      expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);
+
+      groupBox.setLogicalGrid(VerticalSmartGrid);
+      expect(groupBox.logicalGrid instanceof VerticalSmartGrid).toBe(true);
+
+      groupBox.setLogicalGrid('HorizontalGrid');
+      expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);
+
+      groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
         logicalGrid: scout.create(HorizontalGrid)
       });
       expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DisabledStyle, DisplayParent, LogicalGrid, ObjectModel, Session, Widget} from '../index';
+import {DisabledStyle, DisplayParent, LogicalGrid, ObjectModel, ObjectType, Session, Widget} from '../index';
 
 export interface WidgetModel extends ObjectModel<Widget> {
   /**
@@ -29,7 +29,7 @@ export interface WidgetModel extends ObjectModel<Widget> {
   visible?: boolean;
   cssClass?: string;
   loading?: boolean;
-  logicalGrid?: LogicalGrid | string;
+  logicalGrid?: LogicalGrid | ObjectType<LogicalGrid>;
   displayParent?: DisplayParent;
   animateRemoval?: boolean;
 
