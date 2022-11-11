@@ -739,4 +739,38 @@ describe('scout.objects', () => {
     });
   });
 
+  describe('isNullOrUndefinedOrEmpty', () => {
+    it('detects null or undefined or empty values', () => {
+      expect(objects.isNullOrUndefinedOrEmpty(undefined)).toBe(true);
+      expect(objects.isNullOrUndefinedOrEmpty(null)).toBe(true);
+      expect(objects.isNullOrUndefinedOrEmpty({})).toBe(true);
+      expect(objects.isNullOrUndefinedOrEmpty([])).toBe(true);
+
+      expect(objects.isNullOrUndefinedOrEmpty('')).toBe(undefined); // not an object
+      expect(objects.isNullOrUndefinedOrEmpty(' ')).toBe(undefined); // not an object
+      expect(objects.isNullOrUndefinedOrEmpty(0)).toBe(undefined); // not an object
+      expect(objects.isNullOrUndefinedOrEmpty(1)).toBe(undefined); // not an object
+      expect(objects.isNullOrUndefinedOrEmpty([0])).toBe(false);
+      expect(objects.isNullOrUndefinedOrEmpty([''])).toBe(false);
+      expect(objects.isNullOrUndefinedOrEmpty({a: 0})).toBe(false);
+    });
+  });
+
+  describe('removeEmptyProperties', () => {
+    it('removes empty properties', () => {
+      expect(objects.removeEmptyProperties(undefined)).toEqual(undefined);
+      expect(objects.removeEmptyProperties(null)).toEqual(null);
+      expect(objects.removeEmptyProperties({})).toEqual({});
+
+      expect(objects.removeEmptyProperties({a: null})).toEqual({});
+      expect(objects.removeEmptyProperties({a: undefined})).toEqual({});
+      expect(objects.removeEmptyProperties({a: []})).toEqual({});
+      expect(objects.removeEmptyProperties({a: {}})).toEqual({});
+
+      expect(objects.removeEmptyProperties({a: ''})).toEqual({a: ''});
+      expect(objects.removeEmptyProperties({a: ' '})).toEqual({a: ' '});
+      expect(objects.removeEmptyProperties({a: 0})).toEqual({a: 0});
+      expect(objects.removeEmptyProperties({a: {b: {}}})).toEqual({a: {b: {}}}); // no recursive clean
+    });
+  });
 });

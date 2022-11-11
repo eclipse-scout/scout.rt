@@ -360,6 +360,20 @@ export function isNullOrUndefined(obj) {
   return obj === null || obj === undefined;
 }
 
+/**
+ * Returns true if the given object is {@link isNullOrUndefined null or undefined}, an
+ * {@link arrays#empty empty array} or an {@link isEmpty empty object}.
+ */
+export function isNullOrUndefinedOrEmpty(obj) {
+  if (isNullOrUndefined(obj)) {
+    return true;
+  }
+  if (isArray(obj)) {
+    return arrays.empty(obj);
+  }
+  return isEmpty(obj);
+}
+
 export function isFunction(obj) {
   return $.isFunction(obj);
 }
@@ -694,6 +708,35 @@ export function resolveConstProperty(object, config) {
 }
 
 /**
+ * Cleans the given object, i.e. removes all top-level properties with values that are null, undefined or
+ * consist of an empty array or an empty object. This is useful to have a minimal data object.
+ *
+ * This method is *not* recursive.
+ *
+ * The object is modified *in-place* and is also returned.
+ *
+ * If the given object is set but not a {@link isPlainObject plain object}, an error is thrown.
+ *
+ * @param {*} object
+ * @returns {*}
+ * @see isNullOrUndefinedOrEmpty
+ */
+export function removeEmptyProperties(object) {
+  if (isNullOrUndefined(object)) {
+    return object;
+  }
+  if (!isPlainObject(object)) {
+    throw new Error('Not an object: ' + object);
+  }
+  Object.keys(object).forEach(key => {
+    if (isNullOrUndefinedOrEmpty(object[key])) {
+      delete object[key];
+    }
+  });
+  return object;
+}
+
+/**
  * @param {object} obj
  * @returns {Boolean|undefined}
  *  - true if the obj is empty, null or undefined
@@ -744,6 +787,7 @@ export default {
   isEmpty,
   isFunction,
   isNullOrUndefined,
+  isNullOrUndefinedOrEmpty,
   isNumber,
   isPlainObject,
   isString,
@@ -752,6 +796,7 @@ export default {
   mandatoryFunction,
   optProperty,
   propertiesEquals,
+  removeEmptyProperties,
   replacePrototypeFunction,
   resolveConst,
   resolveConstProperty,
