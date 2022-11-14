@@ -9,9 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-/// <reference path="./jquery/jquery-scout-types.ts" />
-/// <reference path="./testing/JasmineScout.ts" />
-
 import {ObjectFactory} from './ObjectFactory';
 
 export * from './scout';
@@ -1060,11 +1057,10 @@ export * from './types';
 export * from './jquery/jquery-scout-types';
 
 // The following files don't export anything, but they need to be imported, so they participate on the webpack build
-import * as jqs from './jquery/jquery-scout';
-import * as jqss from './jquery/jquery-scout-selectors';
-Object.assign({}, jqs, jqss); // FIXME TS without this, jquery-scout won't be included in the build, why is this necessary?
+import './jquery/jquery-scout';
+import './jquery/jquery-scout-selectors';
 
-import * as scout from './scout';
+import {scout} from './scout';
 import * as self from './index';
 
 export default self;

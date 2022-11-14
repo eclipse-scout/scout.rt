@@ -33,8 +33,8 @@ export class ClickActiveElementKeyStroke extends KeyStroke {
   }
 
   override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & { _$activeElement?: JQuery }) {
-    event._$activeElement.trigger('click', {
+    event._$activeElement.trigger($.Event('click', {
       which: 1
-    });
+    }));
   }
 }
