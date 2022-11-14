@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.IDN;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
@@ -366,7 +365,7 @@ public class MailHelperTest {
   public void testInternetAddress3() {
     // test an invalid address, expect a ProcessingException
     MailParticipant participant = new MailParticipant()
-        .withEmail("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com")
+        .withEmail("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com")
         .withName("Invalid address");
     BEANS.get(MailHelper.class).createInternetAddress(participant);
   }
@@ -384,10 +383,10 @@ public class MailHelperTest {
     assertEquals(addressToString, address2.toString());
     assertEquals(addressPersonal, address2.getPersonal());
 
-    assertEquals(IDN.toASCII(email), address2.getAddress());
-    assertEquals(email, IDN.toUnicode(address2.getAddress()));
+    assertEquals(BEANS.get(MailIDNConverter.class).toASCII(email), address2.getAddress());
+    assertEquals(email, BEANS.get(MailIDNConverter.class).toUnicode(address2.getAddress()));
 
-    assertEquals("xn--peter@mller-zhb.de", BEANS.get(MailHelper.class).createInternetAddress("peter@müller.de").getAddress());
+    assertEquals("peter@xn--mller-kva.de", BEANS.get(MailHelper.class).createInternetAddress("peter@müller.de").getAddress());
   }
 
   @Test
@@ -424,8 +423,8 @@ public class MailHelperTest {
     InternetAddress[] addresses = BEANS.get(MailHelper.class).parseInternetAddressList(StringUtility.join(",", inputAddresses));
     assertEquals(inputAddresses.length, addresses.length);
     for (int i = 0; i < inputAddresses.length; i++) {
-      assertEquals(IDN.toASCII(inputAddresses[i]), addresses[i].getAddress());
-      assertEquals(inputAddresses[i], IDN.toUnicode(addresses[i].getAddress()));
+      assertEquals(BEANS.get(MailIDNConverter.class).toASCII(inputAddresses[i]), addresses[i].getAddress());
+      assertEquals(inputAddresses[i], BEANS.get(MailIDNConverter.class).toUnicode(addresses[i].getAddress()));
     }
   }
 
@@ -478,7 +477,7 @@ public class MailHelperTest {
     assertFalse(mailHelper.isEmailAddressValid("foo@bär@de.de"));
     assertFalse(mailHelper.isEmailAddressValid("foo@domain/test.みんな"));
     assertFalse(mailHelper.isEmailAddressValid("foo@domain\test.みんな"));
-    assertFalse(mailHelper.isEmailAddressValid("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com"));
+    assertFalse(mailHelper.isEmailAddressValid("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com"));
   }
 
   @Test

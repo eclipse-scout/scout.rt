@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.IDN;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
@@ -812,7 +811,7 @@ public class MailHelper {
     }
 
     try {
-      InternetAddress internetAddress = new InternetAddress(IDN.toASCII(email));
+      InternetAddress internetAddress = new InternetAddress(BEANS.get(MailIDNConverter.class).toASCII(email));
       if (StringUtility.hasText(name)) {
         internetAddress.setPersonal(name, StandardCharsets.UTF_8.name());
       }
@@ -959,7 +958,7 @@ public class MailHelper {
     }
 
     try {
-      new InternetAddress(IDN.toASCII(emailAddress), true);
+      new InternetAddress(BEANS.get(MailIDNConverter.class).toASCII(emailAddress), true);
       return true;
     }
     catch (AddressException | IllegalArgumentException e) {
