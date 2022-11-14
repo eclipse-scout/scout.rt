@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-/* eslint-disable @typescript-eslint/indent */
+/* eslint-disable indent */
 
 import path from 'path';
 

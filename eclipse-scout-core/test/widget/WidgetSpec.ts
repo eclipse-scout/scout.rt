@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// eslint-disable-next-line max-classes-per-file
 import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, scout, StringField, TreeVisitResult, Widget} from '../../src/index';
 import {InitModelOf} from '../../src/scout';
 

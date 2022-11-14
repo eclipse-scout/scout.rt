@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-/* eslint-disable max-classes-per-file */
 import {Filter, FilterOrFunction, FilterResult, FilterSupport, HtmlComponent, KeyStrokeContext, NullWidget, numbers, StringField, strings, UpdateFilteredElementsOptions, WidgetModel} from '../../src/index';
 import $ from 'jquery';
 import {FullModelOf, InitModelOf} from '../../src/scout';

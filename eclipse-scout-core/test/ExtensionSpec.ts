@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// eslint-disable-next-line max-classes-per-file
 import {Extension, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
 import {InitModelOf} from '../src/scout';

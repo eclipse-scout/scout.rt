@@ -1,3 +1,5 @@
+// noinspection JSUnusedLocalSymbols
+
 /*
  * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -8,8 +10,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
-// noinspection JSUnusedLocalSymbols
 
 import {Image, PropertyChangeEvent, scout, SmartField, StringField} from '../src';
 import $ from 'jquery';
@@ -155,8 +155,8 @@ function events() {
   $comp.trigger('mousedown', {
     hi: 'there'
   });
-  let jqEvent = new jQuery.Event('dblclick', {
-    originalEvent: new jQuery.Event('dummy', {
+  let jqEvent = new $.Event('dblclick', {
+    originalEvent: new $.Event('dummy', {
       detail: 2
     })
   });

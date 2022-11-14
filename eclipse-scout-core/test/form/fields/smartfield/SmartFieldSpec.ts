@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// eslint-disable-next-line max-classes-per-file
 import {fields, keys, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, Status, strings} from '../../../../src/index';
 import {AbortableMicrotaskStaticLookupCall, ColumnDescriptorDummyLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 import {LookupCall} from '../../../../src/lookup/LookupCall';

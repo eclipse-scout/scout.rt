@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-/* eslint-disable max-classes-per-file */
 import {Action, Button, KeyStroke, NumberField, ObjectFactory, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
 import {InitModelOf} from '../src/scout';

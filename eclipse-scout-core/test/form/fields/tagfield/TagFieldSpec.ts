@@ -50,8 +50,7 @@ describe('TagField', () => {
     let $input = field.$container.find('input');
     $input.val(text);
     $input.focus();
-    // eslint-disable-next-line new-cap
-    $input.trigger(jQuery.Event('keyup', {
+    $input.trigger($.Event('keyup', {
       keyCode: keyCode
     }));
   }
@@ -121,8 +120,7 @@ describe('TagField', () => {
       // trigger a keydown event, all the flags are required  to pass
       // the accept-checks in KeyStroke.js
       let $input = field.$container.find('input');
-      // eslint-disable-next-line new-cap
-      $input.trigger(jQuery.Event('keydown', {
+      $input.trigger($.Event('keydown', {
         keyCode: keys.ENTER,
         which: keys.ENTER,
         altKey: false,

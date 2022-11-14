@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// eslint-disable-next-line max-classes-per-file
 import {
   Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, InitModelOf, Insets, KeyStrokeContext, LoadingSupport, ObjectOrChildModel, scout, tooltips, Widget
 } from '../index';

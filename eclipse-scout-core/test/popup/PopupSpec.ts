@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// eslint-disable-next-line max-classes-per-file
 import {Dimension, HtmlComponent, Popup, scout, StringField, Widget, WidgetPopup} from '../../src/index';
 import {JQueryTesting} from '../../src/testing';
 

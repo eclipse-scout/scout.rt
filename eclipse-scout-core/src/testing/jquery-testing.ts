@@ -8,10 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
-/* eslint-disable new-cap */
-
-
 export interface TriggerMouseOptions {
   clicks?: number;
   click?: number;
@@ -27,20 +23,20 @@ export type KeyStrokeModifier = 'alt' | 'ctrl' | 'shift' | 'meta';
 
 export const JQueryTesting = {
   triggerBlur($elem: JQuery) {
-    let event = jQuery.Event('blur', {
-      originalEvent: jQuery.Event('dummy') // create dummy object
+    let event = $.Event('blur', {
+      originalEvent: $.Event('dummy') // create dummy object
     });
     $elem.trigger(event);
   },
 
   triggerRightClick($elem: JQuery) {
-    $elem.trigger(jQuery.Event('mousedown', {which: 3}));
-    $elem.trigger(jQuery.Event('mouseup', {which: 3}));
+    $elem.trigger($.Event('mousedown', {which: 3}));
+    $elem.trigger($.Event('mouseup', {which: 3}));
   },
 
   triggerKeyUp($elem: JQuery, key: number, modifier: KeyStrokeModifier) {
-    let event = jQuery.Event('keyup', {
-      originalEvent: jQuery.Event('dummy'), // create dummy object
+    let event = $.Event('keyup', {
+      originalEvent: $.Event('dummy'), // create dummy object
       which: key
     });
     JQueryTesting.extendEventWithModifier(event, modifier);
@@ -48,8 +44,8 @@ export const JQueryTesting = {
   },
 
   triggerKeyDown($elem: JQuery, key: number, modifier?: KeyStrokeModifier) {
-    let event = jQuery.Event('keydown', {
-      originalEvent: jQuery.Event('dummy'), // create dummy object
+    let event = $.Event('keydown', {
+      originalEvent: $.Event('dummy'), // create dummy object
       which: key
     });
     JQueryTesting.extendEventWithModifier(event, modifier);
@@ -151,9 +147,9 @@ export const JQueryTesting = {
     if (!opts.which) {
       opts.which = 1;
     }
-    event = jQuery.Event(eventType, {
+    event = $.Event(eventType, {
       which: opts.which,
-      originalEvent: jQuery.Event(eventType, {
+      originalEvent: $.Event(eventType, {
         detail: opts.clicks
       }),
       pageX: opts.position.left,
@@ -174,7 +170,7 @@ export const JQueryTesting = {
 
     JQueryTesting.triggerMouseDown($elem, opts);
     JQueryTesting.triggerMouseUp($elem, opts);
-    $elem.trigger(jQuery.Event('contextmenu', {
+    $elem.trigger($.Event('contextmenu', {
       pageX: opts.position.left,
       pageY: opts.position.top
     }));
@@ -200,8 +196,8 @@ export const JQueryTesting = {
   triggerDoubleClick($elem: JQuery) {
     JQueryTesting.triggerClick($elem);
     JQueryTesting.triggerClick($elem, {click: 2});
-    $elem.trigger(jQuery.Event('dblclick', {
-      originalEvent: jQuery.Event('dummy', {
+    $elem.trigger($.Event('dblclick', {
+      originalEvent: $.Event('dummy', {
         detail: 2
       })
     }));
