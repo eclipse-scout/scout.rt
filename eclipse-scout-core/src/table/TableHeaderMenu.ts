@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, arrays, Cell, Column, ColumnUserFilter, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, NumberColumn, NumberColumnAggregationFunction, Point, Popup, RowLayout, scout,
-  scrollbars, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuLayout, TableHeaderMenuModel, TableRowModel, TableRowsCheckedEvent
+  AbstractLayout, arrays, Cell, Column, ColumnUserFilter, ColumnUserFilterValues, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, InitModelOf, NumberColumn, NumberColumnAggregationFunction, Point,
+  Popup, RowLayout, scout, scrollbars, SomeRequired, Table, TableHeader, TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuLayout, TableHeaderMenuModel, TableRow, TableRowModel, TableRowsCheckedEvent
 } from '../index';
 
 export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
@@ -943,7 +943,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
   protected _onFilterTableRowsChecked(event: TableRowsCheckedEvent) {
     this.filter.selectedValues = [];
-    this.filterTable.rows.forEach(row => {
+    this.filterTable.rows.forEach((row: TableHeaderMenuTableRow) => {
       if (row.checked) {
         this.filter.selectedValues.push(row.dataMap.filterValue.key);
       }
@@ -978,3 +978,4 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
 
 export type TableHeaderMenuCheckedMode = EnumObject<typeof TableHeaderMenu.CheckedMode>;
 export type TableHeaderMenuSortMode = EnumObject<typeof TableHeaderMenu.SortMode>;
+export type TableHeaderMenuTableRow = TableRow & { dataMap: Record<string, ColumnUserFilterValues> };

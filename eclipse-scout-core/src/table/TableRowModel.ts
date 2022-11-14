@@ -22,7 +22,6 @@ export interface TableRowModel extends ObjectModel<TableRow> {
   cssClass?: string;
   parentRow?: string | ObjectOrModel<TableRow>;
   expanded?: boolean;
-  dataMap?: Record<PropertyKey, any>;
   lookupRow?: LookupRow<any>;
 
   [property: string]: any; // allow custom properties

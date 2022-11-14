@@ -33,7 +33,6 @@ export class TableRow implements TableRowModel, ObjectWithType {
   childRows: TableRow[];
   expanded: boolean;
   status: TableRowStatus;
-  dataMap?: Record<PropertyKey, any>;
   nodeId: string;
   hierarchyLevel: number;
   cssClass: string;
