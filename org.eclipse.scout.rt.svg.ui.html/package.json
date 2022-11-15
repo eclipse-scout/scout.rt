@@ -15,8 +15,13 @@
     "pnpm": ">=7.16.0"
   },
   "main": "./src/main/js/index.ts",
+  "publishConfig": {
+    "main": "./target/dist/dev/eclipse-scout-svg.js",
+    "types": "./target/dist/d.ts/index.d.ts"
+  },
   "files": [
-    "src/main/js"
+    "src/main/js",
+    "target/dist"
   ],
   "scripts": {
     "ts-rename": "migrate --migrate false --sources src/**/*",

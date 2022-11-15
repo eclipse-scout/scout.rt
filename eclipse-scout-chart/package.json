@@ -19,7 +19,13 @@
     "eclipse-scout",
     "chart"
   ],
+  "publishConfig": {
+    "main": "./dist/eclipse-scout-chart.esm.js",
+    "module": "./dist/eclipse-scout-chart.esm.js",
+    "types": "./dist/d.ts/index.d.ts"
+  },
   "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "files": [
     "dist",
     "src"

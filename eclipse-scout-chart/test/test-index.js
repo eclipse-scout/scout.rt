@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {JasmineScout} from '@eclipse-scout/core/src/testing/index';
+import {JasmineScout} from '@eclipse-scout/core/testing';
 
 let context = require.context('./', true, /[sS]pec\.js$/);
 JasmineScout.runTestSuite(context);

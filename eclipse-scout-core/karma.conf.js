@@ -12,9 +12,4 @@ const baseConfig = require('@eclipse-scout/cli/scripts/karma-defaults');
 
 module.exports = (config, specEntryPoint) => {
   baseConfig(config, specEntryPoint);
-  // noinspection JSUnresolvedVariable
-  config.webpack.externals = {
-    // jQuery is the only external, all other dependencies are imported regularly by the specs
-    'jquery': 'jQuery'
-  };
 };

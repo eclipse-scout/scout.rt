@@ -26,9 +26,6 @@
     <scout.script.version>5.0.0</scout.script.version>
     <sonar.sources>src/main,pom.xml</sonar.sources>
 
-    <master_skip_npm_build_dev>true</master_skip_npm_build_dev>
-    <master_skip_npm_build_prod>true</master_skip_npm_build_prod>
-    <master_skip_karma_test>true</master_skip_karma_test>
     <master_skip_copy_webpack_build_output>true</master_skip_copy_webpack_build_output>
   </properties>
 

@@ -12,20 +12,32 @@
 const fs = require('fs');
 const path = require('path');
 const themeJsOutFilter = f => /.*theme.*\.js/.test(f);
-const listFiles = require('./list-files');
+const {listFiles} = require('./files');
+const scoutBuild = require('./constants');
 
 function deleteFile(filename) {
-  fs.access(filename, fs.constants.W_OK, err => {
-    if (err) {
-      console.error(`${filename} does not exist or cannot be deleted.`);
-    } else {
-      fs.unlink(filename, unlinkErr => {
-        if (unlinkErr) {
-          throw unlinkErr;
-        }
-      });
+  if (!fs.existsSync(filename)) {
+    return;
+  }
+  try {
+    fs.accessSync(filename, fs.constants.W_OK);
+  } catch (err) {
+    console.error(`No right to delete ${filename}.`, err);
+    return;
+  }
+  fs.unlink(filename, unlinkErr => {
+    if (unlinkErr) {
+      throw unlinkErr;
     }
   });
+}
+
+function fileListFilter(fileName) {
+  return fileName !== scoutBuild.fileListName
+    && !fileName.endsWith('.LICENSE')
+    && !themeJsOutFilter(fileName)
+    && !fileName.endsWith('d.ts')
+    && !fileName.endsWith('d.ts.map');
 }
 
 module.exports = {
@@ -33,9 +45,7 @@ module.exports = {
     const scoutBuild = require('./constants');
     let content = '';
     listFiles(dir)
-      .filter(fileName => fileName !== scoutBuild.fileListName)
-      .filter(fileName => !fileName.endsWith('.LICENSE'))
-      .filter(fileName => !themeJsOutFilter(fileName))
+      .filter(fileName => fileListFilter(fileName))
       .map(file => file.substring(dir.length + 1))
       .map(path => path.replace(/\\/g, '/'))
       .map(fileName => `${fileName}\n`)
@@ -55,6 +65,5 @@ module.exports = {
     listFiles(dir)
       .filter(themeJsOutFilter)
       .forEach(f => deleteFile(f));
-
   }
 };

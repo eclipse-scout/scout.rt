@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ChartTableControl} from '../../../src/index';
-import {TableSpecHelper} from '@eclipse-scout/core/src/testing';
+import {TableSpecHelper} from '@eclipse-scout/core/testing';
 
 /* global sandboxSession, createSimpleModel*/
 describe('ChartTableControl', () => {

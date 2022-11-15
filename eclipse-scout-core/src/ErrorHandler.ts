@@ -10,7 +10,7 @@
  */
 import {AjaxError, App, arrays, icons, InitModelOf, LogLevel, NullLogger, ObjectModel, ObjectWithType, scout, Session, strings} from './index';
 import $ from 'jquery';
-import sourcemappedStacktrace from 'sourcemapped-stacktrace';
+import * as sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
 export interface ErrorHandlerModel extends ObjectModel<ErrorHandler> {
   /**

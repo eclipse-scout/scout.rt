@@ -9,7 +9,8 @@
   "main": "./src/main/js/index.js",
   "files": [
     "src/main/resources/WebContent",
-    "src/main/js"
+    "src/main/js",
+    "target/dist"
   ],
   "scripts": {
     "pnpm-install": "pnpm install --ignore-scripts",

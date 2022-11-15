@@ -12,6 +12,7 @@
 // TEST SUPPORT - DO NOT USE IN PRODUCTION CODE
 // /////////////////////////////////////////////////////////////////
 import {ObjectFactory} from '../index';
+import * as self from './index';
 
 export * from './TestingApp';
 export * from './JasmineScout';
@@ -42,8 +43,6 @@ export * from './table/SpecTable';
 export * from './table/SpecTableAdapter';
 export * from './tree/SpecTree';
 export * from './tree/SpecTreeAdapter';
-
-import * as self from './index';
 
 export default self;
 ObjectFactory.get().registerNamespace('scout', self);

@@ -13,15 +13,17 @@ const scoutPostBuild = require('./post-build');
 
 module.exports = class AfterEmitWebpackPlugin {
   constructor(options = {}) {
-    const {outDir} = options;
-    this.options = {outDir};
+    const {outDir, createFileList} = options;
+    this.options = {outDir, createFileList};
   }
 
   // noinspection JSUnusedGlobalSymbols
   apply(compiler) {
     compiler.hooks.afterEmit.tap(pluginName, compilation => {
       scoutPostBuild.cleanOutDir(this.options.outDir);
-      scoutPostBuild.createFileList(this.options.outDir);
+      if (this.options.createFileList ?? true) {
+        scoutPostBuild.createFileList(this.options.outDir);
+      }
     });
   }
 };

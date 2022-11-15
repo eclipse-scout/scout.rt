@@ -21,6 +21,7 @@ const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('web
  * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
+ * @param {object} args.tsOptions a config object to be passed to the ts-loader
  */
 module.exports = (env, args) => {
   const buildMode = args.mode;
@@ -57,8 +58,15 @@ module.exports = (env, args) => {
     ]
   };
 
+  const tsOptions = {
+    ...args.tsOptions,
+    compilerOptions: {
+      noEmit: false,
+      ...args.tsOptions?.compilerOptions
+    }
+  };
+
   const config = {
-    target: 'web',
     mode: buildMode,
     devtool: false, // disabled because SourceMapDevToolPlugin is used (see below)
     ignoreWarnings: [(webpackError, compilation) => isWarningIgnored(devMode, webpackError, compilation)],
@@ -153,7 +161,8 @@ module.exports = (env, args) => {
           loader: require.resolve('babel-loader'),
           options: babelOptions
         }, {
-          loader: require.resolve('ts-loader')
+          loader: require.resolve('ts-loader'),
+          options: tsOptions
         }]
       }, {
         test: /\.jsx?$/,
@@ -239,6 +248,73 @@ module.exports = (env, args) => {
 
   return config;
 };
+
+/**
+ * @param {object} [options]
+ * @param {boolean} [options.clean] Instruct the AfterEmitWebpackPlugin to clean the output. Default is true.
+ * @param {boolean} [options.externalizeDevDeps] Add devDependencies as externals. Default is false.
+ */
+function libraryConfig(config, options = {}) {
+  const packageJson = require(path.resolve('./package.json'));
+  let dependencies = toExternals(packageJson.dependencies);
+  if (options.externalizeDevDeps ?? false) {
+    dependencies = Object.assign(dependencies, toExternals(packageJson.devDependencies));
+  }
+  // Make synthetic default import work (import $ from 'jquery') by importing jquery as commonjs module
+  let globalDependencies = {};
+  if (dependencies['jquery']) {
+    globalDependencies['jquery'] = 'commonjs jquery';
+  }
+
+  let plugins = config.plugins;
+  if (options.clean ?? true) {
+    // FileList is not necessary in library mode
+    plugins = plugins.map(plugin => {
+      if (plugin instanceof AfterEmitWebpackPlugin) {
+        return new AfterEmitWebpackPlugin({outDir: plugin.options.outDir, createFileList: false});
+      }
+      return plugin;
+    });
+  } else {
+    // If clean is false, we don't need the plugin at all
+    plugins = plugins.filter(plugin => !(plugin instanceof AfterEmitWebpackPlugin));
+  }
+
+  return {
+    ...config,
+    optimization: {
+      ...config.optimization,
+      splitChunks: undefined // disable splitting
+    },
+    output: {
+      ...config.output,
+      library: {
+        type: 'module'
+      }
+    },
+    externals: {
+      ...config.externals,
+      ...dependencies,
+      ...globalDependencies
+    },
+    experiments: {
+      // required for library.type = 'module'
+      outputModule: true
+    },
+    plugins
+  };
+}
+
+/**
+ * Creates a new object that contains the same keys as the given object. The values are replaced with the keys.
+ * So the resulting object looks like: {key1: key1, key2: key2}.
+ */
+function toExternals(object) {
+  return Object.keys(object).reduce((obj, current) => {
+    obj[current] = current;
+    return obj;
+  }, {});
+}
 
 /**
  * @param {object} entry the webpack entry object
@@ -373,3 +449,4 @@ function prodDevtoolModuleFilenameTemplate(info) {
 }
 
 module.exports.addThemes = addThemes;
+module.exports.libraryConfig = libraryConfig;

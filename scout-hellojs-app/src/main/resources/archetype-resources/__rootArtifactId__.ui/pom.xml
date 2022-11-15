@@ -12,9 +12,6 @@
   <artifactId>${rootArtifactId}.ui</artifactId>
 
   <properties>
-    <!-- No build required. webpack.config.js in this module only exists for the Jasmine tests -->
-    <master_skip_npm_build_dev>true</master_skip_npm_build_dev>
-    <master_skip_npm_build_prod>true</master_skip_npm_build_prod>
     <master_skip_copy_webpack_build_output>true</master_skip_copy_webpack_build_output>
   </properties>
 

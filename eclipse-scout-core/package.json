@@ -19,7 +19,29 @@
     "eclipse-scout",
     "scout core runtime"
   ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts",
+    "./src/*": "./src/*"
+  },
   "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/d.ts/src/index.d.ts",
+        "import": "./dist/eclipse-scout-core.esm.js"
+      },
+      "./testing": {
+        "types": "./dist/d.ts/src/testing/index.d.ts",
+        "import": "./dist/eclipse-scout-testing.esm.js"
+      },
+      "./src/*": "./src/*"
+    },
+    "main": "./dist/eclipse-scout-core.esm.js",
+    "module": "./dist/eclipse-scout-core.esm.js",
+    "types": "./dist/d.ts/src/index.d.ts"
+  },
   "files": [
     "dist",
     "res",

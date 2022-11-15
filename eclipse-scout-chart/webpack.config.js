@@ -14,23 +14,49 @@ module.exports = (env, args) => {
   args.resDirArray = [];
   const config = baseConfig(env, args);
 
-  // This build creates resources that can directly be included in a html file without needing a build stack (webpack, babel etc.).
-  // The resources are available by a CDN that provides npm modules (e.g. https://www.jsdelivr.com/package/npm/@eclipse-scout/chart)
-  config.entry = {
-    'eclipse-scout-chart': './src/index.ts',
-    'eclipse-scout-chart-theme': './src/eclipse-scout-chart-theme.less',
-    'eclipse-scout-chart-theme-dark': './src/eclipse-scout-chart-theme-dark.less'
-  };
-  Object.assign(config.externals, {
-    // Dependencies should not be included in the resulting js file.
-    // The consumer has to include them by himself which gives him more control (maybe his site has already added jQuery or he wants to use another version)
-    // Left side is the import name, right side the name of the global variable added by the plugin (e.g. window.jQuery)
-    'jquery': 'jQuery',
-    '@eclipse-scout/core': 'scout',
-    'chart.js': 'Chart',
-    'chartjs-plugin-datalabels': 'ChartDataLabels'
-  });
-  config.optimization.splitChunks = undefined; // disable splitting
+  if (config.output.clean) {
+    // output.clean will (randomly) clean resources built by this build
+    // -> Delete the output folder "manually" and disable the clean plugin
+    const {deleteFolder} = require('@eclipse-scout/cli/scripts/files');
+    deleteFolder(config.output.path);
+    config.output.clean = false;
+  }
 
-  return config;
+  // Clean is false because the second config will clean it
+  let esmLibraryConfig = baseConfig.libraryConfig(config, {clean: false});
+  let esmConfig = {
+    entry: {
+      'eclipse-scout-chart.esm': './src/index.ts'
+    },
+    ...esmLibraryConfig,
+    externals: {
+      ...esmLibraryConfig.externals,
+      'chart.js/auto': 'chart.js/auto'
+    }
+  };
+
+  // This build creates resources that can directly be included in a html file without needing a build stack (webpack, babel etc.).
+  // The resources are available by a CDN that provides npm modules (e.g. https://www.jsdelivr.com/package/npm/@eclipse-scout/core)
+  let globalConfig = {
+    ...config,
+    entry: {
+      'eclipse-scout-chart': './src/index.ts',
+      'eclipse-scout-chart-theme': './src/eclipse-scout-chart-theme.less',
+      'eclipse-scout-chart-theme-dark': './src/eclipse-scout-chart-theme-dark.less'
+    },
+    optimization: {
+      ...config.optimization,
+      splitChunks: undefined // disable splitting
+    },
+    externals: {
+      ...config.externals,
+      'jquery': 'jQuery',
+      '@eclipse-scout/core': 'scout',
+      'chart.js': 'Chart',
+      'chart.js/auto': 'Chart',
+      'chartjs-plugin-datalabels': 'ChartDataLabels'
+    }
+  };
+
+  return [esmConfig, globalConfig];
 };

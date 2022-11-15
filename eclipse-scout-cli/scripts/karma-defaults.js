@@ -25,16 +25,38 @@ module.exports = (config, specEntryPoint) => {
   }
   let webpackConfigProvider = require(webpackConfigFilePath);
 
-  const webpackArgs = Object.assign({mode: scoutBuildConstants.mode.development}, config.webpackArgs);
-  const webpackConfig = webpackConfigProvider(null, webpackArgs);
+  const webpackArgs = Object.assign({
+    mode: scoutBuildConstants.mode.development,
+    tsOptions: {
+      compilerOptions: {
+        // No need to create declarations for tests
+        declaration: false,
+        declarationMap: false
+      }
+    }
+  }, config.webpackArgs);
+  let webpackConfig = webpackConfigProvider(null, webpackArgs);
+  if (Array.isArray(webpackConfig)) {
+    webpackConfig = webpackConfig[0];
+  }
   delete webpackConfig.entry;
   if (webpackConfig.optimization) {
     delete webpackConfig.optimization.splitChunks; // disable splitting for tests
   }
 
   if (webpackConfig.output) {
-    // remove output file as Karma uses an in-memory middleware and complains if an output file is present
+    // Remove output file as Karma uses an in-memory middleware and complains if an output file is present
     delete webpackConfig.output.filename;
+    // Don't create a library, it would create an error during test run (module not found)
+    delete webpackConfig.output.library;
+  }
+
+  if (webpackConfig.externals) {
+    // Remove externals so they don't have to be provided
+    // Add jquery as the only external, so it won't be loaded twice because it is provided by @metahub/karma-jasmine-jquery
+    webpackConfig.externals = {
+      'jquery': 'global jQuery'
+    };
   }
 
   // specify output directory for webpack (use different from normal output dir so that they are not polluted with test artifacts)

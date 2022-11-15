@@ -1,4 +1,4 @@
-import {JasmineScout} from '@eclipse-scout/core/src/testing';
+import {JasmineScout} from '@eclipse-scout/core/testing';
 
 import * as ref1 from '../../main/js/index';
 

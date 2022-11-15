@@ -12,7 +12,7 @@
 
 import {Chart, SpeedoChartRenderer} from '../../src/index';
 import {scout} from '@eclipse-scout/core';
-import {LocaleSpecHelper} from '@eclipse-scout/core/src/testing/index';
+import {LocaleSpecHelper} from '@eclipse-scout/core/testing';
 
 describe('SpeedoChartRenderer', () => {
   let locale, helper, session;
