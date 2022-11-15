@@ -115,7 +115,7 @@
     <slf4j.version>1.7.32</slf4j.version>
     <logback.version>1.2.10</logback.version>
     <jackson.version>2.14.0</jackson.version>
-    <io.netty-version>4.1.84.Final</io.netty-version>
+    <io.netty-version>4.1.85.Final</io.netty-version>
     <apache.tika-version>2.4.0</apache.tika-version>
     <batik.version>1.16</batik.version>
     <activemq.version>5.17.2</activemq.version>
