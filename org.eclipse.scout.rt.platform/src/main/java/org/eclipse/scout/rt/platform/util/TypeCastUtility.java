@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,6 +86,19 @@ public final class TypeCastUtility {
   public static Class<?> getNonPrimitiveType(Class<?> type) {
     if (type.isPrimitive()) {
       return instance.getWrappedType(type);
+    }
+    return type;
+  }
+
+  /**
+   * @param type
+   *          not null
+   * @return either the same type or if the type is a wrapper type, the primitive type of that wrapper type. May return
+   *         null if there is no primitive type for the given type
+   */
+  public static Class<?> getPrimitiveType(Class<?> type) {
+    if (!type.isPrimitive()) {
+      return instance.getPrimitiveTypeInternal(type);
     }
     return type;
   }
@@ -203,6 +217,21 @@ public final class TypeCastUtility {
    */
   private Class getWrappedType(Class primitiveType) {
     return m_wrapperTypeMap.get(primitiveType);
+  }
+
+  /**
+   * primitive type for wrapper types
+   */
+  private Class getPrimitiveTypeInternal(Class wrappedType) {
+    int id = m_typeMap.get(wrappedType);
+    Map<Integer, Class> primitiveIdMap = m_primitiveTypeMap
+        .entrySet()
+        .stream()
+        .collect(StreamUtility.toMap(Entry::getValue, Entry::getKey));
+    if (!primitiveIdMap.containsKey(id)) {
+      return null;
+    }
+    return primitiveIdMap.get(id);
   }
 
   /**
