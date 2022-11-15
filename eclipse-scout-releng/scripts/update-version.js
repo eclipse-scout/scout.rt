@@ -177,7 +177,7 @@ const collectModulesInWorkspace = async (startDir, verbose, workspaceRoot) => {
       console.log(`unable to find workspace file. Use parent directory as workspace root: ${workspaceRoot}`);
     }
   }
-  return findWorkspacePackages.default(workspaceRoot);
+  return await findWorkspacePackages.findWorkspacePackages(workspaceRoot);
 };
 
 const updateAllPackageJsons = async ({
