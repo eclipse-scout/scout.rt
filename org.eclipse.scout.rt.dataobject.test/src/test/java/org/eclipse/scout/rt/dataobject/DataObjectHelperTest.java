@@ -289,6 +289,30 @@ public class DataObjectHelperTest {
   }
 
   @Test
+  public void testCleanEmptyObject() {
+    EntityFixtureDo testObj = BEANS.get(EntityFixtureDo.class)
+        .withId(null)
+        .withOtherEntity(null)
+        .withOtherEntities();
+
+    assertTrue(testObj.id().exists());
+    assertTrue(testObj.otherEntity().exists());
+    assertTrue(testObj.otherEntities().exists());
+    m_helper.clean(testObj);
+    assertFalse(testObj.id().exists());
+    assertFalse(testObj.otherEntity().exists());
+    assertFalse(testObj.otherEntities().exists());
+
+    // Should not remove nested empty objects
+    testObj.withOtherEntity(BEANS.get(OtherEntityFixtureDo.class));
+    assertTrue(testObj.otherEntity().exists());
+    assertNotNull(testObj.otherEntity().get());
+    m_helper.clean(testObj);
+    assertTrue(testObj.otherEntity().exists());
+    assertNotNull(testObj.otherEntity().get());
+  }
+
+  @Test
   public void testCleanContributions() {
     OtherEntityFixtureDo testObj = BEANS.get(OtherEntityFixtureDo.class);
     testObj.putContribution(BEANS.get(ListEntityContributionFixtureDo.class)
@@ -316,6 +340,65 @@ public class DataObjectHelperTest {
     assertFalse(testObj.getContribution(ListEntityContributionFixtureDo.class).id().exists());
     assertTrue(testObj.getContribution(ListEntityContributionFixtureDo.class).entities().exists());
     assertFalse(testObj.getContribution(ListEntityContributionFixtureDo.class).getEntities().get(0).otherEntities().exists());
+  }
+
+  @Test
+  public void testCleanNestedObjects() {
+    EntityFixtureDo testObj = BEANS.get(EntityFixtureDo.class)
+        .withId(null)
+        .withOtherEntity(BEANS.get(OtherEntityFixtureDo.class)
+            .withId(null)
+            .withItems()) // empty "items" list (should be cleaned)
+        .withOtherEntities(
+            BEANS.get(OtherEntityFixtureDo.class)
+                .withId(null)
+                .withItems((String) null), // "items" list with null element (should not be cleaned)
+            BEANS.get(OtherEntityFixtureDo.class)
+                .withId(null)
+                .withNestedOtherEntity(
+                    BEANS.get(OtherEntityFixtureDo.class)
+                        .withId(null)));
+
+    assertTrue(testObj.id().exists());
+
+    assertTrue(testObj.otherEntity().exists());
+    assertTrue(testObj.otherEntity().get().id().exists());
+    assertTrue(testObj.otherEntity().get().items().exists());
+    assertEquals(0, testObj.otherEntity().get().items().size());
+
+    assertTrue(testObj.otherEntities().exists());
+    assertEquals(2, testObj.otherEntities().get().size());
+
+    assertNotNull(testObj.otherEntities().get(0));
+    assertTrue(testObj.otherEntities().get(0).id().exists());
+    assertTrue(testObj.otherEntities().get(0).items().exists());
+    assertEquals(1, testObj.otherEntities().get(0).items().size());
+
+    assertNotNull(testObj.otherEntities().get(1));
+    assertTrue(testObj.otherEntities().get(1).id().exists());
+    assertTrue(testObj.otherEntities().get(1).nestedOtherEntity().exists());
+    assertTrue(testObj.otherEntities().get(1).nestedOtherEntity().get().id().exists());
+
+    m_helper.clean(testObj);
+
+    assertFalse(testObj.id().exists());
+
+    assertTrue(testObj.otherEntity().exists());
+    assertFalse(testObj.otherEntity().get().id().exists());
+    assertFalse(testObj.otherEntity().get().items().exists());
+
+    assertTrue(testObj.otherEntities().exists());
+    assertEquals(2, testObj.otherEntities().get().size());
+
+    assertNotNull(testObj.otherEntities().get(0));
+    assertFalse(testObj.otherEntities().get(0).id().exists());
+    assertTrue(testObj.otherEntities().get(0).items().exists());
+    assertEquals(1, testObj.otherEntities().get(0).items().size());
+
+    assertNotNull(testObj.otherEntities().get(1));
+    assertFalse(testObj.otherEntities().get(1).id().exists());
+    assertTrue(testObj.otherEntities().get(1).nestedOtherEntity().exists());
+    assertFalse(testObj.otherEntities().get(1).nestedOtherEntity().get().id().exists());
   }
 
   @Test
