@@ -2431,26 +2431,6 @@ describe('Tree', () => {
     });
   });
 
-  describe('tree enabled/disabled', () => {
-
-    let model;
-    let tree;
-    let node0;
-    let node1;
-    let node2;
-
-    beforeEach(() => {
-      model = helper.createModelFixture(3, 1, true);
-      model.checkable = true;
-      model.nodes[2].enabled = false;
-      tree = helper.createTree(model);
-
-      node0 = tree.nodes[0];
-      node1 = tree.nodes[1];
-      node2 = tree.nodes[2];
-    });
-  });
-
   describe('test visible list and map', () => {
 
     describe('with initial all expanded nodes', () => {

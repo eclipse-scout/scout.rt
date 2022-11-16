@@ -47,14 +47,14 @@
   "devDependencies": {
     "@eclipse-scout/cli": ">=23.1.0-snapshot <23.1.0",
     "@eclipse-scout/releng": "^22.0.0",
-    "jasmine-core": "3.10.1",
+    "jasmine-core": "4.5.0",
     "jasmine-ajax": "4.0.0",
     "jasmine-jquery": "2.1.1",
     "@types/jquery": "3.5.14",
-    "@types/jasmine": "3.10.3",
+    "@types/jasmine": "4.3.0",
     "@types/jasmine-ajax": "3.3.3",
     "@types/jasmine-jquery": "1.5.34",
-    "karma": "6.4.0",
+    "karma": "6.4.1",
     "@eclipse-scout/migrate": ">=23.1.0-snapshot <23.1.0"
   },
   "dependencies": {

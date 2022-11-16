@@ -269,8 +269,6 @@ declare global {
      * @param asArray when set to true, the resolve function will transform the
      *    flat arguments list containing the results into an array. The arguments of the reject function won't be touched. Default is false.
      */
-    promiseAll(...promises: JQuery.PromiseBase<any, any, any, any, any, any, any, any, any, any, any, any>[]): JQuery.Promise<any>;
-
     promiseAll(promises: JQuery.PromiseBase<any, any, any, any, any, any, any, any, any, any, any, any>[], asArray?: boolean): JQuery.Promise<any>;
 
     /**

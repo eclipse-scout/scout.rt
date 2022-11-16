@@ -1,15 +1,16 @@
-// noinspection DuplicatedCode
-
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+// noinspection DuplicatedCode
+
 import {RemoteEvent, Widget} from '../index';
 import MatchersUtil = jasmine.MatchersUtil;
 import CustomEqualityTester = jasmine.CustomEqualityTester;
@@ -58,7 +59,7 @@ declare global {
 
 export const jasmineScoutMatchers = {
 
-  toContainEvents: (util: MatchersUtil, customEqualityTesters?: ReadonlyArray<CustomEqualityTester>): CustomMatcher => ({
+  toContainEvents: (util: MatchersUtil): CustomMatcher => ({
     compare: (actual, expected) => {
       if (expected === undefined) {
         expected = [];
@@ -82,7 +83,7 @@ export const jasmineScoutMatchers = {
           expected[i] = $.parseJSON(JSON.stringify(expected[i]));
         }
 
-        result.pass = result.pass && util.contains(actualEvents, expected[i], customEqualityTesters);
+        result.pass = result.pass && util.contains(actualEvents, expected[i]);
       }
 
       if (!result.pass) {
@@ -92,7 +93,7 @@ export const jasmineScoutMatchers = {
     }
   }),
 
-  toContainEventsExactly: (util: MatchersUtil, customEqualityTesters?: ReadonlyArray<CustomEqualityTester>): CustomMatcher => ({
+  toContainEventsExactly: (util: MatchersUtil): CustomMatcher => ({
     compare: (actual, expected) => {
       if (expected === undefined) {
         expected = [];
@@ -117,7 +118,7 @@ export const jasmineScoutMatchers = {
         }
       }
 
-      result.pass = util.equals(actualEvents, expected, customEqualityTesters);
+      result.pass = util.equals(actualEvents, expected);
 
       if (!result.pass) {
         result.message = 'Expected actual events ' + actualEvents + ' to be equal to ' + expected;
@@ -126,7 +127,7 @@ export const jasmineScoutMatchers = {
     }
   }),
 
-  toContainEventTypesExactly: (util: MatchersUtil, customEqualityTesters?: ReadonlyArray<CustomEqualityTester>): CustomMatcher => ({
+  toContainEventTypesExactly: (util: MatchersUtil): CustomMatcher => ({
     compare: (actual, expected) => {
       if (expected === undefined) {
         expected = [];
@@ -143,7 +144,7 @@ export const jasmineScoutMatchers = {
         }
       }
 
-      result.pass = util.equals(actualEventTypes, expected, customEqualityTesters);
+      result.pass = util.equals(actualEventTypes, expected);
 
       if (!result.pass) {
         result.message = 'Expected actual event types ' + actualEventTypes + ' to be equal to ' + expected;

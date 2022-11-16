@@ -14,6 +14,8 @@ import {RemoteRequestData} from '../../src/index';
 
 describe('JasmineScout', () => {
 
+  let matchersUtil = new jasmine['MatchersUtil']() as jasmine.MatchersUtil;
+
   describe('toContainEventTypesExactly', () => {
 
     function createRequestDataFixture() {
@@ -26,7 +28,7 @@ describe('JasmineScout', () => {
     }
 
     it('checks whether event types in correct order', () => {
-      let matcher = jasmineScoutMatchers.toContainEventTypesExactly(jasmine.matchersUtil),
+      let matcher = jasmineScoutMatchers.toContainEventTypesExactly(matchersUtil),
         result;
 
       let requestData = createRequestDataFixture();
@@ -42,7 +44,7 @@ describe('JasmineScout', () => {
     });
 
     it('checks whether event types are complete', () => {
-      let matcher = jasmineScoutMatchers.toContainEventTypesExactly(jasmine.matchersUtil),
+      let matcher = jasmineScoutMatchers.toContainEventTypesExactly(matchersUtil),
         result;
 
       let requestData = createRequestDataFixture();
@@ -55,7 +57,7 @@ describe('JasmineScout', () => {
     });
 
     it('considers empty values', () => {
-      let matcher = jasmineScoutMatchers.toContainEventTypesExactly(jasmine.matchersUtil),
+      let matcher = jasmineScoutMatchers.toContainEventTypesExactly(matchersUtil),
         result;
 
       let requestData = createRequestDataFixture();

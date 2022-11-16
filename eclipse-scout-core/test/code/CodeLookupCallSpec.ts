@@ -11,13 +11,13 @@
 import {Code, CodeLookupCall, codes, CodeType, scout} from '../../src/index';
 
 describe('CodeLookupCall', () => {
-  let session: SandboxSession, codeType123: CodeType<any>;
+  let session: SandboxSession, codeType123: CodeType<string>;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     codes.registry = {};
-    codeType123 = scout.create(CodeType, {
+    codeType123 = scout.create((CodeType<string>), {
       id: 'codeType.123',
       codes: [{
         id: 'code.1',
@@ -40,11 +40,11 @@ describe('CodeLookupCall', () => {
     });
   });
 
-  function createLookupCall(codeType) {
+  function createLookupCall<T>(codeType: CodeType<T>): CodeLookupCall<T> {
     return scout.create(CodeLookupCall, {
       session: session,
       codeType: codeType.id
-    });
+    }) as CodeLookupCall<T>;
   }
 
   describe('getByKey', () => {
@@ -98,7 +98,7 @@ describe('CodeLookupCall', () => {
         })
         .catch(fail);
 
-      $.promiseAll(promise1, promise2).then(done);
+      $.promiseAll([promise1, promise2]).then(done);
     });
 
     it('returns no lookupRows if no codes match the given text', done => {
