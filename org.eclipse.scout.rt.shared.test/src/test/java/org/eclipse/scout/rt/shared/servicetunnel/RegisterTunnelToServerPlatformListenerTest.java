@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -164,7 +164,7 @@ public class RegisterTunnelToServerPlatformListenerTest {
       assertNotNull(bean);
       Object obj = bean.getInstance();
       assertNotNull(obj);
-      assertTrue(IFixtureTunnelToServer.class.isInstance(obj));
+      assertTrue(obj instanceof IFixtureTunnelToServer);
       assertEquals(expectedPingResult, ((IFixtureTunnelToServer) obj).ping());
     }
   }
@@ -180,19 +180,19 @@ public class RegisterTunnelToServerPlatformListenerTest {
   }
 
   @TunnelToServer
-  public static interface IFixtureTunnelToServer extends IService {
+  public interface IFixtureTunnelToServer extends IService {
     String ping();
   }
 
   @TunnelToServer
-  public static interface IFixtureTunnelToServerEx1 extends IFixtureTunnelToServer {
+  public interface IFixtureTunnelToServerEx1 extends IFixtureTunnelToServer {
   }
 
   @TunnelToServer
-  public static interface IFixtureTunnelToServerEx2 extends IFixtureTunnelToServerEx1 {
+  public interface IFixtureTunnelToServerEx2 extends IFixtureTunnelToServerEx1 {
   }
 
-  public static interface IFixtureTunnelToServerEx3 extends IFixtureTunnelToServerEx2 {
+  public interface IFixtureTunnelToServerEx3 extends IFixtureTunnelToServerEx2 {
   }
 
   public static class FixtureTunnelToServerEx3Impl implements IFixtureTunnelToServerEx3 {

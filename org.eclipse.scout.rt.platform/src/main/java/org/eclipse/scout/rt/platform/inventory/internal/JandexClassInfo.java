@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -72,7 +72,7 @@ public class JandexClassInfo implements IClassInfo {
 
   @Override
   public boolean hasInjectableConstructor() {
-    List<AnnotationInstance> list = m_classInfo.annotations().get(DotName.createSimple(InjectBean.class.getName()));
+    List<AnnotationInstance> list = m_classInfo.annotationsMap().get(DotName.createSimple(InjectBean.class.getName()));
     if (list == null || list.isEmpty()) {
       return false;
     }
@@ -92,12 +92,12 @@ public class JandexClassInfo implements IClassInfo {
 
   @Override
   public boolean hasAnnotation(Class<? extends Annotation> annotationType) {
-    return m_classInfo.annotations().containsKey(DotName.createSimple(annotationType.getName()));
+    return m_classInfo.annotationsMap().containsKey(DotName.createSimple(annotationType.getName()));
   }
 
   @Override
   public Object getAnnotationValue(Class<? extends Annotation> annotationType, String annotationParameterName) {
-    List<AnnotationInstance> annotationInstances = m_classInfo.annotations().get(DotName.createSimple(annotationType.getName()));
+    List<AnnotationInstance> annotationInstances = m_classInfo.annotationsMap().get(DotName.createSimple(annotationType.getName()));
     if (CollectionUtility.isEmpty(annotationInstances)) {
       return null;
     }

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -160,7 +160,7 @@ public class JandexClassInventoryTest {
           FixtureImpl2
    * </pre>
    */
-  public static interface IFixtureInterface1 {
+  public interface IFixtureInterface1 {
   }
 
   public static class FixtureImpl1 implements IFixtureInterface1 {
@@ -172,13 +172,13 @@ public class JandexClassInventoryTest {
   /**
    * subinterface that has subinterfaces and on one of them an implementor class
    */
-  public static interface IFixtureInterface2 extends IFixtureInterface1 {
+  public interface IFixtureInterface2 extends IFixtureInterface1 {
   }
 
-  public static interface IFixtureInterface2Sub1 extends IFixtureInterface2 {
+  public interface IFixtureInterface2Sub1 extends IFixtureInterface2 {
   }
 
-  public static interface IFixtureInterface2Sub2 extends IFixtureInterface2 {
+  public interface IFixtureInterface2Sub2 extends IFixtureInterface2 {
   }
 
   public static class FixtureImpl2 implements IFixtureInterface2Sub2 {
