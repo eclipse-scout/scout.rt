@@ -1062,7 +1062,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       value = dataset.data[dataIndex];
 
     if (this._isHorizontalBar(config)) {
-      if (value && objects.isArray(value.x) && value.x.length === 2) {
+      if (objects.isPlainObject(value) && objects.isArray(value.x) && value.x.length === 2) {
         let avg = (value.x[0] + value.x[1]) / 2;
         tooltipDirection = avg < 0 ? 'left' : 'right';
       } else {

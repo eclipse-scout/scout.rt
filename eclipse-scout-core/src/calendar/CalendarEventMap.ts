@@ -18,6 +18,7 @@ export interface CalendarEventMap extends WidgetEventMap {
   'componentMove': CalendarComponentMoveEvent;
   'modelChange': Event<Calendar>;
   'selectionChange': Event<Calendar>;
+  'selectedRangeChange': Event<Calendar>;
   'propertyChange:displayMode': PropertyChangeEvent<CalendarDisplayMode>;
   'propertyChange:menuInjectionTarget': PropertyChangeEvent<GroupBox>;
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;

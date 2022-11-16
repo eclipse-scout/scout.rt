@@ -22,6 +22,7 @@ export interface CalendarModel extends WidgetModel {
   displayCondensed?: boolean;
   selectedDate?: Date | string;
   showDisplayModeSelection?: boolean;
+  rangeSelectionAllowed?: boolean;
   title?: string;
   useOverflowCells?: boolean;
   calendarToggleListWidth?: number;

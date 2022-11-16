@@ -58,7 +58,10 @@ export class Calendar extends Widget implements CalendarModel {
   selectedComponent: CalendarComponent;
   loadInProgress: boolean;
   selectedDate: Date;
+  selectorStart: Date;
+  selectorEnd: Date;
   showDisplayModeSelection: boolean;
+  rangeSelectionAllowed: boolean;
   title: string;
   useOverflowCells: boolean;
   viewRange: DateRange;
@@ -68,6 +71,7 @@ export class Calendar extends Widget implements CalendarModel {
   modesMenu: CalendarModesMenu;
   menus: Menu[];
   yearPanel: YearPanel;
+  selectedRange: DateRange;
   needsScrollToStartHour: boolean;
 
   $header: JQuery;
@@ -77,6 +81,7 @@ export class Calendar extends Widget implements CalendarModel {
   $grid: JQuery;
   $topGrid: JQuery;
   $list: JQuery;
+  $listContainer: JQuery;
   $listTitle: JQuery;
   $progress: JQuery;
   $headerRow1: JQuery;
@@ -110,9 +115,13 @@ export class Calendar extends Widget implements CalendarModel {
    * @internal
    */
   _moveData: CalendarMoveData;
+  /** @internal */
+  _rangeSelectionStarted: boolean;
 
   protected _mouseMoveHandler: (event: JQuery.MouseMoveEvent) => void;
   protected _mouseUpHandler: (event: JQuery.MouseUpEvent) => void;
+  protected _mouseMoveRangeSelectionHandler: (event: JQuery.MouseMoveEvent) => void;
+  protected _mouseUpRangeSelectionHandler: (event: JQuery.MouseUpEvent) => void;
 
   constructor() {
     super();
@@ -162,7 +171,6 @@ export class Calendar extends Widget implements CalendarModel {
 
     this._mouseMoveHandler = this._onMouseMove.bind(this);
     this._mouseUpHandler = this._onMouseUp.bind(this);
-
     this._mouseMoveRangeSelectionHandler = this._onMouseMoveRangeSelection.bind(this);
     this._mouseUpRangeSelectionHandler = this._onMouseUpRangeSelection.bind(this);
     this.selectedRange = null;
@@ -292,16 +300,15 @@ export class Calendar extends Widget implements CalendarModel {
     this._setProperty('viewRange', viewRange);
   }
 
-  protected _setRangeSelectionAllowed(rangeSelectionAllowed) {
+  protected _setRangeSelectionAllowed(rangeSelectionAllowed: boolean) {
     this.rangeSelectionAllowed = rangeSelectionAllowed;
     if (!this.rangeSelectionAllowed) {
       this._setSelectedRange(null);
     }
   }
 
-  protected _setSelectedRange(selectedRange) {
-    selectedRange = DateRange.ensure(selectedRange);
-
+  protected _setSelectedRange(range: DateRange | JsonDateRange) {
+    let selectedRange = DateRange.ensure(range);
     if (selectedRange && selectedRange.from && selectedRange.to) {
       this.selectorStart = new Date(selectedRange.from);
       this.selectorStart.setHours(0, this._getHours(this.selectorStart) * 60);
@@ -696,7 +703,7 @@ export class Calendar extends Widget implements CalendarModel {
     this._setSelection(selectedDate, null, false, timeChanged);
   }
 
-  _getSelectedDate(event) {
+  protected _getSelectedDate(event: JQuery.MouseEventBase): Date {
     let date = null;
     if ($(event.target).hasClass('calendar-day')) {
       date = $(event.target).data('date');
@@ -711,7 +718,8 @@ export class Calendar extends Widget implements CalendarModel {
     return null;
   }
 
-  _getSelectedSeconds(event) {
+  protected _getSelectedSeconds(event: JQuery.MouseEventBase): number {
+    // @ts-expect-error
     let y = event.originalEvent.layerY;
     if ($(event.target).hasClass('calendar-component') || $(event.target).parents('.calendar-component').length > 0) {
       y += $(event.target).closest('.calendar-component').position().top;
@@ -721,7 +729,7 @@ export class Calendar extends Widget implements CalendarModel {
     return Math.floor(y / this.heightPerDivision) / this.numberOfHourDivisions * 60 * 60;
   }
 
-  _getSelectedDateTime(event) {
+  protected _getSelectedDateTime(event: JQuery.MouseEventBase): Date {
     let selectedDate = this._getSelectedDate(event);
     if (selectedDate && (this.isDay() || this.isWeek() || this.isWorkWeek())) {
       let seconds = this._getSelectedSeconds(event);
@@ -735,7 +743,7 @@ export class Calendar extends Widget implements CalendarModel {
   /**
    * @param selectedComponent may be null when a day is selected
    */
-  _setSelection(selectedDate: Date, selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
+  protected _setSelection(selectedDate: Date, selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
     let changed = false;
     let dateChanged = dates.compareDays(this.selectedDate, selectedDate) !== 0;
 
@@ -1829,7 +1837,7 @@ export class Calendar extends Widget implements CalendarModel {
     return s1.localeCompare(s2);
   }
 
-  _startRangeSelection(event) {
+  protected _startRangeSelection(event: JQuery.MouseDownEvent) {
     if (!this.rangeSelectionAllowed || this._rangeSelectionStarted || Device.get().type === Device.Type.MOBILE) {
       return;
     }
@@ -1869,8 +1877,8 @@ export class Calendar extends Widget implements CalendarModel {
     this._rangeSelectionStarted = true;
   }
 
-  _findDayInCalendar(selectedDate) {
-    let $foundDay = null;
+  protected _findDayInCalendar(selectedDate: Date): JQuery {
+    let $foundDay: JQuery = null;
     $('.calendar-day', this.$container).each((index, element) => {
       let $day = $(element),
         date = $day.data('date');
@@ -1881,8 +1889,8 @@ export class Calendar extends Widget implements CalendarModel {
     return $foundDay;
   }
 
-  _setRangeSelection() {
-    let selectorFirst, selectorLast, numberOfDays, day;
+  protected _setRangeSelection() {
+    let selectorFirst: Date, selectorLast: Date;
 
     if (!this.selectorStart || !this.selectorEnd) {
       return;
@@ -1898,13 +1906,13 @@ export class Calendar extends Widget implements CalendarModel {
       selectorLast = this.selectorEnd;
     }
 
-    numberOfDays = dates.compareDays(selectorLast, selectorFirst) + 1;
+    let numberOfDays = dates.compareDays(selectorLast, selectorFirst) + 1;
     if (numberOfDays === 1) {
       this._appendCalendarRangeSelection(selectorFirst, selectorFirst, selectorLast);
     } else if (numberOfDays > 1) {
       this._appendCalendarRangeSelection(selectorFirst, selectorFirst, null);
       for (let i = 1; i < numberOfDays - 1; i++) {
-        day = new Date(selectorFirst);
+        let day = new Date(selectorFirst);
         day.setDate(day.getDate() + i);
         this._appendCalendarRangeSelection(day, null, null);
       }
@@ -1912,32 +1920,31 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  _removeRangeSelection() {
+  protected _removeRangeSelection() {
     $('.calendar-range-selector').remove();
   }
 
-  _appendCalendarRangeSelection(date, fromTime, toTime) {
-    let $parent = this._findDayInCalendar(date),
-      startPosition, endPosition;
+  protected _appendCalendarRangeSelection(date: Date, fromTime: Date, toTime: Date) {
+    let $parent = this._findDayInCalendar(date);
     if (!$parent) {
       return;
     }
 
     // top and height
-    startPosition = fromTime ? this._dayPosition(this._getHours(fromTime), 0) : 0;
-    endPosition = toTime ? this._dayPosition(this._getHours(toTime) + 0.5, 0) : 100;
+    let startPosition = fromTime ? this._dayPosition(this._getHours(fromTime), 0) : 0;
+    let endPosition = toTime ? this._dayPosition(this._getHours(toTime) + 0.5, 0) : 100;
 
     $parent.appendDiv('calendar-range-selector')
       .css('top', startPosition + '%')
       .css('height', endPosition - startPosition + '%');
   }
 
-  _getHours(date) {
+  protected _getHours(date: Date): number {
     // round to 0.5h
     return Math.round((date.getHours() + date.getMinutes() / 60) * 2) / 2;
   }
 
-  _onMouseMoveRangeSelection(event) {
+  protected _onMouseMoveRangeSelection(event: JQuery.MouseMoveEvent) {
     let selectorEndTime = this._getSelectedDateTime(event);
     if (selectorEndTime) {
       this.selectorEnd = selectorEndTime;
@@ -1946,7 +1953,7 @@ export class Calendar extends Widget implements CalendarModel {
     this._setRangeSelection();
   }
 
-  _onMouseUpRangeSelection(event) {
+  protected _onMouseUpRangeSelection(event: JQuery.MouseUpEvent) {
     if (this._mouseMoveRangeSelectionHandler) {
       this.$window.off('mousemove', this._mouseMoveRangeSelectionHandler);
     }
@@ -1963,8 +1970,8 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  _updateSelectedRange() {
-    let start, end;
+  protected _updateSelectedRange() {
+    let start: Date, end: Date;
 
     if (this.selectorStart && this.selectorEnd) {
       if (dates.compare(this.selectorStart, this.selectorEnd) > 0) {
@@ -1978,7 +1985,7 @@ export class Calendar extends Widget implements CalendarModel {
       start.setHours(0, this._getHours(start) * 60);
       end.setHours(0, this._getHours(end) * 60 + 30);
 
-      this.selectedRange = new Range(start, end);
+      this.selectedRange = new DateRange(start, end);
     } else {
       this.selectedRange = null;
     }

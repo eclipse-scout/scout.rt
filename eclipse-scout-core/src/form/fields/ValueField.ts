@@ -13,7 +13,7 @@ import {
 } from '../../index';
 import $ from 'jquery';
 
-export abstract class ValueField<TValue extends TModelValue, TModelValue = TValue> extends FormField implements ValueFieldModel<TValue, TModelValue> {
+export class ValueField<TValue extends TModelValue, TModelValue = TValue> extends FormField implements ValueFieldModel<TValue, TModelValue> {
   declare model: ValueFieldModel<TValue, TModelValue>;
   declare eventMap: ValueFieldEventMap<TValue>;
   declare self: ValueField<any>;

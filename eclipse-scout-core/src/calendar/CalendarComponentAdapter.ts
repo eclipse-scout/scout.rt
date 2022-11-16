@@ -8,19 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter} from '../index';
+import {CalendarComponentAppLinkActionEvent, Event, ModelAdapter, Widget} from '../index';
 
 export class CalendarComponentAdapter extends ModelAdapter {
 
-  protected _onWidgetAppLinkAction(event) {
+  protected _onWidgetAppLinkAction(event: CalendarComponentAppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
   }
 
-  protected override _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<Widget>) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event);
+      this._onWidgetAppLinkAction(event as CalendarComponentAppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

@@ -31,7 +31,7 @@ describe('GroupBox', () => {
         id: 'gb01',
         subLabel: 'abc',
         gridColumnCount: 3,
-        logicalGrid: 'HorizontalGrid',
+        logicalGrid: HorizontalGrid,
         fields: [{
           objectType: StringField
         }, {

@@ -8,44 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, InitModelOf, JsonDateRange, icons, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
+import {Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, icons, InitModelOf, JsonDateRange, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
-
-/**
- * See JsonCalendarItem.java
- */
-export type CalendarItem = {
-  exists: boolean;
-  lastModified: number;
-  itemId: any;
-  owner: string;
-  cssClass: string;
-  subject: string;
-  description: string;
-  recurrencePattern: {
-    lastModified: number;
-    regenerate: boolean;
-    startTimeMinutes: number;
-    endTimeMinutes: number;
-    durationMinutes: number;
-    firstDate: Date;
-    lastDate: Date;
-    occurrences: number;
-    noEndDate: boolean;
-    /**
-     * @see RecurrencePattern.java TYPE* constants
-     */
-    type: number;
-    interval: number;
-    /**
-     * @see RecurrencePattern.java INST_* constants
-     */
-    instance: number;
-    dayOfWeekBits: number;
-    dayOfMonth: number;
-    monthOfYear: number;
-  };
-};
 
 export class CalendarComponent extends Widget implements CalendarComponentModel {
   declare model: CalendarComponentModel;
@@ -439,15 +403,62 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     return $container[0].innerHTML;
   }
 
-  triggerAppLinkAction(ref) {
+  triggerAppLinkAction(ref: string) {
     this.trigger('appLinkAction', {
       ref: ref
     });
   }
 
-  _onAppLinkAction(event) {
+  _onAppLinkAction(event: JQuery.ClickEvent) {
     let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
+    let ref = $target.data('ref') as string;
     this.triggerAppLinkAction(ref);
   }
 }
+
+
+/**
+ * See JsonCalendarItem.java
+ */
+export type CalendarItem = {
+  exists: boolean;
+  lastModified: number;
+  itemId: any;
+  owner: string;
+  cssClass: string;
+  subject: string;
+  description: string;
+  recurrencePattern: {
+    lastModified: number;
+    regenerate: boolean;
+    startTimeMinutes: number;
+    endTimeMinutes: number;
+    durationMinutes: number;
+    firstDate: Date;
+    lastDate: Date;
+    occurrences: number;
+    noEndDate: boolean;
+    /**
+     * @see RecurrencePattern.java TYPE* constants
+     */
+    type: number;
+    interval: number;
+    /**
+     * @see RecurrencePattern.java INST_* constants
+     */
+    instance: number;
+    dayOfWeekBits: number;
+    dayOfMonth: number;
+    monthOfYear: number;
+  };
+  subjectLabel: string;
+  subjectAppLink: string;
+  subjectIconId: string;
+  descriptionElements: CalendarItemDescriptionElement[];
+};
+
+export type CalendarItemDescriptionElement = {
+  text: string;
+  iconId: string;
+  appLink: string;
+};

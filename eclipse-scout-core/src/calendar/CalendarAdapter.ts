@@ -42,7 +42,7 @@ export class CalendarAdapter extends ModelAdapter {
     return dates.toJsonDateRange(this.widget.viewRange);
   }
 
-  protected _jsonSelectedRange(): todo {
+  protected _jsonSelectedRange(): JsonDateRange {
     if (!this.widget.selectedRange) {
       return null;
     }

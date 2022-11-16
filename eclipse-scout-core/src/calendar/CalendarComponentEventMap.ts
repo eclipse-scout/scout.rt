@@ -8,8 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PropertyChangeEvent, WidgetEventMap} from '../index';
+import {CalendarComponent, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
+
+export interface CalendarComponentAppLinkActionEvent<T = CalendarComponent> extends Event<T> {
+  ref: string;
+}
+
 
 export interface CalendarComponentEventMap extends WidgetEventMap {
+  'appLinkAction': CalendarComponentAppLinkActionEvent;
   'propertyChange:selected': PropertyChangeEvent<boolean>;
 }

@@ -703,11 +703,9 @@ export const objects = {
    *
    * If the given object is set but not a {@link isPlainObject plain object}, an error is thrown.
    *
-   * @param {*} object
-   * @returns {*}
    * @see isNullOrUndefinedOrEmpty
    */
-  removeEmptyProperties(object) {
+  removeEmptyProperties(object: any): any {
     if (objects.isNullOrUndefined(object)) {
       return object;
     }

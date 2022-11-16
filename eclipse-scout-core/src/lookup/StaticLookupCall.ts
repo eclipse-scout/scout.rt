@@ -125,7 +125,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   _createSearchPattern(text: string): RegExp {
-    // Implementation copied from LocalLookupRow.java
+    // Implementation copied from LocalLookupCall.java
 
     const WILDCARD = '*';
     const WILDCARD_PLACEHOLDER = '@wildcard@';
@@ -141,7 +141,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
       text = text.replace(duplicateWildcards, WILDCARD_PLACEHOLDER);
     }
 
-    if (!strings.endsWith(WILDCARD_PLACEHOLDER)) {
+    if (!strings.endsWith(text, WILDCARD_PLACEHOLDER)) {
       text += WILDCARD_PLACEHOLDER;
     }
 
