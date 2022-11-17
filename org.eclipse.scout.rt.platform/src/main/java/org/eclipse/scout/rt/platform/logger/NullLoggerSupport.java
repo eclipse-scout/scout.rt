@@ -25,19 +25,19 @@ public class NullLoggerSupport extends AbstractLoggerSupport {
   private static final Object PRESENT = new Object();
 
   private final ConcurrentMap<String, Object> m_queriedLoggers;
-  private final String m_slf4jloggerFactoryClassStr;
+  private final String m_slf4jLoggerFactoryClassName;
 
-  public NullLoggerSupport(String slf4jloggerFactoryClassStr) {
+  public NullLoggerSupport(String slf4JLoggerFactoryClassName) {
     m_queriedLoggers = new ConcurrentHashMap<>();
-    m_slf4jloggerFactoryClassStr = slf4jloggerFactoryClassStr;
+    m_slf4jLoggerFactoryClassName = slf4JLoggerFactoryClassName;
   }
 
   protected ConcurrentMap<String, Object> getQueriedLoggers() {
     return m_queriedLoggers;
   }
 
-  protected String getSlf4jloggerFactoryClassStr() {
-    return m_slf4jloggerFactoryClassStr;
+  protected String getSlf4jLoggerFactoryClassName() {
+    return m_slf4jLoggerFactoryClassName;
   }
 
   @Override
@@ -53,7 +53,7 @@ public class NullLoggerSupport extends AbstractLoggerSupport {
 
   private void logLoggerSupportNotAvailable(String name) {
     if (LOG.isInfoEnabled() && getQueriedLoggers().putIfAbsent(name, PRESENT) == null) {
-      LOG.info("getting or setting log level is not supported by current slf4j logging implementation [logger={}, slf4jLoggerFactoryClassStr={}]", name, getSlf4jloggerFactoryClassStr());
+      LOG.info("getting or setting log level is not supported by current slf4j logging implementation [logger={}, slf4jLoggerFactoryClassName={}]", name, getSlf4jLoggerFactoryClassName());
     }
   }
 }
