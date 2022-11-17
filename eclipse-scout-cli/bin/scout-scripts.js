@@ -158,6 +158,9 @@ function computeExitCode(results) {
 
 function runWebpack(args) {
   const configFilePath = readWebpackConfig();
+  if (!configFilePath) {
+    return;
+  }
   const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
   compiler.run((err, stats) => logWebpack(err, stats, statsConfig));
 }
@@ -181,6 +184,9 @@ function readWebpackConfig() {
 
 function runWebpackWatch(args) {
   const configFilePath = readWebpackConfig();
+  if (!configFilePath) {
+    return;
+  }
   const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
   compiler.watch({}, (err, stats) => logWebpack(err, stats, statsConfig));
 }
