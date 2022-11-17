@@ -1,6 +1,3 @@
 module.exports = {
-  extends: '@eclipse-scout/eslint-config/src/typescript',
-  parserOptions: {
-    requireConfigFile: false
-  }
+  extends: '@eclipse-scout/eslint-config/src/typescript'
 };

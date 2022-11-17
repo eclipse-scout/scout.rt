@@ -5,7 +5,7 @@
     "pnpm-install": "pnpm install --ignore-scripts"
   },
   "dependencies": {
-    "eslint": "8.23.1",
+    "eslint": "8.27.0",
     "@eclipse-scout/eslint-config": ">=23.1.0-snapshot <23.1.0"
   }
 }
