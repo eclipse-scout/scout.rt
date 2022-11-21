@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.*;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.eclipse.scout.rt.dataobject.fixture.FixtureString2Id;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.junit.Test;
@@ -38,5 +41,13 @@ public class AbstractStringIdTest {
     FixtureStringId id2 = FixtureStringId.of("efgh");
     assertTrue(id1.compareTo(id2) < 0);
     assertTrue(id2.compareTo(id1) > 0);
+  }
+
+  @Test
+  public void testComparable() {
+    FixtureStringId s1 = FixtureStringId.of("a");
+    FixtureStringId s2 = FixtureStringId.of("b");
+    FixtureStringId s3 = FixtureStringId.of("c");
+    assertEquals("abc", Stream.of(s2, s3, s1).sorted(FixtureStringId::compareTo).map(FixtureStringId::unwrap).collect(Collectors.joining()));
   }
 }

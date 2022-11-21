@@ -12,19 +12,19 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.dataobject.id.IStringId;
-import org.eclipse.scout.rt.dataobject.testing.AbstractStringIdStructureTest;
+import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.dataobject.testing.AbstractIdStructureTest;
 import org.junit.runners.Parameterized.Parameters;
 
-public class StringIdStructureTest extends AbstractStringIdStructureTest {
+public class JacksonIdStructureTest extends AbstractIdStructureTest {
 
   @Parameters(name = "{0}")
   public static Iterable<?> parameters() {
-    return streamStringIdClasses("org.eclipse.scout.rt.jackson")
+    return streamIdClasses("org.eclipse.scout.rt.jackson")
         .collect(Collectors.toList());
   }
 
-  public StringIdStructureTest(Class<? extends IStringId> id) {
+  public JacksonIdStructureTest(Class<? extends IId> id) {
     super(id);
   }
 }

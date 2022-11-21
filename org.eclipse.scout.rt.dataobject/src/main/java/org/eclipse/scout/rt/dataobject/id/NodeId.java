@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.dataobject.id;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.NodeIdentifier;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Represents the unique identifier for one node.
@@ -27,7 +28,7 @@ public final class NodeId extends AbstractStringId {
   }
 
   public static NodeId of(String id) {
-    if (id == null) {
+    if (StringUtility.isNullOrEmpty(id)) {
       return null;
     }
     return new NodeId(id);

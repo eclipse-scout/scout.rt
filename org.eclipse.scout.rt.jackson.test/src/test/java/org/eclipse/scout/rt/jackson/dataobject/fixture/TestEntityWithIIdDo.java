@@ -20,9 +20,11 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.id.IId;
 
 @TypeName("scout.TestEntityWithIId")
 public class TestEntityWithIIdDo extends DoEntity {
@@ -39,8 +41,20 @@ public class TestEntityWithIIdDo extends DoEntity {
     return doValue("longId");
   }
 
+  public DoValue<FixtureCompositeId> compositeId() {
+    return doValue("compositeId");
+  }
+
+  public DoValue<IId> iid() {
+    return doValue("iid");
+  }
+
   public DoValue<Map<FixtureStringId, String>> map() {
     return doValue("map");
+  }
+
+  public DoValue<Map<FixtureCompositeId, String>> compositeMap() {
+    return doValue("compositeMap");
   }
 
   public DoValue<List<FixtureLongId>> longIds() {
@@ -97,6 +111,28 @@ public class TestEntityWithIIdDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public TestEntityWithIIdDo withCompositeId(FixtureCompositeId compositeId) {
+    compositeId().set(compositeId);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureCompositeId getCompositeId() {
+    return compositeId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestEntityWithIIdDo withIid(IId iid) {
+    iid().set(iid);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IId getIid() {
+    return iid().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithIIdDo withMap(Map<FixtureStringId, String> map) {
     map().set(map);
     return this;
@@ -105,6 +141,17 @@ public class TestEntityWithIIdDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<FixtureStringId, String> getMap() {
     return map().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestEntityWithIIdDo withCompositeMap(Map<FixtureCompositeId, String> compositeMap) {
+    compositeMap().set(compositeMap);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<FixtureCompositeId, String> getCompositeMap() {
+    return compositeMap().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

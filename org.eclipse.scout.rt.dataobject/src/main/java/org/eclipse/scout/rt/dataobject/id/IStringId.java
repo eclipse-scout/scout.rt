@@ -21,7 +21,7 @@ package org.eclipse.scout.rt.dataobject.id;
  * This interface implements {@link Comparable} by comparing the wrapped {@link String} value, without considering the
  * id types. Hence, every {@link IStringId} is comparable to any other {@link IStringId}.
  */
-public interface IStringId extends IId, Comparable<IStringId> {
+public interface IStringId extends IRootId, Comparable<IStringId> {
 
   @Override
   String unwrap();

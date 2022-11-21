@@ -15,12 +15,12 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 /**
  * Abstract base implementation for all {@link IId} classes. The wrapped id is guaranteed to be non-null.
  */
-public abstract class AbstractId<WRAPPED_TYPE extends Comparable<WRAPPED_TYPE>> implements IId {
+public abstract class AbstractRootId<WRAPPED_TYPE> implements IRootId {
   private static final long serialVersionUID = 1L;
 
   private final WRAPPED_TYPE m_id;
 
-  protected AbstractId(WRAPPED_TYPE id) {
+  protected AbstractRootId(WRAPPED_TYPE id) {
     m_id = Assertions.assertNotNull(id);
   }
 
@@ -50,7 +50,7 @@ public abstract class AbstractId<WRAPPED_TYPE extends Comparable<WRAPPED_TYPE>> 
     if (getClass() != obj.getClass()) {
       return false;
     }
-    AbstractId other = (AbstractId) obj;
+    AbstractRootId other = (AbstractRootId) obj;
     return m_id.equals(other.m_id);
   }
 

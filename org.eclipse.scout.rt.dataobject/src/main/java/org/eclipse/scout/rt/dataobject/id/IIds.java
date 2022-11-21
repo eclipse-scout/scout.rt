@@ -23,9 +23,9 @@ public final class IIds {
   }
 
   /**
-   * Null-safe version of {@link IId#unwrapAsString()}.
+   * @return wrapped {@code id} as string representation for logging purpose
    */
-  public static String toString(IId id) {
+  public static String toString(IRootId id) {
     if (id == null) {
       return null;
     }
@@ -33,17 +33,17 @@ public final class IIds {
   }
 
   /**
-   * Creates a new wrapped {@link IId} by calling the <code>of(value)</code> method of the given id class.
+   * Creates a new wrapped {@link IId} by calling the {@code of(value(s))} method of the given id class.
    */
-  public static <ID extends IId, WT extends Comparable<WT>> ID create(Class<ID> idClass, WT value) {
-    return BEANS.get(IdFactory.class).createInternal(idClass, value);
+  public static <ID extends IId> ID create(Class<ID> idClass, Object... values) {
+    return BEANS.get(IdFactory.class).createInternal(idClass, values);
   }
 
   /**
-   * Returns a function to create new {@link IId} of the provided type. Bean lookup to {@link IdFactory} is cached.
+   * Returns a function to create new {@link IRootId} of the provided type. Bean lookup to {@link IdFactory} is cached.
    */
-  public static <ID extends IId, WT extends Comparable<WT>> Function<WT, ID> factory(Class<ID> idClass) {
-    IdFactory idFactory = BEANS.get(IdFactory.class);
+  public static <ID extends IRootId, WT> Function<WT, ID> factory(Class<ID> idClass) {
+    final IdFactory idFactory = BEANS.get(IdFactory.class);
     return value -> idFactory.createInternal(idClass, value);
   }
 }

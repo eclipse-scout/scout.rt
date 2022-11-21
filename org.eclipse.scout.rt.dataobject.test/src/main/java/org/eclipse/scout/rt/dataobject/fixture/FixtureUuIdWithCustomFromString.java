@@ -17,6 +17,10 @@ import org.eclipse.scout.rt.dataobject.id.AbstractUuId;
 public final class FixtureUuIdWithCustomFromString extends AbstractUuId {
   private static final long serialVersionUID = 1L;
 
+  private FixtureUuIdWithCustomFromString(UUID id) {
+    super(id);
+  }
+
   public static FixtureUuIdWithCustomFromString create() {
     return new FixtureUuIdWithCustomFromString(UUID.randomUUID());
   }
@@ -33,9 +37,5 @@ public final class FixtureUuIdWithCustomFromString extends AbstractUuId {
       return null;
     }
     return new FixtureUuIdWithCustomFromString(UUID.fromString(s.replace('.', '-')));
-  }
-
-  private FixtureUuIdWithCustomFromString(UUID id) {
-    super(id);
   }
 }

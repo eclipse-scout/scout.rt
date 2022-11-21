@@ -13,19 +13,33 @@ package org.eclipse.scout.rt.dataobject.testing;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.dataobject.id.ICompositeId;
 import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.dataobject.id.IUuId;
+import org.eclipse.scout.rt.dataobject.id.IRootId;
+import org.eclipse.scout.rt.dataobject.id.IdFactory;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests the structure of {@link IId} classes.
@@ -45,9 +59,11 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public abstract class AbstractIdStructureTest {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractIdStructureTest.class);
+
   protected static Stream<Class<? extends IId>> streamIdClasses(String packageNameFilter) {
     return ClassInventory.get().getAllKnownSubClasses(IId.class).stream()
-        .filter(ci -> !ci.isAbstract() && !ci.isInterface())
+        .filter(ci -> !ci.isAbstract() && !ci.isInterface() && !ci.hasAnnotation(IgnoreBean.class))
         .sorted(Comparator.comparing(IClassInfo::name))
         .map(IClassInfo::resolveClass)
         .filter(c -> packageNameFilter == null || c.getName().startsWith(packageNameFilter))
@@ -80,28 +96,100 @@ public abstract class AbstractIdStructureTest {
 
   @Test
   public void ofTypeMethod() throws ReflectiveOperationException {
-    Class<?> wrappedTypeClass = TypeCastUtility.getGenericsParameterClass(getIdClass(), IId.class);
-    Method of = getIdClass().getDeclaredMethod("of", wrappedTypeClass);
-    assertNotNull("Method 'of(" + wrappedTypeClass.getName() + ")' is missing", of);
+    List<Class<?>> parameterTypes = BEANS.get(IdFactory.class).getRawTypes(getIdClass());
+    Method of = getIdClass().getDeclaredMethod("of", parameterTypes.toArray(new Class[]{}));
+    assertNotNull("Method 'of(" + parameterTypes + ")' is missing", of);
     int mod = of.getModifiers();
     assertTrue("Method is expected public static, but it is " + Modifier.toString(mod), Modifier.isStatic(mod) && Modifier.isPublic(mod));
     assertEquals(getIdClass(), of.getReturnType());
 
-    // invoke method with null
-    IId id = (IId) of.invoke(null, (Object) null);
-    assertNull("of(null) must return null", id);
+    // invoke method with nulls
+    testOfTypeNullValues(parameterTypes, of);
+
+    // invoke with test values
+    testOfTypeMockValues(parameterTypes, of);
   }
 
-  @Test
-  public void ofStringMethod() throws ReflectiveOperationException {
-    Method of = getIdClass().getDeclaredMethod("of", String.class);
-    assertNotNull("Method 'of(String)' is missing", of);
-    int mod = of.getModifiers();
-    assertTrue("Method is expected public static, but it is " + Modifier.toString(mod), Modifier.isStatic(mod) && Modifier.isPublic(mod));
-    assertEquals(getIdClass(), of.getReturnType());
+  protected void testOfTypeNullValues(List<Class<?>> parameterTypes, Method of) throws IllegalAccessException, InvocationTargetException {
+    Object[] params = new Object[parameterTypes.size()];
+    Arrays.fill(params, null);
+    IId id = (IId) of.invoke(null, params);
+    assertNull("of(null,null...) must return null if invoked with all null values", id);
 
-    // invoke method
-    IId id = (IUuId) of.invoke(null, (String) null);
-    assertNull("of(null) must return null", id);
+    // check empty values for various default root values
+    if (parameterTypes.size() == 1 && parameterTypes.get(0) == String.class) {
+      assertNull("of(\"\") must return null if invoked with empty string", of.invoke(null, ""));
+    }
+    else if (parameterTypes.size() == 1 && parameterTypes.get(0) == Long.class) {
+      assertNull("of(0L) must return null if invoked with zero long value", of.invoke(null, 0L));
+    }
+    else if (parameterTypes.size() == 1 && parameterTypes.get(0) == Integer.class) {
+      assertNull("of(0) must return null if invoked with zero int value", of.invoke(null, 0));
+    }
+  }
+
+  protected void testOfTypeMockValues(List<Class<?>> parameterTypes, Method of) throws ReflectiveOperationException {
+    if (IRootId.class.isAssignableFrom(getIdClass())) {
+      Class<?> wrappedType = parameterTypes.get(0);
+      assertEquals("of method parameter type must be equal to generic type of id class", wrappedType, TypeCastUtility.getGenericsParameterClass(getIdClass(), IRootId.class));
+
+      // invoke method with test value
+      Object value = getMockValue(wrappedType);
+      IRootId id = (IRootId) of.invoke(null, value);
+      assertNotNull("of must not return null", id);
+      assertEquals("class type of class under test must be equal to class type of created id", getIdClass(), id.getClass());
+      assertEquals("unwrapped value must be equal to the one the ID was created for", value, id.unwrap());
+    }
+    else {
+      // invoke method with test values
+      Object[] params = parameterTypes.stream().map(this::getMockValue).toArray();
+      ICompositeId id = (ICompositeId) of.invoke(null, params);
+      assertNotNull("of(" + Arrays.toString(params) + ") must not return null", id);
+      assertArrayEquals(params, unwrapId(id).toArray());
+    }
+  }
+
+  protected List<Object> unwrapId(IId id) {
+    List<Object> rawComponents = new ArrayList<>();
+    unwrapId(id, rawComponents);
+    return rawComponents;
+  }
+
+  protected void unwrapId(IId id, List<Object> rawComponents) {
+    if (id instanceof ICompositeId) {
+      (((ICompositeId) id).unwrap()).forEach(idComponent -> unwrapId(idComponent, rawComponents));
+    }
+    else {
+      rawComponents.add(id.unwrap());
+    }
+  }
+
+  protected Object getMockValue(Class<?> clazz) {
+    if (clazz == String.class) {
+      return "abc";
+    }
+    else if (clazz == UUID.class) {
+      return UUID.fromString("5860fb13-875a-43db-9204-c501edf3d2ed");
+    }
+    else if (clazz == Long.class) {
+      return 42L;
+    }
+    else if (clazz == Integer.class) {
+      return 42;
+    }
+    else if (clazz == Date.class) {
+      return BEANS.get(IDateProvider.class).currentMillis();
+    }
+    else if (clazz == Locale.class) {
+      return Locale.US;
+    }
+    return getCustomMockValue(clazz);
+  }
+
+  /**
+   * Implement this method to provide mock test data for additional raw types.
+   */
+  protected Object getCustomMockValue(Class<?> clazz) {
+    throw new AssertionError("Missing mock data for IId " + getIdClass() + " using  wrapper type " + clazz);
   }
 }

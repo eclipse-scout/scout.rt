@@ -17,13 +17,13 @@ import java.util.UUID;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuIdWithCustomFromString;
-import org.eclipse.scout.rt.dataobject.id.AbstractId;
+import org.eclipse.scout.rt.dataobject.id.AbstractRootId;
 import org.junit.Test;
 
 /**
- * Test cases for {@link AbstractId}
+ * Test cases for {@link AbstractRootId}
  */
-public class AbstractIdTest {
+public class AbstractRootIdTest {
 
   protected static final UUID TEST_UUID = UUID.randomUUID();
   protected static final FixtureUuId FIXTURE_UUID_1 = FixtureUuId.of(TEST_UUID);

@@ -10,69 +10,36 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.inventory.ClassInventory;
-import org.eclipse.scout.rt.platform.inventory.IClassInfo;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * TODO [24.0] PBZ remove this class, was replaced by {@link IdCodec} and {@link IdInventory}
+ *
+ * @deprecated use {@link IdCodec} and {@link IdInventory} instead
+ */
+@Deprecated
 @ApplicationScoped
-@CreateImmediately // validate on startup
 public class IdExternalFormatter {
 
   private static final Logger LOG = LoggerFactory.getLogger(IdExternalFormatter.class);
 
-  protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
-
-  protected final Map<String, Class<? extends IId>> m_nameToClassMap = new HashMap<>();
-  protected final Map<Class<? extends IId>, String> m_classToNameMap = new HashMap<>();
-
-  @PostConstruct
-  protected void createClassCache() {
-    for (IClassInfo classInfo : ClassInventory.get().getKnownAnnotatedTypes(IdTypeName.class)) {
-      String typeName = (String) classInfo.getAnnotationValue(IdTypeName.class, "value");
-      Assertions.assertNotNullOrEmpty(typeName, "Invalid value for @{} on {} (must not be null or empty)", IdTypeName.class.getSimpleName(), classInfo.resolveClass().getName());
-      try {
-        Class<? extends IId> idClass = classInfo.resolveClass().asSubclass(IId.class);
-        Class<? extends IId> registeredIdClass = m_nameToClassMap.put(typeName, idClass);
-        String registeredTypeName = m_classToNameMap.put(idClass, typeName);
-        checkDuplicateIdTypeNames(idClass, typeName, registeredIdClass, registeredTypeName);
-      }
-      catch (@SuppressWarnings("squid:S1166") ClassCastException e) {
-        LOG.warn("Class {} is annotated with @{} but does not implement {}. Skipping class.", classInfo.resolveClass().getName(), IdTypeName.class.getSimpleName(), IId.class.getName());
-      }
-    }
-    LOG.debug("Registered {} id types", m_nameToClassMap.size());
-  }
+  private final LazyValue<IdCodec> m_codec = new LazyValue<>(IdCodec.class);
+  private final LazyValue<IdInventory> m_inventory = new LazyValue<>(IdInventory.class);
 
   /**
-   * Checks for classes with the same {@link IdTypeName} annotation values.
-   */
-  protected void checkDuplicateIdTypeNames(Class<?> clazz, String typeName, Class<?> existingClass, String existingName) {
-    Assertions.assertNull(existingClass, "{} and {} have the same type name '{}'. Use an unique @{} annotation value.", clazz, existingClass, typeName, IdTypeName.class.getSimpleName());
-    Assertions.assertNull(existingName, "{} is annotated with @{} value '{}', but was already registered with type name '{}'. Register each class only once.", clazz, IdTypeName.class.getSimpleName(), typeName, existingName);
-  }
-
-  /**
-   * Returns a string in the format <code>"[type-name]:[raw-id]"</code>.
+   * Returns a string in the format <code>"[type-name]:[raw-id;raw-id;...]"</code>.
    * <ul>
-   * <li><b>type-name</b> is computed by {@link #getTypeName(IId)}.
-   * <li><b>raw-id</b> is the unwrapped id (see {@link IId#unwrapAsString()}).
+   * <li><b>type-name</b> is computed by {@link IdInventory#getTypeName(IId)}.
+   * <li><b>raw-id's</b> are the wrapped ids converted to their string representation (see {@link IdCodec)}, composite
+   * ids are unwrapped to their root ids and then converted to their string representation, separated by ';'.
    * </ul>
    */
-  public <ID extends IId> String toExternalForm(ID id) {
-    String typeName = Assertions.assertNotNull(getTypeName(id), "Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass().getName());
-    String rawId = id.unwrapAsString();
-    return typeName + ":" + rawId;
+  public String toExternalForm(IId id) {
+    return m_codec.get().toQualified(id);
   }
 
   /**
@@ -84,19 +51,7 @@ public class IdExternalFormatter {
    *           If the referenced class is not found
    */
   public IId fromExternalForm(String externalForm) {
-    if (externalForm == null) {
-      return null;
-    }
-    String[] tmp = externalForm.split(":");
-    if (tmp.length != 2) {
-      throw new IllegalArgumentException("externalForm '" + externalForm + "' is invalid");
-    }
-    String typeName = tmp[0];
-    Class<? extends IId> idClass = m_nameToClassMap.get(typeName);
-    if (idClass == null) {
-      throw new ProcessingException("No class found for type name '{}'", typeName);
-    }
-    return m_idFactory.get().createFromString(idClass, tmp[1]);
+    return m_codec.get().fromQualified(externalForm);
   }
 
   /**
@@ -104,19 +59,7 @@ public class IdExternalFormatter {
    * format or there is no type {@code null} is returned.
    */
   public IId fromExternalFormLenient(String externalForm) {
-    if (externalForm == null) {
-      return null;
-    }
-    String[] tmp = externalForm.split(":", 2);
-    if (tmp.length != 2) {
-      return null;
-    }
-    String typeName = tmp[0];
-    Class<? extends IId> idClass = m_nameToClassMap.get(typeName);
-    if (idClass == null) {
-      return null;
-    }
-    return m_idFactory.get().createFromString(idClass, tmp[1]);
+    return m_codec.get().fromQualifiedLenient(externalForm);
   }
 
   /**
@@ -124,14 +67,14 @@ public class IdExternalFormatter {
    *         annotation is not present.
    */
   public String getTypeName(Class<? extends IId> idClass) {
-    return m_classToNameMap.get(idClass);
+    return m_inventory.get().getTypeName(idClass);
   }
 
   /**
    * @return id class which declares {@link IdTypeName} with {@code typeName}
    */
   public Class<? extends IId> getIdClass(String typeName) {
-    return m_nameToClassMap.get(typeName);
+    return m_inventory.get().getIdClass(typeName);
   }
 
   /**
@@ -139,6 +82,6 @@ public class IdExternalFormatter {
    *         the annotation is not present.
    */
   public String getTypeName(IId id) {
-    return getTypeName(id.getClass());
+    return m_inventory.get().getTypeName(id.getClass());
   }
 }

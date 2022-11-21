@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.dataobject.migration;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Unique id for {@link IDoValueMigrationHandler}.
@@ -28,7 +29,7 @@ public final class DoValueMigrationId extends AbstractStringId {
   }
 
   public static DoValueMigrationId of(String id) {
-    if (id == null) {
+    if (StringUtility.isNullOrEmpty(id)) {
       return null;
     }
     return new DoValueMigrationId(id);

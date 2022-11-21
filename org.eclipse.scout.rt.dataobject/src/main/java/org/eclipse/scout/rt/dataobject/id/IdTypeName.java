@@ -22,7 +22,8 @@ import java.lang.annotation.Target;
  * Annotation used to define the unique type name for an {@link IId} class, used when serializing or deserializing
  * instances.
  *
- * @see IdExternalFormatter
+ * @see IdCodec#toQualified(IId)
+ * @see IdCodec#fromQualified(String)
  * @see TypedId
  */
 @Documented
@@ -32,8 +33,8 @@ import java.lang.annotation.Target;
 public @interface IdTypeName {
 
   /**
-   * Unique type name used when serializing an instance of the annotated {@link IId} class. Must not be
-   * <code>null</code> or empty.
+   * Unique type name used when serializing an instance of the annotated {@link IId} class. Must not be {@code null} or
+   * empty.
    */
   String value();
 }

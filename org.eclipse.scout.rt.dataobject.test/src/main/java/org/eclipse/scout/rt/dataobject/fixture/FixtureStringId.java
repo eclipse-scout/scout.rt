@@ -12,19 +12,20 @@ package org.eclipse.scout.rt.dataobject.fixture;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @IdTypeName("scout.FixtureStringId")
 public final class FixtureStringId extends AbstractStringId {
   private static final long serialVersionUID = 1L;
 
+  private FixtureStringId(String id) {
+    super(id);
+  }
+
   public static FixtureStringId of(String id) {
-    if (id == null) {
+    if (StringUtility.isNullOrEmpty(id)) {
       return null;
     }
     return new FixtureStringId(id);
-  }
-
-  private FixtureStringId(String id) {
-    super(id);
   }
 }

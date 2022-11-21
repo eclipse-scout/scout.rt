@@ -15,21 +15,21 @@ import org.eclipse.scout.rt.dataobject.id.AbstractLongId;
 public final class FixtureLongId extends AbstractLongId {
   private static final long serialVersionUID = 1L;
 
+  private FixtureLongId(Long id) {
+    super(id);
+  }
+
   public static FixtureLongId of(Long id) {
-    if (id == null) {
+    if (id == null || id.longValue() == 0L) {
       return null;
     }
     return new FixtureLongId(id);
   }
 
-  public static FixtureLongId of(String string) {
-    if (string == null) {
+  public static FixtureLongId of(String id) {
+    if (id == null) {
       return null;
     }
-    return new FixtureLongId(Long.parseLong(string));
-  }
-
-  private FixtureLongId(Long id) {
-    super(id);
+    return new FixtureLongId(Long.parseLong(id));
   }
 }
