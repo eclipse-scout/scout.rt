@@ -207,17 +207,11 @@ module.exports = (env, args) => {
     config.optimization.minimizer = [
       // minify css
       new CssMinimizerPlugin({
-        test: /\.min\.css$/g,
-        minimizerOptions: {
-          preset: ['default', {
-            discardComments: {removeAll: true}
-          }]
-        }
+        minify: CssMinimizerPlugin.esbuildMinify
       }),
       // minify js
       new TerserPlugin({
-        test: /\.js(\?.*)?$/i,
-        parallel: 4
+        minify: TerserPlugin.esbuildMinify
       })
     ];
   }

@@ -35,6 +35,7 @@
     "version:release": "releng-scripts version:release"
   },
   "dependencies": {
+    "esbuild": "0.15.16",
     "@babel/cli": "7.16.0",
     "@babel/core": "7.16.5",
     "@babel/plugin-proposal-class-properties": "7.16.5",
