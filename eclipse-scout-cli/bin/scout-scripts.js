@@ -115,17 +115,45 @@ function runKarma(configFileName, headless, args) {
     });
   }
 
+  let exitCode = 100;
   const Server = require('karma').Server;
-  const serverInstance = new Server(karmaConfig, exitCode => {
+  const serverInstance = new Server(karmaConfig, karmaExitCode => {
     if (exitCode === 0) {
-      console.log('Karma has exited with 0');
+      console.log('Karma has exited with 0.');
+      process.exit(0); // all fine: tests could be executed and no failures
+    } else if (exitCode > 1) { // the custom exitCodes
+      console.log(`Error in test execution. Exit code: ${exitCode}.`);
+      process.exit(exitCode); // tests could not be executed because of an error. Let the process fail.
     } else {
-      console.log(`There are test failures. Karma has exited with ${exitCode}`);
+      console.log(`There are test failures. Karma has exited with ${exitCode}.`);
+      process.exit(0); // test could be executed but there are test failures: do not set exitCode here because the build should continue even on failing tests.
     }
-    process.exit(0); // do not set exitCode of karma to the process here because the build should continue even on failing tests. therefore always use exitCode zero.
   });
+
+  serverInstance.on('run_complete', (browsers, results) => {
+    // Karma returns exitCode 1 for all results. Therefore, there is no possibility to distinguish the case that tests failed or that the test execution had errors.
+    // To solve this, a custom exitCode is computed which allows separating several cases.
+    exitCode = computeExitCode(results);
+  });
+
   console.log(`Starting Karma server using config file ${configFilePath}`);
   serverInstance.start();
+}
+
+/**
+ * Inspired by Karma.BrowserCollection.calculateExitCode().
+ *
+ * @param results The Karma results object
+ * @returns {number} The custom exit code
+ */
+function computeExitCode(results) {
+  if (results.disconnected) {
+    return 2;
+  }
+  if (results.error) {
+    return 3;
+  }
+  return results.exitCode;
 }
 
 function runWebpack(args) {
