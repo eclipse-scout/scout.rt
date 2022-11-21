@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.jackson.dataobject.id;
 import java.io.IOException;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.dataobject.id.IdCodec;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -23,8 +25,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  */
 public class IIdMapKeySerializer extends JsonSerializer<IId> {
 
+  protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
+
   @Override
   public void serialize(IId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-    gen.writeFieldName(value.unwrapAsString());
+    gen.writeFieldName(m_idCodec.get().toUnqualified(value));
   }
 }

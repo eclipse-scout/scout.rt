@@ -18,14 +18,13 @@ import java.io.Serializable;
  * <p>
  * Subclasses must provide the following static factory methods:
  * <ul>
- * <li><b>of(String)</b>: used by {@link IdFactory} to construct new instances. The method is expected to return
- * <code>null</code> if the given {@link String} is <code>null</code>, otherwise the wrapped value.
+ * <li><b>of(wrapped_type(s)></b>: used by {@link IdFactory} to construct new instances. The method is expected to
+ * return <code>null</code> if the given {@code value(s)} are <code>null</code>, otherwise the wrapped value.
  * </ul>
  * <p>
  *
- * @see IUuId
- * @see IStringId
- * @see ILongId
+ * @see IRootId
+ * @see ICompositeId
  */
 public interface IId extends Serializable {
 
@@ -34,9 +33,4 @@ public interface IId extends Serializable {
    *         persistence layers.
    */
   Object unwrap();
-
-  /**
-   * @return the raw id formatted as string.
-   */
-  String unwrapAsString();
 }

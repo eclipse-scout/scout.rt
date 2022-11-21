@@ -1,8 +1,13 @@
 {
   "_type" : "scout.TestEntityWithIId",
-  "longId" : 37,
-  "longIds" : [ 37, 73 ],
-  "longIdsAsDoList" : [ 73, 23 ],
+  "compositeId" : "scout.FixtureCompositeId:foo;8fa211b0-fd83-42cb-96c9-1942e274ce79",
+  "compositeMap" : {
+    "scout.FixtureCompositeId:foo;8fa211b0-fd83-42cb-96c9-1942e274ce79" : "polo"
+  },
+  "iid" : "scout.FixtureCompositeId:foo2;8fa211b0-fd83-42cb-96c9-1942e274ce79",
+  "longId" : "37",
+  "longIds" : [ "37", "73" ],
+  "longIdsAsDoList" : [ "73", "23" ],
   "map" : {
     "scout.FixtureStringId:marco" : "polo"
   },

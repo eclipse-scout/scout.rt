@@ -16,7 +16,7 @@ package org.eclipse.scout.rt.dataobject.id;
  * <p>
  * For details, see {@link IStringId}.
  */
-public abstract class AbstractStringId extends AbstractId<String> implements IStringId {
+public abstract class AbstractStringId extends AbstractRootId<String> implements IStringId {
   private static final long serialVersionUID = 1L;
 
   protected AbstractStringId(String id) {

@@ -17,13 +17,11 @@ package org.eclipse.scout.rt.dataobject.id;
  * <ul>
  * <li><b>of(Long)</b>: used by {@link IdFactory} to construct new instances. The method is expected to return
  * <code>null</code> if the given {@link Long} is <code>null</code>, otherwise the wrapped {@link Long}.
- * <li><b>of(String)</b>: used by {@link IdFactory} to construct new instances. The method is expected to return
- * <code>null</code> if the given {@link Long} is <code>null</code>, otherwise the wrapped {@link Long}.
  * </ul>
  * This interface implements {@link Comparable} by comparing the wrapped {@link Long} value, without considering the id
  * types. Hence, every {@link ILongId} is comparable to any other {@link ILongId}.
  */
-public interface ILongId extends IId, Comparable<ILongId> {
+public interface ILongId extends IRootId, Comparable<ILongId> {
 
   @Override
   Long unwrap();

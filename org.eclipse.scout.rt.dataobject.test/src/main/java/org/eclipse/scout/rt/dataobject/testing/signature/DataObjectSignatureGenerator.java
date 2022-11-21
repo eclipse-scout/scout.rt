@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.dataobject.enumeration.EnumInventory;
 import org.eclipse.scout.rt.dataobject.enumeration.EnumName;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.dataobject.id.IdExternalFormatter;
+import org.eclipse.scout.rt.dataobject.id.IdInventory;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -106,7 +106,7 @@ public class DataObjectSignatureGenerator {
    * Used for FQN of non-instanciable {@link IId} (interfaces/abstract classes).
    * <p>
    * NOTE: All subclasses are required to have a @{@link IdTypeName} annotation or a custom implemented
-   * {@link IdExternalFormatter}
+   * {@link IdInventory#getTypeName(Class)} method
    */
   protected static final String VALUE_TYPE_ID_INTERFACE_PREFIX = "IDI";
 
@@ -477,7 +477,7 @@ public class DataObjectSignatureGenerator {
       return box(VALUE_TYPE_ID_INTERFACE_PREFIX, idClass.getName());
     }
 
-    String idTypeName = BEANS.get(IdExternalFormatter.class).getTypeName(idClass);
+    String idTypeName = BEANS.get(IdInventory.class).getTypeName(idClass);
     if (idTypeName == null) {
       m_errors.add(String.format("IId class '%s' is missing id type name (referenced in '%s')", idClass.getName(), getContextText(attributeName, containingEntityClass)));
       idTypeName = idClass.getName();

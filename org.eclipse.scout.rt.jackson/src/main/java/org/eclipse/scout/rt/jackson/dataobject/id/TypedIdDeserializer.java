@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.jackson.dataobject.id;
 import java.io.IOException;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.dataobject.id.IdExternalFormatter;
+import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 public class TypedIdDeserializer extends StdDeserializer<TypedId<IId>> {
   private static final long serialVersionUID = 1L;
 
-  protected final LazyValue<IdExternalFormatter> m_idExternalFormatter = new LazyValue<>(IdExternalFormatter.class);
+  protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
 
   public TypedIdDeserializer() {
     super(TypedId.class);
@@ -35,8 +35,6 @@ public class TypedIdDeserializer extends StdDeserializer<TypedId<IId>> {
 
   @Override
   public TypedId<IId> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    String externalForm = p.getText();
-    IId id = m_idExternalFormatter.get().fromExternalForm(externalForm);
-    return TypedId.of(id);
+    return TypedId.of(m_idCodec.get().fromQualified(p.getText()));
   }
 }

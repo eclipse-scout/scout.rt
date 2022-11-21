@@ -20,9 +20,9 @@ import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.dataobject.id.IdFactory;
+import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 
 /**
  * Provides a JAX-RS parameter converter for {@link IId}-based types.
@@ -58,6 +58,8 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
 
     protected final Class<? extends IId> m_idType;
 
+    protected final LazyValue<IdCodec> m_codec = new LazyValue<>(IdCodec.class);
+
     public IIdParamConverter(Class<? extends IId> idType) {
       m_idType = idType;
     }
@@ -67,7 +69,7 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
-      return BEANS.get(IdFactory.class).createFromString(m_idType, value);
+      return m_codec.get().fromUnqualified(m_idType, value);
     }
 
     @Override
@@ -75,7 +77,7 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
-      return value.unwrapAsString();
+      return m_codec.get().toUnqualified(value);
     }
   }
 }

@@ -10,22 +10,26 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
-import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
-import org.eclipse.scout.rt.dataobject.id.IdTypeName;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.dataobject.id.AbstractRootId;
 
-@IdTypeName("scout.FixtureString2Id")
-public final class FixtureString2Id extends AbstractStringId {
+public final class FixtureIntegerId extends AbstractRootId<Integer> {
   private static final long serialVersionUID = 1L;
 
-  private FixtureString2Id(String id) {
+  private FixtureIntegerId(Integer id) {
     super(id);
   }
 
-  public static FixtureString2Id of(String id) {
-    if (StringUtility.isNullOrEmpty(id)) {
+  public static FixtureIntegerId of(Integer id) {
+    if (id == null || id.intValue() == 0) {
       return null;
     }
-    return new FixtureString2Id(id);
+    return new FixtureIntegerId(id);
+  }
+
+  public static FixtureIntegerId of(String string) {
+    if (string == null) {
+      return null;
+    }
+    return new FixtureIntegerId(Integer.parseInt(string));
   }
 }

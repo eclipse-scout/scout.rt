@@ -1,0 +1,17 @@
+{
+  "_type" : "scout.TestEntityWithIId",
+  "compositeId" : "foo;8fa211b0-fd83-42cb-96c9-1942e274ce79",
+  "compositeMap" : {
+    "foo;8fa211b0-fd83-42cb-96c9-1942e274ce79" : "polo"
+  },
+  "longId" : "37",
+  "longIds" : [ "37", "73" ],
+  "longIdsAsDoList" : [ "73", "23" ],
+  "map" : {
+    "marco" : "polo"
+  },
+  "stringId" : "foo",
+  "stringIds" : [ "foo", "foo2" ],
+  "stringIdsAsDoList" : [ "foo2", "foo2" ],
+  "uuId" : "8fa211b0-fd83-42cb-96c9-1942e274ce79"
+}

@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.jackson.dataobject.id;
 import java.io.IOException;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.dataobject.id.IdExternalFormatter;
+import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -21,13 +21,13 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * Custom serializer for {@link IId} instances - like {@link TypedIdSerializer} it uses {@link IdExternalFormatter} for
+ * Custom serializer for {@link IId} instances - like {@link TypedIdSerializer} it uses {@link IdCodec} for
  * serialization. It may be used as a replacement for {@link IIdSerializer}.
  */
 public class QualifiedIIdSerializer extends StdSerializer<IId> {
   private static final long serialVersionUID = 1L;
 
-  protected final LazyValue<IdExternalFormatter> m_idExternalFormatter = new LazyValue<>(IdExternalFormatter.class);
+  protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
 
   public QualifiedIIdSerializer() {
     super(IId.class, false);
@@ -35,6 +35,6 @@ public class QualifiedIIdSerializer extends StdSerializer<IId> {
 
   @Override
   public void serialize(IId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-    gen.writeString(m_idExternalFormatter.get().toExternalForm(value));
+    gen.writeString(m_idCodec.get().toQualified(value));
   }
 }

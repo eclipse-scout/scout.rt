@@ -19,9 +19,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.jackson.dataobject.DataObjectDeserializers;
 import org.eclipse.scout.rt.jackson.dataobject.DataObjectMapKeyDeserializers;
 import org.eclipse.scout.rt.jackson.dataobject.DataObjectMapKeySerializers;
@@ -57,6 +59,8 @@ public class QualifiedIIdSerializationTest {
   protected static final FixtureStringId STRING_2_ID = FixtureStringId.of("foo2");
   protected static final FixtureUuId UU_ID = FixtureUuId.of("8fa211b0-fd83-42cb-96c9-1942e274ce79");
   protected static final FixtureStringId STRING_MARCO_ID = FixtureStringId.of("marco");
+  protected static final FixtureCompositeId COMPOSITE_ID_1 = FixtureCompositeId.of(STRING_1_ID, UU_ID);
+  protected static final FixtureCompositeId COMPOSITE_ID_2 = FixtureCompositeId.of(STRING_2_ID, UU_ID);
 
   protected final List<IBean<?>> m_beans = new ArrayList<>();
 
@@ -86,7 +90,10 @@ public class QualifiedIIdSerializationTest {
         .withLongId(LONG_1_ID)
         .withStringId(STRING_1_ID)
         .withUuId(UU_ID)
+        .withCompositeId(COMPOSITE_ID_1)
+        .withIid(COMPOSITE_ID_2)
         .withMap(Collections.singletonMap(STRING_MARCO_ID, "polo"))
+        .withCompositeMap(Collections.singletonMap(COMPOSITE_ID_1, "polo"))
         .withLongIds(Arrays.asList(LONG_1_ID, LONG_2_ID))
         .withLongIdsAsDoList(LONG_2_ID, LONG_3_ID)
         .withStringIds(Arrays.asList(STRING_1_ID, STRING_2_ID))
@@ -100,6 +107,8 @@ public class QualifiedIIdSerializationTest {
     assertEquals(LONG_1_ID, marshalled.getLongId());
     assertEquals(STRING_1_ID, marshalled.getStringId());
     assertEquals(UU_ID, marshalled.getUuId());
+    assertEquals(COMPOSITE_ID_1, marshalled.getCompositeId());
+    assertEquals(COMPOSITE_ID_2, marshalled.getIid());
     assertEquals(Arrays.asList(LONG_1_ID, LONG_2_ID), marshalled.getLongIds());
     assertEquals(Arrays.asList(LONG_2_ID, LONG_3_ID), marshalled.getLongIdsAsDoList());
     assertEquals(Arrays.asList(STRING_1_ID, STRING_2_ID), marshalled.getStringIds());
@@ -116,7 +125,7 @@ public class QualifiedIIdSerializationTest {
 
     @Override
     public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
-      if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class)) {
+      if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class)) {
         return new QualifiedIIdSerializer();
       }
       return super.findSerializer(config, type, beanDesc);
@@ -129,7 +138,7 @@ public class QualifiedIIdSerializationTest {
 
     @Override
     public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
-      if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class)) {
+      if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class) || type.hasRawClass(IId.class)) {
         return new QualifiedIIdDeserializer();
       }
       return super.findBeanDeserializer(type, config, beanDesc);
@@ -142,7 +151,7 @@ public class QualifiedIIdSerializationTest {
 
     @Override
     public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
-      if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class)) {
+      if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class)) {
         return new QualifiedIIdMapKeySerializer();
       }
       return super.findSerializer(config, type, beanDesc);
@@ -155,7 +164,7 @@ public class QualifiedIIdSerializationTest {
 
     @Override
     public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
-      if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class)) {
+      if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class) || type.hasRawClass(IId.class)) {
         return new QualifiedIIdMapKeyDeserializer();
       }
       return super.findKeyDeserializer(type, config, beanDesc);

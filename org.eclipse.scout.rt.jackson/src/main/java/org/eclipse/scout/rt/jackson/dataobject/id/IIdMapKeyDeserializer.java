@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.jackson.dataobject.id;
 import java.io.IOException;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.dataobject.id.IdFactory;
+import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -25,7 +25,8 @@ import com.fasterxml.jackson.databind.KeyDeserializer;
 public class IIdMapKeyDeserializer extends KeyDeserializer {
 
   private final Class<? extends IId> m_idClass;
-  protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
+
+  protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
 
   public IIdMapKeyDeserializer(Class<? extends IId> idClass) {
     m_idClass = idClass;
@@ -33,6 +34,6 @@ public class IIdMapKeyDeserializer extends KeyDeserializer {
 
   @Override
   public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-    return m_idFactory.get().createFromString(m_idClass, key);
+    return m_idCodec.get().fromUnqualified(m_idClass, key);
   }
 }

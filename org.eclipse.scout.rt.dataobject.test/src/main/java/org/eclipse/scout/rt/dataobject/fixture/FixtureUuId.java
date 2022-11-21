@@ -19,6 +19,10 @@ import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 public final class FixtureUuId extends AbstractUuId {
   private static final long serialVersionUID = 1L;
 
+  private FixtureUuId(UUID id) {
+    super(id);
+  }
+
   public static FixtureUuId create() {
     return new FixtureUuId(UUID.randomUUID());
   }
@@ -35,9 +39,5 @@ public final class FixtureUuId extends AbstractUuId {
       return null;
     }
     return new FixtureUuId(UUID.fromString(id));
-  }
-
-  private FixtureUuId(UUID id) {
-    super(id);
   }
 }

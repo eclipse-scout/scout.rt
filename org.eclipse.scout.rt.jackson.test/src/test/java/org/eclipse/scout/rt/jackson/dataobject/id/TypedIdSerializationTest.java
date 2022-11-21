@@ -16,6 +16,7 @@ import java.net.URL;
 
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
@@ -52,6 +53,20 @@ public class TypedIdSerializationTest {
     TestEntityWithTypedIdDo marshalled = m_dataObjectMapper.readValue(expectedJson, TestEntityWithTypedIdDo.class);
     assertEquals(STRING_ID, marshalled.getStringId().getId());
     assertEquals(UU_ID, marshalled.getUuId().getId());
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithTypedCompositeId() throws Exception {
+    FixtureCompositeId c = FixtureCompositeId.of(STRING_ID, UU_ID);
+    TestEntityWithTypedIdDo entity = BEANS.get(TestEntityWithTypedIdDo.class)
+        .withIid(TypedId.of(c));
+    String json = m_dataObjectMapper.writeValue(entity);
+
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithTypedCompositeIdDo.json"));
+    m_testHelper.assertJsonEquals(expectedJson, json);
+
+    TestEntityWithTypedIdDo marshalled = m_dataObjectMapper.readValue(expectedJson, TestEntityWithTypedIdDo.class);
+    assertEquals(c, marshalled.getIid().getId());
   }
 
   protected URL toURL(String resourceName) {

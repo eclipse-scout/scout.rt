@@ -18,7 +18,7 @@ import java.util.UUID;
  * <p>
  * For details, see {@link IUuId}.
  */
-public abstract class AbstractUuId extends AbstractId<UUID> implements IUuId {
+public abstract class AbstractUuId extends AbstractRootId<UUID> implements IUuId {
   private static final long serialVersionUID = 1L;
 
   protected AbstractUuId(UUID id) {

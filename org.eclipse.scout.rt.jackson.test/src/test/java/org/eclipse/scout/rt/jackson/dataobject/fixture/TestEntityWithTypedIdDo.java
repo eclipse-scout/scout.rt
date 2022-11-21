@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
 
 @TypeName("scout.TestEntityWithTypedId")
@@ -28,6 +29,10 @@ public class TestEntityWithTypedIdDo extends DoEntity {
 
   public DoValue<TypedId<FixtureStringId>> stringId() {
     return doValue("stringId");
+  }
+
+  public DoValue<TypedId<IId>> iid() {
+    return doValue("iid");
   }
 
   /* **************************************************************************
@@ -54,5 +59,16 @@ public class TestEntityWithTypedIdDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public TypedId<FixtureStringId> getStringId() {
     return stringId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestEntityWithTypedIdDo withIid(TypedId<IId> iid) {
+    iid().set(iid);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TypedId<IId> getIid() {
+    return iid().get();
   }
 }

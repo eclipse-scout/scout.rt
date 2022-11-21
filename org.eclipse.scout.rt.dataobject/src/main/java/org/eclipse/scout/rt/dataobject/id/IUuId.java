@@ -21,13 +21,11 @@ import java.util.UUID;
  * instance wrapping {@link UUID#randomUUID()}.
  * <li><b>of(UUID)</b>: used by {@link IdFactory} to construct new instances. The method is expected to return
  * <code>null</code> if the given {@link UUID} is <code>null</code>, otherwise the wrapped {@link UUID}.
- * <li><b>of(String)</b>: used by {@link IdFactory} to construct new instances. The method is expected to return
- * <code>null</code> if the given {@link String} is <code>null</code>, otherwise the wrapped {@link UUID}.
  * </ul>
  * This interface implements {@link Comparable} by comparing the wrapped {@link UUID} value, without considering the id
  * types. Hence, every {@link IUuId} is comparable to any other {@link IUuId}.
  */
-public interface IUuId extends IId, Comparable<IUuId> {
+public interface IUuId extends IRootId, Comparable<IUuId> {
 
   @Override
   UUID unwrap();

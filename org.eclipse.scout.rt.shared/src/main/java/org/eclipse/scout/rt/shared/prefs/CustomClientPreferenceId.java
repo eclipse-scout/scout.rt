@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.prefs;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * ID to identify a {@link ICustomClientPreferenceDo custom client preference}.
@@ -25,7 +26,7 @@ public final class CustomClientPreferenceId extends AbstractStringId {
   }
 
   public static CustomClientPreferenceId of(String id) {
-    if (id == null) {
+    if (StringUtility.isNullOrEmpty(id)) {
       return null;
     }
     return new CustomClientPreferenceId(id);

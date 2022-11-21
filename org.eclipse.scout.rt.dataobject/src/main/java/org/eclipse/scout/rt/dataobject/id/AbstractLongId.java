@@ -16,7 +16,7 @@ package org.eclipse.scout.rt.dataobject.id;
  * <p>
  * For details, see {@link ILongId}.
  */
-public abstract class AbstractLongId extends AbstractId<Long> implements ILongId {
+public abstract class AbstractLongId extends AbstractRootId<Long> implements ILongId {
   private static final long serialVersionUID = 1L;
 
   protected AbstractLongId(Long id) {
