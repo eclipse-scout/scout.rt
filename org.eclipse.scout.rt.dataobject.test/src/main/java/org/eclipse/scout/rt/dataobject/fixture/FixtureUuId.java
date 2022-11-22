@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractUuId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @IdTypeName("scout.FixtureUuId")
 public final class FixtureUuId extends AbstractUuId {
@@ -35,7 +36,7 @@ public final class FixtureUuId extends AbstractUuId {
   }
 
   public static FixtureUuId of(String id) {
-    if (id == null) {
+    if (StringUtility.isNullOrEmpty(id)) {
       return null;
     }
     return new FixtureUuId(UUID.fromString(id));

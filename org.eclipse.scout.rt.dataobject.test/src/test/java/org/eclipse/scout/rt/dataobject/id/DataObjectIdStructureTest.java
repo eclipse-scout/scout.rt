@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.dataobject.id;
 
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.dataobject.id.IdCodecTest.CustomComparableRawDataType;
+import org.eclipse.scout.rt.dataobject.id.AbstractIdCodecTest.CustomComparableRawDataType;
 import org.eclipse.scout.rt.dataobject.testing.AbstractIdStructureTest;
 import org.junit.runners.Parameterized.Parameters;
 
