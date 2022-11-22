@@ -1,3 +1,3 @@
 module.exports = {
-  extends: '@eclipse-scout/eslint-config/src/typescript'
+  extends: '@eclipse-scout'
 };

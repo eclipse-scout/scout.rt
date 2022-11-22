@@ -30,17 +30,6 @@ module.exports = {
 }
 ```
 
-If you are using TypeScript, you should extend from the typescript configuration.
-
-```js
-module.exports = {
-  extends: '@eclipse-scout/eslint-config/src/typescript',
-  rules: {
-    // Additional, per-project rules...
-  }
-}
-```
-
 ## License
 
 [Eclipse Public License (EPL) v1.0](https://www.eclipse.org/legal/epl-v10.html)

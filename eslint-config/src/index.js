@@ -17,86 +17,33 @@ module.exports = {
     jquery: true,
     jasmine: true
   },
-  extends: ['eslint:recommended', 'google', './common'],
+  extends: ['eslint:recommended', './common'],
   // Use typescript parser for js files as well so babel parser is not necessary
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 6,
     sourceType: 'module'
   },
-  rules: {
-    'indent': ['warn', 2, {'SwitchCase': 1}],
-    'no-extra-parens': ['off'],
-    'accessor-pairs': 'warn',
-    'array-callback-return': 'error',
-    'guard-for-in': 'off',
-    'no-alert': 'warn',
-    'no-eval': 'error',
-    'no-extra-bind': 'error',
-    'no-extra-label': 'error',
-    'no-implicit-coercion': 'off',
-    'no-implied-eval': 'error',
-    'no-invalid-this': 'off',
-    'no-iterator': 'error',
-    'no-caller': 'warn',
-    'no-console': 'off',
-    'no-labels': 'error',
-    'no-undef': 'off',
-    'no-throw-literal': 'off',
-    'camelcase': ['error', {allow: ['^\\$', '_']}],
-    'no-lone-blocks': 'error',
-    'no-loop-func': 'error',
-    'no-multi-spaces': 'warn',
-    'no-proto': 'error',
-    'no-prototype-builtins': 'off',
-    'no-return-assign': 'error',
-    'eslint func-call-spacing': 'off',
-    'no-return-await': 'error',
-    'no-self-compare': 'error',
-    'no-label-var': 'error',
-    'no-shadow': 'off',
-    'no-var': 'warn',
-    'eol-last': ['warn', 'always'],
-    'comma-spacing': ['error', {'before': false, 'after': true}],
-    'array-bracket-spacing': ['warn', 'never'],
-    'brace-style': ['error', '1tbs'],
-    'require-unicode-regexp': 'off',
-    'no-sequences': 'error',
-    'no-unmodified-loop-condition': 'error',
-    'computed-property-spacing': ['warn', 'never'],
-    'no-useless-return': 'error',
-    'no-else-return': 'error',
-    'max-len': ['warn', 240, 2, {ignoreUrls: true, ignorePattern: '^import .*'}],
-    'semi': ['error', 'always'],
-    'quotes': ['error', 'single'],
-    'comma-dangle': ['error', 'never'],
-    'object-curly-spacing': ['error', 'never'],
-    'operator-linebreak': 'off',
-    'arrow-parens': ['error', 'as-needed'],
-    'arrow-spacing': 'warn',
-    'no-duplicate-imports': 'error',
-    'one-var': 'off',
-    'padded-blocks': 'off',
-    'prefer-arrow-callback': 'warn',
-    'prefer-template': 'off',
-    'template-curly-spacing': ['error', 'never'],
-    'linebreak-style': ['error', 'unix'],
-    'newline-per-chained-call': 'off',
-    'no-lonely-if': 'off',
-    'new-cap': ['error', {'capIsNewExceptions': ['Deferred', '$.Event'], 'capIsNewExceptionPattern': 'Model$'}],
-    'no-multi-assign': 'error',
-    'no-unused-vars': 'off',
-    'require-jsdoc': 'off',
-    'no-plusplus': 'off',
-    'no-trailing-spaces': 'warn',
-    'space-before-function-paren': ['warn', {
-      'anonymous': 'never',
-      'named': 'never',
-      'asyncArrow': 'always'
-    }],
-    'curly': ['error', 'all'],
-    'eqeqeq': ['error', 'always', {'null': 'ignore'}],
-    'spaced-comment': ['warn', 'always', {'exceptions': ['*']}],
-    'valid-jsdoc': 'off'
-  }
+  overrides: [{
+    extends: ['plugin:@typescript-eslint/recommended', './common'],
+    plugins: ['@typescript-eslint'],
+    files: ['*.ts', '*.tsx'],
+    rules: {
+      '@typescript-eslint/ban-types': 'warn', // Change from error to warn
+      '@typescript-eslint/no-inferrable-types': 'warn', // Change from error to warn
+      '@typescript-eslint/ban-ts-comment': 'off', // Allow ts-ignore
+      '@typescript-eslint/no-unused-vars': 'off', // Allow unused parameters
+      'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}], // Allow triple slash directives
+      'semi': 'off', // Disable because it will be replaced by typescript rule below to avoid conflicting rules with semicolon in interfaces
+      '@typescript-eslint/semi': ['error'],
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/member-delimiter-style': 'warn', // Enforce semicolon for interface members for consistency,
+      '@typescript-eslint/no-this-alias': 'off', // Allow assigment of this to a variable, e.g. for better readability. 'That' and 'self' are not used often anymore.
+      'indent': 'off', // Disable because it will be replaced by the following ts rule
+      '@typescript-eslint/indent': ['error', 2, {'SwitchCase': 1, 'ignoredNodes': ['PropertyDefinition[decorators]']}], // Workarounds bug https://github.com/typescript-eslint/typescript-eslint/issues/1824. See also https://github.com/eslint/eslint/issues/15299#issuecomment-967762181
+      'linebreak-style': 'off',
+      '@typescript-eslint/prefer-ts-expect-error': 'warn',
+      '@typescript-eslint/no-empty-function': 'off'
+    }
+  }]
 };
