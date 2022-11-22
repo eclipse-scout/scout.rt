@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureWrapperCompositeId;
-import org.eclipse.scout.rt.dataobject.id.IdCodecTest.FixtureCompositeWithNullValuesId;
+import org.eclipse.scout.rt.dataobject.id.AbstractIdCodecTest.FixtureCompositeWithNullValuesId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;

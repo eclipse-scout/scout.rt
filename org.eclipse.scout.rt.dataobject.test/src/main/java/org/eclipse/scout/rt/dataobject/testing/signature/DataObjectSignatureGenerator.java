@@ -477,13 +477,17 @@ public class DataObjectSignatureGenerator {
       return box(VALUE_TYPE_ID_INTERFACE_PREFIX, idClass.getName());
     }
 
-    String idTypeName = BEANS.get(IdInventory.class).getTypeName(idClass);
+    String idTypeName = resolveIdTypeName(idClass);
     if (idTypeName == null) {
       m_errors.add(String.format("IId class '%s' is missing id type name (referenced in '%s')", idClass.getName(), getContextText(attributeName, containingEntityClass)));
       idTypeName = idClass.getName();
     }
 
     return box(VALUE_TYPE_ID_PREFIX, idTypeName);
+  }
+
+  protected String resolveIdTypeName(Class<? extends IId> idClass) {
+    return BEANS.get(IdInventory.class).getTypeName(idClass);
   }
 
   protected String processAttributeTypeDoEntity(String attributeName, Class<? extends IDoEntity> doEntityClass, Class<? extends IDoEntity> containingEntityClass) {

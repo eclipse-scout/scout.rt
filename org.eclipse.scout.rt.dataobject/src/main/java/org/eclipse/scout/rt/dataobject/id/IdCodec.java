@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Codec used to convert bewteen {@link IId} instances and their qualified/unqualified representation as {@link String}.
+ * Codec used to convert between {@link IId} instances and their qualified/unqualified representation as {@link String}.
  */
 @ApplicationScoped
 public class IdCodec {
@@ -141,12 +141,10 @@ public class IdCodec {
     if (idClass == null) {
       throw new PlatformException("Missing id class to parse unqualified id {}", unqualifiedId);
     }
-    if (unqualifiedId == null) {
+    if (StringUtility.isNullOrEmpty(unqualifiedId)) {
       return null;
     }
-    String[] rawComponents = unqualifiedId.split(";", -1 /* force empty strings for empty components */);
-    Object[] components = parseComponents(idClass, rawComponents);
-    return m_idFactory.get().createInternal(idClass, components);
+    return fromUnqualifiedUnchecked(idClass, unqualifiedId);
   }
 
   /**
@@ -164,6 +162,18 @@ public class IdCodec {
     //noinspection unchecked
     m_rawTypeToStringMapper.put(rawType, (Function<Object, String>) toStringMapper);
     m_rawTypeFromStringMapper.put(rawType, fromStringMapper);
+  }
+
+  /**
+   * Unregister type mapping between a string representation and the given {@code rawType}.
+   * <p>
+   * Note: The access to the type mapping data structure is not synchronized and therefore not thread safe. Use this
+   * method to set up the {@link IdCodec} instance directly after platform start and not to change the {@link IdCodec}
+   * behavior dynamically at runtime.
+   */
+  public void unregisterRawTypeMapper(Class<?> rawType) {
+    m_rawTypeToStringMapper.remove(rawType);
+    m_rawTypeFromStringMapper.remove(rawType);
   }
 
   // ---------------- helper methods ----------------
@@ -185,7 +195,7 @@ public class IdCodec {
    * @return {@code IId} parsed from {@code qualifiedId}
    */
   protected IId fromQualifiedInternal(String qualifiedId, boolean lenient) {
-    if (qualifiedId == null) {
+    if (StringUtility.isNullOrEmpty(qualifiedId)) {
       return null;
     }
     String[] tmp = qualifiedId.split(":", -1 /* force empty string as second part */);
@@ -208,6 +218,20 @@ public class IdCodec {
       }
     }
     return fromUnqualified(idClass, tmp[1]);
+  }
+
+  /**
+   * Parses a string in the format {@code [raw-id;raw-id;...]} assuming inputs were checked for null/empty values
+   * before.
+   *
+   * @return {@code IId} parsed from {@code qualifiedId} or {@code null} if the given class or string is {@code null}
+   * @throws PlatformException
+   *           if the given string does not match the expected format
+   */
+  protected <ID extends IId> ID fromUnqualifiedUnchecked(Class<ID> idClass, String unqualifiedId) {
+    String[] rawComponents = unqualifiedId.split(";", -1 /* force empty strings for empty components */);
+    Object[] components = parseComponents(idClass, rawComponents);
+    return m_idFactory.get().createInternal(idClass, components);
   }
 
   /**

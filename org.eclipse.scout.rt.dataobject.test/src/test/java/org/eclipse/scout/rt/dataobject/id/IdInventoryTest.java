@@ -15,6 +15,8 @@ import static org.junit.Assert.*;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Test;
 
 /**
@@ -43,5 +45,27 @@ public class IdInventoryTest {
     assertEquals("scout.FixtureUuId", m_inventory.getTypeName(FixtureUuId.of("3c5a66be-12b4-45c6-9e59-8c31cf92dcfb")));
     assertNull(m_inventory.getTypeName(FixtureLongId.of(100L)));
     assertNull(m_inventory.getTypeName((FixtureLongId) null));
+  }
+
+  @Test
+  public void testRegisterIdTypeName() {
+    assertNull(m_inventory.getTypeName(FixtureMockId.class));
+    assertNull(m_inventory.getTypeName(new FixtureMockId("foo")));
+
+    m_inventory.registerIdTypeName("scout.FixtureMockId", FixtureMockId.class);
+    assertEquals("scout.FixtureMockId", m_inventory.getTypeName(FixtureMockId.class));
+    assertEquals("scout.FixtureMockId", m_inventory.getTypeName(new FixtureMockId(("foo"))));
+
+    assertThrows(AssertionException.class, () -> m_inventory.registerIdTypeName("mockIdName", FixtureMockId.class));
+    assertThrows(AssertionException.class, () -> m_inventory.registerIdTypeName("scout.FixtureMockId", FixtureMockId.class));
+  }
+
+  @IgnoreBean
+  protected static final class FixtureMockId extends AbstractStringId {
+    private static final long serialVersionUID = 1L;
+
+    private FixtureMockId(String id) {
+      super(id);
+    }
   }
 }

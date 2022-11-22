@@ -40,15 +40,26 @@ public class IdInventory {
       assertNotNullOrEmpty(typeName, "Invalid value for @{} on {} (must not be null or empty)", IdTypeName.class.getSimpleName(), classInfo.resolveClass().getName());
       try {
         Class<? extends IId> idClass = classInfo.resolveClass().asSubclass(IId.class);
-        Class<? extends IId> registeredIdClass = m_nameToClassMap.put(typeName, idClass);
-        String registeredTypeName = m_classToNameMap.put(idClass, typeName);
-        checkDuplicateIdTypeNames(idClass, typeName, registeredIdClass, registeredTypeName);
+        registerIdTypeName(typeName, idClass);
       }
       catch (@SuppressWarnings("squid:S1166") ClassCastException e) {
         LOG.warn("Class {} is annotated with @{} but does not implement {}. Skipping class.", classInfo.resolveClass().getName(), IdTypeName.class.getSimpleName(), IId.class.getName());
       }
     }
     LOG.debug("Registered {} id types", m_nameToClassMap.size());
+  }
+
+  /**
+   * Register mapping between id class and its id-typename.
+   * <p>
+   * Note: The access to the type mapping data structure is not synchronized and therefore not thread safe. Use this
+   * method to set up the {@link IdInventory} instance directly after platform start and not to change the
+   * {@link IdInventory} behavior dynamically at runtime.
+   */
+  public void registerIdTypeName(String typeName, Class<? extends IId> idClass) {
+    Class<? extends IId> registeredIdClass = m_nameToClassMap.put(typeName, idClass);
+    String registeredTypeName = m_classToNameMap.put(idClass, typeName);
+    checkDuplicateIdTypeNames(idClass, typeName, registeredIdClass, registeredTypeName);
   }
 
   /**
