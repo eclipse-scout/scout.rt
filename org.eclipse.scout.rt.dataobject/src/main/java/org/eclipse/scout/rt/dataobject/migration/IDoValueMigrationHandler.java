@@ -21,6 +21,9 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
  * Interface for a data object value migration handler. In contrast to {@link IDoStructureMigrationHandler}, value
  * migration handlers must not change the structure of a data object, but can replace values of specific attributes.
  * <p>
+ * Value migrations are only applied if {@link DoValueMigrationIdsContextData#getAppliedValueMigrationIds()} is
+ * non-<code>null</code>.
+ * <p>
  * A value migration handler operates on typed values. Values can be of any type, typical use cases include merges,
  * replacements or renaming of built-in IDs (such as {@link IUuId}s. However, values can also be {@link IDoEntity} data
  * objects. Note that enum values from {@link IEnum} <i>cannot</i> be migrated with value migration handlers, but must
@@ -143,6 +146,17 @@ public interface IDoValueMigrationHandler<T> {
    * version foo-2.0.0 to make sure that M1 is applied <i>before</i> M2.
    */
   NamespaceVersion typeVersion();
+
+  /**
+   * This method is called in order to collect applicable value migration handlers before visiting a data object.
+   *
+   * @param ctx
+   *          Migration context with a non-<code>null</code>
+   *          {@link DoValueMigrationIdsContextData#getAppliedValueMigrationIds()}.
+   * @return <code>true</code> if value migration is accepted and therefore considered for execution, <code>false</code>
+   *         otherwise.
+   */
+  boolean accept(DoStructureMigrationContext ctx);
 
   /**
    * Returns the migrated value for a given input value.
