@@ -40,9 +40,8 @@ public class DoValueMigrationDataObjectVisitor extends AbstractReplacingDataObje
 
     Set<DoValueMigrationId> appliedValueMigrationIds = m_ctx.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds();
     assertNotNull(appliedValueMigrationIds, "Applied value migration IDs on context required.");
-    // ignore already applied value migrations
     m_valueMigrationHandlers = m_inventory.getValueMigrationHandlers().stream()
-        .filter(handler -> !appliedValueMigrationIds.contains(handler.id()))
+        .filter(handler -> handler.accept(ctx))
         .collect(Collectors.toList());
   }
 

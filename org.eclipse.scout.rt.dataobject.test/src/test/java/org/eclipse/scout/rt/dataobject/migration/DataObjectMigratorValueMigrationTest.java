@@ -10,8 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject.migration;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.*;
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoVal
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureStringId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypesFixture;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureAlwaysAcceptDoValueMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDoValueMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDo;
@@ -63,6 +64,7 @@ public class DataObjectMigratorValueMigrationTest {
         Arrays.asList(new HouseFixtureDoStructureMigrationHandler_3()),
         Arrays.asList(
             new PetFixtureDoValueMigrationHandler_3(),
+            new PetFixtureAlwaysAcceptDoValueMigrationHandler_3(),
             new RoomSizeFixtureDoValueMigrationHandler_2(),
             new RoomTypeFixtureDoValueMigrationHandler_2(),
             new HouseTypeFixtureDoValueMigrationHandler_2(),
@@ -72,8 +74,8 @@ public class DataObjectMigratorValueMigrationTest {
 
     s_migrationContext = BEANS.get(DoStructureMigrationContext.class)
         .putGlobal(BEANS.get(DoValueMigrationIdsContextData.class)
-            // by default, all value migrations are executed, except RoomSizeFixtureDoValueMigrationHandler_2
-            .withAppliedValueMigrationIds(CollectionUtility.hashSet(RoomSizeFixtureDoValueMigrationHandler_2.ID)));
+            // by default, all value migrations are executed, except RoomSizeFixtureDoValueMigrationHandler_2 (PetFixtureAlwaysAcceptDoValueMigrationHandler_3 always accepts)
+            .withAppliedValueMigrationIds(CollectionUtility.hashSet(PetFixtureAlwaysAcceptDoValueMigrationHandler_3.ID, RoomSizeFixtureDoValueMigrationHandler_2.ID)));
     s_migrator = BEANS.get(DoStructureMigrator.class);
   }
 
@@ -196,7 +198,7 @@ public class DataObjectMigratorValueMigrationTest {
   }
 
   /**
-   * Value migration handler for PetFixtureDo matches a generic DoValue<IDoEntity> node.
+   * Value migration handler for {@link PetFixtureDo} matches a generic DoValue<IDoEntity> node.
    */
   @Test
   public void testAssignableValueClass() {
@@ -213,6 +215,31 @@ public class DataObjectMigratorValueMigrationTest {
         .withName("example")
         .withCustomData(BEANS.get(PetFixtureDo.class)
             .withName("Fluffy")); // migrated from "Name: Fluffy" to "Fluffy" by PetFixtureDoValueMigrationHandler_3
+
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
+  }
+
+  /**
+   * Value migration handler for {@link PetFixtureDo} that always accepts (thus ignoring that already applied).
+   */
+  @Test
+  public void testAlwaysAcceptMigrationHandler() {
+    RoomFixtureDo original = BEANS.get(RoomFixtureDo.class)
+        .withName("example")
+        .withCustomData(BEANS.get(PetFixtureDo.class)
+            .withName("Nickname: Fluffy")); // Will be migrated by PetFixtureAlwaysAcceptDoValueMigrationHandler_3
+
+    // check that part of the set of applied value migration IDs
+    assertTrue(s_migrationContext.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds().contains(PetFixtureAlwaysAcceptDoValueMigrationHandler_3.ID));
+    DoStructureMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+
+    // executed even if already applied
+    assertTrue(result.isChanged());
+
+    RoomFixtureDo expected = BEANS.get(RoomFixtureDo.class)
+        .withName("example")
+        .withCustomData(BEANS.get(PetFixtureDo.class)
+            .withName("Fluffy")); // migrated from "Nickname: Fluffy" to "Fluffy" by PetFixtureAlwaysAcceptDoValueMigrationHandler_3
 
     assertEqualsWithComparisonFailure(expected, result.getDataObject());
   }
