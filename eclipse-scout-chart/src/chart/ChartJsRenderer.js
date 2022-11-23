@@ -1022,7 +1022,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
     let firstDataPoint = dataPoints[0],
-      chart = firstDataPoint[0].chart;
+      chart = firstDataPoint.chart;
     if (!chart.getDatasetMeta(firstDataPoint.datasetIndex).data[firstDataPoint.dataIndex]) {
       return;
     }
