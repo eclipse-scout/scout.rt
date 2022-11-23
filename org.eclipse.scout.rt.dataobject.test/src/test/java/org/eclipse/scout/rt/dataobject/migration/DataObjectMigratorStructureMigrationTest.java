@@ -10,8 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject.migration;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;

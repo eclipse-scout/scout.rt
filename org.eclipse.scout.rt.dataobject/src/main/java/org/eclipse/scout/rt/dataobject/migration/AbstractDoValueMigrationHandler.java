@@ -40,4 +40,13 @@ public abstract class AbstractDoValueMigrationHandler<T> implements IDoValueMigr
     // noinspection unchecked
     return TypeCastUtility.getGenericsParameterClass(this.getClass(), AbstractDoValueMigrationHandler.class);
   }
+
+  /**
+   * The default implementation will accept when this value migration wasn't applied already. Own implementations might
+   * choose to always accept (despite being already applied) or to not accept in case some context data is missing.
+   */
+  @Override
+  public boolean accept(DoStructureMigrationContext ctx) {
+    return !ctx.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds().contains(id());
+  }
 }
