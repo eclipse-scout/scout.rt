@@ -1,0 +1,65 @@
+{
+  "_type" : "TestDoMapDoMapEntity",
+  "_typeVersion" : "jacksonFixture-1.0.0",
+  "count" : 142,
+  "mapMap1" : {
+    "_type" : "TestDoMapEntity",
+    "_typeVersion" : "jacksonFixture-1.0.0",
+    "count" : 42,
+    "mapAttribute1" : {
+      "_type" : "TestItem",
+      "id" : "id-1",
+      "stringAttribute" : "value-1"
+    },
+    "mapAttribute2" : {
+      "_type" : "TestItem",
+      "id" : "id-2",
+      "stringAttribute" : "value-2"
+    },
+    "namedItem" : {
+      "_type" : "TestItem",
+      "id" : "namedItem",
+      "stringAttribute" : "value-named"
+    },
+    "namedItem3" : {
+      "_type" : "TestItem3",
+      "bigDecimalAttribute" : 42,
+      "id" : "namedItem3"
+    }
+  },
+  "mapMap2" : {
+    "_type" : "TestDoMapEntity",
+    "_typeVersion" : "jacksonFixture-1.0.0",
+    "count" : 42,
+    "mapAttribute1" : {
+      "_type" : "TestItem",
+      "id" : "id-1",
+      "stringAttribute" : "value-1"
+    },
+    "mapAttribute2" : {
+      "_type" : "TestItem",
+      "id" : "id-2",
+      "stringAttribute" : "value-2"
+    },
+    "namedItem" : {
+      "_type" : "TestItem",
+      "id" : "namedItem",
+      "stringAttribute" : "value-named"
+    },
+    "namedItem3" : {
+      "_type" : "TestItem3",
+      "bigDecimalAttribute" : 42,
+      "id" : "namedItem3"
+    }
+  },
+  "namedItem" : {
+    "_type" : "TestItem",
+    "id" : "namedItemInMap",
+    "stringAttribute" : "value-named-in-map"
+  },
+  "namedItem3" : {
+    "_type" : "TestItem3",
+    "bigDecimalAttribute" : 420,
+    "id" : "namedItem3"
+  }
+}
