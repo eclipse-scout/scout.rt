@@ -1,0 +1,29 @@
+{
+  "_type" : "TestDoMapDoMapString",
+  "_typeVersion" : "jacksonFixture-1.0.0",
+  "count" : 142,
+  "mapMap1" : {
+    "_type" : "TestDoMapString",
+    "_typeVersion" : "jacksonFixture-1.0.0",
+    "count" : 42,
+    "mapAttribute1" : "foo",
+    "mapAttribute2" : "bar"
+  },
+  "mapMap2" : {
+    "_type" : "TestDoMapString",
+    "_typeVersion" : "jacksonFixture-1.0.0",
+    "count" : 13,
+    "mapAttribute1" : "baz",
+    "mapAttribute2" : "buz"
+  },
+  "namedItem" : {
+    "_type" : "TestItem",
+    "id" : "namedItemInMap",
+    "stringAttribute" : "value-named-in-map"
+  },
+  "namedItem3" : {
+    "_type" : "TestItem3",
+    "bigDecimalAttribute" : 420,
+    "id" : "namedItem3"
+  }
+}

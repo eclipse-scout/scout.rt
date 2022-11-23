@@ -71,8 +71,12 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCurrencyDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDateDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapDoMapEntityDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapDoMapStringDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapListEntityDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapObjectDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapStringDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoValuePojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDuplicatedAttributeDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestElectronicAddressDo;
@@ -1808,6 +1812,24 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ DoMapEntity test cases ------------------------------------
 
   @Test
+  public void testSerializeDeserialize_DoMapString() throws Exception {
+    TestDoMapStringDo mapDo = BEANS.get(TestDoMapStringDo.class);
+    mapDo.put("mapAttribute1", "foo");
+    mapDo.put("mapAttribute2", "bar");
+    mapDo.withCount(42);
+
+    String json = s_dataObjectMapper.writeValueAsString(mapDo);
+    assertJsonEquals("TestDoMapStringDo.json", json);
+
+    TestDoMapStringDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapStringDo.class);
+    assertEqualsWithComparisonFailure(mapDo, marshalled);
+
+    assertEquals("foo", marshalled.get("mapAttribute1"));
+    assertEquals("bar", marshalled.get("mapAttribute2"));
+    assertEquals(Integer.valueOf(42), marshalled.getCount());
+  }
+
+  @Test
   public void testSerializeDeserialize_DoMapEntity() throws Exception {
     TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
     mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
@@ -1825,6 +1847,53 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
     assertEquals("value-named", marshalled.get("namedItem").getStringAttribute());
     assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoMapObject_DoEntity() throws Exception {
+    TestDoMapObjectDo mapDo = BEANS.get(TestDoMapObjectDo.class);
+    mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
+    mapDo.put("mapAttribute2", createTestItemDo("id-2", "value-2"));
+    mapDo.withCount(42);
+    mapDo.withNamedItem(createTestItemDo("namedItem", "value-named"));
+    mapDo.withNamedItem3(createTestItem3Do("namedItem3", new BigDecimal("42")));
+
+    String json = s_dataObjectMapper.writeValueAsString(mapDo);
+    assertJsonEquals("TestDoMapObject_DoEntityDo.json", json);
+
+    TestDoMapObjectDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapObjectDo.class);
+    assertEqualsWithComparisonFailure(mapDo, marshalled);
+
+    assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
+    assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
+    assertEquals(Integer.valueOf(42), marshalled.getCount());
+
+    assertEquals("value-1", marshalled.get("mapAttribute1", TestItemDo.class).getStringAttribute());
+    assertEquals("id-2", marshalled.get("mapAttribute2", TestItemDo.class).getId());
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoMapObject_ListEntity() throws Exception {
+    TestDoMapObjectDo mapDo = BEANS.get(TestDoMapObjectDo.class);
+    mapDo.putList("mapAttribute1", List.of(createTestItemDo("id-1", "value-1"), createTestItemDo("id-2", "value-2")));
+    mapDo.withCount(42);
+    mapDo.withNamedItem(createTestItemDo("namedItem", "value-named"));
+    mapDo.withNamedItem3(createTestItem3Do("namedItem3", new BigDecimal("42")));
+
+    String json = s_dataObjectMapper.writeValueAsString(mapDo);
+    assertJsonEquals("TestDoMapObject_ListEntityDo.json", json);
+
+    TestDoMapObjectDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapObjectDo.class);
+    assertEqualsWithComparisonFailure(mapDo, marshalled);
+
+    assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
+    assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
+    assertEquals(Integer.valueOf(42), marshalled.getCount());
+
+    @SuppressWarnings("unchecked")
+    List<TestItemDo> attribute1 = (List<TestItemDo>) marshalled.get("mapAttribute1", List.class);
+    assertEquals("value-1", attribute1.get(0).getStringAttribute());
+    assertEquals("id-2", attribute1.get(1).getId());
   }
 
   @Test
@@ -1905,6 +1974,68 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("value-1a", marshalled.get("mapAttribute1").get(0).getStringAttribute());
     assertEquals("value-2b", marshalled.get("mapAttribute2").get(1).getStringAttribute());
     assertEquals(Integer.valueOf(42), marshalled.getCount());
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoMapDoMapString() throws Exception {
+    TestDoMapStringDo mapDo = BEANS.get(TestDoMapStringDo.class);
+    mapDo.put("mapAttribute1", "foo");
+    mapDo.put("mapAttribute2", "bar");
+    mapDo.withCount(42);
+
+    TestDoMapStringDo map2Do = BEANS.get(TestDoMapStringDo.class);
+    map2Do.put("mapAttribute1", "baz");
+    map2Do.put("mapAttribute2", "buz");
+    map2Do.withCount(13);
+
+    TestDoMapDoMapStringDo mapMapDo = BEANS.get(TestDoMapDoMapStringDo.class);
+    mapMapDo.put("mapMap1", mapDo);
+    mapMapDo.put("mapMap2", map2Do);
+    mapMapDo.withCount(142);
+    mapMapDo.withNamedItem(createTestItemDo("namedItemInMap", "value-named-in-map"));
+    mapMapDo.withNamedItem3(createTestItem3Do("namedItem3", new BigDecimal("420")));
+
+    String json = s_dataObjectMapper.writeValueAsString(mapMapDo);
+    assertJsonEquals("TestDoMapDoMapStringDo.json", json);
+
+    TestDoMapDoMapStringDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapDoMapStringDo.class);
+    assertEqualsWithComparisonFailure(mapMapDo, marshalled);
+
+    assertEquals("value-named-in-map", marshalled.getNamedItem().getStringAttribute());
+    assertEquals(mapDo, marshalled.get("mapMap1"));
+    assertEquals(map2Do, marshalled.get("mapMap2"));
+    assertEquals("foo", marshalled.get("mapMap1").get("mapAttribute1"));
+    assertEquals("buz", marshalled.get("mapMap2").get("mapAttribute2"));
+    assertEquals(new BigDecimal("420"), marshalled.getNamedItem3().getBigDecimalAttribute());
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoMapDoMapEntity() throws Exception {
+    TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
+    mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
+    mapDo.put("mapAttribute2", createTestItemDo("id-2", "value-2"));
+    mapDo.withCount(42);
+    mapDo.withNamedItem(createTestItemDo("namedItem", "value-named"));
+    mapDo.withNamedItem3(createTestItem3Do("namedItem3", new BigDecimal("42")));
+
+    TestDoMapDoMapEntityDo mapMapDo = BEANS.get(TestDoMapDoMapEntityDo.class);
+    mapMapDo.put("mapMap1", mapDo);
+    mapMapDo.put("mapMap2", mapDo);
+    mapMapDo.withCount(142);
+    mapMapDo.withNamedItem(createTestItemDo("namedItemInMap", "value-named-in-map"));
+    mapMapDo.withNamedItem3(createTestItem3Do("namedItem3", new BigDecimal("420")));
+
+    String json = s_dataObjectMapper.writeValueAsString(mapMapDo);
+    assertJsonEquals("TestDoMapDoMapEntityDo.json", json);
+
+    TestDoMapDoMapEntityDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapDoMapEntityDo.class);
+    assertEqualsWithComparisonFailure(mapMapDo, marshalled);
+
+    assertEquals("value-named-in-map", marshalled.getNamedItem().getStringAttribute());
+    assertEquals(mapDo, marshalled.get("mapMap1"));
+    assertEquals(mapDo, marshalled.get("mapMap2"));
+    assertEquals("value-named", marshalled.get("mapMap1").get("namedItem").getStringAttribute());
+    assertEquals(new BigDecimal("420"), marshalled.getNamedItem3().getBigDecimalAttribute());
   }
 
   // ------------------------------------ polymorphic test cases ------------------------------------

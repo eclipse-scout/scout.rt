@@ -17,9 +17,9 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
 
-@TypeName("TestDoMapEntity")
+@TypeName("TestDoMapObject")
 @TypeVersion(JacksonFixtureTypeVersions.JacksonFixture_1_0_0.class)
-public class TestDoMapEntityDo extends DoMapEntity<TestItemDo> {
+public class TestDoMapObjectDo extends DoMapEntity<Object> {
 
   public DoValue<Integer> count() {
     return doValue("count");
@@ -38,7 +38,7 @@ public class TestDoMapEntityDo extends DoMapEntity<TestItemDo> {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestDoMapEntityDo withCount(Integer count) {
+  public TestDoMapObjectDo withCount(Integer count) {
     count().set(count);
     return this;
   }
@@ -49,7 +49,7 @@ public class TestDoMapEntityDo extends DoMapEntity<TestItemDo> {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestDoMapEntityDo withNamedItem(TestItemDo namedItem) {
+  public TestDoMapObjectDo withNamedItem(TestItemDo namedItem) {
     namedItem().set(namedItem);
     return this;
   }
@@ -60,7 +60,7 @@ public class TestDoMapEntityDo extends DoMapEntity<TestItemDo> {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestDoMapEntityDo withNamedItem3(TestItem3Do namedItem3) {
+  public TestDoMapObjectDo withNamedItem3(TestItem3Do namedItem3) {
     namedItem3().set(namedItem3);
     return this;
   }

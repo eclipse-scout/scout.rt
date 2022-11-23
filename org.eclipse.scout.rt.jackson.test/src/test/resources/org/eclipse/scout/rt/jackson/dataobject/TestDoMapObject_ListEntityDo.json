@@ -1,17 +1,16 @@
 {
-  "_type" : "TestDoMapEntity",
+  "_type" : "TestDoMapObject",
   "_typeVersion" : "jacksonFixture-1.0.0",
   "count" : 42,
-  "mapAttribute1" : {
+  "mapAttribute1" : [ {
     "_type" : "TestItem",
     "id" : "id-1",
     "stringAttribute" : "value-1"
-  },
-  "mapAttribute2" : {
+  }, {
     "_type" : "TestItem",
     "id" : "id-2",
     "stringAttribute" : "value-2"
-  },
+  } ],
   "namedItem" : {
     "_type" : "TestItem",
     "id" : "namedItem",
