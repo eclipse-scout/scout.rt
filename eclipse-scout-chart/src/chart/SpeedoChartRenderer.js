@@ -93,16 +93,14 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     this.widthOfSegmentWithGap = this.segmentWidth + SpeedoChartRenderer.SEGMENT_GAP;
 
     // pointer value in range [0,1]
-    let valuePercentage = this._limitValue((value - minValue) / (maxValue - minValue), 1);
+    let valuePercentage = this._getValuePercentage(value, minValue, maxValue);
 
-    // part for the value
-    let partForValue = this._getPartForValue(valuePercentage);
-
-    // value in the range [0,numTotalSegments - 1] rounded to one segment, limit by the last segment in the part for the value
-    let segmentToPointAt = this._limitValue(Math.round(valuePercentage * numTotalGaps), (partForValue + 1) * this.numSegmentsPerPart - 1);
+    // value in the range [0,numTotalSegments - 1] rounded to one segment
+    let segmentToPointAt = this._getSegmentToPointAt(valuePercentage, numTotalSegments);
 
     // value rounded to the closest segment so that the pointer never stays "in between" two segments but always on a segment
-    let valuePercentageRounded = this._getPercentageValueOfSegment(segmentToPointAt % this.numSegmentsPerPart, partForValue);
+    let valuePercentageRounded = this._getPercentageValueOfSegment(segmentToPointAt % this.numSegmentsPerPart,
+      this._getPartForValue(valuePercentage));
 
     for (let i = 0; i < this.parts; i++) {
       this._renderCirclePart(i);
@@ -115,6 +113,14 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     if (this.chart.config.options.clickable) {
       this.$svg.on('click', this._createClickObject(null, null), this.chart._onValueClick.bind(this.chart));
     }
+  }
+
+  _getValuePercentage(value, minValue, maxValue) {
+    return this._limitValue((value - minValue) / (maxValue - minValue), 1);
+  }
+
+  _getSegmentToPointAt(valuePercentage, numTotalSegments) {
+    return this._limitValue(Math.floor(valuePercentage * numTotalSegments), numTotalSegments - 1);
   }
 
   _limitValue(value, maxValue) {
