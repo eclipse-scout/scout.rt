@@ -255,7 +255,8 @@ export default class Chart extends Widget {
    */
   updateChart(opts) {
     opts = opts || {};
-    opts.enforceRerender = !opts.onlyUpdateData && !opts.onlyRefresh;
+    opts.onlyUpdateData = opts.onlyUpdateData && this.chartRenderer && this.chartRenderer.isDataUpdatable();
+    opts.enforceRerender = !opts.onlyUpdateData;
 
     // Cancel previously scheduled update and merge opts
     if (this._updateChartTimeoutId) {
@@ -307,7 +308,7 @@ export default class Chart extends Widget {
           this.chartRenderer.render(opts.requestAnimation);
           this.trigger('chartRender');
         });
-      } else if (opts.onlyUpdateData && this.chartRenderer.isDataUpdatable()) {
+      } else if (opts.onlyUpdateData) {
         this.chartRenderer.updateData(opts.requestAnimation);
       }
     }

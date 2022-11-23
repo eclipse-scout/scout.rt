@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -95,12 +95,14 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     // pointer value in range [0,1]
     let valuePercentage = this._limitValue((value - minValue) / (maxValue - minValue), 1);
 
-    // value in the range [0,1] rounded to one segment
-    let segmentToPointAt = Math.round(valuePercentage * numTotalGaps);
+    // part for the value
+    let partForValue = this._getPartForValue(valuePercentage);
+
+    // value in the range [0,numTotalSegments - 1] rounded to one segment, limit by the last segment in the part for the value
+    let segmentToPointAt = this._limitValue(Math.round(valuePercentage * numTotalGaps), (partForValue + 1) * this.numSegmentsPerPart - 1);
 
     // value rounded to the closest segment so that the pointer never stays "in between" two segments but always on a segment
-    let valuePercentageRounded = this._getPercentageValueOfSegment(segmentToPointAt % this.numSegmentsPerPart,
-      this._getPartForValue(valuePercentage));
+    let valuePercentageRounded = this._getPercentageValueOfSegment(segmentToPointAt % this.numSegmentsPerPart, partForValue);
 
     for (let i = 0; i < this.parts; i++) {
       this._renderCirclePart(i);
