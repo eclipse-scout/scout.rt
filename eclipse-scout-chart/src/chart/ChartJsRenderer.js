@@ -1021,6 +1021,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (dataPoints.length < 1) {
       return;
     }
+    let firstDataPoint = dataPoints[0],
+      chart = firstDataPoint[0].chart;
+    if (!chart.getDatasetMeta(firstDataPoint.datasetIndex).data[firstDataPoint.dataIndex]) {
+      return;
+    }
     if (this._tooltip) {
       this._tooltip.destroy();
       this._tooltip = null;
@@ -1042,7 +1047,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       tooltipText += arrays.ensure(tooltipItems(dataPoints, tooltipLabel, tooltipLabelValue, tooltipColor)).join('');
     }
 
-    let positionAndOffset = this._computeTooltipPositionAndOffset(dataPoints[0]),
+    let positionAndOffset = this._computeTooltipPositionAndOffset(firstDataPoint),
       origin = graphics.offsetBounds(this.$canvas);
     origin.x += tooltip.caretX + positionAndOffset.offsetX;
     origin.y += tooltip.caretY + positionAndOffset.offsetY;
