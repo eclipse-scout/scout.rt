@@ -201,6 +201,10 @@ module.exports = (env, args) => {
         // Use external source maps in all modes because the browser is very slow in displaying a file containing large lines which is the case if source maps are inlined
         filename: '[file].map',
 
+        // Don't create maps for static resources.
+        // They may already have maps which could lead to "multiple assets emit different content to the same file" exception.
+        exclude: /\/res\/.*/,
+
         // In production mode create external source maps without source code to map stack traces.
         // Otherwise, stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
         noSources: !devMode,
