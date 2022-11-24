@@ -1,0 +1,53 @@
+/**
+ * Note: This file is not a well-formed JSON file according to RFC 4627 because of the comments.
+ * You can remove the comments (and thus create a compliant JSON file again) with
+ * JsonUtility.stripJsonComments(). If the file is served by StaticResourceRequestInterceptor,
+ * this is done automatically.
+ */
+{
+  /* *** Default value definitions *** */
+  /* (Note: Array values are always tested without considering the order) */
+  "defaults": {
+    "Chart": {
+      "~data": {
+        "axes": []
+      },
+      "~config": {
+        "~options": {
+          "autoColor": true,
+          "maxSegments": 5,
+          "clickable": false,
+          "~animation": {
+            "duration": 600
+          },
+          "~plugins": {
+            "~legend": {
+              "display": true,
+              "position": "right"
+            }
+          }
+        }
+      }
+    },
+    "ChartTableControl": {
+      "chartType": 3,
+      "chartAggregation": {
+        "modifier": -1
+      }
+    }
+  },
+  /* *** Object type hierarchy *** */
+  "objectTypeHierarchy": {
+    "Widget": {
+      "Chart": null,
+      "FormField": {
+        "ChartField": null
+      },
+      "Action": {
+        "TableControl": {
+          "ChartTableControl": null
+        }
+      }
+    }
+  }
+}

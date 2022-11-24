@@ -11,6 +11,7 @@
     // Model adapters
     "Widget": {
       "enabled": true,
+      "visible": true,
       "loading": false,
       "inheritAccessibility": true
     },
@@ -18,7 +19,6 @@
       "currentMenuTypes": [],
       "disabledStyle": 0,
       "fieldStyle": "alternative",
-      "visible": true,
       "keyStrokes": [],
       "labelVisible": true,
       "labelPosition": 0,
@@ -62,7 +62,6 @@
       "statusMenuMappings": []
     },
     "Action": {
-      "visible": true,
       "selected": false,
       "horizontalAlignment": -1,
       "toggleAction": false,
