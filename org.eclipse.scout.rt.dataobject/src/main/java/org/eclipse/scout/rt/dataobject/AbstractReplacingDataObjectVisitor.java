@@ -151,10 +151,20 @@ public abstract class AbstractReplacingDataObjectVisitor extends AbstractDataObj
   /**
    * Default implementation only visits and doesn't replace <code>o</code> by a new value.
    * <p>
-   * Subclasses must make sure to call visit (i.e. via super call) if object isn't replaced.
+   * Subclasses must make sure to execute the super call if object isn't replaced because implementation will take care
+   * of handling visitor extensions too.
    */
   @SuppressWarnings("unchecked")
   protected <OT> OT replaceOrVisit(OT o) {
+    if (o != null) {
+      //noinspection unchecked
+      IDataObjectVisitorExtension<Object> visitorExtension = m_inventory.getVisitorExtension((Class<Object>) o.getClass());
+      if (visitorExtension != null) {
+        // Call visitor extension if there is a custom implementation for the given class
+        return (OT) visitorExtension.replaceOrVisit(o, this::replaceOrVisit);
+      }
+    }
+
     visit(o);
     return o;
   }

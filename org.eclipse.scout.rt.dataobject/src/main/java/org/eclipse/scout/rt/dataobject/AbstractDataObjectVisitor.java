@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import org.eclipse.scout.rt.platform.BEANS;
+
 /**
  * Helper class to visit {@link IDataObject}s. By intention no methods are public and sub classes must provide public
  * methods. Usually {@link #visit(Object)} is called.
@@ -22,6 +24,8 @@ import java.util.function.Consumer;
  * {@link DataObjectVisitors} will be in most cases sufficient.
  */
 public abstract class AbstractDataObjectVisitor {
+
+  protected final DataObjectInventory m_inventory = BEANS.get(DataObjectInventory.class);
 
   protected void visit(Object o) {
     if (o == null) {
@@ -47,7 +51,7 @@ public abstract class AbstractDataObjectVisitor {
       caseNode((DoCollection<?>) o, this::caseDoCollection);
     }
     else {
-      caseNode(o, this::caseObject);
+      caseNode(o, this::caseObjectWithExtension);
     }
   }
 
@@ -69,6 +73,7 @@ public abstract class AbstractDataObjectVisitor {
   }
 
   protected void caseDoEntity(IDoEntity entity) {
+    applyVisitorExtension(entity);
     caseDoEntityNodes(entity.allNodes().values());
     caseDoEntityContributions(entity.getContributions());
   }
@@ -116,6 +121,24 @@ public abstract class AbstractDataObjectVisitor {
   protected void caseDoCollection(DoCollection<?> doCollection) {
     for (Object o : doCollection) {
       visit(o);
+    }
+  }
+
+  protected void caseObjectWithExtension(Object o) {
+    applyVisitorExtension(o);
+    caseObject(o);
+  }
+
+  protected void applyVisitorExtension(Object o) {
+    if (o == null) {
+      return; // should never be null, but just in case, e.g. if called from subclasses with a null value
+    }
+
+    //noinspection unchecked
+    IDataObjectVisitorExtension<Object> visitorExtension = m_inventory.getVisitorExtension((Class<Object>) o.getClass());
+    if (visitorExtension != null) {
+      // Call visitor extension if there is a custom implementation for the given class
+      visitorExtension.visit(o, this::visit);
     }
   }
 

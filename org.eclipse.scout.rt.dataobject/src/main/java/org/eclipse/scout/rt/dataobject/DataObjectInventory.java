@@ -83,6 +83,11 @@ public class DataObjectInventory {
    */
   private final Map<Class<? extends IDoEntity>, Set<Class<? extends IDoEntityContribution>>> m_containerClassToContributionClasses = new HashMap<>();
 
+  /**
+   * Map of a class to its {@link IDataObjectVisitorExtension} used with data object visitors.
+   */
+  private final Map<Class<?>, IDataObjectVisitorExtension<?>> m_visitorExtensions = new HashMap<>();
+
   @PostConstruct
   protected void init() {
     ClassInventory.get()
@@ -105,6 +110,9 @@ public class DataObjectInventory {
 
     validateTypeVersionImplementors();
     validateTypeVersionRequired();
+
+    //noinspection unchecked
+    BEANS.all(IDataObjectVisitorExtension.class).forEach(this::registerVisitorExtension);
 
     LOG.info("Registry initialized, found {} {} implementations with @{} annotation and {} implementations with @{} annotation.",
         m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName(),
@@ -367,6 +375,16 @@ public class DataObjectInventory {
   }
 
   /**
+   * Adds visitor extension to registry based on its value class.
+   */
+  protected void registerVisitorExtension(IDataObjectVisitorExtension<?> visitorExtension) {
+    // method is called according to bean manager order, do not override existing entries within the visitor extension map (putIfAbsent).
+    Class<?> valueClass = visitorExtension.valueClass();
+    m_visitorExtensions.putIfAbsent(valueClass, visitorExtension);
+    ClassInventory.get().getAllKnownSubClasses(valueClass).forEach(classInfo -> m_visitorExtensions.putIfAbsent(classInfo.resolveClass(), visitorExtension));
+  }
+
+  /**
    * Checks for {@link IDoEntity} classes with duplicated {@link TypeName} annotation values.
    */
   protected void checkDuplicateClassMapping(Class<?> clazz, String name, String existingName, Class<? extends IDoEntity> existingClass) {
@@ -432,5 +450,14 @@ public class DataObjectInventory {
       return Optional.ofNullable(accessor.getAnnotation(ValueFormat.class).pattern());
     }
     return Optional.empty();
+  }
+
+  /**
+   * @return Visitor extension for the given class, or <code>null</code> if none is registered.
+   */
+  // only used internally by visitor, thus protected
+  protected <T> IDataObjectVisitorExtension<T> getVisitorExtension(Class<T> valueClass) {
+    //noinspection unchecked
+    return (IDataObjectVisitorExtension<T>) m_visitorExtensions.get(valueClass);
   }
 }
