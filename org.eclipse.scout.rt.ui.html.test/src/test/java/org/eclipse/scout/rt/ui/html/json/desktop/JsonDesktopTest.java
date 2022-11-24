@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -326,7 +326,7 @@ public class JsonDesktopTest {
     data[1] = events.get(1).getData();
     assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data[0].getString("uri")); // counter = 0 first for test run
     assertEquals("dynamic/" + m_uiSession.getUiSessionId()
-        + "/2/1/TP6%20ARL%20%3B%20Zulassung%20%28UVV%29%20-%20Bearbeitung%20elektr.%20Fax-Eingang%20%5B-8874%20%2C%20ABC-Pr%C3%BCfbericht%5D%20%281%29.pdf", data[1].getString("uri")); // counter = 1 second for test run
+        + "/2/1/TP6%20ARL%20%20Zulassung%20%28UVV%29%20-%20Bearbeitung%20elektr.%20Fax-Eingang%20%5B-8874%20%2C%20ABC-Pr%C3%BCfbericht%5D%20%281%29.pdf", data[1].getString("uri")); // counter = 1 second for test run
     assertEquals("download", data[0].getString("action"));
     assertEquals("download", data[1].getString("action"));
 
