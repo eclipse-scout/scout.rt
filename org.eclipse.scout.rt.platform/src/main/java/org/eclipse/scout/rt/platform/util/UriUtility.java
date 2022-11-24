@@ -96,10 +96,7 @@ public final class UriUtility {
       if (StringUtility.isNullOrEmpty(param)) {
         continue;
       }
-      String[] parts = StringUtility.split(param, "=");
-      if (parts.length > 2) {
-        throw new ProcessingException("invalid query parameter: '" + param + "'");
-      }
+      String[] parts = StringUtility.split(param, "=", 2);
       String key = decode(parts[0], encoding);
       String value = parts.length < 2 ? "" : decode(parts[1], encoding);
       String existingMapping = result.put(key, value);
