@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 public class DoStructureMigrationDataObjectVisitor extends AbstractDataObjectVisitor {
 
   protected final DoStructureMigrationHelper m_helper;
-  protected final DataObjectMigrationInventory m_inventory;
+  protected final DataObjectMigrationInventory m_migrationInventory;
 
   protected final DataObjectMigrationContext m_ctx;
   protected final NamespaceVersion m_version;
@@ -37,12 +37,12 @@ public class DoStructureMigrationDataObjectVisitor extends AbstractDataObjectVis
 
   public DoStructureMigrationDataObjectVisitor(DataObjectMigrationContext ctx, NamespaceVersion version) {
     m_helper = BEANS.get(DoStructureMigrationHelper.class);
-    m_inventory = BEANS.get(DataObjectMigrationInventory.class);
+    m_migrationInventory = BEANS.get(DataObjectMigrationInventory.class);
 
     m_ctx = ctx;
     m_version = version;
 
-    m_migrationHandlerPerTypeName = m_inventory.getStructureMigrationHandlers(version);
+    m_migrationHandlerPerTypeName = m_migrationInventory.getStructureMigrationHandlers(version);
   }
 
   public boolean isChanged() {
@@ -71,7 +71,7 @@ public class DoStructureMigrationDataObjectVisitor extends AbstractDataObjectVis
 
   protected List<IDoStructureMigrationTargetContextData> pushLocalContextData(IDoEntity doEntity) {
     List<IDoStructureMigrationTargetContextData> localContextDataList = new ArrayList<>();
-    Set<Class<? extends IDoStructureMigrationTargetContextData>> contextDataClasses = m_inventory.getStructureMigrationTargetContextDataClasses(doEntity);
+    Set<Class<? extends IDoStructureMigrationTargetContextData>> contextDataClasses = m_migrationInventory.getStructureMigrationTargetContextDataClasses(doEntity);
     for (Class<? extends IDoStructureMigrationTargetContextData> contextDataClass : contextDataClasses) {
       IDoStructureMigrationTargetContextData contextValue = BEANS.get(contextDataClass);
       if (contextValue.initialize(m_ctx, doEntity)) {
