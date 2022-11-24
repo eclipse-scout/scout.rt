@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.scout.rt.dataobject.fixture.AbstractLoremFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.BiCompositeFixtureObject;
+import org.eclipse.scout.rt.dataobject.fixture.BiCompositeFixtureObjectDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_034;
@@ -29,11 +31,14 @@ import org.eclipse.scout.rt.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureInvalidTypeNameDo;
 import org.eclipse.scout.rt.dataobject.fixture.FirstSimpleContributionFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.IInterfaceFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.IdAsStringFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.InterfaceContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.Lorem1FixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.Lorem2FixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.LoremAbstractContributionFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.MyBiCompositeFixtureObject;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectFixtureDo;
@@ -41,6 +46,8 @@ import org.eclipse.scout.rt.dataobject.fixture.ProjectSubFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ScoutFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SecondSimpleContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.TriCompositeFixtureObject;
+import org.eclipse.scout.rt.dataobject.fixture.TriCompositeFixtureObjectDataObjectVisitorExtension;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -93,6 +100,8 @@ public class DataObjectInventoryTest {
     m_inventory.registerClassByTypeName(DateFixtureDo.class);
     m_inventory.registerClassByTypeName(TestFixtureEntityDo.class);
     m_inventory.registerClassByTypeName(EntityFixtureInvalidTypeNameDo.class);
+    m_inventory.registerVisitorExtension(new TriCompositeFixtureObjectDataObjectVisitorExtension()); // must be registered before the Bi visitor extension (Tri is a subclass of Bi)
+    m_inventory.registerVisitorExtension(new BiCompositeFixtureObjectDataObjectVisitorExtension());
   }
 
   @Test
@@ -304,5 +313,21 @@ public class DataObjectInventoryTest {
     assertEquals(CollectionUtility.hashSet(LoremAbstractContributionFixtureDo.class), inv.getAllContributionClasses(AbstractLoremFixtureDo.class));
     assertEquals(CollectionUtility.hashSet(LoremAbstractContributionFixtureDo.class), inv.getAllContributionClasses(Lorem1FixtureDo.class));
     assertEquals(CollectionUtility.hashSet(LoremAbstractContributionFixtureDo.class), inv.getAllContributionClasses(Lorem2FixtureDo.class));
+  }
+
+  @Test
+  public void testVisitorExtension() {
+    assertNull(m_inventory.getVisitorExtension(FixtureStringId.class));
+
+    assertNotNull(m_inventory.getVisitorExtension(BiCompositeFixtureObject.class));
+    assertEquals(BiCompositeFixtureObjectDataObjectVisitorExtension.class, m_inventory.getVisitorExtension(BiCompositeFixtureObject.class).getClass());
+
+    assertNotNull(m_inventory.getVisitorExtension(MyBiCompositeFixtureObject.class));
+    assertEquals(BiCompositeFixtureObjectDataObjectVisitorExtension.class, m_inventory.getVisitorExtension(MyBiCompositeFixtureObject.class).getClass());
+
+    assertNotNull(m_inventory.getVisitorExtension(TriCompositeFixtureObject.class));
+    assertEquals(TriCompositeFixtureObjectDataObjectVisitorExtension.class, m_inventory.getVisitorExtension(TriCompositeFixtureObject.class).getClass());
+
+    assertNull(m_inventory.getVisitorExtension(IdAsStringFixtureDo.class)); // not registered
   }
 }
