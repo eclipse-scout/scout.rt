@@ -31,7 +31,17 @@ const webpackYargsOptions = {
   boolean: ['progress', 'profile', 'clean'],
   array: ['resDirArray', 'themes']
 };
+const buildYargsOptions = {
+  array: ['run'],
+  default: {run: []}
+};
 const karmaYargsOptions = prepareWebpackYargsOptionsForKarma();
+
+let buildArgs = parser(argv, buildYargsOptions);
+if (buildArgs.run.length > 1) {
+  runBuilds(buildArgs);
+  return;
+}
 
 switch (script) {
   case 'test-server:start': {
@@ -79,6 +89,20 @@ switch (script) {
   default:
     console.log(`Unknown script "${script}"`);
     break;
+}
+
+function runBuilds(args) {
+  const execSync = require('child_process').execSync;
+  let argStr = '';
+  for (let [key, value] of Object.entries(args)) {
+    if (key !== 'run' && key !== '_') {
+      argStr += `--${key} ${value} `;
+    }
+  }
+  for (let type of args.run) {
+    console.log(`Starting ${type} build` + (argStr ? ` with args ${argStr}` : ''));
+    execSync(`scout-scripts ${script} --run ${type} ${argStr}`, {stdio: 'inherit'});
+  }
 }
 
 function runKarma(configFileName, headless, args) {

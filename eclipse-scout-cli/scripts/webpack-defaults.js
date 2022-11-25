@@ -255,7 +255,6 @@ module.exports = (env, args) => {
 
 /**
  * @param {object} [options]
- * @param {boolean} [options.clean] Instruct the AfterEmitWebpackPlugin to clean the output. Default is true.
  * @param {boolean} [options.externalizeDevDeps] Add devDependencies as externals. Default is false.
  */
 function libraryConfig(config, options = {}) {
@@ -270,19 +269,13 @@ function libraryConfig(config, options = {}) {
     globalDependencies['jquery'] = 'commonjs jquery';
   }
 
-  let plugins = config.plugins;
-  if (options.clean ?? true) {
-    // FileList is not necessary in library mode
-    plugins = plugins.map(plugin => {
-      if (plugin instanceof AfterEmitWebpackPlugin) {
-        return new AfterEmitWebpackPlugin({outDir: plugin.options.outDir, createFileList: false});
-      }
-      return plugin;
-    });
-  } else {
-    // If clean is false, we don't need the plugin at all
-    plugins = plugins.filter(plugin => !(plugin instanceof AfterEmitWebpackPlugin));
-  }
+  // FileList is not necessary in library mode
+  let plugins = config.plugins.map(plugin => {
+    if (plugin instanceof AfterEmitWebpackPlugin) {
+      return new AfterEmitWebpackPlugin({outDir: plugin.options.outDir, createFileList: false});
+    }
+    return plugin;
+  });
 
   return {
     ...config,
