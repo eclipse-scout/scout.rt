@@ -112,7 +112,7 @@ module.exports = (env, args) => {
     output: {
       filename: jsFilename,
       path: outDir,
-      clean: nvl(args.clean, true)
+      clean: nvl(args.clean, false)
     },
     performance: {
       hints: false
