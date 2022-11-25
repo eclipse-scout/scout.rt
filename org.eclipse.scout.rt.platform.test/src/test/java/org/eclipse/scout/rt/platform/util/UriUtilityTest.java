@@ -47,10 +47,6 @@ public class UriUtilityTest {
     assertTrue(UriUtility.getQueryParameters(URI.create("scheme://test.com/path/path2")).isEmpty());
     assertEquals(Collections.singletonMap("key", ""), UriUtility.getQueryParameters(new UriBuilder("http://www.example.com?key").createURI()));
     assertEquals(Collections.singletonMap("key", ""), UriUtility.getQueryParameters(new UriBuilder("http://www.example.com?key=").createURI()));
-    assertEquals(Collections.singletonMap("code", "bG9yZW0="), UriUtility.getQueryParameters(new UriBuilder("http://www.example.com/api/customers?code=bG9yZW0=").createURI()));
-    assertEquals(Collections.singletonMap("code", "YW1lZA=="), UriUtility.getQueryParameters(new UriBuilder("http://www.example.com/api/customers?code=YW1lZA==").createURI()));
-    assertEquals(Collections.singletonMap("code", "=="), UriUtility.getQueryParameters(new UriBuilder("http://www.example.com/api/customers?code===").createURI()));
-    assertEquals(Collections.singletonMap("code", "a=b=c=d"), UriUtility.getQueryParameters(new UriBuilder("http://www.example.com/api/customers?code=a=b=c=d").createURI()));
   }
 
   @Test
