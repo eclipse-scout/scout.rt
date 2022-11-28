@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.jdbc;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.server.commons.healthcheck.AbstractHealthChecker;
+import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckCategoryId;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
 /**
@@ -28,7 +29,7 @@ public class JdbcHealthCecker extends AbstractHealthChecker {
   }
 
   @Override
-  protected boolean execCheckHealth() throws Exception {
+  protected boolean execCheckHealth(HealthCheckCategoryId category) throws Exception {
     ISqlStyle s = SQL.getSqlStyle();
     if (s != null) {
       s.testConnection(SQL.getConnection());

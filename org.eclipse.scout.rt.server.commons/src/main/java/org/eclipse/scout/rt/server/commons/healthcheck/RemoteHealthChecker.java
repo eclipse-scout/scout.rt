@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -48,11 +49,14 @@ public class RemoteHealthChecker extends AbstractHealthChecker {
   }
 
   @Override
-  protected boolean execCheckHealth() throws Exception {
+  protected boolean execCheckHealth(HealthCheckCategoryId category) throws Exception {
     boolean status = true;
     if (m_remoteUrls != null) {
       for (String remote : m_remoteUrls) {
         GenericUrl remoteUrl = remote != null ? new GenericUrl(remote) : null;
+        if (remoteUrl != null && category != null) {
+          remoteUrl.put(AbstractHealthCheckServlet.QUERY_PARAMETER_NAME_CATEGORY, category.unwrap());
+        }
         HttpRequest req = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildHeadRequest(remoteUrl);
         req.getHeaders().setCacheControl("no-cache");
         HttpResponse resp = req.execute();
@@ -66,4 +70,8 @@ public class RemoteHealthChecker extends AbstractHealthChecker {
     return status;
   }
 
+  @Override
+  public boolean acceptCategory(HealthCheckCategoryId category) {
+    return Objects.equals(category, Readiness.ID);
+  }
 }
