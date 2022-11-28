@@ -29,10 +29,60 @@ public interface IHealthChecker {
   boolean isActive();
 
   /**
+   * @param category
+   *          the {@link IHealthCheckCategory} if provided, <code>null</code> if none is provided
    * @param context
    *          {@link RunContext} used to run the check in.
    * @return <code>true</code> if check was successful, <code>false</code> otherwise.
    */
-  boolean checkHealth(RunContext context);
+  boolean checkHealth(RunContext context, HealthCheckCategoryId category);
 
+  /**
+   * @param category
+   *          non-null category; if no category is available all checks are considered which are marked as
+   *          {@link #isActive()}
+   * @return <code>true</code> if this <code>IHealthChecker</code> accepts the provided category; <code>false</code> to
+   *         exclude this check for this category
+   */
+  default boolean acceptCategory(HealthCheckCategoryId category) {
+    return true;
+  }
+
+  /**
+   * Interface defining the possible health check categories
+   */
+  @ApplicationScoped
+  public static interface IHealthCheckCategory {
+    HealthCheckCategoryId getId();
+  }
+
+  // --------------------------------------
+  // default categories
+
+  public static final class Startup implements IHealthCheckCategory {
+    public static final HealthCheckCategoryId ID = HealthCheckCategoryId.of("startup");
+
+    @Override
+    public HealthCheckCategoryId getId() {
+      return ID;
+    }
+  }
+
+  public static final class Readiness implements IHealthCheckCategory {
+    public static final HealthCheckCategoryId ID = HealthCheckCategoryId.of("readiness");
+
+    @Override
+    public HealthCheckCategoryId getId() {
+      return ID;
+    }
+  }
+
+  public static final class Liveness implements IHealthCheckCategory {
+    public static final HealthCheckCategoryId ID = HealthCheckCategoryId.of("liveness");
+
+    @Override
+    public HealthCheckCategoryId getId() {
+      return ID;
+    }
+  }
 }

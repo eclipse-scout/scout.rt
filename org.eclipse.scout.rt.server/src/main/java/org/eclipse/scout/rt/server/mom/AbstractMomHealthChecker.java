@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.healthcheck.AbstractHealthChecker;
+import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckCategoryId;
 
 /**
  * @since 6.1
@@ -52,7 +53,7 @@ public abstract class AbstractMomHealthChecker extends AbstractHealthChecker {
   }
 
   @Override
-  protected boolean execCheckHealth() throws Exception {
+  protected boolean execCheckHealth(HealthCheckCategoryId category) throws Exception {
     IMomImplementor implementor = BEANS.get(getConfiguredMomClass()).getImplementor();
     if (implementor == null) {
       return false;

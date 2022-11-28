@@ -64,14 +64,14 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
   }
 
   /**
-   * @return The health check timeout duration in milliseconds. If greater than zero, {@link #execCheckHealth()} will
-   *         time out after given duration.
+   * @return The health check timeout duration in milliseconds. If greater than zero,
+   *         {@link #execCheckHealth(HealthCheckCategoryId)} will time out after given duration.
    */
   protected long getConfiguredTimeoutMillis() {
     return 0;
   }
 
-  protected abstract boolean execCheckHealth() throws Exception;
+  protected abstract boolean execCheckHealth(HealthCheckCategoryId category) throws Exception;
 
   @Override
   public String getName() {
@@ -102,7 +102,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
   }
 
   @Override
-  public boolean checkHealth(RunContext context) {
+  public boolean checkHealth(RunContext context, HealthCheckCategoryId category) {
     if (!isExpired()) {
       return m_lastStatus.get();
     }
@@ -143,7 +143,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
         m_future = Jobs.schedule(() -> {
           LOG.debug("HealthCheck[{}] has started", getName());
           try {
-            boolean result = execCheckHealth();
+            boolean result = execCheckHealth(category);
             notifyHealthCheckResult(result);
             return result;
           }
@@ -166,7 +166,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
 
   /**
    * Called after a health check was executed.
-   * 
+   *
    * @param result
    *          status of last executed health check
    */
