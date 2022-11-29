@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+const fs = require('fs');
 const path = require('path');
 const scoutBuildConstants = require('./constants');
 const CopyPlugin = require('copy-webpack-plugin');
@@ -50,7 +51,7 @@ module.exports = (env, args) => {
     presets: [
       [require.resolve('@babel/preset-env'), {
         debug: false,
-        targets: { // see also esbuild target below
+        targets: {
           firefox: '69',
           chrome: '71',
           safari: '12.1'
@@ -61,6 +62,7 @@ module.exports = (env, args) => {
 
   const tsOptions = {
     ...args.tsOptions,
+    transpileOnly: true, // in prod mode always only transpile (no check), in dev mode type checking is done async using ForkTsCheckerWebpackPlugin
     compilerOptions: {
       noEmit: false,
       ...args.tsOptions?.compilerOptions
@@ -217,7 +219,33 @@ module.exports = (env, args) => {
     config.plugins.push(new ProgressPlugin({profile: args.profile}));
   }
 
-  if (!devMode) {
+  if (devMode) {
+    const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+    const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin');
+
+    let forkTsCheckerConfig = undefined;
+    if (!fs.existsSync('./tsconfig.json')) {
+      // if the module has no tsconfig: use default from Scout.
+      // Otherwise, each module would need to provide a tsconfig even if there is no typescript code in the module.
+      forkTsCheckerConfig = {
+        typescript: {
+          configFile: require.resolve('@eclipse-scout/tsconfig'),
+          context: process.cwd(),
+          configOverwrite: {
+            compilerOptions: {skipLibCheck: true, sourceMap: false, inlineSourceMap: false, declarationMap: false, allowJs: true},
+            include: isMavenModule ? ['./src/main/js/**/*.ts', './src/main/js/**/*.js', './src/test/js/**/*.ts', './src/test/js/**/*.js']
+              : ['./src/**/*.ts', './src/**/*.js', './test/**/*.ts', './test/**/*.js']
+          }
+        }
+      };
+    }
+    config.plugins.push(new ForkTsCheckerWebpackPlugin(forkTsCheckerConfig));
+    config.plugins.push(new ForkTsCheckerNotifierWebpackPlugin({
+      title: getModuleName(),
+      skipSuccessful: true, // no notification for successful builds
+      excludeWarnings: true // no notification for warnings
+    }));
+  } else {
     const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
     const TerserPlugin = require('terser-webpack-plugin');
     config.optimization.minimizer = [
@@ -446,6 +474,17 @@ function prodDevtoolModuleFilenameTemplate(info) {
   if (result) {
     return result[1];
   }
+}
+
+function getModuleName() {
+  let packageJsonFile = path.resolve('./package.json');
+  if (fs.existsSync(packageJsonFile)) {
+    let name = require(packageJsonFile).name;
+    if (name) {
+      return name;
+    }
+  }
+  return path.basename(process.cwd());
 }
 
 module.exports.addThemes = addThemes;

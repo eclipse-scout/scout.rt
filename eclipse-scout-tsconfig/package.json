@@ -8,6 +8,7 @@
     "type": "git",
     "url": "https://github.com/eclipse-scout/scout.rt.git"
   },
+  "main": "tsconfig.json",
   "license": "EPL-1.0",
   "engines": {
     "node": ">=18.12.1",
