@@ -239,7 +239,10 @@ module.exports = (env, args) => {
       }),
       // minify js
       new TerserPlugin({
-        minify: TerserPlugin.esbuildMinify
+        minify: TerserPlugin.esbuildMinify,
+        terserOptions: {
+          logLevel: 'warning' // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+        }
       })
     ];
   }
@@ -410,6 +413,10 @@ function nvl(arg, defaultValue) {
 }
 
 function isWarningIgnored(devMode, webpackError) {
+  if (webpackError && webpackError.message === '[object Object]') {
+    return true; // esbuild warnings are not correctly passed to webpack. ignore them. The actual message is printed with the esbuild flag 'logLevel' (see below)
+  }
+
   if (devMode || !webpackError || !webpackError.warning || !webpackError.warning.message) {
     return false;
   }
