@@ -48,10 +48,10 @@ module.exports = (env, args) => {
     // Other source map types may increase build performance but decrease debugging experience
     // (e.g. wrong this in arrow functions with inline-cheap-module-source-map or not having original source code at all (code after babel transpilation instead of before) with eval types).
     // In production mode create external source maps without source code to map stack traces.
-    // Otherwise stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
+    // Otherwise, stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
     devtool: devMode ? false : 'nosources-source-map',
+    ignoreWarnings: [(webpackError, compilation) => isWarningIgnored(devMode, webpackError, compilation)],
     resolve: {
-
       // no automatic polyfills. clients must add the desired polyfills themselves.
       fallback: {
         assert: false,
@@ -211,7 +211,10 @@ module.exports = (env, args) => {
       }),
       // minify js
       new TerserPlugin({
-        minify: TerserPlugin.esbuildMinify
+        minify: TerserPlugin.esbuildMinify,
+        terserOptions: {
+          logLevel: 'warning' // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+        }
       })
     ];
   }
@@ -332,6 +335,13 @@ function nvl(arg, defaultValue) {
     return defaultValue;
   }
   return arg;
+}
+
+function isWarningIgnored(devMode, webpackError) {
+  if (webpackError && webpackError.message === '[object Object]') {
+    return true; // esbuild warnings are not correctly passed to webpack. ignore them. The actual message is printed with the esbuild flag 'logLevel' (see below)
+  }
+  return false;
 }
 
 /**
