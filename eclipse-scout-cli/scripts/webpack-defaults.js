@@ -42,6 +42,7 @@ module.exports = (env, args) => {
       });
   }
 
+  const minimizerTarget = ['firefox69', 'chrome71', 'safari12.1'];
   const babelOptions = {
     compact: false,
     cacheDirectory: true,
@@ -49,7 +50,7 @@ module.exports = (env, args) => {
     presets: [
       [require.resolve('@babel/preset-env'), {
         debug: false,
-        targets: {
+        targets: { // see also esbuild target below
           firefox: '69',
           chrome: '71',
           safari: '12.1'
@@ -222,13 +223,27 @@ module.exports = (env, args) => {
     config.optimization.minimizer = [
       // minify css
       new CssMinimizerPlugin({
-        minify: CssMinimizerPlugin.esbuildMinify
+        test: /\.min\.css$/i, // only minimize required files
+        exclude: /res[\\/]/i, // exclude resources output directory from minimizing as these files are copied
+        parallel: 4, // best ratio between memory consumption and performance on most systems
+        minify: CssMinimizerPlugin.esbuildMinify,
+        minimizerOptions: {
+          logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+          sourcemap: false, // no sourcemaps for css in prod build (needs more heap memory instead)
+          charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
+          target: minimizerTarget
+        }
       }),
       // minify js
       new TerserPlugin({
+        test: /\.min\.js$/i, // only minimize required files
+        exclude: [/log4javascript-1\.4\.9[\\/]/i, /res[\\/]/i], // exclude resources output directory from minimizing as these files are copied
+        parallel: 4, // best ratio between memory consumption and performance on most systems
         minify: TerserPlugin.esbuildMinify,
         terserOptions: {
-          logLevel: 'warning' // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+          logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+          charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
+          target: minimizerTarget
         }
       })
     ];
