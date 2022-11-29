@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.data.page;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
  * @see AbstractTableFieldBeanData
  * @since 3.10.0-M1
  */
+@Bean
 public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
   private static final long serialVersionUID = 1L;
 
@@ -40,8 +42,6 @@ public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
 
   /**
    * Sets whether the data in this bean has been limited (i.e. there exist more records in the data source).
-   *
-   * @param limitedResult
    */
   public void setLimitedResult(boolean limitedResult) {
     m_limitedResult = limitedResult;
