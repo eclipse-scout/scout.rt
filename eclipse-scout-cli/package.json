@@ -43,7 +43,6 @@
     "ts-loader": "9.4.1",
     "source-map-loader": "4.0.1",
     "copy-webpack-plugin": "11.0.0",
-    "style-loader": "3.3.1",
     "css-loader": "6.7.2",
     "jasmine-core": "4.5.0",
     "jasmine-jquery": "2.1.1",
