@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxy;
+import org.eclipse.scout.rt.server.commons.servlet.HttpProxyRequestContext;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyRequestOptions;
 
 public abstract class AbstractRestProxyRequestHandler extends AbstractUiServletRequestHandler {
@@ -78,4 +79,10 @@ public abstract class AbstractRestProxyRequestHandler extends AbstractUiServletR
    * @return options to be used for an HTTP through the proxy
    */
   protected abstract HttpProxyRequestOptions createHttpProxyRequestOptions(HttpServletRequest req, HttpServletResponse resp);
+
+  protected HttpProxyRequestContext createHttpProxyRequestContext(HttpServletRequest req) {
+    return BEANS.get(HttpProxyRequestContext.class)
+        .withRequest(req)
+        .withLocalContextPathPrefix(getLocalContextPathPrefix());
+  }
 }
