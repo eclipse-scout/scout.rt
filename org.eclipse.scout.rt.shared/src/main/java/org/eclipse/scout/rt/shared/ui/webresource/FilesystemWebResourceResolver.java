@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -16,26 +16,29 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 public class FilesystemWebResourceResolver extends AbstractWebResourceResolver {
 
-  private final Path m_root;
+  private final List<Path> m_roots = new ArrayList<>();
 
   protected FilesystemWebResourceResolver() {
-    m_root = findModuleRoot().resolve(AbstractWebResourceResolver.OUTPUT_FOLDER_NAME);
+    BEANS.all(IFilesystemWebResourceRootContributor.class)
+        .forEach(contributor -> m_roots.addAll(contributor.getRoots()));
   }
 
   @Override
   @SuppressWarnings("squid:S1166") // log or rethrow exception
   protected Stream<URL> getResourceImpl(String resourcePath) {
     try {
-      return resolveUrls(m_root, resourcePath);
+      return resolveUrls(m_roots, resourcePath);
     }
     catch (java.nio.file.InvalidPathException e) {
       // filesystem implementation does not understand/allow this path
@@ -88,30 +91,5 @@ public class FilesystemWebResourceResolver extends AbstractWebResourceResolver {
       }
     }
     return null;
-  }
-
-  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  protected static Path findModuleRoot() {
-    Path workingDir = Paths.get("").toAbsolutePath();
-    Path parentDir = workingDir.getParent();
-    String folderName = workingDir.getFileName().toString();
-    String appModuleName = folderName;
-    if (folderName.endsWith(".dev") || folderName.endsWith("-dev")) {
-      appModuleName = folderName.substring(0, folderName.length() - 4);
-    }
-    Path resourceRoot = parentDir.resolve(appModuleName);
-    if (Files.isDirectory(resourceRoot) && Files.isReadable(resourceRoot)) {
-      return resourceRoot;
-    }
-
-    if (appModuleName.endsWith(".app") || appModuleName.endsWith("-app")) {
-      appModuleName = appModuleName.substring(0, appModuleName.length() - 4);
-    }
-    resourceRoot = parentDir.resolve(appModuleName);
-    if (Files.isDirectory(resourceRoot) && Files.isReadable(resourceRoot)) {
-      return resourceRoot;
-    }
-
-    return workingDir;
   }
 }
