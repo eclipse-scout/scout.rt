@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (c) BSI Business Systems Integration AG. All rights reserved.
+  ~ http://www.bsiag.com/
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.scout.rt</groupId>
+    <artifactId>org.eclipse.scout.rt</artifactId>
+    <version>11.0-SNAPSHOT</version>
+    <relativePath>../org.eclipse.scout.rt</relativePath>
+  </parent>
+
+  <artifactId>org.eclipse.scout.rt.oauth2</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.platform</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.scribejava</groupId>
+      <artifactId>scribejava-apis</artifactId>
+    </dependency>
+  </dependencies>
+</project>

@@ -21,7 +21,9 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
+import org.eclipse.scout.rt.oauth2.OAuth2Helper;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -85,6 +87,14 @@ public class ImapHelper {
       if (StringUtility.hasText(config.getSslProtocols())) {
         props.setProperty("mail.imap.ssl.protocols", config.getSslProtocols());
       }
+    }
+
+    if (config.getAuth2Config() != null) {
+      props.setProperty("mail.imap.sasl.enable", "true");
+      props.setProperty("mail.imap.sasl.mechanisms", "XOAUTH2");
+      props.setProperty("mail.imap.auth.login.disable", "true");
+      props.setProperty("mail.imap.auth.plain.disable", "true");
+      config.withPassword(BEANS.get(OAuth2Helper.class).getToken(config.getAuth2Config()));
     }
 
     if (!CollectionUtility.isEmpty(config.getAdditionalSessionProperties())) {
