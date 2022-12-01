@@ -37,5 +37,9 @@
       <groupId>com.sun.activation</groupId>
       <artifactId>jakarta.activation</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.oauth2</artifactId>
+    </dependency>
   </dependencies>
 </project>
