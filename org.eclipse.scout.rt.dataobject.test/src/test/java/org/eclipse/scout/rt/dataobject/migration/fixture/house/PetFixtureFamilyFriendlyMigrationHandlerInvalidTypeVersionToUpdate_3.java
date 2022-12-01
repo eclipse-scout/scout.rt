@@ -15,9 +15,9 @@ import java.util.Set;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationInventoryTest;
 import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationHelper;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationInventoryTest;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_3;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * A second migration handler for type version {@link BravoFixture_3} for the type name 'bravoFixture.PetFixture', only
- * used within {@link DoStructureMigrationInventoryTest#testValidateMigrationHandlerUniqueness()}.
+ * used within {@link DataObjectMigrationInventoryTest#testValidateMigrationHandlerUniqueness()}.
  */
 @IgnoreBean
 public class PetFixtureFamilyFriendlyMigrationHandlerInvalidTypeVersionToUpdate_3 extends AbstractDoStructureMigrationHandler {
@@ -50,7 +50,7 @@ public class PetFixtureFamilyFriendlyMigrationHandlerInvalidTypeVersionToUpdate_
   }
 
   @Override
-  protected boolean migrate(DoStructureMigrationContext ctx, IDoEntity doEntity) {
+  protected boolean migrate(DataObjectMigrationContext ctx, IDoEntity doEntity) {
     if (doEntity.has("lorem")) {
       return false; // already migrated
     }

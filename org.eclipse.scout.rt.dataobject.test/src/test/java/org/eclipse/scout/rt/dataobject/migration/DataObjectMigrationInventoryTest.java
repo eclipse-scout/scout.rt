@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationInventory.FindNextMigrationHandlerVersionStatus;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationInventory.FindNextMigrationHandlerVersionStatus;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CharlieCustomerFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CharlieCustomerFixtureTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureDo;
@@ -28,9 +28,9 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureTa
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.DuplicateIdFixtureDoValueMigrationHandler_1;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoStructureMigrationHandler_2;
-import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureRawOnlyDoStructureMigrationTargetContextData;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureRawOnlyStructureMigrationTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureStructureMigrationTargetContextData;
-import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureTypedOnlyDoStructureMigrationTargetContextData;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureTypedOnlyStructureMigrationTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureFamilyFriendlyMigrationHandlerInvalidTypeVersionToUpdate_3;
@@ -69,16 +69,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests for {@link DoStructureMigrationInventory}.
+ * Tests for {@link DataObjectMigrationInventory}.
  */
-// TODO 23.1 [data object migration] rename to DataObjectMigrationInventoryTest
-public class DoStructureMigrationInventoryTest {
+public class DataObjectMigrationInventoryTest {
 
-  private static DoStructureMigrationInventory s_inventory;
+  private static DataObjectMigrationInventory s_inventory;
 
   @BeforeClass
   public static void beforeClass() {
-    s_inventory = new TestDoStructureMigrationInventory(
+    s_inventory = new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace()),
         Arrays.asList(
             new AlfaFixture_1(), new AlfaFixture_2(), new AlfaFixture_3(), new AlfaFixture_6(), // AlfaFixture_7 is explicitly not registered
@@ -87,8 +86,8 @@ public class DoStructureMigrationInventoryTest {
             new DeltaFixture_1(), new DeltaFixture_2()),
         Arrays.asList(
             HouseFixtureStructureMigrationTargetContextData.class,
-            HouseFixtureRawOnlyDoStructureMigrationTargetContextData.class,
-            HouseFixtureTypedOnlyDoStructureMigrationTargetContextData.class,
+            HouseFixtureRawOnlyStructureMigrationTargetContextData.class,
+            HouseFixtureTypedOnlyStructureMigrationTargetContextData.class,
             CustomerFixtureTargetContextData.class,
             CharlieCustomerFixtureTargetContextData.class),
         Arrays.asList(
@@ -106,11 +105,11 @@ public class DoStructureMigrationInventoryTest {
   }
 
   /**
-   * Tests for {@link DoStructureMigrationInventory#validateStructureMigrationHandlerUniqueness(Map)} ()}.
+   * Tests for {@link DataObjectMigrationInventory#validateStructureMigrationHandlerUniqueness(Map)} ()}.
    */
   @Test
   public void testValidateMigrationHandlerUniqueness() {
-    TestDoStructureMigrationInventory inventory = new TestDoStructureMigrationInventory(
+    TestDataObjectMigrationInventory inventory = new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace()),
         Arrays.asList(
             new AlfaFixture_1(), new AlfaFixture_2(), new AlfaFixture_3(), new AlfaFixture_6(),
@@ -122,7 +121,7 @@ public class DoStructureMigrationInventoryTest {
 
     assertNotNull(inventory); // no validation error on creation of inventory
 
-    assertThrows(PlatformException.class, () -> new TestDoStructureMigrationInventory(
+    assertThrows(PlatformException.class, () -> new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace()),
         Arrays.asList(
             new AlfaFixture_1(), new AlfaFixture_2(), new AlfaFixture_3(), new AlfaFixture_6(),
@@ -136,7 +135,7 @@ public class DoStructureMigrationInventoryTest {
   }
 
   /**
-   * Validates internal structure of inventory ({@link DoStructureMigrationInventory#m_orderedVersions}.
+   * Validates internal structure of inventory ({@link DataObjectMigrationInventory#m_orderedVersions}.
    */
   @Test
   public void testOrdered() {
@@ -153,7 +152,7 @@ public class DoStructureMigrationInventoryTest {
   }
 
   /**
-   * Validates internal structure of inventory ({@link DoStructureMigrationInventory#m_typeNameVersions}.
+   * Validates internal structure of inventory ({@link DataObjectMigrationInventory#m_typeNameVersions}.
    */
   @Test
   public void testTypeNameVersions() {
@@ -174,24 +173,24 @@ public class DoStructureMigrationInventoryTest {
 
   @Test
   public void testGetDoMigrationContextValues() {
-    Assert.assertThrows(AssertionException.class, () -> s_inventory.getDoMigrationContextValues(null));
+    Assert.assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationTargetContextDataClasses(null));
 
-    assertEquals(0, s_inventory.getDoMigrationContextValues(BEANS.get(DoEntityBuilder.class).put("_type", "unknown").build()).size());
+    assertEquals(0, s_inventory.getStructureMigrationTargetContextDataClasses(BEANS.get(DoEntityBuilder.class).put("_type", "unknown").build()).size());
 
     Set<Class<? extends IDoStructureMigrationTargetContextData>> contextDataSet;
 
-    assertEquals(CollectionUtility.hashSet(HouseFixtureStructureMigrationTargetContextData.class, HouseFixtureRawOnlyDoStructureMigrationTargetContextData.class),
-        s_inventory.getDoMigrationContextValues(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.HouseFixture").build()));
+    assertEquals(CollectionUtility.hashSet(HouseFixtureStructureMigrationTargetContextData.class, HouseFixtureRawOnlyStructureMigrationTargetContextData.class),
+        s_inventory.getStructureMigrationTargetContextDataClasses(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.HouseFixture").build()));
 
-    assertEquals(CollectionUtility.hashSet(HouseFixtureStructureMigrationTargetContextData.class, HouseFixtureTypedOnlyDoStructureMigrationTargetContextData.class),
-        s_inventory.getDoMigrationContextValues(BEANS.get(HouseFixtureDo.class)));
+    assertEquals(CollectionUtility.hashSet(HouseFixtureStructureMigrationTargetContextData.class, HouseFixtureTypedOnlyStructureMigrationTargetContextData.class),
+        s_inventory.getStructureMigrationTargetContextDataClasses(BEANS.get(HouseFixtureDo.class)));
 
     // Subclasses data object, using origin instance (thus new instead of BEANS.get) [not a real case]
     assertEquals(CollectionUtility.hashSet(CustomerFixtureTargetContextData.class),
-        s_inventory.getDoMigrationContextValues(new CustomerFixtureDo()));
+        s_inventory.getStructureMigrationTargetContextDataClasses(new CustomerFixtureDo()));
 
     assertEquals(CollectionUtility.hashSet(CustomerFixtureTargetContextData.class, CharlieCustomerFixtureTargetContextData.class),
-        s_inventory.getDoMigrationContextValues(BEANS.get(CharlieCustomerFixtureDo.class)));
+        s_inventory.getStructureMigrationTargetContextDataClasses(BEANS.get(CharlieCustomerFixtureDo.class)));
   }
 
   @Test
@@ -319,39 +318,39 @@ public class DoStructureMigrationInventoryTest {
 
   @Test
   public void testGetMigrationHandlers() {
-    assertThrows(AssertionException.class, () -> s_inventory.getMigrationHandlers(null));
-    assertThrows(AssertionException.class, () -> s_inventory.getMigrationHandlers(AlfaFixture_7.VERSION)); // no registered
+    assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationHandlers(null));
+    assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationHandlers(AlfaFixture_7.VERSION)); // no registered
 
     // alfaFixture-1
-    assertTrue(s_inventory.getMigrationHandlers(AlfaFixture_1.VERSION).isEmpty()); // no handlers
+    assertTrue(s_inventory.getStructureMigrationHandlers(AlfaFixture_1.VERSION).isEmpty()); // no handlers
 
     Map<String, IDoStructureMigrationHandler> migrationHandlers;
 
     // charlieFixture-2
-    migrationHandlers = s_inventory.getMigrationHandlers(CharlieFixture_2.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(CharlieFixture_2.VERSION);
     assertEquals(2, migrationHandlers.size());
 
     assertTrue(migrationHandlers.get("charlieFixture.BuildingFixture") instanceof HouseFixtureDoStructureMigrationHandler_2);
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_2);
 
     // bravoFixture-3
-    migrationHandlers = s_inventory.getMigrationHandlers(BravoFixture_3.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(BravoFixture_3.VERSION);
     assertEquals(1, migrationHandlers.size());
 
     assertTrue(migrationHandlers.get("bravoFixture.PetFixture") instanceof PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3);
 
     // charlieFixture-3
-    migrationHandlers = s_inventory.getMigrationHandlers(CharlieFixture_3.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(CharlieFixture_3.VERSION);
     assertEquals(1, migrationHandlers.size());
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_3);
 
     // charlieFixture-4
-    migrationHandlers = s_inventory.getMigrationHandlers(CharlieFixture_4.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(CharlieFixture_4.VERSION);
     assertEquals(1, migrationHandlers.size());
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_4);
 
     // charlieFixture-5
-    migrationHandlers = s_inventory.getMigrationHandlers(CharlieFixture_5.VERSION);
+    migrationHandlers = s_inventory.getStructureMigrationHandlers(CharlieFixture_5.VERSION);
     assertEquals(1, migrationHandlers.size());
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_5);
   }
@@ -376,7 +375,7 @@ public class DoStructureMigrationInventoryTest {
    */
   @Test
   public void voidTestDuplicateValueMigrationIds() {
-    PlatformException exception = assertThrows(PlatformException.class, () -> new TestDoStructureMigrationInventory(
+    PlatformException exception = assertThrows(PlatformException.class, () -> new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace()),
         Arrays.asList(
             new AlfaFixture_1(), new AlfaFixture_2(),

@@ -15,7 +15,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationHelper;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_3;
@@ -49,7 +49,7 @@ public class PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3 extends Abs
   }
 
   @Override
-  protected boolean migrate(DoStructureMigrationContext ctx, IDoEntity doEntity) {
+  protected boolean migrate(DataObjectMigrationContext ctx, IDoEntity doEntity) {
     boolean changed = false;
     changed |= BEANS.get(DoStructureMigrationHelper.class).renameTypeName(doEntity, "alfaFixture.PetFixture");
 

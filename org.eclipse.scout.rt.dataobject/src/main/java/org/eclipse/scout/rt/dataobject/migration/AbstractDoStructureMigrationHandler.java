@@ -35,7 +35,7 @@ public abstract class AbstractDoStructureMigrationHandler implements IDoStructur
   public abstract Class<? extends ITypeVersion> toTypeVersionClass();
 
   @Override
-  public boolean applyMigration(DoStructureMigrationContext ctx, IDoEntity doEntity) {
+  public boolean applyMigration(DataObjectMigrationContext ctx, IDoEntity doEntity) {
     boolean changed = false;
     changed |= migrate(ctx, doEntity);
     changed |= updateTypeVersion(doEntity); // new type version needs to be applied because migration is only completed when data object has an updated type version
@@ -43,7 +43,7 @@ public abstract class AbstractDoStructureMigrationHandler implements IDoStructur
   }
 
   /**
-   * For convenience. Same as {@link #applyMigration(DoStructureMigrationContext, IDoEntity)} except that the type
+   * For convenience. Same as {@link #applyMigration(DataObjectMigrationContext, IDoEntity)} except that the type
    * version of the data object itself must not be updated, the caller of this method takes care of handling type
    * version updates.
    * <p>
@@ -55,7 +55,7 @@ public abstract class AbstractDoStructureMigrationHandler implements IDoStructur
    *          Do entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
    * @return <code>true</code> if data object was changed in any way, <code>false</code> otherwise.
    */
-  protected abstract boolean migrate(DoStructureMigrationContext ctx, IDoEntity doEntity);
+  protected abstract boolean migrate(DataObjectMigrationContext ctx, IDoEntity doEntity);
 
   /**
    * Updates the type version of the data object to {@link #toTypeVersion()}.

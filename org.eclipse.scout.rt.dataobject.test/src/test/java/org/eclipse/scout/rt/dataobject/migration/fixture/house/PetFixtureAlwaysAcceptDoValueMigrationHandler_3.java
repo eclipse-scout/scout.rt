@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -41,12 +41,12 @@ public class PetFixtureAlwaysAcceptDoValueMigrationHandler_3 extends AbstractDoV
   }
 
   @Override
-  public boolean accept(DoStructureMigrationContext ctx) {
+  public boolean accept(DataObjectMigrationContext ctx) {
     return true;
   }
 
   @Override
-  public PetFixtureDo migrate(DoStructureMigrationContext ctx, PetFixtureDo value) {
+  public PetFixtureDo migrate(DataObjectMigrationContext ctx, PetFixtureDo value) {
     if (!value.getName().startsWith(NAME_PREFIX)) {
       return value; // already migrated or nothing to migrate
     }

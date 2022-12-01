@@ -15,19 +15,18 @@ package org.eclipse.scout.rt.dataobject.migration;
  * <p>
  * Only implement this interface directly instead of {@link IDoStructureMigrationTargetContextData} if
  * {@link #getIdentifierClass()} is used (because local context data cannot be pushed manually to
- * {@link DoStructureMigrationContext}, only classes implementing {@link IDoStructureMigrationTargetContextData} are
+ * {@link DataObjectMigrationContext}, only classes implementing {@link IDoStructureMigrationTargetContextData} are
  * auto-created when a data object is traversed).
  * <p>
  * A local context data is stacked, i.e. if multiple context data for the same {@link #getIdentifierClass()} are added,
  * the last one is retrieved.
  */
-// TODO 23.1 [data object migration] rename to IDataObjectMigrationLocalContextData
-public interface IDoStructureMigrationLocalContextData {
+public interface IDataObjectMigrationLocalContextData {
 
   /**
    * @return Class used as identifier for context data (map key).
    */
-  default Class<? extends IDoStructureMigrationLocalContextData> getIdentifierClass() {
+  default Class<? extends IDataObjectMigrationLocalContextData> getIdentifierClass() {
     return this.getClass();
   }
 }

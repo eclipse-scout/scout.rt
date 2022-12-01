@@ -67,7 +67,7 @@ public abstract class AbstractDoStructureRenameMigrationHandler extends Abstract
   }
 
   @Override
-  protected boolean migrate(DoStructureMigrationContext ctx, IDoEntity doEntity) {
+  protected boolean migrate(DataObjectMigrationContext ctx, IDoEntity doEntity) {
     DoStructureMigrationHelper helper = BEANS.get(DoStructureMigrationHelper.class);
     boolean changed = false;
     String typeName = helper.getType(doEntity);

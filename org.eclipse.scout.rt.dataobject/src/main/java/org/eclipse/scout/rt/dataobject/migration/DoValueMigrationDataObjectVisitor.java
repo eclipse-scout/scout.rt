@@ -26,16 +26,16 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
  */
 public class DoValueMigrationDataObjectVisitor extends AbstractReplacingDataObjectVisitor {
 
-  protected final DoStructureMigrationInventory m_inventory;
-  protected final DoStructureMigrationContext m_ctx;
+  protected final DataObjectMigrationInventory m_inventory;
+  protected final DataObjectMigrationContext m_ctx;
 
   // ordered list of value migration handlers, which have not been applied
   protected final List<IDoValueMigrationHandler<?>> m_valueMigrationHandlers;
 
   protected boolean m_changed = false;
 
-  public DoValueMigrationDataObjectVisitor(DoStructureMigrationContext ctx) {
-    m_inventory = BEANS.get(DoStructureMigrationInventory.class);
+  public DoValueMigrationDataObjectVisitor(DataObjectMigrationContext ctx) {
+    m_inventory = BEANS.get(DataObjectMigrationInventory.class);
     m_ctx = ctx;
 
     Set<DoValueMigrationId> appliedValueMigrationIds = m_ctx.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds();

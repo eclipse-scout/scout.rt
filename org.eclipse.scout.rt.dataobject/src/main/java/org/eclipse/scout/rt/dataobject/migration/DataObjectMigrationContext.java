@@ -26,27 +26,26 @@ import org.eclipse.scout.rt.platform.Bean;
 /**
  * This class represents the context used during migration of data objects.
  * <p>
- * Methods related with global context data are thread-safe ({@link #putGlobal(IDoStructureMigrationGlobalContextData)}
+ * Methods related with global context data are thread-safe ({@link #putGlobal(IDataObjectMigrationGlobalContextData)}
  * and {@link #getGlobal(Class)}). Methods related with local context data aren't. To use this context in multiple
  * threads, use {@link #copy()} in a new thread.
  */
 @Bean
-// TODO 23.1 [data object migration] rename to DataObjectMigrationContext
-public class DoStructureMigrationContext {
+public class DataObjectMigrationContext {
 
   // maybe accessed by different threads
-  protected final ConcurrentHashMap<Class<? extends IDoStructureMigrationGlobalContextData>, IDoStructureMigrationGlobalContextData> m_globalContextDataMap;
+  protected final ConcurrentHashMap<Class<? extends IDataObjectMigrationGlobalContextData>, IDataObjectMigrationGlobalContextData> m_globalContextDataMap;
 
   // always access by single thread only
-  protected final Map<Class<? extends IDoStructureMigrationLocalContextData>, Deque<IDoStructureMigrationLocalContextData>> m_localContextDataMap;
+  protected final Map<Class<? extends IDataObjectMigrationLocalContextData>, Deque<IDataObjectMigrationLocalContextData>> m_localContextDataMap;
 
-  public DoStructureMigrationContext() {
+  public DataObjectMigrationContext() {
     m_globalContextDataMap = new ConcurrentHashMap<>();
     m_localContextDataMap = new HashMap<>();
     initDefaults();
   }
 
-  protected DoStructureMigrationContext(DoStructureMigrationContext other) {
+  protected DataObjectMigrationContext(DataObjectMigrationContext other) {
     m_globalContextDataMap = other.m_globalContextDataMap; // use the same one
     m_localContextDataMap = new HashMap<>(); // use new one (single thread usage only).
   }
@@ -55,23 +54,23 @@ public class DoStructureMigrationContext {
    * Initializes default context data.
    */
   protected void initDefaults() {
-    putGlobal(BEANS.get(DoStructureMigrationPassThroughLogger.class));
+    putGlobal(BEANS.get(DataObjectMigrationPassThroughLogger.class));
   }
 
   /**
    * Clones the context and keeps the same reference for global context data map but creates a new context map for local
    * context data.
    */
-  protected DoStructureMigrationContext copy() {
-    return new DoStructureMigrationContext(this);
+  protected DataObjectMigrationContext copy() {
+    return new DataObjectMigrationContext(this);
   }
 
   /**
    * Pushes the given initial local context datas to the local context data map. This method must not be called on an
    * exiting context object, but must be called on a fresh copy (see {@link #copy()} or on a fresh instance of
-   * {@link DoStructureMigrationContext}
+   * {@link DataObjectMigrationContext}
    */
-  protected DoStructureMigrationContext withInitialLocalContext(IDoStructureMigrationLocalContextData... initialLocalContextDatas) {
+  protected DataObjectMigrationContext withInitialLocalContext(IDataObjectMigrationLocalContextData... initialLocalContextDatas) {
     if (initialLocalContextDatas != null) {
       // Calling push without a remove is okay here because these provided local contexts are valid for the whole data object
       Arrays.stream(initialLocalContextDatas).filter(Objects::nonNull).forEach(this::push);
@@ -84,9 +83,9 @@ public class DoStructureMigrationContext {
    *
    * @return Value for given global context data class.
    */
-  public <T extends IDoStructureMigrationGlobalContextData> T getGlobal(Class<T> contextDataClass) {
+  public <T extends IDataObjectMigrationGlobalContextData> T getGlobal(Class<T> contextDataClass) {
     assertNotNull(contextDataClass, "contextDataClass is required");
-    IDoStructureMigrationGlobalContextData contextData = m_globalContextDataMap.computeIfAbsent(contextDataClass, k -> {
+    IDataObjectMigrationGlobalContextData contextData = m_globalContextDataMap.computeIfAbsent(contextDataClass, k -> {
       // auto-create global context data with @Bean annotation if not present yet
       if (contextDataClass.getAnnotation(Bean.class) != null) {
         return BEANS.get(contextDataClass);
@@ -99,7 +98,7 @@ public class DoStructureMigrationContext {
   /**
    * Put given global context data.
    */
-  public DoStructureMigrationContext putGlobal(IDoStructureMigrationGlobalContextData contextData) {
+  public DataObjectMigrationContext putGlobal(IDataObjectMigrationGlobalContextData contextData) {
     assertNotNull(contextData, "contextData is required");
     m_globalContextDataMap.put(contextData.getIdentifierClass(), contextData);
     return this;
@@ -108,10 +107,10 @@ public class DoStructureMigrationContext {
   /**
    * @return Value for given locale context data class.
    */
-  public <T extends IDoStructureMigrationLocalContextData> T get(Class<T> contextDataClass) {
+  public <T extends IDataObjectMigrationLocalContextData> T get(Class<T> contextDataClass) {
     assertNotNull(contextDataClass, "contextDataClass is required");
 
-    Deque<IDoStructureMigrationLocalContextData> deque = m_localContextDataMap.get(contextDataClass);
+    Deque<IDataObjectMigrationLocalContextData> deque = m_localContextDataMap.get(contextDataClass);
     if (deque == null || deque.isEmpty()) {
       return null;
     }
@@ -133,9 +132,9 @@ public class DoStructureMigrationContext {
    * }
    * </pre>
    */
-  protected DoStructureMigrationContext push(IDoStructureMigrationLocalContextData contextData) {
+  protected DataObjectMigrationContext push(IDataObjectMigrationLocalContextData contextData) {
     assertNotNull(contextData, "contextData is required");
-    Deque<IDoStructureMigrationLocalContextData> deque = m_localContextDataMap.computeIfAbsent(contextData.getIdentifierClass(), k -> new ArrayDeque<>());
+    Deque<IDataObjectMigrationLocalContextData> deque = m_localContextDataMap.computeIfAbsent(contextData.getIdentifierClass(), k -> new ArrayDeque<>());
     deque.push(contextData);
     return this;
   }
@@ -144,13 +143,13 @@ public class DoStructureMigrationContext {
    * Internal usage only.
    * <p>
    * Remove context data from context (instance must be the same as used for
-   * {@link #push(IDoStructureMigrationLocalContextData)}.
+   * {@link #push(IDataObjectMigrationLocalContextData)}.
    */
-  protected void remove(IDoStructureMigrationLocalContextData contextData) {
+  protected void remove(IDataObjectMigrationLocalContextData contextData) {
     assertNotNull(contextData, "contextData is required");
-    Deque<IDoStructureMigrationLocalContextData> deque = m_localContextDataMap.get(contextData.getIdentifierClass());
+    Deque<IDataObjectMigrationLocalContextData> deque = m_localContextDataMap.get(contextData.getIdentifierClass());
     assertNotNull(deque, "no context data found for {}", contextData.getIdentifierClass());
-    IDoStructureMigrationLocalContextData dequeElement = deque.peek(); // implementation detail: first peek only and check if same instance, then remove
+    IDataObjectMigrationLocalContextData dequeElement = deque.peek(); // implementation detail: first peek only and check if same instance, then remove
     assertTrue(contextData == dequeElement, "last element in deque is not element to remove: remove '{}', deque: '{}'", contextData, dequeElement);
     deque.pop();
     if (deque.isEmpty()) {
@@ -162,14 +161,14 @@ public class DoStructureMigrationContext {
   /**
    * Convenience method to access global logger.
    */
-  public IDoStructureMigrationLogger getLogger() {
-    return getGlobal(IDoStructureMigrationLogger.class);
+  public IDataObjectMigrationLogger getLogger() {
+    return getGlobal(IDataObjectMigrationLogger.class);
   }
 
   /**
    * Convenience method to access global stats.
    */
-  public DoStructureMigrationStatsContextData getStats() {
-    return getGlobal(DoStructureMigrationStatsContextData.class);
+  public DataObjectMigrationStatsContextData getStats() {
+    return getGlobal(DataObjectMigrationStatsContextData.class);
   }
 }

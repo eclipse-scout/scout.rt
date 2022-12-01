@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.Bean;
  * not be applied again during data object migration.
  */
 @Bean
-public class DoValueMigrationIdsContextData implements IDoStructureMigrationGlobalContextData {
+public class DoValueMigrationIdsContextData implements IDataObjectMigrationGlobalContextData {
 
   // Thead-safe because read-only after initialization.
   // An empty set implies that all available value migrations will be applied. In case of a null value, value migrations will be skipped.

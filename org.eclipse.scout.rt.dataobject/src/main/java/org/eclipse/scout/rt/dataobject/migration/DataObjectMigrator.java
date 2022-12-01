@@ -37,15 +37,14 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * </pre>
  */
 @ApplicationScoped
-// TODO 23.1 [data object migration] rename to DataObjectMigrator
-public class DoStructureMigrator {
+public class DataObjectMigrator {
 
   /**
    * Migrates the data object provided by string (UTF-8 encoded) and casts it to the given data object class.
    *
    * @return Result with typed data object and a flag if a migration was applied.
    */
-  public <T extends IDataObject> DoStructureMigratorResult<T> migrateDataObject(DoStructureMigrationContext ctx, String json, Class<T> valueType) {
+  public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(DataObjectMigrationContext ctx, String json, Class<T> valueType) {
     assertNotNull(json, "json is required");
     return migrateDataObject(ctx, new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)), valueType);
   }
@@ -55,7 +54,7 @@ public class DoStructureMigrator {
    *
    * @return Result with typed data object and a flag if a migration was applied.
    */
-  public <T extends IDataObject> DoStructureMigratorResult<T> migrateDataObject(DoStructureMigrationContext ctx, InputStream inputStream, Class<T> valueType) {
+  public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(DataObjectMigrationContext ctx, InputStream inputStream, Class<T> valueType) {
     assertNotNull(inputStream, "inputStream is required");
     IDataObjectMapper dataObjectMapper = BEANS.get(IDataObjectMapper.class);
     IDataObject dataObject = dataObjectMapper.readValueRaw(inputStream);
@@ -69,9 +68,9 @@ public class DoStructureMigrator {
    *
    * @return Result with typed data object and a flag if a migration was applied.
    */
-  public <T extends IDataObject> DoStructureMigratorResult<T> migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject, Class<T> valueType) {
+  public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(DataObjectMigrationContext ctx, IDataObject dataObject, Class<T> valueType) {
     assertNotNull(valueType, "valueType is required");
-    return migrateDataObject(ctx, dataObject, valueType, (IDoStructureMigrationLocalContextData[]) null);
+    return migrateDataObject(ctx, dataObject, valueType, (IDataObjectMigrationLocalContextData[]) null);
   }
 
   /**
@@ -81,13 +80,13 @@ public class DoStructureMigrator {
    *
    * @return Result with typed data object and a flag if a migration was applied.
    */
-  public <T extends IDataObject> DoStructureMigratorResult<T> migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject, Class<T> valueType, IDoStructureMigrationLocalContextData... initialLocalContextData) {
+  public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(DataObjectMigrationContext ctx, IDataObject dataObject, Class<T> valueType, IDataObjectMigrationLocalContextData... initialLocalContextData) {
     return migrateDataObject(ctx, dataObject, valueType, null /* latest version */, initialLocalContextData);
   }
 
   /**
-   * <b>ATTENTION:</b> use {@link #migrateDataObject(DoStructureMigrationContext, IDataObject, Class)} or
-   * {@link #migrateDataObject(DoStructureMigrationContext, IDataObject, Class, IDoStructureMigrationLocalContextData...)}
+   * <b>ATTENTION:</b> use {@link #migrateDataObject(DataObjectMigrationContext, IDataObject, Class)} or
+   * {@link #migrateDataObject(DataObjectMigrationContext, IDataObject, Class, IDataObjectMigrationLocalContextData...)}
    * instead. Only use this for tests and very special cases.
    * <p>
    * Migrates the raw data object.
@@ -103,16 +102,19 @@ public class DoStructureMigrator {
    * @param initialLocalContextData
    *          Initial local context data to use.
    */
-  public <T extends IDataObject> DoStructureMigratorResult<T> migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject, Class<T> valueType, NamespaceVersion toVersion,
-      IDoStructureMigrationLocalContextData... initialLocalContextData) {
+  public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(DataObjectMigrationContext ctx,
+      IDataObject dataObject,
+      Class<T> valueType,
+      NamespaceVersion toVersion,
+      IDataObjectMigrationLocalContextData... initialLocalContextData) {
     assertNotNull(ctx, "ctx is required");
     assertNotNull(dataObject, "dataObject is required");
 
     // Copy context to work on own stack for local context data.
     // Local context may be initialized via initialLocalContextData.
-    DoStructureMigrationContext ctxCopy = ctx.copy().withInitialLocalContext(initialLocalContextData);
-    DoStructureMigrationStatsContextData stats = ctxCopy.getStats();
-    IDoStructureMigrationLogger logger = ctxCopy.getLogger();
+    DataObjectMigrationContext ctxCopy = ctx.copy().withInitialLocalContext(initialLocalContextData);
+    DataObjectMigrationStatsContextData stats = ctxCopy.getStats();
+    IDataObjectMigrationLogger logger = ctxCopy.getLogger();
 
     long start = System.nanoTime();
 
@@ -131,7 +133,7 @@ public class DoStructureMigrator {
     T typedDataObject = dataObjectMapper.readValue(migratedJson, valueType);
 
     // Apply value migration
-    DoStructureMigratorResult<T> result = applyValueMigration(ctxCopy, typedDataObject);
+    DataObjectMigratorResult<T> result = applyValueMigration(ctxCopy, typedDataObject);
     boolean valueChanged = result.isChanged();
     T migratedDataObject = result.getDataObject();
     if (valueChanged) {
@@ -144,17 +146,17 @@ public class DoStructureMigrator {
     }
     stats.addMigrationDuration(start);
 
-    return new DoStructureMigratorResult<>(migratedDataObject, objectChanged);
+    return new DataObjectMigratorResult<>(migratedDataObject, objectChanged);
   }
 
-  protected boolean applyStructureMigration(DoStructureMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion) {
+  protected boolean applyStructureMigration(DataObjectMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion) {
     Map<String, NamespaceVersion> typeVersions = BEANS.get(DoStructureMigrationHelper.class).collectRawDataObjectTypeVersions(dataObject);
     if (typeVersions.isEmpty()) {
       ctx.getLogger().debug("No data object entities with a type name found within {}", dataObject);
       return false;
     }
 
-    List<NamespaceVersion> versions = BEANS.get(DoStructureMigrationInventory.class).getVersions(typeVersions, toVersion);
+    List<NamespaceVersion> versions = BEANS.get(DataObjectMigrationInventory.class).getVersions(typeVersions, toVersion);
     if (versions.isEmpty()) {
       return false;
     }
@@ -171,33 +173,32 @@ public class DoStructureMigrator {
     return structureChanged;
   }
 
-  protected DoStructureMigrationDataObjectVisitor createStructureMigrationVisitor(DoStructureMigrationContext ctx, NamespaceVersion version) {
+  protected DoStructureMigrationDataObjectVisitor createStructureMigrationVisitor(DataObjectMigrationContext ctx, NamespaceVersion version) {
     return new DoStructureMigrationDataObjectVisitor(ctx, version);
   }
 
-  protected <T extends IDataObject> DoStructureMigratorResult<T> applyValueMigration(DoStructureMigrationContext ctx, T dataObject) {
+  protected <T extends IDataObject> DataObjectMigratorResult<T> applyValueMigration(DataObjectMigrationContext ctx, T dataObject) {
     // Applied value migration IDs should be explicitly set to an empty set, if all value migrations actually should be applied.
     // A null value indicates a caller which is unaware of value migrations - skip value migrations.
     if (ctx.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds() == null) {
-      return new DoStructureMigratorResult<>(dataObject, false);
+      return new DataObjectMigratorResult<>(dataObject, false);
     }
 
     DoValueMigrationDataObjectVisitor valueMigrationVisitor = createValueMigrationVisitor(ctx);
     T migratedDataObject = valueMigrationVisitor.migrate(dataObject);
-    return new DoStructureMigratorResult<>(migratedDataObject, valueMigrationVisitor.isChanged());
+    return new DataObjectMigratorResult<>(migratedDataObject, valueMigrationVisitor.isChanged());
   }
 
-  protected DoValueMigrationDataObjectVisitor createValueMigrationVisitor(DoStructureMigrationContext ctx) {
+  protected DoValueMigrationDataObjectVisitor createValueMigrationVisitor(DataObjectMigrationContext ctx) {
     return new DoValueMigrationDataObjectVisitor(ctx);
   }
 
-  // TODO 23.1 [data object migration] rename to DataObjectMigrationResult
-  public static class DoStructureMigratorResult<T extends IDataObject> {
+  public static class DataObjectMigratorResult<T extends IDataObject> {
 
     private T m_dataObject;
     private boolean m_changed;
 
-    public DoStructureMigratorResult(T dataObject, boolean changed) {
+    public DataObjectMigratorResult(T dataObject, boolean changed) {
       m_dataObject = dataObject;
       m_changed = changed;
     }
@@ -209,41 +210,5 @@ public class DoStructureMigrator {
     public boolean isChanged() {
       return m_changed;
     }
-  }
-
-  // ======================================================================
-  // TODO 23.1 [data object migration] remove following deprecated methods
-
-  /**
-   * @deprecated see:
-   *             {@link #migrateDataObject(DoStructureMigrationContext, IDataObject, NamespaceVersion, IDoStructureMigrationLocalContextData...)}
-   */
-  @Deprecated
-  public boolean migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject) {
-    return migrateDataObject(ctx, dataObject, (NamespaceVersion) null /* latest version */);
-  }
-
-  /**
-   * @deprecated see:
-   *             {@link #migrateDataObject(DoStructureMigrationContext, IDataObject, NamespaceVersion, IDoStructureMigrationLocalContextData...)}
-   */
-  @Deprecated
-  public boolean migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject, IDoStructureMigrationLocalContextData... initialLocalContextData) {
-    return migrateDataObject(ctx, dataObject, (NamespaceVersion) null /* latest version */, initialLocalContextData);
-  }
-
-  /**
-   * This method only applies structure migrations. If this is the desired behavior, e.g. for unit tests, use
-   * {@link #applyStructureMigration(DoStructureMigrationContext, IDataObject, NamespaceVersion)} or call one of the
-   * {@code migrateDataObject()} methods which will apply both structure and value migrations and will return a typed
-   * data object.
-   *
-   * @deprecated use {@link #applyStructureMigration(DoStructureMigrationContext, IDataObject, NamespaceVersion)}
-   *             instead. For unit tests, use {code TestDoStructureMigrator#applyStructureMigration}
-   */
-  @Deprecated
-  public boolean migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion, IDoStructureMigrationLocalContextData... initialLocalContextData) {
-    DoStructureMigrationContext ctxCopy = ctx.copy().withInitialLocalContext(initialLocalContextData);
-    return applyStructureMigration(ctxCopy, dataObject, toVersion);
   }
 }

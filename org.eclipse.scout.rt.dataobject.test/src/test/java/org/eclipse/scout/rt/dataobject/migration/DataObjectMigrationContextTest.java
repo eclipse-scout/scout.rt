@@ -18,28 +18,27 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Test;
 
-// TODO 23.1 [data object migration] rename to DataObjectMigrationContextTest
-public class DoStructureMigrationContextTest {
+public class DataObjectMigrationContextTest {
 
   @Test
   public void testDefaults() {
-    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class);
-    assertTrue(ctx.getGlobal(IDoStructureMigrationLogger.class) instanceof DoStructureMigrationPassThroughLogger);
-    assertTrue(ctx.getLogger() instanceof DoStructureMigrationPassThroughLogger);
-    assertEquals(ctx.getLogger(), ctx.getGlobal(IDoStructureMigrationLogger.class));
+    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class);
+    assertTrue(ctx.getGlobal(IDataObjectMigrationLogger.class) instanceof DataObjectMigrationPassThroughLogger);
+    assertTrue(ctx.getLogger() instanceof DataObjectMigrationPassThroughLogger);
+    assertEquals(ctx.getLogger(), ctx.getGlobal(IDataObjectMigrationLogger.class));
   }
 
   @Test
   public void testGlobalBean() {
-    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class);
-    assertTrue(ctx.getGlobal(DoStructureMigrationStatsContextData.class) instanceof DoStructureMigrationStatsContextData);
-    assertTrue(ctx.getStats() instanceof DoStructureMigrationStatsContextData);
-    assertEquals(ctx.getStats(), ctx.getGlobal(DoStructureMigrationStatsContextData.class));
+    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class);
+    assertTrue(ctx.getGlobal(DataObjectMigrationStatsContextData.class) instanceof DataObjectMigrationStatsContextData);
+    assertTrue(ctx.getStats() instanceof DataObjectMigrationStatsContextData);
+    assertEquals(ctx.getStats(), ctx.getGlobal(DataObjectMigrationStatsContextData.class));
   }
 
   @Test
   public void testGlobalManually() {
-    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class);
+    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class);
     assertNull(ctx.getGlobal(ZipCodeFixtureGlobalContextData.class));
     ZipCodeFixtureGlobalContextData zipCodeContextData = new ZipCodeFixtureGlobalContextData();
     ctx.putGlobal(zipCodeContextData);
@@ -48,7 +47,7 @@ public class DoStructureMigrationContextTest {
 
   @Test
   public void testLocal() {
-    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class);
+    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class);
     assertNull(ctx.get(HouseFixtureStructureMigrationTargetContextData.class));
 
     HouseFixtureStructureMigrationTargetContextData houseFixtureContextData = BEANS.get(HouseFixtureStructureMigrationTargetContextData.class);
@@ -77,7 +76,7 @@ public class DoStructureMigrationContextTest {
 
   @Test
   public void testClone() {
-    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class);
+    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class);
 
     ZipCodeFixtureGlobalContextData zipCodeContextData = new ZipCodeFixtureGlobalContextData();
     ctx.putGlobal(zipCodeContextData);
@@ -85,7 +84,7 @@ public class DoStructureMigrationContextTest {
     HouseFixtureStructureMigrationTargetContextData houseFixtureContextData = BEANS.get(HouseFixtureStructureMigrationTargetContextData.class);
     ctx.push(houseFixtureContextData); // not initialized, for this test okay
 
-    DoStructureMigrationContext ctxCopy = ctx.copy();
+    DataObjectMigrationContext ctxCopy = ctx.copy();
 
     // Global (same reference)
     assertSame(ctx.getGlobal(ZipCodeFixtureGlobalContextData.class), ctxCopy.getGlobal(ZipCodeFixtureGlobalContextData.class));

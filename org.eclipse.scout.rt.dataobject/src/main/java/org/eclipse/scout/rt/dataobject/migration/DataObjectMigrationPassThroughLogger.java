@@ -18,10 +18,9 @@ import org.slf4j.LoggerFactory;
  * Thread-safe logger that directly outputs to {@link Logger}.
  */
 @Bean
-// TODO 23.1 [data object migration] rename to DataObjectMigrationPassThroughLogger
-public class DoStructureMigrationPassThroughLogger implements IDoStructureMigrationLogger {
+public class DataObjectMigrationPassThroughLogger implements IDataObjectMigrationLogger {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DoStructureMigrationPassThroughLogger.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataObjectMigrationPassThroughLogger.class);
 
   @Override
   public void trace(String message, Object... args) {

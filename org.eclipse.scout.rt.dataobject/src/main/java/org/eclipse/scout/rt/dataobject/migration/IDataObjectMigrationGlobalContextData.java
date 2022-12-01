@@ -14,18 +14,17 @@ package org.eclipse.scout.rt.dataobject.migration;
  * A global structure migration context data.
  * <p>
  * If a concrete subclass contains an @Bean annotation, it is auto-created when first accessed via
- * {@link DoStructureMigrationContext#getGlobal(Class)} and not existing yet.
+ * {@link DataObjectMigrationContext#getGlobal(Class)} and not existing yet.
  * <p>
  * Because a global context data may be accessed concurrently by different threads each implementation must be
  * thread-safe.
  */
-// TODO 23.1 [data object migration] rename to IDataObjectMigrationGlobalContextData
-public interface IDoStructureMigrationGlobalContextData {
+public interface IDataObjectMigrationGlobalContextData {
 
   /**
    * @return Class used as identifier for context data (map key).
    */
-  default Class<? extends IDoStructureMigrationGlobalContextData> getIdentifierClass() {
+  default Class<? extends IDataObjectMigrationGlobalContextData> getIdentifierClass() {
     return this.getClass();
   }
 }
