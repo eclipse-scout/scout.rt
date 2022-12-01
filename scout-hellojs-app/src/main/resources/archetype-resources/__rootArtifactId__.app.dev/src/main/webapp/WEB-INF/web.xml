@@ -88,4 +88,9 @@
     </cookie-config>
   </session-config>
 
+  <context-param>
+    <param-name>logbackDisableServletContainerInitializer</param-name>
+    <param-value>true</param-value>
+  </context-param>
+
 </web-app>

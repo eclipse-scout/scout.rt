@@ -41,7 +41,7 @@ import org.slf4j.impl.StaticLoggerBinder;
  *
  * @since 5.2
  */
-public class LoggerPlatformListener implements IPlatformListener {
+public class LoggerInstallPlatformListener implements IPlatformListener {
 
   public static final String LOGGER_FACTORY_CLASS_STR_LOGBACK = "ch.qos.logback.classic.util.ContextSelectorStaticBinder";
   public static final String LOGGER_FACTORY_CLASS_STR_JUL = "org.slf4j.impl.JDK14LoggerFactory";
@@ -49,11 +49,11 @@ public class LoggerPlatformListener implements IPlatformListener {
   public static final String LOGGER_SUPPORT_CLASS_NAME_LOGBACK = LOGGER_SUPPORT_PACKAGE_NAME_PREFIX + "LogbackLoggerSupport";
   public static final String LOGGER_SUPPORT_CLASS_NAME_JUL = LOGGER_SUPPORT_PACKAGE_NAME_PREFIX + "JulLoggerSupport";
 
-  private static final Logger LOG = LoggerFactory.getLogger(LoggerPlatformListener.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LoggerInstallPlatformListener.class);
 
   private final Map<String, String> m_loggerSupportByLoggerFactoryId;
 
-  public LoggerPlatformListener() {
+  public LoggerInstallPlatformListener() {
     m_loggerSupportByLoggerFactoryId = new HashMap<>();
     registerLoggerSupportMappings(m_loggerSupportByLoggerFactoryId);
   }

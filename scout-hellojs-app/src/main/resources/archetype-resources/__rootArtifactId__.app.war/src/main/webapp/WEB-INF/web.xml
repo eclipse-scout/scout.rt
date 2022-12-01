@@ -33,9 +33,9 @@
     <filter-name>HttpServerRunContextFilter</filter-name>
     <filter-class>org.eclipse.scout.rt.server.context.HttpServerRunContextFilter</filter-class>
     <init-param>
-     <param-name>session</param-name>
-     <param-value>false</param-value>
-   </init-param>    
+      <param-name>session</param-name>
+      <param-value>false</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>HttpServerRunContextFilter</filter-name>
@@ -89,5 +89,10 @@
       <secure>true</secure>
     </cookie-config>
   </session-config>
+
+  <context-param>
+    <param-name>logbackDisableServletContainerInitializer</param-name>
+    <param-value>true</param-value>
+  </context-param>
 
 </web-app>
