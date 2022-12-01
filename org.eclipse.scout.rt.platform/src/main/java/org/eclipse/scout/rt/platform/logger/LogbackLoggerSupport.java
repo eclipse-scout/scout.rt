@@ -10,10 +10,12 @@
  */
 package org.eclipse.scout.rt.platform.logger;
 
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 
 /**
  * Logger support for Logback.
@@ -95,6 +97,18 @@ public class LogbackLoggerSupport extends AbstractLoggerSupport {
       default:
         LOG.info("unknown scout log level '{}'. Falling back to logback level '{}'", level, Level.WARN);
         return Level.WARN;
+    }
+  }
+
+  @Override
+  public void shutdown() {
+    // similar to ch.qos.logback.classic.servlet.LogbackServletContextListener.contextDestroyed(ServletContextEvent)
+    // however we explicitly want to decide in which order/when this code is run
+    ILoggerFactory factory = LoggerFactory.getILoggerFactory();
+    if (factory instanceof LoggerContext) {
+      LoggerContext loggerContext = (LoggerContext) factory;
+      LOG.info("About to stop {}", loggerContext);
+      loggerContext.stop();
     }
   }
 }

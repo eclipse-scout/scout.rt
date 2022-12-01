@@ -40,4 +40,9 @@ public abstract class AbstractLoggerSupport implements ILoggerSupport {
   public void setLogLevel(Logger logger, LogLevel level) {
     setLogLevel(assertNotNull(logger).getName(), level);
   }
+
+  @Override
+  public void shutdown() {
+    // nop
+  }
 }

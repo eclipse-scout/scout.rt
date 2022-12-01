@@ -16,7 +16,7 @@ import org.slf4j.Logger;
  * A logger support allows to interact with the particular slf4j logger implementations in use.
  * <p>
  * <b>Note:</b> This class is not a bean by intention. The appropriate logger support is determined and installed by
- * {@link LoggerPlatformListener} or manually by the scout project.
+ * {@link LoggerInstallPlatformListener} or manually by the scout project.
  *
  * @since 5.2
  */
@@ -73,4 +73,12 @@ public interface ILoggerSupport {
    *          a level or <code>null</code>.
    */
   void setLogLevel(Logger logger, LogLevel level);
+
+  /**
+   * Shutdown the logger, called during shutdown to flush and/or free resources. Method should not throw if logger is
+   * not even started (actually all known loggers do not have a state or are started implicitly by using them), however
+   * some loggers should be explicitly shutdown. This method is called by a platform listener as late as possible during
+   * shutdown as there is no guarantee that any more logging is possible after this call.
+   */
+  void shutdown();
 }
