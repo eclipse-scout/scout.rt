@@ -344,7 +344,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
    *
    */
   protected _handleLoadError(error: Error): JQuery.Promise<Status> {
-    this.destroy();
+    this.close();
     throw error;
   }
 
