@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -42,7 +42,7 @@ public class HouseFixtureDoStructureMigrationHandler_3 extends AbstractDoStructu
   }
 
   @Override
-  protected boolean migrate(DoStructureMigrationContext ctx, IDoEntity doEntity) {
+  protected boolean migrate(DataObjectMigrationContext ctx, IDoEntity doEntity) {
     List<IDoEntity> rooms = doEntity.getList("rooms", IDoEntity.class);
 
     rooms.add(BEANS.get(DoEntityBuilder.class)

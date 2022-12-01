@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.scout.rt.dataobject.migration.IDoStructureMigrationGlobalContextData;
+import org.eclipse.scout.rt.dataobject.migration.IDataObjectMigrationGlobalContextData;
 
 // not a Bean, manually created
-public class ZipCodeFixtureGlobalContextData implements IDoStructureMigrationGlobalContextData {
+public class ZipCodeFixtureGlobalContextData implements IDataObjectMigrationGlobalContextData {
 
   private final ConcurrentHashMap<String, String> m_zipCodeToCityMap = new ConcurrentHashMap<>();
 

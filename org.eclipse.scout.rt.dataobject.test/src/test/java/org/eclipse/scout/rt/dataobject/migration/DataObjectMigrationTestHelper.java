@@ -15,9 +15,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
-import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureRawOnlyDoStructureMigrationTargetContextData;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureRawOnlyStructureMigrationTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureStructureMigrationTargetContextData;
-import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureTypedOnlyDoStructureMigrationTargetContextData;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureTypedOnlyStructureMigrationTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PersonFixtureTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureNamespace;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_1;
@@ -44,9 +44,8 @@ import org.eclipse.scout.rt.platform.namespace.INamespace;
 /**
  * Helper methods used within tests to access common fixtures (namespaces, type versions, context data classes).
  */
-// TODO 23.1 [data object migration] rename to DataObjectMigrationTestHelper
 @ApplicationScoped
-public class DoStructureMigrationTestHelper {
+public class DataObjectMigrationTestHelper {
 
   public List<INamespace> getFixtureNamespaces() {
     return Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace());
@@ -63,8 +62,8 @@ public class DoStructureMigrationTestHelper {
   public Collection<Class<? extends IDoStructureMigrationTargetContextData>> getFixtureContextDataClasses() {
     return Arrays.asList(
         HouseFixtureStructureMigrationTargetContextData.class,
-        HouseFixtureRawOnlyDoStructureMigrationTargetContextData.class,
-        HouseFixtureTypedOnlyDoStructureMigrationTargetContextData.class,
+        HouseFixtureRawOnlyStructureMigrationTargetContextData.class,
+        HouseFixtureTypedOnlyStructureMigrationTargetContextData.class,
         PersonFixtureTargetContextData.class);
   }
 }

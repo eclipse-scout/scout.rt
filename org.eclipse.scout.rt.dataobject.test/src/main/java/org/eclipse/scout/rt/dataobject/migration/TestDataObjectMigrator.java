@@ -15,14 +15,13 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 
 @IgnoreBean
-// TODO 23.1 [data object migration] rename to TestDataObjectMigrator
-public class TestDoStructureMigrator extends DoStructureMigrator {
+public class TestDataObjectMigrator extends DataObjectMigrator {
 
   /**
    * Override to change visibility from protected to public.
    */
   @Override
-  public boolean applyStructureMigration(DoStructureMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion) {
+  public boolean applyStructureMigration(DataObjectMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion) {
     return super.applyStructureMigration(ctx, dataObject, toVersion);
   }
 }

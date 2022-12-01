@@ -15,7 +15,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.BravoFixtureTypeVersions.BravoFixture_2;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -39,7 +39,7 @@ public class PetFixtureCaseSensitiveNameMigrationHandler_2 extends AbstractDoStr
   }
 
   @Override
-  protected boolean migrate(DoStructureMigrationContext ctx, IDoEntity doEntity) {
+  protected boolean migrate(DataObjectMigrationContext ctx, IDoEntity doEntity) {
     if (!doEntity.has("name")) {
       return false; // nothing to migrate
     }

@@ -54,20 +54,20 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests for {@link DoStructureMigrator}, with focus on data object structure migrations
+ * Tests for {@link DataObjectMigrator}, with focus on data object structure migrations
  * ({@link IDoStructureMigrationHandler}).
  */
 public class DataObjectMigratorStructureMigrationTest {
 
   private static final List<IBean<?>> TEST_BEANS = new ArrayList<>();
 
-  private static DoStructureMigrationContext s_migrationContext;
-  private static DoStructureMigrator s_migrator;
+  private static DataObjectMigrationContext s_migrationContext;
+  private static DataObjectMigrator s_migrator;
 
   @BeforeClass
   public static void beforeClass() {
-    DoStructureMigrationTestHelper testHelper = BEANS.get(DoStructureMigrationTestHelper.class);
-    TestDoStructureMigrationInventory inventory = new TestDoStructureMigrationInventory(
+    DataObjectMigrationTestHelper testHelper = BEANS.get(DataObjectMigrationTestHelper.class);
+    TestDataObjectMigrationInventory inventory = new TestDataObjectMigrationInventory(
         testHelper.getFixtureNamespaces(),
         testHelper.getFixtureTypeVersions(),
         testHelper.getFixtureContextDataClasses(),
@@ -84,9 +84,9 @@ public class DataObjectMigratorStructureMigrationTest {
             new PersonFixtureDoStructureMigrationHandler_2()),
         Collections.emptyList());
 
-    TEST_BEANS.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestDoStructureMigrationInventory.class, inventory).withReplace(true)));
-    s_migrationContext = BEANS.get(DoStructureMigrationContext.class);
-    s_migrator = BEANS.get(DoStructureMigrator.class);
+    TEST_BEANS.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestDataObjectMigrationInventory.class, inventory).withReplace(true)));
+    s_migrationContext = BEANS.get(DataObjectMigrationContext.class);
+    s_migrator = BEANS.get(DataObjectMigrator.class);
   }
 
   @AfterClass

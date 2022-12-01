@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -36,7 +36,7 @@ public class HouseTypeFixtureDoValueMigrationHandler_2 extends AbstractDoValueMi
   }
 
   @Override
-  public HouseTypeFixtureStringId migrate(DoStructureMigrationContext ctx, HouseTypeFixtureStringId value) {
+  public HouseTypeFixtureStringId migrate(DataObjectMigrationContext ctx, HouseTypeFixtureStringId value) {
     return "house".equals(value.unwrap()) ? HouseTypesFixture.DETACHED_HOUSE : value;
   }
 }

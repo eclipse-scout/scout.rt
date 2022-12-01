@@ -55,8 +55,7 @@ import org.eclipse.scout.rt.platform.util.Pair;
  * context data classes).
  */
 @ApplicationScoped
-// TODO 23.1 [data object migration] rename to DataObjectMigrationInventory
-public class DoStructureMigrationInventory {
+public class DataObjectMigrationInventory {
 
   protected final LinkedHashSet<String> m_namespaces = new LinkedHashSet<>();
   protected final LinkedHashSet<NamespaceVersion> m_orderedVersions = new LinkedHashSet<>(); // ordered versions according to VersionedItemInventory
@@ -627,14 +626,13 @@ public class DoStructureMigrationInventory {
     return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, versions.get(insertionPoint));
   }
 
-  // TODO 23.1 [data object migration] rename to getStructureMigrationHandlers
-  public Map<String, IDoStructureMigrationHandler> getMigrationHandlers(NamespaceVersion version) {
+  public Map<String, IDoStructureMigrationHandler> getStructureMigrationHandlers(NamespaceVersion version) {
     assertNotNull(version, "version is required");
     assertTrue(m_orderedVersions.contains(version), "version is unknown");
     return m_structureMigrationHandlers.computeIfAbsent(version, k -> Collections.emptyMap());
   }
 
-  public Set<Class<? extends IDoStructureMigrationTargetContextData>> getDoMigrationContextValues(IDoEntity doEntity) {
+  public Set<Class<? extends IDoStructureMigrationTargetContextData>> getStructureMigrationTargetContextDataClasses(IDoEntity doEntity) {
     assertNotNull(doEntity, "doEntity is required");
 
     String typeName = BEANS.get(DoStructureMigrationHelper.class).getType(doEntity);

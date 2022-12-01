@@ -17,10 +17,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Thread-safe implementation of a data object migration logger that additionally counts the log items per log level.
  */
-// TODO 23.1 [data object migration] rename to DataObjectMigrationCountingPassThroughLogger
-public class DoStructureMigrationCountingPassThroughLogger extends DoStructureMigrationPassThroughLogger {
+public class DataObjectMigrationCountingPassThroughLogger extends DataObjectMigrationPassThroughLogger {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DoStructureMigrationCountingPassThroughLogger.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataObjectMigrationCountingPassThroughLogger.class);
 
   protected final LongAdder m_traceCount = new LongAdder();
   protected final LongAdder m_debugCount = new LongAdder();

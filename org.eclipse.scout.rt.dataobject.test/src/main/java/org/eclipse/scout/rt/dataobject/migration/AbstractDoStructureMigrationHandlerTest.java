@@ -69,11 +69,11 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
    * @param toVersionClass
    *          To version is required to determine the file to load that contains the expected data object (target)
    */
-  public void testMigration(String filenamePrefix, Class<? extends ITypeVersion> fromVersionClass, Class<? extends ITypeVersion> toVersionClass, IDoStructureMigrationLocalContextData... initialLocalContextData) throws IOException {
+  public void testMigration(String filenamePrefix, Class<? extends ITypeVersion> fromVersionClass, Class<? extends ITypeVersion> toVersionClass, IDataObjectMigrationLocalContextData... initialLocalContextData) throws IOException {
     testMigration(filenamePrefix, BEANS.get(fromVersionClass).getVersion().unwrap(), toVersionClass, initialLocalContextData);
   }
 
-  public void testMigration(String filenamePrefix, String fromVersionText, Class<? extends ITypeVersion> toVersionClass, IDoStructureMigrationLocalContextData... initialLocalContextData) throws IOException {
+  public void testMigration(String filenamePrefix, String fromVersionText, Class<? extends ITypeVersion> toVersionClass, IDataObjectMigrationLocalContextData... initialLocalContextData) throws IOException {
     NamespaceVersion toVersion = BEANS.get(toVersionClass).getVersion();
     IPrettyPrintDataObjectMapper dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
 
@@ -83,9 +83,9 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
       actual = (IDoEntity) dataObjectMapper.readValueRaw(in);
     }
 
-    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class)
+    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class)
         .withInitialLocalContext(initialLocalContextData);
-    boolean changed = BEANS.get(DoStructureMigrator.class).applyStructureMigration(ctx, actual, toVersion);
+    boolean changed = BEANS.get(DataObjectMigrator.class).applyStructureMigration(ctx, actual, toVersion);
 
     assertTrue("Data object was not changed by migration", changed);
 

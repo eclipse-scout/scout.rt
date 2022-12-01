@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrator.DoStructureMigratorResult;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrator.DataObjectMigratorResult;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoStructureMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoValueMigrationHandler_1;
@@ -45,19 +45,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests for {@link DoStructureMigrator}, with focus on data object value migrations ({@link IDoValueMigrationHandler}).
+ * Tests for {@link DataObjectMigrator}, with focus on data object value migrations ({@link IDoValueMigrationHandler}).
  */
 public class DataObjectMigratorValueMigrationTest {
 
   private static final List<IBean<?>> TEST_BEANS = new ArrayList<>();
 
-  private static DoStructureMigrationContext s_migrationContext;
-  private static DoStructureMigrator s_migrator;
+  private static DataObjectMigrationContext s_migrationContext;
+  private static DataObjectMigrator s_migrator;
 
   @BeforeClass
   public static void beforeClass() {
-    DoStructureMigrationTestHelper testHelper = BEANS.get(DoStructureMigrationTestHelper.class);
-    TestDoStructureMigrationInventory inventory = new TestDoStructureMigrationInventory(
+    DataObjectMigrationTestHelper testHelper = BEANS.get(DataObjectMigrationTestHelper.class);
+    TestDataObjectMigrationInventory inventory = new TestDataObjectMigrationInventory(
         testHelper.getFixtureNamespaces(),
         testHelper.getFixtureTypeVersions(),
         Collections.emptyList(),
@@ -70,13 +70,13 @@ public class DataObjectMigratorValueMigrationTest {
             new HouseTypeFixtureDoValueMigrationHandler_2(),
             new HouseFixtureDoValueMigrationHandler_1()));
 
-    TEST_BEANS.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestDoStructureMigrationInventory.class, inventory).withReplace(true)));
+    TEST_BEANS.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestDataObjectMigrationInventory.class, inventory).withReplace(true)));
 
-    s_migrationContext = BEANS.get(DoStructureMigrationContext.class)
+    s_migrationContext = BEANS.get(DataObjectMigrationContext.class)
         .putGlobal(BEANS.get(DoValueMigrationIdsContextData.class)
             // by default, all value migrations are executed, except RoomSizeFixtureDoValueMigrationHandler_2 (PetFixtureAlwaysAcceptDoValueMigrationHandler_3 always accepts)
             .withAppliedValueMigrationIds(CollectionUtility.hashSet(PetFixtureAlwaysAcceptDoValueMigrationHandler_3.ID, RoomSizeFixtureDoValueMigrationHandler_2.ID)));
-    s_migrator = BEANS.get(DoStructureMigrator.class);
+    s_migrator = BEANS.get(DataObjectMigrator.class);
   }
 
   @AfterClass
@@ -95,7 +95,7 @@ public class DataObjectMigratorValueMigrationTest {
 
     // no value migrations will match the provided data object
     // RoomSizeFixtureDoValueMigrationHandler_2 is ignored by default in s_migrationContext
-    DoStructureMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+    DataObjectMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
 
     assertFalse(result.isChanged()); // no changes (structure nor values changed)
 
@@ -116,12 +116,12 @@ public class DataObjectMigratorValueMigrationTest {
         .withName("example")
         .withAreaInSquareMeter(10);
 
-    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class)
+    DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class)
         .putGlobal(BEANS.get(DoValueMigrationIdsContextData.class)
             .withAppliedValueMigrationIds(Collections.emptySet())); // run all value migrations
 
     // migration run 1
-    DoStructureMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(ctx, original);
+    DataObjectMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(ctx, original);
 
     assertTrue(result.isChanged());
 
@@ -154,7 +154,7 @@ public class DataObjectMigratorValueMigrationTest {
         .withHouseType(HouseTypeFixtureStringId.of("house")); // will be migrated by HouseTypeFixtureDoValueMigrationHandler_2
 
     // migration run 1
-    DoStructureMigratorResult<HouseFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+    DataObjectMigratorResult<HouseFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
 
     assertTrue(result.isChanged());
 
@@ -184,7 +184,7 @@ public class DataObjectMigratorValueMigrationTest {
         .withRooms(BEANS.get(RoomFixtureDo.class)
             .withName("tiny room"));
 
-    DoStructureMigratorResult<HouseFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+    DataObjectMigratorResult<HouseFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
 
     assertTrue(result.isChanged());
 
@@ -207,7 +207,7 @@ public class DataObjectMigratorValueMigrationTest {
         .withCustomData(BEANS.get(PetFixtureDo.class)
             .withName("Name: Fluffy")); // Will be migrated by PetFixtureDoValueMigrationHandler_3
 
-    DoStructureMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+    DataObjectMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
 
     assertTrue(result.isChanged());
 
@@ -231,7 +231,7 @@ public class DataObjectMigratorValueMigrationTest {
 
     // check that part of the set of applied value migration IDs
     assertTrue(s_migrationContext.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds().contains(PetFixtureAlwaysAcceptDoValueMigrationHandler_3.ID));
-    DoStructureMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+    DataObjectMigratorResult<RoomFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
 
     // executed even if already applied
     assertTrue(result.isChanged());
@@ -256,7 +256,7 @@ public class DataObjectMigratorValueMigrationTest {
         .put("_typeVersion", CharlieFixture_2.VERSION.unwrap()) // will be updated by HouseFixtureDoStructureMigrationHandler_3
         .build();
 
-    DoStructureMigratorResult<IDoEntity> result = s_migrator.migrateDataObject(s_migrationContext, original, IDoEntity.class);
+    DataObjectMigratorResult<IDoEntity> result = s_migrator.migrateDataObject(s_migrationContext, original, IDoEntity.class);
 
     assertTrue(result.isChanged());
 

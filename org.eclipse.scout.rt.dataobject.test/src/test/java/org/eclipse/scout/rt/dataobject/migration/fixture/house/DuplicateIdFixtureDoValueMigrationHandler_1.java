@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_1;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -35,7 +35,7 @@ public class DuplicateIdFixtureDoValueMigrationHandler_1 extends AbstractDoValue
   }
 
   @Override
-  public IDoEntity migrate(DoStructureMigrationContext ctx, IDoEntity value) {
+  public IDoEntity migrate(DataObjectMigrationContext ctx, IDoEntity value) {
     return value; // no migration, used for checking for duplicate migration IDs
   }
 }

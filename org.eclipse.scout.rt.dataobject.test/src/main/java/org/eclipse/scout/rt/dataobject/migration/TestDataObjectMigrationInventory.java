@@ -14,7 +14,6 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
@@ -23,8 +22,7 @@ import org.eclipse.scout.rt.platform.namespace.INamespace;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @IgnoreBean
-// TODO 23.1 [data object migration] rename to TestDataObjectMigrationInventory
-public class TestDoStructureMigrationInventory extends DoStructureMigrationInventory {
+public class TestDataObjectMigrationInventory extends DataObjectMigrationInventory {
 
   protected final List<INamespace> m_internalNamespaces = new ArrayList<>();
   protected final Collection<ITypeVersion> m_internalTypeVersions = new ArrayList<>();
@@ -32,7 +30,7 @@ public class TestDoStructureMigrationInventory extends DoStructureMigrationInven
   protected final List<IDoStructureMigrationHandler> m_internalStructureMigrationHandlers = new ArrayList<>();
   protected final List<IDoValueMigrationHandler<?>> m_internalValueMigrationHandlers = new ArrayList<>();
 
-  public TestDoStructureMigrationInventory(
+  public TestDataObjectMigrationInventory(
       List<INamespace> namespaces,
       Collection<ITypeVersion> typeVersions,
       Collection<Class<? extends IDoStructureMigrationTargetContextData>> contextDataClasses,
@@ -55,22 +53,6 @@ public class TestDoStructureMigrationInventory extends DoStructureMigrationInven
     }
 
     init();
-  }
-
-  /**
-   * This constructor will be removed in a future release.
-   *
-   * @deprecated use {@link #TestDoStructureMigrationInventory(List, Collection, Collection, Collection, Collection)}
-   *             instead.
-   */
-  // TODO 23.1 [data object migration] remove deprecated constructor
-  @Deprecated
-  public TestDoStructureMigrationInventory(
-      List<INamespace> namespaces,
-      Collection<ITypeVersion> typeVersions,
-      Collection<Class<? extends IDoStructureMigrationTargetContextData>> contextDataClasses,
-      IDoStructureMigrationHandler... structureMigrationHandlers) {
-    this(namespaces, typeVersions, contextDataClasses, CollectionUtility.arrayList(structureMigrationHandlers), Collections.emptyList());
   }
 
   @Override

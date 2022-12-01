@@ -36,7 +36,7 @@ public interface IDoStructureMigrationHandler {
    * namespaces are equal and the type version of the data object is lower than the version of the migration handler.
    * <p>
    * This type version is usually the one the migrated data object must have after
-   * {@link #applyMigration(DoStructureMigrationContext, IDoEntity)} was called. Two exceptions:
+   * {@link #applyMigration(DataObjectMigrationContext, IDoEntity)} was called. Two exceptions:
    * <ul>
    * <li>A data object changes its namespace (e.g. triggered with bravo-2 but updated to alfa-3)
    * <li>A data object is replaced by an existing one: no type version update (e.g. LoremDo is integrated into IpsumDo)
@@ -47,7 +47,7 @@ public interface IDoStructureMigrationHandler {
   NamespaceVersion toTypeVersion();
 
   /**
-   * {@link #applyMigration(DoStructureMigrationContext, IDoEntity)} is called for these type names if type version
+   * {@link #applyMigration(DataObjectMigrationContext, IDoEntity)} is called for these type names if type version
    * requirements are satisfied (see {@link #toTypeVersion()}).
    * <p>
    * One migration handler may be triggered by several different type names (e.g. one migration handler for a bunch of
@@ -70,5 +70,5 @@ public interface IDoStructureMigrationHandler {
    * @return <code>true</code> if data object was changed in any way (including type version update only),
    *         <code>false</code> otherwise.
    */
-  boolean applyMigration(DoStructureMigrationContext ctx, IDoEntity doEntity);
+  boolean applyMigration(DataObjectMigrationContext ctx, IDoEntity doEntity);
 }

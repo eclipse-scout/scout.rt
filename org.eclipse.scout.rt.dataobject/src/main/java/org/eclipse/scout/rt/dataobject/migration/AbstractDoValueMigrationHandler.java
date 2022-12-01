@@ -46,7 +46,7 @@ public abstract class AbstractDoValueMigrationHandler<T> implements IDoValueMigr
    * choose to always accept (despite being already applied) or to not accept in case some context data is missing.
    */
   @Override
-  public boolean accept(DoStructureMigrationContext ctx) {
+  public boolean accept(DataObjectMigrationContext ctx) {
     return !ctx.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds().contains(id());
   }
 }

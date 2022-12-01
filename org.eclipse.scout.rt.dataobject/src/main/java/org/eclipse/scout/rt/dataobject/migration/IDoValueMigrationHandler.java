@@ -156,7 +156,7 @@ public interface IDoValueMigrationHandler<T> {
    * @return <code>true</code> if value migration is accepted and therefore considered for execution, <code>false</code>
    *         otherwise.
    */
-  boolean accept(DoStructureMigrationContext ctx);
+  boolean accept(DataObjectMigrationContext ctx);
 
   /**
    * Returns the migrated value for a given input value.
@@ -169,5 +169,5 @@ public interface IDoValueMigrationHandler<T> {
    * @param value
    *          never {@code null}
    **/
-  T migrate(DoStructureMigrationContext ctx, T value);
+  T migrate(DataObjectMigrationContext ctx, T value);
 }

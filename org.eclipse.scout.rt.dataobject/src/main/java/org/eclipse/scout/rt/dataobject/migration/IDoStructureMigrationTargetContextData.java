@@ -15,11 +15,11 @@ import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * Interface for migration context data classes that are created and pushed as local context data to
- * {@link DoStructureMigrationContext} when a corresponding data object is traversed (see
+ * {@link DataObjectMigrationContext} when a corresponding data object is traversed (see
  * {@link DoStructureMigrationContextDataTarget} annotation for data object matching).
  */
 @Bean
-public interface IDoStructureMigrationTargetContextData extends IDoStructureMigrationLocalContextData {
+public interface IDoStructureMigrationTargetContextData extends IDataObjectMigrationLocalContextData {
 
   /**
    * A context for a data object is initialized after the corresponding data object was migrated to the specific
@@ -27,5 +27,5 @@ public interface IDoStructureMigrationTargetContextData extends IDoStructureMigr
    *
    * @return <code>true</true> if it's a valid context and should be used, <code>false</false> to discard context.
    **/
-  boolean initialize(DoStructureMigrationContext ctx, IDoEntity doEntity);
+  boolean initialize(DataObjectMigrationContext ctx, IDoEntity doEntity);
 }

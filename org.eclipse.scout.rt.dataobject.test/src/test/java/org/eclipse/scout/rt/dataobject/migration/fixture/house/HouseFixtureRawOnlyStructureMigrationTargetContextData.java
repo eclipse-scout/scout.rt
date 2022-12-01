@@ -11,12 +11,12 @@
 package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 
 import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContextDataTarget;
 import org.eclipse.scout.rt.dataobject.migration.IDoStructureMigrationTargetContextData;
 
 @DoStructureMigrationContextDataTarget(typeNames = {"charlieFixture.HouseFixture"})
-public class HouseFixtureRawOnlyDoStructureMigrationTargetContextData implements IDoStructureMigrationTargetContextData {
+public class HouseFixtureRawOnlyStructureMigrationTargetContextData implements IDoStructureMigrationTargetContextData {
 
   private String m_name;
 
@@ -25,7 +25,7 @@ public class HouseFixtureRawOnlyDoStructureMigrationTargetContextData implements
   }
 
   @Override
-  public boolean initialize(DoStructureMigrationContext ctx, IDoEntity doEntity) {
+  public boolean initialize(DataObjectMigrationContext ctx, IDoEntity doEntity) {
     m_name = doEntity.getString("name");
     return true;
   }

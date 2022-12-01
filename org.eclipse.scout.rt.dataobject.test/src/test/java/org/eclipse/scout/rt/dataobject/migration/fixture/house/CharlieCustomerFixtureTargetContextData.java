@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 
 import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContextDataTarget;
 import org.eclipse.scout.rt.dataobject.migration.IDoStructureMigrationTargetContextData;
 
@@ -25,7 +25,7 @@ public class CharlieCustomerFixtureTargetContextData implements IDoStructureMigr
   }
 
   @Override
-  public boolean initialize(DoStructureMigrationContext ctx, IDoEntity doEntity) {
+  public boolean initialize(DataObjectMigrationContext ctx, IDoEntity doEntity) {
     if (doEntity instanceof CharlieCustomerFixtureDo) {
       CharlieCustomerFixtureDo house = (CharlieCustomerFixtureDo) doEntity;
       m_emailAddress = house.getEmailAddress();

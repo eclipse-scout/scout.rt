@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueMigrationHandler;
-import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationContext;
+import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_1;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -39,7 +39,7 @@ public class HouseFixtureDoValueMigrationHandler_1 extends AbstractDoValueMigrat
   }
 
   @Override
-  public HouseFixtureDo migrate(DoStructureMigrationContext ctx, HouseFixtureDo value) {
+  public HouseFixtureDo migrate(DataObjectMigrationContext ctx, HouseFixtureDo value) {
     if (!value.rooms().exists()) {
       return value; // nothing to migrate
     }
