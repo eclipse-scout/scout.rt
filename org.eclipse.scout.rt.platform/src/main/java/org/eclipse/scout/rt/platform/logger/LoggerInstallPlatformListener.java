@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 5.2
  */
-public class LoggerPlatformListener implements IPlatformListener {
+public class LoggerInstallPlatformListener implements IPlatformListener {
 
   public static final String LOGGER_FACTORY_CLASS_NAME_LOGBACK = "ch.qos.logback.classic.LoggerContext";
   public static final String LOGGER_FACTORY_CLASS_NAME_JUL = "org.slf4j.jul.JDK14LoggerFactory";
@@ -49,11 +49,11 @@ public class LoggerPlatformListener implements IPlatformListener {
   public static final String LOGGER_SUPPORT_CLASS_NAME_LOGBACK = LOGGER_SUPPORT_PACKAGE_NAME_PREFIX + "LogbackLoggerSupport";
   public static final String LOGGER_SUPPORT_CLASS_NAME_JUL = LOGGER_SUPPORT_PACKAGE_NAME_PREFIX + "JulLoggerSupport";
 
-  private static final Logger LOG = LoggerFactory.getLogger(LoggerPlatformListener.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LoggerInstallPlatformListener.class);
 
   private final Map<String, String> m_loggerSupportByLoggerFactory;
 
-  public LoggerPlatformListener() {
+  public LoggerInstallPlatformListener() {
     m_loggerSupportByLoggerFactory = new HashMap<>();
     registerLoggerSupportMappings(m_loggerSupportByLoggerFactory);
   }
