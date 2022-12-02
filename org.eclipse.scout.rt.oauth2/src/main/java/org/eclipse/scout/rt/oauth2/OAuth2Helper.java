@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.oauth2;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -29,8 +30,7 @@ import com.github.scribejava.core.oauth.OAuth20Service;
 public class OAuth2Helper {
 
   protected final ConcurrentHashMap<OAuth2Config, TokenEntry> m_tokenCache = new ConcurrentHashMap<>();
-  protected final IDateProvider m_dateProvider = BEANS.get(IDateProvider.class);
-  protected long m_latestEviction = m_dateProvider.currentUTCMillis();
+  protected long m_latestEviction = BEANS.get(IDateProvider.class).currentUTCMillis();
   // Clean map after 30 minutes (or longer, if #getToken() isn't called)
   protected final static long EVICTION_INTERVALL = 30 * 60 * 1000;
 
@@ -43,11 +43,12 @@ public class OAuth2Helper {
     try {
       TokenEntry tokenEntry = null;
       tokenEntry = m_tokenCache.get(oAuth2Config);
+      IDateProvider dateProvider = BEANS.get(IDateProvider.class);
       if (tokenEntry == null
           || tokenEntry.getAccessToken() == null
           || tokenEntry.getTokenReceivedTime() == null
           // If expired or when expiring within the next minute: Get a new token
-          || (tokenEntry.getTokenReceivedTime() + tokenEntry.getAccessToken().getExpiresIn() * 1000 - 60000) < m_dateProvider.currentUTCMillis()) {
+          || (tokenEntry.getTokenReceivedTime() + tokenEntry.getAccessToken().getExpiresIn() * 1000 - 60000) < dateProvider.currentUTCMillis()) {
         OAuth2AccessToken token;
         try (OAuth20Service service = new ServiceBuilder(oAuth2Config.getClientId())
             .apiSecret(oAuth2Config.getClientSecret())
@@ -66,7 +67,7 @@ public class OAuth2Helper {
             })) {
           token = service.getAccessTokenClientCredentialsGrant();
 
-          tokenEntry = new TokenEntry(token, m_dateProvider.currentUTCMillis());
+          tokenEntry = new TokenEntry(token, dateProvider.currentUTCMillis());
           m_tokenCache.put(oAuth2Config, tokenEntry);
         }
         catch (IOException | InterruptedException | ExecutionException e) {
@@ -87,13 +88,16 @@ public class OAuth2Helper {
    * Evict all expired entries when at least EVICTION_INTERVALL milliseconds have elapsed since last eviction
    */
   protected void evictExpiredEntries() {
-    if (m_latestEviction + EVICTION_INTERVALL > m_dateProvider.currentUTCMillis()) {
-      for (Entry<OAuth2Config, TokenEntry> entry : m_tokenCache.entrySet()) {
-        if (entry.getValue().m_tokenReceivedTime + entry.getValue().getAccessToken().getExpiresIn() * 1000 < m_dateProvider.currentUTCMillis()) {
+    IDateProvider dateProvider = BEANS.get(IDateProvider.class);
+    if (m_latestEviction + EVICTION_INTERVALL > dateProvider.currentUTCMillis()) {
+      Iterator<Entry<OAuth2Config, TokenEntry>> iterator = m_tokenCache.entrySet().iterator();
+      while (iterator.hasNext()) {
+        Entry<OAuth2Config, TokenEntry> entry = iterator.next();
+        if (entry.getValue().m_tokenReceivedTime + entry.getValue().getAccessToken().getExpiresIn() * 1000 < dateProvider.currentUTCMillis()) {
           m_tokenCache.remove(entry.getKey());
         }
       }
-      m_latestEviction = m_dateProvider.currentUTCMillis();
+      m_latestEviction = dateProvider.currentUTCMillis();
     }
   }
 
