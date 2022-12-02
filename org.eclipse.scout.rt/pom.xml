@@ -96,6 +96,8 @@
     <module>../eclipse-scout-tsconfig</module>
     <module>../eslint-config</module>
 
+    <module>../org.eclipse.scout.rt.oauth2</module>
+
     <!-- chart -->
     <module>../eclipse-scout-chart</module>
     <module>../org.eclipse.scout.rt.chart.client</module>
@@ -554,6 +556,11 @@
         <artifactId>eclipse-scout-chart</artifactId>
         <version>23.1-SNAPSHOT</version>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.oauth2</artifactId>
+        <version>22.0-SNAPSHOT</version>
+      </dependency>
 
       <dependency>
         <groupId>commons-fileupload</groupId>
@@ -624,6 +631,13 @@
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
         <version>1.30</version>
+      </dependency>
+
+      <!-- OAuth -->
+      <dependency>
+        <groupId>com.github.scribejava</groupId>
+        <artifactId>scribejava-apis</artifactId>
+        <version>8.3.1</version>
       </dependency>
 
       <!-- Jersey (REST) -->
