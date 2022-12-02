@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.mail.Session;
 
+import org.eclipse.scout.rt.oauth2.OAuth2Config;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
@@ -31,6 +32,8 @@ public class ImapServerConfig {
   private String m_sslProtocols;
 
   private String m_customStoreProtocol;
+
+  private OAuth2Config m_oAuth2Config;
 
   private Map<String, String> m_additionalSessionProperties;
 
@@ -129,6 +132,15 @@ public class ImapServerConfig {
   public ImapServerConfig withCustomStoreProtocol(String customStoreProtocol) {
     m_customStoreProtocol = customStoreProtocol;
     return this;
+  }
+
+  public ImapServerConfig withOAuth2Config(OAuth2Config oAuth2Config) {
+    m_oAuth2Config = oAuth2Config;
+    return this;
+  }
+
+  public OAuth2Config getAuth2Config() {
+    return m_oAuth2Config;
   }
 
   public Map<String, String> getAdditionalSessionProperties() {
