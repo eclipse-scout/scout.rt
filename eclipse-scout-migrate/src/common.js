@@ -647,3 +647,21 @@ export const defaultRecastOptions = {
   quote: 'single',
   objectCurlySpacing: false
 };
+
+export const defaultMenuTypesMap = {
+  'Table.EmptySpace': {objectType: 'Table', menuTypes: 'MenuTypes', menuType: 'EmptySpace'},
+  'Table.SingleSelection': {objectType: 'Table', menuTypes: 'MenuTypes', menuType: 'SingleSelection'},
+  'Table.MultiSelection': {objectType: 'Table', menuTypes: 'MenuTypes', menuType: 'MultiSelection'},
+  'Table.Header': {objectType: 'Table', menuTypes: 'MenuTypes', menuType: 'Header'},
+  'TabBox.Header': {objectType: 'TabBox', menuTypes: 'MenuTypes', menuType: 'Header'},
+  'Tree.EmptySpace': {objectType: 'Tree', menuTypes: 'MenuTypes', menuType: 'EmptySpace'},
+  'Tree.SingleSelection': {objectType: 'Tree', menuTypes: 'MenuTypes', menuType: 'SingleSelection'},
+  'Tree.MultiSelection': {objectType: 'Tree', menuTypes: 'MenuTypes', menuType: 'MultiSelection'},
+  'Tree.Header': {objectType: 'Tree', menuTypes: 'MenuTypes', menuType: 'Header'},
+  'Planner.Activity': {objectType: 'Planner', menuTypes: 'MenuTypes', menuType: 'Activity'},
+  'Planner.EmptySpace': {objectType: 'Planner', menuTypes: 'MenuTypes', menuType: 'EmptySpace'},
+  'Planner.Range': {objectType: 'Planner', menuTypes: 'MenuTypes', menuType: 'Range'},
+  'Planner.Resource': {objectType: 'Planner', menuTypes: 'MenuTypes', menuType: 'Resource'},
+  'Calendar.EmptySpace': {objectType: 'Calendar', menuTypes: 'MenuTypes', menuType: 'EmptySpace'},
+  'Calendar.CalendarComponent': {objectType: 'Calendar', menuTypes: 'MenuTypes', menuType: 'CalendarComponent'}
+};

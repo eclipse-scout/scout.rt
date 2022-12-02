@@ -189,6 +189,13 @@ export class Tree extends Widget implements TreeModel {
     CHECKBOX_TREE_NODE: 'checkbox_tree_node'
   } as const;
 
+  static MenuTypes = {
+    EmptySpace: 'Tree.EmptySpace',
+    SingleSelection: 'Tree.SingleSelection',
+    MultiSelection: 'Tree.MultiSelection',
+    Header: 'Tree.Header'
+  } as const;
+
   /**
    * Used to calculate the view range size. See {@link calculateViewRangeSize}.
    */
@@ -3302,6 +3309,7 @@ export class Tree extends Widget implements TreeModel {
 
 export type TreeDisplayStyle = EnumObject<typeof Tree.DisplayStyle>;
 export type TreeCheckableStyle = EnumObject<typeof Tree.CheckableStyle>;
+export type TreeMenuTypes = EnumObject<typeof Tree.MenuTypes>;
 export type TreeNodeExpandOptions = {
   /**
    * Default is derived from {@link TreeNode.expandedLazy} and {@link TreeNode.lazyExpandingEnabled} if the node is expanded and false otherwise.

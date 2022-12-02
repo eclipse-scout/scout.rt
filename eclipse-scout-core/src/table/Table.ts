@@ -241,6 +241,13 @@ export class Table extends Widget implements TableModel {
 
   // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
 
+  static MenuTypes = {
+    EmptySpace: 'Table.EmptySpace',
+    SingleSelection: 'Table.SingleSelection',
+    MultiSelection: 'Table.MultiSelection',
+    Header: 'Table.Header'
+  } as const;
+
   static HierarchicalStyle = {
     DEFAULT: 'default',
     STRUCTURED: 'structured'
@@ -5524,6 +5531,7 @@ export class Table extends Widget implements TableModel {
   }
 }
 
+export type TableMenuTypes = EnumObject<typeof Table.MenuTypes>;
 export type TableHierarchicalStyle = EnumObject<typeof Table.HierarchicalStyle>;
 export type TableCheckableStyle = EnumObject<typeof Table.CheckableStyle>;
 export type TableGroupingStyle = EnumObject<typeof Table.GroupingStyle>;

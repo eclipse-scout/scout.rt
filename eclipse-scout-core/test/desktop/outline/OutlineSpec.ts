@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBox, ObjectFactory, objects, OutlineOverview, scout, Status, TileOutlineOverview, Tree} from '../../../src/index';
+import {MessageBox, ObjectFactory, objects, OutlineOverview, scout, Status, Table, TileOutlineOverview, Tree} from '../../../src/index';
 import {FormSpecHelper, JQueryTesting, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '../../../src/testing/index';
 
 describe('Outline', () => {
@@ -191,9 +191,9 @@ describe('Outline', () => {
       let node0 = outline.nodes[0];
       node0.detailTable.setMenus([
         menuHelper.createMenu({
-          menuTypes: ['Table.SingleSelection']
+          menuTypes: [Table.MenuTypes.SingleSelection]
         }), menuHelper.createMenu({
-          menuTypes: ['Table.EmptySpace']
+          menuTypes: [Table.MenuTypes.EmptySpace]
         })
       ]);
       expect(outline.detailMenuBarVisible).toBe(false);
@@ -211,9 +211,9 @@ describe('Outline', () => {
       let node0 = outline.nodes[0];
       node0.detailTable.setMenus([
         menuHelper.createMenu({
-          menuTypes: ['Table.SingleSelection']
+          menuTypes: [Table.MenuTypes.SingleSelection]
         }), menuHelper.createMenu({
-          menuTypes: ['Table.EmptySpace']
+          menuTypes: [Table.MenuTypes.EmptySpace]
         })
       ]);
       expect(outline.detailMenuBarVisible).toBe(false);
@@ -237,7 +237,7 @@ describe('Outline', () => {
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
       // Menus change on table -> detail menu bar needs to be updated as well
-      let menu = menuHelper.createModel('menu', '', ['Table.EmptySpace']);
+      let menu = menuHelper.createModel('menu', '', [Table.MenuTypes.EmptySpace]);
       node0.detailTable.setMenus([menu]);
       expect(outline.detailMenuBarVisible).toBe(true);
       expect(outline.detailMenuBar.menuItems.length).toBe(1);
@@ -275,10 +275,10 @@ describe('Outline', () => {
       outline.render();
       let node0 = outline.nodes[0];
       let emptySpaceMenu = menuHelper.createMenu({
-        menuTypes: ['Table.EmptySpace']
+        menuTypes: [Table.MenuTypes.EmptySpace]
       });
       let emptySpaceMenu2 = menuHelper.createMenu({
-        menuTypes: ['Table.EmptySpace']
+        menuTypes: [Table.MenuTypes.EmptySpace]
       });
       node0.detailTable.setMenus([emptySpaceMenu]);
 
@@ -314,10 +314,10 @@ describe('Outline', () => {
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
       let singleSelectionMenu = menuHelper.createMenu({
-        menuTypes: ['Table.SingleSelection']
+        menuTypes: [Table.MenuTypes.SingleSelection]
       });
       let singleSelectionMenu2 = menuHelper.createMenu({
-        menuTypes: ['Table.SingleSelection']
+        menuTypes: [Table.MenuTypes.SingleSelection]
       });
       node0.detailTable.setMenus([singleSelectionMenu, singleSelectionMenu2]);
       expect(outline.detailMenuBar.menuItems.length).toBe(2);
@@ -370,10 +370,10 @@ describe('Outline', () => {
       outline.render();
       let node0 = outline.nodes[0];
       let emptySpaceMenu = menuHelper.createMenu({
-        menuTypes: ['Table.EmptySpace']
+        menuTypes: [Table.MenuTypes.EmptySpace]
       });
       let emptySpaceMenu2 = menuHelper.createMenu({
-        menuTypes: ['Table.EmptySpace']
+        menuTypes: [Table.MenuTypes.EmptySpace]
       });
       node0.detailTable.setMenus([emptySpaceMenu, emptySpaceMenu2]);
 

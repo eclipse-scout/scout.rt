@@ -15,6 +15,7 @@ import {
 import $ from 'jquery';
 
 export type CalendarDisplayMode = EnumObject<typeof Calendar.DisplayMode>;
+export type CalendarMenuTypes = EnumObject<typeof Calendar.MenuTypes>;
 export type CalendarDirection = EnumObject<typeof Calendar.Direction>;
 export type CalendarMoveData = {
   event?: JQuery.MouseEventBase;
@@ -200,6 +201,11 @@ export class Calendar extends Widget implements CalendarModel {
   static Direction = {
     BACKWARD: -1,
     FORWARD: 1
+  } as const;
+
+  static MenuTypes = {
+    EmptySpace: 'Calendar.EmptySpace',
+    CalendarComponent: 'Calendar.CalendarComponent'
   } as const;
 
   isDay(): boolean {
@@ -1247,7 +1253,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _onDayContextMenu(event: JQuery.ContextMenuEvent<HTMLDivElement>) {
-    this._showContextMenu(event, 'Calendar.EmptySpace');
+    this._showContextMenu(event, Calendar.MenuTypes.EmptySpace);
   }
 
   /** @internal */

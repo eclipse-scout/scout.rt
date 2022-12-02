@@ -129,6 +129,13 @@ export class Planner extends Widget implements PlannerModel {
 
   static RANGE_SELECTION_MOVE_THRESHOLD = 10;
 
+  static MenuTypes = {
+    Activity: 'Planner.Activity',
+    EmptySpace: 'Planner.EmptySpace',
+    Range: 'Planner.Range',
+    Resource: 'Planner.Resource'
+  } as const;
+
   protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
@@ -318,15 +325,15 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _onResourceTitleContextMenu(event: JQuery.ContextMenuEvent) {
-    this._showContextMenu(event, 'Planner.Resource');
+    this._showContextMenu(event, Planner.MenuTypes.Resource);
   }
 
   protected _onRangeSelectorContextMenu(event: JQuery.ContextMenuEvent) {
-    this._showContextMenu(event, 'Planner.Range');
+    this._showContextMenu(event, Planner.MenuTypes.Range);
   }
 
   protected _onActivityContextMenu(event: JQuery.ContextMenuEvent) {
-    this._showContextMenu(event, 'Planner.Activity');
+    this._showContextMenu(event, Planner.MenuTypes.Activity);
   }
 
   protected _showContextMenu(event: JQuery.ContextMenuEvent, allowedType: string) {
@@ -1264,20 +1271,20 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _updateMenuBar() {
-    let menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range'], false, true);
+    let menuItems = this._filterMenus([Planner.MenuTypes.EmptySpace, Planner.MenuTypes.Resource, Planner.MenuTypes.Activity, Planner.MenuTypes.Range], false, true);
     this.menuBar.setMenuItems(menuItems);
   }
 
   protected _filterMenus(allowedTypes: string[], onlyVisible: boolean, enableDisableKeyStrokes?: boolean): Menu[] {
     allowedTypes = allowedTypes || [];
-    if (allowedTypes.indexOf('Planner.Resource') > -1 && this.selectedResources.length === 0) {
-      arrays.remove(allowedTypes, 'Planner.Resource');
+    if (allowedTypes.indexOf(Planner.MenuTypes.Resource) > -1 && this.selectedResources.length === 0) {
+      arrays.remove(allowedTypes, Planner.MenuTypes.Resource);
     }
-    if (allowedTypes.indexOf('Planner.Activity') > -1 && !this.selectedActivity) {
-      arrays.remove(allowedTypes, 'Planner.Activity');
+    if (allowedTypes.indexOf(Planner.MenuTypes.Activity) > -1 && !this.selectedActivity) {
+      arrays.remove(allowedTypes, Planner.MenuTypes.Activity);
     }
-    if (allowedTypes.indexOf('Planner.Range') > -1 && !this.selectionRange.from && !this.selectionRange.to) {
-      arrays.remove(allowedTypes, 'Planner.Range');
+    if (allowedTypes.indexOf(Planner.MenuTypes.Range) > -1 && !this.selectionRange.from && !this.selectionRange.to) {
+      arrays.remove(allowedTypes, Planner.MenuTypes.Range);
     }
     return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes});
   }
@@ -1649,6 +1656,7 @@ export class Planner extends Widget implements PlannerModel {
 export type PlannerDisplayMode = EnumObject<typeof Planner.DisplayMode>;
 export type PlannerDirection = EnumObject<typeof Planner.Direction>;
 export type PlannerSelectionMode = EnumObject<typeof Planner.SelectionMode>;
+export type PlannerMenuTypes = EnumObject<typeof Planner.MenuTypes>;
 
 export interface PlannerActivity {
   id: string;

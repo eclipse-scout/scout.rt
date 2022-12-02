@@ -14,14 +14,15 @@ import countMethodsPlugin from '../src/countMethodsPlugin.js';
 import printEventMapsPlugin from '../src/printEventMapsPlugin.js';
 import typedObjectTypePlugin from '../src/typedObjectTypePlugin.js';
 import widgetColumnMapPlugin from '../src/widgetColumnMapPlugin.js';
+import menuTypesPlugin from '../src/menuTypesPlugin.js';
 
 const rename = renameModule.default; // Default imports don't work as expected when importing from cjs modules
 
 const yargsOptions = {
-  boolean: ['count', 'printEventMaps', 'rename', 'widgetColumnMap'],
+  boolean: ['count', 'printEventMaps', 'rename', 'widgetColumnMap', 'menuTypes'],
   array: ['sources'],
-  string: ['migrate', 'moduleMap', 'jsDocTypeMap', 'paramTypeMap', 'returnTypeMap'],
-  default: {'migrate': '', 'rename': null, 'jsDocTypeMap': {}, 'count': false, 'printEventMaps': false, 'widgetColumnMap': false},
+  string: ['migrate', 'moduleMap', 'jsDocTypeMap', 'paramTypeMap', 'returnTypeMap', 'menuTypesMap'],
+  default: {'migrate': '', 'rename': null, 'jsDocTypeMap': {}, 'count': false, 'printEventMaps': false, 'widgetColumnMap': false, 'menuTypes': false},
   choices: ['migrate', ['ts', 'objectType']]
 };
 const args = parser(process.argv, yargsOptions);
@@ -36,13 +37,18 @@ if (args.rename === null) {
 if (renameToTs) {
   rename({rootDir, sources});
 }
-if (!args.migrate && !args.count && !args.printEventMaps && !args.widgetColumnMap) {
+if (!args.migrate && !args.count && !args.printEventMaps && !args.widgetColumnMap && !args.menuTypes) {
   process.exit(-1);
 }
 
 let moduleMap = args.moduleMap;
 if (moduleMap) {
   console.log('Using moduleMap: ' + JSON.stringify(moduleMap));
+}
+
+let menuTypesMap = args.menuTypesMap;
+if (menuTypesMap) {
+  console.log('Using menuTypesMap: ' + JSON.stringify(menuTypesMap));
 }
 
 const config = new MigrateConfig();
@@ -62,6 +68,12 @@ if (args.widgetColumnMap) {
   config
     .addPlugin(convertToCRLFPlugin, {})
     .addPlugin(widgetColumnMapPlugin, {})
+    .addPlugin(convertToLFPlugin, {});
+}
+if (args.menuTypes) {
+  config
+    .addPlugin(convertToCRLFPlugin, {})
+    .addPlugin(menuTypesPlugin, {menuTypesMap, moduleMap})
     .addPlugin(convertToLFPlugin, {});
 }
 migrate({rootDir, config, sources}).then(exitCode => process.exit(exitCode));

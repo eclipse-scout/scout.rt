@@ -41,6 +41,7 @@ const typedObjectTypePlugin = {
 };
 
 function getTypeForStringObjectType(objectType) {
+  // noinspection DuplicatedCode
   let module = 'scout';
   let name = objectType;
   if (objectType.indexOf('.') > -1) {

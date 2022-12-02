@@ -17,7 +17,7 @@ import {crlfToLf, defaultRecastOptions, findParentPath, insertMissingImportsForT
 const j = jscodeshift.withParser('ts');
 
 /**
- * @type import('ts-migrate-server').Plugin<{paramTypeMap?: object, moduleMap?: object, defaultParamType?: string}>
+ * @type import('ts-migrate-server').Plugin<unknown>
  */
 const widgetColumnMapPlugin = {
   name: 'widget-column-map-plugin',

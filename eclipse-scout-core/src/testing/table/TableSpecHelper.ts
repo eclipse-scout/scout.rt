@@ -103,11 +103,11 @@ export class TableSpecHelper {
   }
 
   createMenuModel(text?: string, icon?: string): MenuModel {
-    return this.menuHelper.createModel(text, icon, ['Table.SingleSelection']);
+    return this.menuHelper.createModel(text, icon, [Table.MenuTypes.SingleSelection]);
   }
 
   createMenuModelWithSingleAndHeader(text: string, icon?: string): MenuModel {
-    return this.menuHelper.createModel(text, icon, ['Table.SingleSelection', 'Table.Header']);
+    return this.menuHelper.createModel(text, icon, [Table.MenuTypes.SingleSelection, Table.MenuTypes.Header]);
   }
 
   createModelColumns(count: number, columnType?: ObjectType): ChildModelOf<Column<any>>[] {

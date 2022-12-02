@@ -48,7 +48,7 @@ export default () => ({
         text: '${symbol_dollar}{textKey:EditPerson}',
         iconId: icons.PENCIL,
         menuTypes: [
-          'Table.SingleSelection'
+          Table.MenuTypes.SingleSelection
         ]
       },
       {
@@ -57,7 +57,7 @@ export default () => ({
         text: '${symbol_dollar}{textKey:CreatePerson}',
         iconId: icons.PLUS,
         menuTypes: [
-          'Table.EmptySpace'
+          Table.MenuTypes.EmptySpace
         ]
       },
       {
@@ -66,7 +66,7 @@ export default () => ({
         text: '${symbol_dollar}{textKey:DeletePerson}',
         iconId: icons.REMOVE,
         menuTypes: [
-          'Table.SingleSelection'
+          Table.MenuTypes.SingleSelection
         ]
       }
     ],

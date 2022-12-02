@@ -1780,16 +1780,16 @@ describe('Table', () => {
     beforeEach(() => {
       let model = helper.createModelFixture(2, 2);
       singleSelMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.SingleSelection']
+        menuTypes: [Table.MenuTypes.SingleSelection]
       });
       multiSelMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.MultiSelection']
+        menuTypes: [Table.MenuTypes.MultiSelection]
       });
       emptySpaceMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.EmptySpace']
+        menuTypes: [Table.MenuTypes.EmptySpace]
       });
       headerMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.Header']
+        menuTypes: [Table.MenuTypes.Header]
       });
       table = helper.createTable(model);
       table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, headerMenu];
@@ -1816,7 +1816,7 @@ describe('Table', () => {
 
     it('returns menus with single- and multi selection set for contextMenu if one or more rows are selected', () => {
       bothSelMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
+        menuTypes: [Table.MenuTypes.SingleSelection, Table.MenuTypes.MultiSelection]
       });
       table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
@@ -1853,7 +1853,7 @@ describe('Table', () => {
 
     it('returns menus with empty space, single- and multi selection set if one or more rows are selected', () => {
       bothSelMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
+        menuTypes: [Table.MenuTypes.SingleSelection, Table.MenuTypes.MultiSelection]
       });
       table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
@@ -1879,23 +1879,23 @@ describe('Table', () => {
 
       menuBarMenu = scout.create(Menu, {
         parent: table,
-        menuTypes: ['Table.EmptySpace']
+        menuTypes: [Table.MenuTypes.EmptySpace]
       });
       singleSelMenu = scout.create(Menu, {
         parent: table,
-        menuTypes: ['Table.SingleSelection']
+        menuTypes: [Table.MenuTypes.SingleSelection]
       });
       singleMultiSelMenu = scout.create(Menu, {
         parent: table,
-        menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
+        menuTypes: [Table.MenuTypes.SingleSelection, Table.MenuTypes.MultiSelection]
       });
       multiSelMenu = scout.create(Menu, {
         parent: table,
-        menuTypes: ['Table.MultiSelection']
+        menuTypes: [Table.MenuTypes.MultiSelection]
       });
       emptySpaceMenu = scout.create(Menu, {
         parent: table,
-        menuTypes: ['Table.EmptySpace']
+        menuTypes: [Table.MenuTypes.EmptySpace]
       });
 
       menuBarMenu.setChildActions([singleSelMenu, singleMultiSelMenu, multiSelMenu, emptySpaceMenu]);
@@ -1945,11 +1945,11 @@ describe('Table', () => {
       let menus = [
         scout.create(Menu, {
           parent: table,
-          menuTypes: ['Table.EmptySpace']
+          menuTypes: [Table.MenuTypes.EmptySpace]
         }),
         scout.create(Menu, {
           parent: table,
-          menuTypes: ['Table.EmptySpace']
+          menuTypes: [Table.MenuTypes.EmptySpace]
         })
       ];
       expect(menus[0].parent).toBe(table);
@@ -1971,7 +1971,7 @@ describe('Table', () => {
       // Create a new menu which is not part of the menu bar -> the menu items of the menu bar are still the same
       menus = menus.concat([scout.create(Menu, {
         parent: table,
-        menuTypes: ['Table.Header']
+        menuTypes: [Table.MenuTypes.Header]
       })]);
       table.setMenus(menus);
       expect(menus[0].parent).toBe(table.menuBar.menuboxLeft);

@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CompositeField, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectOrChildModel, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem
+  arrays, CompositeField, EnumObject, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectOrChildModel, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel,
+  TabItem
 } from '../../../index';
 import $ from 'jquery';
 
@@ -50,6 +51,10 @@ export class TabBox extends CompositeField implements TabBoxModel {
 
     this._tabBoxHeaderPropertyChangeHandler = this._onTabBoxHeaderPropertyChange.bind(this);
   }
+
+  static MenuTypes = {
+    Header: 'TabBox.Header'
+  } as const;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -308,3 +313,5 @@ export class TabBox extends CompositeField implements TabBoxModel {
     }
   }
 }
+
+export type TabBoxMenuTypes = EnumObject<typeof TabBox.MenuTypes>;
