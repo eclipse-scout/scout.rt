@@ -25,6 +25,7 @@ const argv = process.argv.slice(3);
 const parser = require('yargs-parser');
 const fs = require('fs');
 const path = require('path');
+const scoutBuildConstants = require('./../scripts/constants');
 const webpackConfigFileName = './webpack.config.js';
 const webpackCustomConfigFileName = './webpack.config.custom.js';
 const webpackYargsOptions = {
@@ -70,20 +71,21 @@ switch (script) {
   }
   case 'build:dev': {
     const args = parser(argv, webpackYargsOptions);
-    args.mode = 'development';
+    args.mode = scoutBuildConstants.mode.development;
     runWebpack(args);
     break;
   }
   case 'build:prod': {
     const args = parser(argv, webpackYargsOptions);
-    args.mode = 'production';
+    args.mode = scoutBuildConstants.mode.production;
     runWebpack(args);
     break;
   }
   case 'build:dev:watch': {
     const args = parser(argv, webpackYargsOptions);
-    args.mode = 'development';
-    runWebpackWatch(args);
+    args.mode = scoutBuildConstants.mode.development;
+    args.watch = true;
+    runWebpack(args);
     break;
   }
   default:
@@ -186,7 +188,11 @@ function runWebpack(args) {
     return;
   }
   const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
-  compiler.run((err, stats) => logWebpack(err, stats, statsConfig));
+  if (args.watch) {
+    compiler.watch({}, (err, stats) => logWebpack(err, stats, statsConfig));
+  } else {
+    compiler.run((err, stats) => logWebpack(err, stats, statsConfig));
+  }
 }
 
 function readWebpackConfig() {
@@ -204,15 +210,6 @@ function readWebpackConfig() {
     return;
   }
   return configFilePath;
-}
-
-function runWebpackWatch(args) {
-  const configFilePath = readWebpackConfig();
-  if (!configFilePath) {
-    return;
-  }
-  const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
-  compiler.watch({}, (err, stats) => logWebpack(err, stats, statsConfig));
 }
 
 function createWebpackCompiler(configFilePath, args) {

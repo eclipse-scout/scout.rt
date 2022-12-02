@@ -21,6 +21,7 @@ const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('web
  * @param {boolean} args.clean true, to clean the dist folder before each build. Default is true.
  * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
+ * @param {boolean} args.watch true, if webpack runs in watch mode. Default is false.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  * @param {object} args.tsOptions a config object to be passed to the ts-loader
  */
@@ -28,6 +29,7 @@ module.exports = (env, args) => {
   const buildMode = args.mode;
   const {devMode, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(buildMode);
   const isMavenModule = scoutBuildConstants.isMavenModule();
+  const isWatchMode = nvl(args.watch, false);
   const outDir = scoutBuildConstants.getOutputDir(buildMode);
   const resDirArray = args.resDirArray || ['res'];
   console.log(`Webpack mode: ${buildMode}`);
@@ -60,9 +62,11 @@ module.exports = (env, args) => {
     ]
   };
 
+  // in prod mode always only transpile (no type-checks). In dev mode type checking is skipped in watch mode. Instead, ForkTsCheckerWebpackPlugin is used then (see below).
+  const transpileOnly = !devMode || isWatchMode;
   const tsOptions = {
     ...args.tsOptions,
-    transpileOnly: true, // in prod mode always only transpile (no check), in dev mode type checking is done async using ForkTsCheckerWebpackPlugin
+    transpileOnly: transpileOnly,
     compilerOptions: {
       noEmit: false,
       ...args.tsOptions?.compilerOptions
@@ -220,31 +224,33 @@ module.exports = (env, args) => {
   }
 
   if (devMode) {
-    const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-    const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin');
+    if (transpileOnly) { // devMode and no type-checks: perform checks asynchronously (watch mode).
+      const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+      const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin');
 
-    let forkTsCheckerConfig = undefined;
-    if (!fs.existsSync('./tsconfig.json')) {
-      // if the module has no tsconfig: use default from Scout.
-      // Otherwise, each module would need to provide a tsconfig even if there is no typescript code in the module.
-      forkTsCheckerConfig = {
-        typescript: {
-          configFile: require.resolve('@eclipse-scout/tsconfig'),
-          context: process.cwd(),
-          configOverwrite: {
-            compilerOptions: {skipLibCheck: true, sourceMap: false, inlineSourceMap: false, declarationMap: false, allowJs: true},
-            include: isMavenModule ? ['./src/main/js/**/*.ts', './src/main/js/**/*.js', './src/test/js/**/*.ts', './src/test/js/**/*.js']
-              : ['./src/**/*.ts', './src/**/*.js', './test/**/*.ts', './test/**/*.js']
+      let forkTsCheckerConfig = undefined;
+      if (!fs.existsSync('./tsconfig.json')) {
+        // if the module has no tsconfig: use default from Scout.
+        // Otherwise, each module would need to provide a tsconfig even if there is no typescript code in the module.
+        forkTsCheckerConfig = {
+          typescript: {
+            configFile: require.resolve('@eclipse-scout/tsconfig'),
+            context: process.cwd(),
+            configOverwrite: {
+              compilerOptions: {skipLibCheck: true, sourceMap: false, inlineSourceMap: false, declarationMap: false, allowJs: true},
+              include: isMavenModule ? ['./src/main/js/**/*.ts', './src/main/js/**/*.js', './src/test/js/**/*.ts', './src/test/js/**/*.js']
+                : ['./src/**/*.ts', './src/**/*.js', './test/**/*.ts', './test/**/*.js']
+            }
           }
-        }
-      };
+        };
+      }
+      config.plugins.push(new ForkTsCheckerWebpackPlugin(forkTsCheckerConfig));
+      config.plugins.push(new ForkTsCheckerNotifierWebpackPlugin({
+        title: getModuleName(),
+        skipSuccessful: true, // no notification for successful builds
+        excludeWarnings: true // no notification for warnings
+      }));
     }
-    config.plugins.push(new ForkTsCheckerWebpackPlugin(forkTsCheckerConfig));
-    config.plugins.push(new ForkTsCheckerNotifierWebpackPlugin({
-      title: getModuleName(),
-      skipSuccessful: true, // no notification for successful builds
-      excludeWarnings: true // no notification for warnings
-    }));
   } else {
     const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
     const TerserPlugin = require('terser-webpack-plugin');
