@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureT
 import org.eclipse.scout.rt.platform.IgnoreBean;
 
 /**
- * Rename room type value: standard-room -> room
+ * Rename room type values: standard-room -> room, small-room -> room
  */
 @IgnoreBean
 public class RoomTypeFixtureDoValueMigrationHandler_2 extends AbstractDoValueMigrationHandler<RoomTypeFixtureStringId> {
@@ -37,6 +37,6 @@ public class RoomTypeFixtureDoValueMigrationHandler_2 extends AbstractDoValueMig
 
   @Override
   public RoomTypeFixtureStringId migrate(DoStructureMigrationContext ctx, RoomTypeFixtureStringId value) {
-    return "standard-room".equals(value.unwrap()) ? RoomTypesFixture.ROOM : value;
+    return "standard-room".equals(value.unwrap()) || "small-room".equals(value.unwrap()) ? RoomTypesFixture.ROOM : value;
   }
 }
