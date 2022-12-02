@@ -11,17 +11,13 @@
 package org.eclipse.scout.rt.oauth2;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
@@ -32,87 +28,91 @@ import com.github.scribejava.core.oauth.OAuth20Service;
 @ApplicationScoped
 public class OAuth2Helper {
 
-  private Lock m_cacheAccessLock = new ReentrantLock();
-  private Map<String, TokenEntry> m_tokenCache = new HashMap<>();
+  protected final ConcurrentHashMap<OAuth2Config, TokenEntry> m_tokenCache = new ConcurrentHashMap<>();
+  protected final IDateProvider m_dateProvider = BEANS.get(IDateProvider.class);
+  protected long m_latestEviction = m_dateProvider.currentUTCMillis();
+  // Clean map after 30 minutes (or longer, if #getToken() isn't called)
+  protected final static long EVICTION_INTERVALL = 30 * 60 * 1000;
 
   /**
-   * Callers of this method must ensure, that oAuth2Config.getId() gives a unique String for each OAuth2 configuration
-   * and that {@link #invalidateCacheEntry(String)} is called whenever that configuration changes.
+   * Supports the OAuth2 client credentials flow.
    *
-   * @param oAuth2Config
    * @return OAuth2 access token
    */
   public String getToken(OAuth2Config oAuth2Config) {
-    TokenEntry tokenEntry = null;
-    m_cacheAccessLock.lock();
     try {
-      tokenEntry = m_tokenCache.get(oAuth2Config.getId());
+      TokenEntry tokenEntry = null;
+      tokenEntry = m_tokenCache.get(oAuth2Config);
       if (tokenEntry == null
           || tokenEntry.getAccessToken() == null
-          || tokenEntry.getTokenReceivedDate() == null
-          || DateUtility.addSeconds(
-              tokenEntry.getTokenReceivedDate(),
-              tokenEntry.getAccessToken().getExpiresIn() - 60).before(BEANS.get(IDateProvider.class).currentSeconds())) {
-        try {
-          OAuth20Service service = new ServiceBuilder(oAuth2Config.getClientId())
-              .apiSecret(oAuth2Config.getClientSecret())
-              .defaultScope(oAuth2Config.getScope())
-              .build(new DefaultApi20() {
+          || tokenEntry.getTokenReceivedTime() == null
+          // If expired or when expiring within the next minute: Get a new token
+          || (tokenEntry.getTokenReceivedTime() + tokenEntry.getAccessToken().getExpiresIn() * 1000 - 60000) < m_dateProvider.currentUTCMillis()) {
+        OAuth2AccessToken token;
+        try (OAuth20Service service = new ServiceBuilder(oAuth2Config.getClientId())
+            .apiSecret(oAuth2Config.getClientSecret())
+            .defaultScope(oAuth2Config.getScope())
+            .build(new DefaultApi20() {
 
-                @Override
-                public String getAccessTokenEndpoint() {
-                  return oAuth2Config.getTokenEndpoint();
-                }
+              @Override
+              public String getAccessTokenEndpoint() {
+                return oAuth2Config.getTokenEndpoint();
+              }
 
-                @Override
-                protected String getAuthorizationBaseUrl() {
-                  return oAuth2Config.getAuthorizationEndpoint();
-                }
-              });
-          OAuth2AccessToken token = service.getAccessTokenClientCredentialsGrant();
-          tokenEntry = new TokenEntry(token, new Date());
-          m_tokenCache.put(oAuth2Config.getId(), tokenEntry);
+              @Override
+              protected String getAuthorizationBaseUrl() {
+                return oAuth2Config.getAuthorizationEndpoint();
+              }
+            })) {
+          token = service.getAccessTokenClientCredentialsGrant();
+
+          tokenEntry = new TokenEntry(token, m_dateProvider.currentUTCMillis());
+          m_tokenCache.put(oAuth2Config, tokenEntry);
         }
         catch (IOException | InterruptedException | ExecutionException e) {
           throw new ProcessingException("Exception while retrieving OAuth2 access token.", e);
         }
       }
+      if (tokenEntry.getAccessToken() != null) {
+        return tokenEntry.getAccessToken().getAccessToken();
+      }
+      return null;
     }
     finally {
-      m_cacheAccessLock.unlock();
+      evictExpiredEntries();
     }
-    if (tokenEntry.getAccessToken() != null) {
-      return tokenEntry.getAccessToken().getAccessToken();
-    }
-    return null;
   }
 
-  public void invalidateCacheEntry(String id) {
-    m_cacheAccessLock.lock();
-    try {
-      m_tokenCache.remove(id);
-    }
-    finally {
-      m_cacheAccessLock.unlock();
+  /**
+   * Evict all expired entries when at least EVICTION_INTERVALL milliseconds have elapsed since last eviction
+   */
+  protected void evictExpiredEntries() {
+    if (m_latestEviction + EVICTION_INTERVALL > m_dateProvider.currentUTCMillis()) {
+      for (Entry<OAuth2Config, TokenEntry> entry : m_tokenCache.entrySet()) {
+        if (entry.getValue().m_tokenReceivedTime + entry.getValue().getAccessToken().getExpiresIn() * 1000 < m_dateProvider.currentUTCMillis()) {
+          m_tokenCache.remove(entry.getKey());
+        }
+      }
+      m_latestEviction = m_dateProvider.currentUTCMillis();
     }
   }
 
   protected static class TokenEntry {
-    private final OAuth2AccessToken m_accessToken;
-    private final Date m_tokenReceivedDate;
 
-    public TokenEntry(OAuth2AccessToken accessToken, Date tokenReceivedDate) {
+    private final OAuth2AccessToken m_accessToken;
+    private final Long m_tokenReceivedTime;
+
+    public TokenEntry(OAuth2AccessToken accessToken, Long tokenReceivedTime) {
       m_accessToken = accessToken;
-      m_tokenReceivedDate = tokenReceivedDate;
+      m_tokenReceivedTime = tokenReceivedTime;
     }
 
     public OAuth2AccessToken getAccessToken() {
       return m_accessToken;
     }
 
-    public Date getTokenReceivedDate() {
-      return m_tokenReceivedDate;
+    public Long getTokenReceivedTime() {
+      return m_tokenReceivedTime;
     }
   }
-
 }
