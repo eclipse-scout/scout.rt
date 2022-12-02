@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -33,12 +34,15 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDoValue
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomSizeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureDoValueMigrationHandler_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureStringId;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypesCollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypesFixture;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -48,6 +52,9 @@ import org.junit.Test;
  * Tests for {@link DataObjectMigrator}, with focus on data object value migrations ({@link IDoValueMigrationHandler}).
  */
 public class DataObjectMigratorValueMigrationTest {
+
+  protected static final RoomTypeFixtureStringId ROOM_TYPE_STANDARD_ROOM = RoomTypeFixtureStringId.of("standard-room"); // 'standard-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+  protected static final RoomTypeFixtureStringId ROOM_TYPE_SMALL_ROOM = RoomTypeFixtureStringId.of("small-room"); // 'small-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
 
   private static final List<IBean<?>> TEST_BEANS = new ArrayList<>();
 
@@ -270,5 +277,94 @@ public class DataObjectMigratorValueMigrationTest {
         .withRooms(room1, room2);
 
     assertEqualsWithComparisonFailure(expected, result.getDataObject());
+  }
+
+  /**
+   * Tests value migration for a DoList with duplicate values.
+   */
+  @Test
+  public void testListValueMigration() {
+    RoomTypesCollectionFixtureDo original = BEANS.get(RoomTypesCollectionFixtureDo.class)
+        .withRoomTypesList(
+            RoomTypesFixture.ROOM,
+            RoomTypesFixture.LIVING_ROOM,
+            ROOM_TYPE_STANDARD_ROOM, // 'standard-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+            ROOM_TYPE_SMALL_ROOM); // 'small-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+
+    DataObjectMigratorResult<RoomTypesCollectionFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+
+    assertTrue(result.isChanged());
+
+    RoomTypesCollectionFixtureDo expected = BEANS.get(RoomTypesCollectionFixtureDo.class)
+        .withRoomTypesList(
+            RoomTypesFixture.ROOM,
+            RoomTypesFixture.LIVING_ROOM,
+            // Duplicate values in list are expected. Might be an inconsistent state depending on business logic, though.
+            RoomTypesFixture.ROOM,
+            RoomTypesFixture.ROOM);
+
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
+  }
+
+  /**
+   * Tests value migration for a DoSet with duplicate values.
+   */
+  @Test
+  public void testSetValueMigration() {
+    RoomTypesCollectionFixtureDo original = BEANS.get(RoomTypesCollectionFixtureDo.class)
+        .withRoomTypesSet(
+            RoomTypesFixture.ROOM,
+            RoomTypesFixture.LIVING_ROOM,
+            ROOM_TYPE_STANDARD_ROOM, // 'standard-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+            ROOM_TYPE_SMALL_ROOM); // 'small-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+
+    DataObjectMigratorResult<RoomTypesCollectionFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+
+    assertTrue(result.isChanged());
+
+    RoomTypesCollectionFixtureDo expected = BEANS.get(RoomTypesCollectionFixtureDo.class)
+        .withRoomTypesSet(
+            RoomTypesFixture.ROOM, // duplicate values in set have been removed
+            RoomTypesFixture.LIVING_ROOM);
+
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
+  }
+
+  /**
+   * Tests value migration for a map with duplicate keys.
+   */
+  @Test
+  public void testMapValueMigration() {
+    RoomFixtureDo room = BEANS.get(RoomFixtureDo.class)
+        .withName("room")
+        .withRoomType(RoomTypesFixture.ROOM);
+    RoomFixtureDo livingRoom = BEANS.get(RoomFixtureDo.class)
+        .withName("living room")
+        .withRoomType(RoomTypesFixture.LIVING_ROOM);
+    RoomFixtureDo standardRoom = BEANS.get(RoomFixtureDo.class)
+        .withName("standard room")
+        .withRoomType(ROOM_TYPE_STANDARD_ROOM);
+    RoomFixtureDo smallRoom = BEANS.get(RoomFixtureDo.class)
+        .withName("small room")
+        .withRoomType(ROOM_TYPE_SMALL_ROOM);
+
+    RoomTypesCollectionFixtureDo original = BEANS.get(RoomTypesCollectionFixtureDo.class)
+        .withRoomTypesMap(CollectionUtility.hashMap(
+            ImmutablePair.of(RoomTypesFixture.ROOM, room),
+            ImmutablePair.of(RoomTypesFixture.LIVING_ROOM, livingRoom),
+            ImmutablePair.of(ROOM_TYPE_STANDARD_ROOM, standardRoom), // 'standard-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+            ImmutablePair.of(ROOM_TYPE_SMALL_ROOM, smallRoom))); // 'small-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+
+    DataObjectMigratorResult<RoomTypesCollectionFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+
+    assertTrue(result.isChanged());
+
+    Map<RoomTypeFixtureStringId, RoomFixtureDo> resultMap = result.getDataObject().getRoomTypesMap();
+    assertEquals(2, resultMap.size());
+    assertEquals("living room", resultMap.get(RoomTypesFixture.LIVING_ROOM).getName());
+
+    // Merged keys result in a single, randomly selected value, depending on internal order of the original map and implementation details of AbstractReplacingDataObjectVisitor.
+    String roomName = resultMap.get(RoomTypesFixture.ROOM).getName();
+    assertTrue("room".equals(roomName) || "standard room".equals(roomName) || "small room".equals(roomName));
   }
 }
