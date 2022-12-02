@@ -103,12 +103,6 @@ public final class SeleniumDriver {
     // Add command line arguments
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
-    // With ChromeDriver v75 W3C mode was introduced. This breaks several existing tests, because of two reasons:
-    // 1. all offsets are now calculated from the center of an element, and not from the upper-left corner
-    // 2. copy command (CTRL + C) does not work anymore. This may be related to a bug in ChromeDriver, but the bugfix
-    //    mentioned here does not seem to solve the problem (note: document.execCommand('copy') doesn't work either)
-    //    See: https://bugs.chromium.org/p/chromedriver/issues/detail?id=2975
-    options.setExperimentalOption("w3c", false);
     // The following two lines are a replacement for --disable-infobars since this option
     // does not remove the "Chrome is being controlled..." info-bar anymore.
     // See: https://stackoverflow.com/questions/49169990/disable-infobars-argument-unable-to-hide-the-infobar-with-the-message-chrome-is
