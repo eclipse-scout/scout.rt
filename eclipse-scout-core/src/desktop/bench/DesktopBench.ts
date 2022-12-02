@@ -487,7 +487,9 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   }
 
   protected _onOutlineContentDestroy(event: Event<Widget>) {
-    this.setOutlineContent(null);
+    if (event.source === this.outlineContent) {
+      this.setOutlineContent(null);
+    }
   }
 
   protected _onOutlineContentCssClassChange(event: PropertyChangeEvent<string, Widget>) {
