@@ -450,7 +450,9 @@ export default class DesktopBench extends Widget {
   }
 
   _onOutlineContentDestroy(event) {
-    this.setOutlineContent(null);
+    if (event.source === this.outlineContent) {
+      this.setOutlineContent(null);
+    }
   }
 
   _onOutlineContentCssClassChange(event) {
