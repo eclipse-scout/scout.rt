@@ -932,7 +932,7 @@ export class Table extends Widget implements TableModel {
       parent: this,
       selector: '.table-cell',
       text: this._cellTooltipText.bind(this),
-      htmlEnabled: this._isAggregatedTooltip.bind(this),
+      htmlEnabled: this._isCellTooltipHtmlEnabled.bind(this),
       arrowPosition: 50,
       arrowPositionUnit: '%',
       nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
@@ -1001,6 +1001,10 @@ export class Table extends Widget implements TableModel {
     let $row = $cell.parent();
     return $row.data('aggregateRow') /* row in the table */
       || $row.hasClass('table-aggregate'); /* aggregate table control */
+  }
+
+  protected _isCellTooltipHtmlEnabled($cell: JQuery): boolean {
+    return this._isAggregatedTooltip($cell);
   }
 
   reload(reloadReason?: string) {
