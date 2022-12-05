@@ -255,4 +255,61 @@ describe('scout.styles', () => {
     });
   });
 
+  describe('rgb/rgba to hex', () => {
+    it('converts a rgb string to a hex string', () => {
+      expect(styles.rgbToHex('rgb(0,0,0)')).toEqual('#000000');
+      expect(styles.rgbToHex('rgb(17,34,51)')).toEqual('#112233');
+      expect(styles.rgbToHex('rgb(17,34,170)')).toEqual('#1122aa');
+      expect(styles.rgbToHex('rgb(170,187,204)')).toEqual('#aabbcc');
+      expect(styles.rgbToHex('rgb(255,255,255)')).toEqual('#ffffff');
+
+      expect(styles.rgbToHex('rgb(0,0,0)', true)).toEqual('#000000');
+      expect(styles.rgbToHex('rgb(18,52,86)', true)).toEqual('#123456');
+      expect(styles.rgbToHex('rgb(18,58,188)', true)).toEqual('#123abc');
+      expect(styles.rgbToHex('rgb(171,205,239)', true)).toEqual('#abcdef');
+      expect(styles.rgbToHex('rgb(255,255,255)', true)).toEqual('#ffffff');
+    });
+
+    it('converts a rgba string with no alpha to a hex string', () => {
+      expect(styles.rgbToHex('rgba(0,0,0,1)')).toEqual('#000000ff');
+      expect(styles.rgbToHex('rgba(17,34,51,1)')).toEqual('#112233ff');
+      expect(styles.rgbToHex('rgba(17,34,170,1)')).toEqual('#1122aaff');
+      expect(styles.rgbToHex('rgba(170,187,204,1)')).toEqual('#aabbccff');
+      expect(styles.rgbToHex('rgba(255,255,255,1)')).toEqual('#ffffffff');
+
+      expect(styles.rgbToHex('rgba(0,0,0,1)', true)).toEqual('#000000');
+      expect(styles.rgbToHex('rgba(18,52,86,1)', true)).toEqual('#123456');
+      expect(styles.rgbToHex('rgba(18,58,188,1)', true)).toEqual('#123abc');
+      expect(styles.rgbToHex('rgba(171,205,239,1)', true)).toEqual('#abcdef');
+      expect(styles.rgbToHex('rgba(255,255,255,1)', true)).toEqual('#ffffff');
+    });
+
+    it('converts a rgba string with full alpha to a hex string', () => {
+      expect(styles.rgbToHex('rgba(0,0,0,0)')).toEqual('#00000000');
+      expect(styles.rgbToHex('rgba(17,34,51,0)')).toEqual('#11223300');
+      expect(styles.rgbToHex('rgba(17,34,170,0)')).toEqual('#1122aa00');
+      expect(styles.rgbToHex('rgba(170,187,204,0)')).toEqual('#aabbcc00');
+      expect(styles.rgbToHex('rgba(255,255,255,0)')).toEqual('#ffffff00');
+
+      expect(styles.rgbToHex('rgba(0,0,0,0)', true)).toEqual('#000000');
+      expect(styles.rgbToHex('rgba(18,52,86,0)', true)).toEqual('#123456');
+      expect(styles.rgbToHex('rgba(18,58,188,0)', true)).toEqual('#123abc');
+      expect(styles.rgbToHex('rgba(171,205,239,0)', true)).toEqual('#abcdef');
+      expect(styles.rgbToHex('rgba(255,255,255,0)', true)).toEqual('#ffffff');
+    });
+
+    it('converts a rgba string with alpha to a hex string', () => {
+      expect(styles.rgbToHex('rgba(0,0,0,0.1)')).toEqual('#0000001a');
+      expect(styles.rgbToHex('rgba(17,34,51,0.3)')).toEqual('#1122334d');
+      expect(styles.rgbToHex('rgba(17,34,170,0.5)')).toEqual('#1122aa80');
+      expect(styles.rgbToHex('rgba(170,187,204,0.7)')).toEqual('#aabbccb3');
+      expect(styles.rgbToHex('rgba(255,255,255,0.9)')).toEqual('#ffffffe6');
+
+      expect(styles.rgbToHex('rgba(0,0,0,0.9)', true)).toEqual('#000000');
+      expect(styles.rgbToHex('rgba(18,52,86,0.7)', true)).toEqual('#123456');
+      expect(styles.rgbToHex('rgba(18,58,188,0.5)', true)).toEqual('#123abc');
+      expect(styles.rgbToHex('rgba(171,205,239,0.3)', true)).toEqual('#abcdef');
+      expect(styles.rgbToHex('rgba(255,255,255,0.1)', true)).toEqual('#ffffff');
+    });
+  });
 });

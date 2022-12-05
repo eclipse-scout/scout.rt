@@ -225,6 +225,39 @@ export const styles = {
   },
 
   /**
+   * Returns the given rgb color in hex format.
+   *
+   * @param rgba a color in rgb or rgba format
+   * @param forceRemoveAlpha true, if the alpha value should be removed, otherwise false.
+   * @returns the color in hex format
+   */
+  rgbToHex(rgba: string, forceRemoveAlpha = false): string {
+    if (!rgba) {
+      return null;
+    }
+
+    const rgbaValues = rgba.replace(/^rgba?\(|\s+|\)$/g, '').split(','); // gets rgba/rgb string values
+    const hexValues = [];
+
+    for (let i = 0; i < rgbaValues.length; i++) {
+      if (forceRemoveAlpha && i === 3) {
+        continue;
+      }
+      let rgbaValue = parseFloat(rgbaValues[i]); // convert to numbers
+      if (i === 3) {
+        rgbaValue = Math.round(rgbaValue * 255); // convert alpha to 255 number
+      }
+      let hexValue = rgbaValue.toString(16); // convert number to hex
+      if (hexValue.length === 1) {
+        hexValue = '0' + hexValue; // add 0 when length of number is 1
+      }
+      hexValues[i] = hexValue;
+    }
+
+    return '#' + hexValues.join('');
+  },
+
+  /**
    * Make a given color darker by mixing it with a certain amount of black.
    * If no color is specified or the color cannot be parsed, undefined is returned.
    *
