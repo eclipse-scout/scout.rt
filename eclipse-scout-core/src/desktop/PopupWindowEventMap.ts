@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventMap, PopupWindow} from '../index';
+import {Event, EventMap} from '../index';
 
 export interface PopupWindowEventMap extends EventMap {
   'init': Event;
-  'popupWindowUnload': Event & PopupWindow;
+  'popupWindowUnload': Event;
 }

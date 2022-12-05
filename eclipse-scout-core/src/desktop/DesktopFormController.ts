@@ -95,7 +95,7 @@ export class DesktopFormController extends FormController implements DesktopForm
   protected _addPopupWindow(newWindow: Window, form: Form, resizeToPrefSize: boolean) {
     let popupWindow = new PopupWindow(newWindow, form);
     popupWindow.resizeToPrefSize = resizeToPrefSize;
-    popupWindow.events.on('popupWindowUnload', this._onPopupWindowUnload.bind(this));
+    popupWindow.on('popupWindowUnload', this._onPopupWindowUnload.bind(this));
     this.popupWindows.push(popupWindow);
     $.log.isDebugEnabled() && $.log.debug('Opened new popup window for form ID ' + form.id);
   }
@@ -126,7 +126,8 @@ export class DesktopFormController extends FormController implements DesktopForm
     popupWindow._onReady();
   }
 
-  protected _onPopupWindowUnload(popupWindow: Event<PopupWindow> & PopupWindow) {
+  protected _onPopupWindowUnload(event: Event<PopupWindow>) {
+    let popupWindow = event.source;
     let form = popupWindow.form;
     $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + form.id + ' is unloaded - don\'t know if its closed or reloaded yet');
 

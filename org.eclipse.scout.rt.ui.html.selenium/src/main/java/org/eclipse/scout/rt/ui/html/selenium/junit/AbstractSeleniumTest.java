@@ -469,7 +469,9 @@ public abstract class AbstractSeleniumTest {
   }
 
   /**
-   * Clicks the element at the given offset position (from top-left corner).
+   * Moves the mouse to an offset from the element's in-view center point.
+   *
+   * @see Actions#moveToElement(WebElement, int, int)
    */
   public void clickAtOffset(WebElement element, int xOffset, int yOffset) {
     Actions builder = new Actions(getDriver());
