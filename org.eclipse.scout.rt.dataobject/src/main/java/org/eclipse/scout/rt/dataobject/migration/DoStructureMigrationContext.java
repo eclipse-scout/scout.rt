@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.dataobject.migration;
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,10 +71,10 @@ public class DoStructureMigrationContext {
    * exiting context object, but must be called on a fresh copy (see {@link #copy()} or on a fresh instance of
    * {@link DoStructureMigrationContext}
    */
-  protected DoStructureMigrationContext withInitialLocalContext(IDoStructureMigrationLocalContextData... initialLocalContextDatas) {
+  protected DoStructureMigrationContext withInitialLocalContext(List<IDoStructureMigrationLocalContextData> initialLocalContextDatas) {
     if (initialLocalContextDatas != null) {
       // Calling push without a remove is okay here because these provided local contexts are valid for the whole data object
-      Arrays.stream(initialLocalContextDatas).filter(Objects::nonNull).forEach(this::push);
+      initialLocalContextDatas.stream().filter(Objects::nonNull).forEach(this::push);
     }
     return this;
   }
@@ -171,5 +171,12 @@ public class DoStructureMigrationContext {
    */
   public DoStructureMigrationStatsContextData getStats() {
     return getGlobal(DoStructureMigrationStatsContextData.class);
+  }
+
+  /**
+   * Convenience method to access intermediate migration context data.
+   */
+  public DataObjectIntermediateMigrationContextData getIntermediateMigrations() {
+    return getGlobal(DataObjectIntermediateMigrationContextData.class);
   }
 }

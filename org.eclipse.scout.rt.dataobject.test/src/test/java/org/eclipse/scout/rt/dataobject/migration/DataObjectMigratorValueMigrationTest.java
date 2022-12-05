@@ -19,7 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.dataobject.DoEntityHolder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrator.DoStructureMigratorResult;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
@@ -276,6 +278,127 @@ public class DataObjectMigratorValueMigrationTest {
     HouseFixtureDo expected = BEANS.get(HouseFixtureDo.class)
         .withRooms(room1, room2);
 
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
+  }
+
+  /**
+   * Similar as {@link #testStructureAndValueMigrations()} but including an intermediate migrations.
+   */
+  @Test
+  public void testStructureAndValueMigrationsWithIntermediateMigrations() {
+    // raw DoEntity data object
+    IDoEntity original = BEANS.get(DoEntityBuilder.class)
+        .put("_type", "charlieFixture.HouseFixture")
+        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap()) // will be updated by HouseFixtureDoStructureMigrationHandler_3
+        .build();
+
+    DoStructureMigrationContext ctx = s_migrationContext.copy();
+
+    // For all intermediate migrations, store typed data object for equality check afterwards and modify a copy
+
+    DoEntityHolder<IDoEntity> intermediate1ResultHolder = new DoEntityHolder<>();
+    ctx.getIntermediateMigrations().add((innerCtx, typedDataObject) -> {
+      intermediate1ResultHolder.setValue((IDoEntity) typedDataObject);
+      IDoEntity clonedDoEntity = BEANS.get(DataObjectHelper.class).clone((IDoEntity) typedDataObject);
+      clonedDoEntity.put("intermediate", "ctx-1");
+      return DoStructureMigratorResult.of(clonedDoEntity, true);
+    });
+
+    DoEntityHolder<IDoEntity> intermediate2ResultHolder = new DoEntityHolder<>();
+    ctx.getIntermediateMigrations().add((innerCtx, typedDataObject) -> {
+      intermediate2ResultHolder.setValue((IDoEntity) typedDataObject);
+      IDoEntity clonedDoEntity = BEANS.get(DataObjectHelper.class).clone((IDoEntity) typedDataObject);
+      clonedDoEntity.put("intermediate", "ctx-2");
+      return DoStructureMigratorResult.of(clonedDoEntity, true);
+    });
+
+    DoEntityHolder<IDoEntity> localIntermediate1ResultHolder = new DoEntityHolder<>();
+    IDataObjectIntermediateMigration<IDoEntity> localIntermediateMigration1 = (innerCtx, typedDataObject) -> {
+      localIntermediate1ResultHolder.setValue(typedDataObject);
+      IDoEntity clonedDoEntity = BEANS.get(DataObjectHelper.class).clone(typedDataObject);
+      clonedDoEntity.put("intermediate", "local-1");
+      return DoStructureMigratorResult.of(clonedDoEntity, true);
+    };
+
+    DoEntityHolder<IDoEntity> localIntermediate2ResultHolder = new DoEntityHolder<>();
+    IDataObjectIntermediateMigration<IDoEntity> localIntermediateMigration2 = (innerCtx, typedDataObject) -> {
+      localIntermediate2ResultHolder.setValue(typedDataObject);
+      IDoEntity clonedDoEntity = BEANS.get(DataObjectHelper.class).clone(typedDataObject);
+      clonedDoEntity.put("intermediate", "local-2");
+      return DoStructureMigratorResult.of(clonedDoEntity, true);
+    };
+
+    DoStructureMigratorResult<IDoEntity> result = s_migrator.migrateDataObject(ctx, original, IDoEntity.class, Collections.emptyList(), CollectionUtility.arrayList(localIntermediateMigration1, localIntermediateMigration2));
+    assertTrue(result.isChanged());
+
+    // same for all checks
+    RoomFixtureDo expectedRoom1 = BEANS.get(RoomFixtureDo.class)
+        .withName("example room 1")
+        .withRoomType(RoomTypesFixture.ROOM);
+
+    // Verify results of intermediate migration
+    RoomFixtureDo room2 = BEANS.get(RoomFixtureDo.class)
+        .withName("example room 2")
+        .withRoomType(RoomTypeFixtureStringId.of("standard-room")); // not changed yet by RoomTypeFixtureDoValueMigrationHandler_2 (only structure migration handlers were applied)
+    HouseFixtureDo expected = BEANS.get(HouseFixtureDo.class)
+        .withRooms(expectedRoom1, room2);
+
+    assertEqualsWithComparisonFailure(expected, intermediate1ResultHolder.getValue());
+    expected.put("intermediate", "ctx-1");
+    assertEqualsWithComparisonFailure(expected, intermediate2ResultHolder.getValue());
+    expected.put("intermediate", "ctx-2");
+    assertEqualsWithComparisonFailure(expected, localIntermediate1ResultHolder.getValue());
+    expected.put("intermediate", "local-1");
+    assertEqualsWithComparisonFailure(expected, localIntermediate2ResultHolder.getValue());
+
+    // Verify final result
+    RoomFixtureDo expectedRoom2 = BEANS.get(RoomFixtureDo.class)
+        .withName("example room 2")
+        .withRoomType(RoomTypesFixture.ROOM); // changed by RoomTypeFixtureDoValueMigrationHandler_2
+    expected = BEANS.get(HouseFixtureDo.class)
+        .withRooms(expectedRoom1, expectedRoom2);
+
+    expected.put("intermediate", "local-2");
+
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
+  }
+
+  /**
+   * Tests the changed flag behavior of intermediate migrations.
+   */
+  @Test
+  public void testIntermediateMigrationChangedFlag() {
+    HouseFixtureDo original = BEANS.get(HouseFixtureDo.class);
+
+    IDataObjectIntermediateMigration<IDoEntity> localIntermediateMigrationNoChange = (innerCtx, typedDataObject) -> {
+      typedDataObject.put("normalized", true); // a non-relevant change
+      return DoStructureMigratorResult.of(typedDataObject, false);
+    };
+    IDataObjectIntermediateMigration<IDoEntity> localIntermediateMigrationChange = (innerCtx, typedDataObject) -> {
+      typedDataObject.put("intermediate", "changed");
+      return DoStructureMigratorResult.of(typedDataObject, true);
+    };
+
+    // no change
+    DoStructureMigratorResult<IDoEntity> result = s_migrator.migrateDataObject(s_migrationContext, original, IDoEntity.class, Collections.emptyList(), Collections.singletonList(localIntermediateMigrationNoChange));
+    assertFalse(result.isChanged());
+    HouseFixtureDo expected = BEANS.get(HouseFixtureDo.class);
+    expected.put("normalized", true);
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
+
+    // change
+    result = s_migrator.migrateDataObject(s_migrationContext, original, IDoEntity.class, Collections.emptyList(), Collections.singletonList(localIntermediateMigrationChange));
+    assertTrue(result.isChanged());
+    expected = BEANS.get(HouseFixtureDo.class);
+    expected.put("intermediate", "changed");
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
+
+    // no change and change
+    result = s_migrator.migrateDataObject(s_migrationContext, original, IDoEntity.class, Collections.emptyList(), CollectionUtility.arrayList(localIntermediateMigrationNoChange, localIntermediateMigrationChange));
+    assertTrue(result.isChanged());
+    expected = BEANS.get(HouseFixtureDo.class);
+    expected.put("normalized", true);
+    expected.put("intermediate", "changed");
     assertEqualsWithComparisonFailure(expected, result.getDataObject());
   }
 
