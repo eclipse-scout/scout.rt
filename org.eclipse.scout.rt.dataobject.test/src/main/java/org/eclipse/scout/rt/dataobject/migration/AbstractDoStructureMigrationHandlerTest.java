@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.eclipse.scout.rt.dataobject.DataObjectVisitors;
 import org.eclipse.scout.rt.dataobject.DoEntity;
@@ -84,7 +86,7 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
     }
 
     DataObjectMigrationContext ctx = BEANS.get(DataObjectMigrationContext.class)
-        .withInitialLocalContext(initialLocalContextData);
+        .withInitialLocalContext(initialLocalContextData == null ? Collections.emptyList() : Arrays.asList(initialLocalContextData));
     boolean changed = BEANS.get(DataObjectMigrator.class).applyStructureMigration(ctx, actual, toVersion);
 
     assertTrue("Data object was not changed by migration", changed);

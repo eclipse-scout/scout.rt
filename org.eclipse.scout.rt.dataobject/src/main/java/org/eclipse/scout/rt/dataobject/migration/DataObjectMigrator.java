@@ -15,6 +15,8 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -76,12 +78,29 @@ public class DataObjectMigrator {
   /**
    * Migrates the raw data object.
    * <p>
-   * Uses latest version to migrate to. Uses given initial local context data during migration.
+   * Uses latest version to migrate to. Uses given initial local context data during execution.
    *
    * @return Result with typed data object and a flag if a migration was applied.
    */
   public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(DataObjectMigrationContext ctx, IDataObject dataObject, Class<T> valueType, IDataObjectMigrationLocalContextData... initialLocalContextData) {
-    return migrateDataObject(ctx, dataObject, valueType, null /* latest version */, initialLocalContextData);
+    return migrateDataObject(ctx, dataObject, valueType, null /* latest version */, initialLocalContextData == null ? Collections.emptyList() : Arrays.asList(initialLocalContextData), Collections.emptyList());
+  }
+
+  /**
+   * Migrates the raw data object.
+   * <p>
+   * Uses latest version to migrate to. Uses given initial local context data and given intermediate migrations during
+   * execution.
+   *
+   * @return Result with typed data object and a flag if a migration was applied.
+   */
+  public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(
+      DataObjectMigrationContext ctx,
+      IDataObject dataObject,
+      Class<T> valueType,
+      List<IDataObjectMigrationLocalContextData> initialLocalContextData,
+      List<IDataObjectIntermediateMigration<T>> localIntermediateMigrations) {
+    return migrateDataObject(ctx, dataObject, valueType, null /* latest version */, initialLocalContextData, localIntermediateMigrations);
   }
 
   /**
@@ -101,12 +120,17 @@ public class DataObjectMigrator {
    *          Versions to migrate to, <code>null</code> if migrating to latest version.
    * @param initialLocalContextData
    *          Initial local context data to use.
+   * @param localIntermediateMigrations
+   *          Local intermediate migrations to use for this data object. These intermediate migrations will be applied
+   *          after the intermediate migrations defined on the {@link DataObjectMigrationContext}.
    */
-  public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(DataObjectMigrationContext ctx,
+  public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(
+      DataObjectMigrationContext ctx,
       IDataObject dataObject,
       Class<T> valueType,
       NamespaceVersion toVersion,
-      IDataObjectMigrationLocalContextData... initialLocalContextData) {
+      List<IDataObjectMigrationLocalContextData> initialLocalContextData,
+      List<IDataObjectIntermediateMigration<T>> localIntermediateMigrations) {
     assertNotNull(ctx, "ctx is required");
     assertNotNull(dataObject, "dataObject is required");
 
@@ -132,6 +156,22 @@ public class DataObjectMigrator {
     String migratedJson = dataObjectMapper.writeValue(dataObject);
     T typedDataObject = dataObjectMapper.readValue(migratedJson, valueType);
 
+    // Apply intermediate migrations on typed data object (if any), start with global (defined on context) and continue with local (provided as method parameter)
+    List<IDataObjectIntermediateMigration<T>> allIntermediateMigrations = CollectionUtility.combine(ctx.getIntermediateMigrations().all(valueType), localIntermediateMigrations);
+    boolean intermediateChanged = false;
+    for (IDataObjectIntermediateMigration<T> intermediateMigration : allIntermediateMigrations) {
+      DataObjectMigratorResult<?> result = intermediateMigration.applyMigration(ctx, typedDataObject);
+      intermediateChanged |= result.isChanged();
+      // Always use the (new) typed data object, even if not marked as changed.
+      // There might be intermediate migrations that might do some form of normalization but don't want to mark it as changed only due to that.
+      //noinspection unchecked
+      typedDataObject = (T) result.getDataObject();
+    }
+
+    if (intermediateChanged) {
+      logger.trace("Data object after intermediate migrations: {}", typedDataObject);
+    }
+
     // Apply value migration
     DataObjectMigratorResult<T> result = applyValueMigration(ctxCopy, typedDataObject);
     boolean valueChanged = result.isChanged();
@@ -140,13 +180,13 @@ public class DataObjectMigrator {
       logger.trace("Data object after value migration: {}", migratedDataObject);
     }
 
-    boolean objectChanged = structureChanged || valueChanged;
+    boolean objectChanged = structureChanged || intermediateChanged || valueChanged;
     if (objectChanged) {
       stats.incrementDataObjectsChanged();
     }
     stats.addMigrationDuration(start);
 
-    return new DataObjectMigratorResult<>(migratedDataObject, objectChanged);
+    return DataObjectMigratorResult.of(migratedDataObject, objectChanged);
   }
 
   protected boolean applyStructureMigration(DataObjectMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion) {
@@ -181,26 +221,30 @@ public class DataObjectMigrator {
     // Applied value migration IDs should be explicitly set to an empty set, if all value migrations actually should be applied.
     // A null value indicates a caller which is unaware of value migrations - skip value migrations.
     if (ctx.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds() == null) {
-      return new DataObjectMigratorResult<>(dataObject, false);
+      return DataObjectMigratorResult.of(dataObject, false);
     }
 
     DoValueMigrationDataObjectVisitor valueMigrationVisitor = createValueMigrationVisitor(ctx);
     T migratedDataObject = valueMigrationVisitor.migrate(dataObject);
-    return new DataObjectMigratorResult<>(migratedDataObject, valueMigrationVisitor.isChanged());
+    return DataObjectMigratorResult.of(migratedDataObject, valueMigrationVisitor.isChanged());
   }
 
   protected DoValueMigrationDataObjectVisitor createValueMigrationVisitor(DataObjectMigrationContext ctx) {
     return new DoValueMigrationDataObjectVisitor(ctx);
   }
 
-  public static class DataObjectMigratorResult<T extends IDataObject> {
+  public static final class DataObjectMigratorResult<T extends IDataObject> {
 
     private T m_dataObject;
     private boolean m_changed;
 
-    public DataObjectMigratorResult(T dataObject, boolean changed) {
+    private DataObjectMigratorResult(T dataObject, boolean changed) {
       m_dataObject = dataObject;
       m_changed = changed;
+    }
+
+    public static <T extends IDataObject> DataObjectMigratorResult<T> of(T dataObject, boolean changed) {
+      return new DataObjectMigratorResult<>(dataObject, changed);
     }
 
     public T getDataObject() {
