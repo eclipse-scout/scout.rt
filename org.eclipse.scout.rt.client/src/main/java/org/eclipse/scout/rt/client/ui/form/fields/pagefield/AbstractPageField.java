@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -94,7 +94,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     getDetailFormField().setInnerForm(null);
     getTableField().setTable(null, true);
     getSearchFormField().setInnerForm(null);
-    if (m_page != null) {
+    if (m_outline != null) {
       m_outline.dispose();
       m_outline = null;
       m_page = null;
@@ -170,7 +170,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
    *
    * @param oldPage
    *          the old {@link IPage}; might be <code>null</code>.
-   * @param newInnerForm
+   * @param newPage
    *          the new {@link IPage}; might be <code>null</code>.
    */
   @ConfigOperation
