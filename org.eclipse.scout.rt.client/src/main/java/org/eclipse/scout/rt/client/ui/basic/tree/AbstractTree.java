@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -1089,7 +1089,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     }
 
     final Set<Object> keySet = new HashSet<>(primaryKeys);
-    CollectingVisitor<ITreeNode> v = new CollectingVisitor<ITreeNode>() {
+    CollectingVisitor<ITreeNode> v = new CollectingVisitor<>() {
 
       @Override
       public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
@@ -1114,7 +1114,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     if (m_rootNode != null) {
       m_rootNode.setTreeInternal(null, true);
       // inform root of remove
-      root.nodeRemovedNotify();
+      m_rootNode.nodeRemovedNotify();
+      m_rootNode.dispose();
     }
     m_rootNode = root;
     if (m_rootNode != null) {
@@ -1567,7 +1568,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   protected List<IKeyStroke> getKeyStrokesInternal() {
-    return propertySupport.<IKeyStroke>getPropertyList(PROP_KEY_STROKES);
+    return propertySupport.getPropertyList(PROP_KEY_STROKES);
   }
 
   @Override
@@ -1845,7 +1846,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   public Set<ITreeNode> getInsertedNodes() {
-    CollectingVisitor<ITreeNode> v = new CollectingVisitor<ITreeNode>() {
+    CollectingVisitor<ITreeNode> v = new CollectingVisitor<>() {
       @Override
       protected boolean accept(ITreeNode element) {
         return element.isStatusInserted();
@@ -1869,7 +1870,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   @Override
   public Set<ITreeNode> getUpdatedNodes() {
-    CollectingVisitor<ITreeNode> v = new CollectingVisitor<ITreeNode>() {
+    CollectingVisitor<ITreeNode> v = new CollectingVisitor<>() {
       @Override
       protected boolean accept(ITreeNode element) {
         return element.isStatusUpdated();
@@ -1961,7 +1962,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     final ITreeNode current = getSelectedNode();
     if (current != null) {
       final Holder<ITreeNode> next = new Holder<>(ITreeNode.class);
-      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
         boolean m_foundCurrent;
 
         @Override
@@ -1993,7 +1994,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     final ITreeNode current = getSelectedNode();
     if (current != null) {
       final Holder<ITreeNode> foundVisited = new Holder<>(ITreeNode.class);
-      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
         @Override
         public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
           if (element == current) {
@@ -2022,7 +2023,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     }
 
     final Holder<ITreeNode> foundVisited = new Holder<>(ITreeNode.class);
-    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
       @Override
       public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
         if (element.isFilterAccepted()) {
@@ -2052,7 +2053,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       }
     }
     final Holder<ITreeNode> foundVisited = new Holder<>(ITreeNode.class);
-    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
       @Override
       public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
         if (element.isFilterAccepted()) {
@@ -2337,10 +2338,9 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       getContextMenu().removeChildActions(m_currentNodeMenus);
       m_currentNodeMenus = null;
     }
-    List<IMenu> nodeMenus = new ArrayList<>();
     // take only first node to avoid having multiple same menus due to all nodes.
     if (CollectionUtility.hasElements(newSelectedNodes)) {
-      nodeMenus.addAll(CollectionUtility.firstElement(newSelectedNodes).getMenus());
+      List<IMenu> nodeMenus = new ArrayList<>(CollectionUtility.firstElement(newSelectedNodes).getMenus());
       m_currentNodeMenus = nodeMenus;
       getContextMenu().addChildActions(nodeMenus);
     }
