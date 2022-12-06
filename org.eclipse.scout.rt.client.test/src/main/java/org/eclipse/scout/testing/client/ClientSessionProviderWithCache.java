@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -120,6 +121,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     @SuppressWarnings("unchecked")
     final SESSION cachedClientSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, clientSession);
     if (cachedClientSession != null) {
+      stopSession(clientSession);
       clientSession = cachedClientSession;
     }
 
@@ -127,7 +129,18 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   }
 
   protected ConcurrentExpiringMap<CompositeObject, IClientSession> createSessionCache(final long ttl) {
-    return new ConcurrentExpiringMap<>(ttl, TimeUnit.MILLISECONDS, 1_000);
+    return new ConcurrentExpiringMap<>(ttl, TimeUnit.MILLISECONDS, 1_000) {
+      @Override
+      protected void execEntryEvicted(CompositeObject key, IClientSession session) {
+        stopSession(session);
+      }
+    };
+  }
+
+  protected void stopSession(IClientSession session) {
+    if (session != null && session.isActive()) {
+      BEANS.get(ClientSessionStopHelper.class).scheduleStop(session, true, "session housekeeping");
+    }
   }
 
   protected CompositeObject newSessionCacheKey(final String sessionId, final Subject subject) {
