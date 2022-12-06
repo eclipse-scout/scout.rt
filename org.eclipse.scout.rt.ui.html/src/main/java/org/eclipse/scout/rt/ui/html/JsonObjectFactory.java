@@ -114,6 +114,7 @@ import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileAccordion;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.client.ui.tile.IWidgetTile;
+import org.eclipse.scout.rt.client.uuidpool.IUuidPool;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -226,6 +227,7 @@ import org.eclipse.scout.rt.ui.html.json.tile.JsonTileAccordion;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTileGrid;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonWidgetTile;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
+import org.eclipse.scout.rt.ui.html.uuidpool.JsonUuidPool;
 
 @Bean
 @Order(5500)
@@ -501,6 +503,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IPopup) {
       return new JsonPopup((IPopup) model, session, id, parent);
+    }
+    if (model instanceof IUuidPool) {
+      return new JsonUuidPool((IUuidPool) model, session, id, parent);
     }
     return null;
   }
