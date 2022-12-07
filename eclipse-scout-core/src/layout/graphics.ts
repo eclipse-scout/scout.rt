@@ -11,10 +11,6 @@
 import {arrays, Dimension, Insets, objects, Point, Rectangle, scout, scrollbars} from '../index';
 import $ from 'jquery';
 
-/**
- * This file contains helpers for graphical operations
- */
-
 export interface PrefSizeOptions {
   /**
    * When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up. Default is false.
@@ -140,6 +136,9 @@ function setLocation($comp: JQuery, xOrPoint: number | Point, y?: number) {
     .cssTop(point.y);
 }
 
+/**
+ * Helpers for graphical operations
+ */
 export const graphics = {
 
   /**

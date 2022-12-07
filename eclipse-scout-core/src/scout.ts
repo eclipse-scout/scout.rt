@@ -251,7 +251,7 @@ export const scout = {
    */
   installGlobalMouseDownInterceptor(myDocument: Document) {
     myDocument.addEventListener('mousedown', event => {
-      ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target as Element || event.srcElement as Element);
+      ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target as Element);
     }, true); // true=the event handler is executed in the capturing phase
   },
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, HtmlComponent, InitModelOf, LayoutData, SplitterEventMap, SplitterModel, SplitterMoveEvent, Widget} from '../index';
+import {graphics, HtmlComponent, InitModelOf, LayoutData, numbers, SplitterEventMap, SplitterModel, SplitterMoveEvent, Widget} from '../index';
 import $ from 'jquery';
 
 export class Splitter extends Widget implements SplitterModel {
@@ -95,7 +95,7 @@ export class Splitter extends Widget implements SplitterModel {
    * @returns the effective position in pixel.
    */
   setPosition(position?: number): number {
-    if (!$.isNumeric(position)) {
+    if (!numbers.isNumber(position)) {
       position = this._derivePositionFromAnchor();
     }
     if (position !== this.position) {
@@ -121,7 +121,7 @@ export class Splitter extends Widget implements SplitterModel {
   }
 
   protected _setPosition(position: number) {
-    if (!$.isNumeric(position)) {
+    if (!numbers.isNumber(position)) {
       return;
     }
     if (position === this.position) {

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, scout} from '../index';
+import {arrays, numbers, objects, scout} from '../index';
 import $ from 'jquery';
 
 export interface AppendToTarget {
@@ -240,7 +240,7 @@ export const models = {
         insertAt++;
       }
     }
-    if ($.isNumeric(target.index)) {
+    if (numbers.isNumber(target.index)) {
       insertAt = target.index;
     }
     return insertAt;
