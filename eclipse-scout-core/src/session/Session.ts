@@ -668,7 +668,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       urlHint = 'sync';
     }
     if (urlHint) {
-      url = new URL(url).addParameter(urlHint, '').toString();
+      url = new URL(url).addParameter(urlHint).toString();
     }
     return url;
   }
