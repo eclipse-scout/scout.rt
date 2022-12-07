@@ -32,7 +32,6 @@ describe('NavigateDownButton', () => {
     }
   }
 
-
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();

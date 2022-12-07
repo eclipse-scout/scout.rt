@@ -45,7 +45,6 @@ describe('TagField', () => {
     }
   }
 
-
   function typeProposal(field, text, keyCode) {
     let $input = field.$container.find('input');
     $input.val(text);

@@ -64,7 +64,6 @@ export interface PrefSizeOptions {
   animateClasses?: string[];
 }
 
-
 export interface SizeOptions {
   /**
    * When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up. Default is false.
@@ -142,6 +141,7 @@ function setLocation($comp: JQuery, xOrPoint: number | Point, y?: number) {
 }
 
 export const graphics = {
+
   /**
    * Returns the preferred size of $elem.
    * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok

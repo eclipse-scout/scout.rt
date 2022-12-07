@@ -32,7 +32,6 @@ describe('NavigateUpButton', () => {
     }
   }
 
-
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();

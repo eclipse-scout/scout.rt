@@ -46,7 +46,6 @@ export interface ExtensionModel {
   extensions: ExtensionAction[];
 }
 
-
 function get<T>(modelFunc: () => T): T;
 function get<T, P>(modelFunc: () => T, parent: P): T & { parent: P };
 

@@ -13,5 +13,4 @@ interface JQuery<TElement = HTMLElement> extends Array<TElement | JQuery> {
   triggerBlur(): JQuery;
 }
 
-
 export {};

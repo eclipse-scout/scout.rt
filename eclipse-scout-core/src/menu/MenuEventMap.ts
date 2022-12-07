@@ -10,7 +10,6 @@
  */
 import {ActionEventMap, Event, Menu, MenuFilter, MenuStyle, PropertyChangeEvent, SubMenuVisibility} from '../index';
 
-
 export interface MenuEventMap extends ActionEventMap {
   'focus': Event<Menu>;
   'propertyChange:childActions': PropertyChangeEvent<Menu[]>;

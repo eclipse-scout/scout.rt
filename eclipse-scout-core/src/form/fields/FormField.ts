@@ -1432,7 +1432,6 @@ export class FormField extends Widget implements FormFieldModel {
     return false;
   }
 
-
   getValidationResult(): ValidationResult {
     let validByErrorStatus = !this._errorStatus();
     let validByMandatory = !this.mandatory || !this.empty;

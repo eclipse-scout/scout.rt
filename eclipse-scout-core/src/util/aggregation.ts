@@ -10,7 +10,6 @@
  */
 import {icons, objects} from '../index';
 
-
 export interface AvgAggregationState {
   sum: number;
   count: number;

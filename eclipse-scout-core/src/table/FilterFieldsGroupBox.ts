@@ -10,7 +10,6 @@
  */
 import {ColumnUserFilter, FilterFieldsGroupBoxModel, GroupBox, InitModelOf, ObjectType, scout, SomeRequired, ValueField} from '../index';
 
-
 export class FilterFieldsGroupBox extends GroupBox implements FilterFieldsGroupBoxModel {
   declare model: FilterFieldsGroupBoxModel;
   declare initModel: SomeRequired<this['model'], 'parent' | 'filter'>;

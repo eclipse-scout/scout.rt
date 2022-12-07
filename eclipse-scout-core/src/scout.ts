@@ -210,7 +210,6 @@ export const scout = {
     return argsToCheck.indexOf(value) !== -1;
   },
 
-
   create,
 
   /**

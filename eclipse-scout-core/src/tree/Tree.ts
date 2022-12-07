@@ -3300,7 +3300,6 @@ export class Tree extends Widget implements TreeModel {
   }
 }
 
-
 export type TreeDisplayStyle = EnumObject<typeof Tree.DisplayStyle>;
 export type TreeCheckableStyle = EnumObject<typeof Tree.CheckableStyle>;
 export type TreeNodeExpandOptions = {

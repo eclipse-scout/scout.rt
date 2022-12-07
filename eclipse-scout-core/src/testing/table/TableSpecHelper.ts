@@ -286,7 +286,6 @@ export class TableSpecHelper {
     };
   }
 
-
   /**
    * Applies display style on rows and cells so that cells are positioned correctly in a row.<br>
    * Necessary because the stylesheet is not applied when running the specs.

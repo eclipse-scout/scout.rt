@@ -24,7 +24,6 @@ describe('PageWithTable', () => {
     }
   }
 
-
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();

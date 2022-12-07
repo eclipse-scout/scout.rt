@@ -14,7 +14,6 @@ export interface CalendarComponentAppLinkActionEvent<T = CalendarComponent> exte
   ref: string;
 }
 
-
 export interface CalendarComponentEventMap extends WidgetEventMap {
   'appLinkAction': CalendarComponentAppLinkActionEvent;
   'propertyChange:selected': PropertyChangeEvent<boolean>;

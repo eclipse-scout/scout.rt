@@ -337,7 +337,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
       .children('.check-box')
       .toggleClass('disabled', !this.enabled);
 
-
     if (!this.parentNode && tree.selectedNodes.length === 0 || // root nodes have class child-of-selected if no node is selected
       tree.isChildOfSelectedNodes(this)) {
       $node.addClass('child-of-selected');

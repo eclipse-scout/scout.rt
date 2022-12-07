@@ -16,7 +16,6 @@ export interface ColorScheme {
   tile?: boolean;
 }
 
-
 export const colorSchemes = {
   ColorSchemeId: {
     DEFAULT: 'default',

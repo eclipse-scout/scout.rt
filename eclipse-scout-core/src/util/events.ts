@@ -185,7 +185,6 @@ export const events = {
     });
   },
 
-
   /**
    * Adds swipe event listeners to the element given.
    *
@@ -243,9 +242,7 @@ export const events = {
       });
     });
   }
-
 };
-
 
 export interface SwipeCallbackEvent {
   /**

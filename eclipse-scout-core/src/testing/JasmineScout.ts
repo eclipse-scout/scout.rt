@@ -170,7 +170,6 @@ window.createSimpleModel = <T>(objectType, session, id) => {
   };
 };
 
-
 window.mostRecentJsonRequest = () => {
   let req = jasmine.Ajax.requests.mostRecent();
   if (req) {

@@ -2340,7 +2340,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 }
 
-
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
 export type GlassPaneTarget = JQuery | HTMLElement | DeferredGlassPaneTarget;
 export type GlassPaneContribution = (widget: Widget) => GlassPaneTarget | GlassPaneTarget[];

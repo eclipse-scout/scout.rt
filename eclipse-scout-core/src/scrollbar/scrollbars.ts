@@ -79,7 +79,6 @@ export interface ScrollToOptions extends ScrollOptions {
   scrollOffsetDown?: number;
 }
 
-
 export interface ExpandableElement {
   height: number;
   level?: number;

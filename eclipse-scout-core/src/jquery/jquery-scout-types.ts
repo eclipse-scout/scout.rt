@@ -965,7 +965,6 @@ declare global {
      */
     cssPaddingTop(): number;
 
-
     /**
      * Sets paddingLeft and paddingRight to the given value.
      * @see cssPxValue
@@ -989,7 +988,6 @@ declare global {
      * @see cssPxValue
      */
     cssPaddingY(): number;
-
 
     /**
      * Sets borderLeft property to the given value.
@@ -1038,7 +1036,6 @@ declare global {
      * @see cssPxValue
      */
     cssBorderTopWidth(): number;
-
 
     /**
      * Sets borderLeft and borderRight to the given value.

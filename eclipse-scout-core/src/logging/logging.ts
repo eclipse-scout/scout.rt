@@ -62,7 +62,6 @@ export interface LoggingOptions {
   resourceUrl?: string;
 }
 
-
 export interface LogAppender {
   append(loggingEvent: LoggingEvent);
 }

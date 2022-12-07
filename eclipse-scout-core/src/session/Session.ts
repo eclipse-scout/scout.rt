@@ -170,7 +170,6 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   // Placeholder string for an empty filename
   static EMPTY_UPLOAD_FILENAME = '*empty*';
 
-
   init(model: InitModelOf<this>) {
     let options = model || {} as InitModelOf<this>;
 

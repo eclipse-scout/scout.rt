@@ -10,7 +10,6 @@
  */
 import {Event, FormFieldEventMap, PropertyChangeEvent, ValueField, ValueFieldClearable, ValueFieldFormatter, ValueFieldParser, ValueFieldValidator} from '../../index';
 
-
 export interface ValueFieldAcceptInputEvent<TValue = any, T = ValueField<TValue>> extends Event<T> {
   displayText: string;
   whileTyping: boolean;

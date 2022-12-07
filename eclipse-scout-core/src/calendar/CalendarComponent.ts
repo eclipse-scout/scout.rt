@@ -416,7 +416,6 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   }
 }
 
-
 /**
  * See JsonCalendarItem.java
  */

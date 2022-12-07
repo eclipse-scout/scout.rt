@@ -479,7 +479,6 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
 
 App.addListener('bootstrap', ModelAdapter.modifyWidgetPrototype);
 
-
 export interface ModelAdapterLike {
   widget: Widget;
 
