@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 const baseConfig = require('@eclipse-scout/cli/scripts/webpack-defaults');
-const path = require('path');
 module.exports = (env, args) => {
   const config = baseConfig(env, args);
 
@@ -21,16 +20,7 @@ module.exports = (env, args) => {
   };
   testingConfig.externals = [
     testingConfig.externals,
-    ({context, request, contextInfo}, callback) => {
-      // Externalize every import to the main index and replace it with @eclipse-scout/core
-      // Keep imports to the testing index
-      if (/\/index$/.test(request) && !path.resolve(context, request).includes('testing')) {
-        return callback(null, '@eclipse-scout/core');
-      }
-
-      // Continue without externalizing the import
-      callback();
-    }
+    baseConfig.rewriteIndexImports('@eclipse-scout/core', 'testing')
   ];
 
   return testingConfig;

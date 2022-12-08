@@ -494,5 +494,26 @@ function getModuleName() {
   return path.basename(process.cwd());
 }
 
+/**
+ * Externalize every import to the main index and replace it with newImport
+ * Keep imports to the excludedFolder.
+ * @param {string} newImport new name of the replaced import, typically the module name
+ * @param {string} excludedFolder imports to that folder won't be replaced
+ * @return a function that should be added to the webpack externals
+ */
+function rewriteIndexImports(newImport, excludedFolder) {
+  return ({context, request, contextInfo}, callback) => {
+    // Externalize every import to the main index and replace it with @bsi-scout/datamodel
+    // Keep imports to the testing index
+    if (/\/index$/.test(request) && !path.resolve(context, request).includes(excludedFolder)) {
+      return callback(null, newImport);
+    }
+
+    // Continue without externalizing the import
+    callback();
+  };
+}
+
 module.exports.addThemes = addThemes;
 module.exports.libraryConfig = libraryConfig;
+module.exports.rewriteIndexImports = rewriteIndexImports;
