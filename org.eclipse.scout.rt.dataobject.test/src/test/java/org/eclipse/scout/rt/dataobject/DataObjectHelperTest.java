@@ -419,6 +419,11 @@ public class DataObjectHelperTest {
   }
 
   @Test
+  public void testEnsureDeclaredNodesNullSafe() {
+    assertNull(m_helper.ensureDeclaredNodes(null));
+  }
+
+  @Test
   public void testEnsureDeclaredNodes() {
     EntityFixtureDo testObj = BEANS.get(EntityFixtureDo.class);
     assertFalse(testObj.id().exists());

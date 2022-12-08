@@ -345,9 +345,13 @@ public class DataObjectHelper {
 
   /**
    * Ensures that the given data object contains all declared nodes, e.g. all {@link DoValue} nodes are set to
-   * {@code null} and all {@link DoList}, {@link DoSet} and {@link DoCollection} nodes are set to an empty value.
+   * {@code null} and all {@link DoList}, {@link DoSet} and {@link DoCollection} nodes are set to an empty value. If the
+   * given object is {@code null}, {@code null} is returned.
    */
   public <E extends IDoEntity> E ensureDeclaredNodes(E entity) {
+    if (entity == null) {
+      return null;
+    }
     m_dataObjectInventory.get().getAttributesDescription(entity.getClass())
         .values()
         .forEach(desc -> ensureNodeValue(entity, desc.getName(), desc.getType().getRawType(), null));
