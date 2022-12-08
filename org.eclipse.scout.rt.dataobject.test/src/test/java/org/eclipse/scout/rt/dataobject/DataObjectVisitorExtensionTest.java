@@ -22,12 +22,18 @@ import java.util.function.UnaryOperator;
 import org.eclipse.scout.rt.dataobject.fixture.BiCompositeFixtureObject;
 import org.eclipse.scout.rt.dataobject.fixture.BiCompositeFixtureObjectDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectWithCompositeFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectWithCompositeIdDo;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectWithTypedIdDo;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureWrapperCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.IdAsStringFixtureDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.fixture.IdAsStringFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.TriCompositeFixtureObject;
 import org.eclipse.scout.rt.dataobject.fixture.TriCompositeFixtureObjectDataObjectVisitorExtension;
+import org.eclipse.scout.rt.dataobject.id.ICompositeId;
+import org.eclipse.scout.rt.dataobject.id.IRootId;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -213,6 +219,121 @@ public class DataObjectVisitorExtensionTest {
             TypedId.of(FixtureStringId.of("list-1-replaced")),
             TypedId.of(FixtureStringId.of("list-3-replaced")),
             TypedId.of(FixtureStringId.of("list-3-replaced"))));
+
+    assertEqualsWithComparisonFailure(expected, actual);
+  }
+
+  /**
+   * Test for {@link CompositeIdDataObjectVisitorExtension}.
+   */
+  @Test
+  public void testForEachCompositeId() {
+    DataObjectWithCompositeIdDo doEntity = BEANS.get(DataObjectWithCompositeIdDo.class)
+        .withId(FixtureCompositeId.of(FixtureStringId.of("single-id"), FixtureUuId.of("353d9bd3-b082-4346-97b6-8c7f08377495")))
+        .withIds(
+            FixtureCompositeId.of(FixtureStringId.of("list-1"), FixtureUuId.of("0c3b57e0-14e3-4980-b81c-3bcec11794f8")),
+            FixtureCompositeId.of(FixtureStringId.of("list-2"), FixtureUuId.of("395d7a06-8141-4966-9bc5-458515b1fa75")),
+            FixtureCompositeId.of(FixtureStringId.of("list-3"), FixtureUuId.of("48e83968-6411-473d-98d5-2041536eb97f")))
+        .withWrappedCompositeId(FixtureWrapperCompositeId.of(
+            FixtureCompositeId.of(FixtureStringId.of("wrapped-inner-composite-id"), FixtureUuId.of("4480f56b-70f5-48cc-ab29-431cd3cdc0d0")),
+            FixtureStringId.of("wrapped-composite-id")));
+
+    List<IRootId> rootIds = new ArrayList<>();
+    DataObjectVisitors.forEachRec(doEntity, IRootId.class, rootIds::add);
+
+    assertEquals(
+        CollectionUtility.arrayList(
+            FixtureStringId.of("single-id"),
+            FixtureUuId.of("353d9bd3-b082-4346-97b6-8c7f08377495"),
+            FixtureStringId.of("list-1"),
+            FixtureUuId.of("0c3b57e0-14e3-4980-b81c-3bcec11794f8"),
+            FixtureStringId.of("list-2"),
+            FixtureUuId.of("395d7a06-8141-4966-9bc5-458515b1fa75"),
+            FixtureStringId.of("list-3"),
+            FixtureUuId.of("48e83968-6411-473d-98d5-2041536eb97f"),
+            FixtureStringId.of("wrapped-inner-composite-id"),
+            FixtureUuId.of("4480f56b-70f5-48cc-ab29-431cd3cdc0d0"),
+            FixtureStringId.of("wrapped-composite-id")),
+        rootIds);
+
+    List<ICompositeId> compositeIds = new ArrayList<>();
+    DataObjectVisitors.forEachRec(doEntity, ICompositeId.class, compositeIds::add);
+
+    assertEquals(
+        CollectionUtility.arrayList(
+            FixtureCompositeId.of(FixtureStringId.of("single-id"), FixtureUuId.of("353d9bd3-b082-4346-97b6-8c7f08377495")),
+            FixtureCompositeId.of(FixtureStringId.of("list-1"), FixtureUuId.of("0c3b57e0-14e3-4980-b81c-3bcec11794f8")),
+            FixtureCompositeId.of(FixtureStringId.of("list-2"), FixtureUuId.of("395d7a06-8141-4966-9bc5-458515b1fa75")),
+            FixtureCompositeId.of(FixtureStringId.of("list-3"), FixtureUuId.of("48e83968-6411-473d-98d5-2041536eb97f")),
+            // first the wrapper composite
+            FixtureWrapperCompositeId.of(
+                FixtureCompositeId.of(FixtureStringId.of("wrapped-inner-composite-id"), FixtureUuId.of("4480f56b-70f5-48cc-ab29-431cd3cdc0d0")),
+                FixtureStringId.of("wrapped-composite-id")),
+            // before the inner composite
+            FixtureCompositeId.of(FixtureStringId.of("wrapped-inner-composite-id"), FixtureUuId.of("4480f56b-70f5-48cc-ab29-431cd3cdc0d0"))),
+        compositeIds);
+  }
+
+  /**
+   * Test for {@link CompositeIdDataObjectVisitorExtension} with replace of {@link FixtureStringId}.
+   */
+  @Test
+  public void testReplaceCompositeIdInner() {
+    DataObjectWithCompositeIdDo actual = BEANS.get(DataObjectWithCompositeIdDo.class)
+        .withId(FixtureCompositeId.of(FixtureStringId.of("single-id"), FixtureUuId.of("353d9bd3-b082-4346-97b6-8c7f08377495")))
+        .withIds(
+            FixtureCompositeId.of(FixtureStringId.of("list-1"), FixtureUuId.of("0c3b57e0-14e3-4980-b81c-3bcec11794f8")),
+            FixtureCompositeId.of(FixtureStringId.of("list-2"), FixtureUuId.of("395d7a06-8141-4966-9bc5-458515b1fa75")),
+            FixtureCompositeId.of(FixtureStringId.of("list-3"), FixtureUuId.of("48e83968-6411-473d-98d5-2041536eb97f")))
+        .withWrappedCompositeId(FixtureWrapperCompositeId.of(
+            FixtureCompositeId.of(FixtureStringId.of("wrapped-inner-composite-id"), FixtureUuId.of("4480f56b-70f5-48cc-ab29-431cd3cdc0d0")),
+            FixtureStringId.of("wrapped-composite-id")));
+
+    DataObjectVisitors.replaceEach(actual, FixtureStringId.class, id -> FixtureStringId.of(id.unwrapAsString() + "-replaced"));
+
+    DataObjectWithCompositeIdDo expected = BEANS.get(DataObjectWithCompositeIdDo.class)
+        .withId(FixtureCompositeId.of(FixtureStringId.of("single-id-replaced"), FixtureUuId.of("353d9bd3-b082-4346-97b6-8c7f08377495")))
+        .withIds(
+            FixtureCompositeId.of(FixtureStringId.of("list-1-replaced"), FixtureUuId.of("0c3b57e0-14e3-4980-b81c-3bcec11794f8")),
+            FixtureCompositeId.of(FixtureStringId.of("list-2-replaced"), FixtureUuId.of("395d7a06-8141-4966-9bc5-458515b1fa75")),
+            FixtureCompositeId.of(FixtureStringId.of("list-3-replaced"), FixtureUuId.of("48e83968-6411-473d-98d5-2041536eb97f")))
+        .withWrappedCompositeId(FixtureWrapperCompositeId.of(
+            FixtureCompositeId.of(FixtureStringId.of("wrapped-inner-composite-id-replaced"), FixtureUuId.of("4480f56b-70f5-48cc-ab29-431cd3cdc0d0")),
+            FixtureStringId.of("wrapped-composite-id-replaced")));
+
+    assertEqualsWithComparisonFailure(expected, actual);
+  }
+
+  /**
+   * Test for {@link CompositeIdDataObjectVisitorExtension} with replace of {@link FixtureCompositeId}.
+   */
+  @Test
+  public void testReplaceCompositeIdFull() {
+    DataObjectWithCompositeIdDo actual = BEANS.get(DataObjectWithCompositeIdDo.class)
+        .withId(FixtureCompositeId.of(FixtureStringId.of("single-id"), FixtureUuId.of("353d9bd3-b082-4346-97b6-8c7f08377495")))
+        .withIds(
+            FixtureCompositeId.of(FixtureStringId.of("list-1"), FixtureUuId.of("0c3b57e0-14e3-4980-b81c-3bcec11794f8")),
+            FixtureCompositeId.of(FixtureStringId.of("list-2"), FixtureUuId.of("395d7a06-8141-4966-9bc5-458515b1fa75")),
+            FixtureCompositeId.of(FixtureStringId.of("list-3"), FixtureUuId.of("48e83968-6411-473d-98d5-2041536eb97f")))
+        .withWrappedCompositeId(FixtureWrapperCompositeId.of(
+            FixtureCompositeId.of(FixtureStringId.of("wrapped-inner-composite-id"), FixtureUuId.of("4480f56b-70f5-48cc-ab29-431cd3cdc0d0")),
+            FixtureStringId.of("wrapped-composite-id")));
+
+    DataObjectVisitors.replaceEach(actual, FixtureCompositeId.class, id -> {
+      FixtureStringId stringId = (FixtureStringId) id.unwrap().get(0);
+      FixtureUuId uuId = (FixtureUuId) id.unwrap().get(1);
+      return FixtureCompositeId.of(FixtureStringId.of(stringId.unwrap() + "-replaced"), uuId);
+    });
+
+    DataObjectWithCompositeIdDo expected = BEANS.get(DataObjectWithCompositeIdDo.class)
+        .withId(FixtureCompositeId.of(FixtureStringId.of("single-id-replaced"), FixtureUuId.of("353d9bd3-b082-4346-97b6-8c7f08377495")))
+        .withIds(
+            FixtureCompositeId.of(FixtureStringId.of("list-1-replaced"), FixtureUuId.of("0c3b57e0-14e3-4980-b81c-3bcec11794f8")),
+            FixtureCompositeId.of(FixtureStringId.of("list-2-replaced"), FixtureUuId.of("395d7a06-8141-4966-9bc5-458515b1fa75")),
+            FixtureCompositeId.of(FixtureStringId.of("list-3-replaced"), FixtureUuId.of("48e83968-6411-473d-98d5-2041536eb97f")))
+        .withWrappedCompositeId(FixtureWrapperCompositeId.of(
+            FixtureCompositeId.of(FixtureStringId.of("wrapped-inner-composite-id-replaced"), FixtureUuId.of("4480f56b-70f5-48cc-ab29-431cd3cdc0d0")),
+            FixtureStringId.of("wrapped-composite-id")));
 
     assertEqualsWithComparisonFailure(expected, actual);
   }

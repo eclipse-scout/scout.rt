@@ -28,16 +28,12 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Codec used to convert between {@link IId} instances and their qualified/unqualified representation as {@link String}.
  */
 @ApplicationScoped
 public class IdCodec {
-
-  private static final Logger LOG = LoggerFactory.getLogger(IdCodec.class);
 
   protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
   protected final LazyValue<IdInventory> m_idInventory = new LazyValue<>(IdInventory.class);
@@ -99,7 +95,7 @@ public class IdCodec {
       return mapper.apply(value);
     }
     else if (id instanceof ICompositeId) {
-      List<? extends IId> components = ((AbstractCompositeId) id).unwrap();
+      List<? extends IId> components = ((ICompositeId) id).unwrap();
       return components.stream()
           .map(this::toUnqualified)
           .collect(Collectors.joining(";"));
