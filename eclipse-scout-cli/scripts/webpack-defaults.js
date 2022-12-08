@@ -18,7 +18,7 @@ const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('web
 
 /**
  * @param {string} args.mode development or production
- * @param {boolean} args.clean true, to clean the dist folder before each build. Default is true.
+ * @param {boolean} args.clean true, to clean the dist folder before each build. Default is false.
  * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
  * @param {boolean} args.watch true, if webpack runs in watch mode. Default is false.

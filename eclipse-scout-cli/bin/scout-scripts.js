@@ -85,6 +85,7 @@ switch (script) {
     const args = parser(argv, webpackYargsOptions);
     args.mode = scoutBuildConstants.mode.development;
     args.watch = true;
+    args.clean = true; // prevents errors because of old output folders in the development environment
     runWebpack(args);
     break;
   }
