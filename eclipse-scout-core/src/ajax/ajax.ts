@@ -39,7 +39,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  post(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  post(url: string, data?: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
     let opts = $.extend({}, {
       url: url,
       type: 'POST',
