@@ -24,9 +24,6 @@
     "target/dist"
   ],
   "scripts": {
-    "ts-rename": "migrate --migrate false --sources src/**/*",
-    "ts-migrate": "migrate --rename false --sources src/**/*",
-    "ts-event-maps": "migrate --rename false --migrate false --print-event-maps --sources src/**/*.ts",
     "build:dev": "scout-scripts build:dev",
     "build:prod": "scout-scripts build:prod",
     "build:all": "scout-scripts build:dev && scout-scripts build:prod",

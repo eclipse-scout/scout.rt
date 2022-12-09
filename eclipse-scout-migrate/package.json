@@ -26,10 +26,10 @@
   ],
   "type": "module",
   "bin": {
-    "migrate": "bin/migrate.js"
+    "scout-migrate": "bin/scout-migrate.js"
   },
   "scripts": {
-    "migrate": "node bin/migrate",
+    "scout-migrate": "node bin/scout-migrate",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest-config.json"
   },
   "dependencies": {
