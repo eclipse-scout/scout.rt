@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -41,6 +41,7 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -634,8 +635,8 @@ public final class IOUtility {
   public static File createTempFile(InputStream content, String filename, String extension, File directory) {
     try {
       File temp = File.createTempFile(filename, extension, directory);
-      try (InputStream in = content; FileOutputStream out = new FileOutputStream(temp)) {
-        writeBytes(out, readBytes(in));
+      try (InputStream in = content) {
+        Files.copy(in, temp.toPath(), StandardCopyOption.REPLACE_EXISTING);
       }
       return temp;
     }
