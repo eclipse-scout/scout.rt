@@ -275,6 +275,7 @@ module.exports = (env, args) => {
         parallel: 4, // best ratio between memory consumption and performance on most systems
         minify: TerserPlugin.esbuildMinify,
         terserOptions: {
+          legalComments: 'none',
           logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
           charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
           target: minimizerTarget
