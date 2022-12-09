@@ -28,6 +28,7 @@ const path = require('path');
 const scoutBuildConstants = require('./../scripts/constants');
 const webpackConfigFileName = './webpack.config.js';
 const webpackCustomConfigFileName = './webpack.config.custom.js';
+const StatsExtractWebpackPlugin = require('../scripts/StatsExtractWebpackPlugin');
 const webpackYargsOptions = {
   boolean: ['progress', 'profile', 'clean'],
   array: ['resDirArray', 'themes']
@@ -147,20 +148,28 @@ function runKarma(configFileName, headless, args) {
   const serverInstance = new Server(karmaConfig, karmaExitCode => {
     if (exitCode === 0) {
       console.log('Karma has exited with 0.');
-      process.exit(0); // all fine: tests could be executed and no failures
-    } else if (exitCode > 1) { // the custom exitCodes
-      console.log(`Error in test execution. Exit code: ${exitCode}.`);
-      process.exit(exitCode); // tests could not be executed because of an error. Let the process fail.
+      process.exitCode = exitCode; // all fine: tests could be executed and no failures
+    } else if (exitCode === 10) {
+      console.log('Webpack build failed. See webpack output for details.');
+      process.exitCode = exitCode; // webpack error
+    } else if (exitCode === 4) {
+      console.log('There are test failures.');
+      process.exitCode = 0; // test could be executed but there are test failures: do not set exitCode to something other than 0 here because the build should continue even on failing tests.
     } else {
-      console.log(`There are test failures. Karma has exited with ${exitCode}.`);
-      process.exit(0); // test could be executed but there are test failures: do not set exitCode here because the build should continue even on failing tests.
+      console.log(`Error in test execution. Exit code: ${exitCode}.`);
+      process.exitCode = exitCode; // tests could not be executed because of an error. Let the process fail.
     }
   });
 
   serverInstance.on('run_complete', (browsers, results) => {
-    // Karma returns exitCode 1 for all results. Therefore, there is no possibility to distinguish the case that tests failed or that the test execution had errors.
-    // To solve this, a custom exitCode is computed which allows separating several cases.
-    exitCode = computeExitCode(results);
+    // compute exit code based on webpack stats and karma result.
+    // Karma exitCode alone is not detailed enough (all problems have exitCode=1).
+    let webpackStats = null;
+    let statsExtractPlugins = karmaConfig.webpack.plugins.filter(p => p instanceof StatsExtractWebpackPlugin);
+    if (statsExtractPlugins && statsExtractPlugins.length) {
+      webpackStats = statsExtractPlugins[0].stats;
+    }
+    exitCode = computeExitCode(results, webpackStats);
   });
 
   console.log(`Starting Karma server using config file ${configFilePath}`);
@@ -170,17 +179,24 @@ function runKarma(configFileName, headless, args) {
 /**
  * Inspired by Karma.BrowserCollection.calculateExitCode().
  *
- * @param results The Karma results object
+ * @param karmaResults The Karma results object
+ * @param webpackStats The Webpack build stats object
  * @returns {number} The custom exit code
  */
-function computeExitCode(results) {
-  if (results.disconnected) {
-    return 2;
+function computeExitCode(karmaResults, webpackStats) {
+  if (webpackStats && webpackStats.hasErrors()) {
+    return 10; // webpack build failed
   }
-  if (results.error) {
-    return 3;
+  if (karmaResults.disconnected) {
+    return 2; // browser disconnected
   }
-  return results.exitCode;
+  if (karmaResults.error) {
+    return 3; // karma error
+  }
+  if (karmaResults.failed > 0) {
+    return 4; // tests could be executed but there are test failures (Karma uses exitCode=1 here which is not what we want)
+  }
+  return karmaResults.exitCode;
 }
 
 function runWebpack(args) {

@@ -13,6 +13,7 @@ const path = require('path');
 
 const jquery = require.resolve('jquery');
 const webpack = require('webpack');
+const StatsExtractWebpackPlugin = require('./StatsExtractWebpackPlugin');
 
 const scoutBuildConstants = require('./constants');
 
@@ -71,6 +72,7 @@ module.exports = (config, specEntryPoint) => {
     // Use inline source maps because external source maps are not supported by karma (https://github.com/webpack-contrib/karma-webpack/issues/224)
     delete sourceMapPlugin.sourceMapFilename;
   }
+  webpackConfig.plugins.push(new StatsExtractWebpackPlugin()); // used by scout-scripts to access the webpack build result.
 
   const specIndex = searchSpecEntryPoint(specEntryPoint);
   const preprocessorObj = {};
