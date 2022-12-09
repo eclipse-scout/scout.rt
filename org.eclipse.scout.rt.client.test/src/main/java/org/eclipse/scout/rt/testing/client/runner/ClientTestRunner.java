@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -23,6 +23,9 @@ import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
+import org.eclipse.scout.rt.testing.client.runner.statement.CleanupPagesStatements.CleanupPagesAfterClassStatement;
+import org.eclipse.scout.rt.testing.client.runner.statement.CleanupPagesStatements.CleanupPagesBeforeClassStatement;
+import org.eclipse.scout.rt.testing.client.runner.statement.CleanupPagesStatements.CleanupPagesMethodStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.RunInModelJobStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.TimeoutClientRunContextStatement;
@@ -88,7 +91,8 @@ public class ClientTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s5 = new CleanupDesktopStatement(next);
+    final Statement s6 = new CleanupDesktopStatement(next);
+    final Statement s5 = new CleanupPagesMethodStatement(s6);
     final Statement s4;
     if (hasNoTimeout(testMethod)) {
       s4 = new RunInModelJobStatement(s5);
@@ -111,6 +115,20 @@ public class ClientTestRunner extends PlatformTestRunner {
       return next;
     }
     return new TimeoutClientRunContextStatement(next, timeoutMillis);
+  }
+
+  @Override
+  protected Statement interceptBeforeClassStatement(Statement s, Class<?> javaClass) {
+    s = new CleanupPagesBeforeClassStatement(s);
+    s = super.interceptBeforeClassStatement(s, javaClass);
+    return s;
+  }
+
+  @Override
+  protected Statement interceptAfterClassStatement(Statement s, Class<?> javaClass) {
+    s = new CleanupPagesAfterClassStatement(s);
+    s = super.interceptAfterClassStatement(s, javaClass);
+    return s;
   }
 
   @Override
