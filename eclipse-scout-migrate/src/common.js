@@ -314,7 +314,7 @@ export function insertMissingImportsForTypes(j, source, typeDescriptors, moduleM
     if (typeof moduleName === 'function') {
       predicate = moduleName;
     } else if (typeof moduleName === 'string' && moduleName.startsWith('path:')) {
-      // Get relative path from current fiel to module
+      // Get relative path from current file to module
       moduleName = path.relative(path.parse(currentFilePath).dir, path.resolve(moduleName.substring(moduleName.indexOf(':') + 1)));
       // Remove file ending
       moduleName = moduleName.substring(0, moduleName.lastIndexOf('.'));
