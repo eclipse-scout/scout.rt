@@ -2579,7 +2579,7 @@ export class Table extends Widget implements TableModel {
    */
   protected _updateBackgroundEffect() {
     this.columns.forEach((column: NumberColumn) => {
-      if (!column.updateBackgroundEffect) {
+      if (!column.backgroundEffect) {
         return;
       }
       column.updateBackgroundEffect();
@@ -2591,7 +2591,7 @@ export class Table extends Widget implements TableModel {
    */
   protected _calculateValuesForBackgroundEffect() {
     this.columns.forEach((column: NumberColumn) => {
-      if (!column.calculateMinMaxValues) {
+      if (!column.backgroundEffect) {
         return;
       }
       column.calculateMinMaxValues();
@@ -4661,7 +4661,7 @@ export class Table extends Widget implements TableModel {
    */
   protected _renderBackgroundEffect() {
     this.columns.forEach((column: NumberColumn) => {
-      if (!column._renderBackgroundEffect) {
+      if (!column.backgroundEffect) {
         return;
       }
       column._renderBackgroundEffect();
