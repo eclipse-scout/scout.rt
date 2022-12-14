@@ -81,6 +81,7 @@ export class Tree extends Widget implements TreeModel {
   nodeWidthDirty: boolean;
   requestFocusOnNodeControlMouseDown: boolean;
   initialTraversing: boolean;
+  defaultMenuTypes: string[];
   $data: JQuery;
   $fillBefore: JQuery;
   $fillAfter: JQuery;
@@ -170,6 +171,7 @@ export class Tree extends Widget implements TreeModel {
     this.$data = null;
     this._scrollDirections = 'both';
     this.requestFocusOnNodeControlMouseDown = true;
+    this.defaultMenuTypes = [Tree.MenuTypes.EmptySpace];
     this._$mouseDownNode = null;
   }
 
@@ -217,7 +219,7 @@ export class Tree extends Widget implements TreeModel {
     this.menuBar = scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
-      menuOrder: new MenuItemsOrder(this.session, 'Tree'),
+      menuOrder: new MenuItemsOrder(this.session, 'Tree', this.defaultMenuTypes),
       menuFilter: this._filterMenusHandler,
       cssClass: 'bounded'
     });
@@ -959,7 +961,7 @@ export class Tree extends Widget implements TreeModel {
   }
 
   protected _filterMenus(argMenus: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean): Menu[] {
-    return menuUtil.filterAccordingToSelection('Tree', this.selectedNodes.length, argMenus, destination, {onlyVisible, enableDisableKeyStrokes});
+    return menuUtil.filterAccordingToSelection('Tree', this.selectedNodes.length, argMenus, destination, {onlyVisible, enableDisableKeyStrokes, defaultMenuTypes: this.defaultMenuTypes});
   }
 
   protected override _renderEnabled() {

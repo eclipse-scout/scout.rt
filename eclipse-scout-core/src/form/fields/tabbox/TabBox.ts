@@ -53,6 +53,9 @@ export class TabBox extends CompositeField implements TabBoxModel {
   }
 
   static MenuTypes = {
+    /**
+     * Marker for TabBox menus.
+     */
     Header: 'TabBox.Header'
   } as const;
 

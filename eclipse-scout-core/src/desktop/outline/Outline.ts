@@ -890,7 +890,8 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
         detailTable = selectedPage.detailTable;
         menuItems = menuUtil.filter(detailTable.menus, [Table.MenuTypes.EmptySpace], {
           onlyVisible: false,
-          enableDisableKeyStrokes: true
+          enableDisableKeyStrokes: true,
+          defaultMenuTypes: detailTable.defaultMenuTypes
         });
         tableControls = detailTable.tableControls;
         detailTable.setMenuBarVisible(false);
@@ -902,7 +903,8 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
         detailTable = parentPage.detailTable;
         menuItems = menuItems.concat(menuUtil.filter(detailTable.menus, [Table.MenuTypes.SingleSelection], {
           onlyVisible: false,
-          enableDisableKeyStrokes: true
+          enableDisableKeyStrokes: true,
+          defaultMenuTypes: detailTable.defaultMenuTypes
         }));
         detailTable.setMenuBarVisible(false);
         this._attachDetailMenusListener(detailTable);
@@ -1159,7 +1161,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.updateKeyStrokes(menus, oldMenus);
     this._setProperty('menus', menus);
     if (this.titleMenuBar) { // _setMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
-      let menuItems = menuUtil.filter(this.menus, [Tree.MenuTypes.Header]);
+      let menuItems = menuUtil.filter(this.menus, [Tree.MenuTypes.Header], {defaultMenuTypes: this.defaultMenuTypes});
       this.titleMenuBar.setMenuItems(menuItems);
     }
   }

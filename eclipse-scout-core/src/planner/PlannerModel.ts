@@ -30,4 +30,5 @@ export interface PlannerModel extends WidgetModel {
   label?: string;
   selectionMode?: PlannerSelectionMode;
   menus?: ObjectOrChildModel<Menu>[];
+  defaultMenuTypes?: string[];
 }

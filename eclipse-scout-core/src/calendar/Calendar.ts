@@ -74,6 +74,7 @@ export class Calendar extends Widget implements CalendarModel {
   yearPanel: YearPanel;
   selectedRange: DateRange;
   needsScrollToStartHour: boolean;
+  defaultMenuTypes: string[];
 
   $header: JQuery;
   $range: JQuery;
@@ -147,6 +148,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.viewRange = null;
     this.calendarToggleListWidth = 270;
     this.calendarToggleYearWidth = 215;
+    this.defaultMenuTypes = [Calendar.MenuTypes.EmptySpace];
 
     // main elements
     this.$container = null;
@@ -1266,7 +1268,8 @@ export class Calendar extends Widget implements CalendarModel {
         return;
       }
       let filteredMenus = menus.filter(this.menus, [allowedType], {
-          onlyVisible: true
+          onlyVisible: true,
+          defaultMenuTypes: this.defaultMenuTypes
         }),
         $part = $(event.currentTarget);
       if (filteredMenus.length === 0) {

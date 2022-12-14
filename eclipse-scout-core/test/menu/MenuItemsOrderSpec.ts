@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, MenuItemsOrder, NullWidget} from '../../src/index';
+import {Menu, MenuItemsOrder, NullWidget, Table} from '../../src/index';
+import {MenuSpecHelper} from '../../src/testing';
 
 describe('MenuItemsOrder', () => {
 
-  let session: SandboxSession, menuItemsOrder: SpecMenuItemsOrder;
+  let session: SandboxSession, menuHelper: MenuSpecHelper, menuItemsOrder: SpecMenuItemsOrder;
 
   class SpecMenuItemsOrder extends MenuItemsOrder {
     override _createSeparator(): Menu {
@@ -27,7 +28,8 @@ describe('MenuItemsOrder', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    menuItemsOrder = new SpecMenuItemsOrder(session, 'Table');
+    menuHelper = new MenuSpecHelper(session);
+    menuItemsOrder = new SpecMenuItemsOrder(session, 'Table', [Table.MenuTypes.EmptySpace]);
     let nullWidget = new NullWidget();
     nullWidget.session = session;
     // @ts-expect-error
@@ -54,4 +56,23 @@ describe('MenuItemsOrder', () => {
     expect(menuTypes[1]).toBe('Table.Bar');
   });
 
+  it('order', () => {
+    let emptySpaceImplicit = menuHelper.createMenu(),
+      emptySpace = menuHelper.createMenu({menuTypes: [Table.MenuTypes.EmptySpace]}),
+      singleSelection = menuHelper.createMenu({menuTypes: [Table.MenuTypes.SingleSelection]}),
+      multiSelection = menuHelper.createMenu({menuTypes: [Table.MenuTypes.MultiSelection]}),
+      header1 = menuHelper.createMenu({menuTypes: [Table.MenuTypes.Header]}),
+      header2 = menuHelper.createMenu({menuTypes: [Table.MenuTypes.Header]}),
+      separator = menuItemsOrder._createSeparator();
+
+    menuItemsOrder._createSeparator = () => separator;
+
+    let sorted = menuItemsOrder.order([header1, emptySpace, multiSelection, header2, emptySpaceImplicit, singleSelection]);
+    expect(sorted.left.length).toBe(5);
+    expect(sorted.right.length).toBe(0);
+    expect(sorted.all.length).toBe(5);
+
+    expect(sorted.left).toEqual([emptySpace, emptySpaceImplicit, separator, multiSelection, singleSelection]);
+    expect(sorted.all).toEqual([emptySpace, emptySpaceImplicit, separator, multiSelection, singleSelection]);
+  });
 });

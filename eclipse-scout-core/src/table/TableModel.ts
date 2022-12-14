@@ -161,4 +161,5 @@ export interface TableModel extends WidgetModel {
    * Default is true.
    */
   textFilterEnabled?: boolean;
+  defaultMenuTypes?: string[];
 }

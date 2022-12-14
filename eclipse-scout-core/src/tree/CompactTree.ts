@@ -50,7 +50,7 @@ export class CompactTree extends Tree {
     });
     this.menuBar = scout.create(MenuBar, {
       parent: this,
-      menuOrder: new MenuItemsOrder(this.session, 'Tree')
+      menuOrder: new MenuItemsOrder(this.session, 'Tree', this.defaultMenuTypes)
     });
     this.menuBar.render();
 

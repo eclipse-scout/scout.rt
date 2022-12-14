@@ -70,4 +70,5 @@ export interface TreeModel extends WidgetModel {
    * Whether to focus the tree when the node control is clicked. Default is true.
    */
   requestFocusOnNodeControlMouseDown?: boolean;
+  defaultMenuTypes?: string[];
 }
