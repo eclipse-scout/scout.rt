@@ -16,11 +16,11 @@ module.exports = (env, args) => {
     entry: {
       'eclipse-scout-testing.esm': './src/testing/index.ts'
     },
-    ...baseConfig.libraryConfig(config, {externalizeDevDeps: true})
+    ...baseConfig.libraryConfig(config)
   };
   testingConfig.externals = [
-    testingConfig.externals,
-    baseConfig.rewriteIndexImports('@eclipse-scout/core', 'testing')
+    baseConfig.rewriteIndexImports('@eclipse-scout/core', 'testing'),
+    testingConfig.externals
   ];
 
   return testingConfig;

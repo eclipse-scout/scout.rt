@@ -16,14 +16,8 @@ module.exports = (env, args) => {
   const baseConfig = require('@eclipse-scout/cli/scripts/webpack-defaults');
   const config = baseConfig(env, args);
   let libraryConfig = baseConfig.libraryConfig(config);
-  return {
-    entry: {
-      'eclipse-scout-chart.esm': './src/index.ts'
-    },
-    ...libraryConfig,
-    externals: {
-      ...libraryConfig.externals,
-      'chart.js/auto': 'chart.js/auto'
-    }
+  libraryConfig.entry = {
+    'eclipse-scout-chart.esm': './src/index.ts'
   };
+  return libraryConfig;
 };

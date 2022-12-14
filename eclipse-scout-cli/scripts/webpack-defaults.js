@@ -288,20 +288,49 @@ module.exports = (env, args) => {
 };
 
 /**
+ * Creates a new object that contains the same keys as the given object. The values are replaced with the keys.
+ * So the resulting object looks like: {key1: key1, key2: key2}.
+ */
+function toExternals(src, dest) {
+  if (!src) {
+    return;
+  }
+  return Object.keys(src).reduce((obj, current) => {
+    obj[current] = current;
+    return obj;
+  }, dest);
+}
+
+/**
+ * Converts the given base config to a library config meaning that all dependencies declared in the package.json are externalized by default.
+ *
+ * @param {object} config base config to convert to a library config
  * @param {object} [options]
- * @param {boolean} [options.externalizeDevDeps] Add devDependencies as externals. Default is false.
+ * @param {object} [options.externals] object holding custom externals for the module. See https://webpack.js.org/configuration/externals/ for details about supported formats and types.
+ * @param {boolean} [options.externalizeDevDeps] Add devDependencies as externals. Default is true.
+ * @param {boolean} [options.externalizePeerDeps] Add peerDependencies as externals. Default is true.
+ * @param {boolean} [options.externalizeBundledDeps] Add bundledDependencies as externals. Default is true.
+ * @param {boolean} [options.externalizeOptionalDeps] Add optionalDependencies as externals. Default is true.
  */
 function libraryConfig(config, options = {}) {
   const packageJson = require(path.resolve('./package.json'));
-  let dependencies = toExternals(packageJson.dependencies);
-  if (options.externalizeDevDeps ?? false) {
-    dependencies = Object.assign(dependencies, toExternals(packageJson.devDependencies));
+  const packageJsonExternals = {};
+  toExternals(packageJson.dependencies, packageJsonExternals);
+  if (options.externalizeDevDeps ?? true) {
+    toExternals(packageJson.devDependencies, packageJsonExternals);
   }
-  // Make synthetic default import work (import $ from 'jquery') by importing jquery as commonjs module
-  let globalDependencies = {};
-  if (dependencies['jquery']) {
-    globalDependencies['jquery'] = 'commonjs jquery';
+  if (options.externalizePeerDeps ?? true) {
+    toExternals(packageJson.peerDependencies, packageJsonExternals);
   }
+  if (options.externalizeBundledDeps ?? true) {
+    toExternals(packageJson.bundledDependencies, packageJsonExternals);
+  }
+  if (options.externalizeOptionalDeps ?? true) {
+    toExternals(packageJson.optionalDependencies, packageJsonExternals);
+  }
+  packageJsonExternals.jquery = 'commonjs jquery'; // Make synthetic default import work (import $ from 'jquery') by importing jquery as commonjs module
+  const customExternals = options.externals || {};
+  const allExternals = {...packageJsonExternals, ...config.externals, ...customExternals};
 
   // FileList is not necessary in library mode
   let plugins = config.plugins.map(plugin => {
@@ -323,28 +352,40 @@ function libraryConfig(config, options = {}) {
         type: 'module'
       }
     },
-    externals: {
-      ...config.externals,
-      ...dependencies,
-      ...globalDependencies
-    },
     experiments: {
       // required for library.type = 'module'
       outputModule: true
     },
-    plugins
+    plugins,
+    externals: (context, callback) => markExternals(allExternals, context, callback)
   };
 }
 
-/**
- * Creates a new object that contains the same keys as the given object. The values are replaced with the keys.
- * So the resulting object looks like: {key1: key1, key2: key2}.
- */
-function toExternals(object) {
-  return Object.keys(object).reduce((obj, current) => {
-    obj[current] = current;
-    return obj;
-  }, {});
+function markExternals(allExternals, context, callback) {
+  const request = context.request;
+  if (request.startsWith('.')) {
+    // fast check: continue without externalizing the import for relative paths
+    return callback();
+  }
+
+  if (allExternals[request]) {
+    // import matches exactly a declared dependency
+    return callback(null, allExternals[request]);
+  }
+
+  // check for files in sub-folders of an external
+  for (const [key, value] of Object.entries(allExternals)) {
+    if (request.startsWith(key + '/')) {
+      let result = request;
+      let spacePos = value.indexOf(' ');
+      if (spacePos > 0) {
+        result = value.substring(0, spacePos + 1) + result;
+      }
+      return callback(null, result);
+    }
+  }
+
+  callback(); // Continue without externalizing the import
 }
 
 /**
@@ -516,4 +557,5 @@ function rewriteIndexImports(newImport, excludedFolder) {
 
 module.exports.addThemes = addThemes;
 module.exports.libraryConfig = libraryConfig;
+module.exports.markExternals = markExternals;
 module.exports.rewriteIndexImports = rewriteIndexImports;
