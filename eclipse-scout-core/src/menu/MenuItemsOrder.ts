@@ -21,10 +21,12 @@ export class MenuItemsOrder implements MenuOrder, ObjectWithType {
   emptySpaceTypes: string[];
   selectionTypes: string[];
   menuBar: MenuBar;
+  defaultMenuTypes: string[];
 
-  constructor(session: Session, objectType: string) {
+  constructor(session: Session, objectType: string, defaultMenuTypes: string[]) {
     this.session = session;
     this.objectType = objectType;
+    this.defaultMenuTypes = defaultMenuTypes;
     this.emptySpaceTypes = ['EmptySpace'];
     this.selectionTypes = ['SingleSelection', 'MultiSelection'];
   }
@@ -42,12 +44,12 @@ export class MenuItemsOrder implements MenuOrder, ObjectWithType {
         buttons.push(item);
       } else if (item.horizontalAlignment === 1) {
         rightItems.push(item);
-      } else if (menus.checkType(item, this._menuTypes(this.emptySpaceTypes))) {
+      } else if (menus.checkType(item, this._menuTypes(this.emptySpaceTypes), this.defaultMenuTypes)) {
         if (item.visible) {
           isEmptySpaceMenuVisible = true;
         }
         emptySpaceItems.push(item);
-      } else if (menus.checkType(item, this._menuTypes(this.selectionTypes))) {
+      } else if (menus.checkType(item, this._menuTypes(this.selectionTypes), this.defaultMenuTypes)) {
         if (item.visible) {
           isSelectionMenuVisible = true;
         }

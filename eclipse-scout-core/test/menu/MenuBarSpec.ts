@@ -36,7 +36,7 @@ describe('MenuBar', () => {
   function createMenuBar(menuOrder?: MenuOrder): SpecMenuBar {
     return scout.create(SpecMenuBar, {
       parent: session.desktop,
-      menuOrder: scout.nvl(menuOrder, new MenuItemsOrder(session, 'Table'))
+      menuOrder: scout.nvl(menuOrder, new MenuItemsOrder(session, 'Table', [Table.MenuTypes.EmptySpace]))
     });
   }
 

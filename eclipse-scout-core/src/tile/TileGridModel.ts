@@ -132,4 +132,5 @@ export interface TileGridModel extends WidgetModel {
    * Default is null which means {@link TileGrid._updateTextFilterText} is used that works with {@link TileTextFilter.setText}.
    */
   updateTextFilterText?: string;
+  defaultMenuTypes?: string[];
 }

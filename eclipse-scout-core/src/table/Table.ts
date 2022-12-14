@@ -120,6 +120,7 @@ export class Table extends Widget implements TableModel {
   textFilterEnabled: boolean;
   filterSupport: FilterSupport<TableRow>;
   filteredElementsDirty: boolean;
+  defaultMenuTypes: string[];
 
   $data: JQuery;
   $emptyData: JQuery;
@@ -230,6 +231,7 @@ export class Table extends Widget implements TableModel {
     this.textFilterEnabled = true;
     this.filterSupport = this._createFilterSupport();
     this.filteredElementsDirty = false;
+    this.defaultMenuTypes = [Table.MenuTypes.EmptySpace];
 
     this._doubleClickSupport = new DoubleClickSupport();
     this._permanentHeadSortColumns = [];
@@ -2153,7 +2155,7 @@ export class Table extends Widget implements TableModel {
 
   /** @internal */
   _filterMenus(menuItems: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean, notAllowedTypes?: string | string[]): Menu[] {
-    return menus.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes});
+    return menus.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes, defaultMenuTypes: this.defaultMenuTypes});
   }
 
   /** @internal */
@@ -4627,7 +4629,7 @@ export class Table extends Widget implements TableModel {
     return scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
-      menuOrder: new MenuItemsOrder(this.session, 'Table'),
+      menuOrder: new MenuItemsOrder(this.session, 'Table', this.defaultMenuTypes),
       menuFilter: this._filterMenusHandler,
       cssClass: 'bounded'
     });
