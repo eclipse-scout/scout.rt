@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CancelMenu, Event, Form, FormModel, GroupBox, InitModelOf, ListBox, Menu, OkMenu, scout, SomeRequired, Status, Table, TableRowsInsertedEvent, UnsavedFormChangesFormModel, UnsavedFormsLookupCall} from '../../index';
+import {arrays, CancelMenu, Event, Form, FormModel, GroupBox, InitModelOf, ListBox, Menu, OkMenu, scout, SomeRequired, Status, TableRowsInsertedEvent, UnsavedFormChangesFormModel, UnsavedFormsLookupCall} from '../../index';
 
 export class UnsavedFormChangesForm extends Form implements UnsavedFormChangesFormModel {
   declare model: UnsavedFormChangesFormModel;
@@ -71,7 +71,6 @@ export class UnsavedFormChangesForm extends Form implements UnsavedFormChangesFo
     let checkAllMenu = scout.create(Menu, {
       parent: this.openFormsField.table,
       id: 'CheckAllMenu',
-      menuTypes: [Table.MenuTypes.EmptySpace],
       text: '${textKey:CheckAll}'
     });
 
@@ -80,7 +79,6 @@ export class UnsavedFormChangesForm extends Form implements UnsavedFormChangesFo
     let uncheckAllMenu = scout.create(Menu, {
       parent: this.openFormsField.table,
       id: 'UncheckAllMenu',
-      menuTypes: [Table.MenuTypes.EmptySpace],
       text: '${textKey:UncheckAll}'
     });
 

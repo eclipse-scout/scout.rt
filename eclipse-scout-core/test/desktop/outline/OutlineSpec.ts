@@ -191,9 +191,7 @@ describe('Outline', () => {
       node0.detailTable.setMenus([
         menuHelper.createMenu({
           menuTypes: [Table.MenuTypes.SingleSelection]
-        }), menuHelper.createMenu({
-          menuTypes: [Table.MenuTypes.EmptySpace]
-        })
+        }), menuHelper.createMenu()
       ]);
       expect(outline.detailMenuBarVisible).toBe(false);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
@@ -211,9 +209,7 @@ describe('Outline', () => {
       node0.detailTable.setMenus([
         menuHelper.createMenu({
           menuTypes: [Table.MenuTypes.SingleSelection]
-        }), menuHelper.createMenu({
-          menuTypes: [Table.MenuTypes.EmptySpace]
-        })
+        }), menuHelper.createMenu()
       ]);
       expect(outline.detailMenuBarVisible).toBe(false);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
@@ -236,7 +232,7 @@ describe('Outline', () => {
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
       // Menus change on table -> detail menu bar needs to be updated as well
-      let menu = menuHelper.createModel('menu', '', [Table.MenuTypes.EmptySpace]);
+      let menu = menuHelper.createModel('menu', '');
       node0.detailTable.setMenus([menu]);
       expect(outline.detailMenuBarVisible).toBe(true);
       expect(outline.detailMenuBar.menuItems.length).toBe(1);
@@ -273,12 +269,8 @@ describe('Outline', () => {
       helper.setMobileFlags(outline);
       outline.render();
       let node0 = outline.nodes[0];
-      let emptySpaceMenu = menuHelper.createMenu({
-        menuTypes: [Table.MenuTypes.EmptySpace]
-      });
-      let emptySpaceMenu2 = menuHelper.createMenu({
-        menuTypes: [Table.MenuTypes.EmptySpace]
-      });
+      let emptySpaceMenu = menuHelper.createMenu();
+      let emptySpaceMenu2 = menuHelper.createMenu();
       node0.detailTable.setMenus([emptySpaceMenu]);
 
       // Select node -> empty space menus are active
@@ -368,12 +360,8 @@ describe('Outline', () => {
       helper.setMobileFlags(outline);
       outline.render();
       let node0 = outline.nodes[0];
-      let emptySpaceMenu = menuHelper.createMenu({
-        menuTypes: [Table.MenuTypes.EmptySpace]
-      });
-      let emptySpaceMenu2 = menuHelper.createMenu({
-        menuTypes: [Table.MenuTypes.EmptySpace]
-      });
+      let emptySpaceMenu = menuHelper.createMenu();
+      let emptySpaceMenu2 = menuHelper.createMenu();
       node0.detailTable.setMenus([emptySpaceMenu, emptySpaceMenu2]);
 
       // Select node -> empty space menus are active
