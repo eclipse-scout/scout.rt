@@ -1785,9 +1785,7 @@ describe('Table', () => {
       multiSelMenu = helper.menuHelper.createMenu({
         menuTypes: [Table.MenuTypes.MultiSelection]
       });
-      emptySpaceMenu = helper.menuHelper.createMenu({
-        menuTypes: [Table.MenuTypes.EmptySpace]
-      });
+      emptySpaceMenu = helper.menuHelper.createMenu();
       headerMenu = helper.menuHelper.createMenu({
         menuTypes: [Table.MenuTypes.Header]
       });
@@ -1878,8 +1876,7 @@ describe('Table', () => {
       table = helper.createTable(model);
 
       menuBarMenu = scout.create(Menu, {
-        parent: table,
-        menuTypes: [Table.MenuTypes.EmptySpace]
+        parent: table
       });
       singleSelMenu = scout.create(Menu, {
         parent: table,
@@ -1894,8 +1891,7 @@ describe('Table', () => {
         menuTypes: [Table.MenuTypes.MultiSelection]
       });
       emptySpaceMenu = scout.create(Menu, {
-        parent: table,
-        menuTypes: [Table.MenuTypes.EmptySpace]
+        parent: table
       });
 
       menuBarMenu.setChildActions([singleSelMenu, singleMultiSelMenu, multiSelMenu, emptySpaceMenu]);
@@ -1944,12 +1940,10 @@ describe('Table', () => {
       let table = helper.createTable(helper.createModelFixture(2, 2));
       let menus = [
         scout.create(Menu, {
-          parent: table,
-          menuTypes: [Table.MenuTypes.EmptySpace]
+          parent: table
         }),
         scout.create(Menu, {
-          parent: table,
-          menuTypes: [Table.MenuTypes.EmptySpace]
+          parent: table
         })
       ];
       expect(menus[0].parent).toBe(table);

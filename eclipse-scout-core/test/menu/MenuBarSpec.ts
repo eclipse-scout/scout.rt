@@ -30,7 +30,6 @@ describe('MenuBar', () => {
 
   function createModel(text?: string, iconId?: string, menuTypes?: string[]): MenuModel {
     text = scout.nvl(text, 'Foo');
-    menuTypes = scout.nvl(menuTypes, [Table.MenuTypes.EmptySpace]);
     return helper.createModel(text, iconId, menuTypes);
   }
 
@@ -140,7 +139,6 @@ describe('MenuBar', () => {
 
     it('hides unnecessary explicit separator menus', () => {
       let menuModel = helper.createModel();
-      menuModel.menuTypes = [Table.MenuTypes.EmptySpace];
 
       let sep1a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1a', separator: true}));
       let sep1b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1b', separator: true}));
@@ -193,7 +191,6 @@ describe('MenuBar', () => {
     it('MenuBar must update tabbable when a menu item is focused', () => {
       // otherwise the menu item can not have the focus, because the DOM element is not focusable without a tabindex.
       let menuModel = helper.createModel();
-      menuModel.menuTypes = [Table.MenuTypes.EmptySpace];
 
       let menu1 = helper.createMenu($.extend({}, menuModel, {id: 'menu1', text: 'Menu 1'}));
       let menu2 = helper.createMenu($.extend({}, menuModel, {id: 'menu2', text: 'Menu 2'}));
