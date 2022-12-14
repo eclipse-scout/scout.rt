@@ -28,4 +28,5 @@ export interface CalendarModel extends WidgetModel {
   calendarToggleYearWidth?: number;
   menuInjectionTarget?: GroupBox;
   menus?: ObjectOrChildModel<Menu>[];
+  defaultMenuTypes?: string[];
 }

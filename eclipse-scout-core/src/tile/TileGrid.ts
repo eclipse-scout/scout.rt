@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractGrid, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf, KeyStrokeContext,
-  LoadingSupport, LogicalGrid, LogicalGridData, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range, scout, ScrollToOptions, TextFilter, Tile,
-  TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke,
-  TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
+  AbstractGrid, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf,
+  KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range, scout, ScrollToOptions,
+  TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler,
+  TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -61,6 +61,7 @@ export class TileGrid extends Widget implements TileGridModel {
   filterSupport: FilterSupport<Tile>;
   createTextFilter: () => TextFilter<Tile>;
   updateTextFilterText: string;
+  defaultMenuTypes: string[];
   $filterFieldContainer: JQuery;
   $fillBefore: JQuery;
   $fillAfter: JQuery;
@@ -109,6 +110,8 @@ export class TileGrid extends Widget implements TileGridModel {
     this.createTextFilter = null;
     this.updateTextFilterText = null;
 
+    this.defaultMenuTypes = [TileGrid.MenuTypes.EmptySpace];
+
     this._filterMenusHandler = this._filterMenus.bind(this);
     this._renderViewPortAfterAttach = false;
     this._scrollParentScrollHandler = this._onScrollParentScroll.bind(this);
@@ -118,6 +121,12 @@ export class TileGrid extends Widget implements TileGridModel {
     this.$fillBefore = null;
     this.$fillAfter = null;
   }
+
+  static MenuTypes = {
+    EmptySpace: 'TileGrid.EmptySpace',
+    SingleSelection: 'TileGrid.SingleSelection',
+    MultiSelection: 'TileGrid.MultiSelection'
+  } as const;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -552,7 +561,7 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 
   protected _filterMenus(menus: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean, notAllowedTypes?: string | string[]): Menu[] {
-    return menuUtil.filterAccordingToSelection('TileGrid', this.selectedTiles.length, menus, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes});
+    return menuUtil.filterAccordingToSelection('TileGrid', this.selectedTiles.length, menus, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes, defaultMenuTypes: this.defaultMenuTypes});
   }
 
   showContextMenu(options: { pageX?: number; pageY?: number }) {
@@ -1584,3 +1593,5 @@ export class TileGrid extends Widget implements TileGridModel {
     return tiles;
   }
 }
+
+export type TileGridMenuTypes = EnumObject<typeof TileGrid.MenuTypes>;

@@ -14,5 +14,8 @@ package org.eclipse.scout.rt.client.ui.action.menu;
  * {@link AbstractMenu#getConfiguredMenuTypes()}.
  */
 public enum TabBoxMenuType implements IMenuType {
+  /**
+   * Marker for TabBox menus.
+   */
   Header
 }

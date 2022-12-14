@@ -42,6 +42,7 @@ export class Planner extends Widget implements PlannerModel {
   menuBar: MenuBar;
   header: PlannerHeader;
   yearPanel: YearPanel;
+  defaultMenuTypes: string[];
 
   /** scale calculator */
   transformLeft: (t: number) => number;
@@ -85,6 +86,7 @@ export class Planner extends Widget implements PlannerModel {
     this.selectedActivity = null;
     this.startRow = null;
     this.lastRow = null;
+    this.defaultMenuTypes = [Planner.MenuTypes.EmptySpace];
 
     this._resourceTitleWidth = 20;
     this._rangeSelectionStarted = false;
@@ -157,7 +159,7 @@ export class Planner extends Widget implements PlannerModel {
     this.menuBar = scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
-      menuOrder: new PlannerMenuItemsOrder(this.session, 'Planner'),
+      menuOrder: new PlannerMenuItemsOrder(this.session, 'Planner', this.defaultMenuTypes),
       cssClass: 'bounded'
     });
     for (let i = 0; i < this.resources.length; i++) {
@@ -1285,7 +1287,7 @@ export class Planner extends Widget implements PlannerModel {
     if (allowedTypes.indexOf(Planner.MenuTypes.Range) > -1 && !this.selectionRange.from && !this.selectionRange.to) {
       arrays.remove(allowedTypes, Planner.MenuTypes.Range);
     }
-    return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes});
+    return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes, defaultMenuTypes: this.defaultMenuTypes});
   }
 
   setDisplayModeOptions(

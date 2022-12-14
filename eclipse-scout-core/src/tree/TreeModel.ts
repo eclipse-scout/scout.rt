@@ -106,4 +106,5 @@ export interface TreeModel extends WidgetModel {
    * Default is true.
    */
   requestFocusOnNodeControlMouseDown?: boolean;
+  defaultMenuTypes?: string[];
 }

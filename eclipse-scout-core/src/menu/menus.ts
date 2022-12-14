@@ -137,7 +137,7 @@ export const menus = {
   checkType(menu: Menu, types: string | string[], defaultMenuTypes: string | string[] = []): boolean {
     types = arrays.ensure(types);
     if (menu.childActions.length > 0) {
-      let childMenus = menus.filter(menu.childActions, types);
+      let childMenus = menus.filter(menu.childActions, types, {defaultMenuTypes});
       return childMenus.length > 0;
     }
     return menus._checkType(menu, types, defaultMenuTypes);

@@ -11,8 +11,8 @@ import {MenuItemsOrder, Session} from '../index';
 
 export class PlannerMenuItemsOrder extends MenuItemsOrder {
 
-  constructor(session: Session, objectType: string) {
-    super(session, objectType);
+  constructor(session: Session, objectType: string, defaultMenuTypes: string[]) {
+    super(session, objectType, defaultMenuTypes);
     this.selectionTypes = ['Resource', 'Activity', 'Range'];
   }
 
