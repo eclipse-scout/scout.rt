@@ -24,7 +24,7 @@
 
   <properties>
     <jdk.source.version>${javaVersion}</jdk.source.version>
-    <org.eclipse.scout.rt.version>23.1-SNAPSHOT</org.eclipse.scout.rt.version>
+    <org.eclipse.scout.rt.version>23.1.0-beta.0</org.eclipse.scout.rt.version>
     <org.glassfish.jersey.version>2.37</org.glassfish.jersey.version>
     <org.jooq.version>3.15.10</org.jooq.version>
     <derby.version>10.15.2.0</derby.version>
