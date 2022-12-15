@@ -109,7 +109,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     // 2. Lookup session in the cache.
     @SuppressWarnings("unchecked")
     SESSION clientSession = (SESSION) m_cache.get(sessionCacheKey);
-    if (clientSession != null) {
+    if (clientSession != null && clientSession.isActive() && !clientSession.isStopping()) {
       return clientSession;
     }
 
