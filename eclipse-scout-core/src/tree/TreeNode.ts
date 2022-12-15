@@ -185,13 +185,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
     this.filterAccepted = filterAccepted;
   }
 
-  isFilterAccepted(forceFilter?: boolean): boolean {
-    if (this.filterDirty || forceFilter) {
-      this.getTree().applyFiltersForNode(this);
-    }
-    return this.filterAccepted;
-  }
-
   /**
    * This method loads the child nodes of this node and returns a jQuery.Deferred to register callbacks
    * when loading is done or has failed. This method should only be called when childrenLoaded is false.

@@ -1681,7 +1681,15 @@ export class Tree extends Widget implements TreeModel {
     }
 
     parentNode.childNodes.forEach((node: TreeNode, index: number) => {
-      if (!node.initialized || !node.isFilterAccepted(forceFilter)) {
+      if (!node.initialized) {
+        return;
+      }
+      if (node.filterDirty || forceFilter) {
+        // Remove nodes that are not visible anymore but don't add new nodes, they will be added by the insert batch
+        let result = this.applyFiltersForNode(node, false);
+        result.newlyHidden.forEach(node => this._removeFromFlatList(node, false));
+      }
+      if (!node.filterAccepted) {
         return;
       }
 
@@ -2728,7 +2736,10 @@ export class Tree extends Widget implements TreeModel {
       nodes.forEach(node => {
         this.groupedNodes[node.id] = true;
         node._decorate();
-        if (node.expanded && node.isFilterAccepted()) {
+        if (node.filterDirty) {
+          this.applyFiltersForNode(node);
+        }
+        if (node.expanded && node.filterAccepted) {
           addToGroup.call(this, node.childNodes);
         }
       });
@@ -2822,7 +2833,7 @@ export class Tree extends Widget implements TreeModel {
       let node = this.visibleNodesFlat[i];
       let result = this._applyFiltersForNodeRec(node, true, animated);
       if (result.newlyHidden.length) {
-        if (!node.isFilterAccepted()) {
+        if (!node.filterAccepted) {
           newlyHidden.push(...result.newlyHidden);
         }
         this.viewRangeDirty = true;
