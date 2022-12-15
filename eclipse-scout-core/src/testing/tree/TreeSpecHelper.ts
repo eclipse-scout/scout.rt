@@ -30,24 +30,24 @@ export class TreeSpecHelper {
   }
 
   createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { id: string; objectType: string; parent: Widget; session: Session } {
-    return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
+    return this.createModel(this.createModelNodes(nodeCount, depth, {expanded: expanded}));
   }
 
-  createModelNode(id?: string, text?: string, position?: number): TreeNodeModel {
-    return {
+  createModelNode(id?: string, text?: string, position?: number, model?: TreeNodeModel): TreeNodeModel {
+    return $.extend({
       id: id + '' || ObjectFactory.get().createUniqueId(),
       text: text,
       childNodeIndex: position ? position : 0,
       enabled: true,
       checked: false
-    };
+    }, model);
   }
 
-  createModelNodes(nodeCount?: number, depth?: number, expanded?: boolean): TreeNodeModel[] {
-    return this.createModelNodesInternal(nodeCount, depth, expanded);
+  createModelNodes(nodeCount?: number, depth?: number, model?: TreeNodeModel): TreeNodeModel[] {
+    return this.createModelNodesInternal(nodeCount, depth, null, model);
   }
 
-  createModelNodesInternal(nodeCount: number, depth?: number, expanded?: boolean, parentNode?: TreeNodeModel): TreeNodeModel[] {
+  createModelNodesInternal(nodeCount: number, depth?: number, parentNode?: TreeNodeModel, model?: TreeNodeModel): TreeNodeModel[] {
     if (!nodeCount) {
       return;
     }
@@ -62,10 +62,9 @@ export class TreeSpecHelper {
       if (parentNode) {
         nodeId = parentNode.id + '_' + nodeId;
       }
-      nodes[i] = this.createModelNode(nodeId, 'node ' + nodeId, i);
-      nodes[i].expanded = expanded;
+      nodes[i] = this.createModelNode(nodeId, 'node ' + nodeId, i, model);
       if (depth > 0) {
-        nodes[i].childNodes = this.createModelNodesInternal(nodeCount, depth - 1, expanded, nodes[i]);
+        nodes[i].childNodes = this.createModelNodesInternal(nodeCount, depth - 1, nodes[i], model);
       }
     }
     return nodes;

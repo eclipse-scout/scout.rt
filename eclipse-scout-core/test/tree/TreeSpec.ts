@@ -1354,19 +1354,25 @@ describe('Tree', () => {
       expect(secondChild.filterAccepted).toBe(true);
     });
 
-    it('in breadcrumb mode renders children', () => {
-      let model = helper.createModelFixture(10, 2);
+    it('in breadcrumb mode renders children and removes preceding sibling nodes', () => {
+      let model = helper.createModelFixture(10, 3);
       let tree = helper.createTree(model);
-      tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
-      tree.viewRangeSize = 2;
+      let node0_3 = tree.nodes[0].childNodes[3];
       tree.render(session.$entryPoint);
-      let nodeToSelect = tree.nodes[4];
-      tree.scrollTo(nodeToSelect);
-      tree.selectNode(nodeToSelect);
+      tree.selectNode(tree.nodes[0]);
+      tree.expandNode(tree.nodes[0]);
+      tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
+      tree.selectNode(node0_3);
 
-      expect(nodeToSelect.childNodes[0].rendered).toBe(true);
-      expect(nodeToSelect.childNodes[1].rendered).toBe(true);
-      expect(nodeToSelect.childNodes[2].rendered).toBe(false); // not in viewRange
+      // nodes before selected node must not be visible in bread crumb mode
+      for (let i = 2; i >= 0; i--) {
+        expect(tree.nodes[0].childNodes[i].filterAccepted).toBe(false);
+        expect(tree.nodes[0].childNodes[i].attached).toBe(false);
+      }
+      expect(node0_3.filterAccepted).toBe(true);
+      expect(node0_3.attached).toBe(true);
+      expect(node0_3.childNodes[0].attached).toBe(true);
+      expect(node0_3.childNodes[1].attached).toBe(true);
     });
 
     it('also expands the node if bread crumb mode is enabled', () => {
@@ -1730,6 +1736,61 @@ describe('Tree', () => {
       tree.collapseNode(node0, {lazy: true});
       expect(node0.expanded).toBe(false);
     });
+
+    it('renders nodes correctly when disabling lazy expansion', () => {
+      let model = helper.createModelFixture();
+      let tree = helper.createTree(model);
+      tree.render();
+      // Simulate table page > node page > table page -> table page has lazyExpanding set to true, node page to false
+      let nodes = helper.createModelNodes(3, 0, {
+        lazyExpandingEnabled: true,
+        expandedLazy: true
+      });
+      nodes[1].childNodes = [
+        helper.createModelNode('1_0', '1_0', 0),
+        helper.createModelNode('1_1', '1_1', 1),
+        helper.createModelNode('1_2', '1_2', 2)
+      ];
+      tree.insertNodes(nodes);
+      let node1 = tree.nodes[1];
+
+      let $nodes = helper.findAllNodes(tree);
+      expect($nodes.length).toBe(3);
+      nodes = [
+        helper.createModelNode('1_1_0', '1_1_0', 0, {
+          lazyExpandingEnabled: true,
+          expandedLazy: true
+        }), helper.createModelNode('1_1_1', '1_1_1', 1, {
+          lazyExpandingEnabled: true,
+          expandedLazy: true
+        }),
+        helper.createModelNode('1_1_2', '1_1_2', 2, {
+          lazyExpandingEnabled: true,
+          expandedLazy: true
+        })];
+      tree.insertNodes(nodes, node1.childNodes[1]);
+      tree.expandNode(node1, {lazy: false});
+      $nodes = helper.findAllNodes(tree);
+      expect($nodes.length).toBe(6);
+      expect(node1.$node[0]).toBe($nodes[1]);
+      expect(node1.childNodes[0].$node[0]).toBe($nodes[2]);
+      expect(node1.childNodes[1].$node[0]).toBe($nodes[3]);
+      expect(node1.childNodes[2].$node[0]).toBe($nodes[4]);
+      expect(tree.visibleNodesFlat.map(n => n.text)).toEqual(['node 0', 'node 1', '1_0', '1_1', '1_2', 'node 2']);
+
+      tree.expandNode(node1.childNodes[1], {lazy: false});
+      $nodes = helper.findAllNodes(tree);
+      expect($nodes.length).toBe(9);
+      expect(node1.$node[0]).toBe($nodes[1]);
+      expect(node1.childNodes[0].$node[0]).toBe($nodes[2]);
+      expect(node1.childNodes[1].$node[0]).toBe($nodes[3]);
+      expect(node1.childNodes[1].childNodes[0].$node[0]).toBe($nodes[4]);
+      expect(node1.childNodes[1].childNodes[1].$node[0]).toBe($nodes[5]);
+      expect(node1.childNodes[1].childNodes[2].$node[0]).toBe($nodes[6]);
+      expect(node1.childNodes[2].$node[0]).toBe($nodes[7]);
+      expect(tree.visibleNodesFlat.map(n => n.text)).toEqual(['node 0', 'node 1', '1_0', '1_1', '1_1_0', '1_1_1', '1_1_2', '1_2', 'node 2']);
+    });
+
   });
 
   describe('collapseNode', () => {
