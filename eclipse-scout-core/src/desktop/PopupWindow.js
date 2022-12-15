@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, EventSupport, HtmlComponent, Rectangle, scout, SingleLayout} from '../index';
+import {Dimension, EventSupport, HtmlComponent, Rectangle, scout, SingleLayout, strings} from '../index';
 import $ from 'jquery';
 
 export default class PopupWindow {
@@ -93,6 +93,9 @@ export default class PopupWindow {
       this.myWindow.onerror = this.myWindow.opener.onerror;
     }
 
+    this._updateTitle();
+    this.form.on('propertyChange:title propertyChange:subTitle', event => this._updateTitle());
+
     // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
     this.initialized = true;
     this.events.trigger('init');
@@ -124,6 +127,12 @@ export default class PopupWindow {
 
   close() {
     this.myWindow.close();
+  }
+
+  _updateTitle() {
+    let formTitle = strings.join(' - ', this.form.title, this.form.subTitle);
+    let applicationTitle = this.session.desktop.title;
+    this.title(formTitle || applicationTitle);
   }
 
   title(title) {

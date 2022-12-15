@@ -832,12 +832,6 @@ export default class Form extends Widget {
     this.setProperty('showOnOpen', showOnOpen);
   }
 
-  _updateTitleForWindow() {
-    let formTitle = strings.join(' - ', this.title, this.subTitle),
-      applicationTitle = this.session.desktop.title;
-    this.popupWindow.title(formTitle || applicationTitle);
-  }
-
   _updateTitleForDom() {
     let titleText = this.title;
     if (!titleText && this.closable) {
@@ -952,9 +946,6 @@ export default class Form extends Widget {
       this.$title.text(this.title);
       this.$header.toggleClass('no-title', !this.title && !this.subTitle);
     }
-    if (this.isPopupWindow()) {
-      this._updateTitleForWindow();
-    }
     // Layout could have been changed, e.g. if subtitle becomes visible
     this.invalidateLayoutTree();
   }
@@ -967,9 +958,6 @@ export default class Form extends Widget {
     if (this.$header) {
       this.$subTitle.text(this.subTitle);
       this.$header.toggleClass('no-title', !this.title && !this.subTitle);
-    }
-    if (this.isPopupWindow()) {
-      this._updateTitleForWindow();
     }
     // Layout could have been changed, e.g. if subtitle becomes visible
     this.invalidateLayoutTree();
