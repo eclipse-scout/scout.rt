@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, PopupWindow} from '../../src/index';
+import {Form, GroupBox, PopupWindow} from '../../src/index';
 
 describe('PopupWindow', () => {
   let session, helper, $sandbox, origDevice, myForm, myWindow,
@@ -20,14 +20,13 @@ describe('PopupWindow', () => {
     session = sandboxSession();
     $sandbox = $('#sandbox');
 
-    // form mock
-    myForm = {
+    myForm = scout.create(Form, {
+      parent: session.desktop,
       modelClass: 'Foo',
-      session: session,
-      render: () => {
-      },
-      htmlComp: HtmlComponent.install($sandbox, session)
-    };
+      rootGroupBox: {
+        objectType: GroupBox
+      }
+    });
 
     // window mock
     myWindow = $sandbox.window(true);
