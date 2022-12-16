@@ -119,15 +119,18 @@ export class Scrollbar extends Widget implements ScrollbarModel {
 
   protected override _remove() {
     // Uninstall listeners
-    let scrollbars = this.$parent.data('scrollbars');
     this.$parent
       .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
       .off('scroll', this._onScrollHandler)
       .offPassive('touchstart', this._onTouchStartHandler);
-    scrollbars.forEach(scrollbar => {
-      scrollbar.off('scrollStart', this._fixScrollbarHandler);
-      scrollbar.off('scrollEnd', this._unfixScrollbarHandler);
-    });
+    let scrollbars = this.$parent.data('scrollbars');
+    if (scrollbars) {
+      // Scrollbars may be undefined if this.$parent is detached -> don't fail
+      scrollbars.forEach(scrollbar => {
+        scrollbar.off('scrollStart', this._fixScrollbarHandler);
+        scrollbar.off('scrollEnd', this._unfixScrollbarHandler);
+      });
+    }
     this.$container.off('mousedown', this._onScrollbarMouseDownHandler);
     this._$thumb.off('mousedown', '', this._onThumbMouseDownHandler);
     this._$ancestors.off('scroll resize', this._onAncestorScrollOrResizeHandler);
