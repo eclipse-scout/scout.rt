@@ -225,7 +225,14 @@ describe('RestLookupCall', () => {
       session: session,
       resourceUrl: 'test-api/dummy',
       restriction: {
-        dyn1: () => 'abc'.toUpperCase()
+        dyn1: () => 'abc'.toUpperCase(),
+        arr1: ['one', 'two', 'three'],
+        arr2: () => ['one', 'two', 'three'],
+        arr3: [
+          () => 'one',
+          () => null,
+          () => ['two', 'three']
+        ]
       }
     });
     spyOn(lookupCall, '_call'); // <-- disable the ajax call in this test
@@ -249,7 +256,10 @@ describe('RestLookupCall', () => {
       dyn2: '3-2-1',
       dyn5: 0,
       dyn6: false,
-      dyn7: ''
+      dyn7: '',
+      arr1: ['one', 'two', 'three'],
+      arr2: ['one', 'two', 'three'],
+      arr3: ['one', 'two', 'three']
     });
   });
 

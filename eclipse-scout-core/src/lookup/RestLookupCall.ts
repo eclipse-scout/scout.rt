@@ -221,7 +221,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
       let newValue;
       if (Array.isArray(value)) {
         // Resolve each array element individually, remove null values
-        newValue = value.map(resolveValue).filter(Boolean);
+        newValue = arrays.flatMap(value, resolveValue).filter(Boolean);
         newValue = newValue.length ? newValue : null;
       } else {
         newValue = resolveValue(value);
