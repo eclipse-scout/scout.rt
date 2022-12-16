@@ -67,6 +67,9 @@ switch (script) {
     if (args.webpackArgs.progress === undefined) {
       args.webpackArgs.progress = false;
     }
+    if (args.webpackArgs.watch === undefined) {
+      args.webpackArgs.watch = false;
+    }
     runKarma(null, true, args);
     break;
   }

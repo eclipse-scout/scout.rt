@@ -10,12 +10,10 @@
  */
 const fs = require('fs');
 const path = require('path');
-
 const jquery = require.resolve('jquery');
-const webpack = require('webpack');
-const StatsExtractWebpackPlugin = require('./StatsExtractWebpackPlugin');
-
 const scoutBuildConstants = require('./constants');
+const {SourceMapDevToolPlugin} = require('webpack');
+const StatsExtractWebpackPlugin = require('./StatsExtractWebpackPlugin');
 
 module.exports = (config, specEntryPoint) => {
   const webpackConfigFilePath = path.resolve('webpack.config.js');
@@ -28,6 +26,7 @@ module.exports = (config, specEntryPoint) => {
 
   const webpackArgs = Object.assign({
     mode: scoutBuildConstants.mode.development,
+    watch: true, // by default tests are running in watch mode
     tsOptions: {
       compilerOptions: {
         // No need to create declarations for tests
@@ -53,7 +52,7 @@ module.exports = (config, specEntryPoint) => {
   }
 
   if (webpackConfig.externals) {
-    // Remove externals so they don't have to be provided
+    // Remove externals, so they don't have to be provided
     // Add jquery as the only external, so it won't be loaded twice because it is provided by @metahub/karma-jasmine-jquery
     webpackConfig.externals = {
       'jquery': 'global jQuery'
@@ -65,9 +64,9 @@ module.exports = (config, specEntryPoint) => {
   webpackConfig.output.path = path.resolve(scoutBuildConstants.outDir.target, scoutBuildConstants.outDir.distKarma, scoutBuildConstants.outSubDir.development);
   fs.mkdirSync(webpackConfig.output.path, {recursive: true});
 
-  webpackConfig.watch = true;
+  webpackConfig.watch = !!webpackArgs.watch;
 
-  const sourceMapPlugin = webpackConfig.plugins.find(plugin => plugin instanceof webpack.SourceMapDevToolPlugin);
+  const sourceMapPlugin = webpackConfig.plugins.find(plugin => plugin instanceof SourceMapDevToolPlugin);
   if (sourceMapPlugin) {
     // Use inline source maps because external source maps are not supported by karma (https://github.com/webpack-contrib/karma-webpack/issues/224)
     delete sourceMapPlugin.sourceMapFilename;
