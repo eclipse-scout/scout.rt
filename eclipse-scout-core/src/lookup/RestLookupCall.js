@@ -214,7 +214,7 @@ export default class RestLookupCall extends LookupCall {
       let newValue;
       if (Array.isArray(value)) {
         // Resolve each array element individually, remove null values
-        newValue = value.map(resolveValue).filter(Boolean);
+        newValue = arrays.flatMap(value, resolveValue).filter(Boolean);
         newValue = newValue.length ? newValue : null;
       } else {
         newValue = resolveValue(value);
