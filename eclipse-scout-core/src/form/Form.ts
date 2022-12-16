@@ -237,6 +237,9 @@ export class Form extends Widget implements FormModel, DisplayParent {
       // E.g. clicking a checkbox label on another dialog executes mouse down handler of the checkbox which will focus the box. This only works if the focus context of the dialog is active.
       this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
     } else {
+      if (this.isPopupWindow()) {
+        this.$container.addClass('popup-window');
+      }
       layout = new FormLayout(this);
     }
 
