@@ -812,7 +812,8 @@ public class MailHelper {
     }
 
     try {
-      InternetAddress internetAddress = new InternetAddress(IDN.toASCII(email));
+      String internationalizedAddress = getInternationalizedAddress(email);
+      InternetAddress internetAddress = new InternetAddress(internationalizedAddress);
       if (StringUtility.hasText(name)) {
         internetAddress.setPersonal(name, StandardCharsets.UTF_8.name());
       }
@@ -824,6 +825,25 @@ public class MailHelper {
     catch (UnsupportedEncodingException e) {
       throw new ProcessingException("Failed to set personal name for {}", name, e);
     }
+  }
+
+  protected static String getInternationalizedAddress(String email) {
+    String internationalizedAddress = IDN.toASCII(email);
+    int atPosition = email.indexOf('@');
+    if (atPosition > 0) {
+      String localPart = email.substring(0, atPosition);
+      String domainPart = email.substring(atPosition + 1);
+      // according to RFC3490 only the domain part may be internationalized, actually even the domain part has to be
+      // split up into individual labels (e.g. subdomain, domain name, ...); luckily contrary to the original toASCII
+      // method described by the RFC3490 the toASCII method called by our code does the splitting up for us, see
+      // javadoc of IDN
+      internationalizedAddress = String.join("@", localPart, IDN.toASCII(domainPart));
+    }
+    else {
+      // fallback: no at-sign, unable to determine local/domain-part just pass through
+      internationalizedAddress = email;
+    }
+    return internationalizedAddress;
   }
 
   /**
@@ -859,6 +879,11 @@ public class MailHelper {
       }
     }
     return addressList.toArray(new InternetAddress[0]);
+  }
+
+  public static void main(String[] args) {
+    System.err.println(IDN.toASCII("mäier@möwen.de"));
+    System.err.println("mäier@" + IDN.toASCII("möwen.de"));
   }
 
   /**
@@ -1017,7 +1042,7 @@ public class MailHelper {
   /**
    * Extract message ids by reading the {@link #HEADER_IN_REPLY_TO} headers if available or otherwise try to read
    * message id lines from the third part of the message (contains details of the DSN, see
-   * https://tools.ietf.org/html/rfc3461#section-6.2).
+   * <a href="https://tools.ietf.org/html/rfc3461#section-6.2">RFC 3461</a>).
    */
   public List<String> extractInReplyMessageIds(MimeMessage mimeMessage) {
     if (mimeMessage == null) {
