@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/svg",
-  "version": "23.1.0-snapshot",
+  "version": "23.1.0-beta.1",
   "description": "Eclipse Scout",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -38,12 +38,12 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=23.1.0-snapshot <23.1.0",
+    "@eclipse-scout/cli": "23.1.0-beta.1",
     "@eclipse-scout/releng": "^22.0.0",
-    "@eclipse-scout/migrate": ">=23.1.0-snapshot <23.1.0"
+    "@eclipse-scout/migrate": "23.1.0-beta.1"
   },
   "dependencies": {
-    "@eclipse-scout/core": ">=23.1.0-snapshot <23.1.0",
+    "@eclipse-scout/core": "23.1.0-beta.1",
     "jquery": "3.6.0"
   }
 }
