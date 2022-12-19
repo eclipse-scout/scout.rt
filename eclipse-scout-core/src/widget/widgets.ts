@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AnyWidget, arrays, Widget} from '../index';
+import {arrays, Widget} from '../index';
 import $ from 'jquery';
 
 let uniqueIdSeqNo = 0;
@@ -18,7 +18,7 @@ export const widgets = {
    * @param $elem HTML or jQuery element to find the corresponding widget for
    * @returns the widget for the given element. If the element is not linked with a widget directly, it searches its ancestors for the widget.
    */
-  get($elem: HTMLElement | JQuery): AnyWidget {
+  get($elem: HTMLElement | JQuery): Widget {
     $elem = $.ensure($elem);
     while ($elem && $elem.length > 0) {
       let widget = $elem.data('widget');

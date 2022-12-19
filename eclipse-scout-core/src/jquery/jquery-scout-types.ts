@@ -80,7 +80,7 @@ declare global {
      * otherwise true.
      *
      * @param fx the function to wrap
-     * @param [options] an optional options object. Short-hand version: If a number is passed instead
+     * @param options an optional options object. Short-hand version: If a number is passed instead
      *          of an object, the value is automatically converted to the option 'delay'.
      */
     debounce(fx: (...args: any[]) => void, options?: DebounceOptions | number): ((...args: any[]) => void) & { cancel(): boolean };

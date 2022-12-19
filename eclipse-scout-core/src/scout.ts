@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {AdapterData, AnyWidget, App, Device, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, Session, strings, ValueField, Widget, widgets} from './index';
+import {AdapterData, App, Device, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, Session, strings, ValueField, Widget, widgets} from './index';
 import $ from 'jquery';
 
 let $activeElements = null;
@@ -84,7 +84,7 @@ function create<T extends object>(objectType: ObjectType<T> | FullModelOf<T>, mo
 }
 
 function widget<T extends Widget>(widgetIdOrElement: string | number | HTMLElement | JQuery, partIdOrType?: string | (new() => T)): T;
-function widget(widgetIdOrElement: string | number | HTMLElement | JQuery, partId?: string): AnyWidget;
+function widget(widgetIdOrElement: string | number | HTMLElement | JQuery, partId?: string): Widget;
 
 /**
  * Resolves the widget using the given widget id or HTML element.

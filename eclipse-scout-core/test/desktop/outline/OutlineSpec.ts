@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBox, ObjectFactory, objects, OutlineOverview, scout, Status, Table, TileOutlineOverview, Tree} from '../../../src/index';
+import {Form, GroupBox, MessageBox, ObjectFactory, objects, OutlineOverview, scout, Status, Table, TileOutlineOverview, Tree, TreeField} from '../../../src/index';
 import {FormSpecHelper, JQueryTesting, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '../../../src/testing/index';
 
 describe('Outline', () => {
@@ -463,9 +463,17 @@ describe('Outline', () => {
         let treeModel = treeHelper.createModelFixture(3, 3);
         treeModel.nodes[0].id = ObjectFactory.get().createUniqueId(); // tree helper doesn't use unique ids -> do it here
         let tree = treeHelper.createTree(treeModel);
-        // FIXME TS: is it correct to set a tree as outline content? or should it be a table instead?
-        // @ts-expect-error
-        outline.setDetailContent(tree);
+        let form = scout.create(Form, {
+          parent: session.desktop,
+          rootGroupBox: {
+            objectType: GroupBox,
+            fields: [{
+              objectType: TreeField,
+              tree: tree
+            }]
+          }
+        });
+        outline.setDetailContent(form);
 
         spyOn(outline, 'selectNodes');
         spyOn(tree, 'selectNodes');
@@ -476,7 +484,6 @@ describe('Outline', () => {
         expect(outline.selectNodes).not.toHaveBeenCalled();
         expect(tree.selectNodes).toHaveBeenCalledWith(tree.nodes[0]);
       });
-
     });
   });
 

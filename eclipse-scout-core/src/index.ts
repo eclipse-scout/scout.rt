@@ -1056,7 +1056,6 @@ export * from './uuidpool/UuidPool';
 export * from './uuidpool/UuidPoolAdapter';
 export * from './uuidpool/UuidPoolEventMap';
 export * from './uuidpool/UuidPoolModel';
-export * from './AnyWidget';
 export * from './types';
 export * from './jquery/jquery-scout-types';
 

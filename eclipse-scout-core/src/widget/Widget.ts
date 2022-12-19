@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke,
+  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke,
   KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, Predicate, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions,
   Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
@@ -1769,7 +1769,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * @returns the original widget from which this one was cloned. If it is not a clone, itself is returned.
    */
-  original(): AnyWidget {
+  original(): Widget {
     let original: Widget = this;
     while (original.cloneOf) {
       original = original.cloneOf;
@@ -1997,7 +1997,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * @returns the first parent for which the given function returns true.
    */
-  findParent(predicate: Predicate<Widget>): AnyWidget {
+  findParent(predicate: Predicate<Widget>): Widget {
     let parent = this.parent;
     while (parent) {
       if (predicate(parent)) {
@@ -2011,7 +2011,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * @returns the first child for which the given function returns true.
    */
-  findChild(predicate: Predicate<Widget>): AnyWidget {
+  findChild(predicate: Predicate<Widget>): Widget {
     let foundChild = null;
     this.visitChildren(child => {
       if (predicate(child)) {
