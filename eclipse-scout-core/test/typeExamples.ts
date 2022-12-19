@@ -10,8 +10,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
-import {Image, PropertyChangeEvent, scout, SmartField, StringField} from '../src';
+import {Accordion, FormModel, Group, GroupBox, Image, Menu, PropertyChangeEvent, scout, SmartField, StringField} from '../src';
 import $ from 'jquery';
 
 function createTyped() {
@@ -20,6 +19,11 @@ function createTyped() {
     autoFit: true
   });
   img.setAutoFit(false);
+
+  // @ts-expect-error (parent is missing)
+  scout.create(Image, {
+    autoFit: true
+  });
 
   let img1 = scout.create(Image, {
     parent: this,
@@ -86,6 +90,36 @@ function createUntyped() {
     ensureUniqueId: false
   });
   img4.setAutoFit(false);
+}
+
+function refTypes() {
+  let accordion = new Accordion();
+  accordion.setGroups([{
+    objectType: Group
+  }]);
+  accordion.setGroups([{
+    // @ts-expect-error
+    objectType: Accordion
+  }]);
+  accordion.setGroups([{
+    objectType: Group
+  }, new Group()
+  ]);
+  accordion.setGroups([
+    new Group()
+  ]);
+
+  let form: FormModel = {
+    rootGroupBox: {
+      // @ts-expect-error
+      objectType: Menu
+    }
+  };
+  let form2: FormModel = {
+    rootGroupBox: {
+      objectType: GroupBox
+    }
+  };
 }
 
 function events() {
