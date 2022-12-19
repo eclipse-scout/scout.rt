@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.mail;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.junit.Test;
@@ -68,5 +68,24 @@ public class MailIDNConverterTest {
 
     // Assert
     assertEquals(emailAddress, convertedAddress);
+  }
+
+  @Test
+  public void testLongDomainNames() {
+    MailIDNConverter converter = BEANS.get(MailIDNConverter.class);
+
+    // sample e-mail address with long domain name
+    String validLongEmail = "nobody@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk.de";
+    assertEquals(validLongEmail, converter.toASCII(validLongEmail));
+
+    // this e-mail address however has a too long domain name
+    assertThrows(IllegalArgumentException.class, () -> converter.toASCII("invalid@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl.de"));
+
+    // however a longer domain part with subdomains is allowed (only each individual part of the domain part is limited in length, the maximum total length is higher)
+    String emailWithSubdomains = "valid@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk.com";
+    assertEquals(emailWithSubdomains, converter.toASCII(emailWithSubdomains));
+
+    // again a too long domain part (top-level domain seems alright but subdomain is too long)
+    assertThrows(IllegalArgumentException.class, () -> converter.toASCII("invalid@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk.com"));
   }
 }
