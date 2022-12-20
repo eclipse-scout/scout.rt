@@ -118,7 +118,7 @@
     <logback.version>1.2.10</logback.version>
     <jackson.bom.version>2.13.4.20221013</jackson.bom.version>
     <jackson.version>2.13.4</jackson.version>
-    <io.netty-version>4.1.77.Final</io.netty-version>
+    <io.netty-version>4.1.86.Final</io.netty-version>
     <apache.tika-version>2.4.0</apache.tika-version>
     <batik.version>1.16</batik.version>
     <activemq.version>5.16.3</activemq.version>
@@ -234,7 +234,7 @@
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.2.8</version>
+        <version>6.4.0</version>
       </dependency>
 
       <dependency>
