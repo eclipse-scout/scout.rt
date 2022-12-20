@@ -1,0 +1,7 @@
+{
+  "_type" : "TestMap",
+  "iDoEntityAttribute" : {
+    "_type" : "UnknownType",
+    "nr" : 12345
+  }
+}
