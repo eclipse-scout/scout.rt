@@ -174,6 +174,9 @@ export default class Form extends Widget {
       // E.g. clicking a check box label on another dialog executes mouse down handler of the check box which will focus the box. This only works if the focus context of the dialog is active.
       this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
     } else {
+      if (this.isPopupWindow()) {
+        this.$container.addClass('popup-window');
+      }
       layout = new FormLayout(this);
     }
 
