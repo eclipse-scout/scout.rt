@@ -19,6 +19,7 @@ import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("TestMap")
@@ -42,6 +43,14 @@ public class TestMapDo extends DoEntity {
 
   public DoValue<Map<String, TestItemDo>> stringDoTestItemMapAttribute() {
     return doValue("stringDoTestItemMapAttribute");
+  }
+
+  public DoValue<Map<String, IDoEntity>> stringIDoEntityMapAttribute() {
+    return doValue("stringIDoEntityMapAttribute");
+  }
+
+  public DoValue<IDoEntity> iDoEntityAttribute() {
+    return doValue("iDoEntityAttribute");
   }
 
   public DoValue<Map<Date, UUID>> dateUUIDMapAttribute() {
@@ -109,6 +118,28 @@ public class TestMapDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<String, TestItemDo> getStringDoTestItemMapAttribute() {
     return stringDoTestItemMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withStringIDoEntityMapAttribute(Map<String, IDoEntity> stringIDoEntityMapAttribute) {
+    stringIDoEntityMapAttribute().set(stringIDoEntityMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, IDoEntity> getStringIDoEntityMapAttribute() {
+    return stringIDoEntityMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withIDoEntityAttribute(IDoEntity iDoEntityAttribute) {
+    iDoEntityAttribute().set(iDoEntityAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IDoEntity getIDoEntityAttribute() {
+    return iDoEntityAttribute().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

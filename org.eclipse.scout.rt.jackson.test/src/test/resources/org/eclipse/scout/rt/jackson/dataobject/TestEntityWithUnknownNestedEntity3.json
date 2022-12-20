@@ -1,0 +1,7 @@
+{
+  "_type" : "TestItemEntity",
+  "item" : {
+    "_type" : "UnknownType",
+    "nr" : 12345
+  }
+}

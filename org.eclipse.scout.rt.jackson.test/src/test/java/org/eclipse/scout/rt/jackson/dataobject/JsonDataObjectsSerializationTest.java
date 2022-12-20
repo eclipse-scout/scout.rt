@@ -94,6 +94,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItem3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemContributionOneDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemContributionTwoDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemExDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo2;
@@ -2945,6 +2946,120 @@ public class JsonDataObjectsSerializationTest {
     return BEANS.get(FixtureHierarchicalLookupRowDo.class)
         .withId(id)
         .withText("Mock");
+  }
+
+  @Test
+  public void testSerializeWithUnknownNestedEntity() throws Exception {
+    IDoEntity raw = BEANS.get(DoEntityBuilder.class)
+        .put("_type", "UnknownType")
+        .put("nr", 12345)
+        .build();
+    TestMapDo obj = BEANS.get(TestMapDo.class);
+    // add 'wrong' item into map using a non-existent _type
+    obj.put(obj.stringDoTestItemMapAttribute().getAttributeName(), CollectionUtility.hashMap(ImmutablePair.of("one", raw)));
+    // typed access to attribute is not possible
+    assertThrows(ClassCastException.class, () -> obj.getStringDoTestItemMapAttribute().get("one").getId());
+
+    String serialized = s_dataObjectMapper.writeValueAsString(obj);
+    assertJsonEquals("TestEntityWithUnknownNestedEntity.json", serialized);
+
+    TestMapDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestMapDo.class);
+    assertEquals(Integer.valueOf(12345), ((IDoEntity) entityMarshalled.get("stringDoTestItemMapAttribute", Map.class).get("one")).get("nr"));
+  }
+
+  @Test
+  public void testSerializeWithUnknownNestedEntity2() throws Exception {
+    IDoEntity raw = BEANS.get(DoEntityBuilder.class)
+        .put("_type", "UnknownType")
+        .put("nr", 12345)
+        .build();
+
+    TestMapDo obj = BEANS.get(TestMapDo.class);
+    // add 'wrong' item into map using a non-existent _type
+    obj.put(obj.iDoEntityAttribute().getAttributeName(), raw);
+    assertEquals(Integer.valueOf(12345), obj.getIDoEntityAttribute().get("nr", Integer.class));
+
+    String serialized = s_dataObjectMapper.writeValueAsString(obj);
+    assertJsonEquals("TestEntityWithUnknownNestedEntity2.json", serialized);
+
+    TestMapDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestMapDo.class);
+    assertEquals(Integer.valueOf(12345), entityMarshalled.getIDoEntityAttribute().get("nr", Integer.class));
+  }
+
+  @Test
+  public void testSerializeWithUnknownNestedEntity3() throws Exception {
+    IDoEntity raw = BEANS.get(DoEntityBuilder.class)
+        .put("_type", "UnknownType")
+        .put("nr", 12345)
+        .build();
+
+    TestItemEntityDo itemEntity = BEANS.get(TestItemEntityDo.class);
+    // add 'wrong' item into object using a non-existent _type
+    itemEntity.put(itemEntity.item().getAttributeName(), raw);
+    // typed access to attribute is not possible
+    assertThrows(ClassCastException.class, () -> itemEntity.getItem().getId());
+
+    String serialized = s_dataObjectMapper.writeValueAsString(itemEntity);
+    assertJsonEquals("TestEntityWithUnknownNestedEntity3.json", serialized);
+
+    TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
+    assertEquals(Integer.valueOf(12345), entityMarshalled.get("item", IDoEntity.class).get("nr", Integer.class));
+  }
+
+  @Test
+  public void testSerializeWithUnknownNestedEntity4() throws Exception {
+    IDoEntity raw = BEANS.get(DoEntityBuilder.class)
+        .put("nr", 12345)
+        .build();
+
+    TestItemEntityDo itemEntity = BEANS.get(TestItemEntityDo.class);
+    // add 'wrong' item into object using a non-existent _type
+    itemEntity.put(itemEntity.item().getAttributeName(), raw);
+    assertThrows(ClassCastException.class, () -> itemEntity.getItem().getId());
+
+    String serialized = s_dataObjectMapper.writeValueAsString(itemEntity);
+    assertJsonEquals("TestEntityWithUnknownNestedEntity4.json", serialized);
+
+    TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
+    assertEquals(Integer.valueOf(12345), entityMarshalled.get("item", IDoEntity.class).get("nr", Integer.class));
+  }
+
+  @Test
+  public void testSerializeWithUnknownNestedEntity5() throws Exception {
+    IDoEntity raw = BEANS.get(DoEntityBuilder.class)
+        .put("_type", "UnknownType")
+        .put("nr", 12345)
+        .build();
+
+    TestItemEntityDo itemEntity = BEANS.get(TestItemEntityDo.class);
+    // add 'wrong' item into object using a non-existent _type
+    itemEntity.put(itemEntity.itemIfc().getAttributeName(), raw);
+    assertThrows(ClassCastException.class, () -> itemEntity.getItemIfc().stringAttribute());
+
+    String serialized = s_dataObjectMapper.writeValueAsString(itemEntity);
+    assertJsonEquals("TestEntityWithUnknownNestedEntity5.json", serialized);
+
+    TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
+    assertEquals(Integer.valueOf(12345), entityMarshalled.get("itemIfc", IDoEntity.class).get("nr", Integer.class));
+  }
+
+  @Test
+  public void testSerializeWithUnknownNestedEntity6() throws Exception {
+    IDoEntity raw = BEANS.get(DoEntityBuilder.class)
+        .put("_type", "TestEntityWithInterface1")
+        .put("stringAttribute", "foo")
+        .build();
+
+    TestItemEntityDo itemEntity = BEANS.get(TestItemEntityDo.class);
+    // add 'wrong' item into object using a non-existent _type
+    itemEntity.put(itemEntity.itemIfc().getAttributeName(), raw);
+    assertThrows(ClassCastException.class, () -> itemEntity.getItemIfc().stringAttribute());
+
+    String serialized = s_dataObjectMapper.writeValueAsString(itemEntity);
+    assertJsonEquals("TestEntityWithUnknownNestedEntity6.json", serialized);
+
+    TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
+    assertEquals("foo", entityMarshalled.getItemIfc().stringAttribute().get());
   }
 
   // ------------------------------------ common test helper methods ------------------------------------
