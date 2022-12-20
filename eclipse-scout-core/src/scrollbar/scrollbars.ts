@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, HtmlComponent, InitModelOf, Insets, objects, scout, Scrollbar, Session, WidgetModel} from '../index';
+import {arrays, Device, graphics, HtmlComponent, InitModelOf, Insets, objects, scout, Scrollbar, Session, SomeRequired, WidgetModel} from '../index';
 import $ from 'jquery';
 
 export type ScrollDirection = 'x' | 'y' | 'both';
@@ -19,6 +19,7 @@ export interface ScrollbarInstallOptions extends WidgetModel {
    */
   axis?: ScrollDirection;
   borderless?: boolean;
+  mouseWheelNeedsShift?: boolean;
   nativeScrollbars?: boolean;
   hybridScrollbars?: boolean;
 
@@ -152,8 +153,8 @@ export const scrollbars = {
     }
   },
 
-  install($container: JQuery, options?: ScrollbarInstallOptions): JQuery {
-    options = scrollbars._createDefaultScrollToOptions(options);
+  install($container: JQuery, options?: SomeRequired<ScrollbarInstallOptions, 'parent'>): JQuery {
+    options = options || {} as SomeRequired<ScrollbarInstallOptions, 'parent'>;
     options.axis = options.axis || 'both';
     options.scrollShadow = options.scrollShadow || 'auto';
 
@@ -464,7 +465,7 @@ export const scrollbars = {
   },
 
   /** @internal */
-  _installJs($container: JQuery, options: ScrollbarInstallOptions) {
+  _installJs($container: JQuery, options: SomeRequired<ScrollbarInstallOptions, 'parent'>) {
     $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + graphics.debugOutput($container));
     let scrollbarArr = arrays.ensure($container.data('scrollbars'));
     scrollbarArr.forEach(scrollbar => {
@@ -472,13 +473,8 @@ export const scrollbars = {
     });
     scrollbarArr = [];
     let scrollbar;
-    let scrollbarModel: InitModelOf<Scrollbar> = {
-      session: options.session,
-      parent: options.parent,
-      borderless: options.borderless
-    };
     if (options.axis === 'both') {
-      scrollbarModel = $.extend({}, scrollbarModel, {axis: 'y'});
+      let scrollbarModel: InitModelOf<Scrollbar> = $.extend({}, options as InitModelOf<Scrollbar>, {axis: 'y'});
       scrollbar = scout.create(Scrollbar, scrollbarModel);
       scrollbarArr.push(scrollbar);
 
@@ -489,7 +485,7 @@ export const scrollbars = {
       scrollbar = scout.create(Scrollbar, scrollbarModel);
       scrollbarArr.push(scrollbar);
     } else {
-      scrollbarModel = $.extend({}, scrollbarModel, {axis: options.axis});
+      let scrollbarModel: InitModelOf<Scrollbar> = $.extend({}, options, {axis: options.axis});
       scrollbar = scout.create(Scrollbar, scrollbarModel);
       scrollbarArr.push(scrollbar);
     }
@@ -696,7 +692,7 @@ export const scrollbars = {
   },
 
   /** @internal */
-  _createDefaultScrollToOptions(options?: ScrollbarInstallOptions): ScrollToOptions & ScrollbarInstallOptions {
+  _createDefaultScrollToOptions(options?: ScrollbarInstallOptions): ScrollToOptions {
     let defaults: ScrollToOptions = {
       animate: false,
       stop: true
