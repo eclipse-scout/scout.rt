@@ -11,7 +11,7 @@
 import {Form, GroupBox, PopupWindow} from '../../src/index';
 
 describe('PopupWindow', () => {
-  let session, helper, $sandbox, origDevice, myForm, myWindow,
+  let session, $sandbox, myForm, myWindow,
     myErrorHandler = () => {
     };
 
@@ -20,11 +20,11 @@ describe('PopupWindow', () => {
     session = sandboxSession();
     $sandbox = $('#sandbox');
 
-    myForm = scout.create(Form, {
+    myForm = scout.create('Form', {
       parent: session.desktop,
       modelClass: 'Foo',
       rootGroupBox: {
-        objectType: GroupBox
+        objectType: 'GroupBox'
       }
     });
 

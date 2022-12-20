@@ -28,24 +28,24 @@ export default class TreeSpecHelper {
   }
 
   createModelFixture(nodeCount, depth, expanded) {
-    return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
+    return this.createModel(this.createModelNodes(nodeCount, depth, {expanded: expanded}));
   }
 
-  createModelNode(id, text, position) {
-    return {
+  createModelNode(id, text, position, model) {
+    return $.extend({
       id: id + '' || ObjectFactory.get().createUniqueId(),
       text: text,
       childNodeIndex: position ? position : 0,
       enabled: true,
       checked: false
-    };
+    }, model);
   }
 
-  createModelNodes(nodeCount, depth, expanded) {
-    return this.createModelNodesInternal(nodeCount, depth, expanded);
+  createModelNodes(nodeCount, depth, model) {
+    return this.createModelNodesInternal(nodeCount, depth, null, model);
   }
 
-  createModelNodesInternal(nodeCount, depth, expanded, parentNode) {
+  createModelNodesInternal(nodeCount, depth, parentNode, model) {
     if (!nodeCount) {
       return;
     }
@@ -60,10 +60,9 @@ export default class TreeSpecHelper {
       if (parentNode) {
         nodeId = parentNode.id + '_' + nodeId;
       }
-      nodes[i] = this.createModelNode(nodeId, 'node ' + nodeId, i);
-      nodes[i].expanded = expanded;
+      nodes[i] = this.createModelNode(nodeId, 'node ' + nodeId, i, model);
       if (depth > 0) {
-        nodes[i].childNodes = this.createModelNodesInternal(nodeCount, depth - 1, expanded, nodes[i]);
+        nodes[i].childNodes = this.createModelNodesInternal(nodeCount, depth - 1, nodes[i], model);
       }
     }
     return nodes;
