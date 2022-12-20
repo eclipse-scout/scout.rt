@@ -145,13 +145,6 @@ export default class TreeNode {
     this.filterAccepted = filterAccepted;
   }
 
-  isFilterAccepted(forceFilter) {
-    if (this.filterDirty || forceFilter) {
-      this.getTree().applyFiltersForNode(this);
-    }
-    return this.filterAccepted;
-  }
-
   /**
    * This method loads the child nodes of this node and returns a jQuery.Deferred to register callbacks
    * when loading is done or has failed. This method should only be called when childrenLoaded is false.
