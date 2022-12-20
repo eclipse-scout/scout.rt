@@ -1,0 +1,6 @@
+{
+  "_type" : "TestItemEntity",
+  "item" : {
+    "nr" : 12345
+  }
+}

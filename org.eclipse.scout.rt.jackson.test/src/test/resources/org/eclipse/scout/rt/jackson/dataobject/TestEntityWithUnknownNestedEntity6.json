@@ -1,0 +1,7 @@
+{
+  "_type" : "TestItemEntity",
+  "itemIfc" : {
+    "_type" : "TestEntityWithInterface1",
+    "stringAttribute" : "foo"
+  }
+}

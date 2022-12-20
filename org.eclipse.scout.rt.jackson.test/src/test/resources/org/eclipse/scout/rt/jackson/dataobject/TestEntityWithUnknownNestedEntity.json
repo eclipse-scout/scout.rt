@@ -1,0 +1,9 @@
+{
+  "_type" : "TestMap",
+  "stringDoTestItemMapAttribute" : {
+    "one" : {
+      "_type" : "UnknownType",
+      "nr" : 12345
+    }
+  }
+}
