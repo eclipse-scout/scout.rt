@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, ModelAdapter, objects, RemoteTileFilter, scout, Tile, TileActionEvent, TileClickEvent, TileGrid, TileGridModel} from '../index';
+import {Event, ModelAdapter, objects, RemoteTileFilter, scout, TileActionEvent, TileClickEvent, TileGrid, TileGridModel} from '../index';
 
 export class TileGridAdapter extends ModelAdapter {
   declare widget: TileGrid;
@@ -20,15 +20,15 @@ export class TileGridAdapter extends ModelAdapter {
     this._addRemoteProperties(['selectedTiles']);
   }
 
-  protected _syncSelectedTiles(tiles: Tile[]) {
+  protected _syncSelectedTiles(tileIds: string[]) {
     // TileGrid.js won't modify the selectedTiles array while processing the response -> ignore every selectedTiles property change
     this.addFilterForPropertyName('selectedTiles');
-    this.widget.selectTiles(tiles);
+    this.widget.selectTiles(tileIds);
   }
 
-  protected _syncTiles(tiles: Tile[]) {
+  protected _syncTiles(tileIds: any[]) { // actually string[] but "official" Scout JS API of setTiles should not reflect that capability
     this.addFilterForPropertyName('selectedTiles');
-    this.widget.setTiles(tiles);
+    this.widget.setTiles(tileIds);
   }
 
   protected override _initProperties(model: TileGridModel & { filteredTiles?: string[] }) {

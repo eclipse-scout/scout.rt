@@ -265,14 +265,14 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return null;
   }
 
-  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T>): T;
-  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T>[]): T[];
-  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T> | ObjectOrChildModel<T>[]): T | T[];
+  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T> | string): T;
+  protected _createChildren<T extends Widget>(models: (ObjectOrChildModel<T> | string)[]): T[];
+  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T> | string | (ObjectOrChildModel<T> | string)[]): T | T[];
   /**
    * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
    * @returns an array of created widgets if models was an array. Or the created widget if models is not an array.
    */
-  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T> | ObjectOrChildModel<T>[]): T | T[] {
+  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T> | string | (ObjectOrChildModel<T> | string)[]): T | T[] {
     if (!models) {
       return null;
     }

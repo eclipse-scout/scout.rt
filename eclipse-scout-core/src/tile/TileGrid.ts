@@ -835,8 +835,9 @@ export class TileGrid extends Widget implements TileGridModel {
    *
    * Tiles, that are currently invisible due to an active filter, are excluded and won't be selected.
    */
-  selectTiles(tiles: Tile | Tile[]) {
-    tiles = arrays.ensure(tiles);
+  selectTiles(tileOrIds: Tile | string | (Tile | string)[]) {
+    // Resolve the tiles (they are not actually created, just resolved by id)
+    let tiles = this._createChildren(arrays.ensure(tileOrIds));
     tiles = this._filterTiles(tiles); // Selecting invisible tiles is not allowed
 
     // Ensure no tiles will be selected if selectable is disabled
