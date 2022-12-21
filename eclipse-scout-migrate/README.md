@@ -138,7 +138,7 @@ In order to run the TypeScript migration, do the following:
 {
   "scripts": {
     "rename": "scout-migrate --rename --sources src/main/js/**/*.js",
-    "migrate": "scout-migrate --rename false --migrate ts --sources src/main/js/**/*.ts --moduleMap.yourNamespace path:src/main/js/index.js",
+    "migrate": "scout-migrate --rename false --migrate ts --sources src/main/js/**/*.ts --moduleMap.yourNamespace path:src/main/js/index.ts",
     "event-maps": "scout-migrate --print-event-maps --sources src/main/js/**/*.ts"
   }
 }

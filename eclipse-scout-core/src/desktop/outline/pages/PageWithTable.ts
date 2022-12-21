@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, InitModelOf, Page, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowOrderChangedEvent,
-  TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, InitModelOf, ObjectOrModel, Page, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableReloadEvent, TableRow, TableRowActionEvent,
+  TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -134,10 +134,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
     });
   }
 
-  override loadChildren(): JQuery.Deferred<any> {
+  override loadChildren(): JQuery.Promise<any> {
     // It's allowed to have no table - but we don't have to load data in that case
     if (!this.detailTable) {
-      return $.resolvedDeferred();
+      return $.resolvedPromise();
     }
     return this.loadTableData();
   }
@@ -157,34 +157,29 @@ export class PageWithTable extends Page implements PageWithTableModel {
   /**
    * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
    */
-  loadTableData(): JQuery.Deferred<any> {
+  loadTableData(): JQuery.Promise<any> {
     this.ensureDetailTable();
     this.detailTable.deleteAllRows();
     this.detailTable.setLoading(true);
     return this._loadTableData(this._createSearchFilter())
       .then(this._onLoadTableDataDone.bind(this))
       .catch(this._onLoadTableDataFail.bind(this))
-      .then(this._onLoadTableDataAlways.bind(this)) as JQuery.Deferred<any>;
+      .then(this._onLoadTableDataAlways.bind(this));
   }
 
   /**
    * Override this method to load table data (rows to be added to table).
-   * This is an asynchronous operation working with a Deferred. When table data load is successful
-   * <code>_onLoadTableDataDone(data)</code> will be called. When a failure occurs while loading table
-   * data <code>_onLoadTableDataFail(data)</code> will be called.
+   * This is an asynchronous operation working with a Promise. If table data load is successful,
+   * <code>_onLoadTableDataDone(data)</code> will be called. If a failure occurs while loading table
+   * data, <code>_onLoadTableDataFail(data)</code> will be called.
    * <p>
-   * When you want to return static data you still need a deferred. But you can resolve it
-   * immediately. Example code:
-   * <code>
-   *   var deferred = $.Deferred();
-   *   deferred.resolve([{...},{...}]);
-   *   return deferred;
-   * </code>
+   * If you want to return static data, you can return a resolvedPromise:
+   * <code>return $.resolvedPromise([{...},{...}]);</code>
    *
    * @param searchFilter The search filter as exported by the search form or null.
    */
-  protected _loadTableData(searchFilter: any): JQuery.Deferred<any> {
-    return $.resolvedDeferred();
+  protected _loadTableData(searchFilter: any): JQuery.Promise<any> {
+    return $.resolvedPromise();
   }
 
   /**
@@ -216,7 +211,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    * This method converts the loaded table data, which can be any object, into table rows.
    * You must override this method unless tableData is already an array of table rows.
    */
-  protected _transformTableDataToTableRows(tableData: any): TableRow[] {
+  protected _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
     return tableData;
   }
 }

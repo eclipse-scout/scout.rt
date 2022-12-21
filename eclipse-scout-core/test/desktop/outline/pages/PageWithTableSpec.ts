@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, Outline, Page, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
+import {arrays, Column, ObjectOrModel, Outline, Page, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
 import {OutlineSpecHelper} from '../../../../src/testing/index';
 
 describe('PageWithTable', () => {
@@ -19,7 +19,7 @@ describe('PageWithTable', () => {
   let page: SpecPageWithTable;
 
   class SpecPageWithTable extends PageWithTable {
-    override _loadTableData(searchFilter: any): JQuery.Deferred<any> {
+    override _loadTableData(searchFilter: any): JQuery.Promise<any> {
       return super._loadTableData(searchFilter);
     }
   }
@@ -52,7 +52,7 @@ describe('PageWithTable', () => {
     let counter = 0;
     page._loadTableData = searchFilter => {
       counter++;
-      return $.resolvedDeferred();
+      return $.resolvedPromise();
     };
     page.detailTable.reload(); // this should trigger the _loadTableData of the page
 
@@ -61,7 +61,7 @@ describe('PageWithTable', () => {
   });
 
   it('should handle errors in _onLoadTableDataDone', () => {
-    page._loadTableData = searchFilter => $.resolvedDeferred([{
+    page._loadTableData = searchFilter => $.resolvedPromise([{
       rowId: 1,
       parentRow: 666, // does not exist -> causes an error in Table.js#insertRows
       cells: []
@@ -92,7 +92,7 @@ describe('PageWithTable', () => {
         });
       }
 
-      protected override _loadTableData(searchFilter: any): JQuery.Deferred<any> {
+      protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
         let data = [{
           string: 'string 1',
           smartValue: null
@@ -109,10 +109,10 @@ describe('PageWithTable', () => {
           string: 'string 5',
           smartValue: 'key0'
         }];
-        return $.resolvedDeferred(data);
+        return $.resolvedPromise(data);
       }
 
-      protected override _transformTableDataToTableRows(tableData: any): TableRow[] {
+      protected override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
         return tableData
           .map(row => {
             return {
