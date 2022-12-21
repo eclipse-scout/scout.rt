@@ -306,7 +306,7 @@ export const scout = {
   /**
    * @returns the session for the given partId. If the partId is omitted, the first session is returned.
    */
-  getSession(partId: string): Session {
+  getSession(partId?: string): Session {
     let sessions = App.get().sessions;
     if (!sessions) {
       return null;

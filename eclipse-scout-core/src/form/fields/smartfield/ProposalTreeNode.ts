@@ -45,18 +45,18 @@ export class ProposalTreeNode<TValue> extends TreeNode implements ProposalTreeNo
     return this.proposalChooser.isBrowseLoadIncremental();
   }
 
-  override loadChildren(): JQuery.Deferred<SmartFieldLookupResult<TValue>> {
+  override loadChildren(): JQuery.Promise<SmartFieldLookupResult<TValue>> {
     if (this.isBrowseLoadIncremental()) {
       let parentKey = this.lookupRow.key;
-      return this.proposalChooser.smartField.lookupByRec(parentKey) as JQuery.Deferred<SmartFieldLookupResult<TValue>>;
+      return this.proposalChooser.smartField.lookupByRec(parentKey);
     }
     // child nodes are already loaded -> same as parent.loadChildren
-    return $.resolvedDeferred();
+    return $.resolvedPromise();
   }
 
   override hasChildNodes(): boolean {
     if (this.isBrowseLoadIncremental() && !this.childrenLoaded) {
-      return true; // because we don't now yet
+      return true; // because we don't know yet
     }
     return super.hasChildNodes();
   }

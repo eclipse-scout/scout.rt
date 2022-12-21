@@ -186,14 +186,14 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
   }
 
   /**
-   * This method loads the child nodes of this node and returns a jQuery.Deferred to register callbacks
+   * This method loads the child nodes of this node and returns a jQuery.Promise to register callbacks
    * when loading is done or has failed. This method should only be called when childrenLoaded is false.
    *
-   * @returns a Deferred or null when TreeNode cannot load children (which is the case for all
-   *     TreeNodes in the remote case). The default impl. returns a resolved deferred.
+   * @returns a Promise or null when TreeNode cannot load children (which is the case for all
+   *     TreeNodes in the remote case). The default impl. returns an empty resolved promise.
    */
-  loadChildren(): JQuery.Deferred<any> | JQuery.Promise<any> {
-    return $.resolvedDeferred();
+  loadChildren(): JQuery.Promise<any> {
+    return $.resolvedPromise();
   }
 
   /**
@@ -209,10 +209,8 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
     if (this._loadChildrenPromise) {
       return this._loadChildrenPromise;
     }
-    let deferred = this.loadChildren();
-    let promise = deferred.promise();
-    // check if we can get rid of this state-check in a future release
-    if (deferred.state() === 'resolved') {
+    let promise = this.loadChildren();
+    if (promise.state() === 'resolved') {
       this._loadChildrenPromise = null;
       return promise;
     }
