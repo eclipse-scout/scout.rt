@@ -2,8 +2,8 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "ESNext",
-    "moduleResolution": "node",
-    "module": "ES6",
+    "moduleResolution": "NodeNext",
+    "module": "ESNext",
     "skipLibCheck": true,
     "sourceMap": true,
     "alwaysStrict": true,

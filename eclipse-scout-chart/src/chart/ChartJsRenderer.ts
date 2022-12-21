@@ -9,11 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractChartRenderer, Chart} from '../index';
-import ChartJs from 'chart.js/auto';
 import {
-  ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint, FontSpec, LegendElement, LegendItem, LegendOptions,
-  LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
+  ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint, FontSpec, LegendElement,
+  LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
 } from 'chart.js';
+import 'chart.js/auto'; // Import from auto to register charts
 import {arrays, colorSchemes, graphics, numbers, objects, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
 import ChartDataLabels, {Context} from 'chartjs-plugin-datalabels';
 import $ from 'jquery';
