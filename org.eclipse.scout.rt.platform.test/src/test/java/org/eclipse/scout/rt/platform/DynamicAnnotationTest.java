@@ -1,15 +1,22 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.platform;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,6 +35,7 @@ public class DynamicAnnotationTest {
     Assert.assertEquals(AnnotationFactory.createReplace().hashCode(), Bean01.class.getAnnotation(Replace.class).hashCode());
   }
 
+  @SuppressWarnings("SimplifiableAssertion")
   @Test
   public void testOrder() {
     Order orderInstanceFromJre = Bean01.class.getAnnotation(Order.class);
@@ -40,6 +48,7 @@ public class DynamicAnnotationTest {
     Assert.assertTrue(orderInstanceFromJre.equals(orderInstanceFromFactory));
 
     // test special cases
+    //noinspection EqualsWithItself
     Assert.assertTrue(orderInstanceFromFactory.equals(orderInstanceFromFactory));
     Assert.assertTrue(orderInstanceFromJre.equals(orderInstanceFromFactory));
     Assert.assertFalse(orderInstanceFromFactory.equals(null));
@@ -60,8 +69,25 @@ public class DynamicAnnotationTest {
     Assert.assertSame(orderInstanceFromJre.annotationType(), orderInstanceFromFactory.annotationType());
   }
 
-  private static interface IBean01 {
+  @Test
+  public void testInheritedAnnotation() {
+    BeanManagerImplementor beanManager = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
+    IBean<Bean01> bean01 = beanManager.registerClass(Bean01.class);
+    IBean<Bean03> bean03 = beanManager.registerClass(Bean03.class);
+    IBean<Bean04> bean04 = beanManager.registerClass(Bean04.class);
+    IBean<Bean05> bean05 = beanManager.registerClass(Bean05.class);
 
+    Assert.assertFalse(bean01.hasAnnotation(InheritedWithValue.class));
+    Assert.assertTrue(bean03.hasAnnotation(InheritedWithValue.class));
+    Assert.assertTrue(bean04.hasAnnotation(InheritedWithValue.class));
+    Assert.assertTrue(bean05.hasAnnotation(InheritedWithValue.class));
+
+    Assert.assertEquals("Bean03", bean03.getBeanAnnotation(InheritedWithValue.class).value());
+    Assert.assertEquals("Bean04", bean04.getBeanAnnotation(InheritedWithValue.class).value());
+    Assert.assertEquals("Bean04", bean05.getBeanAnnotation(InheritedWithValue.class).value());
+  }
+
+  private interface IBean01 {
   }
 
   @CreateImmediately
@@ -69,10 +95,27 @@ public class DynamicAnnotationTest {
   @Order(-30)
   @Replace
   private static class Bean01 implements IBean01 {
-
   }
 
   @Order(3)
   private static class Bean02 {
+  }
+
+  @InheritedWithValue("Bean03")
+  private static class Bean03 extends Bean01 {
+  }
+
+  @InheritedWithValue("Bean04")
+  private static class Bean04 extends Bean03 {
+  }
+
+  private static class Bean05 extends Bean04 {
+  }
+
+  @Inherited
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.TYPE)
+  private @interface InheritedWithValue {
+    String value();
   }
 }
