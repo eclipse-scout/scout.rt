@@ -131,8 +131,14 @@
     flex-grow: 0;
     margin-right: -10px;
 
-    & > .menubar-box > .menu-item.last {
-      margin-right: 0;
+    & > .menubar-box > .menu-item {
+      &.first {
+        margin-left: 4px;
+      }
+
+      &.last {
+        margin-right: 0;
+      }
     }
   }
 }
