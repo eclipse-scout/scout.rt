@@ -16,11 +16,45 @@
   background-color: @desktop-navigation-background-color;
   color: @desktop-navigation-color;
 
+  & > .desktop-tool-box {
+    right: 0;
+
+    & > .menu-item {
+      margin-bottom: @view-tab-margin;
+
+      & > .font-icon {
+        font-size: @view-tab-icon-font-size;
+      }
+
+      &.ellipsis > .font-icon {
+        font-size: @view-tab-icon-font-size + 2px;
+      }
+    }
+  }
+
   &.view-button-box-invisible {
-    & > .navigation-body {
-      & > .outline > .outline-title {
+    & > .desktop-tool-box > .menu-item {
+      margin-bottom: @desktop-tool-box-item-margin-top;
+    }
+
+    & > .navigation-body > .outline > .outline-title {
+      background-color: @desktop-header-background-color;
+      border-bottom: 0;
+      color: @desktop-header-color;
+
+      &.measure {
+        display: inline-flex;
+      }
+
+      &.touch:active {
         background-color: @desktop-header-background-color;
-        border-bottom: 0;
+      }
+
+      & > .text {
+        flex-grow: 0;
+      }
+
+      & > .menubar > .menubar-box > .menu-item {
         color: @desktop-header-color;
       }
     }
@@ -37,19 +71,5 @@
 
   .desktop-navigation.in-background > & {
     background-color: @desktop-navigation-body-in-background-background-color;
-  }
-}
-
-.desktop-navigation > .desktop-tool-box {
-  & > .menu-item {
-    margin-bottom: @view-tab-margin;
-
-    & > .font-icon {
-      font-size: @view-tab-icon-font-size;
-    }
-
-    &.ellipsis > .font-icon {
-      font-size: @view-tab-icon-font-size + 2px;
-    }
   }
 }
