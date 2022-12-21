@@ -21,6 +21,15 @@
   position: relative;
   border-bottom: 1px solid @outline-title-border-color;
   padding: 0 @outline-title-padding-right @search-outline-panel-padding-bottom @outline-title-padding-left;
+
+  .view-button-box-invisible & {
+    padding-top: @search-outline-panel-no-title-padding-top;
+    padding-bottom: @search-outline-panel-no-title-padding-top + 1xp;
+
+    & > .clear-icon {
+      top: @search-outline-panel-no-title-padding-top;
+    }
+  }
 }
 
 .search-outline-field {
