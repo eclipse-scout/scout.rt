@@ -375,7 +375,7 @@ public class ColumnSet {
         if (grouped) {
           LOG.warn("Invalid column grouping config. " +
               "Column marked as grouped but there are non-grouped or non-visible sort columns with smaller sort index. " +
-              "Grouping will be set to false.");
+              "Grouping will be set to false. Table: {}, column: {}", m_table.getClass().getName(), col.getClass().getName());
         }
         headerCell.setGroupingActive(false);
       }
