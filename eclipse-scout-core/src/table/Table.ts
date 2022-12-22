@@ -3965,6 +3965,14 @@ export class Table extends Widget implements TableModel {
     width = Math.floor(width);
     column.setWidth(width);
 
+    if (this._isDataRendered()) {
+      this._renderResizeColumn(column, width);
+    }
+
+    this._triggerColumnResized(column);
+  }
+
+  protected _renderResizeColumn(column: Column<any>, width: number) {
     let visibleColumnIndex = this.visibleColumns().indexOf(column);
     if (visibleColumnIndex !== -1) {
       let colNum = visibleColumnIndex + 1;
@@ -3991,8 +3999,6 @@ export class Table extends Widget implements TableModel {
         this._resizeAggregateCell(this.$cell(column, aggregateRow.$row));
       }
     });
-
-    this._triggerColumnResized(column);
   }
 
   /** @internal */
