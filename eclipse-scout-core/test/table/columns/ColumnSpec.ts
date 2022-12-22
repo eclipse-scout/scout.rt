@@ -653,4 +653,23 @@ describe('Column', () => {
     expect(column.isContentValid(row).valid).toBe(true);
   });
 
+  describe('setWidth', () => {
+    it('does not fail if table is not rendered', () => {
+      let table = helper.createTable({
+        columns: [{
+          objectType: Column,
+          width: 30
+        }],
+        rows: [{
+          cells: ['hi']
+        }]
+      });
+      table.columns[0].setWidth(50);
+      expect(table.columns[0].width).toBe(50);
+
+      table.render();
+      let $cells = table.rows[0].$row.children('.table-cell');
+      expect($cells.eq(0).cssWidth()).toBe(50);
+    });
+  });
 });
