@@ -1,3 +1,6 @@
 module.exports = {
-  extends: '@eclipse-scout'
+  extends: '@eclipse-scout',
+  rules: {
+    'linebreak-style': 'off'
+  }
 };

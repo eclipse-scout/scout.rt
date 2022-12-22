@@ -1,7 +1,7 @@
-import {Outline} from '@eclipse-scout/core';
+import {Outline, OutlineModel} from '@eclipse-scout/core';
 import {PersonTablePage} from '../index';
 
-export default () => ({
+export default (): OutlineModel => ({
   id: '${simpleArtifactName}.DataOutline',
   title: '${symbol_dollar}{textKey:MyDataOutlineTitle}',
   objectType: Outline,
@@ -11,3 +11,7 @@ export default () => ({
     }
   ]
 });
+
+export type DataOutlineWidgetMap = {
+  '${simpleArtifactName}.DataOutline': Outline;
+};

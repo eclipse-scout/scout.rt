@@ -1,7 +1,7 @@
-import {Menu} from '@eclipse-scout/core';
+import {Menu, DesktopModel} from '@eclipse-scout/core';
 import {DataOutline, Desktop} from '../index';
 
-export default () => ({
+export default (): DesktopModel => ({
   id: '${simpleArtifactName}.Desktop',
   title: '${symbol_dollar}{textKey:ApplicationTitle}',
   objectType: Desktop,
@@ -38,3 +38,11 @@ export default () => ({
     }
   ]
 });
+
+export type DesktopWidgetMap = {
+  '${simpleArtifactName}.Desktop': Desktop;
+  'ThemeMenu': Menu;
+  'DefaultThemeMenu': Menu;
+  'DarkThemeMenu': Menu;
+  'AboutMenu': Menu;
+};

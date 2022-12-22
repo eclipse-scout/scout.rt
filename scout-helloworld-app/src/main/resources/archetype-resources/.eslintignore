@@ -7,4 +7,3 @@ target
 **/src/test/resources
 **/src/main/java
 **/src/test/java
-**/*.war/externalfiles

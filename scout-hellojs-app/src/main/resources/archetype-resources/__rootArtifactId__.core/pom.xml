@@ -16,5 +16,22 @@
       <groupId>${groupId}</groupId>
       <artifactId>${rootArtifactId}.data</artifactId>
     </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

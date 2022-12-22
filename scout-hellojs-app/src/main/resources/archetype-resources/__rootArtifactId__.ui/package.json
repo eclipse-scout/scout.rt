@@ -6,7 +6,7 @@
     "npm": ">=9.1.1",
     "pnpm": ">=7.16.0"
   },
-  "main": "./src/main/js/index.js",
+  "main": "./src/main/js/index.ts",
   "publishConfig": {
     "main": "./target/dist/dev/${simpleArtifactName}-ui.js"
   },
@@ -32,9 +32,14 @@
   "devDependencies": {
     "@eclipse-scout/releng": "^22.0.0",
     "@eclipse-scout/cli": ">=23.1.0-snapshot <23.1.0",
+    "@eclipse-scout/tsconfig": ">=23.1.0-snapshot <23.1.0",
     "jasmine-core": "4.5.0",
     "jasmine-jquery": "2.1.1",
-    "karma": "6.4.1"
+    "karma": "6.4.1",
+    "@types/jquery": "3.5.14",
+    "@types/jasmine": "4.3.1",
+    "@types/jasmine-ajax": "3.3.3",
+    "@types/jasmine-jquery": "1.5.34"
   },
   "dependencies": {
     "@eclipse-scout/core": ">=23.1.0-snapshot <23.1.0",

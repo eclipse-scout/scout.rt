@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2010-2022 BSI Business Systems Integration AG.
-  ~ All rights reserved. This program and the accompanying materials
-  ~ are made available under the terms of the Eclipse Public License v1.0
-  ~ which accompanies this distribution, and is available at
-  ~ https://www.eclipse.org/legal/epl-v10.html
-  ~
-  ~ Contributors:
-  ~     BSI Business Systems Integration AG - initial API and implementation
-  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -26,7 +16,7 @@
     <jdk.source.version>${javaVersion}</jdk.source.version>
     <org.eclipse.scout.rt.version>23.1-SNAPSHOT</org.eclipse.scout.rt.version>
     <org.glassfish.jersey.version>2.37</org.glassfish.jersey.version>
-    <org.jooq.version>3.15.10</org.jooq.version>
+    <org.jooq.version>3.17.6</org.jooq.version>
     <derby.version>10.15.2.0</derby.version>
     <master_npm_release_dependency_mapping>--mapping.0.regex=@eclipse-scout --mapping.0.version=${org.eclipse.scout.rt.version}</master_npm_release_dependency_mapping>
   </properties>
@@ -44,17 +34,13 @@
     <module>../${rootArtifactId}.app.war</module>
     <module>../${rootArtifactId}.app.dev</module>
 
-    <!-- Test modules -->
-    <module>../${rootArtifactId}.core.test</module>
-    <module>../${rootArtifactId}.persistence.test</module>
-
     <!-- DB modules -->
     <module>../${rootArtifactId}.db</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
-      <!-- Scout Dependencies -->
+      <!-- External Dependencies -->
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt</artifactId>
@@ -62,8 +48,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
-      <!-- External Dependencies -->
       <dependency>
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
@@ -128,11 +112,6 @@
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${rootArtifactId}.data</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${groupId}</groupId>
-        <artifactId>${rootArtifactId}.core.test</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -1,0 +1,9 @@
+{
+  "extends": "@eclipse-scout/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "target/dist/d.ts"
+  },
+  "include": [
+    "./src/main/js/**/*"
+  ]
+}

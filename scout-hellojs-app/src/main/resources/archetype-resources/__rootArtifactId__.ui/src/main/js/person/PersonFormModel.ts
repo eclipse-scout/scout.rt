@@ -1,6 +1,6 @@
-import {CancelMenu, CheckBoxField, GroupBox, NumberField, OkMenu, StringField} from '@eclipse-scout/core';
+import {CancelMenu, CheckBoxField, FormModel, GroupBox, NumberField, OkMenu, StringField} from '@eclipse-scout/core';
 
-export default () => ({
+export default (): FormModel => ({
   id: '${simpleArtifactName}.PersonForm',
   displayHint: 'view',
   rootGroupBox: {
@@ -53,3 +53,14 @@ export default () => ({
     ]
   }
 });
+
+export type PersonFormWidgetMap = {
+  'MainBox': GroupBox;
+  'DetailBox': GroupBox;
+  'FirstNameField': StringField;
+  'LastNameField': StringField;
+  'SalaryField': NumberField;
+  'ExternalField': CheckBoxField;
+  'OkMenu': OkMenu;
+  'CancelMenu': CancelMenu;
+};

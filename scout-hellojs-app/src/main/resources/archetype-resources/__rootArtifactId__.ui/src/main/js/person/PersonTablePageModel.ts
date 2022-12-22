@@ -1,7 +1,7 @@
-import {AggregateTableControl, BooleanColumn, Column, FormTableControl, icons, Menu, NumberColumn, PageWithTable, Table} from '@eclipse-scout/core';
+import {AggregateTableControl, BooleanColumn, Column, FormTableControl, icons, Menu, NumberColumn, PageWithTable, PageWithTableModel, Table} from '@eclipse-scout/core';
 import {PersonSearchForm} from '../index';
 
-export default () => ({
+export default (): PageWithTableModel => ({
   id: '${simpleArtifactName}.PersonTablePage',
   objectType: PageWithTable,
   leaf: true,
@@ -47,18 +47,14 @@ export default () => ({
         objectType: Menu,
         text: '${symbol_dollar}{textKey:EditPerson}',
         iconId: icons.PENCIL,
-        menuTypes: [
-          Table.MenuTypes.SingleSelection
-        ]
+        menuTypes: [Table.MenuTypes.SingleSelection]
       },
       {
         id: 'CreatePersonMenu',
         objectType: Menu,
         text: '${symbol_dollar}{textKey:CreatePerson}',
         iconId: icons.PLUS,
-        menuTypes: [
-          Table.MenuTypes.EmptySpace
-        ]
+        menuTypes: [Table.MenuTypes.EmptySpace]
       },
       {
         id: 'DeletePersonMenu',
@@ -87,3 +83,25 @@ export default () => ({
     ]
   }
 });
+
+export type PersonTablePageTableWidgetMap = {
+  'EditPersonMenu': Menu;
+  'CreatePersonMenu': Menu;
+  'DeletePersonMenu': Menu;
+  'SearchFormTableControl': FormTableControl;
+  'SearchForm': PersonSearchForm;
+  'AggregateTableControl': AggregateTableControl;
+};
+
+export type PersonTablePageTableColumnMap = {
+  'PersonIdColumn': Column;
+  'FirstNameColumn': Column;
+  'LastNameColumn': Column;
+  'SalaryColumn': NumberColumn;
+  'ExternColumn': BooleanColumn;
+};
+
+export class PersonTablePageTable extends Table {
+  declare columnMap: PersonTablePageTableColumnMap;
+  declare widgetMap: PersonTablePageTableWidgetMap;
+}
