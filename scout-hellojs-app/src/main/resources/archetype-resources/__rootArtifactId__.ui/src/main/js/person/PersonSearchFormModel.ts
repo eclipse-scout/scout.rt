@@ -1,6 +1,6 @@
-import {Action, GroupBox, Menu, ResetMenu, StringField} from '@eclipse-scout/core';
+import {Action, FormModel, GroupBox, Menu, ResetMenu, StringField} from '@eclipse-scout/core';
 
-export default () => ({
+export default (): FormModel => ({
   id: '${simpleArtifactName}.PersonSearchForm',
   rootGroupBox: {
     id: 'MainBox',
@@ -41,3 +41,12 @@ export default () => ({
     ]
   }
 });
+
+export type PersonSearchFormWidgetMap = {
+  'MainBox': GroupBox;
+  'DetailBox': GroupBox;
+  'FirstNameField': StringField;
+  'LastNameField': StringField;
+  'SearchButton': Menu;
+  'ResetMenu': ResetMenu;
+};

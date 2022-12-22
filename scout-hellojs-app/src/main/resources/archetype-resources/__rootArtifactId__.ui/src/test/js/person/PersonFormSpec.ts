@@ -2,7 +2,7 @@ import {scout} from '@eclipse-scout/core';
 import {Person, PersonForm} from '../../../main/js';
 
 describe('PersonForm', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -16,7 +16,6 @@ describe('PersonForm', () => {
   });
 
   describe('open with person', () => {
-
     it('shows firstName and LastName', done => {
       let personForm = scout.create(PersonForm, {
         parent: session.desktop
@@ -29,14 +28,14 @@ describe('PersonForm', () => {
       personForm.setData(person);
       personForm.open()
         .then(() => {
-          expect(personForm.firstNameField.rendered).toBe(true);
-          expect(personForm.lastNameField.rendered).toBe(true);
-          expect(personForm.firstNameField.value).toBe(person.firstName);
-          expect(personForm.lastNameField.value).toBe(person.lastName);
+          expect(personForm.widget('FirstNameField').rendered).toBe(true);
+          expect(personForm.widget('LastNameField').rendered).toBe(true);
+          expect(personForm.widget('FirstNameField').value).toBe(person.firstName);
+          expect(personForm.widget('LastNameField').value).toBe(person.lastName);
           personForm.close();
         })
         .catch(fail)
-        .always(done);
+        .always(() => done());
     });
   });
 });

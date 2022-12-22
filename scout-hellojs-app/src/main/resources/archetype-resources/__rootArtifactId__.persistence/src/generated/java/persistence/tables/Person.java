@@ -7,17 +7,19 @@
 package ${package}.persistence.tables;
 
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.function.Function;
 
 import ${package}.persistence.Keys;
 import ${package}.persistence.Schema;
 import ${package}.persistence.tables.records.PersonRecord;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Function5;
 import org.jooq.Name;
 import org.jooq.Record;
+import org.jooq.Records;
 import org.jooq.Row5;
+import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -33,126 +35,148 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * The reference instance of <code>Schema.person</code>
-     */
-    public static final Person PERSON = new Person();
+  /**
+   * The reference instance of <code>Schema.person</code>
+   */
+  public static final Person PERSON = new Person();
 
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<PersonRecord> getRecordType() {
-        return PersonRecord.class;
-    }
+  /**
+   * The class holding records for this type
+   */
+  @Override
+  public Class<PersonRecord> getRecordType() {
+    return PersonRecord.class;
+  }
 
-    /**
-     * The column <code>Schema.person.person_id</code>.
-     */
-    public final TableField<PersonRecord, String> PERSON_ID = createField(DSL.name("person_id"), SQLDataType.VARCHAR(36).nullable(false), this, "");
+  /**
+   * The column <code>Schema.person.person_id</code>.
+   */
+  public final TableField<PersonRecord, String> PERSON_ID = createField(DSL.name("person_id"), SQLDataType.VARCHAR(36).nullable(false), this, "");
 
-    /**
-     * The column <code>Schema.person.first_name</code>.
-     */
-    public final TableField<PersonRecord, String> FIRST_NAME = createField(DSL.name("first_name"), SQLDataType.VARCHAR(200), this, "");
+  /**
+   * The column <code>Schema.person.first_name</code>.
+   */
+  public final TableField<PersonRecord, String> FIRST_NAME = createField(DSL.name("first_name"), SQLDataType.VARCHAR(200), this, "");
 
-    /**
-     * The column <code>Schema.person.last_name</code>.
-     */
-    public final TableField<PersonRecord, String> LAST_NAME = createField(DSL.name("last_name"), SQLDataType.VARCHAR(200).nullable(false), this, "");
+  /**
+   * The column <code>Schema.person.last_name</code>.
+   */
+  public final TableField<PersonRecord, String> LAST_NAME = createField(DSL.name("last_name"), SQLDataType.VARCHAR(200).nullable(false), this, "");
 
-    /**
-     * The column <code>Schema.person.salary</code>.
-     */
-    public final TableField<PersonRecord, Integer> SALARY = createField(DSL.name("salary"), SQLDataType.INTEGER, this, "");
+  /**
+   * The column <code>Schema.person.salary</code>.
+   */
+  public final TableField<PersonRecord, Integer> SALARY = createField(DSL.name("salary"), SQLDataType.INTEGER, this, "");
 
-    /**
-     * The column <code>Schema.person.external</code>.
-     */
-    public final TableField<PersonRecord, Boolean> EXTERNAL = createField(DSL.name("external"), SQLDataType.BOOLEAN, this, "");
+  /**
+   * The column <code>Schema.person.external</code>.
+   */
+  public final TableField<PersonRecord, Boolean> EXTERNAL = createField(DSL.name("external"), SQLDataType.BOOLEAN, this, "");
 
-    private Person(Name alias, Table<PersonRecord> aliased) {
-        this(alias, aliased, null);
-    }
+  private Person(Name alias, Table<PersonRecord> aliased) {
+    this(alias, aliased, null);
+  }
 
-    private Person(Name alias, Table<PersonRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
-    }
+  private Person(Name alias, Table<PersonRecord> aliased, Field<?>[] parameters) {
+    super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+  }
 
-    /**
-     * Create an aliased <code>Schema.person</code> table reference
-     */
-    public Person(String alias) {
-        this(DSL.name(alias), PERSON);
-    }
+  /**
+   * Create an aliased <code>Schema.person</code> table reference
+   */
+  public Person(String alias) {
+    this(DSL.name(alias), PERSON);
+  }
 
-    /**
-     * Create an aliased <code>Schema.person</code> table reference
-     */
-    public Person(Name alias) {
-        this(alias, PERSON);
-    }
+  /**
+   * Create an aliased <code>Schema.person</code> table reference
+   */
+  public Person(Name alias) {
+    this(alias, PERSON);
+  }
 
-    /**
-     * Create a <code>Schema.person</code> table reference
-     */
-    public Person() {
-        this(DSL.name("person"), null);
-    }
+  /**
+   * Create a <code>Schema.person</code> table reference
+   */
+  public Person() {
+    this(DSL.name("person"), null);
+  }
 
-    public <O extends Record> Person(Table<O> child, ForeignKey<O, PersonRecord> key) {
-        super(child, key, PERSON);
-    }
+  public <O extends Record> Person(Table<O> child, ForeignKey<O, PersonRecord> key) {
+    super(child, key, PERSON);
+  }
 
-    @Override
-    public org.jooq.Schema getSchema() {
-        return Schema.SCHEMA;
-    }
+  @Override
+  public org.jooq.Schema getSchema() {
+    return aliased() ? null : Schema.SCHEMA;
+  }
 
-    @Override
-    public UniqueKey<PersonRecord> getPrimaryKey() {
-        return Keys.PERSON_PK;
-    }
+  @Override
+  public UniqueKey<PersonRecord> getPrimaryKey() {
+    return Keys.PERSON_PK;
+  }
 
-    @Override
-    public List<UniqueKey<PersonRecord>> getKeys() {
-        return Arrays.<UniqueKey<PersonRecord>>asList(Keys.PERSON_PK);
-    }
+  @Override
+  public Person as(String alias) {
+    return new Person(DSL.name(alias), this);
+  }
 
-    @Override
-    public Person as(String alias) {
-        return new Person(DSL.name(alias), this);
-    }
+  @Override
+  public Person as(Name alias) {
+    return new Person(alias, this);
+  }
 
-    @Override
-    public Person as(Name alias) {
-        return new Person(alias, this);
-    }
+  @Override
+  public Person as(Table<?> alias) {
+    return new Person(alias.getQualifiedName(), this);
+  }
 
-    /**
-     * Rename this table
-     */
-    @Override
-    public Person rename(String name) {
-        return new Person(DSL.name(name), null);
-    }
+  /**
+   * Rename this table
+   */
+  @Override
+  public Person rename(String name) {
+    return new Person(DSL.name(name), null);
+  }
 
-    /**
-     * Rename this table
-     */
-    @Override
-    public Person rename(Name name) {
-        return new Person(name, null);
-    }
+  /**
+   * Rename this table
+   */
+  @Override
+  public Person rename(Name name) {
+    return new Person(name, null);
+  }
 
-    // -------------------------------------------------------------------------
-    // Row5 type methods
-    // -------------------------------------------------------------------------
+  /**
+   * Rename this table
+   */
+  @Override
+  public Person rename(Table<?> name) {
+    return new Person(name.getQualifiedName(), null);
+  }
 
-    @Override
-    public Row5<String, String, String, Integer, Boolean> fieldsRow() {
-        return (Row5) super.fieldsRow();
-    }
+  // -------------------------------------------------------------------------
+  // Row5 type methods
+  // -------------------------------------------------------------------------
+
+  @Override
+  public Row5<String, String, String, Integer, Boolean> fieldsRow() {
+    return (Row5) super.fieldsRow();
+  }
+
+  /**
+   * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+   */
+  public <U> SelectField<U> mapping(Function5<? super String, ? super String, ? super String, ? super Integer, ? super Boolean, ? extends U> from) {
+    return convertFrom(Records.mapping(from));
+  }
+
+  /**
+   * Convenience mapping calling {@link SelectField#convertFrom(Class,Function)}.
+   */
+  public <U> SelectField<U> mapping(Class<U> toType, Function5<? super String, ? super String, ? super String, ? super Integer, ? super Boolean, ? extends U> from) {
+    return convertFrom(toType, Records.mapping(from));
+  }
 }

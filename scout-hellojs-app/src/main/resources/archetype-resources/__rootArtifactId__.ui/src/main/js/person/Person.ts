@@ -1,6 +1,12 @@
 import * as $ from 'jquery';
 
-export default class Person {
+export class Person {
+  resourceType: string;
+  personId: string;
+  firstName: string;
+  lastName: string;
+  salary: number;
+  external: boolean;
 
   constructor() {
     this.resourceType = 'Person';
@@ -13,27 +19,27 @@ export default class Person {
 
   static EVENT_TYPE = 'person';
 
-  init(model) {
+  init(model: any) {
     ${symbol_dollar}.extend(this, model);
   }
 
-  setFirstName(firstName) {
+  setFirstName(firstName: string) {
     this.firstName = firstName;
   }
 
-  setLastName(lastName) {
+  setLastName(lastName: string) {
     this.lastName = lastName;
   }
 
-  setPersonId(id) {
+  setPersonId(id: string) {
     this.personId = id;
   }
 
-  setSalary(salary) {
+  setSalary(salary: number) {
     this.salary = salary;
   }
 
-  setExternal(external) {
+  setExternal(external: boolean) {
     this.external = external;
   }
 }

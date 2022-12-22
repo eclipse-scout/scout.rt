@@ -4,7 +4,7 @@ module.exports = (env, args) => {
   const config = baseConfig(env, args);
   return {
     entry: {
-      '${simpleArtifactName}-ui': './src/main/js/index.js'
+      '${simpleArtifactName}-ui': './src/main/js/index.ts'
     },
     ...baseConfig.libraryConfig(config)
   };

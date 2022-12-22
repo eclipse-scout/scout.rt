@@ -1,33 +1,21 @@
-import {MessageBox, MessageBoxes, models, PageWithTable, scout} from '@eclipse-scout/core';
-import {Person, PersonForm, PersonRepository, PersonRestriction} from '../index';
-import PersonTablePageModel from './PersonTablePageModel';
+import {EventHandler, MessageBox, MessageBoxes, ObjectOrModel, PageWithTable, PageWithTableModel, scout, Table, TableRow} from '@eclipse-scout/core';
+import {DataChangeEvent, Person, PersonForm, PersonRepository, PersonRestriction, PersonSearchFormData} from '../index';
+import PersonTablePageModel, {PersonTablePageTable} from './PersonTablePageModel';
 
-export default class PersonTablePage extends PageWithTable {
+export class PersonTablePage extends PageWithTable {
+  declare detailTable: PersonTablePageTable;
+  protected _dataChangeListener: EventHandler<DataChangeEvent>;
 
-  constructor() {
-    super();
-
-    this._dataChangeListener = null;
+  protected override _jsonModel(): PageWithTableModel {
+    return PersonTablePageModel();
   }
 
-  _jsonModel() {
-    return models.get(PersonTablePageModel);
-  }
-
-  _init(model) {
-    let m = ${symbol_dollar}.extend({}, this._jsonModel(), model);
-    super._init(m);
-  }
-
-  _initDetailTable(table) {
+  protected override _initDetailTable(table: Table) {
     super._initDetailTable(table);
     this._initListeners();
   }
 
-  /**
-   * Override this method if you want to customize the menu entries.
-   */
-  _initListeners() {
+  protected _initListeners() {
     this._dataChangeListener = this._onDataChange.bind(this);
     this.session.desktop.on('dataChange', this._dataChangeListener);
 
@@ -41,25 +29,25 @@ export default class PersonTablePage extends PageWithTable {
     createPersonMenu.on('action', this._onCreatePersonMenuAction.bind(this));
   }
 
-  _destroy() {
+  protected override _destroy() {
     this.session.desktop.off('dataChange', this._dataChangeListener);
     super._destroy();
   }
 
-  _onDataChange(event) {
+  protected _onDataChange(event: DataChangeEvent) {
     if (event.dataType === Person.EVENT_TYPE) {
       this.reloadPage();
     }
   }
 
-  _loadTableData(searchFilter) {
+  protected override _loadTableData(searchFilter: PersonSearchFormData): JQuery.Promise<Person[]> {
     let restriction = scout.create(PersonRestriction, searchFilter, {
       ensureUniqueId: false
     });
     return PersonRepository.get().list(restriction);
   }
 
-  _transformTableDataToTableRows(tableData) {
+  protected override _transformTableDataToTableRows(tableData: Person[]): ObjectOrModel<TableRowWithPerson>[] {
     return tableData
       .map(person => {
         return {
@@ -75,45 +63,37 @@ export default class PersonTablePage extends PageWithTable {
       });
   }
 
-  _getSelectedPerson() {
-    let selection = this.detailTable.selectedRow();
+  protected _getSelectedPerson(): Person {
+    let selection = this.detailTable.selectedRow() as TableRowWithPerson;
     if (selection) {
       return selection.person;
     }
     return null;
   }
 
-  _createPersonForm() {
+  protected _createPersonForm(): PersonForm {
     let outline = this.getOutline();
     return scout.create(PersonForm, {
       parent: outline
     });
   }
 
-  _onEditPersonMenuAction(event) {
+  protected _onEditPersonMenuAction() {
     let personForm = this._createPersonForm();
     personForm.setData(this._getSelectedPerson());
     personForm.open();
   }
 
-  _onDeletePersonMenuAction(event) {
+  protected _onDeletePersonMenuAction() {
     MessageBoxes.openYesNo(this.session.desktop, this.session.text('DeleteConfirmationTextNoItemList'))
       .then(button => {
         if (button === MessageBox.Buttons.YES) {
-          PersonRepository.get()
-            .remove(this._getSelectedPerson().personId)
-            .then(this._onPersonDeleted.bind(this));
+          PersonRepository.get().remove(this._getSelectedPerson().personId);
         }
       });
   }
 
-  _onPersonDeleted() {
-    this.session.desktop.dataChange({
-      dataType: Person.EVENT_TYPE
-    });
-  }
-
-  _onCreatePersonMenuAction(event) {
+  protected _onCreatePersonMenuAction() {
     let personForm = this._createPersonForm();
     let emptyPerson = scout.create(Person, {}, {
       ensureUniqueId: false
@@ -121,4 +101,8 @@ export default class PersonTablePage extends PageWithTable {
     personForm.setData(emptyPerson);
     personForm.open();
   }
+}
+
+export interface TableRowWithPerson extends TableRow {
+  person: Person;
 }

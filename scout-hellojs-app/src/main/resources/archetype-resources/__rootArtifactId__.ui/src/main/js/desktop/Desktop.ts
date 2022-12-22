@@ -1,17 +1,14 @@
-import {App, Desktop as ScoutDesktop, icons, models, scout} from '@eclipse-scout/core';
-import DesktopModel from './DesktopModel';
+import {App, Desktop as ScoutDesktop, DesktopModel as ScoutDesktopModel, Event, Form, GroupBox, LabelField, icons, InitModelOf, scout} from '@eclipse-scout/core';
+import DesktopModel, {DesktopWidgetMap} from './DesktopModel';
 
-export default class Desktop extends ScoutDesktop {
+export class Desktop extends ScoutDesktop {
+  declare widgetMap: DesktopWidgetMap;
 
-  constructor() {
-    super();
+  protected override _jsonModel(): ScoutDesktopModel {
+    return DesktopModel();
   }
 
-  _jsonModel() {
-    return models.get(DesktopModel);
-  }
-
-  _init(model) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     let aboutMenu = this.widget('AboutMenu');
@@ -30,15 +27,15 @@ export default class Desktop extends ScoutDesktop {
     }
   }
 
-  _onDefaultThemeMenuAction(event) {
+  protected _onDefaultThemeMenuAction() {
     this.setTheme('default');
   }
 
-  _onDarkThemeMenuAction(event) {
+  protected _onDarkThemeMenuAction() {
     this.setTheme('dark');
   }
 
-  _onAboutMenuAction(event) {
+  protected _onAboutMenuAction() {
     let form = scout.create(Form, {
       parent: this,
       resizable: false,
@@ -62,4 +59,8 @@ export default class Desktop extends ScoutDesktop {
     });
     form.open();
   }
+}
+
+export interface DataChangeEvent<T = Desktop> extends Event<T> {
+  dataType: string;
 }

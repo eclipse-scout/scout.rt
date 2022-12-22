@@ -1,6 +1,9 @@
 import * as $ from 'jquery';
 
-export default class PersonRestriction {
+export class PersonRestriction {
+  resourceType: string;
+  firstName: string;
+  lastName: string;
 
   constructor() {
     this.resourceType = 'PersonRestriction';
@@ -8,15 +11,15 @@ export default class PersonRestriction {
     this.lastName = null;
   }
 
-  init(model) {
+  init(model: any) {
     ${symbol_dollar}.extend(this, model);
   }
 
-  setFirstName(firstName) {
+  setFirstName(firstName: string) {
     this.firstName = firstName;
   }
 
-  setLastName(lastName) {
+  setLastName(lastName: string) {
     this.lastName = lastName;
   }
 }

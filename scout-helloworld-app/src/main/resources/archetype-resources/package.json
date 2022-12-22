@@ -1,6 +1,7 @@
 {
   "name": "@${simpleArtifactName}/root",
   "version": "${version}",
+  "private": true,
   "scripts": {
     "pnpm-install": "pnpm install --ignore-scripts"
   },
