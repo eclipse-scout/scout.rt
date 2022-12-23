@@ -1006,6 +1006,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                   newWidth = enteredWidth;
                 }
                 column.setWidth(newWidth);
+                ClientUIPreferences.getInstance().setAllTableColumnPreferences(getOrganizedTable());
 
                 if (updateValue) {
                   setValue(row, newWidth);
