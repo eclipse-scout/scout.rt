@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.platform.util.StringUtility.startsWith;
 
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 
@@ -37,7 +38,7 @@ public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY ext
 
     form.addFormListener(e -> {
       if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
-        DO_ENTITY result = BEANS.get(getDoEntityClass());
+        DO_ENTITY result = createEmptyResult();
         exportResult(form, result);
         fireHybridWidgetEvent("save", result);
       }
@@ -62,6 +63,14 @@ public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY ext
 
   protected void startForm(FORM form) {
     form.start();
+  }
+
+  protected DO_ENTITY createEmptyResult() {
+    if (getDoEntityClass() == IDoEntity.class) {
+      //noinspection unchecked
+      return (DO_ENTITY) BEANS.get(DoEntity.class);
+    }
+    return BEANS.get(getDoEntityClass());
   }
 
   protected void exportResult(FORM form, DO_ENTITY result) {
