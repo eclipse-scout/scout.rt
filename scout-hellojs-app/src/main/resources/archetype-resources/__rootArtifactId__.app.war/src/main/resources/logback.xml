@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <variable scope="context" name="mdcPattern" value="principal=%X{subject.principal.name}, httpUri=%X{http.request.uri}, uiSession=%X{scout.ui.session.id}, scoutSession=%X{scout.session.id}, jobName=%X{scout.job.name}, cid=%X{scout.correlation.id}" />
-  <variable scope="context" name="mdcPatternWithoutEmptyValues" value="%replace(${mdcPattern}){'(, )?\w+=((?=\1)|, |$)', ''}" />
-  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level [%thread] %logger.%method\(%file:%line\) - %msg - MDC[${mdcPatternWithoutEmptyValues}]%n%ex" />
-
   <timestamp key="tsByMinute" datePattern="yyyyMMdd-HHmm"/>
 
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
@@ -12,9 +8,7 @@
       <fileNamePattern>${catalina.base}/logs/${rootArtifactId}-${tsByMinute}-%d{yyyy-MM-dd}.log</fileNamePattern>
       <maxHistory>100</maxHistory>
     </rollingPolicy>
-    <encoder>
-      <pattern>${logPattern}</pattern>
-    </encoder>
+    <encoder class="org.eclipse.scout.rt.platform.logger.FixedPatternLogbackEncoder" />
   </appender>
 
   <root level="INFO">

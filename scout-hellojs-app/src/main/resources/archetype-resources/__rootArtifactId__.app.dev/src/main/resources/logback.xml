@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <variable scope="context" name="mdcPattern" value="principal=%X{subject.principal.name}, httpUri=%X{http.request.uri}, uiSession=%X{scout.ui.session.id}, scoutSession=%X{scout.session.id}, jobName=%X{scout.job.name}, cid=%X{scout.correlation.id}" />
-  <variable scope="context" name="mdcPatternWithoutEmptyValues" value="%replace(${mdcPattern}){'(, )?\w+=((?=\1)|, |$)', ''}" />
-  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level [%thread] %logger.%method\(%file:%line\) - %msg - MDC[${mdcPatternWithoutEmptyValues}]%n%ex" />
-
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <filter class="org.eclipse.scout.rt.platform.logger.LevelRangeFilter">
       <levelMin>TRACE</levelMin>
       <levelMax>INFO</levelMax>
     </filter>
-    <encoder>
-      <pattern>${logPattern}</pattern>
-    </encoder>
+    <encoder class="org.eclipse.scout.rt.platform.logger.FixedPatternLogbackEncoder" />
   </appender>
 
   <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
@@ -20,9 +14,7 @@
       <levelMax>ERROR</levelMax>
     </filter>
     <target>System.err</target>
-    <encoder>
-      <pattern>${logPattern}</pattern>
-    </encoder>
+    <encoder class="org.eclipse.scout.rt.platform.logger.FixedPatternLogbackEncoder" />
   </appender>
 
   <root level="INFO">
@@ -34,5 +26,4 @@
 
   <!-- Inclusion of optional, user-specific Logback configurations -->
   <include file="${LOGBACK_INCLUDE_XML}" optional="true" />
-
 </configuration>
