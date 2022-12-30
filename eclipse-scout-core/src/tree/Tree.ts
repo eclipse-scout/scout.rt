@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1032,7 +1032,10 @@ export class Tree extends Widget implements TreeModel {
     this.$container.toggleClass('breadcrumb', this.isBreadcrumbStyleActive());
     this.nodePaddingLeft = null;
     this.nodeControlPaddingLeft = null;
-    this._updateNodePaddingsLeft();
+    let nodeElements = objects.values(this.nodesMap)
+      .filter(n => !!n.$node)
+      .map(n => n.$node.get(0));
+    this._updateNodePaddingsLeft($(nodeElements));
     // update scrollbar if mode has changed (from tree to bc or vice versa)
     this.invalidateLayoutTree();
   }
@@ -1361,8 +1364,9 @@ export class Tree extends Widget implements TreeModel {
     this._updateNodePaddingLevel();
   }
 
-  protected _updateNodePaddingsLeft() {
-    this.$nodes().each((index: number, element: HTMLElement) => {
+  protected _updateNodePaddingsLeft($nodesToUpdate?: JQuery) {
+    let $nodes = $nodesToUpdate || this.$nodes();
+    $nodes.each((index: number, element: HTMLElement) => {
       let $node = $(element);
       let node = $node.data('node') as TreeNode;
       let paddingLeft = this._computeNodePaddingLeft(node);
