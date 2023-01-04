@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -128,8 +128,9 @@ export class TileGrid extends Widget implements TileGridModel {
     this._initTiles();
     this.setFilters(this.filters, false);
     this.filter();
-    this.updateFilteredElements();
     this._setMenus(this.menus);
+    this._sortWhileInit();
+    this.updateFilteredElements();
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -461,6 +462,10 @@ export class TileGrid extends Widget implements TileGridModel {
       return;
     }
     this.comparator = comparator;
+  }
+
+  protected _sortWhileInit() {
+    this.sort();
   }
 
   sort() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -655,6 +655,16 @@ export class TableAdapter extends ModelAdapter {
     }
 
     objects.replacePrototypeFunction(Table, '_createRow', TableAdapter._createRowRemote, true);
+
+    // _sortWhileInit
+    objects.replacePrototypeFunction(Table, '_sortWhileInit', function() {
+      if (this.modelAdapter) {
+        // Scout classic: not necessary to sort in init as the rows are already sorted on the Java UI. Only apply grouping here.
+        this._group();
+      } else {
+        this._sortWhileInitOrig();
+      }
+    }, true);
 
     // _sortAfterInsert
     objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(wasEmpty: boolean) {
