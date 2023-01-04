@@ -96,6 +96,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo2;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestMapDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestMixedRawBigIntegerDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestNestedRawDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestOptionalDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPersonDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPhysicalAddressDo;
@@ -124,6 +125,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -146,6 +148,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
@@ -2809,6 +2812,9 @@ public class JsonDataObjectsSerializationTest {
         .withText("Mock");
   }
 
+  /**
+   * Serialize & deserialize entity with nested map containing unknown DO class referenced by _type.
+   */
   @Test
   public void testSerializeWithUnknownNestedEntity() throws Exception {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
@@ -2824,10 +2830,13 @@ public class JsonDataObjectsSerializationTest {
     String serialized = s_dataObjectMapper.writeValueAsString(obj);
     assertJsonEquals("TestEntityWithUnknownNestedEntity.json", serialized);
 
-    TestMapDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestMapDo.class);
-    assertEquals(Integer.valueOf(12345), ((IDoEntity) entityMarshalled.get("stringDoTestItemMapAttribute", Map.class).get("one")).get("nr"));
+    // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete class
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestMapDo.class));
   }
 
+  /**
+   * Serialize & deserialize entity with nested raw IDoValue containing unknown DO class referenced by _type.
+   */
   @Test
   public void testSerializeWithUnknownNestedEntity2() throws Exception {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
@@ -2843,10 +2852,14 @@ public class JsonDataObjectsSerializationTest {
     String serialized = s_dataObjectMapper.writeValueAsString(obj);
     assertJsonEquals("TestEntityWithUnknownNestedEntity2.json", serialized);
 
+    // OK - read unknown entity into a concrete DO class declaring nested attribute as raw IDoEntity
     TestMapDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestMapDo.class);
     assertEquals(Integer.valueOf(12345), entityMarshalled.getIDoEntityAttribute().get("nr", Integer.class));
   }
 
+  /**
+   * Serialize & deserialize entity with nested TestItemDo entity containing unknown DO class referenced by _type.
+   */
   @Test
   public void testSerializeWithUnknownNestedEntity3() throws Exception {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
@@ -2863,14 +2876,18 @@ public class JsonDataObjectsSerializationTest {
     String serialized = s_dataObjectMapper.writeValueAsString(itemEntity);
     assertJsonEquals("TestEntityWithUnknownNestedEntity3.json", serialized);
 
-    TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
-    assertEquals(Integer.valueOf(12345), entityMarshalled.get("item", IDoEntity.class).get("nr", Integer.class));
+    // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete class
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class));
   }
 
+  /**
+   * Serialize & deserialize entity with nested TestItemDo entity containing raw DO class without _type reference.
+   */
   @Test
   public void testSerializeWithUnknownNestedEntity4() throws Exception {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
         .put("nr", 12345)
+        .put("id", "myId")
         .build();
 
     TestItemEntityDo itemEntity = BEANS.get(TestItemEntityDo.class);
@@ -2881,10 +2898,16 @@ public class JsonDataObjectsSerializationTest {
     String serialized = s_dataObjectMapper.writeValueAsString(itemEntity);
     assertJsonEquals("TestEntityWithUnknownNestedEntity4.json", serialized);
 
+    // OK - read unknown entity into a concrete DO class declaring nested attribute as correct TestItemDo -> unknown entity is parsed correctly into TestItemDo
     TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
     assertEquals(Integer.valueOf(12345), entityMarshalled.get("item", IDoEntity.class).get("nr", Integer.class));
+    assertEquals("myId", entityMarshalled.getItem().getId());
   }
 
+  /**
+   * Serialize & deserialize entity with nested ITestBaseEntityDo interface entity containing unknown DO class
+   * referenced by _type.
+   */
   @Test
   public void testSerializeWithUnknownNestedEntity5() throws Exception {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
@@ -2900,10 +2923,14 @@ public class JsonDataObjectsSerializationTest {
     String serialized = s_dataObjectMapper.writeValueAsString(itemEntity);
     assertJsonEquals("TestEntityWithUnknownNestedEntity5.json", serialized);
 
-    TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
-    assertEquals(Integer.valueOf(12345), entityMarshalled.get("itemIfc", IDoEntity.class).get("nr", Integer.class));
+    // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete DO interface
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class));
   }
 
+  /**
+   * Serialize & deserialize entity with nested ITestBaseEntityDo interface entity containing raw DO class referenced by
+   * correct _type.
+   */
   @Test
   public void testSerializeWithUnknownNestedEntity6() throws Exception {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
@@ -2919,8 +2946,310 @@ public class JsonDataObjectsSerializationTest {
     String serialized = s_dataObjectMapper.writeValueAsString(itemEntity);
     assertJsonEquals("TestEntityWithUnknownNestedEntity6.json", serialized);
 
+    // OK - read raw entity into a concrete DO class declaring nested attribute as correct ITestBaseEntityDo -> raw entity is parsed correctly into TestEntityWithInterface1 instance
     TestItemEntityDo entityMarshalled = s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class);
     assertEquals("foo", entityMarshalled.getItemIfc().stringAttribute().get());
+  }
+
+  /**
+   * JSON without type information, expect concrete class.
+   */
+  @Test
+  public void testDeserializeType_ConcreteClass1() throws Exception {
+    String json = "{\"foo\" : \"bar\"}";
+    TestItemEntityDo marshalled = s_dataObjectMapper.readValue(json, TestItemEntityDo.class);
+    assertEquals(TestItemEntityDo.class, marshalled.getClass());
+  }
+
+  /**
+   * JSON with type information (class available), expect concrete class.
+   */
+  @Test
+  public void testDeserializeType_ConcreteClass2() throws Exception {
+    String json = "{\"_type\" : \"TestItemEntity\"}";
+    // OK - read into correct class
+    TestItemEntityDo marshalled = s_dataObjectMapper.readValue(json, TestItemEntityDo.class);
+    assertEquals(TestItemEntityDo.class, marshalled.getClass());
+    // NOK - read into wrong class
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
+  }
+
+  /**
+   * JSON with type information (class not known), expect concrete class.
+   */
+  @Test
+  public void testDeserializeType_ConcreteClass3() {
+    String json = "{\"_type\" : \"UnknownEntity\"}";
+    // NOK - read into wrong class
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+  }
+
+  /**
+   * JSON with type information (class available) and nested type information (class available), expect concrete class.
+   */
+  @Test
+  public void testDeserializeType_ConcreteClass4() throws Exception {
+    String json = "{\"_type\" : \"TestItemEntity\", \"item\" : {\"_type\" : \"TestItem\"}}";
+    // OK - read into correct class
+    TestItemEntityDo marshalled = s_dataObjectMapper.readValue(json, TestItemEntityDo.class);
+    assertEquals(TestItemEntityDo.class, marshalled.getClass());
+    assertEquals(TestItemDo.class, marshalled.getItem().getClass());
+    // NOK - read into wrong class
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
+
+    // NOK - read into wrong class
+    String json2 = "{\"_type\" : \"TestItemEntity\", \"item\" : {\"_type\" : \"TestItem2\"}}";
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, TestItemEntityDo.class));
+  }
+
+  /**
+   * JSON with type information (class available) and nested type information (class not known), expect concrete class.
+   */
+  @Test
+  public void testDeserializeType_ConcreteClass5() {
+    String json = "{\"_type\" : \"TestItemEntity\", \"item\" : {\"_type\" : \"UnknownEntity\"}}";
+    // NOK - read into wrong class
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+  }
+
+  /**
+   * JSON without type information, expect concrete interface.
+   */
+  @Test
+  public void testDeserializeType_ConcreteIfc1() {
+    String json = "{\"foo\" : \"bar\"}";
+    // Assertion error: multiple instances found for query: interface org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo
+    assertThrows(AssertionException.class, () -> s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class));
+  }
+
+  /**
+   * JSON with type information (class available), expect concrete interface.
+   */
+  @Test
+  public void testDeserializeType_ConcreteIfc2() throws Exception {
+    String json = "{\"_type\" : \"TestEntityWithInterface1\"}";
+    // OK - read into correct interface
+    ITestBaseEntityDo marshalled = s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class);
+    assertTrue(marshalled instanceof ITestBaseEntityDo);
+    // NOK - read into wrong interface
+    String json2 = "{\"_type\" : \"TestItem\"}";
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, ITestBaseEntityDo.class));
+  }
+
+  /**
+   * JSON with type information (class not known), expect concrete interface.
+   */
+  @Test
+  public void testDeserializeType_ConcreteIfc3() {
+    String json = "{\"_type\" : \"UnknownEntity\"}";
+    // NOK - read into wrong interface
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class));
+  }
+
+  /**
+   * JSON with type information (class available) and nested type information (class available), expect concrete
+   * interface.
+   */
+  @Test
+  public void testDeserializeType_ConcreteIfc4() throws Exception {
+    String json = "{\"_type\" : \"TestItemEntity\", \"itemIfc\" : {\"_type\" : \"TestEntityWithInterface1\"}}";
+    // OK - read into correct class
+    TestItemEntityDo marshalled = s_dataObjectMapper.readValue(json, TestItemEntityDo.class);
+    assertEquals(TestItemEntityDo.class, marshalled.getClass());
+    assertEquals(TestEntityWithInterface1Do.class, marshalled.getItemIfc().getClass());
+    // NOK - read into wrong class
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
+
+    // NOK - read into wrong class
+    String json2 = "{\"_type\" : \"TestItemEntity\", \"itemIfc\" : {\"_type\" : \"TestItem\"}}";
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, TestItemEntityDo.class));
+  }
+
+  /**
+   * JSON with type information (class available) and nested type information (class not known), expect concrete
+   * interface.
+   */
+  @Test
+  public void testDeserializeType_ConcreteIfc5() {
+    String json = "{\"_type\" : \"TestItemEntity\", \"itemIfc\" : {\"_type\" : \"UnknownEntity\"}}";
+    // NOK - read into wrong class
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+  }
+
+  /**
+   * JSON without type information, expect generic DoEntity.
+   */
+  @Test
+  public void testDeserializeType_DoEntity1() throws Exception {
+    String json = "{\"foo\" : \"bar\"}";
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+    assertEquals(DoEntity.class, marshalled.getClass());
+    assertFalse(marshalled.has("_type"));
+  }
+
+  /**
+   * JSON with type information (class available), expect generic DoEntity.
+   */
+  @Test
+  public void testDeserializeType_DoEntity2() throws Exception {
+    String json = "{\"_type\" : \"TestItem\"}";
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+    assertEquals(TestItemDo.class, marshalled.getClass());
+    assertFalse(marshalled.has("_type"));
+  }
+
+  /**
+   * JSON with type information (class not known), expect generic DoEntity.
+   */
+  @Test
+  public void testDeserializeType_DoEntity3() throws Exception {
+    String json = "{\"_type\" : \"UnknownEntity\"}";
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+    assertEquals(DoEntity.class, marshalled.getClass());
+    assertEquals("UnknownEntity", marshalled.get("_type"));
+  }
+
+  /**
+   * JSON with type information (class available), expect nested generic DoEntity.
+   */
+  @Test
+  public void testDeserializeType_DoEntity4() throws Exception {
+    String json = "{\"_type\" : \"TestNestedRaw\", \"doEntity\" : {\"_type\" : \"TestItem\"}}";
+    TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
+    assertEquals(TestItemDo.class, marshalled.getDoEntity().getClass());
+    assertFalse(marshalled.getDoEntity().has("_type"));
+  }
+
+  /**
+   * JSON with type information (class not known), expect nested generic DoEntity.
+   */
+  @Test
+  public void testDeserializeType_DoEntity5() throws Exception {
+    String json = "{\"_type\" : \"TestNestedRaw\", \"doEntity\" : {\"_type\" : \"UnknownEntity\"}}";
+    TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
+    assertEquals(DoEntity.class, marshalled.getDoEntity().getClass());
+    assertEquals("UnknownEntity", marshalled.getDoEntity().get("_type"));
+  }
+
+  /**
+   * JSON without type information, expect generic IDoEntity.
+   */
+  @Test
+  public void testDeserializeType_IDoEntity1() throws Exception {
+    String json = "{\"foo\" : \"bar\"}";
+    IDoEntity marshalled = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    assertEquals(DoEntity.class, marshalled.getClass());
+    assertFalse(marshalled.has("_type"));
+  }
+
+  /**
+   * JSON with type information (class available), expect generic IDoEntity.
+   */
+  @Test
+  public void testDeserializeType_IDoEntity2() throws Exception {
+    String json = "{\"_type\" : \"TestItem\"}";
+    IDoEntity marshalled = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    assertEquals(TestItemDo.class, marshalled.getClass());
+    assertFalse(marshalled.has("_type"));
+  }
+
+  /**
+   * JSON with type information (class not known), expect generic IDoEntity.
+   */
+  @Test
+  public void testDeserializeType_IDoEntity3() throws Exception {
+    String json = "{\"_type\" : \"UnknownEntity\"}";
+    IDoEntity marshalled = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    assertEquals(DoEntity.class, marshalled.getClass());
+    assertEquals("UnknownEntity", marshalled.get("_type"));
+  }
+
+  /**
+   * JSON with type information (class available), expect nested generic IDoEntity.
+   */
+  @Test
+  public void testDeserializeType_IDoEntity4() throws Exception {
+    String json = "{\"_type\" : \"TestNestedRaw\", \"iDoEntity\" : {\"_type\" : \"TestItem\"}}";
+    TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
+    assertEquals(TestItemDo.class, marshalled.getIDoEntity().getClass());
+    assertFalse(marshalled.getIDoEntity().has("_type"));
+  }
+
+  /**
+   * JSON with type information (class not known), expect nested generic IDoEntity.
+   */
+  @Test
+  public void testDeserializeType_IDoEntity5() throws Exception {
+    String json = "{\"_type\" : \"TestNestedRaw\", \"iDoEntity\" : {\"_type\" : \"UnknownEntity\"}}";
+    TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
+    assertEquals(DoEntity.class, marshalled.getIDoEntity().getClass());
+    assertEquals("UnknownEntity", marshalled.getIDoEntity().get("_type"));
+  }
+
+  /**
+   * JSON without type information, expect generic IDataObject.
+   */
+  @Test
+  public void testDeserializeType_IDataObject1() throws Exception {
+    String json = "{\"foo\" : \"bar\"}";
+    IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
+    assertEquals(DoEntity.class, marshalled.getClass());
+    assertFalse(((IDoEntity) marshalled).has("_type"));
+  }
+
+  /**
+   * JSON with type information (class available), expect generic IDataObject.
+   */
+  @Test
+  public void testDeserializeType_IDataObject2() throws Exception {
+    String json = "{\"_type\" : \"TestItem\"}";
+    IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
+    assertEquals(TestItemDo.class, marshalled.getClass());
+    assertFalse(((IDoEntity) marshalled).has("_type"));
+  }
+
+  /**
+   * JSON with type information (class not known), expect generic IDataObject.
+   */
+  @Test
+  public void testDeserializeType_IDataObject3() throws Exception {
+    String json = "{\"_type\" : \"UnknownEntity\"}";
+    IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
+    assertEquals(DoEntity.class, marshalled.getClass());
+    assertEquals("UnknownEntity", ((IDoEntity) marshalled).get("_type"));
+  }
+
+  /**
+   * JSON with type information (class available), expect nested generic IDataObject.
+   */
+  @Test
+  public void testDeserializeType_IDataObject4() throws Exception {
+    String json = "{\"_type\" : \"TestNestedRaw\", \"iDataObject\" : {\"_type\" : \"TestItem\"}}";
+    TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
+    assertEquals(TestItemDo.class, marshalled.getIDataObject().getClass());
+    assertFalse(((IDoEntity) marshalled.getIDataObject()).has("_type"));
+  }
+
+  /**
+   * JSON with type information (class not known), expect nested generic IDataObject.
+   */
+  @Test
+  public void testDeserializeType_IDataObject5() throws Exception {
+    String json = "{\"_type\" : \"TestNestedRaw\", \"iDataObject\" : {\"_type\" : \"UnknownEntity\"}}";
+    TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
+    assertEquals(DoEntity.class, marshalled.getIDataObject().getClass());
+    assertEquals("UnknownEntity", ((IDoEntity) marshalled.getIDataObject()).get("_type"));
+  }
+
+  @Test
+  public void testDeserializeTypedPojo() throws Exception {
+    TestItemPojo pojo = new TestItemPojo();
+    pojo.setId("foo");
+    String json = s_defaultJacksonObjectMapper.writeValueAsString(pojo);
+    // NOK - read into wrong pojo class
+    assertThrows(InvalidTypeIdException.class, () -> s_defaultJacksonObjectMapper.readValue(json, TestItemPojo2.class));
+    // NOK - read unknown type into pojo class
+    assertThrows(InvalidTypeIdException.class, () -> s_defaultJacksonObjectMapper.readValue("{\"_type\":\"Unknown\"}", TestItemPojo.class));
   }
 
   // ------------------------------------ common test helper methods ------------------------------------
