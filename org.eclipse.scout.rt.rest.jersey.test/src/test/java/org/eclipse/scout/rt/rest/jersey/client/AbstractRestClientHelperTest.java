@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+package org.eclipse.scout.rt.rest.jersey.client;
+
+import static org.junit.Assert.*;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.Client;
+
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;
+import org.eclipse.scout.rt.rest.client.AntiCsrfClientFilter;
+import org.eclipse.scout.rt.rest.client.HttpHeadersRequestFilter;
+import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
+import org.eclipse.scout.rt.rest.jackson.ObjectMapperResolver;
+import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
+import org.eclipse.scout.rt.rest.jersey.LanguageAndCorrelationIdRestRequestFilter;
+import org.junit.Test;
+
+/**
+ * Various test cases for {@link AbstractRestClientHelper}.
+ */
+public class AbstractRestClientHelperTest {
+
+  @Test
+  public void testDefaultSslContext() throws NoSuchAlgorithmException {
+    JerseyTestRestClientHelper restClientHelper = BEANS.get(JerseyTestRestClientHelper.class);
+    assertEquals(SSLContext.getDefault(), restClientHelper.rawClient().getSslContext());
+  }
+
+  @Test
+  public void testBuildClient() {
+    JerseyTestRestClientHelper restClientHelper = BEANS.get(JerseyTestRestClientHelper.class);
+    Set<Class<?>> actualClasses = restClientHelper.rawClient().getConfiguration().getClasses();
+    Set<Class<?>> expectedClasses = Set.of(ScoutInvocationBuilderListener.class, ScoutJobExecutorServiceProvider.class);
+    assertTrue(CollectionUtility.equalsCollection(expectedClasses, actualClasses));
+
+    Set<Class<?>> actualInstances = restClientHelper.rawClient().getConfiguration().getInstances().stream().map(Object::getClass).collect(Collectors.toSet());
+    Set<Class<?>> expectedInstances = Set.of(ObjectMapperResolver.class, AntiCsrfClientFilter.class, HttpHeadersRequestFilter.class, LanguageAndCorrelationIdRestRequestFilter.class);
+    assertTrue(CollectionUtility.equalsCollection(expectedInstances, actualInstances));
+  }
+
+  @Test
+  public void testLazyClientInstance() {
+    JerseyTestRestClientHelper restClientHelper = BEANS.get(JerseyTestRestClientHelper.class);
+    Client client1 = BEANS.get(RestClientProxyFactory.class).unwrap(restClientHelper.client());
+    Client client2 = BEANS.get(RestClientProxyFactory.class).unwrap(restClientHelper.client());
+    assertEquals("expect same client instance on multiple calls", client1, client2);
+  }
+}
