@@ -19,9 +19,11 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.dataobject.DoNode;
+import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -216,16 +218,26 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       // try to lookup DoEntity with specified entityType
       Class<? extends IDoEntity> clazz = m_doEntityDeserializerTypeStrategy.resolveTypeName(entityType);
       if (clazz != null) {
+        // (1) Class could be resolved by given entityType, validate that resolved class is assignable from class handled by this deserializer instance
+        if (!m_handledClass.isAssignableFrom(clazz)) {
+          throw JsonMappingException.from(ctxt, "Class resolved by parsed entity type is not assignable from class expected by deserializer. ["
+              + "entityType=" + entityType + " resolvedClass=" + clazz.getName() + " handledClassByDeserializer=" + m_handledClass + "]");
+        }
         return newObject(ctxt, clazz);
       }
       else {
-        // use generic DoEntity instance with a type attribute to preserve the type information even if correct DoEntity class could not be resolved
+        // (2) Class could be not resolved by given entityType, validate that handled class (e.g. class expected to be created by this deserializer instance) is of raw type
+        if (!ObjectUtility.isOneOf(m_handledClass, DoEntity.class, IDoEntity.class, IDataObject.class)) {
+          throw JsonMappingException.from(ctxt, "Could not resolve a class by parsed entity type and deserializer expect a concrete class to be created. ["
+              + "entityType=" + entityType + " handledClassByDeserializer=" + m_handledClass + "]");
+        }
+        // Use generic DoEntity instance with a type attribute to preserve the type information even if correct DoEntity class could not be resolved
         DoEntity entity = newObject(ctxt, DoEntity.class);
         entity.put(m_moduleContext.getTypeAttributeName(), entityType);
         return entity;
       }
     }
-    // fallback to handled type of deserializer
+    // Fallback to handled type of deserializer
     return newObject(ctxt, m_handledClass);
   }
 
