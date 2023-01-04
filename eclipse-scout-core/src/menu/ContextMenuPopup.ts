@@ -521,6 +521,9 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     if (event.source.isToggleAction()) {
       return;
     }
+    if (event.defaultPrevented) {
+      return;
+    }
     this.close();
   }
 

@@ -241,4 +241,55 @@ describe('ContextMenuPopup', () => {
 
   });
 
+  describe('preventDefault', () => {
+
+    it('closes the popup when default is not prevented', () => {
+      let menu1 = helper.createMenu(helper.createModel());
+      let menu2 = helper.createMenu(helper.createModel());
+
+      let menu1Clicked = false;
+      menu1.on('action', event => {
+        menu1Clicked = true;
+      });
+
+      let popup = scout.create(ContextMenuPopup, {
+        parent: session.desktop,
+        session: session,
+        menuItems: [menu1, menu2],
+        animateOpening: false,
+        animateRemoval: false
+      });
+
+      popup.open();
+      findClone(popup, menu1).doAction();
+      expect(menu1Clicked).toBe(true);
+      expect(popup.rendered).toBe(false);
+    });
+
+    it('does not close the popup when default is prevented', () => {
+      let menu1 = helper.createMenu(helper.createModel());
+      let menu2 = helper.createMenu(helper.createModel());
+
+      let menu1Clicked = false;
+      menu1.on('action', event => {
+        event.preventDefault(); // <--
+        menu1Clicked = true;
+      });
+
+      let popup = scout.create(ContextMenuPopup, {
+        parent: session.desktop,
+        session: session,
+        menuItems: [menu1, menu2],
+        animateOpening: false,
+        animateRemoval: false
+      });
+
+      popup.open();
+      findClone(popup, menu1).doAction();
+      expect(menu1Clicked).toBe(true);
+      expect(popup.rendered).toBe(true); // <--
+
+      popup.close();
+    });
+  });
 });
