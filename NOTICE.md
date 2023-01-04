@@ -17,8 +17,8 @@ source code repository logs.
 ## Declared Project Licenses
 
 This program and the accompanying materials are made available under the terms
-of the Eclipse Public License v. 1.0 which is available at
-http://www.eclipse.org/legal/epl-v10.html.
+of the Eclipse Public License v1.0 which is available at
+https://www.eclipse.org/legal/epl-v10.html.
 
 SPDX-License-Identifier: EPL-1.0
 
@@ -28,11 +28,9 @@ The project maintains the following source code repositories:
 
 * https://github.com/eclipse-scout/scout.rt
 * https://github.com/eclipse-scout/scout.sdk
-* https://github.com/eclipse-scout/scout.maven-master
 * https://github.com/eclipse-scout/scout.ci
-* https://git.eclipse.org/r/plugins/gitiles/scout/oomph
-* https://git.eclipse.org/r/plugins/gitiles/scout/scout.rt.incubator
-* https://git.eclipse.org/r/plugins/gitiles/scout/org.eclipse.scout-aggregator
+* https://github.com/eclipse-scout/scout.maven-master
+* https://github.com/eclipse-scout/scout.website
 
 ## Third-party Content
 
@@ -187,7 +185,7 @@ Asciidoctor (1.5.2)
 * License: MIT License
 * Project: http://asciidoctor.org/
 * Source:
-   https://github.com/asciidoctor/asciidoctor/tree/master/data/stylesheets
+  https://github.com/asciidoctor/asciidoctor/tree/master/data/stylesheets
 
 ASM (5.0.1)
 
@@ -306,7 +304,7 @@ Batik script library (1.10)
 Batik SVG DOM implementation (1.7)
 
 * License: Apache License 2.0, W3C License, Historical Permission Notice
-   (without Disclaimer)
+  (without Disclaimer)
 
 Batik SVG DOM implementation (1.10)
 
@@ -350,6 +348,10 @@ Batik XML utility library (1.10)
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
+chart.js@2.9.3 (2.9.3)
+
+* License: MIT
+
 CoffeeScript (1.3.3)
 
 * License: MIT License
@@ -388,6 +390,18 @@ easymock (2.4)
 
 * License: MIT license
 
+FastClick (1.0.1)
+
+* License: MIT License
+* Project: https://github.com/ftlabs/fastclick
+* Source: https://github.com/ftlabs/fastclick/tree/v1.0.1
+
+FastClick (1.0.6)
+
+* License: MIT License
+* Project: https://github.com/ftlabs/fastclick
+* Source: https://github.com/ftlabs/fastclick/tree/v1.0.1
+
 Font Awesome (4.2.0)
 
 * License: OFL-1.1 AND MIT
@@ -421,7 +435,7 @@ google-http-client (1.27.0)
 * License: Apache-2.0
 * Project: https://github.com/googleapis/google-http-java-client
 * Source:
-   https://github.com/googleapis/google-http-java-client/tree/v1.27.0/google-http-client
+  https://github.com/googleapis/google-http-java-client/tree/v1.27.0/google-http-client
 
 Greenmail (1.5.10)
 
@@ -434,7 +448,7 @@ Guava (12.0)
 * License: Apache License, 2.0
 * Project: http://code.google.com/p/guava-libraries/
 * Source:
-   http://search.maven.org/remotecontent?filepath=com/google/guava/guava/12.0/guava-12.0-sources.jar
+  http://search.maven.org/remotecontent?filepath=com/google/guava/guava/12.0/guava-12.0-sources.jar
 
 hamcrest-core (1.3)
 
@@ -519,7 +533,7 @@ jackson-annotations (2.8.7)
 * License: Apache-2.0
 * Project: https://github.com/FasterXML/jackson
 * Source:
-   https://github.com/FasterXML/jackson-annotations/releases/tag/jackson-annotations-2.8.7
+  https://github.com/FasterXML/jackson-annotations/releases/tag/jackson-annotations-2.8.7
 
 jackson-core (2.8.7)
 
@@ -578,7 +592,7 @@ jasmine-maven-plugin (1.3.1.4)
 * License: Apache License, 2.0
 * Project: http://searls.github.com/jasmine-maven-plugin
 * Source:
-   https://github.com/searls/jasmine-maven-plugin/tree/jasmine-maven-plugin-1.3.1.x
+  https://github.com/searls/jasmine-maven-plugin/tree/jasmine-maven-plugin-1.3.1.x
 
 Java Servlet API (3.1)
 
@@ -586,7 +600,7 @@ Java Servlet API (3.1)
 
 javassist (3.20.0)
 
-* License: Apache-2.0 OR LGPL -2.1+ OR MPL-1.1
+* License: MPL-1.1 OR LGPL-2.1-or-later OR Apache-2.0
 * Project: http://jboss-javassist.github.io/javassist/
 * Source: https://github.com/jboss-javassist/javassist
 
@@ -623,7 +637,7 @@ javax.mail (1.5.6)
 javax.mail (1.6.1)
 
 * License: (CDDL-1.1 OR GPL-2.0) AND (CDDL-1.1 OR GPL-2.0 WITH
-   Classpath-exception-2.0)
+  Classpath-exception-2.0)
 * Project: https://javaee.github.io/javamail/
 * Source: https://github.com/javaee/javamail
 
@@ -636,9 +650,15 @@ javax.mail (1.6.2)
 javax.ws.rs-api:2.0.1 (2.0.1)
 
 * License: (CDDL-1.1 OR GPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0) AND
-   Apache-2.0
+  Apache-2.0
 * Project: https://projects.eclipse.org/projects/ee4j.jaxrs
 * Source: https://github.com/eclipse-ee4j/jaxrs-api
+
+javax.xml.soap API (1.4.0)
+
+* License: CDDL-1.1 OR GPL-2.0 WITH Classpath-exception
+* Project: https://github.com/eclipse-ee4j/saaj-api
+* Source: https://github.com/eclipse-ee4j/saaj-api
 
 jaxb api (2.2.7)
 
@@ -711,7 +731,7 @@ jersey-common (2.25.1)
 jersey-common (2.27)
 
 * License: (CDDL-1.1 OR GPL-2.0 WITH Classpath-exception-2.0) AND Apache-2.0
-   AND CCO-1.0
+  AND CC0-1.0
 * Project: https://jersey.github.io/index.html
 * Source: https://github.com/jersey/jersey/
 
@@ -720,7 +740,7 @@ jersey-connectors-apache (2.25.1)
 * License: CDDL
 * Project: https://jersey.java.net/project/jersey-apache-connector/
 * Source:
-   http://java.net/projects/jersey/sources/code/show/project/jersey-apache-connector
+  http://java.net/projects/jersey/sources/code/show/project/jersey-apache-connector
 
 jersey-connectors-apache (2.27)
 
@@ -797,7 +817,7 @@ https://android.googlesource.com/platform/libcore/+/310eafdfeb5db23a4d5e405bbe60
 * License: Apache License, 2.0
 * Project: https://android.googlesource.com/platform/libcore
 * Source:
-   https://android.googlesource.com/platform/libcore/+/310eafdfeb5db23a4d5e405bbe607cffd1f4b24a/json/
+  https://android.googlesource.com/platform/libcore/+/310eafdfeb5db23a4d5e405bbe607cffd1f4b24a/json/
 
 jsr181-api (1.0)
 
@@ -846,7 +866,7 @@ log4javascript (1.4.9)
 * License: Apache License, 2.0
 * Project: http://log4javascript.org/
 * Source:
-   http://downloads.sourceforge.net/project/log4javascript/log4javascript/1.4.9/log4javascript-1.4.9.zip
+  http://downloads.sourceforge.net/project/log4javascript/log4javascript/1.4.9/log4javascript-1.4.9.zip
 
 Logback Classic (0.9.19)
 
@@ -898,6 +918,10 @@ Mozilla Rhino (1.7)
 
 * License: Mozilla Public License 2.0 (MPL), New BSD license
 
+npm/npmjs/-/chartjs-plugin-datalabels/0.7.0 (0.7.0)
+
+* License: MIT
+
 objenesis (2.2)
 
 * License: Apache License, 2.0
@@ -909,6 +933,14 @@ org.apache.derby (10.5.3)
 * License: Apache License, 2.0
 * Project: http://db.apache.org/derby/releases/release-10.5.3.0.html
 * Source: http://db.apache.org/derby/releases/release-10.5.3.0.html
+
+org.apache.directory.api:api-all:2.0.1 (2.0.1)
+
+* License: Apache-2.0 AND ISC
+
+org.jsoup:jsoup:1.12.1 (1.12.1)
+
+* License: MIT
 
 org.quartz (2.2.2)
 
@@ -926,10 +958,14 @@ org.quartz (2.3.0)
 * Project: http://www.quartz-scheduler.org/
 * Source: https://github.com/quartz-scheduler/quartz
 
+org.slf4j:slf4j-jdk14:1.7.30 (1.7.30)
+
+* License: MIT
+
 plexus-utils (3.0.20)
 
 * License: Apache 2.0, Apache 1.1, BSD, Public Domain, Indiana University
-   Extreme! Lab Software License V1.1.1 (Apache 1.1 style)
+  Extreme! Lab Software License V1.1.1 (Apache 1.1 style)
 
 resolver.jar (1.2)
 
@@ -953,7 +989,7 @@ saaj.jar (1.2)
 
 selenium-java (2.20.0)
 
-* License: Apache License, 2.0, New BSD (One File)
+* License: Apache-2.0 and BSD-2-Clause
 * Project: http://seleniumhq.org/
 * Source: http://selenium.googlecode.com/svn/trunk/java/client/
 
@@ -1028,14 +1064,14 @@ wagon-http (2.10)
 * License: Apache License, 2.0
 * Project: https://maven.apache.org/wagon/wagon-providers/wagon-http/
 * Source:
-   https://git-wip-us.apache.org/repos/asf?p=maven-wagon.git;a=tree;f=wagon-providers/wagon-http;h=945cb2adf7f483e4568be104e3e4ccce9688443f;hb=218d4d088cc2df5c5e18a2c286601494d723d25e
+  https://git-wip-us.apache.org/repos/asf?p=maven-wagon.git;a=tree;f=wagon-providers/wagon-http;h=945cb2adf7f483e4568be104e3e4ccce9688443f;hb=218d4d088cc2df5c5e18a2c286601494d723d25e
 
 wagon-http-shared (2.10)
 
 * License: Apache License, 2.0
 * Project: https://maven.apache.org/wagon/wagon-providers/wagon-http/
 * Source:
-   https://git-wip-us.apache.org/repos/asf?p=maven-wagon.git;a=tree;f=wagon-providers/wagon-http-shared;h=ee00155628ffa0ac6c82e1af43c1d67d37e4ae63;hb=218d4d088cc2df5c5e18a2c286601494d723d25e
+  https://git-wip-us.apache.org/repos/asf?p=maven-wagon.git;a=tree;f=wagon-providers/wagon-http-shared;h=ee00155628ffa0ac6c82e1af43c1d67d37e4ae63;hb=218d4d088cc2df5c5e18a2c286601494d723d25e
 
 wagon-provider-api (2.10)
 
@@ -1098,10 +1134,10 @@ yuicompressor (2.4.8)
 yuicompressor (2.4.9)
 
 * License: BSD-3-Clause AND MPL-1.1 AND (GPL-2.0+ OR MPL-1.1) AND (GPL-2.0 OR
-   MIT)
+  MIT)
 * Project: https://github.com/BSI-Business-Systems-Integration-AG/yuicompressor
 * Source:
-   https://github.com/BSI-Business-Systems-Integration-AG/yuicompressor/tree/v2.4.9-BSI-1
+  https://github.com/BSI-Business-Systems-Integration-AG/yuicompressor/tree/v2.4.9-BSI-1
 
 ## Cryptography
 

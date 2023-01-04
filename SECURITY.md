@@ -33,3 +33,7 @@ The timing and manner of disclosure is governed by the
 
 Publicly disclosed issues are listed on the
 [Disclosed Vulnerabilities Page](https://www.eclipse.org/security/known.php).
+
+## Related Security Advisories
+
+* 2021-12-23: [CVE-2021-44228 (log4shell)](https://www.eclipse.org/forums/index.php/t/1109741/)

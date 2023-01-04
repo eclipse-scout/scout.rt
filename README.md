@@ -14,10 +14,6 @@ To get started with Scout, follow our [Get Started Guide](https://eclipsescout.g
 
 To learn more about Scout and how to use it, you should have a look at our [documentation platform](https://eclipsescout.github.io/). There you will find tutorials, best practices and architecture details.
 
-## Security Advisories
-
-* 2021-12-23: [CVE-2021-44228 (log4shell)](https://www.eclipse.org/forums/index.php/t/1109741/)
-
 ## Contributing
 
 We welcome any kind of contributions (bug report, documentation improvement, code contribution...). Just open a GitHub issue and / or create a Pull Request.
@@ -30,7 +26,3 @@ Many thanks to all the people who have already contributed to Scout!
 ## Get in Touch
 
 To get in touch with the Eclipse Scout community, please open a thread in the [Eclipse Scout Forum](https://www.eclipse.org/forums/index.php?t=thread&frm_id=174) or on [Stack Overflow](https://stackoverflow.com/tags/eclipse-scout).
-
-## License
-
-[Eclipse Public License (EPL) v1.0](https://wiki.eclipse.org/Eclipse_Public_License)
