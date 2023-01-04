@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -485,6 +485,30 @@ describe('TileGrid', () => {
   });
 
   describe('sort', () => {
+
+    it('works if tiles are passed in model', () => {
+      let model: InitModelOf<TileGrid> = {
+        parent: session.desktop,
+        comparator: (t0, t1) => {
+          // desc
+          return (t0['label'] < t1['label'] ? 1 : ((t0['label'] > t1['label']) ? -1 : 0));
+        },
+        tiles: [{
+          objectType: Tile,
+          label: 'Tile 0'
+        }, {
+          objectType: Tile,
+          label: 'Tile 2'
+        }, {
+          objectType: Tile,
+          label: 'Tile 1'
+        }]
+      };
+      let tileGrid = scout.create(TileGrid, model);
+      expect(tileGrid.tiles[0]['label']).toBe('Tile 2');
+      expect(tileGrid.tiles[1]['label']).toBe('Tile 1');
+      expect(tileGrid.tiles[2]['label']).toBe('Tile 0');
+    });
 
     it('uses the comparator to sort the tiles and filteredTiles', () => {
       let tileGrid = createTileGrid(0);

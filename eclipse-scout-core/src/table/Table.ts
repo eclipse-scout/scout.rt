@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -350,9 +350,9 @@ export class Table extends Widget implements TableModel {
     this._setTableControls(this.tableControls);
     this._setTableStatus(this.tableStatus);
     this._calculateValuesForBackgroundEffect();
-    this._group();
     this._setTileMode(this.tileMode);
     this._setTileTableHeader(this.tileTableHeader);
+    this._sortWhileInit(); // required in case the rows are already provided in the initial model
   }
 
   protected _initRow(row: ObjectOrModel<TableRow>): TableRow {
@@ -2837,6 +2837,11 @@ export class Table extends Widget implements TableModel {
   }
 
   protected _sortAfterInsert(wasEmpty: boolean) {
+    this._sort();
+  }
+
+  protected _sortWhileInit() {
+    // Only in Scout JS mode. Modified for Scout Classic (see TableAdapter).
     this._sort();
   }
 

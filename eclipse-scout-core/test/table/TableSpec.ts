@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1192,6 +1192,18 @@ describe('Table', () => {
       expect(table.columns[0].sortActive).toBe(true);
       expect(table.columns[0].sortAscending).toBe(false);
       expect(table.columns[0].sortIndex).toBe(0);
+    });
+
+    it('works if rows are passed in model', () => {
+      let sortColumnIndex = 0;
+      model = helper.createModelFixture(3, 3);
+      model.columns[sortColumnIndex].sortActive = true;
+      model.columns[sortColumnIndex].sortIndex = 0;
+      model.columns[sortColumnIndex].sortAscending = false;
+      table = helper.createTable(model);
+      expect(table.rows[0].cells[sortColumnIndex].value).toBe('cell2_0');
+      expect(table.rows[1].cells[sortColumnIndex].value).toBe('cell1_0');
+      expect(table.rows[2].cells[sortColumnIndex].value).toBe('cell0_0');
     });
 
     describe('model update', () => {
