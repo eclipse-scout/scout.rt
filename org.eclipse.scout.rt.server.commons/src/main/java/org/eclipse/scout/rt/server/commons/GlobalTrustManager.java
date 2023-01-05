@@ -157,7 +157,12 @@ public class GlobalTrustManager {
   protected List<X509Certificate> getTrustedCertificatesInRemoteFiles() {
     FilenameFilter certFilter = (file, name) -> name.toLowerCase().endsWith(".der");
     try {
-      RemoteFile[] certRemoteFiles = BEANS.get(IRemoteFileService.class).getRemoteFiles(PATH_CERTS, certFilter, null);
+      IRemoteFileService remoteFileService = BEANS.opt(IRemoteFileService.class);
+      if (remoteFileService == null) {
+        LOG.info("No instance of {} available, skip loading certificates from remote file service.", IRemoteFileService.class.getName());
+        return Collections.emptyList();
+      }
+      RemoteFile[] certRemoteFiles = remoteFileService.getRemoteFiles(PATH_CERTS, certFilter, null);
       if (certRemoteFiles == null || certRemoteFiles.length < 1) {
         LOG.info("No certificates to trust in folder '{}' could be found.", PATH_CERTS);
         return Collections.emptyList();
