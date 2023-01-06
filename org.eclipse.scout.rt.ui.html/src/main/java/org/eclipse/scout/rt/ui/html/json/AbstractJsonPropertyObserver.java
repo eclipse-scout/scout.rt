@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -198,7 +198,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       //    1. Table, rowClick   -> sets displayText to 'B' (via Java model)
       //    2. StringField, acceptProposal -> sets displayText to 'A'
       //
-      // Expected: after all events have been processed, displayText in the UI should be A
+      // Expected: after all events have been processed, displayText in the UI should be 'A',
       // but without this check below, it would be 'B', because the second event sets a filter
       // for 'A', so when displayText is changed to 'A' it is not sent back to the UI
       // which is wrong in that case.
@@ -230,7 +230,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     for (JsonProperty<?> lazyProperty : masterProperty.getLazyProperties()) {
       Object modelValue = lazyProperty.modelValue();
       lazyProperty.handlePropertyChange(null, modelValue);
-      // Note: at this point we don'check if the a property-change-event is filtered or not
+      // Note: at this point we don't check if a property-change-event is filtered or not
       if (modelValue != null && lazyProperty.accept() && !lazyProperty.isValueSent()) {
         addPropertyChangeEvent(lazyProperty, modelValue);
       }
@@ -243,7 +243,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
   protected void addPropertyChangeEvent(JsonProperty<?> jsonProperty, Object newValue) {
     String propertyName = jsonProperty.jsonPropertyName();
-    addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
+    newValue = jsonProperty.prepareValueForToJson(newValue);
+    addPropertyChangeEvent(propertyName, newValue);
     jsonProperty.setValueSent(true);
     LOG.debug("Added property change event '{}: {}' for {} with id {}. Model: {}", propertyName, newValue, getObjectType(), getId(), getModel());
   }

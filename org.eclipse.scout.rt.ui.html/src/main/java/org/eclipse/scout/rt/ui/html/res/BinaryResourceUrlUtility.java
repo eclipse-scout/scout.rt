@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -105,8 +105,7 @@ public final class BinaryResourceUrlUtility {
       return null;
     }
     Matcher m = ICON_REGEX_PATTERN.matcher(str);
-    @SuppressWarnings("squid:S1149")
-    StringBuffer ret = new StringBuffer();
+    StringBuilder ret = new StringBuilder();
     while (m.find()) {
       m.appendReplacement(ret, m.group(1) + createIconUrl(m.group(2)) + m.group(1));
     }
@@ -188,8 +187,7 @@ public final class BinaryResourceUrlUtility {
       return null;
     }
     Matcher m = BINARY_RESOURCE_REGEX_PATTERN.matcher(str);
-    @SuppressWarnings("squid:S1149")
-    StringBuffer ret = new StringBuffer();
+    StringBuilder ret = new StringBuilder();
     while (m.find()) {
       m.appendReplacement(ret, m.group(1) + createDynamicAdapterResourceUrl(jsonAdapter, m.group(2)) + m.group(1));
     }
@@ -205,8 +203,7 @@ public final class BinaryResourceUrlUtility {
       return null;
     }
     Matcher m = BINARY_REF_REGEX_PATTERN.matcher(str);
-    @SuppressWarnings("squid:S1149")
-    StringBuffer ret = new StringBuffer();
+    StringBuilder ret = new StringBuilder();
     while (m.find()) {
       m.appendReplacement(ret, m.group(1) + createBinaryRefResourceUrl(m.group(2)) + m.group(1));
     }
