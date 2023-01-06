@@ -80,7 +80,6 @@ export class FormController implements FormControllerModel, ObjectWithType {
    */
   render() {
     this._renderViews();
-
     this._renderDialogs();
   }
 
@@ -106,7 +105,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
       this._removeDialog(dialog, false);
     });
     this.displayParent.views.forEach((view, position) => {
-      this._removeView(view, false);
+      this._removeView(view, false, false);
     });
   }
 
@@ -136,6 +135,10 @@ export class FormController implements FormControllerModel, ObjectWithType {
   }
 
   protected _renderView(view: Form, register: boolean, position?: number, selectView?: boolean) {
+    // Prevent "Already rendered" errors (see #162954).
+    if (view.rendered) {
+      return;
+    }
     if (register) {
       if (position !== undefined) {
         arrays.insert(this.displayParent.views, view, position);
@@ -153,10 +156,6 @@ export class FormController implements FormControllerModel, ObjectWithType {
       return;
     }
 
-    // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
-    if (view.rendered) {
-      return;
-    }
     let desktop = this.session.desktop;
     if (desktop.displayStyle === Desktop.DisplayStyle.COMPACT && !desktop.bench) {
       // Show bench and hide navigation if this is the first view to be shown
@@ -177,7 +176,11 @@ export class FormController implements FormControllerModel, ObjectWithType {
   }
 
   protected _renderDialog(dialog: Form, register: boolean) {
-    let desktop = this.session.desktop;
+    // Prevent "Already rendered" errors (see #162954).
+    if (dialog.rendered) {
+      return;
+    }
+
     if (register) {
       this.displayParent.dialogs.push(dialog);
     }
@@ -191,11 +194,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
       return;
     }
 
-    // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
-    if (dialog.rendered) {
-      return;
-    }
-
+    let desktop = this.session.desktop;
     dialog.on('remove', () => {
       let formToActivate = this._findFormToActivateAfterDialogRemove();
       if (formToActivate) {
@@ -238,14 +237,14 @@ export class FormController implements FormControllerModel, ObjectWithType {
     }
   }
 
-  protected _removeView(view: Form, unregister?: boolean) {
+  protected _removeView(view: Form, unregister?: boolean, showSiblingView?: boolean) {
     unregister = scout.nvl(unregister, true);
     if (unregister) {
       arrays.remove(this.displayParent.views, view);
     }
     // in COMPACT case views are already removed.
     if (this.session.desktop.bench) {
-      this.session.desktop.bench.removeView(view);
+      this.session.desktop.bench.removeView(view, showSiblingView);
     }
   }
 

@@ -9,10 +9,10 @@
  */
 import {
   AbstractLayout, Action, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopBenchViewActivateEvent, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation,
-  DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, GlassPaneTarget, HtmlComponent,
-  HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectOrChildModel, ObjectOrModel, objects, OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, Popup,
-  ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent, SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL,
-  ViewButton, webstorage, Widget, widgets
+  DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, GlassPaneTarget,
+  HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectOrChildModel, ObjectOrModel, objects, OfflineDesktopNotification, OpenUriHandler, Outline,
+  OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent, SplitterPositionChangeEvent, strings, styles, Tooltip, Tree,
+  TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
 
@@ -47,7 +47,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   fileChoosers: FileChooser[];
   outline: Outline;
   activeForm: Form;
-  selectedViewTabs: Form[];
+  selectedViewTabs: Map<DisplayViewId, Form>;
   notifications: DesktopNotification[];
   navigation: DesktopNavigation;
   header: DesktopHeader;
@@ -78,6 +78,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   protected _offlineNotification: OfflineDesktopNotification;
   /** event listeners */
   protected _benchActiveViewChangedHandler: EventHandler<DesktopBenchViewActivateEvent>;
+  protected _selectedViewDestroyHandler: EventHandler<Event<Form>>;
   protected _popstateHandler: (event: JQuery.TriggeredEvent) => void;
 
   constructor() {
@@ -107,7 +108,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.fileChoosers = [];
     this.outline = null;
     this.activeForm = null;
-    this.selectedViewTabs = [];
+    this.selectedViewTabs = new Map();
     this.notifications = [];
     this.navigation = null;
     this.header = null;
@@ -127,10 +128,11 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.$notifications = null;
 
     this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm', 'focusedElement']);
-    this._addPreserveOnPropertyChangeProperties(['focusedElement']);
+    this._addPreserveOnPropertyChangeProperties(['focusedElement', 'selectedViewTabs']);
 
     this._glassPaneTargetFilters = [];
     this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
+    this._selectedViewDestroyHandler = this._onSelectedViewDestroy.bind(this);
   }
 
   static DisplayStyle = {
@@ -171,7 +173,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
      * This is also the preferred action to open URIs with <b>special protocols</b> that are registered in the user's system and delegated to some "protocol
      * handler". This handler may then perform actions in a third party application (e.g. <i>mailto:xyz@example.com</i>
      * would open the system's mail application).<br>
-     * Note that this action may open the object in a new window or tab tab which may be prevented by
+     * Note that this action may open the object in a new window or tab which may be prevented by
      * the browser's popup blocker mechanism.
      */
     OPEN: 'open',
@@ -230,6 +232,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.resolveTextKeys(['title']);
     this._setViews(this.views);
     this._setViewButtons(this.viewButtons);
+    this._setSelectedViewTabs(this.selectedViewTabs);
     this._setMenus(this.menus);
     this._setKeyStrokes(this.keyStrokes);
     this._setBenchLayoutData(this.benchLayoutData);
@@ -395,8 +398,8 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.outline.messageBoxController.render();
     this.outline.fileChooserController.render();
 
-    // this restores the selected view after a page refresh. selectedViewTabs is only set by the server.
-    if (this.outline.selectedViewTabs) {
+    // Restore the selected views after an outline change or select them initially based on the model state
+    if (this.outline.selectedViewTabs.size > 0) {
       this.outline.selectedViewTabs.forEach(selectedView => {
         this.formController._activateView(selectedView);
       });
@@ -1246,7 +1249,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
 
   /** @internal */
   _setFormActivated(form: Form) {
-    // If desktop is in rendering process the can not set a new active form. instead the active form from the model is set selected.
+    // If desktop is in rendering process it can not set a new active form. Instead, the active form from the model is selected.
     if (!this.rendered || this.initialFormRendering) {
       return;
     }
@@ -1259,14 +1262,73 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     if (!form) {
       // no form is activated -> show outline
       this.bringOutlineToFront();
-    } else if (form.displayHint === Form.DisplayHint.VIEW && !form.detailForm && this.bench && this.bench.hasView(form)) {
+    } else if (form.isView() && !form.detailForm && this.bench && this.bench.hasView(form)) {
       // view form was activated. send the outline to back to ensure the form is attached
       // exclude detail forms even though detail forms usually are not activated
       // Also only consider "real" views used in the bench and ignore other views (e.g. used in a form menu)
       this.sendOutlineToBack();
+
+      this._updateSelectedViewTabs(form);
     }
 
     this.triggerFormActivate(form);
+  }
+
+  protected _setSelectedViewTabs(views: Map<DisplayViewId, Form> | Form[]) {
+    this.selectedViewTabs = this.prepareSelectedViewTabs(views);
+  }
+
+  prepareSelectedViewTabs(views: Map<DisplayViewId, Form> | Form[]): Map<DisplayViewId, Form> {
+    let map = new Map();
+    views.forEach(view => {
+      map.set(DesktopBench.normalizeDisplayViewId(view.displayViewId), view);
+      view.one('destroy', this._selectedViewDestroyHandler);
+    });
+    return map;
+  }
+
+  protected _updateSelectedViewTabs(form: Form) {
+    let displayViewId = DesktopBench.normalizeDisplayViewId(form.displayViewId);
+    let selectedViewTabs = this.selectedViewTabs;
+    if (form.displayParent instanceof Outline) {
+      selectedViewTabs = form.displayParent.selectedViewTabs;
+    } else if (form.displayParent instanceof Desktop) {
+      // As soon as a desktop tab was selected, don't remember outline tabs in that section anymore
+      // because it should not automatically unselect a desktop tab when switching outlines
+      this.getOutlines().forEach(outline => outline.selectedViewTabs.delete(displayViewId));
+    } else {
+      return;
+    }
+
+    let previousForm = selectedViewTabs.get(displayViewId);
+    if (previousForm === form) {
+      return;
+    }
+    if (previousForm) {
+      previousForm.off('destroy', this._selectedViewDestroyHandler);
+    }
+    selectedViewTabs.set(displayViewId, form);
+    form.one('destroy', this._selectedViewDestroyHandler);
+  }
+
+  protected _onSelectedViewDestroy(event: Event<Form>) {
+    let form = event.source;
+    let displayViewId = DesktopBench.normalizeDisplayViewId(form.displayViewId);
+    this.getOutlines().forEach(outline => outline.selectedViewTabs.delete(displayViewId));
+    this.selectedViewTabs.delete(displayViewId);
+  }
+
+  getOutlines(): Outline[] {
+    let outlines = new Set<Outline>();
+    for (let child of this.children) {
+      if (child instanceof Outline) {
+        outlines.add(child);
+      }
+      if (child instanceof OutlineViewButton && child.outline) {
+        outlines.add(child.outline);
+      }
+    }
+    return Array.from(outlines);
   }
 
   triggerFormActivate(form: Form) {

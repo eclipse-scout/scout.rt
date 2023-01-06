@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, DisplayParentModel, Menu, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel} from '../index';
+import {Action, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, DisplayParentModel, DisplayViewId, Form, Menu, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel} from '../index';
 
 export interface DesktopModel extends WidgetModel, DisplayParentModel {
   /**
@@ -101,6 +101,12 @@ export interface DesktopModel extends WidgetModel, DisplayParentModel {
    * The currently active {@link Outline}.
    */
   outline?: ObjectOrChildModel<Outline> | string;
+  /**
+   * Configures the forms with {@link Form.DisplayHint.VIEW} that should be selected.
+   *
+   * For each area of the {@link DesktopBench} only one form can be selected.
+   */
+  selectedViewTabs?: Map<DisplayViewId, Form> | Form[] | string[];
   /**
    * The name of the CSS theme to be used for the application.
    * @see Desktop.setTheme

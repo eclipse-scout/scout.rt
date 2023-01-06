@@ -28,8 +28,7 @@ export class FileChooserController {
    */
   registerAndRender(fileChooser: FileChooser) {
     scout.assertProperty(fileChooser, 'displayParent');
-    this.displayParent.fileChoosers.push(fileChooser);
-    this._render(fileChooser);
+    this._render(fileChooser, true);
   }
 
   /**
@@ -59,11 +58,19 @@ export class FileChooserController {
     });
   }
 
-  protected _render(fileChooser: FileChooser) {
+  protected _render(fileChooser: FileChooser, register?: boolean) {
     // missing displayParent (when render is called by reload), use displayParent of FileChooserController
     if (!fileChooser.displayParent) {
       fileChooser._setProperty('displayParent', this.displayParent);
     }
+    // Prevent "Already rendered" errors (see #162954).
+    if (fileChooser.rendered) {
+      return;
+    }
+    if (register) {
+      this.displayParent.fileChoosers.push(fileChooser);
+    }
+
     // Use parent's function or (if not implemented) our own.
     if (this.displayParent.acceptView) {
       if (!this.displayParent.acceptView(fileChooser)) {
@@ -72,10 +79,7 @@ export class FileChooserController {
     } else if (!this.acceptView(fileChooser)) {
       return;
     }
-    // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
-    if (fileChooser.rendered) {
-      return;
-    }
+
     // Open all file choosers in the center of the desktop, except the ones that belong to a popup-window
     // Since the file chooser doesn't have a DOM element as parent when render is called, we must find the
     // entryPoint by using the model.

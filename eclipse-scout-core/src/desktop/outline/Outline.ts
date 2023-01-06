@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget, GroupBox, GroupBoxMenuItemsOrder,
-  HtmlComponent, Icon, InitModelOf, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, ObjectOrChildModel,
-  ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel, PropertyChangeEvent, scout, Table,
-  TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke,
+  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget, GroupBox,
+  GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton,
+  ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel, PropertyChangeEvent,
+  scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke,
   TreeNavigationUpKeyStroke, Widget
 } from '../../index';
 
@@ -46,7 +46,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   /** outline uses different level-paddings that normal trees */
   nodePaddingLevelHierarchyRow: number;
   detailMenuBarVisible: boolean;
-  selectedViewTabs: Form[];
+  selectedViewTabs: Map<DisplayViewId, Form>;
 
   views: Form[];
   dialogs: Form[];
@@ -97,6 +97,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.views = [];
     this.messageBoxes = [];
     this.fileChoosers = [];
+    this.selectedViewTabs = new Map();
     this.formController = null;
     this.messageBoxController = null;
     this.fileChooserController = null;
@@ -110,6 +111,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.nodePaddingLevelHierarchyRow = this.nodePaddingLevelNotCheckable;
     this._scrollDirections = 'y';
     this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
+    this._addPreserveOnPropertyChangeProperties(['selectedViewTabs']);
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -151,6 +153,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this._updateOutlineOverview();
 
     this._setViews(this.views);
+    this._setSelectedViewTabs(this.selectedViewTabs);
     this._setMenus(this.menus);
     this.updateDetailContent();
   }
@@ -1166,6 +1169,10 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
       views.forEach(view => view.setDisplayParent(this));
     }
     this._setProperty('views', views);
+  }
+
+  protected _setSelectedViewTabs(views: Map<DisplayViewId, Form> | Form[]) {
+    this.selectedViewTabs = this.session.desktop.prepareSelectedViewTabs(views);
   }
 
   /**

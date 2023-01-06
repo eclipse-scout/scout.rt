@@ -661,23 +661,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   }
 
   addView(view: OutlineContent, activate?: boolean) {
-    // normalize displayViewId
-    switch (view.displayViewId) {
-      case 'NW':
-      case 'W':
-      case 'SW':
-      case 'N':
-      case 'C':
-      case 'S':
-      case 'NE':
-      case 'E':
-      case 'SE':
-        break;
-      default:
-        // map all other displayViewIds to center
-        view.displayViewId = 'C';
-        break;
-    }
+    view.displayViewId = DesktopBench.normalizeDisplayViewId(view.displayViewId);
     let column = this._getColumn(view.displayViewId);
     this.tabBoxMap[view.id] = column;
     column.addView(view, activate);
@@ -830,6 +814,26 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       });
     });
     return activeViews;
+  }
+
+  static normalizeDisplayViewId(displayViewId: DisplayViewId): DisplayViewId {
+    switch (displayViewId) {
+      case 'NW':
+      case 'W':
+      case 'SW':
+      case 'N':
+      case 'C':
+      case 'S':
+      case 'NE':
+      case 'E':
+      case 'SE':
+        break;
+      default:
+        // map all other displayViewIds to center
+        displayViewId = 'C';
+        break;
+    }
+    return displayViewId;
   }
 }
 export type OutlineContent = Form | Table | OutlineOverview;

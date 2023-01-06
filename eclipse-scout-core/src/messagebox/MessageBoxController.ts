@@ -28,8 +28,7 @@ export class MessageBoxController {
    */
   registerAndRender(messageBox: MessageBox) {
     scout.assertProperty(messageBox, 'displayParent');
-    this.displayParent.messageBoxes.push(messageBox);
-    this._render(messageBox);
+    this._render(messageBox, true);
   }
 
   /**
@@ -59,10 +58,17 @@ export class MessageBoxController {
     });
   }
 
-  protected _render(messageBox: MessageBox) {
+  protected _render(messageBox: MessageBox, register?: boolean) {
     // missing displayParent (when render is called by reload), use displayParent of MessageBoxController
     if (!messageBox.displayParent) {
       messageBox._setProperty('displayParent', this.displayParent);
+    }
+    // Prevent "Already rendered" errors (see #162954).
+    if (messageBox.rendered) {
+      return;
+    }
+    if (register) {
+      this.displayParent.messageBoxes.push(messageBox);
     }
     // Use parent's function or (if not implemented) our own.
     if (this.displayParent.acceptView) {
@@ -73,10 +79,6 @@ export class MessageBoxController {
       return;
     }
 
-    // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
-    if (messageBox.rendered) {
-      return;
-    }
     // Open all message boxes in the center of the desktop, except message-boxes that belong to a popup-window
     // Since the message box doesn't have a DOM element as parent when render is called, we must find the
     // entryPoint by using the model.
