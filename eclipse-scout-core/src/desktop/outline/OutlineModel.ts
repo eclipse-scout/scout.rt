@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DisplayParentModel, Form, ObjectOrChildModel, ObjectOrModel, Page, TreeModel} from '../../index';
+import {DisplayParentModel, DisplayViewId, Form, ObjectOrChildModel, ObjectOrModel, Page, TreeModel} from '../../index';
 
 export interface OutlineModel extends TreeModel, DisplayParentModel {
   nodes?: ObjectOrModel<Page>[];
@@ -22,4 +22,5 @@ export interface OutlineModel extends TreeModel, DisplayParentModel {
   titleVisible?: boolean;
   nodeMenuBarVisible?: boolean;
   detailMenuBarVisible?: boolean;
+  selectedViewTabs?: Map<DisplayViewId, Form> | Form[] | string[];
 }

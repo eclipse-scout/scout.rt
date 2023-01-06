@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
 import {
-  arrays, BusyIndicator, Button, DateField, DatePickerPopup, Desktop, DesktopNotification, DesktopTab, Device, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, Outline, Popup, RemoteEvent, scout, SmartField,
-  SmartFieldPopup, Status, StringField, strings, Tooltip, UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
+  arrays, BusyIndicator, Button, DateField, DatePickerPopup, Desktop, DesktopNotification, DesktopTab, Device, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, ObjectOrChildModel, Outline, OutlineViewButton,
+  Popup, RemoteEvent, scout, SmartField, SmartFieldPopup, Status, StringField, strings, Tooltip, UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
 } from '../../src/index';
 
 describe('Desktop', () => {
@@ -2168,6 +2168,274 @@ describe('Desktop', () => {
       desktop.$container.find('.messagebox');
       expect($messageBox.length).toBe(1);
       expect($messageBox.find('.glasspane').length).toBe(0);
+    });
+  });
+
+
+  describe('views', () => {
+    let formModel = {
+      objectType: Form,
+      modal: false,
+      displayHint: Form.DisplayHint.VIEW,
+      rootGroupBox: {
+        objectType: GroupBox
+      }
+    };
+
+    it('are displayed when desktop is rendered', () => {
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true,
+          views: [
+            {
+              id: 'form1',
+              title: 'form1',
+              ...formModel
+            },
+            {
+              id: 'form2',
+              title: 'form2',
+              ...formModel
+            }
+          ]
+        }
+      });
+      let desktop = session.desktop;
+      expect(desktop.bench.getTabBox('C').getViews().length).toBe(2);
+      expect(desktop.bench.getTabBox('C').currentView).toBe(desktop.views[1]);
+      expect(desktop.views[0].rendered).toBe(false);
+      expect(desktop.views[1].rendered).toBe(true);
+    });
+
+    it('are not registered multiple times if view is also shown manually', () => {
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true,
+          views: [
+            {
+              id: 'form1',
+              title: 'form1',
+              ...formModel
+            },
+            {
+              id: 'form2',
+              title: 'form2',
+              ...formModel
+            }
+          ]
+        }
+      });
+      let desktop = session.desktop;
+      expect(desktop.bench.getTabBox('C').getViews().length).toBe(2);
+      expect(desktop.views[1].rendered).toBe(true);
+
+      // Do nothing if showForm is called even though desktop already contains it (may happen in certain situations in Scout classic, #162954).
+      desktop.showForm(desktop.views[1]);
+      expect(desktop.bench.getTabBox('C').getViews().length).toBe(2);
+      expect(desktop.views.length).toBe(2);
+    });
+  });
+
+  describe('selectedViewTabs', () => {
+    let formModel: ObjectOrChildModel<Form> = {
+      objectType: Form,
+      modal: false,
+      displayHint: Form.DisplayHint.VIEW,
+      displayViewId: 'E',
+      rootGroupBox: {
+        objectType: GroupBox
+      }
+    };
+
+    it('allows to select a specific view on startup', () => {
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true,
+          selectedViewTabs: ['form2'],
+          views: [
+            {
+              id: 'form1',
+              ...formModel
+            },
+            {
+              id: 'form2',
+              ...formModel
+            }
+          ]
+        }
+      });
+      let desktop = session.desktop;
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('form2');
+    });
+
+    it('is cleaned up correctly when views are destroyed', () => {
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true,
+          selectedViewTabs: ['form1'],
+          views: [
+            {
+              id: 'form1',
+              ...formModel
+            }
+          ]
+        }
+      });
+      let desktop = session.desktop;
+      expect(desktop.selectedViewTabs.get('E') instanceof Form).toBe(true);
+      expect(desktop.selectedViewTabs.get('E').id).toBe('form1');
+
+      desktop.views[0].close();
+      expect(desktop.selectedViewTabs.size).toBe(0);
+    });
+
+
+    it('allows to select a specific outline based view on startup', () => {
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true,
+          outline: 'outline1',
+          viewButtons: [
+            {
+              objectType: OutlineViewButton,
+              outline: {
+                id: 'outline1',
+                objectType: Outline,
+                selectedViewTabs: ['form2'],
+                views: [
+                  {
+                    id: 'form1',
+                    ...formModel
+                  },
+                  {
+                    id: 'form2',
+                    ...formModel
+                  }
+                ]
+              }
+            },
+            {
+              objectType: OutlineViewButton,
+              outline: {
+                id: 'outline2',
+                objectType: Outline,
+                selectedViewTabs: ['o2form2'],
+                views: [
+                  {
+                    id: 'o2form1',
+                    ...formModel
+                  },
+                  {
+                    id: 'o2form2',
+                    ...formModel
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      });
+      let desktop = session.desktop;
+      expect(desktop.outline.id).toBe('outline1');
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('form2');
+
+      desktop.setOutline((desktop.viewButtons[1] as OutlineViewButton).outline);
+      expect(desktop.outline.id).toBe('outline2');
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('o2form2');
+    });
+
+    it('are used to restore the views when outline is changed', () => {
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true,
+          outline: 'outline1',
+          views: [
+            {
+              id: 'desktopform',
+              ...formModel
+            }
+          ],
+          viewButtons: [
+            {
+              objectType: OutlineViewButton,
+              outline: {
+                id: 'outline1',
+                objectType: Outline,
+                selectedViewTabs: ['form2'],
+                views: [
+                  {
+                    id: 'form1',
+                    ...formModel
+                  },
+                  {
+                    id: 'form2',
+                    ...formModel
+                  }
+                ]
+              }
+            },
+            {
+              objectType: OutlineViewButton,
+              outline: {
+                id: 'outline2',
+                objectType: Outline,
+                selectedViewTabs: ['o2form2'],
+                views: [
+                  {
+                    id: 'o2form1',
+                    ...formModel
+                  },
+                  {
+                    id: 'o2form2',
+                    ...formModel
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      });
+      let desktop = session.desktop;
+      expect(desktop.outline.id).toBe('outline1');
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('form2');
+
+      desktop.activateForm(desktop.widget('form1') as Form);
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('form1');
+
+      desktop.setOutline((desktop.viewButtons[1] as OutlineViewButton).outline);
+      expect(desktop.outline.id).toBe('outline2');
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('o2form2');
+
+      desktop.activateForm(desktop.widget('o2form1') as Form);
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('o2form1');
+
+      desktop.setOutline((desktop.viewButtons[0] as OutlineViewButton).outline);
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('form1');
+
+      desktop.setOutline((desktop.viewButtons[1] as OutlineViewButton).outline);
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('o2form1');
+
+      // As soon as a desktop view is activated in the same area, the outline based selection is removed
+      desktop.activateForm(desktop.widget('desktopform') as Form);
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('desktopform');
+
+      desktop.setOutline((desktop.viewButtons[0] as OutlineViewButton).outline);
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('desktopform');
+
+      desktop.setOutline((desktop.viewButtons[1] as OutlineViewButton).outline);
+      expect(desktop.bench.getTabBox('E').currentView.id).toBe('desktopform');
     });
   });
 

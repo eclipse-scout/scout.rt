@@ -1490,14 +1490,14 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     // Create new child widget(s)
     let widgets = this._createChildren(models);
 
-    let oldWidgets = this[propertyName];
-    if (oldWidgets && Array.isArray(widgets)) {
-      // If new value is an array, old value has to be one as well
-      // Only destroy those which are not in the new array
-      oldWidgets = arrays.diff(oldWidgets, widgets);
-    }
-
     if (!this.isPreserveOnPropertyChangeProperty(propertyName)) {
+      let oldWidgets = this[propertyName];
+      if (oldWidgets && Array.isArray(widgets)) {
+        // If new value is an array, old value has to be one as well
+        // Only destroy those which are not in the new array
+        oldWidgets = arrays.diff(oldWidgets, widgets);
+      }
+
       // Destroy old child widget(s)
       this._destroyChildren(oldWidgets);
 
