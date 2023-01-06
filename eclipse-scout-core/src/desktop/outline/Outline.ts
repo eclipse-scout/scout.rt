@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,6 +68,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   };
   protected _detailMenusChangeHandler: EventHandler<PropertyChangeEvent<any, Widget>>;
   protected _detailMenusDestroyHandler: EventHandler<Event<Widget>>;
+  protected _defaultDetailFormDestroyHandler: EventHandler<Event<Form>>;
 
   constructor() {
     super();
@@ -103,6 +104,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.textFilterEnabled = false;
     this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
     this._detailMenusNodesSelectedHandler = null;
+    this._defaultDetailFormDestroyHandler = this._onDefaultDetailFormDestroy.bind(this);
     this._additionalContainerClasses += ' outline';
     this.nodePaddingLevelCheckable = 20; /* outline is not checkable. set to same value as not-checkable */
     this.nodePaddingLevelNotCheckable = 20;
@@ -490,16 +492,30 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   protected _setDefaultDetailForm(defaultDetailForm: Form) {
     if (this.defaultDetailForm) {
       this.defaultDetailForm.detailForm = false;
+      this.defaultDetailForm.off('destroy', this._defaultDetailFormDestroyHandler);
     }
     this._setProperty('defaultDetailForm', defaultDetailForm);
     if (this.defaultDetailForm) {
-      this.defaultDetailForm.setClosable(false);
-      this.defaultDetailForm.detailForm = true;
+      this._adaptDefaultDetailForm(this.defaultDetailForm);
+      this.defaultDetailForm.one('destroy', this._defaultDetailFormDestroyHandler);
     }
     if (this.initialized) {
       this._updateOutlineOverview();
       this.updateDetailContent();
     }
+  }
+
+  protected _adaptDefaultDetailForm(form: Form) {
+    form.setModal(false);
+    form.setClosable(false);
+    form.setDisplayHint(Form.DisplayHint.VIEW);
+    form.setDisplayViewId('C');
+    form.setShowOnOpen(false);
+    form.detailForm = true;
+  }
+
+  protected _onDefaultDetailFormDestroy(event: Event<Form>) {
+    this.setDefaultDetailForm(null);
   }
 
   setOutlineOverviewVisible(outlineOverviewVisible: boolean) {
