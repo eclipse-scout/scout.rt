@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, Menu, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel} from '../index';
+import {Action, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, FileChooser, Form, Menu, MessageBox, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel} from '../index';
 
 export interface DesktopModel extends WidgetModel {
   nativeNotificationDefaults?: NativeNotificationDefaults;
@@ -28,9 +28,13 @@ export interface DesktopModel extends WidgetModel {
   menus?: ObjectOrChildModel<Menu>[];
   notifications?: ObjectOrChildModel<DesktopNotification>[];
   addOns?: ObjectOrChildModel<Widget>[];
+  dialogs?: ObjectOrChildModel<Form>[];
+  views?: ObjectOrChildModel<Form>[];
+  messageBoxes?: ObjectOrChildModel<MessageBox>[];
+  fileChoosers?: ObjectOrChildModel<FileChooser>[];
   keyStrokes?: ObjectOrChildModel<Action>[];
   viewButtons?: ObjectOrChildModel<ViewButton>[];
-  outline?: ObjectOrChildModel<Outline>;
+  outline?: ObjectOrChildModel<Outline> | string;
   inBackground?: boolean;
   theme?: string;
   dense?: boolean;

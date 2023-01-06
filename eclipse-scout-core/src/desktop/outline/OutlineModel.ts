@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, ObjectOrChildModel, ObjectOrModel, Page, TreeModel} from '../../index';
+import {FileChooser, Form, MessageBox, ObjectOrChildModel, ObjectOrModel, Page, TreeModel} from '../../index';
 
 export interface OutlineModel extends TreeModel {
   nodes?: ObjectOrModel<Page>[];
@@ -23,4 +23,8 @@ export interface OutlineModel extends TreeModel {
   titleVisible?: boolean;
   nodeMenuBarVisible?: boolean;
   detailMenuBarVisible?: boolean;
+  dialogs?: ObjectOrChildModel<Form>[];
+  views?: ObjectOrChildModel<Form>[];
+  messageBoxes?: ObjectOrChildModel<MessageBox>[];
+  fileChoosers?: ObjectOrChildModel<FileChooser>[];
 }
