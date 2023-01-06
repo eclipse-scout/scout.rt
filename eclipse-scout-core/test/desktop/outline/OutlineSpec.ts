@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -582,6 +582,36 @@ describe('Outline', () => {
       outline.setDefaultDetailForm(form);
       expect(outline.outlineOverview).toBe(null);
       expect(outline.defaultDetailForm.rendered).toBe(true);
+    });
+  });
+
+  describe('defaultDetailForm', () => {
+    beforeEach(() => {
+      session = sandboxSession({
+        desktop: {
+          navigationVisible: true,
+          headerVisible: true,
+          benchVisible: true
+        }
+      });
+    });
+
+    it('is set to null if getting destroyed', () => {
+      let outline = helper.createOutline();
+      session.desktop.setOutline(outline);
+      expect(outline.defaultDetailForm).toBe(null);
+      expect(outline.outlineOverview.rendered).toBe(true);
+
+      let form = formHelper.createFormWithOneField();
+      outline.setDefaultDetailForm(form);
+      expect(outline.defaultDetailForm).toBe(form);
+      expect(form.rendered).toBe(true);
+      expect(outline.outlineOverview).toBe(null);
+
+      form.close();
+      expect(form.destroyed).toBe(true);
+      expect(outline.defaultDetailForm).toBe(null);
+      expect(outline.outlineOverview.rendered).toBe(true);
     });
   });
 });

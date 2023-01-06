@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -45,6 +45,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
@@ -95,6 +97,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   // internal usage of menus temporarily added to the tree.
   private List<IMenu> m_inheritedMenusOfPage;
+
+  private FormListener m_defaultDetailFormDisposeListener;
 
   public AbstractOutline() {
     super();
@@ -757,7 +761,21 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void setDefaultDetailForm(IForm form) {
+    IForm previousForm = getDefaultDetailForm();
+    if (form == previousForm) {
+      return;
+    }
+    if (previousForm != null) {
+      previousForm.removeFormListener(m_defaultDetailFormDisposeListener);
+      m_defaultDetailFormDisposeListener = null;
+    }
     if (form != null) {
+      m_defaultDetailFormDisposeListener = e -> {
+        if (e.getType() == FormEvent.TYPE_CLOSED) {
+          setDefaultDetailForm(null);
+        }
+      };
+      form.addFormListener(m_defaultDetailFormDisposeListener);
       if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
         form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
       }
