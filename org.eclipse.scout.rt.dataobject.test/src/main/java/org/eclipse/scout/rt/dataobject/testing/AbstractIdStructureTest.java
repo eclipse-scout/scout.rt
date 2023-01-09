@@ -38,8 +38,6 @@ import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tests the structure of {@link IId} classes.
@@ -58,8 +56,6 @@ import org.slf4j.LoggerFactory;
  */
 @RunWith(Parameterized.class)
 public abstract class AbstractIdStructureTest {
-
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractIdStructureTest.class);
 
   protected static Stream<Class<? extends IId>> streamIdClasses(String packageNameFilter) {
     return ClassInventory.get().getAllKnownSubClasses(IId.class).stream()

@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.dataobject.id;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * TODO [24.0] PBZ remove this class, was replaced by {@link IdCodec} and {@link IdInventory}
@@ -24,8 +22,6 @@ import org.slf4j.LoggerFactory;
 @Deprecated
 @ApplicationScoped
 public class IdExternalFormatter {
-
-  private static final Logger LOG = LoggerFactory.getLogger(IdExternalFormatter.class);
 
   private final LazyValue<IdCodec> m_codec = new LazyValue<>(IdCodec.class);
   private final LazyValue<IdInventory> m_inventory = new LazyValue<>(IdInventory.class);

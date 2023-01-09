@@ -31,6 +31,7 @@ import org.junit.Test;
 /**
  * Abstract test cases for {@link IdCodec} implementation.
  */
+@SuppressWarnings("squid:S00100")
 public abstract class AbstractIdCodecTest {
 
   protected static final UUID TEST_UUID = UUID.fromString("5833aae1-c813-4d7c-a342-56a53772a3ea");
@@ -404,7 +405,7 @@ public abstract class AbstractIdCodecTest {
   public void testFromQualifiedLenient_Default() {
     FixtureUuId id = FixtureUuId.of(TEST_UUID);
     IId id2 = getCodec().fromQualifiedLenient("scout.FixtureUuId:" + TEST_UUID);
-    assertEquals(id, id);
+    assertEquals(id, id2);
   }
 
   @Test

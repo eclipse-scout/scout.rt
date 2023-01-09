@@ -10,33 +10,14 @@
  */
 package org.eclipse.scout.rt.rest.jersey.client;
 
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import javax.net.ssl.SSLSocketFactory;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Configuration;
 
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.HttpConnectionFactory;
-import org.apache.http.conn.ManagedHttpClientConnection;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.util.PublicSuffixMatcherLoader;
-import org.apache.http.impl.conn.DefaultHttpResponseParserFactory;
-import org.apache.http.impl.conn.ManagedHttpClientConnectionFactory;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.impl.io.DefaultHttpRequestWriterFactory;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.rest.IRestHttpRequestUriEncoder;
 import org.eclipse.scout.rt.rest.client.IRestClientConfigFactory;
 import org.eclipse.scout.rt.rest.client.RestClientProperties;
 import org.eclipse.scout.rt.rest.client.RestClientProperties.LoggerVerbosity;
