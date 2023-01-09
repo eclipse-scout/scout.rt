@@ -1,22 +1,17 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
@@ -26,6 +21,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockMakers;
 import org.mockito.Mockito;
 
 import com.google.api.client.http.HttpResponse;
@@ -42,7 +38,7 @@ public class RemoteServiceInvocationCallableDisconnectTest {
   @Before
   public void prepareRemoteServiceInvocationCallable() throws IOException {
     ServiceTunnelRequest mockRequest = mock(ServiceTunnelRequest.class);
-    m_mockResponse = mock(HttpResponse.class);
+    m_mockResponse = mock(HttpResponse.class, Mockito.withSettings().mockMaker(MockMakers.INLINE));
 
     HttpServiceTunnel mockTunnel = mock(HttpServiceTunnel.class);
     when(mockTunnel.getContentHandler()).thenReturn(mock(IServiceTunnelContentHandler.class));
