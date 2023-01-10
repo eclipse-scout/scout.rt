@@ -64,7 +64,8 @@ public class CookieAccessController implements IAccessController {
     m_cookieName = CONFIG.getPropertyValue(NameProperty.class);
     m_maxAge = CONFIG.getPropertyValue(MaxAgeProperty.class);
     m_signKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
-    if (m_signKey == null) {
+    if (m_enabled && m_signKey == null) {
+      // don't enforce sign key if not enabled
       throw new PlatformException("Missing config.properties entry used for signing auth data: '{}'", BEANS.get(AuthTokenPrivateKeyProperty.class).getKey());
     }
   }
