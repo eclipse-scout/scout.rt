@@ -159,6 +159,7 @@ public class JsonDataObjectsSerializationTest {
   protected static final Date DATE_TRUNCATED = DateUtility.parse("1990-10-20 00:00:00.000", IValueFormatConstants.DEFAULT_DATE_PATTERN);
   protected static final Date DATE = DateUtility.parse("2017-11-30 17:29:12.583", IValueFormatConstants.DEFAULT_DATE_PATTERN);
   protected static final Date DATE_2 = DateUtility.parse("2017-12-30 16:13:44.879", IValueFormatConstants.DEFAULT_DATE_PATTERN);
+  protected static final Date DATE_TIMEZONE = DateUtility.parse("2022-07-11T08:49:42.654Z", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
   protected static final UUID UUID_1 = UUID.fromString("ab8b13a4-b2a0-47a0-9d79-80039417b843");
   protected static final UUID UUID_2 = UUID.fromString("87069a20-6fc5-4b6a-9bc2-2e6cb75d7571");
@@ -457,9 +458,25 @@ public class JsonDataObjectsSerializationTest {
         .build(), testDo.getBrDefault());
   }
 
+  /**
+   * Testcase ensures that correct entity object is set as "current value" on json parser to deserialize fields with
+   * special formatting annotation located after _type attribute.
+   */
   @Test
-  public void testDeserializeTestDateDo_UnorderedAttributes() throws Exception {
+  public void testDeserializeTestDateDo_UnorderedSpecialAttributesAfterType() throws Exception {
     runTestDeserializeTestDateDo("TestDateDoUnorderedAttributes.json");
+    runTestDeserializeTestDateDo("TestDateDoUnorderedAttributes2.json");
+    runTestDeserializeTestDateDo("TestDateDoUnorderedAttributes3.json");
+  }
+
+  /**
+   * Testcase ensures that correct entity object is set as "current value" on json parser to deserialize fields with
+   * special formatting annotation located before _type attribute.
+   */
+  @Test
+  public void testDeserializeTestDateDo_UnorderedSpecialAttributesBeforeType() throws Exception {
+    runTestDeserializeTestDateDo("TestDateDoUnorderedAttributes4.json");
+    runTestDeserializeTestDateDo("TestDateDoUnorderedAttributes4.json");
   }
 
   @Test
@@ -478,6 +495,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(DATE, marshalled.dateDefault().get());
     assertEquals(DATE_TRUNCATED, marshalled.dateOnly().get());
     assertEquals(DateUtility.truncDateToMonth(DATE_TRUNCATED), marshalled.getDateYearMonth());
+    assertEquals(DATE_TIMEZONE, marshalled.aaaDate().get());
   }
 
   @Test
@@ -2712,13 +2730,15 @@ public class JsonDataObjectsSerializationTest {
     testDo.withADummySet(CollectionUtility.hashSet("1", "2"))
         .withDateWithTimestamp(DATE)
         .withDateOnly(DATE_TRUNCATED);
-
+    testDo.withZDummySet(CollectionUtility.hashSet("3", "4"));
     String json = s_dataObjectMapper.writeValueAsString(testDo);
 
     // deserialize and check
     TestDateDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestDateDo.class);
     assertEquals(DATE, testDoMarshalled.getDateWithTimestamp());
     assertEquals(DATE_TRUNCATED, testDoMarshalled.getDateOnly());
+    assertEquals(Set.of("1", "2"), testDoMarshalled.getADummySet());
+    assertEquals(Set.of("3", "4"), testDoMarshalled.getZDummySet());
   }
 
   @Test
