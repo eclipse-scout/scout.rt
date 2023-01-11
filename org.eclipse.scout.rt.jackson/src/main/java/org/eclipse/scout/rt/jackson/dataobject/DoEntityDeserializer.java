@@ -102,12 +102,14 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       if (m_moduleContext.getTypeAttributeName().equals(attributeName)) {
         String entityType = p.getText();
         IDoEntity entity = resolveEntityType(ctxt, entityType);
-        p.setCurrentValue(entity); // set current entity object as current value on parser before parser is merged with token buffer holding cached fields
+        p.setCurrentValue(entity); // set current entity object as current value on parser (used for correct typing of field read after finding _type attribute)
 
         // put back the cached fields of token buffer to parser, if any fields were cached while searching type property
         if (tb != null) {
           p.clearCurrentToken();
-          p = JsonParserSequence.createFlattened(false, tb.asParser(p), p);
+          JsonParser tbParser = tb.asParser(p);
+          tbParser.setCurrentValue(entity); // set current entity object as current value on parser created out of cached token buffer (used for correct typing of field read into token buffer before finding _type attribute)
+          p = JsonParserSequence.createFlattened(false, tbParser, p);
         }
         p.nextToken(); // skip type field value
         return deserializeDoEntityAttributes(p, ctxt, entity);
