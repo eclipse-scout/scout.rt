@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.security;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -19,7 +20,7 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * This class provides support for symmetric encryption/description. {@link StandardCharsets#UTF_8} is used.
+ * This class provides support for symmetric encryption/decryption. {@link StandardCharsets#UTF_8} is used.
  * <p>
  * Call {@link #init(char[], int)} before using this class to encrypt/decrypt.
  * <p>
@@ -31,7 +32,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * <li>Part 2: encrypted data
  * </ul>
  * The salt and encrypted data are base64-encoded (optionally url safe). The profile indicator is used to distinguish
- * between different supported encryption profiles. Currently there is only one supported profile, the one used within
+ * between different supported encryption profiles. Currently, there is only one supported profile, the one used within
  * {@link ISecurityProvider}. If in a future release the default implementation within {@link ISecurityProvider}
  * changes, a new profile will be added to support the decryption of legacy secrets.
  */
@@ -66,9 +67,7 @@ public class Crypter {
     if (m_password == null) {
       return;
     }
-    for (int i = 0; i < m_password.length; i++) {
-      m_password[i] = 0;
-    }
+    Arrays.fill(m_password, (char) 0);
     m_password = null;
   }
 
