@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
@@ -22,15 +21,6 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Description: Allows to store multiple time ranges. There are no overlapping on the stored ranges.
- * <p>
- * e.g. {'1.1.2006 13:00'-'1.1.2006 14:00', '2.1.2006 12:00'-'3.1.2006 12:00'} Copyright (c) 2006 BSI AG Company: BSI AG
- * - www.bsiag.com
- *
- * @since 03.02.2006
- * @version 1.0
- */
 class MultiTimeRange {
   private static final Logger LOG = LoggerFactory.getLogger(MultiTimeRange.class);
 

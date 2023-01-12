@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  - Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  -
+  - This program and the accompanying materials are made
+  - available under the terms of the Eclipse Public License 2.0
+  - which is available at https://www.eclipse.org/legal/epl-2.0/
+  -
+  - SPDX-License-Identifier: EPL-2.0
+  -->
+
 <!-- Generator: Adobe Illustrator 25.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 14.5146 24" style="enable-background:new 0 0 14.5146 24;" xml:space="preserve">
-<polygon points="13.4531,7.8416 7.2568,14.0374 1.0605,7.8416 0,8.9022 7.145,16.0462 7.2568,16.1585 14.4023,9.014 14.5146,8.9022 
+<polygon points="13.4531,7.8416 7.2568,14.0374 1.0605,7.8416 0,8.9022 7.145,16.0462 7.2568,16.1585 14.4023,9.014 14.5146,8.9022
 	"/>
 </svg>

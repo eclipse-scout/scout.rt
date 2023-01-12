@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.platform.resource;
 
@@ -17,7 +16,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.util.FileUtility;
@@ -27,7 +25,6 @@ import org.eclipse.scout.rt.platform.util.FileUtility;
  */
 public final class MimeTypes {
   private static final Map<String/*ext-lowercase*/, IMimeType> EXT_TO_MIMETYPE = Collections.synchronizedMap(new LinkedHashMap<>());
-  private static final Pattern EXT_LIST_PATTERN = Pattern.compile("[\\s,;.]");
 
   static {
     for (MimeType t : MimeType.values()) {

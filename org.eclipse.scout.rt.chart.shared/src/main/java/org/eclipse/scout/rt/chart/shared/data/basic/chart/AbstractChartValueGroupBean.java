@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
@@ -19,7 +18,6 @@ public abstract class AbstractChartValueGroupBean implements IChartValueGroupBea
   private Object m_groupKey;
   private String m_groupName;
   private String m_colorHexValue;
-  private String m_cssClass;
   private boolean m_clickable = true;
 
   @Override
