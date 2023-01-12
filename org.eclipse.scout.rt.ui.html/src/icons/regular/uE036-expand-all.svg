@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  - Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  -
+  - This program and the accompanying materials are made
+  - available under the terms of the Eclipse Public License 2.0
+  - which is available at https://www.eclipse.org/legal/epl-2.0/
+  -
+  - SPDX-License-Identifier: EPL-2.0
+  -->
+
 <!-- Generator: Adobe Illustrator 25.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 19.9097 24" style="enable-background:new 0 0 19.9097 24;" xml:space="preserve">
 <g>
-	<polygon points="9.8435,20.1053 9.9548,20.2176 13.9713,16.2011 14.0836,16.0898 13.0231,15.0292 9.9548,18.0966 6.8865,15.0292 
+	<polygon points="9.8435,20.1053 9.9548,20.2176 13.9713,16.2011 14.0836,16.0898 13.0231,15.0292 9.9548,18.0966 6.8865,15.0292
 		5.826,16.0898 	"/>
 	<polygon points="9.9548,5.9005 13.0231,8.9678 14.0836,7.9073 9.9548,3.78 5.826,7.9073 6.8865,8.9678 	"/>
 	<rect y="-0.0002" width="19.9097" height="1.4995"/>

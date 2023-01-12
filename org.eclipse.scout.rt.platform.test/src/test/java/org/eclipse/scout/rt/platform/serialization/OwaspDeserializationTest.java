@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.eclipse.scout.rt.platform.serialization;
 
 import static org.junit.Assert.*;
@@ -70,7 +79,7 @@ public class OwaspDeserializationTest {
     Predicate<String> blacklist = SerializationUtility.createBlacklistPolicy((String) null);
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Long(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Long.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .withBlacklist(blacklist)
@@ -82,7 +91,7 @@ public class OwaspDeserializationTest {
     Predicate<String> blacklist = SerializationUtility.createBlacklistPolicy(Pattern.quote("java.util.concurrent.atomic.AtomicLong"));
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Long(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Long.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .withBlacklist(blacklist)
@@ -94,7 +103,7 @@ public class OwaspDeserializationTest {
     Predicate<String> blacklist = SerializationUtility.createBlacklistPolicy(Pattern.quote("java.util.concurrent.atomic.AtomicLong"));
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new AtomicLong(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), new AtomicLong(123)));
     SerializationUtility
         .createObjectSerializer()
         .withBlacklist(blacklist)
@@ -105,7 +114,7 @@ public class OwaspDeserializationTest {
   public void testDefaultBlacklistOk() throws IOException, ClassNotFoundException {
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Long(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Long.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -115,7 +124,7 @@ public class OwaspDeserializationTest {
   public void testDefaultBlacklistNok() throws IOException, ClassNotFoundException {
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new javax.naming.Reference("foo")));
+        .serialize(Arrays.asList(Long.valueOf(123), new javax.naming.Reference("foo")));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -127,7 +136,7 @@ public class OwaspDeserializationTest {
 
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Long(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Long.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -139,7 +148,7 @@ public class OwaspDeserializationTest {
 
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new AtomicLong(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), new AtomicLong(123)));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -151,7 +160,7 @@ public class OwaspDeserializationTest {
 
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new javax.naming.Reference("foo")));
+        .serialize(Arrays.asList(Long.valueOf(123), new javax.naming.Reference("foo")));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -163,7 +172,7 @@ public class OwaspDeserializationTest {
 
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Long(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Long.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -175,7 +184,7 @@ public class OwaspDeserializationTest {
 
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new AtomicLong(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), new AtomicLong(123)));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -187,7 +196,7 @@ public class OwaspDeserializationTest {
 
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new javax.naming.Reference("foo")));
+        .serialize(Arrays.asList(Long.valueOf(123), new javax.naming.Reference("foo")));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -203,7 +212,7 @@ public class OwaspDeserializationTest {
         Pattern.quote("java.lang.Long"));
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Long(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Long.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .withWhitelist(whitelist)
@@ -220,7 +229,7 @@ public class OwaspDeserializationTest {
         Pattern.quote("java.lang.Long"));
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Integer(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Integer.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .withWhitelist(whitelist)
@@ -238,7 +247,7 @@ public class OwaspDeserializationTest {
 
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Long(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Long.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);
@@ -255,7 +264,7 @@ public class OwaspDeserializationTest {
 
     byte[] bytes = SerializationUtility
         .createObjectSerializer()
-        .serialize(Arrays.asList(new Long(123), new Integer(123)));
+        .serialize(Arrays.asList(Long.valueOf(123), Integer.valueOf(123)));
     SerializationUtility
         .createObjectSerializer()
         .deserialize(bytes, List.class);

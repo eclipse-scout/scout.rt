@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  - Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  -
+  - This program and the accompanying materials are made
+  - available under the terms of the Eclipse Public License 2.0
+  - which is available at https://www.eclipse.org/legal/epl-2.0/
+  -
+  - SPDX-License-Identifier: EPL-2.0
+  -->
+
 <!-- Generator: Adobe Illustrator 25.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 29.3774 24" style="enable-background:new 0 0 29.3774 24;" xml:space="preserve">
 <g>
-	<polygon points="25.9741,11.8045 29.146,6.8709 27.3618,6.8709 25.0815,10.4158 22.8013,6.8709 21.019,6.8709 24.1899,11.8045 
+	<polygon points="25.9741,11.8045 29.146,6.8709 27.3618,6.8709 25.0815,10.4158 22.8013,6.8709 21.019,6.8709 24.1899,11.8045
 		20.7866,17.096 22.5708,17.096 25.0815,13.1922 27.5933,17.096 29.3774,17.096 	"/>
 	<path d="M16.3306,6.8714h-1.5293L10.8994,17.096h1.6055l1.0845-2.8423h3.9531l1.085,2.8423h1.6055L16.3696,6.973L16.3306,6.8714z
 		 M16.9692,12.7537h-2.8076l1.4043-3.6792L16.9692,12.7537z"/>
-	<polygon points="5.0747,14.5589 2.2251,6.8792 0,6.8792 0,17.096 1.4995,17.096 1.4995,9.2342 4.3784,16.9925 4.4165,17.096 
+	<polygon points="5.0747,14.5589 2.2251,6.8792 0,6.8792 0,17.096 1.4995,17.096 1.4995,9.2342 4.3784,16.9925 4.4165,17.096
 		5.7329,17.096 8.6494,9.2342 8.6494,17.096 10.1489,17.096 10.1489,6.8792 7.9238,6.8792 	"/>
 </g>
 </svg>

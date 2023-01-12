@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  - Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  -
+  - This program and the accompanying materials are made
+  - available under the terms of the Eclipse Public License 2.0
+  - which is available at https://www.eclipse.org/legal/epl-2.0/
+  -
+  - SPDX-License-Identifier: EPL-2.0
+  -->
+
 <!-- Generator: Adobe Illustrator 25.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 22.7271 24" style="enable-background:new 0 0 22.7271 24;" xml:space="preserve">
 <g>
-	<polygon points="8.0059,21.0208 8.0059,0.1732 6.5063,0.1732 6.5063,21.0208 1.0601,15.5745 0,16.6351 7.144,23.7806 
+	<polygon points="8.0059,21.0208 8.0059,0.1732 6.5063,0.1732 6.5063,21.0208 1.0601,15.5745 0,16.6351 7.144,23.7806
 		7.2559,23.8929 14.4019,16.7464 14.5142,16.6351 13.4517,15.5745 	"/>
-	<polygon points="22.7271,4.679 21.6665,3.619 18.3169,6.9691 14.9673,3.619 13.9067,4.679 17.2554,8.0291 13.9067,11.3797 
+	<polygon points="22.7271,4.679 21.6665,3.619 18.3169,6.9691 14.9673,3.619 13.9067,4.679 17.2554,8.0291 13.9067,11.3797
 		14.9673,12.4398 18.3169,9.0897 21.6665,12.4398 22.7271,11.3797 19.3774,8.0291 	"/>
 </g>
 </svg>

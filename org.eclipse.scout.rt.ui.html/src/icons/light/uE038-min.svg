@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  - Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  -
+  - This program and the accompanying materials are made
+  - available under the terms of the Eclipse Public License 2.0
+  - which is available at https://www.eclipse.org/legal/epl-2.0/
+  -
+  - SPDX-License-Identifier: EPL-2.0
+  -->
+
 <!-- Generator: Adobe Illustrator 25.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 26.5044 24" style="enable-background:new 0 0 26.5044 24;" xml:space="preserve">
 <g>
 	<rect x="14.1792" y="7.0545" width="1.0078" height="9.8916"/>
-	<polygon points="25.6772,16.9539 25.5142,16.7176 20.4478,9.1228 20.4478,16.9461 19.4409,16.9461 19.4409,7.0472 20.269,7.0472 
+	<polygon points="25.6772,16.9539 25.5142,16.7176 20.4478,9.1228 20.4478,16.9461 19.4409,16.9461 19.4409,7.0472 20.269,7.0472
 		20.4312,7.282 25.4966,14.8792 25.4966,7.054 26.5044,7.054 26.5044,16.9539 	"/>
-	<polygon points="4.4287,16.951 1.2046,8.26 1.0068,8.2957 1.0068,16.9461 0,16.9461 0,7.0472 1.8271,7.0472 4.916,15.3719 
+	<polygon points="4.4287,16.951 1.2046,8.26 1.0068,8.2957 1.0068,16.9461 0,16.9461 0,7.0472 1.8271,7.0472 4.916,15.3719
 		8.0059,7.0472 9.8325,7.0472 9.8325,16.9461 8.8262,16.9461 8.8262,8.2957 8.6284,8.26 5.4043,16.951 	"/>
 </g>
 </svg>

@@ -1,23 +1,25 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.dataobject.migration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationInventory.FindNextMigrationHandlerVersionStatus;
@@ -176,8 +178,6 @@ public class DataObjectMigrationInventoryTest {
     Assert.assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationTargetContextDataClasses(null));
 
     assertEquals(0, s_inventory.getStructureMigrationTargetContextDataClasses(BEANS.get(DoEntityBuilder.class).put("_type", "unknown").build()).size());
-
-    Set<Class<? extends IDoStructureMigrationTargetContextData>> contextDataSet;
 
     assertEquals(CollectionUtility.hashSet(HouseFixtureStructureMigrationTargetContextData.class, HouseFixtureRawOnlyStructureMigrationTargetContextData.class),
         s_inventory.getStructureMigrationTargetContextDataClasses(BEANS.get(DoEntityBuilder.class).put("_type", "charlieFixture.HouseFixture").build()));
