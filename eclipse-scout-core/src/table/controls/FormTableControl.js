@@ -68,6 +68,10 @@ export default class FormTableControl extends TableControl {
     return !!this.form;
   }
 
+  setForm(form) {
+    this.setProperty('form', form);
+  }
+
   _setForm(form) {
     if (this.form) {
       this.form.off('destroy', this._formDestroyedHandler);

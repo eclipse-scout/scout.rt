@@ -58,7 +58,7 @@ export default class TableFooter extends Widget {
 
     // --- container for an open control ---
     this.$controlContainer = this.$container.appendDiv('table-control-container').hide();
-    this.$controlContent = this.$controlContainer.appendDiv('table-control-content');
+    this.$controlContent = this.$controlContainer.appendDiv('table-control-content focus-boundary');
 
     // --- table controls section ---
     this._$controls = this.$container.appendDiv('table-controls');

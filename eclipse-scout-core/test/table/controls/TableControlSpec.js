@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent, scout, TableControlAdapter} from '../../../src/index';
-import {TableSpecHelper} from '../../../src/testing/index';
+import {focusUtils, RemoteEvent, scout, TableControlAdapter} from '../../../src/index';
+import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('TableControl', () => {
   let session;
@@ -60,7 +60,7 @@ describe('TableControl', () => {
 
     it('opens and closes the control container', () => {
       let action = createAction(createModel());
-      table._setTableControls([action]);
+      table.setTableControls([action]);
       table.render();
       let $controlContainer = table.footer.$controlContainer;
       expect($controlContainer).toBeHidden();
@@ -76,7 +76,7 @@ describe('TableControl', () => {
     it('removes the content of the previous selected control without closing the container', () => {
       let action = createAction(createModel());
       let action2 = createAction(createModel());
-      table._setTableControls([action, action2]);
+      table.setTableControls([action, action2]);
 
       action.selected = true;
       table.render();
@@ -106,7 +106,7 @@ describe('TableControl', () => {
       let model2 = createModel();
       let adapter2 = createTableControlAdapter(model2);
       let action2 = adapter2.createWidget(model2, session.desktop);
-      table._setTableControls([action, action2]);
+      table.setTableControls([action, action2]);
 
       action.selected = true;
       table.render();
@@ -123,5 +123,21 @@ describe('TableControl', () => {
       ];
       expect(mostRecentJsonRequest()).toContainEvents(events);
     });
+  });
+
+  it('clicking in the control container does not focus the table', () => {
+    let table = createTable();
+    let action = scout.create('FormTableControl', {
+      parent: table,
+      selected: true
+    });
+    action.setForm(new FormSpecHelper(session).createFormWithOneField());
+    table.setTableControls([action]);
+    table.render();
+    jasmine.clock().tick(1); // Ensure animation complete function is executed (animation uses a 1ms delay)
+    expect(action.form.rootGroupBox.fields[0].isFocused()).toBeTrue();
+
+    // Focus must not leave the field when clicking outside (it cannot be simulated in a test -> test the function that causes the problem)
+    expect(focusUtils.containsParentFocusableByMouse(action.form.$container, session.desktop.$container)).toBe(false);
   });
 });
