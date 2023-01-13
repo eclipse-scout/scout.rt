@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, Event, EventHandler, Form, FormTableControlEventMap, FormTableControlLayout, FormTableControlModel, GroupBox, InitModelOf, TabBox, TableControl} from '../../index';
+import {AbstractLayout, Event, EventHandler, Form, FormTableControlEventMap, FormTableControlLayout, FormTableControlModel, GroupBox, InitModelOf, ObjectOrChildModel, TabBox, TableControl} from '../../index';
 
 export class FormTableControl extends TableControl implements FormTableControlModel {
   declare model: FormTableControlModel;
@@ -67,6 +67,10 @@ export class FormTableControl extends TableControl implements FormTableControlMo
    */
   override isContentAvailable(): boolean {
     return !!this.form;
+  }
+
+  setForm(form: ObjectOrChildModel<Form>) {
+    this.setProperty('form', form);
   }
 
   protected _setForm(form: Form) {
