@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,6 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
   processButtons: Button[];
   processMenus: Menu[];
   staticMenus: Menu[];
-  selectionKeystroke: string;
   responsive: boolean;
   responsiveHandler?: GroupBoxResponsiveHandler;
   htmlBody: HtmlComponent;
@@ -81,7 +80,6 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.processButtons = [];
     this.processMenus = [];
     this.staticMenus = [];
-    this.selectionKeystroke = null;
     this.responsive = null;
     this.$header = null;
     this.$body = null;
@@ -91,8 +89,18 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
   }
 
   static BorderDecoration = {
+    /**
+     * Makes {@link borderVisible} to be computed automatically which means top and bottom paddings are invisible if it is a {@link mainBox}.
+     * @see _computeBorderVisible
+     */
     AUTO: 'auto',
+    /**
+     * The top and bottom paddings are always visible, even if it is a {@link mainBox}.
+     */
     EMPTY: 'empty',
+    /**
+     * Currently has no effect.
+     */
     LINE: 'line'
   } as const;
 
@@ -165,6 +173,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.setFields(newFields);
   }
 
+  /** @see GroupBoxModel.fields */
   setFields(fields: ObjectOrChildModel<FormField>[]) {
     this.setProperty('fields', fields);
   }
@@ -330,6 +339,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.$subLabel = null;
   }
 
+  /** @see GroupBoxModel.subLabel */
   setSubLabel(subLabel: string) {
     this.setProperty('subLabel', subLabel);
   }
@@ -341,6 +351,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see GroupBoxModel.scrollable */
   setScrollable(scrollable: boolean) {
     this.setProperty('scrollable', scrollable);
   }
@@ -448,6 +459,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see GroupBoxModel.notification */
   setNotification(notification: ObjectOrChildModel<Notification>) {
     this.setProperty('notification', notification);
   }
@@ -525,6 +537,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     }
   }
 
+  /** @see GroupBoxModel.borderVisible */
   setBorderVisible(borderVisible: boolean) {
     this.setProperty('borderVisible', borderVisible);
   }
@@ -539,6 +552,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see GroupBoxModel.borderDecoration */
   setBorderDecoration(borderDecoration: GroupBoxBorderDecoration) {
     this.setProperty('borderDecoration', borderDecoration);
   }
@@ -555,6 +569,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     return super.getContextMenuItems(onlyVisible);
   }
 
+  /** @see GroupBoxModel.menuBarVisible */
   setMenuBarVisible(visible: boolean) {
     this.setProperty('menuBarVisible', visible);
   }
@@ -590,6 +605,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     }
   }
 
+  /** @see GroupBoxModel.menuBarPosition */
   setMenuBarPosition(menuBarPosition: GroupBoxMenuBarPosition) {
     this.setProperty('menuBarPosition', menuBarPosition);
   }
@@ -619,6 +635,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     }
   }
 
+  /** @see GroupBoxModel.menuBarEllipsisPosition */
   setMenuBarEllipsisPosition(menuBarEllipsisPosition: MenuBarEllipsisPosition) {
     this.setProperty('menuBarEllipsisPosition', menuBarEllipsisPosition);
     this.menuBar.setEllipsisPosition(menuBarEllipsisPosition);
@@ -660,6 +677,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     return borderVisible;
   }
 
+  /** @see GroupBoxModel.expandable */
   setExpandable(expandable: boolean) {
     this.setProperty('expandable', expandable);
   }
@@ -687,6 +705,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see GroupBoxModel.expanded */
   setExpanded(expanded: boolean) {
     this.setProperty('expanded', expanded);
   }
@@ -719,6 +738,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see GroupBoxModel.gridColumnCount */
   setGridColumnCount(gridColumnCount: number) {
     this.setProperty('gridColumnCount', gridColumnCount);
     this.invalidateLogicalGrid();
@@ -805,6 +825,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
   }
 
+  /** @see GroupBoxModel.responsive */
   setResponsive(responsive: boolean) {
     this.setProperty('responsive', responsive);
   }

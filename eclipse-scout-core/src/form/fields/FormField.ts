@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -301,6 +301,7 @@ export class FormField extends Widget implements FormFieldModel {
     dragAndDrop.uninstallDragAndDropHandler(this);
   }
 
+  /** @see FormFieldModel.fieldStyle */
   setFieldStyle(fieldStyle: FormFieldStyle) {
     this.setProperty('fieldStyle', fieldStyle);
   }
@@ -326,6 +327,7 @@ export class FormField extends Widget implements FormFieldModel {
     $element.toggleClass('alternative', this.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
   }
 
+  /** @see FormFieldModel.mandatory */
   setMandatory(mandatory: boolean) {
     this.setProperty('mandatory', mandatory);
   }
@@ -343,6 +345,7 @@ export class FormField extends Widget implements FormFieldModel {
     return this.errorStatus;
   }
 
+  /** @see FormFieldModel.errorStatus */
   setErrorStatus(errorStatus: StatusOrModel) {
     this.setProperty('errorStatus', errorStatus);
   }
@@ -394,6 +397,7 @@ export class FormField extends Widget implements FormFieldModel {
     return this.errorStatus.containsStatus(statusType);
   }
 
+  /** @see FormFieldModel.suppressStatus */
   setSuppressStatus(suppressStatus: FormFieldSuppressStatus) {
     this.setProperty('suppressStatus', suppressStatus);
   }
@@ -468,6 +472,7 @@ export class FormField extends Widget implements FormFieldModel {
       .addClass(statusClass);
   }
 
+  /** @see FormFieldModel.tooltipText */
   setTooltipText(tooltipText: string) {
     this.setProperty('tooltipText', tooltipText);
   }
@@ -477,6 +482,7 @@ export class FormField extends Widget implements FormFieldModel {
     this._updateTooltip();
   }
 
+  /** @see FormFieldModel.tooltipAnchor */
   setTooltipAnchor(tooltipAnchor: FormFieldTooltipAnchor) {
     this.setProperty('tooltipAnchor', tooltipAnchor);
   }
@@ -511,6 +517,7 @@ export class FormField extends Widget implements FormFieldModel {
     return this.tooltipAnchor === FormField.TooltipAnchor.ON_FIELD && strings.hasText(this.tooltipText);
   }
 
+  /** @see FormFieldModel.onFieldTooltipOptionsCreator */
   setOnFieldTooltipOptionsCreator(onFieldTooltipOptionsCreator: (this: FormField) => InitModelOf<TooltipSupport>) {
     this.onFieldTooltipOptionsCreator = onFieldTooltipOptionsCreator;
   }
@@ -531,6 +538,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.label */
   setLabel(label: string) {
     this.setProperty('label', label);
   }
@@ -584,6 +592,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.labelVisible */
   setLabelVisible(visible: boolean) {
     this.setProperty('labelVisible', visible);
   }
@@ -601,6 +610,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.labelWidthInPixel */
   setLabelWidthInPixel(labelWidthInPixel: number) {
     this.setProperty('labelWidthInPixel', labelWidthInPixel);
   }
@@ -609,6 +619,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see FormFieldModel.labelUseUiWidth */
   setLabelUseUiWidth(labelUseUiWidth: number) {
     this.setProperty('labelUseUiWidth', labelUseUiWidth);
   }
@@ -617,6 +628,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see FormFieldModel.statusVisible */
   setStatusVisible(visible: boolean) {
     this.setProperty('statusVisible', visible);
   }
@@ -625,6 +637,7 @@ export class FormField extends Widget implements FormFieldModel {
     this._updateFieldStatus();
   }
 
+  /** @see FormFieldModel.statusPosition */
   setStatusPosition(statusPosition: FormFieldStatusPosition) {
     this.setProperty('statusPosition', statusPosition);
   }
@@ -714,6 +727,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.labelPosition */
   setLabelPosition(labelPosition: FormFieldLabelPosition) {
     this.setProperty('labelPosition', labelPosition);
   }
@@ -732,6 +746,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.labelHtmlEnabled */
   setLabelHtmlEnabled(labelHtmlEnabled: boolean) {
     this.setProperty('labelHtmlEnabled', labelHtmlEnabled);
   }
@@ -757,6 +772,7 @@ export class FormField extends Widget implements FormFieldModel {
     this._renderDisabledStyleInternal(this.$mandatory);
   }
 
+  /** @see FormFieldModel.font */
   setFont(font: string) {
     this.setProperty('font', font);
   }
@@ -765,6 +781,7 @@ export class FormField extends Widget implements FormFieldModel {
     styles.legacyFont(this, this.$field);
   }
 
+  /** @see FormFieldModel.foregroundColor */
   setForegroundColor(foregroundColor: string) {
     this.setProperty('foregroundColor', foregroundColor);
   }
@@ -773,6 +790,7 @@ export class FormField extends Widget implements FormFieldModel {
     styles.legacyForegroundColor(this, this.$field);
   }
 
+  /** @see FormFieldModel.backgroundColor */
   setBackgroundColor(backgroundColor: string) {
     this.setProperty('backgroundColor', backgroundColor);
   }
@@ -781,6 +799,7 @@ export class FormField extends Widget implements FormFieldModel {
     styles.legacyBackgroundColor(this, this.$field);
   }
 
+  /** @see FormFieldModel.labelFont */
   setLabelFont(labelFont: string) {
     this.setProperty('labelFont', labelFont);
   }
@@ -789,6 +808,7 @@ export class FormField extends Widget implements FormFieldModel {
     styles.legacyFont(this, this.$label, 'label');
   }
 
+  /** @see FormFieldModel.labelForegroundColor */
   setLabelForegroundColor(labelForegroundColor: string) {
     this.setProperty('labelForegroundColor', labelForegroundColor);
   }
@@ -797,6 +817,7 @@ export class FormField extends Widget implements FormFieldModel {
     styles.legacyForegroundColor(this, this.$label, 'label');
   }
 
+  /** @see FormFieldModel.labelBackgroundColor */
   setLabelBackgroundColor(labelBackgroundColor: string) {
     this.setProperty('labelBackgroundColor', labelBackgroundColor);
   }
@@ -805,6 +826,7 @@ export class FormField extends Widget implements FormFieldModel {
     styles.legacyBackgroundColor(this, this.$label, 'label');
   }
 
+  /** @see FormFieldModel.gridDataHints */
   setGridDataHints(gridData: GridData) {
     this.setProperty('gridDataHints', gridData);
   }
@@ -837,6 +859,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.menus */
   setMenus(menus: ObjectOrChildModel<Menu>[]) {
     this.setProperty('menus', menus);
   }
@@ -1306,6 +1329,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.dropType */
   setDropType(dropType: DropType) {
     this.setProperty('dropType', dropType);
   }
@@ -1314,6 +1338,7 @@ export class FormField extends Widget implements FormFieldModel {
     this._installOrUninstallDragAndDropHandler();
   }
 
+  /** @see FormFieldModel.dropMaximumSize */
   setDropMaximumSize(dropMaximumSize: number) {
     this.setProperty('dropMaximumSize', dropMaximumSize);
   }
@@ -1403,18 +1428,20 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /** @see FormFieldModel.touched */
   markAsSaved() {
     this.setProperty('touched', false);
     this.updateRequiresSave();
   }
 
+  /** @see FormFieldModel.touched */
   touch() {
     this.setProperty('touched', true);
     this.updateRequiresSave();
   }
 
   /**
-   * Updates the requiresSave property by checking if the field is touched or if computeRequiresSave() returns true.
+   * Updates the {@link requiresSave} property by checking if the field is touched or if {@link computeRequiresSave} returns true.
    */
   updateRequiresSave() {
     if (!this.initialized) {
@@ -1424,9 +1451,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Override this function in order to return whether or not this field requires to be saved.
-   * The default impl. returns false.
-   *
+   * Override this function to provide a custom logic to compute the {@link requiresSave} state if the field is not {@link touched}, see {@link updateRequiresSave}.
    */
   computeRequiresSave(): boolean {
     return false;

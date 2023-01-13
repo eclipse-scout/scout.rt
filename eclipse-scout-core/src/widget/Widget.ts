@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke,
-  KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, Predicate, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions,
-  Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
+  LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, Predicate, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired,
+  strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import * as $ from 'jquery';
 
@@ -26,15 +26,28 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   animateRemovalClass: string;
   attached: boolean;
   children: Widget[];
+  /**
+   * Will be set on the clone after a widget has been cloned.
+   * @type {Widget}
+   */
   cloneOf: Widget;
   cssClass: string;
   destroyed: boolean;
   destroying: boolean;
   disabledStyle: DisabledStyle;
   enabled: boolean;
+  /**
+   * The computed enabled state. The difference to the 'enabled' property is that this member
+   * also considers the enabled-states of the parent widgets.
+   */
   enabledComputed: boolean;
   eventDelegators: EventDelegatorForCloning[];
   focused: boolean;
+  /**
+   * Widgets creating a HtmlComponent for the main $container should assign it to this variable.
+   * This enables the execution of layout related operations like invalidateLayoutTree directly on the widget.
+   * @type {HtmlComponent}
+   */
   htmlComp: HtmlComponent;
   id: string;
   inheritAccessibility: boolean;
@@ -50,6 +63,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   parent: Widget;
   removalPending: boolean;
   removing: boolean;
+  /**
+   * The 'rendering' flag is set the true while the _initial_ rendering is performed.
+   * It is used to something different in a _render* method when the method is
+   * called for the first time.
+   */
   rendering: boolean;
   scrollLeft: number;
   scrollTop: number;
@@ -57,7 +75,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   trackFocus: boolean;
   visible: boolean;
   modelAdapter: ModelAdapter;
-  displayParent: DisplayParent;
   $container: JQuery;
   $parent: JQuery;
 
@@ -65,7 +82,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   _widgetProperties: string[];
   /** @internal */
   _cloneProperties: string[];
-  /** @internal */
+  /**
+   * The 'rendered' flag is set the true when initial rendering of the widget is completed.
+   *
+   * @internal
+   */
   _rendered: boolean;
 
   protected _$lastFocusedElement: JQuery;
@@ -89,49 +110,19 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.modelClass = null;
     this.classId = null;
 
-    /**
-     * The owner is responsible that its children are destroyed when the owner is being destroyed.
-     */
     this.owner = null;
-    /**
-     * The parent is typically the same as the owner.
-     * But the widget may be used by another widget (like a popup), in that case the parent will be changed to the popup but the owner stays the same.
-     * This means the popup is now the temporary parent, when the popup is destroyed its widgets are not because the popup is not the owner.
-     * Example: ViewMenuPopup uses the ViewButtons as menu items. These view buttons are owned by the desktop and must therefore not be destroyed
-     * when the popup closes, otherwise they could not be reused the second time the popup opens.
-     */
     this.parent = null;
     this.children = [];
     this.initialized = false;
-
-    /**
-     * Will be set on the clone after a widget has been cloned.
-     * @type {Widget}
-     */
     this.cloneOf = null;
-
-    /**
-     * The 'rendering' flag is set the true while the _initial_ rendering is performed.
-     * It is used to something different in a _render* method when the method is
-     * called for the first time.
-     */
     this.rendering = false;
     this.removing = false;
     this.removalPending = false;
-
-    /**
-     * The 'rendered' flag is set the true when initial rendering of the widget is completed.
-     */
     this._rendered = false;
     this.attached = false;
     this.destroyed = false;
     this.destroying = false;
-
     this.enabled = true;
-    /**
-     * The computed enabled state. The difference to the 'enabled' property is that this member
-     * also considers the enabled-states of the parent widgets.
-     */
     this.enabledComputed = true;
     this.inheritAccessibility = true;
     this.disabledStyle = Widget.DisabledStyle.DEFAULT;
@@ -141,22 +132,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.cssClass = null;
     this.scrollTop = null;
     this.scrollLeft = null;
-
     this.$parent = null;
     this.$container = null;
-
-    /**
-     * Widgets creating a HtmlComponent for the main $container should assign it to this variable.
-     * This enables the execution of layout related operations like invalidateLayoutTree directly on the widget.
-     * @type {HtmlComponent}
-     */
     this.htmlComp = null;
-
-    /**
-     * If set to true, remove won't remove the element immediately but after the animation has been finished
-     * This expects a css animation which may be triggered by the class 'animate-remove'
-     * If browser does not support css animation, remove will be executed immediately
-     */
     this.animateRemoval = false;
     this.animateRemovalClass = 'animate-remove';
 
@@ -171,7 +149,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._scrollHandler = this._onScroll.bind(this);
     this.loadingSupport = this._createLoadingSupport();
     this.keyStrokeContext = this._createKeyStrokeContext();
-    // Widgets using LogicalGridLayout may have a grid to calculate the grid data of the children
     this.logicalGrid = null;
 
     // focus tracking
@@ -187,6 +164,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    */
   static DisabledStyle = {
     DEFAULT: 0,
+    /**
+     * Optimizes the disabled style for readability, meaning higher contrast and fewer borders.
+     *
+     * Should in general only be used if the enabled state of the widget cannot change dynamically, because the style is too similar to the enabled style.
+     */
     READ_ONLY: 1
   } as const;
 
@@ -694,6 +676,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
   }
 
+  /** @see WidgetModel.owner */
   setOwner(owner: Widget) {
     scout.assertParameter('owner', owner);
     if (owner === this.owner) {
@@ -708,6 +691,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.owner._addChild(this);
   }
 
+  /** @see WidgetModel.parent */
   setParent(parent: Widget) {
     scout.assertParameter('parent', parent);
     if (parent === this.parent) {
@@ -909,6 +893,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._renderDisabledStyle();
   }
 
+  /** @see WidgetModel.inheritAccessibility */
   setInheritAccessibility(inheritAccessibility: boolean) {
     this.setProperty('inheritAccessibility', inheritAccessibility);
   }
@@ -920,6 +905,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
   }
 
+  /** @see WidgetModel.disabledStyle */
   setDisabledStyle(disabledStyle: DisabledStyle) {
     this.setProperty('disabledStyle', disabledStyle);
 
@@ -1023,6 +1009,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   /**
    * @param cssClass may contain multiple css classes separated by space.
+   * @see WidgetModel.cssClass
    */
   setCssClass(cssClass: string) {
     this.setProperty('cssClass', cssClass);
@@ -1076,6 +1063,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return null;
   }
 
+  /** @see WidgetModel.loading */
   setLoading(loading: boolean) {
     this.setProperty('loading', loading);
   }
@@ -1205,7 +1193,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   /**
    * If the widget uses a {@link LogicalGridLayout}, the grid may be validated using this method.
-   * <p>
+   *
    * If the grid is not dirty, nothing happens.
    */
   validateLogicalGrid() {
@@ -1256,6 +1244,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   /**
    * @param logicalGrid an instance of {@link LogicalGrid} or a string representing the objectType of a logical grid.
+   * @see WidgetModel.logicalGrid
    */
   setLogicalGrid(logicalGrid: LogicalGrid | ObjectType<LogicalGrid>) {
     this.setProperty('logicalGrid', logicalGrid);
@@ -2022,6 +2011,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return foundChild;
   }
 
+  /** @see WidgetModel.trackFocus */
   setTrackFocus(trackFocus: boolean) {
     this.setProperty('trackFocus', trackFocus);
   }
@@ -2171,6 +2161,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._setProperty('scrollLeft', $scrollable[0].scrollLeft);
   }
 
+  /** @see WidgetModel.scrollTop */
   setScrollTop(scrollTop: number) {
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().setScrollTop(scrollTop);
@@ -2195,6 +2186,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     scrollbars.scrollTop($scrollable, this.scrollTop);
   }
 
+  /** @see WidgetModel.scrollLeft */
   setScrollLeft(scrollLeft: number) {
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().setScrollLeft(scrollLeft);

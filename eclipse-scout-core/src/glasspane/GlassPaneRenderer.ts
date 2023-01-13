@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import $ from 'jquery';
  */
 export class GlassPaneRenderer {
   session: Session;
-  protected _widget: Widget;
+  protected _widget: Widget & { displayParent?: DisplayParent };
   protected _enabled: boolean;
   protected _$glassPanes: JQuery[];
   protected _deferredGlassPanes: DeferredGlassPaneTarget[];

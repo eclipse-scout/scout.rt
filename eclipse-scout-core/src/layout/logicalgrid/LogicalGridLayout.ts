@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,14 @@ import {
 import $ from 'jquery';
 
 /**
- * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
+ * The logical grid layout arranges the elements in a container automatically based on the {@link LogicalGridData}.
+ * The {@link LogicalGridData} is typically initialized from a {@link GridData}, and a {@link GridData} is calculated by a {@link LogicalGrid} derived from {@link LogicalGridWidget.gridDataHints}.
  *
- * @param options available options: hgap, vgap, rowHeight, columnWidth, minWidth
+ * This may sound a bit confusing at first. The important part is:
+ * based on the order of the widgets (e.g. the order of {@link GroupBoxModel.fields}) and the {@link LogicalGridWidget.gridDataHints} (e.g. {@link FormField.gridDataHints}),
+ * the widgets will be arranged automatically by the logical grid layout. So you only need to take care of the order and of configuring the hints.
  *
+ * The width, height and margin of a grid cell is pre-defined, but you can adjust it using {@link LogicalGridLayoutConfig}, e.g. by configuring {@link GroupBoxModel.bodyLayoutConfig}.
  */
 export class LogicalGridLayout extends AbstractLayout {
   validityBasedOnContainerSize: Dimension;

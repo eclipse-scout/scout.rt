@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,14 @@ export interface TileGridModel extends WidgetModel {
    */
   comparator?: Comparator<Tile>;
   /**
-   * If one or more filter is set, only the tiles accepted by the filters are visible. Default is [].
+   * The filters control which tiles are allowed to be displayed in the grid.
+   *
+   * If one of the filters does not accept a specific tile, the tile won't be shown. Hence, all filters must agree to make a tile visible.
+   *
+   * By default, there are no filters.
+   *
+   * @see TileGrid.filteredTiles
+   * @see Table.tiles
    */
   filters?: Filter<Tile>[];
   /**
@@ -102,7 +109,6 @@ export interface TileGridModel extends WidgetModel {
    * Default is false.
    */
   virtual?: boolean;
-  virtualScrolling?: VirtualScrolling;
   /**
    * If enabled, artificial placeholder tiles are added automatically if the tiles in the last row don't fill the whole row.
    * Default is false.

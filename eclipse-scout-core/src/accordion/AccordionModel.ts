@@ -17,6 +17,11 @@ export interface AccordionModel extends WidgetModel {
    * Default is false.
    */
   comparator?: Comparator<Group>;
+  /**
+   * Specifies where the collapse handle should be displayed.
+   *
+   * Default is {@link GroupCollapseStyle.LEFT}
+   */
   collapseStyle?: GroupCollapseStyle;
   /**
    * If true, only one group can be expanded at a time. If one group gets expanded, all other groups will be collapsed automatically.
@@ -24,6 +29,11 @@ export interface AccordionModel extends WidgetModel {
    * Default is true.
    */
   exclusiveExpand?: boolean;
+  /**
+   * The groups to be displayed inside the accordion.
+   *
+   * Default is [].
+   */
   groups?: ObjectOrChildModel<Group>[];
   scrollable?: boolean;
 }

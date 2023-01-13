@@ -73,11 +73,11 @@ export class Action extends Widget implements ActionModel {
 
   static ActionStyle = {
     /**
-     * regular menu-look, also used in overflow menus
+     * Regular look, also used in overflow menus.
      */
     DEFAULT: 0,
     /**
-     * menu looks like a button
+     * Action looks like a button.
      */
     BUTTON: 1
   } as const;
@@ -148,6 +148,12 @@ export class Action extends Widget implements ActionModel {
     super._remove();
   }
 
+  /** @see ActionModel.actionStyle */
+  setActionStyle(actionStyle: ActionStyle) {
+    this.setProperty('actionStyle', actionStyle);
+  }
+
+  /** @see ActionModel.text */
   setText(text: string) {
     this.setProperty('text', text);
   }
@@ -177,6 +183,7 @@ export class Action extends Widget implements ActionModel {
     }
   }
 
+  /** @see ActionModel.textPosition */
   setTextPosition(textPosition: ActionTextPosition) {
     this.setProperty('textPosition', textPosition);
   }
@@ -186,6 +193,7 @@ export class Action extends Widget implements ActionModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see ActionModel.htmlEnabled */
   setHtmlEnabled(htmlEnabled: boolean) {
     this.setProperty('htmlEnabled', htmlEnabled);
   }
@@ -195,6 +203,7 @@ export class Action extends Widget implements ActionModel {
     this._renderText();
   }
 
+  /** @see ActionModel.iconId */
   setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
   }
@@ -242,6 +251,7 @@ export class Action extends Widget implements ActionModel {
     }
   }
 
+  /** @see ActionModel.tooltipText */
   setTooltipText(tooltipText: string) {
     this.setProperty('tooltipText', tooltipText);
   }
@@ -269,8 +279,24 @@ export class Action extends Widget implements ActionModel {
     return show;
   }
 
+  /** @see ActionModel.tabbable */
+  setTabbable(tabbable: boolean) {
+    this.setProperty('tabbable', tabbable);
+  }
+
   protected _renderTabbable() {
     this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
+  }
+
+  /** @see ActionModel.compact */
+  setCompact(compact: boolean) {
+    if (this.compact === compact) {
+      return;
+    }
+    this.compact = compact;
+    if (this.rendered) {
+      this._renderCompact();
+    }
   }
 
   protected _renderCompact() {
@@ -278,6 +304,7 @@ export class Action extends Widget implements ActionModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see ActionModel.tooltipPosition */
   setTooltipPosition(position: TooltipPosition) {
     this.setProperty('tooltipPosition', position);
   }
@@ -313,6 +340,7 @@ export class Action extends Widget implements ActionModel {
     }
   }
 
+  /** @see ActionModel.toggleAction */
   setToggleAction(toggleAction: boolean) {
     this.setProperty('toggleAction', toggleAction);
   }
@@ -335,6 +363,7 @@ export class Action extends Widget implements ActionModel {
     this.trigger('action');
   }
 
+  /** @see ActionModel.selected */
   setSelected(selected: boolean) {
     this.setProperty('selected', selected);
   }
@@ -346,6 +375,7 @@ export class Action extends Widget implements ActionModel {
     }
   }
 
+  /** @see ActionModel.keyStroke */
   setKeyStroke(keyStroke: string) {
     this.setProperty('keyStroke', keyStroke);
   }
@@ -364,10 +394,7 @@ export class Action extends Widget implements ActionModel {
     }
   }
 
-  setTabbable(tabbable: boolean) {
-    this.setProperty('tabbable', tabbable);
-  }
-
+  /** @see ActionModel.textVisible */
   setTextVisible(textVisible: boolean) {
     if (this.textVisible === textVisible) {
       return;
@@ -378,16 +405,7 @@ export class Action extends Widget implements ActionModel {
     }
   }
 
-  setCompact(compact: boolean) {
-    if (this.compact === compact) {
-      return;
-    }
-    this.compact = compact;
-    if (this.rendered) {
-      this._renderCompact();
-    }
-  }
-
+  /** @see ActionModel.horizontalAlignment */
   setHorizontalAlignment(horizontalAlignment: Alignment) {
     this.setProperty('horizontalAlignment', horizontalAlignment);
   }
@@ -396,6 +414,7 @@ export class Action extends Widget implements ActionModel {
     return new ActionKeyStroke(this);
   }
 
+  /** @see ActionModel.preventDoubleClick */
   setPreventDoubleClick(preventDoubleClick: boolean) {
     this.setProperty('preventDoubleClick', preventDoubleClick);
   }
@@ -420,9 +439,5 @@ export class Action extends Widget implements ActionModel {
     tooltips.cancel(this.$container);
 
     this.doAction();
-  }
-
-  setActionStyle(actionStyle: ActionStyle) {
-    this.setProperty('actionStyle', actionStyle);
   }
 }

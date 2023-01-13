@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,8 @@ export interface BasicFieldModel<TValue extends TModelValue, TModelValue = TValu
   /**
    * Indicates whether the property {@link FormFieldModel.displayText} should be updated while the user types.
    *
-   * If the property is set to false, the displayText is updated after the user completes the editing (e.g. by pressing TAB).
-   * If the property is set to true, the displayText is updated while the user types after a configurable delay ({@link updateDisplayTextOnModifyDelay}.
+   * - If the property is set to false, the displayText is updated after the user completes the editing (e.g. by pressing TAB).
+   * - If the property is set to true, the displayText is updated while the user types after a configurable delay ({@link updateDisplayTextOnModifyDelay}.
    *
    * Default is false.
    */

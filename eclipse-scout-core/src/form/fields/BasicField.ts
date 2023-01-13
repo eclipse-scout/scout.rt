@@ -39,6 +39,7 @@ export abstract class BasicField<TValue extends TModelValue, TModelValue = TValu
     }
   }
 
+  /** @see BasicFieldModel.updateDisplayTextOnModify */
   setUpdateDisplayTextOnModify(updateDisplayTextOnModify: boolean) {
     // Execute pending "accept input while typing" function _before_ updating the "updateDisplayTextOnModify" property
     if (this._displayTextModifiedTimeoutId !== null) {
@@ -50,6 +51,7 @@ export abstract class BasicField<TValue extends TModelValue, TModelValue = TValu
     this.setProperty('updateDisplayTextOnModify', updateDisplayTextOnModify);
   }
 
+  /** @see BasicFieldModel.updateDisplayTextOnModifyDelay */
   setUpdateDisplayTextOnModifyDelay(delay: number) {
     this.setProperty('updateDisplayTextOnModifyDelay', delay);
   }
