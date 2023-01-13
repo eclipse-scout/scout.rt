@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.QuotedPrintableCodec;
-import org.eclipse.scout.rt.dataformat.ical.ICalProperties;
 import org.eclipse.scout.rt.dataformat.ical.model.ICalVCardHelper;
 import org.eclipse.scout.rt.dataformat.ical.model.Property;
 import org.eclipse.scout.rt.dataformat.ical.model.PropertyParameter;
@@ -68,11 +67,12 @@ public class UnfoldingReader extends BufferedReader {
   }
 
   public Property readProperty() throws IOException {
-    String s = readLine();
-    while (s != null && s.isEmpty()) {
-      // skip empty lines
+    String s;
+    do {
       s = readLine();
     }
+    while (s != null && s.isEmpty());
+
     if (s == null) {
       // eof
       return null;
@@ -122,9 +122,9 @@ public class UnfoldingReader extends BufferedReader {
         // get the position of the colon in the unfolded content line
         indexOfColon = indexOfNonQuoted(s, ":");
         if (indexOfColon < 0) {
-          // unable to determine the property
-          // do not return null here - otherwise the file-parsing stops here
-          s = ICalProperties.PROP_UNKNOWN + ":" + s;
+          // unable to determine a folded property
+          // the file parsing will stop here
+          return null;
         }
       }
     }
