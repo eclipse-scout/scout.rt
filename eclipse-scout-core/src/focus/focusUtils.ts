@@ -26,7 +26,7 @@ export const focusUtils = {
    */
   containsParentFocusableByMouse(element: HTMLElement | JQuery, entryPoint: JQuery): boolean {
     let $focusableParentElements = $(element)
-      .parents(':focusable')
+      .parentsUntil('.focus-boundary', ':focusable') // Stay inside focus boundaries (e.g. search forms should not consider parent table)
       .not(entryPoint) /* Exclude $entryPoint as all elements are its descendants. However, the $entryPoint is only focusable to provide Portlet support. */
       .filter(() => focusUtils.isFocusableByMouse(this));
     return $focusableParentElements.length > 0;
