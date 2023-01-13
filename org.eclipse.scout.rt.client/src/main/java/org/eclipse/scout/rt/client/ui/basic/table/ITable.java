@@ -36,6 +36,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -136,11 +138,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   /**
    * {@link IPage} or {@link IWidget}
    * <p>
-   * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox},
-   * <p>
-   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * Container of this table, {@link IPage IPage}, {@link ITableField ITableField}, {@link IListBox IListBox},
    *
    * @since 3.8.1
    */
@@ -325,13 +323,13 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   /**
    * @return the context in which the table and column settings (order, width, visible,...) are loaded and stored from
-   *         the {@link org.eclipse.scout.rt.client.ui.ClientUIPreferences ClientUIPreferences}
+   *         the {@link ClientUIPreferences ClientUIPreferences}
    */
   String getUserPreferenceContext();
 
   /**
    * Set the context in which the table and column settings (order, width, visible,...) are loaded and stored from the
-   * {@link org.eclipse.scout.rt.client.ui.ClientUIPreferences ClientUIPreferences}
+   * {@link ClientUIPreferences ClientUIPreferences}
    * <p>
    * Be very careful when changing this property during runtime and when the table is initialized. Use the constructor
    * argument instead.
@@ -609,8 +607,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   /**
    * This property changes the behaviour of {@link #replaceRows(List)} and {@link #deleteRows(int[])} true discards rows
    * when deleted, false keeps them in the cache for later usage in change management Default value is true for
-   * {@link IPageWithTable} and false for {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField
-   * ITableField}
+   * {@link IPageWithTable} and false for {@link ITableField ITableField}
    */
   boolean isAutoDiscardOnDelete();
 
@@ -975,11 +972,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   void setTableCustomizer(ITableCustomizer c);
 
   /**
-   * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox}, etc.
-   * <p>
-   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * Container of this table, {@link IPage IPage}, {@link ITableField ITableField}, {@link IListBox IListBox}, etc.
    *
    * @since 3.8.1
    * @see #getParent()
@@ -1300,7 +1293,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   int getMaxRowCount();
 
   /**
-   * Maximum row count the used is allowed to load into this table, maximal capacity, optional.
+   * Maximum row count the user is allowed to load into this table, maximal capacity, optional.
    *
    * @since 9.0
    */

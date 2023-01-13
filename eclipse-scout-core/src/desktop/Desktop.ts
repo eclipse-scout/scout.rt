@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -135,8 +135,19 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   }
 
   static DisplayStyle = {
+    /**
+     * Default style with header, navigation (outline) and bench (forms).
+     */
     DEFAULT: 'default',
+    /**
+     * In this style, only the bench is visible, header and navigation are invisible.
+     *
+     * Currently, you'll also have to manually set {@link navigationVisible} and {@link headerVisible} to false.
+     */
     BENCH: 'bench',
+    /**
+     * Compact style that can be used for mobile devices where navigation and bench are never visible simultaneously.
+     */
     COMPACT: 'compact'
   } as const;
 
@@ -257,6 +268,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     }, model.nativeNotificationDefaults);
   }
 
+  /** @see DesktopModel.nativeNotificationDefaults */
   setNativeNotificationDefaults(defaults: NativeNotificationDefaults) {
     this.setProperty('nativeNotificationDefaults', defaults);
   }
@@ -352,6 +364,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     }
   }
 
+  /** @see DesktopModel.dense */
   setDense(dense: boolean) {
     this.setProperty('dense', dense);
   }
@@ -700,6 +713,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     });
   }
 
+  /** @see DesktopModel.outline */
   setOutline(outline: Outline) {
     if (this.outline === outline) {
       return;
@@ -743,6 +757,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this._setProperty('viewButtons', viewButtons);
   }
 
+  /** @see DesktopModel.menus */
   setMenus(menus: ObjectOrChildModel<Menu>[]) {
     if (this.header) {
       this.header.setMenus(menus);
@@ -759,6 +774,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this._setProperty('keyStrokes', keyStrokes);
   }
 
+  /** @see DesktopModel.navigationHandleVisible */
   setNavigationHandleVisible(visible: boolean) {
     this.setProperty('navigationHandleVisible', visible);
   }
@@ -767,16 +783,19 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.$container.toggleClass('has-navigation-handle', this.navigationHandleVisible);
   }
 
+  /** @see DesktopModel.navigationVisible */
   setNavigationVisible(visible: boolean) {
     this.setProperty('navigationVisible', visible);
     this.updateSplitterVisibility();
   }
 
+  /** @see DesktopModel.benchVisible */
   setBenchVisible(visible: boolean) {
     this.setProperty('benchVisible', visible);
     this.updateSplitterVisibility();
   }
 
+  /** @see DesktopModel.headerVisible */
   setHeaderVisible(visible: boolean) {
     this.setProperty('headerVisible', visible);
   }
@@ -1499,11 +1518,12 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
 
   /**
    * Changes the current theme.
-   * <p>
+   *
    * The theme name is stored in a persistent cookie called scout.ui.theme.
    * In order to activate it, the browser is reloaded so that the CSS files for the new theme can be downloaded.
-   * <p>
+   *
    * Since it is a persistent cookie, the theme will be activated again the next time the app is started, unless the cookie is deleted.
+   * @see DesktopModel.theme
    */
   setTheme(theme: string) {
     this.setProperty('theme', theme);

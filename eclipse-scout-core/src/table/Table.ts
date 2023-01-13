@@ -71,8 +71,18 @@ export class Table extends Widget implements TableModel {
   footer: TableFooter;
   footerVisible: boolean;
   filters: Filter<TableRow>[];
+  /**
+   * Contains all rows of the table.
+   */
   rows: TableRow[];
+  /**
+   * Contains only the root rows of the table.
+   * If the table is not {@link hierarchical}, it is the same as {@link rows}.
+   */
   rootRows: TableRow[];
+  /**
+   * Contains only the rows that are expanded and accepted by all filters.
+   */
   visibleRows: TableRow[];
   estimatedRowCount: number;
   maxRowCount: number;
@@ -242,9 +252,24 @@ export class Table extends Widget implements TableModel {
   // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
 
   static MenuTypes = {
+    /**
+     * The menu is always visible and displayed first in the {@link MenuBar}.
+     * The menu won't be displayed in the context menu.
+     */
     EmptySpace: 'Table.EmptySpace',
+    /**
+     * The menu is only visible if exactly one row has been selected.
+     * The menu is also displayed in the context menu.
+     */
     SingleSelection: 'Table.SingleSelection',
+    /**
+     * The menu is only visible if at least two row have been selected.
+     * The menu is also displayed in the context menu.
+     */
     MultiSelection: 'Table.MultiSelection',
+    /**
+     * The menu is displayed in the {@link TableHeader} on the right side.
+     */
     Header: 'Table.Header'
   } as const;
 
@@ -957,6 +982,7 @@ export class Table extends Widget implements TableModel {
     }
   }
 
+  /** @see TableModel.truncatedCellTooltipEnabled */
   setTruncatedCellTooltipEnabled(truncatedCellTooltipEnabled: boolean) {
     this.setProperty('truncatedCellTooltipEnabled', truncatedCellTooltipEnabled);
   }
@@ -1041,6 +1067,7 @@ export class Table extends Widget implements TableModel {
       .join(' ');
   }
 
+  /** @see TableModel.multiSelect */
   setMultiSelect(multiSelect: boolean) {
     this.setProperty('multiSelect', multiSelect);
   }
@@ -1240,6 +1267,7 @@ export class Table extends Widget implements TableModel {
     }
   }
 
+  /** @see TableModel.sortEnabled */
   setSortEnabled(sortEnabled: boolean) {
     this.setProperty('sortEnabled', sortEnabled);
   }
@@ -2618,6 +2646,7 @@ export class Table extends Widget implements TableModel {
     return marked;
   }
 
+  /** @see TableModel.multiCheck */
   setMultiCheck(multiCheck: boolean) {
     this.setProperty('multiCheck', multiCheck);
   }
@@ -3275,6 +3304,7 @@ export class Table extends Widget implements TableModel {
     return this.$container;
   }
 
+  /** @see TableModel.scrollToSelection */
   setScrollToSelection(scrollToSelection: boolean) {
     this.setProperty('scrollToSelection', scrollToSelection);
   }
@@ -3873,6 +3903,7 @@ export class Table extends Widget implements TableModel {
   /**
    * @param filter The new filters.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   * @see TableModel.filters
    */
   setFilters(filters: (FilterOrFunction<TableRow> | ObjectOrModel<TableUserFilter>)[], applyFilter = true) {
     this.resetUserFilter(false);
@@ -3934,6 +3965,7 @@ export class Table extends Widget implements TableModel {
     });
   }
 
+  /** @see TableModel.textFilterEnabled */
   setTextFilterEnabled(textFilterEnabled: boolean) {
     this.setProperty('textFilterEnabled', textFilterEnabled);
   }
@@ -4357,6 +4389,7 @@ export class Table extends Widget implements TableModel {
     this.trigger('aggregationFunctionChanged', event);
   }
 
+  /** @see TableModel.headerVisible */
   setHeaderVisible(visible: boolean) {
     this.setProperty('headerVisible', visible);
   }
@@ -4365,6 +4398,7 @@ export class Table extends Widget implements TableModel {
     this._renderTableHeader();
   }
 
+  /** @see TableModel.headerEnabled */
   setHeaderEnabled(headerEnabled: boolean) {
     this.setProperty('headerEnabled', headerEnabled);
   }
@@ -4375,6 +4409,7 @@ export class Table extends Widget implements TableModel {
     this._renderTableHeader();
   }
 
+  /** @see TableModel.headerMenusEnabled */
   setHeaderMenusEnabled(headerMenusEnabled: boolean) {
     this.setProperty('headerMenusEnabled', headerMenusEnabled);
     if (this.header) {
@@ -4403,6 +4438,7 @@ export class Table extends Widget implements TableModel {
     });
   }
 
+  /** @see TableModel.tileMode */
   setTileMode(tileMode: boolean) {
     this.setProperty('tileMode', tileMode);
   }
@@ -4460,6 +4496,7 @@ export class Table extends Widget implements TableModel {
     throw new Error('Cannot create a tile without a producer.');
   }
 
+  /** @see TableModel.tileProducer */
   setTileProducer(tileProducer: (row: TableRow) => Tile) {
     this.setProperty('tileProducer', tileProducer);
   }
@@ -4477,6 +4514,7 @@ export class Table extends Widget implements TableModel {
     });
   }
 
+  /** @see TableModel.rowIconVisible */
   setRowIconVisible(rowIconVisible: boolean) {
     this.setProperty('rowIconVisible', rowIconVisible);
   }
@@ -4510,6 +4548,7 @@ export class Table extends Widget implements TableModel {
     this._renderRowIconVisible();
   }
 
+  /** @see TableModel.rowIconColumnWidth */
   setRowIconColumnWidth(width: number) {
     this.setProperty('rowIconColumnWidth', width);
   }
@@ -4529,6 +4568,7 @@ export class Table extends Widget implements TableModel {
     this._setProperty('selectedRows', selectedRows);
   }
 
+  /** @see TableModel.menus */
   setMenus(menus: ObjectOrChildModel<Menu>[]) {
     this.setProperty('menus', menus);
   }
@@ -4630,6 +4670,7 @@ export class Table extends Widget implements TableModel {
     this._setProperty('tableStatus', status);
   }
 
+  /** @see TableModel.tableStatusVisible */
   setTableStatusVisible(visible: boolean) {
     this.setProperty('tableStatusVisible', visible);
     this._updateFooterVisibility();
@@ -4639,6 +4680,7 @@ export class Table extends Widget implements TableModel {
     this.setFooterVisible(this.tableStatusVisible || this._hasVisibleTableControls());
   }
 
+  /** @see TableModel.hierarchicalStyle */
   setHierarchicalStyle(style: TableHierarchicalStyle) {
     this.setProperty('hierarchicalStyle', style);
   }
@@ -4647,6 +4689,7 @@ export class Table extends Widget implements TableModel {
     this.$container.toggleClass('structured', Table.HierarchicalStyle.STRUCTURED === this.hierarchicalStyle);
   }
 
+  /** @see TableModel.footerVisible */
   setFooterVisible(visible: boolean) {
     this._setProperty('footerVisible', visible);
     if (visible && !this.footer) {
@@ -4698,6 +4741,7 @@ export class Table extends Widget implements TableModel {
     $styleElem.toggleClass('checked', row.checked);
   }
 
+  /** @see TableModel.checkable */
   setCheckable(checkable: boolean) {
     this.setProperty('checkable', checkable);
   }
@@ -4747,6 +4791,7 @@ export class Table extends Widget implements TableModel {
     }
   }
 
+  /** @see TableModel.compact */
   setCompact(compact: boolean) {
     this.setProperty('compact', compact);
   }
@@ -4922,6 +4967,7 @@ export class Table extends Widget implements TableModel {
     this._renderDisabledStyleInternal(this.$data);
   }
 
+  /** @see TableModel.autoResizeColumns */
   setAutoResizeColumns(autoResizeColumns: boolean) {
     this.setProperty('autoResizeColumns', autoResizeColumns);
   }
@@ -4937,6 +4983,7 @@ export class Table extends Widget implements TableModel {
     this.invalidateLayoutTree();
   }
 
+  /** @see TableModel.multilineText */
   setMultilineText(multilineText: boolean) {
     this.setProperty('multilineText', multilineText);
   }
@@ -4946,6 +4993,7 @@ export class Table extends Widget implements TableModel {
     this.redraw();
   }
 
+  /** @see TableModel.dropType */
   setDropType(dropType: DropType) {
     this.setProperty('dropType', dropType);
   }
@@ -4954,6 +5002,7 @@ export class Table extends Widget implements TableModel {
     this._installOrUninstallDragAndDropHandler();
   }
 
+  /** @see TableModel.dropMaximumSize */
   setDropMaximumSize(dropMaximumSize: number) {
     this.setProperty('dropMaximumSize', dropMaximumSize);
   }
@@ -5461,6 +5510,7 @@ export class Table extends Widget implements TableModel {
     }
   }
 
+  /** @see TableModel.virtual */
   setVirtual(virtual: boolean) {
     this._setProperty('virtual', virtual);
   }

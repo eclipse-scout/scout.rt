@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,12 @@
 import {GroupBox, GroupBoxEventMap, GroupBoxModel, Menu, PropertyChangeEvent, Tab, TabBox, TabItemLayout} from '../../../index';
 
 export interface TabItemModel extends GroupBoxModel {
+  /**
+   * Configures the keystroke to select this tab item.
+   *
+   * @see {@link Action.keyStroke} for the format and examples.
+   */
+  selectionKeystroke?: string;
   marked?: boolean;
 }
 
@@ -24,10 +30,12 @@ export class TabItem extends GroupBox implements TabItemModel {
   declare self: TabItem;
   declare parent: TabBox;
 
+  selectionKeystroke: string;
   marked: boolean;
 
   constructor() {
     super();
+    this.selectionKeystroke = null;
     this.marked = false;
   }
 

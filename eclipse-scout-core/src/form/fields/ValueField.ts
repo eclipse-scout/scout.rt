@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -127,12 +127,12 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
 
   /**
    * Accepts the current input and writes it to the model.
-   * <p>
-   * This method is typically called by the _onBlur() function of the field, but may actually be called from anywhere (e.g. button, actions, cell editor, etc.).
-   * It is also called by the _aboutToBlurByMouseDown() function, which is required because our Ok- and Cancel-buttons are not focusable (thus _onBlur() is
+   *
+   * This method is typically called by the {@link _onFieldBlur} function of the field, but may actually be called from anywhere (e.g. button, actions, cell editor, etc.).
+   * It is also called by the {@link aboutToBlurByMouseDown} function, which is required because our Ok- and Cancel-buttons are not focusable (thus {@link _onFieldBlur} is
    * never called) but changes in the value-field must be sent to the server anyway when a button is clicked.
-   * <p>
-   * The default reads the display text using this._readDisplayText() and writes it to the model by calling _triggerAcceptInput().
+   *
+   * The default reads the display text using {@link _readDisplayText} and writes it to the model by calling {@link _triggerAcceptInput}.
    * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
    */
   acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
@@ -189,10 +189,12 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   }
 
   /**
-   * Replaces the existing parser. The parser is called during {@link #parseValue(displayText)}.
+   * Replaces the existing parser. The parser is called during {@link parseValue}.
    *
    * Remember calling the default parser passed as parameter to the parse function, if needed.
    * @param parser the new parser. If null, the default parser is used.
+   *
+   * @see ValueFieldModel.parser
    */
   setParser(parser: ValueFieldParser<TValue>) {
     this.setProperty('parser', parser);
@@ -210,7 +212,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
 
   /**
    * @returns the parsed value
-   * @throws a message, a Status or an error if the parsing fails
+   * @throws a message, a {@link Status} or an error if the parsing fails
    */
   parseValue(displayText: string): TValue {
     let defaultParser = this._parseValue.bind(this);
@@ -218,7 +220,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   }
 
   /**
-   * @throws a message, a Status or an error if the parsing fails
+   * @throws a message, a {@link Status} or an error if the parsing fails
    */
   protected _parseValue(displayText: string): TValue {
     return displayText as TValue;
@@ -262,6 +264,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     this.trigger('acceptInput', event);
   }
 
+  /** @see ValueFieldModel.displayText */
   setDisplayText(displayText: string) {
     this.setProperty('displayText', displayText);
   }
@@ -281,6 +284,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     this.$container.toggleClass('has-text', this.hasText);
   }
 
+  /** @see ValueFieldModel.clearable */
   setClearable(clearableStyle: ValueFieldClearable) {
     this.setProperty('clearable', clearableStyle);
   }
@@ -333,6 +337,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     this.trigger('clear');
   }
 
+  /** @see ValueFieldModel.value */
   setValue(value: TValue | TModelValue) {
     // Same code as in Widget#setProperty expect for the equals check
     // -> _setValue has to be called even if the value is equal so that update display text will be executed
@@ -574,10 +579,12 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   }
 
   /**
-   * Replaces the existing formatter. The formatter is called during {@link #formatValue(value)}.
-   * <p>
+   * Replaces the existing formatter. The formatter is called during {@link formatValue}.
+   *
    * Remember calling the default formatter which is passed as parameter to the format function, if needed.
    * @param formatter the new formatter. If null, the default formatter is used.
+   *
+   * @see ValueFieldModel.formatter
    */
   setFormatter(formatter: ValueFieldFormatter<TValue>) {
     this.setProperty('formatter', formatter);

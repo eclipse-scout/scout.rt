@@ -914,6 +914,7 @@ export * from './desktop/Desktop';
 export * from './desktop/DesktopModel';
 export * from './desktop/DesktopEventMap';
 export * from './desktop/DisplayParent';
+export * from './desktop/DisplayParentModel';
 export * from './desktop/DesktopAdapter';
 export * from './desktop/DesktopLogo';
 export * from './desktop/DesktopLogoModel';

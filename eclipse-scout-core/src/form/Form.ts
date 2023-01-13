@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   maximized: boolean;
   headerVisible: boolean;
   modal: boolean;
+  displayParent: DisplayParent;
   dialogs: Form[];
   views: Form[];
   messageBoxes: MessageBox[];
@@ -247,6 +248,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.rootGroupBox.render();
   }
 
+  /** @see FormModel.modal */
   setModal(modal: boolean) {
     this.setProperty('modal', modal);
   }
@@ -378,6 +380,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return $.resolvedPromise();
   }
 
+  /** @see FormModel.data */
   setData(data: any) {
     this.setProperty('data', data);
   }
@@ -439,10 +442,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * This function is called by the lifecycle, when the 'save' function is called.<p>
+   * This function is called by the lifecycle, when {@link save} is called.
+   *
    * The data given to this function is the result of {@link exportData} which was called in advance.
    *
-   * @returns promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
+   * @returns a promise which may contain a {@link Status} specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
    */
   protected _save(data: object): JQuery.Promise<Status> {
     return $.resolvedPromise();
@@ -597,6 +601,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
   }
 
+  /** @see FormModel.closable */
   setClosable(closable: boolean) {
     this.setProperty('closable', closable);
   }
@@ -625,6 +630,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.abort();
   }
 
+  /** @see FormModel.resizable */
   setResizable(resizable: boolean) {
     this.setProperty('resizable', resizable);
   }
@@ -651,6 +657,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return false;
   }
 
+  /** @see FormModel.movable */
   setMovable(movable: boolean) {
     this.setProperty('movable', movable);
   }
@@ -738,6 +745,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.$saveNeeded = null;
   }
 
+  /** @see FormModel.rootGroupBox */
   setRootGroupBox(rootGroupBox: ObjectOrChildModel<GroupBox>) {
     this.setProperty('rootGroupBox', rootGroupBox);
   }
@@ -776,6 +784,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.invalidateLayoutTree();
   }
 
+  /** @see FormModel.askIfNeedSave */
   setAskIfNeedSave(askIfNeedSave: boolean) {
     this.setProperty('askIfNeedSave', askIfNeedSave);
     if (this.lifecycle) {
@@ -783,14 +792,17 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
   }
 
+  /** @see FormModel.displayViewId */
   setDisplayViewId(displayViewId: DisplayViewId) {
     this.setProperty('displayViewId', displayViewId);
   }
 
+  /** @see FormModel.displayHint */
   setDisplayHint(displayHint: DisplayHint) {
     this.setProperty('displayHint', displayHint);
   }
 
+  /** @see FormModel.saveNeededVisible */
   setSaveNeededVisible(visible: boolean) {
     this.setProperty('saveNeededVisible', visible);
   }
@@ -807,6 +819,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.invalidateLayoutTree();
   }
 
+  /** @see FormModel.status */
   setStatus(status: StatusOrModel) {
     this.setProperty('status', status);
   }
@@ -853,6 +866,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return $prevIcon;
   }
 
+  /** @see FormModel.showOnOpen */
   setShowOnOpen(showOnOpen: boolean) {
     this.setProperty('showOnOpen', showOnOpen);
   }
@@ -945,6 +959,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.$container.appendTo($parent);
   }
 
+  /** @see FormModel.headerVisible */
   setHeaderVisible(headerVisible: boolean) {
     this.setProperty('headerVisible', headerVisible);
   }
@@ -962,6 +977,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.invalidateLayoutTree();
   }
 
+  /** @see FormModel.title */
   setTitle(title: string) {
     this.setProperty('title', title);
   }
@@ -975,6 +991,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.invalidateLayoutTree();
   }
 
+  /** @see FormModel.subTitle */
   setSubTitle(subTitle: string) {
     this.setProperty('subTitle', subTitle);
   }
@@ -988,6 +1005,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.invalidateLayoutTree();
   }
 
+  /** @see FormModel.iconId */
   setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
   }
@@ -1013,6 +1031,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.rootGroupBox.setDisabledStyle(disabledStyle);
   }
 
+  /** @see FormModel.displayParent */
   setDisplayParent(displayParent: DisplayParent) {
     this.setProperty('displayParent', displayParent);
   }
@@ -1028,6 +1047,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
   }
 
+  /** @see FormModel.maximized */
   setMaximized(maximized: boolean) {
     this.setProperty('maximized', maximized);
   }

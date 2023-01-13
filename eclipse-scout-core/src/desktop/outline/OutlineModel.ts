@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FileChooser, Form, MessageBox, ObjectOrChildModel, ObjectOrModel, Page, TreeModel} from '../../index';
+import {DisplayParentModel, Form, ObjectOrChildModel, ObjectOrModel, Page, TreeModel} from '../../index';
 
-export interface OutlineModel extends TreeModel {
+export interface OutlineModel extends TreeModel, DisplayParentModel {
   nodes?: ObjectOrModel<Page>[];
   compact?: boolean;
   defaultDetailForm?: ObjectOrChildModel<Form>;
@@ -23,8 +23,4 @@ export interface OutlineModel extends TreeModel {
   titleVisible?: boolean;
   nodeMenuBarVisible?: boolean;
   detailMenuBarVisible?: boolean;
-  dialogs?: ObjectOrChildModel<Form>[];
-  views?: ObjectOrChildModel<Form>[];
-  messageBoxes?: ObjectOrChildModel<MessageBox>[];
-  fileChoosers?: ObjectOrChildModel<FileChooser>[];
 }
