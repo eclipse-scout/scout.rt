@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -232,10 +232,6 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     let formatted: string[] = [];
     lookupRows.forEach(row => formatted.push(row.text));
     return strings.join(', ', ...formatted);
-  }
-
-  protected override _readDisplayText(): string {
-    return this.displayText;
   }
 
   protected override _clear() {

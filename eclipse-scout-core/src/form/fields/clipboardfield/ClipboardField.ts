@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -122,17 +122,6 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
     if (img) {
       this.$field.prepend(img);
     }
-  }
-
-  // Because a <div> is used as field, jQuery's val() used in ValueField.js is not working here, so
-  // the content of displayText variable is used instead.
-  // (For reading the displayText innerHtml() _could_ be used on the div-field, but some browsers
-  // would collapse whitespaces which would also collapse multiple tabs when coping some table rows.
-  // So instead of reading the effective displayText from the field, the internal displayText value
-  // will be reused without actual reading. Parsing of pasted content is handled onPaste() and stored
-  // in this.displayText.)
-  protected override _readDisplayText(): string {
-    return this.displayText;
   }
 
   protected _getSelection(): Selection {

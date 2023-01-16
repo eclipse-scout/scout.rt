@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -63,11 +63,6 @@ export class BeanField<TValue extends object> extends ValueField<TValue> impleme
   protected override _parseValue(displayText: string): TValue {
     // DisplayText cannot be converted to value, use original value (see comment in _formatValue).
     return this.value;
-  }
-
-  protected override _readDisplayText(): string {
-    // DisplayText cannot be changed, therefore it must be equal to the current value (see comment in _formatValue)
-    return this.displayText;
   }
 
   protected override _renderDisplayText() {
