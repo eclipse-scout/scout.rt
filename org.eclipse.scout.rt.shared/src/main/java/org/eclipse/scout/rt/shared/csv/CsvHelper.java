@@ -22,7 +22,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Format;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -175,8 +174,8 @@ public class CsvHelper {
     }
     else if (sLow.startsWith("integer")) {// integer_<format>
       if (s.length() >= 8) {
-        Format f = new DecimalFormat(s.substring(8), new DecimalFormatSymbols(getLocale()));
-        ((NumberFormat) f).setParseIntegerOnly(true);
+        DecimalFormat f = new DecimalFormat(s.substring(8), new DecimalFormatSymbols(getLocale()));
+        f.setParseIntegerOnly(true);
         return f;
       }
       else {
@@ -230,7 +229,6 @@ public class CsvHelper {
   }
 
   /**
-   * @param dataConsumer
    * @param reader
    *          read data from
    * @param readNameHeader
@@ -340,13 +338,12 @@ public class CsvHelper {
   }
 
   /**
-   * @param writer
+   * Writes the header rows to the writer.
+   *
    * @param writeNames
    *          write a line for the column names
    * @param writeTypes
    *          write a line for the data types
-   * @throws ProcessingException
-   *           Writes the header rows to the writer.
    */
   public void exportHeaderRows(Writer writer, boolean writeNames, boolean writeTypes) {
     String line = null;
@@ -371,20 +368,17 @@ public class CsvHelper {
   }
 
   /**
-   * @param writer
-   * @throws ProcessingException
-   *           Writes data rows to the writer and does close it.
+   * Writes data rows to the writer and closes it.
    */
   public void exportDataRow(Object[] row, Writer writer) {
     exportDataRow(row, writer, true);
   }
 
   /**
-   * @param writer
+   * Writes data rows to the writer.
+   *
    * @param closeWriter
    *          true->will close the writer
-   * @throws ProcessingException
-   *           Writes data rows to the writer.
    */
   public void exportDataRow(Object[] row, Writer writer, boolean closeWriter) {
     String line = null;
@@ -392,7 +386,6 @@ public class CsvHelper {
     String cell = null;
     try {
       List<String> rowStrings = new ArrayList<>();
-      rowStrings.clear();
       for (int i = 0; i < row.length; i++) {
         val = row[i];
         cell = exportCell(val, getColumnFormat(i));
@@ -573,10 +566,7 @@ public class CsvHelper {
   }
 
   /**
-   * @param file
-   * @return the the first line of the file, expecting it to be the column names
-   * @throws ProcessingException
-   *           Read only
+   * @return the first line of the file, expecting it to be the column names
    */
   public List<String> getColumnNames(File f) {
     try (Reader r = new FileReader(f)) {
@@ -589,7 +579,6 @@ public class CsvHelper {
   }
 
   /**
-   * @param reader
    * @return the current row in the reader as cell tokens based on this helpers context
    */
   public List<String> getCurrentRow(Reader reader) {

@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  */
 @ApplicationScoped
 public class NumberFormatProvider {
+
   /**
    * delegates to {@link NumberFormat#getAvailableLocales()}
    */
@@ -42,8 +43,8 @@ public class NumberFormatProvider {
   /**
    * delegates to {@link NumberFormat#getIntegerInstance(Locale)}
    */
-  public NumberFormat getIntegerInstance(Locale locale) {
-    return NumberFormat.getIntegerInstance(locale);
+  public DecimalFormat getIntegerInstance(Locale locale) {
+    return (DecimalFormat) NumberFormat.getIntegerInstance(locale);
   }
 
   /**
