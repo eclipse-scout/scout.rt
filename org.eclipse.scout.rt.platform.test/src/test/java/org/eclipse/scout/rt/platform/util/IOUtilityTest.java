@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -169,17 +169,6 @@ public class IOUtilityTest {
     finally {
       IOUtility.deleteFile(tempFile);
     }
-  }
-
-  @Test
-  public void testFileExtension() {
-    assertEquals("temp", IOUtility.getFileExtension("Test.temp"));
-    assertEquals("temp", IOUtility.getFileExtension("Test.xy.temp"));
-    assertEquals("temp", IOUtility.getFileExtension(".temp"));
-    assertEquals("", IOUtility.getFileExtension("Test."));
-    assertEquals("", IOUtility.getFileExtension("."));
-    assertNull(IOUtility.getFileExtension(""));
-    assertNull(IOUtility.getFileExtension(null));
   }
 
   @Test

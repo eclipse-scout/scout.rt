@@ -1,19 +1,16 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +32,7 @@ public class FileUtilityTest {
   private static final String FILE_NAME = "fooBar.txt";
   private static final String FILE_NAME_MULTIPLE_DOTS = "foo.bar.txt";
   private static final String FILE_NAME_NO_EXT = "fooBar";
+  private static final String FILE_NAME_ONLY_DOT = "fooBar";
   private static final String PLATFORM_PATH = "org/eclipse/scout/rt/platform/";
 
   @Test
@@ -93,7 +91,9 @@ public class FileUtilityTest {
   public void testGetFileExtension_String() {
     assertEquals(TEXT_EXT, FileUtility.getFileExtension(FILE_NAME));
     assertEquals(TEXT_EXT, FileUtility.getFileExtension(FILE_NAME_MULTIPLE_DOTS));
+    assertNull(FileUtility.getFileExtension(FILE_NAME_ONLY_DOT));
     assertNull(FileUtility.getFileExtension(FILE_NAME_NO_EXT));
+    assertNull(FileUtility.getFileExtension(""));
     assertNull(FileUtility.getFileExtension((String) null));
   }
 
@@ -101,7 +101,9 @@ public class FileUtilityTest {
   public void testGetFileExtension_File() {
     assertEquals(TEXT_EXT, FileUtility.getFileExtension(new File(FILE_NAME)));
     assertEquals(TEXT_EXT, FileUtility.getFileExtension(new File(FILE_NAME_MULTIPLE_DOTS)));
-    assertNull(FileUtility.getFileExtension((File) new File(FILE_NAME_NO_EXT)));
+    assertNull(FileUtility.getFileExtension(new File(FILE_NAME_ONLY_DOT)));
+    assertNull(FileUtility.getFileExtension(new File(FILE_NAME_NO_EXT)));
+    assertNull(FileUtility.getFileExtension(new File("")));
     assertNull(FileUtility.getFileExtension((File) null));
   }
 
