@@ -14,7 +14,14 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Random;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -524,5 +531,54 @@ public final class NumberUtility {
       regex += "(\\" + decimalSeparator + "\\d+)?";
     }
     return str.matches(regex);
+  }
+
+  private static final NavigableMap<Long, String> METRIC_SUFFIXES = new TreeMap<>();
+  static {
+    METRIC_SUFFIXES.put(1_000L, "k");
+    METRIC_SUFFIXES.put(1_000_000L, "M");
+    METRIC_SUFFIXES.put(1_000_000_000L, "G");
+    METRIC_SUFFIXES.put(1_000_000_000_000L, "T");
+    METRIC_SUFFIXES.put(1_000_000_000_000_000L, "P");
+    METRIC_SUFFIXES.put(1_000_000_000_000_000_000L, "E");
+  }
+  private static final Map<String, Long> METRIC_SUFFIXES_INVERTED = METRIC_SUFFIXES
+      .entrySet()
+      .stream()
+      .collect(Collectors
+          .toMap(Entry::getValue, Entry::getKey));
+
+  public static final Pattern METRIC_SUFFIX_PATTERN = Pattern.compile("^(\\d*)([kMGTPE])$");
+
+  public static Long parseWithMetricAbbreviationSuffix(String numberWithMetricSuffix) {
+    Matcher m = METRIC_SUFFIX_PATTERN.matcher(numberWithMetricSuffix);
+    if (m.matches()) {
+      Long base = Long.parseLong(m.group(1));
+      Long multiplier = METRIC_SUFFIXES_INVERTED.get(m.group(2));
+      return base * multiplier;
+    }
+    return null;
+  }
+
+  @SuppressWarnings("IntegerDivisionInFloatingPointContext")
+  public static String formatWithMetricAbbreviationSuffix(Long value) {
+    //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+    if (value == Long.MIN_VALUE) {
+      return formatWithMetricAbbreviationSuffix(Long.MIN_VALUE + 1);
+    }
+    if (value < 0) {
+      return "-" + formatWithMetricAbbreviationSuffix(-value);
+    }
+    if (value < 1000) {
+      return Long.toString(value); //deal with easy case
+    }
+
+    Entry<Long, String> e = METRIC_SUFFIXES.floorEntry(value);
+    Long divisor = e.getKey();
+    String suffix = e.getValue();
+
+    long truncated = value / (divisor / 10); //the number part of the output times 10
+    boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
+    return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
   }
 }
