@@ -64,11 +64,6 @@ export class BeanField<TValue extends object> extends ValueField<TValue> impleme
     return this.value;
   }
 
-  protected override _readDisplayText(): string {
-    // DisplayText cannot be changed, therefore it must be equal to the current value (see comment in _formatValue)
-    return this.displayText;
-  }
-
   protected override _renderDisplayText() {
     // nop
   }
