@@ -1,14 +1,16 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.dataobject.id;
+
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +22,6 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class IdExternalFormatter {
   protected void createClassCache() {
     for (IClassInfo classInfo : ClassInventory.get().getKnownAnnotatedTypes(IdTypeName.class)) {
       String typeName = (String) classInfo.getAnnotationValue(IdTypeName.class, "value");
-      Assertions.assertNotNullOrEmpty(typeName, "Invalid value for @{} on {} (must not be null or empty)", IdTypeName.class.getSimpleName(), classInfo.resolveClass().getName());
+      assertNotNullOrEmpty(typeName, "Invalid value for @{} on {} (must not be null or empty)", IdTypeName.class.getSimpleName(), classInfo.resolveClass().getName());
       try {
         @SuppressWarnings("unchecked")
         Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) classInfo.resolveClass().asSubclass(IId.class);
@@ -59,8 +60,8 @@ public class IdExternalFormatter {
    * Checks for classes with the same {@link IdTypeName} annotation values.
    */
   protected void checkDuplicateIdTypeNames(Class<?> clazz, String typeName, Class<?> existingClass, String existingName) {
-    Assertions.assertNull(existingClass, "{} and {} have the same type name '{}'. Use an unique @{} annotation value.", clazz, existingClass, typeName, IdTypeName.class.getSimpleName());
-    Assertions.assertNull(existingName, "{} is annotated with @{} value '{}', but was already registered with type name '{}'. Register each class only once.", clazz, IdTypeName.class.getSimpleName(), typeName, existingName);
+    assertNull(existingClass, "{} and {} have the same type name '{}'. Use an unique @{} annotation value.", clazz, existingClass, typeName, IdTypeName.class.getSimpleName());
+    assertNull(existingName, "{} is annotated with @{} value '{}', but was already registered with type name '{}'. Register each class only once.", clazz, IdTypeName.class.getSimpleName(), typeName, existingName);
   }
 
   /**
@@ -71,7 +72,7 @@ public class IdExternalFormatter {
    * </ul>
    */
   public <ID extends IId<?>> String toExternalForm(ID id) {
-    String typeName = Assertions.assertNotNull(getTypeName(id), "Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass().getName());
+    String typeName = assertNotNull(getTypeName(id), "Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass().getName());
     String rawId = id.unwrapAsString();
     return typeName + ":" + rawId;
   }
@@ -90,14 +91,47 @@ public class IdExternalFormatter {
     }
     String[] tmp = externalForm.split(":");
     if (tmp.length != 2) {
-      throw new IllegalArgumentException("externalForm '" + externalForm + "' is invalid");
+      throwInvalidExternalForm(externalForm);
     }
     String typeName = tmp[0];
     Class<? extends IId<?>> idClass = m_nameToClassMap.get(typeName);
     if (idClass == null) {
-      throw new ProcessingException("No class found for type name '{}'", typeName);
+      throwNoClassFoundForType(typeName);
     }
     return m_idFactory.get().createFromString(idClass, tmp[1]);
+  }
+
+  protected void throwNoClassFoundForType(String typeName) {
+    throw new ProcessingException("No class found for type name '{}'", typeName);
+  }
+
+  protected void throwInvalidExternalForm(String externalForm) {
+    throw new IllegalArgumentException("externalForm '" + externalForm + "' is invalid");
+  }
+
+  /**
+   * Parses a string in the format <code>"[type-name]:[raw-id]"</code> knowing the id type already; if type is not
+   * included in the input string, the known type is used; if another type than the known type is included in the input
+   * string an exception is thrown.
+   */
+  public <ID extends IId<?>> ID fromExternalFormWithKnownType(Class<ID> idType, String externalForm) {
+    if (externalForm == null) {
+      return null;
+    }
+    String[] tmp = externalForm.split(":", 2);
+    if (tmp.length == 2) {
+      String typeName = tmp[0];
+      Class<? extends IId<?>> idClass = m_nameToClassMap.get(typeName);
+      if (idClass == null) {
+        throwNoClassFoundForType(typeName);
+      }
+      assertEquals(idType, idClass, "Id type set in externalForm does not equal the expected (known) type");
+    }
+    else if (tmp.length != 1) {
+      // tmp must either be of length 1 or 2 (see above for 2)
+      throwInvalidExternalForm(externalForm);
+    }
+    return m_idFactory.get().createFromString(idType, tmp.length == 2 ? tmp[1] : tmp[0]);
   }
 
   /**

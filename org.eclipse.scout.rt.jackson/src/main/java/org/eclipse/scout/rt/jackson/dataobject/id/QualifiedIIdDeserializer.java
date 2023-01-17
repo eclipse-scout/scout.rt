@@ -1,14 +1,16 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
+
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.io.IOException;
 
@@ -29,12 +31,22 @@ public class QualifiedIIdDeserializer extends StdDeserializer<IId<?>> {
 
   protected final LazyValue<IdExternalFormatter> m_idExternalFormatter = new LazyValue<>(IdExternalFormatter.class);
 
+  protected final Class<? extends IId<?>> m_concreteIdType;
+
   public QualifiedIIdDeserializer() {
     super(IId.class);
+    m_concreteIdType = null;
+  }
+
+  public QualifiedIIdDeserializer(Class<? extends IId<?>> concreteIdType) {
+    super(assertNotNull(concreteIdType));
+    m_concreteIdType = concreteIdType;
   }
 
   @Override
   public IId<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    return m_idExternalFormatter.get().fromExternalForm(p.readValueAs(String.class));
+    return m_concreteIdType != null
+        ? m_idExternalFormatter.get().fromExternalFormWithKnownType(m_concreteIdType, p.readValueAs(String.class))
+        : m_idExternalFormatter.get().fromExternalForm(p.readValueAs(String.class));
   }
 }
