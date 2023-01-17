@@ -190,7 +190,7 @@ public class CodeServiceTest {
   public static class SomeCodeType extends AbstractCodeType<Long, String> {
 
     private static final long serialVersionUID = 1L;
-    public final static AtomicBoolean EXEC_LOAD_CODES_INVOKED = new AtomicBoolean();
+    public static final AtomicBoolean EXEC_LOAD_CODES_INVOKED = new AtomicBoolean();
 
     @Override
     protected List<? extends ICodeRow<String>> execLoadCodes(Class<? extends ICodeRow<String>> codeRowType) {

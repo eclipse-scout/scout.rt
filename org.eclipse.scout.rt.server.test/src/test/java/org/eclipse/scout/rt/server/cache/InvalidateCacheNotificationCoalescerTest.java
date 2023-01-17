@@ -30,9 +30,9 @@ import org.junit.Test;
  */
 public class InvalidateCacheNotificationCoalescerTest {
 
-  private final static String CACHE_ID_1 = "CacheTestId1";
-  private final static String CACHE_ID_2 = "CacheTestId2";
-  private final static String CACHE_ID_3 = "CacheTestId3";
+  private static final String CACHE_ID_1 = "CacheTestId1";
+  private static final String CACHE_ID_2 = "CacheTestId2";
+  private static final String CACHE_ID_3 = "CacheTestId3";
 
   @Test
   public void testCoalesceEmptySet() {

@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -152,7 +151,7 @@ public class BEANSTest {
   public class TestService implements ITestService2 {
   }
 
-  private static abstract class AbstractTestService {
+  private abstract static class AbstractTestService {
   }
 
   private static class Service1BelowAbstractTestService extends AbstractTestService {

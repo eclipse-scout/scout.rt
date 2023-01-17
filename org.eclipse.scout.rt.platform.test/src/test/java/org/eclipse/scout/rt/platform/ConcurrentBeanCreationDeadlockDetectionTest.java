@@ -163,7 +163,7 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
    * Test beans
    * ==============================================================================
    */
-  public static abstract class AbstractConcurrentTestBean {
+  public abstract static class AbstractConcurrentTestBean {
     private final AtomicBoolean m_initialized = new AtomicBoolean();
 
     protected void initialize() {
@@ -195,7 +195,7 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
     }
   }
 
-  public static abstract class AbstractConcurrentSelfReferencingTestBean {
+  public abstract static class AbstractConcurrentSelfReferencingTestBean {
     private final AtomicBoolean m_initialized = new AtomicBoolean();
     private AbstractConcurrentSelfReferencingTestBean m_otherBean;
 

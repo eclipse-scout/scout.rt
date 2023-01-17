@@ -9,18 +9,15 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 public class PreferredValueTest {
 
-  private final static Object OBJECT_1 = new Object();
-  private final static Object OBJECT_2 = new Object();
-  private final static Object OBJECT_3 = new Object();
+  private static final Object OBJECT_1 = new Object();
+  private static final Object OBJECT_2 = new Object();
+  private static final Object OBJECT_3 = new Object();
 
   @Test
   public void test() {

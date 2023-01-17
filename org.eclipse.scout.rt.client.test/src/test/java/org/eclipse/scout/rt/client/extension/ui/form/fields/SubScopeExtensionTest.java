@@ -51,7 +51,7 @@ public class SubScopeExtensionTest {
     Assert.assertEquals(MAX_LEN, stringField.getMaxLength());
   }
 
-  public static abstract class AbstractBoxTemplate extends AbstractGroupBox {
+  public abstract static class AbstractBoxTemplate extends AbstractGroupBox {
     @Order(1000)
     public class MyStringField extends AbstractStringField {
     }

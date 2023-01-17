@@ -19,7 +19,7 @@ import org.junit.Test;
  * @since 5.2
  */
 public class CacheBuilderTest {
-  private final static String CACHE_ID = "CacheBuilderTestCacheId";
+  private static final String CACHE_ID = "CacheBuilderTestCacheId";
 
   @Test
   public void testCacheBuilderInstance() {

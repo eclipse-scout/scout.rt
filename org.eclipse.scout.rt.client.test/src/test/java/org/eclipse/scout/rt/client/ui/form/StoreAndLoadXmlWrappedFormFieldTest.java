@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -179,7 +178,7 @@ public class StoreAndLoadXmlWrappedFormFieldTest {
     }
   }
 
-  public final static class InnerTestForm extends AbstractForm {
+  public static final class InnerTestForm extends AbstractForm {
 
     public InnerTextField getInnerTextField() {
       return getFieldByClass(InnerTextField.class);

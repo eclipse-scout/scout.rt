@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -64,7 +63,7 @@ public class BeanManagerUniqueTest {
     assertEquals(BaseClass.class, context.optBean(BaseClass.class).getBeanClazz());
   }
 
-  private static abstract class AbstractBaseClass {
+  private abstract static class AbstractBaseClass {
   }
 
   private static class BaseClass extends AbstractBaseClass {
