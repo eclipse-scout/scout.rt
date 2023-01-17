@@ -62,7 +62,7 @@ public class BeanHierarchyTest {
   private static class InvalidReplaceA {
   }
 
-  private static abstract class AbstractFixture {
+  private abstract static class AbstractFixture {
   }
 
   @Replace
@@ -122,7 +122,7 @@ public class BeanHierarchyTest {
   public interface ITestInterface {
   }
 
-  public static abstract class AbstractBaseClass {
+  public abstract static class AbstractBaseClass {
   }
 
   public static class SubClassA extends AbstractBaseClass {

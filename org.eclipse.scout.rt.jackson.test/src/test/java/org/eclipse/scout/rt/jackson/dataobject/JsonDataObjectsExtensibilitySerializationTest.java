@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -234,7 +233,7 @@ public class JsonDataObjectsExtensibilitySerializationTest {
   static interface ITestCustomerDo extends IDataObject {
   }
 
-  static abstract class AbstractTestDataObject extends DoEntity {
+  abstract static class AbstractTestDataObject extends DoEntity {
     public DoValue<String> id() {
       return doValue("id");
     }

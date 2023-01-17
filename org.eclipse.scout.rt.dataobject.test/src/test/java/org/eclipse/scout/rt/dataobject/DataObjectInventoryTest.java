@@ -68,7 +68,7 @@ public class DataObjectInventoryTest {
   protected DataObjectInventory m_inventory;
 
   @TypeName("TestBaseFixtureEntity")
-  public static abstract class TestBaseFixtureEntityDo extends DoEntity {
+  public abstract static class TestBaseFixtureEntityDo extends DoEntity {
   }
 
   public static class TestFixtureSubclass1Do extends TestBaseFixtureEntityDo {
@@ -81,7 +81,7 @@ public class DataObjectInventoryTest {
   }
 
   @TypeName("TestFixtureEntity")
-  public static abstract class TestFixtureEntityDo extends DoEntity {
+  public abstract static class TestFixtureEntityDo extends DoEntity {
     public DoValue<String> id() {
       return doValue("id");
     }

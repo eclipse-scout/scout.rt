@@ -70,7 +70,7 @@ public class ApplicationsScopedTest {
   }
 
   @ApplicationScoped
-  private static abstract class AbstractBean02 {
+  private abstract static class AbstractBean02 {
 
   }
 

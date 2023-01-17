@@ -32,7 +32,7 @@ public class OAuth2Helper {
   protected final ConcurrentHashMap<OAuth2Config, TokenEntry> m_tokenCache = new ConcurrentHashMap<>();
   protected long m_latestEviction = BEANS.get(IDateProvider.class).currentUTCMillis();
   // Clean map after 30 minutes (or longer, if #getToken() isn't called)
-  protected final static long EVICTION_INTERVALL = 30 * 60 * 1000;
+  protected static final long EVICTION_INTERVALL = 30 * 60 * 1000;
 
   /**
    * Supports the OAuth2 client credentials flow.

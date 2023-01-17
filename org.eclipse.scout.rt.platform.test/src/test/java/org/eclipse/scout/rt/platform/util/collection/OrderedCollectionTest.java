@@ -921,7 +921,7 @@ public class OrderedCollectionTest {
     }
   }
 
-  public static abstract class AbstractOrdered implements IOrdered {
+  public abstract static class AbstractOrdered implements IOrdered {
     private double m_order;
 
     public AbstractOrdered() {

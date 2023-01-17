@@ -91,7 +91,7 @@ public class PostConstructTest {
   }
 
   @ApplicationScoped
-  private static abstract class AbstractBean02 {
+  private abstract static class AbstractBean02 {
     private AtomicInteger m_superInitCount = new AtomicInteger();
 
     @PostConstruct
@@ -119,7 +119,7 @@ public class PostConstructTest {
   }
 
   @ApplicationScoped
-  private static abstract class AbstractBean03 {
+  private abstract static class AbstractBean03 {
     private AtomicInteger m_AbstractBean03Init = new AtomicInteger();
 
     @PostConstruct
