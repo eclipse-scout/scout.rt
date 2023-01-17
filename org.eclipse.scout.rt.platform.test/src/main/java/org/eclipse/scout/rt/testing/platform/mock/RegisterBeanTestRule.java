@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
@@ -9,7 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.platform.mock;
 
-import java.util.List;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -24,24 +25,28 @@ import org.junit.runners.model.Statement;
 public class RegisterBeanTestRule<BEAN> implements TestRule {
 
   private final Class<? super BEAN> m_beanClazz;
-  private final BEAN m_mock;
+  private final Supplier<BEAN> m_mockSupplier;
 
-  private List<IBean<?>> m_temporaryBeans;
+  private IBean<?> m_temporaryBean;
 
   public RegisterBeanTestRule(Class<? super BEAN> beanClazz, BEAN mock) {
+    this(beanClazz, () -> mock);
+  }
+
+  public RegisterBeanTestRule(Class<? super BEAN> beanClazz, Supplier<BEAN> mockSupplier) {
     m_beanClazz = beanClazz;
-    m_mock = mock;
+    m_mockSupplier = mockSupplier;
   }
 
   public void registerBean() {
-    m_temporaryBeans = BeanTestingHelper.get().registerBeans(
+    m_temporaryBean = BeanTestingHelper.get().registerBean(
         new BeanMetaData(m_beanClazz)
             .withApplicationScoped(true)
-            .withInitialInstance(m_mock));
+            .withInitialInstance(m_mockSupplier.get()));
   }
 
   public void unregisterBean() {
-    BeanTestingHelper.get().unregisterBeans(m_temporaryBeans);
+    BeanTestingHelper.get().unregisterBean(m_temporaryBean);
   }
 
   @Override
