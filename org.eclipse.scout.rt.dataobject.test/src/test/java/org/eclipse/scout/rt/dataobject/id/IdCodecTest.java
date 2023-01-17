@@ -26,4 +26,9 @@ public class IdCodecTest extends AbstractIdCodecTest {
   protected IdCodec getCodec() {
     return m_idCodec;
   }
+
+  @Override
+  public void testFromQualifiedRootId_2() {
+    super.testFromQualifiedRootId_2();
+  }
 }

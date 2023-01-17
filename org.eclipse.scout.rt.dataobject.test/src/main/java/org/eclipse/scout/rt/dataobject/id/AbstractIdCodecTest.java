@@ -173,6 +173,13 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromQualifiedRootId_2() {
+    FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
+    IId id2 = getCodec().fromQualified("" + TEST_UUID);
+    assertEquals(id1, id2);
+  }
+
+  @Test
   public void testFromQualifiedRootId() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
     IId id2 = getCodec().fromQualified("scout.FixtureUuId:" + TEST_UUID);

@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -26,14 +27,22 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 public class QualifiedIIdDeserializer extends StdDeserializer<IId> {
   private static final long serialVersionUID = 1L;
 
-  protected final LazyValue<IdCodec> m_idExternalFormatter = new LazyValue<>(IdCodec.class);
+  protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
+
+  protected final Class<? extends IId> m_concreteIdType;
 
   public QualifiedIIdDeserializer() {
     super(IId.class);
+    m_concreteIdType = null;
+  }
+
+  public QualifiedIIdDeserializer(Class<? extends IId> concreteIdType) {
+    super(Assertions.assertNotNull(concreteIdType));
+    m_concreteIdType = concreteIdType;
   }
 
   @Override
   public IId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    return m_idExternalFormatter.get().fromQualified(p.getText());
+    return m_idCodec.get().fromQualified(p.getText());
   }
 }

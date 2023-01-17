@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -112,7 +113,7 @@ public class IdCodec {
    *           if the given string does not match the expected format or the referenced class is not found.
    */
   public IId fromQualified(String qualifiedId) {
-    return fromQualifiedInternal(qualifiedId, false);
+    return fromQualifiedInternal(qualifiedId, null, false);
   }
 
   /**
@@ -122,7 +123,7 @@ public class IdCodec {
    *         format or the referenced class is not found.
    */
   public IId fromQualifiedLenient(String qualifiedId) {
-    return fromQualifiedInternal(qualifiedId, true);
+    return fromQualifiedInternal(qualifiedId, null, true);
   }
 
   /**
@@ -182,14 +183,21 @@ public class IdCodec {
 
   /**
    * Parses a string in the format {@code [type-name]:[raw-id;raw-id;...]}.
+   * <p>
+   * If an <i>expectedType</i> is set, the {@code [type-name]} part is optional however if it is set, the
+   * <i>expectedType</i> must be assignable of this type.
+   * </p>
    *
    * @param lenient
    *          If the structure of the given {@code qualifiedId} is invalid and {@code lenient} flag is set to
    *          {@code true}, value {@code null} is returned. If {@code lenient} flag is set to {@code false}, an
    *          exception is thrown.
+   * @param expectedType
+   *          {@code null} if type is not known ({@code [type-name]} is required then) otherwise {@code [type-name]} may
+   *          be omitted.
    * @return {@code IId} parsed from {@code qualifiedId}
    */
-  protected IId fromQualifiedInternal(String qualifiedId, boolean lenient) {
+  protected IId fromQualifiedInternal(String qualifiedId, Class<? extends IId> expectedType, boolean lenient) {
     if (StringUtility.isNullOrEmpty(qualifiedId)) {
       return null;
     }
@@ -202,6 +210,9 @@ public class IdCodec {
         throw new PlatformException("Qualified id '{}' format is invalid", qualifiedId);
       }
     }
+    if (tmp.length == 1 && expectedType != null) {
+      return fromUnqualified(expectedType, tmp[0]);
+    }
     String typeName = tmp[0];
     Class<? extends IId> idClass = m_idInventory.get().getIdClass(typeName);
     if (idClass == null) {
@@ -211,6 +222,9 @@ public class IdCodec {
       else {
         throw new PlatformException("No class found for type name '{}'", typeName);
       }
+    }
+    if (expectedType != null) {
+      Assertions.assertEquals(expectedType, idClass, "Id type set in externalForm does not equal the expected (known) type");
     }
     return fromUnqualified(idClass, tmp[1]);
   }
