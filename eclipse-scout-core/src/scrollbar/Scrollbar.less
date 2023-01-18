@@ -164,12 +164,18 @@
     --scroll-shadow-inset-bottom: 0;
     --scroll-shadow-inset-left: 0;
 
-    @scroll-shadow-blur-spread-color: var(--scroll-shadow-blur) calc(-1 * var(--scroll-shadow-spread)) var(--scroll-shadow-color);
-    @scroll-shadow-top: inset 0 var(--scroll-shadow-size) @scroll-shadow-blur-spread-color;
-    @scroll-shadow-bottom: inset 0 calc(-1 * var(--scroll-shadow-size)) @scroll-shadow-blur-spread-color;
-    @scroll-shadow-left: inset var(--scroll-shadow-size) 0 @scroll-shadow-blur-spread-color;
-    @scroll-shadow-right: inset calc(-1 * var(--scroll-shadow-size)) 0 @scroll-shadow-blur-spread-color;
-    @scroll-shadow-none: inset 0 0 0 0 transparent;
+    --scroll-shadow-blur-spread-color: var(--scroll-shadow-blur) calc(-1 * var(--scroll-shadow-spread)) var(--scroll-shadow-color);
+    --scroll-shadow-top: inset 0 var(--scroll-shadow-size) var(--scroll-shadow-blur-spread-color);
+    --scroll-shadow-bottom: inset 0 calc(-1 * var(--scroll-shadow-size)) var(--scroll-shadow-blur-spread-color);
+    --scroll-shadow-left: inset var(--scroll-shadow-size) 0 var(--scroll-shadow-blur-spread-color);
+    --scroll-shadow-right: inset calc(-1 * var(--scroll-shadow-size)) 0 var(--scroll-shadow-blur-spread-color);
+    --scroll-shadow-none: inset 0 0 0 0 transparent;
+
+    @scroll-shadow-top: var(--scroll-shadow-top);
+    @scroll-shadow-bottom: var(--scroll-shadow-bottom);
+    @scroll-shadow-left: var(--scroll-shadow-left);
+    @scroll-shadow-right: var(--scroll-shadow-right);
+    @scroll-shadow-none: var(--scroll-shadow-none);
 
     &.top {
       box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-none;
