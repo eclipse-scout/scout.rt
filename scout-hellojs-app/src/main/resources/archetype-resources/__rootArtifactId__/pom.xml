@@ -15,7 +15,6 @@
   <properties>
     <jdk.source.version>${javaVersion}</jdk.source.version>
     <org.eclipse.scout.rt.version>23.1-SNAPSHOT</org.eclipse.scout.rt.version>
-    <org.glassfish.jersey.version>2.37</org.glassfish.jersey.version>
     <org.jooq.version>3.17.6</org.jooq.version>
     <derby.version>10.15.2.0</derby.version>
     <master_npm_release_dependency_mapping>--mapping.0.regex=@eclipse-scout --mapping.0.version=${org.eclipse.scout.rt.version}</master_npm_release_dependency_mapping>
@@ -45,13 +44,6 @@
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt</artifactId>
         <version>${org.eclipse.scout.rt.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey</groupId>
-        <artifactId>jersey-bom</artifactId>
-        <version>${org.glassfish.jersey.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
