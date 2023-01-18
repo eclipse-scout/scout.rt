@@ -181,6 +181,22 @@
 
     &.disabled:not(.read-only) {
       --tile-background-color: @tile-default-border-color;
+
+      & ::-moz-selection {
+        #scout.text-selection();
+      }
+
+      & ::selection {
+        #scout.text-selection();
+      }
+    }
+
+    & ::-moz-selection {
+      background: darken(@text-selection-background-color, 10);
+    }
+
+    & ::selection {
+      background: darken(@text-selection-background-color, 10);
     }
 
     & > .form-field {
@@ -289,6 +305,14 @@
 
     &.disabled:not(.read-only) {
       --tile-background-color: @tile-default-border-color;
+    }
+
+    & ::-moz-selection {
+      #scout.text-selection();
+    }
+
+    & ::selection {
+      #scout.text-selection();
     }
 
     & > .form-field {
