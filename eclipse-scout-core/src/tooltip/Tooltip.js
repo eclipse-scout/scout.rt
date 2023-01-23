@@ -64,7 +64,7 @@ export default class Tooltip extends Widget {
     this.$container = this.$parent
       .appendDiv('tooltip')
       .data('tooltip', this);
-
+    this.findDesktop().adjustOverlayOrder(this);
     if (this.cssClass) {
       this.$container.addClass(this.cssClass);
     }
@@ -92,15 +92,7 @@ export default class Tooltip extends Widget {
     }
 
     // If the tooltip is rendered inside a (popup) dialog, get a reference to the dialog.
-    this.dialog = null;
-    let parent = this.parent;
-    while (parent) {
-      if (parent instanceof Form && parent.isDialog()) {
-        this.dialog = parent;
-        break;
-      }
-      parent = parent.parent;
-    }
+    this.dialog = this.findParent(p => p instanceof Form && p.isDialog());
 
     // If inside a dialog, attach a listener to reposition the tooltip when the dialog is moved
     if (this.dialog) {
