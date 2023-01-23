@@ -22,7 +22,6 @@ describe('HierarchicalTableSpec', () => {
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
-
   });
 
   afterEach(() => {
@@ -31,14 +30,6 @@ describe('HierarchicalTableSpec', () => {
     jasmine.clock().uninstall();
     $.fx.off = false;
   });
-
-  function createColumnFilterModel(columnId, selectedValues) {
-    return {
-      objectType: 'TextColumnUserFilter',
-      column: columnId,
-      selectedValues: selectedValues
-    };
-  }
 
   function createAndRegisterColumnFilter(table, column, selectedValues) {
     return helper.createAndRegisterColumnFilter({
@@ -335,8 +326,8 @@ describe('HierarchicalTableSpec', () => {
     });
 
     it('is updated when insert a new child row', () => {
-      let row = helper.createModelRow(33, ['newRow']),
-        spyRenderViewPort = spyOn(table, '_renderViewport').and.callThrough();
+      let row = helper.createModelRow(33, ['newRow']);
+      spyOn(table, '_renderViewport').and.callThrough();
 
       row.parentRow = rows[0].id;
       table.insertRow(row);
@@ -362,8 +353,7 @@ describe('HierarchicalTableSpec', () => {
 
     it('is updated when deleting a row and its children', () => {
       // cascade deleted row
-      let childRowToBeDeleted = rows[2],
-        expectedRowIds = [0, 3];
+      let expectedRowIds = [0, 3];
       table.deleteRow(rows[1]);
 
       expectRowIds(table.rows, expectedRowIds);
@@ -891,7 +881,30 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(table.rows, [0, 2, 3, 4, 5, 6, 1, 7]);
       expectRowIds(table.visibleRows, [2, 3, 6, 1]);
     });
-
   });
 
+  describe('expandRows', () => {
+    it('does not render duplicate rows when called while row is still collapsing', () => {
+      let model = helper.createModelFixture(1, 2);
+      let table = helper.createTable(model);
+      let rows = [
+        {cells: ['child0_row0'], parentRow: table.rows[0]},
+        {cells: ['child1_row0'], parentRow: table.rows[1]}
+      ];
+      table.insertRows(rows);
+      table.expandRows(table.rows);
+      table.render();
+      expect(table.$rows().length).toBe(4);
+
+      $.fx.off = false;
+      table.collapseRow(table.rootRows[1]);
+      table.expandRow(table.rootRows[1]);
+      table.deleteRow(table.rootRows[1]);
+      expect(table.$rows().length).toBe(2);
+
+      table.collapseRow(table.rootRows[0]);
+      table.rows[1].$row.stop(false, true); // Complete animation
+      expect(table.$rows().length).toBe(1);
+    });
+  });
 });

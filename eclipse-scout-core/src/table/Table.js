@@ -1893,10 +1893,10 @@ export default class Table extends Widget {
     $row.removeClass('hiding');
     $row.stop().slideDown({
       duration: 250,
-      complete: function() {
+      complete: () => {
         $row.removeClass('showing');
         this.updateScrollbars();
-      }.bind(this)
+      }
     });
   }
 
@@ -1916,7 +1916,7 @@ export default class Table extends Widget {
     $row.removeClass('showing');
     $row.stop().slideUp({
       duration: 250,
-      complete: function() {
+      complete: () => {
         if (!row.$row) {
           // ignore already removed rows
           return;
@@ -1928,7 +1928,7 @@ export default class Table extends Widget {
           row.$row = null;
         }
         this.updateScrollbars();
-      }.bind(this)
+      }
     });
   }
 
@@ -3631,35 +3631,37 @@ export default class Table extends Widget {
     let renderedRows = [];
     let rowsToHide = [];
     this.$rows().each((i, elem) => {
-      let $row = $(elem),
-        row = $row.data('row');
+      let $row = $(elem);
+      let row = $row.data('row');
       if (this.visibleRows.indexOf(row) < 0) {
         // remember for remove animated
         row.$row.detach();
         rowsToHide.push(row);
       } else {
-        renderedRows.push(row);
+        if ($row.hasClass('hiding')) {
+          // If a row is shown again while the hide animation is still running, complete the hide animation first to ensure the same model row will never be rendered twice.
+          // In order to get a show animation for that case, don't add this row to the list of renderedRows.
+          $row.stop(false, true);
+        } else {
+          renderedRows.push(row);
+        }
       }
     });
 
     this._rerenderViewport();
     // insert rows to remove animated
-    rowsToHide.forEach(function(row) {
-      row.$row.insertAfter(this.$fillBefore);
-    }, this);
+    rowsToHide.forEach(row => row.$row.insertAfter(this.$fillBefore));
     // Rows removed by an animation are still there, new rows were appended -> reset correct row order
     this._order$Rows().insertAfter(this.$fillBefore);
     // Also make sure aggregate rows are at the correct position (_renderAggregateRows does nothing because they are already rendered)
     this._order$AggregateRows();
 
-    rowsToHide.forEach(function(row) {
-      // remove animated
-      this._hideRow(row);
-    }, this);
+    // remove animated
+    rowsToHide.forEach(row => this._hideRow(row));
 
     this.$rows().each((i, elem) => {
-      let $row = $(elem),
-        row = $row.data('row');
+      let $row = $(elem);
+      let row = $row.data('row');
       if ($row.hasClass('hiding')) {
         // Do not remove rows which are removed using an animation
         // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
@@ -5262,16 +5264,15 @@ export default class Table extends Widget {
   }
 
   updateColumnOrder(columns) {
-    let i, column, currentPosition, oldColumnOrder;
     if (columns.length !== this.columns.length) {
       throw new Error('Column order may not be updated because lengths of the arrays differ.');
     }
 
-    oldColumnOrder = this.columns.slice();
+    let oldColumnOrder = this.columns.slice();
 
-    for (i = 0; i < columns.length; i++) {
-      column = columns[i];
-      currentPosition = arrays.findIndex(this.columns, element => element.id === column.id);
+    for (let i = 0; i < columns.length; i++) {
+      let column = columns[i];
+      let currentPosition = arrays.findIndex(this.columns, element => element.id === column.id);
       if (currentPosition < 0) {
         throw new Error('Column with id ' + column.id + 'not found.');
       }
