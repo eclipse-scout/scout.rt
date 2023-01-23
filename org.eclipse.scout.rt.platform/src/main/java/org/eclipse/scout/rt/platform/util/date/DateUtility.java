@@ -70,14 +70,33 @@ public final class DateUtility {
   }
 
   /**
-   * format time with {@value DateFormat#SHORT}, {@value DateFormat#SHORT} patterns
+   * format time with {@value DateFormat#DEFAULT}, {@value DateFormat#SHORT} patterns
    */
   public static String formatDateTime(Date d) {
+    return formatDateTime(d, DateFormat.DEFAULT, DateFormat.SHORT);
+  }
+
+  /**
+   * format time with {@value DateFormat#SHORT}, {@value DateFormat#SHORT} patterns
+   */
+  public static String formatDateTimeShort(Date d) {
+    return formatDateTime(d, DateFormat.SHORT, DateFormat.SHORT);
+  }
+
+  /**
+   * Formats the specified date time with the given patterns from {@link DateFormat}
+   *
+   * @param d date to format
+   * @param dateFormat date format
+   * @param timeFormat time format
+   * @return formatted date as {@link String}
+   */
+  public static String formatDateTime(Date d, int dateFormat, int timeFormat) {
     if (d == null) {
       return "";
     }
     Locale loc = NlsLocale.get();
-    return BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(d);
+    return BEANS.get(DateFormatProvider.class).getDateTimeInstance(dateFormat, timeFormat, loc).format(d);
   }
 
   /**
