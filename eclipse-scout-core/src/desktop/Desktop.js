@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopLayout, DesktopNavigation, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, Event, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, MessageBoxController, objects, Outline, Popup, scout, SimpleTabArea, strings, styles, Tree, URL, webstorage, Widget, widgets} from '../index';
+import {arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopLayout, DesktopNavigation, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, Event, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, MessageBoxController, objects, Outline, Popup, scout, SimpleTabArea, strings, styles, Tooltip, Tree, URL, webstorage, Widget, widgets} from '../index';
 import $ from 'jquery';
 
 export default class Desktop extends Widget {
@@ -1524,6 +1524,83 @@ export default class Desktop extends Widget {
     // when the user clicks the clear icon ("x") inside the editor field.
     if (!$targetOverlay.isOrHas($targetOverlay.activeElement())) {
       this.session.focusManager.activateFocusContext($targetOverlay);
+    }
+  }
+
+  /**
+   * If the given widget is an overlay (i.e. its $container is one of the elements after $overlaySeparator),
+   * the DOM order is adjusted such that the overlay is not displayed in front of other overlays that
+   * belong to a later "context".
+   *
+   * For example, when two dialogs are open, both are rendered after the desktop's $overlaySeparator.
+   *
+   * - Context 0: Any overlay opened by a view is rendered before dialog1.$container.
+   * - Context 1: Any overlay opened by dialog1 is rendered between dialog1.$container and before dialog2.$container.
+   * - Context 2: Any overlay opened by dialog2 is rendered after dialog2.$container.
+   *
+   * Within each context, tooltips are always displayed first, followed by all other overlays (e.g. popups),
+   * each in their opening order.
+   *
+   * @param {Widget} overlay
+   */
+  adjustOverlayOrder(overlay) {
+    if (!this.rendered) {
+      return;
+    }
+
+    let $allOverlays = this.$overlaySeparator.nextAll();
+    if (!$allOverlays.is(overlay.$container)) {
+      return; // not an overlay
+    }
+    const $overlays = $allOverlays.not(overlay.$container);
+
+    // A version of scout.widget() that also works when the DOM is not yet linked with the
+    // model (e.g. when an error tooltip is initially shown when opening a dialog).
+    const findWidget = elem => {
+      let widget = overlay.findParent(p => p.$container && p.$container.is(elem));
+      return widget || scout.widget(elem);
+    };
+
+    // Returns the DOM element of the closest parent widget that is an overlay. To find it, we traverse the
+    // list of overlay in reverse order and check if it contains the given widget. The order is important,
+    // because dialogs linked via 'displayParent' form a single hierarchy.
+    const findParentOverlay = widget => {
+      let parentOverlay = null;
+      $overlays.toArray().reverse().some(elem => {
+        let overlayWidget = findWidget(elem);
+        if (overlayWidget && overlayWidget.has(widget)) {
+          parentOverlay = overlayWidget;
+          return true; // found
+        }
+        return false;
+      });
+      return parentOverlay;
+    };
+
+    // ------
+
+    // Find the parent overlay of the given overlay widget.
+    // The result can also be null, e.g. when opening overlays from a view.
+    let parentOverlay = findParentOverlay(overlay);
+
+    // Find all tooltips that belong to the same parent overlay
+    let siblingTooltipElements = $overlays.toArray().filter(elem => {
+      let widget = findWidget(elem);
+      if (widget instanceof Tooltip) {
+        let parent = findParentOverlay(widget);
+        if (parent === parentOverlay) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    // If the current overlay context contains tooltips, insert the given overlay after them.
+    // Otherwise, insert it at the beginning of the current overlay context.
+    if (arrays.hasElements(siblingTooltipElements)) {
+      overlay.$container.insertAfter(arrays.last(siblingTooltipElements));
+    } else {
+      overlay.$container.insertAfter(parentOverlay ? parentOverlay.$container : this.$overlaySeparator);
     }
   }
 
