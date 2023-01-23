@@ -881,7 +881,30 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(table.rows, [0, 2, 3, 4, 5, 6, 1, 7]);
       expectRowIds(table.visibleRows, [2, 3, 6, 1]);
     });
-
   });
 
+  describe('expandRows', () => {
+    it('does not render duplicate rows when called while row is still collapsing', () => {
+      let model = helper.createModelFixture(1, 2);
+      let table = helper.createTable(model);
+      let rows = [
+        {cells: ['child0_row0'], parentRow: table.rows[0]},
+        {cells: ['child1_row0'], parentRow: table.rows[1]}
+      ];
+      table.insertRows(rows);
+      table.expandRows(table.rows);
+      table.render();
+      expect(table.$rows().length).toBe(4);
+
+      $.fx.off = false;
+      table.collapseRow(table.rootRows[1]);
+      table.expandRow(table.rootRows[1]);
+      table.deleteRow(table.rootRows[1]);
+      expect(table.$rows().length).toBe(2);
+
+      table.collapseRow(table.rootRows[0]);
+      table.rows[1].$row.stop(false, true); // Complete animation
+      expect(table.$rows().length).toBe(1);
+    });
+  });
 });

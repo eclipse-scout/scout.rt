@@ -2019,10 +2019,10 @@ export class Table extends Widget implements TableModel {
     $row.removeClass('hiding');
     $row.stop().slideDown({
       duration: 250,
-      complete: function() {
+      complete: () => {
         $row.removeClass('showing');
         this.updateScrollbars();
-      }.bind(this)
+      }
     });
   }
 
@@ -2042,7 +2042,7 @@ export class Table extends Widget implements TableModel {
     $row.removeClass('showing');
     $row.stop().slideUp({
       duration: 250,
-      complete: function() {
+      complete: () => {
         if (!row.$row) {
           // ignore already removed rows
           return;
@@ -2054,7 +2054,7 @@ export class Table extends Widget implements TableModel {
           row.$row = null;
         }
         this.updateScrollbars();
-      }.bind(this)
+      }
     });
   }
 
@@ -3725,14 +3725,20 @@ export class Table extends Widget implements TableModel {
     let renderedRows: TableRow[] = [];
     let rowsToHide: TableRow[] = [];
     this.$rows().each((i, elem) => {
-      let $row = $(elem),
-        row = $row.data('row') as TableRow;
+      let $row = $(elem);
+      let row = $row.data('row') as TableRow;
       if (this.visibleRows.indexOf(row) < 0) {
         // remember for remove animated
         row.$row.detach();
         rowsToHide.push(row);
       } else {
-        renderedRows.push(row);
+        if ($row.hasClass('hiding')) {
+          // If a row is shown again while the hide animation is still running, complete the hide animation first to ensure the same model row will never be rendered twice.
+          // In order to get a show animation for that case, don't add this row to the list of renderedRows.
+          $row.stop(false, true);
+        } else {
+          renderedRows.push(row);
+        }
       }
     });
 
@@ -3748,8 +3754,8 @@ export class Table extends Widget implements TableModel {
     rowsToHide.forEach(row => this._hideRow(row));
 
     this.$rows().each((i, elem) => {
-      let $row = $(elem),
-        row = $row.data('row') as TableRow;
+      let $row = $(elem);
+      let row = $row.data('row') as TableRow;
       if ($row.hasClass('hiding')) {
         // Do not remove rows which are removed using an animation
         // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
