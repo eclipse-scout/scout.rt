@@ -19,11 +19,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 
 public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY extends IDoEntity> extends AbstractHybridAction<DO_ENTITY> {
 
-  private final static String OPEN_FORM = "openForm";
-  protected final static String OPEN_FORM_PREFIX = OPEN_FORM + DELIMITER;
+  private static final String OPEN_FORM = "openForm";
+  protected static final String OPEN_FORM_PREFIX = OPEN_FORM + DELIMITER;
 
-  private final static String CREATE_FORM = "createForm";
-  protected final static String CREATE_FORM_PREFIX = CREATE_FORM + DELIMITER;
+  private static final String CREATE_FORM = "createForm";
+  protected static final String CREATE_FORM_PREFIX = CREATE_FORM + DELIMITER;
 
   protected boolean isShowFormOnStart() {
     return startsWith(getHybridActionType(), OPEN_FORM);

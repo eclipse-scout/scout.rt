@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 @HybridActionType(PingHybridAction.TYPE)
 public class PingHybridAction extends AbstractHybridAction<IDoEntity> {
-  protected final static String TYPE = "Ping";
+  protected static final String TYPE = "Ping";
 
   @Override
   public void execute(IDoEntity data) {
