@@ -2756,24 +2756,24 @@ export class ChartJsRenderer extends AbstractChartRenderer {
   }
 }
 
-type LabelFormatter = (label: number | string) => string;
-type AxisFitter = (axis: Scale<CartesianScaleOptions>) => void;
-type DatalabelsDisplayHandler = (context: Context) => boolean;
-type DatalabelsFormatter = (value: number | ScatterDataPoint | BubbleDataPoint, context: Context) => string;
-type DatalabelBackgroundColorHandler = (context: Context) => Color;
-type RadialChartDatalabelsFormatter = (value: number, context: Context) => string;
-type LegendLabelGenerator = (chart: ChartJsChart) => LegendItem[];
-type ChartEventHandler = (event: ChartEvent, items: ActiveElement[]) => void;
-type LegendEventHandler = (e: ChartEvent, legendItem: LegendItem, legend: LegendElement<any>) => void;
-type ResizeHandler = (chart: ChartJsChart | ChartJs, size: { width: number; height: number }) => void;
-type TooltipTitleGenerator = (tooltipItems: TooltipItem<any>[]) => string | string[];
-type TooltipItemsGenerator = (tooltipItems: TooltipItem<any>[], tooltipLabel: TooltipLabelGenerator, tooltipLabelValue: TooltipLabelValueGenerator, tooltipColor: TooltipLabelColorGenerator) => string;
-type TooltipLabelGenerator = (tooltipItem: TooltipItem<any>) => string | string[];
-type TooltipLabelValueGenerator = (tooltipItem: TooltipItem<any>) => string | { x: string; y: string };
-type TooltipLabelColorGenerator = (tooltipItem: TooltipItem<any>) => TooltipLabelStyle;
-type TooltipRenderer = (context: { chart: ChartJs; tooltip: TooltipModel<any> }) => void;
+export type LabelFormatter = (label: number | string) => string;
+export type AxisFitter = (axis: Scale<CartesianScaleOptions>) => void;
+export type DatalabelsDisplayHandler = (context: Context) => boolean;
+export type DatalabelsFormatter = (value: number | ScatterDataPoint | BubbleDataPoint, context: Context) => string;
+export type DatalabelBackgroundColorHandler = (context: Context) => Color;
+export type RadialChartDatalabelsFormatter = (value: number, context: Context) => string;
+export type LegendLabelGenerator = (chart: ChartJsChart) => LegendItem[];
+export type ChartEventHandler = (event: ChartEvent, items: ActiveElement[]) => void;
+export type LegendEventHandler = (e: ChartEvent, legendItem: LegendItem, legend: LegendElement<any>) => void;
+export type ResizeHandler = (chart: ChartJsChart | ChartJs, size: { width: number; height: number }) => void;
+export type TooltipTitleGenerator = (tooltipItems: TooltipItem<any>[]) => string | string[];
+export type TooltipItemsGenerator = (tooltipItems: TooltipItem<any>[], tooltipLabel: TooltipLabelGenerator, tooltipLabelValue: TooltipLabelValueGenerator, tooltipColor: TooltipLabelColorGenerator) => string;
+export type TooltipLabelGenerator = (tooltipItem: TooltipItem<any>) => string | string[];
+export type TooltipLabelValueGenerator = (tooltipItem: TooltipItem<any>) => string | { x: string; y: string };
+export type TooltipLabelColorGenerator = (tooltipItem: TooltipItem<any>) => TooltipLabelStyle;
+export type TooltipRenderer = (context: { chart: ChartJs; tooltip: TooltipModel<any> }) => void;
 
-type DatasetColors = {
+export type DatasetColors = {
   backgroundColors?: string[];
   borderColors?: string[];
   hoverBackgroundColors?: string[];
@@ -2785,11 +2785,11 @@ type DatasetColors = {
   datalabelColor?: string;
 };
 
-type Boundary = { maxValue: number; minValue: number };
+export type Boundary = { maxValue: number; minValue: number };
 
 // extend chart.js
 
-type ChartJsChart = Omit<ChartJs, 'config'> & {
+export type ChartJsChart = Omit<ChartJs, 'config'> & {
   config: ChartConfig;
   legend?: LegendElement<any>;
 };

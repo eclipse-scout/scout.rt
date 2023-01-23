@@ -5639,8 +5639,8 @@ export type AggregateTableRow = {
   height?: number;
 };
 
-type ColumnMap = {
+export type ColumnMap = {
   [type: string]: Column<any>;
 };
 
-type ColumnMapOf<T> = T extends { columnMap: infer TMap } ? TMap : object;
+export type ColumnMapOf<T> = T extends { columnMap: infer TMap } ? TMap : object;

@@ -10,7 +10,7 @@
 import {arrays, Event, EventHandler, EventListener, objects, scout} from '../index';
 import $ from 'jquery';
 
-type EventSubTypePredicate = (type, subType) => boolean;
+export type EventSubTypePredicate = (type, subType) => boolean;
 
 export class EventSupport {
   protected _eventListeners: EventListener[];

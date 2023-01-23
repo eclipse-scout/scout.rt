@@ -2357,8 +2357,8 @@ interface EventDelegatorForCloning {
   cloneToOriginal: EventDelegator;
 }
 
-type WidgetMap = {
+export type WidgetMap = {
   [type: string]: Widget;
 };
 
-type WidgetMapOf<T> = T extends { widgetMap: infer TMap } ? TMap : object;
+export type WidgetMapOf<T> = T extends { widgetMap: infer TMap } ? TMap : object;

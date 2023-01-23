@@ -77,7 +77,7 @@ export class ChartTableUserFilter extends TableUserFilter implements ChartTableU
   }
 }
 
-type ChartTableUserFilterAddedEventData = TableUserFilterAddedEventData & {
+export type ChartTableUserFilterAddedEventData = TableUserFilterAddedEventData & {
   filters?: { deterministicKey: TableControlDeterministicKey }[];
   columnIdX?: string;
   columnIdY?: string;

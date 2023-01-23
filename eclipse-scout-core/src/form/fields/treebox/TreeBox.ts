@@ -213,7 +213,7 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
   }
 }
 
-type TreeBoxTreeNode<TValue> = TreeNode & {
+export type TreeBoxTreeNode<TValue> = TreeNode & {
   lookupRow: LookupRow<TValue>;
   active?: boolean;
 };
