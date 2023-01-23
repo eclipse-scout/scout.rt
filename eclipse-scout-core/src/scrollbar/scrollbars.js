@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -20,7 +20,6 @@ import $ from 'jquery';
  */
 
 let _$scrollables = {};
-let mutationObserver;
 let intersectionObserver;
 
 export function getScrollables(session) {
@@ -156,7 +155,7 @@ export function installScrollShadow($container, session, options) {
   $container.data('scroll-shadow-handler', handler);
   $container.on('scroll', handler);
   updateScrollShadow($container);
-  _installMutationObserver(session);
+  _installMutationObserver($container.entryPoint());
   _installIntersectionObserver();
   intersectionObserver.observe($container[0]);
 
@@ -192,11 +191,17 @@ export function uninstallScrollShadow($container, session) {
   if (visibleListener) {
     $container.off('hide show', visibleListener);
   }
-  let $scrollables = _$scrollables[session];
-  if (!$scrollables || !$scrollables.some($scrollable => $scrollable.data('scroll-shadow'))) {
-    _uninstallMutationObserver();
+  if (!_hasScrollShadow(session, $container.entryPoint(true))) {
+    _uninstallMutationObserver($container.entryPoint());
+  }
+  if (!_hasScrollShadow(session)) {
     _uninstallIntersectionObserver();
   }
+}
+
+function _hasScrollShadow(session, entryPoint) {
+  const $scrollables = _$scrollables[session];
+  return $scrollables && $scrollables.some($scrollable => $scrollable.data('scroll-shadow') && (!entryPoint || $scrollable.entryPoint(true) === entryPoint));
 }
 
 /**
@@ -291,12 +296,13 @@ export function updateScrollShadow($container) {
 /**
  * Installs a dom mutation observer that tracks all scrollables in order to move the scroll shadow along with the scrollable.
  */
-function _installMutationObserver(session) {
-  if (mutationObserver) {
+function _installMutationObserver($entryPoint) {
+  if (!$entryPoint || !$entryPoint[0] || $entryPoint.data('mutation-observer')) {
     return;
   }
-  mutationObserver = new MutationObserver(_onDomMutation);
-  mutationObserver.observe(session.$entryPoint[0], {
+  const mutationObserver = new MutationObserver(_onDomMutation);
+  $entryPoint.data('mutation-observer', mutationObserver);
+  mutationObserver.observe($entryPoint[0], {
     subtree: true,
     childList: true
   });
@@ -321,12 +327,12 @@ export function _processDomMutation(mutation) {
   }
 }
 
-function _uninstallMutationObserver() {
-  if (!mutationObserver) {
+function _uninstallMutationObserver($entryPoint) {
+  if (!$entryPoint || !$entryPoint.data('mutation-observer')) {
     return;
   }
-  mutationObserver.disconnect();
-  mutationObserver = null;
+  $entryPoint.data('mutation-observer').disconnect();
+  $entryPoint.removeData('mutation-observer');
 }
 
 /**
