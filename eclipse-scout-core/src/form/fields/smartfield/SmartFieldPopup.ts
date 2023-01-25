@@ -62,6 +62,7 @@ export class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupMod
       .addClass(cssClass)
       .on('mousedown', this._onContainerMouseDown.bind(this));
     this.$container.toggleClass('alternative', this.smartField.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
+    this.findDesktop().adjustOverlayOrder(this);
     this.proposalChooser.render();
   }
 

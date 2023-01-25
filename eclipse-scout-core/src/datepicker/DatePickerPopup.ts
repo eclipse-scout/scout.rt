@@ -44,6 +44,7 @@ export class DatePickerPopup extends Popup implements DatePickerPopupModel {
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
     this.htmlComp.validateRoot = true;
+    this.findDesktop().adjustOverlayOrder(this);
     this.picker.render();
   }
 

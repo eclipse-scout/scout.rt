@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
 import {
-  arrays, BusyIndicator, Button, Desktop, DesktopNotification, DesktopTab, Device, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, Outline, RemoteEvent, scout, Status, StringField, strings,
-  UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
+  arrays, BusyIndicator, Button, DateField, DatePickerPopup, Desktop, DesktopNotification, DesktopTab, Device, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, Outline, Popup, RemoteEvent, scout, SmartField,
+  SmartFieldPopup, Status, StringField, strings, Tooltip, UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
 } from '../../src/index';
 
 describe('Desktop', () => {
@@ -2169,6 +2169,408 @@ describe('Desktop', () => {
       expect($messageBox.length).toBe(1);
       expect($messageBox.find('.glasspane').length).toBe(0);
     });
+  });
 
+  describe('overlays', () => {
+
+    beforeEach(() => {
+      session.inspector = true;
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('displays tooltips behind popups', () => {
+      let desktop = session.desktop;
+      desktop.render(session.$entryPoint);
+
+      let $overlays;
+
+      let view = scout.create(Form, {
+        parent: desktop,
+        displayHint: Form.DisplayHint.VIEW,
+        modal: false,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [
+            {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip 1'},
+            {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip 2'},
+            {id: 'Field3', objectType: DateField}
+          ]
+        }
+      });
+      desktop.showForm(view);
+      desktop.validateLayout(); // needed to prevent the responsive manager from automatically closing tooltips
+
+      $overlays = desktop.$overlaySeparator.nextAll();
+      expect($overlays.length).toBe(0);
+
+      // Tooltip
+      view.widget('Field1', StringField).fieldStatus.togglePopup();
+      $overlays = desktop.$overlaySeparator.nextAll();
+      expect($overlays.length).toBe(1);
+      expect(scout.widget($overlays.eq(0))).toBeInstanceOf(Tooltip);
+
+      // Date picker popup -> expect the popup to be above the tooltip
+      view.widget('Field3', DateField).activate();
+      jasmine.clock().tick(500);
+      $overlays = desktop.$overlaySeparator.nextAll();
+      expect($overlays.length).toBe(2);
+      expect(scout.widget($overlays.eq(0))).toBeInstanceOf(Tooltip);
+      expect($overlays.eq(0).text()).toBe('Tooltip 1');
+      expect(scout.widget($overlays.eq(1))).toBeInstanceOf(DatePickerPopup);
+
+      // Another tooltip -> expect the second tooltip to be above the first tooltip, but below the popup
+      view.widget('Field2', StringField).fieldStatus.togglePopup();
+      $overlays = desktop.$overlaySeparator.nextAll();
+      expect($overlays.length).toBe(3);
+      expect(scout.widget($overlays.eq(0))).toBeInstanceOf(Tooltip);
+      expect($overlays.eq(0).text()).toBe('Tooltip 1');
+      expect(scout.widget($overlays.eq(1))).toBeInstanceOf(Tooltip);
+      expect($overlays.eq(1).text()).toBe('Tooltip 2');
+      expect(scout.widget($overlays.eq(2))).toBeInstanceOf(DatePickerPopup);
+    });
+
+    it('orders overlays relative to their context', () => {
+      let desktop = session.desktop;
+      desktop.render(session.$entryPoint);
+
+      let $overlays;
+
+      let view1 = scout.create(Form, {
+        id: 'View1',
+        parent: desktop,
+        displayHint: Form.DisplayHint.VIEW,
+        modal: false,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [
+            {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip V1-1'},
+            {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip V1-2'},
+            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+          ]
+        }
+      });
+      let view1Field1 = view1.rootGroupBox.widget('Field1', StringField);
+      let view1Field2 = view1.rootGroupBox.widget('Field2', StringField);
+      let view1Field3 = view1.rootGroupBox.widget('Field3', SmartField);
+      let dialog1 = scout.create(Form, {
+        id: 'Dialog1',
+        parent: view1,
+        displayHint: Form.DisplayHint.DIALOG,
+        modal: false,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [
+            {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D1-1'},
+            {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D1-2'},
+            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+          ]
+        }
+      });
+      let dialog1Field1 = dialog1.rootGroupBox.widget('Field1', StringField);
+      let dialog1Field2 = dialog1.rootGroupBox.widget('Field2', StringField);
+      let popup1 = scout.create(WidgetPopup, {
+        id: 'Popup1',
+        parent: dialog1,
+        anchor: dialog1.widget('Field1'),
+        closeOnOtherPopupOpen: false,
+        animateOpening: false,
+        animateRemoval: false,
+        content: {
+          id: 'Popup1Form',
+          objectType: Form,
+          displayHint: Form.DisplayHint.VIEW,
+          modal: false,
+          rootGroupBox: {
+            objectType: GroupBox,
+            fields: [
+              {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip P1-1'},
+              {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip P1-2'},
+              {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+            ]
+          }
+        }
+      });
+      let popup1Content = popup1.content as Form;
+      let popup1Field1 = popup1Content.rootGroupBox.widget('Field1', StringField);
+      let popup1Field2 = popup1Content.rootGroupBox.widget('Field2', StringField);
+      let popup1Field3 = popup1Content.rootGroupBox.widget('Field3', SmartField);
+      let dialog2 = scout.create(Form, {
+        id: 'Dialog2',
+        parent: popup1,
+        displayHint: Form.DisplayHint.DIALOG,
+        modal: false,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [
+            {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D2-1'},
+            {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D2-2'},
+            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+          ]
+        }
+      });
+      let dialog2Field1 = dialog2.rootGroupBox.widget('Field1', StringField);
+      let dialog2Field2 = dialog2.rootGroupBox.widget('Field2', StringField);
+
+      // --------------
+
+      view1.open();
+      jasmine.clock().tick(500);
+      dialog1.open();
+      jasmine.clock().tick(500);
+      popup1.open();
+      jasmine.clock().tick(500);
+      dialog2.open();
+      jasmine.clock().tick(500);
+
+      $overlays = desktop.$overlaySeparator.nextAll();
+      expect(scout.widget($overlays.eq(0))).toBe(dialog1);
+      expect(scout.widget($overlays.eq(1))).toBe(popup1);
+      expect(scout.widget($overlays.eq(2))).toBe(dialog2);
+      expect($overlays.length).toBe(3);
+
+      // --------------
+
+      view1Field1.fieldStatus.togglePopup();
+      view1Field2.fieldStatus.togglePopup();
+      view1Field3.activate();
+      jasmine.clock().tick(500);
+      view1Field3.popup.animateRemoval = false;
+
+      let popup2 = scout.create(WidgetPopup, {
+        id: 'Popup2',
+        parent: view1,
+        // (no anchor)
+        closeOnOtherPopupOpen: false,
+        animateOpening: false,
+        animateRemoval: false,
+        content: {
+          id: 'Popup2Form',
+          objectType: Form,
+          displayHint: Form.DisplayHint.VIEW,
+          modal: false,
+          rootGroupBox: {
+            objectType: GroupBox,
+            fields: [
+              {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip P2-1'},
+              {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip P2-2'},
+              {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+            ]
+          }
+        }
+      });
+      let popup2Content = popup2.content as Form;
+      let popup2Field1 = popup2Content.rootGroupBox.widget('Field1', StringField);
+      let popup2Field2 = popup2Content.rootGroupBox.widget('Field2', StringField);
+      popup2.open();
+
+      popup1Field1.fieldStatus.togglePopup();
+      popup1Field2.fieldStatus.togglePopup();
+
+      dialog2Field1.fieldStatus.togglePopup();
+      dialog2Field2.fieldStatus.togglePopup();
+
+      dialog1Field1.fieldStatus.togglePopup();
+      dialog1Field2.fieldStatus.togglePopup();
+
+      let popup3 = scout.create(Popup, {
+        id: 'Popup3',
+        parent: dialog1,
+        // (no anchor)
+        closeOnOtherPopupOpen: false,
+        animateOpening: false,
+        animateRemoval: false
+      });
+      popup3.open();
+
+      popup2Field1.fieldStatus.togglePopup();
+      popup2Field2.fieldStatus.togglePopup();
+
+      popup1Field3.activate();
+      jasmine.clock().tick(500);
+      popup1Field3.popup.animateRemoval = false;
+
+      // --------------
+
+      $overlays = desktop.$overlaySeparator.nextAll();
+      let overlayWidgets = $overlays.toArray().map(elem => scout.widget(elem));
+
+      // Expected overlays:
+      // Tooltip V1-1
+      // Tooltip V1-2
+      // Dialog1
+      // Tooltip D1-1
+      // Tooltip D1-2
+      // Popup1
+      // Tooltip P1-1
+      // Tooltip P1-2
+      // SmartFieldPopup
+      // Dialog2
+      // Tooltip D2-1
+      // Tooltip D2-2
+      // Popup2
+      // Tooltip P2-1
+      // Tooltip P2-2
+      // Popup3
+
+      expect(overlayWidgets[0]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[0].text).toBe('Tooltip V1-1');
+      expect(overlayWidgets[1]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[1].text).toBe('Tooltip V1-2');
+      expect(overlayWidgets[2]).toBe(dialog1);
+      expect(overlayWidgets[3]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[3].text).toBe('Tooltip D1-1');
+      expect(overlayWidgets[4]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[4].text).toBe('Tooltip D1-2');
+      expect(overlayWidgets[5]).toBe(popup1);
+      expect(overlayWidgets[6]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[6].text).toBe('Tooltip P1-1');
+      expect(overlayWidgets[7]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[7].text).toBe('Tooltip P1-2');
+      expect(overlayWidgets[8]).toBeInstanceOf(SmartFieldPopup);
+      expect(overlayWidgets[9]).toBe(dialog2);
+      expect(overlayWidgets[10]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[10].text).toBe('Tooltip D2-1');
+      expect(overlayWidgets[11]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[11].text).toBe('Tooltip D2-2');
+      expect(overlayWidgets[12]).toBe(popup2);
+      expect(overlayWidgets[13]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[13].text).toBe('Tooltip P2-1');
+      expect(overlayWidgets[14]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[14].text).toBe('Tooltip P2-2');
+      expect(overlayWidgets[15]).toBe(popup3);
+      expect(overlayWidgets.length).toBe(16);
+    });
+
+    it('always opens message boxes on top of everything', () => {
+      let desktop = session.desktop;
+      desktop.render(session.$entryPoint);
+
+      let $overlays;
+
+      let dialog1 = scout.create(Form, {
+        id: 'Dialog1',
+        parent: desktop,
+        displayHint: Form.DisplayHint.DIALOG,
+        modal: false,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [
+            {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D1-1'},
+            {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D1-2'},
+            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+          ]
+        }
+      });
+      let dialog1Field1 = dialog1.rootGroupBox.widget('Field1', StringField);
+      let dialog1Field2 = dialog1.rootGroupBox.widget('Field2', StringField);
+      let dialog2 = scout.create(Form, {
+        id: 'Popup2',
+        parent: dialog1,
+        displayHint: Form.DisplayHint.DIALOG,
+        modal: false,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [
+            {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D2-1'},
+            {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D2-2'},
+            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+          ]
+        }
+      });
+      let dialog2Field1 = dialog2.rootGroupBox.widget('Field1', StringField);
+      let dialog2Field2 = dialog2.rootGroupBox.widget('Field2', StringField);
+
+      // --------------
+
+      dialog1.open();
+      jasmine.clock().tick(500);
+      dialog2.open();
+      jasmine.clock().tick(500);
+
+      $overlays = desktop.$overlaySeparator.nextAll();
+      expect(scout.widget($overlays.eq(0))).toBe(dialog1);
+      expect(scout.widget($overlays.eq(1))).toBe(dialog2);
+      expect($overlays.length).toBe(2);
+
+      // --------------
+
+      dialog2Field1.fieldStatus.togglePopup();
+      dialog1Field1.fieldStatus.togglePopup();
+
+      MessageBoxes.openOk(desktop, 'Test');
+
+      dialog2Field2.fieldStatus.togglePopup();
+      dialog1Field2.fieldStatus.togglePopup();
+
+      // --------------
+
+      $overlays = desktop.$overlaySeparator.nextAll();
+      let overlayWidgets = $overlays.toArray().map(elem => scout.widget(elem));
+
+      // Expected overlays:
+      // Dialog1
+      // Tooltip D1-1
+      // Tooltip D1-2
+      // Dialog2
+      // Tooltip D2-1
+      // Tooltip D2-2
+      // MessageBox
+
+      expect(overlayWidgets[0]).toBe(dialog1);
+      expect(overlayWidgets[1]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[1].text).toBe('Tooltip D1-1');
+      expect(overlayWidgets[2]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[2].text).toBe('Tooltip D1-2');
+      expect(overlayWidgets[3]).toBe(dialog2);
+      expect(overlayWidgets[4]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[4].text).toBe('Tooltip D2-1');
+      expect(overlayWidgets[5]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[5].text).toBe('Tooltip D2-2');
+      expect(overlayWidgets[6]).toBeInstanceOf(MessageBox);
+      expect(overlayWidgets.length).toBe(7);
+    });
+
+    it('renders the tooltip of an form with initial error status correctly', () => {
+      let desktop = session.desktop;
+      desktop.render(session.$entryPoint);
+
+      let $overlays;
+
+      let dialog = scout.create(Form, {
+        id: 'Dialog',
+        parent: desktop,
+        displayHint: Form.DisplayHint.DIALOG,
+        modal: false,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [
+            {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D1-1'},
+            {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D1-2', errorStatus: Status.error('Invalid value')},
+            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+          ]
+        }
+      });
+
+      // --------------
+
+      dialog.open();
+      jasmine.clock().tick(500);
+
+      $overlays = desktop.$overlaySeparator.nextAll();
+      let overlayWidgets = $overlays.toArray().map(elem => scout.widget(elem));
+
+      // Expected overlays:
+      // Dialog1
+      // Tooltip Invalid value
+
+      expect(overlayWidgets[0]).toBe(dialog);
+      expect(overlayWidgets[1]).toBeInstanceOf(Tooltip);
+      expect(overlayWidgets[1].text).toBe('Invalid value');
+      expect(overlayWidgets.length).toBe(2);
+    });
   });
 });

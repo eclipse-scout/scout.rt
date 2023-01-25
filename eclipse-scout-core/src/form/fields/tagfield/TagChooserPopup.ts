@@ -60,6 +60,7 @@ export class TagChooserPopup extends Popup implements TagChooserPopupModel {
     this.$container
       .addClass('tag-chooser-popup')
       .on('mousedown', this._onContainerMouseDown.bind(this));
+    this.findDesktop().adjustOverlayOrder(this);
     this._renderTable();
   }
 
