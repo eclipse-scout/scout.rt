@@ -76,7 +76,13 @@
   "overrides": {
     "node-abort-controller": "3.0.1"
   },
+  "pnpm": {
+    "overrides": {
+      "node-abort-controller": "3.0.1"
+    }
+  },
   "overridesComments": {
     "TODO avd": "node-abort-controller 3.1.0 (pulled by fork-ts-checker-webpack-plugin gives error msgs. Remove once fixed. https://github.com/southpolesteve/node-abort-controller/issues/39"
   }
 }
+
