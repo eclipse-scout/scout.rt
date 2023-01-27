@@ -27,4 +27,14 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
  */
 @ApplicationScoped
 public interface IMomTransport extends IMom {
+
+  /**
+   * Returns <code>true</code> if no {@link IMomImplementor} is configured for this MOM or the configured implementor is
+   * of type {@link NullMomImplementor}.
+   * <p>
+   * Unlike the other methods on this class, this method can be called <b>without</b> triggering the initialization of
+   * the delegate.
+   */
+  boolean isNullTransport();
+
 }

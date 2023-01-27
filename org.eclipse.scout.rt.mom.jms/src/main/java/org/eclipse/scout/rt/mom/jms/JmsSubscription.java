@@ -15,7 +15,9 @@ import java.util.concurrent.TimeUnit;
 import javax.jms.MessageConsumer;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
+import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
+import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.jms.internal.ISubscriptionStats;
@@ -30,12 +32,16 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 public class JmsSubscription implements ISubscription {
 
   protected final IDestination<?> m_destination;
+  protected final IMessageListener<?> m_messageListener;
+  protected final IRequestListener<?, ?> m_requestListener;
   protected final SubscribeInput m_subscribeInput;
   protected final IJmsSessionProvider m_sessionProvider;
   protected final IFuture<?> m_jobMonitor;
 
-  public JmsSubscription(IDestination<?> destination, SubscribeInput subscribeInput, IJmsSessionProvider sessionProvider, IFuture<?> jobMonitor) {
+  public JmsSubscription(IDestination<?> destination, IMessageListener<?> messageListener, IRequestListener<?, ?> requestListener, SubscribeInput subscribeInput, IJmsSessionProvider sessionProvider, IFuture<?> jobMonitor) {
     m_destination = destination;
+    m_messageListener = messageListener;
+    m_requestListener = requestListener;
     m_subscribeInput = subscribeInput;
     m_sessionProvider = sessionProvider;
     m_jobMonitor = jobMonitor;
@@ -44,6 +50,21 @@ public class JmsSubscription implements ISubscription {
   @Override
   public IDestination<?> getDestination() {
     return m_destination;
+  }
+
+  @Override
+  public IMessageListener<?> getMessageListener() {
+    return m_messageListener;
+  }
+
+  @Override
+  public IRequestListener<?, ?> getRequestListener() {
+    return m_requestListener;
+  }
+
+  @Override
+  public SubscribeInput getSubscribeInput() {
+    return m_subscribeInput;
   }
 
   @Override
@@ -57,11 +78,12 @@ public class JmsSubscription implements ISubscription {
     }
   }
 
-  /**
-   * @return the stats of this subscription since the real jms session was started. Returns null if the jms connection
-   *         is currently down.
-   * @since 6.1
-   */
+  @Override
+  public boolean isDisposed() {
+    return m_sessionProvider.isClosing();
+  }
+
+  @Override
   public ISubscriptionStats getStats() {
     return m_sessionProvider.getStats();
   }
