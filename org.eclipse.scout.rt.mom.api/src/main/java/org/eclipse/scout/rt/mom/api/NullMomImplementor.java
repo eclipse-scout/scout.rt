@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.mom.api;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
@@ -27,13 +29,28 @@ public class NullMomImplementor implements IMomImplementor {
   }
 
   @Override
+  public String getId() {
+    return NullMomImplementor.class.getSimpleName();
+  }
+
+  @Override
+  public String getName() {
+    return getId();
+  }
+
+  @Override
+  public List<ISubscription> getSubscriptions() {
+    return new ArrayList<>();
+  }
+
+  @Override
   public <DTO> void publish(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
     // NOOP
   }
 
   @Override
   public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) {
-    return new P_NullSubscription(destination);
+    return new P_NullSubscription(destination, listener, null, input);
   }
 
   @Override
@@ -43,7 +60,7 @@ public class NullMomImplementor implements IMomImplementor {
 
   @Override
   public <REQUEST, REPLY> ISubscription reply(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) {
-    return new P_NullSubscription(destination);
+    return new P_NullSubscription(destination, null, listener, input);
   }
 
   @Override
@@ -64,9 +81,15 @@ public class NullMomImplementor implements IMomImplementor {
   private class P_NullSubscription implements ISubscription {
 
     private final IDestination<?> m_destination;
+    private final IMessageListener<?> m_messageListener;
+    private final IRequestListener<?, ?> m_requestListener;
+    private final SubscribeInput m_input;
 
-    P_NullSubscription(final IDestination<?> destination) {
+    P_NullSubscription(IDestination<?> destination, IMessageListener<?> messageListener, IRequestListener<?, ?> requestListener, SubscribeInput input) {
       m_destination = destination;
+      m_messageListener = messageListener;
+      m_requestListener = requestListener;
+      m_input = input;
     }
 
     @Override
@@ -75,8 +98,33 @@ public class NullMomImplementor implements IMomImplementor {
     }
 
     @Override
+    public IMessageListener<?> getMessageListener() {
+      return m_messageListener;
+    }
+
+    @Override
+    public IRequestListener<?, ?> getRequestListener() {
+      return m_requestListener;
+    }
+
+    @Override
+    public SubscribeInput getSubscribeInput() {
+      return m_input;
+    }
+
+    @Override
     public void dispose() {
       // NOOP
+    }
+
+    @Override
+    public boolean isDisposed() {
+      return false;
+    }
+
+    @Override
+    public ISubscriptionStats getStats() {
+      return null;
     }
   }
 }

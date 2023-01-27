@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.mom.api;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
@@ -60,6 +61,21 @@ public interface IMom {
    * this value.
    */
   long DESTROY_ORDER = 5_700;
+
+  /**
+   * @return <b>volatile</b> identifier of this MOM
+   */
+  String getId();
+
+  /**
+   * @return symbolic name of this MOM
+   */
+  String getName();
+
+  /**
+   * @return new mutable non-null list of all subscriptions
+   */
+  List<ISubscription> getSubscriptions();
 
   /**
    * Publishes the given message to the given destination.

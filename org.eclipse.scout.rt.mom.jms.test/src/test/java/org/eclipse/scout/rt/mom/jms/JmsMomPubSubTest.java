@@ -215,6 +215,10 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     assertEquals("hello world", capturer.get());
 
+    List<ISubscription> subscriptions = BEANS.get(FixtureMom.class).getSubscriptions();
+    assertEquals(1, subscriptions.size());
+    assertEquals(subscription, subscriptions.get(0));
+
     IFuture<Void> disposeFuture = Jobs.schedule(subscription::dispose, Jobs.newInput()
         .withName("dispose subscription")
         .withExecutionHint(FixtureJobInput.EXPLICIT_HINT)
@@ -231,6 +235,9 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     finally {
       latch.countDown();
     }
+
+    disposeFuture.awaitDoneAndGet(1, TimeUnit.SECONDS);
+    assertTrue(BEANS.get(FixtureMom.class).getSubscriptions().isEmpty());
   }
 
   @Test
@@ -406,7 +413,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     MOM.publish(FixtureMom.class, queue, "hello world");
 
     // Verify
-    latch.await(5, TimeUnit.SECONDS);
+    assertTrue(latch.await(5, TimeUnit.SECONDS));
     Thread.sleep(50);
     assertEquals(1, msgCounter.get());
   }
@@ -716,6 +723,10 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     Thread.sleep(1000); // Wait some time to verify that 'message-1' is no longer received.
     assertEquals(messageCounter.get(), 4);
+
+    List<ISubscription> subscriptions = BEANS.get(FixtureMom.class).getSubscriptions();
+    assertEquals(1, subscriptions.size());
+    assertEquals(queue, subscriptions.get(0).getDestination());
   }
 
   @Test
@@ -809,6 +820,8 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     assertEquals("message-for-anna", allCapturer.get(5, TimeUnit.SECONDS));
     assertEquals("message-for-anna", annaCapturer.get(5, TimeUnit.SECONDS));
+
+    assertEquals(3, BEANS.get(FixtureMom.class).getSubscriptions().size());
   }
 
   private Object testPublishAndConsumeInternal(Object transferObject, IMarshaller marshaller) throws InterruptedException {
@@ -853,8 +866,13 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     final ISubscription subscription1 = MOM.subscribe(FixtureMom.class, topic, new CapturerListener<>(capturer1), MOM.newSubscribeInput());
     m_disposables.add(subscription1);
 
+    assertEquals(1, BEANS.get(FixtureMom.class).getSubscriptions().size());
+    assertEquals(subscription1, BEANS.get(FixtureMom.class).getSubscriptions().get(0));
+
     // 2. Disconnect
     subscription1.dispose();
+
+    assertTrue(BEANS.get(FixtureMom.class).getSubscriptions().isEmpty());
 
     // 3. Publish a message
     MOM.publish(FixtureMom.class, topic, "lost message");
@@ -869,10 +887,15 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     // 5. Assert that message is lost
     capturer2.assertEmpty(1, TimeUnit.SECONDS);
 
+    assertEquals(1, BEANS.get(FixtureMom.class).getSubscriptions().size());
+    assertEquals(subscription2, BEANS.get(FixtureMom.class).getSubscriptions().get(0));
+
     // 6. Disconnect
     subscription2.dispose();
 
-    // 7. Publish an other message
+    assertTrue(BEANS.get(FixtureMom.class).getSubscriptions().isEmpty());
+
+    // 7. Publish another message
     MOM.publish(FixtureMom.class, topic, "hello world");
     capturer2.assertEmpty(1, TimeUnit.SECONDS); // not yet
 
@@ -885,9 +908,14 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     // 9. Assert that the message is received
     assertEquals("hello world", capturer3.get(1, TimeUnit.SECONDS));
 
+    assertEquals(1, BEANS.get(FixtureMom.class).getSubscriptions().size());
+    assertEquals(subscription3, BEANS.get(FixtureMom.class).getSubscriptions().get(0));
+
     // 10. Disconnect and cancel the durable subscription
     subscription3.dispose();
     MOM.cancelDurableSubscription(FixtureMom.class, durableSubscriptionName);
+
+    assertTrue(BEANS.get(FixtureMom.class).getSubscriptions().isEmpty());
 
     // 11. Publish another message
     MOM.publish(FixtureMom.class, topic, "hello universe");
@@ -901,5 +929,8 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     // 13. Assert that message is still lost, even if the same name was used (because the previous subscription was cancelled explicitly)
     capturer4.assertEmpty(1, TimeUnit.SECONDS);
+
+    assertEquals(1, BEANS.get(FixtureMom.class).getSubscriptions().size());
+    assertEquals(subscription4, BEANS.get(FixtureMom.class).getSubscriptions().get(0));
   }
 }

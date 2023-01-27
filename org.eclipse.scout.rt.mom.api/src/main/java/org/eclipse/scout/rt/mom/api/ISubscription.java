@@ -22,9 +22,24 @@ import org.eclipse.scout.rt.platform.util.IDisposable;
 public interface ISubscription extends IDisposable {
 
   /**
-   * Returns the destination this subscription belongs to.
+   * @return the destination this subscription belongs to
    */
   IDestination<?> getDestination();
+
+  /**
+   * @return the listener called upon message received or null if {@link #getRequestListener()} is set
+   */
+  IMessageListener<?> getMessageListener();
+
+  /**
+   * @return the listener called upon message received or null if {@link #getMessageListener()} is set
+   */
+  IRequestListener<?, ?> getRequestListener();
+
+  /**
+   * @return input used during subscription
+   */
+  SubscribeInput getSubscribeInput();
 
   /**
    * {@inheritDoc}
@@ -34,4 +49,18 @@ public interface ISubscription extends IDisposable {
    */
   @Override
   void dispose();
+
+  /**
+   * @return true if subscription is disposing or was disposed
+   */
+  boolean isDisposed();
+
+  /**
+   * Returns an object with some stats of this subscription since the session was started. May be null when no session
+   * or connection was opened or in case of null transport.
+   *
+   * @return stats of this subscription since the session was started or null
+   */
+  ISubscriptionStats getStats();
+
 }

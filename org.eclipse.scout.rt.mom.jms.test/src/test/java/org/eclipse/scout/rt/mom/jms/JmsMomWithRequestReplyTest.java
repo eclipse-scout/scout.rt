@@ -208,6 +208,8 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     assertEquals(expectedReply, testee);
     IMarshaller marshaller = BEANS.get(JsonMarshaller.class);
     verifyRequestReplyMessageHandler(queue, marshaller, request, expectedReply);
+    assertEquals(1, BEANS.get(FixtureMom.class).getSubscriptions().size());
+    assertEquals(queue, BEANS.get(FixtureMom.class).getSubscriptions().get(0).getDestination());
   }
 
   @Test(timeout = 200_000)
@@ -256,6 +258,8 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
 
     // Verify
     assertEquals("HELLO WORLD", testee);
+    assertEquals(1, BEANS.get(FixtureMom.class).getSubscriptions().size());
+    assertEquals(topic, BEANS.get(FixtureMom.class).getSubscriptions().get(0).getDestination());
   }
 
   @Test(timeout = 200_000)

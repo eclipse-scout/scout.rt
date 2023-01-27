@@ -9,11 +9,15 @@
  */
 package org.eclipse.scout.rt.mom.jms.internal;
 
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 
 /**
  * @since 6.1
@@ -23,6 +27,7 @@ public class JmsSubscriptionStats implements ISubscriptionStats {
   private final AtomicLong m_messageCount = new AtomicLong();
   private final AtomicLong m_messageNonNullCount = new AtomicLong();
   private final AtomicLong m_errorCount = new AtomicLong();
+  private volatile Date m_lastMessageReceivedTimestamp;
 
   @Override
   public boolean invokingReceive() {
@@ -44,6 +49,11 @@ public class JmsSubscriptionStats implements ISubscriptionStats {
     return m_errorCount.get();
   }
 
+  @Override
+  public Date lastMessageReceivedTimestamp() {
+    return m_lastMessageReceivedTimestamp;
+  }
+
   public void notifyBeforeReceive() {
     m_invokeCount.incrementAndGet();
   }
@@ -57,6 +67,7 @@ public class JmsSubscriptionStats implements ISubscriptionStats {
     if (m != null) {
       m_messageNonNullCount.getAndIncrement();
     }
+    m_lastMessageReceivedTimestamp = BEANS.get(IDateProvider.class).currentMillis();
   }
 
   public void notifyReceiveError(JMSException e) {
