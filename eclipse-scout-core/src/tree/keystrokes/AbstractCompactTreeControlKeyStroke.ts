@@ -45,7 +45,7 @@ export class AbstractCompactTreeControlKeyStroke extends KeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & CompactTreeEventNode) {
+  override handle(event: KeyboardEventBase & CompactTreeEventNode) {
     this.field.selectNodes(event._nextNode);
     this.field.checkNode(event._nextNode, true);
   }

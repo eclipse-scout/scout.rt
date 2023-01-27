@@ -24,7 +24,7 @@ export class TableNavigationHomeKeyStroke extends AbstractTableNavigationKeyStro
     };
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let table = this.field,
       rows = table.visibleRows,
       firstRow = arrays.first(rows),

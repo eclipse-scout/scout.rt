@@ -19,7 +19,7 @@ export class MenuNavigationDownKeyStroke extends MenuNavigationKeyStroke {
     this.renderingHints.render = false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
     if (menuItems.$selected.length > 0) {
       this._changeSelection(menuItems.$selected, menuItems.$selected.nextAll(':visible').first());

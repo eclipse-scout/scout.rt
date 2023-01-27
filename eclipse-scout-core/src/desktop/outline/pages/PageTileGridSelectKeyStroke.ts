@@ -59,7 +59,7 @@ export class PageTileGridSelectKeyStroke extends RangeKeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & { _$element?: JQuery }) {
+  override handle(event: KeyboardEventBase & { _$element?: JQuery }) {
     let tile = event._$element.data('widget') as ButtonTile;
     let tileWidget = tile.tileWidget as TileButton;
     tileWidget.doAction();

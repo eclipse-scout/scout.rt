@@ -586,7 +586,7 @@ export class DatePicker extends Widget implements DatePickerModel {
     });
   }
 
-  protected _onMouseWheel(event: JQueryMouseWheelEvent<HTMLDivElement>) {
+  protected _onMouseWheel(event: JQueryMouseWheelEvent) {
     let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event['originalEvent'];
     let wheelData = originalEvent.wheelDelta ? originalEvent.wheelDelta / 10 : -originalEvent.detail * 3;
     let diff = (wheelData >= 0 ? -1 : 1);

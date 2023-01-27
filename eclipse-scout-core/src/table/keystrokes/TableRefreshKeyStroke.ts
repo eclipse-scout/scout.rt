@@ -28,7 +28,7 @@ export class TableRefreshKeyStroke extends KeyStroke {
     return accepted && this.field.hasReloadHandler;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.field.reload();
   }
 }

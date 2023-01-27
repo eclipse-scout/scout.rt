@@ -36,7 +36,7 @@ export class TableNavigationExpandKeyStroke extends AbstractTableNavigationKeySt
     return selectedRow.expandable;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let table = this.field,
       selectedRow = table.selectedRows[0];
     if (!selectedRow) {

@@ -32,7 +32,7 @@ export class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigationKeyStr
     return accepted && !!currentNode && (currentNode.expanded || !!currentNode.parentNode);
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & TreeEventCurrentNode) {
+  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
     let currentNode = event._treeCurrentNode;
     if (currentNode.expanded) {
       this.field.collapseNode(currentNode);

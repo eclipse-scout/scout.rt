@@ -22,7 +22,7 @@ export class GlassPaneRenderer {
   protected _resolvedDisplayParent: DisplayParent;
   protected _registeredDisplayParent: DisplayParent;
   protected _displayParentRenderHandler: EventHandler;
-  protected _glassPaneRemoveHandler: (event: JQuery.TriggeredEvent<HTMLDivElement>) => void;
+  protected _glassPaneRemoveHandler: (event: JQuery.TriggeredEvent) => void;
   protected _glassPaneRendererRegistered: boolean;
 
   /**
@@ -190,7 +190,7 @@ export class GlassPaneRenderer {
     }
   }
 
-  protected _onMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     let $animationTarget = null;
 
     // notify the display parent to handle the mouse down on the glass pane.
@@ -235,7 +235,7 @@ export class GlassPaneRenderer {
     this.renderGlassPanes();
   }
 
-  protected _onGlassPaneRemove(event: JQuery.TriggeredEvent<HTMLDivElement>) {
+  protected _onGlassPaneRemove(event: JQuery.TriggeredEvent) {
     let $glassPane = $(event.target);
     this._removeGlassPane($glassPane);
   }

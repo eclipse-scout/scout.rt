@@ -30,14 +30,14 @@ export class Scrollbar extends Widget implements ScrollbarModel {
   protected _dirReverse: 'right' | 'bottom';
   protected _scrollDir: 'scrollLeft' | 'scrollTop';
   protected _thumbClipping: Insets;
-  protected _onScrollHandler: (event: JQuery.ScrollEvent<HTMLDivElement>) => void;
-  protected _onScrollWheelHandler: (event: JQueryMouseWheelEvent<HTMLDivElement>) => boolean;
-  protected _onScrollbarMouseDownHandler: (event: JQuery.MouseDownEvent<HTMLDivElement>) => void;
-  protected _onTouchStartHandler: (event: JQuery.TouchStartEvent<HTMLDivElement>) => void;
-  protected _onThumbMouseDownHandler: (event: JQuery.MouseDownEvent<HTMLDivElement>) => boolean;
+  protected _onScrollHandler: (event: JQuery.ScrollEvent) => void;
+  protected _onScrollWheelHandler: (event: JQueryMouseWheelEvent) => boolean;
+  protected _onScrollbarMouseDownHandler: (event: JQuery.MouseDownEvent) => void;
+  protected _onTouchStartHandler: (event: JQuery.TouchStartEvent) => void;
+  protected _onThumbMouseDownHandler: (event: JQuery.MouseDownEvent) => boolean;
   protected _onDocumentMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
   protected _onDocumentMouseUpHandler: (event: JQuery.MouseUpEvent<Document>) => boolean;
-  protected _onAncestorScrollOrResizeHandler: (event: JQuery.TriggeredEvent<HTMLDivElement>) => void;
+  protected _onAncestorScrollOrResizeHandler: (event: JQuery.TriggeredEvent) => void;
   protected _fixScrollbarHandler: () => void;
   protected _unfixScrollbarHandler: () => void;
   protected _$thumb: JQuery;
@@ -350,7 +350,7 @@ export class Scrollbar extends Widget implements ScrollbarModel {
     this.update();
   }
 
-  protected _onTouchStart(event: JQuery.TouchStartEvent<HTMLDivElement>) {
+  protected _onTouchStart(event: JQuery.TouchStartEvent) {
     // In hybrid mode scroll bar is moved by the scroll event.
     // On a mobile device scroll events are fired delayed so the update will be delayed as well.
     // This will lead to flickering and could be prevented by calling fixScrollbar. But unfortunately calling fix will stop the scroll pane from scrolling immediately, at least in Edge.
@@ -368,7 +368,7 @@ export class Scrollbar extends Widget implements ScrollbarModel {
     });
   }
 
-  protected _onScrollWheel(event: JQueryMouseWheelEvent<HTMLDivElement>): boolean {
+  protected _onScrollWheel(event: JQueryMouseWheelEvent): boolean {
     if (!this.$container.isVisible()) {
       return true; // ignore scroll wheel event if there is no scroll bar visible
     }
@@ -388,7 +388,7 @@ export class Scrollbar extends Widget implements ScrollbarModel {
     return false;
   }
 
-  protected _onScrollbarMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
+  protected _onScrollbarMouseDown(event: JQuery.MouseDownEvent) {
     this.notifyBeforeScroll();
 
     let clickableAreaSize = this.$container[this._dim.toLowerCase()]();
@@ -415,7 +415,7 @@ export class Scrollbar extends Widget implements ScrollbarModel {
     this.notifyAfterScroll();
   }
 
-  protected _onThumbMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>): boolean {
+  protected _onThumbMouseDown(event: JQuery.MouseDownEvent): boolean {
     // ignore event if container is too small for thumb movement
     if (this._isContainerTooSmallForThumb()) {
       return true; // let _onScrollbarMouseDown handle the click event

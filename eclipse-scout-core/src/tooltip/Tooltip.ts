@@ -43,7 +43,7 @@ export class Tooltip extends Widget implements TooltipModel {
   protected _openLater: boolean;
   protected _mouseDownHandler: (event: MouseEvent) => boolean;
   protected _keydownHandler: (event: KeyDownEvent) => void;
-  protected _anchorScrollHandler: (event: JQuery.ScrollEvent<HTMLElement>) => void;
+  protected _anchorScrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _moveHandler: () => void;
 
   constructor() {
@@ -342,7 +342,7 @@ export class Tooltip extends Widget implements TooltipModel {
     }, this);
   }
 
-  protected _onAnchorScroll(event: JQuery.ScrollEvent<HTMLElement>) {
+  protected _onAnchorScroll(event: JQuery.ScrollEvent) {
     if (!this.rendered) {
       // Scroll events may be fired delayed, even if scroll listener are already removed.
       return;

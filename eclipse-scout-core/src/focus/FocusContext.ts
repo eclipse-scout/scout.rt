@@ -27,11 +27,11 @@ export class FocusContext {
   $container: JQuery;
 
   /** Notice: every listener is installed on $container and not on $field level, except 'remove' listener because it does not bubble. */
-  protected _keyDownListener: (e: KeyDownEvent<HTMLElement>) => void;
-  protected _focusInListener: (e: FocusInEvent<HTMLElement>) => void;
-  protected _focusOutListener: (e: FocusOutEvent<HTMLElement>) => void;
-  protected _unfocusableListener: (e: TriggeredEvent<HTMLElement>) => void;
-  protected _removeListener: (e: TriggeredEvent<HTMLElement>) => void;
+  protected _keyDownListener: (e: KeyDownEvent) => void;
+  protected _focusInListener: (e: FocusInEvent) => void;
+  protected _focusOutListener: (e: FocusOutEvent) => void;
+  protected _unfocusableListener: (e: TriggeredEvent) => void;
+  protected _removeListener: (e: TriggeredEvent) => void;
 
   constructor($container: JQuery, focusManager: FocusManager) {
     this.$container = $container;
@@ -79,7 +79,7 @@ export class FocusContext {
   /**
    * Method invoked once a 'keydown' event is fired to control proper tab cycle.
    */
-  protected _onKeyDown(event: KeyDownEvent<HTMLElement>) {
+  protected _onKeyDown(event: KeyDownEvent) {
     if (event.which === keys.TAB) {
       let activeElement = this.$container.activeElement(true),
         $focusableElements = this.$container.find(':tabbable:visible'),
@@ -129,7 +129,7 @@ export class FocusContext {
   /**
    * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
    */
-  protected _onFocusIn(event: FocusInEvent<HTMLElement>) {
+  protected _onFocusIn(event: FocusInEvent) {
     let $target = $(event.target);
     $target.on('remove', this._removeListener);
     this.focusedElement = event.target;
@@ -149,7 +149,7 @@ export class FocusContext {
   /**
    * Method invoked once a 'focusout' event is fired by this context's $container or one of its child controls.
    */
-  protected _onFocusOut(event: FocusOutEvent<HTMLElement>) {
+  protected _onFocusOut(event: FocusOutEvent) {
     $(event.target).off('remove', this._removeListener);
     $(this.focusedElement).removeClass('keyboard-navigation');
     this.focusedElement = null;
@@ -159,7 +159,7 @@ export class FocusContext {
   /**
    * Method invoked once a child element of this context's $container is removed.
    */
-  protected _onRemove(event: TriggeredEvent<HTMLElement>) {
+  protected _onRemove(event: TriggeredEvent) {
     // This listener is installed on the focused element only.
     this.validateAndSetFocus(null, filters.notSameFilter(event.target));
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
@@ -170,7 +170,7 @@ export class FocusContext {
    * and it cannot have the focus anymore. In that case we need to look for a new focusable
    * element.
    */
-  protected _onUnfocusable(event: TriggeredEvent<HTMLElement>) {
+  protected _onUnfocusable(event: TriggeredEvent) {
     if ($(event.target).isOrHas(this.lastValidFocusedElement)) {
       this.validateAndSetFocus(null, filters.notSameFilter(event.target));
       event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.

@@ -202,7 +202,7 @@ export class YearPanel extends Widget implements YearPanelModel {
 
   /* -- events ---------------------------------------- */
 
-  protected _onYearClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onYearClick(event: JQuery.ClickEvent) {
     let
       displayMode = Planner.DisplayMode,
       diff = $(event.target).data('year-diff'),
@@ -235,7 +235,7 @@ export class YearPanel extends Widget implements YearPanelModel {
     });
   }
 
-  protected _onYearDayClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onYearDayClick(event: JQuery.ClickEvent) {
     this.selectedDate = $('.year-hover-day', this.$yearList).data('date');
     if (this.selectedDate) {
       this.trigger('dateSelect', {

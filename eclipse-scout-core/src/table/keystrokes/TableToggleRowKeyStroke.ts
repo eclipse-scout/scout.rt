@@ -28,7 +28,7 @@ export class TableToggleRowKeyStroke extends KeyStroke {
       this.field.selectedRows.length > 0;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let selectedRows = this.field.selectedRows.filter(row => row.enabled);
     // Toggle checked state to 'true', except if every row is already checked
     let checked = selectedRows.some(row => !row.checked);

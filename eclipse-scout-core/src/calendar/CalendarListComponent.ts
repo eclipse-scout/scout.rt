@@ -52,7 +52,7 @@ export class CalendarListComponent {
    * Prevent list-component from gaining focus (*1). Since the component is removed/rendered
    * after the click the focus would be on the body afterwards #222862.
    */
-  protected _onMouseDown(source: CalendarComponent, event: JQuery.MouseDownEvent<HTMLDivElement>) {
+  protected _onMouseDown(source: CalendarComponent, event: JQuery.MouseDownEvent) {
     event.preventDefault(); // *1
     let $part = $(event.delegateTarget);
     source.updateSelectedComponent($part, true);
