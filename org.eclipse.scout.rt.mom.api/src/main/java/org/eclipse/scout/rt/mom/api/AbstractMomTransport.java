@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.mom.api;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
@@ -34,7 +36,25 @@ public abstract class AbstractMomTransport implements IMomTransport {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractMomTransport.class);
 
-  protected final FinalValue<IMomImplementor> m_delegate = new FinalValue<>();
+  protected final String m_momUid = UUID.randomUUID().toString();
+
+  private final Object m_delegateLock = new Object();
+  private volatile IMomImplementor m_delegate;
+
+  @Override
+  public String getId() {
+    return m_momUid;
+  }
+
+  @Override
+  public String getName() {
+    return getDelegate().getName();
+  }
+
+  @Override
+  public List<ISubscription> getSubscriptions() {
+    return getDelegate().getSubscriptions();
+  }
 
   /**
    * @return the {@link IMomImplementor} class to use in this MOM. If <code>null</code> is returned, the
@@ -50,19 +70,13 @@ public abstract class AbstractMomTransport implements IMomTransport {
   /**
    * @return the default {@link IMarshaller} to be used if no specific marshaller is configured for this MOM or is
    *         registered for a {@link IDestination}. The default value is <code>null</code>, which means that the default
-   *         marshaller is chosen by the the implementor.
+   *         marshaller is chosen by the implementor.
    */
   protected IMarshaller getConfiguredDefaultMarshaller() {
     return null;
   }
 
-  /**
-   * Returns <code>true</code> if no {@link IMomImplementor} is configured for this MOM or the configured implementor is
-   * of type {@link NullMomImplementor}.
-   * <p>
-   * Unlike the other methods on this class, this method can be called <b>without</b> triggering the initialization of
-   * the delegate.
-   */
+  @Override
   public boolean isNullTransport() {
     final Class<? extends IMomImplementor> implementorClass = getConfiguredImplementor();
     return implementorClass == null || NullMomImplementor.class.isAssignableFrom(implementorClass);
@@ -74,7 +88,7 @@ public abstract class AbstractMomTransport implements IMomTransport {
    * <h3>Warning: risk of deadlocks!</h3>
    * <p>
    * This method is called from within a <i>synchronized</i> block inside {@link #getDelegate()}. The implementation
-   * must <b>not</b> call (directly or indirectly) any other methods on {@link AbstractMomDelegate}. Be very cautious
+   * must <b>not</b> call (directly or indirectly) any other methods on {@link AbstractMomTransport}. Be very cautious
    * when calling other code.
    */
   protected IMomImplementor initDelegate() throws Exception {
@@ -118,12 +132,20 @@ public abstract class AbstractMomTransport implements IMomTransport {
    *         this call may block until the delegate is initialized).
    */
   protected IMomImplementor getDelegate() {
-    if (!m_delegate.isSet()) {
-      synchronized (m_delegate) {
-        m_delegate.setIfAbsent(this::initDelegate);
+    if (m_delegate == null) {
+      synchronized (m_delegateLock) {
+        if (m_delegate == null) {
+          try {
+            m_delegate = initDelegate();
+          }
+          catch (Exception e) {
+            m_delegate = BEANS.get(NullMomImplementor.class);
+            throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+          }
+        }
       }
     }
-    return m_delegate.get();
+    return m_delegate;
   }
 
   /**
@@ -133,7 +155,7 @@ public abstract class AbstractMomTransport implements IMomTransport {
    * @see #getDelegate()
    */
   public IMomImplementor getImplementor() {
-    return m_delegate.get();
+    return m_delegate;
   }
 
   @Override
@@ -168,9 +190,14 @@ public abstract class AbstractMomTransport implements IMomTransport {
 
   @Override
   public void destroy() {
-    if (!m_delegate.isSet()) {
+    IMomImplementor delegate;
+    synchronized (m_delegateLock) {
+      delegate = m_delegate;
+      m_delegate = null;
+    }
+    if (delegate == null) {
       return; // don't trigger unnecessary delegate initialization
     }
-    getDelegate().destroy();
+    delegate.destroy();
   }
 }
