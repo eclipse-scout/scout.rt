@@ -17,28 +17,11 @@ import org.eclipse.scout.rt.mom.jms.JmsSubscription;
  *
  * @since 6.1
  */
-public interface ISubscriptionStats {
+public interface ISubscriptionStats extends org.eclipse.scout.rt.mom.api.ISubscriptionStats {
 
   /**
    * @return true if the subscription is just before or inside a call to MessageConsumer#receive
-   * @since 6.1
    */
   boolean invokingReceive();
 
-  /**
-   * @return the number of messages received, including null messages
-   * @since 6.1
-   */
-  long receivedMessages();
-
-  /**
-   * @return the number of non-null messages received
-   * @since 6.1
-   */
-  long receivedNonNullMessages();
-
-  /**
-   * @return the number of message errors occurred upon calling receive()
-   */
-  long receivedErrors();
 }
