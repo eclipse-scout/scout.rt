@@ -116,7 +116,7 @@ export class LoginBox extends Box {
     return data;
   }
 
-  protected _onLoginFormSubmit(event: JQuery.SubmitEvent<HTMLElement>) {
+  protected _onLoginFormSubmit(event: JQuery.SubmitEvent) {
     // Prevent default submit action
     event.preventDefault();
 

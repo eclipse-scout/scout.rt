@@ -23,7 +23,7 @@ export class MenuBarRightKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let menuItems = this.field.allMenusAsFlatList(),
       $menuItemFocused = this.field.$container.find(':focus'),
       i, menuItem, focusNext = false;

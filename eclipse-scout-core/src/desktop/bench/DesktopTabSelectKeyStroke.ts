@@ -44,7 +44,7 @@ export class DesktopTabSelectKeyStroke extends RangeKeyStroke {
     return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let viewIndex = event.which - keys['1'];
 
     let tabs = this._viewTabs();

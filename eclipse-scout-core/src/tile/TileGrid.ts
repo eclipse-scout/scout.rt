@@ -67,7 +67,7 @@ export class TileGrid extends Widget implements TileGridModel {
   protected _doubleClickSupport: DoubleClickSupport;
   protected _filterMenusHandler: (menuItems: Menu[], destination: MenuDestinations) => Menu[];
   protected _renderViewPortAfterAttach: boolean;
-  protected _scrollParentScrollHandler: (event: JQuery.ScrollEvent<HTMLElement>) => void;
+  protected _scrollParentScrollHandler: (event: JQuery.ScrollEvent) => void;
 
   constructor() {
     super();
@@ -650,7 +650,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this.scrollLeft = scrollLeft;
   }
 
-  protected _onScrollParentScroll(event: JQuery.ScrollEvent<HTMLElement>) {
+  protected _onScrollParentScroll(event: JQuery.ScrollEvent) {
     (this.htmlComp.layout as TileGridLayout).updateViewPort();
   }
 

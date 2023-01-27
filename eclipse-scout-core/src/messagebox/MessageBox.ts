@@ -263,7 +263,7 @@ export class MessageBox extends Widget implements MessageBoxModel {
     myDocument.execCommand('copy');
   }
 
-  protected _onCopy(event: TriggeredEvent<HTMLDivElement>) {
+  protected _onCopy(event: TriggeredEvent) {
     let clipboardData = objects.optProperty(event, 'originalEvent', 'clipboardData') as DataTransfer;
 
     if (clipboardData) {

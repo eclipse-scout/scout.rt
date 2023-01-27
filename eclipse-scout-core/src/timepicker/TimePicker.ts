@@ -197,7 +197,7 @@ export class TimePicker extends Widget implements TimePickerModel {
     return time;
   }
 
-  protected _onTimeClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onTimeClick(event: JQuery.ClickEvent) {
     let $target = $(event.currentTarget);
     let time = new Date($target.data('time'));
     this.selectTime(time);

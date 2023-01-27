@@ -20,7 +20,7 @@ export class RadioButtonGroupRightOrDownKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let fieldBefore,
       focusedButton = $(event.target).data('radiobutton');
 

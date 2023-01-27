@@ -23,7 +23,7 @@ export class CopyKeyStroke extends KeyStroke {
     this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent) => field.$container;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.field.copy();
   }
 }

@@ -42,7 +42,7 @@ export class TableNavigationCollapseKeyStroke extends AbstractTableNavigationKey
     return !!selectedRow.parentRow;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let selectedRow = this.field.selectedRows[0];
     if (!selectedRow) {
       return;

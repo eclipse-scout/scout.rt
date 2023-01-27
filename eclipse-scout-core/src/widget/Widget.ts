@@ -95,7 +95,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   protected _parentRemovingWhileAnimatingHandler: EventHandler;
   protected _postRenderActions: (() => void)[];
   protected _preserveOnPropertyChangeProperties: string[];
-  protected _scrollHandler: (event: JQuery.ScrollEvent<HTMLElement>) => void;
+  protected _scrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _storedFocusedWidget: Widget;
 
   constructor() {

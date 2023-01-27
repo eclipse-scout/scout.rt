@@ -97,23 +97,23 @@ export class PlannerHeader extends Widget {
     $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
   }
 
-  protected _onTodayClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onTodayClick(event: JQuery.ClickEvent) {
     this.trigger('todayClick');
   }
 
-  protected _onNextClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onNextClick(event: JQuery.ClickEvent) {
     this.trigger('nextClick');
   }
 
-  protected _onPreviousClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onPreviousClick(event: JQuery.ClickEvent) {
     this.trigger('previousClick');
   }
 
-  protected _onYearClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onYearClick(event: JQuery.ClickEvent) {
     this.trigger('yearClick');
   }
 
-  protected _onDisplayModeClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onDisplayModeClick(event: JQuery.ClickEvent) {
     let displayMode = $(event.target).data('mode');
     this.setDisplayMode(displayMode);
     this.trigger('displayModeClick', {

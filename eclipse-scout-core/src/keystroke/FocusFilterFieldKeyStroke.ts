@@ -54,7 +54,7 @@ export class FocusFilterFieldKeyStroke extends KeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & { _$filterInput?: JQuery<HTMLInputElement> }) {
+  override handle(event: KeyboardEventBase & { _$filterInput?: JQuery<HTMLInputElement> }) {
     let $filterInput = event._$filterInput;
 
     // Focus the field and move cursor to the end.

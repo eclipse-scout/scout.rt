@@ -54,7 +54,7 @@ export class TableStartCellEditKeyStroke extends KeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & { _editPosition?: TableCellPosition }) {
+  override handle(event: KeyboardEventBase & { _editPosition?: TableCellPosition }) {
     let editPosition = event._editPosition;
     this.field.prepareCellEdit(editPosition.column, editPosition.row, true);
   }

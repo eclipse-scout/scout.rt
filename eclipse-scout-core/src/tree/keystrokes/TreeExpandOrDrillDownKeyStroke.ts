@@ -36,7 +36,7 @@ export class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigationKeyStr
     return !node.expanded && !node.leaf;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & TreeEventCurrentNode) {
+  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
     let currentNode = event._treeCurrentNode;
     if (this.isNodeExpandable(currentNode)) {
       this.field.expandNode(currentNode, {

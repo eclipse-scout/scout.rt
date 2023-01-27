@@ -31,7 +31,7 @@ export class ViewMenuPopupEnterKeyStroke extends KeyStroke {
     return super.accept(event) && this.field.content.selectedTiles.length === 1 && this.field.content.selectedTiles[0].enabledComputed;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.field.activateTile(this.field.content.selectedTiles[0]);
   }
 }

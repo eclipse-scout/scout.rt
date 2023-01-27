@@ -23,7 +23,7 @@ export class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKeyStroke 
     };
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & TreeEventCurrentNode) {
+  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
     let newSelection = this._computeNewSelection(event._treeCurrentNode);
     if (newSelection) {
       this.selectNodesAndReveal(newSelection);

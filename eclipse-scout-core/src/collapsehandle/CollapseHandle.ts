@@ -90,7 +90,7 @@ export class CollapseHandle extends Widget implements CollapseHandleModel {
     this.$container.toggleClass('one-visible', (this.leftVisible || this.rightVisible) && !bothVisible);
   }
 
-  protected _onMouseDown(event: JQuery.MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     let target = event.target;
     if (this.$left.isOrHas(target)) {
       this.trigger('action', {

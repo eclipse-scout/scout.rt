@@ -674,22 +674,22 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  protected _onTodayClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onTodayClick(event: JQuery.ClickEvent) {
     this.selectedDate = new Date();
     this._updateModel(true, false);
   }
 
-  protected _onDisplayModeClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onDisplayModeClick(event: JQuery.ClickEvent) {
     let displayMode = $(event.target).data('mode');
     this.setDisplayMode(displayMode);
   }
 
-  protected _onYearClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onYearClick(event: JQuery.ClickEvent) {
     this._showYearPanel = !this._showYearPanel;
     this._updateScreen(true, true);
   }
 
-  protected _onListClick(event: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onListClick(event: JQuery.ClickEvent) {
     this._showListPanel = !this._showListPanel;
     this._updateScreen(false, true);
   }
@@ -1251,16 +1251,16 @@ export class Calendar extends Widget implements CalendarModel {
     this._setSelection(partDay, component, updateScrollPosition, false);
   }
 
-  protected _onDayContextMenu(event: JQuery.ContextMenuEvent<HTMLDivElement>) {
+  protected _onDayContextMenu(event: JQuery.ContextMenuEvent) {
     this._showContextMenu(event, Calendar.MenuTypes.EmptySpace);
   }
 
   /** @internal */
-  _showContextMenu(event: JQuery.ContextMenuEvent<HTMLDivElement>, allowedType: string) {
+  _showContextMenu(event: JQuery.ContextMenuEvent, allowedType: string) {
     event.preventDefault();
     event.stopPropagation();
 
-    let func = function func(event: JQuery.ContextMenuEvent<HTMLDivElement>, allowedType: string) {
+    let func = function func(event: JQuery.ContextMenuEvent, allowedType: string) {
       if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
         return;
       }

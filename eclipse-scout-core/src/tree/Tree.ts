@@ -2595,8 +2595,8 @@ export class Tree extends Widget implements TreeModel {
     });
   }
 
-  protected _showContextMenu(event: JQuery.ContextMenuEvent<HTMLDivElement>) {
-    let func = function(event: JQuery.ContextMenuEvent<HTMLDivElement>) {
+  protected _showContextMenu(event: JQuery.ContextMenuEvent) {
+    let func = function(event: JQuery.ContextMenuEvent) {
       if (!this.rendered) { // check needed because function is called asynchronously
         return;
       }
@@ -2627,7 +2627,7 @@ export class Tree extends Widget implements TreeModel {
   }
 
   /** @internal */
-  _onNodeMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>): boolean {
+  _onNodeMouseDown(event: JQuery.MouseDownEvent): boolean {
     this._doubleClickSupport.mousedown(event);
     if (this._doubleClickSupport.doubleClicked()) {
       // don't execute on double click events
@@ -2657,7 +2657,7 @@ export class Tree extends Widget implements TreeModel {
   }
 
   /** @internal */
-  _onNodeMouseUp(event: JQuery.MouseUpEvent<HTMLDivElement>): boolean {
+  _onNodeMouseUp(event: JQuery.MouseUpEvent): boolean {
     if (this._doubleClickSupport.doubleClicked()) {
       // don't execute on double click events
       return false;
@@ -2676,7 +2676,7 @@ export class Tree extends Widget implements TreeModel {
     return true;
   }
 
-  protected _isCheckboxClicked(event: JQuery.MouseDownEvent<HTMLDivElement>): boolean {
+  protected _isCheckboxClicked(event: JQuery.MouseDownEvent): boolean {
     // with CheckableStyle.CHECKBOX_TREE_NODE a click anywhere on the node should trigger the check
     if (this.isTreeNodeCheckEnabled()) {
       return true;
@@ -3156,7 +3156,7 @@ export class Tree extends Widget implements TreeModel {
     return Boolean(this.nodeById(node.id));
   }
 
-  protected _onNodeDoubleClick(event: JQuery.DoubleClickEvent<HTMLDivElement>) {
+  protected _onNodeDoubleClick(event: JQuery.DoubleClickEvent) {
     if (this.isBreadcrumbStyleActive()) {
       return;
     }
@@ -3180,7 +3180,7 @@ export class Tree extends Widget implements TreeModel {
     }
   }
 
-  protected _onNodeControlMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>): boolean {
+  protected _onNodeControlMouseDown(event: JQuery.MouseDownEvent): boolean {
     this._doubleClickSupport.mousedown(event);
     if (this._doubleClickSupport.doubleClicked()) {
       // don't execute on double click events
@@ -3219,17 +3219,17 @@ export class Tree extends Widget implements TreeModel {
     return true;
   }
 
-  protected _onNodeControlMouseUp(event: JQuery.MouseUpEvent<HTMLDivElement>): boolean {
+  protected _onNodeControlMouseUp(event: JQuery.MouseUpEvent): boolean {
     // prevent bubbling to _onNodeMouseUp()
     return false;
   }
 
-  protected _onNodeControlDoubleClick(event: JQuery.DoubleClickEvent<HTMLDivElement>): boolean {
+  protected _onNodeControlDoubleClick(event: JQuery.DoubleClickEvent): boolean {
     // prevent bubbling to _onNodeDoubleClick()
     return false;
   }
 
-  protected _onContextMenu(event: JQuery.ContextMenuEvent<HTMLDivElement>) {
+  protected _onContextMenu(event: JQuery.ContextMenuEvent) {
     event.preventDefault();
     this._showContextMenu(event);
   }

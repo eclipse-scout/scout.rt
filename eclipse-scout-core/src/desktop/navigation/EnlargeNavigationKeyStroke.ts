@@ -37,7 +37,7 @@ export class EnlargeNavigationKeyStroke extends KeyStroke {
     return enabled && this.field.rightVisible;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.desktop.enlargeNavigation();
   }
 

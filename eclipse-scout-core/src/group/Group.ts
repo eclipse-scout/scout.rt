@@ -376,13 +376,13 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
     this.invalidateLayoutTree();
   }
 
-  protected _onHeaderMouseDown(event: MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onHeaderMouseDown(event: MouseDownEvent) {
     if (this.collapsible && (!this.header || this.collapseStyle !== Group.CollapseStyle.BOTTOM)) {
       this.setCollapsed(!this.collapsed && this.collapsible);
     }
   }
 
-  protected _onFooterMouseDown(event: MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onFooterMouseDown(event: MouseDownEvent) {
     if (this.collapsible) {
       this.setCollapsed(!this.collapsed && this.collapsible);
     }

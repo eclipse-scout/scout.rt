@@ -31,7 +31,7 @@ export class ClickActiveElementKeyStroke extends KeyStroke {
     return true;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & { _$activeElement?: JQuery }) {
+  override handle(event: KeyboardEventBase & { _$activeElement?: JQuery }) {
     event._$activeElement.trigger($.Event('click', {
       which: 1
     }));

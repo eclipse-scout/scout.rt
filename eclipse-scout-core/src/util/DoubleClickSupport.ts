@@ -53,7 +53,7 @@ export class DoubleClickSupport {
     this._doubleClicked = false;
   }
 
-  mousedown(event: MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  mousedown(event: MouseDownEvent) {
     if (event && event.type === 'mousedown') {
       let posX = scout.nvl(event.pageX, 0);
       let posY = scout.nvl(event.pageY, 0);

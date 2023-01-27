@@ -38,7 +38,7 @@ export class SmartFieldCancelKeyStroke extends KeyStroke {
     return true;
   }
 
-  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.closePopup();
     this.field.resetDisplayText();
   }

@@ -53,7 +53,7 @@ export class Switch extends Widget implements SwitchModel {
     this._renderTooltipText();
   }
 
-  protected _onSwitchButtonClick(e: JQuery.ClickEvent<HTMLDivElement>) {
+  protected _onSwitchButtonClick(e: JQuery.ClickEvent) {
     if (!this.enabledComputed) {
       return;
     }

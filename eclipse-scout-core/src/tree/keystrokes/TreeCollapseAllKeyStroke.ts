@@ -23,7 +23,7 @@ export class TreeCollapseAllKeyStroke extends AbstractTreeNavigationKeyStroke {
     };
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & TreeEventCurrentNode) {
+  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
     this.field.collapseAll();
     if (this.field.visibleNodesFlat.length > 0) {
       this.selectNodesAndReveal(this.field.visibleNodesFlat[0]);
