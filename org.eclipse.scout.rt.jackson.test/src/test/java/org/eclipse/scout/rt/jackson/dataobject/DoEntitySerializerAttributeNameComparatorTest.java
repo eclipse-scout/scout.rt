@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Test;
 
 /**
@@ -27,6 +28,7 @@ public class DoEntitySerializerAttributeNameComparatorTest {
     DoEntitySerializerAttributeNameComparator comparator = BEANS.get(DoEntitySerializerAttributeNameComparator.class).init(context);
 
     // Equality
+    //noinspection EqualsWithItself
     assertEquals(0, comparator.compare("alfa", "alfa"));
     assertEquals(0, comparator.compare(context.getTypeAttributeName(), context.getTypeAttributeName()));
     assertEquals(0, comparator.compare(context.getTypeVersionAttributeName(), context.getTypeVersionAttributeName()));
@@ -40,5 +42,30 @@ public class DoEntitySerializerAttributeNameComparatorTest {
     assertTrue(comparator.compare(context.getTypeAttributeName(), context.getTypeVersionAttributeName()) < 0);
     assertTrue(comparator.compare(context.getTypeVersionAttributeName(), "alfa") < 0);
     assertTrue(comparator.compare("alfa", context.getContributionsAttributeName()) < 0);
+  }
+
+  @Test
+  public void testInitMayBeCalledOnlyOnce() {
+    ScoutDataObjectModuleContext context1 = BEANS.get(ScoutDataObjectModule.class).getModuleContext();
+    ScoutDataObjectModuleContext context2 = BEANS.get(ScoutDataObjectModule.class).getModuleContext();
+    DoEntitySerializerAttributeNameComparator comparator = BEANS.get(DoEntitySerializerAttributeNameComparator.class)
+        .init(context1);
+    assertThrows(AssertionException.class, () -> comparator.init(context2));
+  }
+
+  @Test
+  public void testDifferentConfigurations() {
+    ScoutDataObjectModuleContext contextWithDefaultConfig = BEANS.get(ScoutDataObjectModule.class).getModuleContext();
+    ScoutDataObjectModuleContext contextWithCustomTypeAttributeName = BEANS.get(ScoutDataObjectModule.class).getModuleContext()
+        .withTypeAttributeName("foo");
+
+    DoEntitySerializerAttributeNameComparator comparatorForDefaultConfig = BEANS.get(DoEntitySerializerAttributeNameComparator.class)
+        .init(contextWithDefaultConfig);
+    DoEntitySerializerAttributeNameComparator comparatorForCustomTypeAttributeName = BEANS.get(DoEntitySerializerAttributeNameComparator.class)
+        .init(contextWithCustomTypeAttributeName);
+
+    assertTrue(comparatorForDefaultConfig.compare("bar", "foo") < 0);
+    assertTrue(comparatorForCustomTypeAttributeName.compare("bar", "foo") > 0);
+    assertTrue(comparatorForCustomTypeAttributeName.compare("bar", "fun") < 0);
   }
 }
