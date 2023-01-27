@@ -907,6 +907,15 @@ export default class Form extends Widget {
     let prefBounds = this.prefBounds();
     if (prefBounds) {
       position = prefBounds.point();
+      // Cached bounds may be off-screen -> adjust if necessary
+      let windowSize = this.$container.windowSize();
+      let margins = this.htmlComp.margins();
+      let minX = 0;
+      let minY = 0;
+      let maxX = windowSize.width - prefBounds.width - margins.horizontal();
+      let maxY = windowSize.height - prefBounds.height - margins.vertical();
+      position.x = Math.max(minX, Math.min(maxX, position.x));
+      position.y = Math.max(minY, Math.min(maxY, position.y));
     } else {
       position = DialogLayout.positionContainerInWindow(this.$container);
     }
