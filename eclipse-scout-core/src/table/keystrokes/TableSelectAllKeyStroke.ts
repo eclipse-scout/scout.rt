@@ -25,7 +25,7 @@ export class TableSelectAllKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let table = this.field;
     table.toggleSelection();
     table.selectionHandler.lastActionRow = null;

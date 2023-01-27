@@ -61,7 +61,7 @@ export class Planner extends Widget implements PlannerModel {
   protected _resourceTitleWidth: number;
   protected _rangeSelectionStarted: boolean;
   protected _tooltipSupport: TooltipSupport;
-  protected _gridScrollHandler: (event: JQuery.ScrollEvent<HTMLDivElement>) => void;
+  protected _gridScrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _cellMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
   protected _resizeMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
 
@@ -310,7 +310,7 @@ export class Planner extends Widget implements PlannerModel {
     this.setViewRangeFrom(event.date);
   }
 
-  protected _onResourceTitleMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
+  protected _onResourceTitleMouseDown(event: JQuery.MouseDownEvent) {
     let $resource = $(event.target).parent();
     if ($resource.isSelected()) {
       if (event.which === 3 || event.which === 1 && event.ctrlKey) {
@@ -362,7 +362,7 @@ export class Planner extends Widget implements PlannerModel {
     this.session.onRequestsDone(func, event, allowedType);
   }
 
-  protected _onGridScroll(event: JQuery.ScrollEvent<HTMLDivElement>) {
+  protected _onGridScroll(event: JQuery.ScrollEvent) {
     this._reconcileScrollPos();
   }
 
@@ -897,7 +897,7 @@ export class Planner extends Widget implements PlannerModel {
 
   /* -- selector -------------------------------------------------- */
 
-  protected _onCellMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
+  protected _onCellMouseDown(event: JQuery.MouseDownEvent) {
     let $activity,
       $resource,
       $target = $(event.target),
@@ -964,7 +964,7 @@ export class Planner extends Widget implements PlannerModel {
   /**
    * @returns true if the range selection may be started, false if not
    */
-  protected _prepareRangeSelectionByMousemove(mousedownEvent: JQuery.MouseDownEvent<HTMLDivElement>, mousemoveEvent: JQuery.MouseMoveEvent<Document>): boolean {
+  protected _prepareRangeSelectionByMousemove(mousedownEvent: JQuery.MouseDownEvent, mousemoveEvent: JQuery.MouseMoveEvent<Document>): boolean {
     let moveX = mousedownEvent.pageX - mousemoveEvent.pageX;
     let moveY = mousedownEvent.pageY - mousemoveEvent.pageY;
     let moveThreshold = Planner.RANGE_SELECTION_MOVE_THRESHOLD;
@@ -978,7 +978,7 @@ export class Planner extends Widget implements PlannerModel {
     return Math.abs(moveY) >= moveThreshold && this.selectionMode === Planner.SelectionMode.MULTI_RANGE && mousedownRow !== mousemoveRow;
   }
 
-  protected _onCellMousemove(mousedownEvent: JQuery.MouseDownEvent<HTMLDivElement>, event: JQuery.MouseMoveEvent<Document>) {
+  protected _onCellMousemove(mousedownEvent: JQuery.MouseDownEvent, event: JQuery.MouseMoveEvent<Document>) {
     if (this.selectedActivity && !this._rangeSelectionStarted) {
       // If an activity was selected, switch to range selection if the user moves the mouse
       if (!this._prepareRangeSelectionByMousemove(mousedownEvent, event)) {

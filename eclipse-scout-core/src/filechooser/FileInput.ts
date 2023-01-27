@@ -168,7 +168,7 @@ export class FileInput extends Widget implements FileInputModel {
     }
   }
 
-  protected _onMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     if (!this.enabled) {
       return;
     }

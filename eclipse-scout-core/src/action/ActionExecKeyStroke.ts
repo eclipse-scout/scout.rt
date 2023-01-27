@@ -20,7 +20,7 @@ export class ActionExecKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.field.doAction();
   }
 }

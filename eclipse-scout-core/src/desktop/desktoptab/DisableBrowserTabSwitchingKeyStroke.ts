@@ -43,7 +43,7 @@ export class DisableBrowserTabSwitchingKeyStroke extends RangeKeyStroke {
     return enabled && this.field.selectViewTabsKeyStrokesEnabled;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     // NOP
   }
 }

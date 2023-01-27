@@ -21,7 +21,7 @@ export class OutlineNavigateToTopKeyStroke extends AbstractTreeNavigationKeyStro
     this.renderingHints.$drawingArea = ($drawingArea, event) => this.field.$title || this.field.$data;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & TreeEventCurrentNode) {
+  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
     this.field.navigateToTop();
   }
 }

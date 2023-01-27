@@ -17,7 +17,7 @@ export class TableControlActionKeyStroke extends ActionKeyStroke {
     this.renderingHints.offset = 6;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.field.toggle();
   }
 

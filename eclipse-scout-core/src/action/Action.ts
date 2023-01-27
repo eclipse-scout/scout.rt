@@ -418,7 +418,7 @@ export class Action extends Widget implements ActionModel {
     this.setProperty('preventDoubleClick', preventDoubleClick);
   }
 
-  protected _allowMouseEvent(event: JQuery.MouseEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>): boolean {
+  protected _allowMouseEvent(event: JQuery.MouseEventBase): boolean {
     if (event.which !== 1) {
       return false; // Other button than left mouse button --> nop
     }
@@ -428,7 +428,7 @@ export class Action extends Widget implements ActionModel {
     return true;
   }
 
-  protected _onClick(event: JQuery.ClickEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onClick(event: JQuery.ClickEvent) {
     if (!this._allowMouseEvent(event)) {
       return;
     }

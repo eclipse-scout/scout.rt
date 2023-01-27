@@ -34,7 +34,7 @@ export class SubCloseKeyStroke extends MenuNavigationExecKeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & { $menuItem?: JQuery }) {
+  override handle(event: KeyboardEventBase & { $menuItem?: JQuery }) {
     event.$menuItem.data('widget').doAction();
   }
 }

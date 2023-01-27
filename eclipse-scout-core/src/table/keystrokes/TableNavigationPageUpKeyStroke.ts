@@ -24,7 +24,7 @@ export class TableNavigationPageUpKeyStroke extends AbstractTableNavigationKeySt
     };
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let table = this.field,
       viewport = this._viewportInfo(),
       rows = table.visibleRows,

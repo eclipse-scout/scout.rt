@@ -163,7 +163,7 @@ export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerMo
   /**
    * Handles the keystroke event by the keyStrokeContext's keystroke handlers, but returns immediately once a keystroke requests immediate stop of propagation.
    */
-  protected _handleKeyStrokeEvent(keyStrokeContext: KeyStrokeContext, event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _handleKeyStrokeEvent(keyStrokeContext: KeyStrokeContext, event: KeyboardEventBase) {
     if (!keyStrokeContext.accept(event)) {
       return;
     }
@@ -222,11 +222,11 @@ export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerMo
     return !keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField);
   }
 
-  protected _isHelpKeyStroke(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>): boolean {
+  protected _isHelpKeyStroke(event: KeyboardEventBase): boolean {
     return KeyStroke.acceptEvent(this.helpKeyStroke, event);
   }
 
-  protected _installHelpDisposeListener(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>): boolean {
+  protected _installHelpDisposeListener(event: KeyboardEventBase): boolean {
     let helpDisposeHandler,
       $currentTarget = $(event.currentTarget),
       $myWindow = $currentTarget.window(),
@@ -284,6 +284,6 @@ export interface KeyStrokeManagerModel extends ObjectModel<KeyStrokeManager> {
   session?: Session;
 }
 
-export interface KeyboardEventWithMetaData extends KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> {
+export interface KeyboardEventWithMetaData extends KeyboardEventBase {
   originalEvent?: KeyboardEvent & { renderingHelp?: boolean; keyStrokeContexts?: KeyStrokeContext[] };
 }

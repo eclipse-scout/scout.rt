@@ -20,7 +20,7 @@ export class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke {
     this.renderingHints.render = false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
     if ($menuItem.length > 0) {
       $menuItem.data('widget').doAction();

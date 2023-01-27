@@ -30,7 +30,7 @@ export class ViewMenuOpenKeyStroke extends KeyStroke {
     };
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     if (this.field.selected) {
       this.field.togglePopup();
     } else if (this.field.selectedButton) {

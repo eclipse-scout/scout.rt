@@ -36,8 +36,8 @@ export class TooltipSupport {
   declare self: TooltipSupport;
 
   protected _options: InitModelOf<TooltipSupport>;
-  protected _mouseEnterHandler: (event: MouseEnterEvent<HTMLElement>) => void;
-  protected _mouseLeaveHandler: (event: MouseLeaveEvent<HTMLElement>) => void;
+  protected _mouseEnterHandler: (event: MouseEnterEvent) => void;
+  protected _mouseLeaveHandler: (event: MouseLeaveEvent) => void;
   protected _tooltip: Tooltip;
   protected _tooltipTimeoutId: number;
 
@@ -89,7 +89,7 @@ export class TooltipSupport {
     this._destroyTooltip();
   }
 
-  protected _onMouseEnter(event: MouseEnterEvent<HTMLElement>) {
+  protected _onMouseEnter(event: MouseEnterEvent) {
     let $comp = $(event.currentTarget);
 
     if (this._options.nativeTooltip) {
@@ -101,7 +101,7 @@ export class TooltipSupport {
     }
   }
 
-  protected _onMouseLeave(event: MouseLeaveEvent<HTMLElement>) {
+  protected _onMouseLeave(event: MouseLeaveEvent) {
     this._destroyTooltip();
   }
 

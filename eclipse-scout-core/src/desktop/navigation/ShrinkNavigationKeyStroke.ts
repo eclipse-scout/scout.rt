@@ -36,7 +36,7 @@ export class ShrinkNavigationKeyStroke extends KeyStroke {
     return enabled && this.field.leftVisible;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.desktop.shrinkNavigation();
   }
 

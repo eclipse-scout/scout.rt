@@ -835,7 +835,7 @@ export const scrollbars = {
    * Attaches the given handler to each scrollable parent, including $anchor if it is scrollable as well.
    * Make sure you remove the handlers when not needed anymore using offScroll.
    */
-  onScroll($anchor: JQuery, handler: (event: JQuery.ScrollEvent<HTMLElement>) => void) {
+  onScroll($anchor: JQuery, handler: (event: JQuery.ScrollEvent) => void) {
     handler['$scrollParents'] = [];
     $anchor.scrollParents().each(function() {
       let $scrollParent = $(this);
@@ -844,7 +844,7 @@ export const scrollbars = {
     });
   },
 
-  offScroll(handler: (event: JQuery.ScrollEvent<HTMLElement>) => void) {
+  offScroll(handler: (event: JQuery.ScrollEvent) => void) {
     let $scrollParents: JQuery[] = handler['$scrollParents'];
     if (!$scrollParents) {
       throw new Error('$scrollParents are not defined');

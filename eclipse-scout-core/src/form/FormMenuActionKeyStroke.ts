@@ -16,7 +16,7 @@ export class FormMenuActionKeyStroke extends ActionKeyStroke {
     super(action);
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.field.toggle();
   }
 

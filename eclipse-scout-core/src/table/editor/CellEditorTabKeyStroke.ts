@@ -25,7 +25,7 @@ export class CellEditorTabKeyStroke extends KeyStroke {
     return accepted && !this.field.isCompleteCellEditRequested(); // Make sure events (complete, prepare) don't get sent twice since it will lead to exceptions. This may happen if user presses and holds the tab key.
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let backwards = event.shiftKey,
       table = this.field.table,
       column = this.field.column,

@@ -31,7 +31,7 @@ export class ActionKeyStroke extends KeyStroke {
     return super._isEnabled();
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.field.doAction();
   }
 }

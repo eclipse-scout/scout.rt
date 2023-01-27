@@ -251,7 +251,7 @@ export class Menu extends Action implements MenuModel {
     return false;
   }
 
-  protected _onMouseEvent(event: JQuery.MouseEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onMouseEvent(event: JQuery.MouseEventBase) {
     if (event.type === 'mousedown') {
       this._doubleClickSupport.mousedown(event as JQuery.MouseDownEvent);
     }

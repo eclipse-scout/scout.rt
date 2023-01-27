@@ -21,7 +21,7 @@ export class TableControlCloseKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     this.field.toggle();
   }
 }

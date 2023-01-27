@@ -34,7 +34,7 @@ export class GlassPane extends Widget {
     super._remove();
   }
 
-  protected _onMouseDown(event: MouseDownEvent<HTMLDivElement>) {
+  protected _onMouseDown(event: MouseDownEvent) {
     // Won't be executed if pointer events is set to none. But acts as safety net if pointer events are not supported or even removed by the user
     $.suppressEvent(event);
   }

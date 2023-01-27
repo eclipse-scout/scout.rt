@@ -216,7 +216,7 @@ export interface DropValidationErrorMessage {
 }
 
 export interface FileDropEvent {
-  originalEvent: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>;
+  originalEvent: JQuery.DropEvent;
   files: File[];
 }
 
@@ -276,7 +276,7 @@ export interface DragAndDropOptions {
   /**
    * Returns additional drop properties to be used in {@link DragAndDropHandler.uploadFiles} as uploadProperties
    */
-  additionalDropProperties?: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => any;
+  additionalDropProperties?: (event: JQuery.DropEvent) => any;
 }
 
 export type DropType = EnumObject<typeof SCOUT_TYPES>;

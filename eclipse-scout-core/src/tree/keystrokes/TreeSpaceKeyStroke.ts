@@ -25,7 +25,7 @@ export class TreeSpaceKeyStroke extends KeyStroke {
     return accepted && this.field.checkable && this.field.selectedNodes.length > 0;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: KeyboardEventBase) {
     let selectedNodes = this.field.selectedNodes.filter(node => node.enabled);
     // Toggle checked state to 'true', except if every node is already checked
     let checked = selectedNodes.some(node => !node.checked);
