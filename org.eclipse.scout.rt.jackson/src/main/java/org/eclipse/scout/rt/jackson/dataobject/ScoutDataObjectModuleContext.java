@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -14,9 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 
 /**
  * Context object used to carry properties for {@link ScoutDataObjectModule} and its components (e.g. serializers and
@@ -34,6 +36,8 @@ public class ScoutDataObjectModuleContext {
   protected static final String IGNORE_TYPE_ATTRIBUTE_KEY = "ignoreTypeAttributeKey";
 
   protected static final String CONTRIBUTIONS_ATTRIBUTE_NAME_KEY = "contributionsAttributeNameKey";
+
+  protected LazyValue<DoEntitySerializerAttributeNameComparator> m_comparator = new LazyValue<>(() -> BEANS.get(DoEntitySerializerAttributeNameComparator.class).init(this));
 
   protected final Map<String, Object> m_contextMap = new HashMap<>();
 
@@ -66,6 +70,10 @@ public class ScoutDataObjectModuleContext {
   public ScoutDataObjectModuleContext withDataObjectMapperClass(Class<? extends IDataObjectMapper> dataObjectMapperClass) {
     put(DATA_OBJECT_MAPPER_CLASS_KEY, dataObjectMapperClass);
     return this;
+  }
+
+  public DoEntitySerializerAttributeNameComparator getComparator() {
+    return m_comparator.get();
   }
 
   public String getTypeAttributeName() {

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
@@ -47,12 +46,10 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
   protected final ScoutDataObjectModuleContext m_context;
-  protected final DoEntitySerializerAttributeNameComparator m_comparator;
 
   public DoEntitySerializer(ScoutDataObjectModuleContext context, JavaType type) {
     super(type);
     m_context = context;
-    m_comparator = BEANS.get(DoEntitySerializerAttributeNameComparator.class).init(context);
   }
 
   @Override
@@ -74,7 +71,7 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    */
   protected void serializeAttributes(IDoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
     serializeTypeVersion(gen, entity);
-    TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(m_comparator);
+    TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(m_context.getComparator());
     sortedMap.putAll(entity.allNodes());
     for (Map.Entry<String, DoNode<?>> e : sortedMap.entrySet()) {
       gen.setCurrentValue(entity);

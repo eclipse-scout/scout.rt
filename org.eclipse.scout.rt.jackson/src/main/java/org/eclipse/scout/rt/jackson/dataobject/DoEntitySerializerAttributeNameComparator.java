@@ -1,21 +1,23 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
@@ -33,7 +35,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
  * <li>Contributions attribute (unchanged order of contribution items)</li>
  * </ol>
  */
-@ApplicationScoped
+@Bean
 public class DoEntitySerializerAttributeNameComparator implements Comparator<String>, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -41,6 +43,7 @@ public class DoEntitySerializerAttributeNameComparator implements Comparator<Str
   protected Map<String, Integer> m_orders = new HashMap<>();
 
   public DoEntitySerializerAttributeNameComparator init(ScoutDataObjectModuleContext context) {
+    assertTrue(m_orders.isEmpty(), "Already initialized"); // avoid duplicate initialization as otherwise multiple different attribut names may be considered equal
     m_orders.put(context.getTypeAttributeName(), -2); // always first
     m_orders.put(context.getTypeVersionAttributeName(), -1); // always second
     m_orders.put(context.getContributionsAttributeName(), 1); // always last
