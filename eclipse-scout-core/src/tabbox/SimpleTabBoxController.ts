@@ -146,7 +146,7 @@ export class SimpleTabBoxController<TView extends SimpleTabView = SimpleTabView>
     }) as SimpleTab<TView>;
   }
 
-  protected getTab(view: TView): SimpleTab<TView> {
+  getTab(view: TView): SimpleTab<TView> {
     if (!view) {
       return;
     }

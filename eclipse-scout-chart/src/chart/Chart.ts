@@ -400,7 +400,7 @@ export type ChartAxis = {
 };
 export type ChartValueGroup = {
   type?: string;
-  groupName: string;
+  groupName?: string;
   values: number[] | Record<string, number>[];
   colorHexValue?: string;
   cssClass?: string;
