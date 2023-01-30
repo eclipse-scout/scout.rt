@@ -106,7 +106,6 @@ export interface ExpansionParent<T extends ExpandableElement> {
 export const scrollbars = {
   /** @internal */
   _$scrollables: {} as Record<string, JQuery[]>,
-  mutationObserver: null as MutationObserver,
   intersectionObserver: null as IntersectionObserver,
 
   getScrollables(session?: Session): JQuery[] {
@@ -178,7 +177,7 @@ export const scrollbars = {
     let session = options.session || options.parent.session;
     scrollbars.pushScrollable(session, $container);
     if (options.scrollShadow) {
-      scrollbars.installScrollShadow($container, session, options);
+      scrollbars.installScrollShadow($container, options);
     }
     return $container;
   },
@@ -211,7 +210,7 @@ export const scrollbars = {
     $container.css('-webkit-overflow-scrolling', 'touch');
   },
 
-  installScrollShadow($container: JQuery, session: Session, options: ScrollbarInstallOptions) {
+  installScrollShadow($container: JQuery, options: ScrollbarInstallOptions) {
     if (!Device.get().supportsIntersectionObserver()) {
       return;
     }
@@ -230,7 +229,7 @@ export const scrollbars = {
     $container.data('scroll-shadow-handler', handler);
     $container.on('scroll', handler);
     scrollbars.updateScrollShadow($container);
-    scrollbars._installMutationObserver(session);
+    scrollbars._installMutationObserver($container.entryPoint());
     scrollbars._installIntersectionObserver();
     scrollbars.intersectionObserver.observe($container[0]);
 
@@ -266,11 +265,17 @@ export const scrollbars = {
     if (visibleListener) {
       $container.off('hide show', visibleListener);
     }
-    let $scrollables = scrollbars._$scrollables[session + ''];
-    if (!$scrollables || !$scrollables.some($scrollable => $scrollable.data('scroll-shadow'))) {
-      scrollbars._uninstallMutationObserver();
+    if (!scrollbars._hasScrollShadow(session, $container.entryPoint(true))) {
+      scrollbars._uninstallMutationObserver($container.entryPoint());
+    }
+    if (!scrollbars._hasScrollShadow(session)) {
       scrollbars._uninstallIntersectionObserver();
     }
+  },
+
+  _hasScrollShadow(session: Session, entryPoint?: HTMLElement) {
+    const $scrollables = scrollbars._$scrollables[session + ''];
+    return $scrollables && $scrollables.some($scrollable => $scrollable.data('scroll-shadow') && (!entryPoint || $scrollable.entryPoint(true) === entryPoint));
   },
 
   /** @internal */
@@ -364,12 +369,13 @@ export const scrollbars = {
    * Installs a dom mutation observer that tracks all scrollables in order to move the scroll shadow along with the scrollable.
    * @internal
    */
-  _installMutationObserver(session: Session) {
-    if (scrollbars.mutationObserver) {
+  _installMutationObserver($entryPoint: JQuery) {
+    if (!$entryPoint || !$entryPoint[0] || $entryPoint.data('mutation-observer')) {
       return;
     }
-    scrollbars.mutationObserver = new MutationObserver(scrollbars._onDomMutation);
-    scrollbars.mutationObserver.observe(session.$entryPoint[0], {
+    const mutationObserver = new MutationObserver(scrollbars._onDomMutation);
+    $entryPoint.data('mutation-observer', mutationObserver);
+    mutationObserver.observe($entryPoint[0], {
       subtree: true,
       childList: true
     });
@@ -397,12 +403,12 @@ export const scrollbars = {
   },
 
   /** @internal */
-  _uninstallMutationObserver() {
-    if (!scrollbars.mutationObserver) {
+  _uninstallMutationObserver($entryPoint: JQuery) {
+    if (!$entryPoint || !$entryPoint.data('mutation-observer')) {
       return;
     }
-    scrollbars.mutationObserver.disconnect();
-    scrollbars.mutationObserver = null;
+    $entryPoint.data('mutation-observer').disconnect();
+    $entryPoint.removeData('mutation-observer');
   },
 
   /**
