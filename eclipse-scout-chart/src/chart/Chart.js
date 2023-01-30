@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 import {ChartJsRenderer, ChartLayout, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
 import {arrays, colorSchemes, HtmlComponent, objects, Widget} from '@eclipse-scout/core';
+import $ from 'jquery';
 
 /**
  * @typedef ChartValueGroup
@@ -79,6 +80,7 @@ export default class Chart extends Widget {
 
   _init(model) {
     super._init(model);
+    this._setData(this.data);
     this.setConfig(this.config);
   }
 
@@ -121,6 +123,13 @@ export default class Chart extends Widget {
   setData(data) {
     this.setProperty('data', data);
     this.setCheckedItems(this.checkedItems);
+  }
+
+  _setData(data) {
+    if (data) {
+      data = $.extend({axes: []}, data);
+    }
+    this._setProperty('data', data);
   }
 
   _renderData() {
