@@ -14,3 +14,7 @@ export interface PropertyChangeEvent<TValue = any, TSource = object> extends Eve
   oldValue: TValue;
   newValue: TValue;
 }
+
+export function isPropertyChangeEvent(event: any): event is PropertyChangeEvent {
+  return event instanceof Event && !!(event as PropertyChangeEvent).propertyName;
+}
