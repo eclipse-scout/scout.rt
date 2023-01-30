@@ -11,6 +11,7 @@ import {AbstractChartRenderer, ChartEventMap, ChartJsRenderer, ChartLayout, Char
 import {arrays, ColorScheme, colorSchemes, EnumObject, HtmlComponent, InitModelOf, objects, Widget} from '@eclipse-scout/core';
 import {GreenAreaPosition} from './SpeedoChartRenderer';
 import {ChartConfiguration, LinearScaleOptions, RadialLinearScaleOptions} from 'chart.js';
+import $ from 'jquery';
 
 export class Chart extends Widget implements ChartModel {
   declare model: ChartModel;
@@ -77,6 +78,7 @@ export class Chart extends Widget implements ChartModel {
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.setConfig(this.config);
+    this._setData(this.data);
   }
 
   protected override _render() {
@@ -118,6 +120,13 @@ export class Chart extends Widget implements ChartModel {
   setData(data: ChartData) {
     this.setProperty('data', data);
     this.setCheckedItems(this.checkedItems);
+  }
+
+  protected _setData(data: ChartData) {
+    if (data) {
+      data = $.extend({axes: []}, data);
+    }
+    this._setProperty('data', data);
   }
 
   protected _renderData() {
