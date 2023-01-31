@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/core",
-  "version": "23.1.0-snapshot",
+  "version": "23.2.0-snapshot",
   "description": "Eclipse Scout runtime",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -63,7 +63,7 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=23.1.0-snapshot <23.1.0",
+    "@eclipse-scout/cli": ">=23.2.0-snapshot <23.2.0",
     "@eclipse-scout/releng": "^22.0.0",
     "jasmine-core": "4.5.0",
     "jasmine-ajax": "4.0.0",
@@ -73,7 +73,7 @@
     "@types/jasmine-ajax": "3.3.3",
     "@types/jasmine-jquery": "1.5.34",
     "karma": "6.4.1",
-    "@eclipse-scout/migrate": ">=23.1.0-snapshot <23.1.0"
+    "@eclipse-scout/migrate": ">=23.2.0-snapshot <23.2.0"
   },
   "dependencies": {
     "jquery": "3.6.0",

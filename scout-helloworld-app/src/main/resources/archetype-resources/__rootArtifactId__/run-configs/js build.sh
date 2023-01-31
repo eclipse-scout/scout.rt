@@ -1,11 +1,20 @@
 #!/bin/sh
 
+#
+# Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+#
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
 # This script installs all the JS dependencies and builds the JavaScript and CSS bundles.
 # It also starts a watcher which triggers a rebuild of these bundles whenever JS or CSS code changes.
 #
 # It has to be run once before the UI server is started.
 # You need to rerun it if you update your JS dependencies (package.json).
-# Please see the Scout documentation for details about the available run scripts: https://eclipsescout.github.io/23.1/technical-guide-js.html#command-line-interface-cli
+# Please see the Scout documentation for details about the available run scripts: https://eclipsescout.github.io/23.2/technical-guide-js.html#command-line-interface-cli
 #
 # To make this script work you need a current version of Node.js (>=18.12.1), npm (>=9.1.1) and pnpm (>=7.16.0).
 # Node.js (incl. npm) is available here: https://nodejs.org/.
