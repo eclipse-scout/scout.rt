@@ -22,15 +22,15 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 @ClassId("22f26922-32e7-49f1-9180-b48fbb5e75cd")
 public abstract class AbstractHtmlTile extends AbstractTile implements IHtmlTile {
 
-  private AttachmentSupport m_attachmentSupport;
+  protected final AttachmentSupport m_attachmentSupport;
 
   public AbstractHtmlTile() {
     this(true);
-    m_attachmentSupport = BEANS.get(AttachmentSupport.class);
   }
 
   public AbstractHtmlTile(boolean callInitializer) {
     super(false);
+    m_attachmentSupport = BEANS.get(AttachmentSupport.class);
     if (callInitializer) {
       callInitializer();
     }
@@ -40,13 +40,19 @@ public abstract class AbstractHtmlTile extends AbstractTile implements IHtmlTile
   protected void initConfig() {
     super.initConfig();
     setContent(getConfiguredContent());
-    setHtmlEnabled(true);
+    setHtmlEnabled(getConfiguredHtmlEnabled());
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
   protected String getConfiguredContent() {
     return null;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(11)
+  protected boolean getConfiguredHtmlEnabled() {
+    return true;
   }
 
   @Override
@@ -93,5 +99,4 @@ public abstract class AbstractHtmlTile extends AbstractTile implements IHtmlTile
   public boolean isHtmlEnabled() {
     return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
-
 }
