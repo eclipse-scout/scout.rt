@@ -94,7 +94,7 @@ export class DateTimeCompositeLayout extends AbstractLayout {
         .cssHeight(dateFieldSize.height - $dateField.cssBorderWidthY());
       if ($dateClearIcon) {
         $dateClearIcon.cssTop($dateField.cssBorderTopWidth())
-          .cssRight(timeFieldWidth + hgap)
+          .cssRight(timeFieldWidth + hgap + $dateField.cssBorderRightWidth())
           .cssHeight(dateFieldSize.height - $dateField.cssBorderWidthY());
       }
       $timeFieldIcon.cssTop($timeField.cssBorderTopWidth())
@@ -102,7 +102,7 @@ export class DateTimeCompositeLayout extends AbstractLayout {
         .cssHeight(timeFieldSize.height - $timeField.cssBorderWidthY());
       if ($timeClearIcon) {
         $timeClearIcon.cssTop($timeField.cssBorderTopWidth())
-          .cssRight(0)
+          .cssRight($timeField.cssBorderRightWidth())
           .cssHeight(timeFieldSize.height - $timeField.cssBorderWidthY());
       }
 
@@ -132,7 +132,7 @@ export class DateTimeCompositeLayout extends AbstractLayout {
 
       if ($dateClearIcon) {
         $dateClearIcon.cssTop($dateField.cssBorderTopWidth())
-          .cssRight(0)
+          .cssRight($dateField.cssBorderRightWidth())
           .cssHeight(dateFieldSize.height - $dateField.cssBorderWidthY());
       }
       // Compact style
@@ -154,7 +154,7 @@ export class DateTimeCompositeLayout extends AbstractLayout {
         .cssHeight(timeFieldSize.height - $timeField.cssBorderWidthY());
       if ($timeClearIcon) {
         $timeClearIcon.cssTop($timeField.cssBorderTopWidth())
-          .cssRight(0)
+          .cssRight($timeField.cssBorderRightWidth())
           .cssHeight(timeFieldSize.height - $timeField.cssBorderWidthY());
       }
       // Compact style
