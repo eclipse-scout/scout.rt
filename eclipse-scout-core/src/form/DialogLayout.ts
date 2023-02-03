@@ -78,12 +78,10 @@ export class DialogLayout extends FormLayout {
 
     if (prefBounds) {
       dialogSize = prefBounds.dimension();
-      currentBounds = prefBounds;
-      dialogSize = DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
-      if (prefBounds.dimension().width === dialogSize.width) {
-        // If width is still the same (=fitContainerInWindow did not reduce the width), then just return it. Otherwise read pref size again
-        return dialogSize;
-      }
+      // Assume (0,0) as position so that as much as possible of the stored size can be used.
+      // The true position will be set later in Form#position (called by FormController).
+      dialogSize = DialogLayout.fitContainerInWindow(windowSize, new Point(), dialogSize, dialogMargins);
+      return dialogSize;
     }
 
     // Calculate preferred width first...
@@ -103,7 +101,7 @@ export class DialogLayout extends FormLayout {
   }
 
   /**
-   * Calculates the new container size and position. If the given containerSize is larger then the windowSize, the size will be adjusted.
+   * Calculates the new container size and position. If the given containerSize is larger than the windowSize, the size will be adjusted.
    *
    * @param windowSize total size of the window
    * @param containerPosition current CSS position of the container (top-left of the "margin box")
