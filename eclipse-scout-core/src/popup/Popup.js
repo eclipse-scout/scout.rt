@@ -815,9 +815,9 @@ export default class Popup extends Widget {
       x += anchorBounds.width;
     } else if (horizontalAlignment === Alignment.RIGHTEDGE) {
       if (this.withArrow) {
-        x += anchorBounds.width / 2 - arrowBounds.center().x - margins.right;
+        x += anchorBounds.width / 2 - arrowBounds.center().x - margins.left;
       } else {
-        x = anchorBounds.x + anchorBounds.width - width - margins.right;
+        x = anchorBounds.x + anchorBounds.width - width - margins.left;
       }
     }
 
@@ -838,9 +838,9 @@ export default class Popup extends Widget {
       y += anchorBounds.height;
     } else if (verticalAlignment === Alignment.BOTTOMEDGE) {
       if (this.withArrow) {
-        y += anchorBounds.height / 2 - arrowBounds.center().y - margins.bottom;
+        y += anchorBounds.height / 2 - arrowBounds.center().y - margins.top;
       } else {
-        y = anchorBounds.y + anchorBounds.height - height - margins.bottom;
+        y = anchorBounds.y + anchorBounds.height - height - margins.top;
       }
     }
 
