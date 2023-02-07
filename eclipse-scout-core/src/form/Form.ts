@@ -9,8 +9,8 @@
  */
 import {
   AbortKeyStroke, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout, FormLifecycle,
-  FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, ObjectOrChildModel, Point, PopupWindow, Rectangle, scout, Status,
-  StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
+  FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, numbers, ObjectOrChildModel, objects, Point, PopupWindow, Rectangle, scout,
+  Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -61,6 +61,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   uiCssClass: string;
   lifecycle: FormLifecycle;
   detailForm: boolean;
+  notificationCount: number;
 
   $statusIcons: JQuery[];
   $header: JQuery;
@@ -116,6 +117,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.title = null;
     this.subTitle = null;
     this.iconId = null;
+    this.notificationCount = 0;
 
     this.$statusIcons = [];
     this.$header = null;
@@ -863,6 +865,42 @@ export class Form extends Widget implements FormModel, DisplayParent {
       return $statusIcon;
     }
     return $prevIcon;
+  }
+
+  setNotificationCount(notificationCount: number) {
+    this.setProperty('notificationCount', notificationCount);
+  }
+
+  _setNotificationCount(notificationCount: number) {
+    if (objects.isNullOrUndefined(notificationCount)) {
+      notificationCount = 0;
+    }
+    if (!numbers.isNumber(notificationCount) || !isFinite(notificationCount)) {
+      return;
+    }
+    this._setProperty('notificationCount', Math.max(Math.round(notificationCount), 0));
+  }
+
+  incrementNotificationCount() {
+    this.setNotificationCount(this.notificationCount + 1);
+  }
+
+  decrementNotificationCount() {
+    this.setNotificationCount(this.notificationCount - 1);
+  }
+
+  addNotificationCount(notificationCount: number) {
+    if (objects.isNullOrUndefined(notificationCount)) {
+      notificationCount = 0;
+    }
+    if (!numbers.isNumber(notificationCount) || !isFinite(notificationCount)) {
+      return;
+    }
+    this.setNotificationCount(this.notificationCount + notificationCount);
+  }
+
+  resetNotificationCount() {
+    this.setNotificationCount(0);
   }
 
   /** @see FormModel.showOnOpen */

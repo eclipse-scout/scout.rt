@@ -334,4 +334,50 @@ public class AbstractFormTest {
     form.doReset();
     assertTrue(called[0]);
   }
+
+  @Test
+  public void testNotificationStatus() {
+    final AbstractForm form = new TestForm(false);
+    assertEquals(0, form.getNotificationCount());
+
+    form.incrementNotificationCount();
+    assertEquals(1, form.getNotificationCount());
+    form.incrementNotificationCount();
+    assertEquals(2, form.getNotificationCount());
+    form.incrementNotificationCount();
+    assertEquals(3, form.getNotificationCount());
+    form.incrementNotificationCount();
+    assertEquals(4, form.getNotificationCount());
+
+    form.addNotificationCount(38);
+    assertEquals(42, form.getNotificationCount());
+    form.addNotificationCount(10);
+    assertEquals(52, form.getNotificationCount());
+    form.addNotificationCount(-50);
+    assertEquals(2, form.getNotificationCount());
+    form.addNotificationCount(-10);
+    assertEquals(0, form.getNotificationCount());
+    form.addNotificationCount(10);
+    assertEquals(10, form.getNotificationCount());
+
+    form.setNotificationCount(-13);
+    assertEquals(0, form.getNotificationCount());
+    form.setNotificationCount(13);
+    assertEquals(13, form.getNotificationCount());
+
+    form.resetNotificationCount();
+    assertEquals(0, form.getNotificationCount());
+
+    form.setNotificationCount(3);
+    assertEquals(3, form.getNotificationCount());
+
+    form.decrementNotificationCount();
+    assertEquals(2, form.getNotificationCount());
+    form.decrementNotificationCount();
+    assertEquals(1, form.getNotificationCount());
+    form.decrementNotificationCount();
+    assertEquals(0, form.getNotificationCount());
+    form.decrementNotificationCount();
+    assertEquals(0, form.getNotificationCount());
+  }
 }
