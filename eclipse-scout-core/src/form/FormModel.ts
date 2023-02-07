@@ -195,4 +195,8 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
    * If set, the status will be displayed in the form header or {@link DesktopTab} tab.
    */
   status?: StatusOrModel;
+  /**
+   * If set, the count will be rendered as notification badge in the right upper corner of the view.
+   */
+  notificationCount?: number;
 }

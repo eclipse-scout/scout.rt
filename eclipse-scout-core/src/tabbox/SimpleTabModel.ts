@@ -18,5 +18,6 @@ export interface SimpleTabModel<TView extends SimpleTabView = SimpleTabView> ext
   saveNeeded?: boolean;
   saveNeededVisible?: boolean;
   status?: Status;
+  notificationCount?: number;
   selected?: boolean;
 }

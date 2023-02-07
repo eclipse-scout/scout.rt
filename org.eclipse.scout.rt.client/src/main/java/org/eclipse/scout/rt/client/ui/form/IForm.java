@@ -67,6 +67,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   String PROP_CLOSABLE = "closable";
   String PROP_SAVE_NEEDED_VISIBLE = "saveNeededVisible";
   String PROP_STATUS = "status";
+  String PROP_NOTIFICATION_COUNT = "notificationCount";
 
   /**
    * Hint to render an {@link IForm} as dialog in a separate window. A dialog can be modal or non-modal.
@@ -199,6 +200,23 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   void addStatus(IStatus newStatus);
 
   void removeStatus(IStatus status);
+
+  /**
+   * If set, the count will be rendered as notification badge in the right upper corner of the view.
+   *
+   * @return the number to be display in the notification badge of the form.
+   */
+  int getNotificationCount();
+
+  void setNotificationCount(int notificationCount);
+
+  void incrementNotificationCount();
+
+  void decrementNotificationCount();
+
+  void addNotificationCount(int notificationCount);
+
+  void resetNotificationCount();
 
   /**
    * @return the {@link IWizard} that contains the step that started this form using startWizardStep

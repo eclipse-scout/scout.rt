@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DisplayHint, DisplayParent, Event, Form, GroupBox, PropertyChangeEvent, Status, ValidationResult, WidgetEventMap} from '../index';
+import {DisplayHint, DisplayParent, DisplayViewId, Event, Form, GroupBox, PropertyChangeEvent, Status, ValidationResult, WidgetEventMap} from '../index';
 
 export interface FormRevealInvalidFieldEvent<F extends Form = Form> extends Event<F> {
   validationResult: ValidationResult;
@@ -29,15 +29,16 @@ export interface FormEventMap extends WidgetEventMap {
   'save': Event<Form>;
   'propertyChange:askIfNeedSave': PropertyChangeEvent<boolean>;
   'propertyChange:closable': PropertyChangeEvent<boolean>;
-  'propertyChange:data': PropertyChangeEvent<object>;
+  'propertyChange:data': PropertyChangeEvent<any>;
   'propertyChange:displayHint': PropertyChangeEvent<DisplayHint>;
   'propertyChange:displayParent': PropertyChangeEvent<DisplayParent>;
-  'propertyChange:displayViewId': PropertyChangeEvent<string>;
+  'propertyChange:displayViewId': PropertyChangeEvent<DisplayViewId>;
   'propertyChange:headerVisible': PropertyChangeEvent<boolean>;
   'propertyChange:iconId': PropertyChangeEvent<string>;
   'propertyChange:maximized': PropertyChangeEvent<boolean>;
   'propertyChange:modal': PropertyChangeEvent<boolean>;
   'propertyChange:movable': PropertyChangeEvent<boolean>;
+  'propertyChange:notificationCount': PropertyChangeEvent<number>;
   'propertyChange:resizable': PropertyChangeEvent<boolean>;
   'propertyChange:rootGroupBox': PropertyChangeEvent<GroupBox>;
   'propertyChange:saveNeededVisible': PropertyChangeEvent<boolean>;
