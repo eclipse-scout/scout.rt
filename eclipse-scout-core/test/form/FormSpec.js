@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -1034,6 +1034,147 @@ describe('Form', () => {
         })
         .catch(fail)
         .always(done);
+    });
+  });
+
+  describe('notificationCount', () => {
+
+    it('is updated correctly', () => {
+      const form = helper.createFormWithOneField();
+      expect(form.notificationCount).toBe(0);
+
+      form.incrementNotificationCount();
+      expect(form.notificationCount).toBe(1);
+      form.incrementNotificationCount();
+      expect(form.notificationCount).toBe(2);
+      form.incrementNotificationCount();
+      expect(form.notificationCount).toBe(3);
+      form.incrementNotificationCount();
+      expect(form.notificationCount).toBe(4);
+
+      form.addNotificationCount(38);
+      expect(form.notificationCount).toBe(42);
+      form.addNotificationCount(10);
+      expect(form.notificationCount).toBe(52);
+      form.addNotificationCount(-50);
+      expect(form.notificationCount).toBe(2);
+      form.addNotificationCount(-10);
+      expect(form.notificationCount).toBe(0);
+      form.addNotificationCount(10);
+      expect(form.notificationCount).toBe(10);
+
+      form.setNotificationCount(-13);
+      expect(form.notificationCount).toBe(0);
+      form.setNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+
+      form.resetNotificationCount();
+      expect(form.notificationCount).toBe(0);
+
+      form.setNotificationCount(3);
+      expect(form.notificationCount).toBe(3);
+
+      form.decrementNotificationCount();
+      expect(form.notificationCount).toBe(2);
+      form.decrementNotificationCount();
+      expect(form.notificationCount).toBe(1);
+      form.decrementNotificationCount();
+      expect(form.notificationCount).toBe(0);
+      form.decrementNotificationCount();
+      expect(form.notificationCount).toBe(0);
+    });
+
+    it('is not set to null, undefined or NaN', () => {
+      const form = helper.createFormWithOneField();
+      expect(form.notificationCount).toBe(0);
+
+      form.setNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount();
+      expect(form.notificationCount).toBe(0);
+      form.setNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount(null);
+      expect(form.notificationCount).toBe(0);
+      form.setNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount(undefined);
+      expect(form.notificationCount).toBe(0);
+      form.setNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount(1 + undefined);
+      expect(form.notificationCount).toBe(13);
+
+      form.resetNotificationCount();
+      expect(form.notificationCount).toBe(0);
+
+      form.addNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount();
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount(null);
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount(undefined);
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount(1 + undefined);
+      expect(form.notificationCount).toBe(13);
+    });
+
+    it('is only updated by finite numbers', () => {
+      const form = helper.createFormWithOneField();
+      expect(form.notificationCount).toBe(0);
+
+      form.setNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount(1 / 0);
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount(true);
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount({a: 42});
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount('42');
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount('foo');
+      expect(form.notificationCount).toBe(13);
+
+      form.resetNotificationCount();
+      expect(form.notificationCount).toBe(0);
+
+      form.addNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount(1 / 0);
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount(true);
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount({a: 42});
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount('42');
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount('foo');
+      expect(form.notificationCount).toBe(13);
+    });
+
+    it('is only updated to integer values', () => {
+      const form = helper.createFormWithOneField();
+      expect(form.notificationCount).toBe(0);
+
+      form.setNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.setNotificationCount(4.2);
+      expect(form.notificationCount).toBe(4);
+      form.setNotificationCount(9.7);
+      expect(form.notificationCount).toBe(10);
+      form.setNotificationCount(-2.1);
+      expect(form.notificationCount).toBe(0);
+
+      form.addNotificationCount(13);
+      expect(form.notificationCount).toBe(13);
+      form.addNotificationCount(4.2);
+      expect(form.notificationCount).toBe(17);
+      form.addNotificationCount(9.7);
+      expect(form.notificationCount).toBe(27);
+      form.addNotificationCount(-2.1);
+      expect(form.notificationCount).toBe(25);
     });
   });
 });
