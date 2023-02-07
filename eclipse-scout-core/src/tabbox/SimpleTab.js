@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -32,9 +32,10 @@ export default class SimpleTab extends Widget {
     this.$subTitle = null;
     this.$iconContainer = null;
     this.$statusContainer = null;
+    this.$notificationCount = null;
+    this.$statusIcons = [];
 
     this._statusContainerUsageCounter = 0;
-    this._statusIconDivs = [];
 
     this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
     this._viewRemoveListener = this._onViewRemove.bind(this);
@@ -61,6 +62,7 @@ export default class SimpleTab extends Widget {
     this.saveNeeded = (this.view ? this.view.saveNeeded : model.saveNeeded);
     this.saveNeededVisible = (this.view ? this.view.saveNeededVisible : model.saveNeededVisible);
     this.status = (this.view ? this.view.status : model.status);
+    this.notificationCount = (this.view ? this.view.notificationCount : model.notificationCount);
 
     if (this.view) {
       this._installViewListeners();
@@ -100,6 +102,7 @@ export default class SimpleTab extends Widget {
     this._renderClosable();
     this._renderSaveNeeded();
     this._renderStatus();
+    this._renderNotificationCount();
     this._renderSelected();
   }
 
@@ -209,12 +212,12 @@ export default class SimpleTab extends Widget {
   }
 
   _renderStatus() {
-    this._statusContainerUsageCounter -= (this._statusIconDivs.length === 0 ? 0 : 1);
+    this._statusContainerUsageCounter -= (this.$statusIcons.length === 0 ? 0 : 1);
 
-    this._statusIconDivs.forEach($statusIcon => {
+    this.$statusIcons.forEach($statusIcon => {
       $statusIcon.remove();
     });
-    this._statusIconDivs = [];
+    this.$statusIcons = [];
 
     if (this.status) {
       this.status.asFlatList().forEach(status => {
@@ -225,11 +228,36 @@ export default class SimpleTab extends Widget {
         if (status.cssClass()) {
           $statusIcon.addClass(status.cssClass());
         }
-        this._statusIconDivs.push($statusIcon);
+        this.$statusIcons.push($statusIcon);
       });
     }
-    this._statusContainerUsageCounter += (this._statusIconDivs.length === 0 ? 0 : 1);
+    this._statusContainerUsageCounter += (this.$statusIcons.length === 0 ? 0 : 1);
     this.$container.toggleClass('has-status', this._statusContainerUsageCounter > 0);
+  }
+
+  setNotificationCount(notificationCount) {
+    this.setProperty('notificationCount', notificationCount);
+  }
+
+  _renderNotificationCount() {
+    if (this.notificationCount) {
+      if (!this.$notificationCount) {
+        this.$notificationCount = this.$statusContainer.makeSpan('status notification-count');
+        this.$notificationCount = this.$saveNeeded ? this.$notificationCount.insertAfter(this.$saveNeeded) : this.$notificationCount.prependTo(this.$statusContainer);
+        tooltips.installForEllipsis(this.$notificationCount, {
+          parent: this
+        });
+        this._statusContainerUsageCounter++;
+      }
+      this.$notificationCount.text(this.notificationCount);
+    } else {
+      if (!this.$notificationCount) {
+        return;
+      }
+      this.$notificationCount.remove();
+      this.$notificationCount = null;
+      this._statusContainerUsageCounter--;
+    }
   }
 
   select() {
@@ -304,6 +332,8 @@ export default class SimpleTab extends Widget {
       this.setClosable(event.newValue);
     } else if (event.propertyName === 'status') {
       this.setStatus(event.newValue);
+    } else if (event.propertyName === 'notificationCount') {
+      this.setNotificationCount(event.newValue);
     }
   }
 

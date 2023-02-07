@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -22,6 +22,7 @@
   & > .title-line {
     display: flex;
     align-items: center;
+    overflow: hidden;
 
     .closable& {
       margin-right: 20px;
@@ -49,10 +50,43 @@
       position: relative;
       display: inline-flex;
       margin-left: 4px;
+
+      flex: none;
+      max-width: 75%; // leave a little space for title and icon
+
       color: @status-info-color;
 
       & > .status {
         margin-left: 5px;
+        #scout.overflow-ellipsis-nowrap();
+
+        // do not grow or shrink icons
+        &.save-needer,
+        &.icon {
+          display: inline-flex;
+          align-items: center;
+          flex: none;
+        }
+
+        &.notification-count {
+          display: inline-block;
+
+          margin-top: auto;
+          margin-bottom: auto;
+          padding: 2px 4px;
+
+          min-width: calc(@font-size-small + 4px); // same as height, smallest possible badge is a circle
+          border-radius: calc(@font-size-small / 2 + 2px); // half of the height/min-width, smallest possible badge is a circle
+
+          text-align: center;
+          font-weight: @font-weight-normal;
+          font-size: @font-size-small;
+          line-height: @font-size-small;
+          #scout.overflow-ellipsis-nowrap();
+
+          background: @simple-tab-status-notification-count-background-color;
+          color: @simple-tab-status-notification-count-color;
+        }
       }
     }
   }

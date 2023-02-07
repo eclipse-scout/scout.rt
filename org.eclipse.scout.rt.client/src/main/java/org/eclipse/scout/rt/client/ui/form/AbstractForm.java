@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -495,6 +495,17 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
+   * If set, the count will be rendered as notification badge in the right upper corner of the view.
+   *
+   * @return the number to be display in the notification badge of the form.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(210)
+  protected int getConfiguredNotificationCount() {
+    return 0;
+  }
+
+  /**
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *
@@ -757,6 +768,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     setDisplayViewId(getConfiguredDisplayViewId());
     setClosable(getConfiguredClosable());
     setSaveNeededVisible(getConfiguredSaveNeededVisible());
+    setNotificationCount(getConfiguredNotificationCount());
 
     // visit all system buttons and attach observer
     m_systemButtonListener = new P_SystemButtonListener();// is auto-detaching
@@ -904,6 +916,36 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       ms.add(s);
     }
     return ms;
+  }
+
+  @Override
+  public int getNotificationCount() {
+    return propertySupport.getPropertyInt(PROP_NOTIFICATION_COUNT);
+  }
+
+  @Override
+  public void setNotificationCount(int notificationCount) {
+    propertySupport.setPropertyInt(PROP_NOTIFICATION_COUNT, Math.max(notificationCount, 0));
+  }
+
+  @Override
+  public void incrementNotificationCount() {
+    setNotificationCount(getNotificationCount() + 1);
+  }
+
+  @Override
+  public void decrementNotificationCount() {
+    setNotificationCount(getNotificationCount() - 1);
+  }
+
+  @Override
+  public void addNotificationCount(int notificationCount) {
+    setNotificationCount(getNotificationCount() + notificationCount);
+  }
+
+  @Override
+  public void resetNotificationCount() {
+    setNotificationCount(0);
   }
 
   @Override

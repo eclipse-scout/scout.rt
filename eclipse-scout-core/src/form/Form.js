@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
+import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, numbers, objects, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
 import $ from 'jquery';
 
 export default class Form extends Widget {
@@ -54,6 +54,7 @@ export default class Form extends Widget {
      * Whether this form should render its initial focus
      */
     this.renderInitialFocusEnabled = true;
+    this.notificationCount = 0;
 
     this.$statusIcons = [];
     this.$header = null;
@@ -829,6 +830,42 @@ export default class Form extends Widget {
       return $statusIcon;
     }
     return $prevIcon;
+  }
+
+  setNotificationCount(notificationCount) {
+    this.setProperty('notificationCount', notificationCount);
+  }
+
+  _setNotificationCount(notificationCount) {
+    if (objects.isNullOrUndefined(notificationCount)) {
+      notificationCount = 0;
+    }
+    if (!numbers.isNumber(notificationCount) || !isFinite(notificationCount)) {
+      return;
+    }
+    this._setProperty('notificationCount', Math.max(Math.round(notificationCount), 0));
+  }
+
+  incrementNotificationCount() {
+    this.setNotificationCount(this.notificationCount + 1);
+  }
+
+  decrementNotificationCount() {
+    this.setNotificationCount(this.notificationCount - 1);
+  }
+
+  addNotificationCount(notificationCount) {
+    if (objects.isNullOrUndefined(notificationCount)) {
+      notificationCount = 0;
+    }
+    if (!numbers.isNumber(notificationCount) || !isFinite(notificationCount)) {
+      return;
+    }
+    this.setNotificationCount(this.notificationCount + notificationCount);
+  }
+
+  resetNotificationCount() {
+    this.setNotificationCount(0);
   }
 
   setShowOnOpen(showOnOpen) {

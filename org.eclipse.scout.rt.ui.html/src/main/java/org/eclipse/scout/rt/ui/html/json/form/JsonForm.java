@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -146,6 +146,12 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
       @Override
       protected Boolean modelValue() {
         return getModel().isMaximized();
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(IForm.PROP_NOTIFICATION_COUNT, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getNotificationCount();
       }
     });
   }
