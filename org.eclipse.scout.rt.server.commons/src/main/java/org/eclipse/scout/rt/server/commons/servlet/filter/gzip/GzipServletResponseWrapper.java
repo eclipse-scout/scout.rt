@@ -12,73 +12,84 @@ package org.eclipse.scout.rt.server.commons.servlet.filter.gzip;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
+import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
 
-  private BufferedServletOutputStream m_buf;
-  private int m_compressedLength = -1;
-  private int m_uncompressedLength = -1;
-  // one of these two is used
-  private ServletOutputStream m_servletOut;
+  private static final Logger LOG = LoggerFactory.getLogger(GzipServletResponseWrapper.class);
+
   private PrintWriter m_writer;
+  private ServletOutputStream m_outputStream;
 
-  public GzipServletResponseWrapper(HttpServletResponse resp) {
-    super(resp);
+  private final HttpServletRequest m_request;
+  private final int m_compressThreshold;
+  private final Set<String> m_contentTypes;
+  private final boolean m_enableEmptyContentTypeLogging;
+
+  public GzipServletResponseWrapper(HttpServletResponse response, HttpServletRequest request, int compressThreshold, Set<String> contentTypes, boolean enableEmptyContentTypeLogging) {
+    super(response);
+    m_request = request;
+    m_compressThreshold = compressThreshold;
+    m_contentTypes = contentTypes;
+    m_enableEmptyContentTypeLogging = enableEmptyContentTypeLogging;
   }
 
-  protected BufferedServletOutputStream ensureBufferedStream() {
-    if (m_buf == null) {
-      m_buf = new BufferedServletOutputStream();
-    }
-    return m_buf;
+  @Override
+  public HttpServletResponse getResponse() {
+    return (HttpServletResponse) super.getResponse();
   }
 
-  /**
-   * only valid after {@link #finish(int)} was called
-   */
-  public int getCompressedLength() {
-    return m_compressedLength;
-  }
-
-  /**
-   * only valid after {@link #finish(int)} was called
-   */
-  public int getUncompressedLength() {
-    return m_uncompressedLength;
+  protected GzipServletOutputStream createGzipServletOutputStream(int compressThreshold, HttpServletResponse response) throws IOException {
+    return new GzipServletOutputStream(compressThreshold, response);
   }
 
   @Override
   public ServletOutputStream getOutputStream() throws IOException {
     if (m_writer != null) {
-      throw new IllegalStateException("getWriter was previsouly called, getOutputStream is not available");
+      throw new IllegalStateException("getWriter was previously called, getOutputStream is not available");
     }
-    if (m_servletOut == null) {
-      m_servletOut = ensureBufferedStream();
+
+    if (m_outputStream == null) {
+      m_outputStream = getOrCreateServletOutputStream();
     }
-    return m_servletOut;
+    return m_outputStream;
+  }
+
+  protected ServletOutputStream getOrCreateServletOutputStream() throws IOException {
+    if (!requiresGzipCompression(getContentType())) {
+      return getResponse().getOutputStream();
+    }
+    return createGzipServletOutputStream(m_compressThreshold, getResponse());
   }
 
   @Override
   public PrintWriter getWriter() throws IOException {
-    if (m_servletOut != null) {
-      throw new IllegalStateException("getOutputStream was previsouly called, getWriter is not available");
+    if (m_writer != null) {
+      return m_writer;
     }
-    if (m_writer == null) {
-      m_writer = new PrintWriter(new OutputStreamWriter(ensureBufferedStream(), getResponse().getCharacterEncoding()));
+
+    if (m_outputStream != null) {
+      throw new IllegalStateException("getOutputStream was previously called, getWriter is not available");
     }
+
+    m_outputStream = getOrCreateServletOutputStream();
+    m_writer = new PrintWriter(new OutputStreamWriter(m_outputStream, getResponse().getCharacterEncoding()));
+
     return m_writer;
   }
 
   @Override
   public void setContentLength(int len) {
-    // ignored
+    // ignored: content length zipped content != content length unzipped content
   }
 
   @Override
@@ -86,45 +97,36 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
     if (m_writer != null) {
       m_writer.flush();
     }
-    if (m_buf != null) {
-      m_buf.flush();
+    if (m_outputStream != null) {
+      m_outputStream.flush();
     }
     super.flushBuffer();
   }
 
-  /**
-   * @param minimumLengthToCompress
-   *          is the minimum uncompressed size that is compressed, -1 disables compression
-   * @return true if the content was compressed
-   */
-  public boolean finish(int minimumLengthToCompress) throws IOException {
+  public void finish() throws IOException {
     if (m_writer != null) {
       m_writer.close();
       m_writer = null;
     }
-    boolean compressed = false;
-    if (m_buf != null) {
-      m_buf.close();
-      byte[] raw = m_buf.getContent();
-      m_uncompressedLength = raw.length;
-      m_buf = null;
 
-      HttpServletResponse res = (HttpServletResponse) getResponse();
-      byte[] gzipped;
-      if (minimumLengthToCompress >= 0 && m_uncompressedLength >= minimumLengthToCompress) {
-        gzipped = IOUtility.compressGzip(raw);
-        res.addHeader(GzipServletFilter.CONTENT_ENCODING, GzipServletFilter.GZIP);
-        compressed = true;
-      }
-      else {
-        gzipped = raw;
-      }
-      m_compressedLength = gzipped.length;
-      raw = null;
-      res.setContentLength(gzipped.length);
-      res.getOutputStream().write(gzipped);
-      super.flushBuffer();
+    if (m_outputStream != null) {
+      m_outputStream.close();
+      m_outputStream = null;
     }
-    return compressed;
+  }
+
+  protected boolean requiresGzipCompression(String contentType) {
+    if (!UrlHints.isCompressHint(m_request)) {
+      return false;
+    }
+    if (contentType == null) {
+      if (m_enableEmptyContentTypeLogging) {
+        LOG.warn("Content type of response is not defined for request path info {}.", m_request.getPathInfo());
+      }
+      return false;
+    }
+    // Content type may contain the charset parameter separated by ; -> remove it
+    contentType = contentType.split(";")[0];
+    return m_contentTypes.contains(contentType);
   }
 }
