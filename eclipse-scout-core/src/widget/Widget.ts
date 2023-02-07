@@ -583,8 +583,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Adds class 'animate-remove' to container which can be used to trigger the animation.
-   * After the animation is executed, the element gets removed using this._removeInternal.
+   * Starts a "remove" animation for this widget. By default, a CSS class 'animate-remove' is added to the container.
+   * After the animation is complete, the element gets removed from the DOM using this._removeInternal().
    */
   protected _removeAnimated() {
     let animateRemovalWhileRemovingParent = this._animateRemovalWhileRemovingParent();
@@ -605,18 +605,12 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       if (!this._rendered) {
         return;
       }
-      if (!this.animateRemovalClass) {
-        throw new Error('Missing animate removal class. Cannot remove animated.');
-      }
       if (!this.$container.isVisible() || !this.$container.isEveryParentVisible() || !this.$container.isAttached()) {
         // If element is not visible, animationEnd would never fire -> remove it immediately
         this._removeInternal();
         return;
       }
-      this.$container.addClass(this.animateRemovalClass);
-      this.$container.oneAnimationEnd(() => {
-        this._removeInternal();
-      });
+      this._removeAnimatedImpl();
     });
 
     // If the parent is being removed while the animation is running, the animationEnd event will never fire
@@ -624,6 +618,16 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (!animateRemovalWhileRemovingParent) {
       this.parent.one('removing', this._parentRemovingWhileAnimatingHandler);
     }
+  }
+
+  protected _removeAnimatedImpl() {
+    if (!this.animateRemovalClass) {
+      throw new Error('Missing animate removal class. Cannot remove animated.');
+    }
+    this.$container.addClass(this.animateRemovalClass);
+    this.$container.oneAnimationEnd(() => {
+      this._removeInternal();
+    });
   }
 
   protected _animateRemovalWhileRemovingParent(): boolean {
