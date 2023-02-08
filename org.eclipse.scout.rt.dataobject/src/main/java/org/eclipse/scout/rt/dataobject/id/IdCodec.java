@@ -193,8 +193,8 @@ public class IdCodec {
     if (StringUtility.isNullOrEmpty(qualifiedId)) {
       return null;
     }
-    String[] tmp = qualifiedId.split(":", -1 /* force empty string as second part */);
-    if (tmp.length == 0 || tmp.length > 2) {
+    String[] tmp = qualifiedId.split(":", 2); // split into at most two parts
+    if (tmp.length < 2) { // no ":" found
       if (lenient) {
         return null;
       }

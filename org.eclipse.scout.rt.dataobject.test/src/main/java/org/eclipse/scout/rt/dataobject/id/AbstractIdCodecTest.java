@@ -50,6 +50,14 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testToQualifiedStringId() {
+    String s = "scout.FixtureDateId:my-contain_special$characters{like:or}";
+    FixtureStringId id1 = FixtureStringId.of(s);
+    String ext1 = getCodec().toQualified(id1);
+    assertEquals("scout.FixtureStringId:scout.FixtureDateId:my-contain_special$characters{like:or}", ext1);
+  }
+
+  @Test
   public void testToQualifiedDateId() {
     Date date = new Date(123456789);
     FixtureDateId id1 = IIds.create(FixtureDateId.class, date);
@@ -176,6 +184,14 @@ public abstract class AbstractIdCodecTest {
   public void testFromQualifiedRootId() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
     IId id2 = getCodec().fromQualified("scout.FixtureUuId:" + TEST_UUID);
+    assertEquals(id1, id2);
+  }
+
+  @Test
+  public void testFromQualifiedStringId() {
+    String s = "scout.FixtureDateId:my-contain_special$characters{like:or}";
+    FixtureStringId id1 = FixtureStringId.of(s);
+    IId id2 = getCodec().fromQualified("scout.FixtureStringId:" + s);
     assertEquals(id1, id2);
   }
 
