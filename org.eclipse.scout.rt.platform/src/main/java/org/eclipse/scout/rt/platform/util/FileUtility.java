@@ -340,7 +340,7 @@ public final class FileUtility {
    *
    * @param f
    *          The file for which the content type should be returned.
-   * @return The content type or null if it could not be determined.
+   * @return The content type, never null (application/octet-stream if not determinable otherwise).
    */
   public static String getContentType(File f) {
     if (f == null || !f.exists()) {
