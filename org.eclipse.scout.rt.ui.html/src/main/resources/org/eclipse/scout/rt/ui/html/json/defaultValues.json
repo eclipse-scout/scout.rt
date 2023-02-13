@@ -410,6 +410,7 @@
       "headerMenuEnabled": true,
       "headerTooltipHtmlEnabled": false,
       "horizontalAlignment": -1,
+      "textWrap": false,
       "htmlEnabled": false,
       "initialAlwaysIncludeSortAtBegin": false,
       "initialAlwaysIncludeSortAtEnd": false,
