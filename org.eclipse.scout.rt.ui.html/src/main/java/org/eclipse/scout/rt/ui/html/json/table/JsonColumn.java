@@ -93,6 +93,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put(IColumn.PROP_AUTO_OPTIMIZE_WIDTH, getColumn().isAutoOptimizeWidth());
     json.put(IColumn.PROP_EDITABLE, getColumn().isEditable());
     json.put("mandatory", getColumn().isMandatory());
+    json.put("textWrap", getColumn().isTextWrap());
     json.put(IColumn.PROP_HTML_ENABLED, getColumn().isHtmlEnabled());
     json.put(IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
     json.put("headerCssClass", getColumn().getHeaderCell().getCssClass());
