@@ -83,20 +83,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return null;
   }
 
-  /**
-   * Configures whether the text is automatically wrapped in the table cell / string field for editable cells. The text
-   * is only wrapped if the text is too long to fit in one row.
-   * <p>
-   * Subclasses can override this method. Default is {@code false}.
-   *
-   * @return {@code true} if the text is wrapped, {@code false} otherwise.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(160)
-  protected boolean getConfiguredTextWrap() {
-    return false;
-  }
-
   @ConfigProperty(ConfigProperty.STRING)
   @Order(170)
   protected String getConfiguredFormat() {
@@ -120,7 +106,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     setInputMasked(getConfiguredInputMasked());
     setDisplayFormat(getConfiguredDisplayFormat());
     setMaxLength(getConfiguredMaxLength());
-    setTextWrap(getConfiguredTextWrap());
   }
 
   /*
@@ -144,16 +129,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   @Override
   public String getDisplayFormat() {
     return propertySupport.getPropertyString(IStringField.PROP_FORMAT);
-  }
-
-  @Override
-  public void setTextWrap(boolean b) {
-    propertySupport.setPropertyBool(IStringField.PROP_WRAP_TEXT, b);
-  }
-
-  @Override
-  public boolean isTextWrap() {
-    return propertySupport.getPropertyBool(IStringField.PROP_WRAP_TEXT);
   }
 
   @Override
@@ -235,8 +210,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     f.setMaxLength(getMaxLength());
     boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
     f.setMultilineText(multi);
-    f.setWrapText(isTextWrap());
-    f.setWrapText(true); // avoid to have an horizontal scroll bar
+    f.setWrapText(true); // avoid horizontal scroll bar
   }
 
   @Override

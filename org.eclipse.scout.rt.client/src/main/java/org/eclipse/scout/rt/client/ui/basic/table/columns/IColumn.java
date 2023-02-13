@@ -472,6 +472,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    */
   void setAutoOptimizeWidth(boolean optimize);
 
+  void setTextWrap(boolean b);
+
+  boolean isTextWrap();
+
   boolean isMandatory();
 
   void setMandatory(boolean mandatory);
@@ -512,5 +516,4 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * see {@link #isNodeColumnCandidate()}
    */
   void setNodeColumnCandidate(boolean nodeColumnCandidate);
-
 }

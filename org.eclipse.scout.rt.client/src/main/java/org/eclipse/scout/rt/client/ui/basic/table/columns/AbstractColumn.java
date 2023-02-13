@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
@@ -633,6 +634,24 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures whether the text in this column is automatically wrapped if it is wider than the column (<i>soft
+   * wrap</i>). The property only has an effect if the table {@linkplain ITable#isMultilineText() supports multiline
+   * text}. Explicit line breaks are not affected.
+   * <p>
+   * By default, the property only affects the displayed cell text. Whether the cell editor applies automatic text
+   * wrapping as well depends on the specific column implementation (see {@link #mapEditorFieldProperties(IFormField)}).
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   *
+   * @return {@code true} if the text is wrapped, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(196)
+  protected boolean getConfiguredTextWrap() {
+    return false;
+  }
+
+  /**
    * Configures whether this column value is mandatory / required. This only affects editable columns (see
    * {@link #getConfiguredEditable()} ).
    * <p>
@@ -1003,6 +1022,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (getConfiguredFont() != null) {
       setFont(FontSpec.parse(getConfiguredFont()));
     }
+    setTextWrap(getConfiguredTextWrap());
     setHtmlEnabled(getConfiguredHtmlEnabled());
     setUiSortPossible(getConfiguredUiSortPossible());
     setNodeColumnCandidate(getConfiguredNodeColumnCandidate());
@@ -2074,6 +2094,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setAutoOptimizeMaxWidth(int w) {
     propertySupport.setPropertyInt(PROP_AUTO_OPTIMIZE_MAX_WIDTH, w);
+  }
+
+  @Override
+  public void setTextWrap(boolean b) {
+    propertySupport.setPropertyBool(IStringField.PROP_WRAP_TEXT, b);
+  }
+
+  @Override
+  public boolean isTextWrap() {
+    return propertySupport.getPropertyBool(IStringField.PROP_WRAP_TEXT);
   }
 
   @Override
