@@ -14,5 +14,10 @@ package org.eclipse.scout.rt.client.ui.action.menu;
  * {@link AbstractMenu#getConfiguredMenuTypes()}.
  */
 public enum TabBoxMenuType implements IMenuType {
+  /**
+   * In most cases, it is not necessary to set this menu type for a tab box menu because it does not affect the
+   * visibility of the menu unless the menu is used for widgets other than the tab box. In this case, the menu type can
+   * be used to ensure that the menu is only visible on tab boxes.
+   */
   Header
 }
