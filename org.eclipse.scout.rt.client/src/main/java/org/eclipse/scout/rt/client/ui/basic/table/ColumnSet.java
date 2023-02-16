@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -1410,7 +1409,7 @@ public class ColumnSet {
       //do automatic check for wrapping columns
       boolean m = false;
       for (IColumn col : getVisibleColumns()) {
-        if (col instanceof IStringColumn && ((IStringColumn) col).isTextWrap()) {
+        if (col.isTextWrap()) {
           m = true;
           break;
         }
