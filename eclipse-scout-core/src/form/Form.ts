@@ -9,8 +9,8 @@
  */
 import {
   AbortKeyStroke, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout, FormLifecycle,
-  FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, numbers, ObjectOrChildModel, objects, Point, PopupWindow, Rectangle, scout,
-  Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
+  FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, NotificationBadgeStatus, ObjectOrChildModel, Point, PopupWindow, Rectangle,
+  scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -61,7 +61,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
   uiCssClass: string;
   lifecycle: FormLifecycle;
   detailForm: boolean;
-  notificationCount: number;
 
   $statusIcons: JQuery[];
   $header: JQuery;
@@ -117,7 +116,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.title = null;
     this.subTitle = null;
     this.iconId = null;
-    this.notificationCount = 0;
 
     this.$statusIcons = [];
     this.$header = null;
@@ -139,6 +137,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
     POPUP_WINDOW: 'popupWindow',
     VIEW: 'view'
   } as const;
+
+  protected static _NOTIFICATION_BADGE_STATUS_CODE = 197821;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -867,40 +867,55 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return $prevIcon;
   }
 
-  setNotificationCount(notificationCount: number) {
-    this.setProperty('notificationCount', notificationCount);
-  }
-
-  _setNotificationCount(notificationCount: number) {
-    if (objects.isNullOrUndefined(notificationCount)) {
-      notificationCount = 0;
-    }
-    if (!numbers.isNumber(notificationCount) || !isFinite(notificationCount)) {
+  addStatus(status: Status) {
+    if (!status) {
       return;
     }
-    this._setProperty('notificationCount', Math.max(Math.round(notificationCount), 0));
+    const children = this.status && this.status.children,
+      ms = new Status({children});
+    ms.addStatus(status);
+    this.setStatus(ms);
   }
 
-  incrementNotificationCount() {
-    this.setNotificationCount(this.notificationCount + 1);
-  }
-
-  decrementNotificationCount() {
-    this.setNotificationCount(this.notificationCount - 1);
-  }
-
-  addNotificationCount(notificationCount: number) {
-    if (objects.isNullOrUndefined(notificationCount)) {
-      notificationCount = 0;
-    }
-    if (!numbers.isNumber(notificationCount) || !isFinite(notificationCount)) {
+  removeStatus(status: Status) {
+    if (!this.status || !status) {
       return;
     }
-    this.setNotificationCount(this.notificationCount + notificationCount);
+    if (this.status.equals(status)) {
+      this.setStatus(null);
+      return;
+    }
+    if (this.status.containsStatusByPredicate(s => status.equals(s))) {
+      const newStatus = this.status.clone();
+      newStatus.removeAllStatusByPredicate(s => status.equals(s));
+      this.setStatus(newStatus);
+    }
   }
 
-  resetNotificationCount() {
-    this.setNotificationCount(0);
+  getNotificationBadgeText(): string {
+    const status = this._getNotificationBadgeStatus();
+    if (status) {
+      return status.message;
+    }
+  }
+
+  setNotificationBadgeText(notificationBadgeText: string) {
+    this.removeStatus(this._getNotificationBadgeStatus());
+    if (!notificationBadgeText) {
+      return;
+    }
+    this.addStatus(new NotificationBadgeStatus({
+      message: notificationBadgeText,
+      code: Form._NOTIFICATION_BADGE_STATUS_CODE
+    }));
+  }
+
+  protected _getNotificationBadgeStatus(): NotificationBadgeStatus {
+    if (!this.status) {
+      return;
+    }
+
+    return this.status.asFlatList().find(s => Form._NOTIFICATION_BADGE_STATUS_CODE === s.code);
   }
 
   /** @see FormModel.showOnOpen */

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DefaultStatus, EnumObject, FullModelOf, InitModelOf, ObjectOrModel, objects, ObjectWithType, ParsingFailedStatus, Predicate, scout, StatusModel, strings, ValidationFailedStatus} from '../index';
+import {arrays, DefaultStatus, EnumObject, FullModelOf, InitModelOf, NotificationBadgeStatus, ObjectOrModel, objects, ObjectWithType, ParsingFailedStatus, Predicate, scout, StatusModel, strings, ValidationFailedStatus} from '../index';
 import $ from 'jquery';
 
 export class Status implements StatusModel, ObjectWithType {
@@ -294,6 +294,18 @@ export class Status implements StatusModel, ObjectWithType {
       status.children.forEach(childStatus => {
         arrays.pushAll(list, Status.asFlatList(childStatus));
       });
+      list.sort((s1, s2) => {
+        if (s1 instanceof NotificationBadgeStatus) {
+          if (s2 instanceof NotificationBadgeStatus) {
+            return 0;
+          }
+          return -1;
+        }
+        if (s2 instanceof NotificationBadgeStatus) {
+          return 1;
+        }
+        return 0;
+      });
     } else {
       list.push(status);
     }
@@ -309,6 +321,7 @@ export class Status implements StatusModel, ObjectWithType {
     return {
       Status: Status,
       DefaultStatus: DefaultStatus,
+      NotificationBadgeStatus: NotificationBadgeStatus,
       ParsingFailedStatus: ParsingFailedStatus,
       ValidationFailedStatus: ValidationFailedStatus
     }[className];

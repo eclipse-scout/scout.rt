@@ -9,7 +9,9 @@
  */
 package org.eclipse.scout.rt.platform.status;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.IOrdered;
 
@@ -64,6 +66,13 @@ public interface IMultiStatus extends IStatus {
    *         otherwise.
    */
   boolean containsStatus(Class<? extends IStatus> clazz);
+
+  /**
+   * @param childPredicate
+   *          not <code>null<code>
+   * @return all direct or indirect children for the given predicate
+   */
+  Collection<IStatus> findChildStatuses(Predicate<IStatus> childPredicate);
 
   /**
    * @return maximum severity of the children or {@link #OK}, if no children available

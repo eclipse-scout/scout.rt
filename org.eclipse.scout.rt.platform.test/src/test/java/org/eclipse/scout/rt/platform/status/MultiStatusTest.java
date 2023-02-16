@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.platform.status;
 
+import static org.eclipse.scout.rt.platform.util.StringUtility.startsWith;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -175,6 +177,72 @@ public class MultiStatusTest {
     sub.add(new TestStatus2());
     multiStatus.add(sub);
     assertFalse(multiStatus.containsStatus(TestStatus.class));
+  }
+
+  @Test
+  public void testFindChildStatuses() {
+    MultiStatus rootMs = new MultiStatus();
+    rootMs.add(new Status("Level 1 - OK", IStatus.OK));
+    rootMs.add(new Status("Level 1 - ERROR", IStatus.ERROR));
+    MultiStatus level1Ms = new MultiStatus();
+    rootMs.add(level1Ms);
+    level1Ms.add(new Status("Level 2 - INFO", IStatus.INFO));
+    level1Ms.add(new Status("Level 2 - WARNING", IStatus.WARNING));
+    MultiStatus level2Ms = new MultiStatus();
+    level1Ms.add(level2Ms);
+    level2Ms.add(new Status("Level 3 - OK", IStatus.OK));
+    level2Ms.add(new Status("Level 3 - ERROR", IStatus.ERROR));
+    level2Ms.add(new Status("Level 3 - WARNING", IStatus.WARNING));
+
+    Predicate<IStatus> okPredicate = s -> s.getSeverity() == IStatus.OK;
+    Predicate<IStatus> infoPredicate = s -> s.getSeverity() == IStatus.INFO;
+    Predicate<IStatus> warningPredicate = s -> s.getSeverity() == IStatus.WARNING;
+    Predicate<IStatus> errorPredicate = s -> s.getSeverity() == IStatus.ERROR;
+
+    Predicate<IStatus> level1Predicate = s -> startsWith(s.getMessage(), "Level 1");
+    Predicate<IStatus> level2Predicate = s -> startsWith(s.getMessage(), "Level 2");
+    Predicate<IStatus> level3Predicate = s -> startsWith(s.getMessage(), "Level 3");
+
+    // root of search is not considered a child
+
+    // rootMs
+    assertEquals(2, rootMs.findChildStatuses(okPredicate).size());
+    assertEquals(1, rootMs.findChildStatuses(infoPredicate).size());
+    assertEquals(3, rootMs.findChildStatuses(warningPredicate).size()); // level1Ms has severity WARNING
+    assertEquals(3, rootMs.findChildStatuses(errorPredicate).size()); // level2Ms has severity ERROR
+
+    assertEquals(2, rootMs.findChildStatuses(level1Predicate).size());
+    assertEquals(3, rootMs.findChildStatuses(level2Predicate).size()); // level1Ms has message Level 2 - WARNING
+    assertEquals(4, rootMs.findChildStatuses(level3Predicate).size()); // level2Ms has message Level 3 - ERROR
+
+    assertEquals(2, rootMs.findChildStatuses(level3Predicate.and(errorPredicate)).size());
+    assertEquals(5, rootMs.findChildStatuses(level2Predicate.or(okPredicate)).size());
+
+    // level1Ms
+    assertEquals(1, level1Ms.findChildStatuses(okPredicate).size());
+    assertEquals(1, level1Ms.findChildStatuses(infoPredicate).size());
+    assertEquals(2, level1Ms.findChildStatuses(warningPredicate).size()); // level1Ms is no longer a child
+    assertEquals(2, level1Ms.findChildStatuses(errorPredicate).size()); // level2Ms has severity ERROR
+
+    assertEquals(0, level1Ms.findChildStatuses(level1Predicate).size());
+    assertEquals(2, level1Ms.findChildStatuses(level2Predicate).size()); // level1Ms is no longer a child
+    assertEquals(4, level1Ms.findChildStatuses(level3Predicate).size()); // level2Ms has message Level 3 - ERROR
+
+    assertEquals(2, level1Ms.findChildStatuses(level3Predicate.and(errorPredicate)).size());
+    assertEquals(3, level1Ms.findChildStatuses(level2Predicate.or(okPredicate)).size());
+
+    // level2Ms
+    assertEquals(1, level2Ms.findChildStatuses(okPredicate).size());
+    assertEquals(0, level2Ms.findChildStatuses(infoPredicate).size());
+    assertEquals(1, level2Ms.findChildStatuses(warningPredicate).size()); // level1Ms is no longer a child
+    assertEquals(1, level2Ms.findChildStatuses(errorPredicate).size()); // level2Ms is no longer a child
+
+    assertEquals(0, level2Ms.findChildStatuses(level1Predicate).size());
+    assertEquals(0, level2Ms.findChildStatuses(level2Predicate).size()); // level1Ms is no longer a child
+    assertEquals(3, level2Ms.findChildStatuses(level3Predicate).size()); // level2Ms is no longer a child
+
+    assertEquals(1, level2Ms.findChildStatuses(level3Predicate.and(errorPredicate)).size());
+    assertEquals(1, level2Ms.findChildStatuses(level2Predicate.or(okPredicate)).size());
   }
 
   @Test(expected = AssertionException.class)
