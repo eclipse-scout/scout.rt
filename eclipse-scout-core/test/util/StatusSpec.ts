@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DefaultStatus, ParsingFailedStatus, Status} from '../../src/index';
+import {DefaultStatus, NotificationBadgeStatus, ParsingFailedStatus, Status} from '../../src/index';
 
 describe('scout.Status', () => {
 
@@ -178,4 +178,24 @@ describe('scout.Status', () => {
 
   });
 
+  describe('asFlatList', () => {
+    it('sorts NotificationBadgeStatus to the front', () => {
+      const numericNotificationBadgeStatus = new NotificationBadgeStatus({message: '42'}),
+        alphanumericNotificationBadgeStatus = new NotificationBadgeStatus({message: 'lorem ipsum dolor'}),
+        errorStatus = Status.error(),
+        ms = new Status({
+          children: [
+            numericNotificationBadgeStatus,
+            {
+              children: [
+                errorStatus,
+                alphanumericNotificationBadgeStatus
+              ]
+            }
+          ]
+        });
+
+      expect(ms.asFlatList()).toEqual([numericNotificationBadgeStatus, alphanumericNotificationBadgeStatus, errorStatus]);
+    });
+  });
 });

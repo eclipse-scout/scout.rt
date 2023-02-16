@@ -88,6 +88,7 @@ export * from './util/Range';
 export * from './status/Status';
 export * from './status/StatusModel';
 export * from './status/DefaultStatus';
+export * from './status/NotificationBadgeStatus';
 export * from './status/ParsingFailedStatus';
 export * from './status/ValidationFailedStatus';
 export * from './encoder/CachedElement';

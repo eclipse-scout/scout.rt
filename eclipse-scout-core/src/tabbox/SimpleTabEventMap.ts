@@ -13,7 +13,6 @@ export interface SimpleTabEventMap<TView extends SimpleTabView = SimpleTabView> 
   'click': Event<SimpleTab<TView>>;
   'propertyChange:closable': PropertyChangeEvent<boolean>;
   'propertyChange:iconId': PropertyChangeEvent<string>;
-  'propertyChange:notificationCount': PropertyChangeEvent<number>;
   'propertyChange:saveNeeded': PropertyChangeEvent<boolean>;
   'propertyChange:saveNeededVisible': PropertyChangeEvent<boolean>;
   'propertyChange:selected': PropertyChangeEvent<boolean>;

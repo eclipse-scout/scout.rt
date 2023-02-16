@@ -48,6 +48,7 @@
     & > .status-container {
       position: relative;
       display: inline-flex;
+      align-items: center;
       margin-left: 4px;
 
       flex: none;
@@ -62,29 +63,29 @@
         // do not grow or shrink icons
         &.save-needer,
         &.icon {
-          display: inline-flex;
-          align-items: center;
           flex: none;
         }
 
-        &.notification-count {
-          display: inline-block;
+        &.message {
+          display: none;
+        }
 
-          margin-top: auto;
-          margin-bottom: auto;
-          padding: 2px 4px;
-
-          min-width: calc(@font-size-small + 4px); // same as height, smallest possible badge is a circle
-          border-radius: calc(@font-size-small / 2 + 2px); // half of the height/min-width, smallest possible badge is a circle
-
-          text-align: center;
+        &.notification-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 4px;
+          min-width: 16px;
+          min-height: 16px;
+          border-radius: 8px;
           font-weight: @font-weight-normal;
           font-size: @font-size-small;
-          line-height: @font-size-small;
-          #scout.overflow-ellipsis-nowrap();
+          background: @simple-tab-status-notification-badge-background-color;
+          color: @simple-tab-status-notification-badge-color;
 
-          background: @simple-tab-status-notification-count-background-color;
-          color: @simple-tab-status-notification-count-color;
+          & > .text {
+            #scout.overflow-ellipsis-nowrap();
+          }
         }
       }
     }
