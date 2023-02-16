@@ -154,7 +154,7 @@ public class SmtpConnectionPool {
   protected void init() {
     m_maxIdleTime = CONFIG.getPropertyValue(SmtpPoolMaxIdleTimeProperty.class) * 1000;
     m_maxConnectionLifetime = CONFIG.getPropertyValue(SmtpPoolMaxConnectionLifetimeProperty.class) * 1000;
-    m_waitForConnectionTimeout = CONFIG.getPropertyValue(SmtpPoolWaitForConnectionTimeoutProperty.class);
+    m_waitForConnectionTimeout = CONFIG.getPropertyValue(SmtpPoolWaitForConnectionTimeoutProperty.class) * 1000;
   }
 
   /**
@@ -234,14 +234,14 @@ public class SmtpConnectionPool {
         // if we could not find an idle connection and the pool has already reached its limit in terms of connection count,
         // we wait until someone releases a connection (@see #releaseConnection(SmtpConnectionPoolEntry))
         if (!createNewConnection.get()) {
-          runWithConditionFor(smtpServerConfig, true, condition -> {
+          runWithConditionFor(smtpServerConfig, false, condition -> {
             try {
               if (m_waitForConnectionTimeout == 0) {
                 condition.await();
               }
-              else if (m_waitForConnectionTimeout > 0 && !condition.await(m_waitForConnectionTimeout, TimeUnit.SECONDS)) {
+              else if (m_waitForConnectionTimeout > 0 && !condition.await(m_waitForConnectionTimeout, TimeUnit.MILLISECONDS)) {
                 // await(...) returned false, we did not get the lock and time-out has been reached
-                throw new ProcessingException("Wait for connection timeout of {}s exceeded while waiting for an SMTP connection.", m_waitForConnectionTimeout);
+                throw new ProcessingException("Wait for connection timeout of {}ms exceeded while waiting for an SMTP connection.", m_waitForConnectionTimeout);
               }
             }
             catch (InterruptedException e) {
