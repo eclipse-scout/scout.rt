@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,9 +12,11 @@ package org.eclipse.scout.rt.platform.status;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -182,6 +184,21 @@ public class MultiStatus extends Status implements IMultiStatus {
       }
     }
     return false;
+  }
+
+  @Override
+  public Collection<IStatus> findChildStatuses(Predicate<IStatus> childPredicate) {
+    Assertions.assertNotNull(childPredicate);
+    Collection<IStatus> result = new HashSet<>();
+    for (IStatus child : getChildren()) {
+      if (childPredicate.test(child)) {
+        result.add(child);
+      }
+      if (child instanceof IMultiStatus) {
+        result.addAll(((IMultiStatus) child).findChildStatuses(childPredicate));
+      }
+    }
+    return result;
   }
 
   @Override

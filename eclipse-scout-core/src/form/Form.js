@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, numbers, objects, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
+import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, NotificationBadgeStatus, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
 import $ from 'jquery';
 
 export default class Form extends Widget {
@@ -54,7 +54,6 @@ export default class Form extends Widget {
      * Whether this form should render its initial focus
      */
     this.renderInitialFocusEnabled = true;
-    this.notificationCount = 0;
 
     this.$statusIcons = [];
     this.$header = null;
@@ -72,6 +71,8 @@ export default class Form extends Widget {
     POPUP_WINDOW: 'popupWindow',
     VIEW: 'view'
   };
+
+  static _NOTIFICATION_BADGE_STATUS_CODE = 197821;
 
   _init(model) {
     super._init(model);
@@ -832,40 +833,55 @@ export default class Form extends Widget {
     return $prevIcon;
   }
 
-  setNotificationCount(notificationCount) {
-    this.setProperty('notificationCount', notificationCount);
-  }
-
-  _setNotificationCount(notificationCount) {
-    if (objects.isNullOrUndefined(notificationCount)) {
-      notificationCount = 0;
-    }
-    if (!numbers.isNumber(notificationCount) || !isFinite(notificationCount)) {
+  addStatus(status) {
+    if (!status) {
       return;
     }
-    this._setProperty('notificationCount', Math.max(Math.round(notificationCount), 0));
+    const children = this.status && this.status.children,
+      ms = new Status({children});
+    ms.addStatus(status);
+    this.setStatus(ms);
   }
 
-  incrementNotificationCount() {
-    this.setNotificationCount(this.notificationCount + 1);
-  }
-
-  decrementNotificationCount() {
-    this.setNotificationCount(this.notificationCount - 1);
-  }
-
-  addNotificationCount(notificationCount) {
-    if (objects.isNullOrUndefined(notificationCount)) {
-      notificationCount = 0;
-    }
-    if (!numbers.isNumber(notificationCount) || !isFinite(notificationCount)) {
+  removeStatus(status) {
+    if (!this.status || !status) {
       return;
     }
-    this.setNotificationCount(this.notificationCount + notificationCount);
+    if (this.status.equals(status)) {
+      this.setStatus(null);
+      return;
+    }
+    if (this.status.containsStatusByPredicate(s => status.equals(s))) {
+      const newStatus = this.status.clone();
+      newStatus.removeAllStatusByPredicate(s => status.equals(s));
+      this.setStatus(newStatus);
+    }
   }
 
-  resetNotificationCount() {
-    this.setNotificationCount(0);
+  getNotificationBadgeText() {
+    const status = this._getNotificationBadgeStatus();
+    if (status) {
+      return status.message;
+    }
+  }
+
+  setNotificationBadgeText(notificationBadgeText) {
+    this.removeStatus(this._getNotificationBadgeStatus());
+    if (!notificationBadgeText) {
+      return;
+    }
+    this.addStatus(new NotificationBadgeStatus({
+      message: notificationBadgeText,
+      code: Form._NOTIFICATION_BADGE_STATUS_CODE
+    }));
+  }
+
+  _getNotificationBadgeStatus() {
+    if (!this.status) {
+      return;
+    }
+
+    return this.status.asFlatList().find(s => Form._NOTIFICATION_BADGE_STATUS_CODE === s.code);
   }
 
   setShowOnOpen(showOnOpen) {

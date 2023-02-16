@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {Dimension, fields, Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
+import {Dimension, fields, Form, NotificationBadgeStatus, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
 
 describe('Form', () => {
   let session, helper, outlineHelper;
@@ -1037,144 +1037,32 @@ describe('Form', () => {
     });
   });
 
-  describe('notificationCount', () => {
+  describe('notificationBadgeText', () => {
 
     it('is updated correctly', () => {
       const form = helper.createFormWithOneField();
-      expect(form.notificationCount).toBe(0);
+      expect(form.getNotificationBadgeText()).toBeUndefined();
 
-      form.incrementNotificationCount();
-      expect(form.notificationCount).toBe(1);
-      form.incrementNotificationCount();
-      expect(form.notificationCount).toBe(2);
-      form.incrementNotificationCount();
-      expect(form.notificationCount).toBe(3);
-      form.incrementNotificationCount();
-      expect(form.notificationCount).toBe(4);
+      form.setNotificationBadgeText('foo');
+      expect(form.getNotificationBadgeText()).toBe('foo');
+      form.setNotificationBadgeText('bar');
+      expect(form.getNotificationBadgeText()).toBe('bar');
+      form.setNotificationBadgeText(null);
+      expect(form.getNotificationBadgeText()).toBeUndefined();
 
-      form.addNotificationCount(38);
-      expect(form.notificationCount).toBe(42);
-      form.addNotificationCount(10);
-      expect(form.notificationCount).toBe(52);
-      form.addNotificationCount(-50);
-      expect(form.notificationCount).toBe(2);
-      form.addNotificationCount(-10);
-      expect(form.notificationCount).toBe(0);
-      form.addNotificationCount(10);
-      expect(form.notificationCount).toBe(10);
+      form.setNotificationBadgeText('foo');
+      expect(form.getNotificationBadgeText()).toBe('foo');
+      form.addStatus(new NotificationBadgeStatus('bar'));
+      expect(form.getNotificationBadgeText()).toBe('foo');
+      form.setNotificationBadgeText(null);
+      expect(form.getNotificationBadgeText()).toBeUndefined();
 
-      form.setNotificationCount(-13);
-      expect(form.notificationCount).toBe(0);
-      form.setNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-
-      form.resetNotificationCount();
-      expect(form.notificationCount).toBe(0);
-
-      form.setNotificationCount(3);
-      expect(form.notificationCount).toBe(3);
-
-      form.decrementNotificationCount();
-      expect(form.notificationCount).toBe(2);
-      form.decrementNotificationCount();
-      expect(form.notificationCount).toBe(1);
-      form.decrementNotificationCount();
-      expect(form.notificationCount).toBe(0);
-      form.decrementNotificationCount();
-      expect(form.notificationCount).toBe(0);
-    });
-
-    it('is not set to null, undefined or NaN', () => {
-      const form = helper.createFormWithOneField();
-      expect(form.notificationCount).toBe(0);
-
-      form.setNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount();
-      expect(form.notificationCount).toBe(0);
-      form.setNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount(null);
-      expect(form.notificationCount).toBe(0);
-      form.setNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount(undefined);
-      expect(form.notificationCount).toBe(0);
-      form.setNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount(1 + undefined);
-      expect(form.notificationCount).toBe(13);
-
-      form.resetNotificationCount();
-      expect(form.notificationCount).toBe(0);
-
-      form.addNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount();
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount(null);
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount(undefined);
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount(1 + undefined);
-      expect(form.notificationCount).toBe(13);
-    });
-
-    it('is only updated by finite numbers', () => {
-      const form = helper.createFormWithOneField();
-      expect(form.notificationCount).toBe(0);
-
-      form.setNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount(1 / 0);
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount(true);
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount({a: 42});
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount('42');
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount('foo');
-      expect(form.notificationCount).toBe(13);
-
-      form.resetNotificationCount();
-      expect(form.notificationCount).toBe(0);
-
-      form.addNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount(1 / 0);
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount(true);
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount({a: 42});
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount('42');
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount('foo');
-      expect(form.notificationCount).toBe(13);
-    });
-
-    it('is only updated to integer values', () => {
-      const form = helper.createFormWithOneField();
-      expect(form.notificationCount).toBe(0);
-
-      form.setNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.setNotificationCount(4.2);
-      expect(form.notificationCount).toBe(4);
-      form.setNotificationCount(9.7);
-      expect(form.notificationCount).toBe(10);
-      form.setNotificationCount(-2.1);
-      expect(form.notificationCount).toBe(0);
-
-      form.addNotificationCount(13);
-      expect(form.notificationCount).toBe(13);
-      form.addNotificationCount(4.2);
-      expect(form.notificationCount).toBe(17);
-      form.addNotificationCount(9.7);
-      expect(form.notificationCount).toBe(27);
-      form.addNotificationCount(-2.1);
-      expect(form.notificationCount).toBe(25);
+      form.addStatus(new NotificationBadgeStatus('bar'));
+      expect(form.getNotificationBadgeText()).toBeUndefined();
+      form.setNotificationBadgeText('foo');
+      expect(form.getNotificationBadgeText()).toBe('foo');
+      form.setNotificationBadgeText(null);
+      expect(form.getNotificationBadgeText()).toBeUndefined();
     });
   });
 });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.extension.ui.NotificationBadgeStatus;
 import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IComboMenu;
@@ -124,6 +125,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonByteArray;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonDecimalFormat;
+import org.eclipse.scout.rt.ui.html.json.JsonNotificationBadgeStatus;
 import org.eclipse.scout.rt.ui.html.json.JsonParsingFailedStatus;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.JsonValidationFailedStatus;
@@ -519,6 +521,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (object instanceof ValidationFailedStatus) {
       return new JsonValidationFailedStatus((ValidationFailedStatus) object);
+    }
+    if (object instanceof NotificationBadgeStatus) {
+      return new JsonNotificationBadgeStatus((NotificationBadgeStatus) object);
     }
     if (object instanceof IStatus) {
       return new JsonStatus((IStatus) object);

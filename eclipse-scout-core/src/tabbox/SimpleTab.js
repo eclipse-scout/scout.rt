@@ -32,7 +32,6 @@ export default class SimpleTab extends Widget {
     this.$subTitle = null;
     this.$iconContainer = null;
     this.$statusContainer = null;
-    this.$notificationCount = null;
     this.$statusIcons = [];
 
     this._statusContainerUsageCounter = 0;
@@ -62,7 +61,6 @@ export default class SimpleTab extends Widget {
     this.saveNeeded = (this.view ? this.view.saveNeeded : model.saveNeeded);
     this.saveNeededVisible = (this.view ? this.view.saveNeededVisible : model.saveNeededVisible);
     this.status = (this.view ? this.view.status : model.status);
-    this.notificationCount = (this.view ? this.view.notificationCount : model.notificationCount);
 
     if (this.view) {
       this._installViewListeners();
@@ -102,7 +100,6 @@ export default class SimpleTab extends Widget {
     this._renderClosable();
     this._renderSaveNeeded();
     this._renderStatus();
-    this._renderNotificationCount();
     this._renderSelected();
   }
 
@@ -214,50 +211,36 @@ export default class SimpleTab extends Widget {
   _renderStatus() {
     this._statusContainerUsageCounter -= (this.$statusIcons.length === 0 ? 0 : 1);
 
-    this.$statusIcons.forEach($statusIcon => {
-      $statusIcon.remove();
-    });
+    this.$statusIcons.forEach($statusIcon => $statusIcon.remove());
     this.$statusIcons = [];
 
     if (this.status) {
       this.status.asFlatList().forEach(status => {
-        if (!status || !status.iconId) {
+        if (!status || (!status.iconId && !status.message)) {
           return;
         }
-        let $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
-        if (status.cssClass()) {
-          $statusIcon.addClass(status.cssClass());
+        if (status.iconId) {
+          let $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
+          if (status.cssClass()) {
+            $statusIcon.addClass(status.cssClass());
+          }
+          this.$statusIcons.push($statusIcon);
         }
-        this.$statusIcons.push($statusIcon);
+        if (status.message) {
+          let $statusMessage = this.$statusContainer.appendSpan('status message');
+          if (status.cssClass()) {
+            $statusMessage.addClass(status.cssClass());
+          }
+          let $text = $statusMessage.appendSpan('text', status.message);
+          tooltips.installForEllipsis($text, {
+            parent: this
+          });
+          this.$statusIcons.push($statusMessage);
+        }
       });
     }
     this._statusContainerUsageCounter += (this.$statusIcons.length === 0 ? 0 : 1);
     this.$container.toggleClass('has-status', this._statusContainerUsageCounter > 0);
-  }
-
-  setNotificationCount(notificationCount) {
-    this.setProperty('notificationCount', notificationCount);
-  }
-
-  _renderNotificationCount() {
-    if (this.notificationCount) {
-      if (!this.$notificationCount) {
-        this.$notificationCount = this.$statusContainer.makeSpan('status notification-count');
-        this.$notificationCount = this.$saveNeeded ? this.$notificationCount.insertAfter(this.$saveNeeded) : this.$notificationCount.prependTo(this.$statusContainer);
-        tooltips.installForEllipsis(this.$notificationCount, {
-          parent: this
-        });
-        this._statusContainerUsageCounter++;
-      }
-      this.$notificationCount.text(this.notificationCount);
-    } else {
-      if (!this.$notificationCount) {
-        return;
-      }
-      this.$notificationCount.remove();
-      this.$notificationCount = null;
-      this._statusContainerUsageCounter--;
-    }
   }
 
   select() {
@@ -332,8 +315,6 @@ export default class SimpleTab extends Widget {
       this.setClosable(event.newValue);
     } else if (event.propertyName === 'status') {
       this.setStatus(event.newValue);
-    } else if (event.propertyName === 'notificationCount') {
-      this.setNotificationCount(event.newValue);
     }
   }
 

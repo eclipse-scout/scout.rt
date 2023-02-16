@@ -1,16 +1,18 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.platform.status;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.IOrdered;
 
@@ -65,6 +67,13 @@ public interface IMultiStatus extends IStatus {
    *         otherwise.
    */
   boolean containsStatus(Class<? extends IStatus> clazz);
+
+  /**
+   * @param childPredicate
+   *          not <code>null<code>
+   * @return all direct or indirect children for the given predicate
+   */
+  Collection<IStatus> findChildStatuses(Predicate<IStatus> childPredicate);
 
   /**
    * @return maximum severity of the children or {@link #OK}, if no children available
