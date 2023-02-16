@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DefaultStatus, ObjectFactory, objects, ParsingFailedStatus, strings, ValidationFailedStatus} from '../index';
+import {arrays, DefaultStatus, NotificationBadgeStatus, ObjectFactory, objects, ParsingFailedStatus, strings, ValidationFailedStatus} from '../index';
 import $ from 'jquery';
 
 export default class Status {
@@ -318,6 +318,18 @@ export default class Status {
       status.children.forEach(childStatus => {
         arrays.pushAll(list, Status.asFlatList(childStatus));
       });
+      list.sort((s1, s2) => {
+        if (s1 instanceof NotificationBadgeStatus) {
+          if (s2 instanceof NotificationBadgeStatus) {
+            return 0;
+          }
+          return -1;
+        }
+        if (s2 instanceof NotificationBadgeStatus) {
+          return 1;
+        }
+        return 0;
+      });
     } else {
       list.push(status);
     }
@@ -340,6 +352,7 @@ export default class Status {
     return {
       Status: Status,
       DefaultStatus: DefaultStatus,
+      NotificationBadgeStatus: NotificationBadgeStatus,
       ParsingFailedStatus: ParsingFailedStatus,
       ValidationFailedStatus: ValidationFailedStatus
     }[className];

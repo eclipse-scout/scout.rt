@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DefaultStatus, ParsingFailedStatus, Status} from '../../src/index';
+import {DefaultStatus, NotificationBadgeStatus, ParsingFailedStatus, Status} from '../../src/index';
 
 describe('scout.Status', () => {
 
@@ -179,4 +179,24 @@ describe('scout.Status', () => {
 
   });
 
+  describe('asFlatList', () => {
+    it('sorts NotificationBadgeStatus to the front', () => {
+      const numericNotificationBadgeStatus = new NotificationBadgeStatus({message: '42'}),
+        alphanumericNotificationBadgeStatus = new NotificationBadgeStatus({message: 'lorem ipsum dolor'}),
+        errorStatus = Status.error(),
+        ms = new Status({
+          children: [
+            numericNotificationBadgeStatus,
+            {
+              children: [
+                errorStatus,
+                alphanumericNotificationBadgeStatus
+              ]
+            }
+          ]
+        });
+
+      expect(ms.asFlatList()).toEqual([numericNotificationBadgeStatus, alphanumericNotificationBadgeStatus, errorStatus]);
+    });
+  });
 });
