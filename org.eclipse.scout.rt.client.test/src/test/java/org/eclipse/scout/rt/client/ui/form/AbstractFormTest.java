@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.rt.client.extension.ui.NotificationBadgeStatus;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormTest.WrapperTestFormWithClassId.MainBox.EmbeddedField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
@@ -336,48 +337,29 @@ public class AbstractFormTest {
   }
 
   @Test
-  public void testNotificationStatus() {
+  public void testNotificationBadgeText() {
     final AbstractForm form = new TestForm(false);
-    assertEquals(0, form.getNotificationCount());
+    assertNull(form.getNotificationBadgeText());
 
-    form.incrementNotificationCount();
-    assertEquals(1, form.getNotificationCount());
-    form.incrementNotificationCount();
-    assertEquals(2, form.getNotificationCount());
-    form.incrementNotificationCount();
-    assertEquals(3, form.getNotificationCount());
-    form.incrementNotificationCount();
-    assertEquals(4, form.getNotificationCount());
+    form.setNotificationBadgeText("foo");
+    assertEquals("foo", form.getNotificationBadgeText());
+    form.setNotificationBadgeText("bar");
+    assertEquals("bar", form.getNotificationBadgeText());
+    form.setNotificationBadgeText(null);
+    assertNull(form.getNotificationBadgeText());
 
-    form.addNotificationCount(38);
-    assertEquals(42, form.getNotificationCount());
-    form.addNotificationCount(10);
-    assertEquals(52, form.getNotificationCount());
-    form.addNotificationCount(-50);
-    assertEquals(2, form.getNotificationCount());
-    form.addNotificationCount(-10);
-    assertEquals(0, form.getNotificationCount());
-    form.addNotificationCount(10);
-    assertEquals(10, form.getNotificationCount());
+    form.setNotificationBadgeText("foo");
+    assertEquals("foo", form.getNotificationBadgeText());
+    form.addStatus(new NotificationBadgeStatus("bar"));
+    assertEquals("foo", form.getNotificationBadgeText());
+    form.setNotificationBadgeText(null);
+    assertNull(form.getNotificationBadgeText());
 
-    form.setNotificationCount(-13);
-    assertEquals(0, form.getNotificationCount());
-    form.setNotificationCount(13);
-    assertEquals(13, form.getNotificationCount());
-
-    form.resetNotificationCount();
-    assertEquals(0, form.getNotificationCount());
-
-    form.setNotificationCount(3);
-    assertEquals(3, form.getNotificationCount());
-
-    form.decrementNotificationCount();
-    assertEquals(2, form.getNotificationCount());
-    form.decrementNotificationCount();
-    assertEquals(1, form.getNotificationCount());
-    form.decrementNotificationCount();
-    assertEquals(0, form.getNotificationCount());
-    form.decrementNotificationCount();
-    assertEquals(0, form.getNotificationCount());
+    form.addStatus(new NotificationBadgeStatus("bar"));
+    assertNull(form.getNotificationBadgeText());
+    form.setNotificationBadgeText("foo");
+    assertEquals("foo", form.getNotificationBadgeText());
+    form.setNotificationBadgeText(null);
+    assertNull(form.getNotificationBadgeText());
   }
 }
