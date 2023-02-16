@@ -131,7 +131,7 @@ export const keys = {
     35: 'End',
     36: 'Home',
     37: 'Left',
-    38: 'UP',
+    38: 'Up',
     39: 'Right',
     40: 'Down',
     32: 'Space',
