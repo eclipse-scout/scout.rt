@@ -1052,12 +1052,12 @@ describe('Form', () => {
 
       form.setNotificationBadgeText('foo');
       expect(form.getNotificationBadgeText()).toBe('foo');
-      form.addStatus(new NotificationBadgeStatus('bar'));
+      form.addStatus(new NotificationBadgeStatus({message: 'bar'}));
       expect(form.getNotificationBadgeText()).toBe('foo');
       form.setNotificationBadgeText(null);
       expect(form.getNotificationBadgeText()).toBeUndefined();
 
-      form.addStatus(new NotificationBadgeStatus('bar'));
+      form.addStatus(new NotificationBadgeStatus({message: 'bar'}));
       expect(form.getNotificationBadgeText()).toBeUndefined();
       form.setNotificationBadgeText('foo');
       expect(form.getNotificationBadgeText()).toBe('foo');
