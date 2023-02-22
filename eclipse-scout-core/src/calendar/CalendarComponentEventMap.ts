@@ -7,13 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CalendarComponent, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
-
-export interface CalendarComponentAppLinkActionEvent<T = CalendarComponent> extends Event<T> {
-  ref: string;
-}
+import {AppLinkActionEvent, PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export interface CalendarComponentEventMap extends WidgetEventMap {
-  'appLinkAction': CalendarComponentAppLinkActionEvent;
+  'appLinkAction': AppLinkActionEvent;
   'propertyChange:selected': PropertyChangeEvent<boolean>;
 }

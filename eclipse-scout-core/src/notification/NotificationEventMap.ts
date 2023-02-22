@@ -7,14 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, Notification, PropertyChangeEvent, Status, WidgetEventMap} from '../index';
-
-export interface NotificationAppLinkActionEvent<N extends Notification = Notification> extends Event<N> {
-  ref: string;
-}
+import {AppLinkActionEvent, Event, Notification, PropertyChangeEvent, Status, WidgetEventMap} from '../index';
 
 export interface NotificationEventMap extends WidgetEventMap {
-  'appLinkAction': NotificationAppLinkActionEvent;
+  'appLinkAction': AppLinkActionEvent;
   'close': Event<Notification>;
   'propertyChange:closable': PropertyChangeEvent<boolean>;
   'propertyChange:status': PropertyChangeEvent<Status>;

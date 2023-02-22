@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, HtmlField, HtmlFieldAppLinkActionEvent, HtmlFieldModel, ValueFieldAdapter} from '../../../index';
+import {AppLinkActionEvent, Event, HtmlField, HtmlFieldModel, ValueFieldAdapter} from '../../../index';
 
 export class HtmlFieldAdapter extends ValueFieldAdapter {
 
@@ -22,7 +22,7 @@ export class HtmlFieldAdapter extends ValueFieldAdapter {
     this.widget.scrollToBottom();
   }
 
-  protected _onWidgetAppLinkAction(event: HtmlFieldAppLinkActionEvent) {
+  protected _onWidgetAppLinkAction(event: AppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
@@ -30,7 +30,7 @@ export class HtmlFieldAdapter extends ValueFieldAdapter {
 
   protected override _onWidgetEvent(event: Event<HtmlField>) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event as HtmlFieldAppLinkActionEvent);
+      this._onWidgetAppLinkAction(event as AppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

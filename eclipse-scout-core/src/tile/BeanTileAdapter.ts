@@ -7,10 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BeanTile, BeanTileAppLinkActionEvent, Event, TileAdapter} from '../index';
+import {AppLinkActionEvent, BeanTile, Event, TileAdapter} from '../index';
 
 export class BeanTileAdapter extends TileAdapter {
-  protected _onWidgetAppLinkAction(event: BeanTileAppLinkActionEvent) {
+  protected _onWidgetAppLinkAction(event: AppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
@@ -18,7 +18,7 @@ export class BeanTileAdapter extends TileAdapter {
 
   protected override _onWidgetEvent(event: Event<BeanTile>) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event as BeanTileAppLinkActionEvent);
+      this._onWidgetAppLinkAction(event as AppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

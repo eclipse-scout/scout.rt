@@ -7,14 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, LabelField, PropertyChangeEvent, ValueFieldEventMap} from '../../../index';
-
-export interface LabelFieldAppLinkActionEvent<T = LabelField> extends Event<T> {
-  ref: string;
-}
+import {AppLinkActionEvent, PropertyChangeEvent, ValueFieldEventMap} from '../../../index';
 
 export interface LabelFieldEventMap extends ValueFieldEventMap<string> {
-  'appLinkAction': LabelFieldAppLinkActionEvent;
+  'appLinkAction': AppLinkActionEvent;
   'propertyChange:htmlEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:selectable': PropertyChangeEvent<boolean>;
   'propertyChange:wrapText': PropertyChangeEvent<boolean>;
