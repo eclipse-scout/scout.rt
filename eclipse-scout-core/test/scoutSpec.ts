@@ -122,7 +122,6 @@ describe('main', () => {
 
       expect(scout.assertInstance(arr, Array)).toBe(arr);
       expect(scout.assertInstance(obj, Object)).toBe(obj);
-      // @ts-expect-error
       expect(scout.assertInstance(re, RegExp)).toBe(re);
       expect(scout.assertInstance(session, Session)).toBe(session);
 
