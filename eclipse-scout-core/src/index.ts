@@ -21,6 +21,7 @@ export * from './events/EventDelegatorOptions';
 export * from './events/EventListener';
 export * from './events/EventMap';
 export * from './events/PropertyChangeEvent';
+export * from './events/AppLinkActionEvent';
 export * from './App';
 export * from './AppEventMap';
 export * from './ErrorHandler';

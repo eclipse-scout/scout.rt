@@ -7,13 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, FormFieldEventMap} from '@eclipse-scout/core';
-import {SvgField} from '../index';
-
-export interface SvgFieldAppLinkActionEvent<T = SvgField> extends Event<T> {
-  ref: string;
-}
+import {AppLinkActionEvent, FormFieldEventMap} from '@eclipse-scout/core';
 
 export interface SvgFieldEventMap extends FormFieldEventMap {
-  'appLinkAction': SvgFieldAppLinkActionEvent;
+  'appLinkAction': AppLinkActionEvent;
 }

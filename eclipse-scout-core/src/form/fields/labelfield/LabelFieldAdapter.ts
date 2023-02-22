@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, LabelField, LabelFieldAppLinkActionEvent, ValueFieldAdapter} from '../../../index';
+import {AppLinkActionEvent, Event, LabelField, ValueFieldAdapter} from '../../../index';
 
 export class LabelFieldAdapter extends ValueFieldAdapter {
 
-  protected _onWidgetAppLinkAction(event: LabelFieldAppLinkActionEvent) {
+  protected _onWidgetAppLinkAction(event: AppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
@@ -19,7 +19,7 @@ export class LabelFieldAdapter extends ValueFieldAdapter {
 
   protected override _onWidgetEvent(event: Event<LabelField>) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event as LabelFieldAppLinkActionEvent);
+      this._onWidgetAppLinkAction(event as AppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Cell, Column, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableCheckableStyle, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableRow, Tile, TileTableHeaderBox,
-  ValueField, WidgetEventMap
+  AppLinkActionEvent, Cell, Column, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableCheckableStyle, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableRow, Tile,
+  TileTableHeaderBox, ValueField, WidgetEventMap
 } from '../index';
 
 export interface TableColumnBackgroundEffectChangedEvent<T = Table> extends Event<T> {
@@ -24,10 +24,9 @@ export interface TableAllRowsDeletedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableAppLinkActionEvent<TValue = any, T = Table> extends Event<T> {
+export interface TableAppLinkActionEvent<TValue = any, T = Table> extends AppLinkActionEvent<T> {
   column: Column<TValue>;
   row: TableRow;
-  ref: string;
   $appLink: JQuery;
 }
 
