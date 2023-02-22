@@ -11,8 +11,6 @@ import {Action, EnumObject, HAlign, Key, keys, KeyStrokeFirePolicy, KeyStrokeMod
 import $ from 'jquery';
 
 export class KeyStroke implements KeyStrokeModel {
-  declare model: KeyStrokeModel;
-
   field?: Widget;
 
   /** keys which this keystroke is bound to. Typically, this is a single key, but may be multiple keys if handling the same action (e.g. ENTER and SPACE on a button). */
