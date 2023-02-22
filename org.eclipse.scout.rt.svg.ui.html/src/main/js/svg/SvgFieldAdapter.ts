@@ -7,13 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, FormFieldAdapter} from '@eclipse-scout/core';
-import {SvgFieldAppLinkActionEvent} from './SvgFieldEventMap';
+import {AppLinkActionEvent, Event, FormFieldAdapter} from '@eclipse-scout/core';
 import {SvgField} from '../index';
 
 export class SvgFieldAdapter extends FormFieldAdapter {
 
-  protected _onWidgetAppLinkAction(event: SvgFieldAppLinkActionEvent) {
+  protected _onWidgetAppLinkAction(event: AppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
@@ -21,7 +20,7 @@ export class SvgFieldAdapter extends FormFieldAdapter {
 
   protected override _onWidgetEvent(event: Event<SvgField>) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event as SvgFieldAppLinkActionEvent);
+      this._onWidgetAppLinkAction(event as AppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

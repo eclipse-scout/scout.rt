@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CalendarComponentAppLinkActionEvent, Event, ModelAdapter, Widget} from '../index';
+import {AppLinkActionEvent, Event, ModelAdapter, Widget} from '../index';
 
 export class CalendarComponentAdapter extends ModelAdapter {
 
-  protected _onWidgetAppLinkAction(event: CalendarComponentAppLinkActionEvent) {
+  protected _onWidgetAppLinkAction(event: AppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
@@ -19,7 +19,7 @@ export class CalendarComponentAdapter extends ModelAdapter {
 
   protected override _onWidgetEvent(event: Event<Widget>) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event as CalendarComponentAppLinkActionEvent);
+      this._onWidgetAppLinkAction(event as AppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

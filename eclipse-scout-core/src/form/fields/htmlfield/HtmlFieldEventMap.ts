@@ -7,14 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, HtmlField, PropertyChangeEvent, ValueFieldEventMap} from '../../../index';
-
-export interface HtmlFieldAppLinkActionEvent<T = HtmlField> extends Event<T> {
-  ref: string;
-}
+import {AppLinkActionEvent, PropertyChangeEvent, ValueFieldEventMap} from '../../../index';
 
 export interface HtmlFieldEventMap extends ValueFieldEventMap<string> {
-  'appLinkAction': HtmlFieldAppLinkActionEvent;
+  'appLinkAction': AppLinkActionEvent;
   'propertyChange:scrollBarEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:selectable': PropertyChangeEvent<boolean>;
 }
