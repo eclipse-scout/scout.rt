@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkActionEvent, ValueFieldEventMap} from '../../../index';
+import {Event} from '../index';
 
-export interface BeanFieldEventMap<TValue extends object> extends ValueFieldEventMap<TValue> {
-  'appLinkAction': AppLinkActionEvent;
+export interface AppLinkActionEvent<TSource = object> extends Event<TSource> {
+  ref: string;
 }

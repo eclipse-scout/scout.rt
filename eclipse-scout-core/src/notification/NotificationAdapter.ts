@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, ModelAdapter, Notification, NotificationAppLinkActionEvent} from '../index';
+import {AppLinkActionEvent, Event, ModelAdapter, Notification} from '../index';
 
 export class NotificationAdapter extends ModelAdapter {
 
@@ -15,7 +15,7 @@ export class NotificationAdapter extends ModelAdapter {
     this._send('close');
   }
 
-  protected _onWidgetAppLinkAction(event: NotificationAppLinkActionEvent) {
+  protected _onWidgetAppLinkAction(event: AppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
@@ -25,7 +25,7 @@ export class NotificationAdapter extends ModelAdapter {
     if (event.type === 'close') {
       this._onWidgetClose(event);
     } else if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event as NotificationAppLinkActionEvent);
+      this._onWidgetAppLinkAction(event as AppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

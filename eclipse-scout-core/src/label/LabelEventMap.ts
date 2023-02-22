@@ -7,14 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, Label, PropertyChangeEvent, WidgetEventMap} from '../index';
-
-export interface LabelAppLinkActionEvent<L extends Label = Label> extends Event<L> {
-  ref: string;
-}
+import {AppLinkActionEvent, PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export interface LabelEventMap extends WidgetEventMap {
-  'appLinkAction': LabelAppLinkActionEvent;
+  'appLinkAction': AppLinkActionEvent;
   'propertyChange:htmlEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:scrollable': PropertyChangeEvent<boolean>;
   'propertyChange:value': PropertyChangeEvent<string>;
