@@ -295,7 +295,7 @@ export default class FileChooser extends Widget {
     } catch (errorMessage) {
       MessageBoxes.createOk(this)
         .withHeader(this.session.text('ui.FileSizeLimitTitle'))
-        .withBody(errorMessage)
+        .withBody(fileUtil.getErrorMessageMaximumUploadSizeExceeded(this.session, this.fileInput.maximumUploadSize))
         .withSeverity(Status.Severity.ERROR)
         .buildAndOpen();
       return;

@@ -104,7 +104,7 @@ export default class DragAndDropHandler {
     if (!fileUtil.validateMaximumUploadSize(files, dropMaximumSize)) {
       throw {
         title: this.target.session.text('ui.FileSizeLimitTitle'),
-        message: this.target.session.text('ui.FileSizeLimit', (dropMaximumSize / 1024 / 1024))
+        message: fileUtil.getErrorMessageMaximumUploadSizeExceeded(this.target.session, dropMaximumSize)
       };
     }
   }

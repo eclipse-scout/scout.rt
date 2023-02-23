@@ -18,7 +18,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays} from '../index';
+import {arrays, numbers, RoundingMode} from '../index';
 
 /**
  * Checks if the combined total size of the given files does not exceed the maximum upload size.
@@ -48,7 +48,23 @@ export function fileListToArray(fileList) {
   return files;
 }
 
+export function getErrorMessageMaximumUploadSizeExceeded(session, maximumUploadSize) {
+  if (maximumUploadSize < 1024) {
+    return session.text('ui.FileSizeLimit', maximumUploadSize, session.text('ui.Bytes'));
+  }
+  let maximumUploadSizeKB = maximumUploadSize / 1024;
+  if (maximumUploadSizeKB < 1024) {
+    return session.text('ui.FileSizeLimit', numbers.round(maximumUploadSizeKB, RoundingMode.HALF_UP, 2), 'KB');
+  }
+  let maximumUploadSizeMB = maximumUploadSizeKB / 1024;
+  if (maximumUploadSizeMB < 1024) {
+    return session.text('ui.FileSizeLimit', numbers.round(maximumUploadSizeMB, RoundingMode.HALF_UP, 2), 'MB');
+  }
+  return session.text('ui.FileSizeLimit', numbers.round(maximumUploadSizeMB / 1024, RoundingMode.HALF_UP, 2), 'GB');
+}
+
 export default {
   fileListToArray,
-  validateMaximumUploadSize
+  validateMaximumUploadSize,
+  getErrorMessageMaximumUploadSizeExceeded
 };
