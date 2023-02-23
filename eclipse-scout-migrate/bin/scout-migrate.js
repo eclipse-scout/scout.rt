@@ -130,11 +130,13 @@ function configTypeScript() {
   let typeMap = config.typeMap;
   let paramTypeMap = config.paramTypeMap || typeMap;
   let returnTypeMap = config.returnTypeMap;
+  let defaultReturnType = config.defaultReturnType;
+  let defaultParamType = config.defaultParamType;
   migrateConfig
     .addPlugin(jsDocPlugin, {typeMap: jsDocTypeMap, annotateReturns: true})
     .addPlugin(declareMissingClassPropertiesPlugin, {moduleMap, typeMap})
     .addPlugin(memberAccessModifierPlugin, {})
-    .addPlugin(methodsPlugin, {moduleMap, paramTypeMap, returnTypeMap});
+    .addPlugin(methodsPlugin, {moduleMap, paramTypeMap, returnTypeMap, defaultReturnType, defaultParamType});
 }
 
 function parseTsConfig(path) {
