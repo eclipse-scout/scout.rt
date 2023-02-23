@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, Dimension, EllipsisMenu, EventHandler, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Menu, PropertyChangeEvent, scout, Tab, TabArea} from '../../../index';
+import {AbstractLayout, Dimension, EllipsisMenu, EventHandler, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Menu, MenuModel, PropertyChangeEvent, scout, Tab, TabArea} from '../../../index';
 import $ from 'jquery';
 
 export class TabAreaLayout extends AbstractLayout {
@@ -62,9 +62,11 @@ export class TabAreaLayout extends AbstractLayout {
     this.visibleTabs.forEach(tab => tab.setOverflown(false));
     this.overflowTabs.forEach(tab => tab.setOverflown(true));
 
+    ellipsis.childActions.forEach(menu => menu.destroy());
     ellipsis.setChildActions(this.overflowTabs.map(tab => {
-      let menu = scout.create(Menu, {
+      let menu = scout.create(EllipsisTabMenu, {
         parent: ellipsis,
+        tab: tab, // The tab reference is not used by Scout itself but may be used by others to find the menu belonging to a tab
         text: tab.label,
         visible: tab.visible
       });
@@ -218,4 +220,13 @@ export class TabAreaLayout extends AbstractLayout {
       this._layoutSelectionMarker();
     }
   }
+}
+
+export class EllipsisTabMenu extends Menu implements EllipsisTabMenuModel {
+  declare model: EllipsisTabMenuModel;
+  tab: Tab;
+}
+
+export interface EllipsisTabMenuModel extends MenuModel {
+  tab: Tab;
 }
