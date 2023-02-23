@@ -253,7 +253,7 @@ export default class FileInput extends Widget {
 
   validateMaximumUploadSize(files) {
     if (!fileUtil.validateMaximumUploadSize(files, this.maximumUploadSize)) {
-      throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024));
+      throw fileUtil.getErrorMessageMaximumUploadSizeExceeded(this.session, this.maximumUploadSize);
     }
   }
 }
