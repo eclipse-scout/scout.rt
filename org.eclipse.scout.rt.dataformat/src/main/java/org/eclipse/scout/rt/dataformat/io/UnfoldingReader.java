@@ -68,10 +68,11 @@ public class UnfoldingReader extends BufferedReader {
 
   public Property readProperty() throws IOException {
     String s;
+    // Skip empty lines
     do {
       s = readLine();
     }
-    while (s != null && s.isEmpty());
+    while (s != null && !StringUtility.hasText(s));
 
     if (s == null) {
       // eof
