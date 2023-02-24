@@ -1,0 +1,8 @@
+{
+  "dateDefault" : "2017-11-30 17:29:12.583",
+  "foo": {},
+  "dateOnly" : "1990-10-20",
+ 	"aaaDate": "2022-07-11T08:49:42.654Z",
+  "_type" : "TestDate",
+  "dateYearMonth" : "90-10"
+}

@@ -71,7 +71,7 @@ describe('AggregateTableControl', () => {
         table: table
       });
       tableControl.selected = true;
-      table._setTableControls([tableControl]);
+      table.setTableControls([tableControl]);
 
       column0 = table.columns[0];
       column1 = table.columns[1];
@@ -282,7 +282,7 @@ describe('AggregateTableControl', () => {
         selected: true,
         table: table
       });
-      table._setTableControls([tableControl]);
+      table.setTableControls([tableControl]);
       table.render();
 
       expect(tableControl.enabled).toBe(false);
@@ -304,7 +304,7 @@ describe('AggregateTableControl', () => {
         selected: true,
         table: table
       });
-      table._setTableControls([tableControl]);
+      table.setTableControls([tableControl]);
       table.render();
 
       expect(tableControl.enabled).toBe(true);
@@ -326,7 +326,7 @@ describe('AggregateTableControl', () => {
         selected: false,
         table: table
       });
-      table._setTableControls([tableControl]);
+      table.setTableControls([tableControl]);
       table.render();
 
       expect(tableControl.enabled).toBe(false);

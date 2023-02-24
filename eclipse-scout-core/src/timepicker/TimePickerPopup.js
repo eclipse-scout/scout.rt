@@ -39,6 +39,7 @@ export default class TimePickerPopup extends Popup {
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
     this.htmlComp.validateRoot = true;
+    this.findDesktop().adjustOverlayOrder(this);
     this.picker.render();
   }
 

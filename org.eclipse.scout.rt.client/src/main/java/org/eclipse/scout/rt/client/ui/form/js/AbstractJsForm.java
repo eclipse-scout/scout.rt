@@ -10,7 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.js;
 
-import java.lang.reflect.ParameterizedType;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.TypeCastUtility.getGenericsParameterClass;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -22,7 +23,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.util.Assertions;
 
 @ClassId("371cbcfe-b79b-4d20-acfb-2a1b5ca375bf")
 public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataObject> extends AbstractForm implements IJsForm<IN, OUT> {
@@ -39,20 +39,14 @@ public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataOb
     this(true);
   }
 
-  public AbstractJsForm(boolean callInitializer) {
+  protected AbstractJsForm(boolean callInitializer) {
     super(false);
 
-    Class<?> clazz = getClass();
-    while (clazz.getSuperclass() != AbstractJsForm.class) {
-      clazz = clazz.getSuperclass();
-    }
-
-    ParameterizedType parameterizedType = Assertions.assertInstance(clazz.getGenericSuperclass(), ParameterizedType.class);
-
     //noinspection unchecked
-    m_inputDataType = (Class<IN>) parameterizedType.getActualTypeArguments()[0];
+    m_inputDataType = assertNotNull(getGenericsParameterClass(getClass(), IJsForm.class, 0));
     //noinspection unchecked
-    m_outputDataType = (Class<OUT>) parameterizedType.getActualTypeArguments()[1];
+    m_outputDataType = assertNotNull(getGenericsParameterClass(getClass(), IJsForm.class, 1));
+
     if (callInitializer) {
       callInitializer();
     }

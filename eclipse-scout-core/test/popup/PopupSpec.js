@@ -26,6 +26,7 @@ describe('Popup', () => {
       '.desktop {position: absolute; left: 0; top: 0; width: 220px; height: 220px; background-color: blue;}' +
       '.popup {position: absolute; min-width: 50px; min-height: 50px; max-width: 50px; max-height: 50px; background-color: white;}' +
       '.popup.with-margin {margin: 10px;}' +
+      '.popup.with-uneven-margin {margin: 5px 15px 15px 5px;}' +
       '.popup.with-dyn-margin.top {margin-bottom: 5px;}' +
       '.popup.with-dyn-margin.bottom {margin-top: 5px;}' +
       '.popup.scalable {min-width: 0; min-height: 0; max-width: 500px; max-height: 500px;}' +
@@ -269,6 +270,13 @@ describe('Popup', () => {
         expect(popup.$container.cssLeft()).toBe(70 + 80);
         expect(popup.$container.cssWidth()).toBe(50);
         expect(popup.$container.cssMarginX()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
+        expect(popup.$container.cssLeft()).toBe(70 + 80);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
       });
 
       it('moves to left when overlapping right window border', () => {
@@ -330,6 +338,13 @@ describe('Popup', () => {
         });
         popup.getWindowSize = entryPointSizeFunc;
         popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 - 50 - 20);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
         expect(popup.$container.cssLeft()).toBe(70 - 50 - 20);
         expect(popup.$container.cssWidth()).toBe(50);
         expect(popup.$container.cssMarginX()).toBe(20);
@@ -398,6 +413,13 @@ describe('Popup', () => {
         expect(popup.$container.cssLeft()).toBe(70 - 10);
         expect(popup.$container.cssWidth()).toBe(50);
         expect(popup.$container.cssMarginX()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
+        expect(popup.$container.cssLeft()).toBe(70 - 5);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
       });
     });
 
@@ -428,6 +450,13 @@ describe('Popup', () => {
         popup.getWindowSize = entryPointSizeFunc;
         popup.open();
         expect(popup.$container.cssLeft()).toBe(70 + 80 - 50 - 10);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 - 50 - 5);
         expect(popup.$container.cssWidth()).toBe(50);
         expect(popup.$container.cssMarginX()).toBe(20);
       });
@@ -461,6 +490,13 @@ describe('Popup', () => {
         expect(popup.$container.cssLeft()).toBe(70 + 80 / 2 - 50 / 2 - 10);
         expect(popup.$container.cssWidth()).toBe(50);
         expect(popup.$container.cssMarginX()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
+        expect(popup.$container.cssLeft()).toBe(70 + 80 / 2 - 50 / 2 - 5);
+        expect(popup.$container.cssWidth()).toBe(50);
+        expect(popup.$container.cssMarginX()).toBe(20);
       });
     });
   });
@@ -492,6 +528,13 @@ describe('Popup', () => {
         });
         popup.getWindowSize = entryPointSizeFunc;
         popup.open();
+        expect(popup.$container.cssTop()).toBe(70 + 80);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
         expect(popup.$container.cssTop()).toBe(70 + 80);
         expect(popup.$container.cssHeight()).toBe(50);
         expect(popup.$container.cssMarginY()).toBe(20);
@@ -563,6 +606,13 @@ describe('Popup', () => {
         expect(popup.$container.cssTop()).toBe(70 - 50 - 20);
         expect(popup.$container.cssHeight()).toBe(50);
         expect(popup.$container.cssMarginY()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
+        expect(popup.$container.cssTop()).toBe(70 - 50 - 20);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
       });
 
       it('moves to bottom when overlapping top window border', () => {
@@ -629,6 +679,13 @@ describe('Popup', () => {
         expect(popup.$container.cssTop()).toBe(70 - 10);
         expect(popup.$container.cssHeight()).toBe(50);
         expect(popup.$container.cssMarginY()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
+        expect(popup.$container.cssTop()).toBe(70 - 5);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
       });
     });
 
@@ -657,6 +714,13 @@ describe('Popup', () => {
         popup.getWindowSize = entryPointSizeFunc;
         popup.open();
         expect(popup.$container.cssTop()).toBe(70 + 80 - 50 - 10);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
+        expect(popup.$container.cssTop()).toBe(70 + 80 - 50 - 5);
         expect(popup.$container.cssHeight()).toBe(50);
         expect(popup.$container.cssMarginY()).toBe(20);
       });
@@ -690,6 +754,13 @@ describe('Popup', () => {
         expect(popup.$container.cssTop()).toBe(70 + 80 / 2 - 50 / 2 - 10);
         expect(popup.$container.cssHeight()).toBe(50);
         expect(popup.$container.cssMarginX()).toBe(20);
+
+        popup.removeCssClass('with-margin');
+        popup.addCssClass('with-uneven-margin');
+        popup.position();
+        expect(popup.$container.cssTop()).toBe(70 + 80 / 2 - 50 / 2 - 5);
+        expect(popup.$container.cssHeight()).toBe(50);
+        expect(popup.$container.cssMarginY()).toBe(20);
       });
     });
   });

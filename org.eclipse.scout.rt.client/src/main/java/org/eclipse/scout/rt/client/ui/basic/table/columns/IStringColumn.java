@@ -37,10 +37,6 @@ public interface IStringColumn extends IColumn<String> {
 
   String getDisplayFormat();
 
-  void setTextWrap(boolean b);
-
-  boolean isTextWrap();
-
   void setMaxLength(int len);
 
   int getMaxLength();

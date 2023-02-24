@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
+import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, NotificationBadgeStatus, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
 import $ from 'jquery';
 
 export default class Form extends Widget {
@@ -71,6 +71,8 @@ export default class Form extends Widget {
     POPUP_WINDOW: 'popupWindow',
     VIEW: 'view'
   };
+
+  static _NOTIFICATION_BADGE_STATUS_CODE = 197821;
 
   _init(model) {
     super._init(model);
@@ -831,6 +833,57 @@ export default class Form extends Widget {
     return $prevIcon;
   }
 
+  addStatus(status) {
+    if (!status) {
+      return;
+    }
+    const children = this.status && this.status.children,
+      ms = new Status({children});
+    ms.addStatus(status);
+    this.setStatus(ms);
+  }
+
+  removeStatus(status) {
+    if (!this.status || !status) {
+      return;
+    }
+    if (this.status.equals(status)) {
+      this.setStatus(null);
+      return;
+    }
+    if (this.status.containsStatusByPredicate(s => status.equals(s))) {
+      const newStatus = this.status.clone();
+      newStatus.removeAllStatusByPredicate(s => status.equals(s));
+      this.setStatus(newStatus);
+    }
+  }
+
+  getNotificationBadgeText() {
+    const status = this._getNotificationBadgeStatus();
+    if (status) {
+      return status.message;
+    }
+  }
+
+  setNotificationBadgeText(notificationBadgeText) {
+    this.removeStatus(this._getNotificationBadgeStatus());
+    if (!notificationBadgeText) {
+      return;
+    }
+    this.addStatus(new NotificationBadgeStatus({
+      message: notificationBadgeText,
+      code: Form._NOTIFICATION_BADGE_STATUS_CODE
+    }));
+  }
+
+  _getNotificationBadgeStatus() {
+    if (!this.status) {
+      return;
+    }
+
+    return this.status.asFlatList().find(s => Form._NOTIFICATION_BADGE_STATUS_CODE === s.code);
+  }
+
   setShowOnOpen(showOnOpen) {
     this.setProperty('showOnOpen', showOnOpen);
   }
@@ -907,6 +960,15 @@ export default class Form extends Widget {
     let prefBounds = this.prefBounds();
     if (prefBounds) {
       position = prefBounds.point();
+      // Cached bounds may be off-screen -> adjust if necessary
+      let windowSize = this.$container.windowSize();
+      let margins = this.htmlComp.margins();
+      let minX = 0;
+      let minY = 0;
+      let maxX = windowSize.width - prefBounds.width - margins.horizontal();
+      let maxY = windowSize.height - prefBounds.height - margins.vertical();
+      position.x = Math.max(minX, Math.min(maxX, position.x));
+      position.y = Math.max(minY, Math.min(maxY, position.y));
     } else {
       position = DialogLayout.positionContainerInWindow(this.$container);
     }

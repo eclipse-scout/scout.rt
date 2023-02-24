@@ -243,7 +243,7 @@ public class PlannerTest {
   }
 
   private abstract class P_InterceptorCaller {
-    abstract public void run(P_Planner p);
+    public abstract void run(P_Planner p);
   }
 
   public enum ExtensionMethod {

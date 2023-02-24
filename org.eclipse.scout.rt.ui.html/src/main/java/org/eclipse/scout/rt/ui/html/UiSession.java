@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -225,7 +225,7 @@ public class UiSession implements IUiSession {
       setUiSessionIdInternal(createUiSessionId(jsonStartupReq));
       m_currentJsonResponse.getStartupData().put("uiSessionId", getUiSessionId());
 
-      // Remember the store here, because getting it from an invalidated httpSession does not work (there might even be dead locks!)
+      // Remember the store here, because getting it from an invalidated httpSession does not work (there might even be deadlocks!)
       m_sessionStore = getHttpSessionHelper().getSessionStore(httpSession);
 
       // Look up the requested client session (create and start a new one if necessary)
@@ -235,7 +235,7 @@ public class UiSession implements IUiSession {
       storePreferredLocaleInCookie(resp, m_clientSession.getLocale());
 
       // Add a cookie with the HTTP session ID ("JSESSIONID"). Normally, this is done automatically by the container, but
-      // this methods allows to customize the session cookie (e.g. make the cookie persistent)
+      // this method allows to customize the session cookie (e.g. make the cookie persistent)
       storeHttpSessionIdInCookie(resp, httpSession, m_clientSession.getUserAgent());
 
       // Apply theme from model to HTTP session and cookie
@@ -398,18 +398,18 @@ public class UiSession implements IUiSession {
 
   /**
    * Info: instead of reload the current page in the browser, we could build a servlet-filter which determines what
-   * theme the user has _before_ the client-session is created. However the 'reload' will only be performed in the case
+   * theme the user has _before_ the client-session is created. However, the 'reload' will only be performed in the case
    * where the browser sends a cookie that doesn't match the user-settings which should not happen often.
    *
-   * @return Whether or not the page must be reloaded by the browser (required when theme changes after client-session
-   *         has been initialized)
+   * @return Whether the page must be reloaded by the browser (required when theme changes after client-session has been
+   *         initialized)
    */
   protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, Map<String, String> sessionStartupParams) {
     UiThemeHelper helper = UiThemeHelper.get();
     String modelTheme = m_clientSession.getDesktop().getTheme();
     String currentTheme = helper.getTheme(req);
 
-    // Ensure the model theme is valid, otherwise it could result in a endless reload loop
+    // Ensure the model theme is valid, otherwise it could result in an endless reload loop
     String validTheme = UiThemeHelper.get().validateTheme(modelTheme);
     if (!ObjectUtility.equals(validTheme, modelTheme)) {
       LOG.info("Model theme ({}) is not valid, switching to a valid one ({})", modelTheme, validTheme);
@@ -802,7 +802,7 @@ public class UiSession implements IUiSession {
   /**
    * Indicates if currently a /json request is being processed in such a way that anything written to the current JSON
    * response will be taken back to the UI with that call. If this flag is <code>false</code>, the poller has to be
-   * awaken to send something to the UI ({@link #signalPoller()}).
+   * awakened to send something to the UI ({@link #signalPoller()}).
    */
   protected final boolean isProcessingJsonRequest() {
     return m_processingJsonRequest;
@@ -865,8 +865,7 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public JSONObject processFileUpload(HttpServletRequest req, HttpServletResponse res, IUploadable uploadable,
-      List<BinaryResource> uploadResources, Map<String, String> uploadProperties) {
+  public JSONObject processFileUpload(HttpServletRequest req, HttpServletResponse res, IUploadable uploadable, List<BinaryResource> uploadResources, Map<String, String> uploadProperties) {
     if (uploadable instanceof IBinaryResourceConsumer) {
       return processFileUploadWithConsumer(req, res, (IBinaryResourceConsumer) uploadable, uploadResources, uploadProperties);
     }
@@ -937,8 +936,7 @@ public class UiSession implements IUiSession {
     m_currentJsonResponse.markAsError(JsonResponse.ERR_REJECTED_UPLOAD, "Rejected file upload.");
   }
 
-  protected JSONObject processFileUploadWithUploader(HttpServletRequest req, HttpServletResponse res, IBinaryResourceUploader resourceUploader,
-      List<BinaryResource> uploadResources, Map<String, String> uploadProperties) {
+  protected JSONObject processFileUploadWithUploader(HttpServletRequest req, HttpServletResponse res, IBinaryResourceUploader resourceUploader, List<BinaryResource> uploadResources, Map<String, String> uploadProperties) {
     ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
 
     IFuture<List<String>> future = ModelJobs.schedule(() -> {
@@ -952,7 +950,7 @@ public class UiSession implements IUiSession {
     }, createFileUploadModelJobInput(clientRunContext));
 
     List<String> links = future.awaitDoneAndGet();
-    if (uploadResources.size() != links.size()) {
+    if (uploadResources != null && uploadResources.size() != links.size()) {
       throw new IllegalStateException("Must return a link for each uploaded resource");
     }
 
@@ -965,7 +963,7 @@ public class UiSession implements IUiSession {
       links.forEach(array::put);
       json.put("links", array);
     }
-    LOG.debug("Uploaded " + links.size() + " resources. Returning links to resoruce=" + json);
+    LOG.debug("Uploaded " + links.size() + " resources. Returning links to resource=" + json);
     return json;
   }
 
@@ -1144,7 +1142,7 @@ public class UiSession implements IUiSession {
    * completed.
    */
   protected Predicate<JobEvent> newUiDataAvailableFilter() {
-    return new Predicate<JobEvent>() {
+    return new Predicate<>() {
 
       @Override
       public boolean test(final JobEvent event) {
@@ -1204,7 +1202,7 @@ public class UiSession implements IUiSession {
     }
 
     LOG.trace("Wait for max. {} seconds until background job terminates or wait timeout occurs...", pollWaitSeconds);
-    final long maxPollWait = pollWaitSeconds * 1000;
+    final long maxPollWait = pollWaitSeconds * 1000L;
     final long t0 = System.currentTimeMillis();
     long pollWait = maxPollWait;
     boolean wait = true;
@@ -1219,7 +1217,7 @@ public class UiSession implements IUiSession {
         // 1. Timeout has occurred -> return always, even with empty answer
         // 2. Remaining poll wait time would less than 100 ms -> same as no. 1
         // 3. Session is disposed
-        // 4. Poller was waken up by m_modelJobFinishedListener and JsonResponse is not empty
+        // 4. Poller was wakened up by m_modelJobFinishedListener and JsonResponse is not empty
         wait = false;
       }
       else {
@@ -1248,6 +1246,7 @@ public class UiSession implements IUiSession {
    */
   @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
   protected void signalPoller() {
+    //noinspection ResultOfMethodCallIgnored
     m_pollerQueue.offer(m_notificationToken);
   }
 

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -94,6 +94,7 @@
 
     &:not(.disabled):not(.selected):hover {
       background-color: @desktop-tab-background-color;
+      border-color: @desktop-tab-border-color;
     }
 
     &:not(.selected):hover > .closer {
@@ -232,19 +233,19 @@
 
 .keyframes-flash-desktop-tab-selected-edge() {
   0% {
-    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
+    border-color: @simple-tab-selected-background-color;
   }
   25% {
-    box-shadow: 0 @desktop-tab-border-radius 0 0 @desktop-tab-selected-flash-background-color;
+    border-color: @desktop-tab-selected-flash-background-color;
   }
   50% {
-    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
+    border-color: @simple-tab-selected-background-color;
   }
   75% {
-    box-shadow: 0 @desktop-tab-border-radius 0 0 @desktop-tab-selected-flash-background-color;
+    border-color: @desktop-tab-selected-flash-background-color;
   }
   100% {
-    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
+    border-color: @simple-tab-selected-background-color;
   }
 }
 

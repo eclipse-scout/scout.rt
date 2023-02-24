@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.rt.client.extension.ui.NotificationBadgeStatus;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormTest.WrapperTestFormWithClassId.MainBox.EmbeddedField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
@@ -334,5 +335,32 @@ public class AbstractFormTest {
     assertFalse(called[0]);
     form.doReset();
     assertTrue(called[0]);
+  }
+
+  @Test
+  public void testNotificationBadgeText() {
+    final AbstractForm form = new TestForm(false);
+    assertNull(form.getNotificationBadgeText());
+
+    form.setNotificationBadgeText("foo");
+    assertEquals("foo", form.getNotificationBadgeText());
+    form.setNotificationBadgeText("bar");
+    assertEquals("bar", form.getNotificationBadgeText());
+    form.setNotificationBadgeText(null);
+    assertNull(form.getNotificationBadgeText());
+
+    form.setNotificationBadgeText("foo");
+    assertEquals("foo", form.getNotificationBadgeText());
+    form.addStatus(new NotificationBadgeStatus("bar"));
+    assertEquals("foo", form.getNotificationBadgeText());
+    form.setNotificationBadgeText(null);
+    assertNull(form.getNotificationBadgeText());
+
+    form.addStatus(new NotificationBadgeStatus("bar"));
+    assertNull(form.getNotificationBadgeText());
+    form.setNotificationBadgeText("foo");
+    assertEquals("foo", form.getNotificationBadgeText());
+    form.setNotificationBadgeText(null);
+    assertNull(form.getNotificationBadgeText());
   }
 }

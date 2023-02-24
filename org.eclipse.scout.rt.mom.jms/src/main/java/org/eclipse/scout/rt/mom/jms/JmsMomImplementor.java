@@ -13,7 +13,10 @@ package org.eclipse.scout.rt.mom.jms;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -81,7 +84,6 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -146,6 +148,7 @@ public class JmsMomImplementor implements IMomImplementor {
 
   protected ISubscription m_requestCancellationSubscription;
   protected int m_subscriptionAwaitStartedSeconds = 30;
+  protected final List<ISubscription> m_subscriptions = Collections.synchronizedList(new ArrayList<>());
 
   protected final Map<IDestination, Destination> m_jmsDestinations = new ConcurrentHashMap<>();
   protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
@@ -289,10 +292,28 @@ public class JmsMomImplementor implements IMomImplementor {
     return new JmsSessionProviderWrapper(m_connectionWrapper, transacted, providerFunction);
   }
 
-  protected JmsSubscription createJmsSubscription(IDestination<?> destination, SubscribeInput input, IJmsSessionProvider sessionProvider, IFuture<?> worker) {
-    JmsSubscription subscription = new JmsSubscription(destination, input, sessionProvider, worker);
+  protected JmsSubscription createJmsSubscription(IDestination<?> destination, IMessageListener<?> listener, IRequestListener<?, ?> requestListener, SubscribeInput input, IJmsSessionProvider sessionProvider, IFuture<?> worker) {
+    JmsSubscription subscription = new JmsSubscription(destination, listener, requestListener, input, sessionProvider, worker);
     subscription.awaitStarted(m_subscriptionAwaitStartedSeconds, TimeUnit.SECONDS);
     return subscription;
+  }
+
+  @Override
+  public String getId() {
+    return m_momUid;
+  }
+
+  @Override
+  public String getName() {
+    return m_symbolicName;
+  }
+
+  @Override
+  public List<ISubscription> getSubscriptions() {
+    synchronized (m_subscriptions) {
+      m_subscriptions.removeIf(ISubscription::isDisposed);
+      return new ArrayList<>(m_subscriptions);
+    }
   }
 
   @Override
@@ -359,7 +380,9 @@ public class JmsMomImplementor implements IMomImplementor {
   protected <DTO> ISubscription subscribeImpl(IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) throws JMSException {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, SubscribeInput.ACKNOWLEDGE_TRANSACTED == input.getAcknowledgementMode());
     IFuture<?> worker = Jobs.schedule(createMessageConsumerJob(sessionProvider, destination, listener, input), newJobInput().withName("JMS subscriber"));
-    return createJmsSubscription(destination, input, sessionProvider, worker);
+    JmsSubscription subscription = createJmsSubscription(destination, listener, null, input, sessionProvider, worker);
+    m_subscriptions.add(subscription);
+    return subscription;
   }
 
   protected <DTO> IRunnable createMessageConsumerJob(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) {
@@ -423,6 +446,7 @@ public class JmsMomImplementor implements IMomImplementor {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
     try {
       TemporaryQueue temporaryQueue = sessionProvider.getTemporaryQueue();
+      @SuppressWarnings("resource")
       MessageConsumer responseQueueConsumer = sessionProvider.getSession().createConsumer(temporaryQueue);
 
       // send request message
@@ -506,7 +530,9 @@ public class JmsMomImplementor implements IMomImplementor {
   protected <REQUEST, REPLY> ISubscription replyImpl(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) throws JMSException {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
     IFuture<?> worker = Jobs.schedule(createReplyMessageConsumerJob(sessionProvider, destination, listener, input), newJobInput().withName("JMS subscriber"));
-    return createJmsSubscription(destination, input, sessionProvider, worker);
+    JmsSubscription subscription = createJmsSubscription(destination, null, listener, input, sessionProvider, worker);
+    m_subscriptions.add(subscription);
+    return subscription;
   }
 
   protected <REQUEST, REPLY> IRunnable createReplyMessageConsumerJob(IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) {
@@ -523,7 +549,7 @@ public class JmsMomImplementor implements IMomImplementor {
     SubscribeInput input = MOM.newSubscribeInput();
     IJmsSessionProvider sessionProvider = createSessionProvider(cancellationTopic, false);
     final IFuture<?> worker = Jobs.schedule(createRequestCancellationMessageConsumerJob(sessionProvider, cancellationTopic, input), newJobInput().withName("JMS reply cancel message listener"));
-    return createJmsSubscription(cancellationTopic, input, sessionProvider, worker);
+    return createJmsSubscription(cancellationTopic, null, null, input, sessionProvider, worker);
   }
 
   protected <DTO> IRunnable createRequestCancellationMessageConsumerJob(IJmsSessionProvider sessionProvider, final IDestination<DTO> cancellationTopic, final SubscribeInput input) {
@@ -549,6 +575,10 @@ public class JmsMomImplementor implements IMomImplementor {
   @Override
   public synchronized void destroy() {
     try {
+      synchronized (m_subscriptions) {
+        m_subscriptions.forEach(ISubscription::dispose);
+        m_subscriptions.clear();
+      }
       if (m_requestCancellationSubscription != null) {
         m_requestCancellationSubscription.dispose();
       }

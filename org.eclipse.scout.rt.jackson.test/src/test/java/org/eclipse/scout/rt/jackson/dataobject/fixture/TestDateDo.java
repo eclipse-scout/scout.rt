@@ -78,6 +78,12 @@ public class TestDateDo extends DoEntity {
     return doValue("customDateFormatCustomAttributeName");
   }
 
+  @AttributeName("aaaDate")
+  @ValueFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  public DoValue<Date> aaaDate() {
+    return doValue("aaaDate");
+  }
+
   @ValueFormat(pattern = "yyyyMMddHHmm")
   public DoList<Date> customDateDoList() {
     return doList("customDateDoList");
@@ -209,6 +215,17 @@ public class TestDateDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Date getCustomDateFormat() {
     return customDateFormat().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withAaaDate(Date aaaDate) {
+    aaaDate().set(aaaDate);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Date getAaaDate() {
+    return aaaDate().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

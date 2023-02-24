@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -367,8 +367,10 @@ export default class Session {
   _processStartupResponse(data) {
     // Handle errors from server
     if (data.error) {
-      this._processErrorJsonResponse(data.error);
-      return;
+      let isFatalError = this._processErrorJsonResponse(data.error);
+      if (isFatalError) {
+        return;
+      }
     }
 
     webstorage.removeItemFromSessionStorage('scout:versionMismatch');
@@ -904,12 +906,13 @@ export default class Session {
    * Otherwise, the response queue's expected sequence number will get out of sync.
    */
   processJsonResponseInternal(data) {
-    let success = false;
+    let success = true;
     if (data.error) {
-      this._processErrorJsonResponse(data.error);
-    } else {
+      let isFatalError = this._processErrorJsonResponse(data.error);
+      success = !isFatalError;
+    }
+    if (success) {
       this._processSuccessResponse(data);
-      success = true;
     }
     return success;
   }
@@ -980,6 +983,7 @@ export default class Session {
   }
 
   _processErrorJsonResponse(jsonError) {
+    let isFatalError = true;
     if (jsonError.code === Session.JsonResponseError.VERSION_MISMATCH) {
       let loopDetection = webstorage.getItemFromSessionStorage('scout:versionMismatch');
       if (!loopDetection) {
@@ -1033,14 +1037,17 @@ export default class Session {
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
       boxOptions.yesButtonAction = () => {
       };
+      isFatalError = false; // unsafe upload allows the application to continue
     } else if (jsonError.code === Session.JsonResponseError.REJECTED_UPLOAD) {
       boxOptions.header = this.optText('ui.RejectedUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.RejectedUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
       boxOptions.yesButtonAction = () => {
       };
+      isFatalError = false; // rejected upload allows the application to continue
     }
     this.showFatalMessage(boxOptions, jsonError.code);
+    return isFatalError;
   }
 
   _fireRequestFinished(message) {

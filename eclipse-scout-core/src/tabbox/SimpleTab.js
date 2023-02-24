@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -32,9 +32,9 @@ export default class SimpleTab extends Widget {
     this.$subTitle = null;
     this.$iconContainer = null;
     this.$statusContainer = null;
+    this.$statusIcons = [];
 
     this._statusContainerUsageCounter = 0;
-    this._statusIconDivs = [];
 
     this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
     this._viewRemoveListener = this._onViewRemove.bind(this);
@@ -209,26 +209,37 @@ export default class SimpleTab extends Widget {
   }
 
   _renderStatus() {
-    this._statusContainerUsageCounter -= (this._statusIconDivs.length === 0 ? 0 : 1);
+    this._statusContainerUsageCounter -= (this.$statusIcons.length === 0 ? 0 : 1);
 
-    this._statusIconDivs.forEach($statusIcon => {
-      $statusIcon.remove();
-    });
-    this._statusIconDivs = [];
+    this.$statusIcons.forEach($statusIcon => $statusIcon.remove());
+    this.$statusIcons = [];
 
     if (this.status) {
       this.status.asFlatList().forEach(status => {
-        if (!status || !status.iconId) {
+        if (!status || (!status.iconId && !status.message)) {
           return;
         }
-        let $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
-        if (status.cssClass()) {
-          $statusIcon.addClass(status.cssClass());
+        if (status.iconId) {
+          let $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
+          if (status.cssClass()) {
+            $statusIcon.addClass(status.cssClass());
+          }
+          this.$statusIcons.push($statusIcon);
         }
-        this._statusIconDivs.push($statusIcon);
+        if (status.message) {
+          let $statusMessage = this.$statusContainer.appendSpan('status message');
+          if (status.cssClass()) {
+            $statusMessage.addClass(status.cssClass());
+          }
+          let $text = $statusMessage.appendSpan('text', status.message);
+          tooltips.installForEllipsis($text, {
+            parent: this
+          });
+          this.$statusIcons.push($statusMessage);
+        }
       });
     }
-    this._statusContainerUsageCounter += (this._statusIconDivs.length === 0 ? 0 : 1);
+    this._statusContainerUsageCounter += (this.$statusIcons.length === 0 ? 0 : 1);
     this.$container.toggleClass('has-status', this._statusContainerUsageCounter > 0);
   }
 

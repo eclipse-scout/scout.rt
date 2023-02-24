@@ -26,7 +26,7 @@ import org.junit.Test;
  * @since 5.2
  */
 public abstract class AbstractTransactionalMapTest {
-  private final static String TRANSACTION_MEMBER_ID = "TEST_ID";
+  private static final String TRANSACTION_MEMBER_ID = "TEST_ID";
 
   protected abstract <K, V> Map<K, V> createTransactionalMap(String transactionMemberId, boolean fastForward, Map<K, V> initialMap);
 

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
+import org.eclipse.scout.rt.client.extension.ui.NotificationBadgeStatus;
 import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
@@ -126,6 +127,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
@@ -167,6 +169,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   private static final String FORM_STORED = "FORM_STORED";
   private static final String FORM_LOADING = "FORM_LOADING";
   private static final String FORM_STARTED = "FORM_STARTED";
+
+  protected static final int NOTIFICATION_BADGE_STATUS_CODE = 197821;
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractForm.class);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(CACHE_BOUNDS, ASK_IF_NEED_SAVE,
@@ -495,6 +499,17 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
+   * If set, the text will be rendered as notification badge in the right upper corner of the view.
+   *
+   * @return the text to be display in the notification badge of the form.
+   */
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(210)
+  protected String getConfiguredNotificationBadgeText() {
+    return null;
+  }
+
+  /**
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *
@@ -757,6 +772,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     setDisplayViewId(getConfiguredDisplayViewId());
     setClosable(getConfiguredClosable());
     setSaveNeededVisible(getConfiguredSaveNeededVisible());
+    setNotificationBadgeText(getConfiguredNotificationBadgeText());
 
     // visit all system buttons and attach observer
     m_systemButtonListener = new P_SystemButtonListener();// is auto-detaching
@@ -904,6 +920,33 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       ms.add(s);
     }
     return ms;
+  }
+
+  @Override
+  public String getNotificationBadgeText() {
+    return getNotificationBadgeStatus()
+        .map(Status::getMessage)
+        .orElse(null);
+  }
+
+  @Override
+  public void setNotificationBadgeText(String notificationBadgeText) {
+    getNotificationBadgeStatus().ifPresent(this::removeStatus);
+    if (notificationBadgeText != null) {
+      addStatus(new NotificationBadgeStatus(notificationBadgeText)
+          .withCode(NOTIFICATION_BADGE_STATUS_CODE));
+    }
+  }
+
+  protected Optional<NotificationBadgeStatus> getNotificationBadgeStatus() {
+    final MultiStatus ms = getStatusInternal();
+    if (ms == null) {
+      return Optional.empty();
+    }
+    return ms.findChildStatuses(s -> NOTIFICATION_BADGE_STATUS_CODE == s.getCode()).stream()
+        .filter(NotificationBadgeStatus.class::isInstance)
+        .map(NotificationBadgeStatus.class::cast)
+        .findAny();
   }
 
   @Override

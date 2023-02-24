@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {Dimension, fields, Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
+import {Dimension, fields, Form, NotificationBadgeStatus, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
 
 describe('Form', () => {
   let session, helper, outlineHelper;
@@ -1034,6 +1034,35 @@ describe('Form', () => {
         })
         .catch(fail)
         .always(done);
+    });
+  });
+
+  describe('notificationBadgeText', () => {
+
+    it('is updated correctly', () => {
+      const form = helper.createFormWithOneField();
+      expect(form.getNotificationBadgeText()).toBeUndefined();
+
+      form.setNotificationBadgeText('foo');
+      expect(form.getNotificationBadgeText()).toBe('foo');
+      form.setNotificationBadgeText('bar');
+      expect(form.getNotificationBadgeText()).toBe('bar');
+      form.setNotificationBadgeText(null);
+      expect(form.getNotificationBadgeText()).toBeUndefined();
+
+      form.setNotificationBadgeText('foo');
+      expect(form.getNotificationBadgeText()).toBe('foo');
+      form.addStatus(new NotificationBadgeStatus({message: 'bar'}));
+      expect(form.getNotificationBadgeText()).toBe('foo');
+      form.setNotificationBadgeText(null);
+      expect(form.getNotificationBadgeText()).toBeUndefined();
+
+      form.addStatus(new NotificationBadgeStatus({message: 'bar'}));
+      expect(form.getNotificationBadgeText()).toBeUndefined();
+      form.setNotificationBadgeText('foo');
+      expect(form.getNotificationBadgeText()).toBe('foo');
+      form.setNotificationBadgeText(null);
+      expect(form.getNotificationBadgeText()).toBeUndefined();
     });
   });
 });

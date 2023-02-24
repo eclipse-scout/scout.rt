@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -200,6 +200,15 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   void addStatus(IStatus newStatus);
 
   void removeStatus(IStatus status);
+
+  /**
+   * If set, the text will be rendered as notification badge in the right upper corner of the view.
+   *
+   * @return the text to be display in the notification badge of the form.
+   */
+  String getNotificationBadgeText();
+
+  void setNotificationBadgeText(String notificationBadgeText);
 
   /**
    * @return the {@link IWizard} that contains the step that started this form using startWizardStep

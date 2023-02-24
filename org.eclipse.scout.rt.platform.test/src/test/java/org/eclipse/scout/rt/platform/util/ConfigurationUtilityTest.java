@@ -313,7 +313,7 @@ public class ConfigurationUtilityTest {
     }
   }
 
-  public static abstract class AbstractInnerC {
+  public abstract static class AbstractInnerC {
     public InnerD d = new InnerD();
 
     public class InnerD {

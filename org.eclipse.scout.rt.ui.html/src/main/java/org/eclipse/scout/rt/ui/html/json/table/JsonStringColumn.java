@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
-import org.json.JSONObject;
 
 public class JsonStringColumn<T extends IStringColumn> extends JsonColumn<T> {
 
@@ -30,12 +29,5 @@ public class JsonStringColumn<T extends IStringColumn> extends JsonColumn<T> {
   @Override
   public boolean isValueRequired() {
     return true;
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    json.put("textWrap", getColumn().isTextWrap());
-    return json;
   }
 }
