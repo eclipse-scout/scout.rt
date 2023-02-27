@@ -10,7 +10,7 @@
 import {
   arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport, LookupCall, LookupCallOrModel,
   LookupResult, LookupRow, MaxLengthHandler, objects, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldEventMap, SmartFieldLayout,
-  SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValueField
+  SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValidationFailedStatus, ValueField
 } from '../../../index';
 import $ from 'jquery';
 
@@ -692,14 +692,35 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
       .then(({formattedValue, result}) => {
         this._triggerLookupCallDone(result);
         return formattedValue;
+      })
+      .catch(() => {
+        return this._invalidKeyLookup(value);
       });
   }
 
   protected _lookupByKeyDone(result: SmartFieldLookupResult<TValue>): string {
     this._notUnique = false;
     let lookupRow = LookupCall.firstLookupRow(result);
-    this.setLookupRow(lookupRow);
-    return this._formatLookupRow(lookupRow);
+    if (lookupRow) {
+      this.setLookupRow(lookupRow);
+      return this._formatLookupRow(lookupRow);
+    }
+
+    return this._invalidKeyLookup(result.key);
+  }
+
+  protected _invalidKeyLookup(key : TValue) : string {
+    // lookup call didn't return a result. Maybe the data belonging to the key has been deleted.
+    let invalidValueMessage = this.session.text('ui.InvalidValue');
+    this.setLookupRow(scout.create((LookupRow<TValue>), {
+      key: key,
+      text: invalidValueMessage
+    }));
+    this.setErrorStatus(scout.create(ValidationFailedStatus, {
+      message: this.session.text('ui.ResolvingValueFailed'),
+      severity: Status.Severity.WARNING
+    }));
+    return invalidValueMessage;
   }
 
   /**

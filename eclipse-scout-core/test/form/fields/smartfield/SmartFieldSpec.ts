@@ -7,11 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {fields, keys, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, Status, strings} from '../../../../src/index';
+import {fields, keys, LookupResult, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, ValidationFailedStatus} from '../../../../src/index';
 import {AbortableMicrotaskStaticLookupCall, ColumnDescriptorDummyLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 import {LookupCall} from '../../../../src/lookup/LookupCall';
 import {SmartFieldLookupResult} from '../../../../src/form/fields/smartfield/SmartField';
 import {FullModelOf, InitModelOf, ObjectOrModel} from '../../../../src/scout';
+import $ from 'jquery';
 
 describe('SmartField', () => {
 
@@ -604,6 +605,50 @@ describe('SmartField', () => {
       expect(displayText).toBe('Baz');
     });
 
+    it('lookupByKey should set a validation warning status if there was an error during processing', () => {
+      let field = createFieldWithNoDataKeyLookupCall(true);
+      field.setValue(4 /* non-existing key */); // triggers lookup by key
+      jasmine.clock().tick(500);
+      expect(field.errorStatus).toBeInstanceOf(ValidationFailedStatus);
+      expect(field.errorStatus.isWarning()).toBeTrue();
+    });
+
+    it('lookupByKey should set a validation warning status if the lookup call returns no lookup row', () => {
+      let field = createFieldWithNoDataKeyLookupCall(false);
+      field.setValue(0); // triggers lookup by key
+      jasmine.clock().tick(500);
+      expect(field.errorStatus).toBeInstanceOf(ValidationFailedStatus);
+      expect(field.errorStatus.isWarning()).toBeTrue();
+    });
+
+    function createFieldWithNoDataKeyLookupCall(rejectPromise: boolean): SmartField<any> {
+      return scout.create(SmartField, {
+        parent: session.desktop,
+        lookupCall: {
+          objectType: NoDataKeyLookupCall,
+          rejectPromise: rejectPromise
+        }
+      });
+    }
+
+    class NoDataKeyLookupCall extends LookupCall<number> {
+      rejectPromise: boolean;
+
+      override _getByKey(key: number): JQuery.Promise<LookupResult<number>> {
+        let deferred = $.Deferred();
+        setTimeout(() => {
+          if (this.rejectPromise) {
+            deferred.reject();
+          } else {
+            deferred.resolve({
+              queryBy: QueryBy.KEY,
+              lookupRows: []
+            });
+          }
+        }, 0);
+        return deferred.promise();
+      }
+    }
   });
 
   describe('touch / embed', () => {

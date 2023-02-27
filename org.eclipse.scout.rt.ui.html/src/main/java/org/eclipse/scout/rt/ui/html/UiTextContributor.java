@@ -197,6 +197,8 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.All",
         "ui.CloseAllTabs",
         "ui.CloseOtherTabs",
-        "ui.Done"));
+        "ui.Done",
+        "ui.InvalidValue",
+        "ui.ResolvingValueFailed"));
   }
 }
