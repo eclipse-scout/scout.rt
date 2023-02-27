@@ -9,7 +9,9 @@
  */
 package org.eclipse.scout.rt.server.services.common.pwd;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.security.PasswordPolicy;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 /**
@@ -18,10 +20,10 @@ import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementServic
  * In order to use, register your subclass in the extension "org.eclipse.scout.rt.server.service"
  */
 public abstract class AbstractPasswordManagementService implements IPasswordManagementService {
-  private IPasswordPolicy m_passwordPolicy;
+  private PasswordPolicy m_passwordPolicy;
 
   public AbstractPasswordManagementService() {
-    setPasswordPolicy(new DefaultPasswordPolicy());
+    setPasswordPolicy(BEANS.get(PasswordPolicy.class));
   }
 
   @Override
@@ -32,7 +34,7 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
 
   @Override
   public void resetPassword(String userId, char[] newPassword) {
-    getPasswordPolicy().check(userId, newPassword, getUsernameFor(userId), getHistoryIndexFor(userId, newPassword));
+    getPasswordPolicy().check(getUsernameFor(userId), newPassword, getHistoryIndexFor(userId, newPassword));
     resetPasswordInternal(userId, newPassword);
   }
 
@@ -41,11 +43,11 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
     return getPasswordPolicy().getText();
   }
 
-  protected IPasswordPolicy getPasswordPolicy() {
+  protected PasswordPolicy getPasswordPolicy() {
     return m_passwordPolicy;
   }
 
-  protected void setPasswordPolicy(IPasswordPolicy p) {
+  protected void setPasswordPolicy(PasswordPolicy p) {
     m_passwordPolicy = p;
   }
 
