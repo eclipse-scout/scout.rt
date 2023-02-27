@@ -36,6 +36,7 @@
     <module>../org.eclipse.scout.rt.shared.test</module>
     <module>../org.eclipse.scout.rt.server.commons</module>
     <module>../org.eclipse.scout.rt.server.commons.test</module>
+    <module>../org.eclipse.scout.rt.nls</module>
 
     <module>../org.eclipse.scout.rt.server</module>
     <module>../org.eclipse.scout.rt.server.test</module>
@@ -383,6 +384,12 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
+        <version>23.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.nls</artifactId>
         <version>23.2-SNAPSHOT</version>
       </dependency>
 
