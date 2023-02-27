@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
  *
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.platform.util.date;
 
@@ -48,7 +49,7 @@ public final class DateUtility {
   private static final List<String> FRY_SAT_WEEKEND_DAYS_COUNTRIES = Arrays.asList("AE", "DZ", "BH", "BD", "EG", "IQ", "IL", "JO", "KW", "LY", "MV", "MR", "OM", "PS", "QA", "SA", "SD", "SY", "YE");
 
   /**
-   * format date with {@value DateFormat#DEFAULT} pattern
+   * Formats date with {@link DateFormat#DEFAULT} pattern.
    */
   public static String formatDate(Date d) {
     if (d == null) {
@@ -59,7 +60,7 @@ public final class DateUtility {
   }
 
   /**
-   * format time with {@value DateFormat#SHORT} pattern
+   * Formats time with {@link DateFormat#SHORT} pattern.
    */
   public static String formatTime(Date d) {
     if (d == null) {
@@ -70,25 +71,28 @@ public final class DateUtility {
   }
 
   /**
-   * format time with {@value DateFormat#DEFAULT}, {@value DateFormat#SHORT} patterns
+   * Formats date with the {@link DateFormat#DEFAULT} pattern and time with {@link DateFormat#SHORT}.
    */
   public static String formatDateTime(Date d) {
     return formatDateTime(d, DateFormat.DEFAULT, DateFormat.SHORT);
   }
 
   /**
-   * format time with {@value DateFormat#SHORT}, {@value DateFormat#SHORT} patterns
+   * Formats both date and time with the {@link DateFormat#SHORT} pattern.
    */
   public static String formatDateTimeShort(Date d) {
     return formatDateTime(d, DateFormat.SHORT, DateFormat.SHORT);
   }
 
   /**
-   * Formats the specified date time with the given patterns from {@link DateFormat}
+   * Formats the specified date and time with the given patterns as defined in {@link DateFormat}.
    *
-   * @param d date to format
-   * @param dateFormat date format
-   * @param timeFormat time format
+   * @param d
+   *          date to format
+   * @param dateFormat
+   *          date format
+   * @param timeFormat
+   *          time format
    * @return formatted date as {@link String}
    */
   public static String formatDateTime(Date d, int dateFormat, int timeFormat) {
@@ -100,7 +104,7 @@ public final class DateUtility {
   }
 
   /**
-   * format date with specific pattern as defined in {@link SimpleDateFormat}
+   * Formats date with specific pattern as defined in {@link SimpleDateFormat}.
    */
   public static String format(Date d, String pattern) {
     if (d == null || !StringUtility.hasText(pattern)) {
