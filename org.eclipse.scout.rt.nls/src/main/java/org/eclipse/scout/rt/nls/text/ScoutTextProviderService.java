@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.text;
+package org.eclipse.scout.rt.nls.text;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.AbstractDynamicNlsTextProviderService;
@@ -16,6 +16,6 @@ import org.eclipse.scout.rt.platform.text.AbstractDynamicNlsTextProviderService;
 public class ScoutTextProviderService extends AbstractDynamicNlsTextProviderService {
   @Override
   public String getDynamicNlsBaseName() {
-    return "org.eclipse.scout.rt.shared.texts.ScoutTexts";
+    return "org.eclipse.scout.rt.nls.texts.ScoutTexts";
   }
 }

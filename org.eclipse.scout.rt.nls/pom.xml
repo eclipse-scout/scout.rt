@@ -18,35 +18,13 @@
     <relativePath>../org.eclipse.scout.rt</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.rt.shared</artifactId>
-  <packaging>jar</packaging>
-
+  <artifactId>org.eclipse.scout.rt.nls</artifactId>
 
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.platform</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.security</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.nls</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.http-client</groupId>
-      <artifactId>google-http-client-apache-v2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
   </dependencies>
 </project>
