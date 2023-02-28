@@ -1549,6 +1549,9 @@ public final class StringUtility {
    * but <code>removeSuffixes("CompanyFormData","Data","Form")</code> will result in "CompanyForm"
    */
   public static String removeSuffixes(String s, String... suffixes) {
+    if (isNullOrEmpty(s)) {
+      return s;
+    }
     for (int i = suffixes.length - 1; i >= 0; i--) {
       if (suffixes[i] != null && s.toLowerCase().endsWith(suffixes[i].toLowerCase())) {
         s = s.substring(0, s.length() - suffixes[i].length());
@@ -1662,6 +1665,9 @@ public final class StringUtility {
    * but <code>removePrefixes("CompanyFormData","Form","Company")</code> will result in "FormData"
    */
   public static String removePrefixes(String s, String... prefixes) {
+    if (isNullOrEmpty(s)) {
+      return s;
+    }
     for (String prefixe : prefixes) {
       if (prefixe != null && s.toLowerCase().startsWith(prefixe.toLowerCase())) {
         s = s.substring(prefixe.length());
