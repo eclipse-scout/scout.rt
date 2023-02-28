@@ -16,15 +16,16 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
 /**
- * This {@link Bean} replaces the former IPasswordPolicy and DefaultPasswordPolicy
+ * Default implementation of a password policy checking a password against a set of rules.
  *
  * @since 11.0
  */
 @Bean
 public class PasswordPolicy {
+
   public static final int MIN_PASSWORD_LENGTH = 12;
 
-  private static boolean containsUsername(char[] newPassword, String userName) {
+  protected boolean containsUsername(char[] newPassword, String userName) {
     if (userName == null) {
       return false;
     }
@@ -35,7 +36,7 @@ public class PasswordPolicy {
     return b.indexOf(userName.toUpperCase()) >= 0;
   }
 
-  private static boolean containsOneOf(char[] charsOfPasswordSorted, String charsToSearch) {
+  protected boolean containsOneOf(char[] charsOfPasswordSorted, String charsToSearch) {
     for (char toFind : charsToSearch.toCharArray()) {
       if (Arrays.binarySearch(charsOfPasswordSorted, toFind) >= 0) {
         return true;
@@ -48,6 +49,10 @@ public class PasswordPolicy {
     return TEXTS.get("DefaultPasswordPolicyText");
   }
 
+  /**
+   * Checks password against a set of rules using given {@code userName} and {@code historyIndex} as hints for certain
+   * rules (e.g. password may not contain the username and may not be reused).
+   */
   public void check(String userName, char[] newPassword, int historyIndex) {
     if (newPassword == null || newPassword.length < MIN_PASSWORD_LENGTH) {
       throw new VetoException(TEXTS.get("PasswordMinLength"));
