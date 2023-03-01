@@ -498,7 +498,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
      */
     public void merge(TreeEvent event) {
       if (m_mergedNodes == null) {
-        throw new IllegalStateException("Invocations of merge is not allowed after complete has been invoked.");
+        throw new IllegalStateException("Invocation of merge is not allowed after complete() has been invoked.");
       }
       if (!event.hasNodes()) {
         return;
