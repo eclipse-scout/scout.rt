@@ -429,7 +429,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         && ObjectUtility.equals(event1.getDragObject(), event2.getDragObject())
         && ObjectUtility.equals(event1.getDropObject(), event2.getDropObject())
         && ObjectUtility.equals(event1.getCopyObject(), event2.getCopyObject())
-        && ObjectUtility.equals(event1.getColumns(), event2.getColumns());
+        && ObjectUtility.equals(event1.getColumns(), event2.getColumns())
+        && ObjectUtility.equals(event1.getUpdatedColumns(), event2.getUpdatedColumns());
     return identical;
   }
 
@@ -544,9 +545,11 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     private final Set<IColumn<?>> m_targetColumnSet;
     private final List<ITableRow> m_targetRows;
     private final Set<ITableRow> m_targetRowSet;
+    private final Map<ITableRow, Set<IColumn<?>>> m_targetUpdatedColumns;
 
     private List<IColumn<?>> m_mergedColumns;
     private List<ITableRow> m_mergedRows;
+    private boolean m_completed = false;
 
     public TableEventMerger(TableEvent targetEvent) {
       assertNotNull(targetEvent, "targetEvent must not be null");
@@ -557,6 +560,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       m_targetRows = targetEvent.getRows();
       m_targetRowSet = new HashSet<>(m_targetRows);
       m_mergedRows = new LinkedList<>();
+      m_targetUpdatedColumns = targetEvent.getUpdatedColumns();
     }
 
     /**
@@ -564,27 +568,31 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
      * {@link IllegalStateException}.
      */
     public void merge(TableEvent event) {
-      if (m_mergedColumns == null || m_mergedRows == null) {
-        throw new IllegalStateException("Invocations of merge is not allowed after complete has been invoked.");
+      if (m_completed) {
+        throw new IllegalStateException("Invocation of merge is not allowed after complete() has been invoked.");
       }
       mergeCollections(event.getColumns(), m_mergedColumns, m_targetColumnSet);
       mergeCollections(event.getRows(), m_mergedRows, m_targetRowSet);
+      mergeMaps(event.getUpdatedColumns(), m_targetUpdatedColumns);
     }
 
     /**
      * Completes the merge process. Subsequent invocations of this method does not have any effects.
      */
     public void complete() {
-      if (m_mergedColumns == null || m_mergedRows == null) {
+      if (m_completed) {
         return;
       }
       m_mergedColumns.addAll(m_targetColumns);
       m_targetEvent.setColumns(m_mergedColumns);
-      m_mergedColumns = null;
 
       m_mergedRows.addAll(m_targetRows);
       m_targetEvent.setRows(m_mergedRows);
-      m_mergedRows = null;
+
+      for (Entry<ITableRow, Set<IColumn<?>>> updatedColumn : m_targetUpdatedColumns.entrySet()) {
+        m_targetEvent.setUpdatedColumns(updatedColumn.getKey(), updatedColumn.getValue());
+      }
+      m_completed = true;
     }
 
     /**
@@ -595,6 +603,21 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       // returns true, if the sourceElement has been added; false, if it was already in the set.
       source.removeIf(sourceElement -> !targetSet.add(sourceElement));
       target.addAll(0, source);
+    }
+
+    /**
+     * Merge maps with sets as value, such that, if a key is in both maps, its value sets are combined. If the key is
+     * not present in the target map and the source value is not {@code null}, the source is added to the target.
+     */
+    protected <K, V> void mergeMaps(Map<K, Set<V>> source, Map<K, Set<V>> target) {
+      for (Entry<K, Set<V>> entry : source.entrySet()) {
+        if (CollectionUtility.isEmpty(entry.getValue())) {
+          continue;
+        }
+        Set<V> existing = target.computeIfAbsent(entry.getKey(), k -> new HashSet<>());
+        existing.addAll(entry.getValue());
+        target.put(entry.getKey(), existing);
+      }
     }
   }
 

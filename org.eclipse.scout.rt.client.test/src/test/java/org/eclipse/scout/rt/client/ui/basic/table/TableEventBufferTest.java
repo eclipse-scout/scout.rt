@@ -18,9 +18,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -177,10 +179,12 @@ public class TableEventBufferTest {
     rows1.add(r1);
     rows1.add(r2);
     final TableEvent e1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, rows1);
+    mockRowsWithUpdatedColumns(e1, 0, Set.of(0, 1));
     List<ITableRow> rows2 = new ArrayList<>();
     final ITableRow r3 = mockRow(2);
     rows2.add(r3);
     final TableEvent e2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, rows2);
+    mockRowsWithUpdatedColumns(e2, 2, Set.of(1, 2));
     m_testBuffer.add(e1);
     m_testBuffer.add(e2);
 
@@ -190,11 +194,19 @@ public class TableEventBufferTest {
     final List<ITableRow> resultRows = events.get(0).getRows();
     assertEquals(3, resultRows.size());
 
-    List<ITableRow> expected = new ArrayList<>();
-    expected.add(r1);
-    expected.add(r2);
-    expected.add(r3);
-    assertTrue(CollectionUtility.equalsCollection(expected, resultRows));
+    List<ITableRow> expectedRows = new ArrayList<>();
+    expectedRows.add(r1);
+    expectedRows.add(r2);
+    expectedRows.add(r3);
+    assertTrue(CollectionUtility.equalsCollection(expectedRows, resultRows));
+
+    final Map<ITableRow, Set<IColumn<?>>> updatedColumns = events.get(0).getUpdatedColumns();
+    assertEquals(2, updatedColumns.size());
+
+    Map<ITableRow, Set<IColumn<?>>> expectedUpdatedColumns = new HashMap<>();
+    expectedUpdatedColumns.put(r1, Set.of(mockColumn(0), mockColumn(1)));
+    expectedUpdatedColumns.put(r3, Set.of(mockColumn(1), mockColumn(2)));
+    assertEquals(expectedUpdatedColumns, updatedColumns);
   }
 
   /**
@@ -792,6 +804,48 @@ public class TableEventBufferTest {
     assertEquals(2 * eventCount, tableEvents.size());
   }
 
+  @Test(timeout = 10000)
+  public void testCoalesceSameTypeWithManyUpdateEvents() {
+    final int eventCount = 10000;
+    ITable table = mock(ITable.class);
+    LinkedList<TableEvent> tableEvents = new LinkedList<>();
+    for (int i = 0; i < eventCount; i++) {
+      TableEvent event = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, mockRows(i));
+      mockRowsWithUpdatedColumns(event, i, Set.of(0, 1));
+      tableEvents.add(event);
+    }
+
+    assertEquals(eventCount, tableEvents.size());
+    m_testBuffer.coalesceSameType(tableEvents);
+    assertEquals(1, tableEvents.size());
+    assertEquals(eventCount, CollectionUtility.firstElement(tableEvents).getRowCount());
+  }
+
+  @Test(timeout = 10000)
+  public void testCoalesceSameTypeWithManyUpdateEventsForSameRow() {
+    final int rowCount = 1000;
+    final int colCount = 20;
+    ITable table = mock(ITable.class);
+    LinkedList<TableEvent> tableEvents = new LinkedList<>();
+    for (int i = 0; i < rowCount; i++) {
+      // for each row, mark column indices {0, 1, .., colCount + 1} as updated in colCount different events -> colCount + 2 updated columns per row
+      for (int j = 0; j < colCount; j++) {
+        TableEvent event = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, mockRows(i));
+        mockRowsWithUpdatedColumns(event, i, Set.of(j, j + 1, j + 2));
+        tableEvents.add(event);
+      }
+    }
+
+    assertEquals(rowCount * colCount, tableEvents.size());
+    m_testBuffer.coalesceSameType(tableEvents);
+    assertEquals(1, tableEvents.size());
+    assertEquals(rowCount, CollectionUtility.firstElement(tableEvents).getRowCount());
+    int updateRowCols = CollectionUtility.firstElement(tableEvents).getUpdatedColumns().values().stream()
+        .mapToInt(Collection::size)
+        .sum();
+    assertEquals(rowCount * (colCount + 2), updateRowCols);
+  }
+
   @Test
   public void testRemoveRowsFromPreviousEventsWhenDeleted() {
     ITable table = mock(ITable.class);
@@ -961,15 +1015,52 @@ public class TableEventBufferTest {
     eventMerger.merge(e1);
   }
 
+  @Test
+  public void testMergeUpdateColumns() {
+    TableEvent e1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0));
+    TableEvent e2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(1));
+    mockRowsWithUpdatedColumns(e1, 0, Set.of(0, 1));
+    mockRowsWithUpdatedColumns(e2, 1, Set.of(1, 2));
+    m_testBuffer.add(e1);
+    m_testBuffer.add(e2);
+
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, events.size());
+    Map<ITableRow, Set<IColumn<?>>> updatedColumns = events.get(0).getUpdatedColumns();
+    assertEquals(2, updatedColumns.size());
+  }
+
+  @Test
+  public void testMergeUpdateColumnsWithDifferentColumns() {
+    List<ITableRow> mockRow0 = mockRows(0);
+    List<ITableRow> mockRow1 = mockRows(1);
+    TableEvent e1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRow0);
+    TableEvent e2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRow0);
+    TableEvent e3 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRow1);
+    TableEvent e4 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRow1);
+    mockRowsWithUpdatedColumns(e1, 0, Set.of(0, 1));
+    mockRowsWithUpdatedColumns(e2, 0, Set.of(1, 2));
+    mockRowsWithUpdatedColumns(e3, 1, Set.of(0, 1));
+    mockRowsWithUpdatedColumns(e4, 1, Set.of(1, 2));
+    m_testBuffer.add(e1);
+    m_testBuffer.add(e2);
+    m_testBuffer.add(e3);
+    m_testBuffer.add(e4);
+
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, events.size());
+    Map<ITableRow, Set<IColumn<?>>> updatedColumns = events.get(0).getUpdatedColumns();
+    assertEquals(2, updatedColumns.size());
+    for (Set<IColumn<?>> columns : updatedColumns.values()) {
+      assertEquals(Set.of(mockColumn(0), mockColumn(1), mockColumn(2)), columns);
+    }
+  }
+
   private TableEvent mockEvent(int type) {
     return mockEvent(type, 0);
   }
 
   private TableEvent mockEvent(int type, int rowCount) {
-    return mockEvent(type, rowCount, 0);
-  }
-
-  private TableEvent mockEvent(int type, int rowCount, int startRowIndex) {
     List<ITableRow> rows = null;
     if (rowCount > 0) {
       rows = new ArrayList<>(rowCount);
@@ -1006,5 +1097,15 @@ public class TableEventBufferTest {
       m_mockColumns.put(colIndex, column);
     }
     return column;
+  }
+
+  private ITableRow mockRowsWithUpdatedColumns(TableEvent event, int rowIndex, Set<Integer> colIndexes) {
+    ITableRow row = mockRow(rowIndex);
+    Set<IColumn<?>> cols = new HashSet<>();
+    for (Integer colIndex : colIndexes) {
+      cols.add(mockColumn(colIndex));
+    }
+    event.setUpdatedColumns(row, cols);
+    return row;
   }
 }
