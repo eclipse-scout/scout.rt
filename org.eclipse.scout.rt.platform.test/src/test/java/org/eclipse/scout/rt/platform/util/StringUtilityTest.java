@@ -760,4 +760,44 @@ public class StringUtilityTest {
     assertEquals(0, StringUtility.randomId(0).length());
     assertEquals(0, StringUtility.randomId(-123).length());
   }
+
+  @Test
+  public void testRemovePrefixes() {
+    assertEquals(null, StringUtility.removePrefixes(null, "prefix"));
+    assertEquals("", StringUtility.removePrefixes("", "prefix"));
+
+    assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData"));
+    assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", null));
+    assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", ""));
+    assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", " "));
+
+    assertEquals("CompanyFormData", StringUtility.removePrefixes(" CompanyFormData", " "));
+    assertEquals(".png", StringUtility.removePrefixes("image.png", "image"));
+    assertEquals("FormData", StringUtility.removePrefixes("CompanyFormData", "Company"));
+    assertEquals("FormData", StringUtility.removePrefixes("CompanyFormData", "company"));
+    assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", "Form"));
+
+    assertEquals("Data", StringUtility.removePrefixes("CompanyFormData", "Company", "Form"));
+    assertEquals("FormData", StringUtility.removePrefixes("CompanyFormData", "Form", "Company"));
+  }
+
+  @Test
+  public void testRemoveSuffixes() {
+    assertEquals(null, StringUtility.removeSuffixes(null, "suffix"));
+    assertEquals("", StringUtility.removeSuffixes("", "suffix"));
+    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData"));
+    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", null));
+    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", ""));
+    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", " "));
+
+    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData ", " "));
+    assertEquals("image", StringUtility.removeSuffixes("image.png", ".png"));
+    assertEquals("CompanyForm", StringUtility.removeSuffixes("CompanyFormData", "Data"));
+    assertEquals("CompanyForm", StringUtility.removeSuffixes("CompanyFormData", "data"));
+    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", "Form"));
+
+    assertEquals("Company", StringUtility.removeSuffixes("CompanyFormData", "Form", "Data"));
+    assertEquals("CompanyForm", StringUtility.removeSuffixes("CompanyFormData", "Data", "Form"));
+  }
+
 }
