@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response.Status;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
  * Builder for {@link ErrorDo} and {@link ErrorResponse} objects.
@@ -28,6 +29,7 @@ public class ErrorResponseBuilder {
   private String m_errorCode;
   private String m_title;
   private String m_message;
+  private String m_severity;
 
   public ErrorResponseBuilder withHttpStatus(int httpStatus) {
     m_httpStatus = httpStatus;
@@ -59,6 +61,25 @@ public class ErrorResponseBuilder {
     return this;
   }
 
+  public ErrorResponseBuilder withSeverity(int severity) {
+    switch (severity) {
+      case IStatus.INFO:
+        withSeverity("info");
+        break;
+      case IStatus.WARNING:
+        withSeverity("warning");
+        break;
+      case IStatus.ERROR:
+        withSeverity("error");
+    }
+    return this;
+  }
+
+  public ErrorResponseBuilder withSeverity(String severity) {
+    m_severity = severity;
+    return this;
+  }
+
   public Response build() {
     return Response.status(m_httpStatus)
         .entity(BEANS.get(ErrorResponse.class).withError(buildError()))
@@ -78,6 +99,9 @@ public class ErrorResponseBuilder {
     }
     if (m_message != null) {
       error.withMessage(m_message);
+    }
+    if (m_severity != null) {
+      error.withSeverity(m_severity);
     }
     return error;
   }
