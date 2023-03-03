@@ -33,6 +33,7 @@ public abstract class AbstractVetoExceptionMapper<E extends VetoException> exten
         .withHttpStatus(Response.Status.BAD_REQUEST)
         .withTitle(exception.getStatus().getTitle())
         .withMessage(exception.getStatus().getBody())
-        .withErrorCode(exception.getStatus().getCode());
+        .withErrorCode(exception.getStatus().getCode())
+        .withSeverity(exception.getStatus().getSeverity());
   }
 }
