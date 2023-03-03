@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,12 +23,20 @@ public class ErrorResponseBuilderTest {
 
   @Test
   public void testBuild() {
-    ErrorDo error = BEANS.get(ErrorResponseBuilder.class).withErrorCode(42).withMessage("message").withTitle("title").withHttpStatus(10).buildError();
+    ErrorDo error = BEANS.get(ErrorResponseBuilder.class)
+        .withErrorCode(42)
+        .withMessage("message")
+        .withTitle("title")
+        .withHttpStatus(10)
+        .withSeverity(IStatus.INFO)
+        .buildError();
 
     assertEquals("message", error.getMessage());
     assertEquals("title", error.getTitle());
     assertEquals("42", error.getErrorCode());
     assertEquals(Integer.valueOf(10), error.getHttpStatus());
+    assertEquals("info", error.getSeverity());
+    assertEquals(IStatus.INFO, error.getSeverityAsInt());
     assertEquals(CorrelationId.CURRENT.get(), error.getCorrelationId());
   }
 }
