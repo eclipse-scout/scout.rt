@@ -14,6 +14,7 @@ import javax.annotation.Generated;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 @TypeName("scout.Error")
@@ -46,6 +47,20 @@ public class ErrorDo extends DoEntity {
   }
 
   /**
+   * Error severity. Expecting one of:
+   * <ul>
+   * <li>ok</li>
+   * <li>info</li>
+   * <li>warning</li>
+   * <li>error</li>
+   * </ul>
+   * Assume <em>error</em> if {@code null}
+   */
+  public DoValue<String> severity() {
+    return doValue("severity");
+  }
+
+  /**
    * @return {@link #getErrorCode()} as int if it contains an integer else zero
    */
   @SuppressWarnings("squid:S1166")
@@ -55,6 +70,29 @@ public class ErrorDo extends DoEntity {
     }
     catch (RuntimeException e) {
       return 0;
+    }
+  }
+
+  /**
+   * Decodes the string-typed status into an int constant declared in {@link IStatus}:
+   * <ul>
+   * <li><em>info</em> to {@link IStatus#INFO}</li>
+   * <li><em>warning</em> to {@link IStatus#WARNING}</li>
+   * <li>anything else including {@code null} to {@link IStatus#ERROR}</li>
+   * </ul>
+   */
+  public int getSeverityAsInt() {
+    String s = getSeverity();
+    if (s == null) {
+      return IStatus.ERROR;
+    }
+    switch (s) {
+      case "info":
+        return IStatus.INFO;
+      case "warning":
+        return IStatus.WARNING;
+      default:
+        return IStatus.ERROR;
     }
   }
 
@@ -127,5 +165,16 @@ public class ErrorDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public String getCorrelationId() {
     return correlationId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public ErrorDo withSeverity(String severity) {
+    severity().set(severity);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getSeverity() {
+    return severity().get();
   }
 }
