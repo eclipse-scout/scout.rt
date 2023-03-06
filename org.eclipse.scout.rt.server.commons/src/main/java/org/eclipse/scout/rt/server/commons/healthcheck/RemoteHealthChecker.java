@@ -54,7 +54,7 @@ public class RemoteHealthChecker extends AbstractHealthChecker {
       for (String remote : m_remoteUrls) {
         GenericUrl remoteUrl = remote != null ? new GenericUrl(remote) : null;
         if (remoteUrl != null && category != null) {
-          remoteUrl.put(AbstractHealthCheckServlet.QUERY_PARAMETER_NAME_CATEGORY, category.unwrap());
+          remoteUrl.put(HealthCheckServlet.QUERY_PARAMETER_NAME_CATEGORY, category.unwrap());
         }
         HttpRequest req = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildHeadRequest(remoteUrl);
         req.getHeaders().setCacheControl("no-cache");
