@@ -14,10 +14,12 @@ import static org.junit.Assert.fail;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.dataobject.migration.AbstractDoDeletionMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoStructureMigrationHandlerTest;
 import org.eclipse.scout.rt.dataobject.migration.IDoStructureMigrationHandler;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -95,6 +97,16 @@ public abstract class AbstractDoStructureMigrationHandlerCompletenessTest {
 
     if (ci.hasAnnotation(IgnoreBean.class)) {
       return false; // e.g. test migration handlers
+    }
+
+    Class<?> resolvedClass = ci.resolveClass();
+    Class<?> superclass = resolvedClass.getSuperclass();
+    while (superclass != null) {
+      // ignore deletion migrations
+      if (Objects.equals(superclass, AbstractDoDeletionMigrationHandler.class)) {
+        return false;
+      }
+      superclass = superclass.getSuperclass();
     }
 
     String className = ci.name();
