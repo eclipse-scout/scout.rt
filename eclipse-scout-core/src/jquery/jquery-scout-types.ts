@@ -13,19 +13,24 @@ import Deferred = JQuery.Deferred;
 
 export interface InjectOptions {
   /**
-   * Which document to inject the script to. Default is window.document
+   * Which document to inject the script to. Default is `window.document`.
    */
-  document: Document;
+  document?: Document;
 }
 
 export interface InjectScriptOptions extends InjectOptions {
   /**
    * Whether to remove the script tag again from the DOM after the script has been loaded. Default is false.
    */
-  removeTag: boolean;
+  removeTag?: boolean;
 }
 
-export type AppLinkBeanArgument = { ref: string; name: string } | string;
+export interface AppLink {
+  ref: string;
+  name?: string;
+}
+
+export type AppLinkBeanArgument = AppLink | string;
 
 export type AppLinkFuncArgument<T> = JQuery.TypeEventHandler<T, undefined, T, T, 'click'> | { _onAppLinkAction: JQuery.TypeEventHandler<T, undefined, T, T, 'click'> };
 
@@ -40,10 +45,10 @@ declare global {
     delay?: number;
     /**
      * Defines whether subsequent call to the debounced function within the waiting time cause the timer to be reset or not.
-     * If the reschedule option is 'false', subsequent calls within the waiting time will just be ignored.
+     * If the `reschedule` option is 'false', subsequent calls within the waiting time will just be ignored.
      * Default is true.
      */
-    reschedule: boolean;
+    reschedule?: boolean;
   }
 
   interface JQueryStatic {
@@ -396,22 +401,22 @@ declare global {
     /**
      * Creates a new DIV and prepends it to the current element.
      */
-    prependDiv(cssClass?: string, text?: string): JQuery;
+    prependDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
 
     /**
      * Creates a new DIV and appends it to the current element.
      */
-    appendDiv(cssClass?: string, text?: string): JQuery;
+    appendDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
 
     /**
      * Creates a new DIV and adds it after the current element.
      */
-    afterDiv(cssClass?: string, text?: string): JQuery;
+    afterDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
 
     /**
      * Creates a new DIV and adds it before current element.
      */
-    beforeDiv(cssClass?: string, text?: string): JQuery;
+    beforeDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
 
     /**
      * Creates a new SPAN and appends it to the current element.
