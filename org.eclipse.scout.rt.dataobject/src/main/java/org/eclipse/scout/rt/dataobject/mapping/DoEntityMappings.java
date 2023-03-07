@@ -11,13 +11,19 @@
 package org.eclipse.scout.rt.dataobject.mapping;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
+import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoNode;
+import org.eclipse.scout.rt.dataobject.DoSet;
+import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -94,6 +100,52 @@ public class DoEntityMappings<DO_ENTITY extends IDoEntity, PEER> {
    */
   public <VALUE> DoEntityMappings<DO_ENTITY, PEER> with(Function<DO_ENTITY, DoNode<VALUE>> doNode, Function<PEER, VALUE> valueGetter) {
     return with(doNode, valueGetter, null);
+  }
+
+  /**
+   * Adds a mapping for the given collection node (getter/setter for peer).
+   * <p>
+   * There is no duplicate detection for the node-based mappings, meaning that adding a DO node multiple times with
+   * different mappings will execute all the mappings.
+   * <p>
+   * When working with collection nodes the peer side usually uses a collection (i.e. {@link Collection}, {@link List}
+   * or {@link Set}) directly and not a DO collection node (i.e. {@link DoCollection}, {@link DoList} or {@link DoSet}),
+   * thus use {@link #with(Function, Function, BiConsumer)}. But there might be special peers working with a DO
+   * collection node, thus this method is provided for convenience.
+   */
+  public <VALUE, COLLECTION extends Collection<VALUE>, DO_COLLECTION extends IDoCollection<VALUE, COLLECTION>> DoEntityMappings<DO_ENTITY, PEER> withDoCollection(
+      Function<DO_ENTITY, DO_COLLECTION> doCollectionFunction,
+      Function<PEER, DO_COLLECTION> valueGetter,
+      BiConsumer<PEER, DO_COLLECTION> valueSetter) {
+    m_mappings.add(new IDoEntityMapping<>() {
+
+      @Override
+      public void toDo(PEER peer, DO_ENTITY doEntity) {
+        if (valueGetter == null) {
+          return;
+        }
+
+        DO_COLLECTION valueCollectionNode = valueGetter.apply(peer); // might be null from provided getter
+        COLLECTION values = valueCollectionNode == null ? null : valueCollectionNode.get();
+        DO_COLLECTION collectionNode = doCollectionFunction.apply(doEntity); // never null
+        collectionNode.updateAll(values);
+      }
+
+      @Override
+      public void fromDo(DO_ENTITY dataObject, PEER peer) {
+        if (valueSetter == null) {
+          return;
+        }
+
+        DO_COLLECTION collectionNode = doCollectionFunction.apply(dataObject);
+        if (!collectionNode.exists()) {
+          return;
+        }
+
+        valueSetter.accept(peer, collectionNode);
+      }
+    });
+    return this;
   }
 
   /**
