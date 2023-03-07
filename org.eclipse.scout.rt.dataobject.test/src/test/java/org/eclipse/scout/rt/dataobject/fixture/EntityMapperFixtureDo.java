@@ -9,9 +9,16 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
@@ -24,6 +31,22 @@ public class EntityMapperFixtureDo extends DoEntity {
 
   public DoValue<OtherEntityMapperFixtureDo> otherEntity() {
     return doValue("otherEntity");
+  }
+
+  public DoCollection<String> stringCollection() {
+    return doCollection("stringCollection");
+  }
+
+  public DoCollection<OtherEntityMapperFixtureDo> entityCollection() {
+    return doCollection("entityCollection");
+  }
+
+  public DoList<OtherEntityMapperFixtureDo> entityList() {
+    return doList("entityList");
+  }
+
+  public DoSet<OtherEntityMapperFixtureDo> entitySet() {
+    return doSet("entitySet");
   }
 
   /* **************************************************************************
@@ -50,5 +73,73 @@ public class EntityMapperFixtureDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public OtherEntityMapperFixtureDo getOtherEntity() {
     return otherEntity().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public EntityMapperFixtureDo withStringCollection(Collection<? extends String> stringCollection) {
+    stringCollection().updateAll(stringCollection);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public EntityMapperFixtureDo withStringCollection(String... stringCollection) {
+    stringCollection().updateAll(stringCollection);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Collection<String> getStringCollection() {
+    return stringCollection().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public EntityMapperFixtureDo withEntityCollection(Collection<? extends OtherEntityMapperFixtureDo> entityCollection) {
+    entityCollection().updateAll(entityCollection);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public EntityMapperFixtureDo withEntityCollection(OtherEntityMapperFixtureDo... entityCollection) {
+    entityCollection().updateAll(entityCollection);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Collection<OtherEntityMapperFixtureDo> getEntityCollection() {
+    return entityCollection().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public EntityMapperFixtureDo withEntityList(Collection<? extends OtherEntityMapperFixtureDo> entityList) {
+    entityList().updateAll(entityList);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public EntityMapperFixtureDo withEntityList(OtherEntityMapperFixtureDo... entityList) {
+    entityList().updateAll(entityList);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<OtherEntityMapperFixtureDo> getEntityList() {
+    return entityList().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public EntityMapperFixtureDo withEntitySet(Collection<? extends OtherEntityMapperFixtureDo> entitySet) {
+    entitySet().updateAll(entitySet);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public EntityMapperFixtureDo withEntitySet(OtherEntityMapperFixtureDo... entitySet) {
+    entitySet().updateAll(entitySet);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Set<OtherEntityMapperFixtureDo> getEntitySet() {
+    return entitySet().get();
   }
 }
