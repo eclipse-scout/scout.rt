@@ -20,7 +20,6 @@
 
   <artifactId>org.eclipse.scout.rt.datamodel.ui.html</artifactId>
 
-
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
     <sonar.sources>src/main,pom.xml</sonar.sources>
@@ -40,12 +39,6 @@
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-    </dependency>
-    <!-- Necessary for JS code completion when Scout is in the same IntelliJ Project -->
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>eclipse-scout-core</artifactId>
-      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

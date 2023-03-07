@@ -19,8 +19,6 @@
   </parent>
 
   <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-  <packaging>jar</packaging>
-
 
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
@@ -45,6 +43,11 @@
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
+    </dependency>
+    <!-- Necessary for JS code completion when Scout is in the same IntelliJ Project, see WEB-56592-->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>eclipse-scout-core</artifactId>
     </dependency>
   </dependencies>
 
