@@ -11,6 +11,9 @@ package org.eclipse.scout.rt.dataobject;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -117,6 +120,36 @@ public class DoEntityMappingsTest {
     EntityMapperFixtureDo sourceDo = BEANS.get(EntityMapperFixtureDo.class).withId("test");
     EntityMapperFixture source = BEANS.get(EntityMapperFixture.class);
     source.setId("test2");
+
+    applyAndAssertMappings(mappings, sourceDo, source);
+  }
+
+  @Test
+  public void testWithDoCollection() {
+    DoEntityMappings<EntityMapperFixtureDo, EntityMapperFixture> mappings = new DoEntityMappings<>();
+    mappings.withDoCollection(EntityMapperFixtureDo::stringCollection, EntityMapperFixture::getStringCollection, EntityMapperFixture::setStringCollection);
+    mappings.withDoCollection(EntityMapperFixtureDo::entityCollection, EntityMapperFixture::getEntityCollection, EntityMapperFixture::setEntityCollection);
+    mappings.withDoCollection(EntityMapperFixtureDo::entityList, EntityMapperFixture::getEntityList, EntityMapperFixture::setEntityList);
+    mappings.withDoCollection(EntityMapperFixtureDo::entitySet, EntityMapperFixture::getEntitySet, EntityMapperFixture::setEntitySet);
+
+    Collection<String> stringCollection = List.of("string.one", "string.two", "string.three");
+    Collection<OtherEntityMapperFixtureDo> collection =
+        List.of(BEANS.get(OtherEntityMapperFixtureDo.class).withId("col.one"), BEANS.get(OtherEntityMapperFixtureDo.class).withId("col.two"), BEANS.get(OtherEntityMapperFixtureDo.class).withId("col.three"));
+    List<OtherEntityMapperFixtureDo> list =
+        List.of(BEANS.get(OtherEntityMapperFixtureDo.class).withId("list.one"), BEANS.get(OtherEntityMapperFixtureDo.class).withId("list.two"), BEANS.get(OtherEntityMapperFixtureDo.class).withId("list.three"));
+    Set<OtherEntityMapperFixtureDo> set = Set.of(BEANS.get(OtherEntityMapperFixtureDo.class).withId("set.one"), BEANS.get(OtherEntityMapperFixtureDo.class).withId("set.two"), BEANS.get(OtherEntityMapperFixtureDo.class).withId("set.three"));
+
+    EntityMapperFixtureDo sourceDo = BEANS.get(EntityMapperFixtureDo.class)
+        .withStringCollection(stringCollection)
+        .withEntityCollection(collection)
+        .withEntityList(list)
+        .withEntitySet(set);
+
+    EntityMapperFixture source = BEANS.get(EntityMapperFixture.class);
+    source.setStringCollection(DoCollection.of(stringCollection));
+    source.setEntityCollection(DoCollection.of(collection));
+    source.setEntityList(DoList.of(list));
+    source.setEntitySet(DoSet.of(set));
 
     applyAndAssertMappings(mappings, sourceDo, source);
   }
@@ -302,15 +335,38 @@ public class DoEntityMappingsTest {
     else {
       assertEquals(doValue.getOtherEntity().getId(), value.getOtherId());
     }
+
     if (doValue.hasContribution(EntityMapperContributionFixtureDo.class)) {
       assertEquals(doValue.getContribution(EntityMapperContributionFixtureDo.class).getContributedValue(), value.getContributedValue());
     }
     else {
       assertNull(value.getContributedValue());
     }
+
     if (value instanceof EntityMapperSubPeerFixture) {
       assertTrue(doValue.hasContribution(EntityMapperContributionFixtureDo.class));
       assertEquals(doValue.getContribution(EntityMapperContributionFixtureDo.class).getContributedSubPeerValue(), ((EntityMapperSubPeerFixture) value).getSubPeerValue());
+    }
+
+    if (doValue.entityCollection().exists()) {
+      assertEquals(doValue.getEntityCollection(), value.getEntityCollection() == null ? null : value.getEntityCollection().get());
+    }
+    else {
+      assertNull(value.getEntityCollection());
+    }
+
+    if (doValue.entityList().exists()) {
+      assertEquals(doValue.getEntityList(), value.getEntityList() == null ? null : value.getEntityList().get());
+    }
+    else {
+      assertNull(value.getEntityList());
+    }
+
+    if (doValue.entitySet().exists()) {
+      assertEquals(doValue.getEntitySet(), value.getEntitySet() == null ? null : value.getEntitySet().get());
+    }
+    else {
+      assertNull(value.getEntitySet());
     }
   }
 }
