@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.holders.Holder;
 
@@ -19,6 +22,11 @@ public class EntityMapperFixture {
   private Holder<String> m_id;
   private String m_otherId;
   private Long m_contributedValue;
+
+  private DoCollection<String> m_stringCollection;
+  private DoCollection<OtherEntityMapperFixtureDo> m_entityCollection;
+  private DoList<OtherEntityMapperFixtureDo> m_entityList;
+  private DoSet<OtherEntityMapperFixtureDo> m_entitySet;
 
   public EntityMapperFixture() {
     m_id = new Holder<>();
@@ -50,5 +58,37 @@ public class EntityMapperFixture {
 
   public void setContributedValue(Long contributedValue) {
     m_contributedValue = contributedValue;
+  }
+
+  public DoCollection<String> getStringCollection() {
+    return m_stringCollection;
+  }
+
+  public void setStringCollection(DoCollection<String> stringCollection) {
+    m_stringCollection = stringCollection;
+  }
+
+  public DoCollection<OtherEntityMapperFixtureDo> getEntityCollection() {
+    return m_entityCollection;
+  }
+
+  public void setEntityCollection(DoCollection<OtherEntityMapperFixtureDo> entityCollection) {
+    m_entityCollection = entityCollection;
+  }
+
+  public DoList<OtherEntityMapperFixtureDo> getEntityList() {
+    return m_entityList;
+  }
+
+  public void setEntityList(DoList<OtherEntityMapperFixtureDo> entityList) {
+    m_entityList = entityList;
+  }
+
+  public DoSet<OtherEntityMapperFixtureDo> getEntitySet() {
+    return m_entitySet;
+  }
+
+  public void setEntitySet(DoSet<OtherEntityMapperFixtureDo> entitySet) {
+    m_entitySet = entitySet;
   }
 }
