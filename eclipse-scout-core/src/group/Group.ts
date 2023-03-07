@@ -362,9 +362,9 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
     this.$header.toggleClass('collapse-right', this.collapseStyle === Group.CollapseStyle.RIGHT);
     this.$container.toggleClass('collapse-bottom', this.collapseStyle === Group.CollapseStyle.BOTTOM);
 
-    if (this.collapseStyle === Group.CollapseStyle.RIGHT && !this.header) {
+    if (this.collapseStyle === Group.CollapseStyle.RIGHT) {
       this.$collapseIcon.appendTo(this.$header);
-    } else if (this.collapseStyle === Group.CollapseStyle.LEFT && !this.header) {
+    } else if (this.collapseStyle === Group.CollapseStyle.LEFT) {
       this.$collapseIcon.prependTo(this.$header);
     } else if (this.collapseStyle === Group.CollapseStyle.BOTTOM) {
       let sibling = this.body.$container ? this.body.$container : this.$header;
