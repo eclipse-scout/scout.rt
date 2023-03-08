@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, graphics, keys, scout, scrollbars, Status, strings, Widget} from '../index';
+import {arrays, Form, graphics, keys, Point, scout, scrollbars, Status, strings, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Tooltip extends Widget {
@@ -26,6 +26,8 @@ export default class Tooltip extends Widget {
     this.windowPaddingX = 10;
     this.windowPaddingY = 5;
     this.origin = null;
+    this.originProducer = null;
+    this.offsetProducer = null;
 
     /**
      * When the origin point is calculated using $element.offset(),
@@ -195,7 +197,7 @@ export default class Tooltip extends Widget {
     }
 
     // Render menus
-    menus.forEach(function(menu) {
+    menus.forEach(menu => {
       let iconWidth = 0;
       menu.render(this.$menus);
       if (menu.iconId) {
@@ -228,29 +230,24 @@ export default class Tooltip extends Widget {
   }
 
   position() {
-    let top, left, arrowSizeX, arrowSizeY, overlapX, overlapY, x, y, origin,
+    let top, left, arrowSizeX, arrowSizeY, overlapX, overlapY, tooltipPosition, origin, offset,
       tooltipWidth, tooltipHeight, arrowPosition, inView;
 
-    if (this.origin) {
-      origin = this.origin;
-      x = origin.x;
-    } else {
-      origin = graphics.offsetBounds(this.$anchor);
-      x = origin.x + origin.width / 2;
-    }
-    y = origin.y;
+    origin = this._getOrigin();
+    offset = this._getOffset(origin);
+    tooltipPosition = origin.point().add(offset);
 
     if (this.$anchor) {
       // Sticky tooltip must only be visible if the location where the tooltip points is in view (prevents that the tooltip points at an invisible anchor)
-      inView = scrollbars.isLocationInView(origin, this.$anchor.scrollParent());
+      inView = scrollbars.isLocationInView(tooltipPosition, this.$anchor.scrollParent());
       this.$container.setVisible(inView);
     }
 
     // this.$parent might not be at (0,0) of the document
     if (!this.originRelativeToParent) {
       let parentOffset = this.$parent.offset();
-      x -= parentOffset.left;
-      y -= parentOffset.top;
+      tooltipPosition.x -= parentOffset.left;
+      tooltipPosition.y -= parentOffset.top;
     }
 
     arrowSizeX = 7;
@@ -268,27 +265,27 @@ export default class Tooltip extends Widget {
       arrowPosition = tooltipWidth - arrowPosition;
     }
 
-    top = y - tooltipHeight - arrowSizeY;
-    left = x - arrowPosition;
+    top = tooltipPosition.y - tooltipHeight - arrowSizeY;
+    left = tooltipPosition.x - arrowPosition;
     overlapX = left + tooltipWidth + this.windowPaddingX - this.$parent.width();
     overlapY = top - this.windowPaddingY;
 
     // Move tooltip to the left until it gets fully visible
     if (overlapX > 0) {
       left -= overlapX;
-      arrowPosition = x - left;
+      arrowPosition = tooltipPosition.x - left;
     }
     // Move tooltip to the right if it overlaps the left edge
     if (left < this.windowPaddingX) {
       left = this.windowPaddingX;
-      arrowPosition = x - this.windowPaddingX;
+      arrowPosition = tooltipPosition.x - this.windowPaddingX;
     }
 
     // Move tooltip to the bottom, arrow on top
     this.$arrow.removeClass('arrow-top arrow-bottom');
     if (this.tooltipPosition === 'bottom' || overlapY < 0) {
       this.$arrow.addClass('arrow-top');
-      top = y + origin.height + arrowSizeY;
+      top = tooltipPosition.y + origin.height + arrowSizeY;
     } else {
       this.$arrow.addClass('arrow-bottom');
     }
@@ -307,6 +304,32 @@ export default class Tooltip extends Widget {
         menu.popup.position();
       }
     }, this);
+  }
+
+  _getOrigin() {
+    if (this.originProducer) {
+      const origin = this.originProducer(this.$anchor);
+      if (origin) {
+        return origin;
+      }
+    }
+    if (this.origin) {
+      return this.origin;
+    }
+    return graphics.offsetBounds(this.$anchor);
+  }
+
+  _getOffset(origin) {
+    if (this.offsetProducer) {
+      const offset = this.offsetProducer(origin);
+      if (offset) {
+        return offset;
+      }
+    }
+    if (this.origin) {
+      return new Point(0, 0);
+    }
+    return new Point(origin.width / 2, 0);
   }
 
   _onAnchorScroll(event) {
