@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.HexUtility;
 @FunctionalInterface
 public interface IMimeMagic {
   IMimeMagic DOC_XLS_PPT = createMagic(0, "d0cf11e0a1b11ae1");
+  IMimeMagic DOCX_XLSX_PPTX = createMagic(0, "d0cf11e0a1b11ae1", "504b0304", "504b0506", "504b0708"); // union of DOC_XLS_PPT (used for protected office files) and ZIP (used for non-protected office files)
   IMimeMagic BMP = createMagic(0, "424d");
   IMimeMagic EXE_DLL_SYS = createMagic(0, "4d5a", "5a4d");
   IMimeMagic GIF = createMagic(0, "474946383761", "474946383961");
