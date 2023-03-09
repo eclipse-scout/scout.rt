@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
+import {DummyLookupCall, FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
 import {
   arrays, BusyIndicator, Button, DateField, DatePickerPopup, Desktop, DesktopNotification, DesktopTab, Device, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, ObjectOrChildModel, Outline, OutlineViewButton,
   Popup, RemoteEvent, scout, SmartField, SmartFieldPopup, Status, StringField, strings, Tooltip, UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
@@ -2517,7 +2517,7 @@ describe('Desktop', () => {
           fields: [
             {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip V1-1'},
             {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip V1-2'},
-            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+            {id: 'Field3', objectType: SmartField, lookupCall: DummyLookupCall}
           ]
         }
       });
@@ -2534,7 +2534,7 @@ describe('Desktop', () => {
           fields: [
             {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D1-1'},
             {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D1-2'},
-            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+            {id: 'Field3', objectType: SmartField, lookupCall: DummyLookupCall}
           ]
         }
       });
@@ -2557,7 +2557,7 @@ describe('Desktop', () => {
             fields: [
               {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip P1-1'},
               {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip P1-2'},
-              {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+              {id: 'Field3', objectType: SmartField, lookupCall: DummyLookupCall}
             ]
           }
         }
@@ -2576,7 +2576,7 @@ describe('Desktop', () => {
           fields: [
             {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D2-1'},
             {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D2-2'},
-            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+            {id: 'Field3', objectType: SmartField, lookupCall: DummyLookupCall}
           ]
         }
       });
@@ -2625,7 +2625,7 @@ describe('Desktop', () => {
             fields: [
               {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip P2-1'},
               {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip P2-2'},
-              {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+              {id: 'Field3', objectType: SmartField, lookupCall: DummyLookupCall}
             ]
           }
         }
@@ -2729,7 +2729,7 @@ describe('Desktop', () => {
           fields: [
             {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D1-1'},
             {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D1-2'},
-            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+            {id: 'Field3', objectType: SmartField, lookupCall: DummyLookupCall}
           ]
         }
       });
@@ -2745,7 +2745,7 @@ describe('Desktop', () => {
           fields: [
             {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D2-1'},
             {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D2-2'},
-            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+            {id: 'Field3', objectType: SmartField, lookupCall: DummyLookupCall}
           ]
         }
       });
@@ -2818,7 +2818,7 @@ describe('Desktop', () => {
           fields: [
             {id: 'Field1', objectType: StringField, tooltipText: 'Tooltip D1-1'},
             {id: 'Field2', objectType: StringField, tooltipText: 'Tooltip D1-2', errorStatus: Status.error('Invalid value')},
-            {id: 'Field3', objectType: SmartField, lookupCall: 'DummyLookupCall'}
+            {id: 'Field3', objectType: SmartField, lookupCall: DummyLookupCall}
           ]
         }
       });
@@ -2839,6 +2839,23 @@ describe('Desktop', () => {
       expect(overlayWidgets[1]).toBeInstanceOf(Tooltip);
       expect(overlayWidgets[1].text).toBe('Invalid value');
       expect(overlayWidgets.length).toBe(2);
+    });
+
+    it('never renders overlays outside desktop', () => {
+      let desktop = session.desktop;
+      desktop.render(session.$entryPoint);
+      desktop.addNotification(scout.create(DesktopNotification, {
+        parent: desktop
+      }));
+      let smartField = scout.create(SmartField, {
+        parent: desktop.bench, // Draw inside bench to not influence the overlays
+        lookupCall: DummyLookupCall
+      });
+      smartField.render();
+      smartField.activate();
+      jasmine.clock().tick(500);
+      smartField.popup.animateRemoval = false;
+      expect(smartField.popup.$container.parent()[0]).toBe(desktop.$container[0]);
     });
   });
 });
