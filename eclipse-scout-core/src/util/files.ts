@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays} from '../index';
+import {arrays, numbers, RoundingMode, Session} from '../index';
 
 export const files = {
   /**
@@ -33,5 +33,20 @@ export const files = {
       files.push(fileList[i]);
     }
     return files;
+  },
+
+  getErrorMessageMaximumUploadSizeExceeded(session: Session, maximumUploadSize: number): string {
+    if (maximumUploadSize < 1024) {
+      return session.text('ui.FileSizeLimit', maximumUploadSize, session.text('ui.Bytes'));
+    }
+    let maximumUploadSizeKB = maximumUploadSize / 1024;
+    if (maximumUploadSizeKB < 1024) {
+      return session.text('ui.FileSizeLimit', numbers.round(maximumUploadSizeKB, RoundingMode.HALF_UP, 2), 'KB');
+    }
+    let maximumUploadSizeMB = maximumUploadSizeKB / 1024;
+    if (maximumUploadSizeMB < 1024) {
+      return session.text('ui.FileSizeLimit', numbers.round(maximumUploadSizeMB, RoundingMode.HALF_UP, 2), 'MB');
+    }
+    return session.text('ui.FileSizeLimit', numbers.round(maximumUploadSizeMB / 1024, RoundingMode.HALF_UP, 2), 'GB');
   }
 };
