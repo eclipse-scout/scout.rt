@@ -1568,7 +1568,7 @@ export default class Desktop extends Widget {
       let parentOverlay = null;
       $overlays.toArray().reverse().some(elem => {
         let overlayWidget = findWidget(elem);
-        if (overlayWidget && overlayWidget.has(widget)) {
+        if (overlayWidget && !(overlayWidget instanceof Desktop) && overlayWidget.has(widget)) {
           parentOverlay = overlayWidget;
           return true; // found
         }
