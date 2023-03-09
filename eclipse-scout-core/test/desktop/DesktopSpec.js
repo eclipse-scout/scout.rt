@@ -2568,5 +2568,22 @@ describe('Desktop', () => {
       expect(overlayWidgets[1].text).toBe('Invalid value');
       expect(overlayWidgets.length).toBe(2);
     });
+
+    it('never renders overlays outside desktop', () => {
+      let desktop = session.desktop;
+      desktop.render(session.$entryPoint);
+      desktop.addNotification(scout.create('DesktopNotification', {
+        parent: desktop
+      }));
+      let smartField = scout.create('SmartField', {
+        parent: desktop.bench, // Draw inside bench to not influence the overlays
+        lookupCall: 'DummyLookupCall'
+      });
+      smartField.render();
+      smartField.activate();
+      jasmine.clock().tick(500);
+      smartField.popup.animateRemoval = false;
+      expect(smartField.popup.$container.parent()[0]).toBe(desktop.$container[0]);
+    });
   });
 });
