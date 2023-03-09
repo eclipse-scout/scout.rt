@@ -1156,7 +1156,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     if (!fileUtil.validateMaximumUploadSize(acceptedFiles, maxTotalSize)) {
       let boxOptions: FatalMessageOptions = {
         header: this.text('ui.FileSizeLimitTitle'),
-        body: this.text('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024) + ''),
+        body: fileUtil.getErrorMessageMaximumUploadSizeExceeded(this, maxTotalSize),
         yesButtonText: this.optText('Ok', 'Ok')
       };
 

@@ -177,7 +177,7 @@ export class FileInput extends Widget implements FileInputModel {
 
   validateMaximumUploadSize(files: Blob | Blob[]) {
     if (!fileUtil.validateMaximumUploadSize(files, this.maximumUploadSize)) {
-      throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024) + '');
+      throw fileUtil.getErrorMessageMaximumUploadSizeExceeded(this.session, this.maximumUploadSize);
     }
   }
 }
