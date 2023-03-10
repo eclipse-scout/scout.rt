@@ -53,7 +53,8 @@ public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestCli
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
       return vetoExceptionFactory.apply(error.getMessage(), e)
           .withTitle(error.getTitle())
-          .withCode(error.getErrorCodeAsInt());
+          .withCode(error.getErrorCodeAsInt())
+          .withSeverity(error.getSeverityAsInt());
     }, () -> {
       StatusType statusInfo = response.getStatusInfo();
       return vetoExceptionFactory.apply(statusInfo.getReasonPhrase(), e);
@@ -66,7 +67,8 @@ public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestCli
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
       return new ProcessingException(error.getMessage(), e)
           .withTitle(error.getTitle())
-          .withCode(error.getErrorCodeAsInt());
+          .withCode(error.getErrorCodeAsInt())
+          .withSeverity(error.getSeverityAsInt());
     }, () -> {
       StatusType statusInfo = response.getStatusInfo();
       return new ProcessingException("REST call failed: {} {}", statusInfo.getStatusCode(), statusInfo.getReasonPhrase(), e);

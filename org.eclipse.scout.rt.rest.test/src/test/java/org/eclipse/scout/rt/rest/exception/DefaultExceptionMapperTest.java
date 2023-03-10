@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.rest.error.ErrorDo;
 import org.eclipse.scout.rt.rest.error.ErrorResponse;
@@ -52,7 +53,7 @@ public class DefaultExceptionMapperTest {
 
     when((responseBuilder.status(Mockito.any(StatusType.class)))).then((Answer<ResponseBuilder>) invocation -> addStatus(responseBuilder, ((StatusType) invocation.getArgument(0)).getStatusCode()));
 
-    when((responseBuilder.status(Mockito.anyInt()))).then(invocation -> addStatus(responseBuilder, ((int) invocation.getArgument(0))));
+    when((responseBuilder.status(Mockito.anyInt()))).then(invocation -> addStatus(responseBuilder, invocation.getArgument(0)));
 
     when((responseBuilder.entity(Mockito.any(ErrorResponse.class)))).then((Answer<ResponseBuilder>) invocation -> {
       try (Response response = responseBuilder.build()) {
@@ -118,20 +119,22 @@ public class DefaultExceptionMapperTest {
   @Test
   public void testToResponseVetoException() {
     VetoExceptionMapper mapper = new VetoExceptionMapper();
-    VetoException exception = new VetoException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37);
+    VetoException exception = new VetoException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37).withSeverity(IStatus.WARNING);
     try (Response response = mapper.toResponse(exception)) {
       assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
       assertEquals(exception.getStatus().getTitle(), error.getTitle());
       assertEquals(exception.getStatus().getBody(), error.getMessage());
       assertEquals(exception.getStatus().getCode(), error.getErrorCodeAsInt());
+      assertEquals("warning", error.getSeverity());
+      assertEquals(exception.getStatus().getSeverity(), error.getSeverityAsInt());
     }
   }
 
   @Test
   public void testToResponseAccessForbiddenException() {
     AccessForbiddenExceptionMapper mapper = new AccessForbiddenExceptionMapper();
-    AccessForbiddenException exception = (AccessForbiddenException) new AccessForbiddenException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37);
+    AccessForbiddenException exception = new AccessForbiddenException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37);
     try (Response response = mapper.toResponse(exception)) {
       assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
