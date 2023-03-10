@@ -2838,9 +2838,9 @@ declare module 'chart.js' {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface RadarPointElement<T extends RadarProps = RadarProps, O extends PointOptions = PointOptions> extends PointElement<T, O> {
+export interface RadarPointElement<T extends RadarProps = RadarProps, O extends PointOptions = PointOptions> extends PointElement<T, O> {
 }
 
-interface RadarProps extends PointProps {
+export interface RadarProps extends PointProps {
   angle: number;
 }

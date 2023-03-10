@@ -13,7 +13,7 @@ import TypeOrArray = JQuery.TypeOrArray;
 
 let instance: Device;
 
-interface DeviceModel extends ObjectModel<Device> {
+export interface DeviceModel extends ObjectModel<Device> {
   userAgent: string;
 }
 

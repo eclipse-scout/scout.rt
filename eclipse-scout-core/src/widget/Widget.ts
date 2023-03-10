@@ -2355,7 +2355,7 @@ export interface CloneOptions {
   delegateAllPropertiesToOriginal?: boolean;
 }
 
-interface EventDelegatorForCloning {
+export interface EventDelegatorForCloning {
   clone: Widget;
   originalToClone: EventDelegator;
   cloneToOriginal: EventDelegator;
