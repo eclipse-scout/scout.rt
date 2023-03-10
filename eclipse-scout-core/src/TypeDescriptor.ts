@@ -9,7 +9,7 @@
  */
 import {arrays, ObjectFactory, scout, strings} from './index';
 
-interface ObjectTypePart {
+export interface ObjectTypePart {
   name: string;
   namespaces?: string[];
 }
