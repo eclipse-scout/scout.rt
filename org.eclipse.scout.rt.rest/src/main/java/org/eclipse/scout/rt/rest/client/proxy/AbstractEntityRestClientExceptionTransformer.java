@@ -31,7 +31,7 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
       return e;
     }
 
-    RuntimeException result = transformByResponseStatus(Response.Status.fromStatusCode(response.getStatusInfo().getStatusCode()), e, response);
+    RuntimeException result = transformByResponseStatus(Response.Status.fromStatusCode(response.getStatus()), e, response);
     if (result == null) {
       result = transformByResponseStatusFamily(response.getStatusInfo().getFamily(), e, response);
     }
@@ -46,7 +46,7 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
    */
   protected RuntimeException transformJaxRsProcessingException(javax.ws.rs.ProcessingException e) {
     Throwable cause = e.getCause();
-    return new RemoteSystemUnavailableException(cause.getMessage(), cause);
+    return new RemoteSystemUnavailableException(cause != null ? cause.getMessage() : null, cause);
   }
 
   /**
