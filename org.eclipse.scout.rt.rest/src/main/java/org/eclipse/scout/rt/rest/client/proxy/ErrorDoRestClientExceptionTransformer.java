@@ -18,12 +18,15 @@ import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.dataobject.exception.ResourceNotFoundException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.rest.error.ErrorDo;
 import org.eclipse.scout.rt.rest.error.ErrorResponse;
 
 /**
- * REST client exception handler that extracts {@link ErrorDo} from the error {@link Response}.
+ * REST client exception handler that extracts {@link ErrorDo} from the error {@link Response} if available.
+ * Furthermore, service unavailable, bad gateway and gateway timeout are transformed into a
+ * {@link RemoteSystemUnavailableException}.
  */
 @ApplicationScoped
 public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestClientExceptionTransformer {
@@ -35,6 +38,10 @@ public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestCli
         return transformClientError(e, response, AccessForbiddenException::new);
       case NOT_FOUND:
         return transformClientError(e, response, ResourceNotFoundException::new);
+      case BAD_GATEWAY:
+      case SERVICE_UNAVAILABLE:
+      case GATEWAY_TIMEOUT:
+        return transformUnavailableResponse(e, response);
     }
     return super.transformByResponseStatus(status, e, response);
   }
@@ -73,5 +80,9 @@ public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestCli
       StatusType statusInfo = response.getStatusInfo();
       return new ProcessingException("REST call failed: {} {}", statusInfo.getStatusCode(), statusInfo.getReasonPhrase(), e);
     });
+  }
+
+  protected RuntimeException transformUnavailableResponse(RuntimeException e, Response response) {
+    return new RemoteSystemUnavailableException("Server temporarily not available", e);
   }
 }
