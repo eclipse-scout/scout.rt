@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, scout} from '../index';
+import {AjaxCall, AjaxError, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -22,7 +22,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  get(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  get(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'GET'
@@ -38,7 +38,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  post(url: string, data?: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  post(url: string, data?: any, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'POST',
@@ -55,7 +55,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  put(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  put(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'PUT',
@@ -71,7 +71,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  remove(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  remove(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'DELETE'
@@ -86,7 +86,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  getJson(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  getJson(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'GET'
@@ -102,7 +102,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  postJson(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  postJson(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     if (data && typeof data !== 'string') {
       data = JSON.stringify(data);
     }
@@ -122,7 +122,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  putJson(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  putJson(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     if (data && typeof data !== 'string') {
       data = JSON.stringify(data);
     }
@@ -141,7 +141,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  removeJson(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  removeJson(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'DELETE'
@@ -157,7 +157,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  callJson(options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  callJson(options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     return ajax.createCallJson(options).call();
   },
 
@@ -168,7 +168,7 @@ export const ajax = {
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  call(options?: JQuery.AjaxSettings): JQuery.Promise<any> {
+  call(options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
     return ajax.createCall(options).call();
   },
 
