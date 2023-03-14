@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Outline, Page, TileGridLayoutConfig, TileGridModel} from '../../../index';
+import {ObjectOrModel, Outline, Page, TileGridLayoutConfig, TileGridModel} from '../../../index';
 
 export interface PageTileGridModel extends TileGridModel {
   compact?: boolean;
-  compactLayoutConfig?: TileGridLayoutConfig;
+  compactLayoutConfig?: ObjectOrModel<TileGridLayoutConfig>;
   outline?: Outline;
   page?: Page;
   nodes?: Page[];
