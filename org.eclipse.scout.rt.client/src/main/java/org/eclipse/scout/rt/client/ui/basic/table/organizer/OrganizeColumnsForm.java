@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -749,6 +750,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               for (ITableRow row : rows) {
                 setColumnVisible(row, row.isChecked());
               }
+              enableDisableMenus();
             }
 
             @Override
@@ -1081,46 +1083,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 execAddColumnAction();
               }
 
-            }
-
-            public void moveNewColumnsAfterSelection(List<String> existingColumns) {
-              Table columnsTable = getColumnsTableField().getTable();
-              ITableRow insertAfterThisRow = columnsTable.getSelectedRow();
-              boolean insertOnTop = false;
-              if (insertAfterThisRow == null && columnsTable.getRowCount() > 0) {
-                insertOnTop = true;
-              }
-              getColumnsTableField().reloadTableData();
-              int insertAfterRowIndex = 0;
-              if (insertAfterThisRow != null) {
-                insertAfterRowIndex = insertAfterThisRow.getRowIndex();
-              }
-              // find new rows
-              for (ITableRow columnRow : columnsTable.getRows()) {
-                if (!existingColumns.contains(columnsTable.getKeyColumn().getValue(columnRow).getColumnId())) {
-                  // move new column
-                  try {
-                    getColumnsTableField().getTable().setTableChanging(true);
-                    if (insertOnTop) {
-                      moveUp(columnRow, 0);
-                    }
-                    else if (columnRow.getRowIndex() <= insertAfterRowIndex) {
-                      moveDown(columnRow, insertAfterRowIndex + 1);
-                    }
-                    else {
-                      moveUp(columnRow, insertAfterRowIndex + 1);
-                    }
-                    ++insertAfterRowIndex;
-                    updateColumnVisibilityAndOrder();
-
-                    // select new row
-                    columnsTable.selectRow(columnRow);
-                  }
-                  finally {
-                    columnsTable.setTableChanging(false);
-                  }
-                }
-              }
             }
 
             @Order(20)
@@ -1656,7 +1618,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
   }
 
   protected boolean isColumnMovableUp(IColumn<?> column) {
-    if (column.isFixedPosition()) {
+    if (column.isFixedPosition() || !column.isVisible()) {
       return false;
     }
     List<IColumn<?>> visibleColumns = column.getTable().getColumnSet().getVisibleColumns();
@@ -1668,7 +1630,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
   }
 
   protected boolean isColumnMovableDown(IColumn<?> column) {
-    if (column.isFixedPosition()) {
+    if (column.isFixedPosition() || !column.isVisible()) {
       return false;
     }
     List<IColumn<?>> visibleColumns = column.getTable().getColumnSet().getVisibleColumns();
@@ -1708,11 +1670,21 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
    * behavior is required.
    */
   protected void execAddColumnAction() {
-    if (isCustomizable()) {
-      List<String> existingColumns = getVisibleColumnIds();
-      m_organizedTable.getTableCustomizer().addColumn(null);
-      getColumnsTableField().getTable().moveNewColumnsAfterSelection(existingColumns);
+    Table columnsTable = getColumnsTableField().getTable();
+    List<String> existingColumnIds = new ArrayList<>();
+    columnsTable.getKeyColumn().getValues().forEach(col -> existingColumnIds.add(col.getColumnId()));
+
+    IColumn<?> insertAfterColumn = null;
+    List<IColumn<?>> selectedColumns = columnsTable.getKeyColumn().getSelectedValues();
+    if (selectedColumns.size() > 0) {
+      insertAfterColumn = selectedColumns.get(selectedColumns.size() - 1);
     }
+    getOrganizedTable().getTableOrganizer().addColumn(insertAfterColumn);
+    getColumnsTableField().reloadTableData();
+
+    // Select added rows
+    List<ITableRow> newRows = columnsTable.getRows().stream().filter(row -> !existingColumnIds.contains(columnsTable.getKeyColumn().getValue(row).getColumnId())).collect(Collectors.toList());
+    columnsTable.selectRows(newRows);
   }
 
   /**
@@ -1720,16 +1692,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
    * Override this method if a different behavior is required.
    */
   protected void execRemoveColumnAction() {
-    if (isCustomizable()) {
-      Table columnsTable = getColumnsTableField().getTable();
-      for (ITableRow selectedRow : columnsTable.getSelectedRows()) {
-        IColumn<?> selectedColumn = columnsTable.getKeyColumn().getValue(selectedRow);
-        if (isColumnRemovable(selectedColumn)) {
-          m_organizedTable.getTableCustomizer().removeColumn(selectedColumn);
-        }
-      }
-      getColumnsTableField().reloadTableData();
+    Table columnsTable = getColumnsTableField().getTable();
+    for (ITableRow selectedRow : columnsTable.getSelectedRows()) {
+      IColumn<?> selectedColumn = columnsTable.getKeyColumn().getValue(selectedRow);
+      getOrganizedTable().getTableOrganizer().removeColumn(selectedColumn);
     }
+    getColumnsTableField().reloadTableData();
   }
 
   protected boolean acceptColumnForColumnsTable(IColumn<?> column) {
