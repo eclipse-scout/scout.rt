@@ -77,6 +77,22 @@ public class HtmlHelperTest {
     // Tables
     assertEquals("one two\nthree four", helper.toPlainText("<table><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr></table>"));
 
+    // Styles and Scripts
+    assertEquals(
+        "Lorem ipsum dolor\n"
+            + "Donec mattis metus lorem. Aenean posuere tincidunt enim.\n"
+            + "Pellentesque eu euismod eros, in ullamcorper erat.",
+        helper.toPlainText(
+            "<h1>Lorem ipsum dolor</h1>\n"
+                + "<style>\n"
+                + "p {\n"
+                + " color: #26b72b;\n"
+                + "}\n"
+                + "</style>\n"
+                + "<p style=\"color: blue\">Donec mattis metus lorem. Aenean posuere tincidunt enim.</p>\n"
+                + "<script>alert('Hello World!');</script>\n"
+                + "<p style=\"color: green\">Pellentesque eu euismod eros, in ullamcorper erat.</p>"));
+
     //Emojis
     assertEquals(""
         + "Emojis\n"

@@ -25,6 +25,8 @@ public class HtmlHelper {
   private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</table>|</li>|</head>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_SPACE_END_TAGS = Pattern.compile("</td>|</th>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_TAGS = Pattern.compile("<[^>]+>", Pattern.DOTALL);
+  private static final Pattern HTML_SCRIPTS = Pattern.compile("(?<=<script>).*?(?=<\\/script>)", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_STYLES = Pattern.compile("(?<=<style>).*?(?=<\\/style>)", Pattern.CASE_INSENSITIVE);
   private static final Pattern MULTIPLE_SPACES = Pattern.compile("[ ]+");
   private static final Pattern SPACES_ADJACENT_LINEBREAKS = Pattern.compile("[ ]+\n[ ]?|[ ]?\n[ ]+");
   private static final Pattern DECIMAL_NCR = Pattern.compile("&#(\\d+);");
@@ -95,6 +97,11 @@ public class HtmlHelper {
     s = matcher.replaceAll("\n");
     //tabs
     s = StringUtility.replace(s, StringUtility.HTML_ENCODED_TAB, "\t");
+    //remove script and style contents
+    matcher = HTML_SCRIPTS.matcher(s);
+    s = matcher.replaceAll("");
+    matcher = HTML_STYLES.matcher(s);
+    s = matcher.replaceAll("");
     //remove tags
     matcher = HTML_SPACE_END_TAGS.matcher(s);
     s = matcher.replaceAll(" ");
