@@ -112,7 +112,7 @@ public class WidgetTest {
     assertTrue(widget.isDisposeDone());
 
     // Init may be called again after dispose
-    // The reason is: it has always been like this for forms and we don't want to break existing code
+    // The reason is: it has always been like this for forms, and we don't want to break existing code
     widget.init();
     assertEquals(2, widget.initCalls);
     assertTrue(widget.isInitDone());

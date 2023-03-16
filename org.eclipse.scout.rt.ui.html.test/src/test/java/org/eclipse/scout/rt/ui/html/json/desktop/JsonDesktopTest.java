@@ -93,6 +93,7 @@ public class JsonDesktopTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testFormAddedAndRemoved() {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.init();
@@ -158,6 +159,7 @@ public class JsonDesktopTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testFormClosedBeforeRemovedInDifferentRequests() {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.init();
@@ -199,6 +201,7 @@ public class JsonDesktopTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testFormClosedBeforeRemovedInSameRequest() throws JSONException {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.init();
@@ -232,7 +235,7 @@ public class JsonDesktopTest {
   }
 
   /**
-   * Tests whether non displayable menus are sent.
+   * Tests whether non-displayable menus are sent.
    * <p>
    * This reduces response size and also leverages security because the menus are never visible to the user, not even
    * with the dev tools of the browser
@@ -264,7 +267,7 @@ public class JsonDesktopTest {
   }
 
   /**
-   * Tests whether non displayable view buttons are sent.
+   * Tests whether non-displayable view buttons are sent.
    * <p>
    * This reduces response size and also leverages security because the menus are never visible to the user, not even
    * with the dev tools of the browser
@@ -289,7 +292,7 @@ public class JsonDesktopTest {
   }
 
   /**
-   * Tests whether non displayable outline is sent.
+   * Tests whether non-displayable outline is sent.
    * <p>
    * This reduces response size and also leverages security because the menus are never visible to the user, not even
    * with the dev tools of the browser

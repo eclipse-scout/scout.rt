@@ -281,7 +281,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   /**
-   * @return <code>true</code> if UI key strokes to select view tabs are enabled, <code>false</code> otherwise. Default
+   * @return <code>true</code> if UI keystrokes to select view tabs are enabled, <code>false</code> otherwise. Default
    *         value is <code>true</code>.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -291,7 +291,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   /**
-   * @return optional modifier to use for UI key strokes to select view tabs (only relevant when
+   * @return optional modifier to use for UI keystrokes to select view tabs (only relevant when
    *         {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>). Default value is
    *         {@link IKeyStroke#CONTROL}.
    */
@@ -315,7 +315,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   /**
    * Configures the logo id.
    * <p>
-   * If specified, the logo will be displayed on the top right corner of the desktop.
+   * If specified, the logo will be displayed in the top right corner of the desktop.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
@@ -471,7 +471,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * Called after a UI has been attached to this desktop. The desktop is opened at this point. This method may be called
-   * more than once. It is called immediately after the desktop has been opened and also in case of a reload, when a new
+   * more than once. It is called immediately after the desktop has been opened and also in case of reload, when a new
    * UiSession has been created.
    * <p>
    * Subclasses can override this method. The default does nothing.
@@ -1397,7 +1397,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   /**
-   * @return the internal key stroke list. May be {@code null}.
+   * @return the internal keystroke list. May be {@code null}.
    */
   protected Set<IKeyStroke> getKeyStrokesInternal() {
     return propertySupport.getPropertySet(PROP_KEY_STROKES);
@@ -2162,7 +2162,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   /**
    * How many times the attachGui() method has been called. Some behavior like URL or deep-link handling may be
    * different the first time a desktop is attached. If the attached count is 1 it means the desktop has been created.
-   * If attached count is > 1 it means an existing desktop is re-used (probably by a reload with Ctrl + R in the
+   * If attached count is > 1 it means an existing desktop is re-used (probably by reloading with Ctrl + R in the
    * browser).
    */
   protected int getAttachedCount() {
@@ -2283,7 +2283,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
     }
     else {
-      // non empty deepLinkPath provided but no handler found, throw exception to let user know
+      // non-empty deepLinkPath provided but no handler found, throw exception to let user know
       throw new DeepLinkException("No deep-link handler found. deepLinkPath={" + deepLinkPath + " }");
     }
     return handled;

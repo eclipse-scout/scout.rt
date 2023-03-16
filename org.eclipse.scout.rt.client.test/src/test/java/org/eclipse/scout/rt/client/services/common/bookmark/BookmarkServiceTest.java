@@ -33,19 +33,17 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class BookmarkServiceTest {
 
-  private IDesktop m_desktop;
   private IDesktop m_mockDesktop;
 
   @Before
   public void setUp() {
-    m_desktop = TestEnvironmentClientSession.get().getDesktop();
     m_mockDesktop = Mockito.mock(IDesktop.class);
     TestEnvironmentClientSession.get().replaceDesktop(m_mockDesktop);
   }
 
   @After
   public void tearDown() {
-    TestEnvironmentClientSession.get().replaceDesktop(m_desktop);
+    TestEnvironmentClientSession.get().replaceDesktop(null);
   }
 
   @Test
