@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -26,6 +26,8 @@ public class HtmlHelper {
   private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</table>|</li>|</head>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_SPACE_END_TAGS = Pattern.compile("</td>|</th>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_TAGS = Pattern.compile("<[^>]+>", Pattern.DOTALL);
+  private static final Pattern HTML_SCRIPTS = Pattern.compile("(?<=<script>).*?(?=<\\/script>)", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_STYLES = Pattern.compile("(?<=<style>).*?(?=<\\/style>)", Pattern.CASE_INSENSITIVE);
   private static final Pattern MULTIPLE_SPACES = Pattern.compile("[ ]+");
   private static final Pattern SPACES_ADJACENT_LINEBREAKS = Pattern.compile("[ ]+\n[ ]?|[ ]?\n[ ]+");
 
@@ -88,6 +90,7 @@ public class HtmlHelper {
       // <body> not found, use entire input
       s = html;
     }
+
     //newlines
     s = StringUtility.replace(s, "\r", "");
     s = StringUtility.replace(s, "\n", " ");
@@ -95,11 +98,18 @@ public class HtmlHelper {
     s = matcher.replaceAll("\n");
     //tabs
     s = StringUtility.replace(s, StringUtility.HTML_ENCODED_TAB, "\t");
+
+    //remove script and style contents
+    matcher = HTML_SCRIPTS.matcher(s);
+    s = matcher.replaceAll("");
+    matcher = HTML_STYLES.matcher(s);
+    s = matcher.replaceAll("");
     //remove tags
     matcher = HTML_SPACE_END_TAGS.matcher(s);
     s = matcher.replaceAll(" ");
     matcher = HTML_TAGS.matcher(s);
     s = matcher.replaceAll("");
+
     //remove multiple spaces
     matcher = MULTIPLE_SPACES.matcher(s);
     s = matcher.replaceAll(" ");
