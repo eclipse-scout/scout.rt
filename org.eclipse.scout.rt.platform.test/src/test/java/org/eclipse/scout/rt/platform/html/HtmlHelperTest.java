@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.html;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -32,7 +32,7 @@ public class HtmlHelperTest {
     // but what the toPlainText() method currently returns. They are marked with "[?]"
     // below. Sometimes in the future, it should be considered to change them.
 
-    assertEquals(null, helper.toPlainText(null));
+    assertNull(helper.toPlainText(null));
     assertEquals("", helper.toPlainText(""));
 
     // Text only
@@ -78,6 +78,22 @@ public class HtmlHelperTest {
     // Tables
     assertEquals("one two\nthree four", helper.toPlainText("<table><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr></table>"));
 
+    // Styles and Scripts
+    assertEquals(
+        "Lorem ipsum dolor\n"
+            + "Donec mattis metus lorem. Aenean posuere tincidunt enim.\n"
+            + "Pellentesque eu euismod eros, in ullamcorper erat.",
+        helper.toPlainText(
+            "<h1>Lorem ipsum dolor</h1>\n"
+                + "<style>\n"
+                + "p {\n"
+                + " color: #26b72b;\n"
+                + "}\n"
+                + "</style>\n"
+                + "<p style=\"color: blue\">Donec mattis metus lorem. Aenean posuere tincidunt enim.</p>\n"
+                + "<script>alert('Hello World!');</script>\n"
+                + "<p style=\"color: green\">Pellentesque eu euismod eros, in ullamcorper erat.</p>"));
+
     //Emojis
     assertEquals(""
         + "Emojis\n"
@@ -95,7 +111,7 @@ public class HtmlHelperTest {
   public void testEscape() {
     HtmlHelper helper = BEANS.get(HtmlHelper.class);
 
-    assertEquals(null, helper.escape(null));
+    assertNull(helper.escape(null));
     assertEquals("", helper.escape(""));
     assertEquals(" ", helper.escape(" "));
     assertEquals("hello", helper.escape("hello"));
@@ -120,7 +136,7 @@ public class HtmlHelperTest {
   public void testUnescape() {
     HtmlHelper helper = BEANS.get(HtmlHelper.class);
 
-    assertEquals(null, helper.unescape(null));
+    assertNull(helper.unescape(null));
     assertEquals("", helper.unescape(""));
     assertEquals(" ", helper.unescape(" "));
     assertEquals("hello", helper.unescape("hello"));
@@ -149,7 +165,7 @@ public class HtmlHelperTest {
   public void testNewLineToBr() {
     HtmlHelper helper = BEANS.get(HtmlHelper.class);
 
-    assertEquals(null, helper.newLineToBr(null));
+    assertNull(helper.newLineToBr(null));
     assertEquals("", helper.newLineToBr(""));
     assertEquals(" ", helper.newLineToBr(" "));
     assertEquals("hello", helper.newLineToBr("hello"));
@@ -166,7 +182,7 @@ public class HtmlHelperTest {
   public void testEscapeAndNewLineToBr() {
     HtmlHelper helper = BEANS.get(HtmlHelper.class);
 
-    assertEquals(null, helper.escapeAndNewLineToBr(null));
+    assertNull(helper.escapeAndNewLineToBr(null));
     assertEquals("", helper.escapeAndNewLineToBr(""));
     assertEquals(" ", helper.escapeAndNewLineToBr(" "));
 
