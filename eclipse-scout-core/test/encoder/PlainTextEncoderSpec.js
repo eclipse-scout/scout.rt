@@ -33,6 +33,16 @@ describe('PlainTextEncoder', () => {
     expect(encoder.encode(htmlText)).toBe('hello world! Some more html...');
   });
 
+  it('removes style and script tags', () => {
+    let htmlText = '<style>p{color: #26b72b;}</style>'
+      + '<p style="color: blue">Donec mattis metus lorem. Aenean posuere tincidunt enim.</p>'
+      + '<script>alert(\'Hello World\');</script>'
+      + '<p style="color: green">Pellentesque eu euismod eros, in ullamcorper erat.</p>';
+
+    expect(encoder.encode(htmlText)).toBe('Donec mattis metus lorem. Aenean posuere tincidunt enim.\n' +
+      'Pellentesque eu euismod eros, in ullamcorper erat.\n');
+  });
+
   it('converts br, p, div into new lines', () => {
     let htmlText = '<b>1. line</b><br><i>2. line</i>';
     expect(encoder.encode(htmlText)).toBe('1. line\n2. line');

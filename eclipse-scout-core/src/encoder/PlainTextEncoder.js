@@ -40,6 +40,10 @@ export default class PlainTextEncoder {
       text = text.replace(/<span\s+class="[^"]*font-icon[^"]*">[^<]*<\/span>/gmi, '');
     }
 
+    // Remove script and style contents
+    text = text.replace(/(?<=<script>).*?(?=<\/script>)/gi, '');
+    text = text.replace(/(?<=<style>).*?(?=<\/style>)/gi, '');
+
     // Replace remaining tags
     text = text.replace(/<[^>]+>/gi, '');
 
