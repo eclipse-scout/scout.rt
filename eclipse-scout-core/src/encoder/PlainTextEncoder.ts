@@ -61,6 +61,10 @@ export class PlainTextEncoder {
     // Replace remaining tags
     text = text.replace(/<[^>]+>/gi, '');
 
+    // Convert decimal nrc to unicode
+    text = text.replace('&zwj;', String.fromCharCode(0x200D)); // zero width joiner for combined chars
+    text = text.replace(/&#(\\d+);/gi, (match, group1) => String.fromCharCode(group1));
+
     // Remove spaces at the beginning and end of each line
     text = text.replace(/^[ ]+/gm, '');
     text = text.replace(/[ ]+$/gm, '');
