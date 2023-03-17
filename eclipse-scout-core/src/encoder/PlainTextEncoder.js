@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -42,6 +42,10 @@ export default class PlainTextEncoder {
 
     // Replace remaining tags
     text = text.replace(/<[^>]+>/gi, '');
+
+    // Convert decimal nrc to unicode
+    text = text.replace('&zwj;', String.fromCharCode(0x200D)); // zero width joiner for combined chars
+    text = text.replace(/&#(\\d+);/gi, (match, group1) => String.fromCharCode(group1));
 
     // Remove spaces at the beginning and end of each line
     text = text.replace(/^[ ]+/gm, '');
