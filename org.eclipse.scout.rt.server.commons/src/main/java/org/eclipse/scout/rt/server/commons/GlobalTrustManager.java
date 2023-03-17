@@ -9,13 +9,17 @@
  */
 package org.eclipse.scout.rt.server.commons;
 
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -24,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -33,9 +39,11 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.ConfigPropertyProvider;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.TrustedCertificatesProperty;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -52,7 +60,9 @@ import org.slf4j.LoggerFactory;
 public class GlobalTrustManager {
   private static final Logger LOG = LoggerFactory.getLogger(GlobalTrustManager.class);
 
-  private static final String PATH_CERTS = "/certificates";
+  protected static final String NONE = "NONE";
+  protected static final String P11KEYSTORE = "PKCS11";
+  protected static final String PATH_CERTS = "/certificates";
 
   /**
    * Installs the global trustmanager for 'TLS' server socket protocol and the default trustmanager algorithm as
@@ -76,14 +86,59 @@ public class GlobalTrustManager {
     X509TrustManager globalTrustManager;
     try {
       globalTrustManager = createGlobalTrustManager(tmAlgorithm, getAllTrustedCertificates());
-
       SSLContext sslContext = SSLContext.getInstance(protocol);
-      sslContext.init(null, new TrustManager[]{globalTrustManager}, SecurityUtility.createSecureRandom());
+      sslContext.init(loadKeyManagers(), new TrustManager[]{globalTrustManager}, SecurityUtility.createSecureRandom());
       SSLContext.setDefault(sslContext);
     }
     catch (Exception e) {
       throw new ProcessingException("could not install global trust manager.", e);
     }
+  }
+
+  /**
+   * Loads a list of {@link KeyManager} based on {@code javax.net.ssl.*} system properties.
+   *
+   * @see sun.security.ssl.SSLContextImpl.DefaultManagersHolder#getKeyManagers()
+   */
+  @SuppressWarnings("squid:S1168")
+  protected KeyManager[] loadKeyManagers() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, NoSuchProviderException {
+    String keystore = ConfigUtility.getProperty("javax.net.ssl.keyStore");
+    if (StringUtility.isNullOrEmpty(keystore)) {
+      return null;
+    }
+
+    // setup key store instance
+    String keyStoreType = ConfigUtility.getProperty("javax.net.ssl.keyStoreType");
+    String keyStoreProvider = ConfigUtility.getProperty("javax.net.ssl.keyStoreProvider");
+    KeyStore keyStore;
+    if (StringUtility.hasText(keyStoreProvider)) {
+      keyStore = KeyStore.getInstance(keyStoreType, keyStoreProvider);
+    }
+    else {
+      keyStore = KeyStore.getInstance(keyStoreType);
+    }
+
+    // load key store
+    char[] keystorePassword = ConfigUtility.getProperty("javax.net.ssl.keyStorePassword", "").toCharArray();
+    if (!NONE.equals(keystore)) {
+      try (FileInputStream keystoreInputStream = new FileInputStream(keystore)) {
+        keyStore.load(keystoreInputStream, keystorePassword);
+      }
+    }
+    else {
+      keyStore.load(null, keystorePassword);
+    }
+
+    // initialize key manager factory
+    KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+    if (P11KEYSTORE.equals(keyStoreType)) {
+      keyManagerFactory.init(keyStore, null); // do not specify password if using token
+    }
+    else {
+      keyManagerFactory.init(keyStore, keystorePassword);
+    }
+
+    return keyManagerFactory.getKeyManagers();
   }
 
   /**
