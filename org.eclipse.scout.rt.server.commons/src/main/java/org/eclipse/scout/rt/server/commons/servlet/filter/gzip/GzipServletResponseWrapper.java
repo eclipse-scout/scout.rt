@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.http.protocol.HTTP;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +91,24 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
   @Override
   public void setContentLength(int len) {
     // ignored: content length zipped content != content length unzipped content
+  }
+
+  @Override
+  public void setHeader(String name, String value) {
+    if (HTTP.CONTENT_LEN.equalsIgnoreCase(name)) {
+      // see setContentLength
+      return;
+    }
+    super.setHeader(name, value);
+  }
+
+  @Override
+  public void addHeader(String name, String value) {
+    if (HTTP.CONTENT_LEN.equalsIgnoreCase(name)) {
+      // see setContentLength
+      return;
+    }
+    super.addHeader(name, value);
   }
 
   @Override
