@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -28,6 +28,7 @@ public class HtmlHelper {
   private static final Pattern HTML_TAGS = Pattern.compile("<[^>]+>", Pattern.DOTALL);
   private static final Pattern MULTIPLE_SPACES = Pattern.compile("[ ]+");
   private static final Pattern SPACES_ADJACENT_LINEBREAKS = Pattern.compile("[ ]+\n[ ]?|[ ]?\n[ ]+");
+  private static final Pattern DECIMAL_NCR = Pattern.compile("&#(\\d+);");
 
   /**
    * Very basic HTML to plain text conversion, without parsing and building a model.
@@ -117,7 +118,22 @@ public class HtmlHelper {
     s = StringUtility.replace(s, "&#9;", "\t");
     s = StringUtility.replaceNoCase(s, "&#x9;", "\t");
 
-    return s;
+    //decimal numeric character reference
+    s = StringUtility.replace(s, "&zwj;", Character.toString(0x200D)); //zero width joiner for combined characters
+    matcher = DECIMAL_NCR.matcher(s);
+    StringBuilder sb = new StringBuilder();
+    while (matcher.find()) {
+      String decimalNcr = matcher.group(1);
+      try {
+        String character = Character.toString(Integer.parseInt(decimalNcr));
+        matcher.appendReplacement(sb, character);
+      }
+      catch (IllegalArgumentException e) {
+        matcher.appendReplacement(sb, decimalNcr);
+      }
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
   }
 
   /**
