@@ -62,7 +62,7 @@
     "mini-css-extract-plugin": "2.7.1",
     "css-minimizer-webpack-plugin": "4.2.2",
     "terser-webpack-plugin": "5.3.6",
-    "webpack": "5.75.0",
+    "webpack": "5.76.2",
     "yargs-parser": "21.1.1",
     "fork-ts-checker-webpack-plugin": "7.2.13",
     "fork-ts-checker-notifier-webpack-plugin": "6.0.0"
