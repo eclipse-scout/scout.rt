@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -77,6 +77,18 @@ public class HtmlHelperTest {
 
     // Tables
     assertEquals("one two\nthree four", helper.toPlainText("<table><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr></table>"));
+
+    //Emojis
+    assertEquals(""
+        + "Emojis\n"
+        + "Face with Tears of Joy Emoji: \uD83D\uDE02\n"
+        + "Party Popper Emoji: \uD83C\uDF89\n"
+        + "Man Technologist: Medium-light Skin Tone: \uD83D\uDC68\uD83C\uDFFC\u200D\uD83D\uDCBB",
+        helper.toPlainText(""
+            + "<h1>Emojis</h1>\n"
+            + "<p>Face with Tears of Joy Emoji: &#128514;</p>\n"
+            + "<p>Party Popper Emoji: &#127881;</p>\n"
+            + "<p>Man Technologist: Medium-light Skin Tone: &#128104;&#127996;&zwj;&#128187;</p>"));
   }
 
   @Test
