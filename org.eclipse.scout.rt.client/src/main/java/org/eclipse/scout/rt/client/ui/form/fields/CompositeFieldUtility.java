@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -137,15 +138,6 @@ public final class CompositeFieldUtility {
     fields.sort(new OrderedComparator());
     compositeField.setFields(fields);
     compositeField.rebuildFieldGrid();
-  }
-
-  /**
-   * @deprecated Will be removed with Scout 12. Use {@link #moveFieldTo(IFormField, ICompositeField, ICompositeField)}
-   * instead.
-   */
-  @Deprecated
-  public static void moveFieldTo(IFormField f, ICompositeField oldContainer, ICompositeField newContainer, Map<Class<? extends IFormField>, IFormField> movedFormFieldsByClass) {
-    moveFieldTo(f, oldContainer, newContainer);
   }
 
   public static void moveFieldTo(IFormField f, ICompositeField oldContainer, ICompositeField newContainer) {

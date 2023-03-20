@@ -102,14 +102,6 @@ public abstract class AbstractExtensionChain<EXTENSION> {
     }
   }
 
-  /**
-   * @deprecated As of release 22.0, replaced by {@link #callChain(MethodInvocation)}
-   */
-  @Deprecated
-  protected void callChain(MethodInvocation<?> methodInvocation, Object... arguments) {
-    callChain(methodInvocation);
-  }
-
   protected void callChain(MethodInvocation<?> methodInvocation) {
     if (hasNext()) {
       EXTENSION nextExtension = next();

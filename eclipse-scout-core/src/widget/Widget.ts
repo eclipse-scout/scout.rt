@@ -512,13 +512,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * @deprecated use isRemovalPending instead. Will be removed with 23.0
-   */
-  protected _isRemovalPending(): boolean {
-    return this.isRemovalPending();
-  }
-
-  /**
    * Returns true if the removal of this or an ancestor widget is pending. Checking the ancestor is omitted if the parent is being removed.
    * This may be used to prevent a removal if an ancestor will be removed (e.g. by an animation)
    */

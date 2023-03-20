@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {events, graphics, Insets, JQueryMouseWheelEvent, OldWheelEvent, scout, ScrollbarEventMap, ScrollbarModel, scrollbars, Widget} from '../index';
+import {events, graphics, Insets, JQueryWheelEvent, scout, ScrollbarEventMap, ScrollbarModel, scrollbars, Widget} from '../index';
 import $ from 'jquery';
 
 export class Scrollbar extends Widget implements ScrollbarModel {
@@ -31,7 +31,7 @@ export class Scrollbar extends Widget implements ScrollbarModel {
   protected _scrollDir: 'scrollLeft' | 'scrollTop';
   protected _thumbClipping: Insets;
   protected _onScrollHandler: (event: JQuery.ScrollEvent) => void;
-  protected _onScrollWheelHandler: (event: JQueryMouseWheelEvent) => boolean;
+  protected _onScrollWheelHandler: (event: JQueryWheelEvent) => boolean;
   protected _onScrollbarMouseDownHandler: (event: JQuery.MouseDownEvent) => void;
   protected _onTouchStartHandler: (event: JQuery.TouchStartEvent) => void;
   protected _onThumbMouseDownHandler: (event: JQuery.MouseDownEvent) => boolean;
@@ -101,7 +101,7 @@ export class Scrollbar extends Widget implements ScrollbarModel {
       throw new Error('Data "scrollbars" missing in ' + graphics.debugOutput(this.$parent) + '\nAncestors: ' + this.ancestorsToString(1));
     }
     this.$parent
-      .on('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
+      .on('wheel', this._onScrollWheelHandler)
       .on('scroll', this._onScrollHandler)
       .onPassive('touchstart', this._onTouchStartHandler);
     scrollbars.forEach(scrollbar => {
@@ -119,7 +119,7 @@ export class Scrollbar extends Widget implements ScrollbarModel {
   protected override _remove() {
     // Uninstall listeners
     this.$parent
-      .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
+      .off('wheel', this._onScrollWheelHandler)
       .off('scroll', this._onScrollHandler)
       .offPassive('touchstart', this._onTouchStartHandler);
     let scrollbars = this.$parent.data('scrollbars');
@@ -368,7 +368,7 @@ export class Scrollbar extends Widget implements ScrollbarModel {
     });
   }
 
-  protected _onScrollWheel(event: JQueryMouseWheelEvent): boolean {
+  protected _onScrollWheel(event: JQueryWheelEvent): boolean {
     if (!this.$container.isVisible()) {
       return true; // ignore scroll wheel event if there is no scroll bar visible
     }
@@ -378,11 +378,16 @@ export class Scrollbar extends Widget implements ScrollbarModel {
     if (this.mouseWheelNeedsShift !== event.shiftKey) {
       return true; // only scroll if shift modifier matches
     }
-    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event['originalEvent'];
-    let w = originalEvent.wheelDelta ? -originalEvent.wheelDelta / 2 : originalEvent.detail * 20;
+    let originalEvent = event.originalEvent;
+    let delta = 0;
+    if (this.axis === 'y') {
+      delta = originalEvent.deltaY;
+    } else if (this.axis === 'x') {
+      delta = originalEvent.deltaX | originalEvent.deltaY;
+    }
 
     this.notifyBeforeScroll();
-    this.scroll(w);
+    this.scroll(delta);
     this.notifyAfterScroll();
 
     return false;

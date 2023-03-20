@@ -552,13 +552,6 @@ export class Menu extends Action implements MenuModel {
     return Action.ActionStyle.BUTTON === this.actionStyle;
   }
 
-  /**
-   * @deprecated use insertChildActions instead
-   */
-  addChildActions(childActions: ObjectOrChildModel<Menu> | ObjectOrChildModel<Menu>[]) {
-    this.insertChildActions(childActions);
-  }
-
   insertChildAction(actionsToInsert: ObjectOrChildModel<Menu>) {
     this.insertChildActions([actionsToInsert]);
   }
