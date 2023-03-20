@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -55,6 +56,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.logging.IUiRunContextDiagnostics;
@@ -218,6 +220,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     ServletFileUpload upload = new ServletFileUpload();
     upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
     upload.setSizeMax(uploadable.getMaximumUploadSize());
+    upload.setFileCountMax(CONFIG.getPropertyValue(UiHtmlConfigProperties.MaxUploadFileCountProperty.class));
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
       FileItemStream item = it.next();
       String filename = item.getName();
