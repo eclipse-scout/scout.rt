@@ -24,7 +24,6 @@ describe('WidgetPopup', () => {
       content: {
         objectType: Form,
         displayHint: Form.DisplayHint.VIEW,
-        modal: false,
         initialFocus: initialFocus,
         rootGroupBox: {
           objectType: GroupBox,

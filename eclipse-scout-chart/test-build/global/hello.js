@@ -26,7 +26,6 @@ class Desktop extends scout.Desktop {
         {
           objectType: 'Form',
           displayHint: 'view',
-          modal: false,
           rootGroupBox: {
             objectType: 'GroupBox',
             borderDecoration: scout.GroupBox.BorderDecoration.EMPTY,

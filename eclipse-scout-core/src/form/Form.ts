@@ -90,7 +90,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.displayParent = null; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
     this.maximized = false;
     this.headerVisible = null;
-    this.modal = true;
+    this.modal = null;
     this.logicalGrid = scout.create(FormGrid);
     this.dialogs = [];
     this.views = [];
@@ -258,10 +258,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
     if (this.parent instanceof WrappedFormField) {
       return;
     }
-    if (this.modal && !this._glassPaneRenderer) {
+    let modal = this.modal === null ? this.isDialog() : this.modal;
+    if (modal && !this._glassPaneRenderer) {
       this._glassPaneRenderer = new GlassPaneRenderer(this);
       this._glassPaneRenderer.renderGlassPanes();
-    } else if (!this.modal && this._glassPaneRenderer) {
+    } else if (!modal && this._glassPaneRenderer) {
       this._glassPaneRenderer.removeGlassPanes();
       this._glassPaneRenderer = null;
     }
