@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Dimension, IconDesc, Logger, OldWheelEvent, Point, Predicate, ResizableModel} from '../index';
+import {Dimension, IconDesc, Logger, Point, Predicate, ResizableModel} from '../index';
 import $ from 'jquery';
 import Deferred = JQuery.Deferred;
 
@@ -34,7 +34,7 @@ export type AppLinkBeanArgument = AppLink | string;
 
 export type AppLinkFuncArgument<T> = JQuery.TypeEventHandler<T, undefined, T, T, 'click'> | { _onAppLinkAction: JQuery.TypeEventHandler<T, undefined, T, T, 'click'> };
 
-export type JQueryMouseWheelEvent<TDelegateTarget = any, TData = any, TCurrentTarget = any, TTarget = any> = JQuery.TriggeredEvent<TDelegateTarget, TData, TCurrentTarget, TTarget> & { originalEvent: OldWheelEvent };
+export type JQueryWheelEvent<TDelegateTarget = any, TData = any, TCurrentTarget = any, TTarget = any> = JQuery.TriggeredEvent<TDelegateTarget, TData, TCurrentTarget, TTarget> & { originalEvent: WheelEvent };
 
 declare global {
 

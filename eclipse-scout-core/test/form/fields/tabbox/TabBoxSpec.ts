@@ -62,9 +62,9 @@ describe('TabBox', () => {
         id: 'Bar'
       });
       let tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
-      tabBox.selectTabById('Foo');
+      tabBox.setSelectedTab('Foo');
       expect(tabBox.selectedTab).toBe(tabItemA);
-      tabBox.selectTabById('Bar');
+      tabBox.setSelectedTab('Bar');
       expect(tabBox.selectedTab).toBe(tabItemB);
     });
 

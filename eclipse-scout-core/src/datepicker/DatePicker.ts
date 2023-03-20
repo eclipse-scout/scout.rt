@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DateFormat, DatePickerEventMap, DatePickerModel, dates, Device, events, graphics, HtmlComponent, InitModelOf, JQueryMouseWheelEvent, objects, OldWheelEvent, scout, SwipeCallbackEvent, Widget} from '../index';
+import {arrays, DateFormat, DatePickerEventMap, DatePickerModel, dates, Device, events, graphics, HtmlComponent, InitModelOf, JQueryWheelEvent, objects, scout, SwipeCallbackEvent, Widget} from '../index';
 import $ from 'jquery';
 
 export type DatePickerMonth = { viewDate: Date; rendered: boolean; $container: JQuery; $weekendSeparator?: JQuery };
@@ -181,7 +181,7 @@ export class DatePicker extends Widget implements DatePickerModel {
       month.$weekendSeparator = $box.appendDiv('date-picker-weekend-separator');
     }
     this._build$DateBox(month.viewDate).appendTo($box);
-    $box.on('DOMMouseScroll mousewheel', this._onMouseWheel.bind(this))
+    $box.on('wheel', this._onMouseWheel.bind(this))
       .appendTo(this.$scrollable);
 
     // Fix the size of the box
@@ -586,9 +586,9 @@ export class DatePicker extends Widget implements DatePickerModel {
     });
   }
 
-  protected _onMouseWheel(event: JQueryMouseWheelEvent) {
-    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event['originalEvent'];
-    let wheelData = originalEvent.wheelDelta ? originalEvent.wheelDelta / 10 : -originalEvent.detail * 3;
+  protected _onMouseWheel(event: JQueryWheelEvent) {
+    let originalEvent = event.originalEvent;
+    let wheelData = originalEvent.deltaY | originalEvent.deltaX;
     let diff = (wheelData >= 0 ? -1 : 1);
     this.shiftViewDate(0, diff, 0);
     originalEvent.preventDefault();

@@ -170,17 +170,6 @@ export class TabBox extends CompositeField implements TabBoxModel {
   }
 
   /**
-   * @deprecated use {@link setSelectedTab} instead
-   */
-  selectTabById(tabId: string) {
-    let tab = this.getTabItem(tabId);
-    if (!tab) {
-      throw new Error('Tab with ID \'' + tabId + '\' does not exist');
-    }
-    this.setSelectedTab(tab);
-  }
-
-  /**
    * @param tabItem if a string is provided, the tab will be resolved automatically
    */
   setSelectedTab(tabItem: TabItem | string) {

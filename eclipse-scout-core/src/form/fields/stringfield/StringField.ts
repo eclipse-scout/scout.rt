@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BasicField, DesktopNotification, EnumObject, fields, InitModelOf, InputFieldKeyStrokeContext, MaxLengthHandler, objects, OldWheelEvent, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldEventMap,
+  BasicField, DesktopNotification, EnumObject, fields, InitModelOf, InputFieldKeyStrokeContext, JQueryWheelEvent, MaxLengthHandler, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldEventMap,
   StringFieldLayout, StringFieldModel, strings, texts
 } from '../../../index';
 
@@ -119,7 +119,7 @@ export class StringField extends BasicField<string> {
     }.bind(this);
 
     return this.$parent.makeElement('<textarea>')
-      .on('DOMMouseScroll mousewheel', this._onMouseWheel.bind(this))
+      .on('wheel', this._onMouseWheel.bind(this))
       .on('mousedown', mouseDownHandler)
       .on('focus', event => {
         (this.$field as JQuery).off('mousedown', mouseDownHandler);
@@ -151,9 +151,9 @@ export class StringField extends BasicField<string> {
     }
   }
 
-  protected _onMouseWheel(event: JQuery.TriggeredEvent) {
-    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event['originalEvent'];
-    let delta = originalEvent.wheelDelta ? -originalEvent.wheelDelta : originalEvent.detail;
+  protected _onMouseWheel(event: JQueryWheelEvent) {
+    let originalEvent = event.originalEvent;
+    let delta = originalEvent.deltaY;
     let scrollTop = this.$field[0].scrollTop;
     if (delta < 0 && scrollTop === 0) {
       // StringField is scrolled to the very top -> parent may scroll

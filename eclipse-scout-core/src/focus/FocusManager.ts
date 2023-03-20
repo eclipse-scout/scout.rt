@@ -284,16 +284,11 @@ export class FocusManager implements FocusManagerOptions {
    * @param filter
    *        filter that controls which element should be focused, or null to accept all focusable candidates.
    * @param options
-   *        Use {@link RequestFocusOptions}, boolean is deprecated. If using boolean it represents {@link RequestFocusOptions.onlyIfReady}.
+   *        options to customize the focus request.
    * @returns true if focus was gained, false otherwise.
    */
-  requestFocus(element: HTMLElement | JQuery, filter?: () => boolean, options?: boolean | RequestFocusOptions): boolean {
-    // backward compatibility
-    if (typeof options === 'boolean') {
-      options = {onlyIfReady: options};
-    } else {
-      options = options || {};
-    }
+  requestFocus(element: HTMLElement | JQuery, filter?: () => boolean, options?: RequestFocusOptions): boolean {
+    options = options || {};
     let htmlElement: HTMLElement = element instanceof $ ? element[0] : element;
     if (!htmlElement) {
       return false;

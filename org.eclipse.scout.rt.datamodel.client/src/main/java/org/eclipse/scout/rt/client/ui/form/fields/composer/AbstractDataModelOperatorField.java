@@ -56,14 +56,6 @@ public abstract class AbstractDataModelOperatorField extends AbstractSmartField<
   }
 
   /**
-   * @deprecated use {@link #setAttribute(IDataModelAttribute, IDataModelAttributeOp)})}
-   */
-  @Deprecated
-  public void setAttribute(IDataModelAttribute attribute) {
-    setAttribute(attribute, null);
-  }
-
-  /**
    * Sets an operator according to the given attribute.
    * <p>
    * Sets the desired operator if it is suitable for the given attribute and not <code>null</code>, otherwise the
