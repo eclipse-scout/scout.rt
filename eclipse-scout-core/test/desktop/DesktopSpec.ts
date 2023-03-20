@@ -2175,7 +2175,6 @@ describe('Desktop', () => {
   describe('views', () => {
     let formModel = {
       objectType: Form,
-      modal: false,
       displayHint: Form.DisplayHint.VIEW,
       rootGroupBox: {
         objectType: GroupBox
@@ -2243,7 +2242,6 @@ describe('Desktop', () => {
   describe('selectedViewTabs', () => {
     let formModel: ObjectOrChildModel<Form> = {
       objectType: Form,
-      modal: false,
       displayHint: Form.DisplayHint.VIEW,
       displayViewId: 'E',
       rootGroupBox: {
@@ -2459,7 +2457,6 @@ describe('Desktop', () => {
       let view = scout.create(Form, {
         parent: desktop,
         displayHint: Form.DisplayHint.VIEW,
-        modal: false,
         rootGroupBox: {
           objectType: GroupBox,
           fields: [
@@ -2511,7 +2508,6 @@ describe('Desktop', () => {
         id: 'View1',
         parent: desktop,
         displayHint: Form.DisplayHint.VIEW,
-        modal: false,
         rootGroupBox: {
           objectType: GroupBox,
           fields: [
@@ -2551,7 +2547,6 @@ describe('Desktop', () => {
           id: 'Popup1Form',
           objectType: Form,
           displayHint: Form.DisplayHint.VIEW,
-          modal: false,
           rootGroupBox: {
             objectType: GroupBox,
             fields: [
@@ -2619,7 +2614,6 @@ describe('Desktop', () => {
           id: 'Popup2Form',
           objectType: Form,
           displayHint: Form.DisplayHint.VIEW,
-          modal: false,
           rootGroupBox: {
             objectType: GroupBox,
             fields: [

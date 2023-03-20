@@ -450,30 +450,50 @@ describe('Form', () => {
       let form = helper.createFormWithOneField({
         modal: true
       });
-      form.open()
-        .then(() => {
-          expect($('.glasspane').length).toBe(3);
-          form.close();
-          expect($('.glasspane').length).toBe(0);
-        })
-        .catch(fail)
-        .always(done);
+      openFormAndExpectGlassPane(form, true, done);
+    });
+
+    it('creates a glass pane if true also for views', done => {
+      let form = helper.createFormWithOneField({
+        modal: true,
+        displayHint: Form.DisplayHint.VIEW
+      });
+      openFormAndExpectGlassPane(form, true, done);
     });
 
     it('does not create a glass pane if false', done => {
       let form = helper.createFormWithOneField({
         modal: false
       });
+      openFormAndExpectGlassPane(form, false, done);
+    });
+
+    it('is true for dialogs if not explicitly set', done => {
+      let form = helper.createFormWithOneField({
+        displayHint: Form.DisplayHint.DIALOG
+      });
+      expect(form.modal).toBe(null);
+      openFormAndExpectGlassPane(form, true, done);
+    });
+
+    it('is false for views if not explicitly set', done => {
+      let form = helper.createFormWithOneField({
+        displayHint: Form.DisplayHint.VIEW
+      });
+      expect(form.modal).toBe(null);
+      openFormAndExpectGlassPane(form, false, done);
+    });
+
+    function openFormAndExpectGlassPane(form: Form, expectGlasspane: boolean, done: DoneFn) {
       form.open()
         .then(() => {
-          expect($('.glasspane').length).toBe(0);
+          expect($('.glasspane').length).toBe(expectGlasspane ? form.displayHint === 'dialog' ? 3 : 2 : 0);
           form.close();
           expect($('.glasspane').length).toBe(0);
         })
         .catch(fail)
         .always(done);
-    });
-
+    }
   });
 
   describe('displayParent', () => {

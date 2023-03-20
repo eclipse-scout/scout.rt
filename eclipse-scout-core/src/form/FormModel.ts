@@ -71,21 +71,25 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
    */
   maximized?: boolean;
   /**
-   * The header contains the {@link title}, {@link subtitle}, {@link icon}, {@link saveNeeded} status and close action (controlled by {@link closable}.
+   * The header contains the {@link title}, {@link subtitle}, {@link icon}, {@link saveNeeded} status and close action (controlled by {@link closable}).
    *
-   * Set it to true, to show a header, false to not show a header. Null, to let the UI decide what to do, which means: show a header if it is a dialog, otherwise don't show one.
+   * - If set to true, a header will be shown.
+   * - If set to false, no header will be shown.
+   * - If set to null, the UI will decide what to do, which means: show a header if {@link displayHint} is set to {@link DisplayHint.DIALOG}, otherwise don't show one.
    *
    * Default is null (= header is visible if the form is a dialog).
    */
   headerVisible?: boolean;
   /**
-   * Controls whether the user is allowed to interact with the user interface on the back of the dialog.
+   * Controls whether the user is allowed to interact with the user interface outside the form.
    *
-   * If set to true, the user can only interact with the dialog.
+   * - If set to true, the user can only interact with the form and the rest is blocked.
+   * - If set to false, the interaction is not limited to the form.
+   * - If set to null, the UI decides whether to use true or false, which means: modal will be true if {@link displayHint} is set to {@link DisplayHint.DIALOG}, otherwise it will be false.
    *
-   * What parts of the desktop will be blocked dependends on the used {@link displayParent}.
+   * What parts of the desktop will be blocked depends on the used {@link displayParent}.
    *
-   * Default is true.
+   * Default is null (= form is modal if it is a dialog).
    */
   modal?: boolean;
   /**
