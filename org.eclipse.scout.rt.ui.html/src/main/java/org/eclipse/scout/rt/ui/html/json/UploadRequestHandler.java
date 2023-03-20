@@ -38,6 +38,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -54,6 +55,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.logging.IUiRunContextDiagnostics;
@@ -146,6 +148,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       // Request was already processed and adapter does not exist anymore
       return;
     }
+    if (httpServletRequest.getParameter("legacy") != null) {
+      httpServletResponse.setContentType("text/plain");
+    }
 
     // Read uploaded data
     // GUI requests for the same session must be processed consecutively
@@ -214,6 +219,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     ServletFileUpload upload = new ServletFileUpload();
     upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
     upload.setSizeMax(uploadable.getMaximumUploadSize());
+    upload.setFileCountMax(CONFIG.getPropertyValue(UiHtmlConfigProperties.MaxUploadFileCountProperty.class));
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
       FileItemStream item = it.next();
       String filename = item.getName();

@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
@@ -153,6 +154,25 @@ public final class UiHtmlConfigProperties {
     @Override
     public Integer getDefaultValue() {
       return 30;
+    }
+  }
+
+  public static class MaxUploadFileCountProperty extends AbstractLongConfigProperty {
+
+    @Override
+    public Long getDefaultValue() {
+      return 100L;
+    }
+
+    @Override
+    public String description() {
+      return "For security reasons, file upload is limited to a maximum number of file that can be processed at once.\n"
+          + "By default this property is set to 100. A value of -1 means no limit";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.ui.maxUploadFileCount";
     }
   }
 }
