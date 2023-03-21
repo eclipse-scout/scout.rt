@@ -163,7 +163,7 @@ export class Carousel extends Widget implements CarouselModel {
       let widget = this.widgets[i];
       if (!widget.rendered) {
         widget.render(this.$carouselItems[i]);
-        widget.htmlComp.revalidateLayout();
+        widget.invalidateLayoutTree();
       }
     }
   }
@@ -174,10 +174,28 @@ export class Carousel extends Widget implements CarouselModel {
 
   protected _renderWidgets() {
     this.$carouselFilmstrip.empty();
-    this.$carouselItems = this.widgets.map(widget => {
+    this.$carouselItems = this.widgets.map((widget, index) => {
       let $carouselItem = this.$carouselFilmstrip.appendDiv('carousel-item');
       let htmlComp = HtmlComponent.install($carouselItem, this.session);
       htmlComp.setLayout(new SingleLayout());
+
+      // Only the current item (always 0 initially) may get the focus, otherwise the browser would scroll to reveal the focus which breaks the carousel
+      if (index !== 0) {
+        $carouselItem.addClass('prevent-initial-focus');
+      }
+      $carouselItem.on('focusin', event => {
+        // During rendering, a parent widget may want to restore the focus.
+        // Because this would break the carousel (see above), the focus will be reset to the previously focused element
+        if (this.currentItem !== index) {
+          queueMicrotask(() => {
+            // Reset focus to the previously focused element
+            if (event.relatedTarget instanceof HTMLElement) {
+              event.relatedTarget.focus();
+            }
+            this.$container[0].scrollLeft = 0;
+          });
+        }
+      });
 
       // Add the CSS classes of the widget to be able to style the carousel items.
       // Use a suffix to prevent conflicts
