@@ -116,6 +116,9 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
 
   private List<EXTENSION> loadExtensions(EXTENSION localExtension) {
     List<EXTENSION> extensions = BEANS.get(IInternalExtensionRegistry.class).createExtensionsFor(m_owner);
+    if (extensions.isEmpty()) {
+      return Collections.singletonList(localExtension);
+    }
     extensions.add(localExtension);
     return Collections.unmodifiableList(extensions);
   }
