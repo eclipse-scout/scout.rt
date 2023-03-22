@@ -13,7 +13,7 @@ import {
   LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
 } from 'chart.js';
 import 'chart.js/auto'; // Import from auto to register charts
-import {arrays, colorSchemes, graphics, numbers, objects, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
+import {arrays, colorSchemes, graphics, numbers, objects, Point, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
 import ChartDataLabels, {Context} from 'chartjs-plugin-datalabels';
 import $ from 'jquery';
 import {ChartAxis, ChartConfig, ChartData, ChartType, ClickObject, NumberFormatter} from './Chart';
@@ -962,6 +962,10 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     if (isTooltipShowing) {
       this._renderTooltipLater(context);
     } else {
+      // clear timeout before creating a new handler.
+      // Otherwise, changing the context within the tooltip delay time creates a second handler
+      // and the first one will always be executed, since the tooltipTimoutId reference to it is lost
+      clearTimeout(this._tooltipTimeoutId);
       this._tooltipTimeoutId = setTimeout(() => this._renderTooltipLater(context), tooltips.DEFAULT_TOOLTIP_DELAY);
     }
   }
@@ -1001,11 +1005,8 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       tooltipText += arrays.ensure(tooltipItems(dataPoints, tooltipLabel, tooltipLabelValue, tooltipColor)).join('');
     }
 
-    let positionAndOffset = this._computeTooltipPositionAndOffset(firstDataPoint),
-      origin = graphics.offsetBounds(this.$canvas);
-    origin.x += tooltip.caretX + positionAndOffset.offsetX;
-    origin.y += tooltip.caretY + positionAndOffset.offsetY;
-    origin.height = positionAndOffset.height;
+    let positionAndOffset = this._computeTooltipPositionAndOffset(firstDataPoint);
+    let offset = new Point(tooltip.caretX + positionAndOffset.offsetX, tooltip.caretY + positionAndOffset.offsetY);
 
     this._tooltip = scout.create({
       objectType: Tooltip,
@@ -1016,7 +1017,12 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       cssClass: strings.join(' ', 'chart-tooltip', tooltipOptions.cssClass),
       tooltipPosition: positionAndOffset.tooltipPosition,
       tooltipDirection: positionAndOffset.tooltipDirection,
-      origin: origin
+      originProducer: $anchor => {
+        const origin = graphics.offsetBounds($anchor);
+        origin.height = positionAndOffset.height;
+        return origin;
+      },
+      offsetProducer: origin => offset
     });
     this._tooltip.render();
 
