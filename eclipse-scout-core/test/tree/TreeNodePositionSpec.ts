@@ -43,7 +43,7 @@ describe('TreeNodePosition', () => {
     // 3: -  node_2
     it('insert node between two other nodes on the same level', () => {
       node0 = helper.createModelNode('0_0', 'node0');
-      node1 = helper.createModelNode('0_1', 'node1', 1);
+      node1 = helper.createModelNode('0_1', 'node1', {childNodeIndex: 1});
       node2 = helper.createModelNode('0_2', 'node2');
 
       tree.render();
@@ -58,7 +58,7 @@ describe('TreeNodePosition', () => {
     // 2: root1
     it('insert node between two other nodes on another level', () => {
       node0 = helper.createModelNode('0_0', 'node0');
-      let root1 = helper.createModelNode('1', 'root1', 1);
+      let root1 = helper.createModelNode('1', 'root1');
 
       tree.render();
       tree.insertNodes([root1], null);
@@ -72,7 +72,7 @@ describe('TreeNodePosition', () => {
     // 2: -  node_1
     // 3: -  node_2
     it('insert node ahead all other nodes on the same level', () => {
-      node0 = helper.createModelNode('0_0', 'node0', 0);
+      node0 = helper.createModelNode('0_0', 'node0', {childNodeIndex: 0});
       node1 = helper.createModelNode('0_1', 'node1');
       node2 = helper.createModelNode('0_2', 'node2');
 
@@ -88,9 +88,9 @@ describe('TreeNodePosition', () => {
     // 2: -  node_1
     // 3: - [node_2] <-- insert
     it('insert node below all other nodes on the same level', () => {
-      node0 = helper.createModelNode('0_0', 'node0', 0);
-      node1 = helper.createModelNode('0_1', 'node1', 1);
-      node2 = helper.createModelNode('0_2', 'node2', 2);
+      node0 = helper.createModelNode('0_0', 'node0');
+      node1 = helper.createModelNode('0_1', 'node1');
+      node2 = helper.createModelNode('0_2', 'node2');
 
       tree.render();
       tree.insertNodes([node0, node1], rootNode);
@@ -108,7 +108,7 @@ describe('TreeNodePosition', () => {
     it('insert a subtree between two other nodes on the same level', () => {
       node0 = helper.createModelNode('0_0', 'node0');
 
-      node1 = helper.createModelNode('0_1', 'node1', 1);
+      node1 = helper.createModelNode('0_1', 'node1', {childNodeIndex: 1});
       let node10 = helper.createModelNode('0_1_0', 'node1_0');
       let node11 = helper.createModelNode('0_1_1', 'node1_1');
       node1.expanded = true;
@@ -136,7 +136,7 @@ describe('TreeNodePosition', () => {
       node0.expanded = true;
       node0.childNodes = [node00, node01];
 
-      node1 = helper.createModelNode('1', 'root1', 1);
+      node1 = helper.createModelNode('1', 'root1');
 
       tree.render();
       tree.insertNodes([node0], rootNode);
@@ -166,43 +166,41 @@ describe('TreeNodePosition', () => {
       // This tree does not use a root node
       tree = helper.createTree(helper.createModel([]));
 
-      function createNode(id: string, text: string, expanded: boolean, childNodeIndex?: number): TreeNodeModel {
-        let node = helper.createModelNode(id, text, childNodeIndex);
-        node.expanded = expanded;
-        return node;
+      function createNode(id: string, text: string, expanded: boolean): TreeNodeModel {
+        return helper.createModelNode(id, text, {expanded: expanded});
       }
 
-      let n1 = createNode('n1', 'Node 1', true, 0);
-      let n2 = createNode('n2', 'Node 2', true, 1);
+      let n1 = createNode('n1', 'Node 1', true);
+      let n2 = createNode('n2', 'Node 2', true);
       let n2_1 = createNode('n2_1', 'Node 2.1', true);
-      let n3 = createNode('n3', 'Node 3', true, 2);
+      let n3 = createNode('n3', 'Node 3', true);
       let n3_1 = createNode('n3_1', 'Node 3.1', true);
-      let n4 = createNode('n4', 'Node 4', false, 3);
-      let n4_1 = createNode('n4_1', 'Node 4.1', true, 0);
-      let n4_2 = createNode('n4_2', 'Node 4.2', true, 1);
-      let n4_3 = createNode('n4_3', 'Node 4.3', true, 2);
-      let n4_4 = createNode('n4_4', 'Node 4.4', true, 3);
-      let n4_5 = createNode('n4_5', 'Node 4.5', true, 4);
-      let n4_6 = createNode('n4_6', 'Node 4.6', true, 5);
-      let n4_7 = createNode('n4_7', 'Node 4.7', true, 6);
-      let n4_8 = createNode('n4_8', 'Node 4.8', true, 7);
-      let n4_9 = createNode('n4_9', 'Node 4.9', true, 8);
-      let n4_10 = createNode('n4_10', 'Node 4.10', true, 9);
-      let n4_11 = createNode('n4_11', 'Node 4.11', true, 10);
-      let n4_12 = createNode('n4_12', 'Node 4.12', true, 11);
-      let n4_13 = createNode('n4_13', 'Node 4.13', true, 12);
-      let n4_14 = createNode('n4_14', 'Node 4.14', true, 13);
-      let n4_15 = createNode('n4_15', 'Node 4.15', true, 14);
-      let n4_16 = createNode('n4_16', 'Node 4.16', true, 15);
-      let n4_17 = createNode('n4_17', 'Node 4.17', true, 16);
-      let n4_18 = createNode('n4_18', 'Node 4.18', true, 17);
-      let n4_19 = createNode('n4_19', 'Node 4.19', true, 18);
-      let n4_20 = createNode('n4_20', 'Node 4.20', true, 19);
-      let n4_21 = createNode('n4_21', 'Node 4.21', true, 20);
-      let n4_22 = createNode('n4_22', 'Node 4.22', true, 21);
-      let n4_23 = createNode('n4_23', 'Node 4.23', true, 22);
-      let n4_24 = createNode('n4_24', 'Node 4.24', true, 23);
-      let n5 = createNode('n5', 'Node 5', true, 4);
+      let n4 = createNode('n4', 'Node 4', false);
+      let n4_1 = createNode('n4_1', 'Node 4.1', true);
+      let n4_2 = createNode('n4_2', 'Node 4.2', true);
+      let n4_3 = createNode('n4_3', 'Node 4.3', true);
+      let n4_4 = createNode('n4_4', 'Node 4.4', true);
+      let n4_5 = createNode('n4_5', 'Node 4.5', true);
+      let n4_6 = createNode('n4_6', 'Node 4.6', true);
+      let n4_7 = createNode('n4_7', 'Node 4.7', true);
+      let n4_8 = createNode('n4_8', 'Node 4.8', true);
+      let n4_9 = createNode('n4_9', 'Node 4.9', true);
+      let n4_10 = createNode('n4_10', 'Node 4.10', true);
+      let n4_11 = createNode('n4_11', 'Node 4.11', true);
+      let n4_12 = createNode('n4_12', 'Node 4.12', true);
+      let n4_13 = createNode('n4_13', 'Node 4.13', true);
+      let n4_14 = createNode('n4_14', 'Node 4.14', true);
+      let n4_15 = createNode('n4_15', 'Node 4.15', true);
+      let n4_16 = createNode('n4_16', 'Node 4.16', true);
+      let n4_17 = createNode('n4_17', 'Node 4.17', true);
+      let n4_18 = createNode('n4_18', 'Node 4.18', true);
+      let n4_19 = createNode('n4_19', 'Node 4.19', true);
+      let n4_20 = createNode('n4_20', 'Node 4.20', true);
+      let n4_21 = createNode('n4_21', 'Node 4.21', true);
+      let n4_22 = createNode('n4_22', 'Node 4.22', true);
+      let n4_23 = createNode('n4_23', 'Node 4.23', true);
+      let n4_24 = createNode('n4_24', 'Node 4.24', true);
+      let n5 = createNode('n5', 'Node 5', true);
       let n5_1 = createNode('n5_1', 'Node 5.1', true);
 
       tree.insertNodes([n1, n2, n3, n4, n5], null);
@@ -294,29 +292,27 @@ describe('TreeNodePosition', () => {
       // This tree does not use a root node
       tree = helper.createTree(helper.createModel([]));
 
-      function createNode(id: string, text: string, expanded: boolean, childNodeIndex?: number): TreeNodeModel {
-        let node = helper.createModelNode(id, text, childNodeIndex);
-        node.expanded = expanded;
-        return node;
+      function createNode(id: string, text: string, expanded: boolean): TreeNodeModel {
+        return helper.createModelNode(id, text, {expanded: expanded});
       }
 
-      let n0 = createNode('n0', 'Node 0', true, 0);
-      let n1 = createNode('n1', 'Node 1', true, 0);
-      let n1_1 = createNode('n1_1', 'Node 1.1', true, 0);
-      let n1_2 = createNode('n1_2', 'Node 1.2', true, 1);
-      let n1_3 = createNode('n1_3', 'Node 1.3', true, 2);
-      let n1_4 = createNode('n1_4', 'Node 1.4', true, 3);
-      let n1_5 = createNode('n1_5', 'Node 1.5', true, 4);
-      let n1_6 = createNode('n1_6', 'Node 1.6', true, 5);
-      let n1_7 = createNode('n1_7', 'Node 1.7', true, 6);
-      let n1_8 = createNode('n1_8', 'Node 1.8', true, 7);
-      let n1_9 = createNode('n1_9', 'Node 1.9', true, 8);
-      let n1_10 = createNode('n1_10', 'Node 1.10', true, 9);
-      let n1_11 = createNode('n1_11', 'Node 1.11', true, 10);
-      let n1_12 = createNode('n1_12', 'Node 1.12', true, 11);
-      let n1_13 = createNode('n1_13', 'Node 1.13', true, 12);
-      let n2 = createNode('n2', 'Node 2', true, 1);
-      let n3 = createNode('n3', 'Node 3', true, 2);
+      let n0 = createNode('n0', 'Node 0', true);
+      let n1 = createNode('n1', 'Node 1', true);
+      let n1_1 = createNode('n1_1', 'Node 1.1', true);
+      let n1_2 = createNode('n1_2', 'Node 1.2', true);
+      let n1_3 = createNode('n1_3', 'Node 1.3', true);
+      let n1_4 = createNode('n1_4', 'Node 1.4', true);
+      let n1_5 = createNode('n1_5', 'Node 1.5', true);
+      let n1_6 = createNode('n1_6', 'Node 1.6', true);
+      let n1_7 = createNode('n1_7', 'Node 1.7', true);
+      let n1_8 = createNode('n1_8', 'Node 1.8', true);
+      let n1_9 = createNode('n1_9', 'Node 1.9', true);
+      let n1_10 = createNode('n1_10', 'Node 1.10', true);
+      let n1_11 = createNode('n1_11', 'Node 1.11', true);
+      let n1_12 = createNode('n1_12', 'Node 1.12', true);
+      let n1_13 = createNode('n1_13', 'Node 1.13', true);
+      let n2 = createNode('n2', 'Node 2', true);
+      let n3 = createNode('n3', 'Node 3', true);
       let n3_1 = createNode('n3_1', 'Node 3.1', true);
 
       tree.insertNodes([n0], null);

@@ -311,7 +311,7 @@ describe('TreeAdapter', () => {
       it('calls insertNodes', () => {
         spyOn(tree, 'insertNodes');
 
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', {childNodeIndex: 3});
         let event = helper.createNodesInsertedEvent(model, [newNode0Child3], node0.id);
         adapter.onModelAction(event);
         expect(tree.insertNodes).toHaveBeenCalledWith([newNode0Child3], tree.nodes[0]);
@@ -326,7 +326,7 @@ describe('TreeAdapter', () => {
         expect(tree.nodes[0].b).toBe(234);
         expect(tree.nodes[0].childNodes[3]).toBe(undefined);
 
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', {childNodeIndex: 3});
         let event = helper.createNodesInsertedEvent(model, [newNode0Child3], node0.id);
         adapter.onModelAction(event);
         expect(tree.a).toBe(123);

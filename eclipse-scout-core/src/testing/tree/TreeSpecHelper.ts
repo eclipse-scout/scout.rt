@@ -24,7 +24,6 @@ export class TreeSpecHelper {
     if (nodes) {
       model.nodes = nodes;
     }
-    model.enabled = true;
     return model as TreeModel & { id: string; objectType: string; parent: Widget; session: Session };
   }
 
@@ -32,13 +31,10 @@ export class TreeSpecHelper {
     return this.createModel(this.createModelNodes(nodeCount, depth, {expanded: expanded}));
   }
 
-  createModelNode(id?: string, text?: string, position?: number, model?: TreeNodeModel): TreeNodeModel {
+  createModelNode(id?: string, text?: string, model?: TreeNodeModel): TreeNodeModel {
     return $.extend({
       id: id + '' || ObjectFactory.get().createUniqueId(),
-      text: text,
-      childNodeIndex: position ? position : 0,
-      enabled: true,
-      checked: false
+      text: text
     }, model);
   }
 
@@ -51,17 +47,17 @@ export class TreeSpecHelper {
       return;
     }
 
-    let nodes = [],
-      nodeId;
+    let nodes = [];
     if (!depth) {
       depth = 0;
     }
+    model = model || {};
     for (let i = 0; i < nodeCount; i++) {
-      nodeId = i;
+      let nodeId = i + '';
       if (parentNode) {
         nodeId = parentNode.id + '_' + nodeId;
       }
-      nodes[i] = this.createModelNode(nodeId, 'node ' + nodeId, i, model);
+      nodes[i] = this.createModelNode(nodeId, 'node ' + nodeId, model);
       if (depth > 0) {
         nodes[i].childNodes = this.createModelNodesInternal(nodeCount, depth - 1, nodes[i], model);
       }

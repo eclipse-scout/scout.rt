@@ -149,7 +149,6 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
     return scout.create(ProposalTreeNode, {
       parent: this.content,
       proposalChooser: this,
-      childNodeIndex: 0,
       enabled: lookupRow.enabled,
       htmlEnabled: false,
       iconId: lookupRow.iconId,
@@ -220,7 +219,6 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
       if (parentNode) {
         this._appendChildNode(parentNode, treeNode);
       } else {
-        treeNode.childNodeIndex = rootNodes.length;
         treeNode.parentNode = null;
         rootNodes.push(treeNode);
       }
@@ -236,7 +234,6 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
     if (!parentNode.childNodes) {
       parentNode.childNodes = [];
     }
-    treeNode.childNodeIndex = parentNode.childNodes.length;
     treeNode.parentNode = parentNode;
     parentNode.childNodes.push(treeNode);
     parentNode.leaf = false;

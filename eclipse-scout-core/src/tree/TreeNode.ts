@@ -51,7 +51,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
   prevSelectionAnimationDone: boolean;
   $node: JQuery;
   $text: JQuery<HTMLSpanElement>;
-  childNodeIndex: number; // set by the Tree or from the UI server
+  childNodeIndex: number;
 
   /**
    * This internal variable stores the promise which is used when a loadChildren() operation is in progress.
@@ -133,7 +133,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
 
     // make sure all child nodes are TreeNodes too
     if (this.hasChildNodes()) {
-      this.getTree().ensureTreeNodes(this.childNodes);
+      this.getTree().ensureTreeNodes(this.childNodes, this.parentNode);
     }
   }
 

@@ -245,15 +245,24 @@ export class Tree extends Widget implements TreeModel {
   }
 
   /**
-   * Iterates through the given array and converts node-models to instances of TreeNode (or a subclass).
-   * If the array element is already a TreeNode the function leaves the element untouched. This function also
-   * ensures that the attribute childNodeIndex is set. By default, we use the order of the nodes array as index
-   * but only if childNodeIndex is undefined.
+   * Iterates through the given array and converts node-models to instances of {@link TreeNode} (or a subclass).
+   * If the array element is already a {@link TreeNode} the function leaves the element untouched. This function also
+   * ensures that the attribute {@link TreeNode.childNodeIndex} is set.
    */
-  ensureTreeNodes(nodes: ObjectOrModel<TreeNode>[]) {
+  ensureTreeNodes(nodes: ObjectOrModel<TreeNode>[], parentNode?: TreeNode) {
+    if (nodes.length === 0) {
+      return;
+    }
+    let nextChildNodeIndex = 0;
+    if (this.initialized) {
+      let previousNodes = parentNode ? parentNode.childNodes : this.nodes;
+      if (previousNodes.length > 0) {
+        nextChildNodeIndex = previousNodes[previousNodes.length - 1].childNodeIndex + 1;
+      }
+    }
     for (let i = 0; i < nodes.length; i++) {
       let node = nodes[i];
-      node.childNodeIndex = scout.nvl(node.childNodeIndex, i);
+      node.childNodeIndex = scout.nvl(node.childNodeIndex, nextChildNodeIndex + i);
       if (node instanceof TreeNode) {
         continue;
       }
@@ -2027,10 +2036,16 @@ export class Tree extends Widget implements TreeModel {
     this.selectNodes([]);
   }
 
+  /**
+   * @param node the node to be selected. If no node is provided, the selection will be removed.
+   */
   selectNode(node: TreeNode, debounceSend?: boolean) {
     this.selectNodes(node, debounceSend);
   }
 
+  /**
+   * @param nodes the nodes to be selected. If no nodes are provided, the selection will be removed.
+   */
   selectNodes(nodes: TreeNode | TreeNode[], debounceSend?: boolean) {
     nodes = arrays.ensure(nodes);
 
@@ -2237,16 +2252,39 @@ export class Tree extends Widget implements TreeModel {
     }
   }
 
-  insertNode(node: ObjectOrModel<TreeNode>, parentNode?: TreeNode) {
-    this.insertNodes([node], parentNode);
+  /**
+   * Inserts the given node at the end of the existing {@link nodes} resp. at the end of the existing {@link TreeNode.childNodes} if a parentNode is provided.
+   *
+   * @see insertNodes
+   */
+  insertNode(node: ObjectOrModel<TreeNode>, parentNode?: TreeNode, index?: number) {
+    this.insertNodes([node], parentNode, index);
   }
 
-  insertNodes(nodes: ObjectOrModel<TreeNode> | ObjectOrModel<TreeNode>[], parentNode?: TreeNode) {
+  /**
+   * Inserts the given nodes at the end of the existing {@link nodes} resp. at the end of the existing {@link TreeNode.childNodes} if a parentNode is provided.
+   *
+   * If an index is provided, the new nodes will be inserted at that position.
+   * Alternatively, each node can specify a {@link TreeNode.childNodeIndex}.
+   * If a node provides a {@link TreeNode.childNodeIndex}, it will be inserted at that position.
+   * Other nodes without a {@link TreeNode.childNodeIndex} will still be inserted at the end.
+   *
+   * @param nodes the new nodes to be added.
+   * @param parentNode if provided, the new nodes will be added to that parent (into {@link TreeNode.childNodes}), otherwise they will be added as root nodes (into {@link nodes}).
+   * @param index if provided, the new nodes will be added at that position in {@link TreeNode.childNodes} of the provided parentNode resp. in {@link nodes} if no parent is provided.
+   *    If one of the new nodes specifies a {@link TreeNode.childNodeIndex}, it will be ignored and replaced by the calculated one based on the provided index.
+   */
+  insertNodes(nodes: ObjectOrModel<TreeNode> | ObjectOrModel<TreeNode>[], parentNode?: TreeNode, index?: number) {
     let nodesArray = arrays.ensure(nodes).slice();
     if (nodesArray.length === 0) {
       return;
     }
-    this.ensureTreeNodes(nodesArray);
+    if (!objects.isNullOrUndefined(index)) {
+      nodesArray.forEach(node => {
+        node.childNodeIndex = index++;
+      });
+    }
+    this.ensureTreeNodes(nodesArray, parentNode);
     let treeNodes = nodesArray as TreeNode[];
     if (parentNode && !(parentNode instanceof TreeNode)) {
       throw new Error('parent has to be a tree node: ' + parentNode);
@@ -2257,7 +2295,7 @@ export class Tree extends Widget implements TreeModel {
 
     // Update parent with new child nodes
     if (parentNode) {
-      if (parentNode.childNodes && parentNode.childNodes.length > 0) {
+      if (parentNode.childNodes.length > 0) {
         treeNodes.forEach(entry => {
           // only insert node if not already existing
           if (parentNode.childNodes.indexOf(entry) < 0) {
@@ -2280,7 +2318,7 @@ export class Tree extends Widget implements TreeModel {
         this.ensureExpansionVisible(parentNode);
       }
     } else {
-      if (this.nodes && this.nodes.length > 0) {
+      if (this.nodes.length > 0) {
         treeNodes.forEach(entry => {
           // only insert node if not already existing
           if (this.nodes.indexOf(entry) < 0) {
@@ -2384,6 +2422,11 @@ export class Tree extends Widget implements TreeModel {
     this.deleteAllChildNodes();
   }
 
+  /**
+   * @param nodes the nodes to be deleted. If no nodes are provided, nothing will happen.
+   * @param parentNode the parent node that contains the nodes to be deleted. This is completely optional because each node knows its parent.
+   *    If provided, an exception will occur if one of the given node has a different parent.
+   */
   deleteNodes(nodes: TreeNode | TreeNode[], parentNode?: TreeNode) {
     let deletedNodes: TreeNode[] = [];
     let parentNodesToReindex: TreeNode[] = [];
