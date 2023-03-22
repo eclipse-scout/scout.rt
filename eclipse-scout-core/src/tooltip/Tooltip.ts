@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Form, graphics, keys, Menu, ObjectOrChildModel, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget} from '../index';
+import {arrays, Form, graphics, keys, Menu, ObjectOrChildModel, Point, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget} from '../index';
 import $ from 'jquery';
 import KeyDownEvent = JQuery.KeyDownEvent;
 
@@ -28,6 +28,8 @@ export class Tooltip extends Widget implements TooltipModel {
   windowPaddingY: number;
   origin: Rectangle;
   originRelativeToParent: boolean;
+  originProducer: ($anchor: JQuery) => Rectangle;
+  offsetProducer: (origin: Rectangle) => Point;
   autoRemove: boolean;
   tooltipPosition: TooltipPosition;
   tooltipDirection: TooltipDirection;
@@ -57,6 +59,8 @@ export class Tooltip extends Widget implements TooltipModel {
     this.windowPaddingY = 5;
     this.origin = null;
     this.originRelativeToParent = false;
+    this.originProducer = null;
+    this.offsetProducer = null;
     this.autoRemove = true;
     this.tooltipPosition = 'top';
     this.tooltipDirection = 'right';
@@ -261,29 +265,24 @@ export class Tooltip extends Widget implements TooltipModel {
   }
 
   position() {
-    let top, left, arrowSizeX, arrowSizeY, overlapX, overlapY, x, y, origin,
+    let top, left, arrowSizeX, arrowSizeY, overlapX, overlapY, tooltipPosition, origin, offset,
       tooltipWidth, tooltipHeight, arrowPosition, inView;
 
-    if (this.origin) {
-      origin = this.origin;
-      x = origin.x;
-    } else {
-      origin = graphics.offsetBounds(this.$anchor);
-      x = origin.x + origin.width / 2;
-    }
-    y = origin.y;
+    origin = this._getOrigin();
+    offset = this._getOffset(origin);
+    tooltipPosition = origin.point().add(offset);
 
     if (this.$anchor) {
       // Sticky tooltip must only be visible if the location where the tooltip points is in view (prevents that the tooltip points at an invisible anchor)
-      inView = scrollbars.isLocationInView(origin, this.$anchor.scrollParent());
+      inView = scrollbars.isLocationInView(tooltipPosition, this.$anchor.scrollParent());
       this.$container.setVisible(inView);
     }
 
     // this.$parent might not be at (0,0) of the document
     if (!this.originRelativeToParent) {
       let parentOffset = this.$parent.offset();
-      x -= parentOffset.left;
-      y -= parentOffset.top;
+      tooltipPosition.x -= parentOffset.left;
+      tooltipPosition.y -= parentOffset.top;
     }
 
     arrowSizeX = 7;
@@ -301,27 +300,27 @@ export class Tooltip extends Widget implements TooltipModel {
       arrowPosition = tooltipWidth - arrowPosition;
     }
 
-    top = y - tooltipHeight - arrowSizeY;
-    left = x - arrowPosition;
+    top = tooltipPosition.y - tooltipHeight - arrowSizeY;
+    left = tooltipPosition.x - arrowPosition;
     overlapX = left + tooltipWidth + this.windowPaddingX - this.$parent.width();
     overlapY = top - this.windowPaddingY;
 
     // Move tooltip to the left until it gets fully visible
     if (overlapX > 0) {
       left -= overlapX;
-      arrowPosition = x - left;
+      arrowPosition = tooltipPosition.x - left;
     }
     // Move tooltip to the right if it overlaps the left edge
     if (left < this.windowPaddingX) {
       left = this.windowPaddingX;
-      arrowPosition = x - this.windowPaddingX;
+      arrowPosition = tooltipPosition.x - this.windowPaddingX;
     }
 
     // Move tooltip to the bottom, arrow on top
     this.$arrow.removeClass('arrow-top arrow-bottom');
     if (this.tooltipPosition === 'bottom' || overlapY < 0) {
       this.$arrow.addClass('arrow-top');
-      top = y + origin.height + arrowSizeY;
+      top = tooltipPosition.y + origin.height + arrowSizeY;
     } else {
       this.$arrow.addClass('arrow-bottom');
     }
@@ -340,6 +339,32 @@ export class Tooltip extends Widget implements TooltipModel {
         menu.popup.position();
       }
     }, this);
+  }
+
+  protected _getOrigin(): Rectangle {
+    if (this.originProducer) {
+      const origin = this.originProducer(this.$anchor);
+      if (origin) {
+        return origin;
+      }
+    }
+    if (this.origin) {
+      return this.origin;
+    }
+    return graphics.offsetBounds(this.$anchor);
+  }
+
+  protected _getOffset(origin: Rectangle): Point {
+    if (this.offsetProducer) {
+      const offset = this.offsetProducer(origin);
+      if (offset) {
+        return offset;
+      }
+    }
+    if (this.origin) {
+      return new Point(0, 0);
+    }
+    return new Point(origin.width / 2, 0);
   }
 
   protected _onAnchorScroll(event: JQuery.ScrollEvent) {
