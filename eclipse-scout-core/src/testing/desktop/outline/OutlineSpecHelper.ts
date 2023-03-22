@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FullModelOf, InitModelOf, ModelAdapter, ObjectOrModel, Outline, OutlineAdapter, OutlineModel, Page, PageModel, Session} from '../../../index';
+import {FullModelOf, InitModelOf, ModelAdapter, ObjectFactory, ObjectOrModel, Outline, OutlineAdapter, OutlineModel, Page, PageModel, Session} from '../../../index';
 import {FormSpecHelper, TableSpecHelper} from '../../index';
 import $ from 'jquery';
 
@@ -19,7 +19,7 @@ export class OutlineSpecHelper {
   }
 
   createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): FullModelOf<Outline> & { id: string; session: Session } {
-    return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
+    return this.createModel(this.createModelNodes(nodeCount, depth, {expanded: expanded}));
   }
 
   createModel(nodes: ObjectOrModel<Page>[]): FullModelOf<Outline> & { id: string; session: Session } {
@@ -30,18 +30,18 @@ export class OutlineSpecHelper {
     return model;
   }
 
-  createModelNode(id: string, text: string): PageModel {
-    return {
-      id: id,
+  createModelNode(id: string, text: string, model?: PageModel): PageModel {
+    return $.extend({
+      id: id + '' || ObjectFactory.get().createUniqueId(),
       text: text
-    };
+    }, model);
   }
 
-  createModelNodes(nodeCount: number, depth?: number, expanded?: boolean): PageModel[] {
-    return this.createModelNodesInternal(nodeCount, depth, expanded);
+  createModelNodes(nodeCount: number, depth?: number, model?: PageModel): PageModel[] {
+    return this.createModelNodesInternal(nodeCount, depth);
   }
 
-  createModelNodesInternal(nodeCount: number, depth?: number, expanded?: boolean, parentNode?: PageModel): PageModel[] {
+  createModelNodesInternal(nodeCount: number, depth?: number, parentNode?: PageModel, model?: PageModel): PageModel[] {
     if (!nodeCount) {
       return;
     }
@@ -55,10 +55,9 @@ export class OutlineSpecHelper {
       if (parentNode) {
         nodeId = parentNode.id + '_' + nodeId;
       }
-      nodes[i] = this.createModelNode(nodeId, 'node ' + i);
-      nodes[i].expanded = expanded;
+      nodes[i] = this.createModelNode(nodeId, 'node ' + i, model);
       if (depth > 0) {
-        nodes[i].childNodes = this.createModelNodesInternal(nodeCount, depth - 1, expanded, nodes[i]);
+        nodes[i].childNodes = this.createModelNodesInternal(nodeCount, depth - 1, nodes[i], model);
       }
     }
     return nodes;

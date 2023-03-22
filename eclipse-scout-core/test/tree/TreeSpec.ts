@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {graphics, objects, Page, Range, scout, scrollbars, strings, Tree, TreeField} from '../../src/index';
+import {graphics, objects, Page, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode} from '../../src/index';
 import {JQueryTesting, TreeSpecHelper} from '../../src/testing/index';
 
 describe('Tree', () => {
@@ -34,7 +34,6 @@ describe('Tree', () => {
 
   describe('creation', () => {
     it('adds nodes', () => {
-
       let model = helper.createModelFixture(1);
       let tree = helper.createTree(model);
       tree.render();
@@ -42,18 +41,28 @@ describe('Tree', () => {
       expect(helper.findAllNodes(tree).length).toBe(1);
     });
 
-    it('does not add notes if no nodes are provided', () => {
-
+    it('does not add nodes if no nodes are provided', () => {
       let model = helper.createModelFixture();
       let tree = helper.createTree(model);
       tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(0);
     });
+
+    it('sets childNodeIndices', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree(model);
+      expect(tree.nodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[0].childNodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[0].childNodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[1].childNodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].childNodes[1].childNodeIndex).toBe(1);
+    });
   });
 
   describe('insertNodes', () => {
-    let model, tree, node0, node1, node2;
+    let model: TreeModel, tree: Tree, node0: TreeNode, node1: TreeNode, node2: TreeNode;
 
     beforeEach(() => {
       model = helper.createModelFixture(3, 1, true);
@@ -63,115 +72,283 @@ describe('Tree', () => {
       node2 = tree.nodes[2];
     });
 
-    describe('inserting a child', () => {
+    it('inserts in a reasonable order if tree is empty', () => {
+      // we want to start with an empty tree for this test
+      let rootNodeModel = helper.createModelNode('0', 'root');
+      rootNodeModel.expanded = true;
+      model = helper.createModel([rootNodeModel]);
+      tree = helper.createTree(model);
+      tree.render();
 
-      it('inserts in a reasonable order if childNodeIndex is not set', () => {
-        // we want to start with an empty tree for this test
-        let rootNodeModel = helper.createModelNode('0', 'root');
-        rootNodeModel.expanded = true;
-        model = helper.createModel([rootNodeModel]);
-        tree = helper.createTree(model);
-        tree.render();
+      // child nodes
+      let nodeModels = [
+        helper.createModelNode('0_0', 'node0'),
+        helper.createModelNode('0_1', 'node1'),
+        helper.createModelNode('0_2', 'node2')
+      ];
+      let rootNode = tree.nodes[0];
+      tree.insertNodes(nodeModels, rootNode);
 
-        // child nodes
-        let nodeModels = [
-          helper.createModelNode('0_0', 'node0'),
-          helper.createModelNode('0_1', 'node1'),
-          helper.createModelNode('0_2', 'node2')
-        ];
-        // make sure nodes _DON'T_ have a childNodeIndex (since that's usually the case when a programmer calls insertNodes in JS only)
-        nodeModels.forEach(node => {
-          delete node.childNodeIndex;
-        });
-        let rootNode = tree.nodes[0];
-        tree.insertNodes(nodeModels, rootNode);
-
-        // assert order in DOM is 0_0, 0_1, 0_2 (= same order as in array)
-        let orderedNodeIdString = '';
-        tree.$container.find('[data-level=\'1\']').each(function() {
-          orderedNodeIdString += $(this).attr('data-nodeid') + ',';
-        });
-        expect(orderedNodeIdString).toBe('0_0,0_1,0_2,');
+      // assert order in DOM is 0_0, 0_1, 0_2 (= same order as in array)
+      let orderedNodeIdString = '';
+      tree.$container.find('[data-level=\'1\']').each(function() {
+        orderedNodeIdString += $(this).attr('data-nodeid') + ',';
       });
+      expect(orderedNodeIdString).toBe('0_0,0_1,0_2,');
+    });
 
-      it('updates model', () => {
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
-        expect(tree.nodes.length).toBe(3);
-        expect(Object.keys(tree.nodesMap).length).toBe(12);
+    it('appends new nodes at the bottom', () => {
+      tree.render();
 
-        tree.insertNodes([newNode0Child3], node0);
-        expect(node0.childNodes.length).toBe(4);
-        expect(node0.childNodes[3].text).toBe(newNode0Child3.text);
-        expect(Object.keys(tree.nodesMap).length).toBe(13);
-      });
+      let nodeModels = [
+        helper.createModelNode('a', 'node A'),
+        helper.createModelNode('b', 'node B')
+      ];
+      tree.insertNodes(nodeModels);
+      expect(tree.nodes[2].id).toBe(node2.id);
+      expect(tree.nodes[3].text).toBe('node A');
+      expect(tree.nodes[4].text).toBe('node B');
+      expect(tree.nodes[3].$node.prev().text()).toBe('node 2_2');
+      expect(tree.nodes[3].$node.text()).toBe('node A');
+      expect(tree.nodes[3].$node.next().text()).toBe('node B');
 
-      it('updates model with a complex node containing another node', () => {
-        let node1_1_0 = helper.createModelNode('1_1_0', 'node1_1_0', 0);
-        tree.insertNodes([node1_1_0], node1.childNodes[1]);
+      nodeModels = [
+        helper.createModelNode('2_a', 'node 2_A'),
+        helper.createModelNode('2_b', 'node 2_B')
+      ];
+      tree.insertNodes(nodeModels, node2);
+      expect(node2.childNodes[2].text).toBe('node 2_2');
+      expect(node2.childNodes[3].text).toBe('node 2_A');
+      expect(node2.childNodes[3].childNodeIndex).toBe(3);
+      expect(node2.childNodes[4].text).toBe('node 2_B');
+      expect(node2.childNodes[4].childNodeIndex).toBe(4);
+      expect(node2.childNodes[3].$node.prev().text()).toBe('node 2_2');
+      expect(node2.childNodes[3].$node.text()).toBe('node 2_A');
+      expect(node2.childNodes[3].$node.next().text()).toBe('node 2_B');
+      expect(node2.childNodes[3].$node.next().next().text()).toBe('node A');
 
-        let node2_1_0 = helper.createModelNode('2_1_0', 'node2_1_0', 1);
-        let node2_1_0_0 = helper.createModelNode('2_1_0_0', 'node2_1_0_0', 0);
-        node2_1_0.childNodes = [node2_1_0_0];
-        node2_1_0.expanded = true;
-        tree.insertNodes([node2_1_0], node2.childNodes[1]);
+      nodeModels = [
+        helper.createModelNode('2_c', 'node 2_C')
+      ];
+      tree.insertNodes(nodeModels, node2);
+      expect(node2.childNodes[5].text).toBe('node 2_C');
+      expect(node2.childNodes[5].childNodeIndex).toBe(5);
+      expect(node2.childNodes[5].$node.prev().text()).toBe('node 2_B');
+      expect(node2.childNodes[5].$node.text()).toBe('node 2_C');
+      expect(node2.childNodes[5].$node.next().text()).toBe('node A');
+    });
 
-        expect(node2.childNodes.length).toBe(3);
-        expect(node2.childNodes[0].childNodes.length).toBe(0);
-        expect(node2.childNodes[1].childNodes.length).toBe(1);
-        expect(node1.childNodes[1].childNodes[0].childNodes.length).toBe(0);
-        expect(node1.childNodes[1].childNodes[0].text).toBe(node1_1_0.text);
-        expect(node2.childNodes[1].childNodes[0].text).toBe(node2_1_0.text);
-        expect(node2.childNodes[1].childNodes[0].childNodes[0].text).toBe(node2_1_0_0.text);
-        expect(Object.keys(tree.nodesMap).length).toBe(15);
-      });
+    it('appends new nodes with child nodes at the bottom', () => {
+      tree.render();
 
-      it('updates html document if parent is expanded', () => {
-        tree.render();
-        tree.revalidateLayoutTree();
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
-        expect(helper.findAllNodes(tree).length).toBe(12);
+      let childNodeModels = [
+        helper.createModelNode('a_0', 'node A_0'),
+        helper.createModelNode('a_1', 'node A_1')
+      ];
+      let nodeModels = [
+        helper.createModelNode('a', 'node A', {expanded: true, childNodes: childNodeModels}),
+        helper.createModelNode('b', 'node B')
+      ];
+      tree.insertNodes(nodeModels);
+      expect(tree.nodes[2].id).toBe(node2.id);
+      expect(tree.nodes[3].text).toBe('node A');
+      expect(tree.nodes[4].text).toBe('node B');
+      expect(tree.nodes[3].$node.prev().text()).toBe('node 2_2');
+      expect(tree.nodes[3].$node.text()).toBe('node A');
+      expect(tree.nodes[3].$node.next().text()).toBe('node A_0');
+      expect(tree.nodes[3].childNodes[0].text).toBe('node A_0');
+      expect(tree.nodes[3].childNodes[1].text).toBe('node A_1');
+      expect(tree.nodes[3].childNodes[0].$node.prev().text()).toBe('node A');
+      expect(tree.nodes[3].childNodes[0].$node.text()).toBe('node A_0');
+      expect(tree.nodes[3].childNodes[0].$node.next().text()).toBe('node A_1');
+      expect(tree.nodes[3].childNodes[0].$node.next().next().text()).toBe('node B');
+    });
 
-        tree.insertNodes([newNode0Child3], node0);
-        expect(helper.findAllNodes(tree).length).toBe(13);
-        expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
-      });
+    it('inserts new nodes at a specific position if index is set', () => {
+      let nodeModels = [
+        helper.createModelNode('a', 'node A'),
+        helper.createModelNode('b', 'node B')
+      ];
+      tree.insertNodes(nodeModels, null, 1);
+      expect(tree.nodes[0].text).toBe('node 0');
+      expect(tree.nodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].text).toBe('node A');
+      expect(tree.nodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[2].text).toBe('node B');
+      expect(tree.nodes[2].childNodeIndex).toBe(2);
+      expect(tree.nodes[3].text).toBe('node 1');
+      expect(tree.nodes[3].childNodeIndex).toBe(3);
+      expect(tree.nodes[4].text).toBe('node 2');
+      expect(tree.nodes[4].childNodeIndex).toBe(4);
+    });
 
-      it('updates html document at a specific position', () => {
-        tree.render();
+    it('inserts new child nodes at a specific position if index is set', () => {
+      let nodeModels = [
+        helper.createModelNode('a', 'node A'),
+        helper.createModelNode('b', 'node B')
+      ];
+      tree.insertNodes(nodeModels, tree.nodes[0], 1);
+      expect(tree.nodes[0].childNodes[0].text).toBe('node 0_0');
+      expect(tree.nodes[0].childNodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[0].childNodes[1].text).toBe('node A');
+      expect(tree.nodes[0].childNodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[0].childNodes[2].text).toBe('node B');
+      expect(tree.nodes[0].childNodes[2].childNodeIndex).toBe(2);
+      expect(tree.nodes[0].childNodes[3].text).toBe('node 0_1');
+      expect(tree.nodes[0].childNodes[3].childNodeIndex).toBe(3);
+      expect(tree.nodes[0].childNodes[4].text).toBe('node 0_2');
+      expect(tree.nodes[0].childNodes[4].childNodeIndex).toBe(4);
+    });
 
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
-        let newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
-        expect(helper.findAllNodes(tree).length).toBe(12);
+    it('inserts new nodes at a specific position if index is set and ignores childNodeIndex', () => {
+      let nodeModels = [
+        helper.createModelNode('a', 'node A', {childNodeIndex: 0}),
+        helper.createModelNode('b', 'node B', {childNodeIndex: 2})
+      ];
+      tree.insertNodes(nodeModels, null, 1);
+      expect(tree.nodes[0].text).toBe('node 0');
+      expect(tree.nodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].text).toBe('node A');
+      expect(tree.nodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[2].text).toBe('node B');
+      expect(tree.nodes[2].childNodeIndex).toBe(2);
+      expect(tree.nodes[3].text).toBe('node 1');
+      expect(tree.nodes[3].childNodeIndex).toBe(3);
+      expect(tree.nodes[4].text).toBe('node 2');
+      expect(tree.nodes[4].childNodeIndex).toBe(4);
+    });
 
-        tree.insertNodes([newNode0Child3, newNode0Child4], node0);
-        expect(helper.findAllNodes(tree).length).toBe(14);
-        expect(node0.childNodes[2].$node.text()).toBe(newNode0Child3.text);
-        expect(node0.childNodes[3].$node.text()).toBe(newNode0Child4.text);
-        expect(node0.childNodes[3].$node.attr('data-level')).toBe('1');
-        expect(node0.childNodes[3].$node.next().attr('data-level')).toBe('1');
-        expect(node0.childNodes[3].$node.next().text()).toBe('node 0_2');
+    it('inserts a new node at a specific position if childNodeIndex is set and others at the end', () => {
+      let nodeModels = [
+        helper.createModelNode('a', 'node A', {childNodeIndex: 1}),
+        helper.createModelNode('b', 'node B')
+      ];
+      tree.insertNodes(nodeModels);
+      expect(tree.nodes[0].text).toBe('node 0');
+      expect(tree.nodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].text).toBe('node A');
+      expect(tree.nodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[2].text).toBe('node 1');
+      expect(tree.nodes[2].childNodeIndex).toBe(2);
+      expect(tree.nodes[3].text).toBe('node 2');
+      expect(tree.nodes[3].childNodeIndex).toBe(3);
+      expect(tree.nodes[4].text).toBe('node B');
+      expect(tree.nodes[4].childNodeIndex).toBe(4);
+    });
 
-        let newNode1Child3 = helper.createModelNode('1_3', 'newNode1Child3', 1);
-        let newNode1Child4 = helper.createModelNode('1_4', 'newNode1Child4', 2);
+    it('inserts new nodes at a specific position if childNodeIndices are set', () => {
+      let nodeModels = [
+        helper.createModelNode('a', 'node A', {childNodeIndex: 1}),
+        helper.createModelNode('b', 'node B', {childNodeIndex: 2})
+      ];
+      tree.insertNodes(nodeModels);
+      expect(tree.nodes[0].text).toBe('node 0');
+      expect(tree.nodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].text).toBe('node A');
+      expect(tree.nodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[2].text).toBe('node B');
+      expect(tree.nodes[2].childNodeIndex).toBe(2);
+      expect(tree.nodes[3].text).toBe('node 1');
+      expect(tree.nodes[3].childNodeIndex).toBe(3);
+      expect(tree.nodes[4].text).toBe('node 2');
+      expect(tree.nodes[4].childNodeIndex).toBe(4);
+    });
 
-        tree.insertNodes([newNode1Child3, newNode1Child4]);
-        expect(helper.findAllNodes(tree).length).toBe(16);
-        expect(tree.nodes[1].$node.prev().text()).toBe('node 0_2');
-        expect(tree.nodes[1].$node.prev().attr('data-level')).toBe('1');
-        expect(tree.nodes[1].$node.text()).toBe(newNode1Child3.text);
-        expect(tree.nodes[1].$node.attr('data-level')).toBe('0');
-        expect(tree.nodes[2].$node.text()).toBe(newNode1Child4.text);
-        expect(tree.nodes[2].$node.attr('data-level')).toBe('0');
-        expect(tree.nodes[2].$node.next().attr('data-level')).toBe('0');
-        expect(tree.nodes[2].$node.next().text()).toBe('node 1');
-      });
+    it('inserts new nodes at specific positions if non consecutive childNodeIndices are set', () => {
+      let nodeModels = [
+        helper.createModelNode('a', 'node A', {childNodeIndex: 0}),
+        helper.createModelNode('b', 'node B', {childNodeIndex: 2}) // Will be before node 1 and not node 2 because node A is inserted at first
+      ];
+      tree.insertNodes(nodeModels);
+      expect(tree.nodes[0].text).toBe('node A');
+      expect(tree.nodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].text).toBe('node 0');
+      expect(tree.nodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[2].text).toBe('node B');
+      expect(tree.nodes[2].childNodeIndex).toBe(2);
+      expect(tree.nodes[3].text).toBe('node 1');
+      expect(tree.nodes[3].childNodeIndex).toBe(3);
+      expect(tree.nodes[4].text).toBe('node 2');
+      expect(tree.nodes[4].childNodeIndex).toBe(4);
+    });
+
+    it('updates model', () => {
+      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
+      expect(tree.nodes.length).toBe(3);
+      expect(Object.keys(tree.nodesMap).length).toBe(12);
+
+      tree.insertNodes([newNode0Child3], node0);
+      expect(node0.childNodes.length).toBe(4);
+      expect(node0.childNodes[3].text).toBe(newNode0Child3.text);
+      expect(Object.keys(tree.nodesMap).length).toBe(13);
+    });
+
+    it('updates model with a complex node containing another node', () => {
+      let node1_1_0 = helper.createModelNode('1_1_0', 'node1_1_0');
+      tree.insertNodes([node1_1_0], node1.childNodes[1]);
+
+      let node2_1_0 = helper.createModelNode('2_1_0', 'node2_1_0');
+      let node2_1_0_0 = helper.createModelNode('2_1_0_0', 'node2_1_0_0');
+      node2_1_0.childNodes = [node2_1_0_0];
+      node2_1_0.expanded = true;
+      tree.insertNodes([node2_1_0], node2.childNodes[1]);
+
+      expect(node2.childNodes.length).toBe(3);
+      expect(node2.childNodes[0].childNodes.length).toBe(0);
+      expect(node2.childNodes[1].childNodes.length).toBe(1);
+      expect(node1.childNodes[1].childNodes[0].childNodes.length).toBe(0);
+      expect(node1.childNodes[1].childNodes[0].text).toBe(node1_1_0.text);
+      expect(node2.childNodes[1].childNodes[0].text).toBe(node2_1_0.text);
+      expect(node2.childNodes[1].childNodes[0].childNodes[0].text).toBe(node2_1_0_0.text);
+      expect(Object.keys(tree.nodesMap).length).toBe(15);
+    });
+
+    it('updates html document if parent is expanded', () => {
+      tree.render();
+      tree.revalidateLayoutTree();
+      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
+      expect(helper.findAllNodes(tree).length).toBe(12);
+
+      tree.insertNodes([newNode0Child3], node0);
+      expect(helper.findAllNodes(tree).length).toBe(13);
+      expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
+    });
+
+    it('updates html document at a specific position', () => {
+      tree.render();
+
+      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', {childNodeIndex: 2});
+      let newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', {childNodeIndex: 3});
+      expect(helper.findAllNodes(tree).length).toBe(12);
+
+      tree.insertNodes([newNode0Child3, newNode0Child4], node0);
+      expect(helper.findAllNodes(tree).length).toBe(14);
+      expect(node0.childNodes[2].$node.text()).toBe(newNode0Child3.text);
+      expect(node0.childNodes[3].$node.text()).toBe(newNode0Child4.text);
+      expect(node0.childNodes[3].$node.attr('data-level')).toBe('1');
+      expect(node0.childNodes[3].$node.next().attr('data-level')).toBe('1');
+      expect(node0.childNodes[3].$node.next().text()).toBe('node 0_2');
+
+      let newNode1Child3 = helper.createModelNode('1_3', 'newNode1Child3', {childNodeIndex: 1});
+      let newNode1Child4 = helper.createModelNode('1_4', 'newNode1Child4', {childNodeIndex: 2});
+
+      tree.insertNodes([newNode1Child3, newNode1Child4]);
+      expect(helper.findAllNodes(tree).length).toBe(16);
+      expect(tree.nodes[1].$node.prev().text()).toBe('node 0_2');
+      expect(tree.nodes[1].$node.prev().attr('data-level')).toBe('1');
+      expect(tree.nodes[1].$node.text()).toBe(newNode1Child3.text);
+      expect(tree.nodes[1].$node.attr('data-level')).toBe('0');
+      expect(tree.nodes[2].$node.text()).toBe(newNode1Child4.text);
+      expect(tree.nodes[2].$node.attr('data-level')).toBe('0');
+      expect(tree.nodes[2].$node.next().attr('data-level')).toBe('0');
+      expect(tree.nodes[2].$node.next().text()).toBe('node 1');
     });
 
     it('only updates the model if parent is collapsed', () => {
       tree.setNodeExpanded(node0, false);
       tree.render();
 
-      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
       expect(helper.findAllNodes(tree).length).toBe(9);
 
       tree.insertNodes([newNode0Child3], node0);
@@ -215,7 +392,7 @@ describe('Tree', () => {
       it('inserts a html node if the parent node is selected', () => {
         tree.render();
         tree.revalidateLayoutTree();
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
         expect(helper.findAllNodes(tree).length).toBe(3); // top level nodes are visible
 
         tree.selectNode(node0);
@@ -229,7 +406,7 @@ describe('Tree', () => {
       it('only updates model if the parent node is not selected', () => {
         tree.render();
         tree.revalidateLayoutTree();
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
         expect(helper.findAllNodes(tree).length).toBe(3); // top level nodes are visible
 
         tree.insertNodes([newNode0Child3], node0);
@@ -242,8 +419,8 @@ describe('Tree', () => {
       it('inserts html nodes at a specific position', () => {
         tree.render();
 
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
-        let newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', {childNodeIndex: 2});
+        let newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', {childNodeIndex: 3});
         tree.selectNode(node0);
         expect(helper.findAllNodes(tree).length).toBe(4);
 
@@ -1746,9 +1923,9 @@ describe('Tree', () => {
         expandedLazy: true
       });
       nodes[1].childNodes = [
-        helper.createModelNode('1_0', '1_0', 0),
-        helper.createModelNode('1_1', '1_1', 1),
-        helper.createModelNode('1_2', '1_2', 2)
+        helper.createModelNode('1_0', '1_0'),
+        helper.createModelNode('1_1', '1_1'),
+        helper.createModelNode('1_2', '1_2')
       ];
       tree.insertNodes(nodes);
       let node1 = tree.nodes[1];
@@ -1756,14 +1933,14 @@ describe('Tree', () => {
       let $nodes = helper.findAllNodes(tree);
       expect($nodes.length).toBe(3);
       nodes = [
-        helper.createModelNode('1_1_0', '1_1_0', 0, {
+        helper.createModelNode('1_1_0', '1_1_0', {
           lazyExpandingEnabled: true,
           expandedLazy: true
-        }), helper.createModelNode('1_1_1', '1_1_1', 1, {
+        }), helper.createModelNode('1_1_1', '1_1_1', {
           lazyExpandingEnabled: true,
           expandedLazy: true
         }),
-        helper.createModelNode('1_1_2', '1_1_2', 2, {
+        helper.createModelNode('1_1_2', '1_1_2', {
           lazyExpandingEnabled: true,
           expandedLazy: true
         })];
@@ -2190,7 +2367,6 @@ describe('Tree', () => {
 
       let newNode = helper.createModelNode('', 'newNode0Child1');
       tree.insertNodes([newNode], tree.nodes[0]);
-
       expect(tree.nodes[0].childNodes.length).toBe(3);
       expect(tree.nodes[0].rendered).toBe(true);
       expect(tree.nodes[1].rendered).toBe(false);
@@ -2199,9 +2375,8 @@ describe('Tree', () => {
       expect(tree.nodes[0].childNodes[2].rendered).toBe(false);
       expect(tree.nodes[0].childNodes[2].filterAccepted).toBe(false);
 
-      newNode = helper.createModelNode('', 'node 0', 3);
+      newNode = helper.createModelNode('', 'node 0');
       tree.insertNodes([newNode], tree.nodes[0]);
-
       expect(tree.nodes[0].childNodes.length).toBe(4);
       expect(tree.nodes[0].rendered).toBe(true);
       expect(tree.nodes[1].rendered).toBe(false);
@@ -2232,19 +2407,19 @@ describe('Tree', () => {
 
       // child nodes
       for (i = 0; i < childNodeNames.length; i++) {
-        childNodes.push(helper.createModelNode('', childNodeNames[i], i));
+        childNodes.push(helper.createModelNode('', childNodeNames[i]));
       }
 
       // top level nodes
-      topLevelNodes.push(helper.createModelNode('', 'TopLevel 1', 0));
-      topLevelNodes.push(helper.createModelNode('', 'TopLevel 2', 1));
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 1'));
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 2'));
 
-      topLevelNode3 = helper.createModelNode('', 'TopLevel 3', 2);
+      topLevelNode3 = helper.createModelNode('', 'TopLevel 3');
       topLevelNode3.childNodes = childNodes;
       topLevelNodes.push(topLevelNode3);
 
-      topLevelNodes.push(helper.createModelNode('', 'TopLevel 4', 3));
-      topLevelNodes.push(helper.createModelNode('', 'TopLevel 5', 4));
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 4'));
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 5'));
 
       // filters
       let model = helper.createModel(topLevelNodes);
@@ -2632,11 +2807,11 @@ describe('Tree', () => {
       });
 
       it('insert expanded node to expanded parent', () => {
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
         newNode0Child3.expanded = true;
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
 
-        let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
+        let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0');
         let treeNodeC3 = tree.nodeById(newNode0Child3.id);
         tree.insertNodes([newNode0Child3Child0], treeNodeC3);
         let treeNodeC3C0 = tree.nodeById(newNode0Child3Child0.id);
@@ -2648,7 +2823,7 @@ describe('Tree', () => {
       });
 
       it('insert child node in filtered parent', () => {
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
         newNode0Child3.expanded = true;
         let filter = {
           accept: node => !(strings.startsWith(node.id, '0') && !strings.endsWith(node.id, '3'))
@@ -2699,7 +2874,7 @@ describe('Tree', () => {
       });
 
       it('insert child node which should be filtered', () => {
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
         newNode0Child3.expanded = true;
         let filter = {
           accept: node => newNode0Child3.id !== node.id
@@ -2744,10 +2919,10 @@ describe('Tree', () => {
       });
 
       it('insert child node collapsed parent', () => {
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
         newNode0Child3.expanded = true;
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
-        let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
+        let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0');
         tree.insertNodes([newNode0Child3Child0], tree.nodeById(newNode0Child3.id));
         expect(tree.visibleNodesFlat.indexOf(newNode0Child3) > -1).toBeFalsy();
         expect(tree.visibleNodesMap[newNode0Child3.id]).toBeFalsy();

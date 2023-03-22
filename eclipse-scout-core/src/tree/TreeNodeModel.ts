@@ -13,6 +13,13 @@ export interface TreeNodeModel extends ObjectModel<TreeNode> {
   parent?: Tree;
   checked?: boolean;
   childNodes?: ObjectOrModel<TreeNode>[];
+  /**
+   * Refers to the position of the node in the list of {@link childNodes} of its {@link TreeNode.parentNode}.
+   * If the node is a root node, it refers to the position in {@link Tree.nodes}.
+   *
+   * It is not necessary to provide a childNodeIndex because it will be calculated automatically.
+   * However, if it is provided, it will be respected.
+   */
   childNodeIndex?: number;
   cssClass?: string;
   enabled?: boolean;

@@ -78,10 +78,6 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this.getOutline().mediator.onTableRowsDeleted(rows, childPages, this);
   }
 
-  /**
-   * We must set childNodeIndex on each created childPage because it is required to
-   * determine the order of nodes in the tree.
-   */
   protected _onTableRowsInserted(event: TableRowsInsertedEvent) {
     if (this.leaf) { // when page is a leaf we do nothing at all
       return;
