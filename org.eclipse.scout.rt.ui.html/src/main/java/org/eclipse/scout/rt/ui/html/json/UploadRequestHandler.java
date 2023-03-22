@@ -173,7 +173,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         return;
       }
       catch (RejectedResourceException e) { // NOSONAR
-        // verifyFileName and verifyFileIntegrity are the only methods throwing this exception
+        // verifyFileName and verifyFileIntegrity and maxFileCount are the only methods throwing this exception
         //mark resources as FAILED
         uploadResources = null;
         uploadProperties = null;
@@ -221,7 +221,13 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
     upload.setSizeMax(uploadable.getMaximumUploadSize());
     upload.setFileCountMax(CONFIG.getPropertyValue(UiHtmlConfigProperties.MaxUploadFileCountProperty.class));
+    int fileCount = 0;
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
+      fileCount++;
+      //the first entry in an upload multipart is typically a "rowId" entry. be tolerant with one more file.
+      if (upload.getFileCountMax() > 0 && (fileCount - 1) > upload.getFileCountMax()) {
+        throw new RejectedResourceException("Too many files ({}).", fileCount);
+      }
       FileItemStream item = it.next();
       String filename = item.getName();
       if (StringUtility.hasText(filename)) {
