@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Menu, ObjectOrChildModel, Rectangle, StatusSeverity, TooltipDirection, TooltipPosition, TooltipScrollType, WidgetModel} from '../index';
+import {Menu, ObjectOrChildModel, Point, Rectangle, StatusSeverity, TooltipDirection, TooltipPosition, TooltipScrollType, WidgetModel} from '../index';
 
 export interface TooltipModel extends WidgetModel {
   /**
@@ -42,6 +42,15 @@ export interface TooltipModel extends WidgetModel {
    * "true" to disable this additional calculation.
    */
   originRelativeToParent?: boolean;
+  /**
+   * If provided, the originProvider is called during the calculation of the tooltip position.
+   * If no originProducer is present, the {@link origin} or {@link $anchor} is used for the calculation
+   */
+  originProducer?: ($anchor: JQuery) => Rectangle;
+  /**
+   * If provided, the offsetProducer is called during the calculation of the tooltip position.
+   */
+  offsetProducer?: (origin: Rectangle) => Point;
   /**
    * Default is false
    */
