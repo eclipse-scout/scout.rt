@@ -1,32 +1,31 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.shared.extension;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public abstract class AbstractContributionComposite implements IContributionOwner, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private Map<Class<?> /* type of the contribution */, ArrayList<?>/* contribution instances */> m_contributionsByType;
   private Map<Class<?> /* concrete contribution class */, Object /* contribution instance */> m_contributionsByClass;
 
   protected AbstractContributionComposite() {
@@ -58,11 +57,10 @@ public abstract class AbstractContributionComposite implements IContributionOwne
       owner = o;
     }
     List<?> contributionsForMe = extensionRegistry.createContributionsFor(owner, type);
-    if (type == null) {
-      m_contributionsByType = new HashMap<>();
-      m_contributionsByClass = new HashMap<>(contributionsForMe.size());
-    }
     if (CollectionUtility.hasElements(contributionsForMe)) {
+      if (m_contributionsByClass == null) {
+        m_contributionsByClass = new HashMap<>(contributionsForMe.size(), 1.0f); // use fixed size and loadFactor
+      }
       for (Object contribution : contributionsForMe) {
         m_contributionsByClass.put(contribution.getClass(), contribution);
       }
@@ -70,51 +68,41 @@ public abstract class AbstractContributionComposite implements IContributionOwne
   }
 
   public <T> void resetContributionsByClass(Object o, Class<T> type) {
-    m_contributionsByType.remove(type);
-    m_contributionsByClass.values().removeIf(obj -> type.isAssignableFrom(obj.getClass()));
+    Assertions.assertNotNull(type, "Contribution type class must be specified");
+    if (m_contributionsByClass != null) {
+      m_contributionsByClass.values().removeIf(obj -> type.isAssignableFrom(obj.getClass()));
+    }
     IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
     initContributionsMap(o, extensionRegistry, type);
   }
 
-  private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
-    s.defaultReadObject();
-    if (m_contributionsByClass == null || m_contributionsByType == null) {
-      // ensure that the contributions have been initialized
-      IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
-      initContributionsMap(null, extensionRegistry, null);
+  protected Collection<Object> getAllContributionsInternal() {
+    if (m_contributionsByClass == null) {
+      return null;
     }
-  }
-
-  protected Collection<Object> geAllContributionsInternal() {
     return m_contributionsByClass.values();
   }
 
   @Override
   public List<Object> getAllContributions() {
-    return CollectionUtility.arrayList(geAllContributionsInternal());
+    return CollectionUtility.arrayList(getAllContributionsInternal());
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> List<T> getContributionsByClass(Class<T> type) {
     if (type == null) {
       throw new IllegalArgumentException("Contribution type class must be specified.");
     }
 
-    ArrayList<T> contributionsOfType = (ArrayList<T>) m_contributionsByType.get(type);
-    if (contributionsOfType == null) {
-      Collection<Object> values = m_contributionsByClass.values();
-      contributionsOfType = new ArrayList<>(values.size());
-      for (Object o : values) {
-        if (type.isAssignableFrom(o.getClass())) {
-          T contribution = type.cast(o);
-          contributionsOfType.add(contribution);
-        }
-      }
-      contributionsOfType.trimToSize();
-      m_contributionsByType.put(type, contributionsOfType);
+    if (m_contributionsByClass == null) {
+      return new ArrayList<>(0);
     }
-    return CollectionUtility.arrayList(contributionsOfType);
+
+    return m_contributionsByClass.values()
+        .stream()
+        .filter(type::isInstance)
+        .map(type::cast)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -130,6 +118,9 @@ public abstract class AbstractContributionComposite implements IContributionOwne
   public <T> T optContribution(final Class<T> contribution) {
     if (contribution == null) {
       throw new IllegalArgumentException("Contribution class must be specified.");
+    }
+    if (m_contributionsByClass == null) {
+      return null;
     }
 
     // check in my contributions
