@@ -1,16 +1,14 @@
 /*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.platform.util.concurrent;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,35 +21,34 @@ import org.slf4j.LoggerFactory;
  */
 public class OptimisticLock {
   private static final Logger LOG = LoggerFactory.getLogger(OptimisticLock.class);
-  private final AtomicInteger m_lockCount = new AtomicInteger(0);
+  private volatile int m_lockCount = 0;
 
   /**
    * @return true if lock was acquired as first monitor
    */
   public synchronized boolean acquire() {
-    int count = m_lockCount.incrementAndGet();
-    if (count == 1) {
+    m_lockCount++;
+    if (m_lockCount == 1) {
       // this is the first
       return true;
     }
     else {
-      if (count > 10) {
+      if (m_lockCount > 10) {
         LOG.warn("potential programming problem; lock was 10 times acquired and not released", new Exception("origin"));
       }
       return false;
     }
   }
 
-  public void release() {
-    m_lockCount.decrementAndGet();
+  public synchronized void release() {
+    m_lockCount--;
   }
 
   public boolean isAcquired() {
-    return m_lockCount.get() > 0;
+    return m_lockCount > 0;
   }
 
   public boolean isReleased() {
     return !isAcquired();
   }
-
 }
