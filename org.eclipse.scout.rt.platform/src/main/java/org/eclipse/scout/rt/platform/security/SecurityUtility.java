@@ -217,20 +217,12 @@ public final class SecurityUtility {
   }
 
   /**
-   * @deprecated use {@link #hashPassword(char[], byte[])} without iteration count.
-   * @see ISecurityProvider#createPasswordHash(char[], byte[])
-   */
-  @Deprecated
-  public static byte[] hashPassword(char[] password, byte[] salt, int iterations) {
-    return SECURITY_PROVIDER.get().createPasswordHash(password, salt, iterations);
-  }
-
-  /**
    * This method is recommended in combination with {@link #hashPassword(char[], byte[])} where the iteration count is
    * omitted. This has the advantage that the check of the password hash is independent of the creation of the hash. In
    * case the iteration count is increased yearly, this method checks if the hash is valid
    *
-   * @return true if calculated password has with {@link #hashPassword(char[], byte[], int)} matches the expected hash.
+   * @return true if calculated password hash created with {@link #hashPassword(char[], byte[])} matches the expected
+   *         hash.
    * @since 11.0
    */
   public static boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
@@ -240,7 +232,7 @@ public final class SecurityUtility {
   /**
    * Creates a hash for the given data using the given salt.<br>
    * <br>
-   * <b>Important:</b> For hashing of passwords use {@link #hashPassword(char[], byte[], int)}!
+   * <b>Important:</b> For hashing of passwords use {@link #hashPassword(char[], byte[])}!
    *
    * @param data
    *          The data to hash. Must not be {@code null}.

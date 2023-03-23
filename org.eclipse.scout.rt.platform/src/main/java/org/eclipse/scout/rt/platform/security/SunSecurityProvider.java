@@ -11,11 +11,13 @@ package org.eclipse.scout.rt.platform.security;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -39,6 +41,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Collections;
 
 import javax.crypto.Cipher;
@@ -67,6 +70,17 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
  */
 @Order(5500)
 public class SunSecurityProvider implements ISecurityProvider {
+
+  public static final int MIN_PASSWORD_HASH_ITERATIONS_2016 = 10000;
+  public static final int MIN_PASSWORD_HASH_ITERATIONS_2019 = 20000;
+  public static final int MIN_PASSWORD_HASH_ITERATIONS_2021 = 120_000;
+
+  /**
+   * Specifies the minimum of password hash iterations with PBKDF2-HMAC-SHA512.<br>
+   * See <a href=
+   * "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">Password_Storage_Cheat_Sheet</a>
+   */
+  public static final int MIN_PASSWORD_HASH_ITERATIONS = MIN_PASSWORD_HASH_ITERATIONS_2021;
 
   /**
    * Buffer size for {@link InputStream} read.
@@ -115,6 +129,75 @@ public class SunSecurityProvider implements ISecurityProvider {
     catch (InvalidKeySpecException | NoSuchProviderException e) {
       throw new ProcessingException("Unable to create secret.", e);
     }
+  }
+
+  @Override
+  public byte[] createPasswordHash(char[] password, byte[] salt) {
+    return createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS);
+  }
+
+  /**
+   * @param password
+   *          The password to create the hash for. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
+   *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
+   *          Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
+   * @param iterations
+   *          Specifies how many times the method executes its underlying algorithm. A higher value is safer.<br>
+   *          While there is a minimum number of iterations recommended to ensure data safety, this value changes every
+   *          year as technology improves. As by Aug 2021 at least 120000 iterations are recommended, see
+   *          https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html.<br>
+   *          Experimentation is important. To provide a good security use an iteration count so that the call to this
+   *          method requires one half second to execute (on the production system). Also consider the number of users
+   *          and the number of logins executed to find a value that scales in your environment.
+   * @return the password hash
+   * @throws AssertionException
+   *           If one of the following conditions is {@code true}:<br>
+   *           <ul>
+   *           <li>The password is {@code null} or an empty array</li>
+   *           <li>The salt is {@code null} or an empty array</li>
+   *           <li>The number of iterations is too small.</li>
+   *           </ul>
+   * @throws ProcessingException
+   *           If there is an error creating the hash. <br>
+   */
+  public byte[] createPasswordHash(char[] password, byte[] salt, int iterations) {
+    assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
+    assertGreater(assertNotNull(salt, "salt must not be null.").length, 0, "empty salt is not allowed.");
+    // other checks are done by the PBEKeySpec constructor
+
+    try {
+      SecretKeyFactory skf = SecretKeyFactory.getInstance(getPasswordHashSecretKeyAlgorithm(), getCipherAlgorithmProvider());
+      PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, 256);
+      SecretKey key = skf.generateSecret(spec);
+      byte[] res = key.getEncoded();
+      return res;
+    }
+    catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchProviderException e) {
+      throw new ProcessingException("Unable to create password hash.", e);
+    }
+  }
+
+  @Override
+  public boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2019))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2016))) {
+      return true;
+    }
+    //2014 variants
+    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_8)), salt, 3557))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_16)), salt, 3557))) {
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -167,31 +250,6 @@ public class SunSecurityProvider implements ISecurityProvider {
     byte[] rnd = new byte[numBytes];
     createSecureRandom().nextBytes(rnd);
     return rnd;
-  }
-
-  /**
-   * If this method throws a NoSuchAlgorithmException, this may be because you are using an older Java version. In this
-   * case it is safe to replace the algorithm with "PBKDF2WithHmacSHA1". SHA1 is still safe in the context of PBKDF2. To
-   * do so replace this bean with your own implementation overwriting the method
-   * {@link #getPasswordHashSecretKeyAlgorithm()}.
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  public byte[] createPasswordHash(char[] password, byte[] salt, int iterations) {
-    assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
-    assertGreater(assertNotNull(salt, "salt must not be null.").length, 0, "empty salt is not allowed.");
-    // other checks are done by the PBEKeySpec constructor
-
-    try {
-      SecretKeyFactory skf = SecretKeyFactory.getInstance(getPasswordHashSecretKeyAlgorithm(), getCipherAlgorithmProvider());
-      PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, 256);
-      SecretKey key = skf.generateSecret(spec);
-      byte[] res = key.getEncoded();
-      return res;
-    }
-    catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchProviderException e) {
-      throw new ProcessingException("Unable to create password hash.", e);
-    }
   }
 
   @Override
