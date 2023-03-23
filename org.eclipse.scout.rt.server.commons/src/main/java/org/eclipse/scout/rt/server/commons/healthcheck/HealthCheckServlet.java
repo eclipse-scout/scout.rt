@@ -82,7 +82,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
 
     if (LOG.isDebugEnabled() || Platform.get().inDevelopmentMode()) {
       String detailedOutput = generateOutput(statusCode, result, true);
-      LOG.debug(detailedOutput);
+      LOG.debug("Status {}", StringUtility.replaceNewLines(detailedOutput, ", "));
       resp.getWriter().print(Platform.get().inDevelopmentMode() ? detailedOutput : output);
     }
     else {
