@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -225,17 +226,12 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     assertEquals(expectedProtocol, m_protocol);
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expected = ProcessingException.class)
   public void testSessionWithBlockingFormInLoad() {
     m_sessionBehaviour = SessionBehaviour.OPEN_FORM_IN_LOAD;
     m_desktopBehaviour = DesktopBehaviour.DO_NOTHING;
-    try {
-      IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
-      uiSession.getClientSession();
-    }
-    catch (Exception ex) {
-      throw ex;
-    }
+    IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
+    uiSession.getClientSession();
   }
 
   @Test

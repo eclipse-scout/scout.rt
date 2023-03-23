@@ -9,10 +9,7 @@
  */
 package org.eclipse.scout.rt.client.extension.ui.outline.pages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
@@ -118,6 +115,7 @@ public class TablePageExtensionTest extends AbstractLocalExtensionTestCase {
     assertEquals(1, table.getMenuByClass(EditMenu.class).getAllExtensions().size());
   }
 
+  @SuppressWarnings("unchecked")
   protected void assertExtendedTablePage(AbstractPersonTablePage<?> page, Class<? extends AbstractMenu> expectedTestMenuClass, Class<? extends IMenuExtension> expectedMenuExtensionClass) {
     AbstractPersonTablePage<?>.Table table = page.getTable();
     assertEquals(2, table.getColumnCount());

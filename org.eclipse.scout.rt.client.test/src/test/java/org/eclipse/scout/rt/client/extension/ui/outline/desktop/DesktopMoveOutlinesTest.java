@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.extension.ui.outline.desktop;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -62,7 +61,7 @@ public class DesktopMoveOutlinesTest extends AbstractLocalExtensionTestCase {
     List<IOutline> outlines = desktop.getAvailableOutlines();
     assertEquals(outlineClasses.length, outlines.size());
     for (int i = 0; i < outlineClasses.length; i++) {
-      assertTrue(outlineClasses[i] == outlines.get(i).getClass());
+      assertSame(outlineClasses[i], outlines.get(i).getClass());
     }
   }
 }
