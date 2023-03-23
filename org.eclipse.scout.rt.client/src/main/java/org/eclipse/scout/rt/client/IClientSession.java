@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public interface IClientSession extends ISession, IPropertyObserver {
@@ -85,9 +84,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
   /**
    * Consumers can query for the {@link Subject} of a {@link IClientSession}
    * <p>
-   * The {@link IServiceTunnel} used by {@link IClientSession#getServiceTunnel()} checks for the Subject under which the
-   * session is running and creates a WSSE security element.
-   * <p>
    * The subject is set when this object is created from {@link Subject#getSubject(java.security.AccessControlContext)}
    */
   Subject getSubject();
@@ -103,6 +99,13 @@ public interface IClientSession extends ISession, IPropertyObserver {
 
   /**
    * Sets the desktop model associated with this client session.
+   *
+   * @param desktop
+   *          Must not be null.
+   * @throws IllegalStateException
+   *           if this session already has a desktop set
+   * @throws IllegalArgumentException
+   *           if the given desktop is null
    */
   void setDesktop(IDesktop desktop);
 
@@ -116,9 +119,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
    */
   void setMemoryPolicy(IMemoryPolicy memoryPolicy);
 
-  /**
-   * @param newMap
-   */
   void replaceSharedVariableMapInternal(SharedVariableMap newMap);
 
   /**
