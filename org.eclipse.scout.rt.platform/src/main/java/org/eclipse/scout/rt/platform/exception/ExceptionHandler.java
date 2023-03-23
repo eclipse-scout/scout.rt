@@ -143,19 +143,4 @@ public class ExceptionHandler {
   protected Object[] toLogArguments(Throwable t) {
     return new Object[]{t.getClass().getSimpleName(), ObjectUtility.nvl(t.getMessage(), "n/a"), t};
   }
-
-  /**
-   * Helper method to get the exception's root cause.
-   */
-  public static Throwable getRootCause(final Throwable e) {
-    if (e == null) {
-      return null;
-    }
-
-    Throwable cause = e;
-    while (cause.getCause() != null) {
-      cause = cause.getCause();
-    }
-    return cause;
-  }
 }
