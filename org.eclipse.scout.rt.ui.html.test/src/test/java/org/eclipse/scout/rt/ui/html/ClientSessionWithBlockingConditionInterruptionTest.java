@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.rt.ui.html;
 
 import static org.junit.Assert.assertEquals;
@@ -27,6 +37,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -216,17 +227,12 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     assertEquals(expectedProtocol, m_protocol);
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expected = ProcessingException.class)
   public void testSessionWithBlockingFormInLoad() {
     m_sessionBehaviour = SessionBehaviour.OPEN_FORM_IN_LOAD;
     m_desktopBehaviour = DesktopBehaviour.DO_NOTHING;
-    try {
-      IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
-      uiSession.getClientSession();
-    }
-    catch (Exception ex) {
-      throw ex;
-    }
+    IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
+    uiSession.getClientSession();
   }
 
   @Test

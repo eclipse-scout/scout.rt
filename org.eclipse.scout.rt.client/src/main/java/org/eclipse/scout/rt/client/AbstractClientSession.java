@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -325,26 +325,17 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Override
   public void setDesktop(IDesktop desktop) {
     if (desktop == null) {
-      throw new IllegalArgumentException("argument must not be null");
+      throw new IllegalArgumentException("desktop must not be null");
+    }
+    if (desktop == m_desktop) {
+      return;
     }
     if (m_desktop != null) {
-      throw new IllegalStateException("desktop is active");
+      throw new IllegalStateException("desktop is already set and cannot be changed");
     }
     m_desktop = desktop;
     if (m_virtualDesktop != null) {
-      m_desktop.desktopListeners().addAll(m_virtualDesktop.desktopListeners());
-      m_virtualDesktop.getPropertyChangeListenerMap()
-          .forEach((propName, listeners) -> listeners
-              .forEach(listener -> {
-                if (propName == null) {
-                  m_desktop.addPropertyChangeListener(listener);
-                }
-                else {
-                  m_desktop.addPropertyChangeListener(propName, listener);
-                }
-              }));
-      m_desktop.dataChangeListeners().addAll(m_virtualDesktop.dataChangeListeners());
-      m_desktop.dataChangeDesktopInForegroundListeners().addAll(m_virtualDesktop.dataChangeDesktopInForegroundListeners());
+      m_virtualDesktop.setRealDesktop(desktop);
       m_virtualDesktop = null;
     }
     m_desktop.init();
