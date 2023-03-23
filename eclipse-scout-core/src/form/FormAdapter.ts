@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ChildModelOf, Event, Form, FormField, FullModelOf, ModelAdapter, Widget} from '../index';
+import {ChildModelOf, Event, Form, FormField, FullModelOf, ModelAdapter, RemoteEvent, Widget} from '../index';
 
 export class FormAdapter extends ModelAdapter {
   declare widget: Form;
@@ -46,21 +46,21 @@ export class FormAdapter extends ModelAdapter {
     this._send('close');
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'requestFocus') {
-      this._onRequestFocus(event);
+      this._onRequestFocus(event as any);
     } else if (event.type === 'requestInput') {
-      this._onRequestInput(event);
+      this._onRequestInput(event as any);
     } else {
       super.onModelAction(event);
     }
   }
 
-  protected _onRequestFocus(event: { formField: string }) {
+  protected _onRequestFocus(event: RemoteEvent & { formField: string }) {
     this.session.getOrCreateWidget(event.formField, this.widget).focus();
   }
 
-  protected _onRequestInput(event: { formField: string }) {
+  protected _onRequestInput(event: RemoteEvent & { formField: string }) {
     (this.session.getOrCreateWidget(event.formField, this.widget) as FormField).requestInput();
   }
 }

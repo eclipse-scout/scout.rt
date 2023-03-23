@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, HybridActionEvent, HybridEvent, HybridManager, ModelAdapter} from '../../index';
+import {Event, HybridActionEvent, HybridEvent, HybridManager, ModelAdapter, RemoteEvent} from '../../index';
 
 export class HybridManagerAdapter extends ModelAdapter {
   declare widget: HybridManager;
@@ -16,11 +16,11 @@ export class HybridManagerAdapter extends ModelAdapter {
     super();
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'hybridEvent') {
-      this._onHybridEvent(event);
+      this._onHybridEvent(event as HybridEvent);
     } else if (event.type === 'hybridWidgetEvent') {
-      this._onHybridWidgetEvent(event);
+      this._onHybridWidgetEvent(event as HybridEvent);
     } else {
       super.onModelAction(event);
     }

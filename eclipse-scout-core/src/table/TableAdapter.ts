@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, scout, Table, TableAggregationFunctionChangedEvent,
-  TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent, TableColumnResizedEvent, TableCompleteCellEditEvent, TableDropEvent, TableFilterAddedEvent,
-  TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent,
-  TableSortEvent, TableUserFilter, ValueField
+  AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, RemoteEvent, scout, Table,
+  TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent, TableColumnResizedEvent, TableCompleteCellEditEvent,
+  TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent,
+  TableRowsExpandedEvent, TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
 } from '../index';
 import $ from 'jquery';
 
@@ -520,7 +520,7 @@ export class TableAdapter extends ModelAdapter {
     this.widget.revealSelection();
   }
 
-  protected _onColumnBackgroundEffectChanged(event: any) {
+  protected _onColumnBackgroundEffectChanged(event: RemoteEvent) {
     event.eventParts.forEach(function(eventPart) {
       let column = this.widget.columnById(eventPart.columnId),
         backgroundEffect = eventPart.backgroundEffect;
@@ -535,13 +535,13 @@ export class TableAdapter extends ModelAdapter {
     }, this);
   }
 
-  protected _onRequestFocusInCell(event: any) {
+  protected _onRequestFocusInCell(event: RemoteEvent) {
     let row = this.widget.rowById(event.rowId),
       column = this.widget.columnById(event.columnId);
     this.widget.focusCell(column, row);
   }
 
-  protected _onAggregationFunctionChanged(event: any) {
+  protected _onAggregationFunctionChanged(event: RemoteEvent) {
     let columns = [],
       functions = [];
 
@@ -573,7 +573,7 @@ export class TableAdapter extends ModelAdapter {
     }
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'rowsInserted') {
       this._onRowsInserted(event.rows);
     } else if (event.type === 'rowsDeleted') {

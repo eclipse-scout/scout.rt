@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BrowserField, BrowserFieldExternalWindowStateChangeEvent, BrowserFieldMessageEvent, Event, FormFieldAdapter} from '../../../index';
+import {BrowserField, BrowserFieldExternalWindowStateChangeEvent, BrowserFieldMessageEvent, Event, FormFieldAdapter, RemoteEvent} from '../../../index';
 
 export class BrowserFieldAdapter extends FormFieldAdapter {
   declare widget: BrowserField;
@@ -40,11 +40,11 @@ export class BrowserFieldAdapter extends FormFieldAdapter {
     }
   }
 
-  protected _onModelPostMessage(event: any) {
+  protected _onModelPostMessage(event: RemoteEvent) {
     this.widget.postMessage(event.message, event.targetOrigin);
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'postMessage') {
       this._onModelPostMessage(event);
     } else {

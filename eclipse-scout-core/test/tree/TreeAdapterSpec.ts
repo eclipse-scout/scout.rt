@@ -222,7 +222,11 @@ describe('TreeAdapter', () => {
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop) as Tree;
 
-      adapter._onNodesSelected([tree.nodes[1].id]);
+      adapter.onModelEvent({
+        target: model.id,
+        type: 'nodesSelected',
+        nodeIds: [tree.nodes[1].id]
+      });
       sendQueuedAjaxCalls();
       expect(tree.selectedNodes[0]).toBe(tree.nodes[1]);
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -239,10 +243,14 @@ describe('TreeAdapter', () => {
       tree.checkable = true;
       expect(tree.nodes[1].checked).toBe(false);
 
-      adapter._onNodesChecked([{
-        id: tree.nodes[1].id,
-        checked: true
-      }]);
+      adapter.onModelAction({
+        target: model.id,
+        type: 'nodesChecked',
+        nodes: [{
+          id: tree.nodes[1].id,
+          checked: true
+        }]
+      });
       expect(tree.nodes[1].checked).toBe(true);
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -251,7 +259,6 @@ describe('TreeAdapter', () => {
   });
 
   describe('setNodesExpanded', () => {
-
     it('does not send expand event if triggered by server', () => {
       let model = helper.createModelFixture(2, 2);
       let adapter = helper.createTreeAdapter(model);
@@ -259,7 +266,10 @@ describe('TreeAdapter', () => {
       let node = tree.nodes[1];
       expect(node.expanded).toBe(false);
 
-      adapter._onNodeExpanded(node.id, {
+      adapter.onModelEvent({
+        target: model.id,
+        type: 'nodeExpanded',
+        nodeId: node.id,
         expanded: true,
         expandedLazy: false
       });
@@ -267,7 +277,6 @@ describe('TreeAdapter', () => {
       expect(node.expanded).toBe(true);
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
-
   });
 
   describe('collapseAll', () => {
