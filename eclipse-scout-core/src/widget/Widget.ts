@@ -803,7 +803,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (this.session.desktop) {
       return this.session.desktop;
     }
-    return this.findParent(parent => parent instanceof Desktop) as Desktop;
+    return this.findParent(Desktop);
   }
 
   /**
@@ -1980,17 +1980,25 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * @returns the first parent for which the given function returns true.
+   * @param predicateOrClass may be a {@link Predicate} or a sub-class of {@link Widget}.
+   * @returns the first ancestor for which the given predicate returns true or that matches the given widget type if a subclass of {@link Widget} is provided.
    */
-  findParent(predicate: Predicate<Widget>): Widget {
+  findParent<T extends Widget>(predicateOrClass: Predicate<Widget> | (new() => T)): T {
+    let predicate;
+    // @ts-expect-error
+    if (Widget === predicateOrClass || Widget.isPrototypeOf(predicateOrClass)) {
+      predicate = widget => widget instanceof predicateOrClass;
+    } else {
+      predicate = predicateOrClass;
+    }
     let parent = this.parent;
     while (parent) {
       if (predicate(parent)) {
-        return parent;
+        return parent as T;
       }
       parent = parent.parent;
     }
-    return parent;
+    return parent as T;
   }
 
   /**

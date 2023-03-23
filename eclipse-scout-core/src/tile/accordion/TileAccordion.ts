@@ -239,7 +239,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
   }
 
   getGroupByTile(tile: Tile): Group<TileGrid> {
-    return tile.findParent(parent => parent instanceof Group) as Group<TileGrid>;
+    return tile.findParent(Group<TileGrid>);
   }
 
   /**

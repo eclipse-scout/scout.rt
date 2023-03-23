@@ -105,7 +105,7 @@ export class FormMenu extends Menu implements FormMenuModel {
     }
     this.setForm(null);
 
-    let parentContextMenuPopup = this.findParent(p => p instanceof ContextMenuPopup) as ContextMenuPopup;
+    let parentContextMenuPopup = this.findParent(ContextMenuPopup);
     if (parentContextMenuPopup && !(parentContextMenuPopup.destroying || parentContextMenuPopup.removing)) {
       // only explicitly close the popup if it is not already being closed. Otherwise, it is removed twice.
       parentContextMenuPopup.close();
