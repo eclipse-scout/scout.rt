@@ -1,17 +1,16 @@
 /*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.client.extension.ui.outline.desktop;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -63,7 +62,7 @@ public class DesktopMoveOutlinesTest extends AbstractLocalExtensionTestCase {
     List<IOutline> outlines = desktop.getAvailableOutlines();
     assertEquals(outlineClasses.length, outlines.size());
     for (int i = 0; i < outlineClasses.length; i++) {
-      assertTrue(outlineClasses[i] == outlines.get(i).getClass());
+      assertSame(outlineClasses[i], outlines.get(i).getClass());
     }
   }
 }
