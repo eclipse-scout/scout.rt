@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner, PlannerActivity, PlannerResource, PlannerResourcesSelectedEvent} from '../index';
+import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner, PlannerActivity, PlannerResource, PlannerResourcesSelectedEvent, RemoteEvent} from '../index';
 
 export class PlannerAdapter extends ModelAdapter {
   declare widget: Planner;
@@ -96,7 +96,7 @@ export class PlannerAdapter extends ModelAdapter {
     this.widget.updateResources(resources);
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'resourcesInserted') {
       this._onResourcesInserted(event.resources);
     } else if (event.type === 'resourcesDeleted') {

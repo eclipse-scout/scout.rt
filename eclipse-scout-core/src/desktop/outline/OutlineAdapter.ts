@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, EventHandler, Form, objects, Outline, Page, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter} from '../../index';
+import {App, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter} from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
   declare widget: Outline;
@@ -26,7 +26,7 @@ export class OutlineAdapter extends TreeAdapter {
     this._detailTableFilterRemoved = this._onDetailTableFilterRemoved.bind(this);
   }
 
-  protected _onPageChanged(event: any) {
+  protected _onPageChanged(event: RemoteEvent) {
     let page = this.widget.nodeById(event.nodeId);
     page.overviewIconId = event.overviewIconId;
 
@@ -50,7 +50,7 @@ export class OutlineAdapter extends TreeAdapter {
     this.widget.pageChanged(page);
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'pageChanged') {
       this._onPageChanged(event);
     } else {

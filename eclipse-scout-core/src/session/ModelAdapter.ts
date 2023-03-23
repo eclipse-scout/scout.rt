@@ -416,7 +416,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
     this._syncPropertiesOnPropertyChange(event.properties);
   }
 
-  onModelAction(event: any) {
+  onModelAction(event: RemoteEvent) {
     if (event.type === 'scrollToTop') {
       this.widget.scrollToTop({animate: event.animate});
     } else if (event.type === 'reveal') {

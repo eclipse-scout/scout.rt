@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Desktop, DesktopCancelFormsEvent, DesktopFormActivateEvent, DesktopHistoryState, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, Outline, Widget
+  Desktop, DesktopCancelFormsEvent, DesktopFormActivateEvent, DesktopHistoryState, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, Outline,
+  RemoteEvent, Widget
 } from '../index';
 
 export class DesktopAdapter extends ModelAdapter {
@@ -88,7 +89,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  protected _onFormShow(event: any) {
+  protected _onFormShow(event: RemoteEvent) {
     let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
       let form = this.session.getOrCreateWidget(event.form, displayParent.widget) as Form;
@@ -103,7 +104,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  protected _onFormHide(event: any) {
+  protected _onFormHide(event: RemoteEvent) {
     let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
       let form = this.session.getModelAdapter(event.form) as FormAdapter;
@@ -111,7 +112,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  protected _onFormActivate(event: any) {
+  protected _onFormActivate(event: RemoteEvent) {
     let form = this.session.getWidget(event.form) as Form;
     this.widget.activateForm(form);
   }
@@ -127,7 +128,7 @@ export class DesktopAdapter extends ModelAdapter {
     });
   }
 
-  protected _onMessageBoxShow(event: any) {
+  protected _onMessageBoxShow(event: RemoteEvent) {
     let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
       let messageBox = this.session.getOrCreateWidget(event.messageBox, displayParent.widget) as MessageBox;
@@ -137,7 +138,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  protected _onMessageBoxHide(event: any) {
+  protected _onMessageBoxHide(event: RemoteEvent) {
     let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
       let messageBox = this.session.getModelAdapter(event.messageBox) as MessageBoxAdapter;
@@ -146,7 +147,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  protected _onFileChooserShow(event: any) {
+  protected _onFileChooserShow(event: RemoteEvent) {
     let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
       let parent = displayParent.widget as DisplayParent;
@@ -156,7 +157,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  protected _onFileChooserHide(event: any) {
+  protected _onFileChooserHide(event: RemoteEvent) {
     let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
       let fileChooser = this.session.getModelAdapter(event.fileChooser) as FileChooserAdapter;
@@ -165,29 +166,29 @@ export class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  protected _onOpenUri(event: any) {
+  protected _onOpenUri(event: RemoteEvent) {
     this.widget.openUri(event.uri, event.action);
   }
 
-  protected _onOutlineChanged(event: any) {
+  protected _onOutlineChanged(event: RemoteEvent) {
     let outline = this.session.getOrCreateWidget(event.outline, this.widget) as Outline;
     this.widget.setOutline(outline);
   }
 
-  protected _onAddNotification(event: any) {
+  protected _onAddNotification(event: RemoteEvent) {
     let notification = this.session.getOrCreateWidget(event.notification, this.widget) as DesktopNotification;
     this.widget.addNotification(notification);
   }
 
-  protected _onRemoveNotification(event: any) {
+  protected _onRemoveNotification(event: RemoteEvent) {
     this.widget.removeNotification(event.notification);
   }
 
-  protected _onOutlineContentActivate(event: any) {
+  protected _onOutlineContentActivate(event: RemoteEvent) {
     this.widget.bringOutlineToFront();
   }
 
-  protected _onRequestGeolocation(event: any) {
+  protected _onRequestGeolocation(event: RemoteEvent) {
     if (navigator.geolocation) {
       let success = function(position: GeolocationPosition) {
         this._send('geolocationDetermined', {
@@ -205,7 +206,7 @@ export class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'formShow') {
       this._onFormShow(event);
     } else if (event.type === 'formHide') {

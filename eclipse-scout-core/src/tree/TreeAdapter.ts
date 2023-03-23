@@ -97,7 +97,7 @@ export class TreeAdapter extends ModelAdapter {
     }
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'nodesInserted') {
       this._onNodesInserted(event.nodes, event.commonParentNodeId);
     } else if (event.type === 'nodesUpdated') {
@@ -109,9 +109,9 @@ export class TreeAdapter extends ModelAdapter {
     } else if (event.type === 'nodesSelected') {
       this._onNodesSelected(event.nodeIds);
     } else if (event.type === 'nodeExpanded') {
-      this._onNodeExpanded(event.nodeId, event);
+      this._onNodeExpanded(event.nodeId, event as any);
     } else if (event.type === 'nodeChanged') {
-      this._onNodeChanged(event.nodeId, event);
+      this._onNodeChanged(event.nodeId, event as any);
     } else if (event.type === 'nodesChecked') {
       this._onNodesChecked(event.nodes);
     } else if (event.type === 'childNodeOrderChanged') {
@@ -180,7 +180,7 @@ export class TreeAdapter extends ModelAdapter {
    * @param event.expandedLazy true, to expand the nodes lazily
    * @param event.recursive true, to expand the descendant nodes as well
    */
-  protected _onNodeExpanded(nodeId: string, event: { expanded: boolean; expandedLazy: boolean; recursive?: boolean }) {
+  protected _onNodeExpanded(nodeId: string, event: RemoteEvent & { expanded: boolean; expandedLazy: boolean; recursive?: boolean }) {
     let node = this.widget.nodesMap[nodeId],
       options = {
         lazy: event.expandedLazy
@@ -206,7 +206,7 @@ export class TreeAdapter extends ModelAdapter {
     }
   }
 
-  protected _onNodeChanged(nodeId: string, cell: CellModel<any>) {
+  protected _onNodeChanged(nodeId: string, cell: RemoteEvent & CellModel) {
     let node = this.widget.nodesMap[nodeId];
 
     defaultValues.applyTo(cell, 'TreeNode');

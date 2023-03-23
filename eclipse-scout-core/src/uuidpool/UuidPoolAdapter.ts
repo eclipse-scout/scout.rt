@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Event, ModelAdapter, UuidPool, UuidPoolRefillEvent} from '../index';
+import {arrays, Event, ModelAdapter, RemoteEvent, UuidPool, UuidPoolRefillEvent} from '../index';
 
 export class UuidPoolAdapter extends ModelAdapter {
   declare widget: UuidPool;
@@ -41,7 +41,7 @@ export class UuidPoolAdapter extends ModelAdapter {
     });
   }
 
-  override onModelAction(event: any) {
+  override onModelAction(event: RemoteEvent) {
     if (event.type === 'refill') {
       this._onModelRefill(event);
     } else {
@@ -49,7 +49,7 @@ export class UuidPoolAdapter extends ModelAdapter {
     }
   }
 
-  protected _onModelRefill(event: any) {
+  protected _onModelRefill(event: RemoteEvent) {
     arrays.pushAll(this.widget.uuids, event.uuids);
     this.refillInProgress = false;
   }
