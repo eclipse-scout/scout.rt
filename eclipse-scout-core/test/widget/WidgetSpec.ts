@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, scout, StringField, TreeVisitResult, Widget} from '../../src/index';
+import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, scout, StringField, TableRow, TreeVisitResult, Widget} from '../../src/index';
 import {InitModelOf} from '../../src/scout';
 
 describe('Widget', () => {
@@ -30,6 +30,12 @@ describe('Widget', () => {
     override _remove() {
       super._remove();
     }
+  }
+
+  class SubTestWidget extends TestWidget {
+  }
+
+  class AnotherTestWidget extends NullWidget {
   }
 
   class ScrollableWidget extends NullWidget {
@@ -99,34 +105,29 @@ describe('Widget', () => {
       child1 = new TestWidget();
       child1.init({
         id: 'child1',
-        session: session,
         parent: parent,
         wasVisited: false
       });
       child2 = new TestWidget();
       child2.init({
         id: 'child2',
-        session: session,
         parent: parent,
         wasVisited: false
       });
       grandChild1 = new TestWidget();
       grandChild1.init({
         id: 'grandChild1',
-        session: session,
         parent: child1,
         wasVisited: false
       });
       grandChild2 = new TestWidget();
       grandChild2.init({
         id: 'grandChild2',
-        session: session,
         parent: child1,
         wasVisited: false
       });
       grandChild2_1 = new TestWidget();
       grandChild2_1.init({
-        session: session,
         parent: child2,
         wasVisited: false
       });
@@ -134,7 +135,6 @@ describe('Widget', () => {
 
     it('visits all descendants', () => {
       createWidget({
-        session: session,
         parent: parent
       });
       let counter = 0;
@@ -269,25 +269,21 @@ describe('Widget', () => {
       let child1 = new TestWidget();
       child1.init({
         id: 'child1',
-        session: session,
         parent: parent
       });
       let child2 = new TestWidget();
       child2.init({
         id: 'child2',
-        session: session,
         parent: parent
       });
       let grandChild1 = new TestWidget();
       grandChild1.init({
         id: 'grandChild1',
-        session: session,
         parent: child1
       });
       let grandChild2 = new TestWidget();
       grandChild2.init({
         id: 'grandChild2',
-        session: session,
         parent: child1
       });
       expect(parent.widget('child1')).toBe(child1);
@@ -300,25 +296,21 @@ describe('Widget', () => {
       let child1 = new TestWidget();
       child1.init({
         id: 'child1',
-        session: session,
         parent: parent
       });
       let child2 = new TestWidget();
       child2.init({
         id: 'child2',
-        session: session,
         parent: parent
       });
       let grandChild1 = new TestWidget();
       grandChild1.init({
         id: 'grandChild1',
-        session: session,
         parent: child1
       });
       let grandChild2 = new TestWidget();
       grandChild2.init({
         id: 'grandChild2',
-        session: session,
         parent: child1
       });
       let visitChildrenSpy = spyOn(parent, 'visitChildren').and.callThrough();
@@ -340,31 +332,26 @@ describe('Widget', () => {
       let child1 = new TestWidget();
       child1.init({
         id: 'w1',
-        session: session,
         parent: parent
       });
       let child2 = new TestWidget();
       child2.init({
         id: 'w2',
-        session: session,
         parent: parent
       });
       let grandChild1 = new TestWidget();
       grandChild1.init({
         id: 'w2',
-        session: session,
         parent: child1
       });
       let grandChild2 = new TestWidget();
       grandChild2.init({
         id: 'w3',
-        session: session,
         parent: child2
       });
       let grandChild3 = new TestWidget();
       grandChild3.init({
         id: 'w2',
-        session: session,
         parent: child2
       });
       expect(parent.widget('w1')).toBe(child1);
@@ -380,10 +367,63 @@ describe('Widget', () => {
     });
   });
 
+  describe('findParent', () => {
+    it('finds the first ancestor which has the given type', () => {
+      let child = new SubTestWidget();
+      child.init({
+        id: 'child',
+        parent: parent
+      });
+      let grandChild = new AnotherTestWidget();
+      grandChild.init({
+        id: 'grandChild',
+        parent: child
+      });
+      let grandGrandChild = new AnotherTestWidget();
+      grandGrandChild.init({
+        id: 'grandGrandChild',
+        parent: grandChild
+      });
+      expect(grandGrandChild.findParent(Widget)).toBe(grandChild);
+      expect(grandGrandChild.findParent(AnotherTestWidget)).toBe(grandChild);
+      expect(grandGrandChild.findParent(SubTestWidget)).toBe(child);
+      expect(grandGrandChild.findParent(TestWidget)).toBe(child);
+
+      let thrown;
+      try {
+        // @ts-expect-error TableRow does not extend widget -> it will be treated as predicate which won't work (TypeError: Class constructor TableRow cannot be invoked without 'new')
+        grandGrandChild.findParent(TableRow);
+      } catch (error) {
+        thrown = true;
+      }
+      expect(thrown).toBe(true);
+    });
+
+    it('finds the first ancestor that is accepted by the given predicate', () => {
+      let child = new SubTestWidget();
+      child.init({
+        id: 'child',
+        parent: parent
+      });
+      let grandChild = new AnotherTestWidget();
+      grandChild.init({
+        id: 'grandChild',
+        parent: child
+      });
+      let grandGrandChild = new AnotherTestWidget();
+      grandGrandChild.init({
+        id: 'grandGrandChild',
+        parent: grandChild
+      });
+      expect(grandGrandChild.findParent(parent => parent.id === 'grandChild')).toBe(grandChild);
+      expect(grandGrandChild.findParent(parent => parent.id === 'child')).toBe(child);
+      expect(grandGrandChild.findParent(parent => false)).toBe(null);
+    });
+  });
+
   describe('enabled', () => {
     it('should be propagated correctly', () => {
       let widget = createWidget({
-        session: session,
         parent: parent
       });
       // check setup
@@ -425,7 +465,6 @@ describe('Widget', () => {
 
     it('should not be inherited if inheritAccessibility is disabled', () => {
       let widget = createWidget({
-        session: session,
         parent: parent
       });
       // check setup
@@ -448,7 +487,6 @@ describe('Widget', () => {
     it('recomputeEnabled should be called for all widgets at least once', () => {
 
       let widget = scout.create(Form, {
-        session: session,
         parent: parent,
         rootGroupBox: {
           objectType: GroupBox,
@@ -487,7 +525,6 @@ describe('Widget', () => {
 
     it('should correctly recalculate enabled state when adding a new field', () => {
       let widget = createWidget({
-        session: session,
         parent: parent
       });
       // check setup
@@ -500,7 +537,6 @@ describe('Widget', () => {
       // add a new field which itself is enabled
       let additionalWidget = new TestWidget();
       additionalWidget.init({
-        session: session,
         parent: session.root
       });
 
@@ -518,7 +554,6 @@ describe('Widget', () => {
 
     it('should set rendering, rendered flags correctly', () => {
       let widget = createWidget({
-        session: session,
         parent: parent
       });
       expect(widget.rendered).toBe(false);
@@ -535,7 +570,6 @@ describe('Widget', () => {
         rendering = this.rendering;
       };
       widget.init({
-        session: session,
         parent: parent
       });
       widget.render(session.$entryPoint);
@@ -1479,7 +1513,6 @@ describe('Widget', () => {
       let widget = new TestClass();
       widget.init({
         parent: parent,
-        session: session,
         message: 'A'
       });
 
@@ -1514,7 +1547,6 @@ describe('Widget', () => {
       // Create an instance
       let model1 = {
         parent: parent,
-        session: session,
         items: [{
           objectType: 'testns.TestItem',
           id: 'TI1',
@@ -1534,7 +1566,6 @@ describe('Widget', () => {
       // Create another instance with an invalid reference
       let model2 = {
         parent: parent,
-        session: session,
         objectType: 'testns.ComplexTestWidget',
         items: [{
           objectType: 'testns.TestItem',
@@ -1556,7 +1587,6 @@ describe('Widget', () => {
       // Create another instance with unsupported references (same level)
       let model3 = {
         parent: parent,
-        session: session,
         items: [{
           objectType: 'testns.TestItem',
           id: 'TI1',
@@ -1652,7 +1682,6 @@ describe('Widget', () => {
       let widget = new ScrollableWidget();
       widget.init({
         parent: parent,
-        session: session,
         scrollTop: 40
       });
       expect(widget.scrollTop).toBe(40);

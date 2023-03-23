@@ -100,7 +100,7 @@ export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
     this.content.$container.on('click', '.tile', event => {
       let target = scout.widget(event.target);
       if (!(target instanceof Tile)) {
-        target = target.findParent(parent => parent instanceof Tile);
+        target = target.findParent(Tile);
       }
       this.activateTile(target as Tile);
     });
