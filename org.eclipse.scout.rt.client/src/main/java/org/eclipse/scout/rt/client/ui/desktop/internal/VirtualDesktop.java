@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -15,13 +15,17 @@ import java.security.Permission;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.client.job.ModelJobs.WrongThreadException;
 import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -70,543 +74,640 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  */
 @ClassId("3184965f-010b-4d1b-9c08-d5cd35eedf2b")
 public class VirtualDesktop implements IDesktop {
-  private final DesktopListeners m_listeners;
-  private final BasicPropertySupport m_propertyChangeListeners;
-  private final IDataChangeManager m_dataChangeListeners;
-  private final IDataChangeManager m_dataChangeDesktopInForegroundListeners;
+
+  private DesktopListeners m_listeners;
+  private BasicPropertySupport m_propertyChangeListeners;
+  private IDataChangeManager m_dataChangeListeners;
+  private IDataChangeManager m_dataChangeDesktopInForegroundListeners;
+  private WidgetListeners m_widgetListeners;
+  private IDesktop m_realDesktop; // holds the "real" Desktop set to the ClientSession as soon as available.
 
   public VirtualDesktop() {
     m_listeners = new DesktopListeners();
     m_propertyChangeListeners = new BasicPropertySupport(this);
     m_dataChangeListeners = BEANS.get(IDataChangeManager.class);
     m_dataChangeDesktopInForegroundListeners = BEANS.get(IDataChangeManager.class);
+    m_widgetListeners = new WidgetListeners();
   }
 
-  public Map<String, List<PropertyChangeListener>> getPropertyChangeListenerMap() {
-    return m_propertyChangeListeners.getSpecificPropertyChangeListeners();
+  /**
+   * After calling this function this {@link VirtualDesktop} only acts as proxy for the given real one. Listeners
+   * already registered to this {@link VirtualDesktop} are transferred and future listeners will be added to the real
+   * desktop directly.
+   *
+   * @param realDesktop
+   *          Must not be {@code null} and must not be a {@link VirtualDesktop}.
+   * @throws IllegalArgumentException
+   *           if the realDesktop is null or a {@link VirtualDesktop}.
+   * @throws IllegalStateException
+   *           if a different real desktop has already been set
+   * @throws WrongThreadException
+   *           if this method is not called from a model thread.
+   */
+  public void setRealDesktop(IDesktop realDesktop) {
+    if (realDesktop == null) {
+      throw new IllegalArgumentException("Real desktop must not be null");
+    }
+    if (realDesktop instanceof VirtualDesktop) {
+      throw new IllegalArgumentException("Real desktop must not be virtual");
+    }
+    if (m_realDesktop == realDesktop) {
+      return; // already the correct value
+    }
+    if (m_realDesktop != null) {
+      throw new IllegalStateException("real desktop has already been set");
+    }
+    ModelJobs.assertModelThread();
+
+    // copy listeners over to real desktop
+    realDesktop.desktopListeners().addAll(desktopListeners());
+    m_listeners = null;
+
+    m_propertyChangeListeners.getPropertyChangeListeners().forEach(l -> realDesktop.addPropertyChangeListener(l));
+    m_propertyChangeListeners.getSpecificPropertyChangeListeners()
+        .forEach((propName, listeners) -> listeners
+            .forEach(listener -> realDesktop.addPropertyChangeListener(propName, listener)));
+    m_propertyChangeListeners = null;
+
+    realDesktop.dataChangeListeners().addAll(dataChangeListeners());
+    m_dataChangeListeners = null;
+
+    realDesktop.dataChangeDesktopInForegroundListeners().addAll(dataChangeDesktopInForegroundListeners());
+    m_dataChangeDesktopInForegroundListeners = null;
+
+    realDesktop.widgetListeners().addAll(widgetListeners());
+    m_widgetListeners = null;
+
+    // assign real desktop so that from now on calls to this virtual instance are delegated to the real one
+    m_realDesktop = realDesktop;
+  }
+
+  public Optional<IDesktop> getRealDesktop() {
+    return Optional.ofNullable(m_realDesktop);
   }
 
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
-    m_propertyChangeListeners.addPropertyChangeListener(listener);
+    forwardToRealDesktopOrElse(d -> d.addPropertyChangeListener(listener), () -> m_propertyChangeListeners.addPropertyChangeListener(listener));
   }
 
   @Override
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    m_propertyChangeListeners.addPropertyChangeListener(propertyName, listener);
+    forwardToRealDesktopOrElse(d -> d.addPropertyChangeListener(propertyName, listener), () -> m_propertyChangeListeners.addPropertyChangeListener(propertyName, listener));
   }
 
   @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
-    m_propertyChangeListeners.removePropertyChangeListener(listener);
+    forwardToRealDesktopOrElse(d -> d.removePropertyChangeListener(listener), () -> m_propertyChangeListeners.removePropertyChangeListener(listener));
   }
 
   @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    m_propertyChangeListeners.removePropertyChangeListener(propertyName, listener);
+    forwardToRealDesktopOrElse(d -> d.removePropertyChangeListener(propertyName, listener), () -> m_propertyChangeListeners.removePropertyChangeListener(propertyName, listener));
   }
 
   @Override
   public List<PropertyChangeListener> getPropertyChangeListeners() {
-    return m_propertyChangeListeners.getPropertyChangeListeners();
+    return getFromRealDesktopOrElseGet(d -> d.getPropertyChangeListeners(), () -> m_propertyChangeListeners.getPropertyChangeListeners());
   }
 
   @Override
   public Map<String, List<PropertyChangeListener>> getSpecificPropertyChangeListeners() {
-    return m_propertyChangeListeners.getSpecificPropertyChangeListeners();
+    return getFromRealDesktopOrElseGet(d -> d.getSpecificPropertyChangeListeners(), () -> m_propertyChangeListeners.getSpecificPropertyChangeListeners());
   }
 
   @Override
   public DesktopListeners desktopListeners() {
-    return m_listeners;
+    return getFromRealDesktopOrElse(d -> d.desktopListeners(), m_listeners);
   }
 
   @Override
   public IDataChangeManager dataChangeListeners() {
-    return m_dataChangeListeners;
+    return getFromRealDesktopOrElse(d -> d.dataChangeListeners(), m_dataChangeListeners);
   }
 
   @Override
   public IDataChangeManager dataChangeDesktopInForegroundListeners() {
-    return m_dataChangeDesktopInForegroundListeners;
+    return getFromRealDesktopOrElse(d -> d.dataChangeDesktopInForegroundListeners(), m_dataChangeDesktopInForegroundListeners);
   }
 
-  private UnsupportedOperationException createUnsupportedOperationException() {
-    return new UnsupportedOperationException("The desktop is currently loading. This method must be called after the desktop has loaded and is set onto the session");
+  @Override
+  public WidgetListeners widgetListeners() {
+    return getFromRealDesktopOrElse(d -> d.widgetListeners(), m_widgetListeners);
+  }
+
+  public void forwardToRealDesktopOrThrow(Consumer<IDesktop> realDesktopTask) {
+    getFromRealDesktopOrThrow(d -> {
+      realDesktopTask.accept(d);
+      return Boolean.TRUE;
+    });
+  }
+
+  public <T> T getFromRealDesktopOrThrow(Function<IDesktop, T> realDesktopTask) {
+    IDesktop realDesktop = getRealDesktop()
+        .orElseThrow(() -> new UnsupportedOperationException("The desktop is currently loading. This method must be called after the desktop has loaded and is set onto the session"));
+    return realDesktopTask.apply(realDesktop);
+  }
+
+  public void forwardToRealDesktopIfAvailable(Consumer<IDesktop> realDesktopTask) {
+    getFromRealDesktopOrElse(d -> {
+      realDesktopTask.accept(d);
+      return Boolean.TRUE;
+    }, null);
+  }
+
+  public <T> T getFromRealDesktopOrElse(Function<IDesktop, T> realDesktopTask, T orElse) {
+    return getFromRealDesktopOrElseGet(realDesktopTask, () -> orElse);
+  }
+
+  public void forwardToRealDesktopOrElse(Consumer<IDesktop> realDesktopTask, Runnable virtualDesktopTask) {
+    getFromRealDesktopOrElseGet(d -> {
+      realDesktopTask.accept(d);
+      return Boolean.TRUE;
+    }, () -> {
+      virtualDesktopTask.run();
+      return Boolean.TRUE;
+    });
+  }
+
+  public <T> T getFromRealDesktopOrElseGet(Function<IDesktop, T> realDesktopTask, Supplier<? extends T> orElse) {
+    return getRealDesktop()
+        .map(realDesktopTask)
+        .orElseGet(orElse);
   }
 
   /*
-   * Not implemented methods
+   * Not implemented methods (forward to real desktop if available)
    */
 
   @Override
   public boolean isAutoPrefixWildcardForTextSearch() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isAutoPrefixWildcardForTextSearch());
   }
 
   @Override
   public void setAutoPrefixWildcardForTextSearch(boolean b) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setAutoPrefixWildcardForTextSearch(b));
   }
 
   @Override
   public boolean isSelectViewTabsKeyStrokesEnabled() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(IDesktop::isSelectViewTabsKeyStrokesEnabled);
   }
 
   @Override
   public void setSelectViewTabsKeyStrokesEnabled(boolean selectViewTabsKeyStrokesEnabled) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setSelectViewTabsKeyStrokesEnabled(selectViewTabsKeyStrokesEnabled));
   }
 
   @Override
   public String getSelectViewTabsKeyStrokeModifier() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getSelectViewTabsKeyStrokeModifier());
   }
 
   @Override
   public void setSelectViewTabsKeyStrokeModifier(String selectViewTabsKeyStrokeModifier) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setSelectViewTabsKeyStrokeModifier(selectViewTabsKeyStrokeModifier));
   }
 
   @Override
   public void doLogoAction() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.doLogoAction());
   }
 
   @Override
   public void activateBookmark(Bookmark bm) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.activateBookmark(bm));
   }
 
   @Override
   public void activateBookmark(Bookmark bm, boolean activateOutline) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.activateBookmark(bm, activateOutline));
   }
 
   @Override
   public boolean isShowing(IFileChooser fileChooser) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isShowing(fileChooser));
   }
 
   @Override
   public List<IFileChooser> getFileChoosers() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getFileChoosers());
   }
 
   @Override
   public List<IFileChooser> getFileChoosers(IDisplayParent displayParent) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getFileChoosers(displayParent));
   }
 
   @Override
   public void showFileChooser(IFileChooser fileChooser) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.showFileChooser(fileChooser));
   }
 
   @Override
   public void hideFileChooser(IFileChooser fileChooser) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.hideFileChooser(fileChooser));
   }
 
   @Override
   public void openUri(String url, IOpenUriAction openUriAction) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.openUri(url, openUriAction));
   }
 
   @Override
   public void openUri(BinaryResource binaryResource) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.openUri(binaryResource));
   }
 
   @Override
   public void openUri(BinaryResource binaryResource, IOpenUriAction openUriAction) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.openUri(binaryResource, openUriAction));
   }
 
   @Override
   public void showForm(IForm form) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.showForm(form));
   }
 
   @Override
   public void hideForm(IForm form) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.hideForm(form));
   }
 
   @Override
   public void addKeyStrokes(IKeyStroke... keyStrokes) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.addKeyStrokes(keyStrokes));
   }
 
   @Override
   public void showMessageBox(IMessageBox messageBox) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.showMessageBox(messageBox));
   }
 
   @Override
   public void hideMessageBox(IMessageBox messageBox) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.hideMessageBox(messageBox));
   }
 
   @Override
   public void closeInternal() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.closeInternal());
   }
 
   @Override
   public Bookmark createBookmark() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.createBookmark());
   }
 
   @Override
   public Bookmark createBookmark(IPage<?> page) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.createBookmark(page));
   }
 
   @Override
   public void dataChanged(Object... dataTypes) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.dataChanged(dataTypes));
   }
 
   @Override
   public void fireDataChangeEvent(DataChangeEvent event) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.fireDataChangeEvent(event));
   }
 
   @Override
   public void setDataChanging(boolean b) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setDataChanging(b));
   }
 
   @Override
   public boolean isDataChanging() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isDataChanging());
   }
 
   @Override
   public void ensureViewStackVisible() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.ensureViewStackVisible());
   }
 
   @Override
   public void activateForm(IForm form) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.activateForm(form));
   }
 
   @Override
   public void activateOutline(IOutline outline) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.activateOutline(outline));
   }
 
   @Override
   public void activateFirstPage() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.activateFirstPage());
   }
 
   @Override
   public <T extends IForm> T findForm(Class<T> formType) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.findForm(formType));
   }
 
   @Override
   public <T extends IForm> List<T> findForms(Class<T> formType) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.findForms(formType));
   }
 
   @Override
   public <T extends IOutline> T findOutline(Class<T> outlineType) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.findOutline(outlineType));
   }
 
   @Override
   public <T extends IAction> T findAction(Class<T> actionType) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.findAction(actionType));
   }
 
   @Override
   public <T extends IViewButton> T findViewButton(Class<T> viewButtonType) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.findViewButton(viewButtonType));
   }
 
   @Override
   public List<IOutline> getAvailableOutlines() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getAvailableOutlines());
   }
 
   @Override
   public void setAvailableOutlines(List<? extends IOutline> availableOutlines) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setAvailableOutlines(availableOutlines));
   }
 
   @Override
   public List<IForm> getDialogs() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getDialogs());
   }
 
   @Override
   public List<IForm> getDialogs(IDisplayParent displayParent, boolean includeChildDialogs) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getDialogs(displayParent, includeChildDialogs));
   }
 
   @Override
   public Set<IKeyStroke> getKeyStrokes() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getKeyStrokes());
   }
 
   @Override
   public List<IMenu> getMenus() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getMenus());
   }
 
   @Override
   public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getMenuByClass(menuType));
   }
 
   @Override
   public IContextMenu getContextMenu() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getContextMenu());
   }
 
   @Override
   public boolean isShowing(IMessageBox messageBox) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isShowing(messageBox));
   }
 
   @Override
   public List<IMessageBox> getMessageBoxes() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getMessageBoxes());
   }
 
   @Override
   public List<IDesktopNotification> getNotifications() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getNotifications());
   }
 
   @Override
   public List<IMessageBox> getMessageBoxes(IDisplayParent displayParent) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getMessageBoxes(displayParent));
   }
 
   @Override
   public IOutline getOutline() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getOutline());
   }
 
   @Override
   public IForm getPageSearchForm() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getPageSearchForm());
   }
 
   @Override
   public void setPageSearchForm(IForm f) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setPageSearchForm(f));
   }
 
   @Override
   public IForm getPageDetailForm() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getPageDetailForm());
   }
 
   @Override
   public void setPageDetailForm(IForm f) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setPageDetailForm(f));
   }
 
   @Override
   public ITable getPageDetailTable() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getPageDetailTable());
   }
 
   @Override
   public void setPageDetailTable(ITable t) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setPageDetailTable(t));
   }
 
   @Override
   public List<IForm> getSimilarForms(IForm form) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getSimilarForms(form));
   }
 
   @Override
   public String getTitle() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getTitle());
   }
 
   @Override
   public List<IAction> getActions() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getActions());
   }
 
   @Override
   public <T extends IViewButton> T getViewButton(Class<? extends T> searchType) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getViewButton(searchType));
   }
 
   @Override
   public List<IViewButton> getViewButtons() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getViewButtons());
   }
 
   @Override
   public IDesktopUIFacade getUIFacade() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getUIFacade());
   }
 
   @Override
   public boolean isShowing(IForm form) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isShowing(form));
   }
 
   @Override
   public List<IForm> getForms(IDisplayParent displayParent) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getForms(displayParent));
   }
 
   @Override
   public List<IForm> getViews() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getViews());
   }
 
   @Override
   public Collection<IForm> getSelectedViews(IDisplayParent displayParent) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getSelectedViews(displayParent));
   }
 
   @Override
   public <F extends IForm, H extends IFormHandler> List<F> findAllOpenViews(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.findAllOpenViews(formClass, handlerClass, exclusiveKey));
   }
 
   @Override
   public <F extends IForm, H extends IFormHandler> F findOpenView(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.findOpenView(formClass, handlerClass, exclusiveKey));
   }
 
   @Override
   public List<IForm> getViews(IDisplayParent displayParent) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getViews(displayParent));
   }
 
   @Override
   public List<? extends IWidget> getChildren() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getChildren());
   }
 
   @Override
   public void visit(Consumer<IWidget> visitor) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.visit(visitor));
   }
 
   @Override
   public <T extends IWidget> void visit(Consumer<T> visitor, Class<T> type) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.visit(visitor, type));
   }
 
   @Override
   public TreeVisitResult visit(Function<IWidget, TreeVisitResult> visitor) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.visit(visitor));
   }
 
   @Override
   public <T extends IWidget> TreeVisitResult visit(Function<T, TreeVisitResult> visitor, Class<T> type) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.visit(visitor, type));
   }
 
   @Override
   public TreeVisitResult visit(IDepthFirstTreeVisitor<IWidget> visitor) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.visit(visitor));
   }
 
   @Override
   public <T extends IWidget> TreeVisitResult visit(IDepthFirstTreeVisitor<T> visitor, Class<T> type) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.visit(visitor, type));
   }
 
   @Override
   public <T extends IWidget> TreeVisitResult visit(IBreadthFirstTreeVisitor<T> visitor, Class<T> type) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.visit(visitor, type));
   }
 
   @Override
   public TreeVisitResult visit(IBreadthFirstTreeVisitor<IWidget> visitor) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.visit(visitor));
   }
 
   @Override
   public void init() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.init());
   }
 
   @Override
   public void reinit() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.reinit());
   }
 
   @Override
   public boolean isInitConfigDone() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isInitConfigDone());
   }
 
   @Override
   public boolean isInitDone() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isInitDone());
   }
 
   @Override
   public boolean isDisposeDone() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isDisposeDone());
   }
 
   @Override
   public void dispose() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.dispose());
   }
 
   @Override
   public boolean isOpened() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isOpened());
   }
 
   @Override
   public boolean isGuiAvailable() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isGuiAvailable());
   }
 
   @Override
   public void refreshPages(List<Class<? extends IPage<?>>> pages) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.refreshPages(pages));
   }
 
   @Override
   public void refreshPages(Class... pageTypes) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.refreshPages(pageTypes));
   }
 
   @Override
   public void releaseUnusedPages() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.releaseUnusedPages());
   }
 
   @Override
   public void afterTablePageLoaded(IPageWithTable<?> page) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.afterTablePageLoaded(page));
   }
 
   @Override
   public void removeKeyStrokes(IKeyStroke... keyStrokes) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.removeKeyStrokes(keyStrokes));
   }
 
   @Override
   public void setKeyStrokes(Collection<? extends IKeyStroke> ks) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setKeyStrokes(ks));
   }
 
   @Override
   public void setOutline(Class<? extends IOutline> outlineType) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setOutline(outlineType));
   }
 
   @Override
@@ -621,22 +722,22 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void reloadGui() {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.reloadGui());
   }
 
   @Override
   public void setTitle(String s) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setTitle(s));
   }
 
   @Override
   public String getCssClass() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getCssClass());
   }
 
   @Override
   public void setCssClass(String cssClass) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.setCssClass(cssClass));
   }
 
   @Override
@@ -646,22 +747,22 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public boolean doBeforeClosingInternal() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.doBeforeClosingInternal());
   }
 
   @Override
   public List<IForm> getUnsavedForms() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getUnsavedForms());
   }
 
   @Override
   public IForm getActiveForm() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getActiveForm());
   }
 
   @Override
   public IWidget getFocusedElement() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getFocusedElement());
   }
 
   @Override
@@ -675,27 +776,27 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void addAddOn(Object addOn) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.addAddOn(addOn));
   }
 
   @Override
   public void removeAddOn(Object addOn) {
-    throw createUnsupportedOperationException();
+    forwardToRealDesktopOrThrow(d -> d.removeAddOn(addOn));
   }
 
   @Override
   public Collection<Object> getAddOns() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getAddOns());
   }
 
   @Override
   public <T> T getAddOn(Class<T> addOnClass) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getAddOn(addOnClass));
   }
 
   @Override
   public boolean isOutlineChanging() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.isOutlineChanging());
   }
 
   @Override
@@ -850,7 +951,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public Future<Coordinates> requestGeolocation() {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.requestGeolocation());
   }
 
   @Override
@@ -865,12 +966,12 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public boolean cancelForms(Set<IForm> formSet) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.cancelForms(formSet));
   }
 
   @Override
   public boolean cancelForms(Set<IForm> formSet, boolean alwaysShowUnsavedChangesForm) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.cancelForms(formSet, alwaysShowUnsavedChangesForm));
   }
 
   @Override
@@ -895,7 +996,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind) {
-    throw createUnsupportedOperationException();
+    return getFromRealDesktopOrThrow(d -> d.getWidgetByClass(widgetClassToFind));
   }
 
   @Override
@@ -1061,10 +1162,5 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public void reveal(ScrollOptions options) {
     // NOP
-  }
-
-  @Override
-  public WidgetListeners widgetListeners() {
-    return null;
   }
 }
