@@ -57,7 +57,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
     try {
       doChecks(req, resp);
     }
-    catch (Throwable t) {
+    catch (Throwable t) { //NOSONAR
       LOG.error("HealthChecking crashed", t);
       throw BEANS.get(ServletExceptionTranslator.class).translate(t);
     }

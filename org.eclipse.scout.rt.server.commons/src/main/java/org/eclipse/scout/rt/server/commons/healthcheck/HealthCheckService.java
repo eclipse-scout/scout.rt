@@ -57,7 +57,7 @@ public class HealthCheckService {
           failed.add(check);
         }
       }
-      catch (Throwable t) {
+      catch (Throwable t) { //NOSONAR
         LOG.error("HealthChecker[{}] failed", check.getName(), t);
         failed.add(check);
       }
@@ -82,7 +82,7 @@ public class HealthCheckService {
           LOG.debug("HealthChecker[{}] was ignored (called with category {})", check.getName(), category);
         }
       }
-      catch (Throwable t) {
+      catch (Throwable t) { //NOSONAR
         LOG.error("Active-check crashed with HealthChecker[{}]", check.getName(), t);
       }
     }
