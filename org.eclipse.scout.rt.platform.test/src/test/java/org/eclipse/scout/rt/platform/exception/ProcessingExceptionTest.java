@@ -9,14 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ExceptionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Test;
 
@@ -145,11 +140,7 @@ public class ProcessingExceptionTest {
   }
 
   private void assertUniqueLinesOnStackTrace(Throwable t) {
-    StringWriter writer = new StringWriter();
-    PrintWriter pw = new PrintWriter(writer);
-    t.printStackTrace(pw);
-    String stackTrace = writer.toString();
-
+    String stackTrace = ExceptionUtility.getText(t);
     Set<String> processedLines = new HashSet<>();
     List<String> duplicateLines = new ArrayList<>();
     for (String line : StringUtility.getLines(stackTrace)) {
