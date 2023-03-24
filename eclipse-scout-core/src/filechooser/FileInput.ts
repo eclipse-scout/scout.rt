@@ -107,7 +107,7 @@ export class FileInput extends Widget implements FileInputModel {
         target: this,
         onDrop: event => {
           if (event.files.length >= 1) {
-            this._setFiles(event.files);
+            this.setFiles(event.files);
           }
         },
         dropMaximumSize: () => this.maximumUploadSize,
@@ -119,7 +119,7 @@ export class FileInput extends Widget implements FileInputModel {
   }
 
   clear() {
-    this._setFiles([]);
+    this.setFiles([]);
     // _setFiles actually sets the text as well, but only if files have changed.
     // Make sure text is cleared as well if there are no files but a text set.
     this.setText(null);
@@ -128,7 +128,7 @@ export class FileInput extends Widget implements FileInputModel {
     }
   }
 
-  protected _setFiles(files: FileList | File[] | File) {
+  setFiles(files: FileList | File[] | File) {
     let fileArray: File[];
     if (files instanceof FileList) {
       fileArray = fileUtil.fileListToArray(files);
@@ -164,7 +164,7 @@ export class FileInput extends Widget implements FileInputModel {
   protected _onFileChange(event: JQuery.ChangeEvent<HTMLInputElement>) {
     let files = this.$fileInput[0].files;
     if (files.length) {
-      this._setFiles(files);
+      this.setFiles(files);
     }
   }
 
