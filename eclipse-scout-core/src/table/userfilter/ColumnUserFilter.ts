@@ -194,10 +194,10 @@ export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilte
 }
 
 export type ColumnUserFilterValues = {
-  key: string | number;
-  text: string;
-  iconId: string;
-  htmlEnabled: boolean;
-  cssClass: string;
+  key?: string | number;
+  text?: string;
+  iconId?: string;
+  htmlEnabled?: boolean;
+  cssClass?: string;
   count: number;
 };
