@@ -96,10 +96,6 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return arrays.ensure(value);
   }
 
-  protected override _updateEmpty() {
-    this.empty = arrays.empty(this.value);
-  }
-
   protected _lookupByAll(): JQuery.Promise<LookupResult<TValue>> {
     if (!this.lookupCall) {
       return;

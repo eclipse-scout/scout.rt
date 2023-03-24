@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout, FormLifecycle,
-  FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, NotificationBadgeStatus, ObjectOrChildModel, Point, PopupWindow, Rectangle,
-  scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
+  AbortKeyStroke, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, EventHandler, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout,
+  FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, NotificationBadgeStatus, ObjectOrChildModel, Point,
+  PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -53,7 +53,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
   renderInitialFocusEnabled: boolean;
   /** set by PopupWindow if this Form has displayHint=Form.DisplayHint.POPUP_WINDOW */
   popupWindow: PopupWindow;
-
   title: string;
   subTitle: string;
   iconId: string;
@@ -75,6 +74,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   protected _preMaximizedBounds: Rectangle;
   protected _resizeHandler: (Event) => boolean;
   protected _windowResizeHandler: () => void;
+  protected _mainBoxSaveNeededChangeHandler: EventHandler<PropertyChangeEvent>;
 
   constructor() {
     super();
@@ -104,7 +104,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.movable = true;
     this.rootGroupBox = null;
     this.saveNeeded = false;
-    this.saveNeededVisible = false;
+    this.saveNeededVisible = true;
     this.formController = null;
     this.messageBoxController = null;
     this.fileChooserController = null;
@@ -130,6 +130,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this._preMaximizedBounds = null;
     this._resizeHandler = this._onResize.bind(this);
     this._windowResizeHandler = this._onWindowResize.bind(this);
+    this._mainBoxSaveNeededChangeHandler = () => this.updateSaveNeeded();
   }
 
   static DisplayHint = {
@@ -167,7 +168,30 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   protected override _render() {
-    this._renderForm();
+    this.$container = this.$parent.appendDiv('form')
+      .data('model', this);
+
+    if (this.uiCssClass) {
+      this.$container.addClass(this.uiCssClass);
+    }
+
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    let layout;
+    if (this.isDialog()) {
+      this.$container.addClass('dialog');
+      layout = new DialogLayout(this);
+      this.htmlComp.validateRoot = true;
+      // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
+      // E.g. clicking a checkbox label on another dialog executes mouse down handler of the checkbox which will focus the box. This only works if the focus context of the dialog is active.
+      this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
+    } else {
+      if (this.isPopupWindow()) {
+        this.$container.addClass('popup-window');
+      }
+      layout = new FormLayout(this);
+    }
+    this.htmlComp.setLayout(layout);
+    this._renderRootGroupBox();
   }
 
   protected override _renderProperties() {
@@ -220,35 +244,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
     super._remove();
   }
 
-  protected _renderForm() {
-    let layout;
-
-    this.$container = this.$parent.appendDiv('form')
-      .data('model', this);
-
-    if (this.uiCssClass) {
-      this.$container.addClass(this.uiCssClass);
-    }
-
-    this.htmlComp = HtmlComponent.install(this.$container, this.session);
-    if (this.isDialog()) {
-      this.$container.addClass('dialog');
-      layout = new DialogLayout(this);
-      this.htmlComp.validateRoot = true;
-      // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
-      // E.g. clicking a checkbox label on another dialog executes mouse down handler of the checkbox which will focus the box. This only works if the focus context of the dialog is active.
-      this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
-    } else {
-      if (this.isPopupWindow()) {
-        this.$container.addClass('popup-window');
-      }
-      layout = new FormLayout(this);
-    }
-
-    this.htmlComp.setLayout(layout);
-    this.rootGroupBox.render();
-  }
-
   /** @see FormModel.modal */
   setModal(modal: boolean) {
     this.setProperty('modal', modal);
@@ -287,13 +282,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Loads the data and renders the form afterwards by adding it to the desktop.
-   * <p>
-   * Calling this method is equivalent to calling load() first and once the promise is resolved, calling show().
-   * <p>
+   *
+   * Calling this method is equivalent to calling {@link load} first and once the promise is resolved, calling {@link show}.
+   *
    * Keep in mind that the form won't be rendered immediately after calling {@link open}. Because promises are always resolved asynchronously,
    * {@link show} will be called delayed even if {@link load} does nothing but return a resolved promise.<br>
-   * This is only relevant if you need to access properties which are only available when the form is rendered (e.g. $container), which is not recommended anyway.
-   * <p>
+   * This is only relevant if you need to access properties which are only available when the form is rendered (e.g. {@link $container}), which is not recommended anyway.
    */
   open(): JQuery.Promise<void> {
     return this.load()
@@ -406,8 +400,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
   /**
    * Saves the changes without closing the form.
    * @returns promise which is resolved when the form is saved
-   *    Note: it will be resolved even if the form does not require save and therefore even if {@link @_save} is not called.
-   *    If you only want to be informed when save is required and {@link @_save} executed then you could use {@link whenSave()} or {@link on('save')} instead.
+   *    Note: it will be resolved even if the form does not require save and therefore even if {@link _save} is not called.
+   *    If you only want to be informed when save is required and {@link _save} executed then you could use {@link whenSave} or `on('save')` instead.
    */
   save(): JQuery.Promise<void> {
     return this.lifecycle.save();
@@ -753,10 +747,33 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   protected _setRootGroupBox(rootGroupBox: GroupBox) {
+    if (this.initialized && this.rootGroupBox) {
+      this.rootGroupBox.setMainBox(false);
+      this.rootGroupBox.off('propertyChange:saveNeeded', this._mainBoxSaveNeededChangeHandler);
+    }
     this._setProperty('rootGroupBox', rootGroupBox);
     if (this.rootGroupBox) {
       this.rootGroupBox.setMainBox(true);
+      this.rootGroupBox.on('propertyChange:saveNeeded', this._mainBoxSaveNeededChangeHandler);
     }
+    this.updateSaveNeeded();
+  }
+
+  protected _renderRootGroupBox() {
+    this.rootGroupBox?.render();
+    this.invalidateLayoutTree();
+  }
+
+  updateSaveNeeded() {
+    this.setSaveNeeded(this.rootGroupBox ? this.rootGroupBox.saveNeeded : false);
+  }
+
+  markAsSaved() {
+    this.rootGroupBox?.markAsSaved();
+  }
+
+  protected setSaveNeeded(saveNeeded: boolean) {
+    this.setProperty('saveNeeded', saveNeeded);
   }
 
   protected _renderSaveNeeded() {

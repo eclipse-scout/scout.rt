@@ -48,16 +48,6 @@ export interface ValueFieldModel<TValue extends TModelValue, TModelValue = TValu
    */
   clearable?: ValueFieldClearable;
   /**
-   * The initial value is used to determine whether the field was {@link touched} and is used to replace the value when {@link ValueField.resetValue} is called.
-   *
-   * If the value field is used in a context of a {@link Form} with a {@link FormLifecycle}, the initial value will be set automatically by {@link ValueField.markAsSaved}
-   * before the form is loaded (see {@link Form.load}).
-   *
-   * So in most cases you don't need to explicitly set the initial value because it would have no effect anyway.
-   * Just use {@link value} if you would like to initialize the field with a value.
-   */
-  initialValue?: TValue;
-  /**
    * The main asset of the {@link ValueField}.
    */
   value?: TModelValue;

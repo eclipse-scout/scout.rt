@@ -371,6 +371,26 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     child.destroy();
   }
 
+  protected _destroyOrUnlinkChildren(widgets: ObjectOrChildModel<Widget>[] | ObjectOrChildModel<Widget>) {
+    if (!widgets) {
+      return;
+    }
+
+    widgets = arrays.ensure(widgets);
+    widgets.forEach(child => {
+      if (!(child instanceof Widget) || child.destroyed) {
+        // Child may not be a widget yet during initializing
+        return;
+      }
+      if (child.owner === this) {
+        this._destroyChild(child);
+      } else {
+        // Disconnect child from parent and re-connect to owner
+        child.setParent(child.owner);
+      }
+    });
+  }
+
   /**
    * Creates the UI by creating HTML elements and appending them to the DOM.
    * <p>
@@ -1491,8 +1511,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
         oldWidgets = arrays.diff(oldWidgets, widgets);
       }
 
-      // Destroy old child widget(s)
-      this._destroyChildren(oldWidgets);
+      // Destroy old child widget(s). If the widget does not own the children, they will be unlinked only
+      this._destroyOrUnlinkChildren(oldWidgets);
 
       // Link to new parent
       this.link(widgets);
@@ -2286,32 +2306,59 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Visits every child of this widget in pre-order (top-down).<br>
+   * Visits every descendant of this widget in pre-order (top-down).<br>
    * This widget itself is not visited! Only child widgets are visited recursively.
-   * <p>
+   *
    * The children with a different parent are excluded.<br>
    * This makes sure the child is not visited twice if the owner and the parent are not the same
    * (in that case the widget would be in the children list of the owner and of the parent).
-   * <p>
-   * In order to abort visiting, the visitor can return true.
+   *
+   * In order to abort visiting, the visitor can return true or {@link TreeVisitResult.TERMINATE}.
    *
    * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
   visitChildren(visitor: TreeVisitor<Widget>): boolean | TreeVisitResult {
-    for (let i = 0; i < this.children.length; i++) {
-      let child = this.children[i];
-      if (child.parent === this) {
-        let treeVisitResult = visitor(child);
+    for (const child of this.children) {
+      if (child.parent !== this) {
+        continue;
+      }
+      let treeVisitResult = visitor(child);
+      if (treeVisitResult === true || treeVisitResult === TreeVisitResult.TERMINATE) {
+        // Visitor wants to abort the visiting
+        return TreeVisitResult.TERMINATE;
+      }
+      if (treeVisitResult !== TreeVisitResult.SKIP_SUBTREE) {
+        treeVisitResult = child.visitChildren(visitor);
         if (treeVisitResult === true || treeVisitResult === TreeVisitResult.TERMINATE) {
-          // Visitor wants to abort the visiting
           return TreeVisitResult.TERMINATE;
-        } else if (treeVisitResult !== TreeVisitResult.SKIP_SUBTREE) {
-          treeVisitResult = child.visitChildren(visitor);
-          if (treeVisitResult === true || treeVisitResult === TreeVisitResult.TERMINATE) {
-            return TreeVisitResult.TERMINATE;
-          }
         }
       }
+    }
+  }
+
+  /**
+   * Visits this widget and every descendant of this widget in pre-order (top-down).
+   *
+   * Uses {@link visitChildren} to visit the children.
+   */
+  visit(visitor: TreeVisitor<Widget>, options: { visitSelf?: boolean } = {}): TreeVisitResult {
+    let visitResult;
+    if (scout.nvl(options.visitSelf, true)) {
+      visitResult = visitor(this);
+    }
+    if (scout.isOneOf(visitResult, true, TreeVisitResult.TERMINATE, TreeVisitResult.SKIP_SUBTREE)) {
+      return convert(visitResult);
+    }
+    return convert(this.visitChildren(visitor));
+
+    function convert(visitResult: TreeVisitResult | boolean): TreeVisitResult {
+      if (!visitResult) {
+        return TreeVisitResult.CONTINUE;
+      }
+      if (visitResult === true) {
+        return TreeVisitResult.TERMINATE;
+      }
+      return visitResult;
     }
   }
 

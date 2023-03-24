@@ -1358,13 +1358,13 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
 
     // collect all forms in the display child hierarchy with unsaved changes.
     let unsavedForms = forms.filter(form => {
-      let requiresSaveChildDialogs = false;
+      let saveNeededChildDialogs = false;
       form.visitDisplayChildren((dialog: Form) => {
-        if (dialog.lifecycle.requiresSave()) {
-          requiresSaveChildDialogs = true;
+        if (dialog.lifecycle.saveNeeded()) {
+          saveNeededChildDialogs = true;
         }
       }, displayChild => displayChild instanceof Form);
-      return form.lifecycle.requiresSave() || requiresSaveChildDialogs;
+      return form.lifecycle.saveNeeded() || saveNeededChildDialogs;
     });
 
     // initialize with a resolved promise in case there are no unsaved forms.

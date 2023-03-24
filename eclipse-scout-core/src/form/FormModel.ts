@@ -157,7 +157,7 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
   /**
    * Whether a changed form should display the save {@link saveNeeded} state in the form header or tab.
    *
-   * Default is false.
+   * Default is true.
    */
   saveNeededVisible?: boolean;
   /**

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ChildModelOf, Event, Form, FormField, FullModelOf, ModelAdapter, RemoteEvent, Widget} from '../index';
+import {App, ChildModelOf, Event, Form, FormField, FullModelOf, ModelAdapter, objects, RemoteEvent, Widget} from '../index';
 
 export class FormAdapter extends ModelAdapter {
   declare widget: Form;
@@ -63,4 +63,21 @@ export class FormAdapter extends ModelAdapter {
   protected _onRequestInput(event: RemoteEvent & { formField: string }) {
     (this.session.getOrCreateWidget(event.formField, this.widget) as FormField).requestInput();
   }
+
+  static modifyFormPrototype() {
+    if (!App.get().remote) {
+      return;
+    }
+
+    objects.replacePrototypeFunction(Form, Form.prototype.updateSaveNeeded, FormAdapter.updateSaveNeeded, true);
+  }
+
+  static updateSaveNeeded(this: Form & { updateSaveNeededOrig: typeof Form.prototype.updateSaveNeeded }) {
+    if (!this.modelAdapter) {
+      return this.updateSaveNeededOrig();
+    }
+    // Don't update state on remote forms
+  }
 }
+
+App.addListener('bootstrap', FormAdapter.modifyFormPrototype);

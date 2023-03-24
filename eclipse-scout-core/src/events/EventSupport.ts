@@ -112,7 +112,7 @@ export class EventSupport {
     arrays.remove(this._eventListeners, listener);
   }
 
-  count(type: string, func: EventHandler): number {
+  count(type?: string, func?: EventHandler): number {
     let count = 0;
     this._eventListeners.forEach(listener => {
       if (type && type !== listener.type) {

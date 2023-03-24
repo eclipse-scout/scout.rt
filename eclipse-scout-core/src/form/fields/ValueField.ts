@@ -20,6 +20,10 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   clearable: ValueFieldClearable;
   formatter: ValueFieldFormatter<TValue>;
   hasText: boolean;
+  /**
+   * The initial value is used to determine whether the field needs to be saved (see {@link computeSaveNeeded}) and is used to reset the value when {@link ValueField.resetValue} is called.
+   * It will be set to the {@link value} during initialization of the field and whenever {@link markAsSaved} is called.
+   */
   initialValue: TValue;
   invalidValueMessageKey: string;
   parser: ValueFieldParser<TValue>;
@@ -76,6 +80,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
       delete model.validator;
     }
     this._initValue(this.value);
+    this.initialValue = this.value;
   }
 
   /**
@@ -397,12 +402,15 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
 
     this._valueChanged();
     this._updateMenus();
-    this._updateTouched();
     this._updateEmpty();
+    this.updateSaveNeeded();
     this.triggerPropertyChange('value', oldValue, this.value);
   }
 
   protected _valueEquals(valueA: TValue, valueB: TValue): boolean {
+    if (Array.isArray(valueA) && Array.isArray(valueB)) {
+      return arrays.equals(valueA, valueB);
+    }
     return objects.equals(valueA, valueB);
   }
 
@@ -486,7 +494,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     this.validators.forEach(validator => {
       value = validator(value, defaultValidator);
     });
-    value = scout.nvl(value, null); // Ensure value is never undefined (necessary for _updateTouched and should make it easier generally)
+    value = scout.nvl(value, null); // Ensure value is never undefined (necessary for updateSaveNeeded and should make it easier generally)
     return value;
   }
 
@@ -611,8 +619,15 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     return scout.nvl(value, '') + '';
   }
 
-  protected _updateTouched() {
-    this.touched = !this._valueEquals(this.value, this.initialValue);
+  override computeSaveNeeded(): boolean {
+    if (this._hasValueChanged()) {
+      return true;
+    }
+    return super.computeSaveNeeded();
+  }
+
+  protected _hasValueChanged(): boolean {
+    return !this._valueEquals(this.value, this.initialValue);
   }
 
   addClearIcon($parent?: JQuery) {
@@ -633,13 +648,13 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     this.$field.data('valuefield', this);
   }
 
-  override markAsSaved() {
-    super.markAsSaved();
+  protected override _markAsSaved() {
+    super._markAsSaved();
     this.initialValue = this.value;
   }
 
   protected override _updateEmpty() {
-    this.empty = this.value === null || this.value === undefined;
+    this.empty = this.value === null || this.value === undefined || (Array.isArray(this.value) && arrays.empty(this.value));
   }
 
   // ==== static helper methods ==== //

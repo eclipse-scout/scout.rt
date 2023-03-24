@@ -145,17 +145,6 @@ export interface FormFieldModel extends WidgetModel {
    */
   suppressStatus?: FormFieldSuppressStatus;
   /**
-   * If set to true, the field requires to be saved.
-   *
-   * This will be set automatically in general by {@link ValueField}s, if the {@link ValueFieldModel.value} has changed and differs from the {@link ValueFieldModel.initialValue}.
-   *
-   * Default is false.
-   *
-   * @see FormField.requiresSave
-   * @see FormField.updateRequiresSave
-   */
-  touched?: boolean;
-  /**
    * The text to be used in the {@link Tooltip} that is either displayed in the status area or when hovering over the field, depending on {@link tooltipAnchor}.
    */
   tooltipText?: string;
@@ -218,4 +207,13 @@ export interface FormFieldModel extends WidgetModel {
    * This means, if a color is specified by this property, the field will always have that color even if it is disabled, hovered, selected etc.
    */
   labelBackgroundColor?: string;
+  /**
+   * Configures whether save needed should be computed.
+   *
+   * If set to false, {@link FormField.saveNeeded} will always return false for this field, even if a child field would return true.
+   * However, if the field was {@link FormField.touched}, {@link FormField.saveNeeded} will be true.
+   *
+   * Default is true.
+   */
+  checkSaveNeeded?: boolean;
 }

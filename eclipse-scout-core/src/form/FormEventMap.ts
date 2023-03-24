@@ -40,6 +40,7 @@ export interface FormEventMap extends WidgetEventMap {
   'propertyChange:movable': PropertyChangeEvent<boolean>;
   'propertyChange:resizable': PropertyChangeEvent<boolean>;
   'propertyChange:rootGroupBox': PropertyChangeEvent<GroupBox>;
+  'propertyChange:saveNeeded': PropertyChangeEvent<boolean>;
   'propertyChange:saveNeededVisible': PropertyChangeEvent<boolean>;
   'propertyChange:showOnOpen': PropertyChangeEvent<boolean>;
   'propertyChange:status': PropertyChangeEvent<Status>;

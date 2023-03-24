@@ -9,8 +9,8 @@
  */
 import {
   AbstractLayout, Action, arrays, clipboard, CloneOptions, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
-  FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel, objects, Predicate, PropertyChangeEvent, scout, Status,
-  StatusMenuMapping, StatusOrModel, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitResult, Widget
+  FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel, objects, Predicate,
+  PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
 
@@ -45,10 +45,13 @@ export class FormField extends Widget implements FormFieldModel {
   menusVisible: boolean;
   defaultMenuTypes: string[];
   preventInitialFocus: boolean;
-  requiresSave: boolean;
+  /** If set to true, the field needs to be saved. This will be computed by {@link computeSaveNeeded}. */
+  saveNeeded: boolean;
+  checkSaveNeeded: boolean;
   statusPosition: FormFieldStatusPosition;
   statusVisible: boolean;
   suppressStatus: FormFieldSuppressStatus;
+  /** If set to true, {@link saveNeeded} will return true as well, even if the value has not been changed. */
   touched: boolean;
   tooltipText: string;
   font: string;
@@ -89,6 +92,7 @@ export class FormField extends Widget implements FormFieldModel {
   $mandatory: JQuery;
   $disabledCopyOverlay: JQuery;
   protected _menuPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Menu>>;
+  protected _hierarchyChangeHandler: EventHandler<HierarchyChangeEvent>;
 
   constructor() {
     super();
@@ -114,7 +118,8 @@ export class FormField extends Widget implements FormFieldModel {
     this.menusVisible = true;
     this.defaultMenuTypes = [];
     this.preventInitialFocus = false;
-    this.requiresSave = false;
+    this.saveNeeded = false;
+    this.checkSaveNeeded = true;
     this.statusPosition = FormField.StatusPosition.DEFAULT;
     this.statusVisible = true;
     this.suppressStatus = null;
@@ -134,10 +139,11 @@ export class FormField extends Widget implements FormFieldModel {
 
     this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
     this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition',
-      'labelWidthInPixel', 'labelUseUiWidth', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
+      'labelWidthInPixel', 'labelUseUiWidth', 'mandatory', 'mode', 'preventInitialFocus', 'saveNeeded', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
       'tooltipText', 'tooltipAnchor']);
 
     this._menuPropertyChangeHandler = this._onMenuPropertyChange.bind(this);
+    this._hierarchyChangeHandler = this._onHierarchyChange.bind(this);
   }
 
   static FieldStyle = {
@@ -220,6 +226,12 @@ export class FormField extends Widget implements FormFieldModel {
     this._setGridDataHints(this.gridDataHints);
     this._setGridData(this.gridData);
     this._updateEmpty();
+    this._watchFieldHierarchy();
+  }
+
+  protected override _destroy() {
+    this._unwatchFieldHierarchy(this.parent);
+    super._destroy();
   }
 
   protected override _initProperty(propertyName: string, value: any) {
@@ -1052,15 +1064,11 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   getParentGroupBox(): GroupBox {
-    let parent = this.parent;
-    while (parent && !(parent instanceof GroupBox)) {
-      parent = parent.parent;
-    }
-    return parent as GroupBox;
+    return this.findParent(GroupBox);
   }
 
-  getParentField(): Widget {
-    return this.parent;
+  getParentField(): FormField {
+    return this.findParent(FormField);
   }
 
   /**
@@ -1407,53 +1415,102 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Visits this field and all child form fields in pre-order (top-down).
-   *
-   * @returns the TreeVisitResult, or nothing to continue.
+   * Visits this field and all child {@link FormField}s in pre-order (top-down).
    */
-  visitFields(visitor: (field: FormField) => TreeVisitResult | void): TreeVisitResult | void {
-    return visitor(this);
+  visitFields(visitor: TreeVisitor<FormField>, options: VisitFieldsOptions = {}): TreeVisitResult {
+    return this.visit(child => {
+      if (child instanceof FormField) {
+        let visitResult = visitor(child);
+        return scout.nvl(options.firstLevelFieldsOnly, false) && this !== child ? TreeVisitResult.SKIP_SUBTREE : visitResult;
+      }
+      if (scout.nvl(options.limitToSameFieldTree, false)) {
+        return TreeVisitResult.SKIP_SUBTREE;
+      }
+      return TreeVisitResult.CONTINUE;
+    }, {visitSelf: options.visitSelf});
+  }
+
+  visitFirstChildFields(visitor: TreeVisitor<FormField>) {
+    this.visitFields(field => visitor(field), {firstLevelFieldsOnly: true, visitSelf: false});
   }
 
   /**
-   * Visit all parent form fields. The visit stops if the parent is no form field anymore (e.g. a form, desktop or session).
-   *
+   * Visits all parent form fields.
+   * To stop the visiting if the parent field is no form field anymore (e.g. a form or the desktop), you can set {@link VisitParentFieldsOptions.limitToSameFieldTree} to true.
    */
-  visitParentFields(visitor: (parent: FormField) => void) {
-    let curParent = this.parent;
-    while (curParent instanceof FormField) {
-      visitor(curParent);
-      curParent = curParent.parent;
+  visitParentFields(visitor: (parent: FormField) => void, options: VisitParentFieldsOptions = {}) {
+    let parent = this.parent;
+    while (parent) {
+      if (parent instanceof FormField) {
+        visitor(parent);
+      } else if (scout.nvl(options.limitToSameFieldTree, false)) {
+        return;
+      }
+      parent = parent.parent;
     }
   }
 
-  /** @see FormFieldModel.touched */
+  /**
+   * Sets {@link saveNeeded} and {@link touched} to false on this field and every child field.
+   **/
   markAsSaved() {
-    this.setProperty('touched', false);
-    this.updateRequiresSave();
+    this.visitFirstChildFields(field => {
+      field.markAsSaved();
+    });
+    this._markAsSaved();
+    this.updateSaveNeeded();
   }
 
-  /** @see FormFieldModel.touched */
+  protected _markAsSaved() {
+    this.setProperty('touched', false);
+  }
+
+  /**
+   * Marks the field as {@link touched} which means {@link saveNeeded} will return true even if the value has not been changed.
+   **/
   touch() {
     this.setProperty('touched', true);
-    this.updateRequiresSave();
+    this.updateSaveNeeded();
   }
 
   /**
-   * Updates the {@link requiresSave} property by checking if the field is touched or if {@link computeRequiresSave} returns true.
+   * Updates {@link saveNeeded} depending on whether the field was {@link touched} using {@link touch} or {@link computeSaveNeeded} returns true.
+   *
+   * @param child the child updating its save needed state and informing its parent about it. If passed and `child.saveNeeded` is true, {@link computeSaveNeeded} will be skipped.
    */
-  updateRequiresSave() {
-    if (!this.initialized) {
+  updateSaveNeeded(child?: FormField) {
+    if (!this.initialized || this.destroying) {
       return;
     }
-    this.requiresSave = this.touched || this.computeRequiresSave();
+    this._setSaveNeeded(this.touched || (this.checkSaveNeeded && (child?.saveNeeded || this.computeSaveNeeded())));
+  }
+
+  protected _setSaveNeeded(saveNeeded: boolean) {
+    if (this._setProperty('saveNeeded', saveNeeded)) {
+      this.getParentField()?.updateSaveNeeded(this);
+    }
+  }
+
+  setCheckSaveNeeded(checkSaveNeeded: boolean) {
+    if (this.setProperty('checkSaveNeeded', checkSaveNeeded)) {
+      this.updateSaveNeeded();
+    }
   }
 
   /**
-   * Override this function to provide a custom logic to compute the {@link requiresSave} state if the field is not {@link touched}, see {@link updateRequiresSave}.
+   * Used by {@link updateSaveNeeded} to update the {@link saveNeeded} property.
+   *
+   * By default, all first level child fields are checked. The method returns true, if one of these fields needs to be saved.
    */
-  computeRequiresSave(): boolean {
-    return false;
+  computeSaveNeeded(): boolean {
+    let saveNeeded = false;
+    this.visitFirstChildFields(field => {
+      if (!field.destroying && field.saveNeeded) {
+        saveNeeded = true;
+        return true;
+      }
+    });
+    return saveNeeded;
   }
 
   getValidationResult(): ValidationResult {
@@ -1507,6 +1564,40 @@ export class FormField extends Widget implements FormFieldModel {
       text: text
     });
   }
+
+  /**
+   * Updates save needed state on parent field if the hierarchy changed, e.g. if the field was moved into another composite field.
+   * Also handles the case where a field is not directly connected to a form field parent, but has a non-form-field in between
+   * (e.g. FormFieldMenu has a Menu as parent -> if the menu is moved the state needs to be recomputed as well).
+   */
+  protected _watchFieldHierarchy() {
+    if (!this.initialized) {
+      this.on('hierarchyChange', this._hierarchyChangeHandler);
+    }
+    // Each form field adds its own hierarchyChangeListener but non-form-fields don't -> add listener for every non-form field between this field and the next parent field
+    let parentField = this._visitParentsUntilField(this.parent, parent => parent.on('hierarchyChange', this._hierarchyChangeHandler));
+    parentField?.updateSaveNeeded(this);
+  }
+
+  protected _unwatchFieldHierarchy(oldParent: Widget) {
+    let oldParentField = this._visitParentsUntilField(oldParent, parent => parent.off('hierarchyChange', this._hierarchyChangeHandler));
+    oldParentField?.updateSaveNeeded();
+  }
+
+  protected _onHierarchyChange(event: HierarchyChangeEvent) {
+    this._unwatchFieldHierarchy(event.oldParent);
+    this._watchFieldHierarchy();
+  }
+
+  protected _visitParentsUntilField(parent: Widget, visitor: (parent: Widget) => void): FormField {
+    while (parent) {
+      if (parent instanceof FormField) {
+        return parent;
+      }
+      visitor(parent);
+      parent = parent.parent;
+    }
+  }
 }
 
 export type FormFieldStyle = EnumObject<typeof FormField.FieldStyle>;
@@ -1541,3 +1632,39 @@ export type ValidationResult = {
   reveal: () => void;
 };
 export type AddCellEditorFieldCssClassesOptions = { cssClass?: string };
+
+export interface VisitParentFieldsOptions {
+  /**
+   * If set to true, visiting stops if a parent is not a form field.
+   *
+   * For example: if a group box has a {@link FormFieldMenu}, which is a menu containing a form field, the group box containing the menu won't be visited when the visiting starts at the form field.
+   *
+   * Default is false.
+   */
+  limitToSameFieldTree?: boolean;
+}
+
+export interface VisitFieldsOptions {
+  /**
+   * If set to true, visiting the subtree of a child is skipped if the child is a form field. This means only the form fields are considered that are nearest to the field where the visiting started.
+   *
+   * For example: if a group box has a form field and a menu with a form field, both fields would be visited but the children of these fields would not.
+   *
+   * Default is false.
+   */
+  firstLevelFieldsOnly?: boolean;
+  /**
+   * If set to true, visiting of a child and its subtree is skipped if that child is not a form field, even if it would contain form fields itself.
+   *
+   * For example: if a group box has a {@link FormFieldMenu}, which is a menu containing a form field, the form field inside the menu won't be visited after visiting the group box.
+   *
+   * Default is false.
+   */
+  limitToSameFieldTree?: boolean;
+  /**
+   * If set to true, the field that started the visiting will be visited as well, otherwise only the children will be visited.
+   *
+   * Default is true.
+   */
+  visitSelf?: boolean;
+}

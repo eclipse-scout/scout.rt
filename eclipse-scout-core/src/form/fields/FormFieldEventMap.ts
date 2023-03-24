@@ -19,6 +19,7 @@ export interface FormFieldEventMap extends WidgetEventMap {
   'clipboardExport': FormFieldClipboardExportEvent;
   'drop': Event<FormField> & FileDropEvent;
   'propertyChange:backgroundColor': PropertyChangeEvent<string>;
+  'propertyChange:checkSaveNeeded': PropertyChangeEvent<boolean>;
   'propertyChange:dropMaximumSize': PropertyChangeEvent<number>;
   'propertyChange:dropType': PropertyChangeEvent<DropType>;
   'propertyChange:errorStatus': PropertyChangeEvent<Status>;
@@ -40,6 +41,7 @@ export interface FormFieldEventMap extends WidgetEventMap {
   'propertyChange:mandatory': PropertyChangeEvent<boolean>;
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;
   'propertyChange:menusVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:saveNeeded': PropertyChangeEvent<boolean>;
   'propertyChange:statusPosition': PropertyChangeEvent<FormFieldStatusPosition>;
   'propertyChange:statusVisible': PropertyChangeEvent<boolean>;
   'propertyChange:suppressStatus': PropertyChangeEvent<FormFieldSuppressStatus>;

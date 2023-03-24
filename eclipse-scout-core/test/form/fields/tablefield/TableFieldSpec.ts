@@ -98,140 +98,121 @@ describe('TableField', () => {
     });
   });
 
-  describe('requiresSave', () => {
+  describe('saveNeeded', () => {
 
     let tableField, firstRow;
 
     beforeEach(() => {
       tableField = createTableFieldWithTable();
       firstRow = tableField.table.rows[0];
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
     });
 
-    it('should require save when row has been updated', () => {
+    it('is set to true when row has been updated', () => {
       tableField.table.updateRow(firstRow);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false); // <-- no change yet (because value was not changed)
+      expect(tableField.saveNeeded).toBe(false); // <-- no change yet (because value was not changed)
 
       tableField.table.columns[0].setCellValue(firstRow, 77);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(true);
+      expect(tableField.saveNeeded).toBe(true);
     });
 
     it('does not create a memory leak if same row is updated multiple times', () => {
       tableField.table.columns[0].setCellValue(firstRow, 77);
       tableField.table.updateRow(firstRow);
-      tableField.updateRequiresSave();
       expect(Object.keys(tableField._updatedRows).length).toBe(1);
 
       tableField.table.columns[0].setCellValue(firstRow, 88);
       tableField.table.updateRow(firstRow);
-      tableField.updateRequiresSave();
       expect(Object.keys(tableField._updatedRows).length).toBe(1);
     });
 
-    it('should require save when row has been deleted', () => {
+    it('is set to true when row has been deleted', () => {
       tableField.table.deleteRow(firstRow);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(true);
+      expect(tableField.saveNeeded).toBe(true);
     });
 
-    it('should require save when row has been inserted', () => {
+    it('is set to true when row has been inserted', () => {
       let rowModel = tableHelper.createModelRow('new', ['foo', 'bar']);
       tableField.table.insertRow(rowModel);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(true);
+      expect(tableField.saveNeeded).toBe(true);
     });
 
-    it('should NOT require save when row has been inserted and deleted again', () => {
+    it('is NOT set to true when row has been inserted and deleted again', () => {
       let rowModel = tableHelper.createModelRow('new', ['foo', 'bar']);
       tableField.table.insertRow(rowModel);
       let insertedRow = tableField.table.rowsMap['new'];
       tableField.table.deleteRow(insertedRow);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
     });
 
-    it('should NOT require save when row has been inserted and deleted again even if it was updated or checked in the meantime', () => {
+    it('is NOT set to true when row has been inserted and deleted again even if it was updated or checked in the meantime', () => {
       let rowModel = tableHelper.createModelRow('new', ['foo', 'bar']);
       tableField.table.insertRow(rowModel);
       let insertedRow = tableField.table.rowsMap['new'];
       tableField.table.updateRow(insertedRow);
       tableField.table.checkRow(insertedRow);
       tableField.table.deleteRow(insertedRow);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
     });
 
-    it('should require save when row has been checked', () => {
+    it('is set to true when row has been checked', () => {
       tableField.table.setProperty('checkable', true);
       tableField.table.checkRow(firstRow);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(true);
+      expect(tableField.saveNeeded).toBe(true);
     });
 
-    it('should NOT require save when row has been checked and unchecked again', () => {
+    it('is NOT set to true when row has been checked and unchecked again', () => {
       tableField.table.setProperty('checkable', true);
       tableField.table.checkRow(firstRow);
       tableField.table.uncheckRow(firstRow);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
     });
 
-    it('should require save after a cell edit.', () => {
+    it('is set to true after a cell edit', () => {
       tableField.render();
       tableField.table.columns[0].setEditable(true);
       tableField.markAsSaved();
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
       tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
       jasmine.clock().tick(0);
       tableField.table.cellEditorPopup.cell.field.setValue('my new value');
       tableField.table.completeCellEdit();
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(true);
+      expect(tableField.saveNeeded).toBe(true);
     });
 
-    it('should NOT require save open and close cell editor without any text change.', () => {
+    it('is NOT set to true when open and close cell editor without any text change.', () => {
       tableField.render();
       tableField.table.columns[0].setEditable(true);
       tableField.markAsSaved();
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
       tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
       jasmine.clock().tick(0);
       tableField.table.completeCellEdit();
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
     });
 
     it('resets row status on markAsSaved', () => {
       expect(firstRow.status).toBe(TableRow.Status.NON_CHANGED);
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
 
       tableField.table.columns[0].setCellValue(firstRow, 77);
       expect(firstRow.status).toBe(TableRow.Status.UPDATED);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(true);
+      expect(tableField.saveNeeded).toBe(true);
 
       tableField.markAsSaved();
       expect(firstRow.status).toBe(TableRow.Status.NON_CHANGED);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
 
       tableField.table.insertRow({
         cells: [null, null]
       });
       let lastRow = tableField.table.rows[tableField.table.rows.length - 1];
       expect(lastRow.status).toBe(TableRow.Status.INSERTED);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(true);
+      expect(tableField.saveNeeded).toBe(true);
 
       tableField.markAsSaved();
       expect(lastRow.status).toBe(TableRow.Status.NON_CHANGED);
-      tableField.updateRequiresSave();
-      expect(tableField.requiresSave).toBe(false);
+      expect(tableField.saveNeeded).toBe(false);
     });
-
   });
 });

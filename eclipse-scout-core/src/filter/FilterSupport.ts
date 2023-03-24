@@ -111,7 +111,8 @@ export class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
       statusVisible: false,
       clearable: ValueField.Clearable.ALWAYS,
       updateDisplayTextOnModify: true,
-      preventInitialFocus: true
+      preventInitialFocus: true,
+      checkSaveNeeded: false
     });
     this._filterField.render(this.$container);
 

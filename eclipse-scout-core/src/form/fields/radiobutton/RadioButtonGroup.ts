@@ -10,7 +10,7 @@
 import {
   arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow, ObjectOrChildModel, ObjectOrModel,
   objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout, Status,
-  TreeVisitResult, ValueField
+  ValueField
 } from '../../../index';
 import $ from 'jquery';
 
@@ -167,26 +167,6 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
 
   getFields(): FormField[] {
     return this.fields;
-  }
-
-  override visitFields(visitor: (field: FormField) => TreeVisitResult | void): TreeVisitResult | void {
-    let treeVisitResult = super.visitFields(visitor);
-    if (treeVisitResult === TreeVisitResult.TERMINATE) {
-      return TreeVisitResult.TERMINATE;
-    }
-
-    if (treeVisitResult === TreeVisitResult.SKIP_SUBTREE) {
-      return;
-    }
-
-    let fields = this.getFields();
-    for (let i = 0; i < fields.length; i++) {
-      let field = fields[i];
-      treeVisitResult = field.visitFields(visitor);
-      if (treeVisitResult === TreeVisitResult.TERMINATE) {
-        return TreeVisitResult.TERMINATE;
-      }
-    }
   }
 
   override getFocusableElement(): HTMLElement | JQuery {

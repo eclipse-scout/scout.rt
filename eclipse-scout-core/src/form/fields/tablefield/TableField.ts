@@ -99,7 +99,7 @@ export class TableField extends FormField implements TableFieldModel {
     this.invalidateLayoutTree();
   }
 
-  override computeRequiresSave(): boolean {
+  override computeSaveNeeded(): boolean {
     return Object.keys(this._deletedRows).length > 0 ||
       Object.keys(this._insertedRows).length > 0 ||
       Object.keys(this._updatedRows).length > 0 ||
@@ -119,7 +119,7 @@ export class TableField extends FormField implements TableFieldModel {
   }
 
   protected _updateDeletedRows(rows: TableRow[]) {
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       if (row.id in this._insertedRows) {
         // If a row is contained in _insertedRows an inserted row has been deleted again.
         // In that case we can remove that row from the maps and don't have to add it to deletedRows as well.
@@ -129,22 +129,25 @@ export class TableField extends FormField implements TableFieldModel {
         return;
       }
       this._deletedRows[row.id] = row;
-    }, this);
+    });
+    this.updateSaveNeeded();
   }
 
   protected _updateInsertedRows(rows: TableRow[]) {
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       this._insertedRows[row.id] = row;
-    }, this);
+    });
+    this.updateSaveNeeded();
   }
 
   protected _updateUpdatedRows(rows: TableRow[]) {
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       if (row.status === TableRow.Status.NON_CHANGED) {
         return;
       }
       this._updatedRows[row.id] = row;
-    }, this);
+    });
+    this.updateSaveNeeded();
   }
 
   /**
@@ -152,17 +155,18 @@ export class TableField extends FormField implements TableFieldModel {
    * means it is no longer changed). Add it to the array otherwise.
    */
   protected _updateCheckedRows(rows: TableRow[]) {
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       if (row.id in this._checkedRows) {
         delete this._checkedRows[row.id];
       } else {
         this._checkedRows[row.id] = row;
       }
-    }, this);
+    });
+    this.updateSaveNeeded();
   }
 
-  override markAsSaved() {
-    super.markAsSaved();
+  protected override _markAsSaved() {
+    super._markAsSaved();
     this._deletedRows = objects.createMap();
     this._insertedRows = objects.createMap();
     this._updatedRows = objects.createMap();

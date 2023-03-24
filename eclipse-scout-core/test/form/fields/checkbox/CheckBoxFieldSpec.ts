@@ -79,7 +79,7 @@ describe('CheckBoxField', () => {
         keyStroke: 'ctrl-b'
       });
       field.render();
-      expect(field.value).toBe(null);
+      expect(field.value).toBe(false);
 
       JQueryTesting.triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.value).toBe(true);
@@ -100,5 +100,77 @@ describe('CheckBoxField', () => {
       expect(field.value).toBe(true);
     });
 
+  });
+
+  describe('value', () => {
+    it('is always true or false', () => {
+      let field = scout.create(CheckBoxField, {
+        parent: session.desktop
+      });
+      expect(field.value).toBe(false);
+      expect(field.initialValue).toBe(false);
+
+      field.setValue(true);
+      expect(field.value).toBe(true);
+
+      field.setValue(false);
+      expect(field.value).toBe(false);
+
+      field.setValue(null);
+      expect(field.value).toBe(false);
+    });
+
+    it('can be null if tristate is enabled', () => {
+      let field = scout.create(CheckBoxField, {
+        parent: session.desktop,
+        triStateEnabled: true
+      });
+      expect(field.value).toBe(null);
+      expect(field.initialValue).toBe(null);
+
+      field.setValue(true);
+      expect(field.value).toBe(true);
+
+      field.setValue(false);
+      expect(field.value).toBe(false);
+
+      field.setValue(null);
+      expect(field.value).toBe(null);
+
+      field.setTriStateEnabled(false);
+      expect(field.value).toBe(false);
+
+      field.setValue(null);
+      expect(field.value).toBe(false);
+    });
+  });
+
+
+  describe('saveNeeded', () => {
+    it('is false initially', () => {
+      let field = scout.create(CheckBoxField, {
+        parent: session.desktop
+      });
+      expect(field.saveNeeded).toBe(false);
+
+      field = scout.create(CheckBoxField, {
+        parent: session.desktop,
+        value: true
+      });
+      expect(field.saveNeeded).toBe(false);
+    });
+
+    it('is updated when value changes', () => {
+      let field = scout.create(CheckBoxField, {
+        parent: session.desktop
+      });
+      expect(field.saveNeeded).toBe(false);
+
+      field.setValue(true);
+      expect(field.saveNeeded).toBe(true);
+
+      field.setValue(false);
+      expect(field.saveNeeded).toBe(false);
+    });
   });
 });
