@@ -7,33 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {fields, FormField, FormFieldStyle, TreeVisitResult, widgets} from '../../index';
+import {fields, FormField, FormFieldStyle, widgets} from '../../index';
 
 export abstract class CompositeField extends FormField {
-
   /**
    * @returns an array of child-fields.
    */
   abstract getFields(): FormField[];
-
-  override visitFields(visitor: (field: FormField) => TreeVisitResult | void): TreeVisitResult | void {
-    let treeVisitResult = super.visitFields(visitor);
-    if (treeVisitResult === TreeVisitResult.TERMINATE) {
-      return TreeVisitResult.TERMINATE;
-    }
-    if (treeVisitResult === TreeVisitResult.SKIP_SUBTREE) {
-      return TreeVisitResult.CONTINUE;
-    }
-
-    let fields = this.getFields();
-    for (let i = 0; i < fields.length; i++) {
-      let field = fields[i];
-      treeVisitResult = field.visitFields(visitor);
-      if (treeVisitResult === TreeVisitResult.TERMINATE) {
-        return TreeVisitResult.TERMINATE;
-      }
-    }
-  }
 
   /**
    * Sets the given fieldStyle recursively on all fields of the composite field.

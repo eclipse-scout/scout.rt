@@ -54,7 +54,7 @@ export class LabelField extends ValueField<string> implements LabelFieldModel {
 
   /**
    * Since a LabelField cannot be changed by a user, acceptInput does nothing.
-   * Otherwise LabelFields could 'become' touched, because value and displayText
+   * Otherwise, LabelFields could 'become' touched, because value and displayText
    * of the LabelField don't match.
    */
   override acceptInput(whileTyping?: boolean) {

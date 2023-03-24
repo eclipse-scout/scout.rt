@@ -317,6 +317,32 @@ describe('ListBox', () => {
       expect(field.displayText).toBe('Bar');
       expect(field.table.checkedRows().length).toBe(1);
     });
+
+    it('updates saveNeeded when changed', () => {
+      let listBox = createFieldWithLookupCall();
+      expect(listBox.saveNeeded).toBe(false);
+
+      listBox.setValue([1]);
+      expect(listBox.saveNeeded).toBe(true);
+
+      listBox.setValue([2]);
+      expect(listBox.saveNeeded).toBe(true);
+
+      listBox.setValue(null);
+      expect(listBox.saveNeeded).toBe(false);
+
+      listBox.setValue([1, 2]);
+      expect(listBox.saveNeeded).toBe(true);
+
+      listBox.markAsSaved();
+      expect(listBox.saveNeeded).toBe(false);
+
+      listBox.setValue([1]);
+      expect(listBox.saveNeeded).toBe(true);
+
+      listBox.setValue([1, 2]);
+      expect(listBox.saveNeeded).toBe(false);
+    });
   });
 
   describe('_formatValue', () => {

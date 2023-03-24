@@ -117,7 +117,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   String VIEW_ID_PAGE_TABLE = "PAGE_TABLE";
 
   /**
-   * Initialize the form and all of its fields. By default any of the #start* methods of the form call this method
+   * Initialize the form and all of its fields. By default, any of the #start* methods of the form call this method
    */
   @Override
   void init();
@@ -170,14 +170,14 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   /**
    * A closable form is thought to display a close button either in the header of a dialog or a view.
    *
-   * @return whether or not the form is closable.
+   * @return whether the form is closable.
    */
   boolean isClosable();
 
   void setClosable(boolean closable);
 
   /**
-   * Whether or not a form should display the save needed (dirty) state in the dialog or view header.
+   * Whether a form should display the save needed (dirty) state in the dialog or view header.
    *
    * @return true to display the save needed state, false otherwise.
    */
@@ -262,9 +262,9 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   boolean isFormStarted();
 
   /**
-   * @return <code>true</code> if it is allowed to call the start() method of this form, false otherwise. This methods
+   * @return <code>true</code> if it is allowed to call the start() method of this form, false otherwise. This method
    *         checks two things: 1 - is the form started yet? 2 - is the blocking condition of the form blocking? Use
-   *         this method when you must call the start method of the form and you're not completely sure in which state
+   *         this method when you must call the start method of the form, and you're not completely sure in which state
    *         the form currently is.
    */
   boolean isFormStartable();
@@ -438,23 +438,22 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   void setCancelVerificationText(String text);
 
   /**
-   * Determine whether a save is needed for the form.
+   * Determines whether a save is needed for the form.
    */
   boolean isSaveNeeded();
 
   /**
-   * this method calls execCheckSaveNeeded on every field<br>
-   * to ensure that {@link #isSaveNeeded()} returns the correct value
+   * Calls execCheckSaveNeeded on every field to ensure that {@link #isSaveNeeded()} returns the correct value.
    */
   void checkSaveNeeded();
 
   /**
-   * Mark the form as saved so that a save is no longer needed.
+   * Marks the form as saved so that a save is no longer needed.
    */
   void markSaved();
 
   /**
-   * Touch the form so so that a save is needed.
+   * Touches the form so that a save is needed.
    */
   void touch();
 

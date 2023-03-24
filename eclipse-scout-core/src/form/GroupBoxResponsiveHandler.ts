@@ -88,7 +88,7 @@ export class GroupBoxResponsiveHandler extends ResponsiveHandler {
         field.on('propertyChange', this._formFieldAddedHandler);
         this._compositeFields.push(field);
       }
-    });
+    }, {limitToSameFieldTree: true});
   }
 
   override destroy() {
@@ -110,7 +110,7 @@ export class GroupBoxResponsiveHandler extends ResponsiveHandler {
   }
 
   protected override _transform() {
-    this.widget.visitFields(this._transformWidget.bind(this));
+    this.widget.visitFields(this._transformWidget.bind(this), {limitToSameFieldTree: true});
   }
 
   protected override _transformWidget(widget: FormField): TreeVisitResult {
@@ -124,7 +124,7 @@ export class GroupBoxResponsiveHandler extends ResponsiveHandler {
       return;
     }
 
-    // suppress a validate of the layout tree, because these widgets will be validated later anyway.
+    // suppress a validation of the layout tree, because these widgets will be validated later anyway.
     // the component still might be marked as invalid (which is necessary) caused by the responsive modifications applied.
     let htmlParent: HtmlComponent;
     if (widget.htmlComp) {
@@ -359,7 +359,7 @@ export class GroupBoxResponsiveHandler extends ResponsiveHandler {
   protected _onFormFieldAdded(event: PropertyChangeEvent<any, CompositeField>) {
     if (this.state !== ResponsiveManager.ResponsiveState.NORMAL && (event.propertyName === 'fields' || event.propertyName === 'tabItems')) {
       let newFields = arrays.diff(event.newValue, event.oldValue) as CompositeField[];
-      newFields.forEach(field => field.visitFields(this._transformWidget.bind(this)));
+      newFields.forEach(field => field.visitFields(this._transformWidget.bind(this), {limitToSameFieldTree: true}));
     }
   }
 }

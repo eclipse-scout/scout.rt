@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, scout, StringField, TableRow, TreeVisitResult, Widget} from '../../src/index';
+import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, ObjectFactory, scout, StringField, TableRow, TreeVisitResult, Widget} from '../../src/index';
 import {InitModelOf} from '../../src/scout';
 
 describe('Widget', () => {
@@ -706,6 +706,27 @@ describe('Widget', () => {
       expect(widget.owner).toBe(null);
       expect(parent.children.length).toBe(0);
     });
+
+    it('reconnects to owner if parent is destroyed', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      let another = createWidget({
+        parent: parent
+      });
+      let child = createWidget({
+        parent: widget,
+        owner: another
+      });
+      expect(child.parent).toBe(widget);
+      expect(child.owner).toBe(another);
+      expect(widget.children[0]).toBe(child);
+
+      widget.destroy();
+      expect(child.parent).toBe(another);
+      expect(child.owner).toBe(another);
+      expect(widget.children.length).toBe(0);
+    });
   });
 
   describe('setParent', () => {
@@ -1060,6 +1081,46 @@ describe('Widget', () => {
         widget.setChildWidget(null);
         expect().nothing();
       });
+
+      it('destroys the child when setting to null if the widget is the owner', () => {
+        let widget = createWidget({
+          parent: parent
+        });
+        let child = createWidget({
+          parent: widget
+        });
+
+        widget.setChildWidget(child);
+        expect(child.parent).toBe(widget);
+        expect(child.owner).toBe(widget);
+
+        widget.setChildWidget(null);
+        expect(child.destroyed).toBe(true);
+        expect(child.parent).toBe(null);
+        expect(child.owner).toBe(null);
+      });
+
+      it('disconnects the from the old parent when setting to null if it was not the owner', () => {
+        let widget = createWidget({
+          parent: parent
+        });
+        let another = createWidget({
+          parent: parent
+        });
+        let child = createWidget({
+          parent: parent,
+          owner: another
+        });
+
+        widget.setChildWidget(child);
+        expect(child.parent).toBe(widget);
+        expect(child.owner).toBe(another);
+
+        widget.setChildWidget(null);
+        expect(child.destroyed).toBe(false);
+        expect(child.parent).toBe(another);
+        expect(child.owner).toBe(another);
+      });
     });
 
     it('calls the _render* method if there is one for this property', () => {
@@ -1079,7 +1140,6 @@ describe('Widget', () => {
       widget.setProperty('foo', 'bar');
       expect(widget.$container.text()).toBe('bar');
     });
-
   });
 
   describe('on', () => {
@@ -1523,9 +1583,10 @@ describe('Widget', () => {
   describe('Widget properties', () => {
 
     it('automatically resolves referenced widgets', () => {
-      window['testns'] = {};
-
       class ComplexTestWidget extends Widget {
+        items: TestItem[];
+        selectedItem: TestItem;
+
         constructor() {
           super();
           this._addWidgetProperties(['items', 'selectedItem']);
@@ -1533,32 +1594,33 @@ describe('Widget', () => {
         }
       }
 
-      window['testns'].ComplexTestWidget = ComplexTestWidget;
-
       class TestItem extends Widget {
+        name: string;
+        linkedItem: Widget;
+
         constructor() {
           super();
           this._addWidgetProperties(['linkedItem']);
         }
       }
 
-      window['testns'].TestItem = TestItem;
+      ObjectFactory.get().registerNamespace('testns', {ComplexTestWidget, TestItem});
 
       // Create an instance
       let model1 = {
         parent: parent,
         items: [{
-          objectType: 'testns.TestItem',
+          objectType: TestItem,
           id: 'TI1',
           name: 'Item #1'
         }, {
-          objectType: 'testns.TestItem',
+          objectType: TestItem,
           id: 'TI2',
           name: 'Item #2'
         }],
         selectedItem: 'TI2'
       };
-      let ctw1 = scout.create('testns.ComplexTestWidget', model1);
+      let ctw1 = scout.create(ComplexTestWidget, model1);
       expect(ctw1.items.length).toBe(2);
       expect(ctw1.items[1].name).toBe('Item #2');
       expect(ctw1.selectedItem).toBe(ctw1.items[1]);
@@ -1566,9 +1628,9 @@ describe('Widget', () => {
       // Create another instance with an invalid reference
       let model2 = {
         parent: parent,
-        objectType: 'testns.ComplexTestWidget',
+        objectType: ComplexTestWidget,
         items: [{
-          objectType: 'testns.TestItem',
+          objectType: TestItem,
           id: 'TI1',
           name: 'Item #1'
         }],
@@ -1588,22 +1650,22 @@ describe('Widget', () => {
       let model3 = {
         parent: parent,
         items: [{
-          objectType: 'testns.TestItem',
+          objectType: TestItem,
           id: 'TI1',
           name: 'Item #1',
           linkedItem: 'TI2'
         }, {
-          objectType: 'testns.TestItem',
+          objectType: TestItem,
           id: 'TI2',
           name: 'Item #2'
         }]
       };
       expect(() => {
-        scout.create('testns.ComplexTestWidget', model3);
+        scout.create(ComplexTestWidget, model3);
       }).toThrow(new Error('Referenced widget not found: TI2'));
       // fix it
       delete model3.items[0].linkedItem;
-      let ctw3 = scout.create('testns.ComplexTestWidget', model3);
+      let ctw3 = scout.create(ComplexTestWidget, model3);
       ctw3.items[0].setProperty('linkedItem', ctw3.items[1]);
     });
   });

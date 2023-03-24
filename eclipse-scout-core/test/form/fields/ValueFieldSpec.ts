@@ -11,7 +11,6 @@ import {arrays, FormField, ParsingFailedStatus, scout, Status, StringField, Valu
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 import {ValueFieldValidator} from '../../../src/form/fields/ValueField';
 
-/* global removePopups */
 describe('ValueField', () => {
   let session: SandboxSession, helper: FormSpecHelper, menuHelper: MenuSpecHelper;
 
@@ -642,12 +641,21 @@ describe('ValueField', () => {
 
   });
 
-  describe('validation: initialValue, touched, empty and mandatory', () => {
+  describe('validation: initialValue, empty and mandatory', () => {
 
     let field;
 
     beforeEach(() => {
       field = helper.createField(StringField);
+    });
+
+    it('sets initialValue after field is created', () => {
+      field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'asdf'
+      });
+      expect(field.value).toBe('asdf');
+      expect(field.initialValue).toBe('asdf');
     });
 
     it('sets initialValue when markAsSaved is called', () => {
@@ -656,16 +664,7 @@ describe('ValueField', () => {
       field.markAsSaved();
       expect(field.initialValue).toBe('Foo');
       expect(field.touched).toBe(false);
-    });
-
-    it('sets touched to true when value is different from initial value', () => {
-      field.setValue('Foo');
-      field.markAsSaved();
-      expect(field.touched).toBe(false);
-      field.setValue('Bar');
-      expect(field.touched).toBe(true);
-      field.setValue('Foo');
-      expect(field.touched).toBe(false);
+      expect(field.saveNeeded).toBe(false);
     });
 
     it('sets empty to true when value is an empty string (for StringField)', () => {
@@ -701,6 +700,76 @@ describe('ValueField', () => {
       expect(result.validByMandatory).toBe(false);
     });
 
+    describe('saveNeeded', () => {
+      it('is set false initially', () => {
+        let field = scout.create(StringField, {
+          parent: session.desktop
+        });
+        expect(field.saveNeeded).toBe(false);
+
+        field = scout.create(StringField, {
+          parent: session.desktop,
+          value: 'hi there'
+        });
+        expect(field.saveNeeded).toBe(false);
+      });
+
+      it('is set to true when value changes', () => {
+        expect(field.saveNeeded).toBe(false);
+        field.setValue('Bar');
+        expect(field.saveNeeded).toBe(true);
+        field.setValue(null);
+        expect(field.saveNeeded).toBe(false);
+      });
+
+      it('is set to true when value is different than initial value', () => {
+        field.setValue('Foo');
+        field.markAsSaved();
+        expect(field.saveNeeded).toBe(false);
+        field.setValue('Bar');
+        expect(field.saveNeeded).toBe(true);
+        field.setValue('Foo');
+        expect(field.saveNeeded).toBe(false);
+      });
+
+      it('is set to true when field is touched', () => {
+        expect(field.saveNeeded).toBe(false);
+        field.touch();
+        expect(field.saveNeeded).toBe(true);
+        field.setValue('Foo');
+        expect(field.saveNeeded).toBe(true);
+        field.setValue(null);
+        expect(field.saveNeeded).toBe(true); // Still true
+
+        field.markAsSaved();
+        expect(field.saveNeeded).toBe(false);
+        expect(field.touched).toBe(false);
+      });
+
+      it('is set to false when checkSaveNeeded is false even if the value has changed', () => {
+        let field = scout.create(StringField, {
+          parent: session.desktop,
+          checkSaveNeeded: false
+        });
+        expect(field.saveNeeded).toBe(false);
+
+        field.setValue('Foo');
+        expect(field.saveNeeded).toBe(false);
+
+        field.touch(); // touch has an effect even if check save needed is disabled
+        expect(field.saveNeeded).toBe(true);
+
+        field.markAsSaved();
+        expect(field.saveNeeded).toBe(false);
+
+        field.setCheckSaveNeeded(true);
+        field.setValue('Bar');
+        expect(field.saveNeeded).toBe(true);
+
+        field.setCheckSaveNeeded(false);
+        expect(field.saveNeeded).toBe(false);
+      });
+    });
   });
 
   describe('menu visibility', () => {

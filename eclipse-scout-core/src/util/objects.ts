@@ -496,8 +496,14 @@ export const objects = {
    * by calling <code>mandatoryFunction</code>.
    */
   // eslint-disable-next-line
-  replacePrototypeFunction(obj: any, funcName: string, func: Function, rememberOrig: boolean) {
+  replacePrototypeFunction(obj: any, funcOrName: string | ((...args) => any), func: Function, rememberOrig: boolean) {
     let proto = obj.prototype;
+    let funcName;
+    if (typeof funcOrName === 'string') {
+      funcName = funcOrName;
+    } else {
+      funcName = funcOrName.name;
+    }
     objects.mandatoryFunction(proto, funcName);
     if (rememberOrig) {
       proto[funcName + 'Orig'] = proto[funcName];

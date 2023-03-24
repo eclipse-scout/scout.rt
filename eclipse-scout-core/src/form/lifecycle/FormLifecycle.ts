@@ -27,7 +27,7 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     super.init(model);
   }
 
-  protected _reset() {
+  protected override _reset() {
     this.widget.visitFields(field => {
       if (field instanceof ValueField) {
         field.resetValue();
@@ -77,26 +77,10 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
   }
 
   override markAsSaved() {
-    this.widget.visitFields(field => {
-      field.markAsSaved();
-    });
+    this.widget.markAsSaved();
   }
 
-  /**
-   * Visits all form fields and calls the updateRequiresSave() function. If any
-   * field has the requiresSave flag set to true, this function returns true,
-   * false otherwise.
-   *
-   * @see (Java) AbstractFormField #checkSaveNeeded, #isSaveNeeded
-   */
-  override requiresSave(): boolean {
-    let requiresSave = false;
-    this.widget.visitFields(field => {
-      field.updateRequiresSave();
-      if (field.requiresSave) {
-        requiresSave = true;
-      }
-    });
-    return requiresSave;
+  override saveNeeded(): boolean {
+    return this.widget.saveNeeded;
   }
 }

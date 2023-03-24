@@ -160,8 +160,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     super._initValue(value);
   }
 
-  override markAsSaved() {
-    super.markAsSaved();
+  protected override _markAsSaved() {
+    super._markAsSaved();
     this.setInitActiveFilter(this.activeFilter);
   }
 

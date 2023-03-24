@@ -32,13 +32,6 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
     }
   }
 
-  protected override _initValue(value: TValue[]) {
-    if (!this.tree) {
-      this.tree = this._createDefaultTreeBoxTree();
-    }
-    super._initValue(value);
-  }
-
   protected override _render() {
     super._render();
     this.$container.addClass('tree-box');

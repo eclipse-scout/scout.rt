@@ -250,15 +250,15 @@ describe('Outline', () => {
 
       outline.selectNodes(node0);
       let selectionListenerCount = eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount + 3); // destroy and propertyChange listener
+      expect(selectionListenerCount).toBe(initialListenerCount + 5); // destroy and propertyChange listener
 
       outline.selectNodes(node1);
       selectionListenerCount = eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount + 1); // listeners removed
+      expect(selectionListenerCount).toBe(initialListenerCount + 3); // listeners removed
 
       outline.selectNodes(node0);
       selectionListenerCount = eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount + 3); // listeners attached again
+      expect(selectionListenerCount).toBe(initialListenerCount + 5); // listeners attached again
 
       outline.nodes[0].detailTable.destroy();
       expect(eventListeners.length).toBe(0); // every listener should be removed now

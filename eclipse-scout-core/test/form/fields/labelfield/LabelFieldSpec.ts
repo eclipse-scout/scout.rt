@@ -56,14 +56,14 @@ describe('LabelField', () => {
   describe('acceptInput', () => {
 
     /**
-     * If acceptInput wasn't overridden this test would call parseValue and set the touched property.
+     * If acceptInput wasn't overridden this test would call parseValue and set the saveNeeded property.
      */
     it('must be a NOP operation', () => {
       field.setValue('foo');
       field.markAsSaved();
-      expect(field.touched).toBe(false);
+      expect(field.saveNeeded).toBe(false);
       field.acceptInput();
-      expect(field.touched).toBe(false);
+      expect(field.saveNeeded).toBe(false);
     });
 
   });

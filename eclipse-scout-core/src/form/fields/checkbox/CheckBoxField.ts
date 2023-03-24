@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AddCellEditorFieldCssClassesOptions, CheckBoxFieldEventMap, CheckBoxFieldModel, CheckBoxToggleKeyStroke, Device, fields, InitModelOf, KeyStrokeContext, styles, tooltips, ValueField} from '../../../index';
+import {AddCellEditorFieldCssClassesOptions, CheckBoxFieldEventMap, CheckBoxFieldModel, CheckBoxToggleKeyStroke, Device, fields, InitModelOf, KeyStrokeContext, objects, styles, tooltips, ValueField} from '../../../index';
 
 export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldModel {
   declare model: CheckBoxFieldModel;
@@ -102,6 +102,13 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
     this.setProperty('value', value);
   }
 
+  protected override _ensureValue(value: boolean): boolean {
+    if (!this.triStateEnabled && objects.isNullOrUndefined(value)) {
+      return false;
+    }
+    return super._ensureValue(value);
+  }
+
   /**
    * The value may be false, true (and null in tri-state mode)
    */
@@ -119,9 +126,8 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
   }
 
   setTriStateEnabled(triStateEnabled: boolean) {
-    this.setProperty('triStateEnabled', triStateEnabled);
-    if (this.rendered) {
-      this._renderValue();
+    if (this.setProperty('triStateEnabled', triStateEnabled)) {
+      this.setValue(this._ensureValue(this.value));
     }
   }
 

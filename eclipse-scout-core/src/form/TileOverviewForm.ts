@@ -45,8 +45,8 @@ export class TileOverviewForm extends Form implements TileOverviewFormModel {
     this.addCssClass('dimmed-background');
   }
 
-  protected override _renderForm() {
-    super._renderForm();
+  protected override _render() {
+    super._render();
     this.htmlComp.setLayout(new RowLayout());
     this.$content = this.$container.appendDiv('tile-overview-content');
     this.contentHtmlComp = HtmlComponent.install(this.$content, this.session);
