@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.dto.PageData;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableComputeTableEmptySpaceMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.AggregateTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
-import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -1023,31 +1022,31 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   protected final void interceptLoadData(SearchFilter filter) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageWithTableLoadDataChain<T> chain = new PageWithTableLoadDataChain<>(extensions);
     chain.execLoadData(filter);
   }
 
   protected final IPage<?> interceptCreateChildPage(ITableRow row) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageWithTableCreateChildPageChain<T> chain = new PageWithTableCreateChildPageChain<>(extensions);
     return chain.execCreateChildPage(row);
   }
 
   protected final void interceptPopulateTable() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageWithTablePopulateTableChain<T> chain = new PageWithTablePopulateTableChain<>(extensions);
     chain.execPopulateTable();
   }
 
   protected final void interceptInitSearchForm() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageWithTableInitSearchFormChain<T> chain = new PageWithTableInitSearchFormChain<>(extensions);
     chain.execInitSearchForm();
   }
 
   protected final List<IMenu> interceptComputeTableEmptySpaceMenus() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageWithTableComputeTableEmptySpaceMenusChain<T> chain = new PageWithTableComputeTableEmptySpaceMenusChain<>(extensions);
     return chain.execComputeTableEmptySpaceMenus();
   }

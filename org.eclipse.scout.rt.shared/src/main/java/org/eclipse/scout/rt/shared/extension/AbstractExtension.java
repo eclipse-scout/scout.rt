@@ -20,5 +20,4 @@ public abstract class AbstractExtension<OWNER extends IExtensibleObject> impleme
   public OWNER getOwner() {
     return m_owner;
   }
-
 }

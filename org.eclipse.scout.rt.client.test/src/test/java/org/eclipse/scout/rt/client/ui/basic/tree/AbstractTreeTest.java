@@ -16,13 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Assert;
@@ -47,7 +43,7 @@ public class AbstractTreeTest {
 
   @Before
   public void setup() {
-    BEANS.get(IExtensionRegistry.class).register(TreeNodeExtension.class);
+    //BEANS.get(IExtensionRegistry.class).register(TreeNodeExtension.class);
     m_tree = new P_Tree();
     m_node1 = new P_TreeNode("node1");
     m_node2 = new P_TreeNode("node2");
@@ -66,7 +62,7 @@ public class AbstractTreeTest {
 
   @After
   public void tearDown() {
-    BEANS.get(IExtensionRegistry.class).deregister(TreeNodeExtension.class);
+    //BEANS.get(IExtensionRegistry.class).deregister(TreeNodeExtension.class);
   }
 
   @Test
@@ -522,24 +518,11 @@ public class AbstractTreeTest {
     }
   }
 
-  private static interface ITestDisposable {
+  private interface ITestDisposable {
     boolean isDisposed();
 
     String getName();
 
-  }
-
-  public static class TreeNodeExtension extends AbstractTreeNodeExtension<P_TreeNode> {
-
-    public TreeNodeExtension(P_TreeNode owner) {
-      super(owner);
-    }
-
-    @Override
-    public void execDispose(TreeNodeDisposeChain chain) {
-      chain.execDispose();
-      getOwner().additionalDispose();
-    }
   }
 
   public static class P_TreeNode extends AbstractTreeNode implements ITestDisposable {
