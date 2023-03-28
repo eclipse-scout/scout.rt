@@ -93,7 +93,7 @@ export class FormField extends Widget implements FormFieldModel {
   constructor() {
     super();
 
-    this.dropType = 0;
+    this.dropType = DropType.NONE;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
     this.empty = true;
     this.errorStatus = null;

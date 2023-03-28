@@ -168,7 +168,7 @@ export class Table extends Widget implements TableModel {
     this.compact = false;
     this.compactHandler = scout.create(TableCompactHandler, {table: this});
     this.compactColumn = null;
-    this.dropType = 0;
+    this.dropType = DropType.NONE;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
     this.groupingStyle = Table.GroupingStyle.TOP;
     this.header = null;

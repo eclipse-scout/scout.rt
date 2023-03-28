@@ -79,9 +79,9 @@ export class DragAndDropHandler {
   }
 
   protected _onDrop(event: JQuery.DropEvent) {
-    if (this.supportedScoutTypes.indexOf(dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
-      (this.dropType() & dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) === dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
-      dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+    if (this.supportedScoutTypes.indexOf(DropType.FILE_TRANSFER) >= 0 &&
+      (this.dropType() & DropType.FILE_TRANSFER) === DropType.FILE_TRANSFER && // NOSONAR
+      dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, DropType.FILE_TRANSFER)) {
       if (!this.onDrop ||
         !(event.originalEvent.dataTransfer.files instanceof FileList)) {
         return;
