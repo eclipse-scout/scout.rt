@@ -41,10 +41,10 @@ public class JsonEvent implements IJsonObject {
    */
   public JsonEvent(String target, String type, String reference, JSONObject data) {
     if (target == null) {
-      throw new IllegalArgumentException("Argument 'target' must be null");
+      throw new IllegalArgumentException("Argument 'target' must not be null");
     }
     if (type == null) {
-      throw new IllegalArgumentException("Argument 'type' must be null");
+      throw new IllegalArgumentException("Argument 'type' must not be null");
     }
     if (data == null) {
       data = new JSONObject();
