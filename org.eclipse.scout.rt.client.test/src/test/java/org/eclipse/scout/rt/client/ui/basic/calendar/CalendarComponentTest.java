@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.basic.calendar;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,7 +20,7 @@ import java.util.UUID;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.services.common.calendar.CalendarAppointment;
-import org.eclipse.scout.rt.shared.services.common.calendar.HolidayItem;
+import org.eclipse.scout.rt.shared.services.common.calendar.CalendarTask;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarAppointment;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.junit.Assert;
@@ -45,7 +46,7 @@ public class CalendarComponentTest {
   }
 
   private CalendarComponent[] toArray(Set<CalendarComponent> set) {
-    return set.toArray(new CalendarComponent[set.size()]);
+    return set.toArray(new CalendarComponent[0]);
   }
 
   @Test
@@ -131,7 +132,7 @@ public class CalendarComponentTest {
   }
 
   private ICalendarItem createItem(Date date, String subject) {
-    HolidayItem item = new HolidayItem();
+    CalendarTask item = new CalendarTask();
     item.setSubject(subject);
     item.setItemId(UUID.randomUUID());
     item.setStart(date);
@@ -144,10 +145,7 @@ public class CalendarComponentTest {
 
   private Set<CalendarComponent> createSet(CalendarComponent... calendarComponents) {
     Set<CalendarComponent> set = new TreeSet<>();
-    for (CalendarComponent component : calendarComponents) {
-      set.add(component);
-    }
+    Collections.addAll(set, calendarComponents);
     return set;
   }
-
 }
