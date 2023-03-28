@@ -7,29 +7,26 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DragAndDropHandler, EnumObject, scout, Widget} from '../index';
+import {arrays, DragAndDropHandler, scout, Widget} from '../index';
 
-const SCOUT_TYPES = {
-  FILE_TRANSFER: 1 << 0, // IDNDSupport.TYPE_FILE_TRANSFER (NOSONAR)
-  JAVA_ELEMENT_TRANSFER: 1 << 1, // IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER (NOSONAR)
-  TEXT_TRANSFER: 1 << 2, // IDNDSupport.TYPE_TEXT_TRANSFER (NOSONAR)
-  IMAGE_TRANSFER: 1 << 3 // IDNDSupport.TYPE_IMAGE_TRANSFER (NOSONAR)
-} as const;
+export enum DropType {
+  NONE = 0,
+  FILE_TRANSFER = 1
+}
 
 export const dragAndDrop = {
 
-  SCOUT_TYPES,
   DEFAULT_DROP_MAXIMUM_SIZE: 50 * 1024 * 1024, // 50 MiB
 
   /**
    * Mapping function from scout drag types to browser drag types.
    *
-   * @param scoutTypesArray array of SCOUT_TYPES
+   * @param scoutTypesArray array of DropType
    */
   scoutTypeToDragTypeMapping(scoutTypesArray: DropType | DropType[]): Array<string> {
     scoutTypesArray = arrays.ensure(scoutTypesArray);
     let ret = [];
-    if (scoutTypesArray.indexOf(dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0) {
+    if (scoutTypesArray.indexOf(DropType.FILE_TRANSFER) >= 0) {
       ret.push('Files');
     }
     return ret;
@@ -161,12 +158,12 @@ export const dragAndDrop = {
   _createDragAndDropHandlerOptions(target: DragAndDropTarget): DragAndDropOptions {
     return {
       target: target,
-      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      supportedScoutTypes: DropType.FILE_TRANSFER,
       validateFiles: (files, defaultValidator) => defaultValidator(files),
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       onDrop: event => {
       },
-      dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      dropType: () => DropType.FILE_TRANSFER,
       dropMaximumSize: () => target.dropMaximumSize,
       doInstall: () => target.enabledComputed,
       container: () => target.$container,
@@ -241,7 +238,7 @@ export interface DragAndDropOptions {
   container?: () => JQuery;
 
   /**
-   * The scout type which will be allowed to drop into the target. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
+   * The scout type which will be allowed to drop into the target. Default is {@link DropType.FILE_TRANSFER}
    */
   supportedScoutTypes?: DropType | DropType[];
 
@@ -257,7 +254,7 @@ export interface DragAndDropOptions {
   selector?: JQuery.Selector;
 
   /**
-   * Returns the allowed drop type during a drop event. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
+   * Returns the allowed drop type during a drop event. Default is {@link DropType.FILE_TRANSFER}
    */
   dropType?: () => DropType;
 
@@ -278,5 +275,3 @@ export interface DragAndDropOptions {
    */
   additionalDropProperties?: (event: JQuery.DropEvent) => any;
 }
-
-export type DropType = EnumObject<typeof SCOUT_TYPES>;

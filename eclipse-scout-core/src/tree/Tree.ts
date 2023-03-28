@@ -109,7 +109,7 @@ export class Tree extends Widget implements TreeModel {
     this.checkable = false;
     this.checkableStyle = Tree.CheckableStyle.CHECKBOX_TREE_NODE;
     this.displayStyle = Tree.DisplayStyle.DEFAULT;
-    this.dropType = 0;
+    this.dropType = DropType.NONE;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
     this.lazyExpandingEnabled = true;
     this.menus = [];
