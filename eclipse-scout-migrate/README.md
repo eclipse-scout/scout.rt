@@ -119,10 +119,14 @@ In order to run the TypeScript migration, do the following:
 - Ensure you have a clean Git working tree (no uncommitted files).
 - Create a `tsconfig.json` as described [here](#tsconfig)
 - Add scripts in your `package.json` as described below.
+- Add an `override` in your `package.json` to fix the TypeScript version to 4.8.3 (the migrate tool will skip some migrations and print a warning about the wrong version otherwise). This is only needed for the migration and has to be
+  removed afterwards.
 - Adjust the module map as described in the chapter [Module Map](#module-map)
 - Add custom type maps if you have a large code base and would like to automate a little more, see [Type Map](#type-map)
 - Run the `rename` script by pressing the play button next to it in IntelliJ or using the command line: `npm run rename`.
-  Commit the changes to ensure Git can track the renames correctly.
+  - Adjust the paths in `package.json` (to `index.ts`), in `webpack.config.js` (to your entry point file) and in `karma.conf.js` (to `test-index.ts`).
+  - Open `index.ts` and replace `import * as self from './index.js';` with `import * as self from './index'`;
+  - Commit the changes to ensure Git can track the renames correctly.
 - Run the `migrate` script.
 - Review every file:
   - Verify / add the types of the class properties.
@@ -133,6 +137,9 @@ In order to run the TypeScript migration, do the following:
     Copy the relevant class properties to a separate model file.
     In your widget, implement the model interface and declare a model variable.
   - To create the event maps, you can run the `event-maps` script from below and copy the result into a separate event maps file.
+- If you use third party libraries, you may want to check if they provide types and add them to the `devDependencies` of your `package.json` (e.g. @types/jquery).
+  See also [Project Setup for TypeScript](https://eclipsescout.github.io/scout-docs/stable/technical-guide/user-interface/typescript.html#project-setup-for-typescript)
+- Remove the added `scripts`, `overrides` and dependency to `@eclipse-scout/migrate`.
 
 ```json
 {
@@ -140,6 +147,11 @@ In order to run the TypeScript migration, do the following:
     "rename": "scout-migrate --rename --sources src/main/js/**/*.js",
     "migrate": "scout-migrate --rename false --migrate ts --sources src/main/js/**/*.ts --moduleMap.yourNamespace path:src/main/js/index.ts",
     "event-maps": "scout-migrate --print-event-maps --sources src/main/js/**/*.ts"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "4.8.3"
+    }
   }
 }
 ```
