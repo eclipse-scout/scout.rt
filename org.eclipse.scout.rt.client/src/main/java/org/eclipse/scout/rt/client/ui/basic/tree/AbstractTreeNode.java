@@ -210,6 +210,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
       for (ITreeNode childNode : getChildNodes()) {
         childNode.initTreeNode();
       }
+      execInitTreeNode();
     }
     finally {
       setInitializing(false);
@@ -340,7 +341,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
 
   @Override
   public final void decorateCell() {
-
+    execDecorateCell(m_cell);
   }
 
   @Override
@@ -768,7 +769,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
 
   @Override
   public void collectChildNodes(Set<ITreeNode> collector, boolean recursive) {
-    if(m_childNodeList==null){
+    if (m_childNodeList == null) {
       return;
     }
     for (ITreeNode node : m_childNodeList) {
@@ -817,8 +818,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
       node.setTreeInternal(m_tree, true);
       node.setParentNodeInternal(this);
     }
-    if(m_childNodeList == null){
-      m_childNodeList = new ArrayList<>(startIndex+ nodes.size());
+    if (m_childNodeList == null) {
+      m_childNodeList = new ArrayList<>(startIndex + nodes.size());
     }
 
     m_childNodeList.addAll(startIndex, nodes);
