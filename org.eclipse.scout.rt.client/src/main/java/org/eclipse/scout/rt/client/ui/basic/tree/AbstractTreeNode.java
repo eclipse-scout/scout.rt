@@ -315,9 +315,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
 
   @Override
   public void resetFilterCache() {
-    synchronized (this) {
-      m_filteredChildNodes = null;
-    }
+    m_filteredChildNodes = null;
   }
 
   @Override
@@ -1011,6 +1009,12 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
     setDisposing(true);
     try {
       disposeInternal();
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Exception while disposing node.", e);
+    }
+    try {
+      execDispose();
     }
     catch (RuntimeException e) {
       LOG.warn("Exception while disposing node.", e);

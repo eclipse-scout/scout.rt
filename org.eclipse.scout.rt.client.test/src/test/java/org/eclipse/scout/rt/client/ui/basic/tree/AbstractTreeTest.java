@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +42,6 @@ public class AbstractTreeTest {
 
   @Before
   public void setup() {
-    //BEANS.get(IExtensionRegistry.class).register(TreeNodeExtension.class);
     m_tree = new P_Tree();
     m_node1 = new P_TreeNode("node1");
     m_node2 = new P_TreeNode("node2");
@@ -58,11 +56,6 @@ public class AbstractTreeTest {
     m_tree.addChildNode(m_node2, m_subNode1);
     m_treeListener = new P_TreeListener();
     m_tree.addTreeListener(m_treeListener);
-  }
-
-  @After
-  public void tearDown() {
-    //BEANS.get(IExtensionRegistry.class).deregister(TreeNodeExtension.class);
   }
 
   @Test
@@ -253,7 +246,7 @@ public class AbstractTreeTest {
 
   private static void assertDisposed(ITestDisposable... disposables) {
     for (ITestDisposable disposable : disposables) {
-      assertTrue("should be desposed, but is not: " + disposable.getName(), disposable.isDisposed());
+      assertTrue("should be disposed, but is not: " + disposable.getName(), disposable.isDisposed());
     }
   }
 
@@ -522,13 +515,11 @@ public class AbstractTreeTest {
     boolean isDisposed();
 
     String getName();
-
   }
 
   public static class P_TreeNode extends AbstractTreeNode implements ITestDisposable {
     boolean m_disposeInternalCalled = false;
     boolean m_execDisposeCalled = false;
-    boolean m_additionalDisposeCalled = false;
 
     private String m_name;
 
@@ -543,7 +534,7 @@ public class AbstractTreeTest {
 
     @Override
     public boolean isDisposed() {
-      return m_disposeInternalCalled && m_execDisposeCalled && m_additionalDisposeCalled;
+      return m_disposeInternalCalled && m_execDisposeCalled;
     }
 
     @Override
@@ -555,10 +546,6 @@ public class AbstractTreeTest {
     public void disposeInternal() {
       super.disposeInternal();
       m_disposeInternalCalled = true;
-    }
-
-    public void additionalDispose() {
-      m_additionalDisposeCalled = true;
     }
   }
 
@@ -586,5 +573,4 @@ public class AbstractTreeTest {
       m_disposed = true;
     }
   }
-
 }
