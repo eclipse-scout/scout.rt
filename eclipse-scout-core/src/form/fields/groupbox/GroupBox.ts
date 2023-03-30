@@ -143,20 +143,20 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     return this.fields;
   }
 
-  insertField(field: FormField, index?: number) {
-    let newFields = this.fields.slice();
+  insertField(field: ObjectOrChildModel<FormField>, index?: number) {
+    let newFields = this.fields.slice() as ObjectOrChildModel<FormField>[];
     index = scout.nvl(index, this.fields.length);
     newFields.splice(index, 0, field);
     this.setFields(newFields);
   }
 
-  insertFieldBefore(field: FormField, sibling: FormField) {
+  insertFieldBefore(field: ObjectOrChildModel<FormField>, sibling: FormField) {
     scout.assertParameter('sibling', sibling);
     let index = this.fields.indexOf(sibling);
     this.insertField(field, index);
   }
 
-  insertFieldAfter(field: FormField, sibling: FormField) {
+  insertFieldAfter(field: ObjectOrChildModel<FormField>, sibling: FormField) {
     scout.assertParameter('sibling', sibling);
     let index = this.fields.indexOf(sibling) + 1;
     this.insertField(field, index);

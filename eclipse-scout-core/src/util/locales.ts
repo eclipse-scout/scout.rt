@@ -14,7 +14,7 @@ export const locales = {
   localesMap: {},
 
   bootstrap(url: string): JQuery.Promise<void> {
-    let promise: JQuery.PromiseBase<any, any, any, any, any, any, any, any, any, any, any, any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
+    let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
     return promise.then(locales._preInit.bind(this, url));
   },
 

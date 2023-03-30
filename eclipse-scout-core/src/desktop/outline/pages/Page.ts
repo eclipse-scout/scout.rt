@@ -401,12 +401,12 @@ export class Page extends TreeNode implements PageModel {
    *     to our outline instance and adds optional other properties. Typically, you'll pass an
    *     object (entity-key or arbitrary data) to a child page.
    */
-  protected _pageParam<T extends object>(paramProperties: T): T {
+  protected _pageParam<T extends object>(paramProperties?: T): T & { parent: Outline } {
     let param = {
       parent: this.getOutline()
     };
     $.extend(param, paramProperties);
-    return param as T;
+    return param as T & { parent: Outline };
   }
 
   reloadPage() {
