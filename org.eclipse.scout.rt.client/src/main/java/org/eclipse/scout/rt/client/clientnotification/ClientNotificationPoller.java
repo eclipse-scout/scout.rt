@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.clientnotification;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -24,10 +25,14 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -35,6 +40,7 @@ import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
@@ -49,23 +55,41 @@ public class ClientNotificationPoller {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationPoller.class);
 
+  private final Object m_lock = new Object();
   private IFuture<Void> m_pollerFuture;
+  private IFuture<Void> m_livenessFuture;
+  private volatile long m_pollerStaleTimeMillis;
+  private volatile long m_lastPollRequest;
 
   @PostConstruct
   public void start() {
-    // ensure the poller starts only once.
-    Assertions.assertNull(m_pollerFuture);
-    if (BEANS.get(IServiceTunnel.class).isActive()) {
-      m_pollerFuture = Jobs.schedule(new P_NotificationPoller(), Jobs.newInput()
-          .withRunContext(createRunContext())
-          .withName(ClientNotificationPoller.class.getSimpleName()));
-    }
-    else {
-      LOG.debug("Starting without notifications due to no proxy service is available");
+    synchronized (m_lock) {
+      // ensure the poller starts only once.
+      Assertions.assertNull(m_pollerFuture);
+      if (BEANS.get(IServiceTunnel.class).isActive()) {
+        startPoller();
+        startLivenessChecker();
+      }
+      else {
+        LOG.debug("Starting without notifications due to no proxy service is available");
+      }
     }
   }
 
   public void stop() {
+    synchronized (m_lock) {
+      stopLivenessChecker();
+      stopPoller();
+    }
+  }
+
+  protected void startPoller() {
+    m_pollerFuture = Jobs.schedule(new P_NotificationPoller(this::touch), Jobs.newInput()
+        .withRunContext(createRunContext())
+        .withName(ClientNotificationPoller.class.getSimpleName()));
+  }
+
+  protected void stopPoller() {
     if (m_pollerFuture == null) {
       return;
     }
@@ -95,10 +119,17 @@ public class ClientNotificationPoller {
 
   private static final class P_NotificationPoller implements IRunnable {
 
+    private final Runnable m_livenessCheck;
+
+    public P_NotificationPoller(Runnable livenessCheck) {
+      m_livenessCheck = livenessCheck;
+    }
+
     @Override
     public void run() {
       final RunMonitor outerRunMonitor = RunMonitor.CURRENT.get();
       while (!outerRunMonitor.isCancelled()) {
+        m_livenessCheck.run();
         try {
           // use temporary new run monitor to avoid registering anonymous new cancellables with parent (current) run monitor
           // new local run monitor is registered with parent run monitor as cancellable, however it is unregistered from
@@ -131,6 +162,60 @@ public class ClientNotificationPoller {
     }
   }
 
+  // --- liveness check methods ------------------------------------------------
+
+  protected void startLivenessChecker() {
+    if (m_livenessFuture != null) {
+      return;
+    }
+
+    final long pollerCheckIntervalMillis = Assertions.assertNotNull(CONFIG.getPropertyValue(NotificationPollerLivenessCheckIntervalMillis.class));
+    m_pollerStaleTimeMillis = Assertions.assertNotNull(CONFIG.getPropertyValue(MaxNotificationPollerStaleTimeMillis.class));
+
+    m_livenessFuture = Jobs.schedule(this::checkPollerLiveness, Jobs.newInput()
+        .withRunContext(createRunContext())
+        .withName(ClientNotificationPoller.class.getSimpleName() + "-livenessCheck")
+        .withExceptionHandling(BEANS.get(ExceptionHandler.class), true)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(FixedDelayScheduleBuilder.repeatForever(pollerCheckIntervalMillis, TimeUnit.MILLISECONDS))));
+  }
+
+  protected void stopLivenessChecker() {
+    if (m_livenessFuture == null) {
+      return;
+    }
+    m_livenessFuture.cancel(true);
+    m_livenessFuture = null;
+  }
+
+  protected void touch() {
+    m_lastPollRequest = System.currentTimeMillis();
+  }
+
+  protected void checkPollerLiveness() {
+    LOG.debug("Checking client notification poller liveness");
+    final long lastPollRequest = m_lastPollRequest;
+    if (lastPollRequest + m_pollerStaleTimeMillis < System.currentTimeMillis()) {
+      LOG.warn("Detected stale client notification poller. Restarting poller job [lastPollRequest={}]",
+          DateUtility.format(new Date(lastPollRequest), "yyyy-MM-dd HH:mm:ss.SSS"));
+      synchronized (m_lock) {
+        try {
+          stopPoller();
+        }
+        catch (RuntimeException e) {
+          LOG.info("Exception while stopping client notification poller", e);
+        }
+        try {
+          startPoller();
+          LOG.info("Restarted client notification poller");
+        }
+        catch (RuntimeException e) {
+          LOG.error("Could not start client notification poller", e);
+        }
+      }
+    }
+  }
+
   /**
    * {@link IPlatformListener} to shutdown this {@link ClientNotificationPoller} upon platform shutdown.
    */
@@ -144,6 +229,44 @@ public class ClientNotificationPoller {
         poller.createRunContext().run(() -> BEANS.optional(IClientNotificationService.class)
             .ifPresent(svc -> svc.unregisterNode(NodeId.current())));
       }
+    }
+  }
+
+  public static class MaxNotificationPollerStaleTimeMillis extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.SECONDS.toMillis(90);
+    }
+
+    @Override
+    public String description() {
+      return "The maximum amount of time in milliseconds between two client notification poller invocations before "
+          + "the poller job is restarted. Note: this value should be at least two times of both 'scout.clientnotification.maxNotificationBlockingTimeOut' "
+          + "and 'scout.clientnotification.notificationPollerCheckInterval'. The default is 90 seconds.";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.clientnotification.maxNotificationPollerStaleTime";
+    }
+  }
+
+  public static class NotificationPollerLivenessCheckIntervalMillis extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.SECONDS.toMillis(30);
+    }
+
+    @Override
+    public String description() {
+      return "Interval in milliseconds the poller job liveness check is performed. The default is 30 seconds.";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.clientnotification.notificationPollerLivenessCheckInterval";
     }
   }
 }
