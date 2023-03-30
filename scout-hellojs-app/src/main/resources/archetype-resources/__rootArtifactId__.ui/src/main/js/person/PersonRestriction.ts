@@ -1,12 +1,10 @@
 import * as $ from 'jquery';
 
 export class PersonRestriction {
-  resourceType: string;
   firstName: string;
   lastName: string;
 
   constructor() {
-    this.resourceType = 'PersonRestriction';
     this.firstName = null;
     this.lastName = null;
   }

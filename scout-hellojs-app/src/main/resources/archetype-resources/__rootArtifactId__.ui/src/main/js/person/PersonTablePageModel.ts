@@ -2,44 +2,41 @@ import {AggregateTableControl, BooleanColumn, Column, FormTableControl, icons, M
 import {PersonSearchForm} from '../index';
 
 export default (): PageWithTableModel => ({
-  id: '${simpleArtifactName}.PersonTablePage',
   objectType: PageWithTable,
   leaf: true,
   text: '${symbol_dollar}{textKey:Persons}',
   detailTable: {
-    id: '${simpleArtifactName}.PersonTablePage.Table',
     objectType: Table,
-    autoResizeColumns: true,
     columns: [
-      {
-        id: 'PersonIdColumn',
-        objectType: Column,
-        visible: false
-      },
       {
         id: 'FirstNameColumn',
         objectType: Column,
         text: '${symbol_dollar}{textKey:FirstName}',
-        width: 300
+        width: 200
       },
       {
         id: 'LastNameColumn',
         objectType: Column,
         text: '${symbol_dollar}{textKey:LastName}',
-        width: 300
+        width: 200
       },
       {
         id: 'SalaryColumn',
         objectType: NumberColumn,
         text: '${symbol_dollar}{textKey:Salary}',
-        width: 200
+        width: 120
       },
       {
-        id: 'ExternColumn',
+        id: 'ExternalColumn',
         objectType: BooleanColumn,
         text: '${symbol_dollar}{textKey:External}',
-        width: 150
-      }
+        width: 100
+      },
+      {
+        id: 'PersonIdColumn',
+        objectType: Column,
+        displayable: false
+      },
     ],
     menus: [
       {
@@ -98,7 +95,7 @@ export type PersonTablePageTableColumnMap = {
   'FirstNameColumn': Column;
   'LastNameColumn': Column;
   'SalaryColumn': NumberColumn;
-  'ExternColumn': BooleanColumn;
+  'ExternalColumn': BooleanColumn;
 };
 
 export class PersonTablePageTable extends Table {

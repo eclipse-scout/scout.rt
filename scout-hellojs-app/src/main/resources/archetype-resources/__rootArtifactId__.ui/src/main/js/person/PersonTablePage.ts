@@ -1,4 +1,4 @@
-import {EventHandler, MessageBox, MessageBoxes, ObjectOrModel, PageWithTable, PageWithTableModel, scout, Table, TableRow} from '@eclipse-scout/core';
+import {EventHandler, InitModelOf, MessageBox, MessageBoxes, ObjectOrModel, PageWithTable, PageWithTableModel, scout, Table, TableRow} from '@eclipse-scout/core';
 import {DataChangeEvent, Person, PersonForm, PersonRepository, PersonRestriction, PersonSearchFormData} from '../index';
 import PersonTablePageModel, {PersonTablePageTable} from './PersonTablePageModel';
 
@@ -10,14 +10,15 @@ export class PersonTablePage extends PageWithTable {
     return PersonTablePageModel();
   }
 
-  protected override _initDetailTable(table: Table) {
-    super._initDetailTable(table);
-    this._initListeners();
-  }
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
 
-  protected _initListeners() {
     this._dataChangeListener = this._onDataChange.bind(this);
     this.session.desktop.on('dataChange', this._dataChangeListener);
+  }
+
+  protected override _initDetailTable(table: Table) {
+    super._initDetailTable(table);
 
     let editPersonMenu = this.detailTable.widget('EditPersonMenu');
     editPersonMenu.on('action', this._onEditPersonMenuAction.bind(this));
@@ -35,7 +36,7 @@ export class PersonTablePage extends PageWithTable {
   }
 
   protected _onDataChange(event: DataChangeEvent) {
-    if (event.dataType === Person.EVENT_TYPE) {
+    if (event.dataType === Person.ENTITY_TYPE) {
       this.reloadPage();
     }
   }
@@ -53,11 +54,11 @@ export class PersonTablePage extends PageWithTable {
         return {
           person: person,
           cells: [
-            person.personId,
             person.firstName,
             person.lastName,
             person.salary,
-            person.external
+            person.external,
+            person.personId
           ]
         };
       });

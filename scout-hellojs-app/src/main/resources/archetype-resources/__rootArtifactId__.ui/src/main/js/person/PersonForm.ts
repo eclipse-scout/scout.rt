@@ -40,7 +40,7 @@ export class PersonForm extends Form {
         .then(p => {
           this.setSubTitle(`${p.firstName} ${p.lastName}`);
           return p;
-        })
+        });
     }
     this.setTitle(this.session.text('CreatePerson'));
     return ${symbol_dollar}.resolvedPromise(this.data);

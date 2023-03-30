@@ -1,7 +1,6 @@
 import {Action, FormModel, GroupBox, Menu, ResetMenu, StringField} from '@eclipse-scout/core';
 
 export default (): FormModel => ({
-  id: '${simpleArtifactName}.PersonSearchForm',
   rootGroupBox: {
     id: 'MainBox',
     objectType: GroupBox,
