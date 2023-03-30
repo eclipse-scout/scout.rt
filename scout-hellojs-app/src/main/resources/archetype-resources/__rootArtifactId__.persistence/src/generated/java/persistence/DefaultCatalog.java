@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
@@ -47,10 +56,10 @@ public class DefaultCatalog extends CatalogImpl {
   }
 
   /**
-   * A reference to the 3.17 minor release of the code generator. If this
+   * A reference to the 3.16 minor release of the code generator. If this
    * doesn't compile, it's because the runtime library uses an older minor
-   * release, namely: 3.17. You can turn off the generation of this reference
+   * release, namely: 3.16. You can turn off the generation of this reference
    * by specifying /configuration/generator/generate/jooqVersionReference
    */
-  private static final String REQUIRE_RUNTIME_JOOQ_VERSION = Constants.VERSION_3_17;
+  private static final String REQUIRE_RUNTIME_JOOQ_VERSION = Constants.VERSION_3_16;
 }
