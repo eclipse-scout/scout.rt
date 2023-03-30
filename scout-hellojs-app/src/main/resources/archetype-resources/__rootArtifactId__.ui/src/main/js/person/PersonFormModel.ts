@@ -1,7 +1,6 @@
 import {CancelMenu, CheckBoxField, FormModel, GroupBox, NumberField, OkMenu, StringField} from '@eclipse-scout/core';
 
 export default (): FormModel => ({
-  id: '${simpleArtifactName}.PersonForm',
   displayHint: 'view',
   rootGroupBox: {
     id: 'MainBox',

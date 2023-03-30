@@ -1,80 +1,63 @@
 import {App, Person, PersonRestriction, Repository} from '../index';
 import {App as ScoutApp, scout} from '@eclipse-scout/core';
 
+let repository: PersonRepository;
 export class PersonRepository extends Repository {
-  targetUrl: string;
-
   constructor() {
     super();
 
+    this.entityType = Person.ENTITY_TYPE;
     let app = ScoutApp.get() as App;
     this.targetUrl = app.apiUrl + 'persons/';
   }
 
   /**
-   * Loads a single person
+   * Loads a single person.
    * @param personId The id of the person to fetch. Must not be null.
    */
   load(personId: string): JQuery.Promise<Person> {
-    return this.getJson(this.targetUrl + personId)
-      .then(items => this._first(items));
+    return this._load(this.targetUrl + personId);
   }
 
   /**
-   * get all persons
-   * @param restrictions Restrictions which persons to fetch
-   * @return The persons matching the restrictions
+   * Gets all persons.
+   * @param restrictions Restriction which persons to fetch
+   * @return The persons matching the restriction
    */
-  list(restrictions: PersonRestriction): JQuery.Promise<Person[]> {
-    return this.postJson(this.targetUrl + 'list', JSON.stringify(restrictions));
+  list(restriction: PersonRestriction): JQuery.Promise<Person[]> {
+    return this._list(restriction);
   }
 
   /**
-   * Update existing Person
+   * Updates an existing person.
    * @param person The person to update
    * @returns The updated person
    */
   store(person: Person): JQuery.Promise<Person> {
-    return this.putJson(this.targetUrl + person.personId, JSON.stringify(person))
-      .then(items => this._first(items) as Person)
-      .then(person => this._triggerPersonChanged(person));
+    return this._store(person, this.targetUrl + person.personId);
   }
 
   /**
-   * Delete person
+   * Deletes a person.
    * @param personId The id of the person to delete.
    */
   remove(personId: string): JQuery.Promise<void> {
-    return this.removeJson(this.targetUrl + personId)
-      .then(() => {
-        this._triggerPersonChanged();
-      });
+    return this._remove(personId);
   }
 
   /**
-   * Create new person
+   * Creates a new person.
    * @param person The person to create
    * @returns the created person
    */
   create(person: Person): JQuery.Promise<Person> {
-    return this.postJson(this.targetUrl, JSON.stringify(person))
-      .then(person => this._triggerPersonChanged(person));
-  }
-
-  protected _triggerPersonChanged(person?: Person): Person {
-    scout.getSession().desktop.dataChange({
-      dataType: Person.EVENT_TYPE,
-      data: person
-    });
-    return person;
+    return this._create(person);
   }
 
   static get(): PersonRepository {
-    if (!personRepo) {
-      personRepo = scout.create(PersonRepository);
+    if (!repository) {
+      repository = scout.create(PersonRepository);
     }
-    return personRepo;
+    return repository;
   }
 }
-
-let personRepo: PersonRepository;

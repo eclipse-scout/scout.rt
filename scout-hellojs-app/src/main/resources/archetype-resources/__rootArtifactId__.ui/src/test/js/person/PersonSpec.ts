@@ -13,7 +13,6 @@ describe('Person', () => {
     expect(person.firstName).toBe(values[0]);
     expect(person.lastName).toBe(values[1]);
     expect(person.personId).toBe(values[2]);
-    expect(person.resourceType).toBe('Person');
   });
 
   it('initializes correctly from model', () => {
@@ -28,7 +27,6 @@ describe('Person', () => {
     expect(person.firstName).toBe(values[0]);
     expect(person.lastName).toBe(values[1]);
     expect(person.personId).toBe(values[2]);
-    expect(person.resourceType).toBe('Person');
   });
 
 });

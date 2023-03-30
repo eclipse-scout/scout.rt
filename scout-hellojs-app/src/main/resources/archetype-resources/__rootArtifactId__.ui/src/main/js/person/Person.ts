@@ -1,7 +1,6 @@
 import * as $ from 'jquery';
 
 export class Person {
-  resourceType: string;
   personId: string;
   firstName: string;
   lastName: string;
@@ -9,7 +8,6 @@ export class Person {
   external: boolean;
 
   constructor() {
-    this.resourceType = 'Person';
     this.personId = null;
     this.firstName = null;
     this.lastName = null;
@@ -17,7 +15,7 @@ export class Person {
     this.external = null;
   }
 
-  static EVENT_TYPE = 'person';
+  static ENTITY_TYPE = 'person';
 
   init(model: any) {
     ${symbol_dollar}.extend(this, model);

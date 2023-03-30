@@ -63,4 +63,5 @@ export class Desktop extends ScoutDesktop {
 
 export interface DataChangeEvent<T = Desktop> extends Event<T> {
   dataType: string;
+  data: any;
 }
