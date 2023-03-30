@@ -19,7 +19,7 @@ export const codes = {
   registry: {} as Record<string, CodeType<any>>,
 
   bootstrap(url: string): JQuery.Promise<any> {
-    let promise: JQuery.PromiseBase<any, any, any, any, any, any, any, any, any, any, any, any> = url ? $.ajaxJson(url) : $.resolvedPromise({});
+    let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise({});
     return promise.then(codes._preInit.bind(this, url));
   },
 
