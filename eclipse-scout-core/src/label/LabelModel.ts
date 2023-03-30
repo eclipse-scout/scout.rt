@@ -10,16 +10,24 @@
 import {WidgetModel} from '../index';
 
 export interface LabelModel extends WidgetModel {
+  /**
+   * Configures the content to be displayed.
+   */
   value?: string;
   /**
-   * Configures, if HTML rendering is enabled.
+   * Configures whether HTML tags in the {@link value} should be interpreted or encoded.
    *
-   * Subclasses can override this method. Default is false. Make sure that any user input (or other insecure input) is encoded (security), if this property is enabled.
+   * - If set to false, the HTML tags in the `value` will be encoded, so the tags won't have any effect and only plain text will be displayed.
+   * - If set to true, the HTML tags in the `value` will be interpreted.
+   *   In that case, you have to make sure that user input is encoded by yourself.
+   *   E.g. if the `value` should display text from an input field, use {@link strings.encode} to prevent HTML injection.
    *
-   * true, if HTML rendering is enabled, false otherwise.
+   * Default is false.
    */
   htmlEnabled?: boolean;
   /**
+   * Configures whether the label should be vertically scrollable if there is not enough space to display all content.
+   *
    * Default is false.
    */
   scrollable?: boolean;
