@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -94,6 +95,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_sharedVariableMap.put(name, typedValue);
   }
 
+  protected <T> T computeSharedContextVariableIfAbsent(String name, Class<T> type, Supplier<T> valueSupplier) {
+    return TypeCastUtility.castValue(m_sharedVariableMap.computeIfAbsent(name, (key) -> TypeCastUtility.castValue(valueSupplier.get(), type)), type);
+  }
+
   private void assignUserId() {
     String userId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
     setUserIdInternal(userId);
@@ -113,7 +118,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public final String getUserId() {
+  public String getUserId() {
     return getSharedContextVariable("userId", String.class);
   }
 
