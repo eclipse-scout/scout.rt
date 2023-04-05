@@ -208,13 +208,21 @@ export class ObjectFactory {
   register(objectType: ObjectType, createFunc: ObjectCreator) {
     objectType = this.resolveTypedObjectType(objectType);
     this._registry.set(objectType, createFunc);
-    $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) registered create-function for objectType ' + objectType);
+    $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) registered create-function for objectType ' + this._objectTypeToDebugStr(objectType));
   }
 
   unregister(objectType: ObjectType) {
     objectType = this.resolveTypedObjectType(objectType);
     this._registry.delete(objectType);
-    $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) unregistered objectType ' + objectType);
+    $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) unregistered objectType ' + this._objectTypeToDebugStr(objectType));
+  }
+
+  protected _objectTypeToDebugStr(objectType: ObjectType) {
+    if (typeof objectType === 'string') {
+      return objectType;
+    }
+    // Name property is obfuscated in production code, only use it for debug purposes
+    return objectType.name;
   }
 
   get(objectType: ObjectType): ObjectCreator {

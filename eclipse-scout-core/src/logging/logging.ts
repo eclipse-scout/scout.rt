@@ -12,6 +12,10 @@ import $ from 'jquery';
 
 declare global {
   let log4javascript: any;
+
+  interface Window {
+    log4javascript: any;
+  }
 }
 
 export interface Logger {
@@ -107,7 +111,7 @@ export const logging = {
     if (!enabled) {
       return $.resolvedPromise();
     }
-    if (log4javascript) {
+    if (window.log4javascript) {
       logging.initLog4Javascript(logLevelParam, showPopup);
       return $.resolvedPromise();
     }
