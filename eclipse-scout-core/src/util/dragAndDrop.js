@@ -125,7 +125,7 @@ export function handler(options) {
   if (!options || !options.target) {
     return null;
   }
-  return new DragAndDropHandler(options);
+  return scout.create('DragAndDropHandler', options);
 }
 
 /**
