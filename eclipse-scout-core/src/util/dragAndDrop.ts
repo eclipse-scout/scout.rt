@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DragAndDropHandler, EnumObject, Widget} from '../index';
+import {arrays, DragAndDropHandler, EnumObject, scout, Widget} from '../index';
 
 const SCOUT_TYPES = {
   FILE_TRANSFER: 1 << 0, // IDNDSupport.TYPE_FILE_TRANSFER (NOSONAR)
@@ -123,7 +123,7 @@ export const dragAndDrop = {
     if (!options || !options.target) {
       return null;
     }
-    return new DragAndDropHandler(options);
+    return scout.create(DragAndDropHandler, options);
   },
 
   /**
