@@ -596,7 +596,7 @@ public final class FileUtility {
 
         zos.putNextEntry(new ZipEntry(validatedFilename));
         if (res.getContent() != null) {
-          zos.write(res.getContent()); //TODO imo: extend BinaryResource to support .write(OutputStream)
+          zos.write(res.getContent());
         }
         zos.closeEntry();
       }
@@ -605,7 +605,6 @@ public final class FileUtility {
       zos.close(); // reading the bytes requires the zip output stream to be closed
       byte[] zipContent = IOUtility.getContent(tempFile);
 
-      //TODO imo: BinaryResource extend to support a constructor with InputStream
       return BinaryResources.create()
           .withFilename(zipFilename)
           .withContentType("application/zip")
@@ -629,7 +628,6 @@ public final class FileUtility {
    * @see IOUtility#unzip(byte[], Pattern)
    */
   public static Collection<BinaryResource> unzip(BinaryResource zipArchive, Pattern filterPattern) {
-    // TODO imo: BinaryResource create a .getInputStream(), also allow to pass an
     // InputStream to the constructor/builder of the BinaryResource.
     try {
       return IOUtility.unzip(zipArchive.getContent(), filterPattern);
