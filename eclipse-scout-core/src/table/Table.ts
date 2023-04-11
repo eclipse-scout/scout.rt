@@ -3555,7 +3555,7 @@ export class Table extends Widget implements TableModel {
     return this.$data.find('.selected');
   }
 
-  $cellsForColIndex(colIndex: number, includeAggrRows: boolean): JQuery {
+  $cellsForColIndex(colIndex: number, includeAggrRows?: boolean): JQuery {
     let selector = '.table-row > div:nth-of-type(' + colIndex + ')';
     if (includeAggrRows) {
       selector += ', .table-aggregate-row > div:nth-of-type(' + colIndex + ')';
