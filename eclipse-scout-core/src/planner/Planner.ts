@@ -62,6 +62,7 @@ export class Planner extends Widget implements PlannerModel {
   protected _resourceTitleWidth: number;
   protected _rangeSelectionStarted: boolean;
   protected _tooltipSupport: TooltipSupport;
+  protected _$body: JQuery<Body>;
   protected _gridScrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _cellMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
   protected _resizeMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
@@ -197,6 +198,7 @@ export class Planner extends Widget implements PlannerModel {
     let layout = new PlannerLayout(this);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(layout);
+    this._$body = this.$container.body();
 
     // main elements
     this.header.render();
@@ -237,6 +239,11 @@ export class Planner extends Widget implements PlannerModel {
     this._renderSelectedResources();
     // render with setTimeout because the planner needs to be layouted first
     setTimeout(this._renderSelectionRange.bind(this));
+  }
+
+  protected override _remove() {
+    this._removeMouseMoveHandlers();
+    super._remove();
   }
 
   override get$Scrollable(): JQuery {
@@ -944,7 +951,7 @@ export class Planner extends Widget implements PlannerModel {
 
     // add event handlers
     this._cellMousemoveHandler = this._onCellMousemove.bind(this, event);
-    $target.document()
+    this._$body.document()
       .on('mousemove', this._cellMousemoveHandler)
       .one('mouseup', this._onDocumentMouseUp.bind(this));
   }
@@ -1019,10 +1026,10 @@ export class Planner extends Widget implements PlannerModel {
       this.lastRange = swap;
     }
 
-    $target.body().addClass('col-resize');
+    this._$body.addClass('col-resize');
 
     this._resizeMousemoveHandler = this._onResizeMousemove.bind(this);
-    $target.document()
+    this._$body.document()
       .on('mousemove', this._resizeMousemoveHandler)
       .one('mouseup', this._onDocumentMouseUp.bind(this));
 
@@ -1042,16 +1049,8 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _onDocumentMouseUp(event: JQuery.MouseUpEvent<Document>) {
-    let $target = $(event.target);
-    $target.body().removeClass('col-resize');
-    if (this._cellMousemoveHandler) {
-      $target.document().off('mousemove', this._cellMousemoveHandler);
-      this._cellMousemoveHandler = null;
-    }
-    if (this._resizeMousemoveHandler) {
-      $target.document().off('mousemove', this._resizeMousemoveHandler);
-      this._resizeMousemoveHandler = null;
-    }
+    this._$body.removeClass('col-resize');
+    this._removeMouseMoveHandlers();
     if (!this._rangeSelectionStarted) {
       // Range selection has not been initiated -> don't call select()
       return;
@@ -1059,6 +1058,17 @@ export class Planner extends Widget implements PlannerModel {
     this._rangeSelectionStarted = false;
     if (this.rendered) {
       this._select();
+    }
+  }
+
+  protected _removeMouseMoveHandlers() {
+    if (this._cellMousemoveHandler) {
+      this._$body.document().off('mousemove', this._cellMousemoveHandler);
+      this._cellMousemoveHandler = null;
+    }
+    if (this._resizeMousemoveHandler) {
+      this._$body.document().off('mousemove', this._resizeMousemoveHandler);
+      this._resizeMousemoveHandler = null;
     }
   }
 
