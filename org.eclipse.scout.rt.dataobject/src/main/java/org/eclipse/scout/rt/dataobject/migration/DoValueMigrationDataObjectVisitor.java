@@ -73,7 +73,6 @@ public class DoValueMigrationDataObjectVisitor extends AbstractReplacingDataObje
       }
     }
     // recursively visit migrated value
-    super.replaceOrVisit(currentValue);
-    return currentValue;
+    return super.replaceOrVisit(currentValue);
   }
 }
