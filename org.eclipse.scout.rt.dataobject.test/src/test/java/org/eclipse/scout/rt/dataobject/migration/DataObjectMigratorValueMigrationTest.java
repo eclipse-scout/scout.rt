@@ -22,6 +22,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.DoEntityHolder;
+import org.eclipse.scout.rt.dataobject.IDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrator.DoStructureMigratorResult;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
@@ -35,6 +36,9 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDoValueMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomSizeFixtureDoValueMigrationHandler_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeCompositeFixture;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeCompositeFixtureDataObjectVisitorExtension;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeCompositeFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureStringId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypesCollectionFixtureDo;
@@ -489,5 +493,30 @@ public class DataObjectMigratorValueMigrationTest {
     // Merged keys result in a single, randomly selected value, depending on internal order of the original map and implementation details of AbstractReplacingDataObjectVisitor.
     String roomName = resultMap.get(RoomTypesFixture.ROOM).getName();
     assertTrue("room".equals(roomName) || "standard room".equals(roomName) || "small room".equals(roomName));
+  }
+
+  /**
+   * Tests value migration for objects handled by an {@link IDataObjectVisitorExtension}.
+   *
+   * @see RoomTypeCompositeFixture
+   * @see RoomTypeCompositeFixtureDataObjectVisitorExtension
+   */
+  @Test
+  public void testValueMigrationWithDataObjectVisitorExtension() {
+    RoomTypeCompositeFixtureDo original = BEANS.get(RoomTypeCompositeFixtureDo.class)
+        .withRoomTypeComposite(new RoomTypeCompositeFixture(
+            ROOM_TYPE_STANDARD_ROOM, // 'standard-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+            ROOM_TYPE_SMALL_ROOM)); // 'small-room' will be migrated to 'room' by RoomTypeFixtureDoValueMigrationHandler_2
+
+    DoStructureMigratorResult<RoomTypeCompositeFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, original);
+
+    assertTrue(result.isChanged());
+
+    RoomTypeCompositeFixtureDo expected = BEANS.get(RoomTypeCompositeFixtureDo.class)
+        .withRoomTypeComposite(new RoomTypeCompositeFixture(
+            RoomTypesFixture.ROOM,
+            RoomTypesFixture.ROOM));
+
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
   }
 }
