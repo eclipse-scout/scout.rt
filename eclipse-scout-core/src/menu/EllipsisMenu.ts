@@ -7,12 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EllipsisMenuEventMap, EllipsisMenuModel, icons, Menu, Widget} from '../index';
+import {EllipsisMenuEventMap, EllipsisMenuModel, EllipsisTabMenu, icons, Menu, Widget} from '../index';
 
 export class EllipsisMenu extends Menu implements EllipsisMenuModel {
   declare model: EllipsisMenuModel;
   declare eventMap: EllipsisMenuEventMap;
   declare self: EllipsisMenu;
+
+  declare childActions: EllipsisTabMenu[];
 
   hidden: boolean;
 
@@ -32,7 +34,7 @@ export class EllipsisMenu extends Menu implements EllipsisMenuModel {
     this.$container.addClass('ellipsis');
   }
 
-  override setChildActions(childActions: Menu[]) {
+  override setChildActions(childActions: EllipsisTabMenu[]) {
     super.setChildActions(childActions);
 
     if (childActions) {
