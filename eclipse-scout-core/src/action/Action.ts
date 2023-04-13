@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, ActionEventMap, ActionKeyStroke, ActionModel, Alignment, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, NullLayout, scout, TooltipPosition, tooltips, TooltipSupport, Widget
+  AbstractLayout, ActionEventMap, ActionKeyStroke, ActionModel, Alignment, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, IconDesc, InitModelOf, KeyStrokeContext, NullLayout, scout, TooltipPosition, tooltips, TooltipSupport,
+  Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -24,7 +25,7 @@ export class Action extends Widget implements ActionModel {
   actionStyle: ActionStyle;
   compact: boolean;
   compactOrig: boolean;
-  iconId: string;
+  iconId: IconDesc | string;
   horizontalAlignment: Alignment;
   keyStroke: string;
   keyStrokeFirePolicy: KeyStrokeFirePolicy;
@@ -203,7 +204,7 @@ export class Action extends Widget implements ActionModel {
   }
 
   /** @see ActionModel.iconId */
-  setIconId(iconId: string) {
+  setIconId(iconId: IconDesc | string) {
     this.setProperty('iconId', iconId);
   }
 

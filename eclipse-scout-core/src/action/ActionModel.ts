@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ActionStyle, ActionTextPosition, Alignment, KeyStrokeFirePolicy, WidgetModel} from '../index';
+import {ActionStyle, ActionTextPosition, Alignment, IconDesc, KeyStrokeFirePolicy, WidgetModel} from '../index';
 
 export interface ActionModel extends WidgetModel {
   /**
@@ -32,7 +32,7 @@ export interface ActionModel extends WidgetModel {
    * @see icons.parseIconId
    * @see Icon
    */
-  iconId?: string;
+  iconId?: IconDesc | string;
   /**
    * Configures where the action should be positioned inside a menu bar.
    * It has no effect if the action is used outside a menu bar.
