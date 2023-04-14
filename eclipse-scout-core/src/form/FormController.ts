@@ -136,7 +136,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
 
   protected _renderView(view: Form, register: boolean, position?: number, selectView?: boolean) {
     // Prevent "Already rendered" errors (see #162954).
-    if (view.rendered) {
+    if (view.rendered || view.blockRendering) {
       return;
     }
     if (register) {
@@ -177,7 +177,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
 
   protected _renderDialog(dialog: Form, register: boolean) {
     // Prevent "Already rendered" errors (see #162954).
-    if (dialog.rendered) {
+    if (dialog.rendered || dialog.blockRendering) {
       return;
     }
 

@@ -37,8 +37,19 @@ export class JsFormAdapter extends FormAdapter {
   protected override _createWidget(model: FullModelOf<Form>): Form {
     let widget = super._createWidget(model) as Form;
 
-    widget.showOnOpen = false;
-    widget.open();
+    if (!widget.showOnOpen) {
+      widget.open();
+    } else {
+      widget.blockRendering = true;
+      widget.open();
+      widget.whenPostLoad().then(() => {
+        widget.blockRendering = false;
+        if (widget.destroyed || !widget.showOnOpen) {
+          return;
+        }
+        widget.show();
+      });
+    }
 
     return widget;
   }
