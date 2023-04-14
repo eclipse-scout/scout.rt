@@ -527,8 +527,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
    */
   protected _abort() {
     // Search for a close button in the menus and buttons of the root group box
-    let controls: (Widget & { systemType?: ButtonSystemType })[] = this.rootGroupBox.controls;
-    controls = controls.concat(this.rootGroupBox.menus);
+    let controls: (Widget & { systemType?: ButtonSystemType })[] = this.rootGroupBox?.controls || [];
+    controls = controls.concat(this.rootGroupBox?.menus || []);
     let hasCloseButton = controls
       .filter(control => {
         let enabled = control.enabled;
@@ -1107,7 +1107,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   override setDisabledStyle(disabledStyle: DisabledStyle) {
-    this.rootGroupBox.setDisabledStyle(disabledStyle);
+    this.rootGroupBox?.setDisabledStyle(disabledStyle);
   }
 
   /** @see FormModel.displayParent */
@@ -1293,7 +1293,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   touch() {
-    this.rootGroupBox.touch();
+    this.rootGroupBox?.touch();
   }
 
   /**
@@ -1309,7 +1309,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * Visits all form-fields of this form in pre-order (top-down).
    */
   visitFields(visitor: (FormField) => TreeVisitResult | void) {
-    this.rootGroupBox.visitFields(visitor);
+    this.rootGroupBox?.visitFields(visitor);
   }
 
   /**

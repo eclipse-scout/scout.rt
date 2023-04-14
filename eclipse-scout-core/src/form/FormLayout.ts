@@ -19,13 +19,13 @@ export class FormLayout extends AbstractLayout {
   }
 
   override layout($container: JQuery) {
-    let htmlContainer = HtmlComponent.get($container),
-      htmlRootGb = this._htmlRootGroupBox(),
-      rootGbSize;
-
     this.form.validateLogicalGrid();
-
-    rootGbSize = htmlContainer.availableSize()
+    let htmlRootGb = this._htmlRootGroupBox();
+    if (!htmlRootGb) {
+      return;
+    }
+    let htmlContainer = HtmlComponent.get($container);
+    let rootGbSize = htmlContainer.availableSize()
       .subtract(htmlContainer.insets())
       .subtract(htmlRootGb.margins());
 
@@ -37,19 +37,22 @@ export class FormLayout extends AbstractLayout {
 
   override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     options = options || {};
-    let htmlContainer = HtmlComponent.get($container),
-      htmlRootGb = this._htmlRootGroupBox(),
-      prefSize;
-
     this.form.validateLogicalGrid();
 
     let titleHeight = this._headerHeight();
     if (options.heightHint) {
       options.heightHint -= titleHeight;
     }
-    prefSize = htmlRootGb.prefSize(options)
-      .add(htmlContainer.insets())
-      .add(htmlRootGb.margins());
+    let htmlContainer = HtmlComponent.get($container);
+    let prefSize;
+    let htmlRootGb = this._htmlRootGroupBox();
+    if (htmlRootGb) {
+      prefSize = htmlRootGb.prefSize(options)
+        .add(htmlContainer.insets())
+        .add(htmlRootGb.margins());
+    } else {
+      prefSize = new Dimension().add(htmlContainer.insets());
+    }
     prefSize.height += titleHeight;
 
     return prefSize;
@@ -57,7 +60,7 @@ export class FormLayout extends AbstractLayout {
 
   protected _htmlRootGroupBox(): HtmlComponent {
     let $rootGroupBox = this.form.$container.children('.root-group-box');
-    return HtmlComponent.get($rootGroupBox);
+    return HtmlComponent.optGet($rootGroupBox);
   }
 
   protected _headerHeight(): number {
