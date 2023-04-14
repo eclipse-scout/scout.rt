@@ -61,6 +61,9 @@ export class DesktopFormController extends FormController implements DesktopForm
   }
 
   protected override _renderPopupWindow(form: Form, position?: number) {
+    if (form.blockRendering) {
+      return;
+    }
     let windowSpecs: string,
       resizeToPrefSize: boolean; // flag used to resize browser-window later (see PopupWindow.js)
 

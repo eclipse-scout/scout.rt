@@ -60,6 +60,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
   uiCssClass: string;
   lifecycle: FormLifecycle;
   detailForm: boolean;
+  /** @internal */
+  blockRendering: boolean;
 
   $statusIcons: JQuery[];
   $header: JQuery;
