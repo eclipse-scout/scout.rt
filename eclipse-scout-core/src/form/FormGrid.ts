@@ -14,6 +14,9 @@ import {Form, GridData, LogicalGrid} from '../index';
  */
 export class FormGrid extends LogicalGrid {
   protected _validate(form: Form) {
+    if (!form.rootGroupBox) {
+      return;
+    }
     // The form does not have a real logical grid but needs the gridData anyway (widthInPixel, heightInPixel, see GroupBoxLayout).
     // Grid.w is not relevant for the form, no need to pass a gridColumnCount
     form.rootGroupBox.gridData = GridData.createFromHints(form.rootGroupBox);

@@ -171,7 +171,7 @@ export class TableField extends FormField implements TableFieldModel {
     this._insertedRows = objects.createMap();
     this._updatedRows = objects.createMap();
     this._checkedRows = objects.createMap();
-    this.table.markRowsAsNonChanged();
+    this.table?.markRowsAsNonChanged();
   }
 
   override getValidationResult(): ValidationResult {
@@ -184,8 +184,8 @@ export class TableField extends FormField implements TableFieldModel {
     let validByMandatory = !this.mandatory || !this.empty;
 
     // check cells
-    let rows = arrays.ensure(this.table.rows);
-    let columns = arrays.ensure(this.table.columns);
+    let rows = arrays.ensure(this.table?.rows);
+    let columns = arrays.ensure(this.table?.columns);
     let reveal = () => {
       // nop
     };
