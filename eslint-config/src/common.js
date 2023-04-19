@@ -52,7 +52,7 @@ module.exports = {
     'no-else-return': 'error',
     'max-len': ['warn', 240, 2, {ignoreUrls: true, ignorePattern: '^import .*'}],
     'semi': ['error', 'always'],
-    'quotes': ['error', 'single'],
+    'quotes': ['warn', 'single'],
     'comma-dangle': ['error', 'never'],
     'object-curly-spacing': ['error', 'never'],
     'operator-linebreak': 'off',
