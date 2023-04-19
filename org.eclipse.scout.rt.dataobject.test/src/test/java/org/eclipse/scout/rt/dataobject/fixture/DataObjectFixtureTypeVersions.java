@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.eclipse.scout.rt.dataobject.AbstractTypeVersion;
+import org.eclipse.scout.rt.dataobject.AbstractTypeVersionTest;
 import org.eclipse.scout.rt.dataobject.DataObjectInventoryTest;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -90,5 +91,40 @@ public final class DataObjectFixtureTypeVersions {
     public Collection<NamespaceVersion> getDependencies() {
       return Collections.emptyList();
     }
+  }
+
+  /**
+   * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
+   */
+  @IgnoreBean
+  public static final class DataObjectFixture_1_3_0__suffix extends AbstractTypeVersion {
+  }
+
+  /**
+   * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
+   */
+  @IgnoreBean
+  public static final class DataObjectFixture_1_3_0__123456 extends AbstractTypeVersion {
+  }
+
+  /**
+   * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
+   */
+  @IgnoreBean
+  public static final class DataObjectFixture_1_3_0__lorem_ipsum extends AbstractTypeVersion {
+  }
+
+  /**
+   * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
+   */
+  @IgnoreBean
+  public static final class DataObjectFixture_1_3_0__loremIpsumDolor_3 extends AbstractTypeVersion {
+  }
+
+  /**
+   * Only used for {@link AbstractTypeVersionTest#testFromClassName()}.
+   */
+  @IgnoreBean
+  public static final class DataObjectFixture_1_3_002__suffix extends AbstractTypeVersion {
   }
 }
