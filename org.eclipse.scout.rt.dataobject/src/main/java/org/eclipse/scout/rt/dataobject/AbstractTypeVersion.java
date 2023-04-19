@@ -78,7 +78,10 @@ public abstract class AbstractTypeVersion implements ITypeVersion {
     return Collections.emptyList();
   }
 
-  private static final Pattern CLASS_NAME_PATTERN = Pattern.compile("(\\w+?)_(\\d+(?:_\\d+)*)");
+  /**
+   * Optional suffix (class name only) starting with __ followed by any word characters.
+   */
+  private static final Pattern CLASS_NAME_PATTERN = Pattern.compile("(\\w+?)_(\\d+(?:_\\d+)*)(?:__\\w+)?");
 
   static NamespaceVersion fromClassName(Class<? extends ITypeVersion> typeVersionClass) {
     if (typeVersionClass == null) {
@@ -92,6 +95,6 @@ public abstract class AbstractTypeVersion implements ITypeVersion {
   }
 
   static List<NamespaceVersion> resolveDependencies(Collection<Class<? extends ITypeVersion>> dependencyClasses) {
-    return Collections.unmodifiableList(dependencyClasses.stream().map(dependencyClass -> BEANS.get(dependencyClass).getVersion()).collect(Collectors.toList()));
+    return dependencyClasses.stream().map(dependencyClass -> BEANS.get(dependencyClass).getVersion()).collect(Collectors.toUnmodifiableList());
   }
 }
