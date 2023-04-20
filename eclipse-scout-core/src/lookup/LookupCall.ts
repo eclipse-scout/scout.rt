@@ -7,20 +7,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, ChildModelOf, FullModelOf, InitModelOf, LookupCallModel, LookupResult, LookupRow, objects, ObjectType, QueryBy, scout, Session, SomeRequired} from '../index';
+import {arrays, ChildModelOf, FullModelOf, InitModelOf, LookupCallModel, LookupResult, LookupRow, objects, ObjectType, ObjectWithType, QueryBy, scout, Session, SomeRequired} from '../index';
 import $ from 'jquery';
 
 /**
- * Base class for lookup calls. A concrete implementation of LookupCall.js which uses resources over a network
+ * Base class for lookup calls. A concrete implementation of LookupCall which uses resources over a network
  * must deal with I/O errors and set, in case of an error, the 'exception' property on the returned lookup result.
  * The lookup call must _always_ return a result, otherwise the SmartField cannot work properly.
  */
-export class LookupCall<TKey> implements LookupCallModel<TKey> {
+export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   declare model: LookupCallModel<TKey>;
   declare initModel: SomeRequired<this['model'], 'session'>;
 
   id: string;
-  objectType: ObjectType<LookupCall<TKey>>;
+  objectType: string;
   session: Session;
   hierarchical: boolean;
   loadIncremental: boolean;

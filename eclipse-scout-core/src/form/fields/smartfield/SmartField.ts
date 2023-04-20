@@ -682,7 +682,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     }
 
     // we must do a lookup first to get the display text
-    // Note: this has a side-effect as it sets the property lookupRow on the smart field
+    // Note: this has a side effect as it sets the property lookupRow on the smart field
     this._lastSearchText = null;
     return this._executeLookup(this.lookupCall.cloneForKey(value), true)
       .then(result => {
@@ -1343,11 +1343,11 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     // enter key in order to select a result (see ticket #229775).
     this._clearPendingLookup();
 
-    let currentLookupCall = (this.original() as SmartField<TValue>)._currentLookupCall;
+    let currentLookupCall = this.original()._currentLookupCall;
 
     if (currentLookupCall) {
       currentLookupCall.abort();
-      (this.original() as SmartField<TValue>)._currentLookupCall = null;
+      this.original()._currentLookupCall = null;
       this.setLoading(false);
     }
 
@@ -1425,12 +1425,12 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this.lookupSeqNo++;
     this.setLoading(true);
 
-    let currentLookupCall = (this.original() as SmartField<TValue>)._currentLookupCall;
+    let currentLookupCall = this.original()._currentLookupCall;
 
     if (abortExisting && currentLookupCall) {
       currentLookupCall.abort();
     }
-    (this.original() as SmartField<TValue>)._currentLookupCall = lookupCall;
+    this.original()._currentLookupCall = lookupCall;
     this.trigger('prepareLookupCall', {
       lookupCall: lookupCall
     });
@@ -1438,7 +1438,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     return lookupCall
       .execute()
       .always(() => {
-        (this.original() as SmartField<TValue>)._currentLookupCall = null;
+        this.original()._currentLookupCall = null;
         this.setLoading(false);
         this._clearLookupStatus();
         this._clearNoResultsErrorStatus();
@@ -1550,7 +1550,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
   protected override _setValue(value: TValue) {
     // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
-    // must of the time. Thus we must remove the reference to the old lookup row as early as possible
+    // most of the time. Thus, we must remove the reference to the old lookup row as early as possible
     if (!this._lockLookupRow) {
       if (objects.isNullOrUndefined(value)) {
         // when value is set to null, we must also reset the cached lookup row
