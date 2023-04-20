@@ -9,15 +9,22 @@
  */
 import {arrays, LookupCall, LookupResult, LookupRow, QueryBy, scout, strings} from '../index';
 import $ from 'jquery';
-import Deferred = JQuery.Deferred;
 
 export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
-
   lookupRows: LookupRow<TKey>[];
+  protected _deferred: JQuery.Deferred<LookupResult<TKey>>;
 
   constructor() {
     super();
     this.lookupRows = [];
+    this._deferred = null;
+  }
+
+  override abort() {
+    this._deferred?.reject({
+      abort: true
+    });
+    super.abort();
   }
 
   setLookupRows(lookupRows: LookupRow<TKey>[] | LookupRow<TKey>) {
@@ -31,13 +38,13 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   // --- ALL ---
 
   protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
-    let deferred = $.Deferred();
-    setTimeout(this._queryByAll.bind(this, deferred));
-    return deferred.promise();
+    this._deferred = $.Deferred();
+    setTimeout(this._queryByAll.bind(this));
+    return this._deferred.promise();
   }
 
-  protected _queryByAll(deferred: Deferred<LookupResult<TKey>>) {
-    deferred.resolve({
+  protected _queryByAll() {
+    this._deferred.resolve({
       queryBy: QueryBy.ALL,
       lookupRows: this._lookupRowsByAll()
     });
@@ -52,13 +59,13 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   // --- TEXT ---
 
   protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
-    let deferred = $.Deferred();
-    setTimeout(this._queryByText.bind(this, deferred, text));
-    return deferred.promise();
+    this._deferred = $.Deferred();
+    setTimeout(this._queryByText.bind(this, text));
+    return this._deferred.promise();
   }
 
-  protected _queryByText(deferred: Deferred<LookupResult<TKey>>, text: string) {
-    deferred.resolve({
+  protected _queryByText(text: string) {
+    this._deferred.resolve({
       queryBy: QueryBy.TEXT,
       text: text,
       lookupRows: this._lookupRowsByText(text)
@@ -76,20 +83,20 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   // --- KEY ---
 
   protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
-    let deferred = $.Deferred();
-    setTimeout(this._queryByKey.bind(this, deferred, key));
-    return deferred.promise();
+    this._deferred = $.Deferred();
+    setTimeout(this._queryByKey.bind(this, key));
+    return this._deferred.promise();
   }
 
-  protected _queryByKey(deferred: Deferred<LookupResult<TKey>>, key: TKey) {
+  protected _queryByKey(key: TKey) {
     let lookupRow = this._lookupRowByKey(key);
     if (lookupRow) {
-      deferred.resolve({
+      this._deferred.resolve({
         queryBy: QueryBy.KEY,
         lookupRows: [lookupRow]
       });
     } else {
-      deferred.reject();
+      this._deferred.reject();
     }
   }
 
@@ -100,13 +107,13 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   // --- REC ---
 
   protected override _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
-    let deferred = $.Deferred();
-    setTimeout(this._queryByRec.bind(this, deferred, rec));
-    return deferred.promise();
+    this._deferred = $.Deferred();
+    setTimeout(this._queryByRec.bind(this, rec));
+    return this._deferred.promise();
   }
 
-  protected _queryByRec(deferred: Deferred<LookupResult<TKey>>, rec: TKey) {
-    deferred.resolve({
+  protected _queryByRec(rec: TKey) {
+    this._deferred.resolve({
       queryBy: QueryBy.REC,
       rec: rec,
       lookupRows: this._lookupRowsByRec(rec)

@@ -49,7 +49,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
   protected _restriction: Record<string, any>;
   protected _ajaxCall: AjaxCall;
-  protected _deferred: Deferred<LookupResult<TKey>, { canceled: boolean }>;
+  protected _deferred: Deferred<LookupResult<TKey>, { abort: boolean }>;
 
   constructor() {
     super();
@@ -190,7 +190,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
   override abort() {
     this._deferred.reject({
-      canceled: true
+      abort: true
     });
     this._ajaxCall.abort();
     super.abort();

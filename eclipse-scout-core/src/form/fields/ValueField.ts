@@ -568,7 +568,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
       this._updateDisplayTextPending = true;
       // Promise is returned -> set display text later
       returned
-        .done(this.setDisplayText.bind(this))
+        .done(text => this.setDisplayText(text))
         .fail(() => {
           // If display text was updated in the meantime, don't override the text with an empty string
           if (this._updateDisplayTextPending) {

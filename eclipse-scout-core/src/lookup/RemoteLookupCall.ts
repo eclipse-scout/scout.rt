@@ -13,7 +13,7 @@ import Deferred = JQuery.Deferred;
 
 export class RemoteLookupCall<TKey> extends LookupCall<TKey> {
   adapter: LookupFieldAdapter;
-  deferred: Deferred<LookupResult<TKey>, { canceled: boolean }> & { requestParameter?: RemoteLookupRequest<string | TKey | void> };
+  deferred: Deferred<LookupResult<TKey>, { abort: boolean }> & { requestParameter?: RemoteLookupRequest<string | TKey | void> };
 
   constructor(adapter: LookupFieldAdapter) {
     super();
@@ -78,7 +78,7 @@ export class RemoteLookupCall<TKey> extends LookupCall<TKey> {
   protected _newDeferred(requestParameter: RemoteLookupRequest<string | TKey | void>) {
     if (this.deferred) {
       this.deferred.reject({
-        canceled: true
+        abort: true
       });
     }
     this.deferred = $.Deferred();

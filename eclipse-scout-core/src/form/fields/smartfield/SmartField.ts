@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport, LookupCall, LookupCallOrModel,
-  LookupResult, LookupRow, MaxLengthHandler, objects, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldEventMap, SmartFieldLayout,
-  SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValidationFailedStatus, ValueField
+  AjaxError, arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport, LookupCall,
+  LookupCallOrModel, LookupResult, LookupRow, MaxLengthHandler, objects, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldEventMap,
+  SmartFieldLayout, SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValidationFailedStatus, ValueField
 } from '../../../index';
 import $ from 'jquery';
 
@@ -693,7 +693,17 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
         this._triggerLookupCallDone(result);
         return formattedValue;
       })
-      .catch(() => {
+      .catch((error: any) => {
+        $.log.isDebugEnabled() && $.log.debug('FormatValue failed for SmartField with id ' + this.id, error);
+        if (!this._updateDisplayTextPending) {
+          // If a new value was set in the meantime, the previous lookup call was aborted -> don't mark the field as invalid because only the new lookup matters
+          return '';
+        }
+        if (error && error.abort || error instanceof AjaxError && error.textStatus === 'abort') {
+          // If a new value was set in the meantime but the display text of the new value not resolved yet, ignore the abort event of the first lookup to not show invalid key message while the second lookup is still in progress.
+          // Depending on the implementation of the lookup call, abort could either reject with an object containing abort, or the AjaxCall is rejected directly.
+          return '';
+        }
         return this._invalidKeyLookup(value);
       });
   }

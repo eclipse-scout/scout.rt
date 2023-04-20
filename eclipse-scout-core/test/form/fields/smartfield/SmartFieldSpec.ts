@@ -7,8 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {fields, keys, LookupResult, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, ValidationFailedStatus} from '../../../../src/index';
-import {AbortableMicrotaskStaticLookupCall, ColumnDescriptorDummyLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
+import {
+  fields, keys, LookupResult, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, StaticLookupCall, Status, strings, ValidationFailedStatus
+} from '../../../../src/index';
+import {ColumnDescriptorDummyLookupCall, DelayedStaticLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting, MicrotaskStaticLookupCall} from '../../../../src/testing/index';
 import {LookupCall} from '../../../../src/lookup/LookupCall';
 import {SmartFieldLookupResult} from '../../../../src/form/fields/smartfield/SmartField';
 import {FullModelOf, InitModelOf, ObjectOrModel} from '../../../../src/scout';
@@ -174,7 +176,7 @@ describe('SmartField', () => {
     it('updates display text correctly even after consecutive setValue calls', done => {
       jasmine.clock().uninstall();
       field = createFieldWithLookupCall({}, {
-        objectType: AbortableMicrotaskStaticLookupCall,
+        objectType: MicrotaskStaticLookupCall,
         data: [[1, 'Foo'], [2, 'Bar', 1]]
       });
       field.setValue(1);
@@ -619,6 +621,68 @@ describe('SmartField', () => {
       jasmine.clock().tick(500);
       expect(field.errorStatus).toBeInstanceOf(ValidationFailedStatus);
       expect(field.errorStatus.isWarning()).toBeTrue();
+    });
+
+    it('lookupByKey should not set a validation warning status if lookup was aborted', async () => {
+      jasmine.clock().uninstall();
+      let field = createFieldWithLookupCall({}, {
+        objectType: MicrotaskStaticLookupCall,
+        data: [[1, 'Foo'], [2, 'Bar', 1]]
+      });
+      field.setValue(1);
+      field.setValue(2);
+      await field.when('propertyChange:displayText');
+      expect(field.errorStatus).toBe(null);
+      expect(field.value).toBe(2);
+      expect(field.displayText).toBe('Bar');
+
+      // Check again after catch() in _formatValue has been executed
+      await sleep();
+      expect(field.errorStatus).toBe(null);
+      expect(field.value).toBe(2);
+      expect(field.displayText).toBe('Bar');
+    });
+
+    it('lookupByKey should not set a validation warning status if a second setValue call sets a valid value with setTimeout', async () => {
+      jasmine.clock().uninstall();
+      let field = createFieldWithLookupCall({}, {
+        objectType: MicrotaskStaticLookupCall
+      });
+      field.setValue(1);
+      await sleep();
+      (field.lookupCall as StaticLookupCall<any>).data = [[1, 'Foo'], [2, 'Bar', 1]];
+      field.setValue(2);
+
+      await field.when('propertyChange:displayText');
+      expect(field.errorStatus).toBe(null);
+      expect(field.value).toBe(2);
+      expect(field.displayText).toBe(''); // Set to empty string by catch in _formatValue first
+
+      await field.when('propertyChange:displayText');
+      expect(field.errorStatus).toBe(null);
+      expect(field.value).toBe(2);
+      expect(field.displayText).toBe('Bar');
+    });
+
+    it('lookupByKey should not set a validation warning status if first lookup was aborted and second still running', async () => {
+      jasmine.clock().uninstall();
+      let field = createFieldWithLookupCall({}, {
+        objectType: DelayedStaticLookupCall,
+        data: [[1, 'Foo'], [2, 'Bar', 1]]
+      });
+      field.setValue(1);
+      field.setValue(2); // aborts previous set value
+      let lookupCall = (field._currentLookupCall as DelayedStaticLookupCall<any>);
+      await sleep(); // triggers abort, catch in _formatValue may not be executed yet
+      expect(field.errorStatus).toBe(null);
+      expect(field.value).toBe(2);
+      expect(field.displayText).toBe('');
+
+      lookupCall.resolve(); // Executes lookup -> triggers catch in _formatValue, updateDisplayTextPending is not true anymore -> don't set invalid text because lookup call is aborted
+      await field.when('propertyChange:displayText');
+      expect(field.errorStatus).toBe(null);
+      expect(field.value).toBe(2);
+      expect(field.displayText).toBe('Bar');
     });
 
     function createFieldWithNoDataKeyLookupCall(rejectPromise: boolean): SmartField<any> {
