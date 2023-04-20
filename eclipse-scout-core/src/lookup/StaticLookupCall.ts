@@ -9,7 +9,6 @@
  */
 import {arrays, HierarchicalLookupResultBuilder, InitModelOf, LookupCall, LookupResult, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
 import $ from 'jquery';
-import Deferred = JQuery.Deferred;
 
 /**
  * Base class for lookup calls with static or local data. Implement the _data() and _dataToLookupRow()
@@ -21,10 +20,11 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
 
   delay: number;
   data: any[];
+  protected _deferred: JQuery.Deferred<LookupResult<TKey>>;
 
   constructor() {
     super();
-
+    this._deferred = null;
     this.delay = 0;
     this.data = null;
     this.active = true;
@@ -46,14 +46,21 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     }
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
-    let deferred = $.Deferred();
-    setTimeout(this._queryByAll.bind(this, deferred), this.delay);
-    return deferred.promise();
+  override abort() {
+    this._deferred?.reject({
+      abort: true
+    });
+    super.abort();
   }
 
-  protected _queryByAll(deferred: Deferred<LookupResult<TKey>>) {
-    deferred.resolve({
+  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
+    this._deferred = $.Deferred();
+    setTimeout(this._queryByAll.bind(this), this.delay);
+    return this._deferred.promise();
+  }
+
+  protected _queryByAll() {
+    this._deferred.resolve({
       queryBy: QueryBy.ALL,
       lookupRows: this._lookupRowsByAll()
     });
@@ -74,17 +81,17 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
-    let deferred = $.Deferred();
-    setTimeout(this._queryByText.bind(this, deferred, text), this.delay);
-    return deferred.promise();
+    this._deferred = $.Deferred();
+    setTimeout(this._queryByText.bind(this, text), this.delay);
+    return this._deferred.promise();
   }
 
-  protected _queryByText(deferred: Deferred<LookupResult<TKey>>, text: string) {
+  protected _queryByText(text: string) {
     let lookupRows = this._lookupRowsByText(text);
 
     // resolve non-hierarchical results immediately
     if (!this.hierarchical) {
-      deferred.resolve({
+      this._deferred.resolve({
         queryBy: QueryBy.TEXT,
         text: text,
         lookupRows: lookupRows
@@ -104,7 +111,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     promise
       .then(lookupRows => builder.addParentLookupRows(lookupRows))
       .done(lookupRows => {
-        deferred.resolve({
+        this._deferred.resolve({
           queryBy: QueryBy.TEXT,
           text: text,
           lookupRows: lookupRows
@@ -150,20 +157,20 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
-    let deferred = $.Deferred();
-    setTimeout(this._queryByKey.bind(this, deferred, key), this.delay);
-    return deferred.promise();
+    this._deferred = $.Deferred();
+    setTimeout(this._queryByKey.bind(this, key), this.delay);
+    return this._deferred.promise();
   }
 
-  protected _queryByKey(deferred: Deferred<LookupResult<TKey>>, key: TKey) {
+  protected _queryByKey(key: TKey) {
     let lookupRow = this._lookupRowByKey(key);
     if (lookupRow) {
-      deferred.resolve({
+      this._deferred.resolve({
         queryBy: QueryBy.KEY,
         lookupRows: [lookupRow]
       });
     } else {
-      deferred.reject();
+      this._deferred.reject();
     }
   }
 
@@ -176,13 +183,13 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected override _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
-    let deferred = $.Deferred();
-    setTimeout(this._queryByRec.bind(this, deferred, rec), this.delay);
-    return deferred.promise();
+    this._deferred = $.Deferred();
+    setTimeout(this._queryByRec.bind(this, rec), this.delay);
+    return this._deferred.promise();
   }
 
-  protected _queryByRec(deferred: Deferred<LookupResult<TKey>>, rec: TKey) {
-    deferred.resolve({
+  protected _queryByRec(rec: TKey) {
+    this._deferred.resolve({
       queryBy: QueryBy.REC,
       rec: rec,
       lookupRows: this._lookupRowsByRec(rec)

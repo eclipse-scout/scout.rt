@@ -12,6 +12,7 @@ import {
 } from '../index';
 import {jasmineScoutMatchers, LocaleSpecHelper, TestingApp} from './index';
 import 'jasmine-jquery';
+import $ from 'jquery';
 
 declare global {
 
@@ -57,6 +58,8 @@ declare global {
   function uninstallUnloadHandlers(session: Session);
 
   function createPropertyChangeEvent(model: { id: string }, properties: object);
+
+  function sleep(duration?: number): JQuery.Promise<void>;
 }
 
 export interface SandboxSessionOptions {
@@ -222,6 +225,12 @@ window.createPropertyChangeEvent = (model, properties) => ({
   properties: properties,
   type: 'property'
 });
+
+window.sleep = duration => {
+  let deferred = $.Deferred();
+  setTimeout(() => deferred.resolve(), duration);
+  return deferred.promise();
+};
 
 export const JasmineScout = {
   runTestSuite(context) {
