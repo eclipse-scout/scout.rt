@@ -9,17 +9,17 @@
  */
 import {
   AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf, objects,
-  ObjectType, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, ValueField
+  ObjectWithType, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, ValueField
 } from '../../index';
 import $ from 'jquery';
 
-export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue> {
+export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType {
   declare model: ColumnModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'session'>;
   declare eventMap: ColumnEventMap;
   declare self: Column<any>;
 
-  objectType: ObjectType<Column<TValue>>;
+  objectType: string;
   id: string;
   autoOptimizeWidth: boolean;
   /** true if content of the column changed and width has to be optimized */

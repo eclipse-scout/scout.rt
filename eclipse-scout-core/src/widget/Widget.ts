@@ -27,9 +27,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   children: Widget[];
   /**
    * Will be set on the clone after a widget has been cloned.
-   * @type {Widget}
    */
-  cloneOf: Widget;
+  cloneOf: this;
   cssClass: string;
   destroyed: boolean;
   destroying: boolean;
@@ -1774,8 +1773,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * @returns the original widget from which this one was cloned. If it is not a clone, itself is returned.
    */
-  original(): Widget {
-    let original: Widget = this;
+  original(): this {
+    let original = this;
     while (original.cloneOf) {
       original = original.cloneOf;
     }
