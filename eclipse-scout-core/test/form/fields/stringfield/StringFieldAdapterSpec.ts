@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {StringField} from '../../../../src/index';
+import {StringField, StringFieldAdapter} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 import {FullModelOf, InitModelOf} from '../../../../src/scout';
 
@@ -60,6 +60,23 @@ describe('StringFieldAdapter', () => {
         field.modelAdapter.onModelPropertyChange(event);
         expect($fieldElement.value).toBe('hellohello');
       });
+    });
+  });
+
+  describe('current menu types', () => {
+
+    it('is initialized correctly', () => {
+      let model = {
+        id: '123',
+        objectType: 'StringField',
+        session: session,
+        currentMenuTypes: ['ValueField.Null']
+      };
+      let adapter = new StringFieldAdapter();
+      adapter.init(model);
+      let field = adapter.createWidget(model, session.desktop) as StringField;
+
+      expect(field.getCurrentMenuTypes()).toEqual(['ValueField.Null']);
     });
   });
 });

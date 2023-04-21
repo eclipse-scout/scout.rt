@@ -12,7 +12,8 @@ import {BasicFieldAdapter, Event, StringField, StringFieldModel, StringFieldSele
 export class StringFieldAdapter extends BasicFieldAdapter {
   declare widget: StringField;
 
-  protected override _initProperties(model: StringFieldModel & { insertText?: boolean }) {
+  protected override _initProperties(model: StringFieldModel & { currentMenuTypes: string[]; insertText?: boolean }) {
+    super._initProperties(model);
     if (model.insertText !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
       delete model.insertText;

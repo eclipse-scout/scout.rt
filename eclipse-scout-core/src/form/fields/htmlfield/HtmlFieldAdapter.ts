@@ -11,7 +11,8 @@ import {AppLinkActionEvent, Event, HtmlField, HtmlFieldModel, ValueFieldAdapter}
 
 export class HtmlFieldAdapter extends ValueFieldAdapter {
 
-  protected override _initProperties(model: HtmlFieldModel & { scrollToEnd?: boolean }) {
+  protected override _initProperties(model: HtmlFieldModel & { currentMenuTypes: string[]; scrollToEnd?: boolean }) {
+    super._initProperties(model);
     if (model.scrollToEnd !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#scrollToEnd() to be replaced)
       delete model.scrollToEnd;
