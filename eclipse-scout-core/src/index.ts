@@ -428,6 +428,7 @@ export * from './form/lifecycle/CloseMenu';
 export * from './form/lifecycle/OkMenu';
 export * from './form/lifecycle/ResetMenu';
 export * from './form/lifecycle/SaveMenu';
+export * from './form/lifecycle/SearchMenu';
 export * from './form/DialogLayout';
 export * from './form/ResponsiveManager';
 export * from './form/ResponsiveHandler';

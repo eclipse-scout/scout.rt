@@ -467,6 +467,15 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
+   * Validates the form.
+   *
+   * @returns a promise resolved with `true` if the form is valid, `false` otherwise.
+   */
+  validate(): JQuery.Promise<boolean> {
+    return this.lifecycle.validate();
+  }
+
+  /**
    * This function is called by the lifecycle, for instance when the 'ok' function is called.
    * The function is called every time the 'ok' function is called, which means it runs even when
    * there is not a single touched field. The function should be used to implement an overall validate

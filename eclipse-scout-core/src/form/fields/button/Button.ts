@@ -65,8 +65,7 @@ export class Button extends FormField implements ButtonModel {
     CLOSE: 2,
     OK: 3,
     RESET: 4,
-    SAVE: 5,
-    SAVE_WITHOUT_MARKER_CHANGE: 6
+    SAVE: 5
   } as const;
 
   static DisplayStyle = {

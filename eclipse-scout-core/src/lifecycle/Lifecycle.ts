@@ -266,6 +266,14 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
       });
   }
 
+  /**
+   * @returns a promise resolved with `true` if the {@link widget} is valid, `false` otherwise.
+   */
+  validate(): JQuery.Promise<boolean> {
+    return this._whenInvalid(this._validate)
+      .then(invalid => !invalid);
+  }
+
   protected _validate(): JQuery.Promise<Status> {
     let status = this._validateElements();
     if (status.isValid()) {
