@@ -12,7 +12,8 @@ import {FormFieldModel, LookupFieldAdapter, RemoteLookupCall, scout, TagField, T
 export class TagFieldAdapter extends LookupFieldAdapter {
   declare widget: TagField;
 
-  protected override _initProperties(model: FormFieldModel & { insertText?: boolean }) {
+  protected override _initProperties(model: FormFieldModel & { currentMenuTypes: string[]; insertText?: boolean }) {
+    super._initProperties(model);
     if (model.insertText !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
       delete model.insertText;
