@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.rest.fixture;
 
-import static org.mockito.Mockito.mock;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Link.Builder;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant.VariantListBuilder;
@@ -50,7 +53,16 @@ public class FixtureRuntimeDelegate extends RuntimeDelegate {
   @Override
   @SuppressWarnings("unchecked")
   public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> type) throws IllegalArgumentException {
-    return mock(HeaderDelegate.class);
+    HeaderDelegate<T> delegate = mock(HeaderDelegate.class);
+    doAnswer(a -> {
+      if (a.getArgument(0) instanceof MediaType) {
+        MediaType mediaType = a.getArgument(0);
+        assertTrue(mediaType.getParameters().isEmpty(), "toString for media type parameters currently not mocked");
+        return mediaType.getType() + "/" + mediaType.getSubtype();
+      }
+      throw new UnsupportedOperationException("not mocked");
+    }).when(delegate).toString(any());
+    return delegate;
   }
 
   @Override
