@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
 import {
-  CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, NotificationBadgeStatus, NullWidget, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, SequenceBox, Session, SplitBox, Status, StringField,
-  TabBox, TabItem, webstorage, WrappedFormField
+  CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, NotificationBadgeStatus, NullWidget, NumberField, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session,
+  SplitBox, Status, StringField, TabBox, TabItem, webstorage, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -851,6 +851,9 @@ describe('Form', () => {
           }, {
             id: 'savemenu',
             objectType: SaveMenu
+          }, {
+            id: 'searchmenu',
+            objectType: SearchMenu
           }],
           fields: [{
             id: 'stringfield1',
@@ -877,6 +880,7 @@ describe('Form', () => {
           expect(form.widget('closemenu').enabled).toBe(true);
           expect(form.widget('resetmenu').enabled).toBe(true);
           expect(form.widget('savemenu').enabled).toBe(true);
+          expect(form.widget('searchmenu').enabled).toBe(true);
 
           // enabledComputed
           expect(form.enabledComputed).toBe(false);
@@ -888,6 +892,7 @@ describe('Form', () => {
           expect(form.widget('closemenu').enabledComputed).toBe(true);
           expect(form.widget('resetmenu').enabledComputed).toBe(false);
           expect(form.widget('savemenu').enabledComputed).toBe(false);
+          expect(form.widget('searchmenu').enabledComputed).toBe(false);
 
           return form.close().then(() => {
             expect(session.desktop.activeForm).toBe(null);
@@ -1661,6 +1666,69 @@ describe('Form', () => {
       expect(stringField.value).toBe('you');
       expect(menuField.value).toBe('there');
       expect(form.saveNeeded).toBe(false);
+    });
+  });
+
+  describe('validate', () => {
+
+    let form: Form;
+    let mandatoryStringField: StringField;
+    let numberField: NumberField;
+
+    beforeEach(() => {
+      form = helper.createFormWithOneField();
+
+      mandatoryStringField = form.rootGroupBox.fields[0] as StringField;
+      mandatoryStringField.setMandatory(true);
+
+      numberField = helper.createField(NumberField);
+      numberField.setOwner(form.rootGroupBox);
+      form.rootGroupBox.insertField(numberField);
+    });
+
+    it('returns true if all fields are valid', async () => {
+      mandatoryStringField.setValue('whatever');
+      numberField.setValue(42);
+
+      const valid = await form.validate();
+      expect(valid).toBeTrue();
+    });
+
+    it('returns false if mandatory field is empty', done => {
+      jasmine.clock().install();
+
+      numberField.setValue(42);
+
+      form.validate()
+        .then(valid => {
+          expect(valid).toBeFalse();
+        })
+        .catch(fail)
+        .then(done);
+
+      jasmine.clock().tick(1000);
+      helper.closeMessageBoxes();
+      jasmine.clock().tick(1000);
+      jasmine.clock().uninstall();
+    });
+
+    it('returns false if field is invalid', done => {
+      jasmine.clock().install();
+
+      mandatoryStringField.setValue('whatever');
+      numberField.setValue('whatever');
+
+      form.validate()
+        .then(valid => {
+          expect(valid).toBeFalse();
+        })
+        .catch(fail)
+        .then(done);
+
+      jasmine.clock().tick(1000);
+      helper.closeMessageBoxes();
+      jasmine.clock().tick(1000);
+      jasmine.clock().uninstall();
     });
   });
 });
