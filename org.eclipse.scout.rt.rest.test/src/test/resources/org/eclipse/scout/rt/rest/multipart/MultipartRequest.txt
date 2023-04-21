@@ -1,0 +1,29 @@
+--3372ccc6dada4847b1893ff57a81e553
+Content-Disposition: form-data; name="plaintext"; filename="text.txt"
+Content-Type: text/plain
+
+lorem ipsum dolor
+sit amet
+--3372ccc6dada4847b1893ff57a81e553
+Content-Disposition: form-data; name="json"; filename="json.json"
+Content-Type: application/json
+
+{ "lorem": "ipsum"}
+--3372ccc6dada4847b1893ff57a81e553
+Content-Disposition: form-data; name="umlaute-öäü"; filename="äpfel😀.txt"
+Content-Type: text/plain
+
+Äpfel
+--3372ccc6dada4847b1893ff57a81e553
+Content-Disposition: form-data; name="lorem"
+
+lorem value
+--3372ccc6dada4847b1893ff57a81e553
+Content-Disposition: form-data; name="ipsum"
+
+ipsum välüe
+--3372ccc6dada4847b1893ff57a81e553
+Content-Disposition: form-data; name="dol"or"
+
+dolor"value
+--3372ccc6dada4847b1893ff57a81e553--

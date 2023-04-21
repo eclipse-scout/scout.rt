@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.jersey.client;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Set;
@@ -19,7 +19,6 @@ import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;
 import org.eclipse.scout.rt.rest.client.AntiCsrfClientFilter;
 import org.eclipse.scout.rt.rest.client.HttpHeadersRequestFilter;
@@ -27,6 +26,7 @@ import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
 import org.eclipse.scout.rt.rest.jackson.ObjectMapperResolver;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.LanguageAndCorrelationIdRestRequestFilter;
+import org.eclipse.scout.rt.rest.jersey.client.multipart.MultipartMessageBodyWriter;
 import org.junit.Test;
 
 /**
@@ -44,12 +44,12 @@ public class AbstractRestClientHelperTest {
   public void testBuildClient() {
     JerseyTestRestClientHelper restClientHelper = BEANS.get(JerseyTestRestClientHelper.class);
     Set<Class<?>> actualClasses = restClientHelper.rawClient().getConfiguration().getClasses();
-    Set<Class<?>> expectedClasses = Set.of(ScoutInvocationBuilderListener.class, ScoutJobExecutorServiceProvider.class);
-    assertTrue(CollectionUtility.equalsCollection(expectedClasses, actualClasses));
+    Set<Class<?>> expectedClasses = Set.of(ScoutInvocationBuilderListener.class, ScoutJobExecutorServiceProvider.class, MultipartMessageBodyWriter.class);
+    assertEquals(expectedClasses, actualClasses);
 
     Set<Class<?>> actualInstances = restClientHelper.rawClient().getConfiguration().getInstances().stream().map(Object::getClass).collect(Collectors.toSet());
     Set<Class<?>> expectedInstances = Set.of(ObjectMapperResolver.class, AntiCsrfClientFilter.class, HttpHeadersRequestFilter.class, LanguageAndCorrelationIdRestRequestFilter.class);
-    assertTrue(CollectionUtility.equalsCollection(expectedInstances, actualInstances));
+    assertEquals(expectedInstances, actualInstances);
   }
 
   @Test
