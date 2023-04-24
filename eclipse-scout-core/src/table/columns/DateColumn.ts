@@ -73,7 +73,7 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
     return this.format.format(value);
   }
 
-  protected override _parseValue(text: Date): Date {
+  protected override _ensureValue(text: Date | string): Date {
     return dates.ensure(text);
   }
 

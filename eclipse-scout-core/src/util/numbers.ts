@@ -83,25 +83,25 @@ export const numbers = {
   },
 
   /**
-   * Rounds a number to the given number of decimal places.
+   * Rounds a number to the given number of fraction digits.
    *
    * Numbers should not be rounded with the built-in Number.toFixed() method, since it
    * behaves differently on different browsers. However, it is safe to apply toFixed()
-   * to the result of this method to ensure a fixed number of decimal places (filled up
+   * to the result of this method to ensure a fixed number of fraction digits (filled up
    * with 0's) because this operation does not involve any rounding anymore.
    * <p>
-   * If decimalPlaces is omitted, the number will be rounded to integer by default.
+   * If fractionDigits is omitted, the number will be rounded to integer by default.
    * Rounding mode {@link RoundingMode.HALF_UP} is used as default.
    */
-  round(number: number, roundingMode?: RoundingMode, decimalPlaces?: number): number {
+  round(number: number, roundingMode?: RoundingMode, fractionDigits?: number): number {
     if (number === null || number === undefined) {
       return number;
     }
-    decimalPlaces = decimalPlaces || 0;
+    fractionDigits = fractionDigits || 0;
 
     // Do _not_ multiply with powers of 10 here, because that might cause rounding errors!
-    // Example: 1.005 with 2 decimal places would result in 100.49999999999999
-    number = numbers.shiftDecimalPoint(number, decimalPlaces);
+    // Example: 1.005 with 2 fraction digits would result in 100.49999999999999
+    number = numbers.shiftDecimalPoint(number, fractionDigits);
 
     switch (roundingMode) {
       case RoundingMode.UP:
@@ -143,7 +143,7 @@ export const numbers = {
         }
     }
 
-    return numbers.shiftDecimalPoint(number, -decimalPlaces);
+    return numbers.shiftDecimalPoint(number, -fractionDigits);
   },
 
   /**

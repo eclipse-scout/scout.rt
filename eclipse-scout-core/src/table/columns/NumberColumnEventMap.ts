@@ -13,4 +13,5 @@ export interface NumberColumnEventMap extends ColumnEventMap {
   'propertyChange:aggregationFunction': PropertyChangeEvent<NumberColumnAggregationFunction>;
   'propertyChange:backgroundEffect': PropertyChangeEvent<NumberColumnBackgroundEffect>;
   'propertyChange:decimalFormat': PropertyChangeEvent<DecimalFormat>;
+  'propertyChange:fractionDigits': PropertyChangeEvent<number>;
 }

@@ -7,9 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DecimalFormat, Locale, NumberField, objects} from '../../../index';
+import {DecimalFormat, Locale, NumberField} from '../../../index';
 
 export class IntegerField extends NumberField {
+
+  declare fractionDigits: 0;
 
   static MIN_VALUE = Number.MIN_SAFE_INTEGER;
   static MAX_VALUE = Number.MAX_SAFE_INTEGER;
@@ -18,17 +20,14 @@ export class IntegerField extends NumberField {
     super();
     this.minValue = IntegerField.MIN_VALUE;
     this.maxValue = IntegerField.MAX_VALUE;
+    this.fractionDigits = 0;
   }
 
   protected override _getDefaultFormat(locale: Locale): string | DecimalFormat {
     return '#,##0';
   }
 
-  protected override _parseValue(displayText: string): number {
-    let result = super._parseValue(displayText);
-    if (objects.isNullOrUndefined(result)) {
-      return null;
-    }
-    return this.decimalFormat.round(result, false);
+  protected override _setFractionDigits(fractionDigits: number) {
+    super._setFractionDigits(0);
   }
 }
