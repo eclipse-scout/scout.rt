@@ -348,7 +348,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   protected final JsonEvent addActionEvent(String eventName, IJsonAdapter<?> referenceAdapter, JSONObject eventData) {
     JsonEvent event;
-    if (referenceAdapter == null) {
+    if (isDisposed()) {
+      // Create dummy event to prevent NPEs
+      event = new JsonEvent(getId(), eventName, new JSONObject());
+      LOG.debug("Adding action event ignored '{}' for disposed {} with id {}. Model: {}", eventName, getObjectType(), getId(), getModel());
+    }
+    else if (referenceAdapter == null) {
       event = getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
       LOG.debug("Added action event '{}' for {} with id {}. Model: {}", eventName, getObjectType(), getId(), getModel());
     }
@@ -376,6 +381,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected JsonEvent addPropertyChangeEvent(String propertyName, Object newValue) {
+    if (isDisposed()) {
+      LOG.debug("Adding property change event ignored '{}' for disposed {} with id {}. Model: {}", propertyName, getObjectType(), getId(), getModel());
+      // Create dummy event to prevent NPEs
+      return new JsonPropertyChangeEvent(getId());
+    }
     if (newValue instanceof IJsonAdapter<?>) {
       throw new IllegalArgumentException("Cannot pass an adapter instance to a JSON response");
     }
