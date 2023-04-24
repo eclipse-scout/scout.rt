@@ -11,6 +11,7 @@ import {BasicFieldEventMap, DecimalFormat, PropertyChangeEvent} from '../../../i
 
 export interface NumberFieldEventMap extends BasicFieldEventMap<number> {
   'propertyChange:decimalFormat': PropertyChangeEvent<DecimalFormat>;
+  'propertyChange:fractionDigits': PropertyChangeEvent<number>;
   'propertyChange:maxValue': PropertyChangeEvent<number>;
   'propertyChange:minValue': PropertyChangeEvent<number>;
 }

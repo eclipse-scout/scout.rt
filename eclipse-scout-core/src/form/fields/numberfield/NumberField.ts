@@ -18,6 +18,7 @@ export class NumberField extends BasicField<number, number | string> implements 
   minValue: number;
   maxValue: number;
   decimalFormat: DecimalFormat;
+  fractionDigits: number;
 
   constructor() {
     super();
@@ -25,6 +26,7 @@ export class NumberField extends BasicField<number, number | string> implements 
     this.minValue = null;
     this.maxValue = null;
     this.decimalFormat = null;
+    this.fractionDigits = null;
     this.invalidValueMessageKey = 'InvalidNumberMessageX';
     this.gridDataHints.horizontalAlignment = 1; // number fields are right aligned by default.
   }
@@ -33,15 +35,15 @@ export class NumberField extends BasicField<number, number | string> implements 
     super._init(model);
     this._setMinValue(this.minValue);
     this._setMaxValue(this.maxValue);
-    this._setDecimalFormat(this.decimalFormat);
   }
 
   /**
-   * Initializes the decimal format before calling set value.
+   * Initializes the decimal format and the fraction digits before calling set value.
    * This cannot be done in _init because the value field would call _setValue first
    */
   protected override _initValue(value: number) {
     this._setDecimalFormat(this.decimalFormat);
+    this._setFractionDigits(this.fractionDigits);
     super._initValue(value);
   }
 
@@ -88,8 +90,19 @@ export class NumberField extends BasicField<number, number | string> implements 
     this._setProperty('decimalFormat', decimalFormat);
 
     if (this.initialized) {
-      // if format changes on the fly, just update the display text
-      this._updateDisplayText();
+      this.setValue(this.value);
+    }
+  }
+
+  setFractionDigits(fractionDigits: number) {
+    this.setProperty('fractionDigits', fractionDigits);
+  }
+
+  protected _setFractionDigits(fractionDigits: number) {
+    this._setProperty('fractionDigits', fractionDigits);
+
+    if (this.initialized) {
+      this.setValue(this.value);
     }
   }
 
@@ -126,6 +139,9 @@ export class NumberField extends BasicField<number, number | string> implements 
     if (!numbers.isNumber(typedValue)) {
       // might be NaN if the string is no valid number
       throw this.session.text(this.invalidValueMessageKey, value);
+    }
+    if (numbers.isNumber(this.fractionDigits)) {
+      typedValue = numbers.round(typedValue, this.decimalFormat.roundingMode, this.fractionDigits);
     }
     return typedValue;
   }

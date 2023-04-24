@@ -754,13 +754,13 @@ export class TableAdapter extends ModelAdapter {
         let model;
         if (objects.isPlainObject(vararg)) {
           model = vararg;
-          model.value = this._parseValue(model.value);
+          model.value = this._ensureValue(model.value);
           // Parse the value if a text but no value is provided. The server does only set the text if value and text are equal.
           // It is also necessary for custom columns which don't have a UI representation and never send the value.
           // Do not parse the value if there is an error status.
           // If editing fails, the display text will be the user input, the value unchanged, and the server will set the error status.
           if (model.text && model.value === undefined && !model.errorStatus) {
-            model.value = this._parseValue(model.text);
+            model.value = this._ensureValue(model.text);
           }
           // use null instead of undefined
           if (model.value === undefined) {
@@ -768,7 +768,7 @@ export class TableAdapter extends ModelAdapter {
           }
         } else {
           model = {
-            value: this._parseValue(vararg)
+            value: this._ensureValue(vararg)
           };
         }
         defaultValues.applyTo(model, 'Cell');

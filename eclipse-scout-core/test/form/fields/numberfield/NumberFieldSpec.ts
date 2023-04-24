@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, JQueryTesting, LocaleSpecHelper} from '../../../../src/testing/index';
-import {DecimalFormat, Locale, NumberField, scout, Status} from '../../../../src/index';
+import {DecimalFormat, Locale, NumberField, RoundingMode, scout, Status} from '../../../../src/index';
 
 describe('NumberField', () => {
   let session: SandboxSession;
@@ -251,6 +251,143 @@ describe('NumberField', () => {
       expect(field.decimalFormat.multiplier).toBe(1);
     });
 
+  });
+
+  describe('fractionDigits', () => {
+    let field;
+
+    beforeEach(() => {
+      field = helper.createField(NumberField);
+    });
+
+    it('is applied on setValue', () => {
+      field.setValue(123.456789);
+      expect(field.value).toBe(123.456789);
+
+      field.setFractionDigits(3);
+      field.setValue(123.456789);
+      expect(field.value).toBe(123.457);
+
+      field.setFractionDigits(5);
+      field.setValue(123.456789);
+      expect(field.value).toBe(123.45679);
+
+      field.setFractionDigits(1);
+      field.setValue(123.456789);
+      expect(field.value).toBe(123.5);
+    });
+
+    it('is applied on user input', () => {
+      field.render();
+
+      field.$field.val('123.456789');
+      field.acceptInput();
+      expect(field.value).toBe(123.456789);
+
+      field.setFractionDigits(3);
+      field.$field.val('123.456789');
+      field.acceptInput();
+      expect(field.value).toBe(123.457);
+
+      field.setFractionDigits(5);
+      field.$field.val('123.456789');
+      field.acceptInput();
+      expect(field.value).toBe(123.45679);
+
+      field.setFractionDigits(1);
+      field.$field.val('123.456789');
+      field.acceptInput();
+      expect(field.value).toBe(123.5);
+    });
+
+    it('updates the value if it changes', () => {
+      field.setValue(123.456789);
+
+      field.setDecimalFormat('###0.#');
+      expect(field.value).toBe(123.456789);
+      expect(field.displayText).toBe('123.5');
+
+      field.setDecimalFormat('###0.##');
+      expect(field.value).toBe(123.456789);
+      expect(field.displayText).toBe('123.46');
+
+      field.setFractionDigits(3);
+      expect(field.value).toBe(123.457);
+      expect(field.displayText).toBe('123.46');
+
+      field.setFractionDigits(1);
+      expect(field.value).toBe(123.5);
+      expect(field.displayText).toBe('123.5');
+
+      field.setDecimalFormat('###0.000');
+      expect(field.value).toBe(123.5);
+      expect(field.displayText).toBe('123.500');
+
+      field.setFractionDigits(3);
+      expect(field.value).toBe(123.5);
+      expect(field.displayText).toBe('123.500');
+    });
+
+    it('updates the value if it changes (decimalFormat with multiplier)', () => {
+      field.setValue(123.456789);
+
+      field.setDecimalFormat({
+        pattern: '###0.#',
+        multiplier: 100
+      });
+      expect(field.value).toBe(123.456789);
+      expect(field.displayText).toBe('12345.7');
+
+      field.setFractionDigits(3);
+      expect(field.value).toBe(123.457);
+      expect(field.displayText).toBe('12345.7');
+
+      field.setFractionDigits(1);
+      expect(field.value).toBe(123.5);
+      expect(field.displayText).toBe('12350');
+
+      field.setFractionDigits(3);
+      expect(field.value).toBe(123.5);
+      expect(field.displayText).toBe('12350');
+    });
+
+    it('updates the value using the roundingMode of the format', () => {
+      field.setFractionDigits(1);
+      field.setDecimalFormat('###0.0');
+      field.setValue(12.3456789);
+      expect(field.value).toBe(12.3);
+      expect(field.displayText).toBe('12.3');
+
+      field.setFractionDigits(3);
+      expect(field.value).toBe(12.3);
+      expect(field.displayText).toBe('12.3');
+
+      field.setValue(12.3456789);
+      expect(field.value).toBe(12.346);
+      expect(field.displayText).toBe('12.3');
+
+      field.setDecimalFormat({
+        pattern: '###0.0',
+        roundingMode: RoundingMode.FLOOR
+      });
+      expect(field.value).toBe(12.346);
+      expect(field.displayText).toBe('12.3');
+
+      field.setValue(12.3456789);
+      expect(field.value).toBe(12.345);
+      expect(field.displayText).toBe('12.3');
+
+      field.setDecimalFormat({
+        pattern: '###0.0',
+        roundingMode: RoundingMode.CEILING
+      });
+      expect(field.value).toBe(12.345);
+      expect(field.displayText).toBe('12.4');
+
+      field.setValue(12.3456789);
+      expect(field.value).toBe(12.346);
+      expect(field.displayText).toBe('12.4');
+    });
   });
 
   describe('calculates value', () => {

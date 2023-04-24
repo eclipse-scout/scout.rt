@@ -230,12 +230,12 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       cell = vararg;
 
       // value may be set but may have the wrong type (e.g. text instead of date) -> ensure type
-      cell.value = this._parseValue(cell.value);
+      cell.value = this._ensureValue(cell.value);
     } else {
       // in this case 'vararg' is only a scalar value, typically a string
       let cellType = Cell<TValue>;
       cell = scout.create(cellType, {
-        value: this._parseValue(vararg)
+        value: this._ensureValue(vararg)
       });
     }
 
@@ -245,8 +245,8 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   /**
    * Override this method to create a value based on the given scalar value.
    */
-  protected _parseValue(scalar: TValue): TValue {
-    return scalar;
+  protected _ensureValue(scalar: TValue | string): TValue {
+    return scalar as TValue;
   }
 
   protected _updateCellText(row: TableRow, cell: Cell<TValue>) {
@@ -625,7 +625,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   protected _setCellValue(row: TableRow, value: TValue, cell: Cell<TValue>) {
     // value may have the wrong type (e.g. text instead of date) -> ensure type
-    value = this._parseValue(value);
+    value = this._ensureValue(value);
 
     // Only update row status when value changed.
     // Cell text needs to be updated even if value did not change

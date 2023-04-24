@@ -9,7 +9,7 @@
  */
 
 import {FormSpecHelper} from '../../../../src/testing/index';
-import {IntegerField, ParsingFailedStatus, scout, Status, ValidationFailedStatus} from '../../../../src/index';
+import {IntegerField, ParsingFailedStatus, RoundingMode, scout, Status, ValidationFailedStatus} from '../../../../src/index';
 
 describe('IntegerField', () => {
 
@@ -21,34 +21,40 @@ describe('IntegerField', () => {
     helper = new FormSpecHelper(session);
   });
 
-  class SpecIntegerField extends IntegerField {
-    override _parseValue(displayText: string): number {
-      return super._parseValue(displayText);
-    }
-  }
-
-  it('_parseValue', () => {
-    let field = scout.create(SpecIntegerField, {
+  it('parseAndSetValue', () => {
+    let field = scout.create(IntegerField, {
       parent: session.desktop
     });
 
     // remove fraction digits
-    expect(field._parseValue('123')).toBe(123);
-    expect(field._parseValue('12.3')).toBe(12);
-    expect(field._parseValue('1.23')).toBe(1);
-    expect(field._parseValue('.123')).toBe(0);
-    expect(field._parseValue(' 123 ')).toBe(123);
+    field.parseAndSetValue('123');
+    expect(field.value).toBe(123);
+    field.parseAndSetValue('12.3');
+    expect(field.value).toBe(12);
+    field.parseAndSetValue('1.23');
+    expect(field.value).toBe(1);
+    field.parseAndSetValue('.123');
+    expect(field.value).toBe(0);
+    field.parseAndSetValue(' 123 ');
+    expect(field.value).toBe(123);
 
-    expect(field._parseValue('1.1')).toBe(1); // round down
-    expect(field._parseValue('1.9')).toBe(2); // round up
+    field.parseAndSetValue('1.1');
+    expect(field.value).toBe(1); // round down
+    field.parseAndSetValue('1.9');
+    expect(field.value).toBe(2); // round up
 
     // empty-ish
-    expect(field._parseValue(null)).toBe(null);
-    expect(field._parseValue('')).toBe(null);
-    expect(field._parseValue(' ')).toBe(null);
+    field.parseAndSetValue(null);
+    expect(field.value).toBe(null);
+    field.parseAndSetValue('');
+    expect(field.value).toBe(null);
+    field.parseAndSetValue(' ');
+    expect(field.value).toBe(null);
 
     // invalid numbers
-    expect(() => field._parseValue('1.2.3')).toThrow();
+    expect(field.errorStatus).toBeNull();
+    field.parseAndSetValue('1.2.3');
+    expect(field.errorStatus).not.toBeNull();
   });
 
   it('Test user input', () => {
@@ -130,4 +136,53 @@ describe('IntegerField', () => {
     });
   });
 
+  describe('fractionDigits', () => {
+    let field;
+
+    beforeEach(() => {
+      field = helper.createField(IntegerField);
+    });
+
+    it('is always 0', () => {
+      expect(field.fractionDigits).toBe(0);
+
+      field.setFractionDigits(42);
+      expect(field.fractionDigits).toBe(0);
+
+      field.setFractionDigits(3);
+      expect(field.fractionDigits).toBe(0);
+
+      field.setFractionDigits(null);
+      expect(field.fractionDigits).toBe(0);
+
+      field.setFractionDigits(undefined);
+      expect(field.fractionDigits).toBe(0);
+
+      field = helper.createField(IntegerField, null, {fractionDigits: 42});
+      expect(field.fractionDigits).toBe(0);
+    });
+
+    it('updates the value using the roundingMode of the format', () => {
+      field.setDecimalFormat('###0.0');
+      field.setValue(12.3456789);
+      expect(field.value).toBe(12);
+      expect(field.displayText).toBe('12.0');
+
+      field.setDecimalFormat({
+        pattern: '###0.0',
+        roundingMode: RoundingMode.FLOOR
+      });
+      field.setValue(12.3456789);
+      expect(field.value).toBe(12);
+      expect(field.displayText).toBe('12.0');
+
+      field.setDecimalFormat({
+        pattern: '###0.0',
+        roundingMode: RoundingMode.CEILING
+      });
+      field.setValue(12.3456789);
+      expect(field.value).toBe(13);
+      expect(field.displayText).toBe('13.0');
+    });
+  });
 });

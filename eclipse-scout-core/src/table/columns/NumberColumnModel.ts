@@ -13,6 +13,12 @@ export interface NumberColumnModel extends ColumnModel<number> {
   aggregationFunction?: NumberColumnAggregationFunction;
   backgroundEffect?: 'colorGradient1' | 'colorGradient2' | 'barChart';
   decimalFormat?: DecimalFormat | string | DecimalFormatOptions;
+  /**
+   * Has no effect on the column itself, but is passed to the cell editor if the column is editable.
+   *
+   * @see NumberField.fractionDigits
+   */
+  fractionDigits?: number;
   minValue?: number;
   maxValue?: number;
 }

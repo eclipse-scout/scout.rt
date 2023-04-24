@@ -25,6 +25,7 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
   aggregationFunction: NumberColumnAggregationFunction;
   backgroundEffect: NumberColumnBackgroundEffect;
   decimalFormat: DecimalFormat;
+  fractionDigits: number;
   minValue: number;
   maxValue: number;
 
@@ -47,6 +48,7 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
     this.aggregationFunction = 'sum';
     this.backgroundEffect = null;
     this.decimalFormat = null;
+    this.fractionDigits = null;
     this.minValue = null;
     this.maxValue = null;
     this.calcMinValue = null;
@@ -61,6 +63,7 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setDecimalFormat(this.decimalFormat);
+    this._setFractionDigits(this.fractionDigits);
     this._setAggregationFunction(this.aggregationFunction);
   }
 
@@ -88,7 +91,15 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
     return this.decimalFormat.format(value);
   }
 
-  protected override _parseValue(value: number | string): number {
+  setFractionDigits(fractionDigits: number) {
+    this.setProperty('fractionDigits', fractionDigits);
+  }
+
+  protected _setFractionDigits(fractionDigits: number) {
+    this._setProperty('fractionDigits', fractionDigits);
+  }
+
+  protected override _ensureValue(value: number | string): number {
     // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
     return numbers.ensure(value);
   }
@@ -278,7 +289,7 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
       b = Math.ceil(startColor.blue - level * (startColor.blue - endColor.blue));
 
     return {
-      backgroundColor: 'rgb(' + r + ',' + g + ', ' + b + ')'
+      backgroundColor: 'rgb(' + r + ', ' + g + ', ' + b + ')'
     };
   }
 
@@ -295,7 +306,8 @@ export class NumberColumn extends Column<number> implements NumberColumnModel {
       parent: this.table,
       maxValue: this.maxValue,
       minValue: this.minValue,
-      decimalFormat: this.decimalFormat
+      decimalFormat: this.decimalFormat,
+      fractionDigits: this.fractionDigits
     });
   }
 
