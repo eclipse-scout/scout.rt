@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormField, objects} from '../../src/index';
+import {Action, FormField, Menu, objects, scout, Widget} from '../../src/index';
 
-describe('scout.objects', () => {
+describe('objects', () => {
 
   describe('copyProperties', () => {
 
@@ -783,6 +783,44 @@ describe('scout.objects', () => {
       expect(objects.removeEmptyProperties({a: ' '})).toEqual({a: ' '});
       expect(objects.removeEmptyProperties({a: 0})).toEqual({a: 0});
       expect(objects.removeEmptyProperties({a: {b: {}}})).toEqual({a: {b: {}}}); // no recursive clean
+    });
+  });
+
+  describe('isSameOrExtendsClass', () => {
+    it('returns true if first class is the same as the second one', () => {
+      expect(objects.isSameOrExtendsClass(Widget, Widget)).toBe(true);
+      expect(objects.isSameOrExtendsClass(Date, Date)).toBe(true);
+      expect(objects.isSameOrExtendsClass(Date, Widget)).toBe(false);
+      expect(objects.isSameOrExtendsClass(Date, null)).toBe(false);
+      expect(objects.isSameOrExtendsClass(null, Date)).toBe(false);
+      expect(objects.isSameOrExtendsClass(null, null)).toBe(false);
+      // @ts-expect-error
+      expect(objects.isSameOrExtendsClass(3, 3)).toBe(false);
+    });
+
+    it('returns true if first class extends form the second one', () => {
+      expect(objects.isSameOrExtendsClass(Menu, Widget)).toBe(true);
+      expect(objects.isSameOrExtendsClass(Widget, Menu)).toBe(false);
+    });
+
+    it('uses a type predicate to narrow the type', () => {
+      // compile time test, ifs are always false
+
+      let menuClass: new() => Menu;
+      if (objects.isSameOrExtendsClass(menuClass, Action)) {
+        // menu is a Menu
+        let menu = scout.create(menuClass, {parent: null});
+        expect(menu.shrinkable).toBe(false);
+      }
+
+      let menuClass2;
+      if (objects.isSameOrExtendsClass(menuClass2, Action)) {
+        // menu is an Action
+        let menu = scout.create(menuClass2, {parent: null});
+        expect(menu.text).toBe(null);
+        // @ts-expect-error shrinkable does not exist on Action
+        expect(menu.shrinkable).toBe(false);
+      }
     });
   });
 });

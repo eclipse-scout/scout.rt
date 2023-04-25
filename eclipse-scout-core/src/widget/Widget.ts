@@ -2004,8 +2004,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    */
   findParent<T extends Widget>(predicateOrClass: Predicate<Widget> | (new() => T)): T {
     let predicate;
-    // @ts-expect-error
-    if (Widget === predicateOrClass || Widget.isPrototypeOf(predicateOrClass)) {
+    if (objects.isSameOrExtendsClass(predicateOrClass, Widget)) {
       predicate = widget => widget instanceof predicateOrClass;
     } else {
       predicate = predicateOrClass;

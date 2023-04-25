@@ -157,7 +157,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
    */
   static UriAction = {
     /**
-     * The object represented by the URI should be downloaded rather then be handled by the browser's rendering engine.
+     * The object represented by the URI should be downloaded rather than be handled by the browser's rendering engine.
      * It should make the "Save as..." dialog appear which allows the user to store the resource to his local file system.<br>
      * The application's location does not change, and no browser windows or tabs are opened.<br>
      * <br>
@@ -644,7 +644,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   }
 
   /**
-   * Takes the history.path provided by the browserHistoryEvent and appends additional URL parameters.
+   * Takes the {@link BrowserHistoryEntry.path} and appends additional URL parameters.
    */
   protected _createHistoryPath(history: BrowserHistoryEntry): string {
     if (!history.pathVisible) {
@@ -1106,8 +1106,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   /**
    * Adds a filter which is applied when the glass pane targets are collected.
    * If the filter returns <code>false</code>, the target won't be accepted and not covered by a glass pane.
-   * This filter should be used primarily for elements like the help-popup which stand outside
-   * of the regular modality hierarchy.
+   * This filter should be used primarily for elements like the help-popup which stand outside the regular modality hierarchy.
    *
    * @param filter a function with the parameter target and element. Target is the element which
    *     would be covered by a glass pane, element is the element the user interacts with (e.g. the modal dialog).
@@ -1222,6 +1221,93 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     return displayParent.formController.isFormShown(form);
   }
 
+  /**
+   * Collects all forms that are currently shown, independent of the {@link Form.displayParent}.
+   * This means, forms that have an {@link Outline} or another {@link Form} as display parent, are returned as well.
+   *
+   * *Note*: `shown` does not necessarily mean, the user can see the content of the form for sure, see {@link Form.isShown}.
+   */
+  getShownForms(): Form[] {
+    let forms = [];
+    let displayParents = [this, ...this.getOutlines()];
+
+    for (let displayParent of displayParents) {
+      forms = forms.concat(displayParent.views).concat(displayParent.dialogs);
+    }
+
+    // Form can also be a display parent, collect child forms as well
+    for (let form of forms) {
+      forms = forms.concat(form.views).concat(form.dialogs);
+    }
+    return forms;
+  }
+
+  findFormWithExclusiveKey(exclusiveKey: any, formClass?: new() => Form): Form {
+    let key = exclusiveKey;
+    if (typeof exclusiveKey === 'function') {
+      key = exclusiveKey();
+    }
+    scout.assertValue(key, 'ExclusiveKey expected');
+    for (let form of this.getShownForms()) {
+      if (formClass && !(form instanceof formClass)) {
+        continue;
+      }
+      if (objects.equals(form.exclusiveKey(), key)) {
+        return form;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Creates a new form using the given `formClass` and `formModel` unless there is already a form shown that is an instance of the `formClass` and has the same `exclusiveKey`.
+   * @param exclusiveKey can be anything, a primitive, an object or a function returning the key.
+   */
+  createFormExclusive<TForm extends Form>(formClass: new() => TForm, formModel: InitModelOf<TForm>, exclusiveKey: any | (() => any)): TForm;
+  /**
+   * Creates a new form using the given `formCreator` unless there is already a form shown with the same `exclusiveKey`.
+   * @param exclusiveKey can be anything, a primitive, an object or a function returning the key.
+   */
+  createFormExclusive<TForm extends Form>(formCreator: () => TForm, exclusiveKey: any | (() => any)): TForm;
+
+  createFormExclusive<TForm extends Form>(formClassOrCreator: (new() => TForm) | (() => TForm), formModelOrExclusiveKey: any, exclusiveKey?: any): TForm {
+    let formClass;
+    let formCreator;
+    let formModel;
+    if (objects.isSameOrExtendsClass(formClassOrCreator, Form)) {
+      formClass = formClassOrCreator;
+      formModel = formModelOrExclusiveKey;
+    } else {
+      formCreator = formClassOrCreator;
+      exclusiveKey = formModelOrExclusiveKey;
+    }
+
+    // If there is a form with the same exclusive key and form class, return it
+    let form = !objects.isNullOrUndefined(exclusiveKey) && this.findFormWithExclusiveKey(exclusiveKey, formClass) as TForm;
+    if (form) {
+      return form;
+    }
+
+    // Otherwise, create a new form
+    if (formClass) {
+      form = scout.create(formClass, $.extend({}, formModel, {exclusiveKey}));
+    } else {
+      form = formCreator();
+      form.setExclusiveKey(exclusiveKey);
+    }
+    return form;
+  }
+
+  /**
+   * Brings the form into foreground so the user can see and work with it.
+   *
+   * In case of a {@link Form.DisplayHint.VIEW}, the tab will be selected.
+   * In case of a {@link Form.DisplayHint.DIALOG}, the form will be moved to the front of all dialogs.
+   *
+   * If the form belongs to an outline (has {@link Form.displayParent} set to that outline) that is currently not active, the outline will be activated first.
+   *
+   * Only one form can be active at once. The currently active form is reflected by {@link activeForm}.
+   */
   activateForm(form: Form) {
     if (!form) {
       this._setFormActivated(null);
@@ -1360,11 +1446,11 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     let unsavedForms = forms.filter(form => {
       let saveNeededChildDialogs = false;
       form.visitDisplayChildren((dialog: Form) => {
-        if (dialog.lifecycle.saveNeeded()) {
+        if (dialog.saveNeeded) {
           saveNeededChildDialogs = true;
         }
       }, displayChild => displayChild instanceof Form);
-      return form.lifecycle.saveNeeded() || saveNeededChildDialogs;
+      return form.saveNeeded || saveNeededChildDialogs;
     });
 
     // initialize with a resolved promise in case there are no unsaved forms.

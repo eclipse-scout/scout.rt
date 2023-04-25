@@ -93,6 +93,40 @@ describe('Form', () => {
         .catch(fail)
         .always(done);
     });
+
+    it('does not load the form multiple times', async () => {
+      let loadCounter = 0;
+      let form = scout.create(Form, {parent: session.desktop});
+      form.open();
+      form.on('load', () => loadCounter++);
+      expect(form.isShown()).toBe(false);
+      expect(loadCounter).toBe(0);
+
+      form.open();
+      expect(form.isShown()).toBe(false);
+      expect(loadCounter).toBe(0);
+
+      await form.whenLoad();
+      expect(loadCounter).toBe(1);
+      expect(form.isShown()).toBe(false);
+
+      await form.when('render');
+      expect(form.isShown()).toBe(true);
+
+      await form.open();
+      expect(loadCounter).toBe(1);
+
+      form.hide();
+      expect(form.isShown()).toBe(false);
+
+      await form.open();
+      expect(loadCounter).toBe(1);
+      expect(form.isShown()).toBe(true);
+
+      // Manually triggering load still works
+      await form.load();
+      expect(loadCounter).toBe(2);
+    });
   });
 
   describe('close', () => {
@@ -164,6 +198,51 @@ describe('Form', () => {
         .always(done);
     });
 
+  });
+
+  describe('load', () => {
+    it('sets formLoading to true while loading and formLoaded to true after loading', async () => {
+      let form = scout.create(Form, {parent: session.desktop});
+      expect(form.formLoading).toBe(false);
+      expect(form.formLoaded).toBe(false);
+
+      form.load();
+      expect(form.formLoading).toBe(true);
+      expect(form.formLoaded).toBe(false);
+
+      await form.whenLoad();
+      expect(form.formLoading).toBe(false);
+      expect(form.formLoaded).toBe(true);
+    });
+
+    it('does not load multiple times if load is called while it is still loading', async () => {
+      let loadCounter = 0;
+      let form = scout.create(Form, {parent: session.desktop});
+      form.on('load', () => loadCounter++);
+      expect(loadCounter).toBe(0);
+
+      form.load();
+      expect(loadCounter).toBe(0);
+
+      form.load();
+      expect(loadCounter).toBe(0);
+
+      await form.whenLoad();
+      expect(loadCounter).toBe(1);
+    });
+
+    it('the second call to load returns a promise that is resolved when loaded', async () => {
+      let loadCounter = 0;
+      let form = scout.create(Form, {parent: session.desktop});
+      form.on('load', () => loadCounter++);
+      expect(loadCounter).toBe(0);
+
+      form.load();
+      expect(loadCounter).toBe(0);
+
+      await form.load();
+      expect(loadCounter).toBe(1);
+    });
   });
 
   describe('save', () => {
