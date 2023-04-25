@@ -11,13 +11,10 @@ import {Locale, numbers, RoundingMode, scout, strings} from '../index';
 
 /**
  * Provides formatting of numbers using java format pattern.
- * <p>
+ *
  * Compared to the java DecimalFormat the following pattern characters are not considered:
- * <ul>
- *   <li>prefix and suffix</li>
- *   <li>E</li>
- *   <li>%</li>
- * </ul>
+ * - E
+ * - %
  */
 export class DecimalFormat {
   positivePrefix: string;
@@ -243,16 +240,35 @@ export class DecimalFormat {
   }
 
   /**
-   * Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
+   * Convert to JS number format:
+   * - remove groupingChar and lenientGroupingChars
+   * - replace decimalSeparatorChar with '.'
+   * - remove positiveSuffix and negativeSuffix
+   * - replace positivePrefix with '+'
+   * - replace negativePrefix with '-'
    */
   normalize(numberString: string): string {
     if (!numberString) {
       return numberString;
     }
-    return numberString
+    let result = numberString
       .replace(new RegExp('[' + this.groupingChar + this.lenientGroupingChars + ']', 'g'), '')
-      .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.')
-      .replace(/\s/g, '');
+      .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.');
+
+    if (strings.hasText(this.positivePrefix)) {
+      result = result.replace(new RegExp(this.positivePrefix, 'g'), '+');
+    }
+    if (strings.hasText(this.positiveSuffix)) {
+      result = result.replace(new RegExp(this.positiveSuffix, 'g'), '');
+    }
+    if (strings.hasText(this.negativePrefix)) {
+      result = result.replace(new RegExp(this.negativePrefix, 'g'), '-');
+    }
+    if (strings.hasText(this.negativeSuffix)) {
+      result = result.replace(new RegExp(this.negativeSuffix, 'g'), '');
+    }
+
+    return result.replace(/\s/g, '');
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */

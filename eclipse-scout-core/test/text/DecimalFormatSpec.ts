@@ -349,4 +349,25 @@ describe('DecimalFormat', () => {
       expect(decimalFormat.round(-12345.6789)).toBe(-12345.67);
     });
   });
+
+  describe('normalize', () => {
+    it('can handle prefix and suffix', () => {
+      let decimalFormat = new DecimalFormat(locale, {
+        pattern: 'plus###0%;minus###0§'
+      });
+
+      expect(decimalFormat.normalize('42')).toBe('42');
+      expect(decimalFormat.normalize('42%')).toBe('42');
+      expect(decimalFormat.normalize('42§')).toBe('42');
+      expect(decimalFormat.normalize('plus42')).toBe('+42');
+      expect(decimalFormat.normalize('plus42%')).toBe('+42');
+      expect(decimalFormat.normalize('plus42§')).toBe('+42');
+      expect(decimalFormat.normalize('minus42')).toBe('-42');
+      expect(decimalFormat.normalize('minus42%')).toBe('-42');
+      expect(decimalFormat.normalize('minus42§')).toBe('-42');
+
+      expect(decimalFormat.normalize('plus42&')).toBe('+42&');
+      expect(decimalFormat.normalize('MiNuS42§')).toBe('MiNuS42');
+    });
+  });
 });
