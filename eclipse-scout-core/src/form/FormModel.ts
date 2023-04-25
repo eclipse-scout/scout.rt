@@ -42,6 +42,12 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
    */
   data?: object;
   /**
+   * The exclusive key is used by {@link Desktop.createFormExclusive} to check whether a similar form is already open, and if yes, activate that form instead of opening a new one.
+   *
+   * The exclusive key can be anything, a primitive, an object or a function returning the key.
+   */
+  exclusiveKey?: any | (() => any);
+  /**
    * Defines where the view will be opened in the {@link DesktopBench} if the {@link displayHint} is set to {@link Form.DisplayHint.VIEW}.
    *
    * By default, views are opened in the center area ({@link DisplayViewId.C}).

@@ -1398,6 +1398,184 @@ describe('Desktop', () => {
 
   });
 
+  describe('createFormExclusive', () => {
+    beforeEach(() => {
+      session._renderDesktop();
+    });
+
+    it('doesn\'t open the form if there is already a form open with the same exclusive key', async () => {
+      let form = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 5);
+      expect(form.exclusiveKey()).toBe(5);
+
+      await form.open();
+      expect(form.rendered).toBe(true);
+
+      let formCreated = false;
+      let form2 = session.desktop.createFormExclusive(() => {
+        formCreated = true;
+        return formHelper.createViewWithOneField();
+      }, () => 5);
+      expect(formCreated).toBe(false);
+      expect(form2).toBe(form);
+    });
+
+    it('opens the form if there is already an exclusive form open but with a different exclusive key', async () => {
+      let form = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 5);
+      await form.open();
+      expect(form.rendered).toBe(true);
+
+      let form2 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 3);
+      await form2.open();
+      expect(form2).not.toBe(form);
+      expect(form2.rendered).toBe(true);
+    });
+
+    it('activates the existing form if another form with the same exclusive key should be opened', async () => {
+      let form = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 5);
+      await form.open();
+      expect(form.rendered).toBe(true);
+      expect(session.desktop.activeForm).toBe(form);
+
+      session.desktop.activateForm(null);
+      expect(session.desktop.activeForm).toBe(null);
+
+      let form2 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 5);
+      await form2.open();
+      expect(form2).toBe(form);
+      expect(form2.rendered).toBe(true);
+      expect(session.desktop.activeForm).toBe(form);
+    });
+
+    it('also works if existing forms weren\'t opened using createFormExclusive', async () => {
+      let form = formHelper.createViewWithOneField({exclusiveKey: 5});
+      await form.open();
+      expect(form.rendered).toBe(true);
+
+      let form2 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 3);
+      await form2.open();
+      expect(form2).not.toBe(form);
+      expect(form2.rendered).toBe(true);
+    });
+
+    it('also works with exclusiveKey being a function', async () => {
+      let form = formHelper.createViewWithOneField({exclusiveKey: () => 3});
+      expect(form.exclusiveKey()).toBe(3);
+      await form.open();
+
+      let form2 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), () => 3);
+      expect(form2.exclusiveKey()).toBe(3);
+      await form2.open();
+      expect(form2).toBe(form);
+
+      let form3 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 3);
+      expect(form3.exclusiveKey()).toBe(3);
+      await form3.open();
+      expect(form3).toBe(form);
+
+      let form4 = session.desktop.createFormExclusive(Form, {parent: session.desktop}, () => 3);
+      expect(form4.exclusiveKey()).toBe(3);
+      await form4.open();
+      expect(form4).toBe(form);
+
+      let form5 = session.desktop.createFormExclusive(Form, {parent: session.desktop}, 3);
+      expect(form5.exclusiveKey()).toBe(3);
+      await form5.open();
+      expect(form5).toBe(form);
+    });
+
+    it('also considers forms whose display parent is not the desktop', async () => {
+      let outline = outlineHelper.createOutlineWithOneDetailForm();
+      let form = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField({displayParent: outline}), 5);
+      await form.open();
+
+      // Should only activate form
+      let form2 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 5);
+      await form2.open();
+      expect(form2).toBe(form);
+      expect(form2.rendered).toBe(true);
+      expect(session.desktop.activeForm).toBe(form2);
+
+      // New form with first form as display parent
+      let form3 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField({displayParent: form}), 3);
+      await form3.open();
+      expect(form3).not.toBe(form);
+      expect(form3.rendered).toBe(true);
+      expect(session.desktop.activeForm).toBe(form3);
+
+      form2.activate();
+      expect(session.desktop.activeForm).toBe(form2);
+
+      // Should only activate form3
+      let form4 = session.desktop.createFormExclusive(() => formHelper.createViewWithOneField(), 3);
+      await form4.open();
+      expect(form4).toBe(form3);
+      expect(form4.rendered).toBe(true);
+      expect(session.desktop.activeForm).toBe(form4);
+    });
+
+    class PersonForm extends Form {
+    }
+
+    class PersonFormExt extends PersonForm {
+    }
+
+    class CompanyForm extends Form {
+    }
+
+    it('opens the form even if the exclusive key is the same but the form from a different class', async () => {
+      let form = session.desktop.createFormExclusive(PersonForm, {parent: session.desktop}, 5);
+      await form.open();
+      expect(session.desktop.activeForm).toBe(form);
+
+      // Same class, same key
+      let form2 = session.desktop.createFormExclusive(PersonForm, {parent: session.desktop}, 5);
+      await form2.open();
+      expect(form2).toBe(form);
+      expect(session.desktop.activeForm).toBe(form2);
+
+      // Different class, same key
+      let form3 = session.desktop.createFormExclusive(CompanyForm, {parent: session.desktop}, 5);
+      await form3.open();
+      expect(form3).not.toBe(form2);
+      expect(session.desktop.activeForm).toBe(form3);
+
+      // Same class, different key
+      let form4 = session.desktop.createFormExclusive(CompanyForm, {parent: session.desktop}, 3);
+      await form4.open();
+      expect(form4).not.toBe(form3);
+      expect(session.desktop.activeForm).toBe(form4);
+
+      // Plain form class
+      let plainForm = session.desktop.createFormExclusive(Form, {parent: session.desktop}, 10);
+      await plainForm.open();
+      expect(plainForm).not.toBe(form4);
+      expect(session.desktop.activeForm).toBe(plainForm);
+
+      let plainForm2 = session.desktop.createFormExclusive(Form, {parent: session.desktop}, 10);
+      await plainForm2.open();
+      expect(plainForm2).toBe(plainForm);
+      expect(session.desktop.activeForm).toBe(plainForm2);
+    });
+
+    it('doesn\'t open the form if the exclusive key is the same and the form inherits from the existing form', async () => {
+      // Use case: PersonForm is replaced by the object factory, code works with PersonForm but actually a PersonFormExt is created
+      let formExt = session.desktop.createFormExclusive(PersonFormExt, {parent: session.desktop}, 3);
+      await formExt.open();
+      expect(session.desktop.activeForm).toBe(formExt);
+
+      let personForm = session.desktop.createFormExclusive(PersonForm, {parent: session.desktop}, 3);
+      await personForm.open();
+      expect(personForm).toBe(formExt);
+      expect(session.desktop.activeForm).toBe(formExt);
+
+      // Different key
+      let personForm2 = session.desktop.createFormExclusive(PersonForm, {parent: session.desktop}, 5);
+      await personForm2.open();
+      expect(personForm2).not.toBe(personForm);
+      expect(session.desktop.activeForm).toBe(personForm2);
+    });
+  });
+
   describe('displayStyle', () => {
 
     describe('COMPACT', () => {

@@ -742,6 +742,16 @@ export const objects = {
   },
 
   /**
+   * @returns true if the first parameter is the same or a subclass of the second parameter.
+   */
+  isSameOrExtendsClass<TClass2>(class1: any, class2: new() => TClass2): class1 is new() => TClass2 {
+    if (typeof class1 !== 'function' || typeof class2 !== 'function') {
+      return false;
+    }
+    return class1 === class2 || class2.isPrototypeOf(class1);
+  },
+
+  /**
    * Converts any non-string argument to a string that can be used as an object property name.
    * Complex objects are converted to their JSON representation (instead of returning something
    * non-descriptive such as '[Object object]').

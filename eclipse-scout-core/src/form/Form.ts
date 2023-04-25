@@ -25,6 +25,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   askIfNeedSave: boolean;
   askIfNeedSaveText: string;
   data: any;
+  exclusiveKey: () => any;
   displayViewId: DisplayViewId;
   displayHint: DisplayHint;
   maximized: boolean;
@@ -51,6 +52,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
   showOnOpen: boolean;
   initialFocus: Widget;
   renderInitialFocusEnabled: boolean;
+  formLoading: boolean;
+  formLoaded: boolean;
   /** set by PopupWindow if this Form has displayHint=Form.DisplayHint.POPUP_WINDOW */
   popupWindow: PopupWindow;
   title: string;
@@ -87,6 +90,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.askIfNeedSave = true;
     this.askIfNeedSaveText = null;
     this.data = {};
+    this.exclusiveKey = null;
     this.displayViewId = null;
     this.displayHint = Form.DisplayHint.DIALOG;
     this.displayParent = null; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
@@ -118,6 +122,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.title = null;
     this.subTitle = null;
     this.iconId = null;
+    this.formLoading = false;
+    this.formLoaded = false;
 
     this.$statusIcons = [];
     this.$header = null;
@@ -163,6 +169,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.cacheBoundsKey = scout.nvl(model.cacheBoundsKey, this.objectType);
     this._installLifecycle();
     this._setClosable(this.closable);
+    this._setExclusiveKey(this.exclusiveKey);
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -282,6 +289,20 @@ export class Form extends Widget implements FormModel, DisplayParent {
     });
   }
 
+  setExclusiveKey(exclusiveKey: any) {
+    this.setProperty('exclusiveKey', exclusiveKey);
+  }
+
+  protected _setExclusiveKey(exclusiveKey: any) {
+    let key = exclusiveKey;
+    if (!exclusiveKey) {
+      key = () => null;
+    } else if (typeof exclusiveKey !== 'function') {
+      key = () => exclusiveKey;
+    }
+    this._setProperty('exclusiveKey', key);
+  }
+
   /**
    * Loads the data and renders the form afterwards by adding it to the desktop.
    *
@@ -292,13 +313,15 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * This is only relevant if you need to access properties which are only available when the form is rendered (e.g. {@link $container}), which is not recommended anyway.
    */
   open(): JQuery.Promise<void> {
-    return this.load()
+    return this.load(false)
       .then(() => {
         if (this.destroyed) {
           // If form has been closed right after it was opened don't try to show it
           return;
         }
-        if (this.showOnOpen) {
+        if (this.isShown()) {
+          this.activate();
+        } else if (this.showOnOpen) {
           this.show();
         }
       });
@@ -306,9 +329,18 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Initializes the life cycle and calls the {@link _load} function.
+   * Does nothing, if form is still loading (= {@link formLoading} is true).
+   *
+   * @param allowReload controls whether loading should be allowed even if it has already been loaded once (= if {@link formLoaded is true}).
    * @returns promise which is resolved when the form is loaded.
    */
-  load(): JQuery.Promise<void> {
+  load(allowReload = true): JQuery.Promise<void> {
+    if (this.formLoading) {
+      return this.whenLoad().then(() => undefined);
+    }
+    if (!allowReload && this.formLoaded) {
+      return $.resolvedPromise();
+    }
     return this.lifecycle.load();
   }
 
@@ -324,6 +356,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
    */
   protected _onLifecycleLoad(): JQuery.Promise<Status> {
     try {
+      this._setFormLoading(true);
       return this._load()
         .then(data => {
           if (this.destroyed) {
@@ -332,13 +365,21 @@ export class Form extends Widget implements FormModel, DisplayParent {
           }
           this.setData(data);
           this.importData();
+          this._setFormLoading(false);
+          this.formLoaded = true;
           this.trigger('load');
         }).catch(error => {
+          this._setFormLoading(false);
           return this._handleLoadError(error);
         });
     } catch (error) {
+      this._setFormLoading(false);
       return this._handleLoadError(error);
     }
+  }
+
+  protected _setFormLoading(loading: boolean) {
+    this._setProperty('formLoading', loading);
   }
 
   /**
@@ -681,6 +722,9 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.activate();
   }
 
+  /**
+   * @see Desktop.activateForm
+   */
   activate() {
     this.session.desktop.activateForm(this);
   }
