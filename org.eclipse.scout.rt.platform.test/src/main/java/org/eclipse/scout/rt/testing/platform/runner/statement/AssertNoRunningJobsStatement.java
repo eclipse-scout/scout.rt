@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,12 +12,15 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
@@ -27,6 +30,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.junit.runners.model.Statement;
 
@@ -83,6 +87,16 @@ public class AssertNoRunningJobsStatement extends Statement {
     catch (final TimedOutError e) { // NOSONAR
       final List<String> runningJobs = findJobNames(jobFilter);
       if (!runningJobs.isEmpty()) {
+        // thread-dump
+        System.err.println("Test will fail because some jobs did not complete yet, creating thread dump for debugging purposes:");
+        System.err.println();
+        System.err.println(Thread.getAllStackTraces().entrySet().stream()
+            .map(entry -> StringUtility.box(entry.getKey() /* Thread */ + "\n", Arrays.stream(entry.getValue() /* StackTraceElement[] */)
+                .map(stackTraceElement -> StringUtility.box("\tat ", Objects.toString(stackTraceElement), null))
+                .collect(Collectors.joining("\n")), "\n"))
+            .filter(StringUtility::hasText)
+            .collect(Collectors.joining("\n")));
+
         fail(String.format("Test failed because some jobs did not complete yet. [context=%s, jobs=%s]", m_context, runningJobs));
       }
     }
