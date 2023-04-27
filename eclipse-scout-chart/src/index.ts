@@ -16,6 +16,7 @@ export * from './chart/ChartLayout';
 export * from './chart/ChartModel';
 export * from './chart/AbstractChartRenderer';
 export * from './chart/AbstractSvgChartRenderer';
+export * from './chart/chartJsDateAdapter';
 export * from './chart/ChartJsRenderer';
 export * from './chart/FulfillmentChartRenderer';
 export * from './chart/SpeedoChartRenderer';
