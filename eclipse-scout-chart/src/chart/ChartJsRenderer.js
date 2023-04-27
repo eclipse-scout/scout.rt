@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractChartRenderer, Chart} from '../index';
+import {AbstractChartRenderer, Chart, chartJsDateAdapter} from '../index';
 import ChartJs from 'chart.js/auto';
+import {_adapters as chartJsAdapters} from 'chart.js';
 import {arrays, colorSchemes, Event, graphics, numbers, objects, Point, scout, strings, styles, tooltips} from '@eclipse-scout/core';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import $ from 'jquery';
@@ -266,6 +267,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$canvas);
     if (!chartJsGlobalsInitialized) {
       ChartJs.defaults.font.family = this.$canvas.css('font-family');
+      chartJsAdapters._date.override(chartJsDateAdapter.getAdapter(this.chart.session));
       chartJsGlobalsInitialized = true;
     }
     /**
@@ -1499,7 +1501,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (labelMap) {
       return labelMap[label];
     }
-    if (isNaN(label)) {
+    if (isNaN(label) || typeof label === 'string') {
       return label;
     }
     if (numberFormatter) {
