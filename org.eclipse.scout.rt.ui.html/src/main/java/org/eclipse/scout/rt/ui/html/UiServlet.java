@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.PathValidator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -257,8 +258,14 @@ public class UiServlet extends AbstractHttpServlet {
       return false;
     }
     catch (Exception t) {
-      LOG.error("Exception while processing request", t);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(t)) {
+        // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
+        LOG.debug("Connection error detected: exception class={}, message={}.", t.getClass().getSimpleName(), t.getMessage(), t);
+      }
+      else {
+        LOG.error("Exception while processing request", t);
+        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
       return true;
     }
     finally {

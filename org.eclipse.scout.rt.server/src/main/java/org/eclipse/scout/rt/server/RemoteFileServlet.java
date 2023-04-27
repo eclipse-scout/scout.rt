@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
@@ -120,8 +121,9 @@ public class RemoteFileServlet extends HttpServlet {
       }
     }
     catch (Exception ex) {
-      if (("" + ex.toString()).contains("Connection reset by peer: socket write error")) {
-        // ignore it
+      if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(ex)) {
+        // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
+        LOG.debug("Connection error detected: exception class={}, message={}.", ex.getClass().getSimpleName(), ex.getMessage(), ex);
       }
       else {
         LOG.warn("Failed to get remotefile {}.", pathInfo, ex);

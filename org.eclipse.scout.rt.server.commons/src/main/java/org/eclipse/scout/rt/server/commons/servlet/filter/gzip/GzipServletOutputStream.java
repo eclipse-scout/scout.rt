@@ -16,9 +16,15 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GzipServletOutputStream extends ServletOutputStream {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GzipServletOutputStream.class);
 
   private final HttpServletResponse m_response;
   private final ServletOutputStream m_servletOutputStream;
@@ -119,10 +125,15 @@ public class GzipServletOutputStream extends ServletOutputStream {
       flushBufferToGzipOutputStream();
       writeToGzipOutputStream(b, off, len);
     }
-    catch (IOException e) {
+    catch (Exception e) {
       WriteListener listener = (WriteListener) m_writeListener;
       if (listener != null) {
         listener.onError(e);
+      }
+      if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(e)) {
+        // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
+        LOG.debug("Connection error detected: exception class={}, message={}.", e.getClass().getSimpleName(), e.getMessage(), e);
+        return;
       }
       throw e;
     }
