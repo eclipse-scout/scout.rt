@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.lang.reflect.Field;
 import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
@@ -145,16 +144,7 @@ public class ConnectionErrorDetectorTest {
 
     @Override
     public synchronized Throwable getCause() {
-      Throwable t = null;
-      try {
-        Field causeField = Throwable.class.getDeclaredField("cause");
-        causeField.setAccessible(true);
-        t = (Throwable) causeField.get(this);
-      }
-      catch (NoSuchFieldException | IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-      return t;
+      return ObjectUtility.nvl(super.getCause(), this);
     }
   }
 
