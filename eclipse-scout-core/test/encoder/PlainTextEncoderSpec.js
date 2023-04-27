@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -31,6 +31,16 @@ describe('PlainTextEncoder', () => {
 
     htmlText = '<b>hello</b> world! <SPAN class="xyz">Some more html...</SPAN>';
     expect(encoder.encode(htmlText)).toBe('hello world! Some more html...');
+  });
+
+  it('removes style and script tags', () => {
+    let htmlText = '<style>p{color: #26b72b;}</style>'
+      + '<p style="color: blue">Donec mattis metus lorem. Aenean posuere tincidunt enim.</p>'
+      + '<script>alert(\'Hello World\');</script>'
+      + '<p style="color: green">Pellentesque eu euismod eros, in ullamcorper erat.</p>';
+
+    expect(encoder.encode(htmlText)).toBe('Donec mattis metus lorem. Aenean posuere tincidunt enim.\n' +
+      'Pellentesque eu euismod eros, in ullamcorper erat.\n');
   });
 
   it('converts br, p, div into new lines', () => {

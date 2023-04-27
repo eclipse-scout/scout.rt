@@ -90,7 +90,6 @@ public class HtmlHelper {
       // <body> not found, use entire input
       s = html;
     }
-
     //newlines
     s = StringUtility.replace(s, "\r", "");
     s = StringUtility.replace(s, "\n", " ");
@@ -98,7 +97,6 @@ public class HtmlHelper {
     s = matcher.replaceAll("\n");
     //tabs
     s = StringUtility.replace(s, StringUtility.HTML_ENCODED_TAB, "\t");
-
     //remove script and style contents
     matcher = HTML_SCRIPTS.matcher(s);
     s = matcher.replaceAll("");
@@ -109,7 +107,6 @@ public class HtmlHelper {
     s = matcher.replaceAll(" ");
     matcher = HTML_TAGS.matcher(s);
     s = matcher.replaceAll("");
-
     //remove multiple spaces
     matcher = MULTIPLE_SPACES.matcher(s);
     s = matcher.replaceAll(" ");

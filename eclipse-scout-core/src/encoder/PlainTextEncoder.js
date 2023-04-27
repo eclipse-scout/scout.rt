@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -39,6 +39,10 @@ export default class PlainTextEncoder {
     if (options.removeFontIcons) {
       text = text.replace(/<span\s+class="[^"]*font-icon[^"]*">[^<]*<\/span>/gmi, '');
     }
+
+    // Remove script and style contents
+    text = text.replace(/(?<=<script>).*?(?=<\/script>)/gi, '');
+    text = text.replace(/(?<=<style>).*?(?=<\/style>)/gi, '');
 
     // Replace remaining tags
     text = text.replace(/<[^>]+>/gi, '');
