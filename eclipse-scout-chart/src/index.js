@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,6 +13,7 @@ export {default as ChartAdapter} from './chart/ChartAdapter';
 export {default as ChartLayout} from './chart/ChartLayout';
 export {default as AbstractChartRenderer} from './chart/AbstractChartRenderer';
 export {default as AbstractSvgChartRenderer} from './chart/AbstractSvgChartRenderer';
+export {default as chartJsDateAdapter} from './chart/chartJsDateAdapter';
 export {default as ChartJsRenderer} from './chart/ChartJsRenderer';
 export {default as FulfillmentChartRenderer} from './chart/FulfillmentChartRenderer';
 export {default as SpeedoChartRenderer} from './chart/SpeedoChartRenderer';
