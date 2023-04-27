@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractChartRenderer, Chart} from '../index';
+import {AbstractChartRenderer, Chart, chartJsDateAdapter} from '../index';
 import {
-  ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint, FontSpec, LegendElement,
+  _adapters as chartJsAdapters, ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint,
+  FontSpec, LegendElement,
   LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
 } from 'chart.js';
 import 'chart.js/auto'; // Import from auto to register charts
@@ -235,6 +236,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$canvas);
     if (!chartJsGlobalsInitialized) {
       ChartJs.defaults.font.family = this.$canvas.css('font-family');
+      chartJsAdapters._date.override(chartJsDateAdapter.getAdapter(this.chart.session));
       chartJsGlobalsInitialized = true;
     }
     let config = $.extend(true, {}, this.chart.config);
@@ -1434,7 +1436,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       return labelMap[label];
     }
     // @ts-expect-error
-    if (isNaN(label)) {
+    if (isNaN(label) || typeof label === 'string') {
       return '' + label;
     }
     if (numberFormatter) {
