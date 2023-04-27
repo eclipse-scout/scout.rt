@@ -57,14 +57,30 @@ export class JsFormAdapter extends FormAdapter {
   protected override _onWidgetEvent(event: Event<Form>) {
     if (event.type === 'save') {
       this._onWidgetSave(event);
+    } else if (event.type === 'search') {
+      this._onWidgetSearch(event);
+    } else if (event.type === 'reset') {
+      this._onWidgetReset(event);
     } else {
       super._onWidgetEvent(event);
     }
   }
 
   protected _onWidgetSave(event: Event<Form>) {
-    this._send('save', {
-      outputData: this.widget.data
+    this._sendOutputData('save', this.widget.data);
+  }
+
+  protected _onWidgetSearch(event: Event<Form>) {
+    this._sendOutputData('search', this.widget.exportData());
+  }
+
+  protected _onWidgetReset(event: Event<Form>) {
+    this._sendOutputData('reset', this.widget.exportData());
+  }
+
+  protected _sendOutputData(type: string, data?: any) {
+    this._send(type, {
+      outputData: data
     });
   }
 

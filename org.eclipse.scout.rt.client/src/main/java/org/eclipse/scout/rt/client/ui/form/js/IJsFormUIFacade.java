@@ -15,4 +15,8 @@ import org.eclipse.scout.rt.dataobject.IDataObject;
 public interface IJsFormUIFacade<OUT extends IDataObject> extends IFormUIFacade {
 
   void fireSaveFromUI(OUT outputData);
+
+  void fireSearchFromUI(OUT outputData);
+
+  void fireResetFromUI(OUT outputData);
 }

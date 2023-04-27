@@ -24,6 +24,8 @@ import org.json.JSONObject;
 public class JsonJsForm<IN extends IDataObject, OUT extends IDataObject, T extends IJsForm<IN, OUT>> extends JsonForm<T> {
 
   private static final String EVENT_SAVE = "save";
+  private static final String EVENT_SEARCH = "search";
+  private static final String EVENT_RESET = "reset";
 
   private final JsonDataObjectHelper m_jsonDoHelper = BEANS.get(JsonDataObjectHelper.class); // cached instance
 
@@ -77,14 +79,31 @@ public class JsonJsForm<IN extends IDataObject, OUT extends IDataObject, T exten
     if (EVENT_SAVE.equals(event.getType())) {
       handleUiSave(event);
     }
+    else if (EVENT_SEARCH.equals(event.getType())) {
+      handleUiSearch(event);
+    }
+    else if (EVENT_RESET.equals(event.getType())) {
+      handleUiReset(event);
+    }
     else {
       super.handleUiEvent(event);
     }
   }
 
   protected void handleUiSave(JsonEvent event) {
+    getModel().getUIFacade().fireSaveFromUI(outputData(event));
+  }
+
+  protected void handleUiSearch(JsonEvent event) {
+    getModel().getUIFacade().fireSearchFromUI(outputData(event));
+  }
+
+  protected void handleUiReset(JsonEvent event) {
+    getModel().getUIFacade().fireResetFromUI(outputData(event));
+  }
+
+  protected OUT outputData(JsonEvent event) {
     JSONObject outputDataJson = event.getData().optJSONObject("outputData");
-    OUT outputData = jsonDoHelper().jsonToDataObject(outputDataJson, getModel().getOutputDataType());
-    getModel().getUIFacade().fireSaveFromUI(outputData);
+    return jsonDoHelper().jsonToDataObject(outputDataJson, getModel().getOutputDataType());
   }
 }

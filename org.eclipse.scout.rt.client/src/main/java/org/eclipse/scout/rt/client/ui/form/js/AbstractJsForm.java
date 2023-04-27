@@ -143,6 +143,16 @@ public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataOb
     doSave();
   }
 
+  protected void search(OUT outputData) {
+    setOutputData(outputData);
+    doSaveWithoutMarkerChange();
+  }
+
+  protected void reset(OUT outputData) {
+    setOutputData(outputData);
+    doReset();
+  }
+
   @Order(1000)
   @ClassId("4d09d51a-2a15-4863-8921-2eead40957fa")
   public class MainBox extends AbstractGroupBox {
@@ -153,6 +163,16 @@ public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataOb
     @Override
     public void fireSaveFromUI(OUT outputData) {
       save(outputData);
+    }
+
+    @Override
+    public void fireSearchFromUI(OUT outputData) {
+      search(outputData);
+    }
+
+    @Override
+    public void fireResetFromUI(OUT outputData) {
+      reset(outputData);
     }
   }
 }
