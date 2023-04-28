@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderAutoAssignItemChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemMovedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsChain;
@@ -31,4 +32,5 @@ public interface ICalendarItemProviderExtension<OWNER extends AbstractCalendarIt
 
   void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date fromDate, Date toDate);
 
+  void execAutoAssignCalendarItems(CalendarItemProviderAutoAssignItemChain chain, Set<ICalendarItem> items);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -126,7 +126,7 @@
 }
 
 .calendar-mode,
-.calendar-toggle-year,
+.calendar-toggle-sidebar,
 .calendar-toggle-list {
   display: inline-block;
   vertical-align: middle;
@@ -173,7 +173,7 @@
   border-radius: @button-border-radius;
 }
 
-.calendar-toggle-year,
+.calendar-toggle-sidebar,
 .calendar-toggle-list {
   margin-left: 5px;
 
@@ -182,7 +182,7 @@
   }
 }
 
-.calendar-toggle-year::before {
+.calendar-toggle-sidebar::before {
   .calendar-icon(@icon-calendar, 18px);
 }
 
@@ -201,10 +201,6 @@
   width: calc(~'100% - ' @calendar-component-margin-left);
   text-align: left;
   color: @calendar-component-color;
-
-  &:not(.component-task):not(.component-month) {
-    border-bottom: 2px solid transparent;
-  }
 
   & > .content {
     #scout.overflow-ellipsis();
@@ -493,13 +489,14 @@
   height: calc(~'100% - ' @calendar-title-height - 9px);
 }
 
-.calendar-week-allday-container > .calendar-day {
+.calendar-week-allday-container > .calendar-day > .resource-column {
   padding-top: 30px; // for the day-of-month number
 }
 
 .calendar-week-header,
 .calendar-week-header > .calendar-day-name,
-.calendar-week-header > .calendar-week-name {
+.calendar-week-header > .calendar-week-name,
+.calendar-week-header > .calendar-day-name > .resource-column {
   height: @calendar-title-height;
 }
 
@@ -513,7 +510,8 @@
 
 .calendar-day-name,
 .calendar-week-name,
-.calendar-day {
+.calendar-day,
+.resource-column {
   position: relative;
   display: inline-block;
   overflow: hidden;
@@ -660,7 +658,8 @@
 }
 
 .calendar-day::after,
-.calendar-day-name::after {
+.calendar-day-name::after,
+.resource-column::after {
   position: absolute;
   width: 1px;
   height: 100%;
@@ -747,4 +746,18 @@
   position: absolute;
   opacity: 0.3;
   width: 100%;
+}
+
+.calendar-day > .resource-column {
+  height: 100%;
+}
+
+.resource-column::before {
+  position: absolute;
+  content: attr(data-resource-name);
+  color: @calendar-day-color;
+  left: 7px;
+  bottom: 0;
+  z-index: 1; /* draw over calendar items */
+  line-height: @calendar-title-height;
 }

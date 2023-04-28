@@ -18,6 +18,23 @@ export class DateRange {
     this.to = to;
   }
 
+  /**
+   * Checks if given date is covered by the date range.
+   *
+   * If the truncateToDay parameter is set to true, it
+   * truncates the from and to date to day, as well as
+   * the date parameter.
+   */
+  covers(date: Date, truncateToDay?: boolean): boolean {
+    let from = this.from, to = this.to, d = date;
+    if (truncateToDay) {
+      from = dates.trunc(from);
+      to = dates.trunc(to);
+      d = dates.trunc(d);
+    }
+    return d >= from && d <= to;
+  }
+
   equals(other: DateRange): boolean {
     if (!other) {
       return false;

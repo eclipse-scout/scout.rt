@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.shared.services.common.calendar.CalendarResourceDo;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
 public interface ICalendarItemProvider extends IPropertyObserver {
@@ -35,6 +36,10 @@ public interface ICalendarItemProvider extends IPropertyObserver {
    * type boolean
    */
   String PROP_LOAD_IN_PROGRESS = "loadInProgress";
+  /**
+   * type CalendarResourceDo
+   */
+  String PROP_ASSOCIATED_RESOURCE = "associatedResource";
 
   void disposeProvider();
 
@@ -49,6 +54,10 @@ public interface ICalendarItemProvider extends IPropertyObserver {
   long getRefreshIntervalMillis();
 
   void setRefreshIntervalMillis(long millis);
+
+  CalendarResourceDo getAssociatedResource();
+
+  void setAssociatedResource(CalendarResourceDo associatedResource);
 
   /**
    * @return the current set of items in the requested range
