@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, arrays, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout} from '../index';
+import {AjaxCall, arrays, DoEntity, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout} from '../index';
 import $ from 'jquery';
 import Deferred = JQuery.Deferred;
 
@@ -259,8 +259,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 /**
  * @see AbstractLookupRowDo.java
  */
-export interface LookupRowDo<Key> {
-  _type: string;
+export interface LookupRowDo<Key> extends DoEntity {
   id: Key;
   parentId: Key;
   text: string;

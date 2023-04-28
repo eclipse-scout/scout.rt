@@ -129,6 +129,7 @@ export * from './code/CodeType';
 export * from './code/CodeTypeModel';
 export * from './code/codes';
 export * from './code/CodeLookupCall';
+export * from './dataobject/DoEntity';
 export * from './session/BackgroundJobPollingStatus';
 export * from './session/BackgroundJobPollingSupport';
 export * from './session/BusyIndicator';
