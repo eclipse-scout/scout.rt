@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, objects, Page, Range, scout, scrollbars, strings, Tree} from '../../src/index';
+import {graphics, icons, objects, Page, Range, scout, scrollbars, strings, Tree} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
 
 describe('Tree', () => {
@@ -545,6 +545,30 @@ describe('Tree', () => {
       $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
+    });
+
+    it('update node paddings is done later and tree does not fail if tree was removed in the meantime', done => {
+      node0.iconId = icons.CHART;
+      node0.expanded = true;
+      tree.nodePaddingLevelDiffParentHasIcon = 10;
+      tree.render();
+      let orig = tree._updateNodePaddingsLeft;
+      // If queueMicrotask fails in changeNode, test won't fail -> create spy with try catch to ensure test fails
+      spyOn(tree, Tree.prototype._updateNodePaddingsLeft.name).and.callFake(() => {
+        try {
+          orig();
+        } catch (err) {
+          fail(err);
+        }
+      });
+      tree.changeNode(node0);
+      expect(tree._changeNodeTaskScheduled).toBe(true);
+      tree.remove();
+
+      queueMicrotask(() => {
+        expect(tree._changeNodeTaskScheduled).toBe(false);
+        done();
+      });
     });
   });
 
