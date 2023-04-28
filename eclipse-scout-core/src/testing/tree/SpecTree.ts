@@ -24,6 +24,10 @@ export class SpecTree extends Tree {
     super._renderViewRangeForNode(node);
   }
 
+  override _updateNodePaddingsLeft($nodesToUpdate?: JQuery) {
+    super._updateNodePaddingsLeft($nodesToUpdate);
+  }
+
   override _onScroll(event?: JQuery.ScrollEvent) {
     super._onScroll(event);
   }
