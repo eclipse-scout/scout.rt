@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, SpecForm, SpecLifecycle} from '../../../src/testing/index';
-import {FormLifecycle, scout, Status, StringField, TabBox, TabItem, TableField} from '../../../src/index';
+import {FormLifecycle, GroupBox, scout, Status, StringField, TabBox, TabItem, TableField, TreeVisitResult} from '../../../src/index';
+import $ from 'jquery';
 
 describe('FormLifecycle', () => {
 
@@ -333,5 +334,89 @@ describe('FormLifecycle', () => {
       expect(html).toContain('BarField');
     });
 
+  });
+
+  describe('validation result', () => {
+
+    it('should visit all fields recursively by default', () => {
+      let form = scout.create(SpecForm, {
+        parent: session.desktop,
+        rootGroupBox: {
+          id: 'MainBox',
+          objectType: GroupBox,
+          mainBox: true,
+          fields: [{
+            id: 'GroupBox',
+            objectType: GroupBox,
+            fields: [{
+              id: 'Field1',
+              objectType: StringField
+            }]
+          }]
+        }
+      });
+      let field1 = form.widget('Field1', StringField); // not mandatory
+      expect(field1.getValidationResult().validByMandatory).toBe(true);
+      // Add a nested, mandatory value field
+      let field2 = scout.create(StringField, {
+        parent: field1,
+        mandatory: true
+      });
+      expect(field2.getValidationResult().validByMandatory).toBe(false);
+
+      let invalidElements = form.lifecycle.invalidElements();
+      expect(invalidElements.missingElements.length).toBe(1);
+      expect(invalidElements.missingElements[0].field).toBe(field2);
+
+      // Set field1 to mandatory, now both fields should be reported
+      field1.setMandatory(true);
+      invalidElements = form.lifecycle.invalidElements();
+      expect(invalidElements.missingElements.length).toBe(2);
+      expect(invalidElements.missingElements[0].field).toBe(field1);
+      expect(invalidElements.missingElements[1].field).toBe(field2);
+    });
+
+    it('should consider visit result when visiting fields', () => {
+      let form = scout.create(SpecForm, {
+        parent: session.desktop,
+        rootGroupBox: {
+          id: 'MainBox',
+          objectType: GroupBox,
+          mainBox: true,
+          fields: [{
+            id: 'GroupBox',
+            objectType: GroupBox,
+            fields: [{
+              id: 'Field1',
+              objectType: StringField
+            }]
+          }]
+        }
+      });
+      let field1 = form.widget('Field1', StringField); // not mandatory
+      // Simulate a field class that ignores child fields by returning visit result SKIP_SUBTREE
+      let origGetValidationResult = field1.getValidationResult;
+      field1.getValidationResult = () => {
+        let result = origGetValidationResult.call(field1);
+        result.visitResult = TreeVisitResult.SKIP_SUBTREE;
+        return result;
+      };
+      expect(field1.getValidationResult().validByMandatory).toBe(true);
+      let field2 = scout.create(StringField, {
+        parent: field1,
+        mandatory: true
+      });
+      expect(field2.getValidationResult().validByMandatory).toBe(false);
+
+      // No errors should be reported
+      let invalidElements = form.lifecycle.invalidElements();
+      expect(invalidElements.missingElements.length).toBe(0);
+
+      // Set field1 to mandatory, now it should be reported
+      field1.setMandatory(true);
+      invalidElements = form.lifecycle.invalidElements();
+      expect(invalidElements.missingElements.length).toBe(1);
+      expect(invalidElements.missingElements[0].field).toBe(field1);
+    });
   });
 });

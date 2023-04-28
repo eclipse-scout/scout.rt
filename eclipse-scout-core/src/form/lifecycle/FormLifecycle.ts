@@ -42,16 +42,15 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     this.widget.visitFields(field => {
       let result = field.getValidationResult();
       if (result.valid) {
-        return;
+        return result.visitResult;
       }
       // error status has priority over mandatory
       if (!result.validByErrorStatus) {
         invalidFields.push(result);
-        return;
-      }
-      if (!result.validByMandatory) {
+      } else if (!result.validByMandatory) {
         missingFields.push(result);
       }
+      return result.visitResult;
     });
 
     return {

@@ -1630,6 +1630,7 @@ export type ValidationResult = {
   field: FormField;
   label: string;
   reveal: () => void;
+  visitResult?: TreeVisitResult;
 };
 export type AddCellEditorFieldCssClassesOptions = { cssClass?: string };
 
