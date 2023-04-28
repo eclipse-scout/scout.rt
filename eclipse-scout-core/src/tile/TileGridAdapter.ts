@@ -91,7 +91,7 @@ export class TileGridAdapter extends ModelAdapter {
     }
 
     // _sortWhileInit
-    objects.replacePrototypeFunction(TileGrid, '_sortWhileInit', function() {
+    objects.replacePrototypeFunction(TileGrid, '_sortWhileInit', function(this: TileGrid & { _sortWhileInitOrig }) {
       if (this.modelAdapter) {
         return; // Do nothing. Was sorted in Java UI already.
       }

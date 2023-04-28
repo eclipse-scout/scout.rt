@@ -166,17 +166,14 @@ export class OutlineAdapter extends TreeAdapter {
   }
 
   /**
-   * Replacement for Outline#_computeDetailContent(). 'This' points to the outline.
+   * Replacement for {@link Outline._computeDetailContent}.
    */
-  protected static _computeDetailContentRemote() {
-    // @ts-expect-error
+  protected static _computeDetailContentRemote(this: Outline & { _computeDetailContentOrig }) {
     if (!this.modelAdapter) {
-      // @ts-expect-error
       return this._computeDetailContentOrig();
     }
 
-    // @ts-expect-error
-    let selectedPage = this.selectedNode();
+    let selectedPage: Page & { detailFormResolved?: boolean } = this.selectedNode();
     if (!selectedPage) {
       // Detail content is shown for the selected node only
       return null;
@@ -186,21 +183,17 @@ export class OutlineAdapter extends TreeAdapter {
     if (selectedPage.detailForm || selectedPage.detailFormResolved) {
       // If there is a detail form -> return (and set flag to true to make updateDetailMenusRemote work)
       selectedPage.detailFormResolved = true;
-      // @ts-expect-error
       return this._computeDetailContentOrig();
     }
 
     // It is not known yet whether there is a detail form -> wait for the requests to be processed before showing the table row detail
-    // @ts-expect-error
     if (!this.session.areRequestsPending() && !this.session.areEventsQueued()) {
       // There are no requests pending -> return (and set flag to true to make updateDetailMenusRemote work)
       selectedPage.detailFormResolved = true;
-      // @ts-expect-error
       return this._computeDetailContentOrig();
     }
 
     // Wait for the requests to complete
-    // @ts-expect-error
     this.session.listen().done(function(selectedPage) {
       if (selectedPage.detailFormResolved) {
         // No need to update detail content again if resolved is true
@@ -213,17 +206,14 @@ export class OutlineAdapter extends TreeAdapter {
   }
 
   /**
-   * Replacement for Outline#updateDetailMenusRemote(). 'This' points to the outline.
+   * Replacement for {@link Outline.updateDetailMenus}.
    */
-  static updateDetailMenusRemote() {
-    // @ts-expect-error
+  static updateDetailMenusRemote(this: Outline & { updateDetailMenusOrig: typeof Outline.prototype.updateDetailMenus }) {
     if (!this.modelAdapter) {
-      // @ts-expect-error
       return this.updateDetailMenusOrig();
     }
-    // @ts-expect-error
-    if (this.selectedNode() && this.selectedNode().detailFormResolved) {
-      // @ts-expect-error
+    let selectedPage: Page & { detailFormResolved?: boolean } = this.selectedNode();
+    if (selectedPage && selectedPage.detailFormResolved) {
       return this.updateDetailMenusOrig();
     }
   }
@@ -233,22 +223,17 @@ export class OutlineAdapter extends TreeAdapter {
    * This cannot be done using pageInit event because the page needs to be initialized during the outline initialization
    * and the event listener can only be attached afterwards.
    */
-  protected static _initTreeNodeInternalRemote(page: Page, parentNode: Page) {
-    // @ts-expect-error
+  protected static _initTreeNodeInternalRemote(this: Outline & { modelAdapter: OutlineAdapter; _initTreeNodeInternalOrig }, page: Page, parentNode: Page) {
     this._initTreeNodeInternalOrig(page, parentNode);
-    // @ts-expect-error
     if (!this.modelAdapter) {
       return;
     }
     // The current method may be called during init of the Outline
     // -> widget is not set yet but the following methods need it
-    // @ts-expect-error
     this.modelAdapter.widget = this;
     if (page.detailTable) {
-      // @ts-expect-error
       this.modelAdapter._initDetailTable(page);
     }
-    // @ts-expect-error
     this.modelAdapter._linkNodeWithRowLater(page);
   }
 }

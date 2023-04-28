@@ -457,7 +457,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
     }
 
     // _createChild
-    objects.replacePrototypeFunction(Widget, '_createChild', function(model) {
+    objects.replacePrototypeFunction(Widget, '_createChild', function(this: Widget & { _createChildOrig }, model) {
       if (model instanceof Widget) {
         return model;
       }

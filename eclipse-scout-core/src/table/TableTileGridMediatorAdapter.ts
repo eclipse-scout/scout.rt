@@ -19,7 +19,7 @@ export class TableTileGridMediatorAdapter extends ModelAdapter {
     }
 
     // tiles are already provided by the backend in classic mode
-    objects.replacePrototypeFunction(TableTileGridMediator, 'loadTiles', function() {
+    objects.replacePrototypeFunction(TableTileGridMediator, 'loadTiles', function(this: TableTileGridMediator & { loadTilesOrig }) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
@@ -28,7 +28,7 @@ export class TableTileGridMediatorAdapter extends ModelAdapter {
     }, true);
 
     // handled by the java mediator
-    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsInserted', function(event) {
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsInserted', function(this: TableTileGridMediator & { _onTableRowsInsertedOrig }, event) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
@@ -37,7 +37,7 @@ export class TableTileGridMediatorAdapter extends ModelAdapter {
     }, true);
 
     // handled by the java mediator
-    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsDeleted', function(event) {
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsDeleted', function(this: TableTileGridMediator & { _onTableRowsDeletedOrig }, event) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
@@ -46,7 +46,7 @@ export class TableTileGridMediatorAdapter extends ModelAdapter {
     }, true);
 
     // handled by the java mediator
-    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableAllRowsDeleted', function(event) {
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableAllRowsDeleted', function(this: TableTileGridMediator & { _onTableAllRowsDeletedOrig }, event) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;

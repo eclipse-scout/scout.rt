@@ -112,21 +112,17 @@ export class PlannerAdapter extends ModelAdapter {
     }
   }
 
-  protected static _initResourceRemote(resource: PlannerResource) {
-    // @ts-expect-error
+  protected static _initResourceRemote(this: Planner & { _initResourceOrig }, resource: PlannerResource) {
     if (this.modelAdapter) {
       defaultValues.applyTo(resource, 'Resource');
     }
-    // @ts-expect-error
     return this._initResourceOrig(resource);
   }
 
-  protected static _initActivityRemote(activity: PlannerActivity) {
-    // @ts-expect-error
+  protected static _initActivityRemote(this: Planner & { _initActivityOrig }, activity: PlannerActivity) {
     if (this.modelAdapter) {
       defaultValues.applyTo(activity, 'Activity');
     }
-    // @ts-expect-error
     return this._initActivityOrig(activity);
   }
 

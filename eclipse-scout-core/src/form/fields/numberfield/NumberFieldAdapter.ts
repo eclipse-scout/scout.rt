@@ -29,7 +29,7 @@ export class NumberFieldAdapter extends BasicFieldAdapter {
       return;
     }
 
-    objects.replacePrototypeFunction(NumberField, 'clearErrorStatus', function() {
+    objects.replacePrototypeFunction(NumberField, NumberField.prototype.clearErrorStatus, function() {
       if (this.modelAdapter) {
         // Don't do anything -> let server handle it
 

@@ -635,13 +635,10 @@ export class TableAdapter extends ModelAdapter {
     return model;
   }
 
-  protected static _createRowRemote(rowModel: TableRowModel): TableRow {
-    // @ts-expect-error
+  protected static _createRowRemote(this: Table & { modelAdapter: TableAdapter; _createRowOrig }, rowModel: TableRowModel): TableRow {
     if (this.modelAdapter) {
-      // @ts-expect-error
       rowModel = this.modelAdapter._initRowModel(rowModel);
     }
-    // @ts-expect-error
     return this._createRowOrig(rowModel);
   }
 
@@ -656,7 +653,7 @@ export class TableAdapter extends ModelAdapter {
     objects.replacePrototypeFunction(Table, '_createRow', TableAdapter._createRowRemote, true);
 
     // _sortWhileInit
-    objects.replacePrototypeFunction(Table, '_sortWhileInit', function() {
+    objects.replacePrototypeFunction(Table, '_sortWhileInit', function(this: Table & { _sortWhileInitOrig }) {
       if (this.modelAdapter) {
         // Scout classic: not necessary to sort in init as the rows are already sorted on the Java UI. Only apply grouping here.
         this._group();
@@ -666,7 +663,7 @@ export class TableAdapter extends ModelAdapter {
     }, true);
 
     // _sortAfterInsert
-    objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(wasEmpty: boolean) {
+    objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(this: Table & { _sortAfterInsertOrig }, wasEmpty: boolean) {
       if (this.modelAdapter) {
         // There will only be a row order changed event if table was not empty.
         // If it was empty, there will be NO row order changed event (tableEventBuffer) -> inserted rows are already in correct order -> no sort necessary but group is
@@ -688,7 +685,7 @@ export class TableAdapter extends ModelAdapter {
     }, true);
 
     // uiSortPossible
-    objects.replacePrototypeFunction(Table, '_isSortingPossible', function(sortColumns: Column<any>[]) {
+    objects.replacePrototypeFunction(Table, '_isSortingPossible', function(this: Table & { uiSortPossible: boolean; _isSortingPossibleOrig }, sortColumns: Column<any>[]) {
       if (this.modelAdapter) {
         // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally, we check if each column can install
         // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
@@ -700,7 +697,7 @@ export class TableAdapter extends ModelAdapter {
     }, true);
 
     // sort
-    objects.replacePrototypeFunction(Table, 'sort', function(column: Column<any>, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
+    objects.replacePrototypeFunction(Table, 'sort', function(this: Table & { sortOrig }, column: Column<any>, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
       if (this.modelAdapter && column.guiOnly) {
         return;
       }
@@ -708,7 +705,7 @@ export class TableAdapter extends ModelAdapter {
     }, true);
 
     // no js default tileTableHeader in classic mode
-    objects.replacePrototypeFunction(Table, '_createTileTableHeader', function() {
+    objects.replacePrototypeFunction(Table, '_createTileTableHeader', function(this: Table & { _createTileTableHeaderOrig }) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
@@ -717,7 +714,7 @@ export class TableAdapter extends ModelAdapter {
     }, true);
 
     // not used in classic mode since tiles are created by the server
-    objects.replacePrototypeFunction(Table, 'createTiles', function(rows: TableRow[]) {
+    objects.replacePrototypeFunction(Table, 'createTiles', function(this: Table & { createTilesOrig: typeof Table.prototype.createTiles }, rows: TableRow[]) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
@@ -732,7 +729,7 @@ export class TableAdapter extends ModelAdapter {
     }
 
     // init
-    objects.replacePrototypeFunction(Column, 'init', function(model: ColumnModel<any>) {
+    objects.replacePrototypeFunction(Column, 'init', function(this: Column & { initOrig }, model: ColumnModel<any>) {
       if (model.table && model.table.modelAdapter && !model.guiOnly) {
         // Fill in the missing default values only in remote case, don't do it JS case to not accidentally set undefined properties (e.g. uiSortEnabled)
         model = $.extend({}, model);
@@ -742,7 +739,7 @@ export class TableAdapter extends ModelAdapter {
     }, true);
 
     // _ensureCell
-    objects.replacePrototypeFunction(Column, '_ensureCell', function(vararg: any) {
+    objects.replacePrototypeFunction(Column, '_ensureCell', function(this: Column & { _ensureCellOrig; _ensureValue }, vararg: any) {
       if (this.table.modelAdapter) {
         // Note: we do almost the same thing as in _ensureCellOrig, the difference is that
         // we treat a plain object always as cell-model and we always must apply defaultValues
@@ -778,7 +775,7 @@ export class TableAdapter extends ModelAdapter {
     }, true);
 
     // uiSortPossible
-    objects.replacePrototypeFunction(Column, 'isSortingPossible', function() {
+    objects.replacePrototypeFunction(Column, 'isSortingPossible', function(this: Column & { uiSortPossible: boolean; isSortingPossibleOrig: typeof Column.prototype.isSortingPossible }) {
       if (this.table.modelAdapter) {
         // Returns whether this column can be used to sort on the client side. In a JS only app the flag 'uiSortPossible'
         // is never set and defaults to true. As a side effect of this function a comparator is installed.
@@ -798,7 +795,7 @@ export class TableAdapter extends ModelAdapter {
     }
 
     // _toggleCellValue
-    objects.replacePrototypeFunction(BooleanColumn, '_toggleCellValue', function(row: TableRow, cell: Cell<boolean>) {
+    objects.replacePrototypeFunction(BooleanColumn, '_toggleCellValue', function(this: BooleanColumn & { _toggleCellValueOrig }, row: TableRow, cell: Cell<boolean>) {
       if (this.table.modelAdapter) {
         // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
       } else {
