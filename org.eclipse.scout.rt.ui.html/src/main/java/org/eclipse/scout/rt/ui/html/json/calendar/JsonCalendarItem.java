@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,6 +39,7 @@ public class JsonCalendarItem implements IJsonObject {
     json.put("lastModified", m_item.getLastModified());
     json.put("itemId", m_item.getItemId());
     json.put("owner", m_item.getOwner());
+    json.put("resourceId", m_item.getResourceId());
     json.put("subject", m_item.getSubject());
     json.put("description", m_item.getDescription());
     json.put("cssClass", m_item.getCssClass());

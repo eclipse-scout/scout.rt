@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,8 @@ import {App, arrays, scout, Session, UuidPoolEventMap, UuidPoolModel, Widget} fr
 export class UuidPool extends Widget implements UuidPoolModel {
   declare model: UuidPoolModel;
   declare eventMap: UuidPoolEventMap;
+
+  static readonly ZERO_UUID: string = '00000000-0000-0000-0000-000000000000';
 
   uuids: string[];
   size: number;

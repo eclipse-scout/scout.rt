@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, DateRange, dates, InitModelOf, Planner, PlannerDisplayMode, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
+import {Calendar, DateRange, dates, HtmlComponent, InitModelOf, Planner, PlannerDisplayMode, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
 import $ from 'jquery';
 
 export class YearPanel extends Widget implements YearPanelModel {
@@ -35,6 +35,7 @@ export class YearPanel extends Widget implements YearPanelModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('year-panel-container');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.$yearTitle = this.$container.appendDiv('year-panel-title');
     this.$yearList = this.$container.appendDiv('year-panel-list');
   }
@@ -43,7 +44,9 @@ export class YearPanel extends Widget implements YearPanelModel {
     this.removeContent();
     this._drawYear();
     this._installScrollbars({
-      axis: 'y'
+      axis: 'y',
+      nativeScrollbars: false,
+      hybridScrollbars: false
     });
     this.yearRendered = true;
     this._colorYear();
@@ -161,7 +164,7 @@ export class YearPanel extends Widget implements YearPanelModel {
     halfMonth = $month.outerHeight() / 2;
     halfYear = $year.outerHeight() / 2;
 
-    this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear);
+    this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear, () => scrollbars.update(this.$yearList));
   }
 
   protected _format(date: Date, pattern: string): string {
