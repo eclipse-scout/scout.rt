@@ -9,7 +9,7 @@
  */
 import {
   arrays, CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf,
-  JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcesPanel, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -71,6 +71,7 @@ export class Calendar extends Widget implements CalendarModel {
   modesMenu: CalendarModesMenu;
   menus: Menu[];
   yearPanel: YearPanel;
+  resourcesPanel: ResourcesPanel;
   selectedRange: DateRange;
   needsScrollToStartHour: boolean;
   defaultMenuTypes: string[];
@@ -94,6 +95,7 @@ export class Calendar extends Widget implements CalendarModel {
   /** additional modes; should be stored in model */
   protected _showYearPanel: boolean;
   protected _showListPanel: boolean;
+  protected _showResourcesPanel: boolean;
 
   /**
    * The narrow view range is different from the regular view range.
@@ -162,6 +164,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     this._showYearPanel = false;
     this._showListPanel = false;
+    this._showResourcesPanel = false;
 
     this._exactRange = null;
 
@@ -232,6 +235,9 @@ export class Calendar extends Widget implements CalendarModel {
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.yearPanel = scout.create(YearPanel, {
+      parent: this
+    });
+    this.resourcesPanel = scout.create(ResourcesPanel, {
       parent: this
     });
     this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
@@ -387,6 +393,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.$headerRow1 = this.$header.appendDiv('calendar-header-row first');
     this.$headerRow2 = this.$header.appendDiv('calendar-header-row last');
     this.yearPanel.render();
+    this.resourcesPanel.render();
 
     this.$grids = this.$container.appendDiv('calendar-grids');
     this.$topGrid = this.$grids.appendDiv('calendar-top-grid');
@@ -431,6 +438,8 @@ export class Calendar extends Widget implements CalendarModel {
       .on('click', this._onYearClick.bind(this));
     this.$commands.appendDiv('calendar-toggle-list')
       .on('click', this._onListClick.bind(this));
+    this.$commands.appendDiv('calendar-toggle-resources')
+      .on('click', this._onResourcesClick.bind(this));
 
     // Append the top grid (day/week views)
     let $weekHeader = this.$topGrid.appendDiv('calendar-week-header');
@@ -699,6 +708,11 @@ export class Calendar extends Widget implements CalendarModel {
     this._updateScreen(false, true);
   }
 
+  protected _onResourcesClick(event: JQuery.ClickEvent) {
+    this._showResourcesPanel = !this._showResourcesPanel;
+    this._updateScreen(false, true);
+  }
+
   protected _onDayMouseDown(withTime: boolean, event: JQuery.MouseDownEvent) {
     let selectedDate = new Date($(event.delegateTarget).data('date')),
       timeChanged = false;
@@ -847,12 +861,15 @@ export class Calendar extends Widget implements CalendarModel {
 
     // show or hide year
     $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
-    if (this._showYearPanel) {
+    $('.calendar-toggle-resources', this.$commands).select(this._showResourcesPanel);
+    if (this._showYearPanel || this._showResourcesPanel) {
       this.yearPanel.$container.data('new-width', this.calendarToggleYearWidth);
+      this.resourcesPanel.$container.data('new-width', this.calendarToggleYearWidth);
       gridW -= this.calendarToggleYearWidth;
       containerW -= this.calendarToggleYearWidth;
     } else {
       this.yearPanel.$container.data('new-width', 0);
+      this.resourcesPanel.$container.data('new-width', 0);
     }
 
     // show or hide work list
