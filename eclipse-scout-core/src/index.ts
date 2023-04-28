@@ -389,6 +389,7 @@ export * from './calendar/CalendarModesMenu';
 export * from './calendar/CalendarModesMenuEventMap';
 export * from './calendar/CalendarModesMenuModel';
 export * from './calendar/DateRange';
+export * from './calendar/ResourcesPanel';
 export * from './calendar/YearPanel';
 export * from './calendar/YearPanelModel';
 export * from './calendar/YearPanelEventMap';
