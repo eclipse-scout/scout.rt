@@ -3216,8 +3216,11 @@ export default class Tree extends Widget {
         // Because the change node event is not batch capable, performance would slow down if many change node events are processed
         // To mitigate this, the updating is done later
         queueMicrotask(() => {
-          this._updateNodePaddingsLeft();
           this._changeNodeTaskScheduled = false;
+          if (!this.rendered) {
+            return;
+          }
+          this._updateNodePaddingsLeft();
         });
         this._changeNodeTaskScheduled = true;
       }
