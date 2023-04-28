@@ -16,7 +16,7 @@ export class AggregateTableControlAdapter extends TableControlAdapter {
     }
 
     // _onTableColumnStructureChanged
-    objects.replacePrototypeFunction(AggregateTableControl, '_onTableColumnStructureChanged', function(vararg) {
+    objects.replacePrototypeFunction(AggregateTableControl, '_onTableColumnStructureChanged', function(this: AggregateTableControl & { _onTableColumnStructureChangedOrig; _updateEnabledAndSelectedState }, vararg) {
       if (this.modelAdapter) {
         this._updateEnabledAndSelectedState();
       } else {

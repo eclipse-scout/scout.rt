@@ -276,13 +276,10 @@ export class TreeAdapter extends ModelAdapter {
   /**
    * 'this' in this function refers to the Tree
    */
-  protected static _createTreeNodeRemote(nodeModel: TreeNodeModel) {
-    // @ts-expect-error
+  protected static _createTreeNodeRemote(this: Tree & { modelAdapter: TreeAdapter; _createTreeNodeOrig }, nodeModel: TreeNodeModel) {
     if (this.modelAdapter) {
-      // @ts-expect-error
       nodeModel = this.modelAdapter._initNodeModel(nodeModel);
     }
-    // @ts-expect-error
     return this._createTreeNodeOrig(nodeModel);
   }
 

@@ -67,16 +67,14 @@ export class FormFieldAdapter extends ModelAdapter {
       return;
     }
 
-    objects.replacePrototypeFunction(FormField, 'getCurrentMenuTypes', FormFieldAdapter.getCurrentMenuTypes, true);
+    objects.replacePrototypeFunction(FormField, FormField.prototype.getCurrentMenuTypes, FormFieldAdapter.getCurrentMenuTypes, true);
   }
 
-  static getCurrentMenuTypes(): string[] {
-    // @ts-expect-error
+  static getCurrentMenuTypes(this: FormField & { getCurrentMenuTypesOrig: typeof FormField.prototype.getCurrentMenuTypes }): string[] {
     let modelAdapter = this.modelAdapter as FormFieldAdapter;
     if (modelAdapter) {
       return modelAdapter._currentMenuTypes;
     }
-    // @ts-expect-error
     return this.getCurrentMenuTypesOrig();
   }
 }

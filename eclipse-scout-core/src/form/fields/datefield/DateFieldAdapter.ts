@@ -47,10 +47,8 @@ export class DateFieldAdapter extends ValueFieldAdapter {
     return Object.keys(newProperties).sort(this._createPropertySortFunc(DateFieldAdapter.PROPERTIES_ORDER));
   }
 
-  static isDateAllowedRemote(date: Date): boolean {
-    // @ts-expect-error
+  static isDateAllowedRemote(this: DateField & { isDateAllowedOrig: typeof DateField.prototype.isDateAllowed }, date: Date): boolean {
     if (!this.modelAdapter) {
-      // @ts-expect-error
       return this.isDateAllowedOrig(date);
     }
     // Server will take care of it
@@ -62,7 +60,7 @@ export class DateFieldAdapter extends ValueFieldAdapter {
       return;
     }
 
-    objects.replacePrototypeFunction(DateField, 'isDateAllowed', DateFieldAdapter.isDateAllowedRemote, true);
+    objects.replacePrototypeFunction(DateField, DateField.prototype.isDateAllowed, DateFieldAdapter.isDateAllowedRemote, true);
   }
 }
 
