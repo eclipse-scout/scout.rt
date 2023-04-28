@@ -127,7 +127,8 @@
 
 .calendar-mode,
 .calendar-toggle-year,
-.calendar-toggle-list {
+.calendar-toggle-list,
+.calendar-toggle-resources {
   display: inline-block;
   vertical-align: middle;
   text-align: center;
@@ -174,7 +175,8 @@
 }
 
 .calendar-toggle-year,
-.calendar-toggle-list {
+.calendar-toggle-list,
+.calendar-toggle-resources {
   margin-left: 5px;
 
   &:hover::before {
@@ -188,6 +190,10 @@
 
 .calendar-toggle-list::before {
   .calendar-icon(@icon-list, 18px);
+}
+
+.calendar-toggle-resources::before {
+  .calendar-icon(@icon-person-solid, 18px);
 }
 
 .calendar-component {
