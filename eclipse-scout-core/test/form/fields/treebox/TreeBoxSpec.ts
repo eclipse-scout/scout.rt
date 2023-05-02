@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {LookupCall, LookupCallModel, LookupResult, LookupRow, QueryBy, scout, Status, TreeBox, TreeBoxModel} from '../../../../src/index';
-import {DummyLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
+import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
 import {InitModelOf} from '../../../../src/scout';
 
 describe('TreeBox', () => {
@@ -27,8 +27,8 @@ describe('TreeBox', () => {
   });
 
   class SpecTreeBox<T> extends TreeBox<T> {
-    override _lookupByAllDone(result: LookupResult<T>): boolean {
-      return super._lookupByAllDone(result);
+    override _lookupByAllDone(result: LookupResult<T>) {
+      super._lookupByAllDone(result);
     }
 
     override _executeLookup(lookupCall: LookupCall<T>, abortExisting?: boolean): JQuery.Promise<LookupResult<T>> {
@@ -219,6 +219,42 @@ describe('TreeBox', () => {
       expect(field.tree.visibleNodesFlat.length).toBe(3);
     });
 
+    it('switching to a lookup call returning no results should clear table', () => {
+      let field = createFieldWithLookupCall({}, {
+        objectType: DummyLookupCall
+      });
+      field.setValue([100, 500]);
+      jasmine.clock().tick(300);
+      expect(field.tree.visibleNodesFlat.length).toBe(1);
+
+      let newLookupCall = scout.create(EmptyDummyLookupCall, {
+        session: session
+      });
+      field.setLookupCall(newLookupCall);
+      jasmine.clock().tick(300);
+      // dont change value when lookupCall changes
+      expect(field.value).toEqual([100, 500]);
+      expect(field.displayText).toBe('');
+      expect(field.tree.checkedNodes.length).toBe(0);
+      expect(field.tree.visibleNodesFlat.length).toBe(0);
+    });
+
+    it('switching to a lookup call without a lookup error should remove the error', () => {
+      let field = createFieldWithLookupCall({}, {
+        objectType: ErroneousLookupCall
+      });
+      jasmine.clock().tick(300);
+      expect(field.lookupStatus).not.toBe(null);
+
+      let newLookupCall = scout.create(DummyLookupCall, {
+        session: session
+      });
+      field.setLookupCall(newLookupCall);
+      jasmine.clock().tick(300);
+      expect(field.lookupStatus).toBe(null);
+      expect(field.tree.visibleNodesFlat.length).toBe(1);
+    });
+
     it('should be cloned and prepared for each lookup', () => {
       let templatePropertyValue = 11;
       let preparedPropertyValue = 22;
@@ -261,15 +297,15 @@ describe('TreeBox', () => {
   });
 
   describe('lookup', () => {
-    it('should set error status when result has an exception', () => {
+    it('should set lookup status when result has an exception', () => {
       let field = createFieldWithLookupCall();
       field._lookupByAllDone({
         queryBy: QueryBy.ALL,
         lookupRows: [],
         exception: 'a total disaster'
       });
-      expect(field.errorStatus.severity).toBe(Status.Severity.ERROR);
-      expect(field.errorStatus.message).toBe('a total disaster');
+      expect(field.lookupStatus.severity).toBe(Status.Severity.WARNING);
+      expect(field.lookupStatus.message).toBe('a total disaster');
     });
 
     it('_executeLookup should always remove lookup-status (but not the error-status)', () => {
@@ -293,6 +329,13 @@ describe('TreeBox', () => {
       jasmine.clock().tick(500);
 
       expect(field.tree.visibleNodesFlat.length).toBe(1);
+    });
+
+    it('should not set an error status if lookup returned no results', () => {
+      let field = createFieldWithLookupCall({}, {objectType: EmptyDummyLookupCall});
+      jasmine.clock().tick(300);
+      expect(field.tree.visibleNodesFlat.length).toBe(0);
+      expect(field.errorStatus).toBe(null);
     });
   });
 

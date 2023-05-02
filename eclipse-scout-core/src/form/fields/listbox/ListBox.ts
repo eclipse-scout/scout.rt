@@ -18,7 +18,6 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     super();
 
     this.table = null;
-    this.lookupStatus = null;
 
     this._addWidgetProperties(['table', 'filterBox']);
   }
@@ -116,12 +115,9 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     }
   }
 
-  protected override _lookupByAllDone(result: LookupResult<TValue>): boolean {
-    if (super._lookupByAllDone(result)) {
-      this._populateTable(result);
-      return true;
-    }
-    return false;
+  protected override _lookupByAllDone(result: LookupResult<TValue>) {
+    super._lookupByAllDone(result);
+    this._populateTable(result);
   }
 
   protected _populateTable(result: LookupResult<TValue>) {

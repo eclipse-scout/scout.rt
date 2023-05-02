@@ -320,6 +320,21 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
     // NOP. Implement in subclasses if necessary.
   }
 
+  /**
+   * Creates a lookup result with the given lookup rows. If the lookup call fails, an error message (exception) should be passed.
+   *
+   * Can be used by concrete lookup calls if needed.
+   */
+  protected _createLookupResult(lookupRows: LookupRow<TKey>[], exception?: string): LookupResult<TKey> {
+    return {
+      queryBy: this.queryBy,
+      text: this.searchText,
+      key: this.key,
+      lookupRows: lookupRows,
+      exception: exception
+    };
+  }
+
   // ---- static helpers ----
 
   static ensure<TKey, TLookupCall extends LookupCall<TKey>>(lookupCall: LookupCallOrModel<TKey, TLookupCall>, session: Session): TLookupCall {

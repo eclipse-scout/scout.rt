@@ -113,12 +113,9 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
     }
   }
 
-  protected override _lookupByAllDone(result: LookupResult<TValue>): boolean {
-    if (super._lookupByAllDone(result)) {
-      this._populateTree(result);
-      return true;
-    }
-    return false;
+  protected override _lookupByAllDone(result: LookupResult<TValue>) {
+    super._lookupByAllDone(result);
+    this._populateTree(result);
   }
 
   protected _populateTree(result: LookupResult<TValue>) {

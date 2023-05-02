@@ -370,6 +370,10 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     }
   }
 
+  setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
+    this.setProperty('lookupCall', lookupCall);
+  }
+
   protected _setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._lookupExecuted = false;
@@ -407,13 +411,11 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     }
 
     let deferred = $.Deferred();
-    let doneHandler = function(result) {
-      this._lookupByAllDone(result);
-      deferred.resolve(result);
-    }.bind(this);
-
     this._executeLookup(this.lookupCall.cloneForAll(), true)
-      .done(doneHandler);
+      .done(result => {
+        this._lookupByAllDone(result);
+        deferred.resolve(result);
+      });
 
     return deferred.promise();
   }
@@ -447,26 +449,14 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
 
   protected _lookupByAllDone(result: LookupResult<TValue>) {
     try {
-
       if (result.exception) {
         // Oops! Something went wrong while the lookup has been processed.
-        this.setErrorStatus(Status.error({
+        this.setLookupStatus(Status.warning({
           message: result.exception
         }));
         return;
       }
-
-      // 'No data' case
-      if (result.lookupRows.length === 0) {
-        this.setLookupStatus(Status.warning({
-          message: this.session.text('SmartFieldNoDataFound'),
-          code: RadioButtonGroup.ErrorCode.NO_DATA
-        }));
-        return;
-      }
-
       this._populateRadioButtonGroup(result);
-
     } finally {
       this.trigger('lookupCallDone', {
         result: result
