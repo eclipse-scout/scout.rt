@@ -26,6 +26,8 @@ export * from './form/fields/beanfield/TestBeanField';
 export * from './form/fields/tabbox/TabBoxSpecHelper';
 export * from './desktop/outline/OutlineSpecHelper';
 export * from './lookup/DummyLookupCall';
+export * from './lookup/EmptyDummyLookupCall';
+export * from './lookup/ErroneousLookupCall';
 export * from './lookup/MicrotaskStaticLookupCall';
 export * from './lookup/DelayedStaticLookupCall';
 export * from './lookup/ActiveDummyLookupCall';

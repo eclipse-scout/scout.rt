@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ListBox, ListBoxModel, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
-import {DummyLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
+import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
 import {InitModelOf, ObjectOrModel} from '../../../../src/scout';
 
 describe('ListBox', () => {
@@ -27,8 +27,8 @@ describe('ListBox', () => {
   });
 
   class SpecListBox extends ListBox<any> {
-    override _lookupByAllDone(result: LookupResult<any>): boolean {
-      return super._lookupByAllDone(result);
+    override _lookupByAllDone(result: LookupResult<any>) {
+      super._lookupByAllDone(result);
     }
 
     override _executeLookup(lookupCall: LookupCall<any>, abortExisting?: boolean): JQuery.Promise<LookupResult<any>> {
@@ -216,6 +216,42 @@ describe('ListBox', () => {
       expect(field.table.rows.length).toBe(3);
     });
 
+    it('switching to a lookup call returning no results should clear table', () => {
+      let field = createFieldWithLookupCall({}, {
+        objectType: DummyLookupCall
+      });
+      field.setValue([100, 500]);
+      jasmine.clock().tick(300);
+      expect(field.table.rows.length).toBe(3);
+
+      let newLookupCall = scout.create(EmptyDummyLookupCall, {
+        session: session
+      });
+      field.setLookupCall(newLookupCall);
+      jasmine.clock().tick(300);
+      // dont change value when lookupCall changes
+      expect(field.value).toEqual([100, 500]);
+      expect(field.displayText).toBe('');
+      expect(field.table.checkedRows().length).toBe(0);
+      expect(field.table.rows.length).toBe(0);
+    });
+
+    it('switching to a lookup call without a lookup error should remove the error', () => {
+      let field = createFieldWithLookupCall({}, {
+        objectType: ErroneousLookupCall
+      });
+      jasmine.clock().tick(300);
+      expect(field.lookupStatus).not.toBe(null);
+
+      let newLookupCall = scout.create(DummyLookupCall, {
+        session: session
+      });
+      field.setLookupCall(newLookupCall);
+      jasmine.clock().tick(300);
+      expect(field.lookupStatus).toBe(null);
+      expect(field.table.rows.length).toBe(3);
+    });
+
     it('should be cloned and prepared for each lookup', () => {
       let templatePropertyValue = 11;
       let preparedPropertyValue = 22;
@@ -258,15 +294,15 @@ describe('ListBox', () => {
   });
 
   describe('lookup', () => {
-    it('should set error status when result has an exception', () => {
+    it('should set lookup status when result has an exception', () => {
       let field = createFieldWithLookupCall();
       field._lookupByAllDone({
         queryBy: QueryBy.ALL,
         lookupRows: [],
         exception: 'a total disaster'
       });
-      expect(field.errorStatus.severity).toBe(Status.Severity.ERROR);
-      expect(field.errorStatus.message).toBe('a total disaster');
+      expect(field.lookupStatus.severity).toBe(Status.Severity.WARNING);
+      expect(field.lookupStatus.message).toBe('a total disaster');
     });
 
     it('_executeLookup should always remove lookup-status (but not the error-status)', () => {
@@ -290,6 +326,13 @@ describe('ListBox', () => {
       jasmine.clock().tick(500);
 
       expect(field.table.rows.length).toBe(3);
+    });
+
+    it('should not set an error status if lookup returned no results', () => {
+      let field = createFieldWithLookupCall({}, {objectType: EmptyDummyLookupCall});
+      jasmine.clock().tick(300);
+      expect(field.table.rows.length).toBe(0);
+      expect(field.errorStatus).toBe(null);
     });
   });
 

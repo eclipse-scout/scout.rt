@@ -133,26 +133,14 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
       });
   }
 
-  protected _lookupByAllDone(result: LookupResult<TValue>): boolean {
+  protected _lookupByAllDone(result: LookupResult<TValue>) {
     try {
       if (result.exception) {
         // Oops! Something went wrong while the lookup has been processed.
-        this.setErrorStatus(Status.error({
+        this.setLookupStatus(Status.warning({ // Use warning instead of error to allow form to be closed because user probably cannot fix lookup errors
           message: result.exception
         }));
-        return false;
       }
-
-      // 'No data' case
-      if (result.lookupRows.length === 0) {
-        this.setLookupStatus(Status.warning({
-          message: this.session.text('SmartFieldNoDataFound'),
-          code: LookupBox.ErrorCode.NO_DATA
-        }));
-        return false;
-      }
-
-      return true;
     } finally {
       this.trigger('lookupCallDone', {
         result: result

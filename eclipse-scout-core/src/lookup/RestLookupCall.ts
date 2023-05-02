@@ -26,7 +26,7 @@ import Deferred = JQuery.Deferred;
  *
  * Restriction:
  * ------------
- * The restriction object consists of a number of 'well-known' properties (e.g. 'text' in QueryBy.TEXT
+ * The restriction object consists of a number of 'well-known' properties (e.g. 'text' in {@link QueryBy.TEXT}
  * mode, see AbstractLookupRestrictionDo.java for details) and additional, service-dependent properties
  * that can either be predefined in the model or added programmatically at runtime. Since all of those
  * properties are sent in the same restriction object, some care must be taken to prevent accidental
@@ -168,21 +168,10 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
         let lookupRows = arrays.ensure(data ? data.rows : null)
           .filter(this._acceptLookupRow.bind(this))
           .map(this._createLookupRowFromDo.bind(this));
-        this._deferred.resolve({
-          queryBy: this.queryBy,
-          text: this.searchText,
-          key: this.key,
-          lookupRows: lookupRows
-        });
+        this._deferred.resolve(this._createLookupResult(lookupRows));
       })
       .catch(ajaxError => {
-        this._deferred.resolve({
-          queryBy: this.queryBy,
-          text: this.searchText,
-          key: this.key,
-          lookupRows: [],
-          exception: this.session.text('ErrorWhileLoadingData')
-        });
+        this._deferred.resolve(this._createLookupResult([], this.session.text('ErrorWhileLoadingData')));
       });
 
     return this._deferred.promise();
