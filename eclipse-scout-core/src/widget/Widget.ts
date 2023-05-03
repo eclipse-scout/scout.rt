@@ -573,12 +573,12 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     // remove children in reverse order.
     // noinspection JSVoidFunctionReturnValueUsed Obviously an IntelliJ bug, it assumes reverse is from Animation rather than from Array
     this.children.slice().reverse()
-      .forEach(function(child) {
+      .forEach(child => {
         // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
         if (child.parent === this) {
           child.remove();
         }
-      }, this);
+      });
 
     if (!this._rendered) {
       // The widget may have been removed already by one of the above remove() calls (e.g. by a remove listener)
@@ -698,8 +698,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return;
     }
 
-    if (this.owner) {
+    if (this.owner && this.owner !== this.parent) {
       // Remove from old owner
+      // If parent and owner point to the same instance, removing the child from the owner would remove it from the parent as well -> do it only if they are different.
+      // Both owner and parent have the widget in their children list (parents need it for removing, owners for destroying).
       this.owner._removeChild(this);
     }
     this.owner = owner;
@@ -733,8 +735,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       this.parent.off('removing', this._parentRemovingWhileAnimatingHandler);
 
       if (this.parent !== this.owner) {
-        // Remove from old parent if getting relinked
-        // Is the old parent still the owner, don't remove it because owner stays responsible for destroying it
+        // Remove from old parent if getting relinked.
+        // If parent and owner point to the same instance, removing the child from the parent would remove it from the owner as well -> do it only if they are different.
+        // Both owner and parent have the widget in their children list (parents need it for removing, owners for destroying).
         this.parent._removeChild(this);
       }
     }
@@ -1041,7 +1044,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
         return;
       }
       cssClasses.push(newCssClass);
-    }, this);
+    });
     this.setProperty('cssClass', arrays.format(cssClasses, ' '));
   }
 
