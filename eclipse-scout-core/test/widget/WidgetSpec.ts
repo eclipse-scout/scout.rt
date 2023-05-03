@@ -749,43 +749,52 @@ describe('Widget', () => {
       let widget = createWidget({
         parent: parent
       });
-      let owner = createWidget({
-        parent: new TestWidget()
+      let widget2 = createWidget({
+        parent: parent
       });
-      let another = createWidget({
-        parent: parent,
-        owner: owner
+      let child = createWidget({
+        parent: widget,
+        owner: widget2
       });
-      expect(parent.children[0]).toBe(widget);
-      expect(parent.children[1]).toBe(another);
-      expect(widget.children.length).toBe(0);
-
-      another.setParent(widget);
-      expect(parent.children[0]).toBe(widget);
-      expect(parent.children.length).toBe(1);
+      expect(child.parent).toBe(widget);
+      expect(child.owner).toBe(widget2);
+      expect(widget.children[0]).toBe(child);
       expect(widget.children.length).toBe(1);
-      expect(widget.children[0]).toBe(another);
+      expect(widget2.children[0]).toBe(child);
+      expect(widget2.children.length).toBe(1);
+
+      child.setParent(widget2);
+      expect(child.parent).toBe(widget2);
+      expect(child.owner).toBe(widget2);
+      expect(widget2.children[0]).toBe(child);
+      expect(widget2.children.length).toBe(1);
+      expect(widget.children.length).toBe(0);
     });
 
     it('does not remove the widget from the old parent if the old is the owner', () => {
       let widget = createWidget({
         parent: parent
       });
-      let another = createWidget({
+      let widget2 = createWidget({
         parent: parent
       });
-      expect(another.owner).toBe(parent);
-      expect(parent.children[0]).toBe(widget);
-      expect(parent.children[1]).toBe(another);
-      expect(widget.children.length).toBe(0);
-
-      // The reference to the owner must always be maintained so that the widget will be destroyed eventually
-      another.setParent(widget);
-      expect(parent.children[0]).toBe(widget);
-      expect(parent.children[1]).toBe(another);
-      expect(parent.children.length).toBe(2);
+      let child = createWidget({
+        parent: widget,
+        owner: widget
+      });
+      expect(child.parent).toBe(widget);
+      expect(child.owner).toBe(widget);
+      expect(widget.children[0]).toBe(child);
       expect(widget.children.length).toBe(1);
-      expect(widget.children[0]).toBe(another);
+      expect(widget2.children.length).toBe(0);
+
+      child.setParent(widget2);
+      expect(child.parent).toBe(widget2);
+      expect(child.owner).toBe(widget);
+      expect(widget2.children[0]).toBe(child);
+      expect(widget2.children.length).toBe(1);
+      expect(widget.children[0]).toBe(child);
+      expect(widget.children.length).toBe(1);
     });
 
     it('relinks parent destroy listener to the new parent', () => {
@@ -827,6 +836,61 @@ describe('Widget', () => {
       widget.setParent(newParent);
       expect(event.oldParent).toBe(parent);
       expect(event.parent).toBe(newParent);
+    });
+  });
+
+  describe('setOwner', () => {
+
+    it('removes the widget from the old owner if the old is not the parent', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      let widget2 = createWidget({
+        parent: parent
+      });
+      let child = createWidget({
+        parent: widget2,
+        owner: widget
+      });
+      expect(child.parent).toBe(widget2);
+      expect(child.owner).toBe(widget);
+      expect(widget.children[0]).toBe(child);
+      expect(widget.children.length).toBe(1);
+      expect(widget2.children[0]).toBe(child);
+      expect(widget2.children.length).toBe(1);
+
+      child.setOwner(widget2);
+      expect(child.parent).toBe(widget2);
+      expect(child.owner).toBe(widget2);
+      expect(widget2.children[0]).toBe(child);
+      expect(widget2.children.length).toBe(1);
+      expect(widget.children.length).toBe(0);
+    });
+
+    it('does not remove the widget from the old owner if the old is the parent', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      let widget2 = createWidget({
+        parent: parent
+      });
+      let child = createWidget({
+        parent: widget,
+        owner: widget
+      });
+      expect(child.parent).toBe(widget);
+      expect(child.owner).toBe(widget);
+      expect(widget.children[0]).toBe(child);
+      expect(widget.children.length).toBe(1);
+      expect(widget2.children.length).toBe(0);
+
+      child.setOwner(widget2);
+      expect(child.parent).toBe(widget);
+      expect(child.owner).toBe(widget2);
+      expect(widget2.children[0]).toBe(child);
+      expect(widget2.children.length).toBe(1);
+      expect(widget.children[0]).toBe(child);
+      expect(widget.children.length).toBe(1);
     });
   });
 
