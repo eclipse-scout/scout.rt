@@ -14,6 +14,7 @@
   margin-left: @mandatory-indicator-width;
   outline: none;
   display: flex;
+  align-items: start; // Ensure button and icon are aligned correctly even if texts wraps.
 
   & > .radio-button-circle,
   & > .label,
@@ -37,6 +38,9 @@
 
   & > .icon {
     padding-left: 7px;
+    display: inline-flex;
+    align-items: center;
+    min-height: @radio-button-circle-size;
   }
 
   & > .radio-button-circle {
