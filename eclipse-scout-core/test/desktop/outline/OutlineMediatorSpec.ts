@@ -121,4 +121,29 @@ describe('OutlineMediator', () => {
     expect(page.childNodes[1].filterAccepted).toBe(true); // filter is accepted for 'Bar'
   });
 
+
+  it('onPageSelected', () => {
+    const modelRows = [
+      tableHelper.createModelRow('0', ['Foo']),
+      tableHelper.createModelRow('1', ['Bar'])
+    ];
+
+    detailTable.insertRows(modelRows);
+
+    const row0 = detailTable.rows[0];
+    const row1 = detailTable.rows[1];
+    const page0 = row0.page;
+    const page1 = row1.page;
+
+    expect(detailTable.selectedRows).toEqual([]);
+
+    outline.selectNodes(page1);
+    expect(detailTable.selectedRows).toEqual([row1]);
+
+    outline.selectNodes(page0);
+    expect(detailTable.selectedRows).toEqual([row0]);
+
+    outline.selectNodes(null);
+    expect(detailTable.selectedRows).toEqual([row0]);
+  });
 });

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter} from '../../index';
+import {App, EventHandler, Form, JsFormAdapter, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter} from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
   declare widget: Outline;
@@ -163,6 +163,10 @@ export class OutlineAdapter extends TreeAdapter {
     objects.replacePrototypeFunction(Outline, 'updateDetailMenus', OutlineAdapter.updateDetailMenusRemote, true);
     objects.replacePrototypeFunction(Outline, '_initTreeNodeInternal', OutlineAdapter._initTreeNodeInternalRemote, true);
     objects.replacePrototypeFunction(Outline, '_createTreeNode', OutlineAdapter._createTreeNodeRemote, true);
+    objects.replacePrototypeFunction(Page, '_updateParentTablePageMenusForDetailForm', OutlineAdapter._updateParentTablePageMenusForDetailForm, true);
+    objects.replacePrototypeFunction(Page, '_updateParentTablePageMenusForDetailTable', OutlineAdapter._updateParentTablePageMenusForDetailTable, true);
+    objects.replacePrototypeFunction(Page, 'linkWithRow', OutlineAdapter.linkWithRow, true);
+    objects.replacePrototypeFunction(Page, 'unlinkWithRow', OutlineAdapter.unlinkWithRow, true);
   }
 
   /**
@@ -235,6 +239,32 @@ export class OutlineAdapter extends TreeAdapter {
       this.modelAdapter._initDetailTable(page);
     }
     this.modelAdapter._linkNodeWithRowLater(page);
+  }
+
+  protected static _updateParentTablePageMenusForDetailForm(this: Page & { _updateParentTablePageMenusForDetailFormOrig }) {
+    const detailForm = this.detailForm;
+    if (detailForm && (!detailForm.modelAdapter || detailForm.modelAdapter instanceof JsFormAdapter)) {
+      this._updateParentTablePageMenusForDetailFormOrig();
+    }
+  }
+
+  protected static _updateParentTablePageMenusForDetailTable(this: Page & { _updateParentTablePageMenusForDetailTableOrig }) {
+    const detailTable = this.detailTable;
+    if (detailTable && !detailTable.modelAdapter) {
+      this._updateParentTablePageMenusForDetailTableOrig();
+    }
+  }
+
+  static linkWithRow(this: Page & { linkWithRowOrig: typeof Page.prototype.linkWithRow }, row: TableRow) {
+    this.linkWithRowOrig(row);
+    // @ts-expect-error
+    this._updateParentTablePageMenusForDetailFormAndDetailTable();
+  }
+
+  static unlinkWithRow(this: Page & { unlinkWithRowOrig: typeof Page.prototype.unlinkWithRow }, row: TableRow) {
+    this.unlinkWithRowOrig(row);
+    // @ts-expect-error
+    this._updateParentTablePageMenusForDetailFormAndDetailTable();
   }
 }
 

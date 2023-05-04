@@ -70,4 +70,17 @@ export class OutlineMediator {
   onTableFilter(event: Event<Table>, page: Page) {
     page.getOutline().filter();
   }
+
+  onPageSelected(selectedPage: Page) {
+    if (!selectedPage || !selectedPage.parentNode) {
+      return;
+    }
+
+    const table = selectedPage.parentNode.detailTable;
+    const row = selectedPage.row;
+    if (!table || !row || table !== row.getTable()) {
+      return;
+    }
+    table.selectRow(row);
+  }
 }

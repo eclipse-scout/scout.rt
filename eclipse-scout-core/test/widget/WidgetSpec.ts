@@ -613,6 +613,29 @@ describe('Widget', () => {
       expect(widgetClone.text).toBe('foo');
     });
 
+    it('considers excludePropertiesToClone', () => {
+      widget._addCloneProperties(['notExcluded', 'excluded']);
+      widget.setProperty('notExcluded', 'foo');
+      widget.setProperty('excluded', 'foo');
+
+      const widgetClone = widget.clone(
+        {
+          parent: widget.parent
+        }, {
+          excludePropertiesToClone: ['excluded'],
+          delegateAllPropertiesToClone: true
+        }
+      );
+
+      expect(widgetClone.notExcluded).toBe('foo');
+      expect(widgetClone.excluded).toBe('foo');
+
+      widget.setProperty('notExcluded', 'bar');
+      widget.setProperty('excluded', 'bar');
+
+      expect(widgetClone.notExcluded).toBe('bar');
+      expect(widgetClone.excluded).toBe('foo');
+    });
   });
 
   describe('init', () => {

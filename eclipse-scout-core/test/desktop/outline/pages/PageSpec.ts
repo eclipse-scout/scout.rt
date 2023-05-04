@@ -7,18 +7,22 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, Outline, Page, PageWithTable, scout, Table, Widget} from '../../../../src';
-import {OutlineSpecHelper} from '../../../../src/testing';
+import {Form, GroupBox, Outline, Page, PageWithTable, scout, Table, Widget} from '../../../../src';
+import {MenuSpecHelper, OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing';
 import {ChildModelOf} from '../../../../src/scout';
 
 describe('Page', () => {
 
   let session: SandboxSession;
   let outline: Outline;
+  let tableHelper: TableSpecHelper;
+  let menuHelper: MenuSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
+    tableHelper = new TableSpecHelper(session);
+    menuHelper = new MenuSpecHelper(session);
     outline = new OutlineSpecHelper(session).createOutline();
   });
 
@@ -71,18 +75,92 @@ describe('Page', () => {
     expect(newTable.destroyed).toBe(false);
   });
 
-  function createAndInsertPage(detailTable: ChildModelOf<Table>, detailForm: ChildModelOf<Form>) {
-    let page = new PageWithLazyCreationCounter();
+  it('detailTable and detailForm are enhanced with parent table page menus', () => {
+    const parentPage = createAndInsertPage({
+      objectType: Table,
+      menus: [
+        menuHelper.createModel('EmptySpaceMenu'),
+        menuHelper.createModel('SingleSelectionMenu', null, [Table.MenuTypes.SingleSelection]),
+        menuHelper.createModel('MultiSelectionMenu', null, [Table.MenuTypes.MultiSelection]),
+        menuHelper.createModel('SingleMultiSelectionMenu', null, [Table.MenuTypes.SingleSelection, Table.MenuTypes.MultiSelection])
+      ]
+    }, null);
+    parentPage.createChildPage = row => scout.create(Page, {
+      parent: outline,
+      detailTable: {
+        objectType: Table,
+        menus: [menuHelper.createModel('DetailTableSingleSelectionMenu', null, [Table.MenuTypes.SingleSelection])]
+      },
+      detailForm: {
+        objectType: Form,
+        rootGroupBox: {
+          id: 'MainBox',
+          objectType: GroupBox,
+          menus: [menuHelper.createModel('DetailFormMenu')]
+        }
+      }
+    });
+    outline.selectNode(parentPage);
+
+    parentPage.detailTable.insertRow(tableHelper.createModelRow('0', ['Foo']));
+
+    const page = parentPage.childNodes[0];
+    outline.selectNode(page);
+
+    const detailFormRootGroupBox = page.detailForm.rootGroupBox;
+    const detailTable = page.detailTable;
+    const extractTextAndMenuTypes = m => ({
+      text: m.text,
+      menuTypes: m.menuTypes
+    });
+    const expectedParentTablePageMenus = [
+      {
+        text: 'SingleSelectionMenu',
+        menuTypes: []
+      }, {
+        text: 'SingleMultiSelectionMenu',
+        menuTypes: []
+      }
+    ];
+
+    expect(detailFormRootGroupBox.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
+      text: 'DetailFormMenu',
+      menuTypes: []
+    }]);
+
+    expect(detailTable.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
+      text: 'DetailTableSingleSelectionMenu',
+      menuTypes: [Table.MenuTypes.SingleSelection]
+    }]);
+
+    detailTable.setMenus([menuHelper.createModel('DetailTableMultiSelectionMenu', null, [Table.MenuTypes.MultiSelection])]);
+    expect(detailTable.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
+      text: 'DetailTableMultiSelectionMenu',
+      menuTypes: [Table.MenuTypes.MultiSelection]
+    }]);
+  });
+
+  function createAndInsertPage(detailTable: ChildModelOf<Table>, detailForm: ChildModelOf<Form>, parentPage?: Page): PageWithLazyCreationCounter {
+    const page = createPage(detailTable, detailForm);
+    insertPage(page, parentPage);
+    return page;
+  }
+
+  function createPage(detailTable: ChildModelOf<Table>, detailForm: ChildModelOf<Form>): PageWithLazyCreationCounter {
+    const page = new PageWithLazyCreationCounter();
     page.on('propertyChange:detailForm', e => e.source.numFormCreated++);
     page.on('propertyChange:detailTable', e => e.source.numTableCreated++);
-    let pageModel = {
+    const pageModel = {
       parent: outline,
-      detailTable: detailTable,
-      detailForm: detailForm
+      detailTable,
+      detailForm
     };
     page.init(pageModel);
-    outline.insertNodes([page], null);
     return page;
+  }
+
+  function insertPage(page: Page, parentPage?: Page) {
+    outline.insertNodes([page], parentPage);
   }
 
   function expectListenersToBeExecuted(expectation, page) {
