@@ -141,7 +141,7 @@ export class ViewMenuTab extends Widget implements ViewMenuTabModel {
 
     // Link our fake button with the original and apply all the relevant properties (which are stored in cloneProperties, e.g. outline, cssClass, enabled, etc.)
     clone.cloneOf = viewButton;
-    viewButton._cloneProperties.forEach(property => clone.callSetter(property, viewButton[property]));
+    viewButton.cloneProperties.forEach(property => clone.callSetter(property, viewButton[property]));
 
     // Use default icon if outline does not define one.
     clone.setIconId(viewButton.iconId || this.defaultIconId);

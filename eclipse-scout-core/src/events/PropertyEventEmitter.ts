@@ -7,25 +7,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventEmitter, objects, PropertyChangeEvent, PropertyEventMap, scout, strings} from '../index';
+import {arrays, EventEmitter, objects, PropertyChangeEvent, PropertyEventMap, scout, strings} from '../index';
 
 export class PropertyEventEmitter extends EventEmitter {
   declare eventMap: PropertyEventMap;
   declare self: PropertyEventEmitter;
 
   /**
-   * Contains the names of the properties that should be computed.
-   *
-   * - A regular property will be set on the object and therefore accessible by the property name (e.g. object.property).
-   * - A computed property will be prefixed with an '_' when set on the object and therefore needs a getter to make it accessible.
-   *   This makes it possible to compute the state of a property when it is accessed without having to modify the actual state.
+   * Contains the names of properties that are decorated grouped by the decoration. Subclasses can add their own decorations.
    */
-  protected _computedProperties: string[];
+  propertyDecorations: Record<PropertyDecoration, Set<string>>;
 
   constructor() {
     super();
     this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => event.propertyName === propertyName);
-    this._computedProperties = [];
+    this.propertyDecorations = {
+      computed: new Set<string>()
+    };
   }
 
   /**
@@ -137,16 +135,47 @@ export class PropertyEventEmitter extends EventEmitter {
 
   /**
    * Adds the given properties to the list of computed properties to mark them as computed.
+   * @see computedProperties
    */
   protected _addComputedProperties(properties: string[]) {
+    this._decorateProperties('computed', properties);
+  }
+
+  /**
+   * @see computedProperties
+   */
+  isComputedProperty(propertyName: string): boolean {
+    return this.isPropertyDecorated('computed', propertyName);
+  }
+
+  /**
+   * Contains the names of the properties that should be computed.
+   *
+   * - A regular property will be set on the object and therefore accessible by the property name (e.g. object.property).
+   * - A computed property will be prefixed with an '_' when set on the object and therefore needs a getter to make it accessible.
+   *   This makes it possible to compute the state of a property when it is accessed without having to modify the actual state.
+   */
+  get computedProperties(): Set<string> {
+    return this.propertyDecorations['computed'];
+  }
+
+  protected _decorateProperties(decoration: keyof this['propertyDecorations'], properties: string | string[]) {
+    properties = arrays.ensure(properties);
     for (const property of properties) {
-      if (this._computedProperties.indexOf(property) < 0) {
-        this._computedProperties.push(property);
-      }
+      this.propertyDecorations[decoration as string].add(property);
     }
   }
 
-  isComputedProperty(propertyName: string): boolean {
-    return this._computedProperties.includes(propertyName);
+  protected _undecorateProperties(decoration: keyof this['propertyDecorations'], properties: string | string[]) {
+    properties = arrays.ensure(properties);
+    for (const property of properties) {
+      this.propertyDecorations[decoration as string].delete(property);
+    }
+  }
+
+  isPropertyDecorated(decoration: keyof this['propertyDecorations'], property: string) {
+    return this.propertyDecorations[decoration as string].has(property);
   }
 }
+
+export type PropertyDecoration = 'computed';

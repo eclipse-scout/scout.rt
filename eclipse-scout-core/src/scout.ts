@@ -354,7 +354,7 @@ export const scout = {
 
     function resolveAdapterReferences(adapter: ModelAdapterLike, adapterData: AdapterData) {
       let tmpAdapter: ModelAdapterLike, tmpAdapterData: AdapterData;
-      adapter.widget._widgetProperties.forEach(widgetPropertyName => {
+      adapter.widget.widgetProperties.forEach(widgetPropertyName => {
         let widgetPropertyValue = adapterData[widgetPropertyName];
         if (!widgetPropertyValue) {
           return; // nothing to do when property is null
