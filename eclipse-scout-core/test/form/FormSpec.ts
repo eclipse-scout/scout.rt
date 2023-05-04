@@ -554,7 +554,7 @@ describe('Form', () => {
       let form = helper.createFormWithOneField({
         displayHint: Form.DisplayHint.DIALOG
       });
-      expect(form.modal).toBe(null);
+      expect(form.modal).toBe(true);
       openFormAndExpectGlassPane(form, true, done);
     });
 
@@ -562,7 +562,7 @@ describe('Form', () => {
       let form = helper.createFormWithOneField({
         displayHint: Form.DisplayHint.VIEW
       });
-      expect(form.modal).toBe(null);
+      expect(form.modal).toBe(false);
       openFormAndExpectGlassPane(form, false, done);
     });
 

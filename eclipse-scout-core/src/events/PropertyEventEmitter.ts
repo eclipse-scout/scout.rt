@@ -13,15 +13,25 @@ export class PropertyEventEmitter extends EventEmitter {
   declare eventMap: PropertyEventMap;
   declare self: PropertyEventEmitter;
 
+  /**
+   * Contains the names of the properties that should be computed.
+   *
+   * - A regular property will be set on the object and therefore accessible by the property name (e.g. object.property).
+   * - A computed property will be prefixed with an '_' when set on the object and therefore needs a getter to make it accessible.
+   *   This makes it possible to compute the state of a property when it is accessed without having to modify the actual state.
+   */
+  protected _computedProperties: string[];
+
   constructor() {
     super();
     this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => event.propertyName === propertyName);
+    this._computedProperties = [];
   }
 
   /**
    * Sets a new value for a specific property. If the new value is the same value as the old one, nothing happens.
    * Otherwise, {@link _setProperty} is used to set the property and trigger a property change event.
-   * <p>
+   *
    * This default behavior can be overridden by implementing a custom \_setXy function where XY is the property name.
    * If such a function exists, it will be called instead of {@link _setProperty}
    * @param propertyName the name of the property
@@ -29,11 +39,40 @@ export class PropertyEventEmitter extends EventEmitter {
    * @returns true if the property has been changed, false if not.
    */
   setProperty(propertyName: string, value: any): boolean {
-    if (objects.equals(this[propertyName], value)) {
+    if (objects.equals(this.getProperty(propertyName), value)) {
       return false;
     }
     this._callSetProperty(propertyName, value);
     return true;
+  }
+
+  /**
+   * Returns the name of the property that is used to store the value.
+   *
+   * - For regular properties, the name won't be adjusted and returned as it is.
+   * - For computed properties, the name will be prefixed with '_'.
+   */
+  adaptPropertyName(propertyName: string): string {
+    if (this.isComputedProperty(propertyName)) {
+      return '_' + propertyName;
+    }
+    return propertyName;
+  }
+
+  /**
+   * Adapts the propertyName if necessary using {@link  adaptPropertyName} and returns the value of the property.
+   */
+  getProperty(propertyName: string): any {
+    propertyName = this.adaptPropertyName(propertyName);
+    return this[propertyName];
+  }
+
+  /**
+   * Adapts the propertyName if necessary using {@link  adaptPropertyName} and write the value of the property.
+   */
+  protected _writeProperty(propertyName: string, value: any) {
+    propertyName = this.adaptPropertyName(propertyName);
+    this[propertyName] = value;
   }
 
   protected _callSetProperty(propertyName: string, value: any) {
@@ -47,7 +86,7 @@ export class PropertyEventEmitter extends EventEmitter {
 
   /**
    * Sets the value of the property 'propertyName' to 'newValue' and then triggers a propertyChange event for that property.
-   * <p>
+   *
    * It is possible to prevent the setting of the property value by using {@link Event.preventDefault}.
    *
    * @internal
@@ -57,15 +96,15 @@ export class PropertyEventEmitter extends EventEmitter {
    */
   _setProperty(propertyName: string, newValue: any): boolean {
     scout.assertParameter('propertyName', propertyName);
-    let oldValue = this[propertyName];
+    let oldValue = this.getProperty(propertyName);
     if (objects.equals(oldValue, newValue)) {
       return false;
     }
-    this[propertyName] = newValue;
+    this._writeProperty(propertyName, newValue);
     let event = this.triggerPropertyChange(propertyName, oldValue, newValue);
     if (event.defaultPrevented) {
       // Revert to old value if property change should be prevented
-      this[propertyName] = oldValue;
+      this._writeProperty(propertyName, oldValue);
       return false; // not changed
     }
     return true;
@@ -94,5 +133,20 @@ export class PropertyEventEmitter extends EventEmitter {
     } else {
       this.setProperty(propertyName, value);
     }
+  }
+
+  /**
+   * Adds the given properties to the list of computed properties to mark them as computed.
+   */
+  protected _addComputedProperties(properties: string[]) {
+    for (const property of properties) {
+      if (this._computedProperties.indexOf(property) < 0) {
+        this._computedProperties.push(property);
+      }
+    }
+  }
+
+  isComputedProperty(propertyName: string): boolean {
+    return this._computedProperties.includes(propertyName);
   }
 }

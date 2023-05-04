@@ -69,6 +69,23 @@ describe('Widget', () => {
     }
   }
 
+  class ComputedWidget extends Widget {
+    _computed: boolean;
+
+    constructor() {
+      super();
+      this._computed = true;
+      this._addComputedProperties(['computed']);
+      this._addCloneProperties(['computed']);
+    }
+
+    get computed() {
+      return this._computed;
+    }
+  }
+
+  ObjectFactory.get().registerNamespace('testns', {ComputedWidget});
+
   function appendAnimateRemoveStyle() {
     $(`<style>
       @keyframes nop { 0% { opacity: 1; } 100% { opacity: 1; } }
@@ -636,6 +653,20 @@ describe('Widget', () => {
       expect(widgetClone.notExcluded).toBe('bar');
       expect(widgetClone.excluded).toBe('foo');
     });
+
+    it('considers computed properties', () => {
+      let widget = scout.create(ComputedWidget, {
+        parent: session.desktop
+      });
+      let widgetClone = widget.clone({
+        parent: widget.parent
+      });
+      expect(widget.getProperty('computed')).toBe(true);
+      expect(widget._computed).toBe(true);
+      expect(widgetClone.getProperty('computed')).toBe(true);
+      expect(widgetClone._computed).toBe(true);
+    });
+
   });
 
   describe('init', () => {
@@ -1207,6 +1238,26 @@ describe('Widget', () => {
         expect(child.destroyed).toBe(false);
         expect(child.parent).toBe(another);
         expect(child.owner).toBe(another);
+      });
+    });
+
+    describe('with computed property', () => {
+      it('triggers event as for regular properties', () => {
+        let computedWidget = scout.create(ComputedWidget, {parent: session.desktop});
+        expect(computedWidget.getProperty('computed')).toBe(true);
+        expect(computedWidget.computed).toBe(true);
+
+        let propertyChangeEvent;
+        computedWidget.on('propertyChange:computed', event => {
+          propertyChangeEvent = event;
+        });
+        computedWidget.setProperty('computed', false);
+        expect(propertyChangeEvent.type).toBe('propertyChange');
+        expect(propertyChangeEvent.propertyName).toBe('computed');
+        expect(propertyChangeEvent.oldValue).toBe(true);
+        expect(propertyChangeEvent.newValue).toBe(false);
+        expect(computedWidget.getProperty('computed')).toBe(false);
+        expect(computedWidget.computed).toBe(false);
       });
     });
 

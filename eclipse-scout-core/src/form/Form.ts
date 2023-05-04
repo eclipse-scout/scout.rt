@@ -34,7 +34,6 @@ export class Form extends Widget implements FormModel, DisplayParent {
   displayHint: DisplayHint;
   maximized: boolean;
   headerVisible: boolean;
-  modal: boolean;
   displayParent: DisplayParent;
   dialogs: Form[];
   views: Form[];
@@ -83,6 +82,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   $title: JQuery;
   $subTitle: JQuery;
   $dragHandle: JQuery;
+  protected _modal: boolean;
   protected _glassPaneRenderer: GlassPaneRenderer;
   protected _preMaximizedBounds: Rectangle;
   protected _resizeHandler: (Event) => boolean;
@@ -93,6 +93,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     super();
     this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
     this._addPreserveOnPropertyChangeProperties(['initialFocus']);
+    this._addComputedProperties(['modal']);
 
     this.animateOpening = true;
     this.askIfNeedSave = true;
@@ -108,7 +109,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.displayParent = null; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
     this.maximized = false;
     this.headerVisible = null;
-    this.modal = null;
+    this._modal = null;
     this.logicalGrid = scout.create(FormGrid);
     this.dialogs = [];
     this.views = [];
@@ -271,11 +272,15 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.setProperty('modal', modal);
   }
 
+  get modal(): boolean {
+    return this._modal === null ? this.isDialog() : this._modal;
+  }
+
   protected _renderModal() {
     if (this.parent instanceof WrappedFormField) {
       return;
     }
-    let modal = this.modal === null ? this.isDialog() : this.modal;
+    let modal = this.modal;
     if (modal && !this._glassPaneRenderer) {
       this._glassPaneRenderer = new GlassPaneRenderer(this);
       this._glassPaneRenderer.renderGlassPanes();
