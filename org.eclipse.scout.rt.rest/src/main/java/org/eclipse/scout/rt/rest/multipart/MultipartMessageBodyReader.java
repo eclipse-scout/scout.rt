@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -75,7 +76,7 @@ public class MultipartMessageBodyReader implements MessageBodyReader<IMultipartM
    * <p>
    * Keep protected to avoid (accidental) outside access.
    */
-  protected static class ServerMultipartMessage implements IMultipartMessage {
+  protected static class ServerMultipartMessage implements IMultipartMessage, Closeable {
 
     /**
      * Pattern to remove surrounding quotes from qualifier value.
@@ -211,6 +212,16 @@ public class MultipartMessageBodyReader implements MessageBodyReader<IMultipartM
       catch (IOException e) {
         throw new PlatformException("Failed to read line", e);
       }
+    }
+
+    @Override
+    public void close() throws IOException {
+      // Method doesn't seem to be called. Don't close the input stream (m_inputStream), wrapped within an uncloseable input stream anyway.
+
+      // This class is marked closeable because org.glassfish.jersey.message.internal.InboundMessageContext.readEntity would otherwise close the incoming input stream after creating the multipart message.
+      // Because we consume the input stream later on (via IMultipartPart#getInputStreaM), the initial stream most not be closed before request is completely processed.
+      // When running on Jetty, closing the incoming input stream (EntityContent with HttpInput) would have no effect.
+      // When running on Tomcat, closing the incoming input stream (EntityContent with CoyoteInputStream) will result in an exception when consuming it afterwards (org.apache.catalina.connector.InputBuffer.throwIfClosed).
     }
 
     /**

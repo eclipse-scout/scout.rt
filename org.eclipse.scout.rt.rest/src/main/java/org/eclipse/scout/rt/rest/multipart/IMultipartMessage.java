@@ -10,10 +10,14 @@
  */
 package org.eclipse.scout.rt.rest.multipart;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
+import javax.ws.rs.core.MediaType;
+
 import org.eclipse.scout.rt.rest.IRestResource;
+import org.eclipse.scout.rt.rest.multipart.MultipartMessageBodyReader.ServerMultipartMessage;
 
 /**
  * Multipart message for receiving a REST service invocation using a multipart request, i.e. within a
@@ -61,4 +65,11 @@ import org.eclipse.scout.rt.rest.IRestResource;
  * </pre>
  */
 public interface IMultipartMessage extends Iterator<IMultipartPart> {
+
+  /**
+   * Manually creates a {@link IMultipartMessage} based on media type and input stream.
+   */
+  static IMultipartMessage of(MediaType mediaType, InputStream inputStream) {
+    return new ServerMultipartMessage(mediaType, inputStream);
+  }
 }
