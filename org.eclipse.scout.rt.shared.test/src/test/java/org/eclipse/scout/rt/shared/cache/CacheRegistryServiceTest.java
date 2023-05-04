@@ -33,7 +33,7 @@ public class CacheRegistryServiceTest {
   public void testRegistry() {
     CacheRegistryService s = new CacheRegistryService();
     String testKey = "testkey";
-    BasicCache<String, String> testCache = new BasicCache<String, String>(testKey, mock(ICacheValueResolver.class), new HashMap<>(), false);
+    BasicCache<String, String> testCache = new BasicCache<>(testKey, mock(ICacheValueResolver.class), new HashMap<>());
     s.register(testCache);
     assertEquals(testCache, s.get(testKey));
   }
@@ -43,7 +43,7 @@ public class CacheRegistryServiceTest {
   public void testRegistryIfAbsent() {
     CacheRegistryService s = new CacheRegistryService();
     String testKey = "testkey";
-    BasicCache<String, String> testCache = new BasicCache<String, String>(testKey, mock(ICacheValueResolver.class), new HashMap<>(), false);
+    BasicCache<String, String> testCache = new BasicCache<>(testKey, mock(ICacheValueResolver.class), new HashMap<>());
     s.registerIfAbsent(testCache);
     assertEquals(testCache, s.get(testKey));
   }
@@ -64,9 +64,9 @@ public class CacheRegistryServiceTest {
   public void testDuplicateCreate() {
     CacheRegistryService s = new CacheRegistryService();
     String cacheId = "testcacheid";
-    BasicCache<String, String> cache1 = new BasicCache<String, String>(cacheId, key -> "Valuf of " + key, new HashMap<>(), false);
+    BasicCache<String, String> cache1 = new BasicCache<>(cacheId, key -> "Valuf of " + key, new HashMap<>());
     s.register(cache1);
-    BasicCache<String, String> cache2 = new BasicCache<String, String>(cacheId, key -> "Valuf of " + key, new HashMap<>(), false);
+    BasicCache<String, String> cache2 = new BasicCache<>(cacheId, key -> "Valuf of " + key, new HashMap<>());
     s.register(cache2);
   }
 
@@ -74,9 +74,9 @@ public class CacheRegistryServiceTest {
   public void testDuplicateCreateIfAbsent() {
     CacheRegistryService s = new CacheRegistryService();
     String cacheId = "testcacheid";
-    ICache<String, String> cache1 = new BasicCache<String, String>(cacheId, key -> "Valuf of " + key, new HashMap<>(), false);
+    ICache<String, String> cache1 = new BasicCache<>(cacheId, key -> "Valuf of " + key, new HashMap<>());
     s.registerIfAbsent(cache1);
-    ICache<String, String> cache2 = new BasicCache<String, String>(cacheId, key -> "Valuf of " + key, new HashMap<>(), false);
+    ICache<String, String> cache2 = new BasicCache<>(cacheId, key -> "Valuf of " + key, new HashMap<>());
     ICache<String, String> cache = s.registerIfAbsent(cache2);
     assertSame(cache1, cache);
   }

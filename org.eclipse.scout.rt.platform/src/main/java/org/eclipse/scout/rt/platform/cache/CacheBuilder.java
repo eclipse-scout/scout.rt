@@ -94,14 +94,14 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   }
 
   protected Map<K, V> createCacheMap() {
-    if (!isCreateExpiringMap() && isTransactional() && !isAtomicInsertion() && (isSingleton() || !isTransactionalFastForward())) {
+    if (!isCreateExpiringMap() && isTransactional() && (isSingleton() || !isTransactionalFastForward())) {
       return new CopyOnWriteTransactionalMap<>(getCacheId(), isTransactionalFastForward());
     }
     else if (isCreateExpiringMap()) {
       boolean touchOnGet = isTouchOnGet() || getSizeBound() != null;
       long timeToLive = NumberUtility.nvl(getTimeToLive(), -1L);
       int targetSize = NumberUtility.nvl(getSizeBound(), -1);
-      return new ConcurrentExpiringMap<>(this.createConcurrentMap(), timeToLive, touchOnGet, targetSize);
+      return new ConcurrentExpiringMap<>(createConcurrentMap(), timeToLive, touchOnGet, targetSize);
     }
     else if (isThreadSafe() || isTransactional()) {
       return createConcurrentMap();
@@ -123,7 +123,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   }
 
   protected ICache<K, V> createBasicCache(Map<K, V> cacheMap) {
-    return new BasicCache<>(getCacheId(), getValueResolver(), cacheMap, isAtomicInsertion());
+    return new BasicCache<>(getCacheId(), getValueResolver(), cacheMap);
   }
 
   protected ICache<K, V> addBeforeCustomWrappers(ICache<K, V> cache) {
@@ -233,6 +233,10 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
     return this;
   }
 
+  /**
+   * @deprecated not used anymore; will be removed in scout 23.2
+   */
+  @Deprecated
   public boolean isAtomicInsertion() {
     return m_atomicInsertion && m_threadSafe;
   }

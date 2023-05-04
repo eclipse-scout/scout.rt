@@ -10,10 +10,9 @@
  */
 package org.eclipse.scout.rt.platform.util.collection;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -77,38 +76,27 @@ public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K
   @Override
   @SuppressWarnings("unchecked")
   protected <TM extends Map<K, V> & ITransactionMember> TM createMapTransactionMember() {
-    return (TM) new ConcurrentMapTransactionMember<>(getTransactionMemberId(), getSharedMap(), true, isFastForward());
+    return (TM) new ConcurrentMapTransactionMember(true);
   }
 
-  public static class ConcurrentMapTransactionMember<K, V> extends AbstractMapTransactionMember<K, V> implements ConcurrentMap<K, V> {
-
-    /**
-     * shared map over all transactions
-     */
-    protected final ConcurrentMap<K, V> m_sharedMap;
+  public class ConcurrentMapTransactionMember extends AbstractMapTransactionMember implements ConcurrentMap<K, V> {
 
     /**
      * shared map for read access only
      */
     protected final Map<K, V> m_readSharedMap;
 
-    public ConcurrentMapTransactionMember(String transactionMemberId, ConcurrentMap<K, V> sharedMap, boolean sharedRead, boolean fastForward) {
-      // If reads should not be shared, we create a full copy of the shared map
-      this(transactionMemberId, sharedMap, sharedRead ? sharedMap : new HashMap<>(sharedMap), fastForward);
+    public ConcurrentMapTransactionMember(boolean sharedRead) {
+      this(sharedRead ? m_sharedMap : new HashMap<>(m_sharedMap), new HashMap<>(), new HashMap<>());
     }
 
-    public ConcurrentMapTransactionMember(String transactionMemberId, ConcurrentMap<K, V> sharedMap, Map<K, V> readSharedMap, boolean fastForward) {
-      this(transactionMemberId, sharedMap, readSharedMap, new HashMap<>(), new HashMap<>(), fastForward);
-    }
-
-    public ConcurrentMapTransactionMember(String transactionId, ConcurrentMap<K, V> sharedMap, Map<K, V> readSharedMap, Map<K, V> removedMap, Map<K, V> insertedMap, boolean fastForward) {
-      super(transactionId, removedMap, insertedMap, fastForward);
-      m_sharedMap = sharedMap;
+    public ConcurrentMapTransactionMember(Map<K, V> readSharedMap, Map<K, V> removedMap, Map<K, V> insertedMap) {
+      super(removedMap, insertedMap);
       m_readSharedMap = readSharedMap;
     }
 
     protected ConcurrentMap<K, V> getSharedMap() {
-      return m_sharedMap;
+      return ConcurrentTransactionalMap.this.m_sharedMap;
     }
 
     @Override
@@ -118,51 +106,7 @@ public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K
 
     @Override
     public void commitPhase2() {
-      ConcurrentMap<K, V> sharedMap = getSharedMap();
-      Collection<K> successfulCommitedChanges = new ArrayList<>();
-      Collection<K> failedCommitedChanges = new ArrayList<>();
-      for (Entry<K, V> entry : getRemovedMap().entrySet()) {
-        K key = entry.getKey();
-        V oldValue = entry.getValue();
-        if (oldValue != null) {
-          V insertedValue = getInsertedMap().remove(key);
-          if (insertedValue != null) {
-            if (sharedMap.replace(key, oldValue, insertedValue)) {
-              successfulCommitedChanges.add(key);
-            }
-            else {
-              failedCommitedChanges.add(key);
-            }
-          }
-          else {
-            if (sharedMap.remove(key, oldValue)) {
-              successfulCommitedChanges.add(key);
-            }
-            else {
-              failedCommitedChanges.add(key);
-            }
-          }
-        }
-        else {
-          // if there must be a value inserted, the loop over insertedMap will handle this
-          if (sharedMap.containsKey(key)) {
-            // remove entry, and there was no previous value in sharedMap but now there is one. Commit failed.
-            failedCommitedChanges.add(key);
-          }
-        }
-      }
-      for (Entry<K, V> entry : getInsertedMap().entrySet()) {
-        K key = entry.getKey();
-        V newValue = entry.getValue();
-        V previousValue = sharedMap.putIfAbsent(key, newValue);
-        if (previousValue != null && !previousValue.equals(newValue)) {
-          failedCommitedChanges.add(key);
-        }
-        else {
-          successfulCommitedChanges.add(key);
-        }
-      }
-      changesCommited(sharedMap, successfulCommitedChanges, failedCommitedChanges);
+      commitChanges(getSharedMap());
     }
 
     @Override
@@ -176,47 +120,41 @@ public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K
 
     @Override
     public V putIfAbsent(K key, V value) {
-      V currentValue = get(key);
-      if (currentValue == null) {
-        return put(key, value);
+      V v = get(key);
+      if (v == null) {
+        v = put(key, value);
       }
-      else {
-        return currentValue;
-      }
+
+      return v;
     }
 
     @Override
     public boolean remove(Object key, Object value) {
-      V currentValue = get(key);
-      if (currentValue != null && currentValue.equals(value)) {
-        remove(key);
-        return true;
-      }
-      else {
+      Object curValue = get(key);
+      if (!Objects.equals(curValue, value) || curValue == null) {
         return false;
       }
+      remove(key);
+      return true;
     }
 
     @Override
     public boolean replace(K key, V oldValue, V newValue) {
-      V currentValue = get(key);
-      if (currentValue != null && currentValue.equals(oldValue)) {
-        put(key, newValue);
-        return true;
-      }
-      else {
+      Object curValue = get(key);
+      if (!Objects.equals(curValue, oldValue) || curValue == null) {
         return false;
       }
+      put(key, newValue);
+      return true;
     }
 
     @Override
     public V replace(K key, V value) {
-      if (containsKey(key)) {
-        return put(key, value);
+      V curValue;
+      if (((curValue = get(key)) != null) || containsKey(key)) {
+        curValue = put(key, value);
       }
-      else {
-        return null;
-      }
+      return curValue;
     }
   }
 }

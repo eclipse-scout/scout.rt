@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.BeanUtility;
 
 /**
  * All caches should be build through this builder. After building a cache, <b>do not</b> surround it with another
- * cache-wrapper. Instead use {@link #withAdditionalCustomWrapper(Class, Object...)} to add additional behavior.
+ * cache-wrapper. Instead, use {@link #withAdditionalCustomWrapper(Class, Object...)} to add additional behavior.
  *
  * @param <K>
  *          the type of keys maintained by this cache
@@ -94,7 +94,7 @@ public interface ICacheBuilder<K, V> {
   /**
    * @param remoteValueResolverEnabled
    *          Usually an application client of a shared cache uses the remote cache to resolve a cache value. With this
-   *          property, this behavior can be disabled and the client uses too the local value resolver. This may be
+   *          property, this behavior can be disabled and the client uses the local value resolver too. This may be
    *          useful if a cache value is not {@link Serializable}. (Default true)
    * @return this builder
    */
@@ -108,10 +108,12 @@ public interface ICacheBuilder<K, V> {
   ICacheBuilder<K, V> withThreadSafe(boolean threadSafe);
 
   /**
+   * This property has no effect anymore and will be deprecated in scout 23.2
+   *
    * @param atomicInsertion
    *          if set to true, a cache might concurrently resolve a key, but the get operations that issued these
-   *          resolves will return the same value. This option is only valid if threadSafe is set to true. Typically set
-   *          this option to true if the cache value is modifiable. (Default false)
+   *          resolves will return the same value. This option is only valid if threadSafe is set to true. Typically,
+   *          set this option to true if the cache value is modifiable. (Default false)
    * @return this builder
    */
   ICacheBuilder<K, V> withAtomicInsertion(boolean atomicInsertion);
@@ -162,7 +164,7 @@ public interface ICacheBuilder<K, V> {
    * @param timeToLiveUnit
    *          time to live unit
    * @param touchOnGet
-   *          if true getting an value will reset the time to live of a cache entry
+   *          if true getting a value will reset the time to live of a cache entry
    * @return this builder
    * @throws IllegalArgumentException
    *           if readTimeToLive is negative
@@ -170,7 +172,7 @@ public interface ICacheBuilder<K, V> {
   ICacheBuilder<K, V> withTimeToLive(Long timeToLiveDuration, TimeUnit timeToLiveUnit, boolean touchOnGet);
 
   /**
-   * If set to a non null value, the maximum number of cached values is bounded. The provided size bound is <em>not</em>
+   * If set to a non-null value, the maximum number of cached values is bounded. The provided size bound is <em>not</em>
    * enforced and is just a guidance value.
    * <p>
    * The current policy that is used to evict elements is least recently used (LRU).
@@ -196,10 +198,10 @@ public interface ICacheBuilder<K, V> {
   ICacheBuilder<K, V> withMaxConcurrentResolve(Integer maxConcurrentResolve);
 
   /**
-   * Adds an additional cache wrapper to the constructed cache instance. In the cache instance these additional wrappers
-   * are ordered in the same sequence as they were added. The cache wrapper is created always through a constructor that
-   * takes as first argument an {@link ICache}. See also {@link BeanUtility#createInstance(Class, Object...)} for
-   * creation details.
+   * Adds a cache wrapper to the constructed cache instance. In the cache instance these additional wrappers are ordered
+   * in the same sequence as they were added. The cache wrapper is created always through a constructor that takes as
+   * first argument an {@link ICache}. See also {@link BeanUtility#createInstance(Class, Object...)} for creation
+   * details.
    *
    * @param arguments
    *          any additional arguments (beside the first {@link ICache} argument) used to create the cache wrapper
