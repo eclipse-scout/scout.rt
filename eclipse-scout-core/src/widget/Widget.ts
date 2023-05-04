@@ -9,8 +9,8 @@
  */
 import {
   Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, Predicate, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired,
-  strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, Predicate, PropertyDecoration, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session,
+  SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import * as $ from 'jquery';
 
@@ -20,6 +20,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   declare eventMap: WidgetEventMap;
   declare self: Widget;
   declare widgetMap: WidgetMap;
+  declare propertyDecorations: Record<WidgetPropertyDecoration, Set<string>>;
 
   animateRemoval: boolean;
   animateRemovalClass: string;
@@ -76,10 +77,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   $container: JQuery;
   $parent: JQuery;
 
-  /** @internal */
-  _widgetProperties: string[];
-  /** @internal */
-  _cloneProperties: string[];
   /**
    * The 'rendered' flag is set the true when initial rendering of the widget is completed.
    *
@@ -93,7 +90,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   protected _parentDestroyHandler: EventHandler;
   protected _parentRemovingWhileAnimatingHandler: EventHandler;
   protected _postRenderActions: (() => void)[];
-  protected _preserveOnPropertyChangeProperties: string[];
   protected _scrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _storedFocusedWidget: Widget;
 
@@ -136,10 +132,13 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.animateRemoval = false;
     this.animateRemovalClass = 'animate-remove';
 
-    this._widgetProperties = [];
-    this._cloneProperties = ['visible', 'enabled', 'inheritAccessibility', 'cssClass'];
+    this.propertyDecorations = $.extend(this.propertyDecorations, {
+      clone: new Set<string>(),
+      widget: new Set<string>(),
+      preserveOnPropertyChange: new Set<string>()
+    });
+
     this.eventDelegators = [];
-    this._preserveOnPropertyChangeProperties = [];
     this._postRenderActions = [];
     this._focusInListener = this._onFocusIn.bind(this);
     this._parentDestroyHandler = this._onParentDestroy.bind(this);
@@ -155,6 +154,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._storedFocusedWidget = null;
 
     this._glassPaneContributions = [];
+    this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass']);
   }
 
   /**
@@ -1470,7 +1470,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * Otherwise, the following phases are executed:
    *
    * 1. Preparation: If the property is a widget property, several actions are performed in \_prepareWidgetProperty().
-   * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see {@link _preserveOnPropertyChangeProperties}).
+   * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see {@link preserveOnPropertyChangeProperties}).
    *    If there is a custom remove function (e.g. \_removeXY where XY is the property name), it will be called instead of removing the widgets directly.
    * 3. Model update: If there is a custom set function (e.g. \_setXY where XY is the property name), it will be called. Otherwise, the default set function {@link _setProperty} is called.
    * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. \_renderXY where XY is the property name), it will be called. Otherwise, nothing happens.
@@ -1687,80 +1687,75 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * This means the property not only accepts the actual widget, but also a widget model or a widget reference (id)
    * and then either creates a new widget based on the model or resolves the id and uses the referenced widget as value.
    * Furthermore, it will take care of its lifecycle which means, the widget will automatically be removed and destroyed (as long as the parent is also the owner).
-   * <p>
-   * If only the resolve operations without the lifecycle actions should be performed, you need to add the property to the list _preserveOnPropertyChangeProperties as well.
+   *
+   * If only the resolve operations without the lifecycle actions should be performed, you need to add the property to the list {@link preserveOnPropertyChangeProperties} as well.
    */
   protected _addWidgetProperties(properties: string | string[]) {
-    this._addProperties('_widgetProperties', properties);
+    this._decorateProperties('widget', properties);
+  }
+
+  protected _removeWidgetProperties(properties: string | string[]) {
+    this._undecorateProperties('widget', properties);
   }
 
   isWidgetProperty(propertyName: string): boolean {
-    return this._widgetProperties.indexOf(propertyName) > -1;
+    return this.isPropertyDecorated('widget', propertyName);
+  }
+
+  get widgetProperties(): Set<string> {
+    return this.propertyDecorations['widget'];
   }
 
   /** @internal */
   _addCloneProperties(properties: string | string[]) {
-    this._addProperties('_cloneProperties', properties);
+    this._decorateProperties('clone', properties);
   }
 
   isCloneProperty(propertyName: string): boolean {
-    return this._cloneProperties.indexOf(propertyName) > -1;
+    return this.isPropertyDecorated('clone', propertyName);
+  }
+
+  get cloneProperties(): Set<string> {
+    return this.propertyDecorations['clone'];
   }
 
   /**
    * Properties in this list won't be affected by the automatic lifecycle actions performed for regular widget properties.
    * This means, the widget won't be removed, destroyed and also not linked, which means the parent stays the same.
    * But the resolve operations are still applied, as for regular widget properties.
-   * <p>
+   *
    * The typical use case for such properties is referencing another widget without taking care of that widget.
    */
   protected _addPreserveOnPropertyChangeProperties(properties: string | string[]) {
-    this._addProperties('_preserveOnPropertyChangeProperties', properties);
+    this._decorateProperties('preserveOnPropertyChange', properties);
   }
 
   isPreserveOnPropertyChangeProperty(propertyName: string): boolean {
-    return this._preserveOnPropertyChangeProperties.indexOf(propertyName) > -1;
+    return this.isPropertyDecorated('preserveOnPropertyChange', propertyName);
   }
 
-  protected _addProperties(propertyName: string, properties: string | string[]) {
-    properties = arrays.ensure(properties);
-    properties.forEach(property => {
-      if (this[propertyName].indexOf(property) > -1) {
-        throw new Error(propertyName + ' already contains the property ' + property);
-      }
-      this[propertyName].push(property);
-    });
+  get preserveOnPropertyChangeProperties(): Set<string> {
+    return this.propertyDecorations['preserveOnPropertyChange'];
   }
 
   protected _eachProperty(model: WidgetModel, func: (propertyName: string, value, isWidgetProperty?: boolean) => void) {
-    let propertyName, value, i;
-
     // Loop through primitive properties
-    for (propertyName in model) {
-      if (this._widgetProperties.indexOf(propertyName) > -1) {
+    for (const propertyName in model) {
+      if (this.isWidgetProperty(propertyName)) {
         continue; // will be handled below
       }
-      value = model[propertyName];
+      const value = model[propertyName];
       func(propertyName, value);
     }
 
     // Loop through adapter properties (any order will do).
-    for (i = 0; i < this._widgetProperties.length; i++) {
-      propertyName = this._widgetProperties[i];
-      value = model[propertyName];
+    for (const propertyName of this.widgetProperties) {
+      const value = model[propertyName];
       if (value === undefined) {
         continue;
       }
 
       func(propertyName, value, true);
-    }
-  }
-
-  protected _removeWidgetProperties(properties: string | string[]) {
-    if (Array.isArray(properties)) {
-      arrays.removeAll(this._widgetProperties, properties);
-    } else {
-      arrays.remove(this._widgetProperties, properties);
     }
   }
 
@@ -1785,7 +1780,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Clones the widget and returns the clone. Only the properties defined in this._cloneProperties are copied to the clone.
+   * Clones the widget and returns the clone. Only the properties defined in {@link cloneProperties} are copied to the clone.
    * The parameter model has to contain at least the property 'parent'.
    *
    * @param model The model used to create the clone is a combination of the clone properties and this model.
@@ -1797,7 +1792,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     model = model || {};
     options = options || {};
 
-    cloneModel = objects.extractProperties(this, model, this._cloneProperties);
+    const cloneProperties = Array.from(this.cloneProperties).map(cloneProperty => this.adaptPropertyName(cloneProperty));
+    cloneModel = objects.extractProperties(this, model, cloneProperties);
     clone = scout.create(this.objectType, cloneModel);
     clone.cloneOf = this;
     this._mirror(clone, options);
@@ -1820,12 +1816,13 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
     properties = arrays.ensure(properties);
     properties.forEach(property => {
-      let propertyValue = this[property],
-        clonedProperty = null;
+      property = this.adaptPropertyName(property);
+      let propertyValue = this[property];
+      let clonedProperty = null;
       if (propertyValue === undefined) {
         throw new Error('Property \'' + property + '\' is undefined. Deep copy not possible.');
       }
-      if (this._widgetProperties.indexOf(property) > -1) {
+      if (this.isWidgetProperty(property)) {
         if (Array.isArray(propertyValue)) {
           clonedProperty = propertyValue.map(val => {
             return val.clone({
@@ -1838,9 +1835,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
           }, options);
         }
       } else if (Array.isArray(propertyValue)) {
-        clonedProperty = propertyValue.map(val => {
-          return val;
-        });
+        clonedProperty = propertyValue.map(val => val);
       } else {
         clonedProperty = propertyValue;
       }
@@ -2428,3 +2423,4 @@ export type WidgetMap = {
 };
 
 export type WidgetMapOf<T> = T extends { widgetMap: infer TMap } ? TMap : object;
+export type WidgetPropertyDecoration = 'widget' | 'clone' | 'preserveOnPropertyChange' | PropertyDecoration;

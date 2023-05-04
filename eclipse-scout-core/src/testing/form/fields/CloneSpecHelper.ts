@@ -12,12 +12,12 @@ import {Widget} from '../../../index';
 export class CloneSpecHelper {
 
   validateClone(original: Widget, clone: Widget) {
-    let properties = original._cloneProperties.filter(prop => {
-        return original._widgetProperties.indexOf(prop) < 0;
-      }),
-      widgetProperties = original._cloneProperties.filter(prop => {
-        return original._widgetProperties.indexOf(prop) > -1;
-      });
+    let properties = Array.from(original.cloneProperties).filter(prop => {
+      return !original.isWidgetProperty(prop);
+    });
+    let widgetProperties = Array.from(original.cloneProperties).filter(prop => {
+      return original.isWidgetProperty(prop);
+    });
 
     // simple properties to be cloned
     properties.forEach(prop => {
