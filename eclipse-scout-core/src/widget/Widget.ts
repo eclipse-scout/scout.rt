@@ -234,7 +234,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * For instance, you could not simply set the property value, but extend an already existing value.
    */
   protected _initProperty(propertyName: string, value: any) {
-    this[propertyName] = value;
+    this._writeProperty(propertyName, value);
   }
 
   /**
@@ -1477,7 +1477,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * @returns true, if the property was changed, false if not.
    */
   override setProperty(propertyName: string, value: any): boolean {
-    if (objects.equals(this[propertyName], value)) {
+    if (objects.equals(this.getProperty(propertyName), value)) {
       return false;
     }
 
@@ -1506,7 +1506,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     let widgets = this._createChildren(models);
 
     if (!this.isPreserveOnPropertyChangeProperty(propertyName)) {
-      let oldWidgets = this[propertyName];
+      let oldWidgets = this.getProperty(propertyName);
       if (oldWidgets && Array.isArray(widgets)) {
         // If new value is an array, old value has to be one as well
         // Only destroy those which are not in the new array
@@ -1534,7 +1534,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (this.isPreserveOnPropertyChangeProperty(propertyName)) {
       return;
     }
-    let widgets = this[propertyName];
+    let widgets = this.getProperty(propertyName);
     if (!widgets) {
       return;
     }
