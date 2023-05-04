@@ -34,6 +34,16 @@ public abstract class AbstractCacheWrapper<K, V> implements ICache<K, V> {
   }
 
   @Override
+  public Map<K, V> getCacheMap() {
+    return m_delegate.getCacheMap();
+  }
+
+  @Override
+  public V getCachedValue(K key) {
+    return m_delegate.getCachedValue(key);
+  }
+
+  @Override
   public Map<K, V> getUnmodifiableMap() {
     return m_delegate.getUnmodifiableMap();
   }

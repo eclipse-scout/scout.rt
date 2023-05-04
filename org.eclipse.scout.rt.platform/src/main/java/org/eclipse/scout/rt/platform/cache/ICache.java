@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
  * Interface to model a cache. In case of a cache miss, the functional interface
  * {@link ICacheValueResolver#resolve(Object)} is called to fetch or recompute the value.
  * <p>
- * If one need to reload one ore multiple keys, simply invalidate first the keys and then call {@link #get(Object)} or
+ * If one needs to reload one or multiple keys, simply invalidate first the keys and then call {@link #get(Object)} or
  * {@link #getAll(Collection)}
  * <p>
  * Any null key or values are <em>not</em> allowed. They are ignored.
@@ -75,6 +75,16 @@ public interface ICache<K, V> extends IAdaptable {
    *          cluster nodes. Note that a server propagates invalidations always to its connected clients.
    */
   void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate);
+
+  /**
+   * @return cached value for given key if or null if not yet in cache
+   */
+  V getCachedValue(K key);
+
+  /**
+   * @return new map with the current content of the cache
+   */
+  Map<K, V> getCacheMap();
 
   /**
    * @return an unmodifiable view of the map on which this cache is based on. Never null.

@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
@@ -57,7 +58,7 @@ public class CodeServiceInvalidateTest {
 
   @Test
   public void testInvalidateInsideSubTransaction() {
-    CODES.invalidateCodeTypes(new ArrayList<>(CODES.getAllCodeTypeClasses("")));
+    RunContexts.copyCurrent().run(() -> CODES.invalidateCodeTypes(new ArrayList<>(CODES.getAllCodeTypeClasses(""))));
 
     readCodeType(1);
     invalidateCodeType();
@@ -77,7 +78,7 @@ public class CodeServiceInvalidateTest {
 
   @Test
   public void testReloadInsideSubTransaction() {
-    CODES.invalidateCodeTypes(new ArrayList<>(CODES.getAllCodeTypeClasses("")));
+    RunContexts.copyCurrent().run(() -> CODES.invalidateCodeTypes(new ArrayList<>(CODES.getAllCodeTypeClasses(""))));
 
     readCodeType(1);
     invalidateCodeType();
@@ -100,7 +101,6 @@ public class CodeServiceInvalidateTest {
 
   private static TestCodeType readCodeType(int expectedInstanceId) {
     TestCodeType codeType = BEANS.get(TestCodeType.class);
-    System.out.println("" + codeType.instanceId);
     Assert.assertEquals("TestCodeType.instanceId", expectedInstanceId, codeType.instanceId);
     return codeType;
   }

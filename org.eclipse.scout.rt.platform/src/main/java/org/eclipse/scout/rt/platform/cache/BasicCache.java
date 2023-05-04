@@ -16,10 +16,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.AbstractTransactionalMap;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 
 /**
  * Basic implementation of {@link ICache}.
@@ -35,32 +36,49 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  */
 public class BasicCache<K, V> implements ICache<K, V> {
 
-  private final String m_cacheId;
-  private final ICacheValueResolver<K, V> m_resolver;
-  private final Map<K, V> m_cacheMap;
-  private final boolean m_atomicInsertion;
+  protected final String m_cacheId;
+  protected final ICacheValueResolver<K, V> m_resolver;
+  protected final Map<K, V> m_cacheMap;
 
-  public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, boolean atomicInsertion) {
+  protected final AbstractTransactionalMap<K, ?> m_transactionalMap; // is null if not transactional cache
+
+  public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap) {
+    this(cacheId, resolver, cacheMap, findTransactionalMap(cacheMap));
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <K, V> AbstractTransactionalMap<K, ?> findTransactionalMap(Map<K, V> cacheMap) {
+    Map<K, ?> innerMap = cacheMap;
+    if (cacheMap instanceof ConcurrentExpiringMap) {
+      innerMap = ((ConcurrentExpiringMap<K, Object>) cacheMap).getElementMap();
+    }
+    if (innerMap instanceof AbstractTransactionalMap) {
+      return (AbstractTransactionalMap<K, ?>) innerMap;
+    }
+    return null;
+  }
+
+  public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, AbstractTransactionalMap<K, ?> transactionalMap) {
     m_cacheId = Assertions.assertNotNullOrEmpty(cacheId);
     m_resolver = Assertions.assertNotNull(resolver);
     m_cacheMap = Assertions.assertNotNull(cacheMap);
-    m_atomicInsertion = atomicInsertion;
-    if (m_atomicInsertion && !(cacheMap instanceof ConcurrentMap)) {
-      throw new IllegalArgumentException("To use atomic insertions cacheMap must implement ConcurrentMap interface");
-    }
-  }
 
-  protected ICacheValueResolver<K, V> getResolver() {
-    return m_resolver;
-  }
-
-  protected Map<K, V> getCacheMap() {
-    return m_cacheMap;
+    m_transactionalMap = transactionalMap;
   }
 
   @Override
   public String getCacheId() {
     return m_cacheId;
+  }
+
+  @Override
+  public V getCachedValue(K key) {
+    return m_cacheMap.get(key);
+  }
+
+  @Override
+  public Map<K, V> getCacheMap() {
+    return new HashMap<>(m_cacheMap);
   }
 
   @Override
@@ -75,15 +93,13 @@ public class BasicCache<K, V> implements ICache<K, V> {
     }
     V value = m_cacheMap.get(key);
     if (value == null) {
+      if (m_transactionalMap != null) {
+        m_transactionalMap.getTransactionMember(true); // enforce creation of transaction member before resolve
+      }
       value = m_resolver.resolve(key);
       if (value != null) {
-        if (m_atomicInsertion) {
-          V alreadySetValue = m_cacheMap.putIfAbsent(key, value);
-          value = alreadySetValue != null ? alreadySetValue : value;
-        }
-        else {
-          m_cacheMap.put(key, value);
-        }
+        V alreadySetValue = m_cacheMap.putIfAbsent(key, value);
+        value = alreadySetValue != null ? alreadySetValue : value;
       }
     }
     return value;
@@ -108,6 +124,10 @@ public class BasicCache<K, V> implements ICache<K, V> {
       // all keys could be resolved with cache
       return result;
     }
+
+    if (m_transactionalMap != null) {
+      m_transactionalMap.getTransactionMember(true); // enforce creation of transaction member before resolve
+    }
     Map<K, V> resolvedValues = m_resolver.resolveAll(keys);
     for (Iterator<Entry<K, V>> iterator = resolvedValues.entrySet().iterator(); iterator.hasNext();) {
       Entry<K, V> entry = iterator.next();
@@ -115,15 +135,12 @@ public class BasicCache<K, V> implements ICache<K, V> {
       if (entry.getKey() == null || entry.getValue() == null) {
         iterator.remove();
       }
-      else if (m_atomicInsertion) {
+      else {
         V alreadySetValue = m_cacheMap.putIfAbsent(entry.getKey(), entry.getValue());
         if (alreadySetValue != null) {
           entry.setValue(alreadySetValue);
         }
       }
-    }
-    if (!m_atomicInsertion) {
-      m_cacheMap.putAll(resolvedValues);
     }
     result.putAll(resolvedValues);
     return result;
@@ -131,17 +148,25 @@ public class BasicCache<K, V> implements ICache<K, V> {
 
   @Override
   public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) {
+    boolean markInsertsDirty = true;
+
     if (filter instanceof AllCacheEntryFilter) {
       m_cacheMap.clear();
     }
     else if (filter instanceof KeyCacheEntryFilter) {
+      markInsertsDirty = false; // if all remove operations find a previous value, we do not need to mark inserts of other transactions as dirty
       KeyCacheEntryFilter<K, V> keyCacheEntryFilter = (KeyCacheEntryFilter<K, V>) filter;
       for (K key : keyCacheEntryFilter.getKeys()) {
-        m_cacheMap.remove(key);
+        boolean valueNotRemoved = m_cacheMap.remove(key) == null;
+        markInsertsDirty = markInsertsDirty | valueNotRemoved;
       }
     }
     else if (filter != null) {
       m_cacheMap.entrySet().removeIf(entry -> filter.accept(entry.getKey(), entry.getValue()));
+    }
+
+    if (markInsertsDirty && m_transactionalMap != null) {
+      m_transactionalMap.markInsertsDirty();
     }
   }
 
