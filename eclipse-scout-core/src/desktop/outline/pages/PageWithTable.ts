@@ -29,6 +29,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
     super();
 
     this.nodeType = Page.NodeType.TABLE;
+    this.inheritMenusFromParentTablePage = false;
     this.alwaysCreateChildPage = false;
 
     this._tableRowDeleteHandler = this._onTableRowsDeleted.bind(this);

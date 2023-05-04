@@ -453,6 +453,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
 
   protected override _setSelectedNodes(nodes: Page[], debounceSend?: boolean) {
     super._setSelectedNodes(nodes, debounceSend);
+    this.mediator.onPageSelected(this.selectedNode());
     // Needs to be done here so that tree.selectNodes() can restore scroll position correctly after the content has been updated
     this.updateDetailContent();
   }

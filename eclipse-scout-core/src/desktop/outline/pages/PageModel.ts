@@ -28,4 +28,10 @@ export interface PageModel extends TreeNodeModel {
    */
   overviewIconId?: string;
   showTileOverview?: boolean;
+  /**
+   * True to inherit all menus (single selection) from the parent table page, false to inherit none.
+   *
+   * Default is true
+   */
+  inheritMenusFromParentTablePage?: boolean;
 }

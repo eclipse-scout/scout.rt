@@ -154,7 +154,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   protected void updateParentTableRow(ICell cell) {
     IPage<?> parent = getParentPage();
     if (parent instanceof IPageWithNodes) {
-      ITableRow row = ((IPageWithNodes) parent).getTableRowFor(this);
+      ITableRow row = parent.getTableRowFor(this);
       if (row != null) {
         row.getCellForUpdate(0).setText(cell.getText());
       }

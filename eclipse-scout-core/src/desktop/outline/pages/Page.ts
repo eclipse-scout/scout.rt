@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ButtonTile, ChildModelOf, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, MenuBar, Outline, PageEventMap, PageModel, PropertyChangeEvent, scout,
-  Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  ButtonTile, ChildModelOf, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus, ObjectOrChildModel, Outline, PageEventMap,
+  PageModel, PropertyChangeEvent, scout, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -50,6 +50,7 @@ export class Page extends TreeNode implements PageModel {
    */
   overviewIconId: string;
   showTileOverview: boolean;
+  inheritMenusFromParentTablePage: boolean;
   row: TableRow;
   tile: ButtonTile;
   events: EventSupport;
@@ -59,6 +60,7 @@ export class Page extends TreeNode implements PageModel {
   protected _detailTableModel: ChildModelOf<Table>;
   /** @internal */
   _detailFormModel: ChildModelOf<Form>;
+  protected _menuOwnerMenusChangeHandler: (event: Event<MenuOwner>) => void;
 
   constructor() {
     super();
@@ -76,12 +78,14 @@ export class Page extends TreeNode implements PageModel {
     this.drillDownOnRowClick = false;
     this.overviewIconId = null;
     this.showTileOverview = false;
+    this.inheritMenusFromParentTablePage = true;
     this.events = new EventSupport();
     this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => event.propertyName === propertyName);
     this._tableFilterHandler = this._onTableFilter.bind(this);
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
     this._detailFormModel = null;
+    this._menuOwnerMenusChangeHandler = this._onMenuOwnerMenusChange.bind(this);
   }
 
   /**
@@ -214,10 +218,77 @@ export class Page extends TreeNode implements PageModel {
       form.setDisplayHint(Form.DisplayHint.VIEW);
       form.setDisplayViewId('C');
       form.setShowOnOpen(false);
+      this._updateParentTablePageMenusForDetailForm();
     }
     if (form instanceof TileOverviewForm) {
       form.setPage(this);
     }
+  }
+
+  protected _updateParentTablePageMenusForDetailFormAndDetailTable() {
+    this._updateParentTablePageMenusForDetailForm();
+    this._updateParentTablePageMenusForDetailTable();
+  }
+
+  protected _updateParentTablePageMenusForDetailForm() {
+    this._updateParentTablePageMenusForMenuOwner(this.detailForm && this.detailForm.rootGroupBox);
+  }
+
+  protected _updateParentTablePageMenusForDetailTable() {
+    this._updateParentTablePageMenusForMenuOwner(this.detailTable);
+  }
+
+  protected _updateParentTablePageMenusForMenuOwner(menuOwner: MenuOwner) {
+    if (!menuOwner) {
+      return;
+    }
+
+    menuOwner.off('propertyChange:menus', this._menuOwnerMenusChangeHandler);
+
+    const originalMenus = menuOwner.menus || [];
+    const parentTablePageMenus = this._computeParentTablePageMenus()
+      .map(menu => menu.clone(
+        {
+          parent: menuOwner,
+          menuTypes: [],
+          __parentTablePageMenu: true
+        },
+        {
+          delegateEventsToOriginal: ['action'],
+          delegateAllPropertiesToClone: true,
+          excludePropertiesToClone: ['menuTypes']
+        }));
+
+    menuOwner.setMenus(parentTablePageMenus
+      .concat(originalMenus
+        .filter((menu: Menu & { __parentTablePageMenu?: boolean }) => !menu.__parentTablePageMenu)
+      ));
+
+    menuOwner.on('propertyChange:menus', this._menuOwnerMenusChangeHandler);
+  }
+
+  protected _onMenuOwnerMenusChange(event: Event<MenuOwner>) {
+    this._updateParentTablePageMenusForMenuOwner(event.source);
+  }
+
+  protected _computeParentTablePageMenus(): Menu[] {
+    if (!this.parentNode) {
+      return [];
+    }
+
+    const table = this.parentNode.detailTable;
+    const row = this.row;
+
+    if (!table || !row || table !== row.getTable()) {
+      return [];
+    }
+
+    return menus.filter(table.menus, Table.MenuTypes.SingleSelection)
+      .filter(this._isMenuInheritedFromParentTablePage.bind(this));
+  }
+
+  protected _isMenuInheritedFromParentTablePage(menu: Menu): boolean {
+    return this.inheritMenusFromParentTablePage;
   }
 
   /**
@@ -248,6 +319,7 @@ export class Page extends TreeNode implements PageModel {
       table.setMultiSelect(false);
     }
     table.setTableStatusVisible(this.tableStatusVisible);
+    this._updateParentTablePageMenusForDetailTable();
   }
 
   /**
@@ -482,3 +554,4 @@ export class Page extends TreeNode implements PageModel {
 }
 
 export type NodeType = EnumObject<typeof Page.NodeType>;
+export type MenuOwner = Widget & { menus: Menu[]; setMenus: (menus: ObjectOrChildModel<Menu>[]) => void };
