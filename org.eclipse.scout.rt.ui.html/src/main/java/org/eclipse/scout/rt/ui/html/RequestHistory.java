@@ -69,7 +69,7 @@ public class RequestHistory {
         // Prevent potential denial-of-service attack: If the gap between last processed and
         // requested sequence number is too large, simply forget everything. This should never
         // happen under normal circumstances, but only when a large number is sent deliberately.
-        LOG.warn("Requested sequence number #{} exceeds max. request history size for UI session {}, dropping entire history. Current state of {}", requestSequenceNo, getUiSessionId(), this.toString());
+        LOG.info("Requested sequence number #{} exceeds max. request history size for UI session {}, dropping entire history. Current state of {}", requestSequenceNo, getUiSessionId(), this);
         m_missingRequestSequenceNos.clear();
         for (Long missingSequenceNo = requestSequenceNo - MAX_REQUEST_HISTORY_SIZE; missingSequenceNo < requestSequenceNo; missingSequenceNo++) {
           LOG.debug("Remember missing request sequence number #{}", missingSequenceNo);
@@ -86,7 +86,7 @@ public class RequestHistory {
         }
         // Don't wait for missing sequence numbers forever
         while (m_missingRequestSequenceNos.size() > MAX_REQUEST_HISTORY_SIZE) {
-          LOG.warn("Max. request history size exceeded for UI session {}, dropping oldest request #{}. Current state of {}", getUiSessionId(), m_missingRequestSequenceNos.first(), this.toString());
+          LOG.info("Max. request history size exceeded for UI session {}, dropping oldest request #{}. Current state of {}", getUiSessionId(), m_missingRequestSequenceNos.first(), this);
           m_missingRequestSequenceNos.remove(m_missingRequestSequenceNos.first());
         }
         m_lastProcessedRequestSequenceNo = requestSequenceNo;
