@@ -10,8 +10,6 @@
  */
 package org.eclipse.scout.rt.platform.util.collection;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,17 +67,17 @@ public class CopyOnWriteTransactionalMap<K, V> extends AbstractTransactionalMap<
   @Override
   @SuppressWarnings("unchecked")
   protected <TM extends Map<K, V> & ITransactionMember> TM createMapTransactionMember() {
-    return (TM) new CopyOnWriteMapTransactionMember(getTransactionMemberId(), isFastForward());
+    return (TM) new CopyOnWriteMapTransactionMember();
   }
 
-  public class CopyOnWriteMapTransactionMember extends AbstractMapTransactionMember<K, V> {
+  public class CopyOnWriteMapTransactionMember extends AbstractMapTransactionMember {
 
-    public CopyOnWriteMapTransactionMember(String transactionMemberId, boolean fastForward) {
-      this(transactionMemberId, new HashMap<>(), new HashMap<>(), fastForward);
+    public CopyOnWriteMapTransactionMember() {
+      this(new HashMap<>(), new HashMap<>());
     }
 
-    public CopyOnWriteMapTransactionMember(String transactionId, Map<K, V> removedMap, Map<K, V> insertedMap, boolean fastForward) {
-      super(transactionId, removedMap, insertedMap, fastForward);
+    public CopyOnWriteMapTransactionMember(Map<K, V> removedMap, Map<K, V> insertedMap) {
+      super(removedMap, insertedMap);
     }
 
     @Override
@@ -91,53 +89,7 @@ public class CopyOnWriteTransactionalMap<K, V> extends AbstractTransactionalMap<
     public void commitPhase2() {
       synchronized (m_sharedMapLock) {
         Map<K, V> newSharedMap = new HashMap<>(m_sharedMap);
-        Collection<K> successfulCommitedChanges = new ArrayList<>();
-        Collection<K> failedCommitedChanges = new ArrayList<>();
-        for (Entry<K, V> entry : getRemovedMap().entrySet()) {
-          K key = entry.getKey();
-          V oldValue = entry.getValue();
-          if (oldValue != null) {
-            V insertedValue = getInsertedMap().remove(key);
-            if (insertedValue != null) {
-              if (oldValue.equals(m_sharedMap.get(key))) {
-                newSharedMap.put(key, insertedValue);
-                successfulCommitedChanges.add(key);
-              }
-              else {
-                failedCommitedChanges.add(key);
-              }
-            }
-            else {
-              if (oldValue.equals(m_sharedMap.get(key))) {
-                newSharedMap.remove(key);
-                successfulCommitedChanges.add(key);
-              }
-              else {
-                failedCommitedChanges.add(key);
-              }
-            }
-          }
-          else {
-            // if there must be a value inserted, the loop over insertedMap will handle this
-            if (m_sharedMap.containsKey(key)) {
-              // remove entry, and there was no previous value in sharedMap but now there is one. Commit failed.
-              failedCommitedChanges.add(key);
-            }
-          }
-        }
-        for (Entry<K, V> entry : getInsertedMap().entrySet()) {
-          K key = entry.getKey();
-          V newValue = entry.getValue();
-          V previousValue = m_sharedMap.get(key);
-          if (previousValue != null && !previousValue.equals(newValue)) {
-            failedCommitedChanges.add(key);
-          }
-          else {
-            newSharedMap.put(key, newValue);
-            successfulCommitedChanges.add(key);
-          }
-        }
-        changesCommited(newSharedMap, successfulCommitedChanges, failedCommitedChanges);
+        commitChanges(newSharedMap);
         m_sharedMap = newSharedMap;
       }
     }
