@@ -12,14 +12,17 @@ package org.eclipse.scout.rt.platform.util.collection;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
@@ -38,13 +41,13 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
  * <p>
  * If there were concurrent modifications on the same key in different transactions only the first transaction will be
  * able to commit the change to the shared map. As a default, if a commit fails on a key, the entry is completely
- * removed from the shared map ({@link AbstractMapTransactionMember#changesCommited}).
+ * removed from the shared map ({@link AbstractMapTransactionMember#changesCommitted}).
  * <p>
  * In order to use this map safely one must conform to the following behavior: <b>If the current transaction changed the
  * value of a key in the transactional source, this maps {@link #remove(Object)} to that key must be called
  * <em>before</em> the value is fetched from that source again.</b> If one fails doing so, there are no guarantees, that
  * values in the shared map reflect values in the transactional source. Note that this behavior is given when using
- * {@link ICache}. See also {@link AbstractMapTransactionMember#changesCommited}.
+ * {@link ICache}. See also {@link AbstractMapTransactionMember#changesCommitted}.
  * <p>
  * If the <tt>fastForward</tt> property is set to true, a newly inserted value is directly committed to the shared map
  * if it is consider as a save commit.
@@ -65,8 +68,15 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
  * @since 5.2
  */
 public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
-  private final String m_transactionMemberId;
-  private final boolean m_fastForward;
+  protected final String m_transactionMemberId;
+  /**
+   * If set to true, before a put operation the shared map is checked if there is already an entry for the given key. If
+   * there is no such entry, the new entry is directly put in the shared map.
+   */
+  protected final boolean m_fastForward;
+
+  protected final AtomicInteger m_insertVersion = new AtomicInteger();
+  protected final AtomicInteger m_removeVersion = new AtomicInteger();
 
   public AbstractTransactionalMap(String transactionMemberId) {
     this(transactionMemberId, true);
@@ -83,8 +93,8 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
   }
 
   /**
-   * This method is call when no scout transaction can be found as a fallback. Implementers are allowed to return a full
-   * featured map, a read only map view or throw an {@link IllegalStateException}. Null is not allowed.
+   * This method is call when no scout transaction can be found as a fallback. Implementers are allowed to return a
+   * full-featured map, a read only map view or throw an {@link IllegalStateException}. Null is not allowed.
    */
   protected abstract Map<K, V> getSharedMap();
 
@@ -92,8 +102,30 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     return m_fastForward;
   }
 
+  /**
+   * Any inserts in concurrent transactions must be handled as invalid and will not be committed to the shared map (does
+   * not apply to inserts from this transaction).
+   */
+  public void markInsertsDirty() {
+    AbstractMapTransactionMember transactionMember = getTransactionMember(true);
+    if (transactionMember != null) { // if not transaction, then no transaction member
+      transactionMember.markInsertsDirty();
+    }
+  }
+
+  /**
+   * Any removes in concurrent transactions must be handled as invalid and will not be committed to the shared map (does
+   * not apply to removes from this transaction).
+   */
+  public void markRemovesDirty() {
+    AbstractMapTransactionMember transactionMember = getTransactionMember(true);
+    if (transactionMember != null) { // if not transaction, then no transaction member
+      transactionMember.markRemovesDirty();
+    }
+  }
+
   protected Map<K, V> getTransactionMap(boolean onlyReadOperation) {
-    Map<K, V> m = getTransaction(!onlyReadOperation);
+    Map<K, V> m = getTransactionMember(!onlyReadOperation);
     if (m == null) {
       // no transaction, return shared map
       return getSharedMap();
@@ -101,13 +133,13 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     return m;
   }
 
-  @SuppressWarnings("unchecked")
-  protected <TM extends Map<K, V> & ITransactionMember> TM getTransaction(boolean createIfNotExist) {
+  public AbstractMapTransactionMember getTransactionMember(boolean createIfNotExist) {
     ITransaction t = ITransaction.CURRENT.get();
     if (t == null) {
       return null;
     }
-    TM m = (TM) t.getMember(getTransactionMemberId());
+    @SuppressWarnings("unchecked")
+    AbstractMapTransactionMember m = (AbstractMapTransactionMember) t.getMember(getTransactionMemberId());
     if (m == null && createIfNotExist) {
       m = createMapTransactionMember();
       t.registerMember(m);
@@ -178,8 +210,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
   }
 
   @SuppressWarnings("squid:S2160")
-  public abstract static class AbstractMapTransactionMember<K, V> extends AbstractMap<K, V> implements ITransactionMember {
-    private final String m_memberId;
+  public abstract class AbstractMapTransactionMember extends AbstractMap<K, V> implements ITransactionMember {
 
     /**
      * Map containing an entry for removes that were done within this transaction, containing the old value from the
@@ -188,22 +219,23 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
      */
     protected final Map<K, V> m_removedMap;
     /**
-     * Map containing entry for each inserted value. Before an value is inserted, any previous value has to be removed.
+     * Map containing entry for each inserted value. Before a value is inserted, any previous value has to be removed.
      * In other words, an entry was added to the removedMap.
      */
     protected final Map<K, V> m_insertedMap;
-    /**
-     * If set to true, before a put operation the shared map is checked if there is already an entry for the given key.
-     * If there is no such entry, the new entry is directly put in the shared map.
-     */
-    protected final boolean m_fastForward;
 
-    public AbstractMapTransactionMember(String transactionId, Map<K, V> removedMap, Map<K, V> insertedMap, boolean fastForward) {
+    protected final int m_insertVersion;
+    protected final int m_removeVersion;
+
+    private boolean m_insertsDirty;
+    private boolean m_removesDirty;
+
+    public AbstractMapTransactionMember(Map<K, V> removedMap, Map<K, V> insertedMap) {
       super();
-      m_memberId = transactionId;
       m_removedMap = removedMap;
       m_insertedMap = insertedMap;
-      m_fastForward = fastForward;
+      m_insertVersion = AbstractTransactionalMap.this.m_insertVersion.get();
+      m_removeVersion = AbstractTransactionalMap.this.m_removeVersion.get();
     }
 
     /**
@@ -219,23 +251,113 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       return m_removedMap;
     }
 
-    protected boolean isFastForward() {
-      return m_fastForward;
+    public void markInsertsDirty() {
+      m_insertsDirty = true;
+    }
+
+    public void markRemovesDirty() {
+      m_removesDirty = true;
     }
 
     @Override
     public String getMemberId() {
-      return m_memberId;
+      return m_transactionMemberId;
     }
 
     @Override
     public boolean needsCommit() {
-      return !m_removedMap.isEmpty() || !m_insertedMap.isEmpty();
+      return !m_removedMap.isEmpty() || !m_insertedMap.isEmpty() || m_insertsDirty || m_removesDirty;
     }
 
     @Override
     public boolean commitPhase1() {
       return true;
+    }
+
+    protected void commitChanges(Map<K, V> sharedMap) {
+      List<K> successfulCommittedChanges = new ArrayList<>();
+      List<K> failedCommittedChanges = new ArrayList<>();
+
+      int sharedRemoveVersion;
+      if (m_removesDirty) {
+        sharedRemoveVersion = AbstractTransactionalMap.this.m_removeVersion.getAndIncrement();
+      }
+      else {
+        sharedRemoveVersion = AbstractTransactionalMap.this.m_removeVersion.get();
+      }
+      boolean removesValid = sharedRemoveVersion == m_removeVersion;
+
+      int sharedInsertVersion;
+      if (m_insertsDirty) {
+        sharedInsertVersion = AbstractTransactionalMap.this.m_insertVersion.getAndIncrement();
+      }
+      else {
+        sharedInsertVersion = AbstractTransactionalMap.this.m_insertVersion.get();
+      }
+      boolean insertsValid = sharedInsertVersion == m_insertVersion;
+
+      if (removesValid) {
+        for (Entry<K, V> entry : m_removedMap.entrySet()) {
+          K key = entry.getKey();
+          V oldValue = entry.getValue();
+          if (oldValue != null) {
+            V insertedValue = m_insertedMap.remove(key);
+            if (!insertsValid) {
+              failedCommittedChanges.add(key);
+            }
+            else if (insertedValue != null) {
+              if (sharedMap.replace(key, oldValue, insertedValue)) {
+                successfulCommittedChanges.add(key);
+              }
+              else {
+                failedCommittedChanges.add(key);
+              }
+            }
+            else {
+              if (sharedMap.remove(key, oldValue)) {
+                successfulCommittedChanges.add(key);
+              }
+              else {
+                failedCommittedChanges.add(key);
+              }
+            }
+          }
+          else {
+            // if there must be a value inserted, the loop over insertedMap will handle this
+            if (sharedMap.containsKey(key)) {
+              // remove entry, and there was no previous value in sharedMap but now there is one. Commit failed.
+              failedCommittedChanges.add(key);
+            }
+          }
+        }
+      }
+      else {
+        for (Entry<K, V> entry : m_removedMap.entrySet()) {
+          if (entry.getValue() != null) {
+            m_insertedMap.remove(entry.getKey());
+          }
+        }
+        failedCommittedChanges.addAll(m_removedMap.keySet());
+      }
+
+      if (insertsValid) {
+        for (Entry<K, V> entry : m_insertedMap.entrySet()) {
+          K key = entry.getKey();
+          V newValue = entry.getValue();
+          V previousValue = sharedMap.putIfAbsent(key, newValue);
+          if (previousValue != null && !previousValue.equals(newValue)) {
+            failedCommittedChanges.add(key);
+          }
+          else {
+            successfulCommittedChanges.add(key);
+          }
+        }
+      }
+      else {
+        failedCommittedChanges.addAll(m_insertedMap.keySet());
+      }
+
+      changesCommitted(sharedMap, successfulCommittedChanges, failedCommittedChanges);
     }
 
     /**
@@ -245,8 +367,8 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
      * As a default, entries from the shared map are removed for any failed commit. Therefore, if map is used as a lazy
      * loaded shared cache, the item will be reloaded.
      */
-    protected void changesCommited(Map<K, V> newSharedMap, Collection<K> successfulCommitedChanges, Collection<K> failedCommitedChanges) {
-      for (K key : failedCommitedChanges) {
+    protected void changesCommitted(Map<K, V> newSharedMap, Collection<K> successfulCommittedChanges, Collection<K> failedCommittedChanges) {
+      for (K key : failedCommittedChanges) {
         newSharedMap.remove(key);
       }
     }
@@ -263,6 +385,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     public void release() {
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public V get(Object key) {
       V value = m_insertedMap.get(key);
@@ -280,9 +403,9 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       }
       V sharedValue = getReadSharedMap().get(key);
       boolean hasRemoveEntry = m_removedMap.containsKey(key);
-      if (m_fastForward && !hasRemoveEntry && sharedValue == null && fastForward(key, value)) {
+      if (m_fastForward && !hasRemoveEntry && sharedValue == null && !m_insertsDirty && fastForward(key, value)) {
         // fastForward success; value was directly put in shared map
-        return null;
+        sharedValue = value; // do not return but add to inserted/removed map; this will ensure that dirty marked transactions will roll back this fast-forward action
       }
       V oldValue = m_insertedMap.put(key, value);
       if (!hasRemoveEntry && sharedValue != null) {
@@ -296,13 +419,13 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     /**
      * Tries to commit a new value directly into the shared map
      *
-     * @return true if fast forward succeeded
+     * @return true if fast-forward succeeded
      */
     protected boolean fastForward(K key, V value) {
       return false;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"SuspiciousMethodCalls", "unchecked"})
     @Override
     public V remove(Object key) {
       V insertedValue = m_insertedMap.remove(key);
@@ -332,7 +455,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     public int size() {
       if (m_removedMap.containsValue(null)) {
         // If a value in the removed map is null, then there was no entry in the shared map, at the time when remove was called.
-        // Now there could be an entry in the shared map. Therefore we have now to carefully compute the sizes.
+        // Now there could be an entry in the shared map. Therefore, we have now to carefully compute the sizes.
         Set<K> keys = new HashSet<>(getReadSharedMap().keySet());
         keys.removeAll(m_removedMap.keySet());
         keys.addAll(m_insertedMap.keySet());

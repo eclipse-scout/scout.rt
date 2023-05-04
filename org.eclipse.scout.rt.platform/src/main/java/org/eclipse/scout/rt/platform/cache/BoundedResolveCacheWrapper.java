@@ -35,7 +35,7 @@ public class BoundedResolveCacheWrapper<K, V> extends AbstractCacheWrapper<K, V>
 
   @Override
   public V get(K key) {
-    V value = getUnmodifiableMap().get(key);
+    V value = getCachedValue(key);
     if (value != null) {
       return value;
     }
@@ -57,15 +57,14 @@ public class BoundedResolveCacheWrapper<K, V> extends AbstractCacheWrapper<K, V>
 
   @Override
   public Map<K, V> getAll(Collection<? extends K> keys) {
-    Map<K, V> cacheMap = getUnmodifiableMap();
     Map<K, V> result = new HashMap<>();
     for (K key : keys) {
-      V value = cacheMap.get(key);
+      V value = getCachedValue(key);
       if (value == null) {
         // not all keys can be looked up without resolve. call super anyway
         break;
       }
-      result.put(key, cacheMap.get(key));
+      result.put(key, value);
     }
     if (result.size() == keys.size()) {
       return result;
