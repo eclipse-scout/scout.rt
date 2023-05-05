@@ -189,10 +189,6 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
     }
   }
 
-  /**
-   * @param extensionClass
-   * @return
-   */
   protected List<Class<?>> collectInnerExtensionClasses(Class<?> extensionClass) {
     Class<?>[] innerClasses = extensionClass.getClasses();
     List<Class<?>> result = new ArrayList<>(innerClasses.length);
@@ -235,11 +231,11 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
 
       // contributions: check container
       if (!isValidContribution(extensionClass, ownerClass)) {
-        throw new IllegalExtensionException("Contribution [" + extensionClass.getName() + "] is not supported for owner [" + ownerClass.getName() + "].");
+        throw new IllegalExtensionException("Contribution or inner class [" + extensionClass.getName() + "] is not allowed within the owner [" + ownerClass.getName() + "]. If this is an ordinary inner class, extract it to its own file.");
       }
     }
 
-    // Warn if there is an order information for a non ordered object.
+    // Warn if there is an order information for a non-ordered object.
     boolean isOrdered = IOrdered.class.isAssignableFrom(extensionClass);
     if (!isOrdered && (modelOrder != null || isOrderAnnotationPresentInSuperClasses(extensionClass))) {
       LOG.warn("Order information not valid for extension [{}]. This extension is not an [{}] object.", extensionClass.getName(), IOrdered.class.getName());
@@ -464,9 +460,6 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
 
   /**
    * Returns top-level extensions for the given ownerClass, but not their nested extension classes.
-   *
-   * @param ownerClass
-   * @return
    */
   protected Set<ExtensionRegistryItem> getModelExtensionItemsFor(Class<?> ownerClass) {
     ScopeStack scopeStack = m_scopeStack.get();
