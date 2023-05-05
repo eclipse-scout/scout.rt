@@ -187,7 +187,7 @@ export const scout = {
    * @param type type to check against with "instanceof"
    * @param msg optional error message when the assertion fails
    */
-  assertInstance<T>(value: T, type: new(...args) => any, msg?: string): T {
+  assertInstance<T>(value: any, type: new(...args) => T, msg?: string): T {
     if (!(value instanceof type)) {
       throw new Error(msg || 'Value has wrong type');
     }

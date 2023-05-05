@@ -7,7 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Menu, NullWidget, ObjectFactory, objects, scout, Session, Status, Tooltip} from '../src/index';
+import {Menu, NullWidget, NumberField, ObjectFactory, objects, scout, Session, Status, StringField, Tooltip, ValueField, Widget} from '../src/index';
+import {FormSpecHelper} from '../src/testing';
 
 describe('main', () => {
   let session: SandboxSession;
@@ -135,6 +136,24 @@ describe('main', () => {
       expect(() => scout.assertInstance(obj, Session, 'not-good')).toThrowError('not-good');
     });
 
+    it('narrows to the asserted type', () => {
+      // This is mostly a compile-time test
+
+      const helper = new FormSpecHelper(session);
+      let stringField = helper.createField(StringField);
+      expect(stringField.value).toBe(null);
+
+      let widget = scout.assertInstance(stringField, Widget);
+      // @ts-expect-error: Class "Widget" does not know about "value"...
+      expect(widget.value).toBe(null);
+
+      let valueField = scout.assertInstance(widget, ValueField);
+      // ...but "ValueField" does
+      expect(valueField.value).toBe(null);
+
+      expect(valueField).toBe(stringField);
+      expect(() => scout.assertInstance(widget, NumberField)).toThrow();
+    });
   });
 
   describe('isOneOf', () => {
