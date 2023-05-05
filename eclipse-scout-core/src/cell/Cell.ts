@@ -114,4 +114,20 @@ export class Cell<TValue = any> implements CellModel<TValue> {
   setSortCode(sortCode: number) {
     this.sortCode = sortCode;
   }
+
+  setTooltipText(tooltipText: string) {
+    this.tooltipText = tooltipText;
+  }
+
+  setBackgroundColor(color: string) {
+    this.backgroundColor = color;
+  }
+
+  setForegroundColor(color: string) {
+    this.foregroundColor = color;
+  }
+
+  setFont(font: string) {
+    this.font = font;
+  }
 }

@@ -220,7 +220,7 @@ export class TabArea extends Widget implements TabAreaModel {
   }
 
   visibleTabs(): Tab[] {
-    return this.tabs.filter(tab => tab.isVisible());
+    return this.tabs.filter(tab => tab.visible);
   }
 
   protected _setHasSubLabel(hasSubLabel: boolean) {

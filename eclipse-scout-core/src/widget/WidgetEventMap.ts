@@ -28,6 +28,7 @@ export interface WidgetEventMap extends PropertyEventMap {
   'glassPaneContributionRemoved': GlassPaneContributionEvent;
   'hierarchyChange': HierarchyChangeEvent;
   'propertyChange:enabled': PropertyChangeEvent<boolean>;
+  'propertyChange:enabledGranted': PropertyChangeEvent<boolean>;
   'propertyChange:enabledComputed': PropertyChangeEvent<boolean>;
   'propertyChange:trackFocus': PropertyChangeEvent<boolean>;
   'propertyChange:scrollTop': PropertyChangeEvent<number>;
@@ -35,6 +36,7 @@ export interface WidgetEventMap extends PropertyEventMap {
   'propertyChange:inheritAccessibility': PropertyChangeEvent<boolean>;
   'propertyChange:disabledStyle': PropertyChangeEvent<DisabledStyle>;
   'propertyChange:visible': PropertyChangeEvent<boolean>;
+  'propertyChange:visibleGranted': PropertyChangeEvent<boolean>;
   'propertyChange:focused': PropertyChangeEvent<boolean>;
   'propertyChange:cssClass': PropertyChangeEvent<string>;
   'propertyChange:loading': PropertyChangeEvent<boolean>;

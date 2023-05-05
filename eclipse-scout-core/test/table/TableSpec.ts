@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BeanColumn, Column, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, Range, RemoteEvent, scout, scrollbars, Table, TableField, TableRow} from '../../src/index';
+import {BeanColumn, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, Range, RemoteEvent, scout, scrollbars, Table, TableField, TableRow} from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
 
 describe('Table', () => {
@@ -621,7 +621,7 @@ describe('Table', () => {
       let rows = table.rows;
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
-      rows[0].enabled = false;
+      rows[0].setEnabled(false);
       table.checkRow(rows[0], true);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
@@ -1012,7 +1012,7 @@ describe('Table', () => {
       model.columns[1].width = 101;
       model.columns[1].visible = false;
       model.columns[2].width = 102;
-      model.columns[2].displayable = false;
+      (model.columns[2] as ColumnModel<any>).displayable = false;
       model.columns[3].width = 103;
       model.columns[4].width = 104;
       let adapter = helper.createTableAdapter(model);
@@ -1770,7 +1770,7 @@ describe('Table', () => {
         menu1 = helper.menuHelper.createMenu(menuModel1),
         menuModel2 = helper.createMenuModel('menu'),
         menu2 = helper.menuHelper.createMenu(menuModel2);
-      menu2.visible = false;
+      menu2.setVisible(false);
 
       table.menus = [menu1, menu2];
       let $row0 = table.$data.children('.table-row').eq(0);
@@ -1876,6 +1876,158 @@ describe('Table', () => {
       table.selectRows([]);
       menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([emptySpaceMenu]);
+    });
+  });
+
+  describe('row menus', () => {
+    let singleSelMenu: Menu;
+    let multiSelMenu: Menu;
+    let emptySpaceMenu: Menu;
+
+    beforeEach(() => {
+      singleSelMenu = scout.create(Menu, {
+        parent: session.desktop,
+        menuTypes: [Table.MenuTypes.SingleSelection]
+      });
+      multiSelMenu = scout.create(Menu, {
+        parent: session.desktop,
+        menuTypes: [Table.MenuTypes.MultiSelection]
+      });
+      emptySpaceMenu = scout.create(Menu, {
+        parent: session.desktop
+      });
+    });
+
+    it('are disabled if single selection and row is disabled', () => {
+      let model = helper.createModelFixture(2, 0);
+      helper.createTable($.extend(model, {
+        rows: [{id: 'firstRow', enabled: false}, {}, {}], // 3 rows, first is disabled,
+        selectedRows: ['firstRow'],
+        menus: [singleSelMenu, emptySpaceMenu]
+      }));
+      expect(singleSelMenu.enabled).toBe(false);
+      expect(emptySpaceMenu.enabled).toBe(true);
+    });
+
+    it('are disabled if multi selection and rows are disabled', () => {
+      let model = helper.createModelFixture(2, 0);
+      helper.createTable($.extend(model, {
+        rows: [{id: 'firstRow', enabled: false}, {id: 'secondRow', enabled: false}, {}],
+        selectedRows: ['firstRow', 'secondRow'],
+        menus: [multiSelMenu, emptySpaceMenu]
+      }));
+      expect(multiSelMenu.enabled).toBe(false);
+      expect(emptySpaceMenu.enabled).toBe(true);
+    });
+
+    it('are disabled if added dynamically and row is disabled', () => {
+      let model = helper.createModelFixture(2, 0);
+      let table = helper.createTable($.extend(model, {
+        rows: [{id: 'firstRow', enabled: false}, {}, {}], // 3 rows, first is disabled,
+        selectedRows: ['firstRow']
+      }));
+      expect(singleSelMenu.enabled).toBe(true);
+
+      table.setMenus([singleSelMenu]);
+      expect(singleSelMenu.enabled).toBe(false);
+    });
+
+    it('are enabled if inheritAccessibility is false even if row is disabled', () => {
+      let model = helper.createModelFixture(2, 0);
+      let table = helper.createTable($.extend(model, {
+        rows: [{id: 'firstRow', enabled: false}, {}, {}], // 3 rows, first is disabled,
+        selectedRows: ['firstRow'],
+        menus: [{
+          objectType: Menu,
+          menuTypes: [Table.MenuTypes.SingleSelection],
+          inheritAccessibility: false
+        }]
+      }));
+      singleSelMenu = table.menus[0];
+      expect(singleSelMenu.enabledComputed).toBe(true);
+
+      singleSelMenu.setInheritAccessibility(true);
+      expect(singleSelMenu.enabledComputed).toBe(false);
+    });
+
+    it('are disabled if multi selection but not all rows disabled', () => {
+      let model = helper.createModelFixture(2, 0);
+      helper.createTable($.extend(model, {
+        rows: [{id: 'firstRow', enabled: false}, {id: 'secondRow', enabled: true}, {}],
+        selectedRows: ['firstRow', 'secondRow'],
+        menus: [multiSelMenu, emptySpaceMenu]
+      }));
+      expect(multiSelMenu.enabled).toBe(false);
+      expect(emptySpaceMenu.enabled).toBe(true);
+    });
+
+    it('change enabled state if row changes enabled state', () => {
+      let model = helper.createModelFixture(2, 0);
+      let table = helper.createTable($.extend(model, {
+        rows: [{id: 'firstRow', enabled: false}, {}, {}], // 3 rows, first is disabled,
+        selectedRows: ['firstRow'],
+        menus: [singleSelMenu, multiSelMenu, emptySpaceMenu]
+      }));
+      let row = table.rows[0];
+      row.setEnabled(true);
+      table.updateRows(row);
+      expect(singleSelMenu.enabled).toBe(true);
+      expect(emptySpaceMenu.enabled).toBe(true);
+
+      row.setEnabled(false);
+      table.updateRows(row);
+      expect(singleSelMenu.enabled).toBe(false);
+      expect(emptySpaceMenu.enabled).toBe(true);
+    });
+
+    it('adjust enabled state based on the selection', () => {
+      let model = helper.createModelFixture(2, 0);
+      let table = helper.createTable($.extend(model, {
+        rows: [{id: 'firstRow', enabled: false}, {id: 'secondRow', enabled: false}, {}],
+        menus: [singleSelMenu, multiSelMenu, emptySpaceMenu]
+      }));
+      expect(singleSelMenu.enabled).toBe(true);
+      expect(multiSelMenu.enabled).toBe(true);
+      expect(emptySpaceMenu.enabled).toBe(true);
+
+      table.selectRow(table.rows[0]);
+      expect(singleSelMenu.enabled).toBe(false);
+      expect(multiSelMenu.enabled).toBe(true);
+      expect(emptySpaceMenu.enabled).toBe(true);
+
+      table.selectRows([table.rows[0], table.rows[1]]);
+      expect(singleSelMenu.enabled).toBe(false);
+      expect(multiSelMenu.enabled).toBe(false);
+      expect(emptySpaceMenu.enabled).toBe(true);
+
+      table.selectRow(table.rows[1]);
+      expect(singleSelMenu.enabled).toBe(false);
+      expect(multiSelMenu.enabled).toBe(false); // Menu is not visible so state is not adjusted because it does not matter
+      expect(emptySpaceMenu.enabled).toBe(true);
+
+      table.selectRows([]);
+      expect(singleSelMenu.enabled).toBe(false); // Menu is not visible so state is not adjusted because it does not matter
+      expect(multiSelMenu.enabled).toBe(false);
+      expect(emptySpaceMenu.enabled).toBe(true);
+    });
+
+    it('stay disabled if menu is disabled but row enabled', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable($.extend(model, {
+        rows: [{id: 'firstRow', enabled: false}, {}, {}], // 3 rows, first is disabled,
+        menus: [singleSelMenu],
+        selectedRows: ['firstRow']
+      }));
+      let row = table.rows[0];
+      expect(singleSelMenu.enabled).toBe(false);
+
+      singleSelMenu.setEnabled(false);
+      expect(singleSelMenu.enabled).toBe(false);
+
+      row.setEnabled(true);
+      table.updateRows(row);
+      expect(row.enabled).toBe(true);
+      expect(singleSelMenu.enabled).toBe(false); // Still false
     });
   });
 
@@ -2636,8 +2788,8 @@ describe('Table', () => {
       let table = helper.createTable(model);
       table.render();
 
-      expect(table.columns[0].isVisible()).toBe(true);
-      expect(table.columns[1].isVisible()).toBe(true);
+      expect(table.columns[0].visible).toBe(true);
+      expect(table.columns[1].visible).toBe(true);
       expect(table.$container.find('.table-header-item:not(.filler)').length).toBe(2);
       expect(table.$container.find('.table-cell').length).toBe(2);
 
@@ -2645,8 +2797,8 @@ describe('Table', () => {
 
       // when column is invisible it must be removed from the header
       // also the cells of this column must be removed from all table rows
-      expect(table.columns[0].isVisible()).toBe(true);
-      expect(table.columns[1].isVisible()).toBe(false);
+      expect(table.columns[0].visible).toBe(true);
+      expect(table.columns[1].visible).toBe(false);
       expect(table.$container.find('.table-header-item:not(.filler)').length).toBe(1);
       expect(table.$container.find('.table-cell').length).toBe(1);
     });

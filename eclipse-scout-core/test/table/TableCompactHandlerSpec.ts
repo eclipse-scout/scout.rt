@@ -28,13 +28,13 @@ describe('TableCompactHandler', () => {
     describe('compact is true', () => {
       it('adds compact column and makes others invisible', () => {
         let table = helper.createTable(helper.createModelFixture(2, 1));
-        expect(table.columns[0].isVisible()).toBe(true);
-        expect(table.columns[1].isVisible()).toBe(true);
+        expect(table.columns[0].visible).toBe(true);
+        expect(table.columns[1].visible).toBe(true);
         expect(table.compactColumn).toBe(null);
 
         table.setCompact(true);
-        expect(table.columns[0].isVisible()).toBe(false);
-        expect(table.columns[1].isVisible()).toBe(false);
+        expect(table.columns[0].visible).toBe(false);
+        expect(table.columns[1].visible).toBe(false);
         expect(table.compactColumn instanceof CompactColumn).toBe(true);
       });
 
@@ -42,17 +42,17 @@ describe('TableCompactHandler', () => {
         let table = helper.createTable(helper.createModelFixture(2, 1));
         table.setCheckable(true);
         table.setRowIconVisible(true);
-        expect(table.checkableColumn.isVisible()).toBe(true);
-        expect(table.rowIconColumn.isVisible()).toBe(true);
-        expect(table.columns[2].isVisible()).toBe(true);
-        expect(table.columns[3].isVisible()).toBe(true);
+        expect(table.checkableColumn.visible).toBe(true);
+        expect(table.rowIconColumn.visible).toBe(true);
+        expect(table.columns[2].visible).toBe(true);
+        expect(table.columns[3].visible).toBe(true);
         expect(table.compactColumn).toBe(null);
 
         table.setCompact(true);
-        expect(table.checkableColumn.isVisible()).toBe(true);
-        expect(table.rowIconColumn.isVisible()).toBe(true);
-        expect(table.columns[2].isVisible()).toBe(false);
-        expect(table.columns[3].isVisible()).toBe(false);
+        expect(table.checkableColumn.visible).toBe(true);
+        expect(table.rowIconColumn.visible).toBe(true);
+        expect(table.columns[2].visible).toBe(false);
+        expect(table.columns[3].visible).toBe(false);
         expect(table.compactColumn instanceof CompactColumn).toBe(true);
       });
     });
@@ -61,13 +61,13 @@ describe('TableCompactHandler', () => {
       it('removes compact column and makes others visible', () => {
         let table = helper.createTable(helper.createModelFixture(2, 1));
         table.setCompact(true);
-        expect(table.columns[0].isVisible()).toBe(false);
-        expect(table.columns[1].isVisible()).toBe(false);
+        expect(table.columns[0].visible).toBe(false);
+        expect(table.columns[1].visible).toBe(false);
         expect(table.compactColumn instanceof CompactColumn).toBe(true);
 
         table.setCompact(false);
-        expect(table.columns[0].isVisible()).toBe(true);
-        expect(table.columns[1].isVisible()).toBe(true);
+        expect(table.columns[0].visible).toBe(true);
+        expect(table.columns[1].visible).toBe(true);
         expect(table.compactColumn).toBe(null);
       });
     });

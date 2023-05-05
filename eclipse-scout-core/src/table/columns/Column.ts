@@ -27,7 +27,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   session: Session;
   autoOptimizeMaxWidth: number;
   cssClass: string;
-  compacted: boolean;
   editable: boolean;
   removable: boolean;
   modifiable: boolean;
@@ -47,7 +46,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   initialAlwaysIncludeSortAtBegin: boolean;
   initialAlwaysIncludeSortAtEnd: boolean;
   index: number;
-  initialized: boolean;
   guiOnly: boolean;
   mandatory: boolean;
   optimalWidthMeasurer: ColumnOptimalWidthMeasurer;
@@ -68,7 +66,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   textWrap: boolean;
   filterType: string;
   comparator: ColumnComparator;
-  displayable: boolean;
   visible: boolean;
   textBased: boolean;
   headerMenuEnabled: boolean;
@@ -92,7 +89,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.autoOptimizeWidth = false;
     this.autoOptimizeWidthRequired = false;
     this.autoOptimizeMaxWidth = -1;
-    this.compacted = false;
     this.removable = false;
     this.cssClass = null;
     this.editable = false;
@@ -108,7 +104,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.horizontalAlignment = -1;
     this.htmlEnabled = false;
     this.index = -1;
-    this.initialized = false;
     this.mandatory = false;
     this.optimalWidthMeasurer = new ColumnOptimalWidthMeasurer(this);
     this.sortActive = false;
@@ -127,7 +122,6 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.textWrap = false;
     this.filterType = 'TextColumnUserFilter';
     this.comparator = comparators.TEXT;
-    this.displayable = true;
     this.visible = true;
     this.textBased = true;
     this.headerMenuEnabled = true;
@@ -140,35 +134,30 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
     this.$header = null;
     this.$separator = null;
+
+    this._addMultiDimensionalProperty('visible', true);
+    this._addPropertyDimensionAlias('visible', 'visibleGranted', {dimension: 'granted'});
+    this._addPropertyDimensionAlias('visible', 'displayable');
+    this._addPropertyDimensionAlias('visible', 'compacted', {inverted: true});
   }
 
   static DEFAULT_MIN_WIDTH = 60;
   static SMALL_MIN_WIDTH = 38;
   static NARROW_MIN_WIDTH = 34;
 
-  init(model: InitModelOf<this>) {
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
     this.session = model.session;
-
-    // Copy all properties from model to this
-    $.extend(this, model);
 
     // Initial width is only sent if it differs from width
     if (this.initialWidth === undefined) {
       this.initialWidth = scout.nvl(this.width, 0);
     }
-    this._init(model);
-    this.initialized = true;
-  }
 
-  /**
-   * Override this function in order to implement custom init logic.
-   */
-  protected _init(model: InitModelOf<this>) {
     texts.resolveTextProperty(this, 'text');
     texts.resolveTextProperty(this, 'headerTooltipText');
     icons.resolveIconProperty(this, 'headerIconId');
     this._setTable(this.table);
-    this._setDisplayable(this.displayable);
     this._setAutoOptimizeWidth(this.autoOptimizeWidth);
     // no need to call setEditable here. cell propagation is done in _initCell
   }
@@ -890,59 +879,85 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     return this.comparator.compare(valueA, valueB);
   }
 
+  /**
+   * @deprecated use {@link visible} directly. Will be removed in an upcoming release.
+   */
   isVisible(): boolean {
-    return this.displayable && this.visible && !this.compacted;
+    return this.visible;
   }
 
   /**
-   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}. When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
+   * Computes the visibility of the column ignoring the compacted state.
+   *
+   * @returns true if all visible dimensions excluding the dimension `compacted` of the column are true.
+   *          So even if the column is compacted, it will return true if all other dimensions are true.
    */
-  setVisible(visible: boolean, redraw?: boolean) {
-    if (this.visible === visible) {
-      return;
-    }
-    this._setVisible(visible, redraw);
+  get visibleIgnoreCompacted(): boolean {
+    return this.computeMultiDimensionalProperty('visible', ['compacted']);
   }
 
-  protected _setVisible(visible: boolean, redraw?: boolean) {
-    this._setProperty('visible', visible);
-    if (scout.nvl(redraw, this.initialized)) {
+  /**
+   * Sets the 'default' dimension for the {@link Column.visible} property and recomputes its state.
+   *
+   * @param visible the new visible value for the 'default' dimension, or an object containing the new visible dimensions.
+   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}.
+   *               When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
+   * @see ColumnModel.visible
+   */
+  setVisible(visible: boolean | Record<string, boolean>, redraw?: boolean) {
+    let changed = this.setProperty('visible', visible);
+    // If the visibility of a column changes while it is compacted, the CompactColumn needs to update its content -> Always trigger structure change handler so that TableCompactHandler can update it.
+    if ((changed || this.compacted) && scout.nvl(redraw, this.initialized)) {
       this.table.onColumnVisibilityChanged();
     }
   }
 
   /**
-   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}. When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
+   * Sets the 'granted' dimension for the {@link Column.visible} property and recomputes its state.
+   *
+   * @param visibleGranted the new visible value for the 'granted' dimension.
+   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}.
+   *               When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
+   * @see ColumnModel.visibleGranted
+   */
+  setVisibleGranted(visibleGranted: boolean, redraw?: boolean) {
+    this.setVisible(this.extendPropertyDimensions('visible', 'granted', visibleGranted), redraw);
+  }
+
+  get visibleGranted(): boolean {
+    return this.getProperty('visibleGranted');
+  }
+
+  /**
+   * Sets the 'displayable' dimension for the {@link Column.visible} property and recomputes its state.
+   *
+   * @param displayable the new visible value for the 'displayable' dimension.
+   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}.
+   *               When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
+   * @see ColumnModel.displayable
    */
   setDisplayable(displayable: boolean, redraw?: boolean) {
-    if (this.displayable === displayable) {
-      return;
-    }
-    this._setDisplayable(displayable, redraw);
+    this.setVisible(this.extendPropertyDimensions('visible', 'displayable', displayable), redraw);
   }
 
-  protected _setDisplayable(displayable: boolean, redraw?: boolean) {
-    this._setProperty('displayable', displayable);
-    if (scout.nvl(redraw, this.initialized)) {
-      this.table.onColumnVisibilityChanged();
-    }
+  get displayable(): boolean {
+    return this.getProperty('displayable');
   }
 
   /**
-   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}. When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
+   * Sets the 'compacted' dimension for the {@link Column.visible} property and recomputes its state.
+   *
+   * @param displayable the new visible value for the 'compacted' dimension.
+   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}.
+   *               When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
+   * @see ColumnModel.visible
    */
   setCompacted(compacted: boolean, redraw?: boolean) {
-    if (this.compacted === compacted) {
-      return;
-    }
-    this._setCompacted(compacted, redraw);
+    this.setVisible(this.extendPropertyDimensions('visible', 'compacted', compacted), redraw);
   }
 
-  protected _setCompacted(compacted: boolean, redraw?: boolean) {
-    this._setProperty('compacted', compacted);
-    if (scout.nvl(redraw, this.initialized)) {
-      this.table.onColumnVisibilityChanged();
-    }
+  get compacted(): boolean {
+    return this.getProperty('compacted');
   }
 
   setAutoOptimizeWidth(autoOptimizeWidth: boolean) {

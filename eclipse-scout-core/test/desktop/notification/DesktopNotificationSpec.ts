@@ -156,7 +156,7 @@ describe('DesktopNotification', () => {
 
         setTimeout(() => {
           expect(notification.nativeNotification).toBeNull();
-          expect(notification.isVisible()).toBeTruthy();
+          expect(notification.visible).toBeTruthy();
           done();
         }, 10);
       });
@@ -178,7 +178,7 @@ describe('DesktopNotification', () => {
 
         notification.render($sandbox);
         setTimeout(() => {
-          expect(notification.isVisible()).toBeFalsy();
+          expect(notification.visible).toBeFalsy();
           expect(notification.nativeNotification).not.toBeNull();
           expect(notification.nativeNotification.body).toBe('bar');
           notification.hide();
@@ -197,7 +197,7 @@ describe('DesktopNotification', () => {
         notification.render($sandbox);
 
         setTimeout(() => {
-          expect(notification.isVisible()).toBeTruthy();
+          expect(notification.visible).toBeTruthy();
           expect(notification.nativeNotification).not.toBeNull();
           expect(notification.nativeNotification.body).toBe('bar');
           notification.hide();
@@ -255,7 +255,7 @@ describe('DesktopNotification', () => {
         setTimeout(() => {
           expect(notification.destroyed).toBeFalsy();
           expect(notification.session.desktop.notifications[0]).toBe(notification);
-          expect(notification.isVisible()).toBeFalsy();
+          expect(notification.visible).toBeFalsy();
           expect(notification.nativeNotification).not.toBeNull();
           spyOn(notification.nativeNotification, 'close').and.callThrough();
         }, 10);

@@ -463,10 +463,7 @@ export class TableMatrix {
    */
   columns(filterNumberColumns?: boolean): Column<any>[] {
     filterNumberColumns = scout.nvl(filterNumberColumns, true);
-    return this._table.visibleColumns().filter(column => {
-      if (column.guiOnly) {
-        return false;
-      }
+    return this._table.visibleColumns(false, true).filter(column => {
       if (filterNumberColumns && column instanceof NumberColumn) {
         return false;
       }
@@ -479,7 +476,7 @@ export class TableMatrix {
    * @returns true, if table is in a valid, consistent state
    */
   isMatrixValid(): boolean {
-    return this._table.rows.length === 0 || this.columns(false).length === this._table.rows[0].cells.length;
+    return this._table.rows.length === 0 || this._table.filterColumns(() => true, false).length === this._table.rows[0].cells.length;
   }
 }
 

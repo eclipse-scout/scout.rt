@@ -82,11 +82,16 @@ export class EventDelegator {
       return;
     }
     if (this.delegateAllProperties || this.delegateProperties.indexOf(event.propertyName) > -1) {
-      if (EventDelegator.equalsProperty(event.propertyName, this.target, event.newValue)) {
+      let newValue = event.newValue;
+      if (this.source instanceof PropertyEventEmitter && this.source.isMultiDimensionalProperty(event.propertyName)) {
+        // Delegate the dimension object instead of the computed value
+        newValue = this.source.getPropertyDimensions(event.propertyName);
+      }
+      if (EventDelegator.equalsProperty(event.propertyName, this.target, newValue)) {
         return;
       }
       if (this.callSetter) {
-        (this.target as PropertyEventEmitter).callSetter(event.propertyName, event.newValue);
+        (this.target as PropertyEventEmitter).callSetter(event.propertyName, newValue);
       } else {
         this.target.trigger(event.type, event);
       }

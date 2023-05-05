@@ -37,5 +37,6 @@ export interface ColumnEventMap extends PropertyEventMap {
   'propertyChange:text': PropertyChangeEvent<string>;
   'propertyChange:textWrap': PropertyChangeEvent<boolean>;
   'propertyChange:visible': PropertyChangeEvent<boolean>;
+  'propertyChange:visibleGranted': PropertyChangeEvent<boolean>;
   'propertyChange:width': PropertyChangeEvent<number>;
 }

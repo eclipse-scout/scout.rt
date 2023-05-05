@@ -106,7 +106,7 @@ describe('Menu', () => {
 
     it('should return true when menu can be a target of TAB action', () => {
       menu1.setEnabled(true);
-      menu1.visible = true;
+      menu1.setVisible(true);
       menu1.actionStyle = Action.ActionStyle.BUTTON;
       expect(menu1.isTabTarget()).toBe(true);
 

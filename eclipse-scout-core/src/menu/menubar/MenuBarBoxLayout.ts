@@ -25,7 +25,7 @@ export class MenuBarBoxLayout extends AbstractLayout {
     let menuItemSize = null;
 
     return this.menubox.menuItems
-      .filter(menuItem => !menuItem.overflown && menuItem.isVisible())
+      .filter(menuItem => !menuItem.overflown && menuItem.visible)
       .reduce((prefSize, menuItem) => {
         menuItemSize = menuItem.htmlComp.prefSize({
           useCssSize: true,

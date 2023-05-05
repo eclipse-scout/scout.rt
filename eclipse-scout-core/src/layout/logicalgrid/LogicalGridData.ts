@@ -134,7 +134,7 @@ export class LogicalGridData implements LayoutData {
       let i, inheritWeightY, child, children = widget.getFields();
       for (i = 0; i < children.length; i++) {
         child = children[i];
-        if (child.isVisible()) {
+        if (child.visible) {
           let data = child.gridData;
           if (data.weightY < 0) {
             inheritWeightY = this._inheritWeightYRec(child);

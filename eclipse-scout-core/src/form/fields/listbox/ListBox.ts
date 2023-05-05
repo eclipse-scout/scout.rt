@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Cell, Column, InitModelOf, ListBoxLayout, ListBoxModel, LookupBox, LookupResult, LookupRow, scout, Table, TableRowModel, TableRowsCheckedEvent, Widget} from '../../../index';
+import {arrays, Cell, Column, InitModelOf, ListBoxLayout, ListBoxModel, LookupBox, lookupField, LookupResult, LookupRow, scout, Table, TableRowModel, TableRowsCheckedEvent, Widget} from '../../../index';
 
 export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
   declare model: ListBoxModel<TValue>;
@@ -149,32 +149,11 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
   }
 
   protected _createTableRow(lookupRow: LookupRow<TValue>): TableRowModel {
-    let
-      cell = scout.create(Cell, {
-        text: lookupRow.text
-      }),
-      cells = [cell],
-      row: TableRowModel = {
-        cells: cells,
-        lookupRow: lookupRow
-      };
-
-    // noinspection DuplicatedCode
-    if (lookupRow.iconId) {
-      cell.iconId = lookupRow.iconId;
-    }
-    if (lookupRow.tooltipText) {
-      cell.tooltipText = lookupRow.tooltipText;
-    }
-    if (lookupRow.backgroundColor) {
-      cell.backgroundColor = lookupRow.backgroundColor;
-    }
-    if (lookupRow.foregroundColor) {
-      cell.foregroundColor = lookupRow.foregroundColor;
-    }
-    if (lookupRow.font) {
-      cell.font = lookupRow.font;
-    }
+    let cell = lookupField.createTableCell(lookupRow);
+    let row: TableRowModel = {
+      cells: [cell],
+      lookupRow: lookupRow
+    };
     if (lookupRow.enabled === false) {
       row.enabled = false;
     }

@@ -23,7 +23,6 @@ export class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroup
     super();
     this.text = null;
     this.textKey = null;
-    this.visible = true;
     this.last = false;
   }
 

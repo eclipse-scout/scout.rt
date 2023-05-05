@@ -26,7 +26,7 @@ export class TileTableHeaderGroupByLookupCall extends StaticLookupCall<Column<an
   protected override _data(): any[] {
     let lookupRows = [];
     lookupRows.push([null, this.session.text('NoGrouping'), 'BOLD']);
-    this.table.visibleColumns().forEach(column => {
+    this.table.visibleColumns(false, true).forEach(column => {
       if (this.table.isGroupingPossible(column)) {
         lookupRows.push([column, scout.nvl(column.text, column.headerTooltipText)]);
       }

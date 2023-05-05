@@ -43,12 +43,29 @@ export interface WidgetModel extends ObjectModel<Widget> {
    *
    * If it is disabled, the user can neither modify the widget itself nor its children, unless {@link inheritAccessibility} is set to false on a child.
    *
+   * Enabled is a multidimensional property, which means, the widget will only be enabled if every dimension is true.
+   *
+   * If a boolean is passed, the value will be used for the 'default' dimension.
+   * Alternatively, an object can be passed containing the dimensions. If a dimension is not set explicitly, it defaults to true.
+   *
+   * The available dimensions are:
+   * - default: The default dimension.
+   * - granted: Defines whether the widget is allowed to be enabled, can also be set by {@link enabledGranted}.
+   *
    * *Note*: to check whether a widget is accessible, always use {@link Widget.enabledComputed}. This property considers the {@link enabled} state of the ancestors as well.
    * So, whenever the {@link enabled} property of a widget changes, the {@link enabledComputed} property of the widget and its children will be updated (see {@link recomputeEnabled}).
    *
    * Default is true.
    */
-  enabled?: boolean;
+  enabled?: boolean | Record<string, boolean>;
+  /**
+   * Defines whether the widget is allowed to be enabled.
+   *
+   * This property sets the 'granted' dimension for the {@link enabled} property and therefore influences the computed state.
+   *
+   * Default is true.
+   */
+  enabledGranted?: boolean;
   /**
    * If enabled, the widget keeps track of the active element inside the container,
    * so that it can restore the focus using {@link Widget.restoreFocus} whenever the widget is rendered or attached again.
@@ -69,10 +86,10 @@ export interface WidgetModel extends ObjectModel<Widget> {
    */
   scrollLeft?: number;
   /**
-   * Controls whether widget should inherit the enabled state from its ancestors.
+   * Controls whether the widget should inherit the enabled state from its ancestors.
    *
    * - If set to true, the widget is disabled if any ancestor widget is disabled.
-   * - If set to false, the widget is not affected by enabled state of its ancestor and may be enabled even if an ancestor is disabled.
+   * - If set to false, the widget is not affected by the enabled state of its ancestor and may be enabled even if an ancestor is disabled.
    *
    * Default is true.
    */
@@ -84,11 +101,28 @@ export interface WidgetModel extends ObjectModel<Widget> {
    */
   disabledStyle?: DisabledStyle;
   /**
-   * Configures whether the widget should be visible.
+   * Defines whether the widget should be visible.
+   *
+   * Visible is a multidimensional property, which means, the widget will only be visible if every dimension is true.
+   *
+   * If a boolean is passed, the value will be used for the 'default' dimension.
+   * Alternatively, an object can be passed containing the dimensions. If a dimension is not set explicitly, it defaults to true.
+   *
+   * The available dimensions are:
+   * - default: The default dimension.
+   * - granted: Defines whether the widget is allowed to be visible, can also be set by {@link visibleGranted}.
    *
    * Default is true.
    */
-  visible?: boolean;
+  visible?: boolean | Record<string, boolean>;
+  /**
+   * Defines whether the widget is allowed to be visible.
+   *
+   * This property sets the 'granted' dimension for the {@link visible} property and therefore influences the computed state.
+   *
+   * Default is true.
+   */
+  visibleGranted?: boolean;
   /**
    * Configures the custom css classes on the widget.
    *

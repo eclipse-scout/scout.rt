@@ -63,7 +63,7 @@ export class MenuBarLayout extends AbstractLayout {
 
   override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions & { undo?: boolean }): Dimension {
     this._overflowMenuItems = [];
-    if (!this._menuBar.isVisible()) {
+    if (!this._menuBar.visible) {
       return new Dimension(0, 0);
     }
     let visibleMenuItems = this.visibleMenuItems();

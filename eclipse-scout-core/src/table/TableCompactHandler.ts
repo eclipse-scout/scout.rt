@@ -132,7 +132,7 @@ export class TableCompactHandler implements TableCompactHandlerModel, ObjectWith
   }
 
   protected _acceptColumn(column: Column<any>): boolean {
-    return !column.guiOnly && (!this.useOnlyVisibleColumns || (column.visible && column.displayable));
+    return !column.guiOnly && (!this.useOnlyVisibleColumns || column.visibleIgnoreCompacted);
   }
 
   protected _processColumn(column: Column<any>, index: number, row: TableRow, bean: CompactBean) {

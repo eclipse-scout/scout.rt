@@ -19,7 +19,6 @@ export class Tile extends Widget implements TileModel {
 
   colorScheme: ColorScheme;
   displayStyle: TileDisplayStyle;
-  filterAccepted: boolean;
   gridData: GridData;
   gridDataHints: GridData;
   rowId: string;
@@ -30,7 +29,6 @@ export class Tile extends Widget implements TileModel {
   constructor() {
     super();
     this.displayStyle = Tile.DisplayStyle.DEFAULT;
-    this.filterAccepted = true;
     this.gridData = null;
     this.rowId = null;
     this.gridDataHints = new GridData();
@@ -38,6 +36,7 @@ export class Tile extends Widget implements TileModel {
     this.selected = false;
     this.selectable = false;
     this.plainText = null;
+    this._addPropertyDimensionAlias('visible', 'filterAccepted');
   }
 
   static DisplayStyle = {
@@ -151,14 +150,14 @@ export class Tile extends Widget implements TileModel {
     this.setProperty('filterAccepted', filterAccepted);
   }
 
-  protected _renderFilterAccepted() {
-    this._renderVisible();
+  get filterAccepted(): boolean {
+    return this.getProperty( 'filterAccepted');
   }
 
   /** @internal */
   override _renderVisible() {
     if (this.rendering) {
-      this.$container.setVisible(this.isVisible());
+      this.$container.setVisible(this.visible);
       return;
     }
     if (this.removalPending) {
@@ -167,7 +166,7 @@ export class Tile extends Widget implements TileModel {
       // That would cause the animate-visible animation to be executed twice because tileGrid._renderTile would render the tile and start the animation anew.
       return;
     }
-    if (!this.isVisible()) {
+    if (!this.visible) {
       // Remove animate-visible first to show correct animation even if tile is made invisible while visible animation is still in progress
       // It is also necessary if the container is made invisible before the animation is finished because animationEnd won't fire in that case
       // which means that animate-invisible is still on the element and will trigger the (wrong) animation when container is made visible again
@@ -175,7 +174,7 @@ export class Tile extends Widget implements TileModel {
       this.$container.addClassForAnimation('animate-invisible');
       this.$container.oneAnimationEnd(() => {
         // Make the element invisible after the animation (but only if visibility has not changed again in the meantime)
-        this.$container.setVisible(this.isVisible());
+        this.$container.setVisible(this.visible);
         // Layout is invalidated before the animation starts and the TileGridLayout does not listen for visible-animations to update the scrollbar -> do it here
         // It is mainly necessary if every tile is made invisible / visible. If only some tiles are affected, the TileGridLayout animation change will trigger the scrollbar update
         scrollbars.update(this.parent.get$Scrollable());
@@ -185,7 +184,7 @@ export class Tile extends Widget implements TileModel {
       this.$container.setVisible(true);
       // Wait until the tile is layouted before trying to animate it to make sure the layout does not read the size while the animation runs (because it will be the wrong one)
       this.session.layoutValidator.schedulePostValidateFunction(() => {
-        if (!this.rendered || !this.isVisible()) {
+        if (!this.rendered || !this.visible) {
           return;
         }
         this.$container.removeClass('invisible animate-invisible');
@@ -197,9 +196,5 @@ export class Tile extends Widget implements TileModel {
       });
     }
     this.invalidateParentLogicalGrid();
-  }
-
-  override isVisible(): boolean {
-    return this.visible && this.filterAccepted;
   }
 }

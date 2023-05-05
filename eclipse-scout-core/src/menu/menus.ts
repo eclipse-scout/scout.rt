@@ -45,7 +45,7 @@ export const menus = {
         type = prefix + type;
       }
       fixedNotAllowedTypes.push(type);
-    }, this);
+    });
     return menus.filter(menuArr, allowedTypes, $.extend({}, options, {notAllowedTypes: fixedNotAllowedTypes}));
   },
 

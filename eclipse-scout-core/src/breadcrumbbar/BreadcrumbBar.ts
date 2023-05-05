@@ -84,7 +84,7 @@ export class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
     this.breadcrumbItems.forEach(breadcrumb => {
       if (breadcrumb.rendered) {
         breadcrumb.$container.removeClass('first last');
-        if (breadcrumb.isVisible()) {
+        if (breadcrumb.visible) {
           visibleCrumbs.push(breadcrumb);
         }
       }

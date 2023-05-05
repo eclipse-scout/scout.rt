@@ -452,7 +452,7 @@ describe('Widget', () => {
       expect(widget.parent.enabledComputed).toBe(true);
 
       // check change on widget itself
-      widget.setEnabled(false, false, false);
+      widget.setEnabled(false);
       expect(widget.enabled).toBe(false);
       expect(widget.enabledComputed).toBe(false);
       expect(widget.parent.enabled).toBe(true);
@@ -494,7 +494,7 @@ describe('Widget', () => {
       expect(widget.parent.enabledComputed).toBe(true);
 
       // change enabled of parent and verify that it has no effect on child because inheritance is disabled.
-      widget.parent.setEnabled(false, false, false);
+      widget.parent.setEnabled(false);
       expect(widget.enabled).toBe(true);
       expect(widget.enabledComputed).toBe(true);
       expect(widget.parent.enabled).toBe(false);
@@ -502,7 +502,6 @@ describe('Widget', () => {
     });
 
     it('recomputeEnabled should be called for all widgets at least once', () => {
-
       let widget = scout.create(Form, {
         parent: parent,
         rootGroupBox: {
@@ -545,7 +544,7 @@ describe('Widget', () => {
         parent: parent
       });
       // check setup
-      parent.setEnabled(false, false, false);
+      parent.setEnabled(false);
       expect(widget.enabled).toBe(true);
       expect(widget.enabledComputed).toBe(false);
       expect(widget.parent.enabled).toBe(false);
@@ -564,6 +563,149 @@ describe('Widget', () => {
       // check that the new widget is disabled now
       expect(additionalWidget.enabled).toBe(true);
       expect(additionalWidget.enabledComputed).toBe(false);
+    });
+
+    it('can be passed as boolean or object', () => {
+      let widget = createWidget({
+        parent: parent,
+        enabled: true
+      });
+      expect(widget.enabled).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(true);
+
+      widget = createWidget({
+        parent: parent,
+        enabled: false
+      });
+      expect(widget.enabled).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(false);
+
+      // Object contains the dimensions
+      widget = createWidget({
+        parent: parent,
+        enabled: {
+          default: true
+        }
+      });
+      expect(widget.enabled).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(true);
+
+      widget = createWidget({
+        parent: parent,
+        enabled: {
+          default: false
+        }
+      });
+      expect(widget.enabled).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(false);
+    });
+
+    it('always returns false if enabledGranted is false', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(true);
+      expect(widget.enabledGranted).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'granted')).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(true);
+
+      widget.setEnabledGranted(false);
+      expect(widget.enabled).toBe(false);
+      expect(widget.enabledComputed).toBe(false);
+      expect(widget.enabledGranted).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'granted')).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(true);
+
+      widget = createWidget({
+        parent: parent,
+        enabled: {
+          default: false,
+          granted: false
+        }
+      });
+      expect(widget.enabled).toBe(false);
+      expect(widget.enabledComputed).toBe(false);
+      expect(widget.enabledGranted).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'granted')).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(false);
+
+      widget.setEnabled(true);
+      expect(widget.enabled).toBe(false);
+      expect(widget.enabledComputed).toBe(false);
+      expect(widget.enabledGranted).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'granted')).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(true);
+
+      // EnabledGranted alias wins
+      widget = createWidget({
+        parent: parent,
+        enabledGranted: false,
+        enabled: {
+          granted: true
+        }
+      });
+      expect(widget.enabled).toBe(false);
+      expect(widget.enabledComputed).toBe(false);
+      expect(widget.enabledGranted).toBe(false);
+    });
+
+    it('considers custom dimensions', () => {
+      let widget = createWidget({
+        parent: parent,
+        enabled: {
+          zzz: false
+        }
+      });
+      expect(widget.enabled).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(true); // Must not be modified accidentally
+      expect(widget.getPropertyDimension('enabled', 'zzz')).toBe(false); // Passed by the constructor
+      expect(widget.getPropertyDimension('enabled', 'xyz')).toBe(true); // Dimension unknown so far, defaults to true
+
+      widget.setPropertyDimension('enabled', 'zzz', true);
+      expect(widget.enabled).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'zzz')).toBe(true);
+
+      widget.setPropertyDimension('enabled', 'xyz', false);
+      expect(widget.enabled).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'xyz')).toBe(false);
+    });
+
+    it('supports initializing default value in constructor', () => {
+      class SubWidget extends TestWidget {
+        constructor() {
+          super();
+          this.enabled = false;
+        }
+      }
+      let widget = scout.create(SubWidget, {
+        parent: parent
+      });
+      expect(widget.enabled).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(false);
+
+      let widget2 = scout.create(SubWidget, {
+        parent: parent,
+        enabled: true
+      });
+      expect(widget2.enabled).toBe(true);
+      expect(widget2.getPropertyDimension('enabled', 'default')).toBe(true);
+
+      let widget3 = scout.create(SubWidget, {
+        parent: parent,
+        'enabled-default': true
+      });
+      expect(widget3.enabled).toBe(true);
+      expect(widget3.getPropertyDimension('enabled', 'default')).toBe(true);
+
+      let widget4 = scout.create(SubWidget, {
+        parent: parent,
+        enabled: {
+          default: true
+        }
+      });
+      expect(widget4.enabled).toBe(true);
+      expect(widget4.getPropertyDimension('enabled', 'default')).toBe(true);
     });
   });
 
@@ -667,6 +809,107 @@ describe('Widget', () => {
       expect(widgetClone._computed).toBe(true);
     });
 
+    it('considers dimensional properties', () => {
+      let widget = scout.create(Widget, {
+        parent: session.desktop
+      });
+      widget.setEnabledGranted(false);
+      widget.setPropertyDimension('enabled', 'xyz', false);
+      expect(widget.enabled).toBe(false);
+      expect(widget.enabledComputed).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'granted')).toBe(false);
+      expect(widget.getPropertyDimension('enabled', 'xyz')).toBe(false);
+
+      let widgetClone = widget.clone({
+        parent: widget.parent
+      });
+      expect(widgetClone.enabled).toBe(false);
+      expect(widgetClone.enabledComputed).toBe(false);
+      expect(widgetClone.getPropertyDimension('enabled', 'default')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'granted')).toBe(false);
+      expect(widgetClone.getPropertyDimension('enabled', 'xyz')).toBe(false);
+
+      // Modifications on original dimensions must not be reflected to the clone unless explicitly requested (see next spec)
+      widget.setEnabledGranted(true);
+      widget.setPropertyDimension('enabled', 'xyz', true);
+      expect(widgetClone.enabled).toBe(false);
+      expect(widgetClone.enabledComputed).toBe(false);
+      expect(widgetClone.getPropertyDimension('enabled', 'default')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'granted')).toBe(false);
+      expect(widgetClone.getPropertyDimension('enabled', 'xyz')).toBe(false);
+    });
+
+    it('can mirror dimensional properties', () => {
+      let widget = scout.create(Widget, {
+        parent: session.desktop
+      });
+      widget.setEnabledGranted(false);
+      widget.setPropertyDimension('enabled', 'xyz', false);
+
+      let widgetClone = widget.clone({parent: widget.parent}, {delegateAllPropertiesToClone: true});
+      widget.setEnabledGranted(true);
+      widget.setPropertyDimension('enabled', 'xyz', true);
+      expect(widgetClone.enabled).toBe(true);
+      expect(widgetClone.enabledComputed).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'default')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'granted')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'xyz')).toBe(true);
+    });
+
+    it('can mirror individual dimensional properties', () => {
+      let widget = scout.create(Widget, {
+        parent: session.desktop
+      });
+      widget.setEnabledGranted(false);
+      widget.setPropertyDimension('enabled', 'xyz', false);
+
+      let widgetClone = widget.clone({parent: widget.parent}, {delegatePropertiesToClone: ['enabled']});
+      widget.setEnabledGranted(true);
+      widget.setPropertyDimension('enabled', 'xyz', true);
+      expect(widgetClone.enabled).toBe(true);
+      expect(widgetClone.enabledComputed).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'default')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'granted')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'xyz')).toBe(true);
+    });
+
+    it('can mirror individual property dimensions', () => {
+      let widget = scout.create(Widget, {
+        parent: session.desktop
+      });
+      widget.setEnabledGranted(false);
+      widget.setPropertyDimension('enabled', 'xyz', true);
+      widget.setPropertyDimension('enabled', 'zzz', false);
+
+      let widgetClone = widget.clone({parent: widget.parent}, {delegatePropertiesToClone: ['enabledGranted', 'enabled-zzz']}); // enabledGranted is an alias
+      widget.setEnabledGranted(true);
+      widget.setPropertyDimension('enabled', 'zzz', true);
+      widget.setPropertyDimension('enabled', 'xyz', false); // not mirrored
+      expect(widgetClone.enabled).toBe(true);
+      expect(widgetClone.enabledComputed).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'default')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'granted')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'xyz')).toBe(true);
+      expect(widgetClone.getPropertyDimension('enabled', 'zzz')).toBe(true);
+    });
+
+    it('does not mirror if individual dimensional properties are excluded', () => {
+      let widget = scout.create(Widget, {
+        parent: session.desktop
+      });
+      widget.setEnabledGranted(false);
+      widget.setPropertyDimension('enabled', 'xyz', false);
+
+      let widgetClone = widget.clone({parent: widget.parent}, {delegateAllPropertiesToOriginal: true, excludePropertiesToOriginal: ['enabled']});
+      widgetClone.setEnabledGranted(true);
+      widgetClone.setPropertyDimension('enabled', 'xyz', true);
+      expect(widget.enabled).toBe(true);
+      expect(widget.enabledComputed).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'default')).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'granted')).toBe(true);
+      expect(widget.getPropertyDimension('enabled', 'xyz')).toBe(true);
+    });
   });
 
   describe('init', () => {
@@ -1107,36 +1350,6 @@ describe('Widget', () => {
 
   describe('setProperty', () => {
 
-    it('triggers a property change event if the value changes', () => {
-      let propertyChangeEvent;
-      let widget = createWidget();
-      widget.on('propertyChange', event => {
-        propertyChangeEvent = event;
-      });
-      widget.setProperty('selected', true);
-      expect(propertyChangeEvent.type).toBe('propertyChange');
-      expect(propertyChangeEvent.propertyName).toBe('selected');
-      expect(propertyChangeEvent.oldValue).toBe(undefined);
-      expect(propertyChangeEvent.newValue).toBe(true);
-
-      widget.setProperty('selected', false);
-      expect(propertyChangeEvent.type).toBe('propertyChange');
-      expect(propertyChangeEvent.propertyName).toBe('selected');
-      expect(propertyChangeEvent.oldValue).toBe(true);
-      expect(propertyChangeEvent.newValue).toBe(false);
-    });
-
-    it('does not trigger a property change event if the value does not change', () => {
-      let propertyChangeEvent;
-      let widget = createWidget();
-      widget.on('propertyChange', event => {
-        propertyChangeEvent = event;
-      });
-      widget.selected = true;
-      widget.setProperty('selected', true);
-      expect(propertyChangeEvent).toBe(undefined);
-    });
-
     describe('with widget property', () => {
       it('links the widget with the new child widget', () => {
         let widget = createWidget({
@@ -1238,26 +1451,6 @@ describe('Widget', () => {
         expect(child.destroyed).toBe(false);
         expect(child.parent).toBe(another);
         expect(child.owner).toBe(another);
-      });
-    });
-
-    describe('with computed property', () => {
-      it('triggers event as for regular properties', () => {
-        let computedWidget = scout.create(ComputedWidget, {parent: session.desktop});
-        expect(computedWidget.getProperty('computed')).toBe(true);
-        expect(computedWidget.computed).toBe(true);
-
-        let propertyChangeEvent;
-        computedWidget.on('propertyChange:computed', event => {
-          propertyChangeEvent = event;
-        });
-        computedWidget.setProperty('computed', false);
-        expect(propertyChangeEvent.type).toBe('propertyChange');
-        expect(propertyChangeEvent.propertyName).toBe('computed');
-        expect(propertyChangeEvent.oldValue).toBe(true);
-        expect(propertyChangeEvent.newValue).toBe(false);
-        expect(computedWidget.getProperty('computed')).toBe(false);
-        expect(computedWidget.computed).toBe(false);
       });
     });
 

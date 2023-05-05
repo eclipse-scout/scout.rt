@@ -104,8 +104,8 @@ describe('CellEditor', () => {
     });
 
     it('does not start cell edit if row is disabled', () => {
-      table.rows[0].cells[0].editable = true;
-      table.rows[0].enabled = false;
+      table.rows[0].cells[0].setEditable(true);
+      table.rows[0].setEnabled(false);
 
       spyOn(table, 'prepareCellEdit');
       JQueryTesting.triggerClick($cell0_0);
@@ -113,8 +113,8 @@ describe('CellEditor', () => {
     });
 
     it('does not start cell edit if table is disabled', () => {
-      table.rows[0].cells[0].editable = true;
-      table.enabled = false;
+      table.rows[0].cells[0].setEditable(true);
+      table.setEnabled(false);
       table.recomputeEnabled();
 
       spyOn(table, 'prepareCellEdit');
@@ -200,11 +200,11 @@ describe('CellEditor', () => {
     });
 
     it('starts the cell editor for the next visible cell', () => {
-      table.rows[0].cells[0].editable = true;
-      table.rows[0].cells[1].editable = true;
-      table.rows[1].cells[2].editable = true;
-      table.columns[0].visible = false;
-      table.columns[1].visible = false;
+      table.rows[0].cells[0].setEditable(true);
+      table.rows[0].cells[1].setEditable(true);
+      table.rows[1].cells[2].setEditable(true);
+      table.columns[0].setVisible(false);
+      table.columns[1].setVisible(false);
 
       table.focusCell(table.columns[0], table.rows[0]);
       jasmine.clock().tick(0);

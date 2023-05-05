@@ -357,7 +357,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
    * @param oldColumnState only necessary when the css class was updated
    */
   updateHeader(column: Column<any>, oldColumnState?: ColumnModel<any>) {
-    if (!column.isVisible()) {
+    if (!column.visible) {
       return;
     }
     this._decorateHeader(column, oldColumnState);

@@ -52,7 +52,7 @@ export class BoxButtons extends Widget implements BoxButtonsModel {
   protected _renderDefaultButtonIndex() {
     for (let i = 0; i < this.buttons.length; i++) {
       let button = this.buttons[i];
-      button.$container.toggleClass('default', button.isVisible() && button.enabledComputed && this.isDefaultButtonIndex(i));
+      button.$container.toggleClass('default', button.visible && button.enabledComputed && this.isDefaultButtonIndex(i));
     }
   }
 
