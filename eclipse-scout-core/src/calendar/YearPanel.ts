@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, DateRange, dates, InitModelOf, Planner, PlannerDisplayMode, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
+import {Calendar, DateRange, dates, HtmlComponent, InitModelOf, Planner, PlannerDisplayMode, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
 import $ from 'jquery';
 
 export class YearPanel extends Widget implements YearPanelModel {
@@ -35,6 +35,7 @@ export class YearPanel extends Widget implements YearPanelModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('year-panel-container');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.$yearTitle = this.$container.appendDiv('year-panel-title');
     this.$yearList = this.$container.appendDiv('year-panel-list');
   }

@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf,
-  JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcesPanel, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  arrays, CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent,
+  InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcesPanel, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -70,6 +70,7 @@ export class Calendar extends Widget implements CalendarModel {
   menuInjectionTarget: GroupBox;
   modesMenu: CalendarModesMenu;
   menus: Menu[];
+  calendarSidebar: CalendarSidebar;
   yearPanel: YearPanel;
   resourcesPanel: ResourcesPanel;
   selectedRange: DateRange;
@@ -234,12 +235,12 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
-    this.yearPanel = scout.create(YearPanel, {
+    this.calendarSidebar = scout.create(CalendarSidebar, {
       parent: this
     });
-    this.resourcesPanel = scout.create(ResourcesPanel, {
-      parent: this
-    });
+    this.yearPanel = this.calendarSidebar.yearPanel;
+    this.resourcesPanel = this.calendarSidebar.resourcesPanel;
+
     this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
     this.modesMenu = scout.create(CalendarModesMenu, {
       parent: this,
@@ -392,8 +393,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.$header.toggleClass('mobile', isMobile);
     this.$headerRow1 = this.$header.appendDiv('calendar-header-row first');
     this.$headerRow2 = this.$header.appendDiv('calendar-header-row last');
-    this.yearPanel.render();
-    this.resourcesPanel.render();
+    this.calendarSidebar.render();
 
     this.$grids = this.$container.appendDiv('calendar-grids');
     this.$topGrid = this.$grids.appendDiv('calendar-top-grid');
@@ -862,14 +862,14 @@ export class Calendar extends Widget implements CalendarModel {
     // show or hide year
     $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
     $('.calendar-toggle-resources', this.$commands).select(this._showResourcesPanel);
+    this.yearPanel.setVisible(this._showYearPanel);
+    this.resourcesPanel.setVisible(this._showResourcesPanel);
     if (this._showYearPanel || this._showResourcesPanel) {
-      this.yearPanel.$container.data('new-width', this.calendarToggleYearWidth);
-      this.resourcesPanel.$container.data('new-width', this.calendarToggleYearWidth);
+      this.calendarSidebar.$container.data('new-width', this.calendarToggleYearWidth);
       gridW -= this.calendarToggleYearWidth;
       containerW -= this.calendarToggleYearWidth;
     } else {
-      this.yearPanel.$container.data('new-width', 0);
-      this.resourcesPanel.$container.data('new-width', 0);
+      this.calendarSidebar.$container.data('new-width', 0);
     }
 
     // show or hide work list
