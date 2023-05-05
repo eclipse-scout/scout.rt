@@ -7,16 +7,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Widget} from '../widget/Widget';
-import {InitModelOf} from '../scout';
+import {HtmlComponent, InitModelOf, scout, Tree, Widget} from '../index';
 
 export class ResourcesPanel extends Widget {
+  tree: Tree;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
+    this.tree = scout.create(Tree, {
+      parent: this,
+      checkable: true
+    });
   }
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('resources-panel-container');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.$container.appendSpan().text("test");
+    this.tree.render();
   }
 }
