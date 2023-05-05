@@ -1213,7 +1213,7 @@ describe('Tree', () => {
     it('does not check a node in a disabled tree', () => {
       let model = helper.createModelFixture(4, 4);
       let tree = helper.createTree(model);
-      tree.enabled = false;
+      tree.setEnabled(false);
       tree.render();
 
       let node = tree.nodes[0];

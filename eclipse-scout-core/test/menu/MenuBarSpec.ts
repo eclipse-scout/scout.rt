@@ -102,8 +102,8 @@ describe('MenuBar', () => {
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
 
-      menu1.visible = false;
-      menu2.visible = false;
+      menu1.setVisible(false);
+      menu2.setVisible(false);
 
       menuBar.render();
       menuBar.setMenuItems(menus);
@@ -124,8 +124,8 @@ describe('MenuBar', () => {
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
 
-      menu1.visible = false;
-      menu2.visible = true;
+      menu1.setVisible(false);
+      menu2.setVisible(true);
 
       menuBar.render();
       menuBar.setMenuItems(menus);
@@ -217,7 +217,7 @@ describe('MenuBar', () => {
     });
 
     it('must listen on property changes of its menu items (even when menu bar is not rendered)', () => {
-      menu.visible = false;
+      menu.setVisible(false);
       menuBar.setMenuItems([menu]);
       expect(menuBar.visible).toBe(false);
 
@@ -364,8 +364,8 @@ describe('MenuBar', () => {
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
 
-      menu1.visible = true;
-      menu2.visible = true;
+      menu1.setVisible(true);
+      menu2.setVisible(true);
       menuBar.setMenuItems(menus);
       menuBar.render();
       menuBar.htmlComp.setSize(new Dimension(500, 50));
@@ -604,14 +604,14 @@ describe('MenuBar', () => {
         menuBar = createMenuBar(),
         menus = [rightMenu1, rightMenu2, leftMenu1, leftMenu2];
 
-      rightMenu1.visible = true;
-      rightMenu1.horizontalAlignment = 1;
-      rightMenu2.visible = false;
-      rightMenu2.horizontalAlignment = 1;
-      leftMenu1.visible = true;
-      leftMenu1.horizontalAlignment = -1;
-      leftMenu2.visible = true;
-      leftMenu2.horizontalAlignment = -1;
+      rightMenu1.setVisible(true);
+      rightMenu1.setHorizontalAlignment(1);
+      rightMenu2.setVisible(false);
+      rightMenu2.setHorizontalAlignment(1);
+      leftMenu1.setVisible(true);
+      leftMenu1.setHorizontalAlignment(-1);
+      leftMenu2.setVisible(true);
+      leftMenu2.setHorizontalAlignment(-1);
       menuBar.setEllipsisPosition(MenuBar.EllipsisPosition.RIGHT);
       menuBar.setMenuItems(menus);
       menuBar.render();
@@ -645,14 +645,14 @@ describe('MenuBar', () => {
         menuBar = createMenuBar(),
         menus = [rightMenu1, rightMenu2, leftMenu1, leftMenu2];
 
-      rightMenu1.visible = true;
-      rightMenu1.horizontalAlignment = 1;
-      rightMenu2.visible = true;
-      rightMenu2.horizontalAlignment = 1;
-      leftMenu1.visible = false;
-      leftMenu1.horizontalAlignment = -1;
-      leftMenu2.visible = true;
-      leftMenu2.horizontalAlignment = -1;
+      rightMenu1.setVisible(true);
+      rightMenu1.setHorizontalAlignment(1);
+      rightMenu2.setVisible(true);
+      rightMenu2.setHorizontalAlignment(1);
+      leftMenu1.setVisible(false);
+      leftMenu1.setHorizontalAlignment(-1);
+      leftMenu2.setVisible(true);
+      leftMenu2.setHorizontalAlignment(-1);
       menuBar.setEllipsisPosition(MenuBar.EllipsisPosition.LEFT);
       menuBar.setMenuItems(menus);
       menuBar.render();

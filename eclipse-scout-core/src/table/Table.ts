@@ -148,6 +148,7 @@ export class Table extends Widget implements TableModel {
   protected _animateAggregateRows: boolean;
   protected _postAttachActions: (() => void)[];
   protected _desktopPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Desktop>>;
+  protected _menuInheritAccessibilityChangeHandler: EventHandler<PropertyChangeEvent<boolean, Menu>>;
   protected _imageLoadListener: (event: ErrorEvent) => void;
   protected _insertedRows: TableRow[];
   protected _$mouseDownRow: JQuery;
@@ -242,6 +243,7 @@ export class Table extends Widget implements TableModel {
     this._renderViewPortAfterAttach = false;
     this._postAttachActions = [];
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
+    this._menuInheritAccessibilityChangeHandler = this._updateMenusEnabled.bind(this);
     this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tileTableHeader', 'tableTileGridMediator']);
 
     this.$data = null;
@@ -379,6 +381,7 @@ export class Table extends Widget implements TableModel {
     this._setTileMode(this.tileMode);
     this._setTileTableHeader(this.tileTableHeader);
     this._sortWhileInit(); // required in case the rows are already provided in the initial model
+    this._updateMenusEnabled();
   }
 
   protected _initRow(row: ObjectOrModel<TableRow>): TableRow {
@@ -1598,7 +1601,7 @@ export class Table extends Widget implements TableModel {
     let rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px">';
     for (let i = 0; i < this.columns.length; i++) {
       let column = this.columns[i];
-      if (column.isVisible()) {
+      if (column.visible) {
         rowDiv += column.buildCellForRow(row);
       }
     }
@@ -2181,7 +2184,10 @@ export class Table extends Widget implements TableModel {
       this._triggerRowsSelected();
       this._triggerRowsSelectedPending = false;
     }
-    this.session.onRequestsDone(this._updateMenuBar.bind(this));
+    this.session.onRequestsDone(() => {
+      this._updateMenuBar();
+      this._updateMenusEnabled();
+    });
   }
 
   /** @internal */
@@ -2344,7 +2350,7 @@ export class Table extends Widget implements TableModel {
 
   nextEditableCellPosForRow(startColumnIndex: number, row: TableRow, reverse?: boolean): TableCellPosition {
     let predicate: Predicate<Column<any>> = column => {
-      if (!column.isVisible() || column.guiOnly) {
+      if (!column.visible || column.guiOnly) {
         // does not support tabbing
         return false;
       }
@@ -3069,6 +3075,7 @@ export class Table extends Widget implements TableModel {
       applyFilters: false,
       visibleRows: true
     });
+    this._updateMenusEnabled();
 
     this._triggerRowsUpdated(updatedRows);
 
@@ -3493,6 +3500,7 @@ export class Table extends Widget implements TableModel {
     this.selectedRows = rows; // (Note: direct assignment is safe because the initial filtering created a copy of the original array)
     this._triggerRowsSelected(debounceSend);
 
+    this._updateMenusEnabled();
     this._updateMenuBar();
     if (this._isDataRendered()) {
       this._renderSelection();
@@ -4604,8 +4612,11 @@ export class Table extends Widget implements TableModel {
 
   protected _setMenus(menus: Menu[]) {
     this.updateKeyStrokes(menus, this.menus);
+    this.menus.forEach(menu => menu.off('propertyChange:inheritAccessibility', this._menuInheritAccessibilityChangeHandler));
     this._setProperty('menus', menus);
     this._updateMenuBar();
+    this._updateMenusEnabled();
+    this.menus.forEach(menu => menu.on('propertyChange:inheritAccessibility', this._menuInheritAccessibilityChangeHandler));
 
     if (this.header) {
       this.header.updateMenuBar();
@@ -4682,7 +4693,23 @@ export class Table extends Widget implements TableModel {
     this.$container.toggleClass('has-menubar', this.menuBar && this.menuBar.visible);
     this.$container.toggleClass('menubar-top', this.menuBar && this.menuBar.position === MenuBar.Position.TOP);
     this.$container.toggleClass('menubar-bottom', this.menuBar && this.menuBar.position !== MenuBar.Position.TOP);
+  }
 
+  /**
+   * Updates the enabled state of single- and multi-selection menus based on the enabled state of the selected row(s).
+   *
+   * To make a menu independent of the enabled state of its ancestors (including the row), {@link Widget.inheritAccessibility} can be set to false.
+   * To make a menu only independent of the enabled state of the row, but it should still consider the enabled state of the table and its ancestors, setting the dependent dimension can be prevented as follows:
+   * ```
+   * menu.on('propertyChange:enabled-dependent', event => event.preventDefault());
+   * ```
+   */
+  protected _updateMenusEnabled() {
+    const menus = this._filterMenusForContextMenu();
+    let selectedRowsEnabled = this.selectedRows.every(row => row.enabled);
+    for (const menu of menus) {
+      menu.setPropertyDimension('enabled', 'dependent', !menu.inheritAccessibility || selectedRowsEnabled);
+    }
   }
 
   protected _setKeyStrokes(keyStrokes: Action[]) {
@@ -5556,14 +5583,24 @@ export class Table extends Widget implements TableModel {
     column.setCellErrorStatus(row, errorStatus);
   }
 
-  visibleColumns(includeGuiColumns?: boolean): Column<any>[] {
-    return this.filterColumns(column => column.isVisible(), includeGuiColumns);
+  /**
+   * @param includeGuiColumns true to also include columns created by the UI (e.g. {@link rowIconColumn} or {@link checkableColumn}). Default is true.
+   * @param includeCompacted true to also include the columns that are invisible because they are compacted. Default is false which means compacted columns are not returned.
+   */
+  visibleColumns(includeGuiColumns?: boolean, includeCompacted?: boolean): Column<any>[] {
+    return this.filterColumns(column => scout.nvl(includeCompacted, false) ? column.visibleIgnoreCompacted: column.visible, includeGuiColumns);
   }
 
+  /**
+   * @param includeGuiColumns true to also include columns created by the UI (e.g. {@link rowIconColumn} or {@link checkableColumn}). Default is true.
+   */
   displayableColumns(includeGuiColumns?: boolean): Column<any>[] {
     return this.filterColumns(column => column.displayable, includeGuiColumns);
   }
 
+  /**
+   * @param includeGuiColumns true to also include columns created by the UI (e.g. {@link rowIconColumn} or {@link checkableColumn}). Default is true.
+   */
   filterColumns(filter: Predicate<Column<any>>, includeGuiColumns?: boolean): Column<any>[] {
     includeGuiColumns = scout.nvl(includeGuiColumns, true);
     return this.columns.filter(column => filter(column) && (includeGuiColumns || !column.guiOnly));

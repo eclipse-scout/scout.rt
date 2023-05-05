@@ -47,7 +47,7 @@ export const widgets = {
    */
   updateFirstLastMarker(widgets: Widget[]) {
     widgets.filter((widget, i, widgets) => {
-      return widget.rendered && widget.isVisible();
+      return widget.rendered && widget.visible;
     }).forEach((widget, i, widgets) => {
       widget.$container.toggleClass('first', i === 0);
       widget.$container.toggleClass('last', i === widgets.length - 1);

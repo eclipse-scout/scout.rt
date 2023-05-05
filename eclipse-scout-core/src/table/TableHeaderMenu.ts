@@ -266,7 +266,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected _updateFirstLast() {
-    addFirstLastClass(this.leftGroups.filter(group => group.isVisible()));
+    addFirstLastClass(this.leftGroups.filter(group => group.visible));
     addFirstLastClass(this.$rightGroups);
 
     function addFirstLastClass(groups: (JQuery | TableHeaderMenuGroup)[]) {

@@ -45,24 +45,24 @@ export const lookupField = {
 
     // default column descriptor (first column) has propertyName null
     if (!(desc && desc.propertyName)) {
-      cell.text = lookupRow.text;
+      cell.setText(lookupRow.text);
       if (lookupRow.iconId) {
-        cell.iconId = lookupRow.iconId;
+        cell.setIconId(lookupRow.iconId);
       }
       if (lookupRow.tooltipText) {
-        cell.tooltipText = lookupRow.tooltipText;
+        cell.setTooltipText(lookupRow.tooltipText);
       }
       if (lookupRow.backgroundColor) {
-        cell.backgroundColor = lookupRow.backgroundColor;
+        cell.setBackgroundColor(lookupRow.backgroundColor);
       }
       if (lookupRow.foregroundColor) {
-        cell.foregroundColor = lookupRow.foregroundColor;
+        cell.setForegroundColor(lookupRow.foregroundColor);
       }
       if (lookupRow.font) {
-        cell.font = lookupRow.font;
+        cell.setFont(lookupRow.font);
       }
     } else {
-      cell.text = tableRowData[desc.propertyName];
+      cell.setText(tableRowData[desc.propertyName]);
     }
 
     return cell;

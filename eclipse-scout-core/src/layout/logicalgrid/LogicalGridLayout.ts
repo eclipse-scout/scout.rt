@@ -129,7 +129,7 @@ export class LogicalGridLayout extends AbstractLayout {
     let widget = $comp.data('widget');
     // Prefer the visibility state of the widget, if there is one.
     // This allows for transitions, because the $component may still be in the process of being made invisible
-    let visible = widget ? widget.isVisible() : $comp.isVisible();
+    let visible = widget ? widget.visible : $comp.isVisible();
     if (visible) {
       (<LogicalGridData>htmlComp.layoutData).validate();
       return true;

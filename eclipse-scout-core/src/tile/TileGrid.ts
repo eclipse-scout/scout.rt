@@ -440,11 +440,11 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 
   protected _animateTileRemoval(tile: Tile): boolean {
-    return this.animateTileRemoval && tile && tile.isVisible() && !(tile instanceof PlaceholderTile);
+    return this.animateTileRemoval && tile && tile.visible && !(tile instanceof PlaceholderTile);
   }
 
   protected _animateTileInsertion(tile: Tile): boolean {
-    return this.animateTileInsertion && tile && tile.isVisible() && !(tile instanceof PlaceholderTile);
+    return this.animateTileInsertion && tile && tile.visible && !(tile instanceof PlaceholderTile);
   }
 
   protected _onAnimatedTileRemove(tile: Tile) {

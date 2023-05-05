@@ -32,7 +32,7 @@ describe('menus', () => {
       menu1 = helper.createMenu(helper.createModel('1'));
       menu2 = helper.createMenu(helper.createModel('2'));
       menu3 = helper.createMenu(helper.createModel('3'));
-      menu3.visible = false;
+      menu3.setVisible(false);
 
       items = menus.filter([menu1, menu2, menu3]);
       expect(items).toEqual([]);
@@ -46,7 +46,7 @@ describe('menus', () => {
       menu2.setMenuTypes(['SingleSelection']);
       menu3 = helper.createMenu(helper.createModel('3'));
       menu3.setMenuTypes(['SingleSelection']);
-      menu3.visible = false;
+      menu3.setVisible(false);
 
       items = menus.filter([menu1, menu2, menu3], 'SingleSelection', {
         onlyVisible: true
@@ -59,7 +59,7 @@ describe('menus', () => {
       let items, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel('1'));
       menu1.setMenuTypes(['MultiSelection', 'SingleSelection']);
-      menu1.visible = false;
+      menu1.setVisible(false);
       menu2 = helper.createMenu(helper.createModel('2'));
       menu2.setMenuTypes(['MultiSelection']);
       menu3 = helper.createMenu(helper.createModel('3'));
@@ -109,7 +109,7 @@ describe('menus', () => {
       let menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel('1'));
       menu1.setMenuTypes(['test.MenuType1', 'test.MenuType2']);
-      menu1.visible = false;
+      menu1.setVisible(false);
       menu2 = helper.createMenu(helper.createModel('2'));
       menu2.setMenuTypes(['test.MenuType1']);
       menu3 = helper.createMenu(helper.createModel('3'));

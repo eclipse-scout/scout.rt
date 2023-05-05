@@ -58,13 +58,13 @@ export class Tab extends Widget implements TabModel {
 
   protected override _init(options: InitModelOf<this>) {
     super._init(options);
-    this.visible = this.tabItem.visible;
-    this.label = this.tabItem.label;
-    this.subLabel = this.tabItem.subLabel;
-    this.cssClass = this.tabItem.cssClass;
-    this.marked = this.tabItem.marked;
-    this.errorStatus = this.tabItem.errorStatus;
-    this.tooltipText = this.tabItem.tooltipText;
+    this.setVisible(this.tabItem.visible);
+    this.setLabel(this.tabItem.label);
+    this.setSubLabel(this.tabItem.subLabel);
+    this.setCssClass(this.tabItem.cssClass);
+    this.setMarked(this.tabItem.marked);
+    this.setErrorStatus(this.tabItem.errorStatus);
+    this.setTooltipText(this.tabItem.tooltipText);
 
     this.fieldStatus = scout.create(FieldStatus, {
       parent: this,

@@ -21,7 +21,7 @@ export class TileTableHeaderSortByLookupCall extends StaticLookupCall<TileTableH
 
   protected override _data(): any[] {
     let lookupRows = [];
-    this.table.visibleColumns().forEach(column => {
+    this.table.visibleColumns(false, true).forEach(column => {
       if (column.isSortingPossible()) {
         lookupRows.push([
           {

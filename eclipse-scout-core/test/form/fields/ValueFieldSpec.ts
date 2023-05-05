@@ -801,7 +801,7 @@ describe('ValueField', () => {
     it('context menu only shows visible menus', () => {
       let menu1 = menuHelper.createMenu(menuHelper.createModel('menu')),
         menu2 = menuHelper.createMenu(menuHelper.createModel('menu'));
-      menu2.visible = false;
+      menu2.setVisible(false);
       formField.menus = [menu1, menu2];
       formField.render();
 

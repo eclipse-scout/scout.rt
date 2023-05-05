@@ -472,14 +472,14 @@ describe('FormField', () => {
     });
 
     it('shows the field if visible = true', () => {
-      formField.visible = true;
+      formField.setVisible(true);
       formField.render();
 
       expect(formField.$container.isVisible()).toBe(true);
     });
 
     it('does not show the field if visible = false', () => {
-      formField.visible = false;
+      formField.setVisible(false);
       formField.render();
 
       expect(formField.$container.isVisible()).toBe(false);
@@ -506,7 +506,7 @@ describe('FormField', () => {
         message: 'error',
         severity: Status.Severity.ERROR
       });
-      formField.visible = false;
+      formField.setVisible(false);
       formField.render();
 
       expect(formField.$container.isVisible()).toBe(false);
@@ -807,8 +807,6 @@ describe('FormField', () => {
       expectNotVisited(box2);
       expectNotVisited(box2.fields[0]);
     });
-
-    // FIXME CGU do we have to make exception for form as in Java? Add parameter? should wrapped form field implement it?
   });
 
   describe('visitParentFields', () => {

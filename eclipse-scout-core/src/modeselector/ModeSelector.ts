@@ -117,7 +117,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
     this.modes.forEach(mode => {
       if (mode.rendered) {
         mode.$container.removeClass('first last after-selected');
-        if (mode.isVisible()) {
+        if (mode.visible) {
           visibleModes.push(mode);
           if (mode.selected) {
             selectedModeIndex = visibleModes.length - 1;
@@ -189,7 +189,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
   }
 
   protected _findModeByPos(pos: number): Mode<TModeRef> {
-    let visibleModes = this.modes.filter(m => m.isVisible());
+    let visibleModes = this.modes.filter(m => m.visible);
     for (let i = visibleModes.length - 1; i >= 0; i--) {
       let mode = visibleModes[i];
       let modePosX = Math.floor(graphics.position(mode.$container).x);

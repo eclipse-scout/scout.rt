@@ -53,7 +53,6 @@ export class MenuBar extends Widget implements MenuBarModel {
       all: []
     };
     this.defaultMenu = null;
-    this.visible = false;
     this.ellipsisPosition = MenuBar.EllipsisPosition.RIGHT;
     this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
     this._focusHandler = this._onMenuItemFocus.bind(this);

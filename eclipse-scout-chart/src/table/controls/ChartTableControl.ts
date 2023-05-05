@@ -49,6 +49,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
 
   constructor() {
     super();
+    this.iconId = icons.CHART;
     this.tooltipText = '${textKey:ui.Chart}';
     this.chartAggregation = {
       modifier: TableMatrix.NumberGroup.COUNT
@@ -361,7 +362,11 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   }
 
   protected _hasColumns(): boolean {
-    return this.table.columns.length !== 0;
+    return this._columns().length > 0;
+  }
+
+  protected _columns(): Column[] {
+    return new TableMatrix(this.table, this.session).columns();
   }
 
   protected _axisCount(columnCount: (number | Column<any>)[][], column: Column<any>): number {
@@ -1204,7 +1209,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     }
 
     return {
-      text: '[' + (this.table.visibleColumns().indexOf(column) + 1) + ']'
+      text: '[' + (this._columns().indexOf(column) + 1) + ']'
     };
   }
 

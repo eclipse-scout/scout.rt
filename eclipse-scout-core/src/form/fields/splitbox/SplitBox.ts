@@ -758,8 +758,8 @@ export class SplitBox extends CompositeField {
     if (!this.rendered && !this.rendering) {
       return;
     }
-    let hasFirstField = (this.firstField && this.firstField.isVisible());
-    let hasSecondField = (this.secondField && this.secondField.isVisible());
+    let hasFirstField = (this.firstField && this.firstField.visible);
+    let hasSecondField = (this.secondField && this.secondField.visible);
     let hasTwoFields = hasFirstField && hasSecondField;
     let hasOneField = !hasTwoFields && (hasFirstField || hasSecondField);
 

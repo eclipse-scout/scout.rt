@@ -119,4 +119,8 @@ export class TableRow implements TableRowModel, ObjectWithType {
   setFilterAccepted(filterAccepted: boolean) {
     this.filterAccepted = filterAccepted;
   }
+
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+  }
 }

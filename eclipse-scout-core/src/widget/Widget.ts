@@ -34,10 +34,17 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   destroyed: boolean;
   destroying: boolean;
   disabledStyle: DisabledStyle;
+  /**
+   * The result of every enabled dimension.
+   *
+   * The value will only be true if every dimension is true. If one dimension is false (e.g. 'granted'), the value will be false.
+   */
   enabled: boolean;
   /**
-   * The computed enabled state. The difference to the 'enabled' property is that this member
-   * also considers the enabled-states of the parent widgets.
+   * The computed enabled state.
+   *
+   * The difference to the {@link enabled} property is that this member also considers the enabled-states of the ancestor widgets.
+   * So, if you need to know whether a user can really access a widget, this property is what you need.
    */
   enabledComputed: boolean;
   eventDelegators: EventDelegatorForCloning[];
@@ -50,7 +57,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   htmlComp: HtmlComponent;
   id: string;
   inheritAccessibility: boolean;
-  initialized: boolean;
   keyStrokeContext: KeyStrokeContext;
   loading: boolean;
   loadingSupport: LoadingSupport;
@@ -83,7 +89,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * @internal
    */
   _rendered: boolean;
-
   protected _$lastFocusedElement: JQuery;
   protected _focusInListener: (event: FocusEvent | JQuery.FocusInEvent) => void;
   protected _glassPaneContributions: GlassPaneContribution[];
@@ -107,7 +112,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.owner = null;
     this.parent = null;
     this.children = [];
-    this.initialized = false;
     this.cloneOf = null;
     this.rendering = false;
     this.removing = false;
@@ -137,7 +141,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       widget: new Set<string>(),
       preserveOnPropertyChange: new Set<string>()
     });
-
     this.eventDelegators = [];
     this._postRenderActions = [];
     this._focusInListener = this._onFocusIn.bind(this);
@@ -155,6 +158,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
     this._glassPaneContributions = [];
     this._addCloneProperties(['visible', 'enabled', 'inheritAccessibility', 'cssClass']);
+    this._addMultiDimensionalProperty('enabled', true);
+    this._addMultiDimensionalProperty('visible', true);
+    this._addPropertyDimensionAlias('enabled', 'enabledGranted', {dimension: 'granted'});
+    this._addPropertyDimensionAlias('visible', 'visibleGranted', {dimension: 'granted'});
   }
 
   /**
@@ -174,7 +181,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
    * Calls {@link Widget#_init} and triggers an <em>init</em> event when initialization has been completed.
    */
-  init(model: InitModelOf<this>) {
+  override init(model: InitModelOf<this>) {
     let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
@@ -201,7 +208,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
    * Override this function to initialize widget specific properties in subclasses.
    */
-  protected _init(model: InitModelOf<this>) {
+  protected override _init(model: InitModelOf<this>) {
     if (!model.parent) {
       throw new Error('Parent expected: ' + this);
     }
@@ -223,18 +230,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       }
       this._initProperty(propertyName, value);
     });
-
+    this._initMultiDimensionalProperties(model);
     this._setCssClass(this.cssClass);
     this._setLogicalGrid(this.logicalGrid);
     this._setEnabled(this.enabled);
-  }
-
-  /**
-   * This function sets the property value. Override this function when you need special init behavior for certain properties.
-   * For instance, you could not simply set the property value, but extend an already existing value.
-   */
-  protected _initProperty(propertyName: string, value: any) {
-    this._writeProperty(propertyName, value);
   }
 
   /**
@@ -829,22 +828,23 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Changes the enabled property of this form field to the given value.
+   * Sets the 'default' dimension for the {@link Widget.enabled} property and recomputes its state.
    *
    * @param enabled
-   *          Required. The new enabled value
+   *            The new enabled value for the 'default' dimension, or an object containing the new enabled dimensions.
    * @param updateParents
-   *          If true, the enabled property of all parent form fields are
-   *          updated to same value as well. Default is false.
+   *            If true, the enabled property of all ancestor widgets are updated to same value as well. Default is false.
    * @param updateChildren
-   *          If true, the enabled property of all child form fields (recursive)
-   *          are updated to same value as well. Default is false.
+   *            If true, the enabled property of all descendant widgets are updated to same value as well. Default is false.
+   *            *Important:* Use this parameter only if really necessary because traversing every descendant may be costly and overriding their enabled state may not be reverted easily.
+   *            Instead, in most cases you should be able to use {@link WidgetModel.inheritAccessibility} to make a descendant widget independent on its ancestors.
+   * @see WidgetModel.enabled
    */
-  setEnabled(enabled: boolean, updateParents?: boolean, updateChildren?: boolean) {
+  setEnabled(enabled: boolean | Record<string, boolean>, updateParents?: boolean, updateChildren?: boolean) {
     this.setProperty('enabled', enabled);
 
     if (enabled && updateParents && this.parent) {
-      this.parent.setEnabled(true, true, false);
+      this.parent.setEnabled(true, true);
     }
 
     if (updateChildren) {
@@ -854,11 +854,30 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
   }
 
+  /**
+   * Called whenever a new value should be set for the {@link Widget.enabled} property (which is computed based on its dimensions).
+   *
+   * Sets the actual property and recomputes the {@link enabledComputed} property.
+   */
   protected _setEnabled(enabled: boolean) {
     this._setProperty('enabled', enabled);
     if (this.initialized) {
       this.recomputeEnabled();
     }
+  }
+
+  /**
+   * Sets the 'granted' dimension for the {@link Widget.enabled} property and recomputes its state.
+   *
+   * @param enabledGranted the new enabled value for the 'granted' dimension.
+   * @see WidgetModel.enabledGranted
+   */
+  setEnabledGranted(enabledGranted: boolean) {
+    this.setProperty('enabledGranted', enabledGranted);
+  }
+
+  get enabledGranted(): boolean {
+    return this.getProperty('enabledGranted');
   }
 
   recomputeEnabled(parentEnabled?: boolean) {
@@ -948,14 +967,31 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * @param visible true, to make the widget visible, false to hide it.
+   * Sets the 'default' dimension for the {@link Widget.visible} property and recomputes its state.
+   *
+   * @param visible the new visible value for the 'default' dimension, or an object containing the new visible dimensions.
+   * @see WidgetModel.visibleGranted
    */
-  setVisible(visible: boolean) {
+  setVisible(visible: boolean | Record<string, boolean>) {
     this.setProperty('visible', visible);
   }
 
   /**
-   * @returns whether the widget is visible or not. May depend on other conditions than the visible property only
+   * Sets the 'granted' dimension for the {@link Widget.visible} property and recomputes its state.
+   *
+   * @param visibleGranted the new visible value for the 'granted' dimension.
+   * @see WidgetModel.visibleGranted
+   */
+  setVisibleGranted(visibleGranted: boolean) {
+    this.setProperty('visibleGranted', visibleGranted);
+  }
+
+  get visibleGranted(): boolean {
+    return this.getProperty('visibleGranted');
+  }
+
+  /**
+   * @deprecated use {@link visible} directly. Will be removed in an upcoming release.
    */
   isVisible(): boolean {
     return this.visible;
@@ -965,7 +1001,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (!this.$container) {
       return;
     }
-    this.$container.setVisible(this.isVisible());
+    this.$container.setVisible(this.visible);
     this.invalidateParentLogicalGrid();
   }
 
@@ -975,7 +1011,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   isEveryParentVisible(): boolean {
     let parent = this.parent;
     while (parent) {
-      if (!parent.isVisible()) {
+      if (!parent.visible) {
         return false;
       }
       parent = parent.parent;
@@ -1466,17 +1502,18 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Sets a new value for a specific property. If the new value is the same value as the old one, nothing is performed.
+   * Sets a new value for a specific property. If the new value is the same value as the old one, nothing happens.
    * Otherwise, the following phases are executed:
    *
-   * 1. Preparation: If the property is a widget property, several actions are performed in \_prepareWidgetProperty().
+   * 1. Preparation: If the property is a widget property, several actions are performed in {@link _prepareWidgetProperty}.
    * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see {@link preserveOnPropertyChangeProperties}).
    *    If there is a custom remove function (e.g. \_removeXY where XY is the property name), it will be called instead of removing the widgets directly.
    * 3. Model update: If there is a custom set function (e.g. \_setXY where XY is the property name), it will be called. Otherwise, the default set function {@link _setProperty} is called.
    * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. \_renderXY where XY is the property name), it will be called. Otherwise, nothing happens.
+   *
    * @returns true, if the property was changed, false if not.
    */
-  override setProperty(propertyName: string, value: any): boolean {
+  protected override setPropertyInternal(propertyName: string, value: any): boolean {
     if (objects.equals(this.getProperty(propertyName), value)) {
       return false;
     }
@@ -1788,13 +1825,20 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * @param options Options passed to the mirror function.
    */
   clone(model: WidgetModel, options?: CloneOptions): this {
-    let clone, cloneModel;
     model = model || {};
     options = options || {};
 
-    const cloneProperties = Array.from(this.cloneProperties).map(cloneProperty => this.adaptPropertyName(cloneProperty));
-    cloneModel = objects.extractProperties(this, model, cloneProperties);
-    clone = scout.create(this.objectType, cloneModel);
+    let cloneModel = {};
+    for (let cloneProperty of this.cloneProperties) {
+      let value;
+      if (this.isMultiDimensionalProperty(cloneProperty)) {
+        value = this.getPropertyDimensions(cloneProperty);
+      } else {
+        value = this.getProperty(cloneProperty);
+      }
+      cloneModel[cloneProperty] = value;
+    }
+    let clone = scout.create(this.objectType, $.extend(cloneModel, model));
     clone.cloneOf = this;
     this._mirror(clone, options);
 

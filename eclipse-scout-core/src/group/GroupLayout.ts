@@ -42,10 +42,10 @@ export class GroupLayout extends AbstractLayout {
 
     // 1st condition: Set size only if group is expanded
     // 2nd condition: There is no need to update it during the expand animation (the body will be layouted correctly before the animation starts)
-    // 3rd condition: When Group.setCollapsed(false) has been called an event is triggered that might causes invalidating layout on other all groups (inclusive currently expanding group).
+    // 3rd condition: When Group.setCollapsed(false) has been called an event is triggered that might cause invalidating layout on other all groups (inclusive currently expanding group).
     //                The body of the currently expanding group is not rendered at this time.
     // 4th condition: When body is invisible by property (bodyVisible)
-    if (this.group.collapsed || this.group.bodyAnimating || !this.group.body.rendered || !this.group.body.isVisible()) {
+    if (this.group.collapsed || this.group.bodyAnimating || !this.group.body.rendered || !this.group.body.visible) {
       return;
     }
 
@@ -86,7 +86,7 @@ export class GroupLayout extends AbstractLayout {
       // Return the current size when the body is collapsing or expanding
       // so that the widgets on the bottom and on top move smoothly with the animation
       prefSize = htmlBody.size(true);
-    } else if (this.group.collapsed || !this.group.body.rendered || !this.group.body.isVisible()) {
+    } else if (this.group.collapsed || !this.group.body.rendered || !this.group.body.visible) {
       // Body may not be rendered even if collapsed is false if property has changed but _renderCollapse not called yet
       // (if revalidateLayoutTree is called during collapsed property event)
       prefSize = new Dimension(0, 0);

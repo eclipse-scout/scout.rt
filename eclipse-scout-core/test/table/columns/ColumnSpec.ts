@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BooleanColumn, Cell, Column, NumberColumn, scout} from '../../../src/index';
+import {BooleanColumn, Cell, Column, NumberColumn, scout, Table} from '../../../src/index';
 import {JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
 
 describe('Column', () => {
@@ -611,27 +611,112 @@ describe('Column', () => {
     });
   });
 
+  describe('visible', () => {
+
+    it('is multi dimensional', () => {
+      let table = scout.create(Table, {
+        parent: session.desktop,
+        columns: [{
+          objectType: Column
+        }]
+      });
+      let column = table.columns[0];
+      expect(column.getProperty('visible-default')).toBe(true);
+      expect(column.getProperty('visible-granted')).toBe(true);
+      expect(column.visibleGranted).toBe(true);
+      expect(column.visible).toBe(true);
+
+      column.setVisible({
+        granted: false,
+        default: true
+      });
+      expect(column.getPropertyDimension('visible', 'default')).toBe(true);
+      expect(column.getProperty('visible-granted')).toBe(false);
+      expect(column.visibleGranted).toBe(false);
+      expect(column.visible).toBe(false);
+
+      column.setVisible(true);
+      column.setVisibleGranted(false);
+      expect(column.getProperty('visible-default')).toBe(true);
+      expect(column.getProperty('visible-granted')).toBe(false);
+      expect(column.visibleGranted).toBe(false);
+      expect(column.visible).toBe(false);
+
+      column.setVisible({});
+      expect(column.getProperty('visible-default')).toBe(true);
+      expect(column.getProperty('visible-granted')).toBe(true);
+      expect(column.visibleGranted).toBe(true);
+      expect(column.visible).toBe(true);
+    });
+  });
+
   describe('displayable', () => {
 
     it('if set to false, column may not be made visible', () => {
       let model = helper.createModelFixture(3, 2);
       let table = helper.createTable(model);
-      expect(table.columns[0].visible).toBe(true);
+      expect(table.columns[0].getProperty('visible-default')).toBe(true);
       expect(table.columns[0].displayable).toBe(true);
-      expect(table.columns[0].isVisible()).toBe(true);
+      expect(table.columns[0].visible).toBe(true);
       expect(table.visibleColumns().length).toBe(3);
 
       table.columns[0].setDisplayable(false);
-      expect(table.columns[0].visible).toBe(true);
+      expect(table.columns[0].getProperty('visible-default')).toBe(true);
       expect(table.columns[0].displayable).toBe(false);
-      expect(table.columns[0].isVisible()).toBe(false);
+      expect(table.columns[0].visible).toBe(false);
       expect(table.visibleColumns().length).toBe(2);
 
       table.columns[0].setDisplayable(true);
-      expect(table.columns[0].visible).toBe(true);
+      expect(table.columns[0].getProperty('visible-default')).toBe(true);
       expect(table.columns[0].displayable).toBe(true);
-      expect(table.columns[0].isVisible()).toBe(true);
+      expect(table.columns[0].visible).toBe(true);
       expect(table.visibleColumns().length).toBe(3);
+    });
+
+    it('can be set on initial model', () => {
+      let table = scout.create(Table, {
+        parent: session.desktop,
+        columns: [{
+          objectType: Column,
+          displayable: false
+        }]
+      });
+      expect(table.columns[0].getProperty('visible-default')).toBe(true);
+      expect(table.columns[0].getProperty('visible-displayable')).toBe(false);
+      expect(table.columns[0].displayable).toBe(false);
+      expect(table.columns[0].visible).toBe(false);
+
+      // Alternative way
+      table = scout.create(Table, {
+        parent: session.desktop,
+        columns: [{
+          objectType: Column,
+          visible: {
+            displayable: false
+          }
+        }]
+      });
+      expect(table.columns[0].getProperty('visible-default')).toBe(true);
+      expect(table.columns[0].getProperty('visible-displayable')).toBe(false);
+      expect(table.columns[0].displayable).toBe(false);
+      expect(table.columns[0].visible).toBe(false);
+    });
+
+    it('overrides displayable dimension on init model ', () => {
+      let table = scout.create(Table, {
+        parent: session.desktop,
+        columns: [{
+          objectType: Column,
+          visible: {
+            displayable: true
+          },
+          displayable: false
+        }]
+      });
+      expect(table.columns[0].getProperty('visible-default')).toBe(true);
+      expect(table.columns[0].getProperty('visible-displayable')).toBe(false);
+      expect(table.columns[0].displayable).toBe(false);
+      expect(table.columns[0].visible).toBe(false);
     });
   });
 

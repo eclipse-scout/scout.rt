@@ -33,7 +33,7 @@ export abstract class AbstractGrid extends LogicalGrid {
     // build
     let widgets = [];
     this.gridConfig.getGridWidgets().forEach(widget => {
-      if (widget.isVisible()) {
+      if (widget.visible) {
         widgets.push(widget);
         let hints = widget.gridDataHints;
         if (hints && hints.x >= 0 && hints.y >= 0) {

@@ -165,7 +165,7 @@ describe('ContextMenuPopup', () => {
 
     it('renders invisible menus', () => {
       let menuItems = [menu0, menu1, menu2];
-      menu2.visible = false;
+      menu2.setVisible(false);
       popup = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         session: session,
@@ -200,7 +200,7 @@ describe('ContextMenuPopup', () => {
 
     it('considers visibility when adding last and first classes', () => {
       let menuItems = [menu0, menu1, menu2];
-      menu2.visible = false;
+      menu2.setVisible(false);
       popup = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         session: session,
