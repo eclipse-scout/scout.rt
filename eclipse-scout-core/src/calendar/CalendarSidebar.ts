@@ -31,6 +31,7 @@ export class CalendarSidebar extends Widget {
     });
     this.splitter = scout.create(Splitter, {
       parent: this,
+      $anchor: this.$container,
       splitHorizontal: false,
       cssClass: 'line'
     });

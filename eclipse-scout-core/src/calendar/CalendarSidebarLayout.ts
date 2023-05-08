@@ -51,12 +51,20 @@ export class CalendarSidebarLayout extends AbstractLayout {
     }
 
     // Set sizes
+    splitter.setVisible(yearPanel.isVisible() && resourcesPanel.isVisible());
+
+    let yearPanelHeight, resourcesPanelHeight;
+    yearPanelHeight = yearPanel.isVisible() ? availableSize.height : 0;
+    resourcesPanelHeight = resourcesPanel.isVisible() ? availableSize.height : 0;
+
     let splitterHeight = splitter.htmlComp.bounds().height;
+    if (splitter.isVisible()) {
+      yearPanelHeight = splitter.position - splitterHeight / 2;
+      resourcesPanelHeight = availableSize.height - yearPanelHeight - splitterHeight;
+    }
 
-    let yearPanelHeight = splitter.position - splitterHeight / 2;
-    yearPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top, availableSize.width, insets.top + yearPanelHeight));
+    yearPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top, availableSize.width, yearPanelHeight));
 
-    let resourcesPanelHeight = availableSize.height - yearPanelHeight - splitterHeight / 2;
-    resourcesPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top + splitterHeight, availableSize.width, insets.top + resourcesPanelHeight));
+    resourcesPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top + splitterHeight, availableSize.width, resourcesPanelHeight));
   }
 }
