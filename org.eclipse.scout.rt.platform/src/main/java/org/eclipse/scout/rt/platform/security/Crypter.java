@@ -155,8 +155,7 @@ public class Crypter {
       throw new ProcessingException("Encrypted data uses unsupported profile '{}'", profile);
     }
 
-    EncryptionKey encryptionKey = SecurityUtility.createEncryptionKey(getPassword(), salt, getKeyLength());
-    byte[] decrypted = SecurityUtility.decrypt(encrypted, encryptionKey);
+    byte[] decrypted = SecurityUtility.decrypt(encrypted, getPassword(), salt, getKeyLength());
     return new String(decrypted, StandardCharsets.UTF_8);
   }
 }

@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -25,6 +28,39 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  */
 @ApplicationScoped
 public interface ISecurityProvider {
+
+  /**
+   * Specifies the minimum of password hash iterations with PBKDF2-HMAC-SHA512.
+   * <p>
+   * <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">PBKDF2</a>
+   */
+  int MIN_PASSWORD_HASH_ITERATIONS_2016 = 10000;
+  int MIN_PASSWORD_HASH_ITERATIONS_2019 = 20000;
+  int MIN_PASSWORD_HASH_ITERATIONS_2021 = 120000;
+  int MIN_PASSWORD_HASH_ITERATIONS_2023 = 210000;
+  int MIN_PASSWORD_HASH_ITERATIONS = MIN_PASSWORD_HASH_ITERATIONS_2023;
+
+  /**
+   * <pre>
+     secretKeyAlgorithm: PBKDF2WithHmacSHA256
+     cipherAlgorithm/Provider: AES/SunJCE
+     GCM init vector length: 16
+     GCM auth tag bit length: 128
+     key derivation iteration count: 3557
+   * </pre>
+   */
+  String ENCRYPTION_COMPATIBILITY_HEADER_2021_V1 = "[2021:v1]";
+  /**
+   * <pre>
+   secretKeyAlgorithm: PBKDF2WithHmacSHA256
+   cipherAlgorithm/Provider: AES/SunJCE
+   GCM init vector length: 16
+   GCM auth tag bit length: 128
+   key derivation iteration count: 3557
+   * </pre>
+   */
+  String ENCRYPTION_COMPATIBILITY_HEADER_2023_V1 = "[2023:v1]";
+  String ENCRYPTION_COMPATIBILITY_HEADER = ENCRYPTION_COMPATIBILITY_HEADER_2023_V1;
 
   /**
    * Create a Message Authentication Code (MAC) for the given data and password.
@@ -128,6 +164,37 @@ public interface ISecurityProvider {
   byte[] createPasswordHash(char[] password, byte[] salt);
 
   /**
+   * @deprecated use {@link #createPasswordHash(char[], byte[])}
+   * @param password
+   *          The password to create the hash for. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
+   *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
+   *          Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
+   * @param iterations
+   *          Specifies how many times the method executes its underlying algorithm. A higher value is safer.<br>
+   *          While there is a minimum number of iterations recommended to ensure data safety, this value changes every
+   *          year as technology improves. As by Aug 2021 at least 120000 iterations are recommended, see
+   *          https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html.<br>
+   *          Experimentation is important. To provide a good security use an iteration count so that the call to this
+   *          method requires one half second to execute (on the production system). Also consider the number of users
+   *          and the number of logins executed to find a value that scales in your environment.
+   * @return the password hash
+   * @throws AssertionException
+   *           If one of the following conditions is {@code true}:<br>
+   *           <ul>
+   *           <li>The password is {@code null} or an empty array</li>
+   *           <li>The salt is {@code null} or an empty array</li>
+   *           <li>The number of iterations is too small.</li>
+   *           </ul>
+   * @throws ProcessingException
+   *           If there is an error creating the hash. <br>
+   */
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  @Deprecated
+  byte[] createPasswordHash(char[] password, byte[] salt, int iterations);
+
+  /**
    * This method is recommended in combination with {@link #createPasswordHash(char[], byte[])} where the iteration
    * count is omitted. This has the advantage that the check of the password hash is independent of the creation of the
    * hash. In case the iteration count is increased yearly, this method checks if the hash is valid
@@ -136,7 +203,28 @@ public interface ISecurityProvider {
    *         expected hash.
    * @since 11.0
    */
-  boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash);
+  default boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2021))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2019))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2016))) {
+      return true;
+    }
+    //2014 variants
+    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_8)), salt, 3557))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_16)), salt, 3557))) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Encrypts the given data using the given {@link EncryptionKey}.<br>
@@ -177,8 +265,12 @@ public interface ISecurityProvider {
   void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key);
 
   /**
-   * Creates a new {@link EncryptionKey} to be used with {@link #encrypt(InputStream, OutputStream, EncryptionKey)} or
-   * {@link #decrypt(InputStream, OutputStream, EncryptionKey)}.
+   * Creates a new {@link EncryptionKey} to be only used with
+   * {@link #encrypt(InputStream, OutputStream, EncryptionKey)}.
+   * <p>
+   * Warning: This key must only be used for encryption. Decryption must be backwards compatible and uses meta
+   * parameters stored at beginning of stream. Therefore never use an {@link EncryptionKey} directly to decrypt but
+   * always with {@link SecurityUtility#decrypt(byte[], char[], byte[], int, EncryptionKey)}
    *
    * @param password
    *          The password to use to create the key. Must not be {@code null} or empty.
@@ -189,7 +281,7 @@ public interface ISecurityProvider {
    *          alongside the encrypted data.
    * @param keyLen
    *          The length of the key (in bits). Must be one of 128, 192 or 256.
-   * @return The {@link EncryptionKey} used to encrypt or decrypt data.
+   * @return The {@link EncryptionKey} used to encrypt data.
    * @throws AssertionException
    *           If one of the following conditions is {@code true}:<br>
    *           <ul>
@@ -198,9 +290,40 @@ public interface ISecurityProvider {
    *           <li>The key length is not valid.</li>
    *           </ul>
    * @see #encrypt(InputStream, OutputStream, EncryptionKey)
-   * @see #decrypt(InputStream, OutputStream, EncryptionKey)
    */
   EncryptionKey createEncryptionKey(char[] password, byte[] salt, int keyLen);
+
+  /**
+   * Creates a backward compatible {@link EncryptionKey} that can be used in
+   * {@link #decrypt(InputStream, OutputStream, EncryptionKey)}
+   *
+   * @param password
+   *          The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *          random salt for each key! Salts may not be shared by several keys. Use
+   *          {@link #createSecureRandomBytes(int)} to generate a new salt. It is safe to store the salt in clear text
+   *          alongside the encrypted data.
+   * @param keyLen
+   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @param compatibilityHeader
+   *          that was created when encrypting, see {@link EncryptionKey#getCompatibilityHeader()}
+   * @return The {@link EncryptionKey} used to decrypt data.
+   * @throws AssertionException
+   *           If one of the following conditions is {@code true}:<br>
+   *           <ul>
+   *           <li>The password is {@code null} or an empty array</li>
+   *           <li>The salt is {@code null} or an empty array</li>
+   *           <li>The key length is not valid.</li>
+   *           </ul>
+   * @see #decrypt(InputStream, OutputStream, EncryptionKey)
+   *      <p>
+   *      Implementors of this interface should implement this method in a way that backward compatibility is
+   *      guaranteed.
+   */
+  default EncryptionKey createDecryptionKey(char[] password, byte[] salt, int keyLen, byte[] compatibilityHeader) {
+    return createEncryptionKey(password, salt, keyLen);
+  }
 
   /**
    * Creates a new secure random instance. The returned instance has already been seeded and is ready to use.
