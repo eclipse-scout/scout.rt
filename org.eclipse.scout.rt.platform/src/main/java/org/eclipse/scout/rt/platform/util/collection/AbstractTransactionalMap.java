@@ -13,6 +13,7 @@ import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -222,6 +223,10 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
      * In other words, an entry was added to the removedMap.
      */
     protected final Map<K, V> m_insertedMap;
+    /**
+     * Set contains any entries which where publish by a fast-forward insertion.
+     */
+    protected final Map<K, V> m_fastForwardMap;
 
     protected final int m_insertVersion;
     protected final int m_removeVersion;
@@ -230,11 +235,16 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     private boolean m_removesDirty;
 
     public AbstractMapTransactionMember(Map<K, V> removedMap, Map<K, V> insertedMap) {
+      this(removedMap, insertedMap, AbstractTransactionalMap.this.m_fastForward ? new HashMap<>() : Collections.emptyMap());
+    }
+
+    public AbstractMapTransactionMember(Map<K, V> removedMap, Map<K, V> insertedMap, Map<K, V> fastForwardMap) {
       super();
       m_removedMap = removedMap;
       m_insertedMap = insertedMap;
       m_insertVersion = AbstractTransactionalMap.this.m_insertVersion.get();
       m_removeVersion = AbstractTransactionalMap.this.m_removeVersion.get();
+      m_fastForwardMap = fastForwardMap;
     }
 
     /**
@@ -265,7 +275,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean needsCommit() {
-      return !m_removedMap.isEmpty() || !m_insertedMap.isEmpty() || m_insertsDirty || m_removesDirty;
+      return !m_removedMap.isEmpty() || !m_insertedMap.isEmpty() || !m_fastForwardMap.isEmpty() || m_insertsDirty || m_removesDirty;
     }
 
     @Override
@@ -354,6 +364,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       }
       else {
         failedCommittedChanges.addAll(m_insertedMap.keySet());
+        failedCommittedChanges.addAll(m_fastForwardMap.keySet());
       }
 
       changesCommitted(sharedMap, successfulCommittedChanges, failedCommittedChanges);
@@ -404,7 +415,8 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       boolean hasRemoveEntry = m_removedMap.containsKey(key);
       if (m_fastForward && !hasRemoveEntry && sharedValue == null && !m_insertsDirty && fastForward(key, value)) {
         // fastForward success; value was directly put in shared map
-        sharedValue = value; // do not return but add to inserted/removed map; this will ensure that dirty marked transactions will roll back this fast-forward action
+        m_fastForwardMap.put(key, value);
+        return null;
       }
       V oldValue = m_insertedMap.put(key, value);
       if (!hasRemoveEntry && sharedValue != null) {
