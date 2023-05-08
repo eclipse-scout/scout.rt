@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -176,7 +177,7 @@ public class BasicCacheTest {
 
     @SuppressWarnings("unchecked")
     ICache<Integer, String> cache = BEANS.get(ICacheBuilder.class)
-        .withCacheId("BasicCacheTestCacheId#testInvalidateDuringResolve")
+        .withCacheId("BasicCacheTestCacheId#testNoFastForwardOfDirty")
         .withValueResolver((ICacheValueResolver<Integer, String>) key -> {
           Function<Integer, String> internalResolver = valueResolver.get();
           return internalResolver.apply(key);
@@ -245,6 +246,61 @@ public class BasicCacheTest {
 
     assertTrue(RunContexts.empty().call(() -> cache.getUnmodifiableMap().isEmpty()));
     assertEquals("val_B_1", RunContexts.empty().call(() -> cache.get(1)));
+  }
+
+  /**
+   * A transaction only reading values (does not change data in source and therefore does not call 'invalidate') should
+   * see current values.
+   */
+  @Test
+  public void testReadingOnlyTransactionSeesCurrentValue() {
+    AtomicReference<Function<Integer, String>> valueResolver = new AtomicReference<>();
+
+    @SuppressWarnings("unchecked")
+    ICache<Integer, String> cache = BEANS.get(ICacheBuilder.class)
+        .withCacheId("BasicCacheTestCacheId#testReadingOnlyTransactionSeesCurrentValue")
+        .withValueResolver((ICacheValueResolver<Integer, String>) key -> {
+          Function<Integer, String> internalResolver = valueResolver.get();
+          return internalResolver.apply(key);
+        })
+        .withReplaceIfExists(true)
+        .withTransactional(true)
+        .withTransactionalFastForward(true)
+        .build();
+
+    valueResolver.set(key -> "val_A_" + key);
+    assertEquals("val_A_1", RunContexts.empty().call(() -> cache.get(1)));
+
+    AtomicReference<String> valueRead1 = new AtomicReference<>();
+    AtomicReference<String> valueRead2 = new AtomicReference<>();
+    Phaser dataReadPhaser = new Phaser(2);
+    IFuture<Void> readingTransactionFuture = Jobs.schedule(() -> {
+      valueRead1.set(cache.get(1));
+      valueRead2.set(cache.get(2));
+      dataReadPhaser.arriveAndAwaitAdvance(); // phase A
+      dataReadPhaser.arriveAndAwaitAdvance(); // phase B
+      valueRead1.set(cache.get(1));
+      valueRead2.set(cache.get(2));
+      dataReadPhaser.arriveAndAwaitAdvance(); // phase C
+    }, Jobs.newInput().withRunContext(RunContexts.empty()));
+
+    dataReadPhaser.arriveAndAwaitAdvance(); // phase A
+    assertEquals("val_A_1", valueRead1.get());
+    assertEquals("val_A_2", valueRead2.get());
+
+    RunContexts.empty().run(() -> {
+      valueResolver.set(key -> "val_B_" + key); // change value "in local transaction"
+      cache.invalidate(new AllCacheEntryFilter<>(), true);
+      assertEquals("val_B_2", cache.get(2));
+    });
+
+    dataReadPhaser.arriveAndAwaitAdvance(); // phase B
+    dataReadPhaser.arriveAndAwaitAdvance(); // phase C
+
+    assertEquals("val_B_1", valueRead1.get());
+    assertEquals("val_B_2", valueRead2.get());
+
+    readingTransactionFuture.awaitDone();
   }
 
   @Test
@@ -396,7 +452,7 @@ public class BasicCacheTest {
 
     @SuppressWarnings("unchecked")
     ICache<Integer, String> cache = BEANS.get(ICacheBuilder.class)
-        .withCacheId("BasicCacheTestCacheId#testInvalidateDuringResolve")
+        .withCacheId("BasicCacheTestCacheId#testInvalidateBeforeAndDuringResolve")
         .withValueResolver((ICacheValueResolver<Integer, String>) key -> {
           Function<Integer, String> internalResolver = valueResolver.get();
           return internalResolver.apply(key);
