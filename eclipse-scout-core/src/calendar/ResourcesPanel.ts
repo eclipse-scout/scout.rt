@@ -16,12 +16,18 @@ export class ResourcesPanel extends Widget {
     super._init(model);
     this.tree = scout.create(Tree, {
       parent: this,
-      checkable: true
+      checkable: true,
+      textFilterEnabled: false
     });
 
     this.tree.insertNode({
       text: 'test',
-      leaf: false
+      childNodes: [
+        {
+          text: 'child test',
+          leaf: true
+        }
+      ]
     });
   }
 

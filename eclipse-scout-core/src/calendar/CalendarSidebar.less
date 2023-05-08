@@ -16,15 +16,19 @@
   height: 100%;
 
   & > .splitter {
+    padding-right: 10px;
+  }
+
+  & > .resources-panel-container {
     padding-left: 10px;
     padding-right: 25px;
-  }
 
-  & > .year-panel-container {
-    min-height: 210px;
-  }
+    & > .tree > .tree-data > .tree-node.selected {
+      background-color: transparent;
 
-  & > .year-panel-container {
-    min-height: 210px;
+      &::after {
+        border-color: transparent;
+      }
+    }
   }
 }
