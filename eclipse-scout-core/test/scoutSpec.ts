@@ -13,6 +13,50 @@ import {FormSpecHelper} from '../src/testing';
 describe('main', () => {
   let session: SandboxSession;
 
+  abstract class Animal {
+    readonly name: string;
+
+    abstract canFly(): boolean;
+
+    constructor(name) {
+      this.name = name;
+    }
+  }
+
+  class Bird extends Animal {
+    constructor(name = 'Bird') {
+      super(name);
+    }
+
+    override canFly(): boolean {
+      return true;
+    }
+  }
+
+  class Cat extends Animal {
+    constructor(name = 'Cat') {
+      super(name);
+    }
+
+    override canFly(): boolean {
+      return false;
+    }
+
+    miauw(): string {
+      return 'Miauw!';
+    }
+  }
+
+  class Tiger extends Cat {
+    constructor(name = 'Tiger') {
+      super(name);
+    }
+
+    override miauw(): string {
+      return 'Roar!';
+    }
+  }
+
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
@@ -51,31 +95,109 @@ describe('main', () => {
 
     it('throws Error when value is not set', () => {
       let foo = null;
-      let func = scout.assertParameter.bind(scout, 'foo', foo);
-      expect(func).toThrowError();
+      expect(() => scout.assertParameter('foo', foo)).toThrowError();
       foo = 'bar';
-      func = scout.assertParameter.bind(scout, 'foo', foo);
-      expect(func).not.toThrowError();
+      expect(() => scout.assertParameter('foo', foo)).not.toThrowError();
       foo = undefined;
-      func = scout.assertParameter.bind(scout, 'foo', foo);
-      expect(func).toThrowError();
+      expect(() => scout.assertParameter('foo', foo)).toThrowError();
       foo = false;
-      func = scout.assertParameter.bind(scout, 'foo', foo);
-      expect(func).not.toThrowError();
+      expect(() => scout.assertParameter('foo', foo)).not.toThrowError();
       foo = 0;
-      func = scout.assertParameter.bind(scout, 'foo', foo);
-      expect(func).not.toThrowError();
+      expect(() => scout.assertParameter('foo', foo)).not.toThrowError();
+
     });
 
     it('throws Error when value has wrong type', () => {
       let foo = {};
-      let func = scout.assertParameter.bind(scout, 'foo', foo, Status);
-      expect(func).toThrowError();
+      expect(() => scout.assertParameter('foo', foo, Status)).toThrowError();
       foo = new Status();
-      func = scout.assertParameter.bind(scout, 'foo', foo, Status);
-      expect(func).not.toThrowError();
+      expect(() => scout.assertParameter('foo', foo, Status)).not.toThrowError();
+
+      // Check that this also works for abstract classes
+      let bar: any;
+
+      bar = new Bird();
+      expect(() => scout.assertParameter('bar', bar, Animal)).not.toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Bird)).not.toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Cat)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Tiger)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Status)).toThrowError();
+
+      bar = new Cat();
+      expect(() => scout.assertParameter('bar', bar, Animal)).not.toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Bird)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Cat)).not.toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Tiger)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Status)).toThrowError();
+
+      bar = new Tiger();
+      expect(() => scout.assertParameter('bar', bar, Animal)).not.toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Bird)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Cat)).not.toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Tiger)).not.toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Status)).toThrowError();
+
+      bar = new Status();
+      expect(() => scout.assertParameter('bar', bar, Animal)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Bird)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Cat)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Tiger)).toThrowError();
+      expect(() => scout.assertParameter('bar', bar, Status)).not.toThrowError();
+    });
+  });
+
+  describe('assertProperty', () => {
+
+    it('throws Error when value is not set', () => {
+      let o = {
+        foo: null,
+        bar: 'bar',
+        notDefined: undefined,
+        notTrue: false,
+        zero: 0
+      };
+
+      expect(() => scout.assertProperty(null, 'foo')).toThrowError();
+      expect(() => scout.assertProperty(o, 'foo')).toThrowError();
+      expect(() => scout.assertProperty(o, 'bar')).not.toThrowError();
+      expect(() => scout.assertProperty(o, 'notDefined')).toThrowError();
+      expect(() => scout.assertProperty(o, 'absent')).toThrowError();
+      expect(() => scout.assertProperty(o, 'notTrue')).not.toThrowError();
+      expect(() => scout.assertProperty(o, 'zero')).not.toThrowError();
     });
 
+    it('throws Error when value has wrong type', () => {
+      let o = {
+        bar: new Status(),
+        bird: new Bird(),
+        cat: new Cat(),
+        tiger: new Tiger()
+      };
+
+      expect(() => scout.assertProperty(o, 'foo', Status)).toThrowError();
+      expect(() => scout.assertProperty(o, 'bar', Status)).not.toThrowError();
+
+      // Check that this also works for abstract classes
+      expect(() => scout.assertProperty(o, 'bar', Animal)).toThrowError();
+      expect(() => scout.assertProperty(o, 'bar', Bird)).toThrowError();
+      expect(() => scout.assertProperty(o, 'bar', Cat)).toThrowError();
+      expect(() => scout.assertProperty(o, 'bar', Tiger)).toThrowError();
+
+      expect(() => scout.assertProperty(o, 'bird', Animal)).not.toThrowError();
+      expect(() => scout.assertProperty(o, 'bird', Bird)).not.toThrowError();
+      expect(() => scout.assertProperty(o, 'bird', Cat)).toThrowError();
+      expect(() => scout.assertProperty(o, 'bird', Tiger)).toThrowError();
+
+      expect(() => scout.assertProperty(o, 'cat', Animal)).not.toThrowError();
+      expect(() => scout.assertProperty(o, 'cat', Bird)).toThrowError();
+      expect(() => scout.assertProperty(o, 'cat', Cat)).not.toThrowError();
+      expect(() => scout.assertProperty(o, 'cat', Tiger)).toThrowError();
+
+      expect(() => scout.assertProperty(o, 'tiger', Animal)).not.toThrowError();
+      expect(() => scout.assertProperty(o, 'tiger', Bird)).toThrowError();
+      expect(() => scout.assertProperty(o, 'tiger', Cat)).not.toThrowError();
+      expect(() => scout.assertProperty(o, 'tiger', Tiger)).not.toThrowError();
+    });
   });
 
   describe('assertValue', () => {
@@ -153,6 +275,24 @@ describe('main', () => {
 
       expect(valueField).toBe(stringField);
       expect(() => scout.assertInstance(widget, NumberField)).toThrow();
+
+      // Check that this also works for abstract types
+      let foo: any = new Bird();
+      let a1: Animal = scout.assertInstance(foo, Animal);
+      let a2: Bird = scout.assertInstance(foo, Bird);
+      // @ts-expect-error
+      let a3: Cat = scout.assertInstance(foo, Bird);
+      expect(() => scout.assertInstance(foo, Cat)).toThrowError();
+      expect(() => scout.assertInstance(foo, Tiger)).toThrowError();
+
+      foo = new Tiger();
+      let a4: Animal = scout.assertInstance(foo, Animal);
+      let a5: Cat = scout.assertInstance(foo, Cat);
+      let a6: Tiger = scout.assertInstance(foo, Tiger);
+      let a7: Bird = scout.assertInstance(foo, Cat); // works, because bird has the same structure as cat
+
+      // noinspection BadExpressionStatementJS (only used to disable "unused variable" warnings)
+      [a1, a2, a3, a4, a5, a6, a7];
     });
   });
 
