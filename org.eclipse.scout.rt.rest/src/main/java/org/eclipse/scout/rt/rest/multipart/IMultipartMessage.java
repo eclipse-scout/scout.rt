@@ -10,8 +10,11 @@
  */
 package org.eclipse.scout.rt.rest.multipart;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+
+import javax.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.rest.IRestResource;
 
@@ -31,9 +34,9 @@ import org.eclipse.scout.rt.rest.IRestResource;
  * &#064;Path("upload")
  * &#064;Consumes(MediaType.MULTIPART_FORM_DATA)
  * &#064;Produces(MediaType.APPLICATION_JSON)
- * public UploadResponseDo upload(IMultipartMessage multipartMessage) {
+ * public UploadResponseDo upload(@HeaderParam(&quot;Content-Type&quot;) MediaType mediaType, InputStream inputStream) {
  *   ...
- *
+ *   IMultipartMessage multipartMessage = IMultipartMessage.of(mediaType, inputStream);
  *   while (multipartMessage.hasNext()) {
  *     try (IMultipartPart part = multipartMessage.next()) {
  *       switch (part.getPartName()) {
@@ -61,4 +64,11 @@ import org.eclipse.scout.rt.rest.IRestResource;
  * </pre>
  */
 public interface IMultipartMessage extends Iterator<IMultipartPart> {
+
+  /**
+   * Manually creates a {@link IMultipartMessage} based on media type and input stream.
+   */
+  static IMultipartMessage of(MediaType mediaType, InputStream inputStream) {
+    return new ServerMultipartMessage(mediaType, inputStream);
+  }
 }
