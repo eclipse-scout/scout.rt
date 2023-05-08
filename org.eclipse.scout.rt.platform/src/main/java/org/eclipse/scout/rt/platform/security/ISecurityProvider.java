@@ -9,12 +9,9 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -164,37 +161,6 @@ public interface ISecurityProvider {
   byte[] createPasswordHash(char[] password, byte[] salt);
 
   /**
-   * @deprecated use {@link #createPasswordHash(char[], byte[])}
-   * @param password
-   *          The password to create the hash for. Must not be {@code null} or empty.
-   * @param salt
-   *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
-   *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
-   *          Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
-   * @param iterations
-   *          Specifies how many times the method executes its underlying algorithm. A higher value is safer.<br>
-   *          While there is a minimum number of iterations recommended to ensure data safety, this value changes every
-   *          year as technology improves. As by Aug 2021 at least 120000 iterations are recommended, see
-   *          https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html.<br>
-   *          Experimentation is important. To provide a good security use an iteration count so that the call to this
-   *          method requires one half second to execute (on the production system). Also consider the number of users
-   *          and the number of logins executed to find a value that scales in your environment.
-   * @return the password hash
-   * @throws AssertionException
-   *           If one of the following conditions is {@code true}:<br>
-   *           <ul>
-   *           <li>The password is {@code null} or an empty array</li>
-   *           <li>The salt is {@code null} or an empty array</li>
-   *           <li>The number of iterations is too small.</li>
-   *           </ul>
-   * @throws ProcessingException
-   *           If there is an error creating the hash. <br>
-   */
-  @SuppressWarnings("DeprecatedIsStillUsed")
-  @Deprecated
-  byte[] createPasswordHash(char[] password, byte[] salt, int iterations);
-
-  /**
    * This method is recommended in combination with {@link #createPasswordHash(char[], byte[])} where the iteration
    * count is omitted. This has the advantage that the check of the password hash is independent of the creation of the
    * hash. In case the iteration count is increased yearly, this method checks if the hash is valid
@@ -203,28 +169,7 @@ public interface ISecurityProvider {
    *         expected hash.
    * @since 11.0
    */
-  default boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
-    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS))) {
-      return true;
-    }
-    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2021))) {
-      return true;
-    }
-    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2019))) {
-      return true;
-    }
-    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2016))) {
-      return true;
-    }
-    //2014 variants
-    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_8)), salt, 3557))) {
-      return true;
-    }
-    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_16)), salt, 3557))) {
-      return true;
-    }
-    return false;
-  }
+  boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash);
 
   /**
    * Encrypts the given data using the given {@link EncryptionKey}.<br>

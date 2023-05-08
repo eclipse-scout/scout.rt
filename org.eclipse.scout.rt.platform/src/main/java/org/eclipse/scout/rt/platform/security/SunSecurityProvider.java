@@ -71,17 +71,6 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
 @Order(5500)
 public class SunSecurityProvider implements ISecurityProvider {
 
-  public static final int MIN_PASSWORD_HASH_ITERATIONS_2016 = 10000;
-  public static final int MIN_PASSWORD_HASH_ITERATIONS_2019 = 20000;
-  public static final int MIN_PASSWORD_HASH_ITERATIONS_2021 = 120_000;
-
-  /**
-   * Specifies the minimum of password hash iterations with PBKDF2-HMAC-SHA512.<br>
-   * See <a href=
-   * "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">Password_Storage_Cheat_Sheet</a>
-   */
-  public static final int MIN_PASSWORD_HASH_ITERATIONS = MIN_PASSWORD_HASH_ITERATIONS_2021;
-
   /**
    * Buffer size for {@link InputStream} read.
    */
@@ -247,6 +236,9 @@ public class SunSecurityProvider implements ISecurityProvider {
   @Override
   public boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
     if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2021))) {
       return true;
     }
     if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2019))) {
