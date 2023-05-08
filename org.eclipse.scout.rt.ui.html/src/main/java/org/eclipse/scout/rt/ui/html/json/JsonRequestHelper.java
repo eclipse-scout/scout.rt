@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +19,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
@@ -159,16 +160,13 @@ public class JsonRequestHelper {
     try {
       servletResponse.getOutputStream().write(data);
     }
-    catch (final EOFException e) { // NOSONAR
-      final StringBuilder sb = new StringBuilder("EOF - Client disconnected, cannot write response");
-      if (LOG.isDebugEnabled()) {
-        sb.append(": ").append(jsonText);
+    catch (final Exception e) {
+      if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(e)) {
+        // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
+        LOG.debug("Connection Error: ", e);
+        return;
       }
-      else {
-        sb.append(" (").append(data.length).append(" bytes)");
-      }
-      LOG.warn(sb.toString());
-      return;
+      throw e;
     }
     finally {
       interruption.restore();
