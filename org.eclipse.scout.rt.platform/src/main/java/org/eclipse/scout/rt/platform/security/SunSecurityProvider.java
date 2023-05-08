@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -89,25 +90,90 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public EncryptionKey createEncryptionKey(char[] password, byte[] salt, int keyLen) {
+    return createEncryptionKeyInternal(
+        password,
+        salt,
+        keyLen,
+        getSecretKeyAlgorithm(),
+        getCipherAlgorithm(),
+        getCipherAlgorithmProvider(),
+        GCM_INITIALIZATION_VECTOR_LEN,
+        GCM_AUTH_TAG_BIT_LEN,
+        getKeyDerivationIterationCount());
+  }
+
+  @Override
+  public EncryptionKey createDecryptionKey(char[] password, byte[] salt, int keyLen, byte[] compatibilityHeader) {
+    String v = compatibilityHeader != null ? new String(compatibilityHeader, StandardCharsets.US_ASCII) : ENCRYPTION_COMPATIBILITY_HEADER_2021_V1;
+    if (ENCRYPTION_COMPATIBILITY_HEADER_2021_V1.equals(v)) {
+      // legacy
+      return createEncryptionKeyInternal(
+          password,
+          salt,
+          keyLen,
+          "PBKDF2WithHmacSHA256",
+          "AES",
+          "SunJCE",
+          16,
+          128,
+          3557);
+    }
+    if (ENCRYPTION_COMPATIBILITY_HEADER_2023_V1.equals(v)) {
+      return createEncryptionKeyInternal(
+          password,
+          salt,
+          keyLen,
+          "PBKDF2WithHmacSHA256",
+          "AES",
+          "SunJCE",
+          16,
+          128,
+          3557);
+    }
+    if (ENCRYPTION_COMPATIBILITY_HEADER.equals(v)) {
+      // latest
+      return createEncryptionKey(password, salt, keyLen);
+    }
+    throw new ProcessingException("Unknown compatibility header {}", v);
+  }
+
+  private static EncryptionKey createEncryptionKeyInternal(
+      char[] password,
+      byte[] salt,
+      int keyLen,
+      String secretKeyAlgorithm,
+      String cipherAlgorithm,
+      String cipherAlgorithmProvider,
+      int gcmInitVecLen,
+      int gcmAuthTagBitLen,
+      int keyDerivationIterationCount) {
     assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
     assertGreater(assertNotNull(salt, "salt must be provided.").length, 0, "empty salt is not allowed.");
     assertTrue(keyLen == 128 || keyLen == 192 || keyLen == 256, "key length must be 128, 192 or 256.");
-
     try {
-      SecretKeyFactory factory = SecretKeyFactory.getInstance(getSecretKeyAlgorithm(), getCipherAlgorithmProvider());
-      KeySpec spec = new PBEKeySpec(password, salt, getKeyDerivationIterationCount(), keyLen + (GCM_INITIALIZATION_VECTOR_LEN * 8));
+      SecretKeyFactory factory = SecretKeyFactory.getInstance(secretKeyAlgorithm, cipherAlgorithmProvider);
+      KeySpec spec = new PBEKeySpec(password, salt, keyDerivationIterationCount, keyLen + (gcmInitVecLen * 8));
       SecretKey tmpSecret = factory.generateSecret(spec);
 
       // derive Key and Initialization Vector
       byte[] encoded = tmpSecret.getEncoded();
-      byte[] iv = new byte[GCM_INITIALIZATION_VECTOR_LEN];
+      byte[] iv = new byte[gcmInitVecLen];
       byte[] key = new byte[keyLen / 8];
       System.arraycopy(encoded, 0, key, 0, key.length);
-      System.arraycopy(encoded, key.length, iv, 0, GCM_INITIALIZATION_VECTOR_LEN);
+      System.arraycopy(encoded, key.length, iv, 0, gcmInitVecLen);
 
-      SecretKey secretKey = new SecretKeySpec(key, getCipherAlgorithm());
-      GCMParameterSpec parameters = new GCMParameterSpec(GCM_AUTH_TAG_BIT_LEN, iv);
-      return new EncryptionKey(secretKey, parameters);
+      SecretKey secretKey = new SecretKeySpec(key, cipherAlgorithm);
+      GCMParameterSpec parameters = new GCMParameterSpec(gcmAuthTagBitLen, iv);
+      byte[] compatibilityHeader = ("[1:"
+          + keyLen
+          + "-" + secretKeyAlgorithm
+          + "-" + cipherAlgorithm
+          + "-" + cipherAlgorithmProvider
+          + "-" + gcmInitVecLen
+          + "-" + gcmAuthTagBitLen
+          + "-" + keyDerivationIterationCount
+          + "]").getBytes(StandardCharsets.US_ASCII);
+      return new EncryptionKey(secretKey, parameters, compatibilityHeader);
     }
     catch (NoSuchAlgorithmException e) {
       throw new ProcessingException("Unable to create secret. Algorithm could not be found. Make sure to use JRE 1.8 or newer.", e);
@@ -348,7 +414,14 @@ public class SunSecurityProvider implements ISecurityProvider {
   }
 
   /**
-   * @return Iteration count for key derivation.
+   * @return Iteration count for key derivation. <a href="https://www.baeldung.com/java-secure-aes-key">AES Keys</a>
+   *         <p>
+   *         2023/05: at least 1000
+   *         <p>
+   *         Do not confuse this parameter with {@link #MIN_PASSWORD_HASH_ITERATIONS}. This parameter is used to derive
+   *         a PBEKey for {@link #encrypt(InputStream, OutputStream, EncryptionKey)} whereas
+   *         {@link #MIN_PASSWORD_HASH_ITERATIONS} is used to hash single passwords in a table that is potentially
+   *         exposed to a rainbow attack.
    */
   protected int getKeyDerivationIterationCount() {
     return 3557;
@@ -361,7 +434,6 @@ public class SunSecurityProvider implements ISecurityProvider {
     // Use ECDSA for compatibility with Java 11.
     // EdDSA with Curve25519 may be used in Java >= 15
     // Also consider XMSS in future releases if available by JDK
-
     // The Elliptic Curve Digital Signature Algorithm as defined in ANSI X9.62.
     return "SHA512withECDSA";
   }
@@ -388,6 +460,10 @@ public class SunSecurityProvider implements ISecurityProvider {
    * @see #getKeyPairGenerationAlgorithm()
    */
   protected String getEllipticCurveName() {
+    // For compatibility issues see getSignatureAlgorithm.
+    // Verified with pentest specialist 2023/05: This curve is still ok since the open source version
+    // of scout is running with java 11.
+    // Once java 15 is the baseline then the Curve25519 and Ed448-Goldilocks will be incorporated.
     return "secp256r1"; // aka 'prime256v1', aka 'NIST P-256'
   }
 
@@ -511,5 +587,29 @@ public class SunSecurityProvider implements ISecurityProvider {
       return "Error: " + e;
     }
     return sw.toString();
+  }
+
+  /**
+   * Print security report
+   */
+  @Override
+  public String toString() {
+    return "Implementor: " + getClass().getName() + "\n"
+        + "MinPasswordHashIterations: " + MIN_PASSWORD_HASH_ITERATIONS + "\n"
+        + "MacAlgorithm: " + getMacAlgorithm() + "\n"
+        + "MacAlgorithmProvider: " + getMacAlgorithmProvider() + "\n"
+        + "KeyDerivationIterationCount (PBE): " + getKeyDerivationIterationCount() + "\n"
+        + "SignatureAlgorithm: " + getSignatureAlgorithm() + "\n"
+        + "SignatureProvider: " + getSignatureProvider() + "\n"
+        + "KeyPairGenerationAlgorithm: " + getKeyPairGenerationAlgorithm() + "\n"
+        + "EllipticCurveName: " + getEllipticCurveName() + "\n"
+        + "DigestAlgorithm: " + getDigestAlgorithm() + "\n"
+        + "DigestAlgorithmProvider: " + getDigestAlgorithmProvider() + "\n"
+        + "SecretKeyAlgorithm: " + getSecretKeyAlgorithm() + "\n"
+        + "PasswordHashSecretKeyAlgorithm: " + getPasswordHashSecretKeyAlgorithm() + "\n"
+        + "CipherAlgorithm: " + getCipherAlgorithm() + "\n"
+        + "CipherAlgorithmProvider: " + getCipherAlgorithmProvider() + "\n"
+        + "CipherAlgorithmMode: " + getCipherAlgorithmMode() + "\n"
+        + "CipherAlgorithmPadding: " + getCipherAlgorithmPadding() + "\n";
   }
 }

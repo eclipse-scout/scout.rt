@@ -9,7 +9,9 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -18,6 +20,7 @@ import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
@@ -306,5 +309,31 @@ public class SecurityUtilityTest {
     final byte[] encrypted = Base64Utility.decode("43aysPcKhTvyzZIWa6d1wwntGobQOXT38VU=");
     final byte[] salt = Base64Utility.decode("iPENJpMTU8MxarL8ZMHxXw==");
     Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));
+    EncryptionKey key = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(encrypted), 6), PASSWORD, salt, 128, null);
+    Assert.assertEquals("[1:128-PBKDF2WithHmacSHA256-AES-SunJCE-16-128-3557]", new String(key.getCompatibilityHeader(), StandardCharsets.US_ASCII));
+    Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, key), ENCODING));
+  }
+
+  @Test
+  public void testExtractCompatibilityHeader() {
+    PushbackInputStream in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{0, 1, 2, 3, 4, 5}), 6);
+    Assert.assertNull(SecurityUtility.extractCompatibilityHeader(in));
+    Assert.assertArrayEquals(new byte[]{0, 1, 2, 3, 4, 5}, IOUtility.readBytes(in));
+
+    in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{'[', 1, 2, 3, -1, ':'}), 6);
+    Assert.assertNull(SecurityUtility.extractCompatibilityHeader(in));
+    Assert.assertArrayEquals(new byte[]{'[', 1, 2, 3, -1, ':'}, IOUtility.readBytes(in));
+
+    in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{'[', '1', '2', '3', '0', ':'}), 6);
+    Assert.assertArrayEquals(new byte[]{'[', 49, 50, 51, 48, ':'}, SecurityUtility.extractCompatibilityHeader(in));
+    Assert.assertArrayEquals(new byte[]{}, IOUtility.readBytes(in));
+
+    in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{'[', '1', '2', '3', '0', 77, 78, 79}), 6);
+    Assert.assertNull(SecurityUtility.extractCompatibilityHeader(in));
+    Assert.assertArrayEquals(new byte[]{'[', '1', '2', '3', '0', 77, 78, 79}, IOUtility.readBytes(in));
+
+    in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{'[', '1', '2', '3', '0', ':', 0, ']', 78, 79}), 6);
+    Assert.assertArrayEquals(new byte[]{'[', '1', '2', '3', '0', ':', 0, ']'}, SecurityUtility.extractCompatibilityHeader(in));
+    Assert.assertArrayEquals(new byte[]{78, 79}, IOUtility.readBytes(in));
   }
 }

@@ -32,13 +32,35 @@ public interface ISecurityProvider {
   /**
    * Specifies the minimum of password hash iterations with PBKDF2-HMAC-SHA512.
    * <p>
-   * https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+   * <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">PBKDF2</a>
    */
   int MIN_PASSWORD_HASH_ITERATIONS_2016 = 10000;
   int MIN_PASSWORD_HASH_ITERATIONS_2019 = 20000;
   int MIN_PASSWORD_HASH_ITERATIONS_2021 = 120000;
+  int MIN_PASSWORD_HASH_ITERATIONS_2023 = 210000;
+  int MIN_PASSWORD_HASH_ITERATIONS = MIN_PASSWORD_HASH_ITERATIONS_2023;
 
-  int MIN_PASSWORD_HASH_ITERATIONS = MIN_PASSWORD_HASH_ITERATIONS_2021;
+  /**
+   * <pre>
+     secretKeyAlgorithm: PBKDF2WithHmacSHA256
+     cipherAlgorithm/Provider: AES/SunJCE
+     GCM init vector length: 16
+     GCM auth tag bit length: 128
+     key derivation iteration count: 3557
+   * </pre>
+   */
+  String ENCRYPTION_COMPATIBILITY_HEADER_2021_V1 = "[2021:v1]";
+  /**
+   * <pre>
+   secretKeyAlgorithm: PBKDF2WithHmacSHA256
+   cipherAlgorithm/Provider: AES/SunJCE
+   GCM init vector length: 16
+   GCM auth tag bit length: 128
+   key derivation iteration count: 3557
+   * </pre>
+   */
+  String ENCRYPTION_COMPATIBILITY_HEADER_2023_V1 = "[2023:v1]";
+  String ENCRYPTION_COMPATIBILITY_HEADER = ENCRYPTION_COMPATIBILITY_HEADER_2023_V1;
 
   /**
    * Create a Message Authentication Code (MAC) for the given data and password.
@@ -187,6 +209,9 @@ public interface ISecurityProvider {
     if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS))) {
       return true;
     }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2021))) {
+      return true;
+    }
     if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2019))) {
       return true;
     }
@@ -242,8 +267,12 @@ public interface ISecurityProvider {
   void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key);
 
   /**
-   * Creates a new {@link EncryptionKey} to be used with {@link #encrypt(InputStream, OutputStream, EncryptionKey)} or
-   * {@link #decrypt(InputStream, OutputStream, EncryptionKey)}.
+   * Creates a new {@link EncryptionKey} to be only used with
+   * {@link #encrypt(InputStream, OutputStream, EncryptionKey)}.
+   * <p>
+   * Warning: This key must only be used for encryption. Decryption must be backwards compatible and uses meta
+   * parameters stored at beginning of stream. Therefore never use an {@link EncryptionKey} directly to decrypt but
+   * always with {@link SecurityUtility#decrypt(byte[], char[], byte[], int, EncryptionKey)}
    *
    * @param password
    *          The password to use to create the key. Must not be {@code null} or empty.
@@ -254,7 +283,7 @@ public interface ISecurityProvider {
    *          alongside the encrypted data.
    * @param keyLen
    *          The length of the key (in bits). Must be one of 128, 192 or 256.
-   * @return The {@link EncryptionKey} used to encrypt or decrypt data.
+   * @return The {@link EncryptionKey} used to encrypt data.
    * @throws AssertionException
    *           If one of the following conditions is {@code true}:<br>
    *           <ul>
@@ -263,9 +292,40 @@ public interface ISecurityProvider {
    *           <li>The key length is not valid.</li>
    *           </ul>
    * @see #encrypt(InputStream, OutputStream, EncryptionKey)
-   * @see #decrypt(InputStream, OutputStream, EncryptionKey)
    */
   EncryptionKey createEncryptionKey(char[] password, byte[] salt, int keyLen);
+
+  /**
+   * Creates a backward compatible {@link EncryptionKey} that can be used in
+   * {@link #decrypt(InputStream, OutputStream, EncryptionKey)}
+   *
+   * @param password
+   *          The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *          random salt for each key! Salts may not be shared by several keys. Use
+   *          {@link #createSecureRandomBytes(int)} to generate a new salt. It is safe to store the salt in clear text
+   *          alongside the encrypted data.
+   * @param keyLen
+   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @param compatibilityHeader
+   *          that was created when encrypting, see {@link EncryptionKey#getCompatibilityHeader()}
+   * @return The {@link EncryptionKey} used to decrypt data.
+   * @throws AssertionException
+   *           If one of the following conditions is {@code true}:<br>
+   *           <ul>
+   *           <li>The password is {@code null} or an empty array</li>
+   *           <li>The salt is {@code null} or an empty array</li>
+   *           <li>The key length is not valid.</li>
+   *           </ul>
+   * @see #decrypt(InputStream, OutputStream, EncryptionKey)
+   *      <p>
+   *      Implementors of this interface should implement this method in a way that backward compatibility is
+   *      guaranteed.
+   */
+  default EncryptionKey createDecryptionKey(char[] password, byte[] salt, int keyLen, byte[] compatibilityHeader) {
+    return createEncryptionKey(password, salt, keyLen);
+  }
 
   /**
    * Creates a new secure random instance. The returned instance has already been seeded and is ready to use.
