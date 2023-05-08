@@ -621,6 +621,7 @@ export * from './tree/keystrokes/CompactTreeLeftKeyStroke';
 export * from './tree/keystrokes/CompactTreeRightKeyStroke';
 export * from './calendar/ResourcesPanel';
 export * from './calendar/CalendarSidebar';
+export * from './calendar/CalendarSidebarLayout';
 export * from './form/fields/fields';
 export * from './form/fields/AppLinkKeyStroke';
 export * from './form/fields/SelectAllTextInFieldKeyStroke';
