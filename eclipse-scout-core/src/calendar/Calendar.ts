@@ -859,7 +859,7 @@ export class Calendar extends Widget implements CalendarModel {
       gridPaddingX = this.$grid.innerWidth() - this.$grid.width(),
       gridW = containerW - gridPaddingX;
 
-    // show or hide year
+    // show or hide calendar sidebar
     $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
     $('.calendar-toggle-resources', this.$commands).select(this._showResourcesPanel);
     this.yearPanel.setVisible(this._showYearPanel);
@@ -868,8 +868,10 @@ export class Calendar extends Widget implements CalendarModel {
       this.calendarSidebar.$container.data('new-width', this.calendarToggleYearWidth);
       gridW -= this.calendarToggleYearWidth;
       containerW -= this.calendarToggleYearWidth;
+      this.calendarSidebar.invalidateLayoutTree(false);
     } else {
       this.calendarSidebar.$container.data('new-width', 0);
+      this.calendarSidebar.invalidateLayoutTree(false);
     }
 
     // show or hide work list
