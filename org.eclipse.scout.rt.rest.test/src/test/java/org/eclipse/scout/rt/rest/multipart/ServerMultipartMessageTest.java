@@ -24,40 +24,27 @@ import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.junit.Test;
 
 /**
- * Test for {@link MultipartMessageBodyReader}.
+ * Test for {@link ServerMultipartMessage}.
  */
-public class MultipartMessageBodyReaderTest {
-
-  @Test
-  public void testIsReadable() {
-    MultipartMessageBodyReader reader = new MultipartMessageBodyReader();
-    assertFalse(reader.isReadable(String.class, null, null, MediaType.MULTIPART_FORM_DATA_TYPE)); // wrong class
-    assertFalse(reader.isReadable(IMultipartPart.class, null, null, MediaType.MULTIPART_FORM_DATA_TYPE)); // wrong class
-    assertFalse(reader.isReadable(IMultipartMessage.class, null, null, MediaType.TEXT_PLAIN_TYPE)); // wrong media type
-    assertTrue(reader.isReadable(IMultipartMessage.class, null, null, MediaType.MULTIPART_FORM_DATA_TYPE)); // correct
-  }
+public class ServerMultipartMessageTest {
 
   @Test
   public void testReadFromNoBoundaryInMediaType() {
-    MultipartMessageBodyReader reader = new MultipartMessageBodyReader();
     MediaType mediaType = MediaType.MULTIPART_FORM_DATA_TYPE;
-    assertThrows(AssertionException.class, () -> reader.readFrom(null, null, null, mediaType, null, getMultipartRequestInputStream()));
+    assertThrows(AssertionException.class, () -> new ServerMultipartMessage(mediaType, getMultipartRequestInputStream()));
   }
 
   @Test
   public void testReadFromInvalidBoundaryInMediaType() {
-    MultipartMessageBodyReader reader = new MultipartMessageBodyReader();
     MediaType mediaType = new MediaType(MediaType.MULTIPART_FORM_DATA_TYPE.getType(), MediaType.MULTIPART_FORM_DATA_TYPE.getSubtype(), CollectionUtility.hashMap(ImmutablePair.of("boundary", "loremipsum")));
-    assertThrows(AssertionException.class, () -> reader.readFrom(null, null, null, mediaType, null, getMultipartRequestInputStream()));
+    assertThrows(AssertionException.class, () -> new ServerMultipartMessage(mediaType, getMultipartRequestInputStream()));
   }
 
   @Test
   public void testReadFromValid() throws Exception {
-    MultipartMessageBodyReader reader = new MultipartMessageBodyReader();
-
     String boundary = "3372ccc6dada4847b1893ff57a81e553"; // boundary as used in .txt file
     MediaType mediaType = new MediaType(MediaType.MULTIPART_FORM_DATA_TYPE.getType(), MediaType.MULTIPART_FORM_DATA_TYPE.getSubtype(), CollectionUtility.hashMap(ImmutablePair.of("boundary", boundary)));
-    IMultipartMessage multipartMessage = reader.readFrom(null, null, null, mediaType, null, getMultipartRequestInputStream());
+    IMultipartMessage multipartMessage = IMultipartMessage.of(mediaType, getMultipartRequestInputStream()); // use IMultipartMessage to test delegation too
     assertNotNull(multipartMessage);
 
     assertTrue(multipartMessage.hasNext());
@@ -114,7 +101,7 @@ public class MultipartMessageBodyReaderTest {
 
   protected ByteArrayInputStream getMultipartRequestInputStream() {
     // file contains \n only, replace by \r\n as the HTTP line delimiter is using \r\n too (except the plain text bytes)
-    String multipartRequest = IOUtility.readStringUTF8(MultipartMessageBodyReaderTest.class.getResourceAsStream("MultipartRequest.txt"))
+    String multipartRequest = IOUtility.readStringUTF8(ServerMultipartMessageTest.class.getResourceAsStream("MultipartRequest.txt"))
         .replaceAll("\n", "\r\n")
         .replaceFirst("lorem ipsum dolor\r\nsit amet", "lorem ipsum dolor\nsit amet");
 
