@@ -138,9 +138,9 @@ export const scout = {
    * to the function. Throws an error when value is not set.
    *
    * @param type if this optional parameter is set, the given value must be of this type (instanceof check)
-   * @returns the value
+   * @returns the value (for direct assignment)
    */
-  assertParameter<T>(parameterName: string, value?: T, type?: new(...args) => any): T {
+  assertParameter<T>(parameterName: string, value?: T, type?: abstract new(...args) => any): T {
     if (objects.isNullOrUndefined(value)) {
       throw new Error('Missing required parameter \'' + parameterName + '\'');
     }
@@ -156,7 +156,7 @@ export const scout = {
    * @param type if this parameter is set, the value must be of this type (instanceof check)
    * @returns the value (for direct assignment)
    */
-  assertProperty(object: object, propertyName: string, type?: new(...args) => any) {
+  assertProperty(object: object, propertyName: string, type?: abstract new(...args) => any) {
     let value = object[propertyName];
     if (objects.isNullOrUndefined(value)) {
       throw new Error('Missing required property \'' + propertyName + '\'');
@@ -187,7 +187,7 @@ export const scout = {
    * @param type type to check against with "instanceof"
    * @param msg optional error message when the assertion fails
    */
-  assertInstance<T>(value: any, type: new(...args) => T, msg?: string): T {
+  assertInstance<T>(value: any, type: abstract new(...args) => T, msg?: string): T {
     if (!(value instanceof type)) {
       throw new Error(msg || 'Value has wrong type');
     }
