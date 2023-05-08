@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {HtmlComponent, InitModelOf, ResourcesPanel, scout, Splitter, Widget, YearPanel} from '../index';
+import {CalendarSidebarLayout, HtmlComponent, InitModelOf, ResourcesPanel, scout, Splitter, Widget, YearPanel} from '../index';
 
 export class CalendarSidebar extends Widget {
   yearPanel: YearPanel;
@@ -31,19 +31,29 @@ export class CalendarSidebar extends Widget {
     });
     this.splitter = scout.create(Splitter, {
       parent: this,
-      splitHorizontal: false
+      splitHorizontal: false,
+      cssClass: 'line'
     });
     this.resourcesPanel = scout.create(ResourcesPanel, {
       parent: this,
       checkable: true
     });
+
+    this.splitter.on('positionChange', this._onSplitterPositionChange.bind(this));
+
   }
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('calendar-sidebar');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(new CalendarSidebarLayout(this));
+    this.htmlComp.invalidateLayoutTree(false);
     this.yearPanel.render();
     this.splitter.render();
     this.resourcesPanel.render();
+  }
+
+  _onSplitterPositionChange(event) {
+    this.invalidateLayoutTree(false);
   }
 }

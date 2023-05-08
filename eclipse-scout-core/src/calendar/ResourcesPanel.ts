@@ -18,12 +18,16 @@ export class ResourcesPanel extends Widget {
       parent: this,
       checkable: true
     });
+
+    this.tree.insertNode({
+      text: 'test',
+      leaf: false
+    });
   }
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('resources-panel-container');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
-    this.$container.appendSpan().text("test");
     this.tree.render();
   }
 }
