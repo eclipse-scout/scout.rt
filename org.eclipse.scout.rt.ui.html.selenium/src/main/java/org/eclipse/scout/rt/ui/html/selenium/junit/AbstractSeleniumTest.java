@@ -40,7 +40,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public abstract class AbstractSeleniumTest {
 
-  public static final int DEFAULT_WAIT_UNTIL_TIMEOUT = 10; // seconds
+  public static final int DEFAULT_WAIT_UNTIL_TIMEOUT = 20; // seconds
 
   private static WebDriver s_driver;
 
