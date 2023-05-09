@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {StaticLookupCall} from '@eclipse-scout/core';
+import {StaticLookupCall} from '../../index';
 
 export class ErroneousLookupCall extends StaticLookupCall<any> {
   protected override _queryByAll() {
