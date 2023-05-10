@@ -1514,13 +1514,14 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   getValidationResult(): ValidationResult {
-    let validByErrorStatus = !this._errorStatus();
-    let validByMandatory = !this.mandatory || !this.empty;
-    let valid = validByErrorStatus && validByMandatory;
+    const errorStatus = this._errorStatus(),
+      validByErrorStatus = !errorStatus || errorStatus.isValid(),
+      validByMandatory = !this.mandatory || !this.empty,
+      valid = validByErrorStatus && validByMandatory;
     return {
-      valid: valid,
-      validByErrorStatus: validByErrorStatus,
-      validByMandatory: validByMandatory,
+      valid,
+      validByMandatory,
+      errorStatus,
       field: this,
       label: this.label,
       reveal: () => {
@@ -1625,8 +1626,8 @@ export type FormFieldAlignmentUpdateOptions = {
 };
 export type ValidationResult = {
   valid: boolean;
-  validByErrorStatus: boolean;
   validByMandatory: boolean;
+  errorStatus?: Status;
   field: FormField;
   label: string;
   reveal: () => void;

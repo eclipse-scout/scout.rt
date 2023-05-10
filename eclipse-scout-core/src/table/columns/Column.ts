@@ -1008,14 +1008,14 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     }
   }
 
-  isContentValid(row: TableRow): { valid: boolean; validByErrorStatus: boolean; validByMandatory: boolean } {
-    let cell = this.cell(row);
-    let validByErrorStatus = !cell.errorStatus || cell.errorStatus.severity !== Status.Severity.ERROR;
-    let validByMandatory = !cell.mandatory || this._hasCellValue(cell);
+  isContentValid(row: TableRow): { valid: boolean; validByMandatory: boolean; errorStatus: Status } {
+    const cell = this.cell(row),
+      validByErrorStatus = !cell.errorStatus || cell.errorStatus.isValid(),
+      validByMandatory = !cell.mandatory || this._hasCellValue(cell);
     return {
       valid: validByErrorStatus && validByMandatory,
-      validByErrorStatus: validByErrorStatus,
-      validByMandatory: validByMandatory
+      validByMandatory,
+      errorStatus: cell.errorStatus
     };
   }
 

@@ -17,4 +17,8 @@ export class SpecLifecycle extends FormLifecycle {
   override _createInvalidElementsMessageHtml(missing: ValidationResult[], invalid: ValidationResult[]): string {
     return super._createInvalidElementsMessageHtml(missing, invalid);
   }
+
+  override _showStatusMessageBox(status: Status): JQuery.Promise<Status> {
+    return super._showStatusMessageBox(status);
+  }
 }

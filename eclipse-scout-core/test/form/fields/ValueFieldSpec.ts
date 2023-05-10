@@ -691,7 +691,7 @@ describe('ValueField', () => {
       field.setErrorStatus(errorStatus);
       let result = field.getValidationResult();
       expect(result.valid).toBe(false);
-      expect(result.validByErrorStatus).toBe(false);
+      expect(result.errorStatus).toBe(errorStatus);
 
       field.setErrorStatus(null);
       field.setMandatory(true);

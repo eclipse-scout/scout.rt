@@ -24,7 +24,10 @@ export class FormSpecHelper {
     }
     let $messageBoxButtons = this.session.$entryPoint.find('.messagebox .box-button');
     for (let i = 0; i < $messageBoxButtons.length; i++) {
-      scout.widget($messageBoxButtons[i], Action).doAction();
+      const button = scout.widget($messageBoxButtons[i], Action);
+      if (button) {
+        button.doAction();
+      }
     }
   }
 
