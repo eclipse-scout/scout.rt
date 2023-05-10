@@ -18,8 +18,11 @@ export interface LifecycleModel extends ObjectModel<Lifecycle<any>> {
   emptyMandatoryElementsTextKey?: string;
   emptyMandatoryElementsText?: string;
 
-  invalidElementsTextKey?: string;
-  invalidElementsText?: string;
+  invalidElementsErrorTextKey?: string;
+  invalidElementsErrorText?: string;
+
+  invalidElementsWarningTextKey?: string;
+  invalidElementsWarningText?: string;
 
   askIfNeedSave?: boolean;
   saveChangesQuestionTextKey?: string;

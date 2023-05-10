@@ -180,7 +180,7 @@ export class TableField extends FormField implements TableFieldModel {
       return desc;
     }
 
-    let validByErrorStatus = !this.errorStatus;
+    let errorStatus = this.errorStatus;
     let validByMandatory = !this.mandatory || !this.empty;
 
     // check cells
@@ -191,7 +191,7 @@ export class TableField extends FormField implements TableFieldModel {
     };
     let label = this.label || '';
 
-    rows.some(function(row) {
+    rows.some(row => {
       return columns.some(column => {
         let ret = column.isContentValid(row);
         if (!ret.valid) {
@@ -203,18 +203,24 @@ export class TableField extends FormField implements TableFieldModel {
             label += ': ';
           }
           label += column.text;
-          validByErrorStatus = validByErrorStatus && ret.validByErrorStatus;
+          if (!errorStatus) {
+            errorStatus = ret.errorStatus;
+          } else if (ret.errorStatus && ret.errorStatus.severity > errorStatus.severity) {
+            errorStatus = ret.errorStatus;
+          }
           validByMandatory = validByMandatory && ret.validByMandatory;
-          return !(validByErrorStatus || validByMandatory);
+
+          return errorStatus && errorStatus.isError() && !validByMandatory;
         }
         return false;
-      }, this);
-    }, this);
+      });
+    });
 
+    const validByErrorStatus = !errorStatus || errorStatus.isValid();
     return {
       valid: validByErrorStatus && validByMandatory,
-      validByErrorStatus: validByErrorStatus,
-      validByMandatory: validByMandatory,
+      validByMandatory,
+      errorStatus,
       field: this,
       label: label,
       reveal: reveal

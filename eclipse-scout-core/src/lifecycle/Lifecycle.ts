@@ -7,17 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, MessageBox, MessageBoxes, objects, ObjectWithType, scout, Session, SomeRequired, Status, Widget} from '../index';
+import {arrays, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, MessageBox, MessageBoxes, objects, ObjectWithType, scout, Session, SomeRequired, Status, StatusSeverity, Widget} from '../index';
 import $ from 'jquery';
 
 /**
  * Abstract base class for validation lifecycles as used for forms.
  * A subclass must set the properties, in order to display messages:
  * - emptyMandatoryElementsTextKey
- * - invalidElementsTextKey
+ * - invalidElementsErrorTextKey
+ * - invalidElementsWarningTextKey
  * - saveChangesQuestionTextKey
  */
-export abstract class Lifecycle<TValidationResult> extends EventEmitter implements LifecycleModel, ObjectWithType {
+export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status }> extends EventEmitter implements LifecycleModel, ObjectWithType {
   declare model: LifecycleModel;
   declare initModel: SomeRequired<this['model'], 'widget'>;
   declare eventMap: LifecycleEventMap<TValidationResult>;
@@ -29,8 +30,10 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
   validationFailedText: string;
   emptyMandatoryElementsTextKey: string;
   emptyMandatoryElementsText: string;
-  invalidElementsTextKey: string;
-  invalidElementsText: string;
+  invalidElementsErrorTextKey: string;
+  invalidElementsErrorText: string;
+  invalidElementsWarningTextKey: string;
+  invalidElementsWarningText: string;
   saveChangesQuestionTextKey: string;
   askIfNeedSave: boolean;
   askIfNeedSaveText: string;
@@ -44,8 +47,10 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
     this.validationFailedText = null;
     this.emptyMandatoryElementsTextKey = null;
     this.emptyMandatoryElementsText = null;
-    this.invalidElementsTextKey = null;
-    this.invalidElementsText = null;
+    this.invalidElementsErrorTextKey = null;
+    this.invalidElementsErrorText = null;
+    this.invalidElementsWarningTextKey = null;
+    this.invalidElementsWarningText = null;
     this.saveChangesQuestionTextKey = null;
     this.askIfNeedSave = true;
     this.askIfNeedSaveText = null;
@@ -66,8 +71,11 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
     if (objects.isNullOrUndefined(this.emptyMandatoryElementsText)) {
       this.emptyMandatoryElementsText = this.session().text(this.emptyMandatoryElementsTextKey);
     }
-    if (objects.isNullOrUndefined(this.invalidElementsText)) {
-      this.invalidElementsText = this.session().text(this.invalidElementsTextKey);
+    if (objects.isNullOrUndefined(this.invalidElementsErrorText)) {
+      this.invalidElementsErrorText = this.session().text(this.invalidElementsErrorTextKey);
+    }
+    if (objects.isNullOrUndefined(this.invalidElementsWarningText)) {
+      this.invalidElementsWarningText = this.session().text(this.invalidElementsWarningTextKey);
     }
     if (objects.isNullOrUndefined(this.askIfNeedSaveText)) {
       this.askIfNeedSaveText = this.session().text(this.saveChangesQuestionTextKey);
@@ -95,8 +103,8 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
   ok(): JQuery.Promise<void> {
     // 1. validate form
     return this._whenInvalid(this._validate)
-      .then(invalid => {
-        if (invalid) {
+      .then(status => {
+        if (!status.isValid()) {
           return;
         }
 
@@ -107,8 +115,8 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
 
         // 3. perform save operation
         return this._whenInvalid(this._save)
-          .then(invalid => {
-            if (invalid) {
+          .then(status => {
+            if (!status.isValid()) {
               return;
             }
 
@@ -150,17 +158,17 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
   save(): JQuery.Promise<void> {
     // 1. validate form
     return this._whenInvalid(this._validate)
-      .then(invalid => {
+      .then(status => {
 
         // 2. invalid or form has not been changed
-        if (invalid || !this.saveNeeded()) {
+        if (!status.isValid() || !this.saveNeeded()) {
           return;
         }
 
         // 3. perform save operation
         return this._whenInvalid(this._save)
-          .then(invalid => {
-            if (invalid) {
+          .then(status => {
+            if (!status.isValid()) {
               return;
             }
 
@@ -209,11 +217,11 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
    *                    If the status returned by 'func' is absent or Status.Severity.OK, a promise resolved with
    *                    "false" is returned. Otherwise, the promise returned by _showStatusMessageBox() is returned.
    */
-  protected _whenInvalid(func: () => JQuery.Promise<Status>): JQuery.Promise<boolean> {
+  protected _whenInvalid(func: () => JQuery.Promise<Status>): JQuery.Promise<Status> {
     return func.call(this)
       .then(status => {
-        if (!status || status.severity === Status.Severity.OK) {
-          return $.resolvedPromise(false); // invalid=false
+        if (!status || status.isValid()) {
+          return $.resolvedPromise(status || Status.ok());
         }
         return this._showStatusMessageBox(status);
       })
@@ -254,16 +262,32 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
    *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
    *                    By default, a promise that is resolved with "true" is returned.
    */
-  protected _showStatusMessageBox(status: Status): JQuery.Promise<boolean> {
-    return MessageBoxes.createOk(this.widget)
+  protected _showStatusMessageBox(status: Status): JQuery.Promise<Status> {
+    if (!status || status.isValid()) {
+      return $.resolvedPromise(status);
+    }
+
+    return this._createStatusMessageBox(status).buildAndOpen()
+      .then(option => {
+        if (!status.isError() && option === MessageBox.Buttons.YES) {
+          return $.resolvedPromise(Status.ok(status.message));
+        }
+
+        return $.resolvedPromise(status);
+      });
+  }
+
+  protected _createStatusMessageBox(status: Status): MessageBoxes {
+    let messageBoxes = MessageBoxes.createOk(this.widget)
       .withSeverity(status.severity)
       .withHeader(this.validationFailedText)
-      .withBody(status.message, true)
-      .buildAndOpen()
-      .then(() => {
-        let invalid = (status.severity === Status.Severity.ERROR);
-        return $.resolvedPromise(invalid);
-      });
+      .withBody(status.message, true);
+    if (!status.isError()) {
+      messageBoxes = messageBoxes
+        .withYes(this.widget.session.text('ProceedAnyway'))
+        .withNo(this.widget.session.text('Cancel'));
+    }
+    return messageBoxes;
   }
 
   /**
@@ -271,7 +295,7 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
    */
   validate(): JQuery.Promise<boolean> {
     return this._whenInvalid(this._validate)
-      .then(invalid => !invalid);
+      .then(status => status.isValid());
   }
 
   protected _validate(): JQuery.Promise<Status> {
@@ -287,15 +311,15 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
    */
   protected _validateElements(): Status {
     let elements = this.invalidElements();
-    let status = new Status();
     if (elements.missingElements.length === 0 && elements.invalidElements.length === 0) {
-      status.severity = Status.Severity.OK;
-    } else {
-      status.severity = Status.Severity.ERROR;
-      status.message = this._createInvalidElementsMessageHtml(elements.missingElements, elements.invalidElements);
-      this._revealInvalidElement(arrays.first(elements.missingElements) || arrays.first(elements.invalidElements));
+      return Status.ok();
     }
-    return status;
+    const severity = elements.missingElements.length
+        ? Status.Severity.ERROR
+        : arrays.max(elements.invalidElements.map(e => e.errorStatus ? e.errorStatus.severity : 0)) as StatusSeverity,
+      message = this._createInvalidElementsMessageHtml(elements.missingElements, elements.invalidElements);
+    this._revealInvalidElement(arrays.first(elements.missingElements) || arrays.first(elements.invalidElements));
+    return Status.ensure({severity, message});
   }
 
   protected _revealInvalidElement(invalidElement: TValidationResult) {
@@ -326,17 +350,43 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
    * Creates an HTML message used to display missing and invalid fields in a message box.
    */
   protected _createInvalidElementsMessageHtml(missing: TValidationResult[], invalid: TValidationResult[]): string {
-    let $div = $('<div>'),
+    const $div = $('<div>'),
       hasMissing = missing.length > 0,
-      hasInvalid = invalid.length > 0;
+      invalidError = [], invalidWarning = [];
+
+    invalid.forEach(e => {
+      if (!e.errorStatus) {
+        return;
+      }
+      if (e.errorStatus.isError()) {
+        invalidError.push(e);
+      } else if (e.errorStatus.isWarning()) {
+        invalidWarning.push(e);
+      }
+    });
+
+    const hasInvalidError = invalidError.length > 0,
+      hasInvalidWarning = invalidWarning.length > 0;
+
+    let appendBr = false;
+
     if (hasMissing) {
       appendTitleAndList.call(this, $div, this.emptyMandatoryElementsText, missing, this._missingElementText);
+      appendBr = true;
     }
-    if (hasMissing && hasInvalid) {
-      $div.appendElement('<br>');
+    if (hasInvalidError) {
+      if (appendBr) {
+        $div.appendElement('<br>');
+      }
+      appendTitleAndList.call(this, $div, this.invalidElementsErrorText, invalidError, this._invalidElementErrorText);
+      appendBr = true;
     }
-    if (hasInvalid) {
-      appendTitleAndList.call(this, $div, this.invalidElementsText, invalid, this._invalidElementText);
+    if (hasInvalidWarning) {
+      if (appendBr) {
+        $div.appendElement('<br>');
+      }
+      appendTitleAndList.call(this, $div, this.invalidElementsWarningText, invalidWarning, this._invalidElementWarningText);
+      appendBr = true;
     }
     return $div.html();
 
@@ -356,6 +406,14 @@ export abstract class Lifecycle<TValidationResult> extends EventEmitter implemen
    */
   protected _invalidElementText(element: TValidationResult): string {
     return '';
+  }
+
+  protected _invalidElementErrorText(element: TValidationResult): string {
+    return this._invalidElementText(element);
+  }
+
+  protected _invalidElementWarningText(element: TValidationResult): string {
+    return this._invalidElementText(element);
   }
 
   /**

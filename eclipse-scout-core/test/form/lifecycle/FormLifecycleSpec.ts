@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, SpecForm, SpecLifecycle} from '../../../src/testing/index';
-import {FormLifecycle, GroupBox, scout, Status, StringField, TabBox, TabItem, TableField, TreeVisitResult} from '../../../src/index';
+import {FormField, FormLifecycle, GroupBox, MessageBox, MessageBoxOption, scout, Status, StringField, TabBox, TabItem, TableField, TreeVisitResult, ValidationResult} from '../../../src/index';
 import $ from 'jquery';
 
 describe('FormLifecycle', () => {
@@ -57,7 +57,6 @@ describe('FormLifecycle', () => {
       jasmine.clock().tick(0);
       expect(disposed).toBe(true);
     });
-
   });
 
   describe('ok', () => {
@@ -276,29 +275,13 @@ describe('FormLifecycle', () => {
 
     it('should list labels of missing and invalid fields', () => {
       field.setLabel('FooField');
-      let missingFields = [{
-        valid: false,
-        validByErrorStatus: false,
-        validByMandatory: true,
-        field: field,
-        label: field.label,
-        reveal: () => {
-          // nop
-        }
-      }];
-      let invalidField = helper.createField('StringField', session.desktop);
+      const invalidField = helper.createField('StringField', session.desktop);
       invalidField.setLabel('BarField');
-      let invalidFields = [{
-        valid: false,
-        validByErrorStatus: true,
-        validByMandatory: false,
-        field: invalidField,
-        label: invalidField.label,
-        reveal: () => {
-          // nop
-        }
-      }];
-      let html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
+
+      const missingFields = [createValidationResult(field, false)],
+        invalidFields = [createValidationResult(invalidField, true, Status.error())],
+        html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
+
       expect(html).toContain('FooField');
       expect(html).toContain('BarField');
     });
@@ -306,34 +289,69 @@ describe('FormLifecycle', () => {
     it('should list labels of missing and invalid fields with html labels as plain text', () => {
       field.setLabelHtmlEnabled(true);
       field.setLabel('<i>Foo</i><b>Field</b>');
-      let missingFields = [{
-        valid: false,
-        validByErrorStatus: false,
-        validByMandatory: true,
-        field: field,
-        label: field.label,
-        reveal: () => {
-          // nop
-        }
-      }];
-      let invalidField = helper.createField('StringField', session.desktop);
+      const invalidField = helper.createField('StringField', session.desktop);
       invalidField.setLabelHtmlEnabled(true);
       invalidField.setLabel('<b>Bar</b><i>Field</i>');
-      let invalidFields = [{
-        valid: false,
-        validByErrorStatus: true,
-        validByMandatory: false,
-        field: invalidField,
-        label: invalidField.label,
-        reveal: () => {
-          // nop
-        }
-      }];
-      let html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
+
+      const missingFields = [createValidationResult(field, false)],
+        invalidFields = [createValidationResult(invalidField, true, Status.error())],
+        html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
+
       expect(html).toContain('FooField');
       expect(html).toContain('BarField');
     });
 
+    it('should list labels of invalid fields with a warning', () => {
+      field.setLabel('FooField');
+
+      const invalidFields = [createValidationResult(field, true, Status.warning())],
+        html = form.lifecycle._createInvalidElementsMessageHtml([], invalidFields);
+
+      expect(html).toContain('FooField');
+    });
+
+    it('should NOT list labels of invalid fields with a info/ok', () => {
+      field.setLabel('FooField');
+      const barField = helper.createField('StringField', session.desktop);
+      barField.setLabel('BarField');
+
+      const invalidFields = [
+          createValidationResult(field, true, Status.ok()),
+          createValidationResult(barField, true, Status.info())
+        ],
+        html = form.lifecycle._createInvalidElementsMessageHtml([], invalidFields);
+
+      expect(html).not.toContain('FooField');
+      expect(html).not.toContain('BarField');
+    });
+
+    it('should list labels and messages of the errorStatus of invalid fields', () => {
+      field.setLabel('FooField');
+      const barField = helper.createField('StringField', session.desktop),
+        fieldWithoutLabel = helper.createField('StringField', session.desktop),
+        mandatoryFieldWithError = helper.createField('StringField', session.desktop),
+        mandatoryFieldWithWarning = helper.createField('StringField', session.desktop);
+      barField.setLabel('BarField');
+      mandatoryFieldWithError.setLabel('Mandatory with ERROR');
+      mandatoryFieldWithWarning.setLabel('Mandatory with WARNING');
+
+      const missingFields = [
+          createValidationResult(mandatoryFieldWithWarning, false, Status.error('MandatoryFieldWithWarning has a WARNING!!!'))
+        ],
+        invalidFields = [
+          createValidationResult(field, true, Status.warning('FooField has a WARNING!!!')),
+          createValidationResult(barField, true, Status.error()),
+          createValidationResult(fieldWithoutLabel, true, Status.error('FieldWithoutLabel has an ERROR!!!')),
+          createValidationResult(mandatoryFieldWithError, false, Status.error('MandatoryFieldWithError has an ERROR!!!'))
+        ],
+        html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
+
+      expect(html).toContain('<li>Mandatory with WARNING</li>');
+      expect(html).toContain('<li>FooField: \'FooField has a WARNING!!!\'</li>');
+      expect(html).toContain('<li>BarField</li>');
+      expect(html).toContain('<li>\'FieldWithoutLabel has an ERROR!!!\'</li>');
+      expect(html).toContain('<li>Mandatory with ERROR: \'MandatoryFieldWithError has an ERROR!!!\'</li>');
+    });
   });
 
   describe('validation result', () => {
@@ -418,5 +436,148 @@ describe('FormLifecycle', () => {
       expect(invalidElements.missingElements.length).toBe(1);
       expect(invalidElements.missingElements[0].field).toBe(field1);
     });
+
+    it('has severity ERROR if mandatory field is missing', async () => {
+      jasmine.clock().uninstall();
+
+      field.setMandatory(true);
+      field.setValue(null);
+
+      let status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.ERROR);
+
+      field.setErrorStatus(Status.ok());
+      status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.ERROR);
+
+      field.setErrorStatus(Status.warning());
+      status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.ERROR);
+
+      field.setErrorStatus(Status.error());
+      status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.ERROR);
+    });
+
+    it('has max severity of all invalid fields', async () => {
+      jasmine.clock().uninstall();
+
+      const field2 = helper.createField(StringField, form.rootGroupBox);
+      form.rootGroupBox.insertField(field2);
+
+      let status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.OK);
+
+      field.setErrorStatus(Status.ok());
+      status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.OK);
+
+      field2.setErrorStatus(Status.warning());
+      status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.WARNING);
+
+      field.setErrorStatus(Status.info());
+      status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.WARNING);
+
+      field2.clearErrorStatus();
+      status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      // errorStatus with severity INFO will not be transferred to the validationResult as it is considered valid
+      // -> validation gives OK
+      expect(status.severity).toBe(Status.Severity.OK);
+
+      field2.setErrorStatus(Status.error());
+      status = await form.lifecycle._validate();
+      expect(status).not.toBeNull();
+      expect(status.severity).toBe(Status.Severity.ERROR);
+    });
   });
+
+  describe('statusMessageBox', () => {
+
+    it('converts WARNING to OK on yes', done => {
+      form.lifecycle._showStatusMessageBox(Status.warning())
+        .then(status => {
+          expect(status).not.toBeNull();
+          expect(status.severity).toBe(Status.Severity.OK);
+        })
+        .catch(fail)
+        .always(done);
+      jasmine.clock().tick(0);
+      expectMessageBox(true);
+      closeMessageBoxes(MessageBox.Buttons.YES);
+      jasmine.clock().tick(1000);
+    });
+
+    it('keeps WARNING on no', done => {
+      form.lifecycle._showStatusMessageBox(Status.warning())
+        .then(status => {
+          expect(status).not.toBeNull();
+          expect(status.severity).toBe(Status.Severity.WARNING);
+        })
+        .catch(fail)
+        .always(done);
+      jasmine.clock().tick(0);
+      expectMessageBox(true);
+      closeMessageBoxes(MessageBox.Buttons.NO);
+      jasmine.clock().tick(1000);
+    });
+
+    it('keeps ERROR on yes', done => {
+      form.lifecycle._showStatusMessageBox(Status.error())
+        .then(status => {
+          expect(status).not.toBeNull();
+          expect(status.severity).toBe(Status.Severity.ERROR);
+        })
+        .catch(fail)
+        .always(done);
+      jasmine.clock().tick(0);
+      expectMessageBox(true);
+      closeMessageBoxes(MessageBox.Buttons.YES);
+      jasmine.clock().tick(1000);
+    });
+
+    it('return status if it is valid', async () => {
+      jasmine.clock().uninstall();
+      const info = Status.info();
+      const status = await form.lifecycle._showStatusMessageBox(info);
+      expect(status).toBe(info);
+    });
+
+    function closeMessageBoxes(option: MessageBoxOption) {
+      if (!session || !session.$entryPoint) {
+        return;
+      }
+      const $messageBoxes = session.$entryPoint.find('.messagebox');
+      for (let i = 0; i < $messageBoxes.length; i++) {
+        const messageBox = scout.widget($messageBoxes[i], MessageBox);
+        if (!messageBox) {
+          return;
+        }
+        messageBox.trigger('action', {option});
+      }
+    }
+  });
+
+  function createValidationResult(field: FormField, validByMandatory: boolean, errorStatus?: Status): ValidationResult {
+    return {
+      valid: validByMandatory && (!errorStatus || errorStatus.isValid()),
+      validByMandatory,
+      errorStatus,
+      field,
+      label: field && field.label,
+      reveal: () => {
+        // nop
+      }
+    };
+  }
 });

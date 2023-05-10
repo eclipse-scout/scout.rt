@@ -460,9 +460,8 @@ describe('Form', () => {
         // Form has to close (warning state is not supported yet in Scout JS)
         return {
           valid: true,
-          validByErrorStatus: true,
           validByMandatory: true,
-          field: field,
+          field,
           label: field.label,
           reveal: () => {
             // nop
@@ -1100,9 +1099,8 @@ describe('Form', () => {
         fieldB3 = form.widget('FieldB3'),
         createValidationResult = field => ({
           valid: false,
-          validByErrorStatus: true,
           validByMandatory: true,
-          field: field,
+          field,
           label: field.label,
           reveal: () => {
             fields.selectAllParentTabsOf(field);
