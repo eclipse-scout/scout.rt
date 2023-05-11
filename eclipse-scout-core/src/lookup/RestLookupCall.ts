@@ -164,7 +164,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
     this._ajaxCall = this._createAjaxCall();
 
     this._ajaxCall.call()
-      .then((data, textStatus, jqXHR) => {
+      .then((data: LookupResponse, textStatus, jqXHR) => {
         let lookupRows = arrays.ensure(data ? data.rows : null)
           .filter(this._acceptLookupRow.bind(this))
           .map(this._createLookupRowFromDo.bind(this));
@@ -246,7 +246,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 }
 
 /**
- * @see AbstractLookupRowDo.java
+ * @see "AbstractLookupRowDo.java"
  */
 export interface LookupRowDo<Key> extends DoEntity {
   id: Key;
@@ -258,4 +258,11 @@ export interface LookupRowDo<Key> extends DoEntity {
   iconId: string;
   cssClass: string;
   additionalTableRowData: any;
+}
+
+/**
+ * @see "LookupResponse.java"
+ */
+export interface LookupResponse<TLookupRow = LookupRowDo<any>> extends DoEntity {
+  rows: TLookupRow[];
 }
