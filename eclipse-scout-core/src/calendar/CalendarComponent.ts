@@ -429,6 +429,7 @@ export type CalendarItem = {
   itemId: any;
   owner: string;
   cssClass: string;
+  calendarId: number;
   subject: string;
   description: string;
   recurrencePattern: {

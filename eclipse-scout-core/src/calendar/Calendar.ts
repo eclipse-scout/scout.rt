@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent,
-  InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcesPanel, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox,
+  HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcesPanel, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel,
+  YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -62,6 +63,7 @@ export class Calendar extends Widget implements CalendarModel {
   selectorEnd: Date;
   showDisplayModeSelection: boolean;
   rangeSelectionAllowed: boolean;
+  calendars: CalendarDescriptor[];
   title: string;
   useOverflowCells: boolean;
   viewRange: DateRange;

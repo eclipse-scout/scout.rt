@@ -21,7 +21,9 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarUIFacade;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.Range;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarDescriptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
@@ -141,6 +143,18 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
         return getModel().getTitle();
       }
     });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_CALENDARS, model) {
+      @Override
+      protected List<ICalendarDescriptor> modelValue() {
+        return getModel().getCalendars();
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return calendarDescriptorsToJsonArray(((List<ICalendarDescriptor>) value));
+      }
+    });
     putJsonProperty(new JsonProperty<>(ICalendar.PROP_VIEW_RANGE, model) {
       @Override
       protected Range<Date> modelValue() {
@@ -229,6 +243,17 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       return null;
     }
     return (JsonCalendarComponent<C>) getUiSession().getJsonAdapter(adapterId);
+  }
+
+  protected JSONArray calendarDescriptorsToJsonArray(List<ICalendarDescriptor> descriptors) {
+    JSONArray array = new JSONArray();
+    if (!CollectionUtility.hasElements(descriptors)) {
+      return array;
+    }
+    for (ICalendarDescriptor descriptor : descriptors) {
+      array.put(new JsonCalendarDescriptor(descriptor));
+    }
+    return array;
   }
 
   @Override
