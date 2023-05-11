@@ -373,6 +373,7 @@ export * from './menu/menubar/MenuBarBox';
 export * from './menu/menubar/MenuBarBoxModel';
 export * from './menu/menubar/MenuBarBoxEventMap';
 export * from './menu/menubar/MenuBarBoxLayout';
+export * from './calendar/CalendarDescriptor';
 export * from './calendar/Calendar';
 export * from './calendar/CalendarEventMap';
 export * from './calendar/CalendarModel';

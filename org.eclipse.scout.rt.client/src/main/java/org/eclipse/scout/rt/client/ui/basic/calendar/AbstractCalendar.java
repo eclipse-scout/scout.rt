@@ -64,6 +64,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarDescriptor;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -517,6 +518,16 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   @Override
   public void setDisplayCondensed(boolean condensed) {
     propertySupport.setPropertyBool(PROP_DISPLAY_CONDENSED, condensed);
+  }
+
+  @Override
+  public List<ICalendarDescriptor> getCalendars() {
+    return propertySupport.getPropertyList(PROP_CALENDARS);
+  }
+
+  @Override
+  public void setCalendars(List<ICalendarDescriptor> calendars) {
+    propertySupport.setPropertyList(PROP_CALENDARS, calendars);
   }
 
   @Override

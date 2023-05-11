@@ -36,6 +36,10 @@ public interface ICalendarItem {
    */
   boolean isIntersecting(Date minDate, Date maxDate);
 
+  long getCalendarId();
+
+  void setCalendarId(long id);
+
   String getSubject();
 
   void setSubject(String a);
