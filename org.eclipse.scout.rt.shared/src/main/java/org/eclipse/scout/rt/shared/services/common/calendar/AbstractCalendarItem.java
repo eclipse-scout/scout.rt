@@ -33,6 +33,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   private long m_lastModified;
   private Object m_itemId;
   private String m_owner;
+  private long m_calendarId;
   private String m_subject;
   private String m_subjectLabel;
   private String m_subjectAppLink;
@@ -130,6 +131,16 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   @Override
   public void setOwner(String a) {
     m_owner = a;
+  }
+
+  @Override
+  public long getCalendarId() {
+    return m_calendarId;
+  }
+
+  @Override
+  public void setCalendarId(long id) {
+    m_calendarId = id;
   }
 
   @Override

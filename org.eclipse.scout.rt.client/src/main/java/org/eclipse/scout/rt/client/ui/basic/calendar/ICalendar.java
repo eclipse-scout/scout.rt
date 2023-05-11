@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvi
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarDescriptor;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
 public interface ICalendar extends IWidget, IContextMenuOwner {
@@ -41,6 +42,10 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * type boolean
    */
   String PROP_DISPLAY_CONDENSED = "displayCondensed";
+  /**
+   * type {@link Set<ICalendarDescriptor>}
+   */
+  String PROP_CALENDARS = "calendars";
   /**
    * type String
    */
@@ -96,6 +101,10 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
   boolean isDisplayCondensed();
 
   void setDisplayCondensed(boolean condensed);
+
+  List<ICalendarDescriptor> getCalendars();
+
+  void setCalendars(List<ICalendarDescriptor> calendars);
 
   /**
    * @return a Date tupel [begin, end]

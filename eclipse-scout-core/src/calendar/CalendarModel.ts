@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CalendarComponent, CalendarDisplayMode, GroupBox, Menu, ObjectOrChildModel, WidgetModel} from '../index';
+import {CalendarComponent, CalendarDescriptor, CalendarDisplayMode, GroupBox, Menu, ObjectOrChildModel, WidgetModel} from '../index';
 
 export interface CalendarModel extends WidgetModel {
   monthViewNumberOfWeeks?: number;
@@ -22,6 +22,7 @@ export interface CalendarModel extends WidgetModel {
   selectedDate?: Date | string;
   showDisplayModeSelection?: boolean;
   rangeSelectionAllowed?: boolean;
+  calendars?: CalendarDescriptor[];
   title?: string;
   useOverflowCells?: boolean;
   calendarToggleListWidth?: number;
