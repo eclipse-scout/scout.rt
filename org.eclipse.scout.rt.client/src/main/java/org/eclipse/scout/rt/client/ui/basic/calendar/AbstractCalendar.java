@@ -168,6 +168,12 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(600)
+  protected List<ICalendarDescriptor> getConfiguredCalendars() {
+    return null;
+  }
+
   private List<Class<? extends ICalendarItemProvider>> getConfiguredProducers() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<ICalendarItemProvider>> filtered = ConfigurationUtility.filterClasses(dca, ICalendarItemProvider.class);
@@ -226,6 +232,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     setUseOverflowCells(getConfiguredUseOverflowCells());
     setShowDisplayModeSelection(getConfiguredShowDisplayModeSelection());
     setRangeSelectionAllowed(getConfiguredRangeSelectionAllowed());
+    setCalendars(getConfiguredCalendars());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();

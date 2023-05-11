@@ -251,7 +251,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       return array;
     }
     for (ICalendarDescriptor descriptor : descriptors) {
-      array.put(new JsonCalendarDescriptor(descriptor));
+      array.put(new JsonCalendarDescriptor(descriptor).toJson());
     }
     return array;
   }
