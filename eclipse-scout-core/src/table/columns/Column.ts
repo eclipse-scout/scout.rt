@@ -521,7 +521,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     return this.table.cellValue(this, row);
   }
 
-  cellValue(row: TableRow): TValue | string {
+  cellValue(row: TableRow): TValue {
     return this.table.cellValue(this, row);
   }
 

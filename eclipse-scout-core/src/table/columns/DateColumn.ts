@@ -88,7 +88,7 @@ export class DateColumn extends Column<Date> implements DateColumnModel {
   }
 
   override cellTextForGrouping(row: TableRow): string {
-    let val = this.table.cellValue(this, row) as Date;
+    let val = this.table.cellValue(this, row);
     return this.groupFormat.format(val);
   }
 

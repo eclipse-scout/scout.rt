@@ -17,7 +17,7 @@ export class BeanColumn<TBean> extends Column<TBean> {
     let cssClass = this._cellCssClass(cell);
     let style = this._cellStyle(cell);
     let $cell = $(super._buildCell(cell, '', style, cssClass));
-    let value = this.table.cellValue(this, row) as TBean;
+    let value = this.table.cellValue(this, row);
 
     if (cell.errorStatus) {
       row.hasError = true;

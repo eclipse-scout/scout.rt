@@ -2282,7 +2282,7 @@ export class Table extends Widget implements TableModel {
     return this.cell(this.columns[cellIndex], row);
   }
 
-  cellValue<TValue>(column: Column<TValue>, row: TableRow): TValue | string {
+  cellValue<TValue>(column: Column<TValue>, row: TableRow): TValue {
     let cell = this.cell(column, row);
     if (!cell) {
       return cell as TValue;
@@ -2290,7 +2290,7 @@ export class Table extends Widget implements TableModel {
     if (cell.value !== undefined) {
       return cell.value;
     }
-    return '';
+    return null;
   }
 
   cellText(column: Column<any>, row: TableRow): string {
