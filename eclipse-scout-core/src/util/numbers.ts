@@ -202,7 +202,7 @@ export const numbers = {
    */
   ensure(number: number | string): number {
     if (objects.isNullOrUndefined(number)) {
-      return number as number;
+      return number;
     }
     return Number(number);
   },
@@ -210,14 +210,14 @@ export const numbers = {
   /**
    * Returns true if the given number is of type number but not NaN.
    */
-  isNumber(number: any): boolean {
+  isNumber(number: any): number is number {
     return typeof number === 'number' && !isNaN(number);
   },
 
   /**
    * Returns true if the given number is an integer.
    */
-  isInteger(number: any): boolean {
+  isInteger(number: any): number is number {
     return numbers.isNumber(number) && isFinite(number) && Math.floor(number) === number;
   },
 

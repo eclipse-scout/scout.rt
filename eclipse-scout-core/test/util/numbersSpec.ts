@@ -265,6 +265,10 @@ describe('scout.numbers', () => {
 
     it('returns true if the value is a number', () => {
       expect(numbers.isNumber(3)).toBe(true);
+      expect(numbers.isNumber(0)).toBe(true);
+      expect(numbers.isNumber(0.2)).toBe(true);
+      expect(numbers.isNumber(0.000000000000001)).toBe(true);
+      expect(numbers.isNumber(1 / 0)).toBe(true); // Infinity
     });
 
     it('returns false if the value is not a number', () => {
@@ -275,6 +279,82 @@ describe('scout.numbers', () => {
       expect(numbers.isNumber(NaN)).toBe(false);
     });
 
+    it('has a type guard', () => {
+      let x = 'test';
+      let y = 111;
+      let z: any = 222;
+
+      let sum = 0;
+      if (sum < 0) { // always false, compile time spec only
+        // @ts-expect-error
+        sum += x;
+        sum += y;
+        sum += z;
+      }
+      if (numbers.isNumber(x)) {
+        sum += x;
+      }
+      if (numbers.isNumber(y)) {
+        sum += y;
+      }
+      if (numbers.isNumber(z)) {
+        sum += z;
+      }
+      let q = Math.sqrt(-1);
+      if (numbers.isNumber(q)) {
+        sum += 999;
+      }
+      expect(sum).toBe(333);
+    });
   });
 
+  describe('isInteger', () => {
+
+    it('returns true if the value is an integer number', () => {
+      expect(numbers.isInteger(3)).toBe(true);
+      expect(numbers.isInteger(0)).toBe(true);
+      expect(numbers.isInteger(111.000)).toBe(true);
+    });
+
+    it('returns false if the value is not an integer number', () => {
+      expect(numbers.isInteger('3')).toBe(false);
+      expect(numbers.isInteger(NaN)).toBe(false);
+      expect(numbers.isInteger(0.1)).toBe(false);
+      expect(numbers.isInteger(0.000000000000001)).toBe(false);
+      expect(numbers.isInteger(111.222)).toBe(false);
+      expect(numbers.isInteger([100])).toBe(false);
+    });
+
+    it('returns false if the value is NaN', () => {
+      expect(numbers.isInteger(NaN)).toBe(false);
+    });
+
+    it('has a type guard', () => {
+      let x = 'test';
+      let y = 111;
+      let z: any = 222;
+
+      let sum = 0;
+      if (sum < 0) { // always false, compile time spec only
+        // @ts-expect-error
+        sum += x;
+        sum += y;
+        sum += z;
+      }
+      if (numbers.isInteger(x)) {
+        sum += x;
+      }
+      if (numbers.isInteger(y)) {
+        sum += y;
+      }
+      if (numbers.isInteger(z)) {
+        sum += z;
+      }
+      let q = Math.sqrt(-1);
+      if (numbers.isInteger(q)) {
+        sum += 999;
+      }
+      expect(sum).toBe(333);
+    });
+  });
 });
