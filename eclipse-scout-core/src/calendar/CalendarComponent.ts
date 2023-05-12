@@ -267,6 +267,16 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     this._$parts.forEach($part => $part.toggleClass('comp-selected', this.selected));
   }
 
+  protected override _renderVisible() {
+    if (!this._$parts) {
+      return;
+    }
+    this._$parts.forEach($part => {
+      $part.setVisible(this.isVisible());
+      this.invalidateParentLogicalGrid();
+    });
+  }
+
   setSelected(selected: boolean) {
     this.setProperty('selected', selected);
   }
