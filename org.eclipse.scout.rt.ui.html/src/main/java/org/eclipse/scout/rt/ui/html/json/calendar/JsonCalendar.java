@@ -22,6 +22,8 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarUIFacade;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarDescriptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -58,6 +60,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
   private static final String EVENT_VIEW_RANGE_CHANGE = "viewRangeChange";
   private static final String EVENT_SELECTED_RANGE_CHANGE = "selectedRangeChange";
   private static final String EVENT_MODEL_CHANGE = "modelChange";
+  private static final String EVENT_CALENDAR_VISIBILITY_CHANGE = "calendarVisibilityChange";
 
   private CalendarListener m_calendarListener;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
@@ -279,6 +282,9 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     else if (EVENT_SELECTED_RANGE_CHANGE.equals(event.getType())) {
       handleUiSelectedRangeChange(event);
     }
+    else if (EVENT_CALENDAR_VISIBILITY_CHANGE.equals(event.getType())) {
+      handleUiCalendarVisibilityChange(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -390,6 +396,18 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       return null;
     }
     return new JsonDate(data.optString(propertyName, null)).asJavaDate();
+  }
+
+  protected void handleUiCalendarVisibilityChange(JsonEvent event) {
+    Pair<Long, Boolean> calendarVisibility = extractCalendarVisibility(event.getData());
+    getModel().getUIFacade().setCalendarVisibilityFromUI(calendarVisibility.getLeft(), calendarVisibility.getRight());
+    LOG.debug("calendarId={} visible={}", calendarVisibility.getLeft(), calendarVisibility.getRight());
+  }
+
+  protected Pair<Long, Boolean> extractCalendarVisibility(JSONObject data) {
+    Long calendarId = data.optLong("calendarId");
+    Boolean visible = data.optBoolean("visible");
+    return new ImmutablePair<>(calendarId, visible);
   }
 
   @Override

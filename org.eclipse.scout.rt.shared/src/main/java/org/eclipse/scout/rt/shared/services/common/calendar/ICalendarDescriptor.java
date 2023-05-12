@@ -30,6 +30,13 @@ public interface ICalendarDescriptor {
   void setName(String name);
 
   /**
+   * Indicates if the calendar is displayed
+   */
+  boolean isVisible();
+
+  void setVisible(boolean visible);
+
+  /**
    * Css class of the calendar
    */
   String getCssClass();

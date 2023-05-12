@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponentMoveEvent, dates, Event, JsonDateRange, ModelAdapter} from '../index';
+import {Calendar, CalendarComponentMoveEvent, CalendarVisibilityChangeEvent, dates, Event, JsonDateRange, ModelAdapter} from '../index';
 
 export class CalendarAdapter extends ModelAdapter {
   declare widget: Calendar;
@@ -32,6 +32,8 @@ export class CalendarAdapter extends ModelAdapter {
       this._sendComponentMove(event as CalendarComponentMoveEvent);
     } else if (event.type === 'selectedRangeChange') {
       this._sendSelectedRangeChange();
+    } else if (event.type === 'calendarVisibilityChange') {
+      this._sendCalendarVisibilityChange(event as CalendarVisibilityChangeEvent);
     } else {
       super._onWidgetEvent(event);
     }
@@ -86,6 +88,13 @@ export class CalendarAdapter extends ModelAdapter {
       componentId: event.component.id,
       fromDate: event.component.fromDate,
       toDate: event.component.toDate
+    });
+  }
+
+  protected _sendCalendarVisibilityChange(event: CalendarVisibilityChangeEvent) {
+    this._send('calendarVisibilityChange', {
+      calendarId: event.calendarId,
+      visible: event.visible
     });
   }
 }

@@ -7,27 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {HtmlComponent, InitModelOf, scout, Tree, Widget} from '../index';
+import {HtmlComponent, InitModelOf, ObjectOrModel, ResourcesPanelTreeNode, scout, Tree, Widget} from '../index';
 
 export class ResourcesPanel extends Widget {
-  tree: Tree;
+  tree: ResourcesPanelTree;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
-    this.tree = scout.create(Tree, {
+    this.tree = scout.create(ResourcesPanelTree, {
       parent: this,
       checkable: true,
       textFilterEnabled: false
-    });
-
-    this.tree.insertNode({
-      text: 'test',
-      childNodes: [
-        {
-          text: 'child test',
-          leaf: true
-        }
-      ]
     });
   }
 
@@ -35,5 +25,14 @@ export class ResourcesPanel extends Widget {
     this.$container = this.$parent.appendDiv('resources-panel-container');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.tree.render();
+  }
+}
+
+class ResourcesPanelTree extends Tree {
+  declare nodes: ResourcesPanelTreeNode[];
+
+
+  override insertNode(node: ObjectOrModel<ResourcesPanelTreeNode>, parentNode?: ResourcesPanelTreeNode, index?: number) {
+    super.insertNode(node, parentNode, index);
   }
 }

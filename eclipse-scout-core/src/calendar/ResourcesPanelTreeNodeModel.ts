@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-export interface CalendarDescriptor {
-  calendarId: number;
-  name: string;
-  visible: boolean;
-  cssClass: string;
+
+import {TreeNodeModel} from '../index';
+
+export interface ResourcesPanelTreeNodeModel extends TreeNodeModel {
+  calendarId?: number;
 }
