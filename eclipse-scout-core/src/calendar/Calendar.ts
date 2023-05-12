@@ -9,8 +9,8 @@
  */
 import {
   arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox,
-  HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcesPanel, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel,
-  YearPanelDateSelectEvent
+  HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcesPanel, ResourcesPanelTreeNode, RoundingMode, scout, scrollbars, strings, TreeNodeClickEvent,
+  ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -147,6 +147,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.selectedDate = new Date();
     this.showDisplayModeSelection = true;
     this.rangeSelectionAllowed = false;
+    this.calendars = [];
     this.title = null;
     this.useOverflowCells = true;
     this.viewRange = null;
@@ -243,6 +244,8 @@ export class Calendar extends Widget implements CalendarModel {
     this.yearPanel = this.calendarSidebar.yearPanel;
     this.resourcesPanel = this.calendarSidebar.resourcesPanel;
 
+    this.resourcesPanel.tree.on('nodeClick', this._onCalendarTreeNodeSelected.bind(this));
+
     this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
     this.modesMenu = scout.create(CalendarModesMenu, {
       parent: this,
@@ -252,9 +255,27 @@ export class Calendar extends Widget implements CalendarModel {
     this._setSelectedDate(this.selectedDate);
     this._setDisplayMode(this.displayMode);
     this._setMenuInjectionTarget(this.menuInjectionTarget);
+    this._setCalendars(this.calendars);
     this._exactRange = this._calcExactRange();
     this.yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();
+  }
+
+  setCalendars(calendars: CalendarDescriptor[]) {
+    this.setProperty('calendars', calendars);
+  }
+
+  protected _setCalendars(calendars: CalendarDescriptor[]) {
+    this._setProperty('calendars', calendars);
+    this.resourcesPanel.tree.removeAllNodes();
+    this.calendars.forEach(descriptor => {
+      this.resourcesPanel.tree.insertNode(scout.create(ResourcesPanelTreeNode, {
+        parent: this.resourcesPanel.tree,
+        calendarId: descriptor.calendarId,
+        text: descriptor.name,
+        cssClass: descriptor.cssClass
+      }));
+    });
   }
 
   setSelectedDate(date: Date | string) {
@@ -1356,6 +1377,22 @@ export class Calendar extends Widget implements CalendarModel {
     }.bind(this);
 
     this.session.onRequestsDone(func, event, allowedType);
+  }
+
+  protected _onCalendarTreeNodeSelected(event: TreeNodeClickEvent) {
+    let node = event.node as ResourcesPanelTreeNode;
+    if (!node.calendarId) {
+      return;
+    }
+    let calendar = this.calendars.find(calendar => calendar.calendarId === node.calendarId);
+    if (!calendar) {
+      return;
+    }
+    calendar.visible = node.checked;
+    this.trigger('calendarVisibilityChange', {
+      calendarId: node.calendarId,
+      visible: node.checked
+    });
   }
 
   /* -- components, arrangement------------------------------------ */
