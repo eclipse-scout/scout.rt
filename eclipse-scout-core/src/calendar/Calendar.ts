@@ -273,6 +273,7 @@ export class Calendar extends Widget implements CalendarModel {
         parent: this.resourcesPanel.tree,
         calendarId: descriptor.calendarId,
         text: descriptor.name,
+        checked: descriptor.visible,
         cssClass: descriptor.cssClass
       }));
     });
@@ -1393,6 +1394,9 @@ export class Calendar extends Widget implements CalendarModel {
       calendarId: node.calendarId,
       visible: node.checked
     });
+    this.components
+      .filter(comp => comp.item.calendarId === node.calendarId)
+      .forEach(comp => comp.setVisible(node.checked));
   }
 
   /* -- components, arrangement------------------------------------ */
