@@ -11,5 +11,5 @@
 import {JasmineScout} from '../src/testing/index';
 
 // @ts-expect-error
-let context = require.context('./', true, /[sS]pec\.[t|j]s$/);
+let context = require.context('./', true, /[sS]pec\.[tj]s$/);
 JasmineScout.runTestSuite(context);
