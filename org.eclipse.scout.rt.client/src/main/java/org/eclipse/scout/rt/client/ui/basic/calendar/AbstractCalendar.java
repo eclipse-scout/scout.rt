@@ -988,6 +988,25 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     public void fireAppLinkActionFromUI(String ref) {
       doAppLinkAction(ref);
     }
+
+    @Override
+    public void setCalendarVisibilityFromUI(Long calendarId, Boolean visible) {
+      try {
+        pushUIProcessor();
+        ICalendarDescriptor cal = getCalendars().stream()
+            .filter(desc -> desc.getCalendarId() == calendarId)
+            .findAny()
+            .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar!"));
+        cal.setVisible(visible);
+        // Trigger reload when new calendar is selected
+        if (visible) {
+          reloadCalendarItems();
+        }
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
   }
 
   /**

@@ -15,20 +15,27 @@ public class CalendarDescriptor implements ICalendarDescriptor {
 
   private long m_calendarId;
   private String m_name;
+  private boolean m_visible;
   private String m_cssClass;
 
   public CalendarDescriptor(String name) {
-    this(new Random().nextLong(), name);
+    this(new Random().nextInt(), name);
   }
 
   public CalendarDescriptor(long calendarId, String name) {
-    m_calendarId = calendarId;
-    m_name = name;
+    this(calendarId, name, true);
   }
 
-  public CalendarDescriptor(long calendarId, String name, String cssClass) {
+  public CalendarDescriptor(long calendarId, String name, boolean visible) {
     m_calendarId = calendarId;
     m_name = name;
+    m_visible = visible;
+  }
+
+  public CalendarDescriptor(long calendarId, String name, boolean visible, String cssClass) {
+    m_calendarId = calendarId;
+    m_name = name;
+    m_visible = visible;
     m_cssClass = cssClass;
   }
 
@@ -60,5 +67,15 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   @Override
   public void setCssClass(String cssClass) {
     m_cssClass = cssClass;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return m_visible;
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    m_visible = visible;
   }
 }
