@@ -78,6 +78,7 @@ export class Calendar extends Widget implements CalendarModel {
   selectedRange: DateRange;
   needsScrollToStartHour: boolean;
   defaultMenuTypes: string[];
+  splitDay: boolean;
 
   $header: JQuery;
   $range: JQuery;
@@ -154,6 +155,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.calendarToggleListWidth = 270;
     this.calendarToggleYearWidth = 215;
     this.defaultMenuTypes = [Calendar.MenuType.EmptySpace];
+    this.splitDay = true;
 
     // main elements
     this.$container = null;
@@ -514,10 +516,41 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected override _renderProperties() {
     super._renderProperties();
+    this._renderCalendars();
     this._renderComponents();
     this._renderSelectedComponent();
     this._renderLoadInProgress();
     this._renderDisplayMode();
+  }
+
+  protected _renderCalendars() {
+    let $dayName = this.$topGrid.find('.calendar-week-header > .calendar-day-name');
+    let $fullDay = this.$topGrid.find('.calendar-week-allday-container > .calendar-day');
+    let $day = this.$grid.find('.calendar-week > .calendar-day');
+
+    // Remove old calendar columns
+    $dayName.find('.calendar-column').remove();
+    $fullDay.find('.calendar-column').remove();
+    $day.find('.calendar-column').remove();
+
+    // Add default calendar columns
+    $dayName.appendDiv('calendar-column')
+      .data('calendarId', 'default');
+    $fullDay.appendDiv('calendar-column')
+      .data('calendarId', 'default');
+    $day.appendDiv('calendar-column')
+      .data('calendarId', 'default');
+
+    // Add new calendar columns
+    this.calendars.forEach(calendar => {
+      $dayName.appendDiv('calendar-column')
+        .data('calendarId', calendar.calendarId)
+        .attr('data-calendar-name', calendar.name);
+      $fullDay.appendDiv('calendar-column')
+        .data('calendarId', calendar.calendarId);
+      $day.appendDiv('calendar-column')
+        .data('calendarId', calendar.calendarId);
+    });
   }
 
   protected _renderComponents() {
@@ -969,6 +1002,33 @@ export class Calendar extends Widget implements CalendarModel {
       this.widthPerDivision = newWidthMonthOrWeek;
     }
 
+    // layout calendar columns
+    let calendarRowWidth = 0;
+    if (this.isDay() && this.splitDay) {
+      calendarRowWidth = contentW / (this.calendars.filter(c => c.visible).length + 1);
+    }
+    $('.calendar-day-name:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid)
+      .find('.calendar-column').each((index, element) => {
+      let calendarId = $(element).data('calendarId');
+      let isVisible = calendarId === 'default' ?
+        true : this.calendars.find(element => element.calendarId === calendarId).visible;
+      $(element).data('new-width', isVisible ? calendarRowWidth : 0);
+    });
+    $('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid)
+      .find('.calendar-column').each((index, element) => {
+      let calendarId = $(element).data('calendarId');
+      let isVisible = calendarId === 'default' ?
+        true : this.calendars.find(element => element.calendarId === calendarId).visible;
+      $(element).data('new-width', isVisible ? calendarRowWidth : 0);
+    });
+    $('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$grid)
+      .find('.calendar-column').each((index, element) => {
+      let calendarId = $(element).data('calendarId');
+      let isVisible = calendarId === 'default' ?
+        true : this.calendars.find(element => element.calendarId === calendarId).visible;
+      $(element).data('new-width', isVisible ? calendarRowWidth : 0);
+    });
+
     // layout components
     if (this.isMonth()) {
       $('.component-month', this.$grid).each(function() {
@@ -1397,6 +1457,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.components
       .filter(comp => comp.item.calendarId === node.calendarId)
       .forEach(comp => comp.setVisible(node.checked));
+    this.layoutSize(true);
   }
 
   /* -- components, arrangement------------------------------------ */
