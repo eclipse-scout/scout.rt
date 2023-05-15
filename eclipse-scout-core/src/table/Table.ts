@@ -2203,10 +2203,10 @@ export class Table extends Widget implements TableModel {
    * Starts cell editing for the cell at the given column and row, but only if editing is allowed.
    * @see prepareCellEdit
    */
-  focusCell(column: Column<any>, row: TableRow) {
+  focusCell(column: Column<any>, row: TableRow, openFieldPopupOnCellEdit = false) {
     let cell = this.cell(column, row);
     if (this.enabledComputed && row.enabled && cell.editable) {
-      this.prepareCellEdit(column, row);
+      this.prepareCellEdit(column, row, openFieldPopupOnCellEdit);
     }
   }
 
