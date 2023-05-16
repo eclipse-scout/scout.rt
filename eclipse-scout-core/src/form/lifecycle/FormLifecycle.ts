@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, FormLifecycleModel, InitModelOf, Lifecycle, scout, Status, strings, ValidationResult, ValueField} from '../../index';
+import {Form, FormField, FormLifecycleModel, InitModelOf, Lifecycle, scout, Status, strings, ValidationResult, ValueField} from '../../index';
 
 export class FormLifecycle<TValidationResult extends ValidationResult = ValidationResult> extends Lifecycle<TValidationResult> implements FormLifecycleModel {
   declare model: FormLifecycleModel;
@@ -16,7 +16,6 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
   constructor() {
     super();
 
-    this.validationFailedTextKey = 'FormValidationFailedTitle';
     this.emptyMandatoryElementsTextKey = 'FormEmptyMandatoryFieldsMessage';
     this.invalidElementsErrorTextKey = 'FormInvalidFieldsMessage';
     this.invalidElementsWarningTextKey = 'FormInvalidFieldsWarningMessage';
@@ -40,7 +39,7 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     const missingElements = [],
       invalidElements = [];
 
-    this.widget.visitFields(field => {
+    this.widget.visitFields((field: FormField) => {
       let result = field.getValidationResult();
       if (result.valid) {
         return result.visitResult;
@@ -69,8 +68,12 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     return strings.plainText(element.label);
   }
 
-  protected override _validateWidget(): Status {
+  protected override _validateWidget(): Status | JQuery.Promise<Status> {
     return this.widget._validate();
+  }
+
+  protected override _handleInvalid(status: Status): JQuery.Promise<Status> {
+    return this.widget._handleInvalid(status);
   }
 
   protected override _revealInvalidElement(invalidElement: TValidationResult) {

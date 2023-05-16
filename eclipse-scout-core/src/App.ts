@@ -80,6 +80,13 @@ export class App extends EventEmitter {
     return instance;
   }
 
+  protected static _set(newApp: App) {
+    if (instance) {
+      $.log.isWarnEnabled() && $.log.warn('Overwriting already existing App "' + instance + '" with "' + newApp + '".');
+    }
+    instance = newApp;
+  }
+
   declare model: AppModel;
   declare eventMap: AppEventMap;
   declare self: App;
@@ -104,7 +111,7 @@ export class App extends EventEmitter {
     });
     listeners = [];
 
-    instance = this;
+    App._set(this);
     this.errorHandler = this._createErrorHandler();
   }
 
@@ -205,7 +212,7 @@ export class App extends EventEmitter {
     // Sometimes the JavaScript and therefore the ajax calls won't be executed in case the page is loaded from that cache, but sometimes they will nevertheless (we don't know the reasons).
     // So, if it that happens, the server will return a session timeout and the best thing we can do is to reload the page hoping a request for the index.html will be done which eventually will be forwarded to the login page.
     if ($.isJqXHR(vararg)) {
-      // Ajax error
+      // AJAX error
       // If a resource returns 401 (unauthorized) it is likely a session timeout.
       // This may happen if no Scout backend is used or a reverse proxy returned the response, otherwise status 200 with an error object would be returned, see below
       if (this._isSessionTimeoutStatus(vararg.status)) {
@@ -529,7 +536,12 @@ export class App extends EventEmitter {
         .filter(session => !session.ready && !session.isFatalMessageShown())
         .forEach(session => {
           session.$entryPoint.empty();
-          promises.push(this._createErrorHandler({session: session}).handle(error));
+          const errorHandler = this._createErrorHandler({session: session});
+          const promise = errorHandler.analyzeError(error).then(info => {
+            info.showAsFatalError = true;
+            return errorHandler.handleErrorInfo(info);
+          });
+          promises.push(promise);
         });
     }
 

@@ -2075,14 +2075,15 @@ describe('Desktop', () => {
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
-        jasmine.clock().tick(0);
+        jasmine.clock().tick(10);
         // validation message should be displayed since view2 is in invalid state
         expect(session.$entryPoint.find('.messagebox').length).toBe(1);
         desktop.messageBoxes[0].yesButton.doAction();
-        jasmine.clock().tick(0);
-        // untick all entries to not save the unsaved changes
+        jasmine.clock().tick(10);
+        // uncheck all entries to not save the unsaved changes
         openFormsField.setValue(null);
         unsavedFormChangesForm.ok();
+        jasmine.clock().tick(10);
       });
 
       jasmine.clock().tick(10);
@@ -2130,14 +2131,15 @@ describe('Desktop', () => {
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
-        jasmine.clock().tick(0);
+        jasmine.clock().tick(10);
         // validation message should be displayed since view2 is in invalid state
         expect(session.$entryPoint.find('.messagebox').length).toBe(1);
         desktop.messageBoxes[0].yesButton.doAction();
-        jasmine.clock().tick(0);
-        // untick all entries to not save the unsaved changes
+        jasmine.clock().tick(10);
+        // uncheck all entries to not save the unsaved changes
         openFormsField.setValue(null);
         unsavedFormChangesForm.ok();
+        jasmine.clock().tick(10);
       });
 
       jasmine.clock().tick(10);

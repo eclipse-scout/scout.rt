@@ -38,7 +38,7 @@ export class RemoteApp extends App {
     let model = (options || {}) as InitModelOf<Session>;
     model.$entryPoint = $entryPoint;
     let session = this._createSession(model);
-    App.get().sessions.push(session);
+    this.sessions.push(session);
     return session.start();
   }
 }
