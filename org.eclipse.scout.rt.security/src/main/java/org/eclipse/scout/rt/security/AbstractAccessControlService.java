@@ -112,7 +112,6 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
         .withClusterEnabled(true)
         .withTransactional(true)
         .withTransactionalFastForward(true)
-        .withAtomicInsertion(true)
         .withTimeToLive(1L, TimeUnit.HOURS, false);
   }
 

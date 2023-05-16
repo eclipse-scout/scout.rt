@@ -39,7 +39,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   private boolean m_shared;
   private boolean m_remoteValueResolverEnabled;
   private boolean m_threadSafe;
-  private boolean m_atomicInsertion;
   private boolean m_clusterEnabled;
   private boolean m_transactional;
   private boolean m_transactionalFastForward;
@@ -224,20 +223,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   public boolean isThreadSafe() {
     return m_threadSafe;
-  }
-
-  @Override
-  public CacheBuilder<K, V> withAtomicInsertion(boolean atomicInsertion) {
-    m_atomicInsertion = atomicInsertion;
-    return this;
-  }
-
-  /**
-   * @deprecated not used anymore; will be removed in scout 23.2
-   */
-  @Deprecated
-  public boolean isAtomicInsertion() {
-    return m_atomicInsertion && m_threadSafe;
   }
 
   @Override

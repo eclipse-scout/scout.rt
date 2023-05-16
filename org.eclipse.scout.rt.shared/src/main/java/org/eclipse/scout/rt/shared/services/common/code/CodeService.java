@@ -68,8 +68,7 @@ public class CodeService implements ICodeService {
         .withShared(true)
         .withClusterEnabled(true)
         .withTransactional(true)
-        .withTransactionalFastForward(true)
-        .withAtomicInsertion(true);
+        .withTransactionalFastForward(true);
   }
 
   protected ICacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>> createCacheValueResolver() {
