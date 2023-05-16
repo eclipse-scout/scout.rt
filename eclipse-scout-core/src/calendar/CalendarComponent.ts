@@ -124,7 +124,14 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         // next day, partDay not found in grid
         continue;
       }
-      $part = $day.appendDiv('calendar-component');
+
+      // Find corresponding calendar
+      let $calendar = this._findCalendarColumnInDay($day, this.item.calendarId);
+      if (!$calendar) {
+        // Somehow the calendar cannot be found
+        continue;
+      }
+      $part = $calendar.appendDiv('calendar-component');
 
       $part
         .addClass(this.item.cssClass)
@@ -197,6 +204,16 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       .filter(function(i, elem) {
         return dates.isSameDay($(this).data('date'), date);
       }).eq(0);
+  }
+
+  protected _findCalendarColumnInDay($day: JQuery, calendarId: string | number): JQuery {
+    if (!this.parent.isDay() || !calendarId) {
+      calendarId = 'default';
+    }
+    return $day.find('.calendar-column')
+      .filter((index: number, element: HTMLSelectElement) => {
+        return $(element).data('calendarId').toString() === calendarId.toString();
+      });
   }
 
   protected _isTask(): boolean {
