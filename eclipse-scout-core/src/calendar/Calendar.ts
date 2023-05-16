@@ -330,10 +330,10 @@ export class Calendar extends Widget implements CalendarModel {
     this._updateModel(true);
 
     // only render if components have another layout
-    if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
-      this._renderComponents();
-      this.needsScrollToStartHour = true;
-    }
+    // if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
+    this._renderComponents();
+    this.needsScrollToStartHour = true;
+    // }
   }
 
   protected _setViewRange(viewRange: DateRange | JsonDateRange) {
@@ -1003,30 +1003,26 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // layout calendar columns
-    let calendarRowWidth = 0;
+    let multiCalendarRowWidth = 0;
+    let singleCalendarRowWidth = 0;
     if (this.isDay() && this.splitDay) {
-      calendarRowWidth = contentW / (this.calendars.filter(c => c.visible).length + 1);
+      multiCalendarRowWidth = Math.round(contentW / (this.calendars.filter(c => c.visible).length + 1));
+    } else if (this.isWorkWeek()) {
+      singleCalendarRowWidth = Math.round(contentW / this.workDayIndices.length);
+    } else {
+      singleCalendarRowWidth = Math.round(contentW / 7);
     }
-    $('.calendar-day-name:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid)
-      .find('.calendar-column').each((index, element) => {
-      let calendarId = $(element).data('calendarId');
-      let isVisible = calendarId === 'default' ?
-        true : this.calendars.find(element => element.calendarId === calendarId).visible;
-      $(element).data('new-width', isVisible ? calendarRowWidth : 0);
+
+    $('.calendar-day-name', this.$topGrid).find('.calendar-column').each((index, element) => {
+      this._calcaulateColumnVisibility(singleCalendarRowWidth, multiCalendarRowWidth, element);
     });
-    $('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid)
-      .find('.calendar-column').each((index, element) => {
-      let calendarId = $(element).data('calendarId');
-      let isVisible = calendarId === 'default' ?
-        true : this.calendars.find(element => element.calendarId === calendarId).visible;
-      $(element).data('new-width', isVisible ? calendarRowWidth : 0);
+
+    $('.calendar-day', this.$topGrid).find('.calendar-column').each((index, element) => {
+      this._calcaulateColumnVisibility(singleCalendarRowWidth, multiCalendarRowWidth, element);
     });
-    $('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$grid)
-      .find('.calendar-column').each((index, element) => {
-      let calendarId = $(element).data('calendarId');
-      let isVisible = calendarId === 'default' ?
-        true : this.calendars.find(element => element.calendarId === calendarId).visible;
-      $(element).data('new-width', isVisible ? calendarRowWidth : 0);
+
+    $('.calendar-day', this.$grid).find('.calendar-column').each((index, element) => {
+      this._calcaulateColumnVisibility(singleCalendarRowWidth, multiCalendarRowWidth, element);
     });
 
     // layout components
@@ -1085,6 +1081,32 @@ export class Calendar extends Widget implements CalendarModel {
   protected _afterLayout($parent: JQuery, animate: boolean) {
     this._updateScrollbars($parent, animate);
     this._updateWeekdayNames();
+  }
+
+  protected _calcaulateColumnVisibility(singleColumnWidth: number, multiColumnWidth: number, element: HTMLElement) {
+    let calendarId = $(element).data('calendarId');
+    let isDefaultColumn = calendarId === 'default';
+    let newWidth = 0;
+    if (this.isDay()) {
+      // Always and only show default column
+      if ($(element).parent('.selected')) {
+        if (isDefaultColumn || this.calendars.find(cal => cal.calendarId === calendarId).visible) {
+          newWidth = multiColumnWidth;
+        } else {
+          newWidth = 0;
+        }
+      } else {
+        newWidth = 0;
+      }
+    } else {
+      // Always and only show default column
+      if (isDefaultColumn) {
+        newWidth = singleColumnWidth;
+      } else {
+        newWidth = 0;
+      }
+    }
+    $(element).data('new-width', newWidth);
   }
 
   protected _updateWeekdayNames() {
