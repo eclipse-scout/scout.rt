@@ -1003,18 +1003,17 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // layout calendar columns
-    let multiCalendarRowWidth = 0;
-    let singleCalendarRowWidth = 0;
+    let columnWidth = 0;
     if (this.isDay() && this.splitDay) {
-      multiCalendarRowWidth = Math.round(contentW / (this.calendars.filter(c => c.visible).length + 1));
+      columnWidth = Math.round(contentW / (this.calendars.filter(c => c.visible).length + 1));
     } else if (this.isWorkWeek()) {
-      singleCalendarRowWidth = Math.round(contentW / this.workDayIndices.length);
+      columnWidth = Math.round(contentW / this.workDayIndices.length);
     } else {
-      singleCalendarRowWidth = Math.round(contentW / 7);
+      columnWidth = Math.round(contentW / 7);
     }
 
     if (this.isDay()) {
-      // Set size to 0 for all
+      // 1. Set size to 0 for all
       $('.calendar-column', this.$grids).data('new-width', 0);
 
       // Resize visible columns of selected day
@@ -1024,7 +1023,7 @@ export class Calendar extends Widget implements CalendarModel {
         .filter((i, e) => {
           let id = $(e).data('calendarId');
           return id === 'default' || this.calendars.find(cal => cal.calendarId === id).visible;
-        }).data('new-width', multiCalendarRowWidth);
+        }).data('new-width', columnWidth);
     } else if (this.isWorkWeek() || this.isWeek() || this.isMonth()) {
       // 1. size 0 for all calendar columns
       $('.calendar-column', this.$grids).data('new-width', 0);
@@ -1032,7 +1031,7 @@ export class Calendar extends Widget implements CalendarModel {
       // 2. full size for default column
       $('.calendar-column', this.$grids)
         .filter((i, e) => $(e).data('calendarId') === 'default')
-        .data('new-width', singleCalendarRowWidth);
+        .data('new-width', columnWidth);
     }
 
     // layout components
