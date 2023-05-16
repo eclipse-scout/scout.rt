@@ -1082,12 +1082,12 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    *          If defined, a second call to this method with the same errorCode will
    *          do nothing. Can be used to prevent double messages for the same error.
    */
-  showFatalMessage(options: FatalMessageOptions, errorCode?: string) {
+  showFatalMessage(options: FatalMessageOptions, errorCode?: string): JQuery.Promise<void> {
     if (!errorCode) {
       errorCode = App.get().errorHandler.getJsErrorCode();
     }
     if (this._fatalMessagesOnScreen[errorCode]) {
-      return;
+      return $.resolvedPromise();
     }
     this._fatalMessagesOnScreen[errorCode] = true;
 
@@ -1120,6 +1120,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       }
     });
     messageBox.render($entryPoint);
+    return messageBox.when('action').then(() => undefined);
   }
 
   isFatalMessageShown(): boolean {

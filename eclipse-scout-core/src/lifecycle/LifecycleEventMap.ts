@@ -7,9 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventMap, Lifecycle} from '../index';
+import {Event, EventMap, Lifecycle, Status} from '../index';
+
+
+export interface LifecycleValidateEvent<TValidationResult, L extends Lifecycle<TValidationResult> = Lifecycle<TValidationResult>> extends Event<L> {
+  status: Status;
+}
 
 export interface LifecycleEventMap<TValidationResult> extends EventMap {
+  'validate': LifecycleValidateEvent<TValidationResult>;
   'load': Event<Lifecycle<TValidationResult>>;
   'postLoad': Event<Lifecycle<TValidationResult>>;
   'save': Event<Lifecycle<TValidationResult>>;

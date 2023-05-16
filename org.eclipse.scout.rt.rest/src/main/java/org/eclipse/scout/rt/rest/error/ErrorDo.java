@@ -76,6 +76,7 @@ public class ErrorDo extends DoEntity {
   /**
    * Decodes the string-typed status into an int constant declared in {@link IStatus}:
    * <ul>
+   * <li><em>ok</em> to {@link IStatus#OK}</li>
    * <li><em>info</em> to {@link IStatus#INFO}</li>
    * <li><em>warning</em> to {@link IStatus#WARNING}</li>
    * <li>anything else including {@code null} to {@link IStatus#ERROR}</li>
@@ -87,6 +88,8 @@ public class ErrorDo extends DoEntity {
       return IStatus.ERROR;
     }
     switch (s) {
+      case "ok":
+        return IStatus.OK;
       case "info":
         return IStatus.INFO;
       case "warning":

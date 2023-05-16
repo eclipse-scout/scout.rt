@@ -17,12 +17,13 @@ public class UiTextContributor implements IUiTextContributor {
   @Override
   public void contributeUiTextKeys(Set<String> textKeys) {
     textKeys.addAll(Arrays.asList(
-        // From org.eclipse.scout.rt.shared
+        // From org.eclipse.scout.rt.nls
         "Cancel",
         "CancelButton",
         "CloseButton",
         "Column",
         "ColumnSorting",
+        "CorrelationId",
         "DateIsNotAllowed",
         "ErrorWhileLoadingData",
         "FormEmptyMandatoryFieldsMessage",
@@ -36,10 +37,12 @@ public class UiTextContributor implements IUiTextContributor {
         "InvalidNumberMessageX",
         "InvalidValueMessageX",
         "NavigationBackward",
+        "NetSystemsNotAvailable",
         "No",
         "NoButton",
         "Ok",
         "OkButton",
+        "PleaseTryAgainLater",
         "ProceedAnyway",
         "Remove",
         "ResetButton",
@@ -61,9 +64,11 @@ public class UiTextContributor implements IUiTextContributor {
         "NumberTooSmallMessageX",
         "UnsavedChangesTitle",
         "SaveChangesOfSelectedItems",
+        "TheRequestedResourceCouldNotBeFound",
         "FormsCannotBeSaved",
         "NotAllCheckedFormsCanBeSaved",
         "FormValidationFailedTitle",
+        "YouAreNotAuthorizedToPerformThisAction",
         // From org.eclipse.scout.rt.ui.html
         "ui.CodeUndefined",
         "ui.CalendarToday",

@@ -18,6 +18,18 @@ export interface FormMoveEvent<F extends Form = Form> extends Event<F> {
   top: number;
 }
 
+export interface FormErrorEvent<F extends Form = Form> extends Event<F> {
+  phase: 'load' | 'save' | 'postLoad';
+  /**
+   * Typically an Error but may be anything as everything can be thrown in JavaScript.
+   */
+  error: any;
+}
+
+export interface FormInvalidEvent<F extends Form = Form> extends Event<F> {
+  status: Status;
+}
+
 export interface FormEventMap extends WidgetEventMap {
   'abort': Event<Form>;
   'close': Event<Form>;
@@ -25,6 +37,8 @@ export interface FormEventMap extends WidgetEventMap {
   'move': FormMoveEvent;
   'postLoad': Event<Form>;
   'reset': Event<Form>;
+  'error': FormErrorEvent;
+  'invalid': FormInvalidEvent;
   'revealInvalidField': FormRevealInvalidFieldEvent;
   'save': Event<Form>;
   'propertyChange:askIfNeedSave': PropertyChangeEvent<boolean>;

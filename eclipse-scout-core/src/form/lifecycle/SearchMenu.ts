@@ -32,11 +32,10 @@ export class SearchMenu extends Menu {
     }
 
     const form = this.getForm();
-    form.validate()
-      .then(valid => {
-        if (valid) {
-          form.trigger('search');
-        }
-      });
+    form.validate().then(status => {
+      if (status.isValid()) {
+        form.trigger('search');
+      }
+    });
   }
 }

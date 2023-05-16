@@ -236,6 +236,12 @@ export const JasmineScout = {
   runTestSuite(context) {
     this.startApp(TestingApp);
 
+    beforeAll(() => {
+      spyOn(scout, 'reloadPage').and.callFake(() => {
+        // NOP: disable reloading as this would restart the whole test-suite again and again
+      });
+    });
+
     beforeEach(() => {
       jasmine.addMatchers(jasmineScoutMatchers);
     });

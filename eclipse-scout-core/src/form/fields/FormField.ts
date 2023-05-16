@@ -76,7 +76,7 @@ export class FormField extends Widget implements FormFieldModel {
    * - $field points to the input-field (typically a browser-text field)
    * - $fieldContainer could point to the same input-field or when the field is a composite,
    *   to the parent DIV of that composite. For instance: the multi-line-smartfield is a
-   *   composite with a input-field and a DIV showing the additional lines. In that case $field
+   *   composite with an input-field and a DIV showing the additional lines. In that case $field
    *   points to the input-field and $fieldContainer to the parent DIV of the input-field.
    *   This property should be used primarily for layout-functionality.
    */
@@ -350,7 +350,6 @@ export class FormField extends Widget implements FormFieldModel {
   /**
    * Override this function to return another error status property.
    * The default implementation returns the property 'errorStatus'.
-   *
    */
   protected _errorStatus(): Status {
     return this.errorStatus;
@@ -369,7 +368,6 @@ export class FormField extends Widget implements FormFieldModel {
   /**
    * Adds the given (functional) error status to the list of error status. Prefer this function over #setErrorStatus
    * when you don't want to mess with the internal error states of the field (parsing, validation).
-   *
    */
   addErrorStatus(errorStatus: string | Status) {
     if (typeof errorStatus === 'string') {
@@ -685,7 +683,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
 
     if (errorStatus) {
-      // If the field is used as a cell editor in a editable table, then no validation errors should be shown.
+      // If the field is used as a cell editor in an editable table, then no validation errors should be shown.
       // (parsing and validation will be handled by the cell/column itself)
       if (this.mode === FormField.Mode.CELLEDITOR) {
         return;
@@ -748,7 +746,7 @@ export class FormField extends Widget implements FormFieldModel {
     this._renderLabel();
     if (this.rendered) {
       // Necessary to invalidate parent as well if parent uses the logical grid.
-      // LogicalGridData uses another row height depending of the label position
+      // LogicalGridData uses another row height depending on the label position
       let htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) {
         htmlCompParent.invalidateLayoutTree();
@@ -1165,7 +1163,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Appends a SPAN element for form-field status to this.$container and sets the this.$status property.
+   * Appends a span element for form-field status to this.$container and sets the this.$status property.
    */
   addStatus() {
     if (this.fieldStatus) {
@@ -1192,7 +1190,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Appends a SPAN element to this.$container and sets the this.$pseudoStatus property.
+   * Appends a span element to this.$container and sets the this.$pseudoStatus property.
    * The purpose of a pseudo status is to consume the space an ordinary status would.
    * This makes it possible to make components without a status as width as components with a status.
    */
@@ -1213,7 +1211,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Adds a SPAN element with class 'icon' the the given optional $parent.
+   * Adds a span element with class 'icon' the given optional $parent.
    * When $parent is not set, the element is added to this.$container.
    */
   addIcon($parent?: JQuery) {
@@ -1262,7 +1260,7 @@ export class FormField extends Widget implements FormFieldModel {
    * Updates the "inner alignment" of a field. Usually, the GridData hints only have influence on the LogicalGridLayout.
    * However, the properties "horizontalAlignment" and "verticalAlignment" are sometimes used differently.
    * Instead of controlling the field alignment in case fillHorizontal/fillVertical is false, the developer expects the _contents_ of the field to be aligned correspondingly inside the field.
-   * Technically, this is not correct, but is supported for legacy and convenience reasons for some of the Scout fields.
+   * Technically, this is not correct, but is supported for legacy and convenience reasons for some Scout fields.
    * Those who support the behavior may override _renderGridData() and call this method.
    * Some CSS classes are then added to the field.
    */

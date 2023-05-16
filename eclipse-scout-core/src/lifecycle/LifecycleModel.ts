@@ -12,9 +12,6 @@ import {Lifecycle, ObjectModel, Widget} from '../index';
 export interface LifecycleModel extends ObjectModel<Lifecycle<any>> {
   widget?: Widget;
 
-  validationFailedTextKey?: string;
-  validationFailedText?: string;
-
   emptyMandatoryElementsTextKey?: string;
   emptyMandatoryElementsText?: string;
 
@@ -24,8 +21,9 @@ export interface LifecycleModel extends ObjectModel<Lifecycle<any>> {
   invalidElementsWarningTextKey?: string;
   invalidElementsWarningText?: string;
 
-  askIfNeedSave?: boolean;
   saveChangesQuestionTextKey?: string;
   /** Java: cancelVerificationText */
   askIfNeedSaveText?: string;
+
+  askIfNeedSave?: boolean;
 }

@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {SpecForm, SpecRadioButtonGroup} from '../index';
-import {Action, arrays, Column, Form, FormField, FormModel, FullModelOf, GroupBox, InitModelOf, Mode, ModeSelector, ObjectType, RadioButton, scout, Session, StringField, TabBox, TabItem, Table, TableField, Widget} from '../../index';
+import {
+  arrays, Column, Form, FormField, FormModel, FullModelOf, GroupBox, InitModelOf, MessageBox, MessageBoxOption, Mode, ModeSelector, ObjectType, RadioButton, scout, Session, StringField, TabBox, TabItem, Table, TableField, Widget
+} from '../../index';
 import $ from 'jquery';
 
 export class FormSpecHelper {
@@ -18,16 +20,24 @@ export class FormSpecHelper {
     this.session = session;
   }
 
-  closeMessageBoxes() {
-    if (!this.session || !this.session.$entryPoint) {
+  closeMessageBoxes(option?: MessageBoxOption) {
+    if (!this.session) {
       return;
     }
-    let $messageBoxButtons = this.session.$entryPoint.find('.messagebox .box-button');
-    for (let i = 0; i < $messageBoxButtons.length; i++) {
-      const button = scout.widget($messageBoxButtons[i], Action);
-      if (button) {
-        button.doAction();
-      }
+    let button = option || MessageBox.Buttons.YES;
+    if (this.session.$entryPoint) {
+      // close rendered MessageBoxes
+      this.session.$entryPoint
+        .find('.messagebox').get()
+        .map(domElement => scout.widget(domElement, MessageBox))
+        .filter(messageBox => !!messageBox)
+        .forEach(messageBox => messageBox.trigger('action', {option: button}));
+    }
+
+    // close the remaining (possibly not rendered) boxes on the Desktop
+    if (this.session.desktop) {
+      this.session.desktop.messageBoxes
+        .forEach(messageBox => messageBox.trigger('action', {option: button}));
     }
   }
 

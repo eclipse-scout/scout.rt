@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, MessageBox, MessageBoxes, objects, ObjectWithType, scout, Session, SomeRequired, Status, StatusSeverity, Widget} from '../index';
+import {App, arrays, EventEmitter, InitModelOf, LifecycleEventMap, LifecycleModel, LifecycleValidateEvent, MessageBox, MessageBoxes, objects, ObjectWithType, scout, Session, SomeRequired, Status, StatusSeverity, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -26,8 +26,6 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
 
   objectType: string;
   widget: Widget;
-  validationFailedTextKey: string;
-  validationFailedText: string;
   emptyMandatoryElementsTextKey: string;
   emptyMandatoryElementsText: string;
   invalidElementsErrorTextKey: string;
@@ -37,14 +35,12 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   saveChangesQuestionTextKey: string;
   askIfNeedSave: boolean;
   askIfNeedSaveText: string;
-  handlers: Record<string, () => JQuery.Promise<Status>>;
+  handlers: Record<string, () => JQuery.Promise<void>>;
 
   constructor() {
     super();
 
     this.widget = null;
-    this.validationFailedTextKey = null;
-    this.validationFailedText = null;
     this.emptyMandatoryElementsTextKey = null;
     this.emptyMandatoryElementsText = null;
     this.invalidElementsErrorTextKey = null;
@@ -65,9 +61,6 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   init(model: InitModelOf<this>) {
     scout.assertParameter('widget', model.widget);
     $.extend(this, model);
-    if (objects.isNullOrUndefined(this.validationFailedText)) {
-      this.validationFailedText = this.session().text(this.validationFailedTextKey);
-    }
     if (objects.isNullOrUndefined(this.emptyMandatoryElementsText)) {
       this.emptyMandatoryElementsText = this.session().text(this.emptyMandatoryElementsTextKey);
     }
@@ -90,19 +83,18 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   }
 
   protected _load(): JQuery.Promise<void> {
-    return this.handlers.load()
-      .then(status => {
-        this.trigger('load');
-      });
+    return this.handlers.load().then(() => {
+      this.trigger('load');
+    });
   }
 
-  protected _defaultLoad(): JQuery.Promise<Status> {
+  protected _defaultLoad(): JQuery.Promise<void> {
     return $.resolvedPromise();
   }
 
   ok(): JQuery.Promise<void> {
     // 1. validate form
-    return this._whenInvalid(this._validate)
+    return this._validateAndHandle()
       .then(status => {
         if (!status.isValid()) {
           return;
@@ -114,12 +106,8 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
         }
 
         // 3. perform save operation
-        return this._whenInvalid(this._save)
-          .then(status => {
-            if (!status.isValid()) {
-              return;
-            }
-
+        return this._save()
+          .then(() => {
             this.markAsSaved();
             return this.close();
           });
@@ -135,6 +123,20 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
         this.close.bind(this));
     }
     return this.close();
+  }
+
+  protected _showYesNoCancelMessageBox(message: string, yesAction: () => JQuery.Promise<void>, noAction: () => JQuery.Promise<void>): JQuery.Promise<void> {
+    return MessageBoxes.createYesNoCancel(this.widget)
+      .withHeader(message)
+      .buildAndOpen()
+      .then(option => {
+        if (option === MessageBox.Buttons.YES) {
+          return yesAction();
+        } else if (option === MessageBox.Buttons.NO) {
+          return noAction();
+        }
+        return $.resolvedPromise();
+      });
   }
 
   reset(): JQuery.Promise<void> {
@@ -157,23 +159,16 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
 
   save(): JQuery.Promise<void> {
     // 1. validate form
-    return this._whenInvalid(this._validate)
+    return this._validateAndHandle()
       .then(status => {
-
         // 2. invalid or form has not been changed
         if (!status.isValid() || !this.saveNeeded()) {
           return;
         }
 
         // 3. perform save operation
-        return this._whenInvalid(this._save)
-          .then(status => {
-            if (!status.isValid()) {
-              return;
-            }
-
-            this.markAsSaved();
-          });
+        return this._save()
+          .then(() => this.markAsSaved());
       });
   }
 
@@ -181,15 +176,13 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     // NOP
   }
 
-  protected _save(): JQuery.Promise<Status> {
-    return this.handlers.save()
-      .then(status => {
-        this.trigger('save');
-        return status;
-      });
+  protected _save(): JQuery.Promise<void> {
+    return this.handlers.save().then(() => {
+      this.trigger('save');
+    });
   }
 
-  protected _defaultSave(): JQuery.Promise<Status> {
+  protected _defaultSave(): JQuery.Promise<void> {
     return $.resolvedPromise();
   }
 
@@ -208,102 +201,47 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     this.askIfNeedSave = askIfNeedSave;
   }
 
-  /**
-   * Helper function to deal with functions that return a Status object.
-   * Makes it easier to return early when that function returns an invalid status (= less code to write).
-   *
-   * @returns If the resulting promise is resolved with "true", the life cycle is considered invalid.
-   *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
-   *                    If the status returned by 'func' is absent or Status.Severity.OK, a promise resolved with
-   *                    "false" is returned. Otherwise, the promise returned by _showStatusMessageBox() is returned.
-   */
-  protected _whenInvalid(func: () => JQuery.Promise<Status>): JQuery.Promise<Status> {
-    return func.call(this)
+  protected _validateAndHandle(): JQuery.Promise<Status> {
+    return this._validate()
+      .then(status => {
+        const event = this.trigger('validate', {status}) as LifecycleValidateEvent<TValidationResult>;
+        return event.status;
+      })
       .then(status => {
         if (!status || status.isValid()) {
           return $.resolvedPromise(status || Status.ok());
         }
-        return this._showStatusMessageBox(status);
+        return this._handleInvalid(status);
       })
-      .catch(error => this._showStatusMessageBox(errorToStatus(error)));
-
-    // See ValueField#_createInvalidValueStatus, has similar code to transform error to status
-    function errorToStatus(error: Status | string | { message: string }): Status {
-      if (error instanceof Status) {
-        return error;
-      }
-      if (typeof error === 'string') {
-        return Status.error({
-          message: error
-        });
-      }
-      return Status.error({
-        message: error.message
+      .catch(error => {
+        const errorHandler = App.get().errorHandler;
+        return errorHandler.analyzeError(error)
+          .then(errorInfo => errorHandler.errorInfoToStatus(this.session(), errorInfo))
+          .then(status => this._handleInvalid(status));
       });
-    }
   }
 
-  protected _showYesNoCancelMessageBox(message: string, yesAction: () => JQuery.Promise<void>, noAction: () => JQuery.Promise<void>): JQuery.Promise<void> {
-    return MessageBoxes.createYesNoCancel(this.widget)
-      .withHeader(message)
-      .buildAndOpen()
-      .then(option => {
-        if (option === MessageBox.Buttons.YES) {
-          return yesAction();
-        } else if (option === MessageBox.Buttons.NO) {
-          return noAction();
-        }
-        return $.resolvedPromise();
-      });
+  protected _handleInvalid(status: Status): JQuery.Promise<Status> {
+    return $.resolvedPromise(status); // default no handling
   }
 
   /**
-   * @returns If the resulting promise is resolved with "true", the life cycle is considered invalid.
-   *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
-   *                    By default, a promise that is resolved with "true" is returned.
+   * @returns a promise resolved with the validation result as {@link Status}.
    */
-  protected _showStatusMessageBox(status: Status): JQuery.Promise<Status> {
-    if (!status || status.isValid()) {
-      return $.resolvedPromise(status);
-    }
-
-    return this._createStatusMessageBox(status).buildAndOpen()
-      .then(option => {
-        if (!status.isError() && option === MessageBox.Buttons.YES) {
-          return $.resolvedPromise(Status.ok(status.message));
-        }
-
-        return $.resolvedPromise(status);
-      });
-  }
-
-  protected _createStatusMessageBox(status: Status): MessageBoxes {
-    let messageBoxes = MessageBoxes.createOk(this.widget)
-      .withSeverity(status.severity)
-      .withHeader(this.validationFailedText)
-      .withBody(status.message, true);
-    if (!status.isError()) {
-      messageBoxes = messageBoxes
-        .withYes(this.widget.session.text('ProceedAnyway'))
-        .withNo(this.widget.session.text('Cancel'));
-    }
-    return messageBoxes;
-  }
-
-  /**
-   * @returns a promise resolved with `true` if the {@link widget} is valid, `false` otherwise.
-   */
-  validate(): JQuery.Promise<boolean> {
-    return this._whenInvalid(this._validate)
-      .then(status => status.isValid());
+  validate(): JQuery.Promise<Status> {
+    return this._validateAndHandle();
   }
 
   protected _validate(): JQuery.Promise<Status> {
     let status = this._validateElements();
-    if (status.isValid()) {
-      status = this._validateWidget();
+    if (!status.isValid()) {
+      return $.resolvedPromise(status);
     }
-    return $.resolvedPromise(status);
+    let statusOrPromise = this._validateWidget();
+    if (objects.isPromise(statusOrPromise)) {
+      return statusOrPromise;
+    }
+    return $.resolvedPromise(statusOrPromise);
   }
 
   /**
@@ -332,7 +270,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
    * with a specific element or field. For instance, you could validate if an internal member variable of a Lifecycle
    * or Form is set.
    */
-  protected _validateWidget(): Status {
+  protected _validateWidget(): Status | JQuery.Promise<Status> {
     return Status.ok();
   }
 
@@ -433,7 +371,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
    * Note: in contrast to events, handlers can control the flow of the lifecycle. They also have a return value where events have none.
    *   Only one handler can be registered for each type.
    */
-  handle(type: 'load' | 'save', func: () => JQuery.Promise<Status>) {
+  handle(type: 'load' | 'save', func: () => JQuery.Promise<void>) {
     let supportedTypes = ['load', 'save'];
     if (supportedTypes.indexOf(type) === -1) {
       throw new Error('Cannot register handler for unsupported type \'' + type + '\'');

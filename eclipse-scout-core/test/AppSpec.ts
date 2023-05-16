@@ -9,8 +9,16 @@
  */
 import {App} from '../src/index';
 import {AppModel} from '../src/App';
+import {TestingApp} from '../src/testing';
 
 describe('App', () => {
+
+  let originalApp = App.get();
+
+  afterAll(() => {
+    // restore original app as creating new App instances automatically overwrites the static App variable
+    TestingApp.set(originalApp);
+  });
 
   beforeEach(() => {
     // @ts-expect-error

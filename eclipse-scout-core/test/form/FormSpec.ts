@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
+import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
-  CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, NotificationBadgeStatus, NullWidget, NumberField, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session,
+  App, CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, NotificationBadgeStatus, NullWidget, NumberField, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session,
   SplitBox, Status, StringField, TabBox, TabItem, webstorage, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
@@ -255,10 +255,13 @@ describe('Form', () => {
         return $.resolvedPromise();
       };
 
+      expect(form.formStored).toBe(false);
       form.touch();
+      expect(form.formStored).toBe(false);
       form.save()
         .then(() => {
           expect(saveCalled).toBe(true);
+          expect(form.formStored).toBe(true);
         })
         .catch(fail)
         .always(done);
@@ -283,15 +286,15 @@ describe('Form', () => {
       let form = helper.createFormWithOneField();
       let field = form.rootGroupBox.fields[0] as StringField;
 
-      form._save = data => $.resolvedPromise(Status.error());
+      form._save = data => $.rejectedPromise(Status.error());
 
       field.setValue('whatever');
       form.save()
-        .then(() => {
+        .then(fail)
+        .catch(() => {
           // it should not be marked saved because the save returned an error
           expect(field.saveNeeded).toBe(true);
         })
-        .catch(fail)
         .always(done);
       jasmine.clock().tick(1000);
       helper.closeMessageBoxes();
@@ -1737,7 +1740,7 @@ describe('Form', () => {
 
   describe('validate', () => {
 
-    let form: Form;
+    let form: SpecForm;
     let mandatoryStringField: StringField;
     let numberField: NumberField;
 
@@ -1756,8 +1759,38 @@ describe('Form', () => {
       mandatoryStringField.setValue('whatever');
       numberField.setValue(42);
 
-      const valid = await form.validate();
-      expect(valid).toBeTrue();
+      const status = await form.validate();
+      expect(status.isValid()).toBeTrue();
+    });
+
+    it('default invalid box can be disabled', async () => {
+      spyOn(form, '_showFormInvalidMessageBox').and.callThrough();
+      form.on('invalid', event => event.preventDefault());
+      const status = await form.validate();
+      expect(status.severity).toBe(Status.Severity.ERROR); // still invalid: the mandatory field is missing
+      expect(form._showFormInvalidMessageBox).not.toHaveBeenCalled(); // default handling was skipped
+    });
+
+    it('validation status can be modified to ok in listener', async () => {
+      spyOn(form, '_createStatusMessageBox').and.callThrough();
+      form.on('invalid', event => {
+        event.status = Status.ok({message: 'custom'});
+      });
+      const status = await form.validate();
+      expect(status.severity).toBe(Status.Severity.OK); // was modified by listener
+      expect(status.message).toBe('custom'); // was modified by listener
+      expect(form._createStatusMessageBox).not.toHaveBeenCalled(); // because ok severity creates no message box
+    });
+
+    it('validation status can be modified to warning in listener', async () => {
+      spyOn(form, '_showFormInvalidMessageBox').and.callFake(status => $.resolvedPromise(status));
+      form.on('invalid', event => {
+        event.status = Status.warning({message: 'custom'});
+      });
+      const status = await form.validate();
+      expect(status.severity).toBe(Status.Severity.WARNING); // was modified by listener
+      expect(status.message).toBe('custom'); // was modified by listener
+      expect(form._showFormInvalidMessageBox).toHaveBeenCalledTimes(1);
     });
 
     it('returns false if mandatory field is empty', done => {
@@ -1766,8 +1799,8 @@ describe('Form', () => {
       numberField.setValue(42);
 
       form.validate()
-        .then(valid => {
-          expect(valid).toBeFalse();
+        .then(status => {
+          expect(status.isValid()).toBeFalse();
         })
         .catch(fail)
         .then(done);
@@ -1785,8 +1818,8 @@ describe('Form', () => {
       numberField.setValue('whatever');
 
       form.validate()
-        .then(valid => {
-          expect(valid).toBeFalse();
+        .then(status => {
+          expect(status.isValid()).toBeFalse();
         })
         .catch(fail)
         .then(done);
@@ -1795,6 +1828,155 @@ describe('Form', () => {
       helper.closeMessageBoxes();
       jasmine.clock().tick(1000);
       jasmine.clock().uninstall();
+    });
+  });
+
+  describe('error', () => {
+
+    let form: FixtureErrorForm;
+    let catchCalled: boolean;
+
+    class FixtureErrorForm extends Form {
+      throwInLoad = false;
+      throwInPostLoad = false;
+      throwInSave = false;
+
+      protected override _load(): JQuery.Promise<object> {
+        if (this.throwInLoad) {
+          return $.rejectedPromise('load');
+        }
+        return $.resolvedPromise({});
+      }
+
+      protected override _postLoad(): JQuery.Promise<void> {
+        if (this.throwInPostLoad) {
+          return $.rejectedPromise('postLoad');
+        }
+        return $.resolvedPromise();
+      }
+
+      protected override _save(data: object): JQuery.Promise<void> {
+        if (this.throwInSave) {
+          return $.rejectedPromise('save');
+        }
+        return $.resolvedPromise();
+      }
+    }
+
+    beforeEach(() => {
+      jasmine.clock().install();
+      catchCalled = false;
+      form = scout.create(FixtureErrorForm, {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: GroupBox
+        }
+      });
+      spyOn(App.get().errorHandler, 'handleErrorInfo').and.callThrough();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('is automatically handled in load', done => {
+      form.throwInLoad = true;
+      form.load()
+        .then(fail)
+        .catch(e => {
+          expect(e).toEqual('load');
+          catchCalled = true;
+        })
+        .always(() => {
+          expect(catchCalled).toBe(true);
+          expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
+          done();
+        });
+      jasmine.clock().tick(1000);
+    });
+
+    it('is automatically handled in postLoad', done => {
+      form.throwInPostLoad = true;
+      form.on('error', e => {
+        expect(e.phase).toBe('postLoad');
+        expect(e.error).toBe('postLoad');
+        done();
+      });
+      form.load()
+        .catch(fail); // error in postLoad does not reject the load promise
+      jasmine.clock().tick(1000);
+    });
+
+    it('is automatically handled in save', done => {
+      form.throwInSave = true;
+      form.load()
+        .then(() => {
+          form.touch();
+          form.ok()
+            .then(fail)
+            .catch(e => {
+              catchCalled = true;
+              expect(e).toEqual('save');
+            })
+            .always(() => {
+              expect(catchCalled).toBe(true);
+              expect(form.formStored).toBe(false); // save failed: do not mark as stored
+              expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
+              done();
+            });
+        })
+        .catch(fail);
+      jasmine.clock().tick(1000);
+    });
+
+    it('load error handling can be exchanged', done => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        e.preventDefault(); // disable default error handling
+      });
+      form.load()
+        .then(fail)
+        .catch(e => {
+          catchCalled = true;
+          expect(e).toBe('load');
+          expect(numHandled).toBe(1);
+        })
+        .always(() => {
+          expect(catchCalled).toBe(true);
+          expect(App.get().errorHandler.handleErrorInfo).not.toHaveBeenCalled();
+          done();
+        });
+      jasmine.clock().tick(1000);
+    });
+
+    it('save error handling can be exchanged', done => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        expect(e.phase).toBe('save');
+        e.preventDefault(); // disable default error handling
+      });
+      form.load()
+        .then(() => {
+          form.touch();
+          form.ok()
+            .then(fail)
+            .catch(e => {
+              catchCalled = true;
+              expect(e).toEqual('save');
+              expect(numHandled).toBe(1);
+            })
+            .always(() => {
+              expect(catchCalled).toBe(true);
+              expect(App.get().errorHandler.handleErrorInfo).not.toHaveBeenCalled();
+              done();
+            });
+        })
+        .catch(fail);
+      jasmine.clock().tick(1000);
     });
   });
 });

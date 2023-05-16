@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, EventHandler, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout,
-  FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, NotificationBadgeStatus, ObjectOrChildModel, Point,
-  PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
+  AbortKeyStroke, App, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap,
+  FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, MessageBoxes,
+  NotificationBadgeStatus, ObjectOrChildModel, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -23,6 +23,10 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   animateOpening: boolean;
   askIfNeedSave: boolean;
+  validationFailedText: string;
+  emptyMandatoryElementsText: string;
+  invalidElementsErrorText: string;
+  invalidElementsWarningText: string;
   askIfNeedSaveText: string;
   data: any;
   exclusiveKey: () => any;
@@ -54,7 +58,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
   renderInitialFocusEnabled: boolean;
   formLoading: boolean;
   formLoaded: boolean;
-  /** set by PopupWindow if this Form has displayHint=Form.DisplayHint.POPUP_WINDOW */
+  /**
+   * true if the form was stored (e.g. by calling {@link ok} or {@link save}) since it was created.
+   */
+  formStored: boolean;
+  /** set by PopupWindow if this form has displayHint=Form.DisplayHint.POPUP_WINDOW */
   popupWindow: PopupWindow;
   title: string;
   subTitle: string;
@@ -88,6 +96,10 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
     this.animateOpening = true;
     this.askIfNeedSave = true;
+    this.validationFailedText = '${textKey:FormValidationFailedTitle}';
+    this.emptyMandatoryElementsText = null;
+    this.invalidElementsErrorText = null;
+    this.invalidElementsWarningText = null;
     this.askIfNeedSaveText = null;
     this.data = {};
     this.exclusiveKey = null;
@@ -110,6 +122,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.movable = true;
     this.rootGroupBox = null;
     this.saveNeeded = false;
+    this.formStored = false;
     this.saveNeededVisible = true;
     this.formController = null;
     this.messageBoxController = null;
@@ -152,7 +165,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
-    this.resolveTextKeys(['title', 'askIfNeedSaveText']);
+    this.resolveTextKeys(['title', 'validationFailedText', 'emptyMandatoryElementsText', 'invalidElementsErrorText', 'invalidElementsWarningText', 'askIfNeedSaveText']);
     this.resolveIconIds(['iconId']);
     this._setDisplayParent(this.displayParent);
     this._setViews(this.views);
@@ -285,6 +298,9 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return scout.create(FormLifecycle, {
       widget: this,
       askIfNeedSave: this.askIfNeedSave,
+      emptyMandatoryElementsText: this.emptyMandatoryElementsText,
+      invalidElementsErrorText: this.invalidElementsErrorText,
+      invalidElementsWarningText: this.invalidElementsWarningText,
       askIfNeedSaveText: this.askIfNeedSaveText
     });
   }
@@ -309,7 +325,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * Calling this method is equivalent to calling {@link load} first and once the promise is resolved, calling {@link show}.
    *
    * Keep in mind that the form won't be rendered immediately after calling {@link open}. Because promises are always resolved asynchronously,
-   * {@link show} will be called delayed even if {@link load} does nothing but return a resolved promise.<br>
+   * {@link show} will be called delayed even if {@link load} does nothing but return a resolved promise.
+   *
    * This is only relevant if you need to access properties which are only available when the form is rendered (e.g. {@link $container}), which is not recommended anyway.
    */
   open(): JQuery.Promise<void> {
@@ -354,7 +371,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   /**
    * Lifecycle handle function registered for 'load'.
    */
-  protected _onLifecycleLoad(): JQuery.Promise<Status> {
+  protected _onLifecycleLoad(): JQuery.Promise<void> {
     try {
       this._setFormLoading(true);
       return this._load()
@@ -370,11 +387,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
           this.trigger('load');
         }).catch(error => {
           this._setFormLoading(false);
-          return this._handleLoadError(error);
+          return this._handleLoadErrorInternal(error);
         });
     } catch (error) {
       this._setFormLoading(false);
-      return this._handleLoadError(error);
+      return this._handleLoadErrorInternal(error);
     }
   }
 
@@ -383,18 +400,24 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * This function is called when an error occurs while the {@link _load} function is called or when the {@link _load} function returns with a rejected promise.
-   * By default, the Form is destroyed and the error re-thrown so a caller of {@link Form.load()} may catch the error.
-   *
+   * This function is called when an error occurs in the {@link _onLifecycleLoad} function or when the {@link _load} function returns with a rejected promise.
+   * By default, the error is forwarded to the {@link ErrorHandler}, the form is closed and a rejected promise is returned so a caller of {@link load} may catch the error.
    */
-  protected _handleLoadError(error: Error): JQuery.Promise<Status> {
+  protected _handleLoadErrorInternal(error: any): JQuery.Promise<void> {
+    return this._handleErrorInternal(error, 'load', error => this._handleLoadError(error));
+  }
+
+  /**
+   * Default load error handler. May be overridden by sub-classes.
+   */
+  protected _handleLoadError(error: any): JQuery.Promise<void> {
     this.close();
-    throw error;
+    return this._handleError(error);
   }
 
   /**
    * Method may be implemented to load the data.
-   * By default, a resolved promise containing the provided {@link this.data} is returned.
+   * By default, a resolved promise containing {@link this.data} is returned.
    */
   protected _load(): JQuery.Promise<object> {
     return $.resolvedPromise().then(() => {
@@ -410,9 +433,28 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   protected _onLifecyclePostLoad(): JQuery.Promise<void> {
-    return this._postLoad().then(() => {
-      this.trigger('postLoad');
-    });
+    try {
+      return this._postLoad()
+        .then(() => this.trigger('postLoad'))
+        .catch(error => this._handlePostLoadErrorInternal(error));
+    } catch (error) {
+      return this._handlePostLoadErrorInternal(error);
+    }
+  }
+
+  /**
+   * This function is called when an error occurs in the {@link _onLifecyclePostLoad} function or when the {@link _postLoad} function returns with a rejected promise.
+   * By default, the error is forwarded to the {@link ErrorHandler} and a rejected promise is returned.
+   */
+  protected _handlePostLoadErrorInternal(error: any): JQuery.Promise<void> {
+    return this._handleErrorInternal(error, 'postLoad', error => this._handlePostLoadError(error));
+  }
+
+  /**
+   * Default postLoad error handler. May be overridden by sub-classes.
+   */
+  protected _handlePostLoadError(error: any): JQuery.Promise<void> {
+    return this._handleError(error);
   }
 
   protected _postLoad(): JQuery.Promise<void> {
@@ -424,17 +466,27 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.setProperty('data', data);
   }
 
+  /**
+   * Imports the {@link this.data} to the form.
+   */
   importData() {
     // NOP
   }
 
+  /**
+   * Exports the form to {@link this.data}.
+   */
   exportData(): any {
     return null;
   }
 
   /**
    * Saves and closes the form.
-   * @returns promise which is resolved when the form is closed.
+   *
+   * **Note:** The resulting promise will be resolved even if the form does not require save and therefore even if {@link _save} is not called.
+   * If you only want to be informed when save is required and {@link _save} executed then you could use {@link whenSave} or `on('save')` instead.
+   *
+   * @returns promise which is resolved when the save completes and rejected on an error.
    */
   ok(): JQuery.Promise<void> {
     return this.lifecycle.ok();
@@ -442,9 +494,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Saves the changes without closing the form.
-   * @returns promise which is resolved when the form is saved
-   *    Note: it will be resolved even if the form does not require save and therefore even if {@link _save} is not called.
-   *    If you only want to be informed when save is required and {@link _save} executed then you could use {@link whenSave} or `on('save')` instead.
+   *
+   * **Note:** The resulting promise it will be resolved even if the form does not require save and therefore even if {@link _save} is not called.
+   * If you only want to be informed when save is required and {@link _save} executed then you could use {@link whenSave} or `on('save')` instead.
+   *
+   * @returns promise which is resolved when the save completes and rejected on an error.
    */
   save(): JQuery.Promise<void> {
     return this.lifecycle.save();
@@ -457,21 +511,70 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return this.when('save');
   }
 
-  protected _onLifecycleSave(): JQuery.Promise<Status> {
-    let data = this.exportData();
-    return this._save(data).then(status => {
-      this.setData(data);
-      this.trigger('save');
-      return status;
+  protected _onLifecycleSave(): JQuery.Promise<void> {
+    try {
+      let data = this.exportData();
+      return this._save(data)
+        .then(() => {
+          this.formStored = true;
+          this.setData(data);
+          this.trigger('save');
+        })
+        .catch(error => this._handleSaveErrorInternal(error));
+    } catch (error) {
+      return this._handleSaveErrorInternal(error);
+    }
+  }
+
+  /**
+   * This function is called when an error occurs in {@link _onLifecycleSave} or when {@link _save} returns with a rejected promise.
+   * By default, the error is forwarded to the {@link ErrorHandler} and the promise is rejected so a caller of {@link save} may catch the error.
+   */
+  protected _handleSaveErrorInternal(error: any): JQuery.Promise<void> {
+    return this._handleErrorInternal(error, 'save', error => this._handleSaveError(error));
+  }
+
+  /**
+   * Default save error handler. May be overridden by sub-classes.
+   */
+  protected _handleSaveError(error: any): JQuery.Promise<void> {
+    return this._handleError(error);
+    // do not close as the user might want to change any value causing the error or just to retry.
+  }
+
+  protected _handleErrorInternal(error: any, phase: string, errorHandler: (error: any) => JQuery.Promise<void>): JQuery.Promise<void> {
+    const event = this.trigger('error', {phase, error});
+    let promise;
+    if (event.defaultPrevented) {
+      promise = $.resolvedPromise();
+    } else {
+      promise = errorHandler(error).catch(errorInErrorHandler => {
+        // prevents that a rejected promise from the error handler overwrites the actual error from the form.
+        $.log.error('Error in error handler while trying to handle error "' + error + '".', errorInErrorHandler);
+      });
+    }
+    return promise.then(() => {
+      throw error; // always throw so it can be catched.
     });
+  }
+
+  /**
+   * Default error handler for {@link _load}, {@link _save} and {@link _postLoad}. May be overridden by subclasses.
+   * @return A promise that resolves when the error is handled.
+   */
+  protected _handleError(error: any): JQuery.Promise<void> {
+    const errorHandler = App.get().errorHandler;
+    return errorHandler
+      .handle(error) // shows a message box with the error
+      .then(errorInfo => undefined);
   }
 
   /**
    * Validates the form.
    *
-   * @returns a promise resolved with `true` if the form is valid, `false` otherwise.
+   * @returns a promise resolved with the validation result as {@link Status}.
    */
-  validate(): JQuery.Promise<boolean> {
+  validate(): JQuery.Promise<Status> {
     return this.lifecycle.validate();
   }
 
@@ -481,22 +584,58 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * there is not a single touched field. The function should be used to implement an overall validate
    * logic which is not related to a specific field. For instance, you could validate the state of an
    * internal member variable.
-   * <p>
-   * You should return a Status object with severity ERROR in case the validation fails.
+   *
+   * You should return a {@link Status} object with severity ERROR or WARNING in case the validation fails.
    * @internal
    */
-  _validate(): Status {
+  _validate(): Status | JQuery.Promise<Status> {
     return Status.ok();
+  }
+
+  /**
+   * Called when the validation of this form failed.
+   * @param status The {@link Status} that describes why the validation failed. It is always invalid (error or warning).
+   * @internal
+   */
+  _handleInvalid(status: Status): JQuery.Promise<Status> {
+    const event = this.trigger('invalid', {status}) as FormInvalidEvent;
+    if (event.defaultPrevented) {
+      return $.resolvedPromise(event.status);
+    }
+    return this._showFormInvalidMessageBox(event.status);
+  }
+
+  protected _showFormInvalidMessageBox(status: Status): JQuery.Promise<Status> {
+    if (!status || status.isValid()) {
+      return $.resolvedPromise(status);
+    }
+    return this._createStatusMessageBox(status).buildAndOpen().then(option => {
+      if (!status.isError() && option === MessageBox.Buttons.YES) {
+        return $.resolvedPromise(Status.ok(status.message));
+      }
+      return $.resolvedPromise(status);
+    });
+  }
+
+  protected _createStatusMessageBox(status: Status): MessageBoxes {
+    let messageBoxes = MessageBoxes.createOk(this)
+      .withSeverity(status.severity)
+      .withHeader(this.validationFailedText)
+      .withBody(status.message, true);
+    if (!status.isError()) {
+      messageBoxes = messageBoxes
+        .withYes(this.session.text('ProceedAnyway'))
+        .withNo(this.session.text('Cancel'));
+    }
+    return messageBoxes;
   }
 
   /**
    * This function is called by the lifecycle, when {@link save} is called.
    *
    * The data given to this function is the result of {@link exportData} which was called in advance.
-   *
-   * @returns a promise which may contain a {@link Status} specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
    */
-  protected _save(data: object): JQuery.Promise<Status> {
+  protected _save(data: object): JQuery.Promise<void> {
     return $.resolvedPromise();
   }
 
@@ -539,24 +678,24 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return this.when('close');
   }
 
-  /**
-   * Destroys the form and removes it from the desktop.
-   */
   protected _onLifecycleClose() {
-    let event = new Event();
-    this.trigger('close', event);
+    const event = this.trigger('close');
     if (!event.defaultPrevented) {
       this._close();
     }
   }
 
+  /**
+   * Destroys the form and removes it from the desktop.
+   */
   protected _close() {
     this.hide();
     this.destroy();
   }
 
   /**
-   * This function is called when the user presses the "x" icon.<p>
+   * This function is called when the user presses the "x" icon.
+   *
    * It will either call {@link #close()} or {@link #cancel()), depending on the enabled and visible system buttons, see {@link _abort}.
    */
   abort() {
@@ -632,8 +771,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
   /**
    * Override this method to provide a keystroke which closes the form.
    * The default implementation returns an AbortKeyStroke which handles the ESC key and calls {@link abort}.
-   * <p>
-   * The key stroke is only active if {@link this.closable} is set to true.
+   *
+   * The keystroke is only active if {@link closable} is set to true.
    */
   protected _createCloseKeyStroke(): KeyStroke {
     return new AbortKeyStroke(this, () => this.$close);
@@ -747,7 +886,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * Checks whether the form is shown, which means whether a form has been added to the form stack of the display parent, e.g. by using {@link showForm}.<br>
+   * Checks whether the form is shown, which means whether a form has been added to the form stack of the display parent, e.g. by using {@link showForm}.
+   *
    * It does not necessarily mean the user can see the content of the form for sure,
    * e.g. if the form is opened as a view the tab may be inactive because another view is active, or in case of a dialog it may be hidden behind another dialog or shown in an inactive view.
    */
@@ -1354,7 +1494,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   /**
    * Function required for objects that act as 'displayParent'.
    *
-   * @returns 'true' if this Form is currently accessible to the user
+   * @returns true if this form is currently accessible to the user
    */
   inFront(): boolean {
     return this.rendered && this.attached;

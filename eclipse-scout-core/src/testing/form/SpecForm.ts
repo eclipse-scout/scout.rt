@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, Status} from '../../index';
+import {Form, MessageBoxes, Status} from '../../index';
 import {SpecLifecycle} from '../index';
 
 export class SpecForm extends Form {
@@ -17,7 +17,15 @@ export class SpecForm extends Form {
     return super._load();
   }
 
-  override _save(data: object): JQuery.Promise<Status> {
+  override _save(data: object): JQuery.Promise<void> {
     return super._save(data);
+  }
+
+  override _showFormInvalidMessageBox(status: Status): JQuery.Promise<Status> {
+    return super._showFormInvalidMessageBox(status);
+  }
+
+  override _createStatusMessageBox(status: Status): MessageBoxes {
+    return super._createStatusMessageBox(status);
   }
 }

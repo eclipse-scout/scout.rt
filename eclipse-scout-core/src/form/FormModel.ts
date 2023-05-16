@@ -33,6 +33,30 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
    */
   askIfNeedSaveText?: string;
   /**
+   * The header text to show in message box when the Form validation failed (e.g. on a missing or invalid value).
+   *
+   * If not set, a default text is used: the text with key 'FormValidationFailedTitle'
+   */
+  validationFailedText?: string;
+  /**
+   * Configures the text to show in the Form validation message box for missing mandatory fields.
+   *
+   * If not set, a default text is used: the text with key 'FormEmptyMandatoryFieldsMessage'.
+   */
+  emptyMandatoryElementsText?: string;
+  /**
+   * Configures the text to show in the Form validation message box for fields having invalid values.
+   *
+   * If not set, a default text is used: the text with key 'FormInvalidFieldsMessage'.
+   */
+  invalidElementsErrorText?: string;
+  /**
+   * Configures the text to show in the Form validation message box for fields having a warning status.
+   *
+   * If not set, a default text is used: the text with key 'FormInvalidFieldsWarningMessage'.
+   */
+  invalidElementsWarningText?: string;
+  /**
    * The data property can be used to store arbitrary data on the form.
    *
    * It is typically mapped to form fields in {@link Form.importData} and exported from the form fields back to the data object in {@link Form.exportData}.

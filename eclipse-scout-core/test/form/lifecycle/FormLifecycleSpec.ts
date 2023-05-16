@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, SpecForm, SpecLifecycle} from '../../../src/testing/index';
-import {FormField, FormLifecycle, GroupBox, MessageBox, MessageBoxOption, scout, Status, StringField, TabBox, TabItem, TableField, TreeVisitResult, ValidationResult} from '../../../src/index';
+import {FormField, FormLifecycle, GroupBox, MessageBox, scout, Status, StringField, TabBox, TabItem, TableField, TreeVisitResult, ValidationResult} from '../../../src/index';
 import $ from 'jquery';
 
 describe('FormLifecycle', () => {
@@ -65,7 +65,7 @@ describe('FormLifecycle', () => {
       field.setMandatory(true);
       field.setValue(null);
       form.lifecycle.ok();
-      jasmine.clock().tick(0);
+      jasmine.clock().tick(10);
       expectMessageBox(true);
     });
 
@@ -75,7 +75,7 @@ describe('FormLifecycle', () => {
       field.setValue('Foo');
       form.lifecycle.handle('save', () => {
         saved = true;
-        return $.resolvedPromise(Status.ok());
+        return $.resolvedPromise();
       });
       form.lifecycle.ok();
       jasmine.clock().tick(1000);
@@ -114,7 +114,7 @@ describe('FormLifecycle', () => {
         form2.render();
       }
       form2.lifecycle.ok();
-      jasmine.clock().tick(0);
+      jasmine.clock().tick(10);
       expectMessageBox(true);
       helper.closeMessageBoxes();
       jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
@@ -249,10 +249,11 @@ describe('FormLifecycle', () => {
     });
 
     /**
-     * Errors that are thrown directly in the _load function should not be wrapped into a Promise
-     * and must be catched with try/catch or are finally handled by the global error handler.
+     * Errors that are thrown directly in the _load function should be wrapped into a Promise
+     * so that the catch() of the Promise is called in all error cases. Otherwise, custom error handling is not possible.
      */
     it('should handle errors that occur in _load function', done => {
+      jasmine.clock().install();
       let form = helper.createFormWithOneField();
       let error = null;
       form._load = () => {
@@ -260,12 +261,18 @@ describe('FormLifecycle', () => {
       };
       form.render();
       try {
-        form.load();
+        form.load()
+          .catch(e => {
+            error = e;
+          });
       } catch (error0) {
-        error = error0;
+        // should not happen
+        fail();
       }
+      jasmine.clock().tick(10);
       expect(form.destroyed).toBe(true);
       expect(error).toBe('Something went wrong');
+      jasmine.clock().uninstall();
       done();
     });
 
@@ -505,7 +512,7 @@ describe('FormLifecycle', () => {
   describe('statusMessageBox', () => {
 
     it('converts WARNING to OK on yes', done => {
-      form.lifecycle._showStatusMessageBox(Status.warning())
+      form._showFormInvalidMessageBox(Status.warning())
         .then(status => {
           expect(status).not.toBeNull();
           expect(status.severity).toBe(Status.Severity.OK);
@@ -514,12 +521,12 @@ describe('FormLifecycle', () => {
         .always(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
-      closeMessageBoxes(MessageBox.Buttons.YES);
+      helper.closeMessageBoxes(MessageBox.Buttons.YES);
       jasmine.clock().tick(1000);
     });
 
     it('keeps WARNING on no', done => {
-      form.lifecycle._showStatusMessageBox(Status.warning())
+      form._showFormInvalidMessageBox(Status.warning())
         .then(status => {
           expect(status).not.toBeNull();
           expect(status.severity).toBe(Status.Severity.WARNING);
@@ -528,12 +535,12 @@ describe('FormLifecycle', () => {
         .always(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
-      closeMessageBoxes(MessageBox.Buttons.NO);
+      helper.closeMessageBoxes(MessageBox.Buttons.NO);
       jasmine.clock().tick(1000);
     });
 
     it('keeps ERROR on yes', done => {
-      form.lifecycle._showStatusMessageBox(Status.error())
+      form._showFormInvalidMessageBox(Status.error())
         .then(status => {
           expect(status).not.toBeNull();
           expect(status.severity).toBe(Status.Severity.ERROR);
@@ -542,30 +549,16 @@ describe('FormLifecycle', () => {
         .always(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
-      closeMessageBoxes(MessageBox.Buttons.YES);
+      helper.closeMessageBoxes(MessageBox.Buttons.YES);
       jasmine.clock().tick(1000);
     });
 
     it('return status if it is valid', async () => {
       jasmine.clock().uninstall();
       const info = Status.info();
-      const status = await form.lifecycle._showStatusMessageBox(info);
+      const status = await form._showFormInvalidMessageBox(info);
       expect(status).toBe(info);
     });
-
-    function closeMessageBoxes(option: MessageBoxOption) {
-      if (!session || !session.$entryPoint) {
-        return;
-      }
-      const $messageBoxes = session.$entryPoint.find('.messagebox');
-      for (let i = 0; i < $messageBoxes.length; i++) {
-        const messageBox = scout.widget($messageBoxes[i], MessageBox);
-        if (!messageBox) {
-          return;
-        }
-        messageBox.trigger('action', {option});
-      }
-    }
   });
 
   function createValidationResult(field: FormField, validByMandatory: boolean, errorStatus?: Status): ValidationResult {

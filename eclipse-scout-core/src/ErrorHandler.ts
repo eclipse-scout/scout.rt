@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxError, App, arrays, icons, InitModelOf, LogLevel, NullLogger, ObjectModel, ObjectWithType, scout, Session, strings} from './index';
+import {
+  AjaxError, App, arrays, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status, StatusSeverity, strings
+} from './index';
 import $ from 'jquery';
 import * as sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
@@ -31,19 +33,74 @@ export interface ErrorHandlerModel extends ObjectModel<ErrorHandler> {
 }
 
 export interface ErrorInfo {
-  log: string;
-  level?: LogLevel;
-  error?: any; // May be Error, AjaxError or any other type like string, number etc. since any object can be thrown.
-  mappingError?: string;
-  code?: string;
+  /**
+   * The original error. May be Error, AjaxError or any other type like string, number etc. since any object can be thrown.
+   */
+  error?: any;
+  /**
+   * Specifies if the error should be shown as fatal error or not.
+   * If true, a fatal error is shown which forces the user to reload the page (unless in dev mode where it can be ignored).
+   * If false, a normal messagebox with an ok button is shown and after confirmation the user is allowed to use the app again without reload.
+   * The default is false.
+   */
+  showAsFatalError?: boolean;
+  /**
+   * The message of the error
+   */
   message?: string;
+  /**
+   * The error code
+   */
+  code?: string;
+  /**
+   * The HTTP status code if the error comes from an HTTP request
+   */
+  httpStatus?: number;
+  /**
+   * If the error contains an ErrorDo (see ErrorDo.java)
+   */
+  errorDo?: ErrorDo;
+  /**
+   * The original stack trace
+   */
   stack?: string;
+  /**
+   * Sourcemapped stack trace
+   */
   mappedStack?: string;
+  /**
+   * If there stacktrace mapping to source-maps fails this field contains the cause.
+   */
+  mappingError?: string;
+  /**
+   * The full message to log. Typically consists of the message and e.g. a stack trace.
+   */
+  log: string;
+  /**
+   * Specifies the level errors are logged to the console (and sent to the backend for logging). Default is {@link LogLevel.ERROR}.
+   */
+  level?: LogLevel;
+  /**
+   * Additional custom debug info. May come from an extra field on an Error thrown (Scout extension) or the response text from an ajax call.
+   */
   debugInfo?: string;
+}
+
+/**
+ * See org.eclipse.scout.rt.rest.error.ErrorDo
+ */
+export interface ErrorDo extends DoEntity {
+  httpStatus?: number;
+  errorCode?: string;
+  title?: string;
+  message?: string;
+  correlationId?: string;
+  severity?: string;
 }
 
 export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   declare model: ErrorHandlerModel;
+
   objectType: string;
   logError: boolean;
   displayError: boolean;
@@ -78,22 +135,27 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       if (this._isIgnorableScriptError(errorMessage, fileName, lineNumber, columnNumber, error)) {
         this.handleErrorInfo({
           log: `Ignoring error. Message: ${errorMessage}`,
+          showAsFatalError: true,
           level: LogLevel.INFO
         });
         return;
       }
       if (error instanceof Error) {
-        this.handle(error)
-          .catch(error => {
-            console.error('Error in global JavaScript error handler', error);
-          });
+        this.analyzeError(error)
+          .then(info => {
+            info.showAsFatalError = true;
+            return this.handleErrorInfo(info);
+          })
+          .catch(error => console.error('Error in global JavaScript error handler', error));
         return;
       }
+
       let code = 'J00';
       let log = errorMessage + ' at ' + fileName + ':' + lineNumber + '\n(' + 'Code ' + code + ')';
       this.handleErrorInfo({
-        code: code,
         message: errorMessage,
+        showAsFatalError: true,
+        code: code,
         log: log
       });
     } catch (err) {
@@ -123,7 +185,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
    * @param errorOrArgs error or array or array-like object containing the error and other arguments
    * @returns the analyzed errorInfo
    */
-  handle(errorOrArgs: any | IArguments | any[], ...args: any[]): JQuery.Promise<any> {
+  handle(errorOrArgs: any | IArguments | any[], ...args: any[]): JQuery.Promise<ErrorInfo> {
     let error = errorOrArgs;
     if (errorOrArgs && args.length === 0) {
       if ((String(errorOrArgs) === '[object Arguments]')) {
@@ -145,15 +207,18 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
    * 3. Nothing                 (code: 'P3')
    * 4. Everything else         (code: 'P4')
    */
-  analyzeError(error?: any, ...args: any[]): JQuery.Promise<any> {
-    let errorInfo = {
-      code: null,
+  analyzeError(error?: any, ...args: any[]): JQuery.Promise<ErrorInfo> {
+    let errorInfo: ErrorInfo = {
+      error: error,
       message: null,
+      code: null,
+      httpStatus: null,
+      errorDo: null,
       stack: null,
       mappedStack: null,
-      debugInfo: null,
+      mappingError: null,
       log: null,
-      error: error
+      debugInfo: null
     };
 
     return this._analyzeError(errorInfo, ...args);
@@ -224,12 +289,13 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
 
   protected _analyzeAjaxError(errorInfo: ErrorInfo, ...args: any[]) {
     let error = errorInfo.error;
-    let jqXHR, errorThrown, requestOptions;
+    let jqXHR: JQuery.jqXHR, errorThrown: string, requestOptions: JQuery.AjaxSettings, errorDo: ErrorDo = null;
     if (error instanceof AjaxError) {
       // Scout Ajax Error
       jqXHR = error.jqXHR;
       errorThrown = error.errorThrown;
       requestOptions = error.requestOptions; // scout extension
+      errorDo = error.errorDo;
     } else {
       // jQuery $.ajax() error (arguments of the fail handler are: jqXHR, textStatus, errorThrown, requestOptions)
       // The first argument (jqXHR) is stored in errorInfo.error (may even be an array) -> create args array again and extract the parameters
@@ -237,17 +303,50 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       jqXHR = args[0];
       errorThrown = args[2];
       requestOptions = args[3]; // scout extension
+      let errorDoCandidate = jqXHR?.responseJSON?.error;
+      if (AjaxError.isErrorDo(errorDoCandidate)) {
+        errorDo = errorDoCandidate;
+      }
     }
 
     let ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '');
-    let ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
+    let ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status + '', errorThrown) : 'Connection error');
 
-    errorInfo.code = 'X' + (jqXHR.status || '0');
-    errorInfo.message = 'AJAX call' + strings.box(' "', ajaxRequest, '"') + ' failed' + strings.box(' [', ajaxStatus, ']');
-    errorInfo.log = errorInfo.message;
+    errorInfo.httpStatus = jqXHR.status || 0;
+    errorInfo.code = 'X' + errorInfo.httpStatus;
+    errorInfo.errorDo = errorDo;
+
+    if (errorDo) {
+      errorInfo.message = errorDo.message;
+      errorInfo.level = this._severityToLogLevel(errorDo.severity);
+    }
+
+    // logging info
+    let req = 'AJAX call' + strings.box(' "', ajaxRequest, '"') + ' failed' + strings.box(' [', ajaxStatus, ']');
+    let log = [];
+    if (errorInfo.message) {
+      log.push(errorInfo.message);
+    } else {
+      errorInfo.message = req;
+    }
+    log.push(req);
     if (jqXHR.responseText) {
       errorInfo.debugInfo = 'Response text:\n' + jqXHR.responseText;
-      errorInfo.log += '\n' + errorInfo.debugInfo;
+      log.push(errorInfo.debugInfo);
+    }
+    errorInfo.log = arrays.format(log, '\n');
+  }
+
+  protected _severityToLogLevel(severity: string): LogLevel {
+    switch (severity) {
+      case 'ok':
+        return LogLevel.DEBUG;
+      case 'info':
+        return LogLevel.INFO;
+      case 'warning':
+        return LogLevel.WARN;
+      default:
+        return LogLevel.ERROR;
     }
   }
 
@@ -280,7 +379,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
         deferred.resolve(arrays.format(mappedStack, '\n'));
       });
     } catch (e) {
-      return $.rejectedPromise({message: 'Exception mapping failed', error: e});
+      return $.rejectedPromise({message: 'stacktrace mapping failed', error: e});
     }
 
     return deferred.promise();
@@ -292,7 +391,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
    * - If there is a scout session and the flag "displayError" is set, the error is shown in a message box.
    * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
    */
-  handleErrorInfo(errorInfo: ErrorInfo): ErrorInfo {
+  handleErrorInfo(errorInfo: ErrorInfo): JQuery.Promise<ErrorInfo> {
     errorInfo.level = scout.nvl(errorInfo.level, LogLevel.ERROR);
     if (this.logError && errorInfo.log) {
       this._logErrorInfo(errorInfo);
@@ -303,14 +402,22 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
     let session = this.session || App.get().sessions[0];
     if (session) {
-      if (this.displayError && errorInfo.level === LogLevel.ERROR) {
-        this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
-      }
       if (this.sendError) {
         this._sendErrorMessage(session, errorInfo.log, errorInfo.level);
       }
+      if (this.displayError) {
+        if (errorInfo.showAsFatalError) {
+          if (errorInfo.level === LogLevel.ERROR) {
+            return this._showInternalUiErrorMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log)
+              .then(() => errorInfo);
+          }
+        } else {
+          return this._showErrorMessageBox(session, errorInfo)
+            .then(() => errorInfo);
+        }
+      }
     }
-    return errorInfo;
+    return $.resolvedPromise(errorInfo);
   }
 
   protected _logErrorInfo(errorInfo: ErrorInfo) {
@@ -381,7 +488,51 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     return 'J0';
   }
 
-  protected _showMessageBox(session: Session, errorMessage: string, errorCode: string, logMessage: string) {
+  protected _showErrorMessageBox(session: Session, errorInfo: ErrorInfo): JQuery.Promise<MessageBoxActionEvent> {
+    const parent = session.desktop || new NullWidget();
+    const msgBoxModel: InitModelOf<MessageBox> = {
+      parent,
+      session,
+      ...this._buildErrorMessageBoxModel(session, errorInfo)
+    };
+    const messageBox = scout.create(MessageBox, msgBoxModel);
+    messageBox.on('action', event => messageBox.close());
+    messageBox.render(session.$entryPoint); // do not use messageBox.open() as the Desktop might not yet be ready (e.g. if there is an error in the App startup)
+    return messageBox.when('action');
+  }
+
+  protected _buildErrorMessageBoxModel(session: Session, errorInfo: ErrorInfo): ModelOf<MessageBox> {
+    const status = this.errorInfoToStatus(session, errorInfo);
+    let code: string = null;
+    if (errorInfo.error instanceof Status && errorInfo.error.code !== 0) {
+      code = errorInfo.error.code + '';
+    }
+    if (errorInfo?.errorDo?.errorCode && errorInfo.errorDo.errorCode !== '0') {
+      code = errorInfo.errorDo.errorCode;
+    }
+    let body = status.message || session.optText('ui.UnexpectedProblem', 'Unexpected problem');
+    if (code) {
+      body += ' (' + session.optText('ui.ErrorCodeX', 'Code ' + code, code) + ').';
+    }
+    let html = null;
+    if (errorInfo?.errorDo?.correlationId) {
+      let $container = session.desktop?.$container || session.$entryPoint;
+      let correlationIdText = session.optText('CorrelationId', 'Correlation ID');
+      html = $container.makeDiv('error-popup-correlation-id', correlationIdText + ': ' + errorInfo.errorDo.correlationId)[0].outerHTML;
+    }
+
+    return {
+      header: errorInfo.errorDo?.title,
+      body: body,
+      html: html,
+      iconId: status.iconId,
+      severity: status.severity,
+      hiddenText: errorInfo.log,
+      yesButtonText: session.optText('Ok', 'Ok')
+    };
+  }
+
+  protected _showInternalUiErrorMessageBox(session: Session, errorMessage: string, errorCode: string, logMessage: string): JQuery.Promise<void> {
     let options = {
       header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
       body: strings.join('\n\n',
@@ -398,10 +549,86 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       options.noButtonText = session.optText('ui.Ignore', 'Ignore');
     }
 
-    session.showFatalMessage(options, errorCode);
+    return session.showFatalMessage(options, errorCode);
   }
 
   protected _sendErrorMessage(session: Session, logMessage: string, logLevel: LogLevel) {
     session.sendLogRequest(logMessage, logLevel);
+  }
+
+  errorInfoToStatus(session: Session, errorInfo: ErrorInfo): Status {
+    if (errorInfo.error instanceof Status) {
+      // if a Status is thrown
+      return errorInfo.error;
+    }
+    return Status.ensure({
+      message: this._errorInfoToStatusMessage(session, errorInfo),
+      severity: this._errorInfoToStatusSeverity(errorInfo),
+      code: this._errorInfoToStatusCode(errorInfo)
+    });
+  }
+
+  protected _errorInfoToStatusCode(errorInfo: ErrorInfo): number {
+    let errorCode = errorInfo?.errorDo?.errorCode;
+    if (errorCode && errorCode !== '0' && objects.isNumber(errorCode)) {
+      return numbers.ensure(errorCode);
+    }
+    return errorInfo.httpStatus;
+  }
+
+  protected _errorInfoToStatusSeverity(errorInfo: ErrorInfo): StatusSeverity {
+    switch (errorInfo?.errorDo?.severity) {
+      case 'ok':
+        return Status.Severity.OK;
+      case 'info':
+        return Status.Severity.INFO;
+      case 'warning':
+        return Status.Severity.WARNING;
+      default:
+        return Status.Severity.ERROR;
+    }
+  }
+
+  protected _errorInfoToStatusMessage(session: Session, errorInfo: ErrorInfo): string {
+    if (typeof errorInfo.error === 'string') {
+      return errorInfo.error;
+    }
+    const errorDo = errorInfo.errorDo;
+    if (errorDo) {
+      let body = errorDo.message;
+      if (body && body !== 'undefined') {
+        // ProcessingException has default text 'undefined' which is not very helpful -> don't use it
+        return body;
+      }
+    }
+    if (errorInfo.error?.message) {
+      return errorInfo.error.message;
+    }
+    if (errorInfo.message) {
+      return errorInfo.message;
+    }
+    return this._getMessageBodyForHttpStatus(session, errorInfo);
+  }
+
+  protected _getMessageBodyForHttpStatus(session: Session, errorInfo: ErrorInfo): string {
+    let body: string;
+    switch (errorInfo.httpStatus) {
+      case 404: // Not Found
+        body = session.optText('TheRequestedResourceCouldNotBeFound', 'The requested resource could not be found.');
+        break;
+      case 502: // Bad Gateway
+      case 503: // Service Unavailable
+      case 504: // Gateway Timeout
+        body = session.optText('NetSystemsNotAvailable', 'The system is partially unavailable at the moment.')
+          + '\n\n'
+          + session.optText('PleaseTryAgainLater', 'Please try again later.');
+        break;
+      case 403: // Forbidden
+        body = session.optText('YouAreNotAuthorizedToPerformThisAction', 'You are not authorized to perform this action.');
+        break;
+      default:
+        body = session.optText('ui.UnexpectedProblem', 'Unexpected problem');
+    }
+    return body;
   }
 }

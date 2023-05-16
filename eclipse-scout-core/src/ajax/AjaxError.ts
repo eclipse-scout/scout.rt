@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import $ from 'jquery';
-import {InitModelOf} from '../index';
+import {ErrorDo, InitModelOf, objects} from '../index';
 
 export interface AjaxErrorModel {
   jqXHR: JQuery.jqXHR;
@@ -22,6 +22,7 @@ export class AjaxError implements AjaxErrorModel {
 
   jqXHR: JQuery.jqXHR;
   textStatus: JQuery.Ajax.ErrorTextStatus;
+  errorDo: ErrorDo;
   errorThrown: string;
   requestOptions: JQuery.AjaxSettings;
 
@@ -31,5 +32,22 @@ export class AjaxError implements AjaxErrorModel {
     this.errorThrown = null;
     this.requestOptions = null;
     $.extend(this, model);
+
+    const errorDo = this.jqXHR?.responseJSON?.error;
+    if (AjaxError.isErrorDo(errorDo)) {
+      this.errorDo = errorDo;
+    }
+  }
+
+  static isErrorDo(errorDo: any): errorDo is ErrorDo {
+    return errorDo?._type === 'scout.Error'
+      || objects.isNumber(errorDo?.severityAsInt); // if rt.rest.jackson dependency is missing no _type is part of the response. But instead the severityAsInt property.
+  }
+
+  static extractErrorDo(error: any): ErrorDo {
+    if (error instanceof AjaxError) {
+      return error.errorDo;
+    }
+    return null;
   }
 }

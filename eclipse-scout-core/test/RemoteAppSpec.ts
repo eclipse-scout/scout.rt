@@ -7,10 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {TestingApp} from '../src/testing/index';
+import {FormSpecHelper, TestingApp} from '../src/testing/index';
+import {App} from '../src';
 
 describe('RemoteApp', () => {
   let session: SandboxSession;
+  let helper: FormSpecHelper;
+  let originalApp = App.get();
+
+  afterAll(() => {
+    // restore original app as creating new App instances automatically overwrites the static App variable
+    TestingApp.set(originalApp);
+  });
 
   beforeEach(() => {
     // @ts-expect-error
@@ -18,6 +26,7 @@ describe('RemoteApp', () => {
     session = sandboxSession({
       renderDesktop: false
     });
+    helper = new FormSpecHelper(session);
   });
 
   describe('initDone', () => {
@@ -46,6 +55,7 @@ describe('RemoteApp', () => {
 
     it('is not executed when session startup fails', done => {
       let app = new TestingApp();
+      jasmine.clock().install();
       app.init()
         .catch(() => {
           expect(app.initialized).toBe(false);
@@ -61,6 +71,10 @@ describe('RemoteApp', () => {
         });
         return def.promise();
       };
+      jasmine.clock().tick(10);
+      helper.closeMessageBoxes();
+      jasmine.clock().tick(10);
+      jasmine.clock().uninstall();
     });
   });
 });
