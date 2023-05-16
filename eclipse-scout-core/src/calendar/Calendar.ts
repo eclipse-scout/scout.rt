@@ -1013,17 +1013,27 @@ export class Calendar extends Widget implements CalendarModel {
       singleCalendarRowWidth = Math.round(contentW / 7);
     }
 
-    $('.calendar-day-name', this.$topGrid).find('.calendar-column').each((index, element) => {
-      this._calcaulateColumnVisibility(singleCalendarRowWidth, multiCalendarRowWidth, element);
-    });
+    if (this.isDay()) {
+      // Set size to 0 for all
+      $('.calendar-column', this.$grids).data('new-width', 0);
 
-    $('.calendar-day', this.$topGrid).find('.calendar-column').each((index, element) => {
-      this._calcaulateColumnVisibility(singleCalendarRowWidth, multiCalendarRowWidth, element);
-    });
+      // Resize visible columns of selected day
+      $('.calendar-day-name:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid)
+        .add($('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$grids))
+        .find('.calendar-column')
+        .filter((i, e) => {
+          let id = $(e).data('calendarId');
+          return id === 'default' || this.calendars.find(cal => cal.calendarId === id).visible;
+        }).data('new-width', multiCalendarRowWidth);
+    } else if (this.isWorkWeek() || this.isWeek() || this.isMonth()) {
+      // 1. size 0 for all calendar columns
+      $('.calendar-column', this.$grids).data('new-width', 0);
 
-    $('.calendar-day', this.$grid).find('.calendar-column').each((index, element) => {
-      this._calcaulateColumnVisibility(singleCalendarRowWidth, multiCalendarRowWidth, element);
-    });
+      // 2. full size for default column
+      $('.calendar-column', this.$grids)
+        .filter((i, e) => $(e).data('calendarId') === 'default')
+        .data('new-width', singleCalendarRowWidth);
+    }
 
     // layout components
     if (this.isMonth()) {
@@ -1081,32 +1091,6 @@ export class Calendar extends Widget implements CalendarModel {
   protected _afterLayout($parent: JQuery, animate: boolean) {
     this._updateScrollbars($parent, animate);
     this._updateWeekdayNames();
-  }
-
-  protected _calcaulateColumnVisibility(singleColumnWidth: number, multiColumnWidth: number, element: HTMLElement) {
-    let calendarId = $(element).data('calendarId');
-    let isDefaultColumn = calendarId === 'default';
-    let newWidth = 0;
-    if (this.isDay()) {
-      // Always and only show default column
-      if ($(element).parent('.selected')) {
-        if (isDefaultColumn || this.calendars.find(cal => cal.calendarId === calendarId).visible) {
-          newWidth = multiColumnWidth;
-        } else {
-          newWidth = 0;
-        }
-      } else {
-        newWidth = 0;
-      }
-    } else {
-      // Always and only show default column
-      if (isDefaultColumn) {
-        newWidth = singleColumnWidth;
-      } else {
-        newWidth = 0;
-      }
-    }
-    $(element).data('new-width', newWidth);
   }
 
   protected _updateWeekdayNames() {
