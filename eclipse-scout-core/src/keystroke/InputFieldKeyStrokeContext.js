@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -95,9 +95,22 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
       return;
     }
 
-    if (this._isInputField(event.target) && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
+    if (this._isInputEvent(event)) {
       event.stopPropagation();
     }
+  }
+
+  _isInputEvent(event) {
+    if (!this._isInputField(event.target)) {
+      return false;
+    }
+    if (this._isLetterKeyStroke(event)) {
+      return true;
+    }
+    if (this._isNumberKeyStroke(event)) {
+      return true;
+    }
+    return false;
   }
 
   _isInputField(element) {
