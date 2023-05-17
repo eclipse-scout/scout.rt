@@ -94,9 +94,22 @@ export class InputFieldKeyStrokeContext extends KeyStrokeContext {
       return;
     }
 
-    if (this._isInputField(event.target) && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
+    if (this._isInputEvent(event)) {
       event.stopPropagation();
     }
+  }
+
+  protected _isInputEvent(event: ScoutKeyboardEvent): boolean {
+    if (!this._isInputField(event.target)) {
+      return false;
+    }
+    if (this._isLetterKeyStroke(event)) {
+      return true;
+    }
+    if (this._isNumberKeyStroke(event)) {
+      return true;
+    }
+    return false;
   }
 
   protected _isInputField(element: HTMLElement): boolean {
