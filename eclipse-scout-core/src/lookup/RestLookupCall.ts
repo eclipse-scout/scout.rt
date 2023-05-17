@@ -53,13 +53,19 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
   constructor() {
     super();
+
     this.resourceUrl = null;
     this.maxTextLength = null;
+
+    // for predefined restrictions only (e.g. in JSON or subclasses), don't change this attribute! this instance is shared with all clones!
     this.restriction = null;
+
     // dynamically added restrictions. after setting this attribute, this instance is shared with all following clones!
     this._restriction = null;
+
     this._ajaxCall = null;
     this._deferred = null;
+
     // RestLookupCall implements getByKeys
     this.batch = true;
   }
