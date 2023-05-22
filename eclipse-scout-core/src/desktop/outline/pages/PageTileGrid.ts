@@ -131,15 +131,14 @@ export class PageTileGrid extends TileGrid implements PageTileGridModel {
   }
 
   protected _createPageTile(page: Page): ButtonTile {
-    let button = scout.create(PageTileButton, {
-      parent: this,
-      outline: this.outline,
-      page: page
-    });
     let tile = scout.create(ButtonTile, {
       parent: this,
       cssClass: this.compact ? 'compact' : null,
-      tileWidget: button
+      tileWidget: {
+        objectType: PageTileButton,
+        outline: this.outline,
+        page: page
+      }
     });
     page.tile = tile;
     return tile;
