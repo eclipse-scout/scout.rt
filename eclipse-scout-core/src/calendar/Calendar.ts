@@ -1610,10 +1610,6 @@ export class Calendar extends Widget implements CalendarModel {
 
       // update stackW
       for (let j = 0; j < columns.length; j++) {
-        console.log('key:' + key);
-        console.log(columns);
-        console.log(columns[j].stack);
-        console.log('----------------');
         columns[j].stack[key].w = columns.length;
       }
     }
