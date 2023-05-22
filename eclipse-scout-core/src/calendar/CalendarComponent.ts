@@ -128,7 +128,6 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       // Find corresponding calendar
       let $calendar = this._findCalendarColumnInDay($day, this.item.calendarId);
       if (!$calendar) {
-        // Somehow the calendar cannot be found
         continue;
       }
       $part = $calendar.appendDiv('calendar-component');
