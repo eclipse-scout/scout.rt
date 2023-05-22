@@ -1469,8 +1469,9 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _arrangeComponents() {
     let k: number, c: number, j: number,
-      $day: JQuery, $columns: JQuery, $allChildren: JQuery, $children: JQuery,
-      $scrollableContainer: JQuery, dayComponents: CalendarComponent[], day: Date;
+      $day: JQuery, $columns: JQuery, $defaultColumn: JQuery, $allChildren: JQuery,
+      $children: JQuery, $scrollableContainer: JQuery, dayComponents: CalendarComponent[],
+      day: Date;
 
     let $days = $('.calendar-day', this.$grid);
     // Main (Bottom) grid: Iterate over days
@@ -1478,17 +1479,18 @@ export class Calendar extends Widget implements CalendarModel {
       $day = $days.eq(k);
       day = $day.data('date');
       $columns = $day.children('.calendar-column');
-      $allChildren = $columns.find('.calendar-component');
+      $allChildren = $day.find('.calendar-component');
+      $defaultColumn = $columns.filter((i, e) => $(e).data('calendarId') === 'default');
 
       // Remove old element containers
-      $scrollableContainer = $columns.children('.calendar-scrollable-components');
+      $scrollableContainer = $defaultColumn.children('.calendar-scrollable-components');
       if ($scrollableContainer.length > 0) {
         scrollbars.uninstall($scrollableContainer, this.session);
         $scrollableContainer.remove();
       }
 
       if (this.isMonth() && $allChildren.length > 0) {
-        $scrollableContainer = $day.appendDiv('calendar-scrollable-components');
+        $scrollableContainer = $defaultColumn.appendDiv('calendar-scrollable-components');
 
         for (j = 0; j < $allChildren.length; j++) {
           let $child = $allChildren.eq(j);
