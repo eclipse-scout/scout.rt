@@ -230,7 +230,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   protected override _destroy() {
-    this._unwatchFieldHierarchy(this.parent);
+    this._unwatchFieldHierarchy();
     super._destroy();
   }
 
@@ -1571,23 +1571,25 @@ export class FormField extends Widget implements FormFieldModel {
    * Also handles the case where a field is not directly connected to a form field parent, but has a non-form-field in between
    * (e.g. FormFieldMenu has a Menu as parent -> if the menu is moved the state needs to be recomputed as well).
    */
-  protected _watchFieldHierarchy() {
+  protected _watchFieldHierarchy(parent?: Widget) {
     if (!this.initialized) {
       this.on('hierarchyChange', this._hierarchyChangeHandler);
     }
+    parent = scout.nvl(parent, this.parent);
     // Each form field adds its own hierarchyChangeListener but non-form-fields don't -> add listener for every non-form field between this field and the next parent field
-    let parentField = this._visitParentsUntilField(this.parent, parent => parent.on('hierarchyChange', this._hierarchyChangeHandler));
+    let parentField = this._visitParentsUntilField(parent, parent => parent.on('hierarchyChange', this._hierarchyChangeHandler));
     parentField?.updateSaveNeeded(this);
   }
 
-  protected _unwatchFieldHierarchy(oldParent: Widget) {
+  protected _unwatchFieldHierarchy(oldParent?: Widget) {
+    oldParent = scout.nvl(oldParent, this.parent);
     let oldParentField = this._visitParentsUntilField(oldParent, parent => parent.off('hierarchyChange', this._hierarchyChangeHandler));
     oldParentField?.updateSaveNeeded();
   }
 
   protected _onHierarchyChange(event: HierarchyChangeEvent) {
     this._unwatchFieldHierarchy(event.oldParent);
-    this._watchFieldHierarchy();
+    this._watchFieldHierarchy(event.parent);
   }
 
   protected _visitParentsUntilField(parent: Widget, visitor: (parent: Widget) => void): FormField {

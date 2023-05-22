@@ -1361,31 +1361,6 @@ describe('Form', () => {
       expect(form.saveNeeded).toBe(true);
     });
 
-    it('works if fields are removed temporarily', () => {
-      form = scout.create(Form, {
-        parent: session.desktop,
-        rootGroupBox: {
-          objectType: GroupBox
-        }
-      });
-      expect(form.saveNeeded).toBe(false);
-
-      // Owner is form so field won't be destroyed when removed from the box
-      let newField = scout.create(StringField, {parent: form});
-      form.rootGroupBox.insertField(newField);
-      expect(form.saveNeeded).toBe(false);
-
-      newField.setValue('hi');
-      expect(form.saveNeeded).toBe(true);
-
-      form.rootGroupBox.deleteField(newField);
-      expect(form.saveNeeded).toBe(false);
-      expect(newField.destroyed).toBe(false);
-
-      form.rootGroupBox.insertField(newField);
-      expect(form.saveNeeded).toBe(true);
-    });
-
     it('manages listeners correctly', () => {
       form = scout.create(Form, {
         parent: session.desktop,
@@ -1449,6 +1424,20 @@ describe('Form', () => {
 
       box2.insertField(newField);
       expect(form.saveNeeded).toBe(true);
+
+      // Move field into menu and move menu into box1
+      expect(box1.saveNeeded).toBe(false);
+      box2.deleteField(newField);
+      menu.setField(newField);
+      menu.setOwner(form);
+      box1.insertMenu(menu);
+      expect(newField.events.count('hierarchyChange')).toBe(fieldListenerCount);
+      expect(menu.events.count('hierarchyChange')).toBe(menuListenerCount + 1);
+      expect(box1.events.count('hierarchyChange')).toBe(box1ListenerCount);
+      expect(box2.events.count('hierarchyChange')).toBe(box2ListenerCount);
+      expect(form.rootGroupBox.events.count('hierarchyChange')).toBe(mainBoxListenerCount);
+      expect(form.events.count('hierarchyChange')).toBe(formListenerCount - 1);
+      expect(box1.saveNeeded).toBe(true);
     });
 
     it('works for tab boxes', () => {
