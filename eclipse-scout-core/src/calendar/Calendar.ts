@@ -1013,7 +1013,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     if (this.isDay()) {
-      // 1. Set size to 0 for all
+      // Set size to 0 for all
       $('.calendar-column', this.$grids).data('new-width', 0);
 
       // Resize visible columns of selected day
@@ -1024,11 +1024,11 @@ export class Calendar extends Widget implements CalendarModel {
           let id = $(e).data('calendarId');
           return id === 'default' || this.calendars.find(cal => cal.calendarId === id).visible;
         }).data('new-width', columnWidth);
-    } else if (this.isWorkWeek() || this.isWeek() || this.isMonth()) {
-      // 1. size 0 for all calendar columns
+    } else {
+      // Set size 0 for all calendar columns
       $('.calendar-column', this.$grids).data('new-width', 0);
 
-      // 2. full size for default column
+      // Full size for default column
       $('.calendar-column', this.$grids)
         .filter((i, e) => $(e).data('calendarId') === 'default')
         .data('new-width', columnWidth);
@@ -1468,18 +1468,20 @@ export class Calendar extends Widget implements CalendarModel {
   /* -- components, arrangement------------------------------------ */
 
   protected _arrangeComponents() {
-    let k, j, $day, $allChildren, $children, $scrollableContainer, dayComponents, day;
+    let k: number, c: number, j: number,
+      $day: JQuery, $columns: JQuery, $allChildren: JQuery, $children: JQuery,
+      $scrollableContainer: JQuery, dayComponents: CalendarComponent[], day: Date;
 
     let $days = $('.calendar-day', this.$grid);
     // Main (Bottom) grid: Iterate over days
     for (k = 0; k < $days.length; k++) {
       $day = $days.eq(k);
-      $children = $day.children('.calendar-component:not(.component-task)');
-      $allChildren = $day.children('.calendar-component');
       day = $day.data('date');
+      $columns = $day.children('.calendar-column');
+      $allChildren = $columns.find('.calendar-component');
 
       // Remove old element containers
-      $scrollableContainer = $day.children('.calendar-scrollable-components');
+      $scrollableContainer = $columns.children('.calendar-scrollable-components');
       if ($scrollableContainer.length > 0) {
         scrollbars.uninstall($scrollableContainer, this.session);
         $scrollableContainer.remove();
@@ -1505,15 +1507,19 @@ export class Calendar extends Widget implements CalendarModel {
         });
       }
 
-      if (this.isMonth() && $children.length > 2) {
-        $day.addClass('many-items');
-      } else if (!this.isMonth() && $children.length > 1) {
-        // logical placement
-        dayComponents = this._getComponents($children);
-        this._arrange(dayComponents, day);
+      for (c = 0; c < $columns.length; c++) {
+        $children = $columns.eq(c).children('.calendar-component:not(.component-task)');
 
-        // screen placement
-        this._arrangeComponentSetPlacement($children, day);
+        if (this.isMonth() && $children.length > 2) {
+          $day.addClass('many-items');
+        } else if (!this.isMonth() && $children.length > 1) {
+          // logical placement
+          dayComponents = this._getComponents($children);
+          this._arrange(dayComponents, day);
+
+          // screen placement
+          this._arrangeComponentSetPlacement($children, day);
+        }
       }
     }
 
@@ -1577,12 +1583,13 @@ export class Calendar extends Widget implements CalendarModel {
       if (!c.stack) {
         c.stack = {};
       }
-      c.stack[key] = {};
+      c.stack[this._calculateStackKey(day, c.item.calendarId)] = {};
     }
 
     for (let i = 0; i < components.length; i++) {
       let c = components[i];
       let r = c.getPartDayPosition(day); // Range [from,to]
+      key = this._calculateStackKey(day, c.item.calendarId);
 
       // reduce number of columns, if all components end before this one
       if (columns.length > 0 && this._allEndBefore(columns, r.from, day)) {
@@ -1603,6 +1610,10 @@ export class Calendar extends Widget implements CalendarModel {
 
       // update stackW
       for (let j = 0; j < columns.length; j++) {
+        console.log('key:' + key);
+        console.log(columns);
+        console.log(columns[j].stack);
+        console.log('----------------');
         columns[j].stack[key].w = columns.length;
       }
     }
@@ -1633,18 +1644,26 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _arrangeComponentSetPlacement($children: JQuery, day: Date) {
-    let i, $child, stack;
+    let i, $child, component: CalendarComponent, stack;
 
     // loop and place based on data
     for (i = 0; i < $children.length; i++) {
       $child = $children.eq(i);
-      stack = $child.data('component').stack[day + ''];
+      component = $child.data('component');
+      stack = component.stack[this._calculateStackKey(day, component.item.calendarId)];
 
       // make last element smaller
       $child
         .css('width', 100 / stack.w + '%')
         .css('left', stack.x * 100 / stack.w + '%');
     }
+  }
+
+  protected _calculateStackKey(date: Date, calendarId: number): string {
+    if (!this.isDay() || calendarId === 0) {
+      return 'default';
+    }
+    return date + '' + calendarId ? calendarId.toString() : 'default';
   }
 
   override get$Scrollable(): JQuery {
