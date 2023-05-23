@@ -223,6 +223,14 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
 
   /**
    * Implement this function to provide static data.
+   *
+   * The result is expected to be a list of tuples. Each tuple will be converted to a lookup row via
+   * {@link _dataToLookupRow}. The first three elements of each tuple have a predefined meaning and
+   * are used by the lookup call (e.g. to filter rows by text). More elements can be added freely.
+   *
+   * - [0] = key
+   * - [1] = text
+   * - [2] = parentKey
    */
   protected _data(): any[] {
     return [];
