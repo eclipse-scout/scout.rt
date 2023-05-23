@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, Device, events, GroupBox, HtmlComponent, KeyStrokeContext, menus, numbers, objects, Point, Range, scout, scrollbars, strings, Widget} from '../index';
+import {arrays, CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, Device, events, GroupBox, HtmlComponent, KeyStrokeContext, menus, numbers, objects, Point, Range, scout, scrollbars, strings, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Calendar extends Widget {
@@ -165,7 +165,7 @@ export default class Calendar extends Widget {
   }
 
   _renderSelectedDate() {
-    this._updateModel(true, false);
+    this._updateModel(false);
   }
 
   setDisplayMode(displayMode) {
@@ -197,7 +197,7 @@ export default class Calendar extends Widget {
       // only do it on property changes
       return;
     }
-    this._updateModel(false, true);
+    this._updateModel(true);
 
     // only render if components have another layout
     if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
@@ -359,8 +359,10 @@ export default class Calendar extends Widget {
 
   _renderComponents() {
     this.components.sort(this._sortFromTo);
+    this._updateFullDayIndices();
     this.components.forEach(component => component.remove());
     this.components.forEach(component => component.render());
+    scrollbars.update(this.$grid);
     this._arrangeComponents();
     this._updateListPanel();
   }
@@ -460,7 +462,7 @@ export default class Calendar extends Widget {
 
   _navigateDate(direction) {
     this.selectedDate = this._calcSelectedDate(direction);
-    this._updateModel(true, false);
+    this._updateModel(false);
   }
 
   _calcSelectedDate(direction) {
@@ -479,12 +481,12 @@ export default class Calendar extends Widget {
     }
   }
 
-  _updateModel(updateTopGrid, animate) {
+  _updateModel(animate) {
     this._exactRange = this._calcExactRange();
     this._yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();
     this.trigger('modelChange');
-    this._updateScreen(updateTopGrid, animate);
+    this._updateScreen(true, animate);
   }
 
   /**
@@ -496,7 +498,7 @@ export default class Calendar extends Widget {
 
     if (this._isDay()) {
       from = new Date(p.year, p.month, p.date);
-      to = new Date(p.year, p.month, p.date + 1);
+      to = new Date(p.year, p.month, p.date);
     } else if (this._isWeek()) {
       from = new Date(p.year, p.month, p.date - p.day);
       to = new Date(p.year, p.month, p.date - p.day + 6);
@@ -545,7 +547,7 @@ export default class Calendar extends Widget {
 
   _onTodayClick(event) {
     this.selectedDate = new Date();
-    this._updateModel(true, false);
+    this._updateModel(false);
   }
 
   _onDisplayModeClick(event) {
@@ -653,13 +655,7 @@ export default class Calendar extends Widget {
     // reset animation sizes
     $('div', this.$container).removeData(['new-width', 'new-height']);
 
-    if (this._isMonth()) {
-      this.$topGrid.addClass('calendar-top-grid-short');
-      this.$grid.removeClass('calendar-grid-short');
-    } else {
-      this.$topGrid.removeClass('calendar-top-grid-short');
-      this.$grid.addClass('calendar-grid-short');
-    }
+    this.$grids.toggleClass('calendar-grids-month', this._isMonth());
 
     // init vars (Selected: Day)
     let $selected = $('.selected', this.$grid),
@@ -855,11 +851,62 @@ export default class Calendar extends Widget {
         component.remove();
       }
     });
-    let allDayComponents = this.components.filter(component => component.fullDay);
+    const fullDayComponents = this.components.filter(component => component.fullDay);
+    this._updateFullDayIndices(fullDayComponents);
     // first remove all components and add them from scratch
-    allDayComponents.forEach(component => component.remove());
-    allDayComponents.forEach(component => component.render());
+    fullDayComponents.forEach(component => component.remove());
+    fullDayComponents.forEach(component => component.render());
     this._updateScrollbars(this.$topGrid, false);
+    scrollbars.update(this.$grid);
+  }
+
+  _updateFullDayIndices(fullDayComponents) {
+    if (!fullDayComponents) {
+      fullDayComponents = this.components.filter(component => component.fullDay);
+    }
+    fullDayComponents.sort(this._sortFromTo);
+
+    const {from, to} = this._exactRange;
+    const usedIndicesMap = new Map();
+    let maxComponentsPerDay = 0;
+
+    for (const component of fullDayComponents) {
+      component.fullDayIndex = -1;
+      if (component.coveredDaysRange.to < from || component.coveredDaysRange.from > to) {
+        // component is not in range
+        continue;
+      }
+
+      let date = component.coveredDaysRange.from;
+      if (date < from) {
+        date = from;
+      }
+
+      let usedIndices = arrays.ensure(usedIndicesMap.get(date.valueOf()));
+
+      // get the first unused index
+      // create [0, 1, 2, ..., maxIndex, maxIndex + 1] remove the used indices
+      // => the minimum of the remaining array is the first unused index
+      const maxIndex = usedIndices.length ? arrays.max(usedIndices) : 0;
+      const indexCandidates = arrays.init(maxIndex + 2).map((elem, idx) => idx);
+      arrays.removeAll(indexCandidates, usedIndices);
+      const index = arrays.min(indexCandidates);
+      component.fullDayIndex = index;
+
+      // mark the index as used for all dates of the components range
+      // none of these indices can be used already due to the order of the components
+      while (date <= component.coveredDaysRange.to && date <= to) {
+        usedIndices.push(index);
+        usedIndicesMap.set(date.valueOf(), usedIndices);
+
+        date = dates.shift(date, 0, 0, 1);
+        usedIndices = arrays.ensure(usedIndicesMap.get(date.valueOf()));
+      }
+
+      maxComponentsPerDay = Math.max(index + 1, maxComponentsPerDay);
+    }
+
+    this.$grids.css('--full-day-components', maxComponentsPerDay);
   }
 
   layoutYearPanel() {
@@ -966,7 +1013,6 @@ export default class Calendar extends Widget {
         date.setDate(date.getDate() + 1);
       }
     }
-
   }
 
   layoutAxis() {
@@ -1008,7 +1054,7 @@ export default class Calendar extends Widget {
 
   _onYearPanelDateSelect(event) {
     this.selectedDate = event.date;
-    this._updateModel(true, false);
+    this._updateModel(false);
   }
 
   _updateListPanel() {

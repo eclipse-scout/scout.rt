@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -21,6 +21,7 @@ export default class CalendarComponent extends Widget {
      */
     this.selected = false;
     this.fullDay = false;
+    this.fullDayIndex = -1;
     this.item = null;
     this._$parts = [];
   }
@@ -29,6 +30,10 @@ export default class CalendarComponent extends Widget {
    * If day of a month is smaller than 100px, the components get the class compact
    */
   static MONTH_COMPACT_THRESHOLD = 100;
+
+  static DAY_OF_MONTH_HEIGHT = 30;
+  static COMPONENT_HEIGHT = 24;
+  static COMPONENT_VGAP = 2;
 
   _init(model) {
     super._init(model);
@@ -129,10 +134,9 @@ export default class CalendarComponent extends Widget {
       } else {
         if (this.fullDay) {
           // Full day tasks are rendered in the topGrid
-          let alreadyExistingTasks = $('.component-task', $day).length;
-          // Offset of initial task: 30px for the day-of-month number
-          // Offset of following tasks: 26px * preceding number of tasks. 26px: Task 23px high, 1px border. Spaced by 2px
-          this._arrangeTask(30 + 26 * alreadyExistingTasks);
+          // Offset of initial task: CalendarComponent.DAY_OF_MONTH_HEIGHT
+          // Offset of following tasks: (CalendarComponent.COMPONENT_HEIGHT + CalendarComponent.COMPONENT_VGAP) * preceding number of tasks
+          this._arrangeTask(CalendarComponent.DAY_OF_MONTH_HEIGHT + (CalendarComponent.COMPONENT_HEIGHT + CalendarComponent.COMPONENT_VGAP) * Math.max(this.fullDayIndex, 0));
           $part.addClass('component-task');
         } else {
           let
