@@ -110,7 +110,7 @@ export class Status implements StatusModel, ObjectWithType {
    *
    * @returns whether or not this status contains a child with the give type
    */
-  containsStatus(statusType: new() => Status): boolean {
+  containsStatus(statusType: abstract new() => Status): boolean {
     return this.containsStatusByPredicate(status => status instanceof statusType);
   }
 
@@ -130,7 +130,7 @@ export class Status implements StatusModel, ObjectWithType {
   /**
    * Removes all children of the given type from this status. The type is checked by inheritance.
    */
-  removeAllStatus(statusType: new() => Status) {
+  removeAllStatus(statusType: abstract new() => Status) {
     this.removeAllStatusByPredicate(status => status instanceof statusType);
   }
 

@@ -399,9 +399,9 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /**
-   * Whether or not the error status is or has the given status type.
+   * Whether the error status is or has the given status type.
    */
-  containsStatus(statusType: new() => Status): boolean {
+  containsStatus(statusType: abstract new() => Status): boolean {
     if (!this.errorStatus) {
       return false;
     }

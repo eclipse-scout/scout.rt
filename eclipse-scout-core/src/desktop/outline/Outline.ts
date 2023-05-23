@@ -379,7 +379,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     return menus;
   }
 
-  protected _getMenu(menus: Menu[], menuClass: new() => Menu): Menu {
+  protected _getMenu(menus: Menu[], menuClass: abstract new() => Menu): Menu {
     for (let i = 0; i < menus.length; i++) {
       if (menus[i] instanceof menuClass) {
         return menus[i];
@@ -388,7 +388,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     return null;
   }
 
-  protected _hasMenu(menus: Menu[], menuClass: new() => Menu): boolean {
+  protected _hasMenu(menus: Menu[], menuClass: abstract new() => Menu): boolean {
     return this._getMenu(menus, menuClass) !== null;
   }
 
