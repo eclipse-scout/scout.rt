@@ -87,7 +87,7 @@ function widget(widgetIdOrElement: string | number | HTMLElement | JQuery, partI
 
 /**
  * Resolves the widget using the given widget id or HTML element.
- * <p>
+ *
  * If the argument is a string or a number, it will search the widget hierarchy for the given id using {@link Widget.widget}.
  * If the argument is a {@link HTMLElement} or {@link JQuery} element, it will use {@link widgets.get(elem)} to get the widget which belongs to the given element.
  *
@@ -259,8 +259,8 @@ export const scout = {
    * for that element is prevented, we set an 'active' CSS class instead. This means in the
    * CSS we must deal with :active and with .active, where we need same behavior for the
    * active state across all browsers.
-   * <p>
-   * Typically you'd write something like this in your CSS:
+   *
+   * Typically, you'd write something like this in your CSS:
    *   button:active, button.active { ... }
    */
   installSyntheticActiveStateHandler(myDocument: Document) {

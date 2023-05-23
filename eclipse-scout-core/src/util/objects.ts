@@ -744,7 +744,7 @@ export const objects = {
   /**
    * @returns true if the first parameter is the same or a subclass of the second parameter.
    */
-  isSameOrExtendsClass<TClass2>(class1: any, class2: new() => TClass2): class1 is new() => TClass2 {
+  isSameOrExtendsClass<TClass2>(class1: any, class2: abstract new() => TClass2): class1 is new() => TClass2 {
     if (typeof class1 !== 'function' || typeof class2 !== 'function') {
       return false;
     }

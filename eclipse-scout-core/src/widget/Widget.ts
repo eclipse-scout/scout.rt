@@ -1920,16 +1920,25 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.setParent(this.owner);
   }
 
-  widget<T extends Widget>(widgetId: string, type: new() => T): T;
-  widget<TId extends string & keyof WidgetMapOf<this>>(widgetId: TId): WidgetMapOf<this>[TId];
-
   /**
-   * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.
-   * Returns the widget with the requested ID or null if no widget has been found.
-   * @param widgetId the id of the widget to look for
-   * @param type the type of the widget to look for. When specified, the return value will be cast to that type. This parameter has no effect at runtime.
+   * Traverses the widget tree starting from this widget and searches for a child widget with the given ID.
+   *
+   * @param widgetId the ID of the widget to look for
+   * @param type the type of the widget to look for. The return value will be cast to that type. This parameter has no effect at runtime.
+   * @returns the widget for the requested ID or null if no widget has been found.
    */
-  widget<TId extends string & keyof WidgetMapOf<this>, T extends Widget>(widgetId: TId, type?: new() => T): WidgetMapOf<this>[TId] | T {
+  widget<T extends Widget>(widgetId: string, type: abstract new() => T): T;
+  /**
+   * Traverses the widget tree starting from this widget and searches for a child widget with the given ID.
+   *
+   * If this widget has a {@link widgetMap}, its type has to contain a mapping for the given ID so the found widget can be cast to the correct type.
+   * If there is no concrete {@link widgetMap}, the return type will be {@link Widget}.
+   *
+   * @param widgetId the ID of the widget to look for
+   * @returns the widget for the requested ID or null if no widget has been found.
+   */
+  widget<TId extends string & keyof WidgetMapOf<this>>(widgetId: TId): WidgetMapOf<this>[TId];
+  widget<TId extends string & keyof WidgetMapOf<this>, T extends Widget>(widgetId: TId, type?: abstract new() => T): WidgetMapOf<this>[TId] | T {
     if (predicate(this)) {
       return this as unknown as T;
     }
@@ -1941,7 +1950,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Similar to widget(), but uses "breadth-first" strategy, i.e. it checks all children of the
+   * Similar to {@link widget}, but uses "breadth-first" strategy, i.e. it checks all children of the
    * same depth (level) before it advances to the next level. If multiple widgets with the same
    * ID exist, the one with the smallest distance to this widget is returned.
    *
@@ -2005,7 +2014,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * @param predicateOrClass may be a {@link Predicate} or a sub-class of {@link Widget}.
    * @returns the first ancestor for which the given predicate returns true or that matches the given widget type if a subclass of {@link Widget} is provided.
    */
-  findParent<T extends Widget>(predicateOrClass: Predicate<Widget> | (new() => T)): T {
+  findParent<T extends Widget>(predicateOrClass: Predicate<Widget> | (abstract new() => T)): T {
     let predicate;
     if (objects.isSameOrExtendsClass(predicateOrClass, Widget)) {
       predicate = widget => widget instanceof predicateOrClass;

@@ -3580,7 +3580,25 @@ export class Table extends Widget implements TableModel {
     return $row.children('.table-cell').eq(columnIndex);
   }
 
-  columnById<TId extends string & keyof ColumnMapOf<this>>(columnId: TId): ColumnMapOf<this>[TId] {
+  /**
+   * Searches for a column with the given ID.
+   *
+   * @param columnId the ID of the column to look for
+   * @param type the type of the column to look for. The return value will be cast to that type. This parameter has no effect at runtime.
+   * @returns the column for the requested ID or null if no column has been found.
+   */
+  columnById<TColumn extends Column>(columnId: string, type: abstract new() => TColumn): TColumn;
+  /**
+   * Searches for a column with the given ID.
+   *
+   * If this table has a {@link columnMap}, its type has to contain a mapping for the given ID so the found column can be cast to the correct type.
+   * If there is no concrete {@link columnMap}, the return type will be {@link Column}.
+   *
+   * @param columnId the ID of the column to look for
+   * @returns the column for the requested ID or null if no column has been found.
+   */
+  columnById<TId extends string & keyof ColumnMapOf<this>>(columnId: TId): ColumnMapOf<this>[TId];
+  columnById<TId extends string & keyof ColumnMapOf<this>, TColumn extends Column>(columnId: TId, type?: abstract new() => TColumn): ColumnMapOf<this>[TId] | TColumn {
     return arrays.find(this.columns, column => column.id === columnId) as ColumnMapOf<this>[TId];
   }
 
@@ -3596,7 +3614,7 @@ export class Table extends Widget implements TableModel {
   }
 
   columnsByIds<TId extends string & keyof ColumnMapOf<this>>(columnIds: TId[]): ColumnMapOf<this>[TId][] {
-    return columnIds.map(this.columnById.bind(this));
+    return columnIds.map(id => this.columnById(id));
   }
 
   getVisibleRows(): TableRow[] {
