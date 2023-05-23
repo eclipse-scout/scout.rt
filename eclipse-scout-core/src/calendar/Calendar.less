@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -220,7 +220,7 @@
     background-color: @palette-blue-1; /* Default colors used when component has no specific class */
   }
 
-   /* Default colors used when component has no specific class */
+  /* Default colors used when component has no specific class */
   background-color: @palette-blue-0;
 
   &:hover {
@@ -347,11 +347,28 @@
   display: inline-block;
   vertical-align: top;
   overflow: hidden;
+
+  --min-full-day-components: 2;
+  --max-full-day-components: 4;
+  --full-day-components: 0;
+  --day-of-month-height: 30px; // CalendarComponent.DAY_OF_MONTH_HEIGHT
+  --component-height: 24px; // CalendarComponent.COMPONENT_HEIGHT
+  --component-vgap: 2px; // CalendarComponent.COMPONENT_VGAP
+  --component-height-with-gap: calc(var(--component-height) + var(--component-vgap));
+  --top-grid-height: calc(@calendar-title-height
+  + var(--day-of-month-height)
+  + (max(min(var(--full-day-components), var(--max-full-day-components)), var(--min-full-day-components)) * var(--component-height-with-gap))// number of full day components, bounded by min and max
+  - (min(max(var(--full-day-components), var(--min-full-day-components)), 1) * var(--component-vgap))// remove additional gap after the last full day component if there is one
+  + 1px); // border
+
+  &.calendar-grids-month {
+    --top-grid-height: @calendar-title-height + 1px;
+  }
 }
 
 .calendar-grid {
   display: block;
-  height: calc(~'100% - 25px');
+  height: calc(~'100% - ' var(--top-grid-height));
   padding-right: @root-group-box-padding-right;
 
   & + .scroll-shadow {
@@ -367,20 +384,12 @@
   }
 }
 
-.calendar-grid.calendar-grid-short {
-  height: calc(~'100% - 105px');
-}
-
 .calendar-top-grid {
   display: block;
   overflow: hidden;
   border-bottom: 1px solid @border-color;
-  height: 105px;
+  height: var(--top-grid-height);
   margin-right: @root-group-box-padding-right;
-
-  &.calendar-top-grid-short {
-    height: 25px;
-  }
 
   &.mobile {
     margin-right: @calendar-padding-right-mobile;
@@ -394,9 +403,12 @@
   white-space: nowrap;
 }
 
-.calendar-week-allday-container,
+.calendar-week-allday-container {
+  height: calc(~'100% - ' @calendar-title-height);
+}
+
 .calendar-week-allday-container > .calendar-week-name {
-  height: 80px;
+  height: calc(~'100% - ' @calendar-title-height - 9px);
 }
 
 .calendar-week-allday-container > .calendar-day {
