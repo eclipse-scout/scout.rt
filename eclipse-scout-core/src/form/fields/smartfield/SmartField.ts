@@ -697,7 +697,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
         $.log.isDebugEnabled() && $.log.debug('FormatValue failed for SmartField with id ' + this.id, error);
         if (!this._updateDisplayTextPending) {
           // If a new value was set in the meantime, the previous lookup call was aborted -> don't mark the field as invalid because only the new lookup matters
-          return '';
+          throw error;
         }
         if (error && error.abort || error instanceof AjaxError && error.textStatus === 'abort') {
           // If a new value was set in the meantime but the display text of the new value not resolved yet, ignore the abort event of the first lookup to not show invalid key message while the second lookup is still in progress.

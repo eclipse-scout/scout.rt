@@ -656,11 +656,6 @@ describe('SmartField', () => {
       await field.when('propertyChange:displayText');
       expect(field.errorStatus).toBe(null);
       expect(field.value).toBe(2);
-      expect(field.displayText).toBe(''); // Set to empty string by catch in _formatValue first
-
-      await field.when('propertyChange:displayText');
-      expect(field.errorStatus).toBe(null);
-      expect(field.value).toBe(2);
       expect(field.displayText).toBe('Bar');
     });
 
