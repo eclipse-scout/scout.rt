@@ -432,6 +432,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
 
   override selectNodes(nodes: Page | Page[], debounceSend?: boolean) {
     nodes = arrays.ensure(nodes);
+    nodes.splice(1);
     if (nodes.length > 0 && this.isNodeSelected(nodes[0])) {
       // Already selected, do nothing
       return;
