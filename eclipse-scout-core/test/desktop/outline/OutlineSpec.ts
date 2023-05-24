@@ -180,6 +180,26 @@ describe('Outline', () => {
       expect(node.detailFormVisibleByUi).toBe(true);
     });
 
+    it('can only select 1 node', () => {
+      const node1 = outline.nodes[1];
+
+      expect(outline.selectedNodes).toEqual([]);
+
+      outline.selectNodes([node]);
+      expect(outline.selectedNodes).toEqual([node]);
+
+      outline.selectNodes([node1]);
+      expect(outline.selectedNodes).toEqual([node1]);
+
+      outline.selectNodes([node, node1]);
+      expect(outline.selectedNodes).toEqual([node]);
+
+      outline.selectNodes([node1, node]);
+      expect(outline.selectedNodes).toEqual([node1]);
+
+      outline.selectNodes();
+      expect(outline.selectedNodes).toEqual([]);
+    });
   });
 
   describe('updateDetailMenus', () => {
