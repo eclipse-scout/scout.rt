@@ -18,6 +18,7 @@ export interface CalendarComponentModel extends WidgetModel {
    */
   selected?: boolean;
   fullDay?: boolean;
+  fullDayIndex?: number;
   item?: CalendarItem;
   coveredDaysRange?: DateRange | JsonDateRange;
 }

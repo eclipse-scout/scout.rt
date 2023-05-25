@@ -20,6 +20,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   toDate: string;
   selected: boolean;
   fullDay: boolean;
+  fullDayIndex: number;
   draggable: boolean;
   item: CalendarItem;
   stack: Record<string, { x?: number; w?: number }>;
@@ -32,6 +33,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     super();
     this.selected = false;
     this.fullDay = false;
+    this.fullDayIndex = -1;
     this.item = null;
     this._$parts = [];
   }
@@ -40,6 +42,10 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
    * If day of a month is smaller than 100px, the components get the class compact
    */
   static MONTH_COMPACT_THRESHOLD = 100;
+
+  static DAY_OF_MONTH_HEIGHT = 30;
+  static COMPONENT_HEIGHT = 24;
+  static COMPONENT_VGAP = 2;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -142,10 +148,9 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       } else {
         if (this.fullDay) {
           // Full day tasks are rendered in the topGrid
-          let alreadyExistingTasks = $('.component-task', $day).length;
-          // Offset of initial task: 30px for the day-of-month number
-          // Offset of following tasks: 26px * preceding number of tasks. 26px: Task 23px high, 1px border. Spaced by 2px
-          this._arrangeTask(30 + 26 * alreadyExistingTasks);
+          // Offset of initial task: CalendarComponent.DAY_OF_MONTH_HEIGHT
+          // Offset of following tasks: (CalendarComponent.COMPONENT_HEIGHT + CalendarComponent.COMPONENT_VGAP) * preceding number of tasks
+          this._arrangeTask(CalendarComponent.DAY_OF_MONTH_HEIGHT + (CalendarComponent.COMPONENT_HEIGHT + CalendarComponent.COMPONENT_VGAP) * Math.max(this.fullDayIndex, 0));
           $part.addClass('component-task');
         } else {
           let
