@@ -9,5 +9,5 @@
   ~ SPDX-License-Identifier: EPL-2.0
   -->
 <configuration>
-  <include resource="logback-test-scout.xml"/>
+  <include resource="logback-test-scout.xml" />
 </configuration>
