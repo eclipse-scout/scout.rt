@@ -20,8 +20,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
@@ -35,6 +37,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.databind.type.MapType;
 
 /**
  * Serializer for {@link IDoEntity} and all sub-classes.
@@ -74,7 +77,7 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
     sortedMap.putAll(entity.allNodes());
     for (Map.Entry<String, DoNode<?>> e : sortedMap.entrySet()) {
       gen.setCurrentValue(entity);
-      serializeAttributes(e.getKey(), e.getValue(), gen, provider);
+      serializeAttribute(e.getKey(), e.getValue(), gen, provider);
     }
     serializeContributions(gen, entity, provider);
   }
@@ -91,44 +94,39 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
     if (entity.hasContributions()) {
       Collection<IDoEntityContribution> contributions = entity.getContributions();
       validateContributions(entity, contributions);
-      serializeCollection(m_context.getContributionsAttributeName(), contributions, gen, provider);
+      gen.writeObjectField(m_context.getContributionsAttributeName(), contributions);
     }
   }
 
-  protected void serializeAttributes(String attributeName, Object obj, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  protected void serializeAttribute(String attributeName, Object obj, JsonGenerator gen, SerializerProvider provider) throws IOException {
     if (obj instanceof DoValue) {
       // serialize DoValue value as unwrapped object
       obj = ((DoValue<?>) obj).get();
     }
-    if (obj instanceof Collection) {
-      serializeCollection(attributeName, (Collection<?>) obj, gen, provider);
+
+    if (obj == null) {
+      gen.writeObjectField(attributeName, null);
+    }
+    else if (obj instanceof Collection || obj instanceof IDoCollection) {
+      gen.writeObjectField(attributeName, obj);
     }
     else if (obj instanceof Map) {
       serializeMap(attributeName, (Map<?, ?>) obj, gen, provider);
     }
-    else {
+    else if (obj.getClass() == DoEntity.class) {
+      // DoEntity exclusion: in special circumstances (e.g. migration scenarios) where a typed DO entity might contain an untyped DO entity,
+      // the typed DoEntitySerializer must not be used because expecting different instances of the attributes
+      // (e.g. an attribute with type IId results in QualifiedIdSerializer, expecting a IId and not a String as present in the untyped DO entity).
       gen.writeObjectField(attributeName, obj);
     }
-  }
-
-  /**
-   * Serializes a collection attribute within {@link IDoEntity}
-   */
-  protected void serializeCollection(String attributeName, Collection<?> collection, JsonGenerator gen, SerializerProvider provider) throws IOException {
-    Optional<AttributeType> type = getAttributeType(attributeName);
-    if (type.isPresent()) {
-      serializeTypedAttribute(attributeName, collection, gen, provider, type.get().getJavaType());
-    }
     else {
-      // If no type definition is available, serialize all collection-like types (e.g. all {@link List} and {@link Set} implementations) as array using default jackson serializer.
-      // This "raw" array serialization forces Jackson to includes type information if necessary according to actual chosen serializer for each object type (see writeObject(...) call).
-      gen.writeFieldName(attributeName);
-      gen.writeStartArray();
-      gen.setCurrentValue(collection);
-      for (Object item : collection) {
-        gen.writeObject(item);
+      Optional<AttributeType> attributeType = getAttributeType(attributeName);
+      if (attributeType.isPresent()) {
+        serializeTypedAttribute(attributeName, obj, gen, provider, attributeType.get().getJavaType());
       }
-      gen.writeEndArray();
+      else {
+        gen.writeObjectField(attributeName, obj);
+      }
     }
   }
 
@@ -136,29 +134,47 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    * Serializes a map attribute within {@link IDoEntity}
    */
   protected void serializeMap(String attributeName, Map<?, ?> map, JsonGenerator gen, SerializerProvider provider) throws IOException {
-    Optional<AttributeType> type = getAttributeType(attributeName);
-    if (type.isPresent()) {
-      serializeTypedAttribute(attributeName, map, gen, provider, type.get().getJavaType());
+    Optional<AttributeType> typeOpt = getAttributeType(attributeName);
+    JsonSerializer<Object> keySerializer = null;
+    JsonSerializer<Object> valueSerializer = null;
+    if (typeOpt.isPresent()) {
+      MapType mapType = (MapType) typeOpt.get().getJavaType();
+
+      // A data object (e.g. DoValue<Map<TestItemDo, String>>) or a pojo (e.g. DoValue<Map<Pojo, String>>) should never be used as a key type of a map,
+      // because SdtKeySerializers.Default will be used which would trigger toString on the given object (not really useful).
+      keySerializer = provider.findKeySerializer(mapType.getKeyType(), null);
+
+      // Check for != Object is required because findTypedValueSerializer would otherwise return UnknownSerializer.
+      // By not setting a serializer here, JsonGenerator#writeObject will be called further below, which will result in a value-based serialization.
+      if (mapType.getContentType().getRawClass() != Object.class) {
+        valueSerializer = provider.findTypedValueSerializer(mapType.getContentType(), true, null);
+      }
     }
-    else {
-      // If no type definition is available, serialize all {@link Map} types as object  using default jackson serializer
-      // This "raw" map serialization forces Jackson to includes type information if necessary according to actual chosen serializer for each object type (see writeObject(...) call).
-      gen.writeFieldName(attributeName);
-      gen.writeStartObject();
-      gen.setCurrentValue(map);
-      for (Entry<?, ?> entry : map.entrySet()) {
-        // serialize map key
-        if (entry.getKey() == null) {
-          provider.getDefaultNullKeySerializer().serialize(entry.getKey(), gen, provider);
-        }
-        else {
-          provider.findKeySerializer(entry.getKey().getClass(), null).serialize(entry.getKey(), gen, provider);
-        }
-        // serialize map value
+
+    // This "raw" map serialization forces Jackson to includes type information by using the appropriate serializer if a type is available
+    // or use the default serialization via key serializer/JsonGenerator#writeObject otherwise.
+    gen.writeFieldName(attributeName);
+    gen.writeStartObject();
+    gen.setCurrentValue(map);
+    for (Entry<?, ?> entry : map.entrySet()) {
+      // serialize map key
+      if (entry.getKey() == null) {
+        provider.getDefaultNullKeySerializer().serialize(entry.getKey(), gen, provider);
+      }
+      else {
+        JsonSerializer<Object> ser = keySerializer == null ? provider.findKeySerializer(entry.getKey().getClass(), null) : keySerializer;
+        ser.serialize(entry.getKey(), gen, provider);
+      }
+
+      // serialize map value
+      if (valueSerializer == null || entry.getValue() == null) { // JsonSerializer#serializer must not be called will a null value
         gen.writeObject(entry.getValue());
       }
-      gen.writeEndObject();
+      else {
+        valueSerializer.serialize(entry.getValue(), gen, provider);
+      }
     }
+    gen.writeEndObject();
   }
 
   /**

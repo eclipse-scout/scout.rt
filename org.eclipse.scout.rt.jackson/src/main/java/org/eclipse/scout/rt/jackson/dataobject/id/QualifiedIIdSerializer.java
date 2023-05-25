@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  * Custom serializer for {@link IId} instances - like {@link TypedIdSerializer} it uses {@link IdCodec} for
- * serialization. It may be used as a replacement for {@link IIdSerializer}.
+ * serialization. It may be used as a replacement for {@link UnqualifiedIIdSerializer}.
  */
 public class QualifiedIIdSerializer extends StdSerializer<IId> {
   private static final long serialVersionUID = 1L;

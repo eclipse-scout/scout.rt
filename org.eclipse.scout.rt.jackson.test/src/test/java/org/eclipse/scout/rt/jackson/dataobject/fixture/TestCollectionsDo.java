@@ -100,6 +100,24 @@ public class TestCollectionsDo extends DoEntity {
     return doCollection("itemPojo2DoCollectionAttribute");
   }
 
+  // DoList and DoCollection of interface/abstract data object
+
+  public DoList<AbstractTestAddressDo> itemDoListAbstractAttribute() {
+    return doList("itemDoListAbstractAttribute");
+  }
+
+  public DoList<ITestAddressDo> itemDoListInterfaceAttribute() {
+    return doList("itemDoListInterfaceAttribute");
+  }
+
+  public DoValue<List<AbstractTestAddressDo>> itemListAbstractAttribute() {
+    return doValue("itemListAbstractAttribute");
+  }
+
+  public DoValue<List<ITestAddressDo>> itemListInterfaceAttribute() {
+    return doValue("itemListInterfaceAttribute");
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -321,5 +339,61 @@ public class TestCollectionsDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Collection<TestItemPojo2> getItemPojo2DoCollectionAttribute() {
     return itemPojo2DoCollectionAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemDoListAbstractAttribute(Collection<? extends AbstractTestAddressDo> itemDoListAbstractAttribute) {
+    itemDoListAbstractAttribute().updateAll(itemDoListAbstractAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemDoListAbstractAttribute(AbstractTestAddressDo... itemDoListAbstractAttribute) {
+    itemDoListAbstractAttribute().updateAll(itemDoListAbstractAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<AbstractTestAddressDo> getItemDoListAbstractAttribute() {
+    return itemDoListAbstractAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemDoListInterfaceAttribute(Collection<? extends ITestAddressDo> itemDoListInterfaceAttribute) {
+    itemDoListInterfaceAttribute().updateAll(itemDoListInterfaceAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemDoListInterfaceAttribute(ITestAddressDo... itemDoListInterfaceAttribute) {
+    itemDoListInterfaceAttribute().updateAll(itemDoListInterfaceAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<ITestAddressDo> getItemDoListInterfaceAttribute() {
+    return itemDoListInterfaceAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemListAbstractAttribute(List<AbstractTestAddressDo> itemListAbstractAttribute) {
+    itemListAbstractAttribute().set(itemListAbstractAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<AbstractTestAddressDo> getItemListAbstractAttribute() {
+    return itemListAbstractAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemListInterfaceAttribute(List<ITestAddressDo> itemListInterfaceAttribute) {
+    itemListInterfaceAttribute().set(itemListInterfaceAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<ITestAddressDo> getItemListInterfaceAttribute() {
+    return itemListInterfaceAttribute().get();
   }
 }

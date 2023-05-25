@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -47,6 +49,8 @@ import org.eclipse.scout.rt.dataobject.fixture.SecondSimpleContributionFixtureDo
 import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.TriCompositeFixtureObject;
 import org.eclipse.scout.rt.dataobject.fixture.TriCompositeFixtureObjectDataObjectVisitorExtension;
+import org.eclipse.scout.rt.dataobject.fixture.VariousIdsFixtureDo;
+import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -99,6 +103,7 @@ public class DataObjectInventoryTest {
     m_inventory.registerClassByTypeName(DateFixtureDo.class);
     m_inventory.registerClassByTypeName(TestFixtureEntityDo.class);
     m_inventory.registerClassByTypeName(EntityFixtureInvalidTypeNameDo.class);
+    m_inventory.registerClassByTypeName(VariousIdsFixtureDo.class);
     m_inventory.registerVisitorExtension(new TriCompositeFixtureObjectDataObjectVisitorExtension()); // must be registered before the Bi visitor extension (Tri is a subclass of Bi)
     m_inventory.registerVisitorExtension(new BiCompositeFixtureObjectDataObjectVisitorExtension());
   }
@@ -167,7 +172,7 @@ public class DataObjectInventoryTest {
 
   @Test
   public void testGetTypeNameToClassMapSize() {
-    assertEquals(4, m_inventory.getTypeNameToClassMap().size());
+    assertEquals(5, m_inventory.getTypeNameToClassMap().size());
   }
 
   @Test
@@ -239,6 +244,84 @@ public class DataObjectInventoryTest {
     assertEquals("otherEntities", attributesDescription.get("otherEntities").getName());
     assertEquals("otherEntitiesList", attributesDescription.get("otherEntitiesList").getName());
     assertEquals("otherEntitiesMap", attributesDescription.get("otherEntitiesMap").getName());
+  }
+
+  /**
+   * Tests that data object inventory contains proper information for all variations of nodes regarding generics.
+   */
+  @Test
+  public void testGetAttributeDescriptionVariousIds() {
+    Optional<DataObjectAttributeDescriptor> attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "stringId");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
+    assertEquals(FixtureStringId.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "iId");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
+    assertEquals(IId.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "stringIds");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoCollection.class, attributeDescription.get().getType().getRawType());
+    assertEquals(FixtureStringId.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "iIds");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoCollection.class, attributeDescription.get().getType().getRawType());
+    assertEquals(IId.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "manualStringIds");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
+    assertTrue(attributeDescription.get().getType().getActualTypeArguments()[0] instanceof ParameterizedType);
+    ParameterizedType parameterizedType = (ParameterizedType) attributeDescription.get().getType().getActualTypeArguments()[0];
+    assertEquals(Collection.class, parameterizedType.getRawType());
+    assertEquals(FixtureStringId.class, parameterizedType.getActualTypeArguments()[0]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "manualIIds");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
+    assertTrue(attributeDescription.get().getType().getActualTypeArguments()[0] instanceof ParameterizedType);
+    parameterizedType = (ParameterizedType) attributeDescription.get().getType().getActualTypeArguments()[0];
+    assertEquals(Collection.class, parameterizedType.getRawType());
+    assertEquals(IId.class, parameterizedType.getActualTypeArguments()[0]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "stringIdKeyMap");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
+    assertTrue(attributeDescription.get().getType().getActualTypeArguments()[0] instanceof ParameterizedType);
+    parameterizedType = (ParameterizedType) attributeDescription.get().getType().getActualTypeArguments()[0];
+    assertEquals(Map.class, parameterizedType.getRawType());
+    assertEquals(FixtureStringId.class, parameterizedType.getActualTypeArguments()[0]);
+    assertEquals(String.class, parameterizedType.getActualTypeArguments()[1]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "iIdKeyMap");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
+    assertTrue(attributeDescription.get().getType().getActualTypeArguments()[0] instanceof ParameterizedType);
+    parameterizedType = (ParameterizedType) attributeDescription.get().getType().getActualTypeArguments()[0];
+    assertEquals(Map.class, parameterizedType.getRawType());
+    assertEquals(IId.class, parameterizedType.getActualTypeArguments()[0]);
+    assertEquals(String.class, parameterizedType.getActualTypeArguments()[1]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "stringIdValueMap");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
+    assertTrue(attributeDescription.get().getType().getActualTypeArguments()[0] instanceof ParameterizedType);
+    parameterizedType = (ParameterizedType) attributeDescription.get().getType().getActualTypeArguments()[0];
+    assertEquals(Map.class, parameterizedType.getRawType());
+    assertEquals(String.class, parameterizedType.getActualTypeArguments()[0]);
+    assertEquals(FixtureStringId.class, parameterizedType.getActualTypeArguments()[1]);
+
+    attributeDescription = m_inventory.getAttributeDescription(VariousIdsFixtureDo.class, "iIdValueMap");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
+    assertTrue(attributeDescription.get().getType().getActualTypeArguments()[0] instanceof ParameterizedType);
+    parameterizedType = (ParameterizedType) attributeDescription.get().getType().getActualTypeArguments()[0];
+    assertEquals(Map.class, parameterizedType.getRawType());
+    assertEquals(String.class, parameterizedType.getActualTypeArguments()[0]);
+    assertEquals(IId.class, parameterizedType.getActualTypeArguments()[1]);
   }
 
   @Test(expected = AssertionException.class)

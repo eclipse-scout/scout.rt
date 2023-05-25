@@ -9,24 +9,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.util.Currency;
-import java.util.Date;
-import java.util.Locale;
-
-import org.eclipse.scout.rt.dataobject.DoCollection;
-import org.eclipse.scout.rt.dataobject.DoList;
-import org.eclipse.scout.rt.dataobject.DoSet;
-import org.eclipse.scout.rt.dataobject.DoValue;
-import org.eclipse.scout.rt.dataobject.IDataObject;
-import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
-import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.dataobject.id.TypedId;
-import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumDeserializer;
-import org.eclipse.scout.rt.jackson.dataobject.id.IIdDeserializer;
-import org.eclipse.scout.rt.jackson.dataobject.id.TypedIdDeserializer;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
@@ -35,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.Deserializers;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.ReferenceType;
 
 /**
@@ -55,60 +40,48 @@ public class DataObjectDeserializers extends Deserializers.Base {
   }
 
   @Override
+  public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
+    for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
+      JsonDeserializer<?> deserializer = provider.findDeserializer(getModuleContext(), type, config, beanDesc);
+      if (deserializer != null) {
+        return deserializer;
+      }
+    }
+    return super.findBeanDeserializer(type, config, beanDesc);
+  }
+
+  @Override
   public JsonDeserializer<?> findReferenceDeserializer(ReferenceType refType, DeserializationConfig config, BeanDescription beanDesc, TypeDeserializer contentTypeDeserializer, JsonDeserializer<?> contentDeserializer)
       throws JsonMappingException {
-    if (refType.hasRawClass(DoValue.class)) {
-      return new DoValueDeserializer(refType, null, contentTypeDeserializer, contentDeserializer);
+    for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
+      JsonDeserializer<?> deserializer = provider.findReferenceDeserializer(getModuleContext(), refType, config, beanDesc, contentTypeDeserializer, contentDeserializer);
+      if (deserializer != null) {
+        return deserializer;
+      }
     }
     return super.findReferenceDeserializer(refType, config, beanDesc, contentTypeDeserializer, contentDeserializer);
   }
 
   @Override
-  public JsonDeserializer<?> findEnumDeserializer(Class<?> type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
-    if (IEnum.class.isAssignableFrom(type)) {
-      return new EnumDeserializer(type.asSubclass(IEnum.class));
+  public JsonDeserializer<?> findCollectionDeserializer(CollectionType type, DeserializationConfig config, BeanDescription beanDesc, TypeDeserializer elementTypeDeserializer, JsonDeserializer<?> elementDeserializer)
+      throws JsonMappingException {
+    for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
+      JsonDeserializer<?> deserializer = provider.findCollectionDeserializer(getModuleContext(), type, config, beanDesc, elementTypeDeserializer, elementDeserializer);
+      if (deserializer != null) {
+        return deserializer;
+      }
     }
-    return super.findEnumDeserializer(type, config, beanDesc);
+    return super.findCollectionDeserializer(type, config, beanDesc, elementTypeDeserializer, elementDeserializer);
   }
 
   @Override
-  public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
-    Class<?> rawClass = type.getRawClass();
-    if (IDoEntity.class.isAssignableFrom(rawClass)) {
-      return new DoEntityDeserializer(m_moduleContext, type);
+  public JsonDeserializer<?> findEnumDeserializer(Class<?> type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
+    for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
+      JsonDeserializer<?> deserializer = provider.findEnumDeserializer(getModuleContext(), type, config, beanDesc);
+      if (deserializer != null) {
+        return deserializer;
+      }
     }
-    else if (DoList.class.isAssignableFrom(rawClass)) {
-      return new DoCollectionDeserializer<>(type, DoList::new);
-    }
-    else if (DoSet.class.isAssignableFrom(rawClass)) {
-      return new DoCollectionDeserializer<>(type, DoSet::new);
-    }
-    else if (DoCollection.class.isAssignableFrom(rawClass)) {
-      return new DoCollectionDeserializer<>(type, DoCollection::new);
-    }
-    else if (Date.class.isAssignableFrom(rawClass)) {
-      return new DoDateDeserializer();
-    }
-    else if (IDataObject.class.isAssignableFrom(rawClass)) {
-      return new DataObjectDeserializer(type.getRawClass());
-    }
-    else if (Locale.class.isAssignableFrom(rawClass)) {
-      return new DoLocaleDeserializer();
-    }
-    else if (Currency.class.isAssignableFrom(rawClass)) {
-      return new DoCurrencyDeserializer();
-    }
-    else if (BinaryResource.class.isAssignableFrom(rawClass)) {
-      return new DoBinaryResourceDeserializer();
-    }
-    else if (IId.class.isAssignableFrom(rawClass)) {
-      @SuppressWarnings("unchecked")
-      Class<? extends IId> idClass = (Class<? extends IId>) rawClass;
-      return new IIdDeserializer(idClass);
-    }
-    else if (TypedId.class.isAssignableFrom(rawClass)) {
-      return new TypedIdDeserializer();
-    }
-    return super.findBeanDeserializer(type, config, beanDesc);
+    return super.findEnumDeserializer(type, config, beanDesc);
   }
 }

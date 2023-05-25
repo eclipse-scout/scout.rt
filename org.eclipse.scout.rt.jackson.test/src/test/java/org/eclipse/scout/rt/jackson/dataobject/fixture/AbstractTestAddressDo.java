@@ -14,7 +14,7 @@ import javax.annotation.Generated;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 
-public abstract class AbstractTestAddressDo extends DoEntity {
+public abstract class AbstractTestAddressDo extends DoEntity { // doesn't extend ITestAddressDo otherwise abstract class behavior is not testet separately
 
   public DoValue<String> id() {
     return doValue("id");

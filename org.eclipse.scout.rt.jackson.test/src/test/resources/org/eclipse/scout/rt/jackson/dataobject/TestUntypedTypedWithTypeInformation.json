@@ -1,0 +1,10 @@
+{
+  "_type" : "scout.TestTypedUntypedOuter",
+  "iId" : "scout.FixtureStringId:qualifiedid",
+  "inner" : {
+    "_type" : "scout.TestTypedUntypedInner",
+    "iId" : "scout.FixtureStringId:qualifiedid",
+    "stringId" : "unqualified-string-id"
+  },
+  "stringId" : "unqualified-string-id"
+}

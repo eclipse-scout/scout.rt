@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Generated;
 
@@ -29,6 +30,10 @@ public class TestGenericDo<T> extends DoEntity {
 
   public DoList<T> genericListAttribute() {
     return doList("genericListAttribute");
+  }
+
+  public DoValue<Map<String, T>> genericMapAttribute() {
+    return doValue("genericMapAttribute");
   }
 
   /* **************************************************************************
@@ -61,5 +66,16 @@ public class TestGenericDo<T> extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public List<T> getGenericListAttribute() {
     return genericListAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestGenericDo<T> withGenericMapAttribute(Map<String, T> genericMapAttribute) {
+    genericMapAttribute().set(genericMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, T> getGenericMapAttribute() {
+    return genericMapAttribute().get();
   }
 }

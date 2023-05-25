@@ -8,7 +8,7 @@
     "_type" : "TestItem",
     "id" : "d3",
     "stringAttribute" : "itemDo-as-collection-item-2"
-  } ],
+  }, null ],
   "itemDoAttribute" : {
     "_type" : "TestItem",
     "id" : "d1",
@@ -23,6 +23,15 @@
     "id" : "d13",
     "stringAttribute" : "itemDo-as-DoCollection-item-2"
   } ],
+  "itemDoListAbstractAttribute" : [ {
+    "_type" : "TestElectronicAddress",
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }, {
+    "_type" : "TestPhysicalAddress",
+    "city" : "Example",
+    "id" : "physicAddress"
+  } ],
   "itemDoListAttribute" : [ {
     "_type" : "TestItem",
     "id" : "d8",
@@ -31,6 +40,15 @@
     "_type" : "TestItem",
     "id" : "d9",
     "stringAttribute" : "itemDo-as-DoList-item-2"
+  } ],
+  "itemDoListInterfaceAttribute" : [ {
+    "_type" : "TestElectronicAddress",
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }, {
+    "_type" : "TestPhysicalAddress",
+    "city" : "Example",
+    "id" : "physicAddress"
   } ],
   "itemDoSetAttribute" : [ {
     "_type" : "TestItem",
@@ -41,6 +59,15 @@
     "id" : "d11",
     "stringAttribute" : "itemDo-as-DoSet-item-2"
   } ],
+  "itemListAbstractAttribute" : [ {
+    "_type" : "TestElectronicAddress",
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }, {
+    "_type" : "TestPhysicalAddress",
+    "city" : "Example",
+    "id" : "physicAddress"
+  } ],
   "itemListAttribute" : [ {
     "_type" : "TestItem",
     "id" : "d4",
@@ -49,6 +76,15 @@
     "_type" : "TestItem",
     "id" : "d5",
     "stringAttribute" : "itemDo-as-list-item-2"
+  } ],
+  "itemListInterfaceAttribute" : [ {
+    "_type" : "TestElectronicAddress",
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }, {
+    "_type" : "TestPhysicalAddress",
+    "city" : "Example",
+    "id" : "physicAddress"
   } ],
   "itemPojo2DoCollectionAttribute" : [ {
     "_type" : "TestItem2",

@@ -23,18 +23,15 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.jackson.dataobject.DataObjectDeserializers;
-import org.eclipse.scout.rt.jackson.dataobject.DataObjectMapKeyDeserializers;
-import org.eclipse.scout.rt.jackson.dataobject.DataObjectMapKeySerializers;
-import org.eclipse.scout.rt.jackson.dataobject.DataObjectSerializers;
+import org.eclipse.scout.rt.jackson.dataobject.IDataObjectSerializerProvider;
 import org.eclipse.scout.rt.jackson.dataobject.JacksonPrettyPrintDataObjectMapper;
+import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithIIdDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
-import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +41,6 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.SerializationConfig;
@@ -68,10 +64,7 @@ public class QualifiedIIdSerializationTest {
 
   @Before
   public void before() {
-    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(QualifiedIIdSerializationTest_DataObjectSerializers.class)));
-    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(QualifiedIIdSerializationTest_DataObjectDeserializers.class)));
-    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(QualifiedIIdSerializationTest_DataObjectMapKeySerializers.class)));
-    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(QualifiedIIdSerializationTest_DataObjectMapKeyDeserializers.class)));
+    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(QualifiedIIdSerializationTest_DataObjectSerializerProvider.class)));
 
     m_dataObjectMapper = new JacksonPrettyPrintDataObjectMapper(); // create new instance not using BEANS#get because of serializer cache
     m_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
@@ -119,54 +112,39 @@ public class QualifiedIIdSerializationTest {
   }
 
   @IgnoreBean
-  @Replace
-  protected static class QualifiedIIdSerializationTest_DataObjectSerializers extends DataObjectSerializers {
+  protected static class QualifiedIIdSerializationTest_DataObjectSerializerProvider implements IDataObjectSerializerProvider {
 
     @Override
-    public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
+    public JsonSerializer<?> findSerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription beanDesc) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class)) {
         return new QualifiedIIdSerializer();
       }
-      return super.findSerializer(config, type, beanDesc);
-    }
-  }
 
-  @IgnoreBean
-  @Replace
-  protected static class QualifiedIIdSerializationTest_DataObjectDeserializers extends DataObjectDeserializers {
+      return null;
+    }
 
     @Override
-    public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
+    public JsonDeserializer<?> findDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class) || type.hasRawClass(IId.class)) {
-        return new QualifiedIIdDeserializer();
+        return new QualifiedIIdDeserializer(type.getRawClass().asSubclass(IId.class));
       }
-      return super.findBeanDeserializer(type, config, beanDesc);
+      return null;
     }
-  }
-
-  @IgnoreBean
-  @Replace
-  protected static class QualifiedIIdSerializationTest_DataObjectMapKeySerializers extends DataObjectMapKeySerializers {
 
     @Override
-    public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
+    public JsonSerializer<?> findKeySerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription beanDesc) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class)) {
         return new QualifiedIIdMapKeySerializer();
       }
-      return super.findSerializer(config, type, beanDesc);
+      return null;
     }
-  }
-
-  @IgnoreBean
-  @Replace
-  protected static class QualifiedIIdSerializationTest_DataObjectMapKeyDeserializers extends DataObjectMapKeyDeserializers {
 
     @Override
-    public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
+    public KeyDeserializer findKeyDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class) || type.hasRawClass(IId.class)) {
-        return new QualifiedIIdMapKeyDeserializer();
+        return new QualifiedIIdMapKeyDeserializer(type.getRawClass().asSubclass(IId.class));
       }
-      return super.findKeyDeserializer(type, config, beanDesc);
+      return null;
     }
   }
 }

@@ -9,25 +9,27 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
-import java.io.IOException;
-
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 
 /**
- * Custom serializer used for map keys of type {@link IId}.
+ * Custom deserializer used for map keys of type {@link IId}.
  */
-public class IIdMapKeySerializer extends JsonSerializer<IId> {
+public class UnqualifiedIIdMapKeyDeserializer extends KeyDeserializer {
 
   protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
+  protected final Class<? extends IId> m_idClass;
+
+  public UnqualifiedIIdMapKeyDeserializer(Class<? extends IId> idClass) {
+    m_idClass = idClass;
+  }
 
   @Override
-  public void serialize(IId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-    gen.writeFieldName(m_idCodec.get().toUnqualified(value));
+  public Object deserializeKey(String key, DeserializationContext ctxt) {
+    return m_idCodec.get().fromUnqualified(m_idClass, key);
   }
 }

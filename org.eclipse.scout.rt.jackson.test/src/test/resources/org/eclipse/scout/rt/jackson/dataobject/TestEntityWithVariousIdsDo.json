@@ -1,0 +1,25 @@
+{
+  "_type" : "scout.TestEntityWithVariousIds",
+  "iId" : "scout.FixtureStringId:i-id",
+  "iIdKeyMap" : {
+    "scout.FixtureStringId:i-id-map-key-1" : "plain-i-id-map-value-1",
+    "scout.FixtureStringId:i-id-map-key-2" : "plain-i-id-map-value-2"
+  },
+  "iIdValueMap" : {
+    "plain-i-id-map-key-2" : "scout.FixtureStringId:i-id-map-value-2",
+    "plain-i-id-map-key-1" : "scout.FixtureStringId:i-id-map-value-1"
+  },
+  "iIds" : [ "scout.FixtureStringId:i-id-1", "scout.FixtureStringId:i-id-2" ],
+  "manualIIds" : [ "scout.FixtureStringId:manual-i-id-1", "scout.FixtureStringId:manual-i-id-2" ],
+  "manualStringIds" : [ "manual-string-id-1", "manual-string-id-2" ],
+  "stringId" : "string-id",
+  "stringIdKeyMap" : {
+    "string-id-map-key-2" : "plain-string-id-map-value-2",
+    "string-id-map-key-1" : "plain-string-id-map-value-1"
+  },
+  "stringIdValueMap" : {
+    "plain-string-id-map-key-1" : "string-id-map-value-1",
+    "plain-string-id-map-key-2" : "string-id-map-value-2"
+  },
+  "stringIds" : [ "string-id-1", "string-id-2" ]
+}

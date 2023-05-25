@@ -24,6 +24,18 @@
     "de-CH" : "fr-CH",
     "en-US" : "en"
   },
+  "stringDoAbstractAddressMapAttribute" : {
+    "doAbstractKey2" : {
+      "_type" : "TestPhysicalAddress",
+      "city" : "Example",
+      "id" : "physicAddress"
+    },
+    "doAbstractKey1" : {
+      "_type" : "TestElectronicAddress",
+      "email" : "foo@bar.de",
+      "id" : "elecAddress"
+    }
+  },
   "stringDoTestItemMapAttribute" : {
     "doKey1" : {
       "_type" : "TestItem",
@@ -34,11 +46,55 @@
       "_type" : "TestItem",
       "id" : "item-key4",
       "stringAttribute" : "value4"
+    },
+    "doKey3" : null
+  },
+  "stringMapStringMapStringListTestItemDoMapAttribute" : {
+    "complex1" : {
+      "complex1-inner-1" : [ {
+        "_type" : "TestItem",
+        "id" : "complex1-inner-1-list-1",
+        "stringAttribute" : "complex1-inner-1-list-1-attribute"
+      }, {
+        "_type" : "TestItem",
+        "id" : "complex1-inner-1-list-2",
+        "stringAttribute" : "complex1-inner-1-list-2-attribute"
+      } ],
+      "complex1-inner-2" : [ {
+        "_type" : "TestItem",
+        "id" : "complex1-inner-2-list-1",
+        "stringAttribute" : "complex1-inner-2-list-1-attribute"
+      }, {
+        "_type" : "TestItem",
+        "id" : "complex1-inner-2-list-2",
+        "stringAttribute" : "complex1-inner-2-list-2-attribute"
+      } ]
+    },
+    "complex2" : {
+      "complex2-inner-1" : [ {
+        "_type" : "TestItem",
+        "id" : "complex2-inner-1-list-1",
+        "stringAttribute" : "complex2-inner-1-list-1-attribute"
+      }, {
+        "_type" : "TestItem",
+        "id" : "complex2-inner-1-list-2",
+        "stringAttribute" : "complex2-inner-1-list-2-attribute"
+      } ],
+      "complex2-inner-2" : [ {
+        "_type" : "TestItem",
+        "id" : "complex2-inner-2-list-1",
+        "stringAttribute" : "complex2-inner-2-list-1-attribute"
+      }, {
+        "_type" : "TestItem",
+        "id" : "complex2-inner-2-list-2",
+        "stringAttribute" : "complex2-inner-2-list-2-attribute"
+      } ]
     }
   },
   "stringStringMapAttribute" : {
     "foo1" : "bar",
-    "foo2" : "baz"
+    "foo2" : "baz",
+    "foo3" : null
   },
   "stringTestItemPojoMapAttribute" : {
     "pojoKey1" : {

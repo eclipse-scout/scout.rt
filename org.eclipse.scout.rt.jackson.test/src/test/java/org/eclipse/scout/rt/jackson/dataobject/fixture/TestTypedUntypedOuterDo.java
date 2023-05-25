@@ -11,22 +11,25 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
+import org.eclipse.scout.rt.dataobject.id.IId;
 
-@TypeName("TestPhysicalAddress")
-public class TestPhysicalAddressDo extends AbstractTestAddressDo implements ITestAddressDo {
+@TypeName("scout.TestTypedUntypedOuter")
+public class TestTypedUntypedOuterDo extends DoEntity {
 
-  public DoValue<String> street() {
-    return doValue("street");
+  public DoValue<FixtureStringId> stringId() {
+    return doValue("stringId");
   }
 
-  public DoValue<String> city() {
-    return doValue("city");
+  public DoValue<IId> iId() {
+    return doValue("iId");
   }
 
-  public DoValue<String> zipCode() {
-    return doValue("zipCode");
+  public DoValue<TestTypedUntypedInnerDo> inner() {
+    return doValue("inner");
   }
 
   /* **************************************************************************
@@ -34,42 +37,35 @@ public class TestPhysicalAddressDo extends AbstractTestAddressDo implements ITes
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestPhysicalAddressDo withStreet(String street) {
-    street().set(street);
+  public TestTypedUntypedOuterDo withStringId(FixtureStringId stringId) {
+    stringId().set(stringId);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getStreet() {
-    return street().get();
+  public FixtureStringId getStringId() {
+    return stringId().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestPhysicalAddressDo withCity(String city) {
-    city().set(city);
+  public TestTypedUntypedOuterDo withIId(IId iId) {
+    iId().set(iId);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getCity() {
-    return city().get();
+  public IId getIId() {
+    return iId().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestPhysicalAddressDo withZipCode(String zipCode) {
-    zipCode().set(zipCode);
+  public TestTypedUntypedOuterDo withInner(TestTypedUntypedInnerDo inner) {
+    inner().set(inner);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getZipCode() {
-    return zipCode().get();
-  }
-
-  @Override
-  @Generated("DoConvenienceMethodsGenerator")
-  public TestPhysicalAddressDo withId(String id) {
-    id().set(id);
-    return this;
+  public TestTypedUntypedInnerDo getInner() {
+    return inner().get();
   }
 }

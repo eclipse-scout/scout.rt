@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
@@ -45,8 +46,8 @@ public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
   }
 
   protected boolean useForType(JavaType t) {
-    // IDoEntity and sub-interfaces force to write a type name
-    if (t.getRawClass().isInterface()) {
+    // IDoEntity, sub-interfaces and abstract data object force to write a type name
+    if (t.getRawClass().isInterface() || Modifier.isAbstract(t.getRawClass().getModifiers())) {
       return true;
     }
     // write type name if class is annotated with a type name

@@ -1,0 +1,9 @@
+{
+  "stringId" : "string-id",
+  "stringIdList" : [ "string-id-1", "string-id-2" ],
+  "typed" : {
+    "_type" : "scout.TestEntityWithVariousIds",
+    "iId" : "scout.FixtureStringId:qualified-string-id",
+    "stringId" : "unqualified-string-id"
+  }
+}

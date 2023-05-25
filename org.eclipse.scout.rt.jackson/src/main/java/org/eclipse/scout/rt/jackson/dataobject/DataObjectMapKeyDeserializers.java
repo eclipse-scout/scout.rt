@@ -9,19 +9,12 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.util.Currency;
-import java.util.Locale;
-
-import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
-import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumMapKeyDeserializer;
-import org.eclipse.scout.rt.jackson.dataobject.id.IIdMapKeyDeserializer;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.deser.KeyDeserializers;
 
@@ -47,22 +40,12 @@ public class DataObjectMapKeyDeserializers implements KeyDeserializers {
   }
 
   @Override
-  public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
-    Class<?> rawClass = type.getRawClass();
-    if (Locale.class.isAssignableFrom(rawClass)) {
-      return new LocaleMapKeyDeserializer();
-    }
-    if (Currency.class.isAssignableFrom(rawClass)) {
-      return new CurrencyMapKeyDeserializer();
-    }
-    if (IId.class.isAssignableFrom(rawClass)) {
-      @SuppressWarnings("unchecked")
-      Class<? extends IId> idClass = rawClass.asSubclass(IId.class);
-      return new IIdMapKeyDeserializer(idClass);
-    }
-    else if (IEnum.class.isAssignableFrom(rawClass)) {
-      Class<? extends IEnum> enumClass = rawClass.asSubclass(IEnum.class);
-      return new EnumMapKeyDeserializer(enumClass);
+  public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
+    for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
+      KeyDeserializer deserializer = provider.findKeyDeserializer(getModuleContext(), type, config, beanDesc);
+      if (deserializer != null) {
+        return deserializer;
+      }
     }
     return null;
   }

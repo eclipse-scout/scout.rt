@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
@@ -229,7 +230,7 @@ public class JsonDataObjectsExtensibilitySerializationTest {
 
   */
 
-  static interface ITestCustomerDo extends IDataObject {
+  interface ITestCustomerDo extends IDoEntity {
   }
 
   abstract static class AbstractTestDataObject extends DoEntity {

@@ -11,14 +11,21 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
+import org.eclipse.scout.rt.dataobject.id.IId;
 
-@TypeName("TestElectronicAddress")
-public class TestElectronicAddressDo extends AbstractTestAddressDo implements ITestAddressDo {
+@TypeName("scout.TestTypedUntypedInner")
+public class TestTypedUntypedInnerDo extends DoEntity {
 
-  public DoValue<String> email() {
-    return doValue("email");
+  public DoValue<FixtureStringId> stringId() {
+    return doValue("stringId");
+  }
+
+  public DoValue<IId> iId() {
+    return doValue("iId");
   }
 
   /* **************************************************************************
@@ -26,20 +33,24 @@ public class TestElectronicAddressDo extends AbstractTestAddressDo implements IT
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestElectronicAddressDo withEmail(String email) {
-    email().set(email);
+  public TestTypedUntypedInnerDo withStringId(FixtureStringId stringId) {
+    stringId().set(stringId);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getEmail() {
-    return email().get();
+  public FixtureStringId getStringId() {
+    return stringId().get();
   }
 
-  @Override
   @Generated("DoConvenienceMethodsGenerator")
-  public TestElectronicAddressDo withId(String id) {
-    id().set(id);
+  public TestTypedUntypedInnerDo withIId(IId iId) {
+    iId().set(iId);
     return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IId getIId() {
+    return iId().get();
   }
 }

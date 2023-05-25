@@ -9,11 +9,12 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.enumeration;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.net.URL;
 import java.util.Collections;
 
+import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumMapKeyD
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,12 +39,24 @@ public class EnumSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithEnum() throws Exception {
+  public void testSerializeDeserialize_EntityWithEmptyEnum() throws Exception {
+    TestEntityWithEnumDo entity = BEANS.get(TestEntityWithEnumDo.class);
+    String json = m_dataObjectMapper.writeValue(entity);
+
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithEmptyEnumDo.json"));
+    m_testHelper.assertJsonEquals(expectedJson, json);
+
+    TestEntityWithEnumDo marshalled = m_dataObjectMapper.readValue(expectedJson, TestEntityWithEnumDo.class);
+    assertEquals(Collections.<String, DoNode<?>> emptyMap(), marshalled.allNodes());
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithValidEnum() throws Exception {
     TestEntityWithEnumDo entity = BEANS.get(TestEntityWithEnumDo.class);
     entity.withValue(FixtureEnum.ONE);
     String json = m_dataObjectMapper.writeValue(entity);
 
-    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithEnumDo.json"));
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithValidEnumDo.json"));
     m_testHelper.assertJsonEquals(expectedJson, json);
 
     TestEntityWithEnumDo marshalled = m_dataObjectMapper.readValue(expectedJson, TestEntityWithEnumDo.class);
@@ -50,8 +64,14 @@ public class EnumSerializationTest {
   }
 
   @Test
+  public void testSerializeDeserialize_EntityWithInvalidEnum() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithInvalidEnumDo.json"));
+    assertThrows(AssertionException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithEnumDo.class));
+  }
+
+  @Test
   public void testSerializeDeserialize_EntityWithEnumMapKey() throws Exception {
-    TestEntityWithEnumMapKeyDo entity = new TestEntityWithEnumMapKeyDo();
+    TestEntityWithEnumMapKeyDo entity = BEANS.get(TestEntityWithEnumMapKeyDo.class);
     entity.withMap(Collections.singletonMap(FixtureEnum.ONE, "test"));
     String json = m_dataObjectMapper.writeValue(entity);
 
@@ -64,7 +84,7 @@ public class EnumSerializationTest {
 
   @Test(expected = PlatformException.class)
   public void testSerializeDeserialize_EntityWithEnumMapKeyNull() {
-    TestEntityWithEnumMapKeyDo entity = new TestEntityWithEnumMapKeyDo();
+    TestEntityWithEnumMapKeyDo entity = BEANS.get(TestEntityWithEnumMapKeyDo.class);
     entity.withMap(Collections.singletonMap(null, "test"));
     m_dataObjectMapper.writeValue(entity);
   }

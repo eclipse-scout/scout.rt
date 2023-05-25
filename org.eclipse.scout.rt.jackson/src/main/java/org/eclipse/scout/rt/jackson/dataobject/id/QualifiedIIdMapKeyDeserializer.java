@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
+
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.platform.util.LazyValue;
@@ -18,14 +20,20 @@ import com.fasterxml.jackson.databind.KeyDeserializer;
 
 /**
  * Custom deserializer for {@link IId} instances - like {@link TypedIdDeserializer} it uses {@link IdCodec} for
- * serialization. It may be used as a replacement for {@link IIdDeserializer}.
+ * serialization. It may be used as a replacement for {@link UnqualifiedIIdDeserializer}.
  */
 public class QualifiedIIdMapKeyDeserializer extends KeyDeserializer {
 
   protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
+  protected final Class<? extends IId> m_idClass;
+
+  public QualifiedIIdMapKeyDeserializer(Class<? extends IId> idClass) {
+    m_idClass = idClass;
+  }
 
   @Override
   public Object deserializeKey(String key, DeserializationContext ctxt) {
-    return m_idCodec.get().fromQualified(key);
+    // check required to prevent returning an instance that isn't compatible with requested ID class
+    return assertInstance(m_idCodec.get().fromQualified(key), m_idClass);
   }
 }

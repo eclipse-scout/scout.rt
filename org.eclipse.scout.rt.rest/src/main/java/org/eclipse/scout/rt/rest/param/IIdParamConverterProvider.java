@@ -55,12 +55,11 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
    */
   public static class IIdParamConverter implements ParamConverter<IId> {
 
-    protected final Class<? extends IId> m_idType;
-
     protected final LazyValue<IdCodec> m_codec = new LazyValue<>(IdCodec.class);
+    protected final Class<? extends IId> m_idClass;
 
-    public IIdParamConverter(Class<? extends IId> idType) {
-      m_idType = idType;
+    public IIdParamConverter(Class<? extends IId> idClass) {
+      m_idClass = idClass;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
-      return m_codec.get().fromUnqualified(m_idType, value);
+      return m_codec.get().fromUnqualified(m_idClass, value);
     }
 
     @Override

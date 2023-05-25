@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -44,6 +45,11 @@ public class TestMapDo extends DoEntity {
     return doValue("stringDoTestItemMapAttribute");
   }
 
+  // testing the scenario of a map value serializer handling abstract data object (compared to stringDoTestItemMapAttribute which uses a concret data object)
+  public DoValue<Map<String, AbstractTestAddressDo>> stringDoAbstractAddressMapAttribute() {
+    return doValue("stringDoAbstractAddressMapAttribute");
+  }
+
   public DoValue<Map<String, IDoEntity>> stringIDoEntityMapAttribute() {
     return doValue("stringIDoEntityMapAttribute");
   }
@@ -58,6 +64,11 @@ public class TestMapDo extends DoEntity {
 
   public DoValue<Map<Locale, Locale>> localeLocaleMapAttribute() {
     return doValue("localeLocaleMapAttribute");
+  }
+
+  // testing a more complex scenario for value serializer determined in DoEntitySerializer#serializeMap
+  public DoValue<Map<String, Map<String, List<TestItemDo>>>> stringMapStringMapStringListTestItemDoMapAttribute() {
+    return doValue("stringMapStringMapStringListTestItemDoMapAttribute");
   }
 
   /* **************************************************************************
@@ -120,6 +131,17 @@ public class TestMapDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withStringDoAbstractAddressMapAttribute(Map<String, AbstractTestAddressDo> stringDoAbstractAddressMapAttribute) {
+    stringDoAbstractAddressMapAttribute().set(stringDoAbstractAddressMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, AbstractTestAddressDo> getStringDoAbstractAddressMapAttribute() {
+    return stringDoAbstractAddressMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public TestMapDo withStringIDoEntityMapAttribute(Map<String, IDoEntity> stringIDoEntityMapAttribute) {
     stringIDoEntityMapAttribute().set(stringIDoEntityMapAttribute);
     return this;
@@ -161,5 +183,16 @@ public class TestMapDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<Locale, Locale> getLocaleLocaleMapAttribute() {
     return localeLocaleMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withStringMapStringMapStringListTestItemDoMapAttribute(Map<String, Map<String, List<TestItemDo>>> stringMapStringMapStringListTestItemDoMapAttribute) {
+    stringMapStringMapStringListTestItemDoMapAttribute().set(stringMapStringMapStringListTestItemDoMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, Map<String, List<TestItemDo>>> getStringMapStringMapStringListTestItemDoMapAttribute() {
+    return stringMapStringMapStringListTestItemDoMapAttribute().get();
   }
 }

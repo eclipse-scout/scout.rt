@@ -24,6 +24,9 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.dataobject.id.IUuId;
+import org.eclipse.scout.rt.jackson.dataobject.id.QualifiedIIdDeserializer;
+import org.eclipse.scout.rt.jackson.dataobject.id.QualifiedIIdMapKeyDeserializer;
 
 @TypeName("scout.TestEntityWithIId")
 public class TestEntityWithIIdDo extends DoEntity {
@@ -48,12 +51,26 @@ public class TestEntityWithIIdDo extends DoEntity {
     return doValue("iid");
   }
 
+  /**
+   * Used for testing {@link QualifiedIIdDeserializer} regarding type safety.
+   */
+  public DoValue<IUuId> iUuId() {
+    return doValue("iUuId");
+  }
+
   public DoValue<Map<FixtureStringId, String>> map() {
     return doValue("map");
   }
 
   public DoValue<Map<FixtureCompositeId, String>> compositeMap() {
     return doValue("compositeMap");
+  }
+
+  /**
+   * Used for testing {@link QualifiedIIdMapKeyDeserializer} regarding type safety.
+   */
+  public DoValue<Map<IUuId, String>> iUuIdMap() {
+    return doValue("iUuIdMap");
   }
 
   public DoValue<List<FixtureLongId>> longIds() {
@@ -131,6 +148,23 @@ public class TestEntityWithIIdDo extends DoEntity {
     return iid().get();
   }
 
+  /**
+   * See {@link #iUuId()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestEntityWithIIdDo withIUuId(IUuId iUuId) {
+    iUuId().set(iUuId);
+    return this;
+  }
+
+  /**
+   * See {@link #iUuId()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public IUuId getIUuId() {
+    return iUuId().get();
+  }
+
   @Generated("DoConvenienceMethodsGenerator")
   public TestEntityWithIIdDo withMap(Map<FixtureStringId, String> map) {
     map().set(map);
@@ -151,6 +185,23 @@ public class TestEntityWithIIdDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<FixtureCompositeId, String> getCompositeMap() {
     return compositeMap().get();
+  }
+
+  /**
+   * See {@link #iUuIdMap()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestEntityWithIIdDo withIUuIdMap(Map<IUuId, String> iUuIdMap) {
+    iUuIdMap().set(iUuIdMap);
+    return this;
+  }
+
+  /**
+   * See {@link #iUuIdMap()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<IUuId, String> getIUuIdMap() {
+    return iUuIdMap().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

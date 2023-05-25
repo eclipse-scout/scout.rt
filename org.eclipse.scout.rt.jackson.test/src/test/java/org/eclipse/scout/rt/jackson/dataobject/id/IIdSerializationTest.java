@@ -15,16 +15,19 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.id.IUuId;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithIIdDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -79,14 +82,61 @@ public class IIdSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithUnqualifiedIId() throws Exception {
-    TestEntityWithIIdDo entity = BEANS.get(TestEntityWithIIdDo.class).withIid(COMPOSITE_ID_1);
-    String json = m_dataObjectMapper.writeValue(entity);
-    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithIIdUnqualified2Do.json"));
-    m_testHelper.assertJsonEquals(expectedJson, json);
+  public void testDeserialize_EntityWithUnqualifiedIId() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithIIdUnqualified2Do.json"));
 
     // IId serialized as unqualified iid is not deserializable (IId class type is not available)
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithQualifiedIId() throws Exception {
+    TestEntityWithIIdDo entity = BEANS.get(TestEntityWithIIdDo.class).withIid(COMPOSITE_ID_1);
+    String json = m_dataObjectMapper.writeValue(entity);
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithIIdQualified2Do.json"));
+    m_testHelper.assertJsonEquals(expectedJson, json);
+
+    TestEntityWithIIdDo actual = m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    assertEquals(actual.getIid(), COMPOSITE_ID_1);
+  }
+
+  /**
+   * Using a valid {@link #UU_ID} ({@link FixtureUuId}) as {@link IUuId}.
+   */
+  @Test
+  public void testSerializeDeserialize_EntityWithCorrectlyTypedQualifiedId() {
+    String json = m_dataObjectMapper.writeValue(BEANS.get(DoEntityBuilder.class)
+        .put("iUuId", "scout.FixtureUuId:8fa211b0-fd83-42cb-96c9-1942e274ce79")
+        .build());
+
+    TestEntityWithIIdDo entity = m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    assertEquals(UU_ID, entity.getIUuId());
+
+    json = m_dataObjectMapper.writeValue(BEANS.get(DoEntityBuilder.class)
+        .put("iUuIdMap", Collections.singletonMap("scout.FixtureUuId:8fa211b0-fd83-42cb-96c9-1942e274ce79", "test"))
+        .build());
+
+    entity = m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    assertEquals(1, entity.getIUuIdMap().size());
+    assertEquals("test", entity.getIUuIdMap().get(UU_ID));
+  }
+
+  /**
+   * Using an invalid {@link #STRING_1_ID} ({@link FixtureStringId}) as {@link IUuId}.
+   */
+  @Test
+  public void testSerializeDeserialize_EntityWithWronglyTypedQualifiedId() {
+    String json = m_dataObjectMapper.writeValue(BEANS.get(DoEntityBuilder.class)
+        .put("iUuId", "scout.FixtureStringId:foo")
+        .build());
+
+    assertThrows(AssertionException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    String mapJson = m_dataObjectMapper.writeValue(BEANS.get(DoEntityBuilder.class)
+        .put("iUuIdMap", Collections.singletonMap("scout.FixtureStringId:foo", "test"))
+        .build());
+
+    assertThrows(AssertionException.class, () -> m_dataObjectMapper.readValue(mapJson, TestEntityWithIIdDo.class));
   }
 
   protected URL toURL(String resourceName) {

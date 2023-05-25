@@ -9,12 +9,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.util.Locale;
-
-import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
-import org.eclipse.scout.rt.dataobject.id.IId;
-import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumMapKeySerializer;
-import org.eclipse.scout.rt.jackson.dataobject.id.IIdMapKeySerializer;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -48,19 +43,12 @@ public class DataObjectMapKeySerializers extends Serializers.Base {
 
   @Override
   public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
-    Class<?> rawClass = type.getRawClass();
-    if (Locale.class.isAssignableFrom(rawClass)) {
-      return new LocaleMapKeySerializer();
+    for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
+      JsonSerializer<?> serializer = provider.findKeySerializer(getModuleContext(), type, config, beanDesc);
+      if (serializer != null) {
+        return serializer;
+      }
     }
-
-    if (IId.class.isAssignableFrom(rawClass)) {
-      return new IIdMapKeySerializer();
-    }
-
-    if (IEnum.class.isAssignableFrom(rawClass)) {
-      return new EnumMapKeySerializer();
-    }
-
-    return null;
+    return super.findSerializer(config, type, beanDesc);
   }
 }

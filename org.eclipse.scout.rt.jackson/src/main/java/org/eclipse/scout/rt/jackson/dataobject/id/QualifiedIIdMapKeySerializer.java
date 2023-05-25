@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
  * Custom serializer for {@link IId} instances - like {@link TypedIdSerializer} it uses {@link IdCodec} for
- * serialization. It may be used as a replacement for {@link IIdMapKeySerializer}.
+ * serialization. It may be used as a replacement for {@link UnqualifiedIIdMapKeySerializer}.
  */
 public class QualifiedIIdMapKeySerializer extends JsonSerializer<IId> {
 

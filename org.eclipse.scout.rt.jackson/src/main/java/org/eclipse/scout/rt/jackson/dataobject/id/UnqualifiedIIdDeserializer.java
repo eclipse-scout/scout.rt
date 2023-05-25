@@ -22,19 +22,19 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 /**
  * Custom deserializer for {@link IId} values.
  */
-public class IIdDeserializer extends StdDeserializer<IId> {
+public class UnqualifiedIIdDeserializer extends StdDeserializer<IId> {
   private static final long serialVersionUID = 1L;
 
-  protected final Class<? extends IId> m_idType;
   protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
+  protected final Class<? extends IId> m_idClass;
 
-  public IIdDeserializer(Class<? extends IId> idType) {
-    super(idType);
-    m_idType = idType;
+  public UnqualifiedIIdDeserializer(Class<? extends IId> idClass) {
+    super(idClass);
+    m_idClass = idClass;
   }
 
   @Override
   public IId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    return m_idCodec.get().fromUnqualified(m_idType, p.getText());
+    return m_idCodec.get().fromUnqualified(m_idClass, p.getText());
   }
 }
