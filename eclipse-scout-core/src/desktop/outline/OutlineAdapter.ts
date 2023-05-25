@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, EventHandler, Form, JsFormAdapter, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter} from '../../index';
+import {App, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter} from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
   declare widget: Outline;
@@ -243,7 +243,7 @@ export class OutlineAdapter extends TreeAdapter {
 
   protected static _updateParentTablePageMenusForDetailForm(this: Page & { _updateParentTablePageMenusForDetailFormOrig }) {
     const detailForm = this.detailForm;
-    if (detailForm && (!detailForm.modelAdapter || detailForm.modelAdapter instanceof JsFormAdapter)) {
+    if (detailForm && !detailForm.modelAdapter) {
       this._updateParentTablePageMenusForDetailFormOrig();
     }
   }

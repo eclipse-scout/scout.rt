@@ -22,7 +22,6 @@ export class JsFormAdapter extends FormAdapter {
       parent: model.parent,
       owner: model.owner,
       objectType: model.jsFormObjectType,
-      modelAdapter: model.modelAdapter,
       displayParent: model.displayParent,
       displayHint: model.displayHint,
       data: model.inputData
