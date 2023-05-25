@@ -40,6 +40,10 @@
       <artifactId>jetty-plus</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-javax-server</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.platform</artifactId>
     </dependency>

@@ -45,6 +45,7 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyCertificateAliasProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePasswordProperty;
@@ -210,6 +211,8 @@ public class JettyServer {
     String resourceBase = webappDir.getAbsolutePath();
     WebAppContext webAppContext = new P_WebAppContext(resourceBase, contextPath);
     webAppContext.setThrowUnavailableOnStartupException(true);
+
+    JavaxWebSocketServletContainerInitializer.configure(webAppContext, null);
 
     LOG.info("Starting Jetty with resourceBase={}", resourceBase);
 

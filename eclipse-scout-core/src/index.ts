@@ -109,6 +109,7 @@ export * from './util/ViewportScrollerModel';
 export * from './ajax/ajax';
 export * from './ajax/AjaxCall';
 export * from './ajax/AjaxError';
+export * from './ajax/websocket';
 export * from './lookup/LookupCall';
 export * from './lookup/LookupCallModel';
 export * from './lookup/LookupResult';
