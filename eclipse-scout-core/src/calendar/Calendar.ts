@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf,
+  arrays, CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf,
   JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
@@ -257,7 +257,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _renderSelectedDate() {
-    this._updateModel(true, false);
+    this._updateModel(false);
   }
 
   setDisplayMode(displayMode: CalendarDisplayMode) {
@@ -291,7 +291,7 @@ export class Calendar extends Widget implements CalendarModel {
       // only do it on property changes
       return;
     }
-    this._updateModel(false, true);
+    this._updateModel(true);
 
     // only render if components have another layout
     if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
@@ -486,8 +486,10 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _renderComponents() {
     this.components.sort(this._sortFromTo);
+    this._updateFullDayIndices();
     this.components.forEach(component => component.remove());
     this.components.forEach(component => component.render());
+    scrollbars.update(this.$grid);
     this._arrangeComponents();
     this._updateListPanel();
   }
@@ -589,7 +591,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _navigateDate(direction: CalendarDirection) {
     this.selectedDate = this._calcSelectedDate(direction);
-    this._updateModel(true, false);
+    this._updateModel(false);
   }
 
   protected _calcSelectedDate(direction: CalendarDirection): Date {
@@ -610,12 +612,12 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  protected _updateModel(updateTopGrid: boolean, animate: boolean) {
+  protected _updateModel(animate: boolean) {
     this._exactRange = this._calcExactRange();
     this.yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();
     this.trigger('modelChange');
-    this._updateScreen(updateTopGrid, animate);
+    this._updateScreen(true, animate);
   }
 
   /**
@@ -627,7 +629,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     if (this.isDay()) {
       from = new Date(p.year, p.month, p.date);
-      to = new Date(p.year, p.month, p.date + 1);
+      to = new Date(p.year, p.month, p.date);
     } else if (this.isWeek()) {
       from = new Date(p.year, p.month, p.date - p.day);
       to = new Date(p.year, p.month, p.date - p.day + 6);
@@ -676,7 +678,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _onTodayClick(event: JQuery.ClickEvent) {
     this.selectedDate = new Date();
-    this._updateModel(true, false);
+    this._updateModel(false);
   }
 
   protected _onDisplayModeClick(event: JQuery.ClickEvent) {
@@ -830,13 +832,7 @@ export class Calendar extends Widget implements CalendarModel {
     // reset animation sizes
     $('div', this.$container).removeData(['new-width', 'new-height']);
 
-    if (this.isMonth()) {
-      this.$topGrid.addClass('calendar-top-grid-short');
-      this.$grid.removeClass('calendar-grid-short');
-    } else {
-      this.$topGrid.removeClass('calendar-top-grid-short');
-      this.$grid.addClass('calendar-grid-short');
-    }
+    this.$grids.toggleClass('calendar-grids-month', this.isMonth());
 
     // init vars (Selected: Day)
     let $selected = $('.selected', this.$grid),
@@ -1032,11 +1028,62 @@ export class Calendar extends Widget implements CalendarModel {
         component.remove();
       }
     });
-    let allDayComponents = this.components.filter(component => component.fullDay);
+    const fullDayComponents = this.components.filter(component => component.fullDay);
+    this._updateFullDayIndices(fullDayComponents);
     // first remove all components and add them from scratch
-    allDayComponents.forEach(component => component.remove());
-    allDayComponents.forEach(component => component.render());
+    fullDayComponents.forEach(component => component.remove());
+    fullDayComponents.forEach(component => component.render());
     this._updateScrollbars(this.$topGrid, false);
+    scrollbars.update(this.$grid);
+  }
+
+  protected _updateFullDayIndices(fullDayComponents?: CalendarComponent[]) {
+    if (!fullDayComponents) {
+      fullDayComponents = this.components.filter(component => component.fullDay);
+    }
+    fullDayComponents.sort(this._sortFromTo);
+
+    const {from, to} = this._exactRange;
+    const usedIndicesMap = new Map();
+    let maxComponentsPerDay = 0;
+
+    for (const component of fullDayComponents) {
+      component.fullDayIndex = -1;
+      if (component.coveredDaysRange.to < from || component.coveredDaysRange.from > to) {
+        // component is not in range
+        continue;
+      }
+
+      let date = component.coveredDaysRange.from;
+      if (date < from) {
+        date = from;
+      }
+
+      let usedIndices = arrays.ensure(usedIndicesMap.get(date.valueOf()));
+
+      // get the first unused index
+      // create [0, 1, 2, ..., maxIndex, maxIndex + 1] remove the used indices
+      // => the minimum of the remaining array is the first unused index
+      const maxIndex = usedIndices.length ? arrays.max(usedIndices) : 0;
+      const indexCandidates = arrays.init(maxIndex + 2, null).map((elem, idx) => idx);
+      arrays.removeAll(indexCandidates, usedIndices);
+      const index = arrays.min(indexCandidates);
+      component.fullDayIndex = index;
+
+      // mark the index as used for all dates of the components range
+      // none of these indices can be used already due to the order of the components
+      while (date <= component.coveredDaysRange.to && date <= to) {
+        usedIndices.push(index);
+        usedIndicesMap.set(date.valueOf(), usedIndices);
+
+        date = dates.shift(date, 0, 0, 1);
+        usedIndices = arrays.ensure(usedIndicesMap.get(date.valueOf()));
+      }
+
+      maxComponentsPerDay = Math.max(index + 1, maxComponentsPerDay);
+    }
+
+    this.$grids.css('--full-day-components', maxComponentsPerDay);
   }
 
   layoutYearPanel() {
@@ -1184,7 +1231,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _onYearPanelDateSelect(event: YearPanelDateSelectEvent) {
     this.selectedDate = event.date;
-    this._updateModel(true, false);
+    this._updateModel(false);
   }
 
   protected _updateListPanel() {
