@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<included>
+  <!-- This file may be included in all scout logback configurations which requires a simple console logger -->
+
+  <contextListener class="org.eclipse.scout.rt.platform.logger.AutoRegisteringJulLevelChangePropagator" />
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="org.eclipse.scout.rt.platform.logger.LevelRangeFilter">
+      <levelMin>TRACE</levelMin>
+      <levelMax>INFO</levelMax>
+    </filter>
+    <encoder class="org.eclipse.scout.rt.platform.logger.FixedPatternLogbackEncoder" />
+  </appender>
+
+  <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="org.eclipse.scout.rt.platform.logger.LevelRangeFilter">
+      <levelMin>WARN</levelMin>
+      <levelMax>ERROR</levelMax>
+    </filter>
+    <target>System.err</target>
+    <encoder class="org.eclipse.scout.rt.platform.logger.FixedPatternLogbackEncoder" />
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="STDERR" />
+  </root>
+
+  <!-- Inclusion of optional, user-specific Logback configurations -->
+  <include file="${LOGBACK_INCLUDE_XML}" optional="true" />
+</included>

@@ -8,8 +8,6 @@
   ~
   ~ SPDX-License-Identifier: EPL-2.0
   -->
-<configuration debug="true">
+<configuration>
   <include resource="logback-test-scout.xml" />
-
-  <logger name="org.eclipse.scout.rt.ui.html" level="DEBUG" />
 </configuration>
