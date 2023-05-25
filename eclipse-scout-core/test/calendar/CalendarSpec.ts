@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponent, dates, scout} from '../../src/index';
+import {Calendar, CalendarComponent, DateRange, dates, scout} from '../../src/index';
 
 describe('Calendar', () => {
   let session: SandboxSession;
@@ -25,6 +25,14 @@ describe('Calendar', () => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
+
+  class SpecCalendar extends Calendar {
+    declare _exactRange: DateRange;
+
+    override _updateFullDayIndices(fullDayComponents?: CalendarComponent[]) {
+      super._updateFullDayIndices(fullDayComponents);
+    }
+  }
 
   describe('init', () => {
 
@@ -56,7 +64,7 @@ describe('Calendar', () => {
   });
 
   describe('component', () => {
-    let cal: Calendar,
+    let cal: SpecCalendar,
       c1: CalendarComponent,
       c2: CalendarComponent,
       c3: CalendarComponent,
@@ -98,7 +106,7 @@ describe('Calendar', () => {
     };
 
     beforeEach(() => {
-      cal = scout.create(Calendar, {parent: session.desktop});
+      cal = scout.create(SpecCalendar, {parent: session.desktop});
       c1 = scout.create(CalendarComponent, $.extend({parent: cal}, option1));
       c2 = scout.create(CalendarComponent, $.extend({parent: cal}, option2));
       c3 = scout.create(CalendarComponent, $.extend({parent: cal}, option3));
@@ -228,6 +236,190 @@ describe('Calendar', () => {
       });
 
     });
+
+    describe('_updateFullDayIndices', () => {
+      const mondayStr = '2023-05-22 00:00:00.000';
+      const tuesdayStr = '2023-05-23 00:00:00.000';
+      const wednesdayStr = '2023-05-24 00:00:00.000';
+      const thursdayStr = '2023-05-25 00:00:00.000';
+      const fridayStr = '2023-05-26 00:00:00.000';
+      const mondayDate = dates.parseJsonDate(mondayStr);
+      const wednesdayDate = dates.parseJsonDate(wednesdayStr);
+      const thursdayDate = dates.parseJsonDate(thursdayStr);
+      const fridayDate = dates.parseJsonDate(fridayStr);
+
+      let mondayWednesday, tuesdayThursday, wednesdayFriday,
+        monday, tuesday1, tuesday2, wednesday, thursday1, thursday2, friday,
+        fullDayComponents;
+
+      beforeEach(() => {
+        mondayWednesday = createFullDay(mondayStr, wednesdayStr);
+        tuesdayThursday = createFullDay(tuesdayStr, thursdayStr);
+        wednesdayFriday = createFullDay(wednesdayStr, fridayStr);
+        monday = createFullDay(mondayStr, mondayStr);
+        tuesday1 = createFullDay(tuesdayStr, tuesdayStr);
+        tuesday2 = createFullDay(tuesdayStr, tuesdayStr);
+        wednesday = createFullDay(wednesdayStr, wednesdayStr);
+        thursday1 = createFullDay(thursdayStr, thursdayStr);
+        thursday2 = createFullDay(thursdayStr, thursdayStr);
+        friday = createFullDay(fridayStr, fridayStr);
+
+        fullDayComponents = [mondayWednesday, tuesdayThursday, wednesdayFriday,
+          monday, tuesday1, tuesday2, wednesday, thursday1, thursday2, friday];
+
+        cal.render();
+      });
+
+      function createFullDay(fromDate: string, toDate: string): CalendarComponent {
+        return scout.create(CalendarComponent, {
+          parent: cal,
+          fromDate, toDate,
+          coveredDaysRange: {
+            from: fromDate,
+            to: toDate
+          },
+          fullDay: true
+        });
+      }
+
+      it('is not updated if component is out of range', () => {
+        expect(mondayWednesday.fullDayIndex).toBe(-1);
+        expect(tuesdayThursday.fullDayIndex).toBe(-1);
+        expect(wednesdayFriday.fullDayIndex).toBe(-1);
+        expect(monday.fullDayIndex).toBe(-1);
+        expect(tuesday1.fullDayIndex).toBe(-1);
+        expect(tuesday2.fullDayIndex).toBe(-1);
+        expect(wednesday.fullDayIndex).toBe(-1);
+        expect(thursday1.fullDayIndex).toBe(-1);
+        expect(thursday2.fullDayIndex).toBe(-1);
+        expect(friday.fullDayIndex).toBe(-1);
+
+        cal._exactRange = new DateRange(mondayDate, mondayDate);
+        cal._updateFullDayIndices(fullDayComponents);
+
+        expect(mondayWednesday.fullDayIndex).not.toBe(-1);
+        expect(tuesdayThursday.fullDayIndex).toBe(-1);
+        expect(wednesdayFriday.fullDayIndex).toBe(-1);
+        expect(monday.fullDayIndex).not.toBe(-1);
+        expect(tuesday1.fullDayIndex).toBe(-1);
+        expect(tuesday2.fullDayIndex).toBe(-1);
+        expect(wednesday.fullDayIndex).toBe(-1);
+        expect(thursday1.fullDayIndex).toBe(-1);
+        expect(thursday2.fullDayIndex).toBe(-1);
+        expect(friday.fullDayIndex).toBe(-1);
+
+        cal._exactRange = new DateRange(wednesdayDate, thursdayDate);
+        cal._updateFullDayIndices(fullDayComponents);
+
+        expect(mondayWednesday.fullDayIndex).not.toBe(-1);
+        expect(tuesdayThursday.fullDayIndex).not.toBe(-1);
+        expect(wednesdayFriday.fullDayIndex).not.toBe(-1);
+        expect(monday.fullDayIndex).toBe(-1);
+        expect(tuesday1.fullDayIndex).toBe(-1);
+        expect(tuesday2.fullDayIndex).toBe(-1);
+        expect(wednesday.fullDayIndex).not.toBe(-1);
+        expect(thursday1.fullDayIndex).not.toBe(-1);
+        expect(thursday2.fullDayIndex).not.toBe(-1);
+        expect(friday.fullDayIndex).toBe(-1);
+
+        cal._exactRange = new DateRange(thursdayDate, thursdayDate);
+        cal._updateFullDayIndices(fullDayComponents);
+
+        expect(mondayWednesday.fullDayIndex).toBe(-1);
+        expect(tuesdayThursday.fullDayIndex).not.toBe(-1);
+        expect(wednesdayFriday.fullDayIndex).not.toBe(-1);
+        expect(monday.fullDayIndex).toBe(-1);
+        expect(tuesday1.fullDayIndex).toBe(-1);
+        expect(tuesday2.fullDayIndex).toBe(-1);
+        expect(wednesday.fullDayIndex).toBe(-1);
+        expect(thursday1.fullDayIndex).not.toBe(-1);
+        expect(thursday2.fullDayIndex).not.toBe(-1);
+        expect(friday.fullDayIndex).toBe(-1);
+      });
+
+      it('is correctly updated', () => {
+        expect(mondayWednesday.fullDayIndex).toBe(-1);
+        expect(tuesdayThursday.fullDayIndex).toBe(-1);
+        expect(wednesdayFriday.fullDayIndex).toBe(-1);
+        expect(monday.fullDayIndex).toBe(-1);
+        expect(tuesday1.fullDayIndex).toBe(-1);
+        expect(tuesday2.fullDayIndex).toBe(-1);
+        expect(wednesday.fullDayIndex).toBe(-1);
+        expect(thursday1.fullDayIndex).toBe(-1);
+        expect(thursday2.fullDayIndex).toBe(-1);
+        expect(friday.fullDayIndex).toBe(-1);
+
+        cal._exactRange = new DateRange(mondayDate, mondayDate);
+        cal._updateFullDayIndices(fullDayComponents);
+
+        // monday
+        // mondayWednesday
+
+        expect(mondayWednesday.fullDayIndex).toBe(1);
+        expect(tuesdayThursday.fullDayIndex).toBe(-1);
+        expect(wednesdayFriday.fullDayIndex).toBe(-1);
+        expect(monday.fullDayIndex).toBe(0);
+        expect(tuesday1.fullDayIndex).toBe(-1);
+        expect(tuesday2.fullDayIndex).toBe(-1);
+        expect(wednesday.fullDayIndex).toBe(-1);
+        expect(thursday1.fullDayIndex).toBe(-1);
+        expect(thursday2.fullDayIndex).toBe(-1);
+        expect(friday.fullDayIndex).toBe(-1);
+
+        cal._exactRange = new DateRange(mondayDate, fridayDate);
+        cal._updateFullDayIndices(fullDayComponents);
+
+        // monday
+        // mondayWednesday
+
+        // tuesday1
+        // mondayWednesday
+        // tuesday2
+        // tuesdayThursday
+
+        // wednesday
+        // mondayWednesday
+        // wednesdayFriday
+        // tuesdayThursday
+
+        // thursday1
+        // thursday2
+        // wednesdayFriday
+        // tuesdayThursday
+
+        // friday
+        //
+        // wednesdayFriday
+
+        expect(mondayWednesday.fullDayIndex).toBe(1);
+        expect(tuesdayThursday.fullDayIndex).toBe(3);
+        expect(wednesdayFriday.fullDayIndex).toBe(2);
+        expect(monday.fullDayIndex).toBe(0);
+        expect(tuesday1.fullDayIndex).toBe(0);
+        expect(tuesday2.fullDayIndex).toBe(2);
+        expect(wednesday.fullDayIndex).toBe(0);
+        expect(thursday1.fullDayIndex).toBe(0);
+        expect(thursday2.fullDayIndex).toBe(1);
+        expect(friday.fullDayIndex).toBe(0);
+
+        cal._exactRange = new DateRange(fridayDate, fridayDate);
+        cal._updateFullDayIndices(fullDayComponents);
+
+        // wednesdayFriday
+        // friday
+
+        expect(mondayWednesday.fullDayIndex).toBe(-1);
+        expect(tuesdayThursday.fullDayIndex).toBe(-1);
+        expect(wednesdayFriday.fullDayIndex).toBe(0);
+        expect(monday.fullDayIndex).toBe(-1);
+        expect(tuesday1.fullDayIndex).toBe(-1);
+        expect(tuesday2.fullDayIndex).toBe(-1);
+        expect(wednesday.fullDayIndex).toBe(-1);
+        expect(thursday1.fullDayIndex).toBe(-1);
+        expect(thursday2.fullDayIndex).toBe(-1);
+        expect(friday.fullDayIndex).toBe(1);
+      });
+    });
   });
 
   describe('navigation', () => {
@@ -298,5 +490,4 @@ describe('Calendar', () => {
     });
 
   });
-
 });
