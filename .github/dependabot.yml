@@ -1,0 +1,76 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /eclipse-scout-chart
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /eclipse-scout-cli
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /eclipse-scout-core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /eclipse-scout-migrate
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /eclipse-scout-releng
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /eclipse-scout-tsconfig
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /eslint-config
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /karma-jasmine-scout
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.rt.svg.ui.html
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /scout-hellojs-app/src/main/resources/archetype-resources/__rootArtifactId__.app
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /scout-hellojs-app/src/main/resources/archetype-resources/__rootArtifactId__.ui
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /scout-hellojs-app/src/main/resources/archetype-resources
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /scout-helloworld-app/src/main/resources/archetype-resources/__rootArtifactId__.ui.html
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /scout-helloworld-app/src/main/resources/archetype-resources
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: daily
