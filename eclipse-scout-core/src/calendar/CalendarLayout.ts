@@ -26,7 +26,7 @@ export class CalendarLayout extends AbstractLayout {
   override layout($container: JQuery) {
     let height = 0,
       headerHeight = 0,
-      $yearContainer = this.calendar.yearPanel.$container,
+      $calendarSidebar = this.calendar.calendarSidebar.$container,
       $grids = this.calendar.$grids,
       $listContainer = this.calendar.$listContainer,
       $header = this.calendar.$header;
@@ -45,7 +45,7 @@ export class CalendarLayout extends AbstractLayout {
     }
 
     headerHeight = $header.outerHeight(true);
-    $yearContainer.css('height', 'calc(100% - ' + (headerHeight + $yearContainer.cssMarginY()) + 'px)');
+    $calendarSidebar.css('height', 'calc(100% - ' + (headerHeight + $calendarSidebar.cssMarginY()) + 'px)');
     $grids.css('height', 'calc(100% - ' + (headerHeight + $grids.cssMarginY()) + 'px)');
     $listContainer.css('height', 'calc(100% - ' + (headerHeight + $listContainer.cssMarginY()) + 'px)');
 
