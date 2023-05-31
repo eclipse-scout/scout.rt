@@ -134,6 +134,8 @@ export * from './session/BackgroundJobPollingStatus';
 export * from './session/BackgroundJobPollingSupport';
 export * from './session/BusyIndicator';
 export * from './session/BusyIndicatorEventMap';
+export * from './session/BusySupport';
+export * from './session/BusySupportModel';
 export * from './session/RemoteEvent';
 export * from './session/Locale';
 export * from './session/LocaleModel';

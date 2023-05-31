@@ -1845,8 +1845,7 @@ describe('Desktop', () => {
 
       desktop.cancelViews([view1, view2]);
 
-      // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
+      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -1871,7 +1870,7 @@ describe('Desktop', () => {
 
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
+      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       unsavedFormChangesForm.whenPostLoad().then(() => {
         unsavedFormChangesForm.close();
@@ -1893,7 +1892,7 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
+      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -1956,7 +1955,7 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
+      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -2000,7 +1999,7 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
+      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -2067,7 +2066,7 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
+      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -2123,7 +2122,7 @@ describe('Desktop', () => {
       jasmine.clock().install();
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
+      let unsavedFormChangesForm = arrays.find(desktop.children, child => child instanceof UnsavedFormChangesForm) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');

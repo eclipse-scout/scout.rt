@@ -261,6 +261,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   protected _analyzeRegularError(errorInfo: ErrorInfo) {
     let error = errorInfo.error as Error;
     errorInfo.code = this.getJsErrorCode(error);
+    errorInfo.showAsFatalError = true;
     errorInfo.message = String(error.message || error);
     if (error.stack) {
       errorInfo.stack = String(error.stack);

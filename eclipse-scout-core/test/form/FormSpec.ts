@@ -255,13 +255,13 @@ describe('Form', () => {
         return $.resolvedPromise();
       };
 
-      expect(form.formStored).toBe(false);
+      expect(form.formSaved).toBe(false);
       form.touch();
-      expect(form.formStored).toBe(false);
+      expect(form.formSaved).toBe(false);
       form.save()
         .then(() => {
           expect(saveCalled).toBe(true);
-          expect(form.formStored).toBe(true);
+          expect(form.formSaved).toBe(true);
         })
         .catch(fail)
         .always(done);
@@ -1842,6 +1842,7 @@ describe('Form', () => {
       throwInSave = false;
 
       protected override _load(): JQuery.Promise<object> {
+        expect(this.session.desktop.busy).toBe(true);
         if (this.throwInLoad) {
           return $.rejectedPromise('load');
         }
@@ -1849,6 +1850,7 @@ describe('Form', () => {
       }
 
       protected override _postLoad(): JQuery.Promise<void> {
+        expect(this.session.desktop.busy).toBe(true);
         if (this.throwInPostLoad) {
           return $.rejectedPromise('postLoad');
         }
@@ -1856,6 +1858,7 @@ describe('Form', () => {
       }
 
       protected override _save(data: object): JQuery.Promise<void> {
+        expect(this.session.desktop.busy).toBe(true);
         if (this.throwInSave) {
           return $.rejectedPromise('save');
         }
@@ -1920,7 +1923,7 @@ describe('Form', () => {
             })
             .always(() => {
               expect(catchCalled).toBe(true);
-              expect(form.formStored).toBe(false); // save failed: do not mark as stored
+              expect(form.formSaved).toBe(false); // save failed: do not mark as stored
               expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
               done();
             });
@@ -1940,6 +1943,7 @@ describe('Form', () => {
         .then(fail)
         .catch(e => {
           catchCalled = true;
+          expect(form.session.desktop.busy).toBe(false);
           expect(e).toBe('load');
           expect(numHandled).toBe(1);
         })
@@ -1966,6 +1970,7 @@ describe('Form', () => {
             .then(fail)
             .catch(e => {
               catchCalled = true;
+              expect(form.session.desktop.busy).toBe(false);
               expect(e).toEqual('save');
               expect(numHandled).toBe(1);
             })

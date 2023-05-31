@@ -75,7 +75,7 @@ public class RestRequestCancellationClientRequestFilter implements ClientRequest
       }
 
       RunContexts.copyCurrent()
-          .withRunMonitor(BEANS.get(RunMonitor.class)) // execute with a new RunMontior
+          .withRunMonitor(BEANS.get(RunMonitor.class)) // execute with a new RunMonitor
           .run(() -> m_requestCanceller.accept(m_requestId));
 
       return true;
