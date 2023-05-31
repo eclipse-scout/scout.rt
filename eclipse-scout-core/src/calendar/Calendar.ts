@@ -330,10 +330,10 @@ export class Calendar extends Widget implements CalendarModel {
     this._updateModel(true);
 
     // only render if components have another layout
-    // if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
     this._renderComponents();
-    this.needsScrollToStartHour = true;
-    // }
+    if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
+      this.needsScrollToStartHour = true;
+    }
   }
 
   protected _setViewRange(viewRange: DateRange | JsonDateRange) {
@@ -919,17 +919,19 @@ export class Calendar extends Widget implements CalendarModel {
     // show or hide calendar sidebar
     $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
     $('.calendar-toggle-resources', this.$commands).select(this._showResourcesPanel);
-    this.yearPanel.setVisible(this._showYearPanel);
-    this.resourcesPanel.setVisible(this._showResourcesPanel);
+    // this.yearPanel.setVisible(this._showYearPanel);
+    // this.resourcesPanel.setVisible(this._showResourcesPanel);
     if (this._showYearPanel || this._showResourcesPanel) {
       this.calendarSidebar.$container.data('new-width', this.calendarToggleYearWidth);
       gridW -= this.calendarToggleYearWidth;
       containerW -= this.calendarToggleYearWidth;
-      this.calendarSidebar.invalidateLayoutTree(false);
     } else {
       this.calendarSidebar.$container.data('new-width', 0);
-      this.calendarSidebar.invalidateLayoutTree(false);
     }
+
+    let sidebarHeight = this._showYearPanel && this._showResourcesPanel ? 200 : 400;
+    this.yearPanel.$container.data('new-height', this._showYearPanel ? sidebarHeight : 0);
+    this.resourcesPanel.$container.data('new-height', this._showResourcesPanel ? sidebarHeight : 0);
 
     // show or hide work list
     $('.calendar-toggle-list', this.$commands).select(this._showListPanel);
@@ -1005,7 +1007,7 @@ export class Calendar extends Widget implements CalendarModel {
     // layout calendar columns
     let columnWidth = 0;
     if (this.isDay() && this.splitDay) {
-      columnWidth = Math.round(contentW / (this.calendars.filter(c => c.visible).length + 1));
+      columnWidth = Math.round(contentW / (this.calendars.filter(c => c.visible).length + (this._defaultCalendarVisible($topSelected.index()) ? 1 : 0)));
     } else if (this.isWorkWeek()) {
       columnWidth = Math.round(contentW / this.workDayIndices.length);
     } else {
@@ -1022,7 +1024,10 @@ export class Calendar extends Widget implements CalendarModel {
         .find('.calendar-column')
         .filter((i, e) => {
           let id = $(e).data('calendarId');
-          return id === 'default' || this.calendars.find(cal => cal.calendarId === id).visible;
+          if (id === 'default') {
+            return this._defaultCalendarVisible($topSelected.index());
+          }
+          return this.calendars.find(cal => cal.calendarId === id).visible;
         }).data('new-width', columnWidth);
     } else {
       // Set size 0 for all calendar columns
@@ -1075,6 +1080,9 @@ export class Calendar extends Widget implements CalendarModel {
               $e.addClass('hidden');
             }
             this._afterLayout($e, animate);
+          },
+          () => {
+            this._afterLayout($e, animate);
           });
         } else {
           $e.css('height', h);
@@ -1088,8 +1096,16 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _afterLayout($parent: JQuery, animate: boolean) {
+    this.calendarSidebar.invalidateLayoutTree(false);
     this._updateScrollbars($parent, animate);
     this._updateWeekdayNames();
+  }
+
+  protected _defaultCalendarVisible(selectedIndex: number): boolean {
+    return this.components
+      .filter(comp => comp.coveredDaysRange.covers(this.selectedDate, true))
+      .filter(comp => !comp.item.calendarId)
+      .length > 0;
   }
 
   protected _updateWeekdayNames() {
@@ -1113,9 +1129,12 @@ export class Calendar extends Widget implements CalendarModel {
       weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
     }
 
-    $('.calendar-day-name', this.$topGrid).each(function(index: number) {
-      $(this).attr('data-day-name', weekdays[index]);
-    });
+
+    $('.calendar-day-name > .calendar-column', this.$topGrid)
+      .filter((i, element) => $(element).data('calendarId') === 'default')
+      .each((i, elm) => {
+        $(elm).attr('data-calendar-name', weekdays[i]);
+      });
   }
 
   protected _updateScrollbars($parent: JQuery, animate: boolean) {
@@ -1211,7 +1230,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     // set range text
     if (this.isDay()) {
-      text = this._format(exFrom, 'd. MMMM yyyy');
+      text = this._format(exFrom, 'EEEE, d. MMMM yyyy');
     } else if (this.isWorkWeek() || this.isWeek()) {
       let toText = this.session.text('ui.to');
       if (exFrom.getMonth() === exTo.getMonth()) {

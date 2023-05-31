@@ -37,7 +37,7 @@ export class CalendarSidebarLayout extends AbstractLayout {
     this._validateSplitterPosition(htmlComp, splitter, availableSize);
 
     // Set sizes
-    splitter.setVisible(yearPanel.isVisible() && resourcesPanel.isVisible());
+    splitter.setVisible(!yearPanel.$container.hasClass('hidden') && !resourcesPanel.$container.hasClass('hidden'));
 
     let yearPanelHeight, resourcesPanelHeight;
     let splitterHeight = splitter.htmlComp.bounds().height;

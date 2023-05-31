@@ -210,9 +210,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       calendarId = 'default';
     }
     return $day.find('.calendar-column')
-      .filter((index: number, element: HTMLSelectElement) => {
-        return $(element).data('calendarId').toString() === calendarId.toString();
-      });
+      .filter((index: number, element: HTMLSelectElement) => $(element).data('calendarId').toString() === calendarId.toString());
   }
 
   protected _isTask(): boolean {
