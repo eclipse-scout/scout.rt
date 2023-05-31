@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 public class ServiceUtility {
 
   /**
-   * @return the reflective service operation that can be called using {@link #invoke(Method,Object,Object[])}
+   * @return the reflective service operation that can be called using {@link #invoke(Object, Method, Object[])}
    */
   public Method getServiceOperation(Class<?> serviceClass, String operation, Class<?>[] paramTypes) {
     Assertions.assertNotNull(serviceClass, "service class is null");

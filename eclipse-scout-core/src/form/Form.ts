@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, App, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap,
-  FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, MessageBoxes,
-  NotificationBadgeStatus, ObjectOrChildModel, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
+  AbortKeyStroke, App, BusyIndicatorOptions, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler, FileChooser, FileChooserController, FocusRule, FormController,
+  FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController,
+  MessageBoxes, NotificationBadgeStatus, ObjectOrChildModel, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -58,9 +58,9 @@ export class Form extends Widget implements FormModel, DisplayParent {
   formLoading: boolean;
   formLoaded: boolean;
   /**
-   * true if the form was stored (e.g. by calling {@link ok} or {@link save}) since it was created.
+   * true if the form was saved (e.g. by calling {@link ok} or {@link save}) since it was created.
    */
-  formStored: boolean;
+  formSaved: boolean;
   /** set by PopupWindow if this form has displayHint=Form.DisplayHint.POPUP_WINDOW */
   popupWindow: PopupWindow;
   title: string;
@@ -123,7 +123,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.movable = true;
     this.rootGroupBox = null;
     this.saveNeeded = false;
-    this.formStored = false;
+    this.formSaved = false;
     this.saveNeededVisible = true;
     this.formController = null;
     this.messageBoxController = null;
@@ -363,7 +363,17 @@ export class Form extends Widget implements FormModel, DisplayParent {
     if (!allowReload && this.formLoaded) {
       return $.resolvedPromise();
     }
-    return this.lifecycle.load();
+    return this._withBusyHandling(() => this.lifecycle.load());
+  }
+
+  protected _withBusyHandling<T>(action: () => JQuery.Promise<T>): JQuery.Promise<T> {
+    this.setBusy(true);
+    try {
+      return action()
+        .always(() => this.setBusy(false));
+    } catch (error) {
+      this.setBusy(false);
+    }
   }
 
   /**
@@ -390,7 +400,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
           this._setFormLoading(false);
           this.formLoaded = true;
           this.trigger('load');
-        }).catch(error => {
+        })
+        .catch(error => {
           this._setFormLoading(false);
           return this._handleLoadErrorInternal(error);
         });
@@ -517,18 +528,20 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   protected _onLifecycleSave(): JQuery.Promise<void> {
-    try {
-      let data = this.exportData();
-      return this._save(data)
-        .then(() => {
-          this.formStored = true;
-          this.setData(data);
-          this.trigger('save');
-        })
-        .catch(error => this._handleSaveErrorInternal(error));
-    } catch (error) {
-      return this._handleSaveErrorInternal(error);
-    }
+    return this._withBusyHandling(() => {
+      try {
+        let data = this.exportData();
+        return this._save(data)
+          .then(() => {
+            this.formSaved = true;
+            this.setData(data);
+            this.trigger('save');
+          })
+          .catch(error => this._handleSaveErrorInternal(error));
+      } catch (error) {
+        return this._handleSaveErrorInternal(error);
+      }
+    });
   }
 
   /**
@@ -1552,6 +1565,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
     bounds = JSON.parse(bounds) as Rectangle;
     return new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
+  }
+
+  /** @see BusySupport.setBusy */
+  setBusy(busy: boolean | BusyIndicatorOptions) {
+    this.session.desktop.setBusy(busy);
   }
 
   /**

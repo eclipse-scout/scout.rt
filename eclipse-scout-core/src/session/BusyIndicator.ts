@@ -10,9 +10,34 @@
 import {Action, BoxButtons, BusyIndicatorEventMap, ClickActiveElementKeyStroke, CloseKeyStroke, Event, FocusRule, GlassPaneRenderer, InitModelOf, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
 
 export interface BusyIndicatorModel extends WidgetModel {
+  /**
+   * Specifies if the {@link BusyIndicator} is cancellable.
+   *
+   * If true, a cancel button is visible and the 'cancel' event may be fired on click.
+   *
+   * Default is true.
+   */
   cancellable?: boolean;
+  /**
+   * The time in milliseconds from the moment the {@link BusyIndicator} is rendered until the popup becomes visible.
+   * Before this timeout the glasspanes are rendered and the cursors is displayed as busy.
+   * As soon as the timeout elapsed, the busy indicator popup is shown as well.
+   * Only after the popup is shown it is possible to cancel the indicator.
+   *
+   * Default is 2.5s.
+   */
   showTimeout?: number;
+  /**
+   * The text to show in the busy indicator popup.
+   *
+   * Default is 'Please wait'.
+   */
   label?: string;
+  /**
+   * An additional text shown in the busy indicator popup below the label.
+   *
+   * Default is no details text.
+   */
   details?: string;
 }
 
@@ -151,6 +176,7 @@ export class BusyIndicator extends Widget implements BusyIndicatorModel {
     super._remove();
   }
 
+  /** @see BusyIndicatorModel.label */
   setLabel(label: string) {
     this.setProperty('label', label);
   }
@@ -159,6 +185,7 @@ export class BusyIndicator extends Widget implements BusyIndicatorModel {
     this.$label.text(this.label || '');
   }
 
+  /** @see BusyIndicatorModel.details */
   setDetails(details: string) {
     this.setProperty('details', details);
   }
@@ -174,7 +201,7 @@ export class BusyIndicator extends Widget implements BusyIndicatorModel {
   }
 
   /**
-   * Used by CloseKeyStroke.js
+   * Used by CloseKeyStroke
    */
   close() {
     if (this.cancelButton && this.cancelButton.$container && this.session.focusManager.requestFocus(this.cancelButton.$container)) {

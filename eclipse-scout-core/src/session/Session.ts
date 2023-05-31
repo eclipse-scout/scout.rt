@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, InitModelOf, JsonErrorResponse,
-  KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType, Reconnector, RemoteEvent,
-  ResponseQueue, scout, SessionEventMap, SessionModel, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget
+  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager, fonts, icons, InitModelOf,
+  JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType, Reconnector,
+  RemoteEvent, ResponseQueue, scout, SessionEventMap, SessionModel, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
@@ -74,9 +74,6 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   $entryPoint: JQuery;
 
   protected _adapterDataCache: Record<string, AdapterData>;
-  protected _busy: boolean;
-  protected _busyIndicator: BusyIndicator;
-  protected _busyIndicatorTimeoutId: number;
   protected _deferredEventTypes: string[];
   protected _deferred: JQuery.Deferred<string[], never, never>;
   protected _fatalMessagesOnScreen: Record<string, boolean>;
@@ -84,6 +81,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   protected _queuedRequest: RemoteRequest;
   protected _asyncDelay: number;
   protected _sendTimeoutId: number;
+  protected _cancellationHandler: EventHandler<Event<BusyIndicator>>;
 
   constructor() {
     super();
@@ -129,9 +127,6 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.processingEvents = false;
     this.adapterExportEnabled = false;
     this._adapterDataCache = {};
-    this._busy = false;
-    this._busyIndicator = null;
-    this._busyIndicatorTimeoutId = null;
     this._deferred = null;
     this._fatalMessagesOnScreen = {};
     this._retryRequest = null;
@@ -154,6 +149,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       objectType: 'NullWidget'
     }, rootParent);
     this.widget = this.root;
+    this._cancellationHandler = e => this._sendCancelRequest();
   }
 
   // Corresponds to constants in JsonResponse
@@ -449,7 +445,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     // Create the desktop
     // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
     let clientSessionData = this._getAdapterData(data.startupData.clientSession);
-    this.desktop = (this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget) as unknown) as Desktop;
+    this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget) as Desktop;
     App.get()._triggerDesktopReady(this.desktop);
 
     let renderDesktopImpl = function() {
@@ -718,7 +714,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
   protected _performUserAjaxRequest(ajaxOptions: JQuery.AjaxSettings, busyHandling: boolean, request?: RemoteRequest) {
     if (busyHandling) {
-      this.setBusy(true);
+      this._setBusy(true);
     }
     this.setRequestPending(true);
 
@@ -742,7 +738,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
         // The second check prevents flickering of the busy indicator if there is a scheduled request
         // that will be sent immediately afterwards (see onAjaxAlways).
         if (busyHandling && !this.areBusyIndicatedEventsQueued()) {
-          this.setBusy(false);
+          this._setBusy(false);
         }
         success = this.responseQueue.process(data);
       } catch (err) {
@@ -753,7 +749,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     function onAjaxFail(ajaxError: { jqXHR: JQuery.jqXHR; textStatus: ErrorTextStatus; errorThrown: string }) {
       try {
         if (busyHandling) {
-          this.setBusy(false);
+          this._setBusy(false);
         }
         this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
       } catch (err) {
@@ -798,7 +794,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
         // It could still be true when here were more busy indicated events in the queue when
         // the error response was received (e.g. when selecting some table rows just when the
         // server is restarted).
-        this.setBusy(false);
+        this._setBusy(false);
       }
       this.layoutValidator.validate();
 
@@ -807,6 +803,18 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
         throw jsError;
       }
     }
+  }
+
+  protected _setBusy(busy: boolean) {
+    this.desktop?.setBusy({
+      busy: busy,
+      force: true,
+      renderDelay: 500, // longer delay as otherwise the cursor flickers on every backend call
+      busyIndicatorModel: {
+        cancellable: true
+      },
+      onCancel: this._cancellationHandler
+    });
   }
 
   registerAjaxCall(ajaxCall: AjaxCall) {
@@ -1306,70 +1314,6 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     if (this.inspector) {
       this.$entryPoint.toggleAttr('data-request-pending', pending, 'true');
     }
-  }
-
-  setBusy(busy: boolean) {
-    if (busy) {
-      if (!this._busy) {
-        this._renderBusy();
-      }
-      this._busy = true;
-    } else {
-      if (this._busy) {
-        this._removeBusy();
-      }
-      this._busy = false;
-    }
-  }
-
-  protected _renderBusy() {
-    if (this._busyIndicatorTimeoutId !== null && this._busyIndicatorTimeoutId !== undefined) {
-      // Do not schedule it twice
-      return;
-    }
-    // Don't show the busy indicator immediately. Set a short timer instead (which may be
-    // cancelled again if the busy state returns to false in the meantime).
-    this._busyIndicatorTimeoutId = setTimeout(() => {
-      if (this._busyIndicator) {
-        // busy indicator is already showing
-        return;
-      }
-      if (!this.desktop || !this.desktop.rendered) {
-        return; // No busy indicator without desktop (e.g. during shutdown)
-      }
-      this._busyIndicator = scout.create(BusyIndicator, {
-        parent: this.desktop
-      });
-      this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));
-      this._busyIndicator.render(this.$entryPoint);
-    }, 500);
-  }
-
-  protected _removeBusy() {
-    // Clear pending timer
-    clearTimeout(this._busyIndicatorTimeoutId);
-    this._busyIndicatorTimeoutId = null;
-
-    // Remove busy indicator (if it was already created)
-    if (this._busyIndicator) {
-      this._busyIndicator.destroy();
-      this._busyIndicator = null;
-    }
-  }
-
-  protected _onCancelProcessing(event: Event) {
-    let busyIndicator = this._busyIndicator;
-    if (!busyIndicator) {
-      return; // removed in the meantime
-    }
-    busyIndicator.off('cancel');
-
-    // Set "canceling" state in busy indicator (after 100ms, would not look good otherwise)
-    setTimeout(() => {
-      busyIndicator.cancelled();
-    }, 100);
-
-    this._sendCancelRequest();
   }
 
   protected _sendCancelRequest() {

@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopBenchViewActivateEvent, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation,
-  DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, GlassPaneTarget,
-  HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectOrChildModel, ObjectOrModel, objects, OfflineDesktopNotification, OpenUriHandler, Outline,
-  OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent, SplitterPositionChangeEvent, strings, styles, Tooltip, Tree,
-  TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
+  AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopBenchViewActivateEvent, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout,
+  DesktopModel, DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
+  FileChooserController, Form, GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectOrChildModel, ObjectOrModel, objects,
+  OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
+  SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
 
@@ -67,6 +67,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   animateLayoutChange: boolean;
   url: URL;
   responsiveHandler: ResponsiveHandler;
+  busySupport: BusySupport;
 
   $notifications: JQuery;
   $overlaySeparator: JQuery;
@@ -125,6 +126,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.theme = null;
     this.dense = false;
     this.url = null;
+    this.busySupport = scout.create(BusySupport, {parent: this});
     this.$notifications = null;
 
     this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm', 'focusedElement']);
@@ -364,6 +366,18 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
       this.outline.setCompact(compact);
       this.outline.setEmbedDetailContent(compact);
     }
+  }
+
+  /** @see BusySupport.setBusy */
+  setBusy(busy: boolean | BusyIndicatorOptions) {
+    this.busySupport.setBusy(busy);
+  }
+
+  /**
+   * @return true if the desktop has a busy indicator active.
+   */
+  get busy(): boolean {
+    return this.busySupport.isBusy();
   }
 
   /** @see DesktopModel.dense */
