@@ -919,8 +919,6 @@ export class Calendar extends Widget implements CalendarModel {
     // show or hide calendar sidebar
     $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
     $('.calendar-toggle-resources', this.$commands).select(this._showResourcesPanel);
-    // this.yearPanel.setVisible(this._showYearPanel);
-    // this.resourcesPanel.setVisible(this._showResourcesPanel);
     if (this._showYearPanel || this._showResourcesPanel) {
       this.calendarSidebar.$container.data('new-width', this.calendarToggleYearWidth);
       gridW -= this.calendarToggleYearWidth;
@@ -929,9 +927,9 @@ export class Calendar extends Widget implements CalendarModel {
       this.calendarSidebar.$container.data('new-width', 0);
     }
 
-    let sidebarHeight = this._showYearPanel && this._showResourcesPanel ? 200 : 400;
-    this.yearPanel.$container.data('new-height', this._showYearPanel ? sidebarHeight : 0);
-    this.resourcesPanel.$container.data('new-height', this._showResourcesPanel ? sidebarHeight : 0);
+    this.calendarSidebar.startShowYearPanel(this._showYearPanel);
+    this.calendarSidebar.startShowResourcesPanel(this._showResourcesPanel);
+    this.calendarSidebar.invalidateLayoutTree(false);
 
     // show or hide work list
     $('.calendar-toggle-list', this.$commands).select(this._showListPanel);
