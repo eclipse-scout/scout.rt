@@ -32,6 +32,12 @@ class ResourcesPanelTree extends Tree {
   declare nodes: ResourcesPanelTreeNode[];
 
 
+  constructor() {
+    super();
+
+    this._scrollDirections = 'y';
+  }
+
   override insertNode(node: ObjectOrModel<ResourcesPanelTreeNode>, parentNode?: ResourcesPanelTreeNode, index?: number) {
     super.insertNode(node, parentNode, index);
   }

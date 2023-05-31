@@ -15,6 +15,10 @@ export class CalendarSidebar extends Widget {
   splitter: Splitter;
   resourcesPanel: ResourcesPanel;
 
+  showYearPanel: boolean;
+  showResourcesPanel: boolean;
+  invalidPanelSizes: boolean;
+
   constructor() {
     super();
 
@@ -55,5 +59,21 @@ export class CalendarSidebar extends Widget {
 
   _onSplitterPositionChange(event) {
     this.invalidateLayoutTree(false);
+  }
+
+  startShowYearPanel(show: boolean) {
+    if (show === this.showYearPanel) {
+      return;
+    }
+    this.showYearPanel = show;
+    this.invalidPanelSizes = true;
+  }
+
+  startShowResourcesPanel(show: boolean) {
+    if (show === this.showResourcesPanel) {
+      return;
+    }
+    this.showResourcesPanel = show;
+    this.invalidPanelSizes = true;
   }
 }

@@ -12,7 +12,7 @@ import {AbstractLayout, CalendarSidebar, Dimension, HtmlComponent, Rectangle, Sp
 export class CalendarSidebarLayout extends AbstractLayout {
   widget: CalendarSidebar;
 
-  static MIN_SPLITTER_POSITION = 210;
+  protected _splitter: Splitter;
 
   protected _relativeSplitterPosition: number;
   protected _availableHeight: number;
@@ -22,53 +22,76 @@ export class CalendarSidebarLayout extends AbstractLayout {
     super();
 
     this.widget = widget;
+    this._splitter = widget.splitter;
   }
 
 
   override layout($container: JQuery) {
-    const htmlComp = HtmlComponent.get($container);
-    const insets = htmlComp.insets();
-    const availableSize = htmlComp.availableSize().subtract(insets);
+    let htmlComp = HtmlComponent.get($container),
+      insets = htmlComp.insets(),
+      availableSize = htmlComp.availableSize().subtract(insets),
+      yearPanelHeight, resourcesPanelHeight, splitterHeight;
 
-    const yearPanel = this.widget.yearPanel;
-    const splitter = this.widget.splitter;
-    const resourcesPanel = this.widget.resourcesPanel;
+    this._validateSplitterPosition(htmlComp, this._splitter, availableSize);
 
-    this._validateSplitterPosition(htmlComp, splitter, availableSize);
+    splitterHeight = this._splitter.htmlComp.bounds().height;
 
-    // Set sizes
-    splitter.setVisible(!yearPanel.$container.hasClass('hidden') && !resourcesPanel.$container.hasClass('hidden'));
+    yearPanelHeight = this._splitter.position - splitterHeight / 2;
+    resourcesPanelHeight = availableSize.height - yearPanelHeight - splitterHeight;
 
-    let yearPanelHeight, resourcesPanelHeight;
-    let splitterHeight = splitter.htmlComp.bounds().height;
+    this.widget.yearPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top, availableSize.width, yearPanelHeight));
+    this.widget.resourcesPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top + splitterHeight, availableSize.width, resourcesPanelHeight));
 
-    yearPanelHeight = yearPanel.isVisible() ? availableSize.height : 0;
-    resourcesPanelHeight = resourcesPanel.isVisible() ? availableSize.height : 0;
-
-    if (splitter.isVisible()) {
-      yearPanelHeight = splitter.position - splitterHeight / 2;
-      resourcesPanelHeight = availableSize.height - yearPanelHeight - splitterHeight;
+    // Makes splitter invisible when its at top or bottom
+    if (this._splitter.position !== 0 && this._splitter.position !== this._availableHeight) {
+      this._splitter.$container.removeClass('invisible');
+    } else {
+      this._splitter.$container.addClass('invisible');
     }
 
-    yearPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top, availableSize.width, yearPanelHeight));
-    resourcesPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top + splitterHeight, availableSize.width, resourcesPanelHeight));
+    this.setAnimatedSplitterPosition();
+  }
+
+  setAnimatedSplitterPosition() {
+    if (!this.widget.invalidPanelSizes) {
+      return;
+    }
+    if (this.widget.showYearPanel && !this.widget.showResourcesPanel && this._splitter.position === 0) {
+      // No vertical animation on fade in of calendar sidebar (year panel)
+      this._splitter.setPosition(this._availableHeight);
+    } else if (this.widget.showResourcesPanel && !this.widget.showYearPanel && this._splitter.position === this._availableHeight) {
+      // No vertical animation on fade in of calendar sidebar (resources panel)
+      this._splitter.setPosition(0);
+    } else if (!this.widget.showYearPanel && !this.widget.showResourcesPanel) {
+      // No vertical animation on fade out of calendar sidebar
+    } else {
+      let opts: JQuery.EffectsOptions<HTMLElement> = {
+        progress: () => {
+          this._splitter.setPosition(this._splitter.$container.cssTop());
+        }
+      };
+      let pos = this.widget.showYearPanel && this.widget.showResourcesPanel
+        ? this._availableHeight / 2
+        : this.widget.showYearPanel ? this._availableHeight : 0;
+      this._splitter.$container.animate({
+        top: pos
+      }, opts);
+    }
+    this.widget.invalidPanelSizes = false;
   }
 
   protected _validateSplitterPosition(htmlComp: HtmlComponent, splitter: Splitter, availableSize: Dimension) {
-    if (splitter.position === null) {
-      // Set initial splitter position
-      this._silentUpdateSpliterPosition(htmlComp, splitter, availableSize.height / 2);
-    } else if (availableSize.height !== this._availableHeight) {
-      // Window has been resized -> preserve relative splitter position
+    // Window has been resized -> preserve relative splitter position
+    if (availableSize.height !== this._availableHeight) {
       this._silentUpdateSpliterPosition(htmlComp, splitter, availableSize.height * this._relativeSplitterPosition);
     }
 
     // Validate min and max splitter position
-    let maxSplitterPosition = availableSize.height - CalendarSidebarLayout.MIN_SPLITTER_POSITION;
-    if (splitter.position < CalendarSidebarLayout.MIN_SPLITTER_POSITION) {
-      this._silentUpdateSpliterPosition(htmlComp, splitter, CalendarSidebarLayout.MIN_SPLITTER_POSITION);
+    let maxSplitterPosition = availableSize.height;
+    if (splitter.position < 0) {
+      this._silentUpdateSpliterPosition(htmlComp, splitter, 0);
     } else if (splitter.position > maxSplitterPosition) {
-      this._silentUpdateSpliterPosition(htmlComp, splitter, Math.max(maxSplitterPosition, CalendarSidebarLayout.MIN_SPLITTER_POSITION));
+      this._silentUpdateSpliterPosition(htmlComp, splitter, Math.max(maxSplitterPosition, 0));
     }
 
     // Update cached values
