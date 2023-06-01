@@ -1,0 +1,138 @@
+/*
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {
+  ajax, AjaxError, ErrorHandler, Event, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout, SomeRequired
+} from '../index';
+
+export class AccessControl extends PropertyEventEmitter implements AccessControlModel {
+  declare self: AccessControl;
+  declare model: AccessControlModel;
+  declare initModel: SomeRequired<this['model'], 'permissionsUrl'>;
+  declare eventMap: AccessControlEventMap;
+
+  permissionsUrl: string;
+  interval: number;
+
+  protected _permissionCollection: PermissionCollection;
+  protected _retryIntervals: number[];
+  protected _syncTimeoutId: number;
+
+  constructor() {
+    super();
+    this.permissionsUrl = null;
+    this.interval = 1800000; // 30 * 60 * 1000 (30 minutes)
+
+    this._permissionCollection = null;
+    this._retryIntervals = [];
+    this._syncTimeoutId = null;
+  }
+
+  override init(model: InitModelOf<this>) {
+    this.permissionsUrl = scout.assertParameter('permissionsUrl', model.permissionsUrl);
+    this._setInterval(scout.nvl(model.interval, this.interval));
+
+    this.startSync();
+  }
+
+  setInterval(interval: number) {
+    this.setProperty('interval', interval);
+  }
+
+  protected _setInterval(interval: number) {
+    const retryIntervals = [];
+    if (interval) {
+      let retryInterval = 1000;
+      while (retryInterval < interval) {
+        retryIntervals.push(retryInterval);
+        retryInterval = retryInterval * 2;
+      }
+    }
+    this._retryIntervals = retryIntervals;
+    this._setProperty('interval', interval);
+  }
+
+  startSync() {
+    this._sync();
+  }
+
+  stopSync() {
+    clearTimeout(this._syncTimeoutId);
+  }
+
+  protected _sync() {
+    this._loadPermissionCollection()
+      .catch((error: AjaxError) => {
+        // handle error and return null
+        scout.create(ErrorHandler, {displayError: false}).handle(error);
+        return null;
+      })
+      .then((model: PermissionCollectionModel) => {
+        const sync = !!model;
+        // if no model was loaded keep last permission collection (or none collection if no permission collection is present)
+        model = model || this._permissionCollection || {type: PermissionCollectionType.NONE};
+        // update permission collection
+        this._permissionCollection = PermissionCollection.ensure(model);
+        // schedule next sync
+        this._syncTimeoutId = setTimeout(this._sync.bind(this), this.interval);
+        if (sync) {
+          // notify listeners
+          this._onSync();
+        }
+      });
+  }
+
+  protected _loadPermissionCollection(): JQuery.Promise<PermissionCollectionModel, AjaxError> {
+    return ajax.getJson(this.permissionsUrl, {}, {retryIntervals: this._retryIntervals});
+  }
+
+  protected _onSync() {
+    this.trigger('sync');
+  }
+
+  /**
+   * @returns promise which is resolved after the next successful sync.
+   */
+  whenSync(): JQuery.Promise<Event<AccessControl>> {
+    return this.when('sync');
+  }
+
+  /**
+   * Check `permission` against the current {@link PermissionCollection}.
+   * Quick check is executed synchronously while non-quick check is executed asynchronously.
+   */
+  check(permission: Permission, quick: true): boolean;
+  check(permission: Permission, quick?: false): JQuery.Promise<boolean>;
+  check(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean>;
+  check(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean> {
+    if (!this._permissionCollection) {
+      return quick ? false : $.resolvedPromise(false);
+    }
+    return this._permissionCollection.implies(permission, quick);
+  }
+}
+
+export interface AccessControlModel extends ObjectModel<AccessControl> {
+  /**
+   * URL pointing to a json resource that provides information about permissions (see {@link PermissionCollectionModel}).
+   */
+  permissionsUrl?: string;
+  /**
+   * Interval in which sync is performed (in milliseconds).
+   *
+   * Default is 1800000 (30 minutes).
+   */
+  interval?: number;
+}
+
+export interface AccessControlEventMap extends PropertyEventMap {
+  'sync': Event;
+  'propertyChange:interval': PropertyChangeEvent<number>;
+}

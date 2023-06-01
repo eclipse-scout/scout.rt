@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, AjaxError, scout} from '../index';
+import {AjaxCall, AjaxCallModel, AjaxError, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -19,15 +19,16 @@ export const ajax = {
    * Performs an HTTP GET request.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  get(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
+  get(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'GET'
     }, options);
-    return ajax.call(opts);
+    return ajax.call(opts, model);
   },
 
   /**
@@ -35,16 +36,17 @@ export const ajax = {
    * @param data the data to be sent.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  post(url: string, data?: any, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
+  post(url: string, data?: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'POST',
       data: data
     }, options);
-    return ajax.call(opts);
+    return ajax.call(opts, model);
   },
 
   /**
@@ -52,46 +54,49 @@ export const ajax = {
    * @param data the data to be sent.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  put(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
+  put(url: string, data: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'PUT',
       data: data
     }, options);
-    return ajax.call(opts);
+    return ajax.call(opts, model);
   },
 
   /**
    * Performs an HTTP DELETE request.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  remove(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
+  remove(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'DELETE'
     }, options);
-    return ajax.call(opts);
+    return ajax.call(opts, model);
   },
 
   /**
    * Performs an HTTP GET request using JSON as format for the request and the response.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  getJson(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
+  getJson(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'GET'
     }, options);
-    return ajax.callJson(opts);
+    return ajax.callJson(opts, model);
   },
 
   /**
@@ -99,10 +104,11 @@ export const ajax = {
    * @param data the data to be sent. If the data is not a string it will be converted to a string using JSON.stringify().
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  postJson(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
+  postJson(url: string, data: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     if (data && typeof data !== 'string') {
       data = JSON.stringify(data);
     }
@@ -111,7 +117,7 @@ export const ajax = {
       type: 'POST',
       data: data
     }, options);
-    return ajax.callJson(opts);
+    return ajax.callJson(opts, model);
   },
 
   /**
@@ -119,10 +125,11 @@ export const ajax = {
    * @param data the data to be sent. If the data is not a string it will be converted to a string using JSON.stringify().
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  putJson(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
+  putJson(url: string, data: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     if (data && typeof data !== 'string') {
       data = JSON.stringify(data);
     }
@@ -131,22 +138,23 @@ export const ajax = {
       type: 'PUT',
       data: data
     }, options);
-    return ajax.callJson(opts);
+    return ajax.callJson(opts, model);
   },
 
   /**
    * Performs an HTTP DELETE request using JSON as format for the request and the response.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  removeJson(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
+  removeJson(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
       type: 'DELETE'
     }, options);
-    return ajax.callJson(opts);
+    return ajax.callJson(opts, model);
   },
 
   /**
@@ -154,22 +162,24 @@ export const ajax = {
    * The default HTTP method is POST.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  callJson(options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
-    return ajax.createCallJson(options).call();
+  callJson(options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+    return ajax.createCallJson(options, model).call();
   },
 
   /**
    * Performs an Ajax request.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
    */
-  call(options?: JQuery.AjaxSettings): JQuery.Promise<any, AjaxError> {
-    return ajax.createCall(options).call();
+  call(options: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
+    return ajax.createCall(options, model).call();
   },
 
   /**
@@ -177,31 +187,32 @@ export const ajax = {
    * but does not execute it yet. The default HTTP method is POST.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns the prepared Ajax call object. Execute it with the call() function.
    */
-  createCallJson(options?: JQuery.AjaxSettings): AjaxCall {
+  createCallJson(options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): AjaxCall {
     let opts = $.extend({}, {
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8'
     }, options);
-    return ajax.createCall(opts);
+    return ajax.createCall(opts, model);
   },
 
   /**
    * Prepares an Ajax call, but does not execute it yet.
    * @param [options] additional settings for the request.
    *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param [model] additional properties for the {@link AjaxCall}.
    * @returns the prepared Ajax call object. Execute it with the call() function.
    */
-  createCall(options?: JQuery.AjaxSettings): AjaxCall {
-    let opts = $.extend({}, {
+  createCall(options: JQuery.UrlAjaxSettings, model?: AjaxCallModel): AjaxCall {
+    const ajaxOptions = $.extend({}, {
       cache: false
     }, options);
+    const ajaxCallModel = $.extend(true, {}, {ajaxOptions}, model);
 
-    return scout.create(AjaxCall, {
-      ajaxOptions: opts
-    }, {
+    return scout.create(AjaxCall, ajaxCallModel, {
       ensureUniqueId: false
     });
   }

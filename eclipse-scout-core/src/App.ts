@@ -9,8 +9,8 @@
  */
 
 import {
-  AppEventMap, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, SessionModel,
-  texts, webstorage, Widget
+  access, AppEventMap, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session,
+  SessionModel, texts, webstorage, Widget
 } from './index';
 import $ from 'jquery';
 
@@ -60,6 +60,11 @@ export interface AppBootstrapOptions {
    *  URL pointing to a json resources containing codes that will be available through {@link codes}.
    */
   codesUrl?: string;
+
+  /**
+   * URL pointing to a json resource that provides information about permissions (see {@link PermissionCollectionModel}).
+   */
+  permissionsUrl?: string;
 }
 
 export class App extends EventEmitter {
@@ -189,7 +194,8 @@ export class App extends EventEmitter {
       fonts.bootstrap(options.fonts),
       locales.bootstrap(options.localesUrl),
       texts.bootstrap(options.textsUrl),
-      codes.bootstrap(options.codesUrl)
+      codes.bootstrap(options.codesUrl),
+      access.bootstrap(options.permissionsUrl)
     ];
   }
 
