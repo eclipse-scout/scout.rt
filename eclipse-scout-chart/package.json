@@ -45,7 +45,7 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=23.1.0-snapshot <23.1.0",
+    "@eclipse-scout/cli": ">=23.2.0-snapshot <23.1.0",
     "@eclipse-scout/releng": "^22.0.0",
     "jasmine-core": "4.5.0",
     "jasmine-jquery": "2.1.1",
