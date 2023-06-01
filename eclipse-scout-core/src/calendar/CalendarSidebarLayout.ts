@@ -13,8 +13,8 @@ export class CalendarSidebarLayout extends AbstractLayout {
   widget: CalendarSidebar;
 
   protected _splitter: Splitter;
-
   protected _relativeSplitterPosition: number;
+  protected _newSplitterPosition: number;
   protected _availableHeight: number;
   protected _splitterConstraints: string;
 
@@ -27,6 +27,7 @@ export class CalendarSidebarLayout extends AbstractLayout {
 
 
   override layout($container: JQuery) {
+    console.log('layouting calendar sidebar');
     let htmlComp = HtmlComponent.get($container),
       insets = htmlComp.insets(),
       availableSize = htmlComp.availableSize().subtract(insets),
@@ -49,13 +50,18 @@ export class CalendarSidebarLayout extends AbstractLayout {
       this._splitter.$container.addClass('invisible');
     }
 
-    this.setAnimatedSplitterPosition();
+    if (this._newSplitterPosition) {
+      let newPos = this._newSplitterPosition;
+      this._newSplitterPosition = null;
+      this._setSplitterPosition(newPos, true);
+    }
   }
 
   setAnimatedSplitterPosition() {
     if (!this.widget.invalidPanelSizes) {
       return;
     }
+    console.log('Animate...');
     if (this.widget.showYearPanel && !this.widget.showResourcesPanel && this._splitter.position === 0) {
       // No vertical animation on fade in of calendar sidebar (year panel)
       this._splitter.setPosition(this._availableHeight);
@@ -65,19 +71,39 @@ export class CalendarSidebarLayout extends AbstractLayout {
     } else if (!this.widget.showYearPanel && !this.widget.showResourcesPanel) {
       // No vertical animation on fade out of calendar sidebar
     } else {
+      let pos = this.widget.showYearPanel && this.widget.showResourcesPanel
+        ? 50
+        : this.widget.showYearPanel ? 100 : 0;
+      this.setNewSplitterPositionPercentage(pos);
+    }
+    this.widget.invalidPanelSizes = false;
+  }
+
+  setNewSplitterPosition(pos: number) {
+    this._newSplitterPosition = pos;
+  }
+
+  setNewSplitterPositionPercentage(pos: number) {
+    this._newSplitterPosition = this._availableHeight / 100 * pos;
+  }
+
+  protected _setSplitterPosition(pos: number, animate?: boolean) {
+    if (!animate) {
+      this._splitter.setPosition(pos);
+    } else {
+      console.log('init pos: ' + this._splitter.$container.cssTop());
       let opts: JQuery.EffectsOptions<HTMLElement> = {
         progress: () => {
           this._splitter.setPosition(this._splitter.$container.cssTop());
+          this.layout(this.widget.$container);
+          console.log('update pos: ' + this._splitter.$container.cssTop());
+        },
+        fail: (animation: JQuery.Animation<HTMLElement>, jumpedToEnd: boolean) => {
+          console.log(animation);
         }
       };
-      let pos = this.widget.showYearPanel && this.widget.showResourcesPanel
-        ? this._availableHeight / 2
-        : this.widget.showYearPanel ? this._availableHeight : 0;
-      this._splitter.$container.animate({
-        top: pos
-      }, opts);
+      this._splitter.$container.animate({top: pos}, opts);
     }
-    this.widget.invalidPanelSizes = false;
   }
 
   protected _validateSplitterPosition(htmlComp: HtmlComponent, splitter: Splitter, availableSize: Dimension) {
