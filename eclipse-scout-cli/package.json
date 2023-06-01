@@ -35,7 +35,7 @@
     "version:release": "releng-scripts version:release"
   },
   "dependencies": {
-    "esbuild": "0.15.16",
+    "esbuild": "0.17.19",
     "@babel/core": "7.20.5",
     "@babel/preset-env": "7.20.2",
     "babel-loader": "9.1.0",
