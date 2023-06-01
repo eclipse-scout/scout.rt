@@ -46,7 +46,7 @@
     "css-loader": "6.7.2",
     "jasmine-core": "4.5.0",
     "jasmine-jquery": "2.1.1",
-    "jquery": "3.6.0",
+    "jquery": "3.7.0",
     "karma": "6.4.1",
     "karma-chrome-launcher": "3.1.1",
     "karma-jasmine": "5.1.0",
