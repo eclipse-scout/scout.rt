@@ -68,7 +68,7 @@
     "jasmine-core": "4.5.0",
     "jasmine-ajax": "4.0.0",
     "jasmine-jquery": "2.1.1",
-    "@types/jquery": "3.5.14",
+    "@types/jquery": "3.5.16",
     "@types/jasmine": "4.3.0",
     "@types/jasmine-ajax": "3.3.3",
     "@types/jasmine-jquery": "1.5.34",
