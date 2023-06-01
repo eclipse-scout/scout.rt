@@ -116,7 +116,7 @@
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
     <jetty.version>10.0.15</jetty.version>
     <slf4j.version>2.0.4</slf4j.version>
-    <logback.version>1.3.5</logback.version>
+    <logback.version>1.4.7</logback.version>
     <jackson.version>2.14.0</jackson.version>
     <io.netty-version>4.1.89.Final</io.netty-version>
     <apache.tika-version>2.6.0</apache.tika-version>
