@@ -67,6 +67,8 @@ export class CalendarSidebar extends Widget {
     }
     this.showYearPanel = show;
     this.invalidPanelSizes = true;
+    (<CalendarSidebarLayout>this.htmlComp.layout).setAnimatedSplitterPosition();
+    this.invalidateLayoutTree(false);
   }
 
   startShowResourcesPanel(show: boolean) {
@@ -75,5 +77,7 @@ export class CalendarSidebar extends Widget {
     }
     this.showResourcesPanel = show;
     this.invalidPanelSizes = true;
+    (<CalendarSidebarLayout>this.htmlComp.layout).setAnimatedSplitterPosition();
+    this.invalidateLayoutTree(false);
   }
 }
