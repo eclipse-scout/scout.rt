@@ -31,7 +31,7 @@
     "jasmine-ajax": "4.0.0"
   },
   "dependencies": {
-    "jquery": "3.6.0",
+    "jquery": "3.7.0",
     "sourcemapped-stacktrace": "1.1.11"
   },
   "keywords": [
