@@ -42,7 +42,7 @@
     "@types/jasmine-jquery": "1.5.34"
   },
   "dependencies": {
-    "@eclipse-scout/core": ">=23.1.0-snapshot <23.1.0",
+    "@eclipse-scout/core": ">=23.2.0-snapshot <23.1.0",
     "jquery": "3.6.0"
   }
 }
