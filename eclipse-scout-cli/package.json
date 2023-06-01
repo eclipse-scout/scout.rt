@@ -48,7 +48,7 @@
     "jasmine-jquery": "2.1.1",
     "jquery": "3.6.0",
     "karma": "6.4.1",
-    "karma-chrome-launcher": "3.1.1",
+    "karma-chrome-launcher": "3.2.0",
     "karma-jasmine": "5.1.0",
     "karma-jasmine-ajax": "0.1.13",
     "@metahub/karma-jasmine-jquery": "4.0.1",
