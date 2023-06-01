@@ -75,7 +75,7 @@
     "karma": "6.4.1"
   },
   "dependencies": {
-    "jquery": "3.6.0",
+    "jquery": "3.7.0",
     "sourcemapped-stacktrace": "1.1.11"
   }
 }
