@@ -45,6 +45,9 @@
     <module>../org.eclipse.scout.rt.server.jdbc</module>
     <module>../org.eclipse.scout.rt.server.jdbc.test</module>
 
+    <module>../org.eclipse.scout.rt.api</module>
+    <module>../org.eclipse.scout.rt.api.data</module>
+
     <module>../org.eclipse.scout.rt.mom.api</module>
     <module>../org.eclipse.scout.rt.mom.api.test</module>
     <module>../org.eclipse.scout.rt.mom.jms</module>
@@ -431,6 +434,18 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jdbc.test</artifactId>
+        <version>23.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.api</artifactId>
+        <version>23.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.api.data</artifactId>
         <version>23.2-SNAPSHOT</version>
       </dependency>
 

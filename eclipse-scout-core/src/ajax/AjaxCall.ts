@@ -7,14 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxError, Call, CallModel, InitModelOf, URL} from '../index';
+import {AjaxError, Call, CallModel, InitModelOf, SomeRequired, URL} from '../index';
 import $ from 'jquery';
 
 export class AjaxCall extends Call implements AjaxCallModel {
   declare model: AjaxCallModel;
   declare pendingCall: JQuery.jqXHR;
+  declare initModel: SomeRequired<this['model'], 'ajaxOptions'>;
 
-  ajaxOptions: JQuery.AjaxSettings;
+  ajaxOptions: JQuery.UrlAjaxSettings;
 
   constructor() {
     super();
@@ -111,7 +112,7 @@ export class AjaxCall extends Call implements AjaxCallModel {
 
 export interface AjaxCallModel extends CallModel {
   /**
-   * Options for the jquery ajax call. At least the {@link CallModel.url} is required.
+   * Options for the jquery ajax call. At least the {@link JQuery.UrlAjaxSettings.url} is required.
    */
-  ajaxOptions: JQuery.AjaxSettings;
+  ajaxOptions?: JQuery.UrlAjaxSettings;
 }

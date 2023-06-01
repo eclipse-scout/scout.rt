@@ -619,11 +619,11 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.layoutValidator.validate();
   }
 
-  defaultAjaxOptions(request: RemoteRequest): JQuery.AjaxSettings {
+  defaultAjaxOptions(request: RemoteRequest): JQuery.UrlAjaxSettings {
     request = request || this._newRequest();
     let url = this._decorateUrl(this.remoteUrl, request);
 
-    let ajaxOptions: JQuery.AjaxSettings = {
+    let ajaxOptions: JQuery.UrlAjaxSettings = {
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8',
@@ -700,7 +700,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     });
   }
 
-  protected _callAjax(callOptions?: AjaxCallModel): JQuery.Promise<RemoteResponse> {
+  protected _callAjax(callOptions: InitModelOf<AjaxCall>): JQuery.Promise<RemoteResponse> {
     let defaultOptions = {
       retryIntervals: [100, 500, 500, 500]
     };
@@ -712,7 +712,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       .always(this.unregisterAjaxCall.bind(this, ajaxCall));
   }
 
-  protected _performUserAjaxRequest(ajaxOptions: JQuery.AjaxSettings, busyHandling: boolean, request?: RemoteRequest) {
+  protected _performUserAjaxRequest(ajaxOptions: JQuery.UrlAjaxSettings, busyHandling: boolean, request?: RemoteRequest) {
     if (busyHandling) {
       this._setBusy(true);
     }
@@ -1173,7 +1173,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       return false;
     }
 
-    let uploadAjaxOptions: JQuery.AjaxSettings = {
+    let uploadAjaxOptions: JQuery.UrlAjaxSettings = {
       type: 'POST',
       url: 'upload/' + this.uiSessionId + '/' + target.id,
       cache: false,
