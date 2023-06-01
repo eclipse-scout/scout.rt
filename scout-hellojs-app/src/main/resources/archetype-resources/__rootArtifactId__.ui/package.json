@@ -37,7 +37,7 @@
     "jasmine-jquery": "2.1.1",
     "karma": "6.4.1",
     "@types/jquery": "3.5.14",
-    "@types/jasmine": "4.3.1",
+    "@types/jasmine": "4.3.2",
     "@types/jasmine-ajax": "3.3.3",
     "@types/jasmine-jquery": "1.5.34"
   },
