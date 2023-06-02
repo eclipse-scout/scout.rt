@@ -8,7 +8,7 @@ export abstract class Repository implements ObjectWithType {
   /** @see reviver on {@link JSON.parse} */
   jsonReviver: (this: any, key: string, value: any) => any;
 
-  constructor() {
+  protected constructor() {
     this.jsonReviver = Repository.objectTypeTransformer;
   }
 

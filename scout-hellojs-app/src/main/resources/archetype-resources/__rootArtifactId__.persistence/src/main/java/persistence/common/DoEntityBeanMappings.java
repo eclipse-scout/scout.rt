@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 
 public class DoEntityBeanMappings<DO_ENTITY extends DoEntity, ENTITY_BEAN> {
 
-  private List<DoEntityBeanMapping<DO_ENTITY, ENTITY_BEAN, ?>> m_mappings = new LinkedList<>();
+  private final List<DoEntityBeanMapping<DO_ENTITY, ENTITY_BEAN, ?>> m_mappings = new LinkedList<>();
 
   public List<DoEntityBeanMapping<DO_ENTITY, ENTITY_BEAN, ?>> getMappings() {
     return m_mappings;
