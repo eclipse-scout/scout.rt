@@ -14,15 +14,18 @@ export class CalendarSidebarLayout extends AbstractLayout {
 
   protected _splitter: Splitter;
   protected _relativeSplitterPosition: number;
-  protected _newSplitterPosition: number;
   protected _availableHeight: number;
   protected _splitterConstraints: string;
+
+  protected _newSplitterPosition: number;
+  protected _animateNewSplitterPosition: boolean;
 
   constructor(widget: CalendarSidebar) {
     super();
 
     this.widget = widget;
     this._splitter = widget.splitter;
+    this._newSplitterPosition = null;
   }
 
 
@@ -50,56 +53,29 @@ export class CalendarSidebarLayout extends AbstractLayout {
       this._splitter.$container.addClass('invisible');
     }
 
-    if (this._newSplitterPosition) {
+    if (this._newSplitterPosition !== null) {
       let newPos = this._newSplitterPosition;
       this._newSplitterPosition = null;
-      this._setSplitterPosition(newPos, true);
+      this._setSplitterPosition(newPos, this._animateNewSplitterPosition);
     }
   }
 
-  setAnimatedSplitterPosition() {
-    if (!this.widget.invalidPanelSizes) {
-      return;
-    }
-    console.log('Animate...');
-    if (this.widget.showYearPanel && !this.widget.showResourcesPanel && this._splitter.position === 0) {
-      // No vertical animation on fade in of calendar sidebar (year panel)
-      this._splitter.setPosition(this._availableHeight);
-    } else if (this.widget.showResourcesPanel && !this.widget.showYearPanel && this._splitter.position === this._availableHeight) {
-      // No vertical animation on fade in of calendar sidebar (resources panel)
-      this._splitter.setPosition(0);
-    } else if (!this.widget.showYearPanel && !this.widget.showResourcesPanel) {
-      // No vertical animation on fade out of calendar sidebar
-    } else {
-      let pos = this.widget.showYearPanel && this.widget.showResourcesPanel
-        ? 50
-        : this.widget.showYearPanel ? 100 : 0;
-      this.setNewSplitterPositionPercentage(pos);
-    }
-    this.widget.invalidPanelSizes = false;
-  }
-
-  setNewSplitterPosition(pos: number) {
+  setNewSplitterPosition(pos: number, animate?: boolean) {
     this._newSplitterPosition = pos;
+    this._animateNewSplitterPosition = animate;
   }
 
-  setNewSplitterPositionPercentage(pos: number) {
-    this._newSplitterPosition = this._availableHeight / 100 * pos;
+  setNewSplitterPositionPercentage(pos: number, animate?: boolean) {
+    this.setNewSplitterPosition(this._availableHeight / 100 * pos, animate);
   }
 
   protected _setSplitterPosition(pos: number, animate?: boolean) {
     if (!animate) {
       this._splitter.setPosition(pos);
     } else {
-      console.log('init pos: ' + this._splitter.$container.cssTop());
       let opts: JQuery.EffectsOptions<HTMLElement> = {
         progress: () => {
           this._splitter.setPosition(this._splitter.$container.cssTop());
-          this.layout(this.widget.$container);
-          console.log('update pos: ' + this._splitter.$container.cssTop());
-        },
-        fail: (animation: JQuery.Animation<HTMLElement>, jumpedToEnd: boolean) => {
-          console.log(animation);
         }
       };
       this._splitter.$container.animate({top: pos}, opts);
