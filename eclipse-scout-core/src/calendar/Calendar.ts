@@ -929,7 +929,6 @@ export class Calendar extends Widget implements CalendarModel {
 
     this.calendarSidebar.startShowYearPanel(this._showYearPanel);
     this.calendarSidebar.startShowResourcesPanel(this._showResourcesPanel);
-    this.calendarSidebar.invalidateLayoutTree(false);
 
     // show or hide work list
     $('.calendar-toggle-list', this.$commands).select(this._showListPanel);
