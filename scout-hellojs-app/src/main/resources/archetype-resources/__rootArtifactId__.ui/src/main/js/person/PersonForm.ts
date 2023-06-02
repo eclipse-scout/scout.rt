@@ -1,5 +1,5 @@
 import PersonFormModel, {PersonFormWidgetMap} from './PersonFormModel';
-import {Form, FormModel, Status} from '@eclipse-scout/core';
+import {Form, FormModel} from '@eclipse-scout/core';
 import {Person, PersonRepository} from '../index';
 
 export class PersonForm extends Form {
@@ -27,9 +27,9 @@ export class PersonForm extends Form {
     this.widget('ExternalField').setValue(person.external);
   }
 
-  protected override _save(data: Person): JQuery.Promise<Status> {
+  protected override _save(data: Person): JQuery.Promise<void> {
     return (data.personId ? PersonRepository.get().store(data) : PersonRepository.get().create(data))
-      .then(() => Status.ok());
+      .then(() => undefined);
   }
 
   protected override _load(): JQuery.Promise<Person> {

@@ -21,7 +21,7 @@ export class PersonRepository extends Repository {
 
   /**
    * Gets all persons.
-   * @param restrictions Restriction which persons to fetch
+   * @param restriction Restriction which persons to fetch
    * @return The persons matching the restriction
    */
   list(restriction: PersonRestriction): JQuery.Promise<Person[]> {
