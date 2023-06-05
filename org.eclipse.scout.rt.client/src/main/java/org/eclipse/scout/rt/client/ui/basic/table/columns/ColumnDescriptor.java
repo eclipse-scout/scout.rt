@@ -18,7 +18,9 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 public class ColumnDescriptor {
 
   private String m_propertyName;
+  private String m_objectType;
   private String m_text;
+  private String m_headerIconId;
   private String m_cssClass;
   private int m_width;
   private boolean m_fixedWidth;
@@ -61,6 +63,22 @@ public class ColumnDescriptor {
   }
 
   /**
+   * @return Object type of this column.
+   */
+  public String getObjectType() {
+    return m_objectType;
+  }
+
+  /**
+   * @param objectType
+   *          Object type of this column (e.g. 'BooleanColumn').
+   */
+  public ColumnDescriptor withObjectType(String objectType) {
+    m_objectType = objectType;
+    return this;
+  }
+
+  /**
    * @return Header text of this column.
    */
   public String getText() {
@@ -73,6 +91,22 @@ public class ColumnDescriptor {
    */
   public ColumnDescriptor withText(String text) {
     m_text = text;
+    return this;
+  }
+
+  /**
+   * @return Header icon-id of this column.
+   */
+  public String getHeaderIconId() {
+    return m_headerIconId;
+  }
+
+  /**
+   * @param headerIconId
+   *          Header icon-id of this column.
+   */
+  public ColumnDescriptor withHeaderIconId(String headerIconId) {
+    m_headerIconId = headerIconId;
     return this;
   }
 
