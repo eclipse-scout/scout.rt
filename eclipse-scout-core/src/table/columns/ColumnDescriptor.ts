@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Alignment} from '../../index';
+import {Alignment, Column, ObjectType} from '../../index';
 
 /**
  * The ColumnDescriptor is used to define texts, widths and order of columns.
@@ -18,7 +18,9 @@ export interface ColumnDescriptor {
    * Name of the corresponding property in the "additional table row data" or <code>null</code> if this descriptor describes the first (default) column.
    */
   propertyName?: string;
+  objectType?: ObjectType<Column>;
   text?: string;
+  headerIconId?: string;
   cssClass?: string;
   width?: number;
   fixedWidth?: boolean;

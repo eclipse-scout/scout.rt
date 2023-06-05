@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, LookupRow, scout, TableRowModel} from '../../../index';
+import {Cell, ColumnDescriptor, LookupRow, scout, TableRowModel} from '../../../index';
 
 export const lookupField = {
   /**
@@ -40,7 +40,7 @@ export const lookupField = {
   /**
    * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
    */
-  createTableCell<T>(lookupRow: LookupRow<T>, desc?: { propertyName?: string }, tableRowData?: object): Cell<T> {
+  createTableCell<T>(lookupRow: LookupRow<T>, desc?: ColumnDescriptor, tableRowData?: object): Cell<T> {
     let cell = scout.create(Cell);
 
     // default column descriptor (first column) has propertyName null
@@ -62,7 +62,7 @@ export const lookupField = {
         cell.setFont(lookupRow.font);
       }
     } else {
-      cell.setText(tableRowData[desc.propertyName]);
+      cell.setValue(tableRowData[desc.propertyName]);
     }
 
     return cell;
