@@ -52,6 +52,9 @@ export class CalendarSidebarLayout extends AbstractLayout {
       this._splitter.$container.addClass('invisible');
     }
 
+    this.widget.yearPanel._scrollYear();
+
+    // Applies an external set of the splitter position
     if (this._newSplitterPosition !== null) {
       let newPos = this._newSplitterPosition;
       this._newSplitterPosition = null;
