@@ -86,12 +86,22 @@ public class HtmlHelperTest {
             "<h1>Lorem ipsum dolor</h1>\n"
                 + "<style>\n"
                 + "p {\n"
-                + " color: #26b72b;\n"
+                + "  color: #26b72b;\n"
                 + "}\n"
-                + "</style>\n"
+                + "</style>"
                 + "<p style=\"color: blue\">Donec mattis metus lorem. Aenean posuere tincidunt enim.</p>\n"
-                + "<script>alert('Hello World!');</script>\n"
-                + "<p style=\"color: green\">Pellentesque eu euismod eros, in ullamcorper erat.</p>"));
+                + "<script>alert('Hello World!');</script>"
+                + "<p style=\"color: green\">Pellentesque eu euismod eros, "
+                + "<script>alert('Hello World 2!');</script><script>alert('Hello World 3!');</script>"
+                + "<script type='text/javascript'>\n"
+                + "  document.write(123);\n"
+                + "</script>"
+                + "<style type='text/css'>\n"
+                + "p {\n"
+                + "  color: #26b72b;\n"
+                + "}\n"
+                + "</style>"
+                + "in ullamcorper erat.</p>"));
 
     //Emojis
     assertEquals(""

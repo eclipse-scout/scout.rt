@@ -59,8 +59,8 @@ export class PlainTextEncoder {
     }
 
     // Remove script and style contents
-    text = text.replace(/(?<=<script>).*?(?=<\/script>)/gi, '');
-    text = text.replace(/(?<=<style>).*?(?=<\/style>)/gi, '');
+    text = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
 
     // Replace remaining tags
     text = text.replace(/<[^>]+>/gi, '');
