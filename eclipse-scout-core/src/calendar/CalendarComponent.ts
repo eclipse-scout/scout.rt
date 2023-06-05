@@ -296,7 +296,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   }
 
   updateSelectedComponent($part: JQuery, updateScrollPosition: boolean) {
-    this.parent._selectedComponentChanged(this, $part.data('partDay') as Date, updateScrollPosition);
+    this.parent._selectedComponentChanged(this, this.item.calendarId, $part.data('partDay') as Date, updateScrollPosition);
   }
 
   protected _onMouseUp(event: JQuery.MouseUpEvent) {
