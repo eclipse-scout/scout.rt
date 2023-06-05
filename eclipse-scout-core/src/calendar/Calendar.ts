@@ -1135,7 +1135,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _updateScrollbars($parent: JQuery, animate: boolean) {
-    let $scrollables = $('.calendar-scrollable-components', $parent);
+    let $scrollables = $('.calendar-scrollable-components > .calendar-column', $parent);
     $scrollables.each((i, elem) => {
       scrollbars.update($(elem), true);
     });
@@ -1143,7 +1143,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _uninstallComponentScrollbars($parent: JQuery) {
-    $parent.find('.calendar-scrollable-components').each((i, elem) => {
+    $parent.find('.calendar-scrollable-components > .calendar-column').each((i, elem) => {
       scrollbars.uninstall($(elem), this.session);
     });
   }
@@ -1553,19 +1553,20 @@ export class Calendar extends Widget implements CalendarModel {
         session: this.session,
         axis: 'y'
       });
-      this.$topGrid.find('.calendar-scrollable-components').each((i, elem) => {
-        let $topDay = $(elem);
-        if ($topDay.data('scrollable')) {
-          scrollbars.update($topDay);
-          return;
-        }
-        scrollbars.install($topDay, {
-          parent: this,
-          session: this.session,
-          axis: 'y',
-          scrollShadow: 'none'
+      this.$topGrid.find('.calendar-scrollable-components > .calendar-column')
+        .each((i, elem) => {
+          let $topDay = $(elem);
+          if ($topDay.data('scrollable')) {
+            scrollbars.update($topDay);
+            return;
+          }
+          scrollbars.install($topDay, {
+            parent: this,
+            session: this.session,
+            axis: 'y',
+            scrollShadow: 'none'
+          });
         });
-      });
     }
   }
 
