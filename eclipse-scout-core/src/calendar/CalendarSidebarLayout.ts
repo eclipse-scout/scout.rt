@@ -30,7 +30,6 @@ export class CalendarSidebarLayout extends AbstractLayout {
 
 
   override layout($container: JQuery) {
-    console.log('layouting calendar sidebar');
     let htmlComp = HtmlComponent.get($container),
       insets = htmlComp.insets(),
       availableSize = htmlComp.availableSize().subtract(insets),

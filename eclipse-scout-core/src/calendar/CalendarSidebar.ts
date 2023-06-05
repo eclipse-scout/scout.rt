@@ -65,22 +65,7 @@ export class CalendarSidebar extends Widget {
       return;
     }
     this._showYearPanel = show;
-    let layout = this.htmlComp.layout as CalendarSidebarLayout;
-
-    if (show && !this._showResourcesPanel) {
-      // Nothing is visible before, sidebar extends horizontally, no vertical animation
-      layout.setNewSplitterPositionPercentage(100, false);
-    } else if (show && this._showResourcesPanel) {
-      // Resources panel is already visible, animate on top of it
-      layout.setNewSplitterPositionPercentage(50, true);
-    } else if (!show && this._showResourcesPanel) {
-      // Hide year panel with animation
-      layout.setNewSplitterPositionPercentage(0, true);
-    } else if (!show && !this._showResourcesPanel) {
-      // Nothing is expanded, sidebar will colapse, no vertical animation
-    }
-
-    this.invalidateLayoutTree(false);
+    this._layoutSizes(show, this._showResourcesPanel, 100, 0);
   }
 
   startShowResourcesPanel(show: boolean) {
@@ -88,21 +73,23 @@ export class CalendarSidebar extends Widget {
       return;
     }
     this._showResourcesPanel = show;
-    let layout = this.htmlComp.layout as CalendarSidebarLayout;
+    this._layoutSizes(show, this._showYearPanel, 0, 100);
+  }
 
-    if (show && !this._showYearPanel) {
+  protected _layoutSizes(elmentVisible: boolean, otherElementVisible: boolean, fullExpandedPos: number, notExpandedPos: number) {
+    let layout = this.htmlComp.layout as CalendarSidebarLayout;
+    if (elmentVisible && !otherElementVisible) {
       // Nothing is visible before, sidebar extends horizontally, no vertical animation
-      layout.setNewSplitterPositionPercentage(0, false);
-    } else if (show && this._showYearPanel) {
+      layout.setNewSplitterPositionPercentage(fullExpandedPos, false);
+    } else if (elmentVisible && otherElementVisible) {
       // Year panel is already visible, animate under it
       layout.setNewSplitterPositionPercentage(50, true);
-    } else if (!show && this._showYearPanel) {
+    } else if (!elmentVisible && otherElementVisible) {
       // Hide resources panel with animation
-      layout.setNewSplitterPositionPercentage(100, true);
-    } else if (!show && !this._showYearPanel) {
+      layout.setNewSplitterPositionPercentage(notExpandedPos, true);
+    } else if (!elmentVisible && !otherElementVisible) {
       // Nothing is expanded, sidebar will colapse, no vertical animation
     }
-
     this.invalidateLayoutTree(false);
   }
 }
