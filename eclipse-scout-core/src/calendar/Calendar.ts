@@ -64,6 +64,7 @@ export class Calendar extends Widget implements CalendarModel {
   showDisplayModeSelection: boolean;
   rangeSelectionAllowed: boolean;
   calendars: CalendarDescriptor[];
+  selectedCalendar: CalendarDescriptor;
   title: string;
   useOverflowCells: boolean;
   viewRange: DateRange;
@@ -149,6 +150,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.showDisplayModeSelection = true;
     this.rangeSelectionAllowed = false;
     this.calendars = [];
+    this.selectedCalendar = null;
     this.title = null;
     this.useOverflowCells = true;
     this.viewRange = null;
@@ -502,12 +504,6 @@ export class Calendar extends Widget implements CalendarModel {
       }
     }
 
-    // click event on all day and children elements
-    let mousedownCallbackWithTime = this._onDayMouseDown.bind(this, true);
-    this.$grid.find('.calendar-day').on('mousedown', mousedownCallbackWithTime);
-    let mousedownCallback = this._onDayMouseDown.bind(this, false);
-    this.$topGrid.find('.calendar-day').on('mousedown', mousedownCallback);
-
     this.$window = this.$container.window();
     this.$container.on('mousedown touchstart', this._onMouseDown.bind(this));
 
@@ -551,6 +547,12 @@ export class Calendar extends Widget implements CalendarModel {
       $day.appendDiv('calendar-column')
         .data('calendarId', calendar.calendarId);
     });
+
+    // click event on all day and children elements
+    let mousedownCallbackWithTime = this._onDayColumnMouseDown.bind(this, true);
+    this.$grid.find('.calendar-column').on('mousedown', mousedownCallbackWithTime);
+    let mousedownCallback = this._onDayColumnMouseDown.bind(this, false);
+    this.$topGrid.find('.calendar-column').on('mousedown', mousedownCallback);
   }
 
   protected _renderComponents() {
@@ -770,9 +772,12 @@ export class Calendar extends Widget implements CalendarModel {
     this._updateScreen(false, true);
   }
 
-  protected _onDayMouseDown(withTime: boolean, event: JQuery.MouseDownEvent) {
-    let selectedDate = new Date($(event.delegateTarget).data('date')),
-      timeChanged = false;
+  protected _onDayColumnMouseDown(withTime: boolean, event: JQuery.MouseDownEvent) {
+    let selectedDayColumn = $(event.delegateTarget),
+      selectedDate = new Date(selectedDayColumn.parent().data('date')),
+      timeChanged = false,
+      selectedCalendarId = selectedDayColumn.data('calendarId');
+
     if (withTime && (this.isDay() || this.isWeek() || this.isWorkWeek())) {
       let seconds = this._getSelectedSeconds(event);
       if (seconds < 60 * 60 * 24) {
@@ -781,13 +786,15 @@ export class Calendar extends Widget implements CalendarModel {
       }
       this._startRangeSelection(event);
     }
-    this._setSelection(selectedDate, null, false, timeChanged);
+    this._setSelection(selectedDate, selectedCalendarId, null, false, timeChanged);
   }
 
   protected _getSelectedDate(event: JQuery.MouseEventBase): Date {
     let date = null;
     if ($(event.target).hasClass('calendar-day')) {
       date = $(event.target).data('date');
+    } else if ($(event.target).hasClass('calendar-column')) {
+      date = $(event.target).parent().data('date');
     } else if ($(event.target).hasClass('calendar-component')
       || $(event.target).parents('.calendar-component').length > 0
       || $(event.target).hasClass('calendar-range-selector')) {
@@ -824,7 +831,7 @@ export class Calendar extends Widget implements CalendarModel {
   /**
    * @param selectedComponent may be null when a day is selected
    */
-  protected _setSelection(selectedDate: Date, selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
+  protected _setSelection(selectedDate: Date, selectedCalendar: number | CalendarDescriptor | 'default', selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
     let changed = false;
     let dateChanged = dates.compareDays(this.selectedDate, selectedDate) !== 0;
 
@@ -843,6 +850,15 @@ export class Calendar extends Widget implements CalendarModel {
         });
       }
       this.selectedDate = selectedDate;
+    }
+
+    // Set selected calendar
+    if (numbers.isNumber(selectedCalendar)) {
+      this.selectedCalendar = this.calendars.find(c => c.calendarId === selectedCalendar);
+    } else if (selectedCalendar === 'default') {
+      this.selectedCalendar = null;
+    } else {
+      this.selectedCalendar = selectedCalendar as CalendarDescriptor;
     }
 
     // selected component / part (may be null)
@@ -1421,8 +1437,8 @@ export class Calendar extends Widget implements CalendarModel {
   /* -- components, events-------------------------------------------- */
 
   /** @internal */
-  _selectedComponentChanged(component: CalendarComponent, partDay: Date, updateScrollPosition: boolean) {
-    this._setSelection(partDay, component, updateScrollPosition, false);
+  _selectedComponentChanged(component: CalendarComponent, calendarId: number, partDay: Date, updateScrollPosition: boolean) {
+    this._setSelection(partDay, calendarId, component, updateScrollPosition, false);
   }
 
   protected _onDayContextMenu(event: JQuery.ContextMenuEvent) {
@@ -2070,7 +2086,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // Ignore clicks to calendar components, this should open the tooltip
-    if (!$(event.target).hasClass('calendar-range-selector') && !$(event.target).hasClass('calendar-day')) {
+    if (!$(event.target).hasClass('calendar-range-selector') && !$(event.target).hasClass('calendar-column')) {
       return;
     }
 
@@ -2105,6 +2121,13 @@ export class Calendar extends Widget implements CalendarModel {
       }
     });
     return $foundDay;
+  }
+
+  protected _findSelectedCalendarColumn(selectedDate: Date): JQuery {
+    let calendarId = this.selectedCalendar ? this.selectedCalendar.calendarId : 'default';
+    return this._findDayInCalendar(selectedDate)
+      .find('.calendar-column')
+      .filter((i, e) => $(e).data('calendarId') === calendarId);
   }
 
   protected _setRangeSelection() {
@@ -2143,7 +2166,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _appendCalendarRangeSelection(date: Date, fromTime: Date, toTime: Date) {
-    let $parent = this._findDayInCalendar(date);
+    let $parent = this._findSelectedCalendarColumn(date);
     if (!$parent) {
       return;
     }
