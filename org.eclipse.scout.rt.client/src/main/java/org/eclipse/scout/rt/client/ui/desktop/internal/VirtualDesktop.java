@@ -985,8 +985,8 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void setProperty(String name, Object value) {
-    forwardToRealDesktopIfAvailable(d -> d.setProperty(name, value));
+  public boolean setProperty(String name, Object value) {
+    return getFromRealDesktopOrElse(d -> d.setProperty(name, value), false);
   }
 
   @Override

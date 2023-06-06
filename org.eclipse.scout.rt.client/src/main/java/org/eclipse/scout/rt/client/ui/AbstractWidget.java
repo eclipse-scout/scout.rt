@@ -362,8 +362,8 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setProperty(String name, Object value) {
-    propertySupport.setProperty(name, value);
+  public boolean setProperty(String name, Object value) {
+    return propertySupport.setProperty(name, value);
   }
 
   @Override

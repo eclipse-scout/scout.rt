@@ -213,8 +213,8 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
-  public void setProperty(String name, Object value) {
-    m_wrappedMenu.setProperty(name, value);
+  public boolean setProperty(String name, Object value) {
+    return m_wrappedMenu.setProperty(name, value);
   }
 
   @Override

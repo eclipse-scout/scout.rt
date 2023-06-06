@@ -243,8 +243,10 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * <b>Important: </b> Although this method is intended to be used for custom properties, it's actually possible to
    * change main properties as well. Keep in mind that directly changing main properties may result in unexpected
    * behavior, so do it only if necessary. Rather use the provided API instead.<br>
+   *
+   * @return true if property value changed
    */
-  void setProperty(String name, Object value);
+  boolean setProperty(String name, Object value);
 
   boolean hasProperty(String name);
 

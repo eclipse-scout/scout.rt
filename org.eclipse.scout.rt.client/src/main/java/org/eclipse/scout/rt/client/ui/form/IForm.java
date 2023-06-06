@@ -588,9 +588,11 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * behavior, so do it only if you really know what you are doing. Rather use the officially provided api instead. <br>
    * Example for an unexpected behavior: setVisible() does not only set the property PROP_VISIBLE but also executes
    * additional code. This code would NOT be executed by directly setting the property PROP_VISIBLE with setProperty().
+   *
+   * @return true if property value changed
    */
   @Override
-  void setProperty(String name, Object value);
+  boolean setProperty(String name, Object value);
 
   /**
    * XML export/import of form state
