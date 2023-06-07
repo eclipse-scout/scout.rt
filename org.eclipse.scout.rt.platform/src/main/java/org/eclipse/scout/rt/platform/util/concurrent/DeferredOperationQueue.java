@@ -92,7 +92,14 @@ public class DeferredOperationQueue<E> {
         }
       });
       if (m_flushJobScheduled.compareAndSet(false, true)) {
-        scheduleFlushJob();
+        try {
+          scheduleFlushJob();
+        }
+        catch (RuntimeException | Error e) {
+          // restore flushJobScheduled flag so that successive invocations schedule another job
+          m_flushJobScheduled.set(false);
+          throw e;
+        }
       }
     }
     finally {
