@@ -17,10 +17,12 @@ import static org.mockito.Mockito.*;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -292,6 +294,37 @@ public class DeferredOperationQueueTest {
             .mapToObj(i -> "e" + i)
             .collect(Collectors.toList()),
         batch);
+  }
+
+  @Test(timeout = 5000)
+  public void testScheduleFlushJobThrowsException() throws Exception {
+    List<String> batch = new ArrayList<>();
+    AtomicBoolean throwException = new AtomicBoolean(true);
+    CountDownLatch flushedLatch = new CountDownLatch(1);
+    DeferredOperationQueue<String> queue = new DeferredOperationQueue<>(QUEUE_TRANSACTION_MEMBER_ID, 2, TimeUnit.HOURS.toMillis(10), batch::addAll) {
+      @Override
+      protected void scheduleFlushJob() {
+        if (throwException.get()) {
+          throw new RuntimeException("expected exception");
+        }
+        super.scheduleFlushJob();
+      }
+
+      @Override
+      protected void flushDeferred(boolean singleRun) {
+        super.flushDeferred(true);
+        flushedLatch.countDown();
+      }
+    };
+
+    RunContexts.empty().run(() -> queue.add("first element"));
+    assertEquals(Collections.emptyList(), batch);
+
+    throwException.set(false);
+    RunContexts.empty().run(() -> queue.add("second element"));
+
+    assertTrue(flushedLatch.await(2, TimeUnit.SECONDS));
+    assertEquals(asList("first element", "second element"), batch);
   }
 
   protected static <T> Consumer<T> nop() {
