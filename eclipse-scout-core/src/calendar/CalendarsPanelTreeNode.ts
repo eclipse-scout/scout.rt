@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InitModelOf, ResourcesPanelTreeNodeModel, TreeNode} from '../index';
+import {CalendarsPanelTreeNodeModel, InitModelOf, TreeNode} from '../index';
 
-export class ResourcesPanelTreeNode extends TreeNode implements ResourcesPanelTreeNodeModel {
-  declare model: ResourcesPanelTreeNodeModel;
+export class CalendarsPanelTreeNode extends TreeNode implements CalendarsPanelTreeNodeModel {
+  declare model: CalendarsPanelTreeNodeModel;
 
   calendarId: number;
 
