@@ -33,17 +33,17 @@ export class CalendarSidebarLayout extends AbstractLayout {
     let htmlComp = HtmlComponent.get($container),
       insets = htmlComp.insets(),
       availableSize = htmlComp.availableSize().subtract(insets),
-      yearPanelHeight, resourcesPanelHeight, splitterHeight;
+      yearPanelHeight, calendarsPanelHeight, splitterHeight;
 
     this._validateSplitterPosition(htmlComp, this._splitter, availableSize);
 
     splitterHeight = this._splitter.htmlComp.bounds().height;
 
     yearPanelHeight = this._splitter.position - splitterHeight / 2;
-    resourcesPanelHeight = availableSize.height - yearPanelHeight - splitterHeight;
+    calendarsPanelHeight = availableSize.height - yearPanelHeight - splitterHeight;
 
     this.widget.yearPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top, availableSize.width, yearPanelHeight));
-    this.widget.resourcesPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top + splitterHeight, availableSize.width, resourcesPanelHeight));
+    this.widget.calendarsPanel.htmlComp.setBounds(new Rectangle(insets.left, insets.top + splitterHeight, availableSize.width, calendarsPanelHeight));
 
     // Makes splitter invisible when its at top or bottom
     if (this._splitter.position !== 0 && this._splitter.position !== this._availableHeight) {

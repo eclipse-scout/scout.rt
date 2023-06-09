@@ -8,22 +8,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CalendarSidebarLayout, HtmlComponent, InitModelOf, ResourcesPanel, scout, Splitter, Widget, YearPanel} from '../index';
+import {CalendarSidebarLayout, CalendarsPanel, HtmlComponent, InitModelOf, scout, Splitter, Widget, YearPanel} from '../index';
 
 export class CalendarSidebar extends Widget {
   yearPanel: YearPanel;
   splitter: Splitter;
-  resourcesPanel: ResourcesPanel;
+  calendarsPanel: CalendarsPanel;
 
   protected _showYearPanel: boolean;
-  protected _showResourcesPanel: boolean;
+  protected _showCalendarsPanel: boolean;
 
   constructor() {
     super();
 
     this.yearPanel = null;
     this.splitter = null;
-    this.resourcesPanel = null;
+    this.calendarsPanel = null;
   }
 
   override init(model: InitModelOf<this>) {
@@ -37,7 +37,7 @@ export class CalendarSidebar extends Widget {
       splitHorizontal: false,
       cssClass: 'line'
     });
-    this.resourcesPanel = scout.create(ResourcesPanel, {
+    this.calendarsPanel = scout.create(CalendarsPanel, {
       parent: this,
       checkable: true
     });
@@ -53,7 +53,7 @@ export class CalendarSidebar extends Widget {
     this.htmlComp.invalidateLayoutTree(false);
     this.yearPanel.render();
     this.splitter.render();
-    this.resourcesPanel.render();
+    this.calendarsPanel.render();
   }
 
   _onSplitterPositionChange(event) {
@@ -65,14 +65,14 @@ export class CalendarSidebar extends Widget {
       return;
     }
     this._showYearPanel = show;
-    this._layoutSizes(show, this._showResourcesPanel, 100, 0);
+    this._layoutSizes(show, this._showCalendarsPanel, 100, 0);
   }
 
-  startShowResourcesPanel(show: boolean) {
-    if (show === this._showResourcesPanel) {
+  startShowCalendarsPanel(show: boolean) {
+    if (show === this._showCalendarsPanel) {
       return;
     }
-    this._showResourcesPanel = show;
+    this._showCalendarsPanel = show;
     this._layoutSizes(show, this._showYearPanel, 0, 100);
   }
 
@@ -82,10 +82,10 @@ export class CalendarSidebar extends Widget {
       // Nothing is visible before, sidebar extends horizontally, no vertical animation
       layout.setNewSplitterPositionPercentage(fullExpandedPos, false);
     } else if (elmentVisible && otherElementVisible) {
-      // Year panel is already visible, animate under it
+      // Other panel is already visible, animate beside it
       layout.setNewSplitterPositionPercentage(50, true);
     } else if (!elmentVisible && otherElementVisible) {
-      // Hide resources panel with animation
+      // Hide this panel with animation
       layout.setNewSplitterPositionPercentage(notExpandedPos, true);
     } else if (!elmentVisible && !otherElementVisible) {
       // Nothing is expanded, sidebar will colapse, no vertical animation

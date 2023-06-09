@@ -10,6 +10,6 @@
 
 import {TreeNodeModel} from '../index';
 
-export interface ResourcesPanelTreeNodeModel extends TreeNodeModel {
+export interface CalendarsPanelTreeNodeModel extends TreeNodeModel {
   calendarId?: number;
 }
