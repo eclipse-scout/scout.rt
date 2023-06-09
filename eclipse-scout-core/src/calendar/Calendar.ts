@@ -553,6 +553,8 @@ export class Calendar extends Widget implements CalendarModel {
     this.$grid.find('.calendar-column').on('mousedown', mousedownCallbackWithTime);
     let mousedownCallback = this._onDayColumnMouseDown.bind(this, false);
     this.$topGrid.find('.calendar-column').on('mousedown', mousedownCallback);
+
+    this._renderComponents();
   }
 
   protected _renderComponents() {
