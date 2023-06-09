@@ -43,9 +43,13 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    */
   String PROP_DISPLAY_CONDENSED = "displayCondensed";
   /**
-   * type {@link Set<ICalendarDescriptor>}
+   * type {@link List<ICalendarDescriptor>}
    */
   String PROP_CALENDARS = "calendars";
+  /**
+   * type {@link ICalendarDescriptor}
+   */
+  String PROP_SELECTED_CALENDAR = "selectedCalendar";
   /**
    * type String
    */
@@ -105,6 +109,8 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
   List<ICalendarDescriptor> getCalendars();
 
   void setCalendars(List<ICalendarDescriptor> calendars);
+
+  ICalendarDescriptor getSelectedCalendar();
 
   /**
    * @return a Date tupel [begin, end]

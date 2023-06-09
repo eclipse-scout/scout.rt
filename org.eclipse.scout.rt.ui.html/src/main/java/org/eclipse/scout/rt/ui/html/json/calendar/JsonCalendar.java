@@ -61,6 +61,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
   private static final String EVENT_SELECTED_RANGE_CHANGE = "selectedRangeChange";
   private static final String EVENT_MODEL_CHANGE = "modelChange";
   private static final String EVENT_CALENDAR_VISIBILITY_CHANGE = "calendarVisibilityChange";
+  private static final String EVENT_SELECTED_CALENDAR_CHANGE = "selectedCalendarChange";
 
   private CalendarListener m_calendarListener;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
@@ -285,6 +286,9 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     else if (EVENT_CALENDAR_VISIBILITY_CHANGE.equals(event.getType())) {
       handleUiCalendarVisibilityChange(event);
     }
+    else if (EVENT_SELECTED_CALENDAR_CHANGE.equals(event.getType())) {
+      handleUiSelectedCalendarChange(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -402,6 +406,12 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     Pair<Long, Boolean> calendarVisibility = extractCalendarVisibility(event.getData());
     getModel().getUIFacade().setCalendarVisibilityFromUI(calendarVisibility.getLeft(), calendarVisibility.getRight());
     LOG.debug("calendarId={} visible={}", calendarVisibility.getLeft(), calendarVisibility.getRight());
+  }
+
+  protected void handleUiSelectedCalendarChange(JsonEvent event) {
+    Long calendarId = event.getData().optLong("calendarId");
+    getModel().getUIFacade().setSelectedCalendarFromUI(calendarId);
+    LOG.debug("calendarId={}", calendarId);
   }
 
   protected Pair<Long, Boolean> extractCalendarVisibility(JSONObject data) {
