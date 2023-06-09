@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox,
-  HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, ResourcesPanel, ResourcesPanelTreeNode, RoundingMode, scout, scrollbars, strings, TreeNodeClickEvent,
+  arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, CalendarsPanel, CalendarsPanelTreeNode, ContextMenuPopup, DateRange, dates, Device,
+  EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, TreeNodeClickEvent,
   ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
@@ -75,7 +75,7 @@ export class Calendar extends Widget implements CalendarModel {
   menus: Menu[];
   calendarSidebar: CalendarSidebar;
   yearPanel: YearPanel;
-  resourcesPanel: ResourcesPanel;
+  calendarsPanel: CalendarsPanel;
   selectedRange: DateRange;
   needsScrollToStartHour: boolean;
   defaultMenuTypes: string[];
@@ -100,7 +100,7 @@ export class Calendar extends Widget implements CalendarModel {
   /** additional modes; should be stored in model */
   protected _showYearPanel: boolean;
   protected _showListPanel: boolean;
-  protected _showResourcesPanel: boolean;
+  protected _showCalendarsPanel: boolean;
 
   /**
    * The narrow view range is different from the regular view range.
@@ -172,7 +172,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     this._showYearPanel = false;
     this._showListPanel = false;
-    this._showResourcesPanel = false;
+    this._showCalendarsPanel = false;
 
     this._exactRange = null;
 
@@ -246,9 +246,9 @@ export class Calendar extends Widget implements CalendarModel {
       parent: this
     });
     this.yearPanel = this.calendarSidebar.yearPanel;
-    this.resourcesPanel = this.calendarSidebar.resourcesPanel;
+    this.calendarsPanel = this.calendarSidebar.calendarsPanel;
 
-    this.resourcesPanel.tree.on('nodeClick', this._onCalendarTreeNodeSelected.bind(this));
+    this.calendarsPanel.tree.on('nodeClick', this._onCalendarTreeNodeSelected.bind(this));
 
     this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
     this.modesMenu = scout.create(CalendarModesMenu, {
@@ -271,10 +271,10 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _setCalendars(calendars: CalendarDescriptor[]) {
     this._setProperty('calendars', calendars);
-    this.resourcesPanel.tree.removeAllNodes();
+    this.calendarsPanel.tree.removeAllNodes();
     this.calendars.forEach(descriptor => {
-      this.resourcesPanel.tree.insertNode(scout.create(ResourcesPanelTreeNode, {
-        parent: this.resourcesPanel.tree,
+      this.calendarsPanel.tree.insertNode(scout.create(CalendarsPanelTreeNode, {
+        parent: this.calendarsPanel.tree,
         calendarId: descriptor.calendarId,
         text: descriptor.name,
         checked: descriptor.visible,
@@ -466,8 +466,8 @@ export class Calendar extends Widget implements CalendarModel {
       .on('click', this._onYearClick.bind(this));
     this.$commands.appendDiv('calendar-toggle-list')
       .on('click', this._onListClick.bind(this));
-    this.$commands.appendDiv('calendar-toggle-resources')
-      .on('click', this._onResourcesClick.bind(this));
+    this.$commands.appendDiv('calendar-toggle-calendars')
+      .on('click', this._onCalendarsClick.bind(this));
 
     // Append the top grid (day/week views)
     let $weekHeader = this.$topGrid.appendDiv('calendar-week-header');
@@ -767,8 +767,8 @@ export class Calendar extends Widget implements CalendarModel {
     this._updateScreen(false, true);
   }
 
-  protected _onResourcesClick(event: JQuery.ClickEvent) {
-    this._showResourcesPanel = !this._showResourcesPanel;
+  protected _onCalendarsClick(event: JQuery.ClickEvent) {
+    this._showCalendarsPanel = !this._showCalendarsPanel;
     this._updateScreen(false, true);
   }
 
@@ -934,8 +934,8 @@ export class Calendar extends Widget implements CalendarModel {
 
     // show or hide calendar sidebar
     $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
-    $('.calendar-toggle-resources', this.$commands).select(this._showResourcesPanel);
-    if (this._showYearPanel || this._showResourcesPanel) {
+    $('.calendar-toggle-calendars', this.$commands).select(this._showCalendarsPanel);
+    if (this._showYearPanel || this._showCalendarsPanel) {
       this.calendarSidebar.$container.data('new-width', this.calendarToggleYearWidth);
       gridW -= this.calendarToggleYearWidth;
       containerW -= this.calendarToggleYearWidth;
@@ -944,7 +944,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     this.calendarSidebar.startShowYearPanel(this._showYearPanel);
-    this.calendarSidebar.startShowResourcesPanel(this._showResourcesPanel);
+    this.calendarSidebar.startShowCalendarsPanel(this._showCalendarsPanel);
 
     // show or hide work list
     $('.calendar-toggle-list', this.$commands).select(this._showListPanel);
@@ -1478,7 +1478,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _onCalendarTreeNodeSelected(event: TreeNodeClickEvent) {
-    let node = event.node as ResourcesPanelTreeNode;
+    let node = event.node as CalendarsPanelTreeNode;
     if (!node.calendarId) {
       return;
     }

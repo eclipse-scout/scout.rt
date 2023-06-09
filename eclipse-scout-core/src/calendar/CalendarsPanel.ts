@@ -7,14 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {HtmlComponent, InitModelOf, ObjectOrModel, ResourcesPanelTreeNode, scout, Tree, Widget} from '../index';
+import {CalendarsPanelTreeNode, HtmlComponent, InitModelOf, ObjectOrModel, scout, Tree, Widget} from '../index';
 
-export class ResourcesPanel extends Widget {
-  tree: ResourcesPanelTree;
+export class CalendarsPanel extends Widget {
+  tree: CalendarsPanelTree;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
-    this.tree = scout.create(ResourcesPanelTree, {
+    this.tree = scout.create(CalendarsPanelTree, {
       parent: this,
       checkable: true,
       textFilterEnabled: false
@@ -22,14 +22,14 @@ export class ResourcesPanel extends Widget {
   }
 
   protected override _render() {
-    this.$container = this.$parent.appendDiv('resources-panel-container');
+    this.$container = this.$parent.appendDiv('calendars-panel-container');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.tree.render();
   }
 }
 
-class ResourcesPanelTree extends Tree {
-  declare nodes: ResourcesPanelTreeNode[];
+class CalendarsPanelTree extends Tree {
+  declare nodes: CalendarsPanelTreeNode[];
 
 
   constructor() {
@@ -38,7 +38,7 @@ class ResourcesPanelTree extends Tree {
     this._scrollDirections = 'y';
   }
 
-  override insertNode(node: ObjectOrModel<ResourcesPanelTreeNode>, parentNode?: ResourcesPanelTreeNode, index?: number) {
+  override insertNode(node: ObjectOrModel<CalendarsPanelTreeNode>, parentNode?: CalendarsPanelTreeNode, index?: number) {
     super.insertNode(node, parentNode, index);
   }
 }
