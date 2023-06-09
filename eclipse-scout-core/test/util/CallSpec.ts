@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Call} from '../../src/index';
-import {InitModelOf} from '../../src/scout';
+import {InitModelOf, scout} from '../../src/scout';
 
 describe('scout.Call', () => {
 
@@ -119,4 +119,21 @@ describe('scout.Call', () => {
     expect(call.callCounter).toBe(2);
   });
 
+  it('correctly initializes retry internals', () => {
+    let call1 = scout.create(SuccessCall);
+    expect(call1.retryIntervals).toEqual([]);
+    expect(call1.maxRetries).toBe(0);
+
+    let call2 = scout.create(SuccessCall, {retryIntervals: [100, 200, 300]});
+    expect(call2.retryIntervals).toEqual([100, 200, 300]);
+    expect(call2.maxRetries).toBe(3);
+
+    let call3 = scout.create(SuccessCall, {maxRetries: 2});
+    expect(call3.retryIntervals).toEqual([0, 0]);
+    expect(call3.maxRetries).toBe(2);
+
+    let call4 = scout.create(SuccessCall, {retryIntervals: [100, 200, 300], maxRetries: 2}); // maxRetries takes precedence
+    expect(call4.retryIntervals).toEqual([0, 0]);
+    expect(call4.maxRetries).toBe(2);
+  });
 });
