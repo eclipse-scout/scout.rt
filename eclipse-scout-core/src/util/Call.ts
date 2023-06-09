@@ -38,7 +38,7 @@ export abstract class Call implements CallModel, ObjectWithType {
   constructor() {
     this.initialized = false;
     this.retryIntervals = [];
-    this.maxRetries = 0;
+    this.maxRetries = null; // automatically set to the length of retryInternals in init(), unless specified explicitly
     this.minCallDuration = 500;
     /**
      * Counts how many times this call was actually performed (normally, only 1 try is expected)
