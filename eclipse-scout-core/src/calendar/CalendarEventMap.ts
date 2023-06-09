@@ -18,12 +18,17 @@ export interface CalendarVisibilityChangeEvent<C extends Calendar = Calendar> ex
   visible: boolean;
 }
 
+export interface SelectedCalendarChangeEvent<C extends Calendar = Calendar> extends Event<C> {
+  calendarId: number;
+}
+
 export interface CalendarEventMap extends WidgetEventMap {
   'componentMove': CalendarComponentMoveEvent;
   'modelChange': Event<Calendar>;
   'selectionChange': Event<Calendar>;
   'selectedRangeChange': Event<Calendar>;
   'calendarVisibilityChange': CalendarVisibilityChangeEvent;
+  'selectedCalendarChange': SelectedCalendarChangeEvent;
   'propertyChange:displayMode': PropertyChangeEvent<CalendarDisplayMode>;
   'propertyChange:menuInjectionTarget': PropertyChangeEvent<GroupBox>;
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;

@@ -321,7 +321,9 @@ export class Calendar extends Widget implements CalendarModel {
       }
     }
     this.selectedRange = null;
+    this.selectedCalendar = null;
     this.trigger('selectedRangeChange');
+    this.trigger('selectedCalendarChange', {calendarId: null});
   }
 
   protected _renderDisplayMode(oldDisplayMode?: CalendarDisplayMode) {
@@ -855,12 +857,19 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // Set selected calendar
+    let newSelectedCalendar = this.selectedCalendar;
     if (numbers.isNumber(selectedCalendar)) {
-      this.selectedCalendar = this.calendars.find(c => c.calendarId === selectedCalendar);
+      newSelectedCalendar = this.calendars.find(c => c.calendarId === selectedCalendar);
     } else if (selectedCalendar === 'default') {
-      this.selectedCalendar = null;
+      newSelectedCalendar = null;
     } else {
-      this.selectedCalendar = selectedCalendar as CalendarDescriptor;
+      newSelectedCalendar = selectedCalendar as CalendarDescriptor;
+    }
+    if (newSelectedCalendar !== this.selectedCalendar) {
+      this.selectedCalendar = newSelectedCalendar;
+      this.trigger('selectedCalendarChange', {
+        calendarId: newSelectedCalendar ? newSelectedCalendar.calendarId : null
+      });
     }
 
     // selected component / part (may be null)

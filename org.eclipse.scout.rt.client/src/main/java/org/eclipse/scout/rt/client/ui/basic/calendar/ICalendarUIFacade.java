@@ -40,4 +40,6 @@ public interface ICalendarUIFacade {
   void fireAppLinkActionFromUI(String ref);
 
   void setCalendarVisibilityFromUI(Long calendarId, Boolean visible);
+
+  void setSelectedCalendarFromUI(Long calendarId);
 }

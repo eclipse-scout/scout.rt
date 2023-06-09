@@ -27,13 +27,13 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   }
 
   public CalendarDescriptor(long calendarId, String name, boolean visible) {
-    m_calendarId = calendarId;
+    setCalendarId(calendarId);
     m_name = name;
     m_visible = visible;
   }
 
   public CalendarDescriptor(long calendarId, String name, boolean visible, String cssClass) {
-    m_calendarId = calendarId;
+    setCalendarId(calendarId);
     m_name = name;
     m_visible = visible;
     m_cssClass = cssClass;
@@ -46,6 +46,9 @@ public class CalendarDescriptor implements ICalendarDescriptor {
 
   @Override
   public void setCalendarId(long calendarId) {
+    if (calendarId == 0) {
+      throw new IllegalArgumentException("Can not set calendarId. The value 0 is a reserved value");
+    }
     m_calendarId = calendarId;
   }
 
