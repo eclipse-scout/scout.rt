@@ -538,6 +538,11 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
+  public ICalendarDescriptor getSelectedCalendar() {
+    return propertySupport.getProperty(PROP_SELECTED_CALENDAR, ICalendarDescriptor.class);
+  }
+
+  @Override
   public Range<Date> getViewRange() {
     @SuppressWarnings("unchecked")
     Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_VIEW_RANGE);
@@ -1002,6 +1007,27 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
         if (visible) {
           reloadCalendarItems();
         }
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setSelectedCalendarFromUI(Long calendarId) {
+      try {
+        pushUIProcessor();
+        ICalendarDescriptor selectedCalendar;
+        if (calendarId == null || calendarId == 0) {
+          selectedCalendar = null;
+        }
+        else {
+          selectedCalendar = getCalendars().stream()
+              .filter(desc -> desc.getCalendarId() == calendarId)
+              .findAny()
+              .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar for id " + calendarId));
+        }
+        propertySupport.setProperty(PROP_SELECTED_CALENDAR, selectedCalendar);
       }
       finally {
         popUIProcessor();
