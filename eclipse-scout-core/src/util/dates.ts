@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DateFormat, DateRange, Locale, objects, scout, strings} from '../index';
+import {DateFormat, DateRange, JsonValueMapper, Locale, objects, scout, strings} from '../index';
 
 export interface JsonDateRange {
   from: string;
@@ -578,5 +578,31 @@ export const dates = {
       date.setHours(h, m);
     }
     return date;
+  },
+
+  /**
+   * @returns a mapping function that converts the properties with the given keys to a Date using {@link dates.parseJsonDate}.
+   */
+  parseJsonDateMapper(...keys: string[]): JsonValueMapper {
+    return (key, value) => {
+      if (keys.includes(key)) {
+        return dates.parseJsonDate(value);
+      }
+      return value;
+    };
+  },
+
+  /**
+   * @returns a mapping function that converts any Date property to a string using {@link dates.toJsonDate}.
+   */
+  stringifyJsonDateMapper(): JsonValueMapper {
+    // Must NOT be an arrow function to maintain 'this'
+    return function(key, value) {
+      // value is already a string returned by Date.toJSON, but we need a different format -> this[key] is the original value
+      if (this[key] instanceof Date) {
+        return dates.toJsonDate(this[key]);
+      }
+      return value;
+    };
   }
 };

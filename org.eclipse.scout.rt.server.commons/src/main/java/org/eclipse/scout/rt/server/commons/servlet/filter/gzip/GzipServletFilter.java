@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -81,10 +83,37 @@ public class GzipServletFilter implements Filter {
     }
 
     chain.doFilter(req, resp);
+    if (!req.isAsyncStarted()) {
+      if (resp instanceof GzipServletResponseWrapper) {
+        GzipServletResponseWrapper gzipResp = (GzipServletResponseWrapper) resp;
+        gzipResp.finish();
+      }
+    } else {
+      req.getAsyncContext().addListener(new AsyncListener() {
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+          ServletResponse resp = event.getSuppliedResponse();
+          if (resp instanceof GzipServletResponseWrapper) {
+            GzipServletResponseWrapper gzipResp = (GzipServletResponseWrapper) resp;
+            // This is actually not necessary because the output stream should be completed by now
+            // If it is not, finish would log a warning because it is too late to close it
+            // -> We just call it to verify it has been completed correctly
+            gzipResp.finish();
+          }
+        }
 
-    if (resp instanceof GzipServletResponseWrapper) {
-      GzipServletResponseWrapper gzipResp = (GzipServletResponseWrapper) resp;
-      gzipResp.finish();
+        @Override
+        public void onTimeout(AsyncEvent event) {
+        }
+
+        @Override
+        public void onError(AsyncEvent event) {
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) {
+        }
+      });
     }
   }
 

@@ -47,3 +47,11 @@ export interface Abortable {
 }
 
 export type AbortableWidget = Widget & Abortable;
+
+export type JsonValue = string | number | boolean | JsonObject | JsonValue[];
+
+export interface JsonObject {
+  [x: string]: JsonValue;
+}
+
+export type JsonValueMapper = (key: string, value: any) => any;
