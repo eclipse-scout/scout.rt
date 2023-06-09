@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Primitive, scout, strings} from '../index';
+import {arrays, JsonValueMapper, Primitive, scout, strings} from '../index';
 import $ from 'jquery';
 
 const CONST_REGEX = /\${const:([^}]*)}/;
@@ -767,5 +767,50 @@ export const objects = {
       return key;
     }
     return JSON.stringify(key);
+  },
+
+  /**
+   * Receives the value for the given key from the map, if the value is not null or undefined.
+   * If the key has no value associated, the value will be computed with the given function and added to the map, unless it is null or undefined.
+   *
+   * @returns the value associated with the given key or the computed value returned by the given mapping function.
+   */
+  getOrSetIfAbsent<TKey, TValue>(map: Map<TKey, TValue>, key: TKey, computeValue: (key: TKey) => TValue): TValue {
+    let value = map.get(key);
+    if (!objects.isNullOrUndefined(value)) {
+      return value;
+    }
+    value = computeValue(key);
+    if (!objects.isNullOrUndefined(value)) {
+      map.set(key, value);
+    }
+    return value;
+  },
+
+  /**
+   * Parses the given JSON string and creates a JavaScript object using JSON.parse.
+   * One or more mapping functions can be passed to transform the properties of the object before it is returned.
+   * Compared to JSON.parse, there won't be an error if data is an empty string or undefined. Instead, data is returned as it is.
+   */
+  parseJson(data: string, ...mappers: JsonValueMapper[]) {
+    if (!data) {
+      return data;
+    }
+    return JSON.parse(data, (key, value) => {
+      for (const mapper of mappers) {
+        value = mapper(key, value);
+      }
+      return value;
+    });
+  },
+
+  stringifyJson(json: object, ...mappers: JsonValueMapper[]) {
+    // Must NOT be an arrow function to maintain 'this'
+    return JSON.stringify(json, function(key, value) {
+      for (const mapper of mappers) {
+        value = mapper.call(this, key, value);
+      }
+      return value;
+    });
   }
 };

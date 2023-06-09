@@ -126,6 +126,19 @@ export class EventSupport {
     return count;
   }
 
+  /**
+   * @returns the event types of the registered listeners
+   */
+  types(): string[] {
+    let types = new Set<string>();
+    for (const listener of this._eventListeners) {
+      if (listener.type) {
+        types.add(listener.type);
+      }
+    }
+    return Array.from(types);
+  }
+
   trigger(type: string, event?: Event) {
     event = event || {} as Event;
     event.type = type;

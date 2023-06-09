@@ -100,8 +100,8 @@
     <module>../eslint-config</module>
 
     <module>../org.eclipse.scout.rt.oauth2</module>
-
     <module>../org.eclipse.scout.rt.opentelemetry.sdk</module>
+    <module>../org.eclipse.scout.rt.uinotification</module>
 
     <!-- chart -->
     <module>../eclipse-scout-chart</module>
@@ -588,6 +588,11 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.opentelemetry.sdk</artifactId>
+        <version>24.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.uinotification</artifactId>
         <version>24.1-SNAPSHOT</version>
       </dependency>
 

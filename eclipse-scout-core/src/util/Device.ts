@@ -9,7 +9,6 @@
  */
 import {App, EnumObject, InitModelOf, ObjectModel, objects, ObjectWithType, Predicate, scout} from '../index';
 import $ from 'jquery';
-import TypeOrArray = JQuery.TypeOrArray;
 
 let instance: Device;
 
@@ -88,14 +87,11 @@ export class Device implements DeviceModel, ObjectWithType {
   } as const;
 
   /**
-   * Called during bootstrap by index.html before the session startup.<p>
-   * Precalculates the value of some attributes to store them
-   * in a static way (and prevent many repeating function calls within loops).<p>
-   * Also loads device specific scripts (e.g. fast click for ios devices)
+   * Called during bootstrap by index.html before the session startup.
+   *
+   * Precalculates the value of some attributes to store them in a static way (and prevent many repeating function calls within loops).
    */
-  bootstrap(): JQuery.Promise<any>[] {
-    let promises = [];
-
+  bootstrap(): JQuery.Promise<any> {
     // Pre-calculate value and store in a simple property, to prevent many function calls inside loops
     this.scrollbarWidth = this._detectScrollbarWidth();
     this.type = this._detectType(this.userAgent);
@@ -108,13 +104,7 @@ export class Device implements DeviceModel, ObjectWithType {
       this._fixIPhoneRotationBug();
     }
 
-    return promises;
-  }
-
-  protected _loadScriptDeferred(scriptUrl: string, doneFunc: TypeOrArray<JQuery.Deferred.Callback<JQuery>>): JQuery.Promise<JQuery> {
-    return $
-      .injectScript(scriptUrl)
-      .done(doneFunc);
+    return $.resolvedPromise();
   }
 
   /**

@@ -138,6 +138,10 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
     if (!UrlHints.isCompressHint(m_request)) {
       return false;
     }
+    if (m_request.isAsyncStarted()) {
+      // GzipServletOutputStream does not work with async responses unfortunately
+      return false;
+    }
     if (contentType == null) {
       if (m_enableEmptyContentTypeLogging) {
         LOG.warn("Content type of response is not defined for request path info {}.", m_request.getPathInfo());
