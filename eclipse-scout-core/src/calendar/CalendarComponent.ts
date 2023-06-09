@@ -83,6 +83,17 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       return;
     }
 
+    // Calculate visible
+    let calendarDescriptor = this.parent.calendars.find(calendar => calendar.calendarId === this.item.calendarId);
+    if (calendarDescriptor) {
+      // components with no calendarId are alwas shown in the default column
+      this.setVisible(calendarDescriptor.visible);
+    }
+
+    if (!this.isVisible()) {
+      return;
+    }
+
     let loopDay = this._startLoopDay();
 
     let appointmentToDate: Date | string = dates.parseJsonDate(this.toDate);
@@ -279,16 +290,6 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
 
   protected _renderSelected() {
     this._$parts.forEach($part => $part.toggleClass('comp-selected', this.selected));
-  }
-
-  protected override _renderVisible() {
-    if (!this._$parts) {
-      return;
-    }
-    this._$parts.forEach($part => {
-      $part.setVisible(this.isVisible());
-      this.invalidateParentLogicalGrid();
-    });
   }
 
   setSelected(selected: boolean) {

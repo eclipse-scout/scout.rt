@@ -331,8 +331,8 @@ export class Calendar extends Widget implements CalendarModel {
     }
     this._updateModel(true);
 
-    // only render if components have another layout
     this._renderComponents();
+    // only render if components have another layout
     if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
       this.needsScrollToStartHour = true;
     }
@@ -1491,9 +1491,11 @@ export class Calendar extends Widget implements CalendarModel {
       calendarId: node.calendarId,
       visible: node.checked
     });
-    this.components
-      .filter(comp => comp.item.calendarId === node.calendarId)
-      .forEach(comp => comp.setVisible(node.checked));
+    this.calendars.find(calendar => calendar.calendarId === node.calendarId).visible = node.checked;
+    if (!this.isDay() || node.checked) {
+      // No re-rendering required when on day -> component is hidden by layouyt
+      this._renderComponents();
+    }
     this.layoutSize(true);
   }
 
