@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.extension.ui.desktop;
 
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopActivateDefaultViewChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopDefaultViewChain;
@@ -22,10 +23,12 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopOut
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailFormChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailTableChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageSearchFormChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopReloadPageFromRootChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTablePageLoadedChain;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -34,6 +37,16 @@ public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> 
 
   public AbstractDesktopExtension(DESKTOP owner) {
     super(owner);
+  }
+
+  @Override
+  public void activateDefaultView(DesktopActivateDefaultViewChain chain, String deepLinkPath) {
+    chain.activateDefaultView(deepLinkPath);
+  }
+
+  @Override
+  public void reloadPageFromRoot(DesktopReloadPageFromRootChain chain, IPage<?> page) {
+    chain.reloadPageFromRoot(page);
   }
 
   @Override

@@ -14,6 +14,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -27,6 +28,40 @@ public final class DesktopChains {
 
     public AbstractDesktopChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {
       super(extensions, IDesktopExtension.class);
+    }
+  }
+
+  public static class DesktopActivateDefaultViewChain extends AbstractDesktopChain {
+
+    public DesktopActivateDefaultViewChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {
+      super(extensions);
+    }
+
+    public void activateDefaultView(String deepLinkPath) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
+          next.activateDefaultView(DesktopActivateDefaultViewChain.this, deepLinkPath);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
+  public static class DesktopReloadPageFromRootChain extends AbstractDesktopChain {
+
+    public DesktopReloadPageFromRootChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {
+      super(extensions);
+    }
+
+    public void reloadPageFromRoot(IPage<?> page) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
+          next.reloadPageFromRoot(DesktopReloadPageFromRootChain.this, page);
+        }
+      };
+      callChain(methodInvocation);
     }
   }
 

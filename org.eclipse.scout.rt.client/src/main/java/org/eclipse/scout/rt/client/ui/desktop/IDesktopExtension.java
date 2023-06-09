@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.Bean;
@@ -195,4 +196,7 @@ public interface IDesktopExtension {
    */
   void contributeActions(Collection<IAction> actions);
 
+  ContributionCommand activateDefaultViewDelegate(String deepLinkPath);
+
+  ContributionCommand reloadPageFromRootDelegate(IPage<?> page);
 }

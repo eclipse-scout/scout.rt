@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
 import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.deeplink.OutlineDeepLinkHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DefaultDesktopEventHistory;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopActivateDefaultViewChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopDefaultViewChain;
@@ -44,6 +45,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopOut
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailFormChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailTableChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageSearchFormChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopReloadPageFromRootChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTablePageLoadedChain;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
@@ -696,6 +698,18 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     addPropertyChangeListener(new P_LocalPropertyChangeListener());
 
     addAddOn(BEANS.get(PopupManager.class));
+  }
+
+  protected final void interceptActivateDefaultView(String deepLinkPath) {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopActivateDefaultViewChain chain = new DesktopActivateDefaultViewChain(extensions);
+    chain.activateDefaultView(deepLinkPath);
+  }
+
+  protected final void interceptReloadPageFromRoot(IPage<?> page) {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopReloadPageFromRootChain chain = new DesktopReloadPageFromRootChain(extensions);
+    chain.reloadPageFromRoot(page);
   }
 
   protected final void interceptInit() {
@@ -1968,10 +1982,23 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public void reloadPageFromRoot(IPage<?> page) {
+
     Bookmark bm = createBookmark();
     page.setChildrenDirty(true);
     //activate bookmark without activating the outline, since this would hide active tabs.
     activateBookmark(bm, false);
+
+    //    for (IDesktopExtension ext : getDesktopExtensions()) {
+//      try {
+//        ContributionCommand cc = ext.reloadPageFromRootDelegate(page);
+//        if (cc == ContributionCommand.Stop) {
+//          break;
+//        }
+//      }
+//      catch (RuntimeException | PlatformError ex) {
+//        BEANS.get(ExceptionHandler.class).handle(ex);
+//      }
+//    }
   }
 
   @Override
@@ -2514,6 +2541,18 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
 
     @Override
+    public ContributionCommand activateDefaultViewDelegate(String deepLinkPath) {
+      interceptActivateDefaultView(deepLinkPath);
+      return ContributionCommand.Continue;
+    }
+
+    @Override
+    public ContributionCommand reloadPageFromRootDelegate(IPage<?> page) {
+      interceptReloadPageFromRoot(page);
+      return ContributionCommand.Continue;
+    }
+
+    @Override
     public ContributionCommand initDelegate() {
       interceptInit();
       return ContributionCommand.Continue;
@@ -2895,6 +2934,16 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
     public LocalDesktopExtension(DESKTOP desktop) {
       super(desktop);
+    }
+
+    @Override
+    public void activateDefaultView(DesktopActivateDefaultViewChain chain, String deepLinkPath) {
+      getOwner().activateDefaultView(deepLinkPath);
+    }
+
+    @Override
+    public void reloadPageFromRoot(DesktopReloadPageFromRootChain chain, IPage<?> page) {
+      getOwner().reloadPageFromRoot(page);
     }
 
     @Override

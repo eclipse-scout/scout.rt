@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -27,12 +28,36 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**
  * base implementation of {@link IDesktopExtension}
  */
 public abstract class AbstractDesktopExtension implements IDesktopExtension {
   private IDesktop m_coreDesktop;
+
+  @Override
+  public ContributionCommand activateDefaultViewDelegate(String deepLinkPath) {
+    return activateDefaultView(deepLinkPath);
+  }
+
+  @Override
+  public ContributionCommand reloadPageFromRootDelegate(IPage<?> page) {
+    return reloadPageFromRoot(page);
+  }
+
+  public ContributionCommand activateDefaultView(String deepLinkPath) {
+    return ContributionCommand.Continue;
+  }
+
+  public ContributionCommand reloadPageFromRoot(IPage<?> page) {
+    Bookmark bm = getCoreDesktop().createBookmark();
+    page.setChildrenDirty(true);
+    //activate bookmark without activating the outline, since this would hide active tabs.
+    getCoreDesktop().activateBookmark(bm, false);
+
+    return ContributionCommand.Continue;
+  }
 
   @Override
   public ContributionCommand initDelegate() {
