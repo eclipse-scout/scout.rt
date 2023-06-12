@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 @ClassId("5bcb48f0-9b72-4f28-9c08-038cd5d9a1c4")
@@ -200,7 +199,7 @@ public class DefaultPasswordForm extends AbstractForm {
 
   protected void resetSessionIfCurrentUser(IPasswordManagementService svc) {
     //owasp: reset session
-    IClientSession session = (IClientSession) ISession.CURRENT.get();
+    IClientSession session = IClientSession.get();
     String userName = svc.getUsernameFor(getUserId());
     String myNameIs = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
     if (myNameIs.equals(userName)) {
