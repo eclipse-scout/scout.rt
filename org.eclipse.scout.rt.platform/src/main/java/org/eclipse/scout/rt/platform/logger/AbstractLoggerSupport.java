@@ -11,6 +11,10 @@ package org.eclipse.scout.rt.platform.logger;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 
 /**
@@ -19,6 +23,8 @@ import org.slf4j.Logger;
  * @since 5.2
  */
 public abstract class AbstractLoggerSupport implements ILoggerSupport {
+
+  private volatile Map<String, Optional<LogLevel>> m_initialStateMap;
 
   @Override
   public LogLevel getLogLevel(Class<?> clazz) {
@@ -38,6 +44,42 @@ public abstract class AbstractLoggerSupport implements ILoggerSupport {
   @Override
   public void setLogLevel(Logger logger, LogLevel level) {
     setLogLevel(assertNotNull(logger).getName(), level);
+  }
+
+  /**
+   * Adds the initial log-level of logger with given name to the initial state map, should be called by
+   * {@link #setLogLevel(String, LogLevel)} function which actually changes the level.
+   */
+  protected void trackInitialState(String name) {
+    Map<String, Optional<LogLevel>> initialStateMap = m_initialStateMap;
+    if (initialStateMap != null) {
+      initialStateMap.putIfAbsent(name, Optional.ofNullable(getLogLevel(name)));
+    }
+  }
+
+  @Override
+  public synchronized void trackInitialStates() {
+    m_initialStateMap = new ConcurrentHashMap<>();
+  }
+
+  @Override
+  public synchronized void resetToInitialStates() {
+    Map<String, Optional<LogLevel>> initialStateMap = m_initialStateMap;
+    if (initialStateMap != null) {
+      m_initialStateMap = null;
+      initialStateMap.forEach((k, v) -> setLogLevel(k, v.orElse(null)));
+    }
+  }
+
+  /**
+   * Clear the initial state tracking (however does not enable/disable it), should be called after initial states have
+   * been reloaded (e.g. logger itself reloads its initial states).
+   */
+  protected void clearInitialStates() {
+    Map<String, Optional<LogLevel>> initialStateMap = m_initialStateMap;
+    if (initialStateMap != null) {
+      initialStateMap.clear();
+    }
   }
 
   @Override

@@ -53,6 +53,7 @@ public class JulLoggerSupport extends AbstractLoggerSupport {
 
   @Override
   public void setLogLevel(String name, LogLevel level) {
+    trackInitialState(name);
     Level julLevel = scoutToJulLevel(level);
     java.util.logging.Logger julLogger = getJulLogger(name);
     julLogger.setLevel(julLevel);

@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.logging.Level;
 
@@ -25,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @since 5.2
  */
-public class JulLoggerSupportTest {
+public class JulLoggerSupportTest extends AbstractLoggerSupportTest {
 
   private static final Class<?> TEST_LOGGER_CLASS = JulLoggerSupportTest.class;
   private static final String TEST_LOGGER_NAME = TEST_LOGGER_CLASS.getName();
@@ -130,5 +128,20 @@ public class JulLoggerSupportTest {
 
   private Level getJulLevel() {
     return java.util.logging.Logger.getLogger(TEST_LOGGER_NAME).getLevel();
+  }
+
+  @Override
+  protected JulLoggerSupport getLoggerSupport() {
+    return m_loggerSupport;
+  }
+
+  @Override
+  protected String getTestLoggerName() {
+    return TEST_LOGGER_NAME;
+  }
+
+  @Override
+  protected LogLevel getTestLoggerLevel() {
+    return m_loggerSupport.julToScoutLevel(getJulLevel());
   }
 }
