@@ -74,6 +74,21 @@ public interface ILoggerSupport {
   void setLogLevel(Logger logger, LogLevel level);
 
   /**
+   * Thread-safe. Enable initial state tracking (to enable restoring initial states after log levels have been changed).
+   *
+   * @see #resetToInitialStates()
+   */
+  void trackInitialStates();
+
+  /**
+   * Thread-safe. Resets all changed log-levels to their previous (initial) state (before any changes). Also disables
+   * initial state-tracking ({@link #trackInitialStates()} must be called to re-enable it).
+   *
+   * @see #trackInitialStates()
+   */
+  void resetToInitialStates();
+
+  /**
    * Shutdown the logger, called during shutdown to flush and/or free resources. Method should not throw if logger is
    * not even started (actually all known loggers do not have a state or are started implicitly by using them), however
    * some loggers should be explicitly shutdown. This method is called by a platform listener as late as possible during

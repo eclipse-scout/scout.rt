@@ -9,21 +9,54 @@
  */
 package org.eclipse.scout.rt.platform.logger;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.spi.ConfigurationEvent.EventType;
 
 /**
+ * <p>
  * Logger support for Logback.
+ * </p>
+ * <p>
+ * With support for change tracking to automatically re-apply all changes after Logback reloads its logging
+ * configuration (e.g. configured by periodic rescan)
+ * </p>
  *
  * @since 5.2
  */
 public class LogbackLoggerSupport extends AbstractLoggerSupport {
 
   private static final Logger LOG = LoggerFactory.getLogger(LogbackLoggerSupport.class);
+
+  /**
+   * {@link Map} caching log levels for loggers whose level was changed dynamically after initialization.
+   */
+  private volatile Map<Logger, Optional<LogLevel>> m_changeMap = new ConcurrentHashMap<>();
+
+  public LogbackLoggerSupport(ILoggerFactory factory) {
+    LoggerContext loggerContext = Assertions.assertNotNull((LoggerContext) factory, "No {} provided", LoggerContext.class);
+
+    loggerContext.addConfigurationEventListener(evt -> {
+      if (evt.getEventType() == EventType.CONFIGURATION_ENDED) {
+        clearInitialStates(); // initial states will be set again with the following setLogLevel calls (however they might have changed after reload)
+
+        // re-apply all dynamically set custom log-levels
+        Map<Logger, Optional<LogLevel>> changeMap = m_changeMap;
+        if (changeMap != null) {
+          changeMap.forEach((k, v) -> setLogLevel(k, v.orElse(null)));
+        }
+      }
+    });
+  }
 
   @Override
   public LogLevel getLogLevel(String name) {
@@ -44,9 +77,25 @@ public class LogbackLoggerSupport extends AbstractLoggerSupport {
 
   @Override
   public void setLogLevel(Logger logger, LogLevel level) {
+    trackInitialState(logger.getName());
+    trackChange(logger, level);
     Level logbackLevel = scoutToLogbackLevel(level);
     ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
     logbackLogger.setLevel(logbackLevel);
+  }
+
+  @Override
+  public synchronized void resetToInitialStates() {
+    m_changeMap = null; // disable change tracking
+    super.resetToInitialStates();
+    m_changeMap = new ConcurrentHashMap<>(); // track changes again (empty may, levels are set to initial states again)
+  }
+
+  protected void trackChange(Logger logger, LogLevel level) {
+    Map<Logger, Optional<LogLevel>> changeMap = m_changeMap;
+    if (changeMap != null) {
+      changeMap.put(logger, Optional.ofNullable(level));
+    }
   }
 
   protected LogLevel logbackToScoutLevel(Level level) {

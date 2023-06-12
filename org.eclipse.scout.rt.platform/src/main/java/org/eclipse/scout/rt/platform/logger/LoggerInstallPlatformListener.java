@@ -85,7 +85,7 @@ public class LoggerInstallPlatformListener implements IPlatformListener {
       LOG.debug("Determined scout logger support FQCN {}", loggerSupportFqcn);
 
       if (loggerSupportFqcn != null) {
-        loggerSupport = createLoggerSupport(loggerSupportFqcn);
+        loggerSupport = createLoggerSupport(loggerSupportFqcn, factory);
       }
     }
     catch (Exception | NoClassDefFoundError e) { // catch NoClassDefFoundError by intention (threw if no slf4j binding is available)
@@ -106,12 +106,19 @@ public class LoggerInstallPlatformListener implements IPlatformListener {
   }
 
   /**
+   * <p>
    * Creates a new instance of the given logger support fully qualified class name and checks its type.
+   * </p>
+   * <p>
+   * If the logger support provides a one-argument {@link ILoggerFactory} constructor this one is used otherwise a
+   * no-argument constructor must be provided.
+   * </p>
    */
-  protected ILoggerSupport createLoggerSupport(String loggerSupportFqcn) throws ClassNotFoundException {
+  protected ILoggerSupport createLoggerSupport(String loggerSupportFqcn, ILoggerFactory factory) throws ClassNotFoundException {
     Class<?> clazz = SerializationUtility.getClassLoader().loadClass(loggerSupportFqcn);
     Assertions.assertTrue(ILoggerSupport.class.isAssignableFrom(clazz));
-    return (ILoggerSupport) BeanUtility.createInstance(clazz);
+    boolean hasLoggerFactoryConstructor = BeanUtility.findConstructor(clazz, ILoggerFactory.class) != null;
+    return (ILoggerSupport) (hasLoggerFactoryConstructor ? BeanUtility.createInstance(clazz, factory) : BeanUtility.createInstance(clazz));
   }
 
   /**

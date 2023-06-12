@@ -10,30 +10,39 @@
 package org.eclipse.scout.rt.platform.logger;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import org.eclipse.scout.rt.platform.logger.ILoggerSupport.LogLevel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.spi.ConfigurationEvent;
+import ch.qos.logback.core.spi.ConfigurationEvent.EventType;
+import ch.qos.logback.core.spi.ConfigurationEventListener;
 
 /**
  * @since 5.2
  */
-public class LogbackLoggerSupportTest {
+public class LogbackLoggerSupportTest extends AbstractLoggerSupportTest {
 
   private static final Class<?> TEST_LOGGER_CLASS = LogbackLoggerSupportTest.class;
   private static final String TEST_LOGGER_NAME = TEST_LOGGER_CLASS.getName();
   private static final Logger TEST_LOGGER = LoggerFactory.getLogger(TEST_LOGGER_CLASS);
 
   private LogbackLoggerSupport m_loggerSupport;
+  private LoggerContext m_loggerContextMock = mock(LoggerContext.class);
 
   @Before
   public void before() {
-    m_loggerSupport = new LogbackLoggerSupport();
+    m_loggerContextMock = mock(LoggerContext.class);
+    m_loggerSupport = new LogbackLoggerSupport(m_loggerContextMock);
   }
 
   @After
@@ -108,11 +117,55 @@ public class LogbackLoggerSupportTest {
     assertEquals(Level.INFO, getLogbackLevel());
   }
 
+  @Test
+  public void testConfigurationEndedListenerRegistration() {
+    verify(m_loggerContextMock, times(1)).addConfigurationEventListener(any(ConfigurationEventListener.class));
+  }
+
+  @Test
+  public void testChangeTracking() {
+    ArgumentCaptor<ConfigurationEventListener> captor = ArgumentCaptor.forClass(ConfigurationEventListener.class);
+    verify(m_loggerContextMock, times(1)).addConfigurationEventListener(captor.capture());
+    ConfigurationEventListener listener = captor.getValue();
+
+    // set level to ERROR
+    assertNull(getLogbackLevel());
+    m_loggerSupport.setLogLevel(TEST_LOGGER_CLASS, LogLevel.ERROR);
+    assertEquals(getLogbackLevel(), Level.ERROR);
+
+    // now set level again (w/o logger support otherwise this would be tracked as change)
+    ((ch.qos.logback.classic.Logger) TEST_LOGGER).setLevel(null);
+    assertNull(getLogbackLevel());
+
+    // trigger event listener
+    ConfigurationEvent event = mock(ConfigurationEvent.class);
+    when(event.getEventType()).thenReturn(EventType.CONFIGURATION_ENDED);
+    listener.listen(event);
+
+    // expect previous change to be restored again
+    assertEquals(getLogbackLevel(), Level.ERROR);
+  }
+
   private void setLogbackLevel(Level level) {
     ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(TEST_LOGGER_NAME)).setLevel(level);
   }
 
   private Level getLogbackLevel() {
     return ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(TEST_LOGGER_NAME)).getLevel();
+  }
+
+  @Override
+  protected LogbackLoggerSupport getLoggerSupport() {
+    return m_loggerSupport;
+  }
+
+  @Override
+  protected String getTestLoggerName() {
+    return TEST_LOGGER_NAME;
+  }
+
+  @Override
+  protected LogLevel getTestLoggerLevel() {
+    return m_loggerSupport.logbackToScoutLevel(getLogbackLevel());
   }
 }
