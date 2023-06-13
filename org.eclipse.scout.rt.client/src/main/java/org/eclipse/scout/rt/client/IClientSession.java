@@ -125,4 +125,8 @@ public interface IClientSession extends ISession, IPropertyObserver {
    * that only one model job is active at any given time for this session.
    */
   IExecutionSemaphore getModelJobSemaphore();
+
+  static IClientSession get() {
+    return (IClientSession) ISession.CURRENT.get();
+  }
 }

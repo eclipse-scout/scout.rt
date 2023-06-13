@@ -199,7 +199,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * notifications when changed on the server.
    * </p>
    */
-  protected <T> T getSharedContextVariable(String name, Class<T> type) {
+  public <T> T getSharedContextVariable(String name, Class<T> type) {
     Object o = m_sharedVariableMap.get(name);
     return TypeCastUtility.castValue(o, type);
   }
@@ -274,7 +274,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * @throws ProcessingException
    *           if interrupted (and the variables are not initialized)
    */
-  protected void initializeSharedVariables() {
+  public void initializeSharedVariables() {
     BEANS.get(IPingService.class).ping("");
   }
 
