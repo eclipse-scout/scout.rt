@@ -2091,10 +2091,12 @@ export class Calendar extends Widget implements CalendarModel {
 
     // Ignore right mouse button clicks within current selection
     let selectedDateTime = this._getSelectedDateTime(event);
+    let newSelectedCalendarId = $(event.delegateTarget).data('calendarId');
     if (event.which === 3 &&
       this.selectedRange && selectedDateTime &&
       dates.compare(selectedDateTime, this.selectedRange.from) >= 0 &&
-      dates.compare(selectedDateTime, this.selectedRange.to) < 0) {
+      dates.compare(selectedDateTime, this.selectedRange.to) < 0 &&
+      this.selectedCalendar.calendarId === newSelectedCalendarId) {
       return;
     }
 
