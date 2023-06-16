@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.util.Objects;
 import java.util.Random;
 
 public class CalendarDescriptor implements ICalendarDescriptor {
@@ -80,5 +81,41 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   @Override
   public void setVisible(boolean visible) {
     m_visible = visible;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    CalendarDescriptor that = (CalendarDescriptor) o;
+
+    if (m_calendarId != that.m_calendarId) {
+      return false;
+    }
+    if (m_visible != that.m_visible) {
+      return false;
+    }
+    if (!Objects.equals(m_name, that.m_name)) {
+      return false;
+    }
+    if (!Objects.equals(m_cssClass, that.m_cssClass)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (m_calendarId ^ (m_calendarId >>> 32));
+    result = 31 * result + (m_name != null ? m_name.hashCode() : 0);
+    result = 31 * result + (m_visible ? 1 : 0);
+    result = 31 * result + (m_cssClass != null ? m_cssClass.hashCode() : 0);
+    return result;
   }
 }
