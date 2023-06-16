@@ -115,7 +115,7 @@ public final class ServerCommonsConfigProperties {
       return String.format("Configures individual Content Security Policy (CSP) directives.\n"
           + "See https://www.w3.org/TR/CSP2/ and the Bean '%s' for more details.\n"
           + "The value must be provided as a Map.\n"
-          + "Example: scout.cspDirective[img-src]='self' data: https: http://localhost:8086",
+          + "Example: scout.cspDirective[img-src]='self' data: https://media.example.com",
           ContentSecurityPolicy.class.getName());
     }
   }
