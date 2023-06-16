@@ -146,6 +146,20 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       String attributeName = p.getCurrentName();
       p.nextToken(); // let current token point to the value
       AttributeType attributeType = findResolvedAttributeType(entity, attributeName, p.currentToken());
+
+//      Type typeArg = attributeType.getJavaType();
+//      if (typeArg instanceof MapType) {
+//        MapType pt = (MapType) typeArg;
+//        if (pt.getContentType().getRawClass() == Object.class) {
+//                      attributeType = AttributeType.ofDoValue(TypeFactory.defaultInstance().constructMapType(Map.class, (Class<?>) pt.getKeyType().getRawClass(), DoEntity.class));
+//        }
+////        if (pt.getRawType() == Map.class) {
+////          if (pt.getActualTypeArguments()[1] == Object.class) {
+////            attributeType = AttributeType.ofDoValue(TypeFactory.defaultInstance().constructMapType(Map.class, (Class<?>) pt.getActualTypeArguments()[0], DoEntity.class));
+////          }
+////        }
+//      }
+
       if (attributeType.isDoCollection()) {
         DoNode<?> nodeValue = readAttributeValue(p, attributeType, attributeName);
 

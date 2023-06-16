@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureHierarchicalLookupRowDo;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.lookup.LookupResponse;
 import org.eclipse.scout.rt.dataobject.value.DateValueDo;
@@ -71,6 +72,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCurrencyDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDateDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoListObject;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapListEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoValuePojo;
@@ -1689,6 +1691,57 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testSerializeDeserialize_TestMapDoObject() throws Exception {
+    TestMapDo mapDo = new TestMapDo();
+    Map<FixtureUuId, Object> map = new HashMap<>();
+    FixtureUuId id = FixtureUuId.create();
+    map.put(id, createTestItemDo("foo", "bar"));
+
+    FixtureUuId id2 = FixtureUuId.create();
+    map.put(id2, FixtureStringId.of("my-foo-string-id"));
+    mapDo.withFieldValues(map);
+
+    String json = s_dataObjectMapper.writeValueAsString(mapDo);
+    System.out.println("serialized\n" + json);
+
+    TestMapDo mapDo2 = s_dataObjectMapper.readValue(json, TestMapDo.class);
+    System.out.println("deserialized\n" + mapDo2);
+
+    assertEquals("foo", ((TestItemDo) mapDo2.getFieldValues().get(id)).getId());
+
+    String j = "{\n"
+        + "  \"_type\" : \"TestMap\",\n"
+        + "  \"fieldValues\" : {\n"
+        + "    \"3b0effe4-8313-4e15-8f15-be4d0a30864f\" : {\n"
+        + "      \"_type\" : \"TestItem\",\n"
+        + "      \"id\" : \"foo\",\n"
+        + "      \"stringAttribute\" : \"bar\"\n"
+        + "    }\n"
+        + "  }\n"
+        + "}\n";
+    TestMapDo mapDo3 = s_dataObjectMapper.readValue(j, TestMapDo.class);
+    System.out.println(mapDo3);
+
+    assertEquals("foo", ((TestItemDo) mapDo3.getFieldValues().get(FixtureUuId.of("3b0effe4-8313-4e15-8f15-be4d0a30864f"))).getId());
+
+    //    System.out.println(mapDo2.getFieldValues().entrySet().g);
+  }
+
+  @Test
+  public void testSerializeDeserialize_TestMapDoObject2() throws Exception {
+    TestMapDo mapDo = new TestMapDo();
+    Map<FixtureUuId, IDoEntity> map = new HashMap<>();
+    map.put(FixtureUuId.create(), createTestItemDo("foo", "bar"));
+    mapDo.withFieldValues2(map);
+
+    String json = s_dataObjectMapper.writeValueAsString(mapDo);
+    TestMapDo mapDo2 = s_dataObjectMapper.readValue(json, TestMapDo.class);
+    System.out.println(mapDo2);
+
+    //    System.out.println(mapDo2.getFieldValues().entrySet().g);
+  }
+
+  @Test
   public void testSerialize_illegalKeyTypeMap() throws Exception {
     DoEntity entity = BEANS.get(DoEntity.class);
     Map<TestItemDo, String> illegalKeyTypeMap = new HashMap<>();
@@ -2605,6 +2658,22 @@ public class JsonDataObjectsSerializationTest {
     assertEqualsWithComparisonFailure(item1, marshalledList.get(1));
     assertEquals("bar", marshalledList.get(2));
     assertEqualsWithComparisonFailure(item2, marshalledList.get(3));
+  }
+
+  @Test
+  public void testDoListObject() throws Exception {
+    TestDoListObject listEntity = BEANS.get(TestDoListObject.class);
+    TestItemDo item = createTestItemDo("foo", "bar");
+    listEntity.withObjectList("foo", item, "baz", 42);
+
+    String json = s_dataObjectMapper.writeValueAsString(listEntity);
+
+    TestDoListObject marshalled = s_dataObjectMapper.readValue(json, TestDoListObject.class);
+    assertEquals("foo", marshalled.getObjectList().get(0));
+    assertEquals(item, marshalled.getObjectList().get(1));
+    assertEquals("baz", marshalled.getObjectList().get(2));
+    assertEquals(42, marshalled.getObjectList().get(3));
+    assertEquals(listEntity, marshalled);
   }
 
   // ------------------------------------ tests with custom JSON type property name -----------------------------------

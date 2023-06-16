@@ -34,8 +34,10 @@ import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.deser.Deserializers;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.ReferenceType;
 
 /**
@@ -70,6 +72,13 @@ public class DataObjectDeserializers extends Deserializers.Base {
       return new EnumDeserializer(type.asSubclass(IEnum.class));
     }
     return super.findEnumDeserializer(type, config, beanDesc);
+  }
+
+  @Override
+  public JsonDeserializer<?> findMapDeserializer(MapType type, DeserializationConfig config, BeanDescription beanDesc, KeyDeserializer keyDeserializer, TypeDeserializer elementTypeDeserializer, JsonDeserializer<?> elementDeserializer)
+      throws JsonMappingException {
+    //return super.findMapDeserializer(type, config, beanDesc, keyDeserializer, elementTypeDeserializer, elementDeserializer);
+    return new DoMapDeserializer<>(type);
   }
 
   @Override

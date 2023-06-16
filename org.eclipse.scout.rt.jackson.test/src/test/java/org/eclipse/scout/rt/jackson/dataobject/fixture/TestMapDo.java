@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 
 @TypeName("TestMap")
 public class TestMapDo extends DoEntity {
@@ -45,6 +46,11 @@ public class TestMapDo extends DoEntity {
     return doValue("stringDoTestItemMapAttribute");
   }
 
+  // testing the scenario of a map value serializer handling abstract data object (compared to stringDoTestItemMapAttribute which uses a concret data object)
+  public DoValue<Map<String, AbstractTestAddressDo>> stringDoAbstractAddressMapAttribute() {
+    return doValue("stringDoAbstractAddressMapAttribute");
+  }
+
   public DoValue<Map<String, IDoEntity>> stringIDoEntityMapAttribute() {
     return doValue("stringIDoEntityMapAttribute");
   }
@@ -59,6 +65,19 @@ public class TestMapDo extends DoEntity {
 
   public DoValue<Map<Locale, Locale>> localeLocaleMapAttribute() {
     return doValue("localeLocaleMapAttribute");
+  }
+
+  // testing a more complex scenario for value serializer determined in DoEntitySerializer#serializeMap
+  public DoValue<Map<String, Map<String, List<TestItemDo>>>> stringMapStringMapStringListTestItemDoMapAttribute() {
+    return doValue("stringMapStringMapStringListTestItemDoMapAttribute");
+  }
+
+  public DoValue<Map<FixtureUuId, Object>> fieldValues() {
+    return doValue("fieldValues");
+  }
+
+  public DoValue<Map<FixtureUuId, IDoEntity>> fieldValues2() {
+    return doValue("fieldValues2");
   }
 
   /* **************************************************************************
@@ -121,6 +140,17 @@ public class TestMapDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withStringDoAbstractAddressMapAttribute(Map<String, AbstractTestAddressDo> stringDoAbstractAddressMapAttribute) {
+    stringDoAbstractAddressMapAttribute().set(stringDoAbstractAddressMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, AbstractTestAddressDo> getStringDoAbstractAddressMapAttribute() {
+    return stringDoAbstractAddressMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public TestMapDo withStringIDoEntityMapAttribute(Map<String, IDoEntity> stringIDoEntityMapAttribute) {
     stringIDoEntityMapAttribute().set(stringIDoEntityMapAttribute);
     return this;
@@ -162,5 +192,38 @@ public class TestMapDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<Locale, Locale> getLocaleLocaleMapAttribute() {
     return localeLocaleMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withStringMapStringMapStringListTestItemDoMapAttribute(Map<String, Map<String, List<TestItemDo>>> stringMapStringMapStringListTestItemDoMapAttribute) {
+    stringMapStringMapStringListTestItemDoMapAttribute().set(stringMapStringMapStringListTestItemDoMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, Map<String, List<TestItemDo>>> getStringMapStringMapStringListTestItemDoMapAttribute() {
+    return stringMapStringMapStringListTestItemDoMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withFieldValues(Map<FixtureUuId, Object> fieldValues) {
+    fieldValues().set(fieldValues);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<FixtureUuId, Object> getFieldValues() {
+    return fieldValues().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withFieldValues2(Map<FixtureUuId, IDoEntity> fieldValues2) {
+    fieldValues2().set(fieldValues2);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<FixtureUuId, IDoEntity> getFieldValues2() {
+    return fieldValues2().get();
   }
 }

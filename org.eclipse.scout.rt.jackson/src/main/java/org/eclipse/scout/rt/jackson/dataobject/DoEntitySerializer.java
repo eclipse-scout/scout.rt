@@ -138,7 +138,7 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    */
   protected void serializeMap(String attributeName, Map<?, ?> map, JsonGenerator gen, SerializerProvider provider) throws IOException {
     Optional<AttributeType> type = getAttributeType(attributeName);
-    if (type.isPresent()) {
+    if (type.isPresent() && type.get().getJavaType().getContentType().getRawClass() != Object.class) {
       serializeTypedAttribute(attributeName, map, gen, provider, type.get().getJavaType());
     }
     else {

@@ -57,6 +57,16 @@ public final class TypeFactoryUtility {
         // special case: declared DoNode<Object> with list-typed value
         typeArg = DoList.class;
       }
+
+//      if (typeArg instanceof ParameterizedType) {
+//        ParameterizedType pt = (ParameterizedType) typeArg;
+//        if (pt.getRawType() == Map.class) {
+//          if (pt.getActualTypeArguments()[1] == Object.class) {
+//            return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructMapType(Map.class, (Class<?>) pt.getActualTypeArguments()[0], DoEntity.class));
+//          }
+//        }
+//      }
+
       return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(typeArg));
     }
     throw new PlatformException("Could not convert type {}, only DoValue<?>, DoList<?>, DoSet<?> and DoCollection<?> supported", parametrizedType);
