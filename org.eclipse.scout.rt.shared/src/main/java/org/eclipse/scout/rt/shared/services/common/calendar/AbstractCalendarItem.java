@@ -217,6 +217,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
     attributes.put("lastModified", getDumpDateFormat().format(m_lastModified));
     attributes.put("id", String.valueOf(m_itemId));
     attributes.put("owner", m_owner);
+    attributes.put("calendarId", m_calendarId);
     attributes.put("subject", m_subject);
     attributes.put("subjectLabel", m_subjectLabel);
     attributes.put("subjectAppLink", m_subjectAppLink);

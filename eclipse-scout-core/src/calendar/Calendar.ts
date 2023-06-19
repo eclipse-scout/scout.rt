@@ -1031,7 +1031,7 @@ export class Calendar extends Widget implements CalendarModel {
     // layout calendar columns
     let columnWidth = 0;
     if (this.isDay() && this.splitDay) {
-      columnWidth = Math.round(contentW / (this.calendars.filter(c => c.visible).length + (this._defaultCalendarVisible($topSelected.index()) ? 1 : 0)));
+      columnWidth = Math.round(contentW / (this.calendars.filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
     } else if (this.isWorkWeek()) {
       columnWidth = Math.round(contentW / this.workDayIndices.length);
     } else {
@@ -1049,7 +1049,7 @@ export class Calendar extends Widget implements CalendarModel {
         .filter((i, e) => {
           let id = $(e).data('calendarId');
           if (id === 'default') {
-            return this._defaultCalendarVisible($topSelected.index());
+            return this._defaultCalendarVisible();
           }
           return this.calendars.find(cal => cal.calendarId === id).visible;
         }).data('new-width', columnWidth);
@@ -1125,11 +1125,15 @@ export class Calendar extends Widget implements CalendarModel {
     this._updateWeekdayNames();
   }
 
-  protected _defaultCalendarVisible(selectedIndex: number): boolean {
+  protected _defaultCalendarVisible(): boolean {
     return this.components
       .filter(comp => comp.coveredDaysRange.covers(this.selectedDate, true))
       .filter(comp => !comp.item.calendarId)
       .length > 0;
+  }
+
+  findCalendarForComponent(component: CalendarComponent): CalendarDescriptor {
+    return this.calendars.find(cal => cal.calendarId === component.item.calendarId);
   }
 
   protected _updateWeekdayNames() {

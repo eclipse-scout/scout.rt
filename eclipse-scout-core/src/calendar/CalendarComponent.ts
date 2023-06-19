@@ -84,7 +84,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     }
 
     // Calculate visible
-    let calendarDescriptor = this.parent.calendars.find(calendar => calendar.calendarId === this.item.calendarId);
+    let calendarDescriptor = this.parent.findCalendarForComponent(this);
     if (calendarDescriptor) {
       // components with no calendarId are alwas shown in the default column
       this.setVisible(calendarDescriptor.visible);
@@ -99,6 +99,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     let appointmentToDate: Date | string = dates.parseJsonDate(this.toDate);
     let appointmentFromDate = dates.parseJsonDate(this.fromDate);
     let coveredDaysRangeTo = this.coveredDaysRange.to;
+    let calendarCssClass = calendarDescriptor ? calendarDescriptor.cssClass : null;
 
     if (!this.fullDay) {
       let truncToDate = dates.trunc(appointmentToDate);
@@ -145,6 +146,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
 
       $part
         .addClass(this.item.cssClass)
+        .addClass(calendarCssClass)
         .data('component', this)
         .data('partDay', partDay)
         .on('mouseup', this._onMouseUp.bind(this))
