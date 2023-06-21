@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout} from '@eclipse-scout/core';
+import {arrays, objects, scout} from '@eclipse-scout/core';
 import {AbstractSvgChartRenderer} from '../index';
 import $ from 'jquery';
 
@@ -58,7 +58,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
   _renderPercentage(value, total) {
     // arc segment
     let arcClass = 'fulfillment-chart',
-      color = this.chart.data.chartValueGroups[0].colorHexValue,
+      color = arrays.ensure(this.chart.data.chartValueGroups[0].colorHexValue)[0],
       chartGroupCss = this.chart.data.chartValueGroups[0].cssClass;
 
     if (this.chart.config.options.autoColor) {
@@ -140,7 +140,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
 
   _renderCirclePath(cssClass, id, radius) {
     let chartGroupCss = this.chart.data.chartValueGroups[0].cssClass;
-    let color = this.chart.data.chartValueGroups[1].colorHexValue;
+    let color = arrays.ensure(this.chart.data.chartValueGroups[1].colorHexValue)[0];
 
     if (this.chart.config.options.autoColor) {
       cssClass += ' auto-color';

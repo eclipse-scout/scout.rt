@@ -1,15 +1,16 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractSvgChartRenderer, VennAsync3Calculator, VennCircle, VennCircleHelper} from '../index';
 import $ from 'jquery';
+import {arrays} from '@eclipse-scout/core';
 
 export default class VennChartRenderer extends AbstractSvgChartRenderer {
 
@@ -63,17 +64,17 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
 
     // create svg elements and venns
     if (this.numberOfCircles > 0) {
-      this.$v1 = this._createCircle(0, this.data[0].colorHexValue, this.data[0].cssClass);
+      this.$v1 = this._createCircle(0, arrays.ensure(this.data[0].colorHexValue)[0], this.data[0].cssClass);
       this.vennNumber1 = new VennCircle(this.$v1);
       this.vennReal1 = new VennCircle(this.$v1);
     }
     if (this.numberOfCircles > 1) {
-      this.$v2 = this._createCircle(1, this.data[1].colorHexValue, this.data[1].cssClass);
+      this.$v2 = this._createCircle(1, arrays.ensure(this.data[1].colorHexValue)[0], this.data[1].cssClass);
       this.vennNumber2 = new VennCircle(this.$v2);
       this.vennReal2 = new VennCircle(this.$v2);
     }
     if (this.numberOfCircles > 2) {
-      this.$v3 = this._createCircle(2, this.data[2].colorHexValue, this.data[2].cssClass);
+      this.$v3 = this._createCircle(2, arrays.ensure(this.data[2].colorHexValue)[0], this.data[2].cssClass);
       this.vennNumber3 = new VennCircle(this.$v3);
       this.vennReal3 = new VennCircle(this.$v3);
     }
