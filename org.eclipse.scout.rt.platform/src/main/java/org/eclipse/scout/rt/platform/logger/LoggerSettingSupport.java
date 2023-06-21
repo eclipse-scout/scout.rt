@@ -36,23 +36,22 @@ public class LoggerSettingSupport {
     final ILoggerSupport loggerSupport = BEANS.get(ILoggerSupport.class);
     loggerSupport.resetToInitialStates();
 
-    if (setting == null) {
-      return;
+    if (setting != null) {
+      // track changes to restore them later
+      loggerSupport.trackInitialStates();
+
+      if (setting.getRootLevel() != null) {
+        loggerSupport.setLogLevel(Logger.ROOT_LOGGER_NAME, setting.getRootLevel());
+      }
+
+      if (setting.getCustomLevels() != null) {
+        setting.getCustomLevels().entrySet()
+            .stream()
+            .filter(e -> e.getKey() != null)
+            .forEach(e -> loggerSupport.setLogLevel(e.getKey(), e.getValue()));
+      }
     }
 
-    // track changes to restore them later
-    loggerSupport.trackInitialStates();
-
-    if (setting.getRootLevel() != null) {
-      loggerSupport.setLogLevel(Logger.ROOT_LOGGER_NAME, setting.getRootLevel());
-    }
-
-    if (setting.getCustomLevels() != null) {
-      setting.getCustomLevels().entrySet()
-          .stream()
-          .filter(e -> e.getKey() != null)
-          .forEach(e -> loggerSupport.setLogLevel(e.getKey(), e.getValue()));
-    }
     LOG.info("Initialized logger using setting={}", setting);
   }
 
