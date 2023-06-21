@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {objects, strings} from '@eclipse-scout/core';
+import {arrays, objects, strings} from '@eclipse-scout/core';
 import {AbstractSvgChartRenderer, Chart} from '../index';
 import $ from 'jquery';
 import {ChartValueGroup, ClickObject} from './Chart';
@@ -126,7 +126,7 @@ export class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
         width: width,
         widthBottom: widthBottom,
         cssClass: 'salesfunnel-chart-bar',
-        fill: chartValueGroups[i].colorHexValue,
+        fill: arrays.ensure(chartValueGroups[i].colorHexValue)[0],
         label: chartValueGroups[i].groupName,
         clickObject: this._createClickObject(null, i)
       };
@@ -318,7 +318,7 @@ export class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
         width: width,
         widthBottom: width,
         cssClass: 'salesfunnel-chart-bar',
-        fill: chartValueGroups[i].colorHexValue,
+        fill: arrays.ensure(chartValueGroups[i].colorHexValue)[0],
         label: chartValueGroups[i].groupName,
         clickObject: this._createClickObject(null, i)
       };
