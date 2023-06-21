@@ -402,7 +402,7 @@ export type ChartValueGroup = {
   type?: string;
   groupName?: string;
   values: number[] | Record<string, number>[];
-  colorHexValue?: string;
+  colorHexValue?: string | string[];
   cssClass?: string;
 };
 
