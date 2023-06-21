@@ -9,7 +9,7 @@
  */
 
 import {Chart} from '../index';
-import {Session} from '@eclipse-scout/core';
+import {arrays, Session} from '@eclipse-scout/core';
 import {UpdateChartOptions} from './Chart';
 
 export class AbstractChartRenderer {
@@ -63,7 +63,7 @@ export class AbstractChartRenderer {
         }
       }
       // color should have been set.
-      if (!this.chart.config.options.autoColor && !chartValueGroup.colorHexValue && !chartValueGroup.cssClass) {
+      if (!this.chart.config.options.autoColor && !arrays.ensure(chartValueGroup.colorHexValue).length && !chartValueGroup.cssClass) {
         return false;
       }
     }

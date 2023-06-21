@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @since 5.2
@@ -28,9 +29,15 @@ public interface IChartValueGroupBean extends Serializable {
 
   void setGroupName(String groupName);
 
-  String getColorHexValue();
+  List<String> getColorHexValue();
 
-  void setColorHexValue(String colorHexValue);
+  void setColorHexValue(String... colorHexValue);
+
+  void setColorHexValue(List<String> colorHexValue);
+
+  void addColorHexValue(String colorHexValue);
+
+  void clearColorHexValue();
 
   boolean isClickable();
 

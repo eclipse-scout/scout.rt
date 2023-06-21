@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {objects, scout} from '@eclipse-scout/core';
+import {arrays, objects, scout} from '@eclipse-scout/core';
 import {AbstractSvgChartRenderer, Chart} from '../index';
 import $ from 'jquery';
 import {UpdateChartOptions} from './Chart';
@@ -60,7 +60,7 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
   protected _renderPercentage(value: number, total: number) {
     // arc segment
     let arcClass = 'fulfillment-chart',
-      color = this.chart.data.chartValueGroups[0].colorHexValue,
+      color = arrays.ensure(this.chart.data.chartValueGroups[0].colorHexValue)[0],
       chartGroupCss = this.chart.data.chartValueGroups[0].cssClass;
 
     if (this.chart.config.options.autoColor) {
@@ -142,7 +142,7 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
 
   protected _renderCirclePath(cssClass: string, id: string, radius: number): JQuery<SVGElement> {
     let chartGroupCss = this.chart.data.chartValueGroups[0].cssClass;
-    let color = this.chart.data.chartValueGroups[1].colorHexValue;
+    let color = arrays.ensure(this.chart.data.chartValueGroups[1].colorHexValue)[0];
 
     if (this.chart.config.options.autoColor) {
       cssClass += ' auto-color';

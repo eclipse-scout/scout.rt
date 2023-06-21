@@ -10,8 +10,8 @@
 import {AbstractChartRenderer, Chart, chartJsDateAdapter} from '../index';
 import {
   _adapters as chartJsAdapters, ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint,
-  FontSpec, LegendElement,
-  LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
+  FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle,
+  TooltipModel, TooltipOptions
 } from 'chart.js';
 import 'chart.js/auto'; // Import from auto to register charts
 import {arrays, colorSchemes, graphics, numbers, objects, Point, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
@@ -899,7 +899,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       legendColor, backgroundColor, borderColor, index;
     if (scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
       borderColor = dataset.borderColor;
-      legendColor = dataset.legendColor;
+      legendColor = Array.isArray(dataset.legendColor) ? dataset.legendColor[tooltipItem.dataIndex] : dataset.legendColor;
       index = tooltipItem.datasetIndex;
     }
     if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
@@ -1643,12 +1643,21 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     colors = $.extend(true, colors, this._computeDatasetColors(config, multipleColorsPerDataset));
 
     data.datasets.forEach((elem, idx) => {
-      let backgroundColor = (multipleColorsPerDataset ? colors.backgroundColors : colors.backgroundColors[idx]),
-        borderColor = (multipleColorsPerDataset ? colors.borderColors : colors.borderColors[idx]),
-        hoverBackgroundColor = (multipleColorsPerDataset ? colors.hoverBackgroundColors : colors.hoverBackgroundColors[idx]),
-        hoverBorderColor = (multipleColorsPerDataset ? colors.hoverBorderColors : colors.hoverBorderColors[idx]),
-        legendColor = (multipleColorsPerDataset ? colors.legendColors : colors.legendColors[idx]),
-        pointHoverBackgroundColor = (multipleColorsPerDataset ? colors.pointHoverColors : colors.legendColors[idx]);
+      const getColor = colorsArray => {
+        let candidate = colorsArray[idx];
+        if (multipleColorsPerDataset && !Array.isArray(candidate)) {
+          // we want multiple colors -> get the parent array
+          candidate = colorsArray;
+        }
+        return candidate;
+      };
+
+      let backgroundColor = getColor(colors.backgroundColors),
+        borderColor = getColor(colors.borderColors),
+        hoverBackgroundColor = getColor(colors.hoverBackgroundColors),
+        hoverBorderColor = getColor(colors.hoverBorderColors),
+        legendColor = getColor(colors.legendColors),
+        pointHoverBackgroundColor = getColor(colors.pointHoverColors);
 
       let setProperty = (identifier, value) => {
         if (typeof elem[identifier] === 'function') {
@@ -1669,13 +1678,19 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         setProperty('pointHoverBorderColor', this.firstOpaqueBackgroundColor);
       }
       if (checkable) {
-        let datasetLength = elem.data.length;
+        const datasetLength = elem.data.length,
+          ensureColorArray = color => {
+            if (Array.isArray(color)) {
+              return color;
+            }
+            return arrays.init(datasetLength, color);
+          };
         if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.BUBBLE, Chart.Type.SCATTER) || (type === Chart.Type.BAR && (elem.type || Chart.Type.BAR) === Chart.Type.BAR)) {
-          let uncheckedBackgroundColor = (multipleColorsPerDataset ? colors.backgroundColors : arrays.init(datasetLength, colors.backgroundColors[idx])),
-            uncheckedHoverBackgroundColor = (multipleColorsPerDataset ? colors.hoverBackgroundColors : arrays.init(datasetLength, colors.hoverBackgroundColors[idx])),
+          let uncheckedBackgroundColor = ensureColorArray(backgroundColor),
+            uncheckedHoverBackgroundColor = ensureColorArray(hoverBackgroundColor),
 
-            checkedBackgroundColor = (multipleColorsPerDataset ? colors.checkedBackgroundColors : arrays.init(datasetLength, colors.checkedBackgroundColors[idx])),
-            checkedHoverBackgroundColor = (multipleColorsPerDataset ? colors.checkedHoverBackgroundColors : arrays.init(datasetLength, colors.checkedHoverBackgroundColors[idx]));
+            checkedBackgroundColor = ensureColorArray(getColor(colors.checkedBackgroundColors)),
+            checkedHoverBackgroundColor = ensureColorArray(getColor(colors.checkedHoverBackgroundColors));
 
           setProperty('uncheckedBackgroundColor', uncheckedBackgroundColor);
           setProperty('uncheckedHoverBackgroundColor', uncheckedHoverBackgroundColor);
@@ -1685,10 +1700,12 @@ export class ChartJsRenderer extends AbstractChartRenderer {
           setProperty('backgroundColor', elem.uncheckedBackgroundColor);
           setProperty('hoverBackgroundColor', elem.uncheckedHoverBackgroundColor);
         } else if (scout.isOneOf(type, Chart.Type.LINE, Chart.Type.RADAR) || (type === Chart.Type.BAR && elem.type === Chart.Type.LINE)) {
-          let uncheckedPointBackgroundColor = arrays.init(datasetLength, pointHoverBackgroundColor),
-            uncheckedPointHoverBackgroundColor = arrays.init(datasetLength, pointHoverBackgroundColor),
-            checkedPointBackgroundColor = arrays.init(datasetLength, borderColor),
-            checkedPointHoverBackgroundColor = arrays.init(datasetLength, hoverBorderColor || borderColor);
+          let uncheckedPointBackgroundColor = ensureColorArray(pointHoverBackgroundColor),
+            uncheckedPointHoverBackgroundColor = ensureColorArray(pointHoverBackgroundColor),
+
+            checkedPointBackgroundColor = ensureColorArray(borderColor),
+            checkedPointHoverBackgroundColor = ensureColorArray(hoverBorderColor || borderColor);
+
           setProperty('uncheckedPointBackgroundColor', uncheckedPointBackgroundColor);
           setProperty('uncheckedPointHoverBackgroundColor', uncheckedPointHoverBackgroundColor);
           setProperty('checkedPointBackgroundColor', checkedPointBackgroundColor);
@@ -1838,9 +1855,6 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       };
 
     this.chart.data.chartValueGroups.forEach(elem => {
-      let rgbColor = styles.hexToRgb(elem.colorHexValue),
-        adjustColor = (opacity, darker) => this._adjustColorOpacity(styles.darkerColor(rgbColor, darker), opacity);
-
       let backgroundOpacity = 1,
         hoverBackgroundOpacity = 1,
         hoverBackgroundDarker = 0.1,
@@ -1884,17 +1898,45 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         hoverBackgroundDarker = 0;
       }
 
-      colors.backgroundColors.push(adjustColor((checkable || transparent) ? uncheckedBackgroundOpacity : backgroundOpacity, 0));
-      colors.borderColors.push(adjustColor(1, 0));
-      colors.hoverBackgroundColors.push(adjustColor((checkable || transparent) ? uncheckedHoverBackgroundOpacity : hoverBackgroundOpacity, (checkable || transparent) ? 0 : hoverBackgroundDarker));
-      colors.hoverBorderColors.push(adjustColor(1, hoverBorderDarker));
+      const backgroundColors = [],
+        borderColors = [],
+        hoverBackgroundColors = [],
+        hoverBorderColors = [],
+        checkedBackgroundColors = [],
+        checkedHoverBackgroundColors = [],
+        legendColors = [],
+        pointHoverColors = [];
 
-      colors.checkedBackgroundColors.push(adjustColor(checkedBackgroundOpacity, checkedBackgroundDarker));
-      colors.checkedHoverBackgroundColors.push(adjustColor(checkedHoverBackgroundOpacity, checkedHoverBackgroundDarker));
+      let colorHexValues = arrays.ensure(elem.colorHexValue);
 
-      colors.legendColors.push(adjustColor(1, 0));
+      const datasetLength = arrays.length(elem.values as any[]);
+      if (colorHexValues.length && colorHexValues.length < datasetLength) {
+        // repeat colors for the whole dataset
+        colorHexValues = arrays.init(datasetLength, null).map((elem, idx) => colorHexValues[idx % colorHexValues.length]);
+      }
 
-      colors.pointHoverColors.push(adjustColor(1, 0));
+      colorHexValues.forEach(colorHexValue => {
+        const rgbColor = styles.hexToRgb(colorHexValue),
+          adjustColor = (opacity, darker) => this._adjustColorOpacity(styles.darkerColor(rgbColor, darker), opacity);
+
+        backgroundColors.push(adjustColor((checkable || transparent) ? uncheckedBackgroundOpacity : backgroundOpacity, 0));
+        borderColors.push(adjustColor(1, 0));
+        hoverBackgroundColors.push(adjustColor((checkable || transparent) ? uncheckedHoverBackgroundOpacity : hoverBackgroundOpacity, (checkable || transparent) ? 0 : hoverBackgroundDarker));
+        hoverBorderColors.push(adjustColor(1, hoverBorderDarker));
+        checkedBackgroundColors.push(adjustColor(checkedBackgroundOpacity, checkedBackgroundDarker));
+        checkedHoverBackgroundColors.push(adjustColor(checkedHoverBackgroundOpacity, checkedHoverBackgroundDarker));
+        legendColors.push(adjustColor(1, 0));
+        pointHoverColors.push(adjustColor(1, 0));
+      });
+
+      colors.backgroundColors.push(backgroundColors);
+      colors.borderColors.push(borderColors);
+      colors.hoverBackgroundColors.push(hoverBackgroundColors);
+      colors.hoverBorderColors.push(hoverBorderColors);
+      colors.checkedBackgroundColors.push(checkedBackgroundColors);
+      colors.checkedHoverBackgroundColors.push(checkedHoverBackgroundColors);
+      colors.legendColors.push(legendColors);
+      colors.pointHoverColors.push(pointHoverColors);
     });
     colors.datalabelColor = this._computeDatalabelColor(type);
 
@@ -1985,7 +2027,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       let dataset = data.datasets[idx],
         legendColor, borderColor, backgroundColor;
       if (dataset && scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
-        legendColor = dataset.legendColor;
+        legendColor = arrays.ensure(dataset.legendColor)[0];
         borderColor = this._adjustColorOpacity(dataset.borderColor as string, 1);
       } else if (data.datasets.length && scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
         dataset = data.datasets[0];
@@ -2782,14 +2824,14 @@ export type TooltipLabelColorGenerator = (tooltipItem: TooltipItem<any>) => Tool
 export type TooltipRenderer = (context: { chart: ChartJs; tooltip: TooltipModel<any> }) => void;
 
 export type DatasetColors = {
-  backgroundColors?: string[];
-  borderColors?: string[];
-  hoverBackgroundColors?: string[];
-  hoverBorderColors?: string[];
-  checkedBackgroundColors?: string[];
-  checkedHoverBackgroundColors?: string[];
-  legendColors?: string[];
-  pointHoverColors?: string[];
+  backgroundColors?: (string | string[])[];
+  borderColors?: (string | string[])[];
+  hoverBackgroundColors?: (string | string[])[];
+  hoverBorderColors?: (string | string[])[];
+  checkedBackgroundColors?: (string | string[])[];
+  checkedHoverBackgroundColors?: (string | string[])[];
+  legendColors?: (string | string[])[];
+  pointHoverColors?: (string | string[])[];
   datalabelColor?: string;
 };
 
