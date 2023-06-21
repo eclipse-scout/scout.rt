@@ -1,13 +1,15 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+import {arrays} from '@eclipse-scout/core';
 
 export default class AbstractChartRenderer {
 
@@ -58,7 +60,7 @@ export default class AbstractChartRenderer {
         }
       }
       // color should have been set.
-      if (!this.chart.config.options.autoColor && !chartValueGroup.colorHexValue && !chartValueGroup.cssClass) {
+      if (!this.chart.config.options.autoColor && !arrays.ensure(chartValueGroup.colorHexValue).length && !chartValueGroup.cssClass) {
         return false;
       }
     }

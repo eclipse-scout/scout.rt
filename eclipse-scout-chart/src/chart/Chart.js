@@ -14,7 +14,9 @@ import $ from 'jquery';
 
 /**
  * @typedef ChartValueGroup
+ * @property {*[]} values
  * @property {string} type
+ * @property {string | string[]} colorHexValue
  */
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, strings} from '@eclipse-scout/core';
+import {arrays, objects, strings} from '@eclipse-scout/core';
 import {AbstractSvgChartRenderer} from '../index';
 import $ from 'jquery';
 
@@ -106,7 +106,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
         width: width,
         widthBottom: widthBottom,
         cssClass: 'salesfunnel-chart-bar',
-        fill: chartValueGroups[i].colorHexValue,
+        fill: arrays.ensure(chartValueGroups[i].colorHexValue)[0],
         label: chartValueGroups[i].groupName,
         clickObject: this._createClickObject(null, i)
       };
@@ -302,7 +302,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
         width: width,
         widthBottom: width,
         cssClass: 'salesfunnel-chart-bar',
-        fill: chartValueGroups[i].colorHexValue,
+        fill: arrays.ensure(chartValueGroups[i].colorHexValue)[0],
         label: chartValueGroups[i].groupName,
         clickObject: this._createClickObject(null, i)
       };
