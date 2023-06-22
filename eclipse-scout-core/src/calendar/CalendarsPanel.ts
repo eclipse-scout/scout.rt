@@ -31,7 +31,6 @@ export class CalendarsPanel extends Widget {
 class CalendarsPanelTree extends Tree {
   declare nodes: CalendarsPanelTreeNode[];
 
-
   constructor() {
     super();
 
