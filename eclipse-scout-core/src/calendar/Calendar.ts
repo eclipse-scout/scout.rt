@@ -782,6 +782,11 @@ export class Calendar extends Widget implements CalendarModel {
       timeChanged = false,
       selectedCalendarId = selectedDayColumn.data('calendarId');
 
+    // Check if date is valid
+    if (!selectedDate.valueOf()) {
+      return;
+    }
+
     if (withTime && (this.isDay() || this.isWeek() || this.isWorkWeek())) {
       let seconds = this._getSelectedSeconds(event);
       if (seconds < 60 * 60 * 24) {
