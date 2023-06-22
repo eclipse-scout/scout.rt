@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, GroupBox, Outline, Page, PageWithTable, scout, Table, Widget} from '../../../../src';
+import {arrays, Form, GroupBox, Outline, Page, PageWithTable, scout, Table, Widget} from '../../../../src';
 import {MenuSpecHelper, OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing';
 import {ChildModelOf} from '../../../../src/scout';
 
@@ -82,7 +82,14 @@ describe('Page', () => {
         menuHelper.createModel('EmptySpaceMenu'),
         menuHelper.createModel('SingleSelectionMenu', null, [Table.MenuType.SingleSelection]),
         menuHelper.createModel('MultiSelectionMenu', null, [Table.MenuType.MultiSelection]),
-        menuHelper.createModel('SingleMultiSelectionMenu', null, [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection])
+        menuHelper.createModel('SingleMultiSelectionMenu', null, [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection]),
+        {
+          ...menuHelper.createModel('SingleSelectionMenuWithChildMenus', null, [Table.MenuType.SingleSelection]),
+          childActions: [
+            menuHelper.createModel('ChildSingleSelectionMenu', null, [Table.MenuType.SingleSelection]),
+            menuHelper.createModel('ChildMultiSelectionMenu', null, [Table.MenuType.MultiSelection])
+          ]
+        }
       ]
     }, null);
     parentPage.createChildPage = row => scout.create(Page, {
@@ -111,32 +118,46 @@ describe('Page', () => {
     const detailTable = page.detailTable;
     const extractTextAndMenuTypes = m => ({
       text: m.text,
-      menuTypes: m.menuTypes
+      menuTypes: m.menuTypes,
+      childActions: arrays.ensure(m.childActions).map(child => extractTextAndMenuTypes(child))
     });
     const expectedParentTablePageMenus = [
       {
         text: 'SingleSelectionMenu',
-        menuTypes: []
+        menuTypes: [],
+        childActions: []
       }, {
         text: 'SingleMultiSelectionMenu',
-        menuTypes: []
+        menuTypes: [],
+        childActions: []
+      }, {
+        text: 'SingleSelectionMenuWithChildMenus',
+        menuTypes: [],
+        childActions: [{
+          text: 'ChildSingleSelectionMenu',
+          menuTypes: [],
+          childActions: []
+        }]
       }
     ];
 
     expect(detailFormRootGroupBox.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
       text: 'DetailFormMenu',
-      menuTypes: []
+      menuTypes: [],
+      childActions: []
     }]);
 
     expect(detailTable.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
       text: 'DetailTableSingleSelectionMenu',
-      menuTypes: [Table.MenuType.SingleSelection]
+      menuTypes: [Table.MenuType.SingleSelection],
+      childActions: []
     }]);
 
     detailTable.setMenus([menuHelper.createModel('DetailTableMultiSelectionMenu', null, [Table.MenuType.MultiSelection])]);
     expect(detailTable.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
       text: 'DetailTableMultiSelectionMenu',
-      menuTypes: [Table.MenuType.MultiSelection]
+      menuTypes: [Table.MenuType.MultiSelection],
+      childActions: []
     }]);
   });
 

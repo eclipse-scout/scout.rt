@@ -246,18 +246,7 @@ export class Page extends TreeNode implements PageModel {
     menuOwner.off('propertyChange:menus', this._menuOwnerMenusChangeHandler);
 
     const originalMenus = menuOwner.menus || [];
-    const parentTablePageMenus = this._computeParentTablePageMenus()
-      .map(menu => menu.clone(
-        {
-          parent: menuOwner,
-          menuTypes: [],
-          __parentTablePageMenu: true
-        },
-        {
-          delegateEventsToOriginal: ['action'],
-          delegateAllPropertiesToClone: true,
-          excludePropertiesToClone: ['menuTypes']
-        }));
+    const parentTablePageMenus = this._computeParentTablePageMenus(menuOwner);
 
     menuOwner.setMenus(parentTablePageMenus
       .concat(originalMenus
@@ -271,7 +260,7 @@ export class Page extends TreeNode implements PageModel {
     this._updateParentTablePageMenusForMenuOwner(event.source);
   }
 
-  protected _computeParentTablePageMenus(): Menu[] {
+  protected _computeParentTablePageMenus(newParent: Widget): Menu[] {
     if (!this.parentNode) {
       return [];
     }
@@ -283,8 +272,41 @@ export class Page extends TreeNode implements PageModel {
       return [];
     }
 
-    return menus.filter(table.menus, Table.MenuType.SingleSelection)
-      .filter(this._isMenuInheritedFromParentTablePage.bind(this));
+    return this._filterAndCloneParentTablePageMenus(table.menus, newParent);
+  }
+
+  protected _filterAndCloneParentTablePageMenus(tablePageMenus: Menu[], newParent: Widget): Menu[] {
+    return this._filterParentTablePageMenus(tablePageMenus)
+      .filter(this._isMenuInheritedFromParentTablePage.bind(this))
+      .map(menu => this._cloneParentTablePageMenu(menu, newParent));
+  }
+
+  protected _filterParentTablePageMenus(tablePageMenus: Menu[]): Menu[] {
+    return menus.filter(tablePageMenus, Table.MenuType.SingleSelection);
+  }
+
+  protected _cloneParentTablePageMenu(menu: Menu, newParent: Widget): Menu {
+    if (!menu) {
+      return null;
+    }
+
+    const clone = menu.clone(
+      {
+        parent: newParent,
+        menuTypes: [],
+        __parentTablePageMenu: true
+      },
+      {
+        delegateEventsToOriginal: ['action'],
+        delegateAllPropertiesToClone: true,
+        excludePropertiesToClone: ['menuTypes', 'childActions']
+      });
+
+    if (menu.childActions && menu.childActions.length) {
+      clone.setChildActions(this._filterAndCloneParentTablePageMenus(menu.childActions, clone));
+    }
+
+    return clone;
   }
 
   protected _isMenuInheritedFromParentTablePage(menu: Menu): boolean {
