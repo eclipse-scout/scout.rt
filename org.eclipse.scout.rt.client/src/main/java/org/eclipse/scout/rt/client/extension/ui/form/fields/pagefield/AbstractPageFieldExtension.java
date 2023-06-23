@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.AbstractGroupBoxExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.PageFieldChains.PageFieldPageChangedChain;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField;
 
@@ -17,5 +18,10 @@ public abstract class AbstractPageFieldExtension<T extends IPage, OWNER extends 
 
   public AbstractPageFieldExtension(OWNER owner) {
     super(owner);
+  }
+
+  @Override
+  public void execPageChanged(PageFieldPageChangedChain<T> chain, T oldPage, T newPage) {
+    chain.execPageChanged(oldPage, newPage);
   }
 }
