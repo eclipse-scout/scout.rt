@@ -59,6 +59,46 @@ describe('PropertyEventEmitter', () => {
     }
   }
 
+  class DimensionMultiPropertyAliasEventEmitter extends PropertyEventEmitter {
+
+    foo: boolean;
+    bar: boolean;
+
+    constructor() {
+      super();
+      this.foo = true;
+      this.bar = true;
+      this._addMultiDimensionalProperty('foo', true);
+      this._addMultiDimensionalProperty('bar', true);
+      this._addPropertyDimensionAlias('foo', 'fooDim', {dimension: 'dim'});
+      this._addPropertyDimensionAlias('bar', 'barDim', {dimension: 'dim'});
+    }
+
+    setFoo(foo: boolean) {
+      this.setProperty('foo', foo);
+    }
+
+    setFooDim(fooDim: boolean) {
+      this.setProperty('fooDim', fooDim);
+    }
+
+    get fooDim(): boolean {
+      return this.getProperty('fooDim');
+    }
+
+    setBar(bar: boolean) {
+      this.setProperty('bar', bar);
+    }
+
+    setBarDim(barDim: boolean) {
+      this.setProperty('barDim', barDim);
+    }
+
+    get barDim(): boolean {
+      return this.getProperty('barDim');
+    }
+  }
+
   describe('init', () => {
     describe('multidimensional property', () => {
       it('default dimension can be passed as boolean or object', () => {
@@ -137,6 +177,49 @@ describe('PropertyEventEmitter', () => {
         emitter.setProperty('alias', false);
         expect(emitter.getProperty('multiProp')).toBe(false);
         expect(emitter.getProperty('alias')).toBe(false);
+      });
+
+      it('updates the correct dimension if multiple properties use the same alias', () => {
+        let emitter = scout.create(DimensionMultiPropertyAliasEventEmitter);
+        expect(emitter.isMultiDimensionalProperty('foo')).toBe(true);
+        expect(emitter.isMultiDimensionalProperty('bar')).toBe(true);
+        expect(emitter.isPropertyDimensionAlias('fooDim')).toBe(true);
+        expect(emitter.isPropertyDimensionAlias('barDim')).toBe(true);
+
+        expect(emitter.getProperty('foo')).toBe(true);
+        expect(emitter.getProperty('fooDim')).toBe(true);
+        expect(emitter.getProperty('foo-dim')).toBe(true);
+        expect(emitter.foo).toBe(true);
+        expect(emitter.fooDim).toBe(true);
+        expect(emitter.getProperty('bar')).toBe(true);
+        expect(emitter.getProperty('barDim')).toBe(true);
+        expect(emitter.getProperty('bar-dim')).toBe(true);
+        expect(emitter.bar).toBe(true);
+        expect(emitter.barDim).toBe(true);
+
+        emitter.setBarDim(false);
+        expect(emitter.getProperty('foo')).toBe(true);
+        expect(emitter.getProperty('fooDim')).toBe(true);
+        expect(emitter.getProperty('foo-dim')).toBe(true);
+        expect(emitter.foo).toBe(true);
+        expect(emitter.fooDim).toBe(true);
+        expect(emitter.getProperty('bar')).toBe(false);
+        expect(emitter.getProperty('barDim')).toBe(false);
+        expect(emitter.getProperty('bar-dim')).toBe(false);
+        expect(emitter.bar).toBe(false);
+        expect(emitter.barDim).toBe(false);
+
+        emitter.setFoo(false);
+        expect(emitter.getProperty('foo')).toBe(false);
+        expect(emitter.getProperty('fooDim')).toBe(true);
+        expect(emitter.getProperty('foo-dim')).toBe(true);
+        expect(emitter.foo).toBe(false);
+        expect(emitter.fooDim).toBe(true);
+        expect(emitter.getProperty('bar')).toBe(false);
+        expect(emitter.getProperty('barDim')).toBe(false);
+        expect(emitter.getProperty('bar-dim')).toBe(false);
+        expect(emitter.bar).toBe(false);
+        expect(emitter.barDim).toBe(false);
       });
 
       it('supports inverted aliases', () => {
