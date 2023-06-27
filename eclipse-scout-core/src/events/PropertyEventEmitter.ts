@@ -416,7 +416,7 @@ export class PropertyEventEmitter extends EventEmitter {
     let changed = false;
     for (const [dimension, value] of Object.entries(dimensions)) {
       let internalPropertyName = propertyName + '-' + dimension;
-      let alias = this.getAliasForPropertyDimension(dimension);
+      let alias = this.getAliasForPropertyDimension(propertyName, dimension);
       if (alias) {
         internalPropertyName = alias;
       }
@@ -477,9 +477,9 @@ export class PropertyEventEmitter extends EventEmitter {
   /**
    * @returns the alias for a property dimension, if there is an alias registered for that dimension
    */
-  getAliasForPropertyDimension(dimension: string): string {
+  getAliasForPropertyDimension(propertyName: string, dimension: string): string {
     for (const [alias, config] of Object.entries(this._propertyDimensionAliases)) {
-      if (config.dimension === dimension) {
+      if (config.propertyName === propertyName && config.dimension === dimension) {
         return alias;
       }
     }
