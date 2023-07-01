@@ -34,6 +34,11 @@ public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {
   }
 
   @Override
+  protected String getConfiguredTextPlural() {
+    return TEXTS.get("CompanyTypes");
+  }
+
+  @Override
   public Long getId() {
     return ID;
   }

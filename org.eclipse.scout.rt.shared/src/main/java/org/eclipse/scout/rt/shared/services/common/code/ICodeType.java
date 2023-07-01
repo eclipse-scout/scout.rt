@@ -18,9 +18,9 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
  * Code types are dynamic enumerations used in front- and back-end. <br>
  * Values are cached on client and server.
  *
- * @param CODE_TYPE_ID
+ * @param <CODE_TYPE_ID>
  *          type of the codetype: see {@link #getId()}
- * @param CODE_ID
+ * @param <CODE_ID>
  *          type of the code: see {@link #getCode(Object)}
  */
 public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITypeWithClassId {
@@ -31,7 +31,15 @@ public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITy
 
   int getMaxLevel();
 
+  /**
+   * @return the name of the code type in singular form.
+   */
   String getText();
+
+  /**
+   * @return the name of the code type in plural form.
+   */
+  String getTextPlural();
 
   String getIconId();
 
@@ -69,9 +77,6 @@ public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITy
 
   /**
    * visits per default only the active codes
-   *
-   * @param visitor
-   * @return
    */
   <T extends ICode<CODE_ID>> boolean visit(ICodeVisitor<T> visitor);
 

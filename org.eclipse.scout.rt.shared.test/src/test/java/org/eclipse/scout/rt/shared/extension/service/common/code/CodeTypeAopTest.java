@@ -62,6 +62,11 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     }
 
     @Override
+    protected String getConfiguredTextPlural() {
+      return TEXTS.get("Countries");
+    }
+
+    @Override
     public Long getId() {
       return ID;
     }
@@ -161,9 +166,6 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param owner
-     */
     public CodeTypeExtension(CountryCodeType owner) {
       super(owner);
     }
@@ -171,7 +173,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
     @Override
     public List<? extends ICode<Long>> execCreateCodes(CodeTypeWithGenericCreateCodesChain chain) {
       execCreateCodesCounter.incrementAndGet();
-      AbstractCode<Long> burmaCode = new AbstractCode<Long>() {
+      AbstractCode<Long> burmaCode = new AbstractCode<>() {
         private static final long serialVersionUID = 1L;
 
         @Override
