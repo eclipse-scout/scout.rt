@@ -50,6 +50,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   private boolean m_initialized;
   private String m_text;
+  private String m_textPlural;
   private String m_iconId;
   private boolean m_hierarchy;
   private int m_maxLevel;
@@ -97,12 +98,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     }
   }
 
-  public AbstractCodeTypeWithGeneric(String label, boolean hierarchy) {
-    m_objectExtensions = new ObjectExtensions<>(this, true);
-    m_text = label;
-    m_hierarchy = hierarchy;
-  }
-
   protected final List<Class<? extends ICode>> getConfiguredCodes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(ConfigurationUtility.filterClasses(dca, ICode.class), ICode.class);
@@ -123,6 +118,12 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(40)
   protected String getConfiguredText() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(50)
+  protected String getConfiguredTextPlural() {
     return null;
   }
 
@@ -270,6 +271,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   protected void initConfig() {
     m_text = getConfiguredText();
+    m_textPlural = getConfiguredTextPlural();
     m_iconId = getConfiguredIconId();
     m_hierarchy = getConfiguredIsHierarchy();
     m_maxLevel = getConfiguredMaxLevel();
@@ -339,6 +341,11 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @Override
   public String getText() {
     return m_text;
+  }
+
+  @Override
+  public String getTextPlural() {
+    return m_textPlural;
   }
 
   @Override
@@ -577,7 +584,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   @Override
   public String toString() {
-    return "CodeType[id=" + getId() + ", label=" + getText() + "]";
+    return "CodeType[id=" + getId() + ", text=" + getText() + "]";
   }
 
   @Override

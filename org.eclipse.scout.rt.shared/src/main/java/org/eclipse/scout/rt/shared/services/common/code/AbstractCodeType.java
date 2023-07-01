@@ -20,19 +20,8 @@ public abstract class AbstractCodeType<CODE_TYPE_ID, CODE_ID> extends AbstractCo
     super();
   }
 
-  /**
-   * @param callInitializer
-   */
   public AbstractCodeType(boolean callInitializer) {
     super(callInitializer);
-  }
-
-  /**
-   * @param label
-   * @param hierarchy
-   */
-  public AbstractCodeType(String label, boolean hierarchy) {
-    super(label, hierarchy);
   }
 
   @Override
@@ -51,7 +40,5 @@ public abstract class AbstractCodeType<CODE_TYPE_ID, CODE_ID> extends AbstractCo
     public LocalCodeTypeExtension(OWNER owner) {
       super(owner);
     }
-
   }
-
 }

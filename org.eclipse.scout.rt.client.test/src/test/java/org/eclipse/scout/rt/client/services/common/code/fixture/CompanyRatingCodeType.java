@@ -35,6 +35,11 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
   }
 
   @Override
+  protected String getConfiguredTextPlural() {
+    return TEXTS.get("CompanyRatings");
+  }
+
+  @Override
   public Long getId() {
     return ID;
   }
