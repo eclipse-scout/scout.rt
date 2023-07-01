@@ -45,6 +45,11 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
     return TEXTS.get("YearToDate");
   }
 
+  @Override
+  protected String getConfiguredTextPlural() {
+    return TEXTS.get("YearToDate");
+  }
+
   @Order(-3)
   @ClassId("5767462c-fc9c-43b3-bb01-0f9ef708bab4")
   public static class ThreeYearsBeforeCode extends AbstractCode<Integer> {
