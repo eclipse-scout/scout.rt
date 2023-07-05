@@ -18,13 +18,19 @@ import java.util.List;
 public class DefaultFilesystemWebResourceRootContributor implements IFilesystemWebResourceRootContributor {
   @Override
   public List<Path> getRoots() {
-    return Collections.singletonList(findModuleRoot().resolve(AbstractWebResourceResolver.OUTPUT_FOLDER_NAME));
+    Path moduleRoot = findModuleRoot();
+    if (moduleRoot == null) {
+      return Collections.emptyList();
+    }
+    return Collections.singletonList(moduleRoot.resolve(AbstractWebResourceResolver.OUTPUT_FOLDER_NAME));
   }
 
-  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected static Path findModuleRoot() {
     Path workingDir = Paths.get("").toAbsolutePath();
     Path parentDir = workingDir.getParent();
+    if (parentDir == null) {
+      return null;
+    }
     String folderName = workingDir.getFileName().toString();
     String appModuleName = folderName;
     if (folderName.endsWith(".dev") || folderName.endsWith("-dev")) {
