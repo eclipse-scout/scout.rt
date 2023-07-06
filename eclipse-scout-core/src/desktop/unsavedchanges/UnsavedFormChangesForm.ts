@@ -71,7 +71,7 @@ export class UnsavedFormChangesForm extends Form implements UnsavedFormChangesFo
     let checkAllMenu = scout.create(Menu, {
       parent: this.openFormsField.table,
       id: 'CheckAllMenu',
-      menuTypes: [Table.MenuTypes.EmptySpace],
+      menuTypes: [Table.MenuType.EmptySpace],
       text: '${textKey:CheckAll}'
     });
 
@@ -80,7 +80,7 @@ export class UnsavedFormChangesForm extends Form implements UnsavedFormChangesFo
     let uncheckAllMenu = scout.create(Menu, {
       parent: this.openFormsField.table,
       id: 'UncheckAllMenu',
-      menuTypes: [Table.MenuTypes.EmptySpace],
+      menuTypes: [Table.MenuType.EmptySpace],
       text: '${textKey:UncheckAll}'
     });
 

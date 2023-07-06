@@ -51,7 +51,7 @@ describe('TableHeaderSpec', () => {
     table.setMenus([scout.create(Menu, { // fake header menu required to properly calculate visibility
       parent: table,
       text: 'Foo',
-      menuTypes: [Table.MenuTypes.Header]
+      menuTypes: [Table.MenuType.Header]
     })]);
     table.render();
 

@@ -51,7 +51,7 @@ export class TabBox extends CompositeField implements TabBoxModel {
     this._tabBoxHeaderPropertyChangeHandler = this._onTabBoxHeaderPropertyChange.bind(this);
   }
 
-  static MenuTypes = {
+  static MenuType = {
     /**
      * In most cases, it is not necessary to set this menu type for a tab box menu because it does not affect the
      * visibility of the menu unless the menu is used for widgets other than the tab box. In this case, the menu type can
@@ -59,6 +59,10 @@ export class TabBox extends CompositeField implements TabBoxModel {
      */
     Header: 'TabBox.Header'
   } as const;
+  /**
+   * @deprecated use {@link TabBox.MenuType} instead
+   */
+  static MenuTypes = TabBox.MenuType;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -318,4 +322,9 @@ export class TabBox extends CompositeField implements TabBoxModel {
   }
 }
 
+export type TabBoxMenuType = EnumObject<typeof TabBox.MenuType>;
+// noinspection JSDeprecatedSymbols
+/**
+ * @deprecated use {@link TabBoxMenuType} instead
+ */
 export type TabBoxMenuTypes = EnumObject<typeof TabBox.MenuTypes>;

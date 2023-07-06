@@ -119,11 +119,15 @@ export class TileGrid extends Widget implements TileGridModel {
     this.$fillAfter = null;
   }
 
-  static MenuTypes = {
+  static MenuType = {
     EmptySpace: 'TileGrid.EmptySpace',
     SingleSelection: 'TileGrid.SingleSelection',
     MultiSelection: 'TileGrid.MultiSelection'
   } as const;
+  /**
+   * @deprecated use {@link TileGrid.MenuType} instead
+   */
+  static MenuTypes = TileGrid.MenuType;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -1591,4 +1595,9 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 }
 
+export type TileGridMenuType = EnumObject<typeof TileGrid.MenuType>;
+// noinspection JSDeprecatedSymbols
+/**
+ * @deprecated use {@link TileGridMenuType} instead
+ */
 export type TileGridMenuTypes = EnumObject<typeof TileGrid.MenuTypes>;

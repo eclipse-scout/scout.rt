@@ -250,7 +250,7 @@ export class Table extends Widget implements TableModel {
 
   // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
 
-  static MenuTypes = {
+  static MenuType = {
     /**
      * The menu is always visible and displayed first in the {@link MenuBar}.
      * The menu won't be displayed in the context menu.
@@ -271,6 +271,10 @@ export class Table extends Widget implements TableModel {
      */
     Header: 'Table.Header'
   } as const;
+  /**
+   * @deprecated use {@link Table.MenuType} instead
+   */
+  static MenuTypes = Table.MenuType;
 
   static HierarchicalStyle = {
     DEFAULT: 'default',
@@ -5601,6 +5605,11 @@ export class Table extends Widget implements TableModel {
   }
 }
 
+export type TableMenuType = EnumObject<typeof Table.MenuType>;
+// noinspection JSDeprecatedSymbols
+/**
+ * @deprecated use {@link TableMenuType} instead
+ */
 export type TableMenuTypes = EnumObject<typeof Table.MenuTypes>;
 export type TableHierarchicalStyle = EnumObject<typeof Table.HierarchicalStyle>;
 export type TableCheckableStyle = EnumObject<typeof Table.CheckableStyle>;
