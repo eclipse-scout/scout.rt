@@ -251,7 +251,7 @@ function logWebpack(err, stats, statsConfig) {
     console.error(info.errors);
     process.exitCode = 1; // let the webpack build fail on errors
   }
-  if (stats.hasWarnings()) {
+  if (info.warnings && info.warnings.length > 0) {
     console.warn(info.warnings);
   }
   statsConfig = statsConfig || {};
