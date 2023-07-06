@@ -12,11 +12,11 @@ import $ from 'jquery';
 
 export interface AppendToTarget {
   id?: string;
-  root: boolean;
+  root?: boolean;
 }
 
 export interface InsertTarget {
-  id: string;
+  id?: string;
   root?: boolean;
   property?: string;
   before?: string;
@@ -26,13 +26,13 @@ export interface InsertTarget {
 }
 
 export interface AppendToAction {
-  operation: string; // 'appendTo'
+  operation: 'appendTo';
   target: AppendToTarget;
   extension: object;
 }
 
 export interface InsertAction {
-  operation: string; // 'insert'
+  operation: 'insert';
   target: InsertTarget;
   extension: object;
 }
@@ -41,7 +41,7 @@ export type ExtensionAction = AppendToAction | InsertAction;
 
 export interface ExtensionModel {
   id?: string;
-  type?: string; // 'extension'
+  type?: 'extension';
   extensions: ExtensionAction[];
 }
 
