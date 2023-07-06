@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {models} from '../../src/index';
+import {ExtensionModel, models} from '../../src/index';
 
 describe('scout.models', () => {
 
@@ -31,11 +31,11 @@ describe('scout.models', () => {
       models.init(model);
     });
 
-    it('load object without type possible', () => {
+    it('loads object without type possible', () => {
       expect(models._get('object', 'model')['value']).toBe('objectValue');
     });
 
-    it('ensure the object is a copy', () => {
+    it('ensures the object is a copy', () => {
       models._get('model', 'model')['value'] = 'changed';
       expect(models._get('model', 'model')['value']).toBe('modelValue');
     });
@@ -68,13 +68,11 @@ describe('scout.models', () => {
         }, {
           id: 'child4',
           value: 4
-        }
-
-        ]
+        }]
       }
     };
 
-    let newPropertyInRoot = {
+    let newPropertyInRoot: ExtensionModel = {
       extensions: [{
         operation: 'appendTo',
         target: {
@@ -86,7 +84,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let overridePropertyInRoot = {
+    let overridePropertyInRoot: ExtensionModel = {
       extensions: [{
         operation: 'appendTo',
         target: {
@@ -98,7 +96,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let overridePropertyInTree = {
+    let overridePropertyInTree: ExtensionModel = {
       extensions: [{
         operation: 'appendTo',
         target: {
@@ -110,7 +108,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let newObjectNoArrayInRoot = {
+    let newObjectNoArrayInRoot: ExtensionModel = {
       extensions: [{
         operation: 'insert',
         target: {
@@ -124,7 +122,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let newObjectInTree = {
+    let newObjectInTree: ExtensionModel = {
       extensions: [{
         operation: 'insert',
         target: {
@@ -138,7 +136,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let newObjectTreeInTree = {
+    let newObjectTreeInTree: ExtensionModel = {
       extensions: [{
         operation: 'insert',
         target: {
@@ -156,7 +154,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let newObjectInTreeIndexed = {
+    let newObjectInTreeIndexed: ExtensionModel = {
       extensions: [{
         operation: 'insert',
         target: {
@@ -171,7 +169,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let newObjectInTreeRelativeIndex = {
+    let newObjectInTreeRelativeIndex: ExtensionModel = {
       type: 'extension',
       extensions: [{
         operation: 'insert',
@@ -187,7 +185,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let newObjectInTreeRelativeIndexWithArray = {
+    let newObjectInTreeRelativeIndexWithArray: ExtensionModel = {
       type: 'extension',
       extensions: [{
         operation: 'insert',
@@ -206,7 +204,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let newObjectGroupWithTarget = {
+    let newObjectGroupWithTarget: ExtensionModel = {
       type: 'extension',
       extensions: [{
         operation: 'insert',
@@ -222,7 +220,7 @@ describe('scout.models', () => {
       }]
     };
 
-    let newObjectArrayGroupWithTarget = {
+    let newObjectArrayGroupWithTarget: ExtensionModel = {
       type: 'extension',
       extensions: [{
         operation: 'insert',
@@ -244,51 +242,61 @@ describe('scout.models', () => {
       parentObj = $.extend(true, {}, originalParent);
     });
 
-    it('insert new property into root object', () => {
+    it('inserts new property into root object', () => {
       models.extend(newPropertyInRoot, parentObj);
       expect(parentObj.newColor).toBe('green');
     });
+
     it('override property in root object', () => {
       models.extend(overridePropertyInRoot, parentObj);
       expect(parentObj.color).toBe('yellow');
     });
-    it('insert new property into a non existing array on root object', () => {
+
+    it('inserts new property into a non existing array on root object', () => {
       models.extend(newObjectNoArrayInRoot, parentObj);
       expect(parentObj.array[0].value).toBe('inserted into non existing Array');
     });
+
     it('override property in tree object', () => {
       models.extend(overridePropertyInTree, parentObj);
       expect(parentObj.rootContainer.children[1].value).toBe('property in tree overridden');
     });
-    it('insert new object into tree object', () => {
+
+    it('inserts new object into tree object', () => {
       models.extend(newObjectInTree, parentObj);
       expect(parentObj.rootContainer.children[1].children[1].value).toBe('new object in tree');
     });
-    it('insert new object tree into tree object', () => {
+
+    it('inserts new object tree into tree object', () => {
       models.extend(newObjectTreeInTree, parentObj);
       expect(parentObj.rootContainer.children[1].children[1].children[0].value).toBe('new object tree in tree');
     });
-    it('insert new object into tree object with fixed index', () => {
+
+    it('inserts new object into tree object with fixed index', () => {
       models.extend(newObjectInTreeIndexed, parentObj);
       expect(parentObj.rootContainer.children[1].children[0].value).toBe('fixed index insert');
     });
-    it('insert new object into tree object with relative index', () => {
+
+    it('inserts new object into tree object with relative index', () => {
       models.extend(newObjectInTreeRelativeIndex, parentObj);
       expect(parentObj.rootContainer.children[1].children[0].value).toBe('relative index insert');
     });
-    it('insert new object into tree object with relative index and two extension elements', () => {
+
+    it('inserts new object into tree object with relative index and two extension elements', () => {
       models.extend(newObjectInTreeRelativeIndexWithArray, parentObj);
       expect(parentObj.rootContainer.children[1].children[0].value).toBe('relative index insert');
       expect(parentObj.rootContainer.children[1].children[1].value).toBe('relative index insert2');
     });
-    it('insert object referenced by String', () => {
+
+    it('inserts object referenced by String', () => {
       let model = {};
       model['newObjectInTreeRelativeIndex'] = newObjectInTreeRelativeIndex;
       models.init(model);
       models.extend('newObjectInTreeRelativeIndex', parentObj);
       expect(parentObj.rootContainer.children[1].children[0].value).toBe('relative index insert');
     });
-    it('insert object bound to field', () => {
+
+    it('inserts object bound to field', () => {
       models.extend(newObjectGroupWithTarget, parentObj);
       expect(parentObj.rootContainer.children[1].children[0].groupedWith).toBe('child3');
 
@@ -298,10 +306,9 @@ describe('scout.models', () => {
       expect(parentObj.rootContainer.children[1].children[1].id).toBe('newObj2');
       expect(parentObj.rootContainer.children[1].children[2].id).toBe('newObjBound');
       expect(parentObj.rootContainer.children[1].children[3].id).toBe('child3');
-
     });
 
-    it('insert objects array bound to field', () => {
+    it('inserts objects array bound to field', () => {
       models.extend(newObjectArrayGroupWithTarget, parentObj);
       expect(parentObj.rootContainer.children[1].children[0].groupedWith).toBe('child3');
       expect(parentObj.rootContainer.children[1].children[1].groupedWith).toBe('child3');
@@ -313,9 +320,6 @@ describe('scout.models', () => {
       expect(parentObj.rootContainer.children[1].children[2].id).toBe('newObjBound');
       expect(parentObj.rootContainer.children[1].children[3].id).toBe('newObjBound2');
       expect(parentObj.rootContainer.children[1].children[4].id).toBe('child3');
-
     });
-
   });
-
 });
