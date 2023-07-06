@@ -490,14 +490,13 @@ function nvl(arg, defaultValue) {
 }
 
 function isWarningIgnored(devMode, webpackError) {
-  if (webpackError && webpackError.message === '[object Object]') {
-    return true; // esbuild warnings are not correctly passed to webpack. ignore them. The actual message is printed with the esbuild flag 'logLevel' (see below)
-  }
-
-  if (devMode || !webpackError || !webpackError.warning || !webpackError.warning.message) {
+  if (devMode || !webpackError) {
     return false;
   }
-  return webpackError.warning.message.startsWith('Failed to parse source map');
+  // Ignore warnings from esbuild minifier.
+  // One warning is 'Converting "require" to "esm" is currently not supported' which is not of interest.
+  // Others may be created by third party libs which are not of interest as well.
+  return webpackError.name === 'Warning';
 }
 
 /**
