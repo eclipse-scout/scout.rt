@@ -32,74 +32,70 @@
   color: @text-color;
   pointer-events: auto;
   font-weight: @font-weight-bold;
+  --no-icon-marker-color: @notification-info-border-color;
 
   &.alternative {
     border: 0;
+
+    & > .notification-icon.font-icon {
+      --icon-background-color: var(--no-icon-marker-color);
+    }
   }
 
   &.no-icon {
     padding: @notification-no-icon-padding-y 12px @notification-no-icon-padding-y 23px;
 
     &::before {
-      .notification-severity-marker(@notification-info-background-color, 9px);
+      .notification-severity-marker(var(--no-icon-marker-color), 9px);
     }
   }
 
   &.ok {
     border-color: @notification-ok-border-color;
     color: @ok-color;
+    --no-icon-marker-color: @notification-ok-border-color;
 
     &.alternative {
-      background-color: @notification-ok-background-color;
-    }
-
-    &.no-icon::before {
-      border-color: @notification-ok-border-color;
-      background-color: @notification-ok-border-color;
+      color: @notification-alternative-ok-color;
+      background-color: @notification-alternative-ok-background-color;
+      --no-icon-marker-color: @notification-alternative-ok-color;
     }
   }
 
   &.info {
     border-color: @notification-info-border-color;
     font-weight: @font-weight-normal;
+    --no-icon-marker-color: @notification-info-border-color;
 
     &.alternative {
-      color: @info-color;
+      color: @notification-alternative-info-color;
       font-weight: @font-weight-bold;
-      background-color: @notification-info-background-color;
-    }
-
-    &.no-icon::before {
-      border-color: @notification-info-border-color;
-      background-color: @notification-info-border-color;
+      background-color: @notification-alternative-info-background-color;
+      --no-icon-marker-color: @notification-alternative-info-color;
     }
   }
 
   &.warning {
     border-color: @notification-warning-border-color;
     color: @warning-color;
+    --no-icon-marker-color: @notification-warning-border-color;
 
     &.alternative {
-      background-color: @notification-warning-background-color;
-    }
-
-    &.no-icon::before {
-      border-color: @notification-warning-border-color;
-      background-color: @notification-warning-border-color;
+      color: @notification-alternative-warning-color;
+      background-color: @notification-alternative-warning-background-color;
+      --no-icon-marker-color: @notification-alternative-warning-color;
     }
   }
 
   &.error {
     border-color: @notification-error-border-color;
     color: @error-color;
+    --no-icon-marker-color: @notification-error-border-color;
 
     &.alternative {
-      background-color: @notification-error-background-color;
-    }
-
-    &.no-icon::before {
-      border-color: @notification-error-border-color;
-      background-color: @notification-error-border-color;
+      color: @notification-alternative-error-color;
+      background-color: @notification-alternative-error-background-color;
+      --no-icon-marker-color: @notification-alternative-error-color;
     }
   }
 
@@ -118,27 +114,28 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  --icon-background-color: @background-color;
 
   &.font-icon {
     color: @text-inverted-color;
-    background-color: @background-color;
+    background-color: var(--icon-background-color);
     font-size: 14px;
     border-radius: 50%;
 
     .ok > & {
-      background-color: @ok-color;
+      --icon-background-color: @ok-color;
     }
 
     .info > & {
-      background-color: @info-color;
+      --icon-background-color: @info-color;
     }
 
     .warning > & {
-      background-color: @warning-color;
+      --icon-background-color: @warning-color;
     }
 
     .error > & {
-      background-color: @error-color;
+      --icon-background-color: @error-color;
     }
   }
 }

@@ -309,13 +309,17 @@
 @desktop-navigation-background-color: @desktop-header-background-color;
 @desktop-navigation-body-background-color: @background-color;
 @desktop-navigation-color: @palette-gray-10;
-@notification-ok-background-color: @palette-green-0;
+@notification-alternative-ok-background-color: @palette-green-0;
+@notification-alternative-info-background-color: @accent-color-0;
+@notification-alternative-warning-background-color: @palette-orange-0;
+@notification-alternative-error-background-color: @palette-red-0;
+@notification-alternative-ok-color: darken(@ok-color, 3%); // Colors need to be a little darker on a background to make them accessible
+@notification-alternative-info-color: @info-color;
+@notification-alternative-warning-color: darken(@warning-color, 3%);
+@notification-alternative-error-color: darken(@error-color, 8%);
 @notification-ok-border-color: @ok-color;
-@notification-info-background-color: @accent-color-0;
 @notification-info-border-color: @info-color;
-@notification-warning-background-color: @palette-orange-0;
 @notification-warning-border-color: @warning-color;
-@notification-error-background-color: @palette-red-0;
 @notification-error-border-color: @error-color;
 @outline-breadcrumb-border-color: @border-color;
 @outline-breadcrumb-ancestor-background-color: @desktop-navigation-body-background-color;
