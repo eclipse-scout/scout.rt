@@ -50,7 +50,7 @@ export class Notification extends Widget implements NotificationModel {
   }
 
   protected override _render() {
-    this.$container = this.$parent.appendDiv('notification');
+    this.$container = this.$parent.appendDiv('notification alternative'); // Alternative is the new default.
     this.$content = this.$container.appendDiv('notification-content');
     this.$messageText = this.$content.appendDiv('notification-message');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
