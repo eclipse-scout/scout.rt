@@ -324,7 +324,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
 
   /** @internal */
   _onContextMenu(event: JQuery.ContextMenuEvent) {
-    this.parent._showContextMenu(event, Calendar.MenuTypes.CalendarComponent);
+    this.parent._showContextMenu(event, Calendar.MenuType.CalendarComponent);
   }
 
   protected _format(date: Date, pattern: string): string {

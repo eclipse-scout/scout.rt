@@ -129,12 +129,16 @@ export class Planner extends Widget implements PlannerModel {
 
   static RANGE_SELECTION_MOVE_THRESHOLD = 10;
 
-  static MenuTypes = {
+  static MenuType = {
     Activity: 'Planner.Activity',
     EmptySpace: 'Planner.EmptySpace',
     Range: 'Planner.Range',
     Resource: 'Planner.Resource'
   } as const;
+  /**
+   * @deprecated use {@link Planner.MenuType} instead
+   */
+  static MenuTypes = Planner.MenuType;
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
@@ -331,15 +335,15 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _onResourceTitleContextMenu(event: JQuery.ContextMenuEvent) {
-    this._showContextMenu(event, Planner.MenuTypes.Resource);
+    this._showContextMenu(event, Planner.MenuType.Resource);
   }
 
   protected _onRangeSelectorContextMenu(event: JQuery.ContextMenuEvent) {
-    this._showContextMenu(event, Planner.MenuTypes.Range);
+    this._showContextMenu(event, Planner.MenuType.Range);
   }
 
   protected _onActivityContextMenu(event: JQuery.ContextMenuEvent) {
-    this._showContextMenu(event, Planner.MenuTypes.Activity);
+    this._showContextMenu(event, Planner.MenuType.Activity);
   }
 
   protected _showContextMenu(event: JQuery.ContextMenuEvent, allowedType: string) {
@@ -1280,20 +1284,20 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _updateMenuBar() {
-    let menuItems = this._filterMenus([Planner.MenuTypes.EmptySpace, Planner.MenuTypes.Resource, Planner.MenuTypes.Activity, Planner.MenuTypes.Range], false, true);
+    let menuItems = this._filterMenus([Planner.MenuType.EmptySpace, Planner.MenuType.Resource, Planner.MenuType.Activity, Planner.MenuType.Range], false, true);
     this.menuBar.setMenuItems(menuItems);
   }
 
   protected _filterMenus(allowedTypes: string[], onlyVisible: boolean, enableDisableKeyStrokes?: boolean): Menu[] {
     allowedTypes = allowedTypes || [];
-    if (allowedTypes.indexOf(Planner.MenuTypes.Resource) > -1 && this.selectedResources.length === 0) {
-      arrays.remove(allowedTypes, Planner.MenuTypes.Resource);
+    if (allowedTypes.indexOf(Planner.MenuType.Resource) > -1 && this.selectedResources.length === 0) {
+      arrays.remove(allowedTypes, Planner.MenuType.Resource);
     }
-    if (allowedTypes.indexOf(Planner.MenuTypes.Activity) > -1 && !this.selectedActivity) {
-      arrays.remove(allowedTypes, Planner.MenuTypes.Activity);
+    if (allowedTypes.indexOf(Planner.MenuType.Activity) > -1 && !this.selectedActivity) {
+      arrays.remove(allowedTypes, Planner.MenuType.Activity);
     }
-    if (allowedTypes.indexOf(Planner.MenuTypes.Range) > -1 && !this.selectionRange.from && !this.selectionRange.to) {
-      arrays.remove(allowedTypes, Planner.MenuTypes.Range);
+    if (allowedTypes.indexOf(Planner.MenuType.Range) > -1 && !this.selectionRange.from && !this.selectionRange.to) {
+      arrays.remove(allowedTypes, Planner.MenuType.Range);
     }
     return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes});
   }
@@ -1665,6 +1669,11 @@ export class Planner extends Widget implements PlannerModel {
 export type PlannerDisplayMode = EnumObject<typeof Planner.DisplayMode>;
 export type PlannerDirection = EnumObject<typeof Planner.Direction>;
 export type PlannerSelectionMode = EnumObject<typeof Planner.SelectionMode>;
+export type PlannerMenuType = EnumObject<typeof Planner.MenuType>;
+// noinspection JSDeprecatedSymbols
+/**
+ * @deprecated use {@link PlannerMenuType} instead
+ */
 export type PlannerMenuTypes = EnumObject<typeof Planner.MenuTypes>;
 
 export interface PlannerActivity {

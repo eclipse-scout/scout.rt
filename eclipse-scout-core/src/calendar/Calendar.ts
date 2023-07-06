@@ -14,6 +14,11 @@ import {
 import $ from 'jquery';
 
 export type CalendarDisplayMode = EnumObject<typeof Calendar.DisplayMode>;
+export type CalendarMenuType = EnumObject<typeof Calendar.MenuType>;
+// noinspection JSDeprecatedSymbols
+/**
+ * @deprecated use {@link CalendarMenuType} instead
+ */
 export type CalendarMenuTypes = EnumObject<typeof Calendar.MenuTypes>;
 export type CalendarDirection = EnumObject<typeof Calendar.Direction>;
 export type CalendarMoveData = {
@@ -202,10 +207,14 @@ export class Calendar extends Widget implements CalendarModel {
     FORWARD: 1
   } as const;
 
-  static MenuTypes = {
+  static MenuType = {
     EmptySpace: 'Calendar.EmptySpace',
     CalendarComponent: 'Calendar.CalendarComponent'
   } as const;
+  /**
+   * @deprecated use {@link Calendar.MenuType} instead
+   */
+  static MenuTypes = Calendar.MenuType;
 
   isDay(): boolean {
     return this.displayMode === Calendar.DisplayMode.DAY;
@@ -1299,7 +1308,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _onDayContextMenu(event: JQuery.ContextMenuEvent) {
-    this._showContextMenu(event, Calendar.MenuTypes.EmptySpace);
+    this._showContextMenu(event, Calendar.MenuType.EmptySpace);
   }
 
   /** @internal */

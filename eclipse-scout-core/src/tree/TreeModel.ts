@@ -54,7 +54,7 @@ export interface TreeModel extends WidgetModel {
   /**
    * Configures the menus to be displayed in the {@link MenuBar} of the tree.
    *
-   * The visibility of the {@link Menu} and where it should appear depends on the used {@link Tree.MenuTypes} configured in {@link Menu.menuTypes}.
+   * The visibility of the {@link Menu} and where it should appear depends on the used {@link Tree.MenuType} configured in {@link Menu.menuTypes}.
    */
   menus?: ObjectOrChildModel<Menu>[];
   /**

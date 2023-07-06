@@ -755,8 +755,8 @@ describe('ValueField', () => {
     });
 
     it('context menu only shows menus of specific type', () => {
-      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ValueField.MenuTypes.Null, ValueField.MenuTypes.NotNull])),
-        menu2 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ValueField.MenuTypes.Null]));
+      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ValueField.MenuType.Null, ValueField.MenuType.NotNull])),
+        menu2 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ValueField.MenuType.Null]));
       formField.setMenus([menu1, menu2]);
       formField.render();
 

@@ -31,7 +31,7 @@ export class ImageField extends FormField implements ImageFieldModel {
   constructor() {
     super();
 
-    this.defaultMenuTypes = [...this.defaultMenuTypes, ImageField.MenuTypes.ImageUrl, ImageField.MenuTypes.Null];
+    this.defaultMenuTypes = [...this.defaultMenuTypes, ImageField.MenuType.ImageUrl, ImageField.MenuType.Null];
     this.autoFit = false;
     this.imageUrl = null;
     this.scrollBarEnabled = false;
@@ -42,10 +42,14 @@ export class ImageField extends FormField implements ImageFieldModel {
     this._clickHandler = null;
   }
 
-  static MenuTypes = {
+  static MenuType = {
     Null: 'ImageField.Null',
     ImageUrl: 'ImageField.ImageUrl'
   } as const;
+  /**
+   * @deprecated use {@link ImageField.MenuType} instead
+   */
+  static MenuTypes = ImageField.MenuType;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -210,9 +214,9 @@ export class ImageField extends FormField implements ImageFieldModel {
 
   protected override _getCurrentMenuTypes(): string[] {
     if (this.imageUrl) {
-      return [...super._getCurrentMenuTypes(), ImageField.MenuTypes.ImageUrl];
+      return [...super._getCurrentMenuTypes(), ImageField.MenuType.ImageUrl];
     }
-    return [...super._getCurrentMenuTypes(), ImageField.MenuTypes.Null];
+    return [...super._getCurrentMenuTypes(), ImageField.MenuType.Null];
   }
 
   /**
@@ -253,4 +257,9 @@ export class ImageField extends FormField implements ImageFieldModel {
   }
 }
 
+export type ImageFieldMenuType = EnumObject<typeof ImageField.MenuType>;
+// noinspection JSDeprecatedSymbols
+/**
+ * @deprecated use {@link ImageFieldMenuType} instead
+ */
 export type ImageFieldMenuTypes = EnumObject<typeof ImageField.MenuTypes>;

@@ -29,7 +29,7 @@ describe('MenuBar', () => {
 
   function createModel(text?: string, iconId?: string, menuTypes?: string[]): MenuModel {
     text = scout.nvl(text, 'Foo');
-    menuTypes = scout.nvl(menuTypes, [Table.MenuTypes.EmptySpace]);
+    menuTypes = scout.nvl(menuTypes, [Table.MenuType.EmptySpace]);
     return helper.createModel(text, iconId, menuTypes);
   }
 
@@ -52,8 +52,8 @@ describe('MenuBar', () => {
         menuBar = createMenuBar(),
         menus = [menu2, menu1];
 
-      menu1.setMenuTypes([Table.MenuTypes.EmptySpace, Table.MenuTypes.SingleSelection]);
-      menu2.setMenuTypes([Table.MenuTypes.SingleSelection]);
+      menu1.setMenuTypes([Table.MenuType.EmptySpace, Table.MenuType.SingleSelection]);
+      menu2.setMenuTypes([Table.MenuType.SingleSelection]);
 
       menuBar.render();
       menuBar.setMenuItems(menus);
@@ -71,8 +71,8 @@ describe('MenuBar', () => {
     it('must add/destroy dynamically created separators', () => {
       let separator,
         menu1 = helper.createMenu(createModel('empty')),
-        menu2 = helper.createMenu(createModel('selection-1', null, [Table.MenuTypes.SingleSelection])),
-        menu3 = helper.createMenu(createModel('selection-2', null, [Table.MenuTypes.SingleSelection])),
+        menu2 = helper.createMenu(createModel('selection-1', null, [Table.MenuType.SingleSelection])),
+        menu3 = helper.createMenu(createModel('selection-2', null, [Table.MenuType.SingleSelection])),
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
 
@@ -139,16 +139,16 @@ describe('MenuBar', () => {
 
     it('hides unnecessary explicit separator menus', () => {
       let menuModel = helper.createModel();
-      menuModel.menuTypes = [Table.MenuTypes.EmptySpace];
+      menuModel.menuTypes = [Table.MenuType.EmptySpace];
 
       let sep1a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1a', separator: true}));
       let sep1b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1b', separator: true}));
       let menu1 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu1', text: 'Menu 1 (L)'}));
       let sep12a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12a', separator: true}));
-      let sep12b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12b', separator: true, menuTypes: [Table.MenuTypes.SingleSelection]})); // <-- will generate an additional artificial separator menu
-      let menu2 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: [Table.MenuTypes.SingleSelection]}));
-      let sep2a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2a', separator: true, menuTypes: [Table.MenuTypes.SingleSelection]}));
-      let sep2b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2b', separator: true, menuTypes: [Table.MenuTypes.SingleSelection]}));
+      let sep12b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12b', separator: true, menuTypes: [Table.MenuType.SingleSelection]})); // <-- will generate an additional artificial separator menu
+      let menu2 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: [Table.MenuType.SingleSelection]}));
+      let sep2a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2a', separator: true, menuTypes: [Table.MenuType.SingleSelection]}));
+      let sep2b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2b', separator: true, menuTypes: [Table.MenuType.SingleSelection]}));
 
       let sep3a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3a', horizontalAlignment: 1, separator: true}));
       let sep3b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3b', horizontalAlignment: 1, separator: true}));
@@ -192,7 +192,7 @@ describe('MenuBar', () => {
     it('MenuBar must update tabbable when a menu item is focused', () => {
       // otherwise the menu item can not have the focus, because the DOM element is not focusable without a tabindex.
       let menuModel = helper.createModel();
-      menuModel.menuTypes = [Table.MenuTypes.EmptySpace];
+      menuModel.menuTypes = [Table.MenuType.EmptySpace];
 
       let menu1 = helper.createMenu($.extend({}, menuModel, {id: 'menu1', text: 'Menu 1'}));
       let menu2 = helper.createMenu($.extend({}, menuModel, {id: 'menu2', text: 'Menu 2'}));
