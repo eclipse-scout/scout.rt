@@ -908,7 +908,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
       // DetailContent can be null, or it is the tableRowDetail. Don't show menus on OutlineOverview.
       if (selectedPage.detailTable) {
         detailTable = selectedPage.detailTable;
-        menuItems = menuUtil.filter(detailTable.menus, [Table.MenuTypes.EmptySpace], {
+        menuItems = menuUtil.filter(detailTable.menus, [Table.MenuType.EmptySpace], {
           onlyVisible: false,
           enableDisableKeyStrokes: true,
           defaultMenuTypes: detailTable.defaultMenuTypes
@@ -921,7 +921,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
       let parentPage = selectedPage.parentNode;
       if (parentPage && parentPage.detailTable) {
         detailTable = parentPage.detailTable;
-        menuItems = menuItems.concat(menuUtil.filter(detailTable.menus, [Table.MenuTypes.SingleSelection], {
+        menuItems = menuItems.concat(menuUtil.filter(detailTable.menus, [Table.MenuType.SingleSelection], {
           onlyVisible: false,
           enableDisableKeyStrokes: true,
           defaultMenuTypes: detailTable.defaultMenuTypes
@@ -1185,7 +1185,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this.updateKeyStrokes(menus, oldMenus);
     this._setProperty('menus', menus);
     if (this.titleMenuBar) { // _setMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
-      let menuItems = menuUtil.filter(this.menus, [Tree.MenuTypes.Header], {defaultMenuTypes: this.defaultMenuTypes});
+      let menuItems = menuUtil.filter(this.menus, [Tree.MenuType.Header], {defaultMenuTypes: this.defaultMenuTypes});
       this.titleMenuBar.setMenuItems(menuItems);
     }
   }

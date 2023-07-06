@@ -232,7 +232,7 @@ export class Table extends Widget implements TableModel {
     this.textFilterEnabled = true;
     this.filterSupport = this._createFilterSupport();
     this.filteredElementsDirty = false;
-    this.defaultMenuTypes = [Table.MenuTypes.EmptySpace];
+    this.defaultMenuTypes = [Table.MenuType.EmptySpace];
 
     this._doubleClickSupport = new DoubleClickSupport();
     this._permanentHeadSortColumns = [];
@@ -254,7 +254,7 @@ export class Table extends Widget implements TableModel {
 
   // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
 
-  static MenuTypes = {
+  static MenuType = {
     /**
      * The menu is always visible and displayed first in the {@link MenuBar}.
      * The menu won't be displayed in the context menu.
@@ -5658,7 +5658,7 @@ export class Table extends Widget implements TableModel {
   }
 }
 
-export type TableMenuTypes = EnumObject<typeof Table.MenuTypes>;
+export type TableMenuType = EnumObject<typeof Table.MenuType>;
 export type TableHierarchicalStyle = EnumObject<typeof Table.HierarchicalStyle>;
 export type TableCheckableStyle = EnumObject<typeof Table.CheckableStyle>;
 export type TableGroupingStyle = EnumObject<typeof Table.GroupingStyle>;

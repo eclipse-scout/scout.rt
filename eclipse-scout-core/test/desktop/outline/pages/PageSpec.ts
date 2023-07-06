@@ -80,16 +80,16 @@ describe('Page', () => {
       objectType: Table,
       menus: [
         menuHelper.createModel('EmptySpaceMenu'),
-        menuHelper.createModel('SingleSelectionMenu', null, [Table.MenuTypes.SingleSelection]),
-        menuHelper.createModel('MultiSelectionMenu', null, [Table.MenuTypes.MultiSelection]),
-        menuHelper.createModel('SingleMultiSelectionMenu', null, [Table.MenuTypes.SingleSelection, Table.MenuTypes.MultiSelection])
+        menuHelper.createModel('SingleSelectionMenu', null, [Table.MenuType.SingleSelection]),
+        menuHelper.createModel('MultiSelectionMenu', null, [Table.MenuType.MultiSelection]),
+        menuHelper.createModel('SingleMultiSelectionMenu', null, [Table.MenuType.SingleSelection, Table.MenuType.MultiSelection])
       ]
     }, null);
     parentPage.createChildPage = row => scout.create(Page, {
       parent: outline,
       detailTable: {
         objectType: Table,
-        menus: [menuHelper.createModel('DetailTableSingleSelectionMenu', null, [Table.MenuTypes.SingleSelection])]
+        menus: [menuHelper.createModel('DetailTableSingleSelectionMenu', null, [Table.MenuType.SingleSelection])]
       },
       detailForm: {
         objectType: Form,
@@ -130,13 +130,13 @@ describe('Page', () => {
 
     expect(detailTable.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
       text: 'DetailTableSingleSelectionMenu',
-      menuTypes: [Table.MenuTypes.SingleSelection]
+      menuTypes: [Table.MenuType.SingleSelection]
     }]);
 
-    detailTable.setMenus([menuHelper.createModel('DetailTableMultiSelectionMenu', null, [Table.MenuTypes.MultiSelection])]);
+    detailTable.setMenus([menuHelper.createModel('DetailTableMultiSelectionMenu', null, [Table.MenuType.MultiSelection])]);
     expect(detailTable.menus.map(extractTextAndMenuTypes)).toEqual([...expectedParentTablePageMenus, {
       text: 'DetailTableMultiSelectionMenu',
-      menuTypes: [Table.MenuTypes.MultiSelection]
+      menuTypes: [Table.MenuType.MultiSelection]
     }]);
   });
 

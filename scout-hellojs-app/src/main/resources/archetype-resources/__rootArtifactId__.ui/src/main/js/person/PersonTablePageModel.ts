@@ -53,7 +53,7 @@ export default (): PageWithTableModel => ({
         objectType: Menu,
         text: '${symbol_dollar}{textKey:EditPerson}',
         iconId: icons.PENCIL,
-        menuTypes: [Table.MenuTypes.SingleSelection]
+        menuTypes: [Table.MenuType.SingleSelection]
       },
       {
         id: 'CreatePersonMenu',
@@ -67,7 +67,7 @@ export default (): PageWithTableModel => ({
         text: '${symbol_dollar}{textKey:DeletePerson}',
         iconId: icons.REMOVE,
         menuTypes: [
-          Table.MenuTypes.SingleSelection
+          Table.MenuType.SingleSelection
         ]
       }
     ],

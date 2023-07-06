@@ -14,7 +14,7 @@ import {
 import $ from 'jquery';
 
 export type CalendarDisplayMode = EnumObject<typeof Calendar.DisplayMode>;
-export type CalendarMenuTypes = EnumObject<typeof Calendar.MenuTypes>;
+export type CalendarMenuType = EnumObject<typeof Calendar.MenuType>;
 export type CalendarDirection = EnumObject<typeof Calendar.Direction>;
 export type CalendarMoveData = {
   event?: JQuery.MouseEventBase;
@@ -147,7 +147,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.viewRange = null;
     this.calendarToggleListWidth = 270;
     this.calendarToggleYearWidth = 215;
-    this.defaultMenuTypes = [Calendar.MenuTypes.EmptySpace];
+    this.defaultMenuTypes = [Calendar.MenuType.EmptySpace];
 
     // main elements
     this.$container = null;
@@ -204,7 +204,7 @@ export class Calendar extends Widget implements CalendarModel {
     FORWARD: 1
   } as const;
 
-  static MenuTypes = {
+  static MenuType = {
     EmptySpace: 'Calendar.EmptySpace',
     CalendarComponent: 'Calendar.CalendarComponent'
   } as const;
@@ -1301,7 +1301,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _onDayContextMenu(event: JQuery.ContextMenuEvent) {
-    this._showContextMenu(event, Calendar.MenuTypes.EmptySpace);
+    this._showContextMenu(event, Calendar.MenuType.EmptySpace);
   }
 
   /** @internal */

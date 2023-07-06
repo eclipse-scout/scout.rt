@@ -34,7 +34,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   constructor() {
     super();
 
-    this.defaultMenuTypes = [...this.defaultMenuTypes, ValueField.MenuTypes.NotNull, ValueField.MenuTypes.Null];
+    this.defaultMenuTypes = [...this.defaultMenuTypes, ValueField.MenuType.NotNull, ValueField.MenuType.Null];
     this.clearable = ValueField.Clearable.FOCUSED;
     this.displayText = null;
     this.formatter = this._formatValue.bind(this);
@@ -66,7 +66,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     NEVER: 'never'
   } as const;
 
-  static MenuTypes = {
+  static MenuType = {
     Null: 'ValueField.Null',
     NotNull: 'ValueField.NotNull'
   } as const;
@@ -423,9 +423,9 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
 
   protected override _getCurrentMenuTypes(): string[] {
     if (objects.isNullOrUndefined(this.value)) {
-      return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.Null];
+      return [...super._getCurrentMenuTypes(), ValueField.MenuType.Null];
     }
-    return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.NotNull];
+    return [...super._getCurrentMenuTypes(), ValueField.MenuType.NotNull];
   }
 
   /**
@@ -697,7 +697,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
 }
 
 export type ValueFieldClearable = EnumObject<typeof ValueField.Clearable>;
-export type ValueFieldMenuTypes = EnumObject<typeof ValueField.MenuTypes>;
+export type ValueFieldMenuType = EnumObject<typeof ValueField.MenuType>;
 export type ValueFieldValidator<TValue> = (value: TValue, defaultValidator?: ValueFieldValidator<TValue>) => TValue;
 export type ValueFieldFormatter<TValue> = (value: TValue, defaultFormatter?: ValueFieldFormatter<TValue>) => string | JQuery.Promise<string>;
 export type ValueFieldParser<TValue> = (displayText: string, defaultParser?: ValueFieldParser<TValue>) => TValue;

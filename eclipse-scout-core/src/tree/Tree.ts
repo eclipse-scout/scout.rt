@@ -170,7 +170,7 @@ export class Tree extends Widget implements TreeModel {
     this.$data = null;
     this._scrollDirections = 'both';
     this.requestFocusOnNodeControlMouseDown = true;
-    this.defaultMenuTypes = [Tree.MenuTypes.EmptySpace];
+    this.defaultMenuTypes = [Tree.MenuType.EmptySpace];
     this._$mouseDownNode = null;
   }
 
@@ -190,7 +190,7 @@ export class Tree extends Widget implements TreeModel {
     CHECKBOX_TREE_NODE: 'checkbox_tree_node'
   } as const;
 
-  static MenuTypes = {
+  static MenuType = {
     EmptySpace: 'Tree.EmptySpace',
     SingleSelection: 'Tree.SingleSelection',
     MultiSelection: 'Tree.MultiSelection',
@@ -3371,7 +3371,7 @@ export class Tree extends Widget implements TreeModel {
 
 export type TreeDisplayStyle = EnumObject<typeof Tree.DisplayStyle>;
 export type TreeCheckableStyle = EnumObject<typeof Tree.CheckableStyle>;
-export type TreeMenuTypes = EnumObject<typeof Tree.MenuTypes>;
+export type TreeMenuType = EnumObject<typeof Tree.MenuType>;
 export type TreeNodeExpandOptions = {
   /**
    * Default is derived from {@link TreeNode.expandedLazy} and {@link TreeNode.lazyExpandingEnabled} if the node is expanded and false otherwise.
