@@ -14,8 +14,14 @@ export type Predicate<T> = (obj: T) => boolean;
 
 export type Comparator<T> = (a: T, b: T) => number;
 
-export type Optional<TObject, TKey extends keyof TObject> = Partial<Pick<TObject, TKey>> & Omit<TObject, TKey>;
+/**
+ * Makes some properties in TObject optional.
+ */
+export type SomePartial<TObject, TKey extends keyof TObject> = Partial<Pick<TObject, TKey>> & Omit<TObject, TKey>;
 
+/**
+ * Makes some properties in TObject required.
+ */
 export type SomeRequired<TObject, TKey extends keyof TObject> = Required<Pick<TObject, TKey>> & TObject;
 
 export type EnumObject<T> = T[keyof T];
@@ -24,14 +30,20 @@ export type EmptyObject = Record<string, never>;
 
 export type Primitive = number | string | boolean | symbol | bigint;
 
-export type Closeable = { close(): void };
+export interface Closeable {
+  close(): void;
+}
 
 export type CloseableWidget = Widget & Closeable;
 
-export type Copyable = { copy(): void };
+export interface Copyable {
+  copy(): void;
+}
 
 export type CopyableWidget = Widget & Copyable;
 
-export type Abortable = Closeable & { abort(): void };
+export interface Abortable {
+  abort(): void;
+}
 
 export type AbortableWidget = Widget & Abortable;

@@ -7,14 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbortableWidget, CloseKeyStroke, KeystrokeRenderAreaProvider} from '../index';
+import {Abortable, CloseableWidget, CloseKeyStroke, KeystrokeRenderAreaProvider} from '../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class AbortKeyStroke extends CloseKeyStroke {
 
-  declare field: AbortableWidget;
+  declare field: CloseableWidget & Abortable;
 
-  constructor(field: AbortableWidget, $drawingArea: KeystrokeRenderAreaProvider) {
+  constructor(field: CloseableWidget & Abortable, $drawingArea: KeystrokeRenderAreaProvider) {
     super(field, $drawingArea);
   }
 
