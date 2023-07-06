@@ -283,7 +283,7 @@ export class Page extends TreeNode implements PageModel {
       return [];
     }
 
-    return menus.filter(table.menus, Table.MenuTypes.SingleSelection)
+    return menus.filter(table.menus, Table.MenuType.SingleSelection)
       .filter(this._isMenuInheritedFromParentTablePage.bind(this));
   }
 

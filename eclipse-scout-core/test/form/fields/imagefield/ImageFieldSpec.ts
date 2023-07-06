@@ -41,8 +41,8 @@ describe('ImageField', () => {
     });
 
     it('context menu only shows menus of specific type', () => {
-      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ImageField.MenuTypes.Null, ImageField.MenuTypes.ImageUrl])),
-        menu2 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ImageField.MenuTypes.Null]));
+      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ImageField.MenuType.Null, ImageField.MenuType.ImageUrl])),
+        menu2 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ImageField.MenuType.Null]));
       imageField.setMenus([menu1, menu2]);
       imageField.render();
 

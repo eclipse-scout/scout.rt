@@ -110,7 +110,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this.createTextFilter = null;
     this.updateTextFilterText = null;
 
-    this.defaultMenuTypes = [TileGrid.MenuTypes.EmptySpace];
+    this.defaultMenuTypes = [TileGrid.MenuType.EmptySpace];
 
     this._filterMenusHandler = this._filterMenus.bind(this);
     this._renderViewPortAfterAttach = false;
@@ -122,7 +122,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this.$fillAfter = null;
   }
 
-  static MenuTypes = {
+  static MenuType = {
     EmptySpace: 'TileGrid.EmptySpace',
     SingleSelection: 'TileGrid.SingleSelection',
     MultiSelection: 'TileGrid.MultiSelection'
@@ -1594,4 +1594,4 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 }
 
-export type TileGridMenuTypes = EnumObject<typeof TileGrid.MenuTypes>;
+export type TileGridMenuType = EnumObject<typeof TileGrid.MenuType>;

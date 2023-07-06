@@ -28,7 +28,7 @@ describe('MenuItemsOrder', () => {
     setFixtures(sandbox());
     session = sandboxSession();
     menuHelper = new MenuSpecHelper(session);
-    menuItemsOrder = new SpecMenuItemsOrder(session, 'Table', [Table.MenuTypes.EmptySpace]);
+    menuItemsOrder = new SpecMenuItemsOrder(session, 'Table', [Table.MenuType.EmptySpace]);
     let nullWidget = new NullWidget();
     nullWidget.session = session;
     // @ts-expect-error
@@ -57,11 +57,11 @@ describe('MenuItemsOrder', () => {
 
   it('order', () => {
     let emptySpaceImplicit = menuHelper.createMenu(),
-      emptySpace = menuHelper.createMenu({menuTypes: [Table.MenuTypes.EmptySpace]}),
-      singleSelection = menuHelper.createMenu({menuTypes: [Table.MenuTypes.SingleSelection]}),
-      multiSelection = menuHelper.createMenu({menuTypes: [Table.MenuTypes.MultiSelection]}),
-      header1 = menuHelper.createMenu({menuTypes: [Table.MenuTypes.Header]}),
-      header2 = menuHelper.createMenu({menuTypes: [Table.MenuTypes.Header]}),
+      emptySpace = menuHelper.createMenu({menuTypes: [Table.MenuType.EmptySpace]}),
+      singleSelection = menuHelper.createMenu({menuTypes: [Table.MenuType.SingleSelection]}),
+      multiSelection = menuHelper.createMenu({menuTypes: [Table.MenuType.MultiSelection]}),
+      header1 = menuHelper.createMenu({menuTypes: [Table.MenuType.Header]}),
+      header2 = menuHelper.createMenu({menuTypes: [Table.MenuType.Header]}),
       separator = menuItemsOrder._createSeparator();
 
     menuItemsOrder._createSeparator = () => separator;

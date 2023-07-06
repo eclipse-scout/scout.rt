@@ -210,7 +210,7 @@ describe('Outline', () => {
       let node0 = outline.nodes[0];
       node0.detailTable.setMenus([
         menuHelper.createMenu({
-          menuTypes: [Table.MenuTypes.SingleSelection]
+          menuTypes: [Table.MenuType.SingleSelection]
         }), menuHelper.createMenu()
       ]);
       expect(outline.detailMenuBarVisible).toBe(false);
@@ -228,7 +228,7 @@ describe('Outline', () => {
       let node0 = outline.nodes[0];
       node0.detailTable.setMenus([
         menuHelper.createMenu({
-          menuTypes: [Table.MenuTypes.SingleSelection]
+          menuTypes: [Table.MenuType.SingleSelection]
         }), menuHelper.createMenu()
       ]);
       expect(outline.detailMenuBarVisible).toBe(false);
@@ -325,10 +325,10 @@ describe('Outline', () => {
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
       let singleSelectionMenu = menuHelper.createMenu({
-        menuTypes: [Table.MenuTypes.SingleSelection]
+        menuTypes: [Table.MenuType.SingleSelection]
       });
       let singleSelectionMenu2 = menuHelper.createMenu({
-        menuTypes: [Table.MenuTypes.SingleSelection]
+        menuTypes: [Table.MenuType.SingleSelection]
       });
       node0.detailTable.setMenus([singleSelectionMenu, singleSelectionMenu2]);
       expect(outline.detailMenuBar.menuItems.length).toBe(2);
