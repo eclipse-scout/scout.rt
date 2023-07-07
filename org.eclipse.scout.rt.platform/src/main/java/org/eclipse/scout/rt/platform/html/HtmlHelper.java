@@ -26,8 +26,8 @@ public class HtmlHelper {
   private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</table>|</li>|</head>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_SPACE_END_TAGS = Pattern.compile("</td>|</th>", Pattern.CASE_INSENSITIVE);
   private static final Pattern HTML_TAGS = Pattern.compile("<[^>]+>", Pattern.DOTALL);
-  private static final Pattern HTML_SCRIPTS = Pattern.compile("(?<=<script>).*?(?=<\\/script>)", Pattern.CASE_INSENSITIVE);
-  private static final Pattern HTML_STYLES = Pattern.compile("(?<=<style>).*?(?=<\\/style>)", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_SCRIPTS = Pattern.compile("<script\\b[^<]*(?:(?!</script>)<[^<]*)*</script>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_STYLES = Pattern.compile("<style\\b[^<]*(?:(?!</style>)<[^<]*)*</style>", Pattern.CASE_INSENSITIVE);
   private static final Pattern MULTIPLE_SPACES = Pattern.compile("[ ]+");
   private static final Pattern SPACES_ADJACENT_LINEBREAKS = Pattern.compile("[ ]+\n[ ]?|[ ]?\n[ ]+");
   private static final Pattern DECIMAL_NCR = Pattern.compile("&#(\\d+);");

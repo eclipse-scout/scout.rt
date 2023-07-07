@@ -34,12 +34,28 @@ describe('PlainTextEncoder', () => {
   });
 
   it('removes style and script tags', () => {
-    let htmlText = '<style>p{color: #26b72b;}</style>'
+    let htmlText = '<h1>Lorem ipsum dolor</h1>\n'
+      + '<style>\n'
+      + 'p {\n'
+      + '  color: #26b72b;\n'
+      + '}\n'
+      + '</style>'
       + '<p style="color: blue">Donec mattis metus lorem. Aenean posuere tincidunt enim.</p>'
-      + '<script>alert(\'Hello World\');</script>'
-      + '<p style="color: green">Pellentesque eu euismod eros, in ullamcorper erat.</p>';
+      + '<script>alert(\'Hello World!\');</script>'
+      + '<p style="color: green">Pellentesque eu euismod eros, '
+      + '<script>alert(\'Hello World 2!\');</script><script>alert(\'Hello World 3!\');</script>'
+      + '<script type=\'text/javascript\'>\n'
+      + '  document.write(123);\n'
+      + '</script>'
+      + '<style media=\'print\'>\n'
+      + 'p {\n'
+      + '  color: #26b72b;\n'
+      + '}\n'
+      + '</style>'
+      + 'in ullamcorper erat.</p>';
 
-    expect(encoder.encode(htmlText)).toBe('Donec mattis metus lorem. Aenean posuere tincidunt enim.\n' +
+    expect(encoder.encode(htmlText)).toBe('Lorem ipsum dolor\n' +
+      'Donec mattis metus lorem. Aenean posuere tincidunt enim.\n' +
       'Pellentesque eu euismod eros, in ullamcorper erat.\n');
   });
 
