@@ -13,6 +13,6 @@ export class TileGridGridConfig extends LogicalGridConfig {
   declare widget: TileGrid;
 
   override getGridWidgets(): LogicalGridWidget[] {
-    return this.widget.filteredTiles;
+    return this.widget.getFilteredTilesWithPlaceholders();
   }
 }

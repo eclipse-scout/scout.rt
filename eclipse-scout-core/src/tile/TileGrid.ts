@@ -21,21 +21,20 @@ import $ from 'jquery';
  */
 const TILE_SELECTOR = '> .tile';
 
-export class TileGrid extends Widget implements TileGridModel {
+export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileGridModel {
   declare model: TileGridModel;
   declare eventMap: TileGridEventMap;
-  declare self: TileGrid;
+  declare self: TileGrid<TTile>;
   declare logicalGrid: AbstractGrid;
 
   animateTileRemoval: boolean;
   animateTileInsertion: boolean;
-  comparator: Comparator<Tile>;
+  comparator: Comparator<TTile>;
   contextMenu: ContextMenuPopup;
   empty: boolean;
-  filters: Filter<Tile>[];
-  filteredTiles: Tile[];
+  filters: Filter<TTile>[];
   filteredElementsDirty: boolean;
-  focusedTile: Tile;
+  focusedTile: TTile;
   // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
   gridColumnCount: number;
   prefGridColumnCount: number;
@@ -44,12 +43,11 @@ export class TileGrid extends Widget implements TileGridModel {
   multiSelect: boolean;
   renderAnimationEnabled: boolean;
   selectable: boolean;
-  selectedTiles: Tile[];
+  selectedTiles: TTile[];
   selectionHandler: TileGridSelectionHandler;
   scrollable: boolean;
   startupAnimationDone: boolean;
   startupAnimationEnabled: boolean;
-  tiles: Tile[];
   tileRemovalPendingCount: number;
   viewRangeSize: number;
   viewRangeRendered: Range;
@@ -58,13 +56,15 @@ export class TileGrid extends Widget implements TileGridModel {
   withPlaceholders: boolean;
   placeholderProducer: () => ObjectOrModel<PlaceholderTile>;
   textFilterEnabled: boolean;
-  filterSupport: FilterSupport<Tile>;
-  createTextFilter: () => TextFilter<Tile>;
+  filterSupport: FilterSupport<TTile>;
+  createTextFilter: () => TextFilter<TTile>;
   updateTextFilterText: string;
   defaultMenuTypes: string[];
   $filterFieldContainer: JQuery;
   $fillBefore: JQuery;
   $fillAfter: JQuery;
+  protected _tiles: (TTile | PlaceholderTile)[];
+  protected _filteredTiles: (TTile | PlaceholderTile)[];
   protected _doubleClickSupport: DoubleClickSupport;
   protected _filterMenusHandler: (menuItems: Menu[], destination: MenuDestinations) => Menu[];
   protected _renderViewPortAfterAttach: boolean;
@@ -79,7 +79,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this._doubleClickSupport = new DoubleClickSupport();
     this.empty = false;
     this.filters = [];
-    this.filteredTiles = [];
+    this._filteredTiles = [];
     this.filteredElementsDirty = true;
     this.focusedTile = null;
     this.gridColumnCount = 4;
@@ -95,7 +95,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this.scrollable = true;
     this.startupAnimationDone = false;
     this.startupAnimationEnabled = false;
-    this.tiles = [];
+    this._tiles = [];
     this.tileRemovalPendingCount = 0;
     this.viewRangeSize = 0;
     this.viewRangeRendered = new Range(0, 0);
@@ -117,6 +117,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this._scrollParentScrollHandler = this._onScrollParentScroll.bind(this);
     this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
     this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
+    this._addComputedProperties(['tiles', 'filteredTiles']);
 
     this.$fillBefore = null;
     this.$fillAfter = null;
@@ -182,14 +183,14 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 
   protected _initTiles() {
-    this.tiles.forEach(tile => {
+    this._tiles.forEach(tile => {
       this._initTile(tile);
     });
   }
 
-  protected _initTile(tile: Tile) {
+  protected _initTile(tile: (TTile | PlaceholderTile)) {
     tile.setSelectable(this.selectable);
-    tile.setSelected(this.selectedTiles.indexOf(tile) >= 0);
+    tile.setSelected(this.selectedTiles.indexOf(tile as TTile) >= 0);
 
     // Set proper state in case tile was used in another grid
     tile.setParent(this);
@@ -252,45 +253,57 @@ export class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  insertTile(tile: ObjectOrChildModel<Tile>) {
+  insertTile(tile: ObjectOrChildModel<TTile>) {
     this.insertTiles([tile]);
   }
 
-  insertTiles(tilesToInsert: ObjectOrChildModel<Tile> | ObjectOrChildModel<Tile>[], appendPlaceholders?: boolean) {
+  insertTiles(tilesToInsert: ObjectOrChildModel<TTile> | ObjectOrChildModel<TTile>[]) {
+    this._insertTilesInternal(tilesToInsert);
+  }
+
+  protected _insertTilesInternal(tilesToInsert: ObjectOrChildModel<TTile | PlaceholderTile> | ObjectOrChildModel<TTile | PlaceholderTile>[], appendPlaceholders?: boolean) {
     tilesToInsert = arrays.ensure(tilesToInsert);
     if (tilesToInsert.length === 0) {
       return;
     }
-    let tiles = this.tiles as ObjectOrChildModel<Tile>[];
-    this.setTiles(tiles.concat(tilesToInsert), appendPlaceholders);
+    let tiles = this._tiles as ObjectOrChildModel<TTile | PlaceholderTile>[];
+    this._setTilesInternal(tiles.concat(tilesToInsert), appendPlaceholders);
   }
 
-  deleteTile(tile: Tile) {
+  deleteTile(tile: TTile) {
     this.deleteTiles([tile]);
   }
 
-  deleteTiles(tilesToDelete: Tile | Tile[], appendPlaceholders?: boolean) {
+  deleteTiles(tilesToDelete: TTile | (TTile)[]) {
+    this._deleteTilesInternal(tilesToDelete);
+  }
+
+  protected _deleteTilesInternal(tilesToDelete: TTile | PlaceholderTile | (TTile | PlaceholderTile)[], appendPlaceholders?: boolean) {
     tilesToDelete = arrays.ensure(tilesToDelete);
     if (tilesToDelete.length === 0) {
       return;
     }
-    let tiles = this.tiles.slice();
+    let tiles = this._tiles.slice();
     arrays.removeAll(tiles, tilesToDelete);
-    this.setTiles(tiles, appendPlaceholders);
+    this._setTilesInternal(tiles, appendPlaceholders);
   }
 
   deleteAllTiles() {
     this.setTiles([]);
   }
 
-  setTiles(tilesOrModels: ObjectOrChildModel<Tile> | ObjectOrChildModel<Tile>[], appendPlaceholders?: boolean) {
+  setTiles(tilesOrModels: ObjectOrChildModel<TTile> | ObjectOrChildModel<TTile>[]) {
+    this._setTilesInternal(tilesOrModels);
+  }
+
+  protected _setTilesInternal(tilesOrModels: ObjectOrChildModel<TTile | PlaceholderTile> | ObjectOrChildModel<TTile | PlaceholderTile>[], appendPlaceholders?: boolean) {
     let tilesOrModelsArr = arrays.ensure(tilesOrModels);
-    if (objects.equals(this.tiles, tilesOrModels)) {
+    if (objects.equals(this._tiles, tilesOrModels)) {
       return;
     }
 
     // Ensure given tiles are real tiles (of type Tile)
-    let tiles = this._createChildren(tilesOrModelsArr);
+    let tiles = this._createChildren(tilesOrModelsArr) as (TTile | PlaceholderTile)[];
 
     if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
       // Remove placeholders from new tiles, they will be added later
@@ -298,25 +311,25 @@ export class TileGrid extends Widget implements TileGridModel {
     }
 
     // Only insert those which are not already there
-    let tilesToInsert = arrays.diff(tiles, this.tiles);
+    let tilesToInsert = arrays.diff(tiles, this._tiles);
     this._insertTiles(tilesToInsert);
 
     // Append the existing placeholders, otherwise they would be unnecessarily deleted if a tile is deleted
     if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
       let placeholders = this.placeholders();
-      // But only add as much placeholders as needed: If a new tile is added, it should replace the placeholder underneath.
+      // But only add as many placeholders as needed: If a new tile is added, it should replace the placeholder underneath.
       // If this were not done the placeholders would move animated when a new tile is inserted rather than just staying where they are
       placeholders = placeholders.slice(Math.min(this._filterTiles(tilesToInsert).length, placeholders.length), placeholders.length);
       arrays.pushAll(tiles, placeholders);
     }
 
     // Only delete those which are not in the new array
-    let tilesToDelete = arrays.diff(this.tiles, tiles);
+    let tilesToDelete = arrays.diff(this._tiles, tiles);
     this._deleteTiles(tilesToDelete);
 
     this._sort(tiles);
-    this.filteredElementsDirty = this.filteredElementsDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0 || !arrays.equals(this.tiles, tiles); // last check necessary if sorting changed
-    let currentTiles = this.tiles;
+    this.filteredElementsDirty = this.filteredElementsDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0 || !arrays.equals(this._tiles, tiles); // last check necessary if sorting changed
+    let currentTiles = this._tiles;
     this._setProperty('tiles', tiles);
     this.updateFilteredElements();
 
@@ -327,7 +340,7 @@ export class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  protected _insertTiles(tiles: Tile[]) {
+  protected _insertTiles(tiles: (TTile | PlaceholderTile)[]) {
     if (tiles.length === 0) {
       return;
     }
@@ -337,7 +350,7 @@ export class TileGrid extends Widget implements TileGridModel {
     });
   }
 
-  protected _insertTile(tile: Tile) {
+  protected _insertTile(tile: (TTile | PlaceholderTile)) {
     this._initTile(tile);
     this._applyFilters([tile]);
     if (!this.virtual && this.rendered) {
@@ -367,7 +380,7 @@ export class TileGrid extends Widget implements TileGridModel {
     tile.$container.addClass('newly-rendered');
   }
 
-  protected _renderInsertTiles(tiles: Tile[]) {
+  protected _renderInsertTiles(tiles: (TTile | PlaceholderTile)[]) {
     tiles.forEach(tile => {
       if (!tile.rendered) {
         return;
@@ -393,19 +406,19 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 
   protected _removeAllTiles() {
-    this.tiles.forEach(tile => {
+    this._tiles.forEach(tile => {
       tile.remove();
     });
     this.viewRangeRendered = new Range(0, 0);
   }
 
   protected _renderAllTiles() {
-    this.tiles.forEach(tile => {
+    this._tiles.forEach(tile => {
       this._renderTile(tile);
     });
   }
 
-  protected _deleteTiles(tiles: Tile[]) {
+  protected _deleteTiles(tiles: (TTile | PlaceholderTile)[]) {
     if (tiles.length === 0) {
       return;
     }
@@ -413,7 +426,7 @@ export class TileGrid extends Widget implements TileGridModel {
     tiles.forEach(tile => {
       this._deleteTile(tile);
     });
-    this.deselectTiles(tiles);
+    this.deselectTiles(tiles as TTile[]);
 
     if (this.rendered && !this.htmlComp.layouting) {
       // no need to invalidate when tile placeholders are added or removed while layouting
@@ -421,7 +434,7 @@ export class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  protected _deleteTile(tile: Tile) {
+  protected _deleteTile(tile: TTile | PlaceholderTile) {
     if (this._animateTileRemoval(tile)) {
       // Animate tile removal, but not while layouting when tile placeholders are added or removed
       tile.animateRemoval = true;
@@ -439,11 +452,11 @@ export class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  protected _animateTileRemoval(tile: Tile): boolean {
+  protected _animateTileRemoval(tile: TTile | PlaceholderTile): boolean {
     return this.animateTileRemoval && tile && tile.visible && !(tile instanceof PlaceholderTile);
   }
 
-  protected _animateTileInsertion(tile: Tile): boolean {
+  protected _animateTileInsertion(tile: TTile | PlaceholderTile): boolean {
     return this.animateTileInsertion && tile && tile.visible && !(tile instanceof PlaceholderTile);
   }
 
@@ -465,7 +478,7 @@ export class TileGrid extends Widget implements TileGridModel {
    *
    * The tiles will be sorted automatically whenever new tiles are inserted.
    */
-  setComparator(comparator: Comparator<Tile>) {
+  setComparator(comparator: Comparator<TTile>) {
     if (this.comparator === comparator) {
       return;
     }
@@ -477,13 +490,13 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 
   sort() {
-    let tiles = this.tiles.slice();
+    let tiles = this._tiles.slice();
     this._sort(tiles);
-    if (arrays.equals(this.tiles, tiles)) {
+    if (arrays.equals(this._tiles, tiles)) {
       // Check is needed anyway to determine whether filteredElementsDirty needs to be set, so we can use it here as well to early return if nothing changed
       return;
     }
-    let currentTiles = this.tiles;
+    let currentTiles = this._tiles;
     this._setProperty('tiles', tiles);
 
     // Sort list of filtered tiles as well
@@ -496,7 +509,7 @@ export class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  protected _sort(tiles: Tile[]) {
+  protected _sort(tiles: (TTile | PlaceholderTile)[]) {
     if (this.comparator === null) {
       return;
     }
@@ -684,17 +697,46 @@ export class TileGrid extends Widget implements TileGridModel {
     this._insertMissingPlaceholders();
   }
 
-  tilesWithoutPlaceholders(): Tile[] {
+  /**
+   * @deprecated Use {@link tiles} instead
+   */
+  tilesWithoutPlaceholders(): TTile[] {
+    return this.tiles;
+  }
+
+  /**
+   * @returns all tiles of the tile grid without {@link PlaceholderTile}s.
+   * @see TileGridModel.withPlaceholders
+   */
+  get tiles(): TTile[] {
+    return this._tilesWithoutPlaceholders(this._tiles);
+  }
+
+  /**
+   * @returns all tiles of the tile grid that accept the {@link filters} without {@link PlaceholderTile}s.
+   * @see TileGridModel.filters
+   * @see TileGridModel.withPlaceholders
+   */
+  get filteredTiles(): TTile[] {
+    return this._tilesWithoutPlaceholders(this._filteredTiles);
+  }
+
+  protected _tilesWithoutPlaceholders(tiles: (TTile | PlaceholderTile)[]): TTile[] {
     if (!this.withPlaceholders) {
-      return this.tiles;
+      // No need to filter the list if placeholders are disabled
+      return tiles as TTile[];
     }
-    return this.tiles.filter(tile => !(tile instanceof PlaceholderTile));
+    return tiles.filter(tile => !(tile instanceof PlaceholderTile)) as TTile[];
+  }
+
+  getFilteredTilesWithPlaceholders() {
+    return this._filteredTiles;
   }
 
   protected _createPlaceholders(): PlaceholderTile[] {
     let numPlaceholders, lastX,
       columnCount = this.gridColumnCount,
-      tiles = this.filteredTiles,
+      tiles = this._filteredTiles,
       placeholders = [];
 
     if (tiles.length > 0) {
@@ -739,7 +781,7 @@ export class TileGrid extends Widget implements TileGridModel {
     let placeholders = this.placeholders();
     placeholders.forEach(placeholder => {
       // Remove all placeholder in the row if there is one at x=0 (don't do it if there are only placeholders)
-      if (placeholder.gridData.x === 0 && this.filteredTiles[0] !== placeholder) {
+      if (placeholder.gridData.x === 0 && this._filteredTiles[0] !== placeholder) {
         obsolete = true;
       }
       if (obsolete) {
@@ -747,34 +789,34 @@ export class TileGrid extends Widget implements TileGridModel {
       }
     });
 
-    this.deleteTiles(obsoletePlaceholders, false);
+    this._deleteTilesInternal(obsoletePlaceholders, false);
   }
 
   protected _deleteAllPlaceholders() {
-    this.deleteTiles(this.placeholders(), false);
+    this._deleteTilesInternal(this.placeholders(), false);
   }
 
   placeholders(): PlaceholderTile[] {
     let i, placeholders = [];
-    for (i = this.tiles.length - 1; i >= 0; i--) {
-      if (!(this.tiles[i] instanceof PlaceholderTile)) {
+    for (i = this._tiles.length - 1; i >= 0; i--) {
+      if (!(this._tiles[i] instanceof PlaceholderTile)) {
         // Placeholders are always at the end -> we may stop as soon as no more placeholders are found
         break;
       }
-      arrays.insert(placeholders, this.tiles[i], 0);
+      arrays.insert(placeholders, this._tiles[i], 0);
     }
     return placeholders;
   }
 
   protected _insertMissingPlaceholders() {
     let placeholders = this._createPlaceholders();
-    this.insertTiles(placeholders, false);
+    this._insertTilesInternal(placeholders, false);
   }
 
   /**
    * @returns the deleted placeholders
    */
-  protected _deletePlaceholders(tiles: Tile[]): PlaceholderTile[] {
+  protected _deletePlaceholders(tiles: (TTile | PlaceholderTile)[]): PlaceholderTile[] {
     let i;
     let deletedPlaceholders = [];
     for (i = tiles.length - 1; i >= 0; i--) {
@@ -803,7 +845,7 @@ export class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  setFocusedTile(tile: Tile) {
+  setFocusedTile(tile: TTile) {
     if (this.focusedTile === tile) {
       return;
     }
@@ -827,7 +869,7 @@ export class TileGrid extends Widget implements TileGridModel {
     if (!selectable) {
       this.deselectAllTiles();
     }
-    this.tiles.forEach(tile => {
+    this._tiles.forEach(tile => {
       tile.setSelectable(selectable);
     });
   }
@@ -848,10 +890,10 @@ export class TileGrid extends Widget implements TileGridModel {
    *
    * Tiles, that are currently invisible due to an active filter, are excluded and won't be selected.
    */
-  selectTiles(tileOrIds: Tile | string | (Tile | string)[]) {
+  selectTiles(tileOrIds: TTile | string | (TTile | string)[]) {
     // Resolve the tiles (they are not actually created, just resolved by id)
     let tiles = this._createChildren(arrays.ensure(tileOrIds));
-    tiles = this._filterTiles(tiles); // Selecting invisible tiles is not allowed
+    tiles = this._filterTiles(this._tilesWithoutPlaceholders(tiles)); // Selecting invisible tiles or placeholders is not allowed
 
     // Ensure no tiles will be selected if selectable is disabled
     if (!this.selectable) {
@@ -887,7 +929,7 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 
   /** @see selectTiles */
-  selectTile(tile: Tile) {
+  selectTile(tile: TTile) {
     this.selectTiles([tile]);
   }
 
@@ -898,7 +940,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this.selectTiles(this.filteredTiles);
   }
 
-  deselectTiles(tiles: Tile | Tile[]) {
+  deselectTiles(tiles: TTile | TTile[]) {
     tiles = arrays.ensure(tiles);
     let selectedTiles = this.selectedTiles.slice();
     if (arrays.removeAll(selectedTiles, tiles)) {
@@ -906,7 +948,7 @@ export class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  deselectTile(tile: Tile) {
+  deselectTile(tile: TTile) {
     this.deselectTiles([tile]);
   }
 
@@ -918,26 +960,26 @@ export class TileGrid extends Widget implements TileGridModel {
    * Deselects every tile if all tiles are selected. Otherwise selects all tiles.
    */
   toggleSelection() {
-    if (this.selectedTiles.length === this.filteredTiles.length) {
+    if (this.selectedTiles.length === this._filteredTiles.length) {
       this.deselectAllTiles();
     } else {
       this.selectAllTiles();
     }
   }
 
-  addTilesToSelection(tiles: Tile[]) {
+  addTilesToSelection(tiles: TTile[]) {
     tiles = arrays.ensure(tiles);
     this.selectTiles(this.selectedTiles.concat(tiles));
   }
 
-  addTileToSelection(tile: Tile) {
+  addTileToSelection(tile: TTile) {
     this.addTilesToSelection([tile]);
   }
 
   /**
    * @returns true if the tile is completely or partially visible in the first scrollable parent.
    */
-  isTileInView(tile: Tile): boolean {
+  isTileInView(tile: TTile): boolean {
     let $scrollable = this.$container.scrollParent();
     if ($scrollable.length === 0) {
       $scrollable = this.$container;
@@ -977,7 +1019,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this._triggerTileClick(tile, mouseButton, event);
   }
 
-  protected _triggerTileClick(tile: Tile, mouseButton: number, originalEvent: JQuery.ClickEvent) {
+  protected _triggerTileClick(tile: TTile, mouseButton: number, originalEvent: JQuery.ClickEvent) {
     this.trigger('tileClick', {
       tile: tile,
       mouseButton: mouseButton,
@@ -994,14 +1036,14 @@ export class TileGrid extends Widget implements TileGridModel {
     this.doTileAction(tile);
   }
 
-  doTileAction(tile: Tile) {
+  doTileAction(tile: TTile) {
     if (!tile) {
       return;
     }
     this._triggerTileAction(tile);
   }
 
-  protected _triggerTileAction(tile: Tile) {
+  protected _triggerTileAction(tile: TTile) {
     this.trigger('tileAction', {
       tile: tile
     });
@@ -1015,7 +1057,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this.selectionHandler.selectTileOnMouseDown(event);
   }
 
-  scrollTo(tile: Tile, options?: ScrollToOptions) {
+  scrollTo(tile: TTile, options?: ScrollToOptions) {
     this.ensureTileRendered(tile);
     // If tile was not rendered it is not yet positioned correctly -> make sure layout is valid before trying to scroll
     // Layout must not render the viewport because scroll position is not correct yet -> just make sure tiles are at the correct position
@@ -1042,7 +1084,7 @@ export class TileGrid extends Widget implements TileGridModel {
    * @param filter The filters to add.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  addFilter(filter: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
+  addFilter(filter: FilterOrFunction<TTile> | FilterOrFunction<TTile>[], applyFilter = true) {
     this.filterSupport.addFilter(filter, applyFilter);
   }
 
@@ -1050,7 +1092,7 @@ export class TileGrid extends Widget implements TileGridModel {
    * @param filter The filters to remove.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  removeFilter(filter: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
+  removeFilter(filter: FilterOrFunction<TTile> | FilterOrFunction<TTile>[], applyFilter = true) {
     this.filterSupport.removeFilter(filter, applyFilter);
   }
 
@@ -1058,7 +1100,7 @@ export class TileGrid extends Widget implements TileGridModel {
    * @param filter The new filters.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  setFilters(filters: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
+  setFilters(filters: FilterOrFunction<TTile> | FilterOrFunction<TTile>[], applyFilter = true) {
     this.filterSupport.setFilters(filters, applyFilter);
   }
 
@@ -1066,28 +1108,28 @@ export class TileGrid extends Widget implements TileGridModel {
     this.filterSupport.filter();
   }
 
-  protected _applyFilters(tiles: Tile[], fullReset?: boolean): FilterResult<Tile> {
-    return this.filterSupport.applyFilters(tiles.filter(tile => !(tile instanceof PlaceholderTile)), fullReset);
+  protected _applyFilters(tiles: (TTile | PlaceholderTile)[], fullReset?: boolean): FilterResult<TTile> {
+    return this.filterSupport.applyFilters(this._tilesWithoutPlaceholders(tiles), fullReset);
   }
 
-  protected _createFilterSupport(): FilterSupport<Tile> {
+  protected _createFilterSupport(): FilterSupport<TTile> {
     return new FilterSupport({
       widget: this,
       $container: () => this.$filterFieldContainer,
-      getElementsForFiltering: this.tilesWithoutPlaceholders.bind(this),
+      getElementsForFiltering: () => this.tiles,
       createTextFilter: this._createTextFilter.bind(this),
       updateTextFilterText: this._updateTextFilterText.bind(this)
     });
   }
 
-  protected _createTextFilter(): TextFilter<Tile> {
+  protected _createTextFilter(): TextFilter<TTile> {
     if (objects.isFunction(this.createTextFilter)) {
       return this.createTextFilter();
     }
     return new TileTextFilter();
   }
 
-  protected _updateTextFilterText(filter: Filter<Tile>, text: string): boolean {
+  protected _updateTextFilterText(filter: Filter<TTile>, text: string): boolean {
     if (objects.isFunction(this.updateTextFilterText)) {
       return this.updateTextFilterText(filter, text);
     }
@@ -1111,7 +1153,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this.filterSupport.renderFilterField();
   }
 
-  updateFilteredElements(result?: FilterResult<Tile>, opts?: UpdateFilteredElementsOptions) {
+  updateFilteredElements(result?: FilterResult<TTile>, opts?: UpdateFilteredElementsOptions) {
     if (!this.filteredElementsDirty) {
       this._updateEmpty();
       return;
@@ -1132,7 +1174,7 @@ export class TileGrid extends Widget implements TileGridModel {
         // Not all tiles may be rendered yet (e.g. if filter is active before grid is rendered and removed after grid is rendered)
         // But updating the view range is necessary anyway (fillers, scrollbars, viewRangeRendered etc.)
         this._renderTileDelta(result);
-        this._renderTileOrder(this.tiles);
+        this._renderTileOrder(this._tiles);
       }
     }
 
@@ -1140,7 +1182,7 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 
   protected _updateEmpty() {
-    this.setEmpty(this.filteredTiles.length === 0);
+    this.setEmpty(this._filteredTiles.length === 0);
   }
 
   setEmpty(empty: boolean) {
@@ -1155,8 +1197,8 @@ export class TileGrid extends Widget implements TileGridModel {
   /**
    * @returns the tiles which are accepted by the filter and therefore visible.
    */
-  protected _filterTiles(tiles?: Tile[]): Tile[] {
-    tiles = scout.nvl(tiles, this.tiles);
+  protected _filterTiles<TTile extends Tile>(tiles?: TTile[]): TTile[] {
+    tiles = scout.nvl(tiles, this._tiles);
     if (this.filters.length === 0) {
       return tiles.slice();
     }
@@ -1165,48 +1207,70 @@ export class TileGrid extends Widget implements TileGridModel {
 
   findTileIndexAt(x: number, y: number, startIndex?: number, reverse?: boolean): number {
     startIndex = scout.nvl(startIndex, 0);
-    return arrays.findIndexFrom(this.filteredTiles, startIndex, (tile, i) => {
+    return arrays.findIndexFrom(this._filteredTiles, startIndex, (tile, i) => {
       return tile.gridData.x === x && tile.gridData.y === y;
     }, reverse);
   }
 
+  findTilesInRange(viewRange: Range, filter?: Predicate<TTile>): TTile[] {
+    return this._findTilesInRange(viewRange, filter, false);
+  }
+
   /**
    * If the max range is used, the live list of filtered tiles is returned, because every tile has to be in the range.
+   * @param considerPlaceholders whether placeholder tiles should be processed as well. Default is true.
    */
-  findTilesInRange(viewRange: Range, filter?: Predicate<Tile>): Tile[] {
+  protected _findTilesInRange<T extends boolean>(viewRange: Range, filter?: Predicate<TTile>, considerPlaceholders?: T): T extends true ? (TTile | PlaceholderTile)[] : TTile[] {
+    considerPlaceholders = scout.nvl(considerPlaceholders, true);
     if (viewRange.equals(this.virtualScrolling.maxViewRange())) {
       // Directly return all tiles if max view range
-      return this.filteredTiles;
+      return considerPlaceholders ? this._filteredTiles : this.filteredTiles as any;
     }
 
     let tiles = [];
     for (let row = viewRange.from; row < viewRange.to; row++) {
-      this.eachTileInRow(row, tile => { // jshint ignore:line
-        if (!filter || filter(tile)) {
+      this._eachTileInRow(row, tile => {
+        if (!filter || tile instanceof PlaceholderTile || filter(tile)) {
           tiles.push(tile);
         }
-      });
+      }, considerPlaceholders);
     }
     return tiles;
   }
 
-  findTilesInRow(row: number): Tile[] {
+  findTilesInRow(row: number): TTile[] {
+    return this._findTilesInRow(row, false);
+  }
+
+  /**
+   * @param considerPlaceholders whether placeholder tiles should be processed as well. Default is true.
+   */
+  protected _findTilesInRow<T extends boolean>(row: number, considerPlaceholders?: T): T extends true ? (TTile | PlaceholderTile)[] : TTile[] {
     let tiles = [];
-    this.eachTileInRow(row, tile => {
+    this._eachTileInRow(row, tile => {
       tiles.push(tile);
-    });
+    }, considerPlaceholders);
     return tiles;
+  }
+
+  eachTileInRow(row: number, func: (tile: TTile, index: number) => void): TTile[] {
+    return this._eachTileInRow(row, func, false);
   }
 
   /**
    * Executes the given function for each tile in a row.
+   * @param considerPlaceholders whether placeholder tiles should be processed as well. Default is true.
    */
-  eachTileInRow(row: number, func: (tile: Tile, index: number) => void): Tile[] {
+  protected _eachTileInRow<T extends boolean>(row: number, func: (tile: TTile | PlaceholderTile, index: number) => void, considerPlaceholders?: T): T extends true ? (TTile | PlaceholderTile)[] : TTile[] {
     let startIndex = row * this.gridColumnCount;
     let tiles = [];
     for (let i = startIndex; i < startIndex + this.gridColumnCount; i++) {
-      if (this.filteredTiles[i]) {
-        func(this.filteredTiles[i], i);
+      let tile = this._filteredTiles[i];
+      if (!scout.nvl(considerPlaceholders, true) && tile instanceof PlaceholderTile) {
+        continue;
+      }
+      if (this._filteredTiles[i]) {
+        func(this._filteredTiles[i], i);
       }
     }
     return tiles;
@@ -1303,7 +1367,7 @@ export class TileGrid extends Widget implements TileGridModel {
 
   rowCount(gridColumnCount?: number): number {
     gridColumnCount = scout.nvl(gridColumnCount, this.gridColumnCount);
-    return Math.ceil(this.filteredTiles.length / gridColumnCount);
+    return Math.ceil(this._filteredTiles.length / gridColumnCount);
   }
 
   /**
@@ -1354,7 +1418,7 @@ export class TileGrid extends Widget implements TileGridModel {
   protected _renderTilesInRange(range: Range) {
     let numRowsRendered = 0;
     let tilesRendered = 0;
-    let tiles = this.filteredTiles;
+    let tiles = this._filteredTiles;
     if (tiles.length === 0) {
       return;
     }
@@ -1368,7 +1432,7 @@ export class TileGrid extends Widget implements TileGridModel {
     this.viewRangeRendered = newRange[0];
 
     for (let row = range.from; row < range.to; row++) {
-      this.eachTileInRow(row, renderTile.bind(this));
+      this._eachTileInRow(row, renderTile.bind(this));
       numRowsRendered++;
     }
 
@@ -1390,13 +1454,13 @@ export class TileGrid extends Widget implements TileGridModel {
    * @returns the newly rendered tiles
    * @internal
    */
-  _renderTileDelta(filterResult?: FilterResult<Tile>): Tile[] {
+  _renderTileDelta(filterResult?: FilterResult<TTile | PlaceholderTile>): (TTile | PlaceholderTile)[] {
     if (!this.virtual) {
       return [];
     }
-    let prevTiles = this.renderedTiles();
+    let prevTiles = this.renderedTiles(true);
     let newViewRange = this.virtualScrolling.calculateCurrentViewRange();
-    let newTiles = this.findTilesInRange(newViewRange);
+    let newTiles = this._findTilesInRange(newViewRange);
 
     let tilesToRemove = arrays.diff(prevTiles, newTiles);
     let tilesToRender = arrays.diff(newTiles, prevTiles);
@@ -1438,7 +1502,7 @@ export class TileGrid extends Widget implements TileGridModel {
     return tilesToRender;
   }
 
-  protected _removeTileByFilter(tile: Tile) {
+  protected _removeTileByFilter(tile: TTile | PlaceholderTile) {
     // In virtual mode, filtered tiles are not rendered. In normal mode, the filter animation is triggered by _renderVisible of the tile.
     // Since the tile is removed immediately, the invisible animation would not start, so we use the remove animation instead.
     // But because the delete animation is a different one to the filter animation, the removeClass needs to be swapped
@@ -1468,12 +1532,12 @@ export class TileGrid extends Widget implements TileGridModel {
     tile._renderVisible();
   }
 
-  protected _renderTileOrder(prevTiles: Tile[]) {
+  protected _renderTileOrder(prevTiles: (TTile | PlaceholderTile)[]) {
     // Loop through the tiles and move every html element to the end of the container
     // Only move if the order is different to the old order
     // This is actually only necessary to make debugging easier, since the tiles are positioned absolutely it would work without it
     let different = false;
-    this.tiles.forEach((tile, i) => {
+    this._tiles.forEach((tile, i) => {
       if (prevTiles[i] !== tile || different) {
         // Start ordering as soon as the order of the arrays starts to differ
         if (this.virtual && !tile.rendered) {
@@ -1517,18 +1581,13 @@ export class TileGrid extends Widget implements TileGridModel {
   }
 
   protected _removeTilesInRow(row: number) {
-    let tiles = this.findTilesInRow(row);
+    let tiles = this._findTilesInRow(row);
     tiles.forEach(tile => {
       tile.remove();
     });
   }
 
-  rowHasRenderedTiles(row: number): boolean {
-    let tilesInRow = this.findTilesInRow(row);
-    return tilesInRow.some(tile => tile.rendered && !tile.removing);
-  }
-
-  ensureTileRendered(tile: Tile) {
+  ensureTileRendered(tile: TTile) {
     if (!tile.rendered) {
       let rowIndex = tile.gridData.y;
       this.virtualScrolling.renderViewRangeForRowIndex(rowIndex);
@@ -1574,16 +1633,20 @@ export class TileGrid extends Widget implements TileGridModel {
    * If virtual is false, the live list of filtered tiles is returned, because every tile has to be rendered.
    * If virtual is true, the rendered tiles are collected and returned.
    */
-  renderedTiles(): Tile[] {
+  renderedTiles<T extends boolean>(considerPlaceholders?: T): T extends true ? (TTile | PlaceholderTile)[] : TTile[] {
     if (!this.rendered) {
       return [];
     }
+    considerPlaceholders = scout.nvl(considerPlaceholders, false);
     if (!this.virtual) {
-      return this.filteredTiles;
+      return considerPlaceholders ? this._filteredTiles : this.filteredTiles as any;
     }
     let tiles = [];
     this.$container.children('.tile').each((i, elem) => {
       let tile = scout.widget(elem);
+      if (!considerPlaceholders && tile instanceof PlaceholderTile) {
+        return;
+      }
       if (!tile.removalPending) {
         // Don't return the tiles which are being removed
         // Otherwise delta could be wrong if called while removing. Example: filter is added and removed right after while the tiles are still being removed -> RenderTileDelta has to render the tiles being removed

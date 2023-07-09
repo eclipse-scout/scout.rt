@@ -12,30 +12,30 @@ import {
   TileAccordionEventMap, TileAccordionLayout, TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
 } from '../../index';
 
-export class TileAccordion extends Accordion implements TileAccordionModel {
+export class TileAccordion<TTile extends Tile = Tile> extends Accordion implements TileAccordionModel {
   declare model: TileAccordionModel;
   declare eventMap: TileAccordionEventMap;
-  declare self: TileAccordion;
-  declare groups: Group<TileGrid>[];
+  declare self: TileAccordion<TTile>;
+  declare groups: Group<TileGrid<TTile>>[];
 
   gridColumnCount: number;
   multiSelect: boolean;
   selectable: boolean;
   takeTileFiltersFromGroup: boolean;
-  tileComparator: Comparator<Tile>;
-  filters: Filter<Tile>[];
+  tileComparator: Comparator<TTile>;
+  filters: Filter<TTile>[];
   tileGridLayoutConfig: TileGridLayoutConfig;
   tileGridSelectionHandler: TileAccordionSelectionHandler;
   withPlaceholders: boolean;
   virtual: boolean;
   textFilterEnabled: boolean;
-  filterSupport: FilterSupport<Tile>;
-  createTextFilter: () => TextFilter<Tile>;
+  filterSupport: FilterSupport<TTile>;
+  createTextFilter: () => TextFilter<TTile>;
   updateTextFilterText: string;
   $filterFieldContainer: JQuery;
   protected _selectionUpdateLocked: boolean;
   protected _tileGridPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
-  protected _groupBodyHeightChangeHandler: EventHandler<Event<Group<TileGrid>>>;
+  protected _groupBodyHeightChangeHandler: EventHandler<Event<Group<TileGrid<TTile>>>>;
 
   constructor() {
     super();
@@ -91,7 +91,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     return new KeyStrokeContext();
   }
 
-  protected override _initGroup(group: Group<TileGrid> & { body: TileGrid & { __tileAccordionEventDelegator?: EventDelegator } }) {
+  protected override _initGroup(group: Group<TileGrid<TTile>> & { body: TileGrid<TTile> & { __tileAccordionEventDelegator?: EventDelegator } }) {
     super._initGroup(group);
     group.body.setSelectionHandler(this.tileGridSelectionHandler);
 
@@ -153,7 +153,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     });
   }
 
-  protected override _deleteGroup(group: Group<TileGrid> & { body: TileGrid & { __tileAccordionEventDelegator?: EventDelegator } }) {
+  protected override _deleteGroup(group: Group<TileGrid<TTile>> & { body: TileGrid<TTile> & { __tileAccordionEventDelegator?: EventDelegator } }) {
     if (group.body) {
       group.body.off('propertyChange', this._tileGridPropertyChangeHandler);
       group.body.__tileAccordionEventDelegator.destroy();
@@ -162,7 +162,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     super._deleteGroup(group);
   }
 
-  override setGroups(groups: Group<TileGrid>[]) {
+  override setGroups(groups: Group<TileGrid<TTile>>[]) {
     let oldTileCount = this.getTileCount();
     let oldFilteredTileCount = this.getFilteredTileCount();
     let oldSelectedTileCount = this.getSelectedTileCount();
@@ -234,19 +234,19 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     this.setProperty('multiSelect', multiSelect);
   }
 
-  getGroupById(id: string): Group<TileGrid> {
+  getGroupById(id: string): Group<TileGrid<TTile>> {
     return arrays.find(this.groups, group => group.id === id);
   }
 
-  getGroupByTile(tile: Tile): Group<TileGrid> {
-    return tile.findParent(Group<TileGrid>);
+  getGroupByTile(tile: TTile): Group<TileGrid<TTile>> {
+    return tile.findParent(Group<TileGrid<TTile>>);
   }
 
   /**
    * Distribute the tiles to the corresponding groups and returns an object with group id as key and array of tiles as value.
    * Always returns all current groups even if the given tiles may not be distributed to all groups.
    */
-  protected _groupTiles(tiles: Tile[]): Record<string, Tile[]> {
+  protected _groupTiles(tiles: TTile[]): Record<string, TTile[]> {
     // Create a map of groups, key is the id, value is an array of tiles
     let tilesPerGroup = {};
     this.groups.forEach(group => {
@@ -268,11 +268,11 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     return tilesPerGroup;
   }
 
-  deleteTile(tile: Tile) {
+  deleteTile(tile: TTile) {
     this.deleteTiles([tile]);
   }
 
-  deleteTiles(tilesToDelete: Tile[] | Tile) {
+  deleteTiles(tilesToDelete: TTile[] | TTile) {
     tilesToDelete = arrays.ensure(tilesToDelete);
     if (tilesToDelete.length === 0) {
       return;
@@ -291,13 +291,13 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
    *
    * If the list contains new tiles not assigned to a group yet, an exception will be thrown.
    */
-  setTiles(tilesOrModels: ObjectOrChildModel<Tile> | ObjectOrChildModel<Tile>[]) {
+  setTiles(tilesOrModels: ObjectOrChildModel<TTile> | ObjectOrChildModel<TTile>[]) {
     let tilesOrModelsArr = arrays.ensure(tilesOrModels);
     if (objects.equals(this.getTiles(), tilesOrModelsArr)) {
       return;
     }
 
-    // Ensure given tiles are real tiles (of type Tile)
+    // Ensure given tiles are real tiles (of type TTile)
     let tiles = this._createChildren(tilesOrModelsArr);
 
     // Distribute the tiles to the corresponding groups (result may contain groups without tiles)
@@ -310,7 +310,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     }
   }
 
-  getTiles(): Tile[] {
+  getTiles(): TTile[] {
     let tiles = [];
     this.groups.forEach(group => {
       arrays.pushAll(tiles, group.body.tiles);
@@ -330,7 +330,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
    * @param filter The filters to add.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  addFilter(filter: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
+  addFilter(filter: FilterOrFunction<TTile> | FilterOrFunction<TTile>[], applyFilter = true) {
     this.filterSupport.addFilter(filter, applyFilter);
   }
 
@@ -338,7 +338,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
    * @param filter The filters to remove.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  removeFilter(filter: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
+  removeFilter(filter: FilterOrFunction<TTile> | FilterOrFunction<TTile>[], applyFilter = true) {
     this.filterSupport.removeFilter(filter, applyFilter);
   }
 
@@ -346,11 +346,11 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
    * @param filter The new filters.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  setFilters(filters: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
+  setFilters(filters: FilterOrFunction<TTile> | FilterOrFunction<TTile>[], applyFilter = true) {
     this.filterSupport.setFilters(filters, applyFilter);
   }
 
-  protected _setFilters(filter: FilterOrFunction<Tile> | FilterOrFunction<Tile>[]) {
+  protected _setFilters(filter: FilterOrFunction<TTile> | FilterOrFunction<TTile>[]) {
     let filters = arrays.ensure(filter);
     this.groups.forEach(group => {
       group.body.setFilters(filters.slice(), false);
@@ -362,12 +362,12 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     this.filterSupport.filter();
   }
 
-  protected _filter(): FilterResult<Tile> {
+  protected _filter(): FilterResult<TTile> {
     this.groups.forEach(group => group.body.filter());
     return null; // FilterSupport of the TileGrids take care of the results
   }
 
-  protected _createFilterSupport(): FilterSupport<Tile> {
+  protected _createFilterSupport(): FilterSupport<TTile> {
     return new FilterSupport({
       widget: this,
       $container: () => this.$filterFieldContainer,
@@ -377,14 +377,14 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     });
   }
 
-  protected _createTextFilter(): TextFilter<Tile> {
+  protected _createTextFilter(): TextFilter<TTile> {
     if (objects.isFunction(this.createTextFilter)) {
       return this.createTextFilter();
     }
     return new TileTextFilter();
   }
 
-  protected _updateTextFilterText(filter: Filter<Tile>, text: string): boolean {
+  protected _updateTextFilterText(filter: Filter<TTile>, text: string): boolean {
     if (objects.isFunction(this.updateTextFilterText)) {
       return this.updateTextFilterText(filter, text);
     }
@@ -407,7 +407,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     this.filterSupport.renderFilterField();
   }
 
-  getFilteredTiles(): Tile[] {
+  getFilteredTiles(): TTile[] {
     let tiles = [];
     this.groups.forEach(group => {
       arrays.pushAll(tiles, group.body.filteredTiles);
@@ -426,7 +426,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
   /**
    * Compared to {@link getFilteredTiles()}, this function considers the collapsed state of the group as well, meaning only filtered tiles of expanded groups are returned.
    */
-  getVisibleTiles(): Tile[] {
+  getVisibleTiles(): TTile[] {
     let tiles = [];
     this.expandedGroups().forEach(group => {
       arrays.pushAll(tiles, group.body.filteredTiles);
@@ -457,7 +457,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
    *
    * Tiles, that are currently invisible due to an active filter, are excluded and won't be selected.
    */
-  selectTiles(tiles: Tile[]) {
+  selectTiles(tiles: TTile[]) {
     tiles = arrays.ensure(tiles);
 
     // Split tiles into separate lists for each group (result may contain groups without tiles)
@@ -471,7 +471,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
   }
 
   /** @see selectTiles */
-  selectTile(tile: Tile) {
+  selectTile(tile: TTile) {
     this.selectTiles([tile]);
   }
 
@@ -482,7 +482,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     this.selectTiles(this.getVisibleTiles());
   }
 
-  deselectTiles(tiles: Tile[]) {
+  deselectTiles(tiles: TTile[]) {
     tiles = arrays.ensure(tiles);
     let selectedTiles = this.getSelectedTiles().slice();
     if (arrays.removeAll(selectedTiles, tiles)) {
@@ -490,7 +490,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     }
   }
 
-  deselectTile(tile: Tile) {
+  deselectTile(tile: TTile) {
     this.deselectTiles([tile]);
   }
 
@@ -498,16 +498,16 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     this.selectTiles([]);
   }
 
-  addTilesToSelection(tiles: Tile[]) {
+  addTilesToSelection(tiles: TTile[]) {
     tiles = arrays.ensure(tiles);
     this.selectTiles(this.getSelectedTiles().concat(tiles));
   }
 
-  addTileToSelection(tile: Tile) {
+  addTileToSelection(tile: TTile) {
     this.addTilesToSelection([tile]);
   }
 
-  getSelectedTiles(): Tile[] {
+  getSelectedTiles(): TTile[] {
     let selectedTiles = [];
     this.groups.forEach(group => {
       arrays.pushAll(selectedTiles, group.body.selectedTiles);
@@ -515,7 +515,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     return selectedTiles;
   }
 
-  getSelectedTile(): Tile {
+  getSelectedTile(): TTile {
     return this.getSelectedTiles()[0];
   }
 
@@ -539,7 +539,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
   }
 
   /** @see TileAccordionModel.tileComparator */
-  setTileComparator(comparator: Comparator<Tile>) {
+  setTileComparator(comparator: Comparator<TTile>) {
     this.groups.forEach(group => {
       group.body.setComparator(comparator);
     });
@@ -552,7 +552,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     });
   }
 
-  setFocusedTile(tile: Tile) {
+  setFocusedTile(tile: TTile) {
     let groupForTile = null;
     if (tile !== null) {
       groupForTile = this.getGroupByTile(tile);
@@ -566,7 +566,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     });
   }
 
-  getFocusedTile(): Tile {
+  getFocusedTile(): TTile {
     let focusedTile = null;
     this.groups.some(group => {
       if (group.body.focusedTile) {
@@ -584,17 +584,17 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     }, 0);
   }
 
-  getVisibleGridX(tile: Tile): number {
+  getVisibleGridX(tile: TTile): number {
     return tile.gridData.x;
   }
 
-  getVisibleGridY(tile: Tile): number {
+  getVisibleGridY(tile: TTile): number {
     let group = this.getGroupByTile(tile);
     let yCorr = this.getVisibleRowByGroup(group);
     return tile.gridData.y + yCorr;
   }
 
-  getGroupByVisibleRow(rowToFind: number): Group<TileGrid> {
+  getGroupByVisibleRow(rowToFind: number): Group<TileGrid<TTile>> {
     if (rowToFind < 0 || rowToFind >= this.getVisibleGridRowCount()) {
       return null;
     }
@@ -613,7 +613,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
    *          Example: There are 3 rows and 2 groups. The first group contains 2 rows, the second 1 row.
    *          The index of the first group is 0, the index of the second group is 2.
    */
-  getVisibleRowByGroup(groupToFind: Group<TileGrid>): number {
+  getVisibleRowByGroup(groupToFind: Group<TileGrid<TTile>>): number {
     let currentIndex = 0;
     let found = this.expandedGroups().some(group => {
       let rowCount = group.body.logicalGrid.gridRows;
@@ -629,11 +629,11 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     return currentIndex;
   }
 
-  expandedGroups(): Group<TileGrid>[] {
+  expandedGroups(): Group<TileGrid<TTile>>[] {
     return this.groups.filter(group => !group.collapsed);
   }
 
-  protected _handleSelectionChanged(tileGrid: TileGrid) {
+  protected _handleSelectionChanged(tileGrid: TileGrid<TTile>) {
     if (this._selectionUpdateLocked) {
       // Don't execute when deselecting other tiles to minimize the amount of property change events
       return;
@@ -656,7 +656,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     }
   }
 
-  protected _onTileGridPropertyChange(event: PropertyChangeEvent<any, TileGrid>) {
+  protected _onTileGridPropertyChange(event: PropertyChangeEvent<any, TileGrid<TTile>>) {
     // Trigger artificial property changes with newValue set to null.
     // Reason: these property changes are fired for each grid. Creating the compound arrays using getFilteredTiles() etc.
     // costs some time (even if only some ms) but may not be necessary at all. The consumer can still call these functions by himself.
@@ -671,13 +671,13 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     }
   }
 
-  protected override _onGroupCollapsedChange(event: PropertyChangeEvent<boolean, Group<TileGrid>>) {
+  protected override _onGroupCollapsedChange(event: PropertyChangeEvent<boolean, Group<TileGrid<TTile>>>) {
     super._onGroupCollapsedChange(event);
 
     this._handleCollapsed(event.source);
   }
 
-  protected _handleCollapsed(group: Group<TileGrid>) {
+  protected _handleCollapsed(group: Group<TileGrid<TTile>>) {
     if (group.collapsed) {
       // Deselect tiles of a collapsed group (this will also set focusedTile to null) -> actions on invisible elements is confusing, and keystrokes only operate on visible elements, too
       group.body.deselectAllTiles();
@@ -688,7 +688,7 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     }
   }
 
-  protected _onGroupBodyHeightChange(event: Event<Group<TileGrid>>) {
+  protected _onGroupBodyHeightChange(event: Event<Group<TileGrid<TTile>>>) {
     this.groups.forEach(group => {
       if (event.source === group || group.bodyAnimating) {
         // No need to layout body for the group which is already expanding / collapsing since it does it anyway
@@ -701,14 +701,14 @@ export class TileAccordion extends Accordion implements TileAccordionModel {
     });
   }
 
-  protected _onGroupBodyHeightChangeDone(event: Event<Group<TileGrid>>) {
+  protected _onGroupBodyHeightChangeDone(event: Event<Group<TileGrid<TTile>>>) {
     event.source.off('bodyHeightChange', this._groupBodyHeightChangeHandler);
   }
 
   /**
    * @returns the first fully visible tile at the scrollTop.
    */
-  tileAtScrollTop(scrollTop: number): Tile {
+  tileAtScrollTop(scrollTop: number): TTile {
     return arrays.find(this.getTiles().filter(tile => tile.rendered), tile => {
       return tile.$container.position().top >= scrollTop;
     });

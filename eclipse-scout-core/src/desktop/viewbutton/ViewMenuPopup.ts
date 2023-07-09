@@ -14,7 +14,7 @@ import {ChildModelOf, CompositeTile, CompositeTileModel, Icon, InitModelOf, Labe
  */
 export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
   declare model: ViewMenuPopupModel;
-  declare content: TileGrid;
+  declare content: TileGrid<ViewButtonTile>;
 
   defaultIconId: string;
   viewMenus: ViewButton[];
@@ -31,7 +31,7 @@ export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
     super._init(options);
     let tiles = this._createTiles();
     let noIcons = tiles.every(tile => !tile.widgets[0].visible);
-    this.content = scout.create(TileGrid, {
+    this.content = scout.create((TileGrid<ViewButtonTile>), {
       parent: this,
       tiles: tiles,
       cssClass: noIcons ? 'no-icons' : '',
@@ -45,7 +45,7 @@ export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
         hgap: 10
       }
     });
-    let viewButtonTiles = this.content.tiles as ViewButtonTile[];
+    let viewButtonTiles = this.content.tiles;
     let tile = viewButtonTiles.find(tile => tile.viewMenu.selected);
     if (tile) {
       this.content.selectTile(tile);

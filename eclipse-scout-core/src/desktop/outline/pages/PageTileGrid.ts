@@ -12,11 +12,10 @@ import {
   TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeNodeChangedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent
 } from '../../../index';
 
-export class PageTileGrid extends TileGrid implements PageTileGridModel {
+export class PageTileGrid extends TileGrid<ButtonTile> implements PageTileGridModel {
   declare model: PageTileGridModel;
   declare eventMap: PageTileGridEventMap;
   declare self: PageTileGrid;
-  declare tiles: ButtonTile[];
 
   compact: boolean;
   compactLayoutConfig: TileGridLayoutConfig;

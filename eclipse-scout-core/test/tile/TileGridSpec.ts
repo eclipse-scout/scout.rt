@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Group, InitModelOf, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel} from '../../src/index';
+import {Group, InitModelOf, PlaceholderTile, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel} from '../../src/index';
 import {JQueryTesting} from '../../src/testing/index';
 
 describe('TileGrid', () => {
@@ -121,6 +121,23 @@ describe('TileGrid', () => {
 
       tileGrid.selectTiles(tileGrid.tiles[1]);
       expect(tileGrid.tiles[1].selected).toBe(true);
+    });
+
+    it('does not select placeholder tiles', () => {
+      let tileGrid = createTileGrid(3, {
+        selectable: true,
+        withPlaceholders: true
+      });
+      tileGrid.validateLogicalGrid();
+
+      let tile = tileGrid.tiles[0];
+      let placeholder = tileGrid.getFilteredTilesWithPlaceholders()[3];
+      expect(placeholder).toBeInstanceOf(PlaceholderTile);
+
+      tileGrid.selectTiles([tile, placeholder]);
+      expect(tile.selected).toBe(true);
+      expect(placeholder.selected).toBe(false);
+      expect(tileGrid.selectedTiles).toEqual([tile]);
     });
 
     it('triggers a property change event', () => {
@@ -1115,6 +1132,22 @@ describe('TileGrid', () => {
       expect(tileGrid2.tiles[2].filterAccepted).toBe(true);
     });
 
+    it('ignores placeholder tiles', () => {
+      let tileGrid = createTileGrid(1, {
+        withPlaceholders: true
+      });
+      let filter = {
+        accept: tile => !(tile instanceof PlaceholderTile)
+      };
+      tileGrid.addFilter(filter);
+      tileGrid.validateLogicalGrid();
+
+      let tile = tileGrid.tiles[0];
+      let placeholder = tileGrid.getFilteredTilesWithPlaceholders()[1];
+      expect(placeholder).toBeInstanceOf(PlaceholderTile);
+      expect(tileGrid.tiles).toEqual([tile]);
+      expect(tileGrid.filteredTiles).toEqual([tile]);
+    });
   });
 
   describe('addFilter', () => {

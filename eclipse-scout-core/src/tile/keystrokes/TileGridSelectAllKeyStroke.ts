@@ -19,7 +19,7 @@ export class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke {
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let tile = this.getSelectionHandler().getVisibleTiles()[0];
       if (tile) {
-        // Draw in first tile so that other key stroke hints (e.g. left, right etc.) don't overlap this one
+        // Draw in first tile so that other keystroke hints (e.g. left, right etc.) don't overlap this one
         return tile.$container;
       }
     };
