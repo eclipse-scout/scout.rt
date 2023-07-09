@@ -11,7 +11,7 @@ import {arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Ins
 import $ from 'jquery';
 
 export class TileGridLayout extends LogicalGridLayout {
-  declare widget: TileGrid;
+  declare widget: TileGrid<Tile>;
   containerPos: Point;
   containerScrollTop: number;
   maxWidth: number;
@@ -73,7 +73,7 @@ export class TileGridLayout extends LogicalGridLayout {
 
     // Animate only once on startup (if enabled) but animate every time on resize
     let animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone) || this.widget.renderAnimationEnabled;
-    this.tiles = this.widget.renderedTiles();
+    this.tiles = this.widget.renderedTiles(true);
 
     // Make them invisible otherwise the influence scrollHeight (e.g. if grid is scrolled to the very bottom and tiles are filtered, scrollbar would still increase scroll height)
     scrollbars.setVisible($container, false);
@@ -366,7 +366,7 @@ export class TileGridLayout extends LogicalGridLayout {
 
   /**
    * Calculates the preferred size only based on the grid column count, row count and layout config. Does not use rendered elements.
-   * Therefore only works if all tiles are of the same size (which is a precondition for the virtual scrolling anyway).
+   * Therefore, it only works if all tiles are of the same size (which is a precondition for the virtual scrolling anyway).
    */
   virtualPrefSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     let rowCount, columnCount;

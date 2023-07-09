@@ -7,14 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventDelegator, FormField, InitModelOf, LoadingSupport, ObjectOrChildModel, TileFieldEventMap, TileFieldModel, TileGrid, Widget} from '../../../index';
+import {EventDelegator, FormField, InitModelOf, LoadingSupport, ObjectOrChildModel, Tile, TileFieldEventMap, TileFieldModel, TileGrid, Widget} from '../../../index';
 
-export class TileField extends FormField implements TileFieldModel {
+export class TileField<TTile extends Tile = Tile> extends FormField implements TileFieldModel {
   declare model: TileFieldModel;
   declare eventMap: TileFieldEventMap;
-  declare self: TileField;
+  declare self: TileField<TTile>;
 
-  tileGrid: TileGrid;
+  tileGrid: TileGrid<TTile>;
   eventDelegator: EventDelegator;
 
   constructor() {
@@ -49,11 +49,11 @@ export class TileField extends FormField implements TileFieldModel {
     this._renderDropType();
   }
 
-  setTileGrid(tileGrid: ObjectOrChildModel<TileGrid>) {
+  setTileGrid(tileGrid: ObjectOrChildModel<TileGrid<TTile>>) {
     this.setProperty('tileGrid', tileGrid);
   }
 
-  protected _setTileGrid(tileGrid: TileGrid) {
+  protected _setTileGrid(tileGrid: TileGrid<TTile>) {
     if (this.tileGrid) {
       if (this.eventDelegator) {
         this.eventDelegator.destroy();

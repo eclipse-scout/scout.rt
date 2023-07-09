@@ -54,6 +54,7 @@ export interface TileGridModel extends WidgetModel {
   multiSelect?: boolean;
   /**
    * Specifies whether an animation should be executed whenever the tile grid is rendered.
+   *
    * The animation is quite small and discreet and just moves the tiles a little.
    * It will happen if the startup animation is disabled or done and every time the tiles are rendered anew.
    *
@@ -71,6 +72,7 @@ export interface TileGridModel extends WidgetModel {
   selectionHandler?: TileGridSelectionHandler;
   /**
    * Specifies whether the tile grid should be scrollable or not.
+   *
    * If true, it will be vertically scrollable.
    * It will also be horizontally scrollable but only if {@link LogicalGridLayoutConfig.minWidth} is set.
    *
@@ -110,17 +112,20 @@ export interface TileGridModel extends WidgetModel {
   virtual?: boolean;
   /**
    * If enabled, artificial placeholder tiles are added automatically if the tiles in the last row don't fill the whole row.
+   *
    * Default is false.
    */
   withPlaceholders?: boolean;
   /**
    * If enabled, a text field is shown when the tile grid is focused or hovered so the user can filter the tiles by typing.
+   *
    * Default is false.
    */
   textFilterEnabled?: boolean;
   filterSupport?: FilterSupport<Tile>;
   /**
    * Factory function to create a custom {@link TextFilter} that is used if {@link textFilterEnabled} is set to true.
+   *
    * If no function is set, the {@link TileTextFilter} will be used that will convert the rendered content of the tile to plain text and apply the filter to that.
    *
    * Default is null which means the {@link TileTextFilter} is active.
@@ -128,7 +133,9 @@ export interface TileGridModel extends WidgetModel {
   createTextFilter?: () => TextFilter<Tile>;
   /**
    * A function to update the {@link TextFilter.acceptedText}.
+   *
    * Setting this property may be necessary if a custom {@link TextFilter} is set using {@link createTextFilter}.
+   *
    * Default is null which means {@link TileGrid._updateTextFilterText} is used that works with {@link TileTextFilter.setText}.
    */
   updateTextFilterText?: string;
