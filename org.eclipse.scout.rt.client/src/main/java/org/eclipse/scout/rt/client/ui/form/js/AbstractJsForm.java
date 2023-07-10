@@ -155,7 +155,7 @@ public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataOb
 
   @Order(1000)
   @ClassId("4d09d51a-2a15-4863-8921-2eead40957fa")
-  public class MainBox extends AbstractGroupBox {
+  public final class MainBox extends AbstractGroupBox {
   }
 
   protected class P_UIFacade extends AbstractForm.P_UIFacade implements IJsFormUIFacade<OUT> {

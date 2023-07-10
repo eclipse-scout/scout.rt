@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -82,6 +84,41 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   @Override
   protected void initJsonProperties(FORM model) {
     super.initJsonProperties(model);
+    putJsonProperty(new JsonAdapterProperty<>(PROP_ROOT_GROUP_BOX, model, getUiSession()) {
+      @Override
+      protected IGroupBox modelValue() {
+        return getModel().getRootGroupBox();
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(PROP_MODAL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isModal();
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(PROP_CACHE_BOUNDS, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isCacheBounds();
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(PROP_CACHE_BOUNDS_KEY, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().computeCacheBoundsKey();
+      }
+
+      @Override
+      public boolean accept() {
+        return getModel().isCacheBounds();
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(PROP_DISPLAY_VIEW_ID, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getDisplayViewId();
+      }
+    });
     putJsonProperty(new JsonProperty<IForm>(IForm.PROP_HEADER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
@@ -152,8 +189,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapter(getModel().getRootGroupBox());
-
     attachGlobalAdapters(m_desktop.getViews(getModel()));
     attachGlobalAdapters(m_desktop.getDialogs(getModel(), false));
     attachGlobalAdapters(m_desktop.getMessageBoxes(getModel()));
@@ -183,15 +218,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    IForm model = getModel();
-    putProperty(json, PROP_MODAL, model.isModal());
-    putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
-    putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
-    putProperty(json, PROP_CACHE_BOUNDS, model.isCacheBounds());
-    if (model.isCacheBounds()) {
-      putProperty(json, PROP_CACHE_BOUNDS_KEY, model.computeCacheBoundsKey());
-    }
-    putAdapterIdProperty(json, PROP_ROOT_GROUP_BOX, model.getRootGroupBox());
+    putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(getModel().getDisplayHint()));
     setInitialFocusProperty(json);
     putAdapterIdsProperty(json, "views", m_desktop.getViews(getModel()));
     putAdapterIdsProperty(json, "dialogs", m_desktop.getDialogs(getModel(), false));
