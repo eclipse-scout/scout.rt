@@ -40,6 +40,8 @@ public class JsonJsForm<IN extends IDataObject, OUT extends IDataObject, T exten
 
   @Override
   protected void initJsonProperties(T model) {
+    // Don't call super() because only a small subset of the properties needs to be sent to the UI
+
     putJsonProperty(new JsonProperty<IJsForm<IN, OUT>>(IJsForm.PROP_INPUT_DATA, model) {
       @Override
       protected IN modelValue() {
