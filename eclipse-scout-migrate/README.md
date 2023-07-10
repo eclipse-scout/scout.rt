@@ -192,10 +192,28 @@ const moduleMap = {
   yourNamespace: '@your-module/core'
 };
 
-export {typeMap, returnTypeMap, moduleMap};
+// The default type that will be used if the parameter has no type.
+// Can for example be set to 'any' after the migration to check whether all parameters have been typed.
+let defaultParamType;
+
+// The default type that will be used if the function has no return type.
+// Can for example be set to 'void' after the migration to check whether all parameters have been typed.
+let defaultReturnType;
+
+export {typeMap, returnTypeMap, moduleMap, defaultParamType, defaultReturnType};
 ```
 
 You can add as many mappings as you like, or none at all, they are completely optional.
+To activate your config, you need to pass the config object to the migrate script by using the `--config` option.
+For the TypeScript migration, you can do it as follows:
+
+```json
+{
+  "scripts": {
+    "migrate": "scout-migrate --rename false --migrate ts --sources src/main/js/**/*.ts --config migrate-config.mjs"
+  }
+}
+```
 
 **Note**: you can either define the module map in the config file or pass it ass arguments to the script.
 If you do both, they will be merged. If they contain the same keys, the value passed via argument wins.
