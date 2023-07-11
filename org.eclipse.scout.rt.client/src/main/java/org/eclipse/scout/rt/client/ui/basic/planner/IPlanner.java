@@ -47,6 +47,16 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   String PROP_HEADER_VISIBLE = "headerVisible";
 
   /**
+   * {@link Boolean}
+   */
+  String PROP_RANGE_SELECTABLE = "rangeSelectable";
+
+  /**
+   * {@link Boolean}
+   */
+  String PROP_MULTI_SELECT = "multiSelect";
+
+  /**
    * Values from {@link IPlannerDisplayMode}.
    */
   String PROP_DISPLAY_MODE = "displayMode";
@@ -62,11 +72,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   String PROP_AVAILABLE_DISPLAY_MODES = "availableDisplayModes";
 
   /**
-   * {@link #SELECTION_MODE_NONE}, {@link #SELECTION_MODE_SINGLE_RANGE}, {@link #SELECTION_MODE_MULTI_RANGE}
-   */
-  String PROP_SELECTION_MODE = "selectionMode";
-
-  /**
    * {@link Boolean}
    */
   String PROP_ACTIVITY_SELECTABLE = "activitySelectable";
@@ -76,10 +81,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
    */
   String PROP_SELECTED_ACTIVITY = "selectedActivity";
   String PROP_CONTEXT_MENU = "contextMenus";
-
-  int SELECTION_MODE_NONE = 0;
-  int SELECTION_MODE_SINGLE_RANGE = 1;
-  int SELECTION_MODE_MULTI_RANGE = 2;
 
   IFastListenerList<PlannerListener> plannerListeners();
 
@@ -124,7 +125,8 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   int getDisplayMode();
 
   /**
-   * @param mode value from {@link IPlannerDisplayMode}
+   * @param mode
+   *          value from {@link IPlannerDisplayMode}
    */
   void setDisplayMode(int mode);
 
@@ -142,9 +144,13 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
 
   void setHeaderVisible(boolean visible);
 
-  int getSelectionMode();
+  boolean isMultiSelect();
 
-  void setSelectionMode(int mode);
+  void setMultiSelect(boolean multiSelect);
+
+  boolean isRangeSelectable();
+
+  void setRangeSelectable(boolean rangeSelectable);
 
   boolean isActivitySelectable();
 

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DateRange, JsonDateRange, Menu, ObjectOrChildModel, PlannerActivity, PlannerDisplayMode, PlannerDisplayModeOptions, PlannerResource, PlannerSelectionMode, WidgetModel} from '../index';
+import {DateRange, JsonDateRange, Menu, ObjectOrChildModel, PlannerActivity, PlannerDisplayMode, PlannerDisplayModeOptions, PlannerResource, WidgetModel} from '../index';
 
 export interface PlannerModel extends WidgetModel {
   resources?: PlannerResource[];
@@ -26,8 +26,9 @@ export interface PlannerModel extends WidgetModel {
   displayModeOptions?: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>;
   activitySelectable?: boolean;
   headerVisible?: boolean;
+  multiSelect?: boolean;
   label?: string;
-  selectionMode?: PlannerSelectionMode;
+  rangeSelectable?: boolean;
   menus?: ObjectOrChildModel<Menu>[];
   defaultMenuTypes?: string[];
 }

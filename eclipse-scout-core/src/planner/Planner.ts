@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CellModel, ContextMenuPopup, DateFormat, DateRange, dates, EnumObject, Event, graphics, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, MenuBar, menus as menuUtil, objects, PlannerEventMap, PlannerHeader,
-  PlannerHeaderDisplayModeClickEvent, PlannerLayout, PlannerMenuItemsOrder, PlannerModel, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel, YearPanelDateSelectEvent
+  arrays, CellModel, comparators, ContextMenuPopup, DateFormat, DateRange, dates, EnumObject, Event, graphics, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, MenuBar, menus as menuUtil, objects, PlannerEventMap,
+  PlannerHeader, PlannerHeaderDisplayModeClickEvent, PlannerLayout, PlannerMenuItemsOrder, PlannerModel, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -27,7 +27,8 @@ export class Planner extends Widget implements PlannerModel {
   label: string;
   resources: PlannerResource[];
   resourceMap: Record<string, PlannerResource>;
-  selectionMode: PlannerSelectionMode;
+  multiSelect: boolean;
+  rangeSelectable: boolean;
   selectionRange: DateRange;
   selectedResources: PlannerResource[];
   viewRange: DateRange;
@@ -50,7 +51,7 @@ export class Planner extends Widget implements PlannerModel {
   yearPanelVisible: boolean;
   $range: JQuery;
   $modes: JQuery;
-  $selector: JQuery;
+  $selectors: JQuery[];
   $grid: JQuery;
   $highlight: JQuery;
   $timeline: JQuery;
@@ -61,11 +62,13 @@ export class Planner extends Widget implements PlannerModel {
 
   protected _resourceTitleWidth: number;
   protected _rangeSelectionStarted: boolean;
+  protected _resourceSelectionMode: PlannerResourceSelectionMode;
   protected _tooltipSupport: TooltipSupport;
   protected _$body: JQuery<Body>;
   protected _gridScrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _cellMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
   protected _resizeMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
+  protected _resourceTitleMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
 
   constructor() {
     super();
@@ -77,10 +80,11 @@ export class Planner extends Widget implements PlannerModel {
     // @ts-expect-error
     this.displayModeOptions = {};
     this.headerVisible = true;
+    this.multiSelect = true;
     this.label = null;
     this.resources = [];
     this.resourceMap = {};
-    this.selectionMode = Planner.SelectionMode.MULTI_RANGE;
+    this.rangeSelectable = true;
     this.selectionRange = new DateRange();
     this.selectedResources = [];
     this.viewRange = new DateRange();
@@ -91,6 +95,7 @@ export class Planner extends Widget implements PlannerModel {
 
     this._resourceTitleWidth = 20;
     this._rangeSelectionStarted = false;
+    this._resourceSelectionMode = Planner.ResourceSelectionMode.DEFAULT;
 
     // main elements
     this.$container = null;
@@ -123,12 +128,6 @@ export class Planner extends Widget implements PlannerModel {
     YEAR: 6
   } as const;
 
-  static SelectionMode = {
-    NONE: 0,
-    SINGLE_RANGE: 1,
-    MULTI_RANGE: 2
-  } as const;
-
   static RANGE_SELECTION_MOVE_THRESHOLD = 10;
 
   static MenuType = {
@@ -136,6 +135,12 @@ export class Planner extends Widget implements PlannerModel {
     EmptySpace: 'Planner.EmptySpace',
     Range: 'Planner.Range',
     Resource: 'Planner.Resource'
+  } as const;
+
+  static ResourceSelectionMode = {
+    DEFAULT: 0,
+    DESELECT: 1,
+    ADD: 2
   } as const;
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -321,15 +326,40 @@ export class Planner extends Widget implements PlannerModel {
 
   protected _onResourceTitleMouseDown(event: JQuery.MouseDownEvent) {
     let $resource = $(event.target).parent();
+    let selectedResource = $resource.data('resource') as PlannerResource;
     if ($resource.isSelected()) {
-      if (event.which === 3 || event.which === 1 && event.ctrlKey) {
+      if (event.which === 3) {
         // Right click on an already selected resource must not clear the selection -> context menu will be opened
         return;
       }
     }
-    this.startRow = $resource.data('resource') as PlannerResource;
+
+    if (event.which === 1 && event.ctrlKey) {
+      if ($resource.isSelected()) {
+        this._resourceSelectionMode = Planner.ResourceSelectionMode.DESELECT;
+      } else if (this.multiSelect) {
+        this._resourceSelectionMode = Planner.ResourceSelectionMode.ADD;
+      }
+    }
+
+    this.startRow = selectedResource;
     this.lastRow = this.startRow;
-    this._select();
+    this._select(true);
+
+    // add event handlers
+    this._resourceTitleMousemoveHandler = this._onResourceTitleMousemove.bind(this, event);
+    this._$body.document()
+      .on('mousemove', this._resourceTitleMousemoveHandler)
+      .one('mouseup', this._onDocumentMouseUp.bind(this));
+  }
+
+  protected _onResourceTitleMousemove(mousedownEvent: JQuery.MouseDownEvent, event: JQuery.MouseMoveEvent<Document>) {
+    let lastRow = this._findRow(event.pageY);
+    if (lastRow) {
+      this.lastRow = lastRow;
+    }
+
+    this._select(true);
   }
 
   protected _onResourceTitleContextMenu(event: JQuery.ContextMenuEvent) {
@@ -910,18 +940,17 @@ export class Planner extends Widget implements PlannerModel {
     let $activity,
       $resource,
       $target = $(event.target),
-      selectionMode = Planner.SelectionMode,
       opensContextMenu = (event.which === 3 || event.which === 1 && event.ctrlKey);
 
     if (this.activitySelectable) {
-      if (!opensContextMenu && this.$selector) {
+      if (!opensContextMenu && this.$selectors) {
         // Hide selector otherwise activity may not be resolved (elementFromPoint would return the $selector)
         // This allows selecting an activity which is inside a selection range
-        this.$selector.hide();
+        this.$selectors.forEach(s => s.hide());
       }
       $activity = this.$grid.elementFromPoint(event.pageX, event.pageY);
-      if (!opensContextMenu && this.$selector) {
-        this.$selector.show();
+      if (!opensContextMenu && this.$selectors) {
+        this.$selectors.forEach(s => s.show());
       }
       if ($activity.hasClass('planner-activity')) {
         $resource = $activity.parent().parent();
@@ -935,13 +964,17 @@ export class Planner extends Widget implements PlannerModel {
       this.selectActivity(null);
     }
 
-    if (this.selectionMode === selectionMode.NONE) {
+    if (!this.rangeSelectable) {
       return;
     }
 
-    if ($target.hasClass('selector') && opensContextMenu) {
-      // Right click on the selector must not clear the selection -> context menu will be opened
-      return;
+    if ($target.hasClass('selector')) {
+      if (opensContextMenu) {
+        // Right click on the selector must not clear the selection -> context menu will be opened
+        return;
+      }
+    } else if (event.which === 1 && event.ctrlKey && this.multiSelect) {
+      this._resourceSelectionMode = Planner.ResourceSelectionMode.ADD;
     }
 
     if (!this.selectedActivity) {
@@ -966,7 +999,7 @@ export class Planner extends Widget implements PlannerModel {
     this.lastRange = this.startRange;
 
     // draw
-    this._select();
+    this._select(true);
     this._rangeSelectionStarted = true;
   }
 
@@ -984,7 +1017,7 @@ export class Planner extends Widget implements PlannerModel {
     let mousedownRow = this._findRow(mousedownEvent.pageY);
     let mousemoveRow = this._findRow(mousemoveEvent.pageY);
     // Accept if y movement is big enough AND the row changed. No need to switch into range selection mode if cursor is still on the same row
-    return Math.abs(moveY) >= moveThreshold && this.selectionMode === Planner.SelectionMode.MULTI_RANGE && mousedownRow !== mousemoveRow;
+    return Math.abs(moveY) >= moveThreshold && this.multiSelect && mousedownRow !== mousemoveRow;
   }
 
   protected _onCellMousemove(mousedownEvent: JQuery.MouseDownEvent, event: JQuery.MouseMoveEvent<Document>) {
@@ -1005,7 +1038,7 @@ export class Planner extends Widget implements PlannerModel {
       this.lastRange = lastRange;
     }
 
-    this._select();
+    this._select(true);
   }
 
   protected _onResizeMouseDown(event: JQuery.MouseDownEvent): boolean {
@@ -1045,19 +1078,20 @@ export class Planner extends Widget implements PlannerModel {
     if (lastRange) {
       this.lastRange = lastRange;
     }
-    this._select();
+    this._select(false);
   }
 
   protected _onDocumentMouseUp(event: JQuery.MouseUpEvent<Document>) {
     this._$body.removeClass('col-resize');
     this._removeMouseMoveHandlers();
+    this._resourceSelectionMode = Planner.ResourceSelectionMode.DEFAULT;
     if (!this._rangeSelectionStarted) {
       // Range selection has not been initiated -> don't call select()
       return;
     }
     this._rangeSelectionStarted = false;
     if (this.rendered) {
-      this._select();
+      this._select(false);
     }
   }
 
@@ -1066,41 +1100,55 @@ export class Planner extends Widget implements PlannerModel {
       this._$body.document().off('mousemove', this._cellMousemoveHandler);
       this._cellMousemoveHandler = null;
     }
+    if (this._resourceTitleMousemoveHandler) {
+      this._$body.document().off('mousemove', this._resourceTitleMousemoveHandler);
+      this._resourceTitleMousemoveHandler = null;
+    }
     if (this._resizeMousemoveHandler) {
       this._$body.document().off('mousemove', this._resizeMousemoveHandler);
       this._resizeMousemoveHandler = null;
     }
   }
 
-  protected _select() {
-    if (!this.startRow || !this.lastRow) {
+  protected _select(updateResources = true) {
+    if (updateResources && (!this.startRow || !this.lastRow)) {
       return;
     }
     let rangeSelected = !!(this.startRange && this.lastRange);
-    let $startRow = this.startRow.$resource,
-      $lastRow = this.lastRow.$resource;
+    if (updateResources) {
+      let $startRow = this.startRow.$resource,
+        $lastRow = this.lastRow.$resource;
 
-    // in case of single selection
-    if (this.selectionMode === Planner.SelectionMode.SINGLE_RANGE) {
-      this.lastRow = this.startRow;
-      $lastRow = this.startRow.$resource;
-    }
+      // in case of single selection
+      if (!this.multiSelect) {
+        this.lastRow = this.startRow;
+        $lastRow = this.startRow.$resource;
+      }
 
-    // select rows
-    let $upperRow = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow,
-      $lowerRow = ($startRow[0].offsetTop > $lastRow[0].offsetTop) ? $startRow : $lastRow,
-      resources = $('.planner-resource', this.$grid).toArray(),
-      top = $upperRow[0].offsetTop,
-      low = $lowerRow[0].offsetTop;
+      // select rows
+      let $upperRow = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow,
+        $lowerRow = ($startRow[0].offsetTop > $lastRow[0].offsetTop) ? $startRow : $lastRow,
+        resources = $('.planner-resource', this.$grid).toArray(),
+        top = $upperRow[0].offsetTop,
+        low = $lowerRow[0].offsetTop;
 
-    for (let r = resources.length - 1; r >= 0; r--) {
-      let row = resources[r];
-      if ((row.offsetTop < top && row.offsetTop < low) || (row.offsetTop > top && row.offsetTop > low)) {
-        resources.splice(r, 1);
+      for (let r = resources.length - 1; r >= 0; r--) {
+        let row = resources[r];
+        if ((row.offsetTop < top && row.offsetTop < low) || (row.offsetTop > top && row.offsetTop > low)) {
+          resources.splice(r, 1);
+        }
+      }
+
+      let selectedResources = resources.map(i => $(i).data('resource'));
+      if (this._resourceSelectionMode === Planner.ResourceSelectionMode.ADD) {
+        selectedResources = selectedResources.concat(this.selectedResources).sort((a, b) => comparators.NUMERIC.compare(a.$resource.index(), b.$resource.index()));
+        this.selectResources(selectedResources);
+      } else if (this._resourceSelectionMode === Planner.ResourceSelectionMode.DESELECT) {
+        this.deselectResources(selectedResources);
+      } else {
+        this.selectResources(selectedResources);
       }
     }
-
-    this.selectResources(resources.map(i => $(i).data('resource')));
     this.selectActivity(null);
 
     if (rangeSelected) {
@@ -1294,7 +1342,7 @@ export class Planner extends Widget implements PlannerModel {
     if (allowedTypes.indexOf(Planner.MenuType.Activity) > -1 && !this.selectedActivity) {
       arrays.remove(allowedTypes, Planner.MenuType.Activity);
     }
-    if (allowedTypes.indexOf(Planner.MenuType.Range) > -1 && !this.selectionRange.from && !this.selectionRange.to) {
+    if (allowedTypes.indexOf(Planner.MenuType.Range) > -1 && (this.selectedResources.length === 0 || !this.selectionRange.from || !this.selectionRange.to)) {
       arrays.remove(allowedTypes, Planner.MenuType.Range);
     }
     return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes, defaultMenuTypes: this.defaultMenuTypes});
@@ -1341,7 +1389,7 @@ export class Planner extends Widget implements PlannerModel {
     this._renderRange();
     this._renderScale();
     this._rerenderActivities(); // required in case first/lastHourOfDay changes
-    this._select(); // adjust selection if minSelectionIntervalCount has changed
+    this._select(false); // adjust selection if minSelectionIntervalCount has changed
     this.invalidateLayoutTree();
   }
 
@@ -1402,34 +1450,59 @@ export class Planner extends Widget implements PlannerModel {
     }
   }
 
-  protected _renderSelectionMode() {
-    if (this.selectionMode === Planner.SelectionMode.NONE) {
-      if (this.$selector) {
-        this.$selector.remove();
-        this.$highlight.remove();
-      }
+  protected _renderRangeSelectable() {
+    if (!this.rangeSelectable) {
+      this._removeSelectors();
     } else {
       this._renderSelectionRange();
     }
   }
 
-  protected _renderSelectionRange() {
-    let fromDate = this.selectionRange.from,
-      toDate = this.selectionRange.to,
-      startRow = this.selectedResources[0],
-      lastRow = this.selectedResources[this.selectedResources.length - 1];
+  protected _renderMultiSelect() {
+    if (!this.multiSelect && arrays.length(this.selectedResources) > 1) {
+      this.selectResources(this.selectedResources[0]);
+    }
+  }
 
-    // remove old selector
-    if (this.$selector) {
-      this.$selector.remove();
+  protected _removeSelectors() {
+    if (this.$selectors) {
+      this.$selectors.forEach(s => s.remove());
+    }
+    if (this.$highlight) {
       this.$highlight.remove();
     }
+  }
 
-    if (!startRow || !lastRow || !this.selectionRange.from || !this.selectionRange.to) {
+  protected _renderSelectionRange() {
+    // remove old selector
+    this._removeSelectors();
+
+    if (!this.rangeSelectable || this.selectedResources.length === 0 || !this.selectionRange.from || !this.selectionRange.to) {
       return;
     }
-    let $startRow = startRow.$resource;
-    let $lastRow = lastRow.$resource;
+
+    this.$selectors = [];
+
+    let $startRow = this.selectedResources[0].$resource;
+    let $lastRow = $startRow;
+    let lastIndex;
+    for (let i = 0; i < this.selectedResources.length; i++) {
+      let $currentRow = this.selectedResources[i].$resource;
+      let currentIndex = $currentRow.index();
+      if (!!lastIndex && lastIndex + 1 < currentIndex) {
+        // render selection
+        this._renderSelectionRangeInternal($startRow, $lastRow, false);
+        $startRow = $currentRow;
+      }
+      lastIndex = currentIndex;
+      $lastRow = $currentRow;
+    }
+    this._renderSelectionRangeInternal($startRow, $lastRow, true);
+  }
+
+  protected _renderSelectionRangeInternal($startRow: JQuery, $lastRow: JQuery, colorizeScale: boolean) {
+    let fromDate = this.selectionRange.from,
+      toDate = this.selectionRange.to;
 
     // Make sure selection fits into scale
     let from = Math.max(fromDate.valueOf(), this.beginScale);
@@ -1437,23 +1510,26 @@ export class Planner extends Widget implements PlannerModel {
 
     // top and height
     let $parent = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow;
-    this.$selector = $parent.children('.resource-cells').appendDiv('selector');
-    this.$selector.cssHeight($startRow.outerHeight() + Math.abs($lastRow[0].offsetTop - $startRow[0].offsetTop));
-    let $selectorResizeLeft = this.$selector.appendDiv('selector-resize-left').on('mousedown', this._onResizeMouseDown.bind(this));
-    let $selectorResizeRight = this.$selector.appendDiv('selector-resize-right').on('mousedown', this._onResizeMouseDown.bind(this));
-    this.$selector
+    let $selector = $parent.children('.resource-cells').appendDiv('selector');
+    $selector.cssHeight($startRow.outerHeight() + Math.abs($lastRow[0].offsetTop - $startRow[0].offsetTop));
+    let $selectorResizeLeft = $selector.appendDiv('selector-resize-left').on('mousedown', this._onResizeMouseDown.bind(this));
+    let $selectorResizeRight = $selector.appendDiv('selector-resize-right').on('mousedown', this._onResizeMouseDown.bind(this));
+    $selector
       .css('left', 'calc(' + this.transformLeft(from) + '% - ' + $selectorResizeLeft.cssWidth() + 'px)')
       .css('width', 'calc(' + this.transformWidth(from, to) + '% + ' + ($selectorResizeLeft.cssWidth() + $selectorResizeRight.cssWidth()) + 'px)')
       .on('contextmenu', this._onRangeSelectorContextMenu.bind(this));
+    this.$selectors.push($selector);
 
-    // colorize scale
-    this.$highlight = this.$timelineSmall.prependDiv('highlight');
+    if (colorizeScale) {
+      // colorize scale
+      this.$highlight = this.$timelineSmall.prependDiv('highlight');
 
-    let left = this.$selector.cssLeft() + $selectorResizeLeft.cssWidth() + this.$scaleTitle.cssWidth();
-    let width = this.$selector.cssWidth() - ($selectorResizeLeft.cssWidth() + $selectorResizeRight.cssWidth());
-    this.$highlight
-      .cssLeft(left)
-      .cssWidth(width);
+      let left = this.$selectors[0].cssLeft() + $selectorResizeLeft.cssWidth() + this.$scaleTitle.cssWidth();
+      let width = this.$selectors[0].cssWidth() - ($selectorResizeLeft.cssWidth() + $selectorResizeRight.cssWidth());
+      this.$highlight
+        .cssLeft(left)
+        .cssWidth(width);
+    }
   }
 
   protected _setSelectedActivity(selectedActivity: PlannerActivity | string) {
@@ -1666,7 +1742,7 @@ export class Planner extends Widget implements PlannerModel {
 
 export type PlannerDisplayMode = EnumObject<typeof Planner.DisplayMode>;
 export type PlannerDirection = EnumObject<typeof Planner.Direction>;
-export type PlannerSelectionMode = EnumObject<typeof Planner.SelectionMode>;
+export type PlannerResourceSelectionMode = EnumObject<typeof Planner.ResourceSelectionMode>;
 export type PlannerMenuType = EnumObject<typeof Planner.MenuType>;
 
 export interface PlannerActivity {

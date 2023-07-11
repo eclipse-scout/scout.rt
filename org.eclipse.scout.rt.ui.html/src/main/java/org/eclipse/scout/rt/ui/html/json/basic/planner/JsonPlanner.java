@@ -116,25 +116,25 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
   @Override
   protected void initJsonProperties(PLANNER model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_LABEL, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_LABEL, model) {
       @Override
       protected String modelValue() {
         return getModel().getLabel();
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_AVAILABLE_DISPLAY_MODES, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_AVAILABLE_DISPLAY_MODES, model) {
       @Override
       protected Set<Integer> modelValue() {
         return getModel().getAvailableDisplayModes();
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_DISPLAY_MODE, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_DISPLAY_MODE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getDisplayMode();
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_DISPLAY_MODE_OPTIONS, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_DISPLAY_MODE_OPTIONS, model) {
       @Override
       protected Map<Integer, DisplayModeOptions> modelValue() {
         return getModel().getDisplayModeOptions();
@@ -153,7 +153,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
         return options;
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_VIEW_RANGE, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_VIEW_RANGE, model) {
       @Override
       protected Range<Date> modelValue() {
         return getModel().getViewRange();
@@ -168,13 +168,19 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
         return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_HEADER_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_HEADER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isHeaderVisible();
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTION_RANGE, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_MULTI_SELECT, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isMultiSelect();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_SELECTION_RANGE, model) {
       @Override
       protected Range<Date> modelValue() {
         return getModel().getSelectionRange();
@@ -189,7 +195,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
         return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTED_ACTIVITY, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_SELECTED_ACTIVITY, model) {
       @Override
       protected Activity<?, ?> modelValue() {
         return getModel().getSelectedActivity();
@@ -201,13 +207,13 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
         return new P_GetOrCreateCellIdProvider().getId(activityCell);
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTION_MODE, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_RANGE_SELECTABLE, model) {
       @Override
-      protected Integer modelValue() {
-        return getModel().getSelectionMode();
+      protected Boolean modelValue() {
+        return getModel().isRangeSelectable();
       }
     });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_ACTIVITY_SELECTABLE, model) {
+    putJsonProperty(new JsonProperty<>(IPlanner.PROP_ACTIVITY_SELECTABLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isActivitySelectable();
