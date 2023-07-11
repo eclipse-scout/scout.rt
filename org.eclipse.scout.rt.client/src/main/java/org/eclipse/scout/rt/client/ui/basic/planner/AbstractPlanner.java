@@ -154,9 +154,17 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     return true;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(165)
+  protected boolean getConfiguredRangeSelectable() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+
   @Order(170)
-  protected int getConfiguredSelectionMode() {
-    return SELECTION_MODE_MULTI_RANGE;
+  protected boolean getConfiguredMultiSelect() {
+    return true;
   }
 
   @Order(175)
@@ -273,7 +281,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     setDisplayModeOptions(new HashMap<>());
     initDisplayModeOptions();
     setHeaderVisible(getConfiguredHeaderVisible());
-    setSelectionMode(getConfiguredSelectionMode());
+    setMultiSelect(getConfiguredMultiSelect());
+    setRangeSelectable(getConfiguredRangeSelectable());
     setActivitySelectable(getConfiguredActivitySelectable());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -614,7 +623,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     setPlannerChanging(true);
     try {
       List<Resource<RI>> newSelection = new ArrayList<>(resources);
-      if (newSelection.size() > 1 && !isMultiSelectResources()) {
+      if (newSelection.size() > 1 && !isMultiSelect()) {
         Resource<RI> first = newSelection.get(0);
         newSelection.clear();
         newSelection.add(first);
@@ -795,6 +804,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   }
 
   @Override
+  public void setMultiSelect(boolean resourceMultiSelect) {
+    propertySupport.setPropertyBool(PROP_MULTI_SELECT, resourceMultiSelect);
+  }
+
+  @Override
+  public boolean isMultiSelect() {
+    return propertySupport.getPropertyBool(PROP_MULTI_SELECT);
+  }
+
+  @Override
   public int getDisplayMode() {
     return propertySupport.getPropertyInt(PROP_DISPLAY_MODE);
   }
@@ -835,17 +854,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   }
 
   @Override
-  public int getSelectionMode() {
-    return propertySupport.getPropertyInt(PROP_SELECTION_MODE);
-  }
-
-  public boolean isMultiSelectResources() {
-    return SELECTION_MODE_MULTI_RANGE == getSelectionMode();
+  public boolean isRangeSelectable() {
+    return propertySupport.getPropertyBool(PROP_RANGE_SELECTABLE);
   }
 
   @Override
-  public void setSelectionMode(int mode) {
-    propertySupport.setPropertyInt(PROP_SELECTION_MODE, mode);
+  public void setRangeSelectable(boolean rangeSelectable) {
+    propertySupport.setPropertyBool(PROP_RANGE_SELECTABLE, rangeSelectable);
   }
 
   @Override
