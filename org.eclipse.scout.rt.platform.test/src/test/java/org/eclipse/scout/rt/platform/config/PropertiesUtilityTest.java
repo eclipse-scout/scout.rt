@@ -11,6 +11,9 @@ package org.eclipse.scout.rt.platform.config;
 
 import static org.junit.Assert.*;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -39,10 +42,13 @@ public class PropertiesUtilityTest {
   private static final String EMPTY_KEY = "emptyKey";
 
   private static Properties load(String path) throws Exception {
-    Properties props = new Properties();
-    props.load(PropertiesUtility.class.getResourceAsStream("/" + path));
-    PropertiesUtility.resolveVariables(props,true);
-    return props;
+    try (InputStream inputStream = PropertiesUtility.class.getResourceAsStream("/" + path);
+        InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+      Properties props = new Properties();
+      props.load(reader);
+      PropertiesUtility.resolveVariables(props, true);
+      return props;
+    }
   }
 
   @Test
@@ -61,7 +67,7 @@ public class PropertiesUtilityTest {
     Properties props = new Properties();
     props.setProperty("prop1", "a${prop1}b");
     try {
-      PropertiesUtility.resolveVariables(props,true);
+      PropertiesUtility.resolveVariables(props, true);
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
@@ -76,7 +82,7 @@ public class PropertiesUtilityTest {
     props.setProperty("prop1", "a${prop2}b");
     props.setProperty("prop2", "a${prop33}b");
     try {
-      PropertiesUtility.resolveVariables(props,true);
+      PropertiesUtility.resolveVariables(props, true);
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
@@ -93,7 +99,7 @@ public class PropertiesUtilityTest {
     props.setProperty("prop4", "a${prop5}b");
     props.setProperty("prop5", "a${prop4}b");
     try {
-      PropertiesUtility.resolveVariables(props,true);
+      PropertiesUtility.resolveVariables(props, true);
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
@@ -109,7 +115,7 @@ public class PropertiesUtilityTest {
       System.setProperty(attrOtherSystemPropertyKey, "resolved");
 
       Properties props = load(SAMPLE_CONFIG_PROPS);
-      PropertiesUtility.resolveVariables(props,true);
+      PropertiesUtility.resolveVariables(props, true);
       assertEquals("property resolved", props.getProperty(ATTR_STRING_KEY));
 
       System.setProperty(ATTR_STRING_KEY, "property ${" + ATTR_LONG_KEY + "}");

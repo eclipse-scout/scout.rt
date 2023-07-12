@@ -24,7 +24,7 @@ public class DefaultConfigFileLoader implements IConfigFileLoader {
 
   @Override
   public void load(URL source, Properties destination) {
-    try (BufferedReader in = new BufferedReader(new InputStreamReader(source.openStream(), StandardCharsets.ISO_8859_1))) {
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(source.openStream(), StandardCharsets.UTF_8))) {
       destination.load(in);
     }
     catch (Exception t) {

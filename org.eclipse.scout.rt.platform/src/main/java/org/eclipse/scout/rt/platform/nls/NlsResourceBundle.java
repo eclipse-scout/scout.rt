@@ -11,7 +11,9 @@ package org.eclipse.scout.rt.platform.nls;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -109,7 +111,7 @@ public final class NlsResourceBundle {
     if (locale == null || Locale.ROOT.equals(locale)) {
       return "";
     }
-    return "_" + locale.toString();
+    return "_" + locale;
   }
 
   /**
@@ -118,18 +120,18 @@ public final class NlsResourceBundle {
    */
   private static NlsResourceBundle getBundle(NlsResourceBundle parent, String baseName, String suffix, ClassLoader cl) throws IOException {
     String fileName = baseName.replace('.', '/') + suffix + '.' + TEXT_RESOURCE_EXTENSION;
-    URL res = cl.getResource(fileName);
-    if (res != null) {
-      try (InputStream in = res.openStream()) {
-        return new NlsResourceBundle(parent, loadTextMap(in));
+    InputStream stream = cl.getResourceAsStream(fileName);
+    if (stream != null) {
+      try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+        return new NlsResourceBundle(parent, loadTextMap(reader));
       }
     }
     return null;
   }
 
-  private static Map<String, String> loadTextMap(InputStream stream) throws IOException {
+  private static Map<String, String> loadTextMap(Reader reader) throws IOException {
     Properties properties = new Properties();
-    properties.load(stream);
+    properties.load(reader);
     Map<String, String> map = new HashMap<>();
     for (Entry<Object, Object> entry : properties.entrySet()) {
       map.put((String) entry.getKey(), (String) entry.getValue());

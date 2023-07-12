@@ -16,9 +16,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -120,8 +123,10 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
       }
     }
 
-    try (FileOutputStream fos = new FileOutputStream(prefsLocation, false); OutputStream out = new BufferedOutputStream(fos)) {
-      props.store(out, null);
+    try (FileOutputStream fos = new FileOutputStream(prefsLocation, false);
+        BufferedOutputStream out = new BufferedOutputStream(fos);
+        OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
+      props.store(writer, null);
       out.flush();
       fos.getFD().sync();
     }
@@ -133,8 +138,9 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
   protected Properties loadFromDisk(File prefsLocation) {
     LOG.debug("loading preferences from file '{}'.", prefsLocation.getAbsolutePath());
     Properties result = new Properties();
-    try (InputStream input = new BufferedInputStream(new FileInputStream(prefsLocation))) {
-      result.load(input);
+    try (InputStream input = new BufferedInputStream(new FileInputStream(prefsLocation));
+        Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
+      result.load(reader);
     }
     catch (IOException e) {
       throw new ProcessingException("Error loading preferences from file '" + prefsLocation.getAbsolutePath() + "'.", e);
