@@ -2,7 +2,7 @@
   <configuration default="false" name="[webapp] dev server" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.eclipse.scout.dev.jetty.JettyServer" />
     <module name="${rootArtifactId}.server.app.dev" />
-    <option name="PROGRAM_PARAMETERS" value="-Dscout.jetty.port=8080 -Djandex.rebuild=true" />
+    <option name="VM_PARAMETERS" value="-Dscout.jetty.port=8080 -Djandex.rebuild=true" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <method v="2">
       <option name="Make" enabled="true" />
