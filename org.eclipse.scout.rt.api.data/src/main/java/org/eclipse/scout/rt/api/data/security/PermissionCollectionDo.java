@@ -91,12 +91,18 @@ public class PermissionCollectionDo extends DoEntity {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  /**
+   * See {@link #objectType()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public PermissionCollectionDo withObjectType(String objectType) {
     objectType().set(objectType);
     return this;
   }
 
+  /**
+   * See {@link #objectType()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public String getObjectType() {
     return objectType().get();

@@ -170,12 +170,18 @@ public class ErrorDo extends DoEntity {
     return correlationId().get();
   }
 
+  /**
+   * See {@link #severity()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public ErrorDo withSeverity(String severity) {
     severity().set(severity);
     return this;
   }
 
+  /**
+   * See {@link #severity()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public String getSeverity() {
     return severity().get();
