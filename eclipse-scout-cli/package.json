@@ -65,7 +65,7 @@
     "webpack": "5.80.0",
     "yargs-parser": "21.1.1",
     "fork-ts-checker-webpack-plugin": "8.0.0",
-    "fork-ts-checker-notifier-webpack-plugin": "6.0.0"
+    "fork-ts-checker-notifier-webpack-plugin": "7.0.0"
   },
   "devDependencies": {
     "@eclipse-scout/releng": "^22.0.0"
