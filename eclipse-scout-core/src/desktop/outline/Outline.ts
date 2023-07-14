@@ -12,7 +12,7 @@ import {
   GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton,
   ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel, PropertyChangeEvent,
   scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke,
-  TreeNavigationUpKeyStroke, Widget
+  TreeNavigationUpKeyStroke, Widget, objects
 } from '../../index';
 
 export class Outline extends Tree implements DisplayParent, OutlineModel {
@@ -174,6 +174,12 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, Page);
     nodeModel.parent = this;
+    if (nodeModel.nodeType === 'jsPage') {
+      let jsNodeModel = {};
+      objects.extractProperties(nodeModel, jsNodeModel, ['id', 'parent', 'owner', 'objectType']);
+      jsNodeModel = $.extend(true, {}, nodeModel.jsPageModel, jsNodeModel);
+      nodeModel = jsNodeModel;
+    }
     return scout.create(nodeModel as FullModelOf<Page>);
   }
 

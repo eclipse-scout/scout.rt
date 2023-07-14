@@ -22,12 +22,14 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.js.IJsPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
+import org.eclipse.scout.rt.ui.html.json.JsonDataObjectHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
@@ -64,13 +66,13 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   @Override
   protected void initJsonProperties(OUTLINE model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_NAVIGATE_BUTTONS_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<>(IOutline.PROP_NAVIGATE_BUTTONS_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isNavigateButtonsVisible();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<OUTLINE>(IOutline.PROP_DEFAULT_DETAIL_FORM, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<>(IOutline.PROP_DEFAULT_DETAIL_FORM, model, getUiSession()) {
       @Override
       protected IForm modelValue() {
         return getModel().getDefaultDetailForm();
@@ -81,7 +83,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
         return JsonAdapterPropertyConfigBuilder.globalConfig();
       }
     });
-    putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_OUTLINE_OVERVIEW_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<>(IOutline.PROP_OUTLINE_OVERVIEW_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isOutlineOverviewVisible();
@@ -182,6 +184,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     json.put(PROP_OVERVIEW_ICON_ID, page.getOverviewIconId());
     json.put(PROP_SHOW_TILE_OVERVIEW, page.isShowTileOverview());
     json.put(PROP_COMPACT_ROOT, page.isCompactRoot());
+    if (node instanceof IJsPage) {
+      putJsPageObjectTypeAndModel(json, (IJsPage) node);
+    }
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, page);
     return json;
   }
@@ -193,6 +198,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     }
     else if (node instanceof IPageWithTable) {
       nodeType = "table";
+    }
+    if (node instanceof IJsPage) {
+      nodeType = "jsPage";
     }
     if (nodeType != null) {
       putProperty(json, "nodeType", nodeType);
@@ -211,6 +219,11 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
         putAdapterIdProperty(json, PROP_DETAIL_TABLE, table);
       }
     }
+  }
+
+  protected void putJsPageObjectTypeAndModel(JSONObject json, IJsPage jsPage) {
+    putProperty(json, "objectType", jsPage.getJsPageObjectType());
+    putProperty(json, IJsPage.PROP_JS_PAGE_MODEL, BEANS.get(JsonDataObjectHelper.class).dataObjectToJson(jsPage.getJsPageModel()));
   }
 
   @Override
