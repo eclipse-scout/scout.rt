@@ -227,12 +227,17 @@ module.exports = (env, args) => {
       const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
       const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin');
 
-      let forkTsCheckerConfig = undefined;
+      let forkTsCheckerConfig = {
+        typescript: {
+          memoryLimit: 4096
+        }
+      };
       if (!fs.existsSync('./tsconfig.json')) {
         // if the module has no tsconfig: use default from Scout.
         // Otherwise, each module would need to provide a tsconfig even if there is no typescript code in the module.
         forkTsCheckerConfig = {
           typescript: {
+            ...forkTsCheckerConfig.typescript,
             configFile: require.resolve('@eclipse-scout/tsconfig'),
             context: process.cwd(),
             configOverwrite: {
