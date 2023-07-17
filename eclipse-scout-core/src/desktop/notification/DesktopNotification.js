@@ -169,7 +169,7 @@ export default class DesktopNotification extends ScoutNotification {
       return;
     }
 
-    if (window.Notification && Notification.permission === 'denied') {
+    if (!window.Notification || Notification.permission === 'denied') {
       this._hideLaterIfNativeOnly();
       return;
     }
