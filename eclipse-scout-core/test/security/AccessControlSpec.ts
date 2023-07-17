@@ -166,7 +166,11 @@ describe('AccessControl', () => {
           type: 'ALL'
         })
       });
-      await accessControl.whenSync();
+      accessControl.whenSyncError().then(fail);
+      await Promise.all([
+        accessControl.whenSyncSuccess(),
+        accessControl.whenSync()
+      ]);
 
       expect(accessControl._permissionCollection).not.toBeNull();
     });
@@ -179,6 +183,7 @@ describe('AccessControl', () => {
         status: 500
       });
       accessControl.whenSync().then(fail);
+      accessControl.whenSyncSuccess().then(fail);
       jasmine.clock().tick(1);
 
       expect(accessControl._permissionCollection).not.toBeNull();

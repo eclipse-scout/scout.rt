@@ -11,6 +11,7 @@
 import {
   ajax, AjaxError, ErrorHandler, Event, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout, SomeRequired
 } from '../index';
+import $ from 'jquery';
 
 export class AccessControl extends PropertyEventEmitter implements AccessControlModel {
   declare self: AccessControl;
@@ -72,6 +73,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
       .catch((error: AjaxError) => {
         // handle error and return null
         scout.create(ErrorHandler, {displayError: false}).handle(error);
+        this._onSyncError();
         return null;
       })
       .then((model: PermissionCollectionModel) => {
@@ -84,7 +86,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
         this._syncTimeoutId = setTimeout(this._sync.bind(this), this.interval);
         if (sync) {
           // notify listeners
-          this._onSync();
+          this._onSyncSuccess();
         }
       });
   }
@@ -93,15 +95,36 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     return ajax.getJson(this.permissionsUrl, {}, {retryIntervals: this._retryIntervals});
   }
 
-  protected _onSync() {
-    this.trigger('sync');
+  /**
+   * @returns promise which is resolved if the next sync is successful and rejected if it results in an error.
+   */
+  whenSync(): JQuery.Promise<void> {
+    const success = $.Deferred();
+    this.whenSyncSuccess().then(e => success.resolve());
+    this.whenSyncError().then(e => success.reject('Permissions were not synchronized successfully.'));
+    return success.promise();
+  }
+
+  protected _onSyncSuccess() {
+    this.trigger('syncSuccess');
   }
 
   /**
    * @returns promise which is resolved after the next successful sync.
    */
-  whenSync(): JQuery.Promise<Event<AccessControl>> {
-    return this.when('sync');
+  whenSyncSuccess(): JQuery.Promise<Event<AccessControl>> {
+    return this.when('syncSuccess');
+  }
+
+  protected _onSyncError() {
+    this.trigger('syncError');
+  }
+
+  /**
+   * @returns promise which is resolved after the next sync error.
+   */
+  whenSyncError(): JQuery.Promise<Event<AccessControl>> {
+    return this.when('syncError');
   }
 
   /**
@@ -133,6 +156,7 @@ export interface AccessControlModel extends ObjectModel<AccessControl> {
 }
 
 export interface AccessControlEventMap extends PropertyEventMap {
-  'sync': Event;
+  'syncSuccess': Event<AccessControl>;
+  'syncError': Event<AccessControl>;
   'propertyChange:interval': PropertyChangeEvent<number>;
 }

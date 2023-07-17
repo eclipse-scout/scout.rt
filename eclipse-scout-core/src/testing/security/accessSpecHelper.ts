@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {access, AccessControl, arrays, Event, ObjectFactory, ObjectOrModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType} from '../../index';
+import {access, AccessControl, arrays, ObjectFactory, ObjectOrModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType} from '../../index';
 import $ from 'jquery';
 
 export const accessSpecHelper = {
@@ -59,7 +59,7 @@ class StaticAccessControl extends AccessControl {
     // nop
   }
 
-  override whenSync(): JQuery.Promise<Event<AccessControl>> {
+  override whenSync(): JQuery.Promise<void> {
     return $.resolvedPromise();
   }
 }
