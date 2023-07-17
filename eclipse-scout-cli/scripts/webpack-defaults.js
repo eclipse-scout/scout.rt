@@ -23,6 +23,15 @@ const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('web
  * @param {boolean} args.watch true, if webpack runs in watch mode. Default is false.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  * @param {object} args.tsOptions a config object to be passed to the ts-loader
+ * @param {boolean|'fork'} args.typeCheck
+ *    true: let the TypeScript compiler check the types.
+ *    false: let the TypeScript compiler only transpile the TypeScript code without checking types, which makes it faster.
+ *    fork: starts a separate process to run the type checks so that the build won't be blocked until type check completes.
+ *          Also shows a notification if type check fails. This mode needs more memory.
+ *    auto:
+ *    - In prod mode, types won't be checked (typeCheck is false).
+ *    - In dev mode, types will be checked (typeCheck is true).
+ *    - In watch mode: types will be checked in a separate process (typeCheck is fork).
  */
 module.exports = (env, args) => {
   const buildMode = args.mode;
@@ -31,7 +40,12 @@ module.exports = (env, args) => {
   const isWatchMode = nvl(args.watch, false);
   const outDir = scoutBuildConstants.getOutputDir(buildMode);
   const resDirArray = args.resDirArray || ['res'];
+  let typeCheck = computeTypeCheck(args.typeCheck, devMode, isWatchMode);
   console.log(`Webpack mode: ${buildMode}`);
+  if (isWatchMode) {
+    console.log('File watching enabled');
+  }
+  console.log(`Type check: ${typeCheck}`);
 
   // # Copy static web-resources delivered by the modules
   const copyPluginConfig = [];
@@ -61,8 +75,7 @@ module.exports = (env, args) => {
     ]
   };
 
-  // in prod mode always only transpile (no type-checks). In dev mode type checking is skipped in watch mode. Instead, ForkTsCheckerWebpackPlugin is used then (see below).
-  const transpileOnly = !devMode || isWatchMode;
+  const transpileOnly = typeCheck === 'fork' ? true : !typeCheck;
   const tsOptions = {
     ...args.tsOptions,
     transpileOnly: transpileOnly,
@@ -222,40 +235,41 @@ module.exports = (env, args) => {
     config.plugins.push(new ProgressPlugin({profile: args.profile}));
   }
 
-  if (devMode) {
-    if (transpileOnly) { // devMode and no type-checks: perform checks asynchronously (watch mode).
-      const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-      const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin');
+  if (typeCheck === 'fork') {
+    // perform type checks asynchronously in a separate process
+    const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+    const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin');
 
-      let forkTsCheckerConfig = {
+    let forkTsCheckerConfig = {
+      typescript: {
+        memoryLimit: 4096
+      }
+    };
+    if (!fs.existsSync('./tsconfig.json')) {
+      // if the module has no tsconfig: use default from Scout.
+      // Otherwise, each module would need to provide a tsconfig even if there is no typescript code in the module.
+      forkTsCheckerConfig = {
         typescript: {
-          memoryLimit: 4096
+          ...forkTsCheckerConfig.typescript,
+          configFile: require.resolve('@eclipse-scout/tsconfig'),
+          context: process.cwd(),
+          configOverwrite: {
+            compilerOptions: {skipLibCheck: true, sourceMap: false, inlineSourceMap: false, declarationMap: false, allowJs: true},
+            include: isMavenModule ? ['./src/main/js/**/*.ts', './src/main/js/**/*.js', './src/test/js/**/*.ts', './src/test/js/**/*.js']
+              : ['./src/**/*.ts', './src/**/*.js', './test/**/*.ts', './test/**/*.js']
+          }
         }
       };
-      if (!fs.existsSync('./tsconfig.json')) {
-        // if the module has no tsconfig: use default from Scout.
-        // Otherwise, each module would need to provide a tsconfig even if there is no typescript code in the module.
-        forkTsCheckerConfig = {
-          typescript: {
-            ...forkTsCheckerConfig.typescript,
-            configFile: require.resolve('@eclipse-scout/tsconfig'),
-            context: process.cwd(),
-            configOverwrite: {
-              compilerOptions: {skipLibCheck: true, sourceMap: false, inlineSourceMap: false, declarationMap: false, allowJs: true},
-              include: isMavenModule ? ['./src/main/js/**/*.ts', './src/main/js/**/*.js', './src/test/js/**/*.ts', './src/test/js/**/*.js']
-                : ['./src/**/*.ts', './src/**/*.js', './test/**/*.ts', './test/**/*.js']
-            }
-          }
-        };
-      }
-      config.plugins.push(new ForkTsCheckerWebpackPlugin(forkTsCheckerConfig));
-      config.plugins.push(new ForkTsCheckerNotifierWebpackPlugin({
-        title: getModuleName(),
-        skipSuccessful: true, // no notification for successful builds
-        excludeWarnings: true // no notification for warnings
-      }));
     }
-  } else {
+    config.plugins.push(new ForkTsCheckerWebpackPlugin(forkTsCheckerConfig));
+    config.plugins.push(new ForkTsCheckerNotifierWebpackPlugin({
+      title: getModuleName(),
+      skipSuccessful: true, // no notification for successful builds
+      excludeWarnings: true // no notification for warnings
+    }));
+  }
+
+  if (!devMode) {
     const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
     const TerserPlugin = require('terser-webpack-plugin');
     config.optimization.minimizer = [
@@ -556,6 +570,23 @@ function rewriteIndexImports(newImport, excludedFolder) {
     // Continue without externalizing the import
     callback();
   };
+}
+
+function computeTypeCheck(typeCheck, devMode, watchMode) {
+  typeCheck = nvl(typeCheck, 'auto');
+  if (typeCheck !== 'auto' && typeCheck !== 'fork') {
+    typeCheck = typeCheck.toLowerCase() === 'true';
+  }
+  if (typeCheck !== 'auto') {
+    return typeCheck;
+  }
+  if (!devMode) {
+    return false;
+  }
+  if (watchMode) {
+    return 'fork';
+  }
+  return true;
 }
 
 module.exports.addThemes = addThemes;
