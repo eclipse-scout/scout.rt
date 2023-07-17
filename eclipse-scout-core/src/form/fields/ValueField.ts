@@ -689,11 +689,10 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
   protected static _getActiveValueField(target: Element): ValueField<any> {
     let $activeElement = $(target).activeElement(),
       activeWidget = scout.widget($activeElement);
-    if (activeWidget instanceof ValueField) {
-      return activeWidget.enabledComputed ? activeWidget : null;
+    if (activeWidget instanceof ValueField && activeWidget.enabledComputed) {
+      return activeWidget;
     }
-    const parent = activeWidget && activeWidget.findParent(parent => parent instanceof ValueField) as ValueField<any>;
-    return (parent && parent.enabledComputed) ? parent : null;
+    return null;
   }
 }
 
