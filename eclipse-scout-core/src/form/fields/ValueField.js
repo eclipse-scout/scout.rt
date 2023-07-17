@@ -640,10 +640,9 @@ export default class ValueField extends FormField {
   static _getActiveValueField(target) {
     let $activeElement = $(target).activeElement(),
       activeWidget = scout.widget($activeElement);
-    if (activeWidget instanceof ValueField) {
-      return activeWidget.enabledComputed ? activeWidget : null;
+    if (activeWidget instanceof ValueField && activeWidget.enabledComputed) {
+      return activeWidget;
     }
-    const parent = activeWidget && activeWidget.findParent(parent => parent instanceof ValueField);
-    return (parent && parent.enabledComputed) ? parent : null;
+    return null;
   }
 }
