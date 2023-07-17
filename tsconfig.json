@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "eclipse-scout-core"},
+    { "path": "eclipse-scout-chart"},
+    { "path": "org.eclipse.scout.rt.svg.ui.html"}
+  ]
+}
