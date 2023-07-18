@@ -45,10 +45,6 @@ export default class HtmlField extends ValueField {
     this._renderSelectable();
   }
 
-  _readDisplayText() {
-    return this.displayText;
-  }
-
   /**
    * @override
    */

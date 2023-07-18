@@ -94,7 +94,7 @@ export default class ValueField extends FormField {
    * The default impl. returns an empty string, because not every ValueField has a sensible display text.
    */
   _readDisplayText() {
-    return '';
+    return scout.nvl(this.displayText, '');
   }
 
   _onClearIconMouseDown(event) {
