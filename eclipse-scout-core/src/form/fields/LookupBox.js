@@ -228,10 +228,6 @@ export default class LookupBox extends ValueField {
     return strings.join(', ', formatted);
   }
 
-  _readDisplayText() {
-    return this.displayText;
-  }
-
   _clear() {
     this.setValue(null);
   }

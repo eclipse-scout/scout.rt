@@ -68,11 +68,6 @@ export default class BeanField extends ValueField {
     return this.value;
   }
 
-  _readDisplayText() {
-    // DisplayText cannot be changed, therefore it must be equal to the current value (see comment in _formatValue)
-    return this.displayText;
-  }
-
   /**
    * @override
    */
