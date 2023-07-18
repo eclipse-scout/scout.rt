@@ -123,6 +123,45 @@ describe('PermissionCollection', () => {
     });
   });
 
+  describe('getGrantedPermissionLevel', () => {
+
+    it('is Permission.Level.ALL if type is ALL', () => {
+      const collection = scout.create(PermissionCollection, {type: PermissionCollectionType.ALL});
+
+      expect(collection.getGrantedPermissionLevel(null)).toBe(Permission.Level.UNDEFINED);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('some'))).toBe(Permission.Level.ALL);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('other'))).toBe(Permission.Level.ALL);
+    });
+
+    it('is Permission.Level.NONE if type is NONE', () => {
+      const collection = scout.create(PermissionCollection, {type: PermissionCollectionType.NONE});
+
+      expect(collection.getGrantedPermissionLevel(null)).toBe(Permission.Level.UNDEFINED);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('some'))).toBe(Permission.Level.NONE);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('other'))).toBe(Permission.Level.NONE);
+    });
+
+    it('gets the correct permission level if type is DEFAULT', () => {
+      const collection = scout.create(PermissionCollection, {
+        permissions: {
+          undef: [scout.create(Permission, {name: 'undef', level: Permission.Level.UNDEFINED})],
+          none: [scout.create(Permission, {name: 'none', level: Permission.Level.NONE})],
+          all: [scout.create(Permission, {name: 'all', level: Permission.Level.ALL})],
+          multiple: [scout.create(Permission, {name: 'multiple', level: Permission.Level.NONE}), scout.create(Permission, {name: 'multiple', level: Permission.Level.ALL})],
+          multipleSame: [scout.create(Permission, {name: 'multipleSame', level: Permission.Level.ALL}), scout.create(Permission, {name: 'multipleSame', level: Permission.Level.ALL})]
+        }
+      });
+
+      expect(collection.getGrantedPermissionLevel(null)).toBe(Permission.Level.UNDEFINED);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('undef'))).toBe(Permission.Level.UNDEFINED);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('none'))).toBe(Permission.Level.NONE);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('all'))).toBe(Permission.Level.ALL);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('multiple'))).toBe(Permission.Level.UNDEFINED);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('multipleSame'))).toBe(Permission.Level.ALL);
+      expect(collection.getGrantedPermissionLevel(Permission.quick('other'))).toBe(Permission.Level.NONE);
+    });
+  });
+
   describe('permissions', () => {
 
     it('is always of type PermissionMap', () => {

@@ -15,7 +15,9 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.security.IPermission;
+import org.eclipse.scout.rt.security.PermissionLevel;
 
 /**
  * This data object represents a Scout JS object model and supports subclassing.<br>
@@ -37,6 +39,10 @@ public class PermissionDo extends DoEntity {
     return doValue("name");
   }
 
+  public DoValue<Integer> level() {
+    return doValue("level");
+  }
+
   /* **************************************************************************
    * CUSTOM CONVENIENCE TO DO FUNCTION
    * *************************************************************************/
@@ -46,7 +52,8 @@ public class PermissionDo extends DoEntity {
     public void apply(IPermission permission, PermissionDo permissionDo) {
       permissionDo
           .withObjectType(PERMISSION_OBJECT_TYPE)
-          .withName(permission.getName());
+          .withName(permission.getName())
+          .withLevel(ObjectUtility.nvl(permission.getLevel(), PermissionLevel.UNDEFINED).getValue());
     }
   }
 
@@ -80,5 +87,16 @@ public class PermissionDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public String getName() {
     return name().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public PermissionDo withLevel(Integer level) {
+    level().set(level);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Integer getLevel() {
+    return level().get();
   }
 }

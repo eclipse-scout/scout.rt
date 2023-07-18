@@ -9,7 +9,8 @@
  */
 
 import {
-  ajax, AjaxError, ErrorHandler, Event, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout, SomeRequired
+  ajax, AjaxError, ErrorHandler, Event, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout,
+  SomeRequired
 } from '../index';
 import $ from 'jquery';
 
@@ -92,7 +93,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
   }
 
   protected _loadPermissionCollection(): JQuery.Promise<PermissionCollectionModel, AjaxError> {
-    return ajax.getJson(this.permissionsUrl, {}, {retryIntervals: this._retryIntervals});
+    return ajax.getJson(this.permissionsUrl, {cache: true}, {retryIntervals: this._retryIntervals});
   }
 
   /**
@@ -139,6 +140,20 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
       return quick ? false : $.resolvedPromise(false);
     }
     return this._permissionCollection.implies(permission, quick);
+  }
+
+  /**
+   * Returns the granted {@link PermissionLevel} for a given permission instance `permission`.
+   * - {@link Permission.Level.UNDEFINED} if `permission` is `null` or in general 'not an {@link Permission}'
+   * - {@link Permission.Level.NONE} if no level at all is granted to `permission`
+   * - {@link PermissionLevel} if the level can be determined exactly.
+   * - {@link Permission.Level.UNDEFINED} if there are multiple granted permission levels possible and there is not enough data in the `permission` contained to determine the result closer.
+   */
+  getGrantedPermissionLevel(permission: Permission): PermissionLevel {
+    if (!this._permissionCollection) {
+      return Permission.Level.UNDEFINED;
+    }
+    return this._permissionCollection.getGrantedPermissionLevel(permission);
   }
 }
 
