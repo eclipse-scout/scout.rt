@@ -8,17 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {access, Permission} from '../../src/index';
+import {access, Permission, scout} from '../../src/index';
 import {accessSpecHelper} from '../../src/testing/index';
 
 describe('access', () => {
   let same: Permission,
-    name: Permission;
+    name: Permission,
+    none: Permission;
 
   beforeAll(async () => {
-    same = Permission.ensure({objectType: SamePermission, name: 'same'});
+    same = Permission.ensure({objectType: SamePermission, name: 'same', level: Permission.Level.ALL});
     name = Permission.quick('name');
-    await accessSpecHelper.install(accessSpecHelper.permissionCollectionModel(same, name));
+    none = scout.create(Permission, {name: 'none', level: Permission.Level.NONE});
+    await accessSpecHelper.install(accessSpecHelper.permissionCollectionModel(same, name, none));
   });
 
   afterAll(() => {
@@ -44,6 +46,11 @@ describe('access', () => {
       expect(access.quickCheck(Permission.ensure({objectType: SamePermission, name: 'name'}))).toBeTrue();
       expect(access.quickCheck(name)).toBeTrue();
 
+      expect(access.quickCheck('none')).toBeFalse();
+      expect(access.quickCheck(Permission.quick('none'))).toBeFalse();
+      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, name: 'none'}))).toBeFalse();
+      expect(access.quickCheck(none)).toBeFalse();
+
       expect(access.quickCheck('other')).toBeFalse();
       expect(access.quickCheck(Permission.quick('other'))).toBeFalse();
       expect(access.quickCheck(Permission.ensure({objectType: SamePermission, name: 'other'}))).toBeFalse();
@@ -63,9 +70,25 @@ describe('access', () => {
       expect(await access.check(Permission.ensure({objectType: SamePermission, name: 'name'}))).toBeTrue();
       expect(await access.check(name)).toBeTrue();
 
+      expect(await access.check('none')).toBeFalse();
+      expect(await access.check(Permission.quick('none'))).toBeFalse();
+      expect(await access.check(Permission.ensure({objectType: SamePermission, name: 'none'}))).toBeFalse();
+      expect(await access.check(none)).toBeFalse();
+
       expect(await access.check('other')).toBeFalse();
       expect(await access.check(Permission.quick('other'))).toBeFalse();
       expect(await access.check(Permission.ensure({objectType: SamePermission, name: 'other'}))).toBeFalse();
+    });
+  });
+
+  describe('getGrantedPermissionLevel', () => {
+
+    it('gets the correct permission level', () => {
+      expect(access.getGrantedPermissionLevel(null)).toBe(Permission.Level.UNDEFINED);
+      expect(access.getGrantedPermissionLevel('same')).toBe(Permission.Level.ALL);
+      expect(access.getGrantedPermissionLevel('name')).toBe(Permission.Level.UNDEFINED);
+      expect(access.getGrantedPermissionLevel('none')).toBe(Permission.Level.NONE);
+      expect(access.getGrantedPermissionLevel('other')).toBe(Permission.Level.NONE);
     });
   });
 });

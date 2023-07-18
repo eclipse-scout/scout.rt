@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, Permission, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout} from '../index';
+import {FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, Permission, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout} from '../index';
 
 export class PermissionCollection extends PropertyEventEmitter implements PermissionCollectionModel {
   declare self: PermissionCollection;
@@ -104,6 +104,47 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
         return quick ? true : $.resolvedPromise(true);
       case PermissionCollectionType.NONE:
         return quick ? false : $.resolvedPromise(false);
+    }
+  }
+
+  /**
+   * Returns the granted {@link PermissionLevel} for a given permission instance `permission`.
+   * - {@link Permission.Level.UNDEFINED} if `permission` is `null` or in general 'not an {@link Permission}'
+   * - {@link Permission.Level.NONE} if no level at all is granted to `permission`
+   * - {@link PermissionLevel} if the level can be determined exactly.
+   * - {@link Permission.Level.UNDEFINED} if there are multiple granted permission levels possible and there is not enough data in the `permission` contained to determine the result closer.
+   */
+  getGrantedPermissionLevel(permission: Permission): PermissionLevel {
+    if (!permission || !(permission instanceof Permission)) {
+      return Permission.Level.UNDEFINED;
+    }
+    switch (this.type) {
+      case PermissionCollectionType.DEFAULT: {
+        const permissions = this.permissions.get(permission.name);
+        if (!permissions || !permissions.size) {
+          return Permission.Level.NONE;
+        }
+
+        const grantedLevels = new Set<PermissionLevel>();
+        for (const p of permissions) {
+          if (p.matches(permission)) {
+            grantedLevels.add(p.level);
+          }
+        }
+
+        switch (grantedLevels.size) {
+          case 0:
+            return Permission.Level.NONE;
+          case 1:
+            return grantedLevels.values().next().value;
+          default:
+            return Permission.Level.UNDEFINED;
+        }
+      }
+      case PermissionCollectionType.ALL:
+        return Permission.Level.ALL;
+      case PermissionCollectionType.NONE:
+        return Permission.Level.NONE;
     }
   }
 

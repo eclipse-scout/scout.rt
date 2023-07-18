@@ -155,7 +155,7 @@ public final class PermissionLevel implements Serializable {
   private Object readResolve() throws ObjectStreamException {
     PermissionLevel existing = opt(m_value);
     if (existing == null) {
-      return register(m_value, "UNKNOWN[" + m_value + "]", false, () -> "Unknown PermssionLevel");
+      return register(m_value, "UNKNOWN[" + m_value + "]", false, () -> "Unknown PermissionLevel");
     }
     else {
       return existing;

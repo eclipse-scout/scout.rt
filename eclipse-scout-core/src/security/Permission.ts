@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, scout, SomeRequired, strings} from '../index';
+import {EnumObject, FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, scout, SomeRequired, strings} from '../index';
 
 export class Permission implements PermissionModel {
   declare self: Permission;
@@ -16,14 +16,23 @@ export class Permission implements PermissionModel {
   declare initModel: SomeRequired<this['model'], 'name'>;
 
   name: string;
+  level: PermissionLevel;
 
   constructor() {
     this.name = null;
+    this.level = Permission.Level.UNDEFINED;
   }
+
+  static Level = {
+    UNDEFINED: -1,
+    NONE: 0,
+    ALL: 100
+  };
 
   init(model: InitModelOf<this>) {
     model = model || {} as InitModelOf<this>;
     this.name = scout.assertParameter('name', strings.nullIfEmpty(model.name));
+    this.level = scout.nvl(model.level, this.level);
   }
 
   /**
@@ -34,7 +43,7 @@ export class Permission implements PermissionModel {
   implies(permission: Permission, quick?: false): JQuery.Promise<boolean>;
   implies(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean>;
   implies(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean> {
-    if (this.matches(permission)) {
+    if (this.matches(permission) && this.level !== Permission.Level.NONE) {
       return quick ? this._evalPermissionQuick(permission) : this._evalPermission(permission);
     }
     return quick ? false : $.resolvedPromise(false);
@@ -91,4 +100,10 @@ export interface PermissionModel extends ObjectModel<Permission> {
    * The name and identifier of the {@link Permission}.
    */
   name?: string;
+  /**
+   * The level of the {@link Permission}.
+   */
+  level?: PermissionLevel;
 }
+
+export type PermissionLevel = EnumObject<typeof Permission.Level>;
