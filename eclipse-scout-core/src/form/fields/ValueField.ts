@@ -115,7 +115,7 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
    * The default impl. returns an empty string, because not every ValueField has a sensible display text.
    */
   protected _readDisplayText(): string {
-    return '';
+    return scout.nvl(this.displayText, '');
   }
 
   protected _onClearIconMouseDown(event: JQuery.MouseDownEvent) {

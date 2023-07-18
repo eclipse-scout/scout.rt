@@ -47,10 +47,6 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
     this._renderSelectable();
   }
 
-  protected override _readDisplayText(): string {
-    return this.displayText;
-  }
-
   protected override _renderDisplayText() {
     if (!this.displayText) {
       this.$field.empty();
