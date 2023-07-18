@@ -123,17 +123,6 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
     }
   }
 
-  // Because a <div> is used as field, jQuery's val() used in ValueField.js is not working here, so
-  // the content of displayText variable is used instead.
-  // (For reading the displayText innerHtml() _could_ be used on the div-field, but some browsers
-  // would collapse whitespaces which would also collapse multiple tabs when coping some table rows.
-  // So instead of reading the effective displayText from the field, the internal displayText value
-  // will be reused without actual reading. Parsing of pasted content is handled onPaste() and stored
-  // in this.displayText.)
-  protected override _readDisplayText(): string {
-    return this.displayText;
-  }
-
   protected _getSelection(): Selection {
     let selection: Selection,
       myWindow = this.$container.window(true);

@@ -233,10 +233,6 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return strings.join(', ', ...formatted);
   }
 
-  protected override _readDisplayText(): string {
-    return this.displayText;
-  }
-
   protected override _clear() {
     this.setValue(null);
   }
