@@ -97,6 +97,7 @@ public class IdCodec {
       List<? extends IId> components = ((ICompositeId) id).unwrap();
       return components.stream()
           .map(this::toUnqualified)
+          .map(s -> s == null ? "" : s) // empty string if component is null just in case of composite id
           .collect(Collectors.joining(";"));
     }
     return handleToUnqualifiedUnknownIdType(id);
@@ -246,7 +247,13 @@ public class IdCodec {
         throw new PlatformException("Missing raw type mapper for wrapped type {}, id type {}", type, idClass);
       }
       try {
-        components[i] = mapper.apply(rawComponents[i]);
+        String raw = rawComponents[i];
+        if (StringUtility.isNullOrEmpty(raw)) {
+          components[i] = null;
+        }
+        else {
+          components[i] = mapper.apply(raw);
+        }
       }
       catch (Exception e) {
         throw new PlatformException("Failed to parse component value={}, rawType={}, idType={}", rawComponents[i], type.getName(), idClass.getName(), e);

@@ -124,6 +124,11 @@ public class IdFactoryTest {
     List<? extends IId> id2Components = id2.unwrap();
     assertEquals("abc", id2Components.get(0).unwrap());
     assertNull(id2Components.get(1));
+
+    FixtureCompositeWithNullValuesId id3 = BEANS.get(IdFactory.class).createInternal(FixtureCompositeWithNullValuesId.class, null, UUID.fromString("144a0317-8cb5-40b2-981f-1fae0781715f"));
+    List<? extends IId> id3Components = id3.unwrap();
+    assertNull(id3Components.get(0));
+    assertEquals(UUID.fromString("144a0317-8cb5-40b2-981f-1fae0781715f"), id3Components.get(1).unwrap());
   }
 
   @Test
