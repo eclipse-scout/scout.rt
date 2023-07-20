@@ -55,7 +55,6 @@ module.exports = {
       return;
     }
     fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, {flag: 'w'});
-    console.log(`created ${scoutBuild.fileListName}:\n${content}`);
   },
   cleanOutDir: dir => {
     if (!fs.existsSync(dir)) {
