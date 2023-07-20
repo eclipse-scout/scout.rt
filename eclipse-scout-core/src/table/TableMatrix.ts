@@ -276,10 +276,7 @@ export class TableMatrix {
       keyAxis.keyToDeterministicKey = key => key;
       keyAxis.normDeterministic = f => keyAxis.norm(f);
     } else if (axis instanceof IconColumn) {
-      keyAxis.textIsIcon = true;
-      keyAxis.deterministicKeyToKey = (deterministicKey: number) => deterministicKey;
-      keyAxis.keyToDeterministicKey = key => key;
-      keyAxis.normDeterministic = f => keyAxis.norm(f);
+      keyAxis.isIcon = true;
     } else {
       keyAxis.reorder = () => {
         let comparator = comparators.TEXT;
@@ -487,7 +484,8 @@ export type TableMatrixKeyAxis = number[] & {
   column: Column<any>;
   normTable: string[];
   sortCodeMap: Record<number, number>;
-  textIsIcon?: boolean;
+  isIcon?: boolean;
+  iconId?: string;
   min: number;
   max: number;
   format(n: number): string;

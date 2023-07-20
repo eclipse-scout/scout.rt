@@ -72,8 +72,8 @@ export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilte
       let deterministicKey = this.xAxis.keyToDeterministicKey(key);
       let text = this.xAxis.format(key);
       let iconId: string = null;
-      if (key !== null && this.xAxis.textIsIcon) {
-        // Only display icon if textIsIcon (still display empty text if key is null)
+      if (key !== null && this.xAxis.isIcon) {
+        // Only display icon if isIcon (still display empty text if key is null)
         iconId = text;
         text = null;
       }
