@@ -866,7 +866,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   }
 
   protected _handleIconLabel(label: string, axis: TableMatrixKeyAxis, iconClasses: string[]): string {
-    if (axis && axis.textIsIcon) {
+    if (axis && axis.isIcon) {
       let icon = icons.parseIconId(label);
       if (icon && icon.isFontIcon()) {
         iconClasses.push(...icon.appendCssClass('font-icon').split(' '));
@@ -982,7 +982,7 @@ export class ChartTableControl extends TableControl implements ChartTableControl
         }
       }
       label = axis.format(label as number);
-      if (axis.textIsIcon) {
+      if (axis.isIcon) {
         let icon = icons.parseIconId(label);
         if (icon && icon.isFontIcon()) {
           label = icon.iconCharacter;
