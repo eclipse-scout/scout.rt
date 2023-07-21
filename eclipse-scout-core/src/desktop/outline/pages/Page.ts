@@ -54,6 +54,7 @@ export class Page extends TreeNode implements PageModel {
   row: TableRow;
   tile: ButtonTile;
   events: EventSupport;
+  pageChanging: number;
 
   protected _tableFilterHandler: EventHandler<Event<Table>>;
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
@@ -81,6 +82,7 @@ export class Page extends TreeNode implements PageModel {
     this.inheritMenusFromParentTablePage = true;
     this.events = new EventSupport();
     this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => event.propertyName === propertyName);
+    this.pageChanging = 0;
     this._tableFilterHandler = this._onTableFilter.bind(this);
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
@@ -98,15 +100,20 @@ export class Page extends TreeNode implements PageModel {
   } as const;
 
   protected override _init(model: InitModelOf<this>) {
-    this._detailTableModel = Page._removePropertyIfLazyLoading(model, 'detailTable') as ChildModelOf<Table>;
-    this._detailFormModel = Page._removePropertyIfLazyLoading(model, 'detailForm') as ChildModelOf<Form>;
+    try {
+      this.setPageChanging(true);
+      this._detailTableModel = Page._removePropertyIfLazyLoading(model, 'detailTable') as ChildModelOf<Table>;
+      this._detailFormModel = Page._removePropertyIfLazyLoading(model, 'detailForm') as ChildModelOf<Form>;
 
-    super._init(model);
-    icons.resolveIconProperty(this, 'overviewIconId');
+      super._init(model);
+      icons.resolveIconProperty(this, 'overviewIconId');
 
-    // init necessary if the properties are still available (e.g. Scout classic)
-    this._internalInitTable();
-    this._internalInitDetailForm();
+      // init necessary if the properties are still available (e.g. Scout classic)
+      this._internalInitTable();
+      this._internalInitDetailForm();
+    } finally {
+      this.setPageChanging(false);
+    }
   }
 
   protected static _removePropertyIfLazyLoading(object: PageModel, name: string): any {
@@ -126,6 +133,7 @@ export class Page extends TreeNode implements PageModel {
   }
 
   protected override _destroy() {
+    this.trigger('destroying');
     super._destroy();
     if (this.detailTable) {
       this.detailTable.destroy();
@@ -133,6 +141,7 @@ export class Page extends TreeNode implements PageModel {
     if (this.detailForm) {
       this.detailForm.destroy();
     }
+    this.trigger('destroy');
   }
 
   protected _internalInitTable() {
@@ -427,6 +436,7 @@ export class Page extends TreeNode implements PageModel {
       this._initDetailForm(form);
     }
     this.triggerPropertyChange('detailForm', oldDetailForm, form);
+    this.getOutline().pageChanged(this);
   }
 
   /**
@@ -450,6 +460,7 @@ export class Page extends TreeNode implements PageModel {
       this._initDetailTable(table);
     }
     this.triggerPropertyChange('detailTable', oldDetailTable, table);
+    this.getOutline().pageChanged(this);
   }
 
   /**
@@ -536,6 +547,16 @@ export class Page extends TreeNode implements PageModel {
     let drillNode = this.pageForTableRow(row);
     this.getOutline().selectNode(drillNode);
     this.detailTable.deselectRow(row);
+  }
+
+  setPageChanging(changing: boolean) {
+    if (changing) {
+      this.pageChanging++;
+      return;
+    }
+    if (this.pageChanging) {
+      this.pageChanging--;
+    }
   }
 
   /**

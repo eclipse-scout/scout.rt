@@ -7,9 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventMap, Form, PropertyChangeEvent, Table} from '../../../index';
+import {Event, EventMap, Form, Page, PropertyChangeEvent, Table} from '../../../index';
 
 export interface PageEventMap extends EventMap {
   'propertyChange:detailForm': PropertyChangeEvent<Form>;
   'propertyChange:detailTable': PropertyChangeEvent<Table>;
+  'destroying': Event<Page>;
+  'destroy': Event<Page>;
 }
