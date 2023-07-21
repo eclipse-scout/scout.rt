@@ -23,10 +23,22 @@ export class HybridManager extends Widget {
 
   // static helpers
 
-  static get(session: Session): HybridManager {
-    return arrays.find(session.desktop.addOns, addOn => {
-      return addOn instanceof HybridManager;
-    }) as HybridManager;
+  static get(session: Session, wait?: false): HybridManager;
+  static get(session: Session, wait: true): JQuery.Promise<HybridManager>;
+  static get(session: Session, wait?: boolean): HybridManager | JQuery.Promise<HybridManager> {
+    const findHybridManager = () => session.desktop.addOns.find(addOn => addOn instanceof HybridManager) as HybridManager;
+
+    if (!wait) {
+      return findHybridManager();
+    }
+
+    if (session.desktop.initialized) {
+      return $.resolvedPromise(findHybridManager());
+    }
+
+    const deferred = $.Deferred();
+    session.desktop.one('init', e => deferred.resolve(findHybridManager()));
+    return deferred.promise();
   }
 
   // init
@@ -101,6 +113,7 @@ export class HybridManager extends Widget {
 
   _onHybridFormEvent(form: Form, eventType: string, data: object) {
     if (eventType === 'reset') {
+      form.setData(data);
       form.trigger('reset');
     } else if (eventType === 'save') {
       form.setData(data);
