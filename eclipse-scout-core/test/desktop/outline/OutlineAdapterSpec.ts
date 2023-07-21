@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {OutlineSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../../src/testing';
-import {defaultValues, Outline} from '../../../src';
+import {defaultValues, Outline, Page} from '../../../src';
 
 describe('OutlineAdapter', () => {
   let session: SandboxSession;
@@ -64,6 +64,7 @@ describe('OutlineAdapter', () => {
 
     outline.insertNode({
       id: 'root',
+      nodeType: Page.NodeType.TABLE,
       text: 'Table Page',
       detailTable: table,
       detailTableVisible: true
@@ -84,6 +85,7 @@ describe('OutlineAdapter', () => {
     // Insert row and node separately, in Scout classic the OutlineMediator.js does not sync the rows to nodes because it happens on server side.
     outline.insertNode({
       id: 'node1',
+      nodeType: Page.NodeType.NODES,
       text: 'node 1'
     }, node);
     table.insertRow({
@@ -99,6 +101,7 @@ describe('OutlineAdapter', () => {
     // Insert cell 2 -> must not be shown
     outline.insertNode({
       id: 'node2',
+      nodeType: Page.NodeType.NODES,
       text: 'node 2'
     }, node);
     table.insertRow({
@@ -111,6 +114,7 @@ describe('OutlineAdapter', () => {
     // Insert another cell 1 -> must be shown
     outline.insertNode({
       id: 'node3',
+      nodeType: Page.NodeType.NODES,
       text: 'node 1'
     }, node);
     table.insertRow({
@@ -142,6 +146,7 @@ describe('OutlineAdapter', () => {
     });
     outline.insertNode({
       id: 'node1',
+      nodeType: Page.NodeType.NODES,
       text: 'node 1'
     }, node);
     expect(table.$rows().length).toBe(1);
@@ -155,6 +160,7 @@ describe('OutlineAdapter', () => {
     });
     outline.insertNode({
       id: 'node2',
+      nodeType: Page.NodeType.NODES,
       text: 'node 2'
     }, node);
     expect(table.$rows().length).toBe(1);
@@ -163,6 +169,7 @@ describe('OutlineAdapter', () => {
     // Update visible row -> filter still accepts, nothing happens
     outline.updateNode({
       id: 'node1',
+      nodeType: Page.NodeType.NODES,
       text: 'node 1 new'
     });
     table.updateRow({
@@ -176,6 +183,7 @@ describe('OutlineAdapter', () => {
     // Update invisible row -> filter still does not accept, nothing happens
     outline.updateNode({
       id: 'node2',
+      nodeType: Page.NodeType.NODES,
       text: 'node 2 new'
     });
     table.updateRow({
@@ -189,6 +197,7 @@ describe('OutlineAdapter', () => {
     // Update invisible row -> filter now accepts, row and node will get visible
     outline.updateNode({
       id: 'node2',
+      nodeType: Page.NodeType.NODES,
       text: 'node 1 from 2'
     });
     table.updateRow({
@@ -221,6 +230,7 @@ describe('OutlineAdapter', () => {
     });
     outline.insertNode({
       id: 'node1',
+      nodeType: Page.NodeType.NODES,
       text: 'node 1'
     }, node);
     table.insertRow({
@@ -230,6 +240,7 @@ describe('OutlineAdapter', () => {
     });
     outline.insertNode({
       id: 'node2',
+      nodeType: Page.NodeType.NODES,
       text: 'node 2'
     }, node);
     expect(table.$rows().length).toBe(1);
@@ -255,19 +266,59 @@ describe('OutlineAdapter', () => {
     expect(outline.$nodes().length).toBe(3);
   });
 
-  it('applies defaultValues to pages', () => {
+  it('applies defaultValues to remote pages', () => {
     defaultValues.init(defaults);
-    let outline = createOutlineWithDetailTable();
-    let node0 = outline.nodes[0];
-    expect(outline['a']).toBe(123);
-    expect(outline.nodes[0]['b']).toBe(234);
-    expect(outline.nodes[0].childNodes[0]).toBe(undefined);
+    const treeHelper = new TreeSpecHelper(session);
 
-    let newChildNode = helper.createModelNode('0_1', 'newChildNode');
-    let treeHelper = new TreeSpecHelper(session);
-    let event = treeHelper.createNodesInsertedEvent(outline, [newChildNode], node0.id);
-    outline.modelAdapter.onModelAction(event);
+    const outline = createOutlineWithDetailTable();
     expect(outline['a']).toBe(123);
-    expect(outline.nodes[0].childNodes[0]['b']).toBe(234);
+
+    const node0: OutlineAdapterPage = outline.nodes[0];
+    expect(node0['b']).toBe(234);
+    expect(node0.remote).toBeTrue();
+    expect(node0.childNodes[0]).toBeUndefined();
+
+    outline.modelAdapter.onModelAction(treeHelper.createNodesInsertedEvent(outline,
+      [helper.createModelNode('0_0', 'newChildNode', {nodeType: Page.NodeType.NODES})],
+      node0.id));
+
+    const node00: OutlineAdapterPage = node0.childNodes[0];
+    expect(node00.id).toBe('0_0');
+    expect(node00['b']).toBe(234);
+    expect(node00.remote).toBeTrue();
+
+    outline.modelAdapter.onModelAction(treeHelper.createNodesInsertedEvent(outline,
+      [helper.createModelNode('0_1', 'newChildNode')],
+      node0.id));
+
+    const node01: OutlineAdapterPage = node0.childNodes[1];
+    expect(node01.id).toBe('0_1');
+    expect(node01['b']).toBeUndefined();
+    expect(node01.remote).toBeFalsy();
+
+    outline.modelAdapter.onModelAction(treeHelper.createNodesInsertedEvent(outline,
+      [
+        helper.createModelNode('0_1_0', 'newChildNode', {nodeType: Page.NodeType.NODES}),
+        helper.createModelNode('0_1_1', 'newChildNode'),
+        helper.createModelNode('0_1_2', 'newChildNode', {nodeType: Page.NodeType.TABLE})
+      ],
+      node01.id));
+
+    const node010: OutlineAdapterPage = node01.childNodes[0];
+    expect(node010.id).toBe('0_1_0');
+    expect(node010['b']).toBe(234);
+    expect(node010.remote).toBeTrue();
+
+    const node011: OutlineAdapterPage = node01.childNodes[1];
+    expect(node011.id).toBe('0_1_1');
+    expect(node011['b']).toBeUndefined();
+    expect(node011.remote).toBeFalsy();
+
+    const node012: OutlineAdapterPage = node01.childNodes[2];
+    expect(node012.id).toBe('0_1_2');
+    expect(node012['b']).toBe(234);
+    expect(node012.remote).toBeTrue();
   });
 });
+
+export type OutlineAdapterPage = Page & { remote?: boolean };
