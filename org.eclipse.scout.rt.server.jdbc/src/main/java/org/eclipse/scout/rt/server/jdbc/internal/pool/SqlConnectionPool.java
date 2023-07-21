@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -24,11 +25,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.opentelemetry.IHistogramViewHintProvider;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.TimingUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.metrics.DoubleHistogram;
+import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.api.metrics.ObservableLongMeasurement;
 
 /**
  * System-wide connection pool for pooling connections There is one pool for every ISqlService sub class type If
@@ -39,6 +49,10 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("squid:S1166")
 public class SqlConnectionPool {
   private static final Logger LOG = LoggerFactory.getLogger(SqlConnectionPool.class);
+
+  private static final AttributeKey<String> POOL_NAME = AttributeKey.stringKey("pool.name");
+  private static final AttributeKey<String> CONNECTION_STATE = AttributeKey.stringKey("state");
+  private static final String OTEL_METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME = "db.client.connections.wait_time";
 
   private volatile boolean m_destroyed;
   private final String m_identity = UUID.randomUUID().toString();
@@ -54,6 +68,11 @@ public class SqlConnectionPool {
   private volatile long m_connectionLifetime;
   private volatile long m_connectionBusyTimeout;
   private final AtomicBoolean m_initialized = new AtomicBoolean(false);
+  /*
+   * OpenTelemetry
+   */
+  private DoubleHistogram m_connectionWaitTime;
+  private Attributes m_defaultAttributes;
 
   public void initialize(String name, int poolSize, long connectionLifetime, long connectionBusyTimeout) {
     Assertions.assertTrue(m_initialized.compareAndSet(false, true), "already initialized");
@@ -62,6 +81,7 @@ public class SqlConnectionPool {
     m_connectionLifetime = connectionLifetime;
     m_connectionBusyTimeout = connectionBusyTimeout;
     startManagePool();
+    initMetrics();
   }
 
   /**
@@ -76,7 +96,42 @@ public class SqlConnectionPool {
             .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.MINUTES))));
   }
 
+  /**
+   * @see <a href=
+   *      "https://opentelemetry.io/docs/specs/otel/metrics/semantic_conventions/database-metrics/">OpenTelemetry:
+   *      Semantic Conventions for Database Metrics</a>
+   */
+  private void initMetrics() {
+    Meter meter = GlobalOpenTelemetry.get().getMeter("scout.SqlConnectionPool");
+
+    ObservableLongMeasurement connectionsUsage = meter.upDownCounterBuilder("db.client.connections.usage")
+        .setDescription("The number of connections that are currently in state described by the state attribute.")
+        .setUnit("{connection}")
+        .buildObserver();
+    ObservableLongMeasurement maxConnections = meter.upDownCounterBuilder("db.client.connections.max")
+        .setDescription("The maximum number of open connections allowed.")
+        .setUnit("{connection}")
+        .buildObserver();
+    m_connectionWaitTime = meter.histogramBuilder(OTEL_METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME)
+        .setUnit("ms")
+        .setDescription("The time it took to obtain an open connection from the pool.")
+        .build();
+
+    m_defaultAttributes = Attributes.of(POOL_NAME, m_name);
+    Attributes idleConnectionsAttributes = m_defaultAttributes.toBuilder().put(CONNECTION_STATE, "idle").build();
+    Attributes usedConnectionsAttributes = m_defaultAttributes.toBuilder().put(CONNECTION_STATE, "used").build();
+    //noinspection resource
+    meter.batchCallback(() -> {
+      connectionsUsage.record(m_idleEntries.size(), idleConnectionsAttributes);
+      connectionsUsage.record(m_busyEntries.size(), usedConnectionsAttributes);
+      maxConnections.record(m_poolSize, m_defaultAttributes);
+    },
+        connectionsUsage,
+        maxConnections);
+  }
+
   public Connection leaseConnection(AbstractSqlService service) throws ClassNotFoundException, SQLException {
+    final long startTime = System.nanoTime();
     managePool();
     synchronized (m_poolLock) {
       Assertions.assertFalse(isDestroyed(), "{} not available because destroyed.", getClass().getSimpleName());
@@ -133,6 +188,8 @@ public class SqlConnectionPool {
       candidate.leaseCount++;
       m_busyEntries.add(candidate);
       LOG.debug("lease   {}", candidate.conn);
+      double elapsedAcquired = TimingUtility.msElapsed(startTime);
+      m_connectionWaitTime.record(elapsedAcquired, m_defaultAttributes);
       return candidate.conn;
     }
   }
@@ -309,5 +366,23 @@ public class SqlConnectionPool {
     }, Jobs.newInput()
         .withName("Closing SQL connection [name={}, connection={}, reason={}]", m_name, connection, reason)
         .withExecutionHint(m_identity));
+  }
+
+  /**
+   * Custom histogramm buckets for <code>db.client.connections.wait_time</code> (time unit: milliseconds).
+   *
+   * @see #m_connectionWaitTime
+   */
+  public static class WaitTimeHistogramViewHintProvider implements IHistogramViewHintProvider {
+
+    @Override
+    public String getInstrumentName() {
+      return OTEL_METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME;
+    }
+
+    @Override
+    public List<Double> getExplicitBuckets() {
+      return List.of(1d, 2d, 5d, 10d, 25d, 50d, 100d, 500d, 1_000d, 5_000d);
+    }
   }
 }
