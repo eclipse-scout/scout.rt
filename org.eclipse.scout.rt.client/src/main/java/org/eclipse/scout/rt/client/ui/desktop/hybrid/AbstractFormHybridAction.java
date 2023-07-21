@@ -42,6 +42,8 @@ public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY ext
         fireHybridWidgetEvent("save", result);
       }
       else if (FormEvent.TYPE_RESET_COMPLETE == e.getType()) {
+        DO_ENTITY result = createEmptyResult();
+        exportResult(form, result);
         fireHybridWidgetEvent("reset");
       }
       else if (FormEvent.TYPE_CLOSED == e.getType()) {
