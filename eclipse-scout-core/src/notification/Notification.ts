@@ -97,12 +97,12 @@ export class Notification extends Widget implements NotificationModel {
   protected _renderMessage() {
     let message = this.status.message || '';
     if (this.htmlEnabled) {
-      this.$messageText.html(message);
+      this.$messageText.htmlOrNbsp(message);
       // Add action to app-links
       this.$messageText.find('.app-link')
         .on('click', this._onAppLinkAction.bind(this));
     } else {
-      this.$messageText.html(strings.nl2br(message));
+      this.$messageText.htmlOrNbsp(strings.nl2br(message));
     }
     this.invalidateLayoutTree();
   }
