@@ -492,6 +492,29 @@ describe('Outline', () => {
         expect(tree.selectNodes).toHaveBeenCalledWith(tree.nodes[0]);
       });
     });
+
+    it('is updated when page changes', () => {
+      const outline = helper.createOutlineWithOneDetailTable();
+      helper.setMobileFlags(outline);
+      outline.render();
+      const page = outline.nodes[0].childNodes[0];
+      page.setDetailForm(new FormSpecHelper(session).createFormWithOneField({
+        modal: false
+      }));
+
+      expect(outline.detailContent).toBe(null);
+
+      outline.selectNodes(page);
+      expect(outline.detailContent).toBe(page.detailForm);
+
+      const oldDetailForm = page.detailForm;
+      page.setDetailForm(new FormSpecHelper(session).createFormWithOneField({
+        modal: false,
+        enabled: false
+      }));
+      expect(outline.detailContent).toBe(page.detailForm);
+      expect(outline.detailContent).not.toBe(oldDetailForm);
+    });
   });
 
   describe('outlineOverview', () => {

@@ -156,6 +156,7 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this._setSelectedViewTabs(this.selectedViewTabs);
     this._setMenus(this.menus);
     this.updateDetailContent();
+    this._nodesSelectedInternal(this.selectedNodes);
   }
 
   /**
@@ -1203,6 +1204,10 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   }
 
   pageChanged(page: Page) {
+    if (page?.pageChanging) {
+      return;
+    }
+
     if (page) {
       this._initDetailTableAndForm(page);
     }

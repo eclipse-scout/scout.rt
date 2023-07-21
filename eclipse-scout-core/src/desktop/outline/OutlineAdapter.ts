@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter} from '../../index';
+import {
+  App, ChildModelOf, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel
+} from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
   declare widget: Outline;
@@ -27,27 +29,35 @@ export class OutlineAdapter extends TreeAdapter {
   }
 
   protected _onPageChanged(event: RemoteEvent) {
+    let success = false;
     let page = this.widget.nodeById(event.nodeId);
-    page.overviewIconId = event.overviewIconId;
+    try {
+      page.setPageChanging(true);
+      page.overviewIconId = event.overviewIconId;
 
-    page.detailFormVisible = event.detailFormVisible;
-    let detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget) as Form;
-    page.setDetailForm(detailForm);
+      page.detailFormVisible = event.detailFormVisible;
+      let detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget) as Form;
+      page.setDetailForm(detailForm);
 
-    page.navigateButtonsVisible = event.navigateButtonsVisible;
-    page.detailTableVisible = event.detailTableVisible;
-    let detailTable = this.session.getOrCreateWidget(event.detailTable, this.widget) as Table;
-    if (page.detailTable !== detailTable) {
-      if (page.detailTable) {
-        this._destroyDetailTable(page);
+      page.navigateButtonsVisible = event.navigateButtonsVisible;
+      page.detailTableVisible = event.detailTableVisible;
+      let detailTable = this.session.getOrCreateWidget(event.detailTable, this.widget) as Table;
+      if (page.detailTable !== detailTable) {
+        if (page.detailTable) {
+          this._destroyDetailTable(page);
+        }
+        page.setDetailTable(detailTable);
+        if (page.detailTable) {
+          this._initDetailTable(page);
+        }
       }
-      page.setDetailTable(detailTable);
-      if (page.detailTable) {
-        this._initDetailTable(page);
-      }
+      success = true;
+    } finally {
+      page.setPageChanging(false);
     }
-
-    this.widget.pageChanged(page);
+    if (success) {
+      this.widget.pageChanged(page);
+    }
   }
 
   override onModelAction(event: RemoteEvent) {
@@ -241,16 +251,52 @@ export class OutlineAdapter extends TreeAdapter {
     this.modelAdapter._linkNodeWithRowLater(page);
   }
 
-  protected static _updateParentTablePageMenusForDetailForm(this: Page & { _updateParentTablePageMenusForDetailFormOrig }) {
+  protected static override _createTreeNodeRemote(this: Tree & { modelAdapter: TreeAdapter; _createTreeNodeOrig }, nodeModel: TreeNodeModel) {
+    // nodeType is only used for Scout Classic pages
+    if (!this.modelAdapter || !nodeModel?.nodeType) {
+      return this._createTreeNodeOrig(nodeModel);
+    }
+
+    nodeModel = (this.modelAdapter as OutlineAdapter)._initNodeModel(nodeModel);
+
+    if (nodeModel.nodeType === 'jsPage') {
+      if (!nodeModel.jsPageObjectType?.length) {
+        throw new Error('jsPageObjectType not set');
+      }
+
+      let jsPageModel = {
+        id: nodeModel.id,
+        parent: nodeModel.parent,
+        owner: nodeModel.owner,
+        objectType: nodeModel.jsPageObjectType
+      };
+
+      if (nodeModel.jsPageModel) {
+        jsPageModel = $.extend(true, {}, nodeModel.jsPageModel, jsPageModel);
+      }
+
+      nodeModel = jsPageModel;
+    }
+
+    return this._createTreeNodeOrig(nodeModel);
+  }
+
+  protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<TreeNode> {
+    const model = super._initNodeModel(nodeModel);
+    model.remote = true;
+    return model;
+  }
+
+  protected static _updateParentTablePageMenusForDetailForm(this: Page & { _updateParentTablePageMenusForDetailFormOrig; remote?: true }) {
     const detailForm = this.detailForm;
-    if (detailForm && !detailForm.modelAdapter) {
+    if (detailForm && (!detailForm.modelAdapter || !this.remote)) {
       this._updateParentTablePageMenusForDetailFormOrig();
     }
   }
 
-  protected static _updateParentTablePageMenusForDetailTable(this: Page & { _updateParentTablePageMenusForDetailTableOrig }) {
+  protected static _updateParentTablePageMenusForDetailTable(this: Page & { _updateParentTablePageMenusForDetailTableOrig; remote?: true }) {
     const detailTable = this.detailTable;
-    if (detailTable && !detailTable.modelAdapter) {
+    if (detailTable && (!detailTable.modelAdapter || !this.remote)) {
       this._updateParentTablePageMenusForDetailTableOrig();
     }
   }
