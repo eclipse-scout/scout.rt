@@ -164,9 +164,55 @@ export class PageWithTable extends Page implements PageWithTableModel {
   loadTableData(): JQuery.Promise<any> {
     this.ensureDetailTable();
     this.detailTable.setLoading(true);
+    const restoreSelectionInfo = this._getRestoreSelectionInfo();
     return this._loadTableData(this._createSearchFilter())
-      .then(this._onLoadTableDataDone.bind(this))
-      .catch(this._onLoadTableDataFail.bind(this));
+      .then(data => this._onLoadTableDataDone(data, restoreSelectionInfo))
+      .catch(error => this._onLoadTableDataFail(error, restoreSelectionInfo));
+  }
+
+  /**
+   * Get info needed to restore the selection after table data was loaded.
+   * - {@link RestoreSelectionInfo.restoreSelection} is `true` if a child page of this page is currently selected.
+   * - {@link RestoreSelectionInfo.selectedRowKey} is the row key (see {@link TableRow.getKeyValues}) of the row corresponding to the direct child page of this page that is currently selected or a parent of the currently selected page.
+   */
+  protected _getRestoreSelectionInfo(): RestoreSelectionInfo {
+    let restoreSelection = false;
+    let selectedRowKey = null;
+    if (this.getOutline().selectedNode()) {
+      let node = this.getOutline().selectedNode();
+      while (node?.parentNode) {
+        if (node.parentNode === this) {
+          restoreSelection = true;
+          selectedRowKey = node.row?.getKeyValues();
+          break;
+        }
+        node = node.parentNode;
+      }
+    }
+    return {restoreSelection, selectedRowKey};
+  }
+
+  /**
+   * Restores the selection by the given {@link RestoreSelectionInfo}. If there is no selected page for the current outline, the following page will be selected:
+   * 1. The page corresponding to the selected row of the detail table of this page.
+   * 2. The page corresponding to the row found by the given former selected row key (@see {@link RestoreSelectionInfo}).
+   * 3. This page.
+   */
+  protected _restoreSelection(restoreSelectionInfo?: RestoreSelectionInfo) {
+    if (!restoreSelectionInfo) {
+      return;
+    }
+    try {
+      const {restoreSelection, selectedRowKey} = restoreSelectionInfo;
+      if (restoreSelection && !this.getOutline().selectedNode()) {
+        let selectedNode = this.detailTable.selectedRow()?.page
+          || this.detailTable.getRowByKey(selectedRowKey)?.page
+          || this;
+        this.getOutline().selectNode(selectedNode);
+      }
+    } catch (e) {
+      $.log.warn('Unable to restore selection.', e);
+    }
   }
 
   /**
@@ -190,21 +236,21 @@ export class PageWithTable extends Page implements PageWithTableModel {
    *
    * @param tableData data loaded by <code>_loadTableData</code>
    */
-  protected _onLoadTableDataDone(tableData: any) {
+  protected _onLoadTableDataDone(tableData: any, restoreSelectionInfo?: RestoreSelectionInfo) {
     let success = false;
     try {
       const rows = this._transformTableDataToTableRows(tableData);
       this.detailTable.replaceRows(rows);
       success = true;
     } finally {
-      this._onLoadTableDataAlways();
+      this._onLoadTableDataAlways(restoreSelectionInfo);
     }
     if (success) {
       this.trigger('load');
     }
   }
 
-  protected _onLoadTableDataFail(error: any) {
+  protected _onLoadTableDataFail(error: any, restoreSelectionInfo?: RestoreSelectionInfo) {
     try {
       this.detailTable.setTableStatus(Status.error({
         message: this.session.text('ErrorWhileLoadingData')
@@ -212,12 +258,13 @@ export class PageWithTable extends Page implements PageWithTableModel {
       $.log.error('Failed to load tableData. error=', error);
       this.detailTable.deleteAllRows();
     } finally {
-      this._onLoadTableDataAlways();
+      this._onLoadTableDataAlways(restoreSelectionInfo);
       this.trigger('error', {error});
     }
   }
 
-  protected _onLoadTableDataAlways() {
+  protected _onLoadTableDataAlways(restoreSelectionInfo?: RestoreSelectionInfo) {
+    this._restoreSelection(restoreSelectionInfo);
     this.childrenLoaded = true;
     this.detailTable.setLoading(false);
   }
@@ -230,3 +277,17 @@ export class PageWithTable extends Page implements PageWithTableModel {
     return tableData;
   }
 }
+
+/**
+ * Object containing the info needed to restore the selection after table data was loaded.
+ */
+export type RestoreSelectionInfo = {
+  /**
+   * Whether the selection should be restored or not.
+   */
+  restoreSelection: boolean;
+  /**
+   * Former selected row key.
+   */
+  selectedRowKey: any[];
+};
