@@ -48,6 +48,7 @@ export class FormField extends Widget implements FormFieldModel {
   /** If set to true, the field needs to be saved. This will be computed by {@link computeSaveNeeded}. */
   saveNeeded: boolean;
   checkSaveNeeded: boolean;
+  lifecycleBoundary: boolean;
   statusPosition: FormFieldStatusPosition;
   statusVisible: boolean;
   suppressStatus: FormFieldSuppressStatus;
@@ -120,6 +121,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.preventInitialFocus = false;
     this.saveNeeded = false;
     this.checkSaveNeeded = true;
+    this.lifecycleBoundary = false;
     this.statusPosition = FormField.StatusPosition.DEFAULT;
     this.statusVisible = true;
     this.suppressStatus = null;

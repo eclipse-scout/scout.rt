@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, FormField, FormLifecycleModel, InitModelOf, Lifecycle, scout, Status, strings, ValidationResult, ValueField} from '../../index';
+import {Form, FormField, FormLifecycleModel, InitModelOf, Lifecycle, scout, Status, strings, TreeVisitResult, ValidationResult, ValueField} from '../../index';
 
 export class FormLifecycle<TValidationResult extends ValidationResult = ValidationResult> extends Lifecycle<TValidationResult> implements FormLifecycleModel {
   declare model: FormLifecycleModel;
@@ -32,6 +32,9 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
       if (field instanceof ValueField) {
         field.resetValue();
       }
+      if (field.lifecycleBoundary) {
+        return TreeVisitResult.SKIP_SUBTREE;
+      }
     });
   }
 
@@ -41,16 +44,18 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
 
     this.widget.visitFields((field: FormField) => {
       let result = field.getValidationResult();
-      if (result.valid) {
-        return result.visitResult;
+      if (!result.valid) {
+        // error status has priority over mandatory
+        if (result.errorStatus && result.errorStatus.isError()) { // ERROR
+          invalidElements.push(result);
+        } else if (!result.validByMandatory) { // empty mandatory
+          missingElements.push(result);
+        } else if (result.errorStatus && !result.errorStatus.isValid()) { // WARNING
+          invalidElements.push(result);
+        }
       }
-      // error status has priority over mandatory
-      if (result.errorStatus && result.errorStatus.isError()) { // ERROR
-        invalidElements.push(result);
-      } else if (!result.validByMandatory) { // empty mandatory
-        missingElements.push(result);
-      } else if (result.errorStatus && !result.errorStatus.isValid()) { // WARNING
-        invalidElements.push(result);
+      if (field.lifecycleBoundary) {
+        return TreeVisitResult.SKIP_SUBTREE;
       }
       return result.visitResult;
     });

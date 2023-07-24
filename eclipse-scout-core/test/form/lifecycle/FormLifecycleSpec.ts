@@ -444,6 +444,61 @@ describe('FormLifecycle', () => {
       expect(invalidElements.missingElements[0].field).toBe(field1);
     });
 
+    it('should consider lifecycle boundary when visiting fields', () => {
+      let form = scout.create(SpecForm, {
+        parent: session.desktop,
+        rootGroupBox: {
+          id: 'MainBox',
+          objectType: GroupBox,
+          mainBox: true,
+          fields: [{
+            id: 'Field1',
+            objectType: StringField
+          }]
+        }
+      });
+      let field1 = form.widget('Field1', StringField); // not mandatory
+      expect(field1.getValidationResult().validByMandatory).toBe(true);
+
+      let field2 = scout.create(StringField, {
+        parent: field1,
+        mandatory: true
+      });
+      expect(field2.getValidationResult().validByMandatory).toBe(false);
+
+      // field2 should be reported
+      let invalidElements = form.lifecycle.invalidElements();
+      expect(invalidElements.missingElements.length).toBe(1);
+      expect(invalidElements.missingElements[0].field).toBe(field2);
+
+      // Mark field1 as lifecycle boundary -> error on field2 should no longer be reported
+      field1.lifecycleBoundary = true;
+      // Assert that lifecycleBoundary flag takes precedence
+      let origGetValidationResult = field1.getValidationResult;
+      field1.getValidationResult = () => {
+        let result = origGetValidationResult.call(field1);
+        result.visitResult = TreeVisitResult.CONTINUE; // <-- this should be ignored because of lifecycleBoundary=true
+        return result;
+      };
+      invalidElements = form.lifecycle.invalidElements();
+      expect(invalidElements.missingElements.length).toBe(0);
+
+      // Set field1 to mandatory, it should be reported (lifecycleBoundary property only affects child fields)
+      field1.setMandatory(true);
+      invalidElements = form.lifecycle.invalidElements();
+      expect(invalidElements.missingElements.length).toBe(1);
+      expect(invalidElements.missingElements[0].field).toBe(field1);
+
+      // -----
+
+      // resetValue() also considers the lifecycleBoundary flag
+      field1.setValue('a');
+      field2.setValue('b');
+      form.reset();
+      expect(field1.value).toBe(null);
+      expect(field2.value).toBe('b');
+    });
+
     it('has severity ERROR if mandatory field is missing', async () => {
       jasmine.clock().uninstall();
 
