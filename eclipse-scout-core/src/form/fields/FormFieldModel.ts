@@ -216,4 +216,10 @@ export interface FormFieldModel extends WidgetModel {
    * Default is true.
    */
   checkSaveNeeded?: boolean;
+  /**
+   * Specifies whether the form lifecycle ignores child fields when visiting this field.
+   *
+   * The default is false.
+   */
+  lifecycleBoundary?: boolean;
 }
