@@ -46,6 +46,16 @@ export interface ColumnModel<TValue = string> extends ObjectModel<Column<TValue>
    */
   index?: number;
 
+  /**
+   * Configures whether this column value belongs to the primary key of the surrounding {@link Table}. The {@link Table}'s primary key
+   * might consist of several columns.
+   *
+   * This is mainly used to restore the selection when rows are replaced using {@link Table.replaceRows}.
+   *
+   * Default is `false`.
+   */
+  primaryKey?: boolean;
+
   checkable?: boolean;
 
   /**

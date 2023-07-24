@@ -999,6 +999,7 @@ export * from './desktop/outline/pages/PageModel';
 export * from './desktop/outline/pages/PageEventMap';
 export * from './desktop/outline/pages/PageWithNodes';
 export * from './desktop/outline/pages/PageWithTable';
+export * from './desktop/outline/pages/PageWithTableEventMap';
 export * from './desktop/outline/pages/PageWithTableModel';
 export * from './desktop/outline/pages/PageTileButton';
 export * from './desktop/outline/pages/PageTileButtonModel';

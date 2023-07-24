@@ -2885,6 +2885,16 @@ export class Table extends Widget implements TableModel {
     this._sort();
   }
 
+  /**
+   * Replaces all current rows by the given ones and tries to restore the selection afterwards (see {@link restoreSelection}).
+   */
+  replaceRows(rows: ObjectOrModel<TableRow> | ObjectOrModel<TableRow>[]) {
+    const selectedKeys = this.getSelectedKeys();
+    this.deleteAllRows();
+    this.insertRows(rows);
+    this.restoreSelection(selectedKeys);
+  }
+
   deleteRow(row: TableRow) {
     this.deleteRows([row]);
   }
@@ -3524,6 +3534,66 @@ export class Table extends Widget implements TableModel {
 
   isRowSelected(row: TableRow): boolean {
     return this.selectedRows.indexOf(row) > -1;
+  }
+
+  /**
+   * Restores the selection by the given selectedKeys. Rows matching these given values (see {@link Table.getRowsByKey}) will be selected.
+   *
+   * @param selectedKeys array of key values (see {@link TableRow.getKeyValues}) of the rows to select.
+   */
+  restoreSelection(selectedKeys: any[][]) {
+    this.selectRows(this.getRowsByKey(selectedKeys));
+  }
+
+  /**
+   * Get the key values (see {@link TableRow.getKeyValues}) of all selected rows.
+   */
+  getSelectedKeys(): any[][] {
+    if (!this.selectedRows?.length) {
+      return [];
+    }
+    return this.selectedRows.map(row => row.getKeyValues());
+  }
+
+  /**
+   * Get rows by comparing the given keys with the key values (see {@link TableRow.getKeyValues}) of the current rows.
+   *
+   * @param keys array of key values (see {@link TableRow.getKeyValues}).
+   */
+  getRowsByKey(keys: any[][]): TableRow[] {
+    if (!keys?.length) {
+      return [];
+    }
+    keys = [...keys];
+    const rows = [];
+    for (const row of this.rows) {
+      let index = -1;
+      try {
+        index = keys.findIndex(key => objects.equalsRecursive(key, row.getKeyValues()));
+      } catch (e) {
+        $.log.warn('Unable to find row.', e);
+      }
+      if (index !== -1) {
+        keys.splice(index, 1);
+        rows.push(row);
+        if (!keys.length) {
+          break;
+        }
+      }
+    }
+    return rows;
+  }
+
+  /**
+   * @see Table.getRowsByKey
+   *
+   * @param keys key values (see {@link TableRow.getKeyValues}).
+   */
+  getRowByKey(key: any[]): TableRow {
+    if (!key) {
+      return null;
+    }
+    return this.getRowsByKey([key])[0];
   }
 
   filterCount(): number {
