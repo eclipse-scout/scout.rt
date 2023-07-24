@@ -3509,4 +3509,41 @@ describe('Table', () => {
       expect(table.filteredRows().length).toBe(4);
     });
   });
+
+  describe('replaceRows', () => {
+
+    it('keeps the selection if possible', () => {
+      const rows = helper.createModelRows(3, 5);
+      const table = helper.createTable(helper.createModel(helper.createModelColumns(3), rows));
+      const loadAll = () => {
+        table.replaceRows(rows);
+      };
+      const loadSome = () => {
+        table.replaceRows(rows.slice(0, 3));
+      };
+
+      table.render();
+      table.hasReloadHandler = true;
+      table.on('reload', loadAll);
+
+      expect(table.selectedRows).toEqual([]);
+
+      table.selectRow(table.rows[0]);
+      expect(table.selectedRows).toEqual([table.rows[0]]);
+
+      table.reload();
+      expect(table.selectedRows).toEqual([table.rows[0]]);
+
+      table.selectRows([table.rows[1], table.rows[4]]);
+      expect(table.selectedRows).toEqual([table.rows[1], table.rows[4]]);
+
+      table.reload();
+      expect(table.selectedRows).toEqual([table.rows[1], table.rows[4]]);
+
+      table.off('reload', loadAll);
+      table.on('reload', loadSome);
+      table.reload();
+      expect(table.selectedRows).toEqual([table.rows[1]]);
+    });
+  });
 });

@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, InitModelOf, ObjectOrModel, Page, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableReloadEvent, TableRow, TableRowActionEvent,
-  TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, InitModelOf, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableReloadEvent, TableRow,
+  TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
 export class PageWithTable extends Page implements PageWithTableModel {
   declare model: PageWithTableModel;
+  declare eventMap: PageWithTableEventMap;
 
   alwaysCreateChildPage: boolean;
 
@@ -69,12 +70,16 @@ export class PageWithTable extends Page implements PageWithTableModel {
     if (this.leaf) { // when page is a leaf we do nothing at all
       return;
     }
-    let rows = arrays.ensure(event.rows),
-      childPages = rows.map(row => {
-        let childPage = row.page;
-        childPage.unlinkWithRow(row);
-        return childPage;
-      });
+    const rows = arrays.ensure(event.rows);
+    const childPages = [];
+    rows.forEach(row => {
+      const childPage = row.page;
+      if (!childPage) {
+        return;
+      }
+      childPage.unlinkWithRow(row);
+      childPages.push(childPage);
+    });
 
     this.getOutline().mediator.onTableRowsDeleted(rows, childPages, this);
   }
@@ -135,7 +140,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
     if (!this.detailTable) {
       return $.resolvedPromise();
     }
-    return this.loadTableData();
+    const deferred = $.Deferred();
+    this.one('load error', e => deferred.resolve());
+    this.detailTable.reload();
+    return deferred.promise();
   }
 
   protected _createSearchFilter(): any {
@@ -155,12 +163,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
    */
   loadTableData(): JQuery.Promise<any> {
     this.ensureDetailTable();
-    this.detailTable.deleteAllRows();
     this.detailTable.setLoading(true);
     return this._loadTableData(this._createSearchFilter())
       .then(this._onLoadTableDataDone.bind(this))
-      .catch(this._onLoadTableDataFail.bind(this))
-      .then(this._onLoadTableDataAlways.bind(this));
+      .catch(this._onLoadTableDataFail.bind(this));
   }
 
   /**
@@ -185,17 +191,30 @@ export class PageWithTable extends Page implements PageWithTableModel {
    * @param tableData data loaded by <code>_loadTableData</code>
    */
   protected _onLoadTableDataDone(tableData: any) {
-    let rows = this._transformTableDataToTableRows(tableData);
-    if (rows && rows.length > 0) {
-      this.detailTable.insertRows(rows);
+    let success = false;
+    try {
+      const rows = this._transformTableDataToTableRows(tableData);
+      this.detailTable.replaceRows(rows);
+      success = true;
+    } finally {
+      this._onLoadTableDataAlways();
+    }
+    if (success) {
+      this.trigger('load');
     }
   }
 
   protected _onLoadTableDataFail(error: any) {
-    this.detailTable.setTableStatus(Status.error({
-      message: this.session.text('ErrorWhileLoadingData')
-    }));
-    $.log.error('Failed to load tableData. error=', error);
+    try {
+      this.detailTable.setTableStatus(Status.error({
+        message: this.session.text('ErrorWhileLoadingData')
+      }));
+      $.log.error('Failed to load tableData. error=', error);
+      this.detailTable.deleteAllRows();
+    } finally {
+      this._onLoadTableDataAlways();
+      this.trigger('error', {error});
+    }
   }
 
   protected _onLoadTableDataAlways() {

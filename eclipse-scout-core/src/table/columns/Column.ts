@@ -46,6 +46,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   initialAlwaysIncludeSortAtBegin: boolean;
   initialAlwaysIncludeSortAtEnd: boolean;
   index: number;
+  primaryKey: boolean;
   guiOnly: boolean;
   mandatory: boolean;
   optimalWidthMeasurer: ColumnOptimalWidthMeasurer;
@@ -104,6 +105,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.horizontalAlignment = -1;
     this.htmlEnabled = false;
     this.index = -1;
+    this.primaryKey = false;
     this.mandatory = false;
     this.optimalWidthMeasurer = new ColumnOptimalWidthMeasurer(this);
     this.sortActive = false;
