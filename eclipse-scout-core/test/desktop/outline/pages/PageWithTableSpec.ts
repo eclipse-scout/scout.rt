@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Column, ObjectOrModel, Outline, Page, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
+import {arrays, Column, NumberColumn, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
 import {OutlineSpecHelper} from '../../../../src/testing/index';
 
 describe('PageWithTable', () => {
@@ -18,6 +18,10 @@ describe('PageWithTable', () => {
   let page: SpecPageWithTable;
 
   class SpecPageWithTable extends PageWithTable {
+    override _createSearchFilter(): any {
+      return super._createSearchFilter();
+    }
+
     override _loadTableData(searchFilter: any): JQuery.Promise<any> {
       return super._loadTableData(searchFilter);
     }
@@ -161,4 +165,92 @@ describe('PageWithTable', () => {
       .catch(fail);
   });
 
+  it('restores the selection after reload if possible', () => {
+    const tablePage = scout.create(SpecPageWithTable, {
+      parent: outline,
+      detailTable: {
+        objectType: Table,
+        columns: [
+          {
+            objectType: NumberColumn,
+            displayable: false,
+            visible: false,
+            primaryKey: true
+          },
+          {
+            objectType: Column
+          }
+        ]
+      }
+    });
+    outline.insertNodes([tablePage], null);
+    outline.selectNode(tablePage);
+
+    const table = tablePage.detailTable;
+    table.render();
+
+    const data = [
+      [0, 'Row 0'],
+      [1, 'Row 1'],
+      [2, 'Row 2'],
+      [3, 'Row 3'],
+      [4, 'Row 4']
+    ];
+    let searchIds = [0, 1, 2, 3, 4];
+
+    tablePage._createSearchFilter = () => searchIds;
+    tablePage._loadTableData = searchFilter => {
+      return $.resolvedPromise(data
+        .filter(d => arrays.contains(searchFilter, d[0]))
+        .map(cells => ({
+          cells: [...cells]
+        })));
+    };
+    tablePage.createChildPage = row => scout.create(PageWithNodes, {
+      parent: outline,
+      computeTextForRow: r => r.cells[1].text
+    });
+
+    expect(outline.selectedNode()).toBe(tablePage);
+
+    table.reload();
+    jasmine.clock().tick(3);
+    expect(outline.selectedNode()).toBe(tablePage);
+
+    table.selectRow(table.getRowByKey([2]));
+    expect(outline.selectedNode()).toBe(tablePage);
+
+    table.doRowAction(table.getRowByKey([2]));
+    expect(outline.selectedNode()).toBe(tablePage.childNodes[2]);
+    expect(outline.selectedNode().text).toBe('Row 2');
+
+    table.reload();
+    jasmine.clock().tick(3);
+    expect(outline.selectedNode()).toBe(tablePage.childNodes[2]);
+    expect(outline.selectedNode().text).toBe('Row 2');
+
+    searchIds = [1, 3];
+    table.reload();
+    jasmine.clock().tick(3);
+    expect(outline.selectedNode()).toBe(tablePage);
+
+    table.selectRow(table.getRowByKey([3]));
+    table.doRowAction(table.getRowByKey([3]));
+    expect(outline.selectedNode()).toBe(tablePage.childNodes[1]);
+    expect(outline.selectedNode().text).toBe('Row 3');
+
+    searchIds = [0, 2, 3];
+    data[3][1] = 'Updated row 3';
+    table.reload();
+    jasmine.clock().tick(3);
+    expect(outline.selectedNode()).toBe(tablePage.childNodes[2]);
+    expect(outline.selectedNode().text).toBe('Updated row 3');
+
+    outline.selectNode(page);
+    expect(outline.selectedNode()).toBe(page);
+
+    table.reload();
+    jasmine.clock().tick(3);
+    expect(outline.selectedNode()).toBe(page);
+  });
 });
