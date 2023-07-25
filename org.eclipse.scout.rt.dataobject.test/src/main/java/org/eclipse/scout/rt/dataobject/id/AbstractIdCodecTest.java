@@ -229,6 +229,12 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testCompositeIdAllNullAllTypes() {
+    assertNull(FixtureCompositeWithAllTypesId.of((String) null, null, null, null, null, null));
+    assertNull(FixtureCompositeWithAllTypesId.of((FixtureStringId) null, null, null, null, null, null));
+  }
+
+  @Test
   public void testToUnqualifiedIdNullValue() {
     assertNull(getCodec().toUnqualified(null));
   }
@@ -459,8 +465,9 @@ public abstract class AbstractIdCodecTest {
     assertEquals(id1, id2);
 
     FixtureCompositeId id3 = FixtureCompositeId.of("abc", null);
+    assertNull(id3);
     IId id4 = getCodec().fromUnqualified(FixtureCompositeId.class, "foo;");
-    assertEquals(id3, id4);
+    assertNull(id4);
   }
 
   @Test
@@ -610,7 +617,7 @@ public abstract class AbstractIdCodecTest {
     }
 
     public static FixtureCompositeWithAllTypesId of(FixtureStringId c1, FixtureUuId c2, FixtureLongId c3, FixtureIntegerId c4, FixtureDateId c5, FixtureLocaleId c6) {
-      if (c1 == null && c2 == null) {
+      if (c1 == null && c2 == null && c3 == null && c4 == null && c5 == null && c6 == null) {
         return null;
       }
       return new FixtureCompositeWithAllTypesId(c1, c2, c3, c4, c5, c6);
