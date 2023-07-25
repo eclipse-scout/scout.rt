@@ -39,11 +39,10 @@ export function init(length, initValue) {
 }
 
 /**
- * Removes the first occurrence of the specified element from the array,
- * if it is present (optional operation).  If the array does not contain
- * the element, it is unchanged.
+ * Removes the first occurrence of the specified element from the array.
+ * If the array does not contain the element, it stays unchanged.
  *
- * @return {boolean} true if the array contained the specified element
+ * @return {boolean} true if an element was removed
  */
 export function remove(arr, element) {
   if (arr) {
@@ -52,6 +51,25 @@ export function remove(arr, element) {
       arr.splice(index, 1);
       return true;
     }
+  }
+  return false;
+}
+
+/**
+ * Removes the first array element that matches the given predicate.
+ * If no element matches the given predicate, the array stays unchanged.
+ *
+ * @template T
+ * @param {T[]} arr
+ * @param {function(T): boolean} predicate
+ * @param {*} [thisArg] optional "this" binding for predicate function
+ * @return {boolean} true if an element was removed
+ */
+export function removeByPredicate(arr, predicate, thisArg) {
+  let index = findIndex(arr, predicate, thisArg);
+  if (index !== -1) {
+    arr.splice(index, 1);
+    return true;
   }
   return false;
 }
@@ -688,6 +706,7 @@ export default {
   pushIfDefined,
   pushSet,
   remove,
+  removeByPredicate,
   removeAll,
   replace,
   toMap,
