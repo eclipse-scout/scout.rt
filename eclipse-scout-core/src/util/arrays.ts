@@ -35,11 +35,10 @@ export const arrays = {
   },
 
   /**
-   * Removes the first occurrence of the specified element from the array,
-   * if it is present (optional operation). If the array does not contain
-   * the element, it is unchanged.
+   * Removes the first occurrence of the specified element from the array.
+   * If the array does not contain the element, it stays unchanged.
    *
-   * @returns true if the array contained the specified element
+   * @returns true if an element was removed
    */
   remove<T>(arr: T[], element: T): boolean {
     if (arr) {
@@ -48,6 +47,21 @@ export const arrays = {
         arr.splice(index, 1);
         return true;
       }
+    }
+    return false;
+  },
+
+  /**
+   * Removes the first array element that matches the given predicate.
+   * If no element matches the given predicate, the array stays unchanged.
+   *
+   * @returns true if an element was removed
+   */
+  removeByPredicate<T>(arr: T[], predicate: (elem: T, index: number, arr: T[]) => boolean, thisArg?: any): boolean {
+    let index = arrays.findIndex(arr, predicate, thisArg);
+    if (index !== -1) {
+      arr.splice(index, 1);
+      return true;
     }
     return false;
   },
