@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
@@ -80,7 +80,7 @@ public class PageWithTable6Test {
 
   private static void assertMenus(PageWithTable.Table table, String[] expectedMenus) {
     List<String> actualMenus = new ArrayList<>();
-    for (IMenu m : ActionUtility.normalizedActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(table.getContextMenu().getCurrentMenuTypes(), true))) {
+    for (IMenu m : MenuUtility.normalizedMenus(table.getContextMenu().getChildActions(), MenuUtility.createMenuFilterMenuTypes(table.getContextMenu().getCurrentMenuTypes(), true))) {
       if (m.isEnabledIncludingParents()) {
         actualMenus.add(m.getText());
       }

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
@@ -51,7 +50,7 @@ public enum TileGridMenuType implements IMenuType {
    *          (optional) menus are filtered with this predicate before visibility is updated
    */
   public static void updateMenuVisibilities(IContextMenu contextMenu, Set<IMenuType> acceptedMenuTypes, Predicate<IAction> filter) {
-    final Predicate<IAction> activeFilter = ActionUtility.createMenuFilterMenuTypes(acceptedMenuTypes, false);
+    final Predicate<IMenu> activeFilter = MenuUtility.createMenuFilterMenuTypes(acceptedMenuTypes, false);
     contextMenu.visit(menu -> {
       if (filter != null && !filter.test(menu)) {
         return;

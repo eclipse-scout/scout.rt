@@ -34,7 +34,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.Ca
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.ICalendarExtension;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.CalendarMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -247,7 +246,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
         ICalendarItemProvider provider = ConfigurationUtility.newInnerInstance(this, itemProviderClazz);
         producerList.add(provider);
         // add empty space menus to the context menu
-        menus.addAllOrdered(ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.EmptySpace), false)));
+        menus.addAllOrdered(MenuUtility.filterMenusRec(provider.getMenus(), MenuUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.EmptySpace), false)));
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + itemProviderClazz.getName() + "'.", e));
@@ -616,7 +615,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     }
     // add menus of provider
     if (provider != null) {
-      m_inheritedMenusOfSelectedProvider = ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.CalendarComponent), false));
+      m_inheritedMenusOfSelectedProvider = MenuUtility.filterMenusRec(provider.getMenus(), MenuUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.CalendarComponent), false));
       getContextMenu().addChildActions(m_inheritedMenusOfSelectedProvider);
     }
   }
