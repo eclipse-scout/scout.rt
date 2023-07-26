@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 @ClassId("19966ccc-1ead-420b-8bad-bb97480230d6")
 public class OutlineFormMenuWrapper extends OutlineMenuWrapper implements IFormMenu<IForm> {
 
-  protected OutlineFormMenuWrapper(IFormMenu<? extends IForm> menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
+  protected OutlineFormMenuWrapper(IFormMenu<? extends IForm> menu, IMenuTypeMapper menuTypeMapper, Predicate<IMenu> menuFilter) {
     super(menu, menuTypeMapper, menuFilter);
   }
 

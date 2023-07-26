@@ -18,8 +18,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.CompositeSubMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.CompositeSubMenu.EmptySpaceSubSubMenu;
@@ -86,16 +84,16 @@ public class TableMenuTest {
 
     // single hugo boss
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
-    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
-    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    Predicate<IMenu> filter = MenuUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = MenuUtility.normalizedMenus(contextMenu.getChildActions(), filter);
     assertEquals(2, visibleMenus.size());
     assertEquals("SingleSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
     assertEquals("HugoBossMenu", visibleMenus.get(1).getClass().getSimpleName());
 
     // single only meier
     t.selectRows(CollectionUtility.arrayList(t.getRow(1)), false);
-    filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
-    visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    filter = MenuUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    visibleMenus = MenuUtility.normalizedMenus(contextMenu.getChildActions(), filter);
     assertEquals(1, visibleMenus.size());
     assertEquals("SingleSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
   }
@@ -110,8 +108,8 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
     // multi selection
     t.selectRows(CollectionUtility.arrayList(t.getRow(0), t.getRow(1)), false);
-    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
-    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    Predicate<IMenu> filter = MenuUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = MenuUtility.normalizedMenus(contextMenu.getChildActions(), filter);
     assertEquals(1, visibleMenus.size());
     assertEquals("MultiSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
   }
@@ -126,8 +124,8 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
     // empty selection
     t.selectRows(CollectionUtility.emptyArrayList(), false);
-    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
-    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    Predicate<IMenu> filter = MenuUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = MenuUtility.normalizedMenus(contextMenu.getChildActions(), filter);
     assertEquals(1, visibleMenus.size());
     assertEquals("EmptySpaceMenu", visibleMenus.get(0).getClass().getSimpleName());
   }
@@ -143,8 +141,8 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
 
     t.selectRows(CollectionUtility.emptyArrayList(), false);
-    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
-    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    Predicate<IMenu> filter = MenuUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = MenuUtility.normalizedMenus(contextMenu.getChildActions(), filter);
     assertFalse(visibleMenus.get(0).isEnabledIncludingParents());
   }
 
@@ -159,8 +157,8 @@ public class TableMenuTest {
     ITableContextMenu contextMenu = t.getContextMenu();
 
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
-    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
-    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    Predicate<IMenu> filter = MenuUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = MenuUtility.normalizedMenus(contextMenu.getChildActions(), filter);
     assertFalse(visibleMenus.get(0).isEnabledIncludingParents());
   }
 
@@ -176,8 +174,8 @@ public class TableMenuTest {
     t.getRow(0).setEnabled(false);
 
     t.selectRows(CollectionUtility.emptyArrayList(), false);
-    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
-    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    Predicate<IMenu> filter = MenuUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = MenuUtility.normalizedMenus(contextMenu.getChildActions(), filter);
     assertTrue(visibleMenus.get(0).isEnabled());
   }
 
@@ -193,8 +191,8 @@ public class TableMenuTest {
     t.getRow(0).setEnabled(false);
 
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
-    Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
-    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    Predicate<IMenu> filter = MenuUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = MenuUtility.normalizedMenus(contextMenu.getChildActions(), filter);
     assertFalse(visibleMenus.get(0).isEnabledIncludingParents());
   }
 

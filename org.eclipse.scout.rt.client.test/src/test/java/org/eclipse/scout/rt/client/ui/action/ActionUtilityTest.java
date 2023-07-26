@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.action;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,7 +37,8 @@ public class ActionUtilityTest {
 
   @Test
   public void testCleanupWithEmptyList() {
-    List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(Collections.<IMenu> emptyList());
+    //noinspection deprecation
+    List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(Collections.emptyList());
     assertTrue(cleanList.isEmpty());
   }
 
@@ -47,6 +47,7 @@ public class ActionUtilityTest {
     IMenu s1 = createMenu("s1", true, true);
     IMenu s2 = createMenu("s2", true, true);
     IMenu s3 = createMenu("s3", true, true);
+    //noinspection deprecation
     List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(CollectionUtility.arrayList(s1, s2, s3));
     assertEquals(Collections.emptyList(), cleanList);
   }
@@ -57,6 +58,7 @@ public class ActionUtilityTest {
     IMenu s2 = createMenu("s2", true, true);
     IMenu s3 = createMenu("s3", true, true);
     IMenu m4 = createMenu("m4", false, true);
+    //noinspection deprecation
     List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(CollectionUtility.arrayList(s1, s2, s3, m4));
     assertEquals(Arrays.asList(m4), cleanList);
   }
@@ -70,6 +72,7 @@ public class ActionUtilityTest {
     IMenu s5 = createMenu("s5", true, true);
     IMenu s6 = createMenu("s6", true, true);
     IMenu s7 = createMenu("s7", true, true);
+    //noinspection deprecation
     List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(CollectionUtility.arrayList(s1, s2, s3, m4, s5, s6, s7));
     assertEquals(Arrays.asList(m4), cleanList);
   }
@@ -84,6 +87,7 @@ public class ActionUtilityTest {
     IMenu s6 = createMenu("s6", true, true);
     IMenu s7 = createMenu("s7", true, true);
     IMenu m8 = createMenu("m8", false, true);
+    //noinspection deprecation
     List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(CollectionUtility.arrayList(s1, s2, s3, m4, s5, s6, s7, m8));
     assertEquals(Arrays.asList(m4, s5, m8), cleanList);
   }

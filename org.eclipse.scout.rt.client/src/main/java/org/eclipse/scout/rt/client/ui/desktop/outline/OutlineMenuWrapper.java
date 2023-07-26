@@ -21,12 +21,11 @@ import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -48,10 +47,10 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   private final IMenu m_wrappedMenu;
   private final PropertyChangeListener m_wrappedMenuPropertyChangeListener;
   private final Set<IMenuType> m_menuTypes;
-  private final Predicate<IAction> m_menuFilter;
+  private final Predicate<IMenu> m_menuFilter;
   private final IMenuTypeMapper m_menuTypeMapper;
 
-  public static final Predicate<IAction> ACCEPT_ALL_FILTER = action -> true;
+  public static final Predicate<IMenu> ACCEPT_ALL_FILTER = menu -> true;
 
   public static final IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = menuType -> menuType;
 
@@ -82,7 +81,7 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
    *          the menuTypes for the menu and for each menu in the sub-hierarchy are individually computed with this
    *          mapper
    */
-  protected OutlineMenuWrapper(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IAction> menuFilter) {
+  protected OutlineMenuWrapper(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IMenu> menuFilter) {
     m_wrappedMenu = menu;
     m_menuTypeMapper = menuTypeMapper;
     m_menuFilter = menuFilter;
@@ -109,10 +108,8 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
     List<IMenu> childActions = m_wrappedMenu.getChildActions();
     List<IMenu> wrappedChildActions = new ArrayList<>(childActions.size());
     // create child wrappers
-    for (IAction a : ActionUtility.getActions(childActions, m_menuFilter)) {
-      if (a instanceof IMenu) {
-        wrappedChildActions.add(new OutlineMenuWrapper((IMenu) a, m_menuTypeMapper, m_menuFilter));
-      }
+    for (IMenu m : MenuUtility.filterMenusRec(childActions, m_menuFilter)) {
+      wrappedChildActions.add(new OutlineMenuWrapper(m, m_menuTypeMapper, m_menuFilter));
     }
     propertySupport.setProperty(PROP_CHILD_ACTIONS, wrappedChildActions);
   }
