@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {keys, KeyStroke, Table} from '../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, Table} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TableCopyKeyStroke extends KeyStroke {
@@ -20,6 +20,14 @@ export class TableCopyKeyStroke extends KeyStroke {
     this.ctrl = true;
     this.renderingHints.render = false;
     this.inheritAccessibility = false;
+  }
+
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
+    if (this.field.footer?.$controlContainer?.has(event.target).length) {
+      // Allow text copy inside control container (labels, iframes etc.)
+      return false;
+    }
+    return super._accept(event);
   }
 
   override handle(event: KeyboardEventBase) {

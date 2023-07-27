@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {keys, KeyStroke, Table} from '../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, Table} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TableSelectAllKeyStroke extends KeyStroke {
@@ -23,6 +23,14 @@ export class TableSelectAllKeyStroke extends KeyStroke {
       return this.field.footer ? this.field.footer._$infoSelection.find('.table-info-button') : null;
     };
     this.inheritAccessibility = false;
+  }
+
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
+    if (this.field.footer?.$controlContainer?.has(event.target).length) {
+      // Allow text selection inside control container (labels, iframes etc.)
+      return false;
+    }
+    return super._accept(event);
   }
 
   override handle(event: KeyboardEventBase) {

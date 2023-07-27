@@ -35,6 +35,11 @@ export abstract class AbstractTableNavigationKeyStroke extends KeyStroke {
       return false;
     }
 
+    if (event.shiftKey && this.field.footer?.$controlContainer?.has(event.target).length) {
+      // Allow text selection inside control container (labels, iframes etc.)
+      return false;
+    }
+
     let $activeElement = this.field.$container.activeElement();
     let elementType = $activeElement[0].tagName.toLowerCase();
     let $filterInput = this.field.$container.data('filter-field');
