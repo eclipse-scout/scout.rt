@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {KeyStrokeMode, ScoutKeyboardEvent} from '../index';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class VirtualKeyStrokeEvent implements ScoutKeyboardEvent {
   which: number;
@@ -17,17 +18,23 @@ export class VirtualKeyStrokeEvent implements ScoutKeyboardEvent {
   shiftKey: boolean;
   target: HTMLElement;
   type: KeyStrokeMode;
+  originalEvent?: KeyboardEvent & { smartFieldEvent?: boolean } | undefined;
   protected _propagationStopped: boolean;
   protected _immediatePropagationStopped: boolean;
   protected _defaultPrevented: boolean;
 
-  constructor(which: number, ctrl: boolean, alt: boolean, shift: boolean, keyStrokeMode: KeyStrokeMode, target: HTMLElement) {
+  constructor(which: number, ctrl: boolean, alt: boolean, shift: boolean, keyStrokeMode: KeyStrokeMode, eventOrTarget: KeyboardEventBase | HTMLElement) {
     this.which = which;
     this.ctrlKey = ctrl;
     this.metaKey = false;
     this.altKey = alt;
     this.shiftKey = shift;
-    this.target = target;
+    if (eventOrTarget instanceof HTMLElement) {
+      this.target = eventOrTarget;
+    } else {
+      this.target = eventOrTarget.target;
+      this.originalEvent = eventOrTarget.originalEvent;
+    }
     this.type = keyStrokeMode;
 
     this._propagationStopped = false;

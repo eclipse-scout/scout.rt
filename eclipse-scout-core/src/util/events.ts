@@ -153,7 +153,8 @@ export const events = {
       return;
     }
     // @ts-expect-error
-    let newEvent = new event.constructor(event.type, event);
+    let newEvent: PropagatedEvent = new event.constructor(event.type, event);
+    newEvent.sourceEvent = event;
     if (!target.dispatchEvent(newEvent)) {
       event.preventDefault();
     }
@@ -268,4 +269,8 @@ export interface SwipeCallbackEvent {
    * -1 if the move is to the left, 1 if the move is to the right, 0 or -0 if it is not moved yet
    */
   direction: number;
+}
+
+export interface PropagatedEvent extends Event {
+  sourceEvent: Event;
 }

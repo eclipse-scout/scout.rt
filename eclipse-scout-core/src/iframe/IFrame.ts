@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, events, HtmlComponent, IFrameEventMap, IFrameModel, keys, scout, Widget} from '../index';
+import {Device, events, HtmlComponent, IFrameEventMap, IFrameKeyStrokeContext, IFrameModel, KeyStrokeContext, scout, Widget} from '../index';
 
 export class IFrame extends Widget implements IFrameModel {
   declare model: IFrameModel;
@@ -37,6 +37,10 @@ export class IFrame extends Widget implements IFrameModel {
     this.trackLocation = false;
     this.wrapIframe = Device.get().isIosPlatform();
     this.$iframe = null;
+  }
+
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
+    return new IFrameKeyStrokeContext();
   }
 
   protected override _render() {
@@ -110,21 +114,18 @@ export class IFrame extends Widget implements IFrameModel {
   }
 
   /**
-   * Make key strokes work even if pressed in the iframe
+   * Make keystrokes work even if pressed in the iframe
    */
   protected _propagateKeyEvents() {
     let source = this._contentDocument();
     if (!source) {
       return;
     }
-    let target = (this.wrapIframe ? this.$container[0] : this.$parent[0]);
+    let target = this.$iframe[0];
     if (!target) {
       return;
     }
-    events.addPropagationListener(source, target, ['keydown', 'keyup', 'keypress'], (event: KeyboardEvent) => {
-      // Don't propagate TAB key strokes otherwise it would break tabbing inside the document.
-      return event.which !== keys.TAB;
-    });
+    events.addPropagationListener(source, target, ['keydown', 'keyup', 'keypress']);
   }
 
   setScrollBarEnabled(scrollBarEnabled: boolean) {

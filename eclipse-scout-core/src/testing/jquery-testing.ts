@@ -18,7 +18,7 @@ export interface TriggerMouseOptions {
   };
 }
 
-export type KeyStrokeModifier = 'alt' | 'ctrl' | 'shift' | 'meta';
+export type KeyStrokeModifier = 'alt' | 'ctrl' | 'shift' | 'meta' | 'ctrl-shift' | 'ctrl-alt' | 'ctrl-alt-shift';
 
 export const JQueryTesting = {
   triggerBlur($elem: JQuery) {
@@ -51,11 +51,15 @@ export const JQueryTesting = {
     $elem.trigger(event);
   },
 
-  extendEventWithModifier(event: JQuery.Event, modifier?: KeyStrokeModifier) {
-    event.altKey = modifier === 'alt';
-    event.ctrlKey = modifier === 'ctrl';
-    event.shiftKey = modifier === 'shift';
-    event.metaKey = modifier === 'meta';
+  extendEventWithModifier<T extends { altKey: boolean; ctrlKey: boolean; shiftKey: boolean; metaKey: boolean }>(event: T, modifier?: KeyStrokeModifier): T {
+    if (!modifier) {
+      return event;
+    }
+    event.altKey = modifier.includes('alt');
+    event.ctrlKey = modifier.includes('ctrl');
+    event.shiftKey = modifier.includes('shift');
+    event.metaKey = modifier.includes('meta');
+    return event;
   },
 
   triggerMouseEnter($elem: JQuery, opts?: TriggerMouseOptions) {
@@ -74,18 +78,11 @@ export const JQueryTesting = {
    * Does not use jQuery to create the event to make sure capture phase listeners are notified as well.
    */
   triggerMouseDownCapture($elem: JQuery) {
-    let event;
-    try {
-      event = new MouseEvent('mousedown', {
-        'view': window,
-        'bubbles': true,
-        'cancelable': true
-      });
-    } catch (e) {
-      // Phantom JS only supports the old, deprecated API
-      event = document.createEvent('MouseEvent');
-      event.initEvent('mousedown', true, true);
-    }
+    let event = new MouseEvent('mousedown', {
+      view: window,
+      bubbles: true,
+      cancelable: true
+    });
     $elem[0].dispatchEvent(event);
   },
 
@@ -106,25 +103,12 @@ export const JQueryTesting = {
   },
 
   triggerKeyCapture($elem: JQuery, eventType: string, which: number, modifier?: KeyStrokeModifier) {
-    // Due to a Chrome bug, "new KeyboardEvent" cannot be used,
-    // as it doesn't set "which". We have to use this less specific
-    // constructor.
-    let eventObj;
-
-    try {
-      eventObj = new Event(eventType, {
-        'bubbles': true,
-        'cancelable': true
-      });
-    } catch (e) {
-      // Workaround for PhantomJS
-      eventObj = document.createEvent('CustomEvent');
-      eventObj.initEvent(eventType, true, true);
-    }
-
-    eventObj.keyCode = which;
-    eventObj.which = which;
-    JQueryTesting.extendEventWithModifier(eventObj, modifier);
+    let eventObj = new KeyboardEvent(eventType, this.extendEventWithModifier({
+      bubbles: true,
+      cancelable: true,
+      which: which,
+      keyCode: which
+    }, modifier));
 
     $elem[0].dispatchEvent(eventObj);
   },
@@ -203,17 +187,10 @@ export const JQueryTesting = {
   },
 
   triggerImageLoadCapture($elem: JQuery) {
-    let event;
-    try {
-      event = new Event('load', {
-        'bubbles': true,
-        'cancelable': true
-      });
-    } catch (e) {
-      // Phantom JS only supports the old, deprecated API
-      event = document.createEvent('Event');
-      event.initEvent('load', true, true);
-    }
+    let event = new Event('load', {
+      bubbles: true,
+      cancelable: true
+    });
     $elem[0].dispatchEvent(event);
   }
 };
