@@ -45,10 +45,14 @@ $.fn.triggerKeyDown = function(key, modifier) {
 };
 
 function extendEventWithModifier(event, modifier) {
-  event.altKey = modifier === 'alt';
-  event.ctrlKey = modifier === 'ctrl';
-  event.shiftKey = modifier === 'shift';
-  event.metaKey = modifier === 'meta';
+  if (!modifier) {
+    return event;
+  }
+  event.altKey = modifier.includes('alt');
+  event.ctrlKey = modifier.includes('ctrl');
+  event.shiftKey = modifier.includes('shift');
+  event.metaKey = modifier.includes('meta');
+  return event;
 }
 
 $.fn.triggerMouseEnter = function(opts) {
@@ -67,18 +71,11 @@ $.fn.triggerMouseDown = function(opts) {
  * Does not use jQuery to create the event to make sure capture phase listeners are notified as well.
  */
 $.fn.triggerMouseDownCapture = function(opts) {
-  let event;
-  try {
-    event = new MouseEvent('mousedown', {
-      'view': window,
-      'bubbles': true,
-      'cancelable': true
-    });
-  } catch (e) {
-    // Phantom JS only supports the old, deprecated API
-    event = document.createEvent('MouseEvent');
-    event.initEvent('mousedown', true, true);
-  }
+  let event = new MouseEvent('mousedown', {
+    view: window,
+    bubbles: true,
+    cancelable: true
+  });
   this[0].dispatchEvent(event);
   return this;
 };
@@ -101,25 +98,12 @@ $.fn.triggerKeyInputCapture = function(which, modifier) {
 };
 
 $.fn.triggerKeyCapture = function(eventType, which, modifier) {
-  // Due to a Chrome bug, "new KeyboardEvent" cannot be used,
-  // as it doesn't set "which". We have to use this less specific
-  // constructor.
-  let eventObj;
-
-  try {
-    eventObj = new Event(eventType, {
-      'bubbles': true,
-      'cancelable': true
-    });
-  } catch (e) {
-    // Workaround for PhantomJS
-    eventObj = document.createEvent('CustomEvent');
-    eventObj.initEvent(eventType, true, true);
-  }
-
-  eventObj.keyCode = which;
-  eventObj.which = which;
-  extendEventWithModifier(eventObj, modifier);
+  let eventObj = new KeyboardEvent(eventType, extendEventWithModifier({
+    bubbles: true,
+    cancelable: true,
+    which: which,
+    keyCode: which
+  }, modifier));
 
   this[0].dispatchEvent(eventObj);
   return this;
@@ -223,18 +207,10 @@ $.fn.triggerDoubleClick = function() {
 };
 
 $.fn.triggerImageLoadCapture = function(opts) {
-  let event;
-  try {
-    event = new Event('load', {
-      'view': window,
-      'bubbles': true,
-      'cancelable': true
-    });
-  } catch (e) {
-    // Phantom JS only supports the old, deprecated API
-    event = document.createEvent('Event');
-    event.initEvent('load', true, true);
-  }
+  let event = new Event('load', {
+    bubbles: true,
+    cancelable: true
+  });
   this[0].dispatchEvent(event);
   return this;
 };

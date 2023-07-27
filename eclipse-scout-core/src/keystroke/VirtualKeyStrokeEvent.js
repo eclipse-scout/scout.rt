@@ -10,13 +10,18 @@
  */
 export default class VirtualKeyStrokeEvent {
 
-  constructor(which, ctrl, alt, shift, keyStrokeMode, target) {
+  constructor(which, ctrl, alt, shift, keyStrokeMode, eventOrTarget) {
     this.which = which;
     this.ctrlKey = ctrl;
     this.metaKey = false;
     this.altKey = alt;
     this.shiftKey = shift;
-    this.target = target;
+    if (eventOrTarget instanceof HTMLElement) {
+      this.target = eventOrTarget;
+    } else {
+      this.target = eventOrTarget.target;
+      this.originalEvent = eventOrTarget.originalEvent;
+    }
     this.type = keyStrokeMode;
 
     this._propagationStopped = false;
