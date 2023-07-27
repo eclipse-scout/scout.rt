@@ -75,17 +75,10 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
       keys.UP,
       keys.DOWN
     ];
-    if (multiline) {
-      this.registerStopPropagationKeys(keyStrokeModifier.CTRL, multilineNavigationKeys);
-      this.registerStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, multilineNavigationKeys);
-      this.registerStopPropagationKeys(keyStrokeModifier.SHIFT, multilineNavigationKeys);
-      this.registerStopPropagationKeys(keyStrokeModifier.NONE, multilineNavigationKeys);
-    } else {
-      this.unregisterStopPropagationKeys(keyStrokeModifier.CTRL, multilineNavigationKeys);
-      this.unregisterStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, multilineNavigationKeys);
-      this.unregisterStopPropagationKeys(keyStrokeModifier.SHIFT, multilineNavigationKeys);
-      this.unregisterStopPropagationKeys(keyStrokeModifier.NONE, multilineNavigationKeys);
-    }
+    this.toggleStopPropagationKeys(keyStrokeModifier.CTRL, multilineNavigationKeys, multiline);
+    this.toggleStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, multilineNavigationKeys, multiline);
+    this.toggleStopPropagationKeys(keyStrokeModifier.SHIFT, multilineNavigationKeys, multiline);
+    this.toggleStopPropagationKeys(keyStrokeModifier.NONE, multilineNavigationKeys, multiline);
   }
 
   _applyPropagationFlags(event) {
@@ -101,7 +94,7 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
   }
 
   _isInputEvent(event) {
-    if (!this._isInputField(event.target)) {
+    if (!this.isInput(event.target)) {
       return false;
     }
     if (this._isLetterKeyStroke(event)) {
@@ -113,12 +106,28 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
     return false;
   }
 
-  _isInputField(element) {
-    if (element && element.isContentEditable) {
-      return true;
+  isInput($element) {
+    // noinspection JSDeprecatedSymbols
+    return this._isInputField($element);
+  }
+
+  /**
+   * @deprecated use isInput instead
+   */
+  _isInputField($element) {
+    let $elem = $.ensure($element);
+    if (!$elem.length) {
+      return false;
     }
-    let $element = $(element);
-    return $element.is('input:text') || $element.is('input:file') || $element.is('textarea');
+    return $elem[0].isContentEditable
+      || $elem.is('textarea')
+      || $elem.is('input') && !this.isButton($elem);
+  }
+
+  isButton($element) {
+    let $elem = $.ensure($element);
+    let buttonTypes = ['button', 'input[type=button]', 'input[type=checkbox', 'input[type=color]', 'input[type=file]', 'input[type=image]', 'input[type=radio]', 'input[type=reset]', 'input[type=submit]'];
+    return buttonTypes.some(type => $elem.is(type));
   }
 
   _isNumberKeyStroke(event) {

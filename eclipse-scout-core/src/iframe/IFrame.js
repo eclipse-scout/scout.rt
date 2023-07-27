@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, events, HtmlComponent, keys, scout, Widget} from '../index';
+import {Device, events, HtmlComponent, IFrameKeyStrokeContext, scout, Widget} from '../index';
 
 export default class IFrame extends Widget {
 
@@ -24,6 +24,10 @@ export default class IFrame extends Widget {
     // Don't wrap it when running in the chrome emulator (in that case isIosPlatform returns false)
     this.wrapIframe = Device.get().isIosPlatform();
     this.$iframe = null;
+  }
+
+  _createKeyStrokeContext() {
+    return new IFrameKeyStrokeContext();
   }
 
   _render() {
@@ -100,21 +104,18 @@ export default class IFrame extends Widget {
   }
 
   /**
-   * Make key strokes work even if pressed in the iframe
+   * Make keystrokes work even if pressed in the iframe
    */
   _propagateKeyEvents() {
     let source = this._contentDocument();
     if (!source) {
       return;
     }
-    let target = (this.wrapIframe ? this.$container[0] : this.$parent[0]);
+    let target = this.$iframe[0];
     if (!target) {
       return;
     }
-    events.addPropagationListener(source, target, ['keydown', 'keyup', 'keypress'], event => {
-      // Don't propagate TAB key strokes otherwise it would break tabbing inside the document.
-      return event.which !== keys.TAB;
-    });
+    events.addPropagationListener(source, target, ['keydown', 'keyup', 'keypress']);
   }
 
   setScrollBarEnabled(scrollBarEnabled) {

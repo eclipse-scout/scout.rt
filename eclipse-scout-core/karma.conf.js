@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 const baseConfig = require('@eclipse-scout/cli/scripts/karma-defaults');
+const path = require('path');
 
 module.exports = (config, specEntryPoint) => {
   baseConfig(config, specEntryPoint);
@@ -17,4 +18,8 @@ module.exports = (config, specEntryPoint) => {
     // jQuery is the only external, all other dependencies are imported regularly by the specs
     'jquery': 'jQuery'
   };
+
+  const resDir = path.resolve('test/_res').replace(/\\/g, '/') + '/';
+  config.files.push({pattern: resDir + '**/*.*', watched: false, included: false});
+  config.proxies['/_res/'] = '/absolute' + resDir;
 };
