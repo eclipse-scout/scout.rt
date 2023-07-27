@@ -8,7 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 const baseConfig = require('@eclipse-scout/cli/scripts/karma-defaults');
+const path = require('path');
 
 module.exports = (config, specEntryPoint) => {
   baseConfig(config, specEntryPoint);
+
+  const resDir = path.resolve('test/_res').replace(/\\/g, '/') + '/';
+  config.files.push({pattern: resDir + '**/*.*', watched: false, included: false});
+  config.proxies['/_res/'] = '/absolute' + resDir;
 };

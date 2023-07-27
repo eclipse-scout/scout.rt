@@ -234,6 +234,7 @@ export * from './glasspane/GlassPane';
 export * from './glasspane/DeferredGlassPaneTarget';
 export * from './glasspane/GlassPaneRenderer';
 export * from './iframe/IFrame';
+export * from './iframe/IFrameKeyStrokeContext';
 export * from './iframe/IFrameModel';
 export * from './iframe/IFrameEventMap';
 export * from './scrollbar/Scrollbar';
