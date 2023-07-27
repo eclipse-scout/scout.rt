@@ -71,6 +71,14 @@ export default class KeyStrokeContext {
     arrays.removeAll(this._stopPropagationKeys[modifierBitMask], keys);
   }
 
+  toggleStopPropagationKeys(modifierBitMask, keys, condition) {
+    if (condition) {
+      this.registerStopPropagationKeys(modifierBitMask, keys);
+    } else {
+      this.unregisterStopPropagationKeys(modifierBitMask, keys);
+    }
+  }
+
   /**
    * Use this method to register an interceptor to set propagation flags on context level.
    */

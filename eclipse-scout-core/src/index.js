@@ -166,6 +166,7 @@ export {default as GlassPane} from './glasspane/GlassPane';
 export {default as DeferredGlassPaneTarget} from './glasspane/DeferredGlassPaneTarget';
 export {default as GlassPaneRenderer} from './glasspane/GlassPaneRenderer';
 export {default as IFrame} from './iframe/IFrame';
+export {default as IFrameKeyStrokeContext} from './iframe/IFrameKeyStrokeContext';
 export {default as Scrollbar} from './scrollbar/Scrollbar';
 export {default as scrollbars} from './scrollbar/scrollbars';
 export {default as VirtualScrolling} from './scrollbar/VirtualScrolling';

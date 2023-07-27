@@ -149,6 +149,7 @@ export function propagateEvent(target, event) {
     return;
   }
   let newEvent = new event.constructor(event.type, event);
+  newEvent.sourceEvent = event;
   if (!target.dispatchEvent(newEvent)) {
     event.preventDefault();
   }
