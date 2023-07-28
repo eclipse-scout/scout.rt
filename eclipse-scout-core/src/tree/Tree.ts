@@ -257,7 +257,7 @@ export class Tree extends Widget implements TreeModel {
     if (this.initialized) {
       let previousNodes = parentNode ? parentNode.childNodes : this.nodes;
       if (previousNodes.length > 0) {
-        nextChildNodeIndex = previousNodes[previousNodes.length - 1].childNodeIndex + 1;
+        nextChildNodeIndex = scout.nvl(previousNodes[previousNodes.length - 1].childNodeIndex, -1) + 1;
       }
     }
     for (let i = 0; i < nodes.length; i++) {
