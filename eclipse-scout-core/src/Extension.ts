@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {scout} from './index';
+import {ObjectType, scout} from './index';
 
 /**
  * This class is used to extend an existing Scout object. In order to use the extension feature
@@ -54,7 +54,7 @@ export class Extension<E> {
    *
    * @param extensions an array of strings containing extension class names
    */
-  static install(extensions: string[]) {
+  static install(extensions: ObjectType[]) {
     extensions.forEach(ext => {
       scout.create(ext);
     });
