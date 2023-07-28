@@ -152,12 +152,16 @@ describe('Tree', () => {
       tree.insertNodes(nodeModels);
       expect(tree.nodes[2].id).toBe(node2.id);
       expect(tree.nodes[3].text).toBe('node A');
+      expect(tree.nodes[3].childNodeIndex).toBe(3);
       expect(tree.nodes[4].text).toBe('node B');
+      expect(tree.nodes[4].childNodeIndex).toBe(4);
       expect(tree.nodes[3].$node.prev().text()).toBe('node 2_2');
       expect(tree.nodes[3].$node.text()).toBe('node A');
       expect(tree.nodes[3].$node.next().text()).toBe('node A_0');
       expect(tree.nodes[3].childNodes[0].text).toBe('node A_0');
+      expect(tree.nodes[3].childNodes[0].childNodeIndex).toBe(0);
       expect(tree.nodes[3].childNodes[1].text).toBe('node A_1');
+      expect(tree.nodes[3].childNodes[1].childNodeIndex).toBe(1);
       expect(tree.nodes[3].childNodes[0].$node.prev().text()).toBe('node A');
       expect(tree.nodes[3].childNodes[0].$node.text()).toBe('node A_0');
       expect(tree.nodes[3].childNodes[0].$node.next().text()).toBe('node A_1');

@@ -133,7 +133,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
 
     // make sure all child nodes are TreeNodes too
     if (this.hasChildNodes()) {
-      this.getTree().ensureTreeNodes(this.childNodes, this.parentNode);
+      this.getTree().ensureTreeNodes(this.childNodes, this);
     }
   }
 
