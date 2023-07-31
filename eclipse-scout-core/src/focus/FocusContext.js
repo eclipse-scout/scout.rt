@@ -67,48 +67,74 @@ export default class FocusContext {
    */
   _onKeyDown(event) {
     if (event.which === keys.TAB) {
-      let activeElement = this.$container.activeElement(true),
-        $focusableElements = this.$container.find(':tabbable:visible'),
-        firstFocusableElement = $focusableElements.first()[0],
-        lastFocusableElement = $focusableElements.last()[0],
-        activeElementIndex = $focusableElements.index(activeElement),
-        focusedElement;
+      this.focusNextTabbable(!event.shiftKey, event);
+    }
+  }
 
-      // Forward Tab
-      if (!event.shiftKey) {
-        // If the last focusable element is focused, or the focus is on the container, set the focus to the first focusable element
-        if (firstFocusableElement && (activeElement === lastFocusableElement || activeElement === this.$container[0])) {
-          $.suppressEvent(event);
-          this.validateAndSetFocus(firstFocusableElement);
-          focusedElement = firstFocusableElement;
-        } else if (activeElementIndex < $focusableElements.length - 1) {
-          focusedElement = $focusableElements.get(activeElementIndex + 1);
-          // Note: event is _not_ suppressed here --> will be handled by browser
-        }
-      } else { // Backward Tab (Shift+TAB)
-        // If the first focusable element is focused, or the focus is on the container, set the focus to the last focusable element
-        if (lastFocusableElement && (activeElement === firstFocusableElement || activeElement === this.$container[0])) {
-          $.suppressEvent(event);
-          this.validateAndSetFocus(lastFocusableElement);
-          focusedElement = lastFocusableElement;
-        } else if (activeElementIndex > 0) {
-          focusedElement = $focusableElements.get(activeElementIndex - 1);
-          // Note: event is _not_ suppressed here --> will be handled by browser
-        }
-      }
-      if (!focusedElement) {
-        return;
-      }
+  /**
+   * Starting from the current `activeElement`, focuses the next or previous valid element within this focus context.
+   * If the context does not contain tabbable elements or the `activeElement` is not part of this context, nothing happens.
+   *
+   * If a TAB key event is given and the target element is the next element in the natural DOM order, the focus is not
+   * changed by this method. Instead, the focus is expected to be automatically changed by the browser (default tabbing
+   * behavior).
+   */
+  focusNextTabbable(forward = true, event) {
+    let $focusableElements = this.$container.find(':tabbable:visible');
+    if ($focusableElements.length === 0) {
+      return; // no focusable elements -> nothing to do
+    }
 
-      let $focusableElement = $(focusedElement);
-      $focusableElement.addClass('keyboard-navigation');
+    let activeElement = this.$container.activeElement(true);
+    let firstFocusableElement = $focusableElements.first()[0];
+    let lastFocusableElement = $focusableElements.last()[0];
+    let activeElementIndex = $focusableElements.index(activeElement);
 
-      // Check if new focused element is currently visible, otherwise scroll the container
-      let containerBounds = graphics.offsetBounds($focusableElement);
-      let $scrollable = $focusableElement.scrollParent();
-      if (!scrollbars.isLocationInView(new Point(containerBounds.x, containerBounds.y), $scrollable)) {
-        scrollbars.scrollTo($scrollable, $focusableElement);
+    let elementToFocus = null;
+    let wrap = false;
+
+    if (forward) {
+      // --- FORWARD ---
+      // If the last focusable element is currently focused, or the focus is on the container, set the focus to the first focusable element
+      if (activeElement === lastFocusableElement || activeElement === this.$container[0]) {
+        elementToFocus = firstFocusableElement;
+        wrap = true;
+      } else if (activeElementIndex < $focusableElements.length - 1) {
+        elementToFocus = $focusableElements.get(activeElementIndex + 1);
       }
+    } else {
+      // --- BACKWARD ---
+      // If the first focusable element is currently focused, or the focus is on the container, set the focus to the last focusable element
+      if (activeElement === firstFocusableElement || activeElement === this.$container[0]) {
+        elementToFocus = lastFocusableElement;
+        wrap = true;
+      } else if (activeElementIndex > 0) {
+        elementToFocus = $focusableElements.get(activeElementIndex - 1);
+      }
+    }
+
+    if (!elementToFocus) {
+      return; // no valid element found
+    }
+
+    // Set focus manually if the target element does not correspond to the next element according to the
+    // DOM order, or if there is currently no keyboard event in progress that will
+    if (event && !wrap) {
+      // Don't change the focus here --> will be handled by browser
+    } else {
+      // Set focus manually to the target element
+      this.validateAndSetFocus(elementToFocus);
+      $.suppressEvent(event);
+    }
+
+    let $focusableElement = $(elementToFocus);
+    $focusableElement.addClass('keyboard-navigation');
+
+    // Check if new focused element is currently visible, otherwise scroll the container
+    let containerBounds = graphics.offsetBounds($focusableElement);
+    let $scrollable = $focusableElement.scrollParent();
+    if (!scrollbars.isLocationInView(new Point(containerBounds.x, containerBounds.y), $scrollable)) {
+      scrollbars.scrollTo($scrollable, $focusableElement);
     }
   }
 
