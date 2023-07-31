@@ -486,23 +486,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
   protected _focusNextTabbable() {
     if (this._tabPrevented) {
-      let $tabElements = this.entryPoint().find(':tabbable'),
-        direction = this._tabPrevented.shiftKey ? -1 : 1,
-        fieldIndex = $tabElements.index(this.$field),
-        nextIndex = fieldIndex + direction;
-
-      if (nextIndex < 0) {
-        nextIndex = $tabElements.length - 1;
-      } else if (nextIndex >= $tabElements.length) {
-        nextIndex = 0;
-      }
-      $.log.isDebugEnabled() && $.log.debug('(SmartField#_inputAccepted) tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
-      let $nextElement = $tabElements.eq(nextIndex).focus() as JQuery<HTMLInputElement>;
-      if (objects.isFunction($nextElement[0].select)) {
-        $nextElement[0].select();
-      }
-      // This is normally done by FocusManager, but since propagation is stopped, we need to do it here as well
-      $nextElement.addClass('keyboard-navigation');
+      this.session.focusManager.focusNextTabbable(this.$container.activeElement(), !this._tabPrevented.shiftKey);
       this._tabPrevented = null;
     }
   }
