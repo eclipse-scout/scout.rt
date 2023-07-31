@@ -7,47 +7,101 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-.switch {
-  position: absolute;
-  right: 0;
-  display: flex;
+@switch-transition-duration: 250ms;
+@switch-transition-duration-fast: 150ms;
 
-  & > .switch-button {
-    margin-top: -2px;
+.switch {
+  --label-color: @text-color;
+  --label-disabled-color: @text-disabled-color;
+
+  --width: 36px;
+  --height: 22px;
+  --transition: none;
+  --border-radius: 11px;
+  --padding: 0px; // allows increasing the "active" mouse area
+  --padding-x: var(--padding);
+  --padding-y: var(--padding);
+  --background-color: @switch-background-color;
+  --border-color: @switch-border-color;
+  --activated-background-color: @switch-activated-background-color;
+  --activated-border-color: transparent;
+  --disabled-background-color: @switch-disabled-background-color;
+  --disabled-border-color: @switch-disabled-border-color;
+  --disabled-activated-background-color: @switch-disabled-activated-background-color;
+  --disabled-activated-border-color: transparent;
+
+  --handle-size: 16px;
+  --handle-top: 2px;
+  --handle-left: 2px;
+  --handle-left-activated: 16px; // button-width - button-border-horizontal - handle-width - handle-margin-right
+  --handle-left-transition-duration: @switch-transition-duration;
+  --handle-border-radius: none;
+  --handle-background-color: @switch-handle-background-color;
+  --handle-border-color: @switch-handle-border-color;
+  --handle-activated-background-color: var(--handle-background-color);
+  --handle-activated-border-color: var(--handle-border-color);
+  --handle-disabled-background-color: @switch-handle-disabled-background-color;
+  --handle-disabled-border-color: @switch-handle-disabled-border-color;
+  --handle-disabled-activated-background-color: var(--handle-disabled-background-color);
+  --handle-disabled-activated-border-color: var(--handle-disabled-border-color);
+
+  --icon-content: @icon-remove-bold;
+  --icon-font-size: 9px;
+  --icon-activated-content: @icon-checked-bold;
+  --icon-activated-font-size: 8px;
+  --icon-color: @switch-icon-color;
+  --icon-activated-color: @switch-icon-activated-color;
+  --icon-disabled-color: @switch-icon-disabled-color;
+  --icon-disabled-activated-color: @switch-icon-disabled-activated-color;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: calc(max(var(--height), var(--handle-size)) + (2 * var(--padding-y)));
+  min-width: calc(var(--width) + (2 * var(--padding-x)));
+  padding: var(--padding-y) var(--padding-x);
+  outline: none;
+
+  &:not(.disabled) {
+    cursor: pointer;
   }
 }
 
 .switch-label {
   margin-right: 8px;
-}
+  color: var(--label-color);
 
-.switch-button,
-.switch-button:before {
-  transition: .25s ease-in-out;
+  .disabled > & {
+    color: var(--label-disabled-color);
+  }
 }
 
 .switch-button {
-  width: 36px;
   position: relative;
-  height: 22px;
-  border-radius: 11px;
-  background-color: @switch-background-color;
-  cursor: pointer;
-  border: solid 1px @switch-border-color;
-  --activated-border-color: @switch-activated-border-color;
-  --activated-background-color: @switch-activated-background-color;
+  width: var(--width);
+  height: var(--height);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--background-color);
+  transition: var(--transition);
 
+  // Handle
   &:before {
     content: '';
-    display: block;
     position: absolute;
-    height: 16px;
-    width: 16px;
+    height: var(--handle-size);
+    width: var(--handle-size);
     border-radius: 50%;
-    top: 2px;
-    left: 2px;
-    border: solid 1px @switch-button-border-color;
-    background-color: @switch-button-background-color;
+    top: var(--handle-top);
+    left: var(--handle-left);
+    transition: left var(--handle-left-transition-duration);
+    border: 1px solid var(--handle-border-color);
+    background-color: var(--handle-background-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--icon-color);
+    font-size: var(--icon-font-size);
   }
 
   &.activated {
@@ -55,30 +109,87 @@
     border-color: var(--activated-border-color);
 
     &:before {
-      background-color: @switch-button-activated-background-color;
-      border-color: @switch-button-activated-border-color;
-      left: calc(~'100% - 18px');
+      left: var(--handle-left-activated);
+      background-color: var(--handle-activated-background-color);
+      border-color: var(--handle-activated-border-color);
+      color: var(--icon-activated-color);
+      font-size: var(--icon-activated-font-size);
     }
   }
 
   .disabled > & {
-    background-color: @switch-disabled-background-color;
-    border-color: @switch-disabled-border-color;
-    cursor: unset;
+    background-color: var(--disabled-background-color);
+    border-color: var(--disabled-border-color);
 
     &::before {
-      background-color: @switch-button-disabled-background-color;
-      border-color: @switch-button-disabled-border-color;
+      background-color: var(--handle-disabled-background-color);
+      border-color: var(--handle-disabled-border-color);
+      color: var(--icon-disabled-color);
     }
 
     &.activated {
-      background-color: @disabled-color;
-      border-color: @disabled-color;
+      background-color: var(--disabled-activated-background-color);
+      border-color: var(--disabled-activated-border-color);
 
       &::before {
-        background-color: @switch-button-activated-background-color;
-        border-color: @switch-button-activated-border-color;
+        background-color: var(--handle-disabled-activated-background-color);
+        border-color: var(--handle-disabled-activated-border-color);
+        color: var(--icon-disabled-activated-color);
       }
     }
+  }
+
+  &.icon-visible {
+
+    &::before {
+      #scout.font-icon();
+      content: var(--icon-content);
+    }
+
+    &.activated::before {
+      content: var(--icon-activated-content);
+    }
+  }
+}
+
+.switch.style-default {
+  --handle-border-color: transparent;
+  --handle-activated-background-color: @switch-style-default-handle-activated-background-color;
+  --handle-disabled-background-color: transparent;
+  --handle-disabled-activated-background-color: @background-color;
+  --handle-disabled-activated-border-color: transparent;
+  --icon-disabled-color: @icon-disabled-color;
+  --icon-activated-color: @switch-activated-background-color;
+  --icon-disabled-activated-color: @switch-disabled-activated-background-color;
+
+  &:focus > .switch-button,
+  &.focused > .switch-button {
+    #scout.focus-border();
+  }
+}
+
+.switch.style-slider {
+  --width: 40px;
+  --height: 6px;
+  --transition: background-color @switch-transition-duration-fast;
+  --border-radius: 3px;
+  --handle-size: 18px;
+  --handle-top: -7px; // (-1px = draw over button-border)
+  --handle-left: -1px; // (-1px = draw over button-border)
+  --handle-left-activated: 21px; // button-width - handle-width (-1px = draw over button-border)
+  --handle-left-transition-duration: @switch-transition-duration-fast;
+  --background-color: @switch-style-slider-background-color;
+  --border-color: transparent;
+  --disabled-background-color: @switch-style-slider-disabled-background-color;
+  --disabled-border-color: transparent;
+  --disabled-activated-background-color: @switch-style-slider-disabled-background-color;
+
+  &:not(.disabled) > .switch-button::before {
+    #scout.drop-shadow(@y: 1px, @blur: 2px);
+  }
+
+  &:focus > .switch-button::before,
+  &.focused > .switch-button::before {
+    #scout.focus-border();
   }
 }

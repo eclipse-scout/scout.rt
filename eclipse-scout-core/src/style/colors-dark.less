@@ -212,11 +212,14 @@
 @status-ok-hover-color: lighten(@status-ok-color, 10%);
 @status-warning-hover-color: lighten(@status-warning-color, 10%);
 @status-error-hover-color: lighten(@status-error-color, 10%);
-@switch-background-color: @mode-alternative-background-color;
+@switch-background-color: fade(@palette-black, 50%);
 @switch-border-color: @check-box-border-color;
-@switch-button-background-color: @text-color;
-@switch-button-activated-background-color: @palette-gray-9;
-@switch-button-disabled-background-color: @check-box-disabled-border-color;
+@switch-disabled-border-color: @switch-border-color;
+@switch-handle-disabled-background-color: @palette-gray-2;
+@switch-handle-disabled-border-color: @switch-border-color;
+@switch-style-default-handle-activated-background-color: @palette-gray-9;
+@switch-style-slider-background-color: @palette-gray-4;
+@switch-style-slider-disabled-background-color: @palette-gray-5-1;
 @tab-item-marked-border-color: @palette-gray-5;
 @table-header-item-state-color: @text-color;
 @table-header-item-color: @palette-gray-4;

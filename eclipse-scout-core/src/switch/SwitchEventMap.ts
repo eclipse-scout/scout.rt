@@ -7,11 +7,22 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, PropertyChangeEvent, Switch, WidgetEventMap} from '../index';
+import {Event, PropertyChangeEvent, Switch, SwitchDisplayStyle, WidgetEventMap} from '../index';
+
+export interface SwitchSwitchEvent<TSource = Switch> extends Event<TSource> {
+  originalEvent: JQuery.Event;
+  oldValue: boolean;
+  newValue: boolean;
+}
 
 export interface SwitchEventMap extends WidgetEventMap {
-  'switch': Event<Switch>;
+  'switch': SwitchSwitchEvent;
   'propertyChange:activated': PropertyChangeEvent<boolean>;
   'propertyChange:label': PropertyChangeEvent<string>;
+  'propertyChange:labelHtmlEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:labelVisible': PropertyChangeEvent<boolean>;
   'propertyChange:tooltipText': PropertyChangeEvent<string>;
+  'propertyChange:iconVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:displayStyle': PropertyChangeEvent<SwitchDisplayStyle>;
+  'propertyChange:tabbable': PropertyChangeEvent<boolean>;
 }

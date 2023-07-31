@@ -7,17 +7,34 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {WidgetModel} from '../index';
+import {Switch, SwitchDisplayStyle, WidgetModel} from '../index';
 
 export interface SwitchModel extends WidgetModel {
   /**
-   * default is false
+   * Default is false
    */
   activated?: boolean;
   label?: string;
   /**
-   * default is false
+   * Default is false
    */
-  htmlEnabled?: boolean;
+  labelHtmlEnabled?: boolean;
+  /**
+   * Specifies if the label is visible. A value of `null` means "automatic", i.e. the label is
+   * automatically shown when the 'label' property contains text.
+   */
+  labelVisible?: boolean;
   tooltipText?: string;
+  /**
+   * Default is false
+   */
+  iconVisible?: boolean;
+  /**
+   * Default is {@link Switch.DisplayStyle.DEFAULT}
+   */
+  displayStyle?: SwitchDisplayStyle;
+  /**
+   * Default is false
+   */
+  tabbable?: boolean;
 }

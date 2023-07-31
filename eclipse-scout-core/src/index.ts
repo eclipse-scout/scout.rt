@@ -864,6 +864,8 @@ export * from './form/fields/wrappedform/WrappedFormFieldAdapter';
 export * from './switch/Switch';
 export * from './switch/SwitchModel';
 export * from './switch/SwitchEventMap';
+export * from './switch/SwitchNavigationKeyStroke';
+export * from './switch/SwitchToggleKeyStroke';
 export * from './tagbar/TagBar';
 export * from './tagbar/TagBarModel';
 export * from './tagbar/TagBarEventMap';
