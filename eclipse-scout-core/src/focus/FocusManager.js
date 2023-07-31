@@ -369,6 +369,16 @@ export default class FocusManager {
     });
   }
 
+  /**
+   * Focuses the next or previous valid element within the focus context of the given `activeElement`.
+   */
+  focusNextTabbable(activeElement, forward = true) {
+    let focusContext = this._findFocusContextFor(activeElement);
+    if (focusContext) {
+      focusContext.focusNextTabbable(forward);
+    }
+  }
+
   _findFocusContextFor($element) {
     $element = $.ensure($element);
     let context = null;
