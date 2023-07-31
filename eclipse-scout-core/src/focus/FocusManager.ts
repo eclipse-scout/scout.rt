@@ -383,6 +383,16 @@ export class FocusManager implements FocusManagerOptions {
     return arrays.find(this._focusContexts, focusContext => focusContext.$container === $container);
   }
 
+  /**
+   * Focuses the next or previous valid element within the focus context of the given `activeElement`.
+   */
+  focusNextTabbable(activeElement: JQuery | HTMLElement, forward = true) {
+    let focusContext = this._findFocusContextFor(activeElement);
+    if (focusContext) {
+      focusContext.focusNextTabbable(forward);
+    }
+  }
+
   protected _findFocusContextFor(element: JQuery | HTMLElement): FocusContext {
     let $element = $.ensure(element);
     let context = null;
