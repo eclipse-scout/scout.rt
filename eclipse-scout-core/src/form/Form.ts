@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, App, BusyIndicatorOptions, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler, FileChooser, FileChooserController, FocusRule, FormController,
-  FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController,
-  MessageBoxes, NotificationBadgeStatus, ObjectOrChildModel, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
+  AbortKeyStroke, App, aria, AriaLabelledByInsertPosition, BusyIndicatorOptions, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler, FileChooser,
+  FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke,
+  KeyStrokeContext, MessageBox, MessageBoxController, MessageBoxes, NotificationBadgeStatus, ObjectOrChildModel, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult,
+  ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 
@@ -194,6 +195,10 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.$container = this.$parent.appendDiv('form')
       .data('model', this);
 
+    if (!(this.parent instanceof WrappedFormField)) {
+      aria.role(this.$container, this.isDialog() || this.isPopupWindow() ? 'dialog' : 'form');
+    }
+
     if (this.uiCssClass) {
       this.$container.addClass(this.uiCssClass);
     }
@@ -281,6 +286,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
       return;
     }
     let modal = this.modal;
+    aria.modal(this.$container, modal || null);
     if (modal && !this._glassPaneRenderer) {
       this._glassPaneRenderer = new GlassPaneRenderer(this);
       this._glassPaneRenderer.renderGlassPanes();
@@ -828,6 +834,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
       }
       this.$close = this.$statusContainer.appendDiv('status closer')
         .on('click', this._onCloseIconClick.bind(this));
+      aria.role(this.$close, 'button');
+      aria.label(this.$close, this.session.text('ui.Close'));
     } else {
       if (!this.$close) {
         return;
@@ -933,6 +941,10 @@ export class Form extends Widget implements FormModel, DisplayParent {
     tooltips.installForEllipsis(this.$subTitle, {
       parent: this
     });
+
+    aria.linkElementWithLabel(this.$container, this.$title);
+    aria.linkElementWithLabel(this.$container, this.$subTitle, AriaLabelledByInsertPosition.BACK);
+
     this._renderTitle();
     this._renderSubTitle();
     this._renderIconId();
@@ -1269,9 +1281,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
     } else if (!headerVisible && this.$header) {
       this._removeHeader();
     }
+
     // If header contains no title it won't be a real header, it will be in the top right corner just containing icons.
     let noTitleHeader = this.$header && this.$header.hasClass('no-title');
     this.$container.toggleClass('header-visible', headerVisible && !noTitleHeader);
+    let ariaLabel = strings.join(' ', this.title, this.subTitle);
+    aria.label(this.$container, (!headerVisible && !noTitleHeader) ? ariaLabel : null);
     this.invalidateLayoutTree();
   }
 

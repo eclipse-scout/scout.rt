@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EnumObject, numbers, RoundingMode} from '@eclipse-scout/core';
+import {aria, EnumObject, numbers, RoundingMode} from '@eclipse-scout/core';
 import {AbstractSvgChartRenderer, Chart} from '../index';
 
 export class SpeedoChartRenderer extends AbstractSvgChartRenderer {
@@ -263,6 +263,7 @@ export class SpeedoChartRenderer extends AbstractSvgChartRenderer {
         .addClass('speedo-chart-label')
         .attr('style', 'font-size: ' + this.scaleWeight * 1.55 + 'px;');
     }
+    aria.description(this.$svg, this.session.text('ui.SpeedoChartAriaDescription', legendValue, minLegendValue, maxLegendValue));
   }
 
   /**

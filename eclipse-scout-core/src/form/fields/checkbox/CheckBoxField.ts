@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AddCellEditorFieldCssClassesOptions, CheckBoxFieldEventMap, CheckBoxFieldModel, CheckBoxToggleKeyStroke, Device, fields, InitModelOf, KeyStrokeContext, objects, styles, tooltips, ValueField} from '../../../index';
+import {AddCellEditorFieldCssClassesOptions, aria, CheckBoxFieldEventMap, CheckBoxFieldModel, CheckBoxToggleKeyStroke, Device, InitModelOf, KeyStrokeContext, objects, styles, tooltips, ValueField} from '../../../index';
 
 export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldModel {
   declare model: CheckBoxFieldModel;
@@ -68,13 +68,14 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
       .appendDiv('check-box')
       .on('mousedown', this._onMouseDown.bind(this))
       .data('valuefield', this);
+    aria.role(this.$checkBox, 'checkbox');
     this.addField(this.$checkBox);
 
     this.$checkBoxLabel = this.$fieldContainer
       .appendDiv('label')
       .on('mousedown', this._onMouseDown.bind(this));
 
-    fields.linkElementWithLabel(this.$checkBox, this.$checkBoxLabel);
+    aria.linkElementWithLabel(this.$checkBox, this.$checkBoxLabel);
     tooltips.installForEllipsis(this.$checkBoxLabel, {
       parent: this
     });
@@ -116,6 +117,7 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
     this.$fieldContainer.toggleClass('checked', this.value === true);
     this.$checkBox.toggleClass('checked', this.value === true);
     this.$checkBox.toggleClass('undefined', this.triStateEnabled && this.value !== true && this.value !== false);
+    aria.checked(this.$checkBox, this.value, this.triStateEnabled);
   }
 
   protected override _renderEnabled() {

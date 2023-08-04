@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Button, FormFieldTile, NullLayout, strings, tooltips} from '../../../index';
+import {aria, Button, FormFieldTile, NullLayout, strings, tooltips} from '../../../index';
 
 export class TileButton extends Button {
   $iconContainer: JQuery;
@@ -24,6 +24,7 @@ export class TileButton extends Button {
       return;
     }
     let $button = this.$parent.makeDiv();
+    aria.role($button, 'button');
     this.$buttonLabel = $button.appendSpan('label');
 
     this.addContainer(this.$parent, 'tile-button');

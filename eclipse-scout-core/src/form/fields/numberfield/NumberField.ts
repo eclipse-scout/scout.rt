@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BasicField, Calculator, DecimalFormat, DecimalFormatOptions, fields, InitModelOf, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
+import {aria, BasicField, Calculator, DecimalFormat, DecimalFormatOptions, fields, InitModelOf, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
 
 export class NumberField extends BasicField<number, number | string> implements NumberFieldModel {
   declare model: NumberFieldModel;
@@ -58,6 +58,7 @@ export class NumberField extends BasicField<number, number | string> implements 
     let $field = fields.makeTextField(this.$parent);
     this.addField($field);
     this.addStatus();
+    this._addAriaFieldDescription();
   }
 
   protected override _renderGridData() {
@@ -222,5 +223,9 @@ export class NumberField extends BasicField<number, number | string> implements 
     if (!objects.isNullOrUndefined(this.maxValue) && !objects.isNullOrUndefined(this.minValue) && maxValue < this.minValue) {
       this._setMinValue(maxValue);
     }
+  }
+
+  protected _addAriaFieldDescription() {
+    aria.addHiddenDescriptionAndLinkToElement(this.$field, this.id + '-func-desc', this.session.text('ui.AriaNumberFieldDescription'));
   }
 }

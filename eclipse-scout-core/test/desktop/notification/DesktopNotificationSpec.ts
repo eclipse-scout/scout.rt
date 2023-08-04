@@ -289,4 +289,21 @@ describe('DesktopNotification', () => {
       }, 10);
     });
   });
+
+  describe('aria properties', () => {
+
+    it('has aria role alert', () => {
+      let notification = scout.create(DesktopNotification, {
+        parent: parent,
+        closable: true,
+        status: {
+          message: 'bar',
+          severity: Status.Severity.OK
+        }
+      });
+
+      notification.render($sandbox);
+      expect(notification.$container).toHaveAttr('role', 'alert');
+    });
+  });
 });

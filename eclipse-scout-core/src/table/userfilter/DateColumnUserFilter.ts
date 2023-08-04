@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ColumnUserFilter, ColumnUserFilterModel, DateColumn, DateColumnUserFilterModel, DateField, dates, FilterFieldsGroupBox, InitModelOf, PropertyChangeEvent, TableMatrix, TableMatrixDateGroup, TableMatrixNumberGroup, TableRow,
+  aria, ColumnUserFilter, ColumnUserFilterModel, DateColumn, DateColumnUserFilterModel, DateField, dates, FilterFieldsGroupBox, InitModelOf, PropertyChangeEvent, TableMatrix, TableMatrixDateGroup, TableMatrixNumberGroup, TableRow,
   TableUserFilterAddedEventData
 } from '../../index';
 import $ from 'jquery';
@@ -111,6 +111,11 @@ export class DateColumnUserFilter extends ColumnUserFilter implements ColumnUser
   override modifyFilterFields() {
     this.dateFromField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
     this.dateToField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
+  }
+
+  override linkFieldsWithTitle($filterFieldsText: JQuery<HTMLDivElement>) {
+    aria.linkElementWithLabel(this.dateFromField.$dateField, $filterFieldsText);
+    aria.linkElementWithLabel(this.dateToField.$dateField, $filterFieldsText);
   }
 
   protected _onInput(event: JQuery.TriggeredEvent) {

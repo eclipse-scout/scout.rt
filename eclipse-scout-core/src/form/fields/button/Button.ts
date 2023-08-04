@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ButtonAdapterMenu, ButtonEventMap, ButtonKeyStroke, ButtonLayout, ButtonModel, ContextMenuPopup, Device, DoubleClickSupport, EnumObject, FormField, icons, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, scout, styles, tooltips,
-  Widget
+  aria, ButtonAdapterMenu, ButtonEventMap, ButtonKeyStroke, ButtonLayout, ButtonModel, ContextMenuPopup, Device, DoubleClickSupport, EnumObject, FormField, icons, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, objects, scout, styles,
+  tooltips, Widget
 } from '../../../index';
 
 export class Button extends FormField implements ButtonModel {
@@ -141,6 +141,7 @@ export class Button extends FormField implements ButtonModel {
     if (this.displayStyle === Button.DisplayStyle.LINK) {
       // Render as link-button
       $button = this.$parent.makeDiv('link-button menu-item');
+      aria.role($button, 'link');
       this.$buttonLabel = $button.appendSpan('button-label text');
     } else {
       // render as button
@@ -166,13 +167,17 @@ export class Button extends FormField implements ButtonModel {
       .unfocusable();
 
     if (this.menus && this.menus.length > 0) {
+      aria.hasPopup($button, 'menu');
       this.menus.forEach(menu => this.keyStrokeContext.registerKeyStroke(menu));
       if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
         let icon = icons.parseIconId(Button.SUBMENU_ICON);
         this.$submenuIcon = $button
           .appendSpan('submenu-icon')
           .text(icon.iconCharacter);
+        aria.hidden(this.$submenuIcon, true);
       }
+    } else {
+      aria.hasPopup($button, null);
     }
     this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 
@@ -215,6 +220,13 @@ export class Button extends FormField implements ButtonModel {
     this.invalidateLayoutTree();
   }
 
+  override _updateMenus() {
+    super._updateMenus();
+    let hasMenus = this.menus && this.menus.length > 0;
+    aria.hasPopup(this.$field, hasMenus ? 'menu' : null);
+    aria.expanded(this.$field, hasMenus ? !objects.isNullOrUndefined(this.popup) : null);
+  }
+
   /**
    * @returns true if the action has been performed or false if it has not been performed (e.g. when the button is not enabled).
    */
@@ -243,7 +255,9 @@ export class Button extends FormField implements ButtonModel {
       this.popup = this._openPopup();
       this.popup.one('destroy', event => {
         this.popup = null;
+        aria.expanded(this.$field, false);
       });
+      aria.expanded(this.$field, true);
     }
   }
 
@@ -286,6 +300,7 @@ export class Button extends FormField implements ButtonModel {
     if (this.displayStyle === Button.DisplayStyle.TOGGLE) {
       this.$field.toggleClass('selected', this.selected);
     }
+    aria.pressed(this.$field, this.displayStyle === Button.DisplayStyle.TOGGLE ? this.selected : null);
   }
 
   protected override _renderLabel() {
@@ -418,6 +433,11 @@ export class Button extends FormField implements ButtonModel {
 
   setPreventDoubleClick(preventDoubleClick: boolean) {
     this.setProperty('preventDoubleClick', preventDoubleClick);
+  }
+
+  protected override _linkWithLabel($element: JQuery) {
+    super._linkWithLabel($element);
+    aria.linkElementWithLabel($element, this.$buttonLabel);
   }
 
   override getFocusableElement(): HTMLElement | JQuery {

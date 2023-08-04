@@ -255,4 +255,30 @@ describe('ViewButtonBox', () => {
     });
   });
 
+  describe('aria properties', () => {
+    let viewButtonBox: ViewButtonBox;
+
+    beforeEach(() => {
+      viewButtonBox = scout.create(ViewButtonBox, {
+        parent: session.desktop,
+        viewButtons: [scout.create(ViewButton, {
+          parent: session.desktop,
+          text: 'Button1',
+          displayStyle: 'MENU',
+          visible: true
+        })]
+      });
+    });
+
+    it('has view button with aria role button', () => {
+      viewButtonBox.render();
+      expect(viewButtonBox.viewButtons[0].$container).toHaveAttr('role', 'button');
+    });
+
+    it('has view button with aria-label set', () => {
+      viewButtonBox.render();
+      expect(viewButtonBox.viewButtons[0].$container.attr('aria-label')).toBeTruthy();
+      expect(viewButtonBox.viewButtons[0].$container.attr('aria-labelledby')).toBeFalsy();
+    });
+  });
 });

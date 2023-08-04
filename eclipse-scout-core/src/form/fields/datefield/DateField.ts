@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AddCellEditorFieldCssClassesOptions, arrays, CellEditorPopup, CellEditorRenderedOptions, DateFieldEventMap, DateFieldModel, DateFormat, DateFormatAnalyzeInfo, DatePicker, DatePickerDateSelectEvent, DatePickerPopup, DatePickerTouchPopup,
-  DatePredictionFailedStatus, dates, DateTimeCompositeLayout, Device, Event, fields, focusUtils, FormField, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, objects, ParsingFailedStatus, Popup, Predicate,
-  scout, Status, StatusType, strings, styles, TimePicker, TimePickerPopup, TimePickerTimeSelectEvent, TimePickerTouchPopup, ValueField, ValueFieldWithCellEditorRenderedCallback
+  AddCellEditorFieldCssClassesOptions, aria, arrays, CellEditorPopup, CellEditorRenderedOptions, DateFieldEventMap, DateFieldModel, DateFormat, DateFormatAnalyzeInfo, DatePicker, DatePickerDateSelectEvent, DatePickerPopup,
+  DatePickerTouchPopup, DatePredictionFailedStatus, dates, DateTimeCompositeLayout, Device, Event, fields, focusUtils, FormField, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, objects, ParsingFailedStatus,
+  Popup, Predicate, scout, Status, StatusType, strings, styles, TimePicker, TimePickerPopup, TimePickerTimeSelectEvent, TimePickerTouchPopup, ValueField, ValueFieldWithCellEditorRenderedCallback
 } from '../../../index';
 import $ from 'jquery';
 
@@ -191,6 +191,14 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this.popup = null;
   }
 
+  protected override _renderMandatory() {
+    super._renderMandatory();
+    // date field uses individual fields, move mandatory attribute
+    aria.required(this.$field, null);
+    aria.required(this.$dateField, this.mandatory || null);
+    aria.required(this.$timeField, this.mandatory || null);
+  }
+
   setHasDate(hasDate: boolean) {
     this.setProperty('hasDate', hasDate);
   }
@@ -221,11 +229,12 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
           .on('focus', this._onDateFieldFocus.bind(this));
       }
       this._linkWithLabel(this.$dateField);
+      aria.addHiddenDescriptionAndLinkToElement(this.$dateField, this.id + '-date-func-desc', this.session.text('ui.AriaDateFieldDescription', this.dateFormatPattern));
       HtmlComponent.install(this.$dateField, this.session);
 
       this.$dateFieldIcon = fields.appendIcon(this.$field, 'date')
         .on('mousedown', this._onDateIconMouseDown.bind(this));
-
+      aria.hidden(this.$dateFieldIcon, true);
     } else if (!this.hasDate && this.$dateField) {
       // Remove $dateField
       this.$dateField.remove();
@@ -274,11 +283,12 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
           .on('focus', this._onTimeFieldFocus.bind(this));
       }
       this._linkWithLabel(this.$timeField);
+      aria.addHiddenDescriptionAndLinkToElement(this.$timeField, this.id + '-time-func-desc', this.session.text('ui.AriaTimeFieldDescription', this.timeFormatPattern));
       HtmlComponent.install(this.$timeField, this.session);
 
       this.$timeFieldIcon = fields.appendIcon(this.$field, 'time')
         .on('mousedown', this._onTimeIconMouseDown.bind(this));
-
+      aria.hidden(this.$timeFieldIcon, true);
     } else if (!this.hasTime && this.$timeField) {
       // Remove $timeField
       this.$timeField.remove();
@@ -689,6 +699,8 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
         // date clear icon
         this.$dateClearIcon = this.$field.appendSpan('icon date-clear unfocusable text-field-icon action')
           .on('mousedown', this._onDateClearIconMouseDown.bind(this));
+        aria.role(this.$dateClearIcon, 'button');
+        aria.label(this.$dateClearIcon, this.session.text('ui.ClearField'), true);
       }
     } else {
       if (this.$dateClearIcon) {
@@ -705,6 +717,8 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
         // time clear icon
         this.$timeClearIcon = this.$field.appendSpan('icon time-clear unfocusable text-field-icon action')
           .on('mousedown', this._onTimeClearIconMouseDown.bind(this));
+        aria.role(this.$timeClearIcon, 'button');
+        aria.label(this.$timeClearIcon, this.session.text('ui.ClearField'), true);
       }
     } else {
       if (this.$timeClearIcon) {
@@ -1834,6 +1848,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this.trigger('acceptInput', event);
   }
 }
+
 export type DateFieldPredictionResult = {
   date: Date;
   text: string;

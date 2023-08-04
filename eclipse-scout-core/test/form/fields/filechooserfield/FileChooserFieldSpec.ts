@@ -108,16 +108,6 @@ describe('FileChooserField', () => {
 
   describe('label', () => {
 
-    it('is linked with the field', () => {
-      let field = scout.create(FileChooserField, {
-        parent: session.desktop,
-        label: 'label'
-      });
-      field.render();
-      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
-      expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
-    });
-
     it('focuses the field when clicked', () => {
       let field = scout.create(FileChooserField, {
         parent: session.desktop,
@@ -130,4 +120,30 @@ describe('FileChooserField', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria-labelledby set', () => {
+      let field = scout.create(FileChooserField, {
+        parent: session.desktop,
+        label: 'label'
+      });
+      field.render();
+      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
+      expect(field.$field.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has aria-describedby description for its functionality', () => {
+      let field = scout.create(FileChooserField, {
+        parent: session.desktop,
+        label: 'label'
+      });
+      field.render();
+
+      let $fieldDescription = field.$fieldContainer.find('#desc' + field.id + '-func-desc');
+      expect(field.fileInput.$fileInput.attr('aria-describedby')).toBeTruthy();
+      expect(field.fileInput.$fileInput.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
+      expect(field.fileInput.$fileInput.attr('aria-description')).toBeFalsy();
+    });
+  });
 });

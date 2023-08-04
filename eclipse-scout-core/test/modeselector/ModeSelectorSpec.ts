@@ -234,4 +234,36 @@ describe('ModeSelector', () => {
       expect(modeSelector.modes[1].selected).toBe(true);
     });
   });
+
+  describe('focus', () => {
+
+    it('focuses the selected mode', () => {
+      let modeSelector = helper.createModeSelector(session.desktop, 2);
+      modeSelector.render();
+      modeSelector.selectModeById(modeSelector.modes[1].id);
+      expect(modeSelector.modes[1].$container).not.toBeFocused();
+
+      modeSelector.focus();
+      expect(modeSelector.modes[1].$container).toBeFocused();
+    });
+
+    it('focuses the first button if no button is selected', () => {
+      let modeSelector = helper.createModeSelector(session.desktop, 2);
+      modeSelector.render();
+      expect(modeSelector.selectedMode).toBe(null);
+      expect(modeSelector.modes[0].$container).not.toBeFocused();
+
+      modeSelector.focus();
+      expect(modeSelector.modes[0].$container).toBeFocused();
+    });
+
+    describe('aria properties', () => {
+
+      it('has aria role radiogroup', () => {
+        let modeSelector = helper.createModeSelector(session.desktop, 2);
+        modeSelector.render();
+        expect(modeSelector.$slider).toHaveAttr('role', 'radiogroup');
+      });
+    });
+  });
 });

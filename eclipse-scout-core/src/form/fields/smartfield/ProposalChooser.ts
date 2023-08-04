@@ -199,8 +199,13 @@ export abstract class ProposalChooser<TValue, TContent extends ProposalChooserCo
     this.$status.setVisible(visible);
     if (this.status) {
       this._setStatusMessage(this.status.message);
+      this.smartField.$screenReaderStatus?.appendSpan()
+        .addClass('text')
+        .addClass('sr-proposal-chooser-status')
+        .text(this.status.message);
     } else {
       this.$status.text('');
+      this.smartField.$screenReaderStatus?.children('.sr-proposal-chooser-status').remove();
     }
     this.htmlComp.invalidateLayoutTree();
   }

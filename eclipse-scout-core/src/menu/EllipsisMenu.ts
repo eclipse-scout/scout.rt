@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EllipsisMenuEventMap, EllipsisMenuModel, icons, Menu, Widget} from '../index';
+import {aria, EllipsisMenuEventMap, EllipsisMenuModel, icons, Menu, Widget} from '../index';
 
 export class EllipsisMenu extends Menu implements EllipsisMenuModel {
   declare model: EllipsisMenuModel;
@@ -44,6 +44,13 @@ export class EllipsisMenu extends Menu implements EllipsisMenuModel {
   protected override _renderProperties() {
     super._renderProperties();
     this._renderHidden();
+  }
+
+  protected override _renderSelected() {
+    super._renderSelected();
+    // has to be done here because hasPopup is false for ellipsis menu
+    aria.hasPopup(this.$container, 'menu');
+    aria.expanded(this.$container, this.selected);
   }
 
   // add the set hidden function to the ellipsis

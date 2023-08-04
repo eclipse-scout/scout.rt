@@ -143,7 +143,10 @@ export class TableControl extends Action implements TableControlModel {
     return this.$contentContainer;
   }
 
-  protected override _renderSelected(selected?: boolean, options?: { closeWhenUnselected?: boolean; animate?: boolean }) {
+  protected override _renderSelected(selected?: boolean, options?: {
+    closeWhenUnselected?: boolean;
+    animate?: boolean;
+  }) {
     selected = scout.nvl(selected, this.selected);
     options = $.extend({}, {closeWhenUnselected: true}, options);
 
@@ -187,7 +190,10 @@ export class TableControl extends Action implements TableControlModel {
     }
   }
 
-  override setSelected(selected: boolean, options?: { closeWhenUnselected?: boolean; animate?: boolean }) {
+  override setSelected(selected: boolean, options?: {
+    closeWhenUnselected?: boolean;
+    animate?: boolean;
+  }) {
     if (selected && !this.visible) {
       return;
     }

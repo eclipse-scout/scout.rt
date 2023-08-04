@@ -140,4 +140,15 @@ describe('DesktopBench', () => {
     });
   });
 
+  describe('aria properties', () => {
+
+    it('has aria role main', () => {
+      expect(desktop.bench.$container).toHaveAttr('role', 'main');
+    });
+
+    it('has aria-label set', () => {
+      expect(desktop.bench.$container.attr('aria-label')).toBeTruthy();
+      expect(desktop.bench.$container.attr('aria-labelledby')).toBeFalsy();
+    });
+  });
 });

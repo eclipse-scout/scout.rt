@@ -441,6 +441,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.locale = new Locale(data.startupData.locale);
     this.textMap = texts.get(this.locale.languageTag);
     this.textMap.addAll(data.startupData.textMap);
+    scout.setDocumentLocale(this.locale);
 
     // Create the desktop
     // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
@@ -1450,6 +1451,8 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     if (textMap) {
       objects.copyOwnProperties(textMap, this.textMap);
     }
+    // set document locale so screen readers read text correctly
+    scout.setDocumentLocale(locale);
     // TODO [7.0] bsh: inform components to reformat display text? also check Collator in comparators.TEXT
 
     this.trigger('localeSwitch', {

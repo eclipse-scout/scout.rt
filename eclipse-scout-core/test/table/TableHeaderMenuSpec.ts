@@ -20,6 +20,9 @@ describe('TableHeaderMenu', () => {
     helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
+
+    session.textMap.add('ColumnSorting', 'Sorting');
+    session.textMap.add('ui.ascending', 'ascending');
   });
 
   afterEach(() => {
@@ -320,6 +323,44 @@ describe('TableHeaderMenu', () => {
         table.header.closeHeaderMenu();
       });
 
+    });
+
+    describe('aria properties', () => {
+
+      it('has table header menus with aria role button', () => {
+        let table = createSingleColumnTableByTexts(['Value']);
+        let column = table.columns[0];
+        table.render();
+        table.header.openHeaderMenu(column);
+        let tableHeaderMenu = table.header.tableHeaderMenu;
+        expect(tableHeaderMenu.groupButton.$container).toHaveAttr('role', 'button');
+        table.header.closeHeaderMenu();
+      });
+
+      it('has aria-pressed set if selected', () => {
+        let table = createSingleColumnTableByTexts(['Value']);
+        let column = table.columns[0];
+        table.render();
+        table.header.openHeaderMenu(column);
+        let tableHeaderMenu = table.header.tableHeaderMenu;
+        expect(tableHeaderMenu.groupButton.$container).toHaveAttr('role', 'button');
+        expect(tableHeaderMenu.groupButton.$container).toHaveAttr('aria-pressed', 'false');
+        tableHeaderMenu.groupButton.setSelected(true);
+        expect(tableHeaderMenu.groupButton.$container).toHaveAttr('aria-pressed', 'true');
+        table.header.closeHeaderMenu();
+      });
+
+      it('has aria-labelledBy', () => {
+        let table = createSingleColumnTableByTexts(['Value']);
+        let column = table.columns[0];
+        table.render();
+        table.header.openHeaderMenu(column);
+        let tableHeaderMenu = table.header.tableHeaderMenu;
+        expect(tableHeaderMenu.groupButton.$container.attr('aria-labelledby')).toBeTruthy();
+        expect(tableHeaderMenu.groupButton.$container.attr('aria-labelledby')).toBe(tableHeaderMenu.groupButton.parent.$text.attr('id'));
+        expect(tableHeaderMenu.groupButton.$container.attr('aria-label')).toBeFalsy();
+        table.header.closeHeaderMenu();
+      });
     });
   });
 });

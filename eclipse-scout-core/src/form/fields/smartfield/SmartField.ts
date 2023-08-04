@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport, LookupCall,
+  AjaxError, aria, arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport, LookupCall,
   LookupCallOrModel, LookupResult, LookupRow, MaxLengthHandler, objects, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldEventMap,
   SmartFieldLayout, SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValidationFailedStatus, ValueField
 } from '../../../index';
@@ -63,6 +63,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   protected _cellEditorPopup: CellEditorPopup<TValue>;
   protected _lockLookupRow: boolean;
 
+  $screenReaderStatus: JQuery;
+
   constructor() {
     super();
 
@@ -104,6 +106,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
       'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
       'displayStyle'
     ]);
+
+    this.$screenReaderStatus = null;
   }
 
   static DisplayStyle = {
@@ -147,6 +151,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     }
 
     fields.initTouch(this, model);
+    this.on('lookupCallDone', event => this._renderScreenReaderStatus(event.result));
   }
 
   /**
@@ -195,12 +200,27 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     }
     this.addField($field);
     this.maxLengthHandler.install($field);
+    aria.role($field, 'combobox');
+    aria.expanded($field, false);
+    this._addScreenReaderStatus();
 
     if (!this.embedded) {
       this.addMandatoryIndicator();
     }
     this.addIcon();
     this.addStatus();
+    this._addAriaFieldDescription();
+  }
+
+  protected _addScreenReaderStatus() {
+    // status container that renders information about the look up
+    this.$screenReaderStatus = this.$container.appendDiv();
+    aria.role(this.$screenReaderStatus, 'status');
+    aria.screenReaderOnly(this.$screenReaderStatus);
+  }
+
+  protected _addAriaFieldDescription() {
+    aria.addHiddenDescriptionAndLinkToElement(this.$field, this.id + '-func-desc', this.session.text('ui.AriaSmartFieldDescription'));
   }
 
   protected override _renderProperties() {
@@ -220,6 +240,27 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this.updateInnerAlignment({
       useHorizontalAlignment: !this.browseHierarchy
     });
+  }
+
+  _renderScreenReaderStatus(result: SmartFieldLookupResult<TValue>) {
+    if (result && this.$screenReaderStatus) {
+      this._clearScreenReaderStatus();
+      if (result.numLookupRows) {
+        this.$screenReaderStatus.appendSpan().addClass('sr-lookup-row-count').text(this.session.text('ui.NumProposals', result.numLookupRows));
+      } else {
+        this.$screenReaderStatus.appendSpan().addClass('sr-lookup-row-count').text(this.session.text('ui.NoProposals'));
+      }
+    }
+  }
+
+  /**
+   * Screen reader status should always be cleared if chooser is not visible, so everytime the chooser becomes visible, the status is announced to the
+   * user
+   */
+  _clearScreenReaderStatus() {
+    if (this.$screenReaderStatus) {
+      this.$screenReaderStatus.children('.sr-lookup-row-count').remove();
+    }
   }
 
   cssClassName(): string {
@@ -975,6 +1016,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     // On touch devices the field does not get the focus.
     // But it should look focused when the popup is open.
     this.$field.addClass('focused');
+    aria.expanded(this.$field, true);
     this.$container.addClass('popup-open');
 
     let useTouch = this.touchMode && !this.isDropdown();
@@ -991,6 +1033,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     });
 
     this.popup.open();
+    aria.linkElementWithControls(this.$field, this.popup.$container);
     this.popup.$container.css('--inactive-lookup-row-suffix-text', `'${this.session.text('InactiveState')}'`);
 
     /* This variable is required to route events to the right field:
@@ -1012,6 +1055,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
       if (this.rendered) {
         this.$container.removeClass('popup-open');
         this.$field.removeClass('focused');
+        this._resetPopupAriaProperties();
         this._renderErrorStatus();
       }
     });
@@ -1022,6 +1066,16 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     if (this.popup) {
       this.popup.close();
     }
+  }
+
+  /**
+   * Resets the aria properties that were changed by the pop up to indicate that the pop up is not open
+   */
+  _resetPopupAriaProperties() {
+    aria.expanded(this.$field, false);
+    aria.removeActiveDescendant(this.$field);
+    this._clearScreenReaderStatus();
+    aria.removeControls(this.$field);
   }
 
   /**

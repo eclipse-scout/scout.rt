@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, Action, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, DisplayParent, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, InitModelOf, keys,
+  AbortKeyStroke, Action, aria, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, DisplayParent, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, InitModelOf, keys,
   KeyStrokeContext, MessageBoxEventMap, MessageBoxLayout, MessageBoxModel, objects, scout, Status, StatusSeverity, strings, Widget
 } from '../index';
 import TriggeredEvent = JQuery.TriggeredEvent;
@@ -133,6 +133,8 @@ export class MessageBox extends Widget implements MessageBoxModel {
       .on('mousedown', this._onMouseDown.bind(this))
       .on('copy', this._onCopy.bind(this));
 
+    aria.role(this.$container, 'alertdialog');
+
     let $handle = this.$container.appendDiv('drag-handle');
     this.$container.draggable($handle);
 
@@ -212,12 +214,18 @@ export class MessageBox extends Widget implements MessageBoxModel {
     this.$header.html(strings.nl2br(this.header));
     this.$header.setVisible(!!this.header || !!this.iconId);
     this.$header.toggleClass('has-text', strings.hasText(this.header));
+    if (strings.hasText(this.header)) {
+      aria.linkElementWithLabel(this.$container, this.$header);
+    }
   }
 
   protected _renderBody() {
     this.$body.html(strings.nl2br(this.body));
     this.$body.setVisible(!!this.body);
     this.$content.toggleClass('has-body', !!this.body);
+    if (strings.hasText(this.body)) {
+      aria.linkElementWithDescription(this.$container, this.$body);
+    }
   }
 
   protected _renderHtml() {
@@ -227,6 +235,9 @@ export class MessageBox extends Widget implements MessageBoxModel {
     this.$html.find('a, .app-link')
       .attr('tabindex', '0')
       .unfocusable();
+    if (strings.hasText(this.html)) {
+      aria.linkElementWithDescription(this.$container, this.$html);
+    }
   }
 
   protected _renderHiddenText() {

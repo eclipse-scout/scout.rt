@@ -111,6 +111,16 @@ describe('WidgetPopup', () => {
     });
   });
 
+  describe('aria properties', () => {
+
+    it('has aria role none', () => {
+      let popup = createPopupWithFormAnd2Fields('Second Field');
+      popup.animateOpening = false;
+      popup.open();
+      expect(popup.$container).toHaveAttr('role', 'none');
+    });
+  });
+
   class SpecTooltip extends Tooltip {
     override position() {
       const {x, y} = this._getOrigin();

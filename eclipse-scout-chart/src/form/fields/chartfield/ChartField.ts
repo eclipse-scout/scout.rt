@@ -41,4 +41,8 @@ export class ChartField extends FormField implements ChartFieldModel {
     this.chart.remove();
     this._removeField();
   }
+
+  protected override _linkWithLabel($element: JQuery) {
+    // nop, the chart renderers will take care of labeling and describing the chart
+  }
 }

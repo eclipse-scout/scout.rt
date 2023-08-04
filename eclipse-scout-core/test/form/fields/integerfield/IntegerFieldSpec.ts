@@ -185,4 +185,16 @@ describe('IntegerField', () => {
       expect(field.displayText).toBe('13.0');
     });
   });
+
+  describe('aria properties', () => {
+
+    it('has aria-describedby description for its functionality', () => {
+      let field = helper.createField(IntegerField);
+      field.render();
+      let $fieldDescription = field.$container.find('#desc' + field.id + '-func-desc');
+      expect(field.$field.attr('aria-describedby')).toBeTruthy();
+      expect(field.$field.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+    });
+  });
 });

@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow, ObjectOrChildModel, ObjectOrModel,
-  objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout, Status,
-  ValueField
+  aria, arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow, ObjectOrChildModel,
+  ObjectOrModel, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout,
+  Status, ValueField
 } from '../../../index';
 import $ from 'jquery';
 
@@ -111,6 +111,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     this.addMandatoryIndicator();
 
     this.$body = this.$container.appendDiv('radiobutton-group-body');
+    aria.role(this.$body, 'radiogroup');
     this.htmlBody = HtmlComponent.install(this.$body, this.session);
     this.htmlBody.setLayout(this._createBodyLayout());
 

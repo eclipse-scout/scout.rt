@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, BoxButtons, BusyIndicatorEventMap, ClickActiveElementKeyStroke, CloseKeyStroke, Event, FocusRule, GlassPaneRenderer, InitModelOf, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
+import {Action, aria, BoxButtons, BusyIndicatorEventMap, ClickActiveElementKeyStroke, CloseKeyStroke, Event, FocusRule, GlassPaneRenderer, InitModelOf, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
 
 export interface BusyIndicatorModel extends WidgetModel {
   /**
@@ -118,6 +118,7 @@ export class BusyIndicator extends Widget implements BusyIndicatorModel {
     // Render busy indicator (still hidden by CSS, will be shown later in setTimeout.
     // But don't use .hidden, otherwise the box' size cannot be calculated correctly!)
     this.$container = this.$parent.appendDiv('busyindicator invisible');
+    aria.role(this.$container, 'alertdialog');
 
     let $handle = this.$container.appendDiv('drag-handle');
     this.$container.draggable($handle);
@@ -137,6 +138,9 @@ export class BusyIndicator extends Widget implements BusyIndicatorModel {
     // Render properties
     this._renderLabel();
     this._renderDetails();
+
+    aria.linkElementWithLabel(this.$container, this.$label);
+    aria.linkElementWithDescription(this.$container, this.$details);
 
     // Prevent resizing when message-box is dragged off the viewport
     this.$container.addClass('calc-helper');

@@ -9,7 +9,7 @@
  */
 
 import {
-  access, AppEventMap, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session,
+  access, AppEventMap, aria, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session,
   SessionModel, texts, webstorage, Widget
 } from './index';
 import $ from 'jquery';
@@ -338,6 +338,8 @@ export class App extends EventEmitter {
         .addClass('application-loading-root')
         .fadeIn();
     }
+    aria.role($loadingRoot, 'alert');
+    aria.screenReaderOnly($loadingRoot.appendDiv('text').attr('lang', 'en-US').text('Loading'));
     this._renderLoadingElement($loadingRoot, 'application-loading01');
     this._renderLoadingElement($loadingRoot, 'application-loading02');
     this._renderLoadingElement($loadingRoot, 'application-loading03');

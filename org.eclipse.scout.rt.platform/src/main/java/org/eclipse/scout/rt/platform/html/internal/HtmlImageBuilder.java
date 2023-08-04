@@ -19,5 +19,6 @@ public class HtmlImageBuilder extends EmptyHtmlNodeBuilder {
   public HtmlImageBuilder(CharSequence path) {
     super("img");
     addAttribute("src", path);
+    addAttribute("alt", "");
   }
 }

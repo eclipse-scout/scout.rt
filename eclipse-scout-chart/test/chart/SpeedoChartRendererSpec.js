@@ -141,4 +141,46 @@ describe('SpeedoChartRenderer', () => {
         .toBe(partForSegmentToPointAt);
     }
   });
+
+  describe('aria properties', () => {
+    it('has aria description set', () => {
+      let chart = scout.create(Chart, {
+        parent: session.desktop,
+        data: {
+          axes: [],
+          chartValueGroups: [{
+            clickable: true,
+            colorHexValue: '#ffee00',
+            groupName: 'Group0',
+            values: [
+              1, 5, 10
+            ]
+          }]
+        },
+        config: {
+          type: Chart.Type.SPEEDO,
+          clickable: true,
+          options: {
+            autoColor: true,
+            clickable: true,
+            plugins: {
+              tooltip: {
+                enabled: true
+              },
+              legend: {
+                display: true,
+                position: Chart.Position.RIGHT
+              }
+            },
+            speedo: {
+              greenAreaPosition: SpeedoChartRenderer.Position.CENTER
+            }
+          }
+        }
+      });
+      chart.render();
+      chart.chartRenderer.refresh();
+      expect(chart.chartRenderer.$svg.attr('aria-description')).toBeTruthy();
+    });
+  });
 });

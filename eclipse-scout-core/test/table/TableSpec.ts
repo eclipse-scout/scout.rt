@@ -11,6 +11,7 @@ import {
   BeanColumn, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, TableRowModel, Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
+import $ from 'jquery';
 
 describe('Table', () => {
   let session: SandboxSession;
@@ -3640,6 +3641,113 @@ describe('Table', () => {
 
       table = helper.createTable(helper.createModel($.extend(true, [], helper.createModelColumns(3), [{summary: true}, {}, {summary: true}]), []));
       expect(table.summaryColumns()).toEqual([table.columns[0], table.columns[2]]);
+    });
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria role grid', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable(model);
+      table.render();
+      expect(table.$container).toHaveAttr('role', 'grid');
+    });
+
+    it('has a header row with role row, with cells with role columnheader or separator', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+
+      let $headerColumns = table.header.$container.find('.table-header-item').not('.filler');
+      expect($headerColumns.length).toBeGreaterThan(0);
+      $headerColumns.each((index, $headerColumn) => {
+        expect($headerColumn).toHaveAttr('role', 'columnheader');
+        expect($headerColumn).not.toHaveAttr('role', 'none');
+      });
+
+      let $headerColumnSeparators = table.header.$container.find('.table-header-resize');
+      expect($headerColumnSeparators.length).toBeGreaterThan(0);
+      $headerColumnSeparators.each((index, $headerColumnSeparator) => {
+        expect($headerColumnSeparator).toHaveAttr('role', 'none');
+        expect($headerColumnSeparator).not.toHaveAttr('role', 'columnheader');
+      });
+    });
+
+    it('has a data section with role rowgroup, the rows contained are of role row, the cells of role gridcell', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+      expect(table.$data).toHaveAttr('role', 'rowgroup');
+      table.rows.forEach(row => {
+        expect(row.$row).toHaveAttr('role', 'row');
+        row.$row.children('.table-cell').each((index, cell) => {
+          expect($(cell)).toHaveAttr('role', 'gridcell');
+        });
+      });
+    });
+
+    it('has selected rows and their cells set to aria-selected true', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+
+      function expectSelected(row: TableRow, selected: boolean) {
+        if (selected) {
+          expect(row.$row).toHaveAttr('aria-selected', 'true');
+        } else {
+          expect(row.$row.attr('aria-selected')).toBeFalsy();
+        }
+      }
+
+      expectSelected(table.rows[0], false);
+      expectSelected(table.rows[1], false);
+
+      table.selectRow(table.rows[0]);
+
+      expectSelected(table.rows[0], true);
+      expectSelected(table.rows[1], false);
+
+      table.selectAll();
+
+      expectSelected(table.rows[0], true);
+      expectSelected(table.rows[1], true);
+
+      table.deselectAll();
+
+      expectSelected(table.rows[0], false);
+      expectSelected(table.rows[1], false);
+
+      table.selectRow(table.rows[1]);
+
+      expectSelected(table.rows[0], false);
+      expectSelected(table.rows[1], true);
+    });
+
+    it('has aria-activedescendant set if a row is selected', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+      expect(table.$container.attr('aria-activedescendant')).toBeFalsy();
+
+      table.selectRow(table.rows[0]);
+      expect(table.$container.attr('aria-activedescendant')).toBe(table.rows[0].$row.attr('id'));
+
+      table.selectRow(table.rows[1]);
+      expect(table.$container.attr('aria-activedescendant')).toBe(table.rows[1].$row.attr('id'));
+    });
+
+    it('has a description for aggregation rows', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+
+      table.groupColumn(table.columns[0]);
+      let $aggregateRows = table.$aggregateRows();
+      expect($aggregateRows.length).toBeGreaterThan(0);
+      $aggregateRows.each((index, aggregateRow) => {
+        expect($(aggregateRow).attr('aria-description')).toBeTruthy();
+        expect($(aggregateRow).attr('aria-describedby')).toBeFalsy();
+      });
     });
   });
 });

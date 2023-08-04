@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Button, Form, GroupBox, icons, scout, WrappedFormField} from '../../../../src/index';
+import {Button, Form, GroupBox, icons, Menu, scout, WrappedFormField} from '../../../../src/index';
 
 describe('Button', () => {
   let session: SandboxSession;
@@ -211,4 +211,52 @@ describe('Button', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria role link if it is Button.DisplayStyle.LINK', () => {
+      // in case of default button it is already a button html element, so no aria needed
+      let defaultButton = scout.create(Button, {
+        parent: session.desktop,
+        label: 'label',
+        displayStyle: Button.DisplayStyle.DEFAULT
+      });
+      defaultButton.render();
+      expect(defaultButton.$field).not.toHaveAttr('role');
+
+      let linkButton = scout.create(Button, {
+        parent: session.desktop,
+        label: 'label',
+        displayStyle: Button.DisplayStyle.LINK
+      });
+      linkButton.render();
+      expect(linkButton.$field).toHaveAttr('role', 'link');
+    });
+
+    it('has attribute aria-haspopup set to menu if it has sub menus', () => {
+      let button = scout.create(Button, {
+        parent: session.desktop,
+        label: 'label'
+      });
+      button.render();
+      expect(button.$field).not.toHaveAttr('aria-haspopup');
+      expect(button.$field).not.toHaveAttr('aria-expanded');
+      button.insertMenu(scout.create(Menu, {
+        parent: button
+      }));
+      expect(button.$field).toHaveAttr('aria-haspopup', 'menu');
+      expect(button.$field).toHaveAttr('aria-expanded', 'false');
+    });
+
+    it('has aria pressed set correctly if toggle action', () => {
+      let button = scout.create(Button, {
+        parent: session.desktop,
+        label: 'label',
+        displayStyle: Button.DisplayStyle.TOGGLE
+      });
+      button.render();
+      expect(button.$field).toHaveAttr('aria-pressed', 'false');
+      button.setSelected(true);
+      expect(button.$field).toHaveAttr('aria-pressed', 'true');
+    });
+  });
 });

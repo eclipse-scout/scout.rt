@@ -64,4 +64,9 @@ public interface CssClasses {
    * Class that is available on selected widgets and enables an alternative style.
    */
   String ALTERNATIVE = "alternative";
+
+  /**
+   * Add this to elements to make them only visible to screen readers
+   */
+  String SCREEN_READER_ONLY = "sr-only";
 }

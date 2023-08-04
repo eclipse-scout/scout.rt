@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, ContextMenuPopup, EventHandler, FieldStatusEventMap, FieldStatusModel, FormField, FormFieldStatusPosition, HierarchyChangeEvent, HtmlComponent, Menu, PropertyChangeEvent, scout, Status, StatusOrModel, strings, Tooltip, Widget
+  aria, arrays, ContextMenuPopup, EventHandler, FieldStatusEventMap, FieldStatusModel, FormField, FormFieldStatusPosition, HierarchyChangeEvent, HtmlComponent, Menu, PropertyChangeEvent, scout, Status, StatusOrModel, strings, Tooltip,
+  Widget
 } from '../../index';
 
 export class FieldStatus extends Widget implements FieldStatusModel {
@@ -194,6 +195,7 @@ export class FieldStatus extends Widget implements FieldStatusModel {
         menus: this.menus
       });
       this.tooltip.render();
+      aria.role(this.tooltip.$content, 'alert');
       this.$container.addClass('selected');
       this.tooltip.one('destroy', () => {
         this.tooltip = null;

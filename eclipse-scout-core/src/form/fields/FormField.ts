@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, arrays, clipboard, CloneOptions, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
+  AbstractLayout, Action, aria, arrays, clipboard, CloneOptions, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
   FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel, objects, Predicate,
   PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
 } from '../../index';
@@ -347,6 +347,7 @@ export class FormField extends Widget implements FormFieldModel {
 
   protected _renderMandatory() {
     this.$container.toggleClass('mandatory', this.mandatory);
+    aria.required(this.$field, this.mandatory || null);
   }
 
   /**
@@ -508,7 +509,9 @@ export class FormField extends Widget implements FormFieldModel {
     if (this.$field) {
       this.$field.toggleClass('has-tooltip', hasTooltipText);
     }
+
     this._updateFieldStatus();
+    aria.description(this.$field, this.tooltipText);
 
     if (this.$fieldContainer) {
       if (this.hasOnFieldTooltip()) {
@@ -561,6 +564,7 @@ export class FormField extends Widget implements FormFieldModel {
       if (this.$label) {
         this.$label.text('');
       }
+      aria.label(this.$field, this.label);
     } else if (this.$label) {
       this._removePlaceholder();
       // Make sure an empty label has the same height as the other labels, especially important for top labels
@@ -1107,11 +1111,13 @@ export class FormField extends Widget implements FormFieldModel {
    * This allows screen readers to build a catalog of the elements on the screen and their relationships, for example, to read the label when the input is focused.
    */
   protected _linkWithLabel($element: JQuery) {
-    if (!this.$label || !$element) {
+    if (strings.empty(this.label)) { // no label, do not link field to nbsp
       return;
     }
 
-    fields.linkElementWithLabel($element, this.$label);
+    if (this.labelPosition !== FormField.LabelPosition.ON_FIELD) {
+      aria.linkElementWithLabel($element, this.$label);
+    }
   }
 
   protected _removeIcon() {
@@ -1222,6 +1228,7 @@ export class FormField extends Widget implements FormFieldModel {
     }
     this.$icon = fields.appendIcon($parent)
       .on('mousedown', this._onIconMouseDown.bind(this));
+    aria.hidden(this.$icon, true);
   }
 
   protected _onIconMouseDown(event: JQuery.MouseDownEvent) {

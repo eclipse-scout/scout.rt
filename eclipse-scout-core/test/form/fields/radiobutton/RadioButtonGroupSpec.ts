@@ -313,20 +313,6 @@ describe('RadioButtonGroup', () => {
     });
   });
 
-  describe('label', () => {
-    it('is linked with the buttons', () => {
-      let group = helper.createRadioButtonGroup(session.desktop, 2);
-      group.setLabel('label');
-      group.radioButtons[0].setLabel('label 0');
-      group.radioButtons[1].setLabel('label 1');
-      group.render();
-      expect(group.radioButtons[0].$field.attr('aria-labelledby')).toBeTruthy();
-      expect(group.radioButtons[0].$field.attr('aria-labelledby')).toBe(group.$label.attr('id') + ' ' + group.radioButtons[0].$buttonLabel.attr('id'));
-      expect(group.radioButtons[1].$field.attr('aria-labelledby')).toBeTruthy();
-      expect(group.radioButtons[1].$field.attr('aria-labelledby')).toBe(group.$label.attr('id') + ' ' + group.radioButtons[1].$buttonLabel.attr('id'));
-    });
-  });
-
   describe('selectButton', () => {
     it('selects the new button and unselects the old one', () => {
       let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
@@ -502,6 +488,31 @@ describe('RadioButtonGroup', () => {
 
       radioButtonGroup.focus();
       expect(radioButtonGroup.radioButtons[0].$field).toBeFocused();
+    });
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria-labelledby set on the buttons', () => {
+      let group = helper.createRadioButtonGroup(session.desktop, 2);
+      group.setLabel('label');
+      group.radioButtons[0].setLabel('label 0');
+      group.radioButtons[1].setLabel('label 1');
+      group.render();
+
+      expect(group.radioButtons[0].$field.attr('aria-labelledby')).toBeTruthy();
+      expect(group.radioButtons[0].$field.attr('aria-labelledby')).toBe(group.$label.attr('id') + ' ' + group.radioButtons[0].$buttonLabel.attr('id'));
+      expect(group.radioButtons[0].$field.attr('aria-label')).toBeFalsy();
+
+      expect(group.radioButtons[1].$field.attr('aria-labelledby')).toBeTruthy();
+      expect(group.radioButtons[1].$field.attr('aria-labelledby')).toBe(group.$label.attr('id') + ' ' + group.radioButtons[1].$buttonLabel.attr('id'));
+      expect(group.radioButtons[1].$field.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has aria role radiogroup', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop);
+      radioButtonGroup.render();
+      expect(radioButtonGroup.$body).toHaveAttr('role', 'radiogroup');
     });
   });
 });

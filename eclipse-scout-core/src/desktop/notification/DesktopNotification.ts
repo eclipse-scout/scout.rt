@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DesktopNotificationEventMap, DesktopNotificationModel, Device, EnumObject, InitModelOf, Notification as ScoutNotification, scout, Status, StatusOrModel, strings} from '../../index';
+import {aria, DesktopNotificationEventMap, DesktopNotificationModel, Device, EnumObject, InitModelOf, Notification as ScoutNotification, scout, Status, StatusOrModel, strings} from '../../index';
 
 export class DesktopNotification extends ScoutNotification implements DesktopNotificationModel {
   declare model: DesktopNotificationModel;
@@ -82,6 +82,8 @@ export class DesktopNotification extends ScoutNotification implements DesktopNot
     this.$content = this.$container.appendDiv('desktop-notification-content');
     this.$messageText = this.$content.appendDiv('desktop-notification-message');
     this.$loader = this.$container.appendDiv('desktop-notification-loader');
+
+    aria.role(this.$container, 'alert'); // Read the notification to screen reader users
 
     if (Device.get().supportsCssAnimation()) {
       this.$loader.addClass('animated');

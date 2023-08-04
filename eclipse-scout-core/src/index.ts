@@ -425,6 +425,8 @@ export * from './modeselector/ModeSelector';
 export * from './modeselector/ModeSelectorEventMap';
 export * from './modeselector/ModeSelectorLayout';
 export * from './modeselector/ModeSelectorModel';
+export * from './modeselector/ModeSelectorLeftOrUpKeyStroke';
+export * from './modeselector/ModeSelectorRightOrDownKeyStroke';
 export * from './form/Form';
 export * from './form/FormAdapter';
 export * from './form/FormEventMap';
@@ -580,6 +582,10 @@ export * from './table/userfilter/TableTextUserFilterModel';
 export * from './table/TileTableHierarchyFilter';
 export * from './table/KeyTableFilter';
 export * from './table/TextTableFilter';
+export * from './table/AbstractTableAccessibilityRenderer';
+export * from './table/DefaultTableAccessibilityRenderer';
+export * from './table/HierarchicalTableAccessibilityRenderer';
+export * from './table/ListBoxTableAccessibilityRenderer';
 export * from './timepicker/TimePicker';
 export * from './timepicker/TimePickerModel';
 export * from './timepicker/TimePickerEventMap';
@@ -1085,6 +1091,7 @@ export * from './uuidpool/UuidPoolAdapter';
 export * from './uuidpool/UuidPoolEventMap';
 export * from './uuidpool/UuidPoolModel';
 export * from './types';
+export * from './aria';
 export * from './jquery/jquery-scout-types';
 
 // The following files don't export anything, but they need to be imported, so they participate on the webpack build

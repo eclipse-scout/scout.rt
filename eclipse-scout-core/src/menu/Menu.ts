@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, ActionKeyStroke, arrays, CloneOptions, ContextMenuPopup, EnumObject, HtmlComponent, icons, InitModelOf, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, MenuOrder, ObjectOrChildModel,
-  Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TreeVisitor, TreeVisitResult
+  Action, ActionKeyStroke, aria, arrays, CloneOptions, ContextMenuPopup, EnumObject, HtmlComponent, icons, InitModelOf, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, MenuOrder,
+  ObjectOrChildModel, Popup, PopupAlignment, PropertyChangeEvent, scout, strings, tooltips, TreeVisitor, TreeVisitResult
 } from '../index';
 
 export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
@@ -153,8 +153,26 @@ export class Menu extends Action implements MenuModel {
     this._renderSubMenuIcon();
   }
 
-  protected _renderActionStyle() {
+  protected override _renderActionStyle() {
     this.$container.toggleClass('menu-button', this.isButton() && !this.overflown);
+    this.updateAriaRole();
+  }
+
+  override _renderToggleAction() {
+    this.updateAriaRole();
+  }
+
+  /**
+   * Aria role for menus is based on multiple properties. Properties that influence the menu role should call
+   * this update when rendering the property
+   */
+  updateAriaRole() {
+    if (this.separator) {
+      aria.role(this.$container, 'separator');
+      return;
+    }
+    let hasPopup = this._doActionTogglesSubMenu() || this._doActionTogglesPopup();
+    aria.role(this.$container, this.isToggleAction() && !hasPopup ? 'menuitemcheckbox' : 'menuitem');
   }
 
   protected override _renderSelected() {
@@ -167,12 +185,14 @@ export class Menu extends Action implements MenuModel {
         this.parent.updateNextToSelected();
       }
     }
+    let hasPopup = this._doActionTogglesSubMenu() || this._doActionTogglesPopup();
     if (this.selected) {
       if (this._doActionTogglesSubMenu()) {
         this._renderSubMenuItems(this, this.childActions);
       } else if (this._doActionTogglesPopup()) {
         this._openPopup();
       }
+      aria.expanded(this.$container, hasPopup ? true : null);
     } else {
       if (this._doActionTogglesSubMenu() && this.rendered) {
         this._removeSubMenuItems(this);
@@ -180,8 +200,12 @@ export class Menu extends Action implements MenuModel {
         this._closePopup();
         this._closeSubMenus();
       }
+      aria.expanded(this.$container, hasPopup ? false : null);
     }
-    this.$container.toggleClass('has-popup', this._doActionTogglesSubMenu() || this._doActionTogglesPopup());
+    this.$container.toggleClass('has-popup', hasPopup);
+    aria.hasPopup(this.$container, hasPopup ? 'menu' : null);
+    aria.pressed(this.$container, null); // remove pressed set by action
+    aria.checked(this.$container, this.isToggleAction() && !hasPopup ? this.selected : null);
   }
 
   protected _closeSubMenus() {
@@ -313,6 +337,7 @@ export class Menu extends Action implements MenuModel {
         this.$submenuIcon = this.$container
           .appendSpan('submenu-icon')
           .text(icon.iconCharacter);
+        aria.hidden(this.$submenuIcon, true);
         this.invalidateLayoutTree();
       }
     } else {
@@ -510,11 +535,15 @@ export class Menu extends Action implements MenuModel {
     }
     this.popup = this._createPopup();
     this.popup.open();
+    aria.linkElementWithControls(this.$container, this.popup.$container);
     this.popup.one('destroy', event => {
       this.popup = null;
+      aria.removeControls(this.$container);
     });
     // Unselect on close which comes earlier than destroy (before the animation), to give more immediate feedback
-    this.popup.on('close', event => this.setSelected(false));
+    this.popup.on('close', event => {
+      this.setSelected(false);
+    });
 
     if (this.uiCssClass) {
       this.popup.$container.addClass(this.uiCssClass);

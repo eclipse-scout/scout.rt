@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  CollapseHandle, CollapseHandleActionEvent, Desktop, DesktopNavigationEventMap, DesktopNavigationHandle, DesktopNavigationLayout, DesktopNavigationModel, DesktopToolBox, EventHandler, HtmlComponent, InitModelOf, LayoutData, Outline,
-  PropertyChangeEvent, scout, SingleLayout, styles, Tree, ViewButtonBox, Widget
+  aria, CollapseHandle, CollapseHandleActionEvent, Desktop, DesktopNavigationEventMap, DesktopNavigationHandle, DesktopNavigationLayout, DesktopNavigationModel, DesktopToolBox, Event, EventHandler, HtmlComponent, InitModelOf, LayoutData,
+  Outline, PropertyChangeEvent, scout, SingleLayout, strings, styles, Tree, ViewButtonBox, Widget
 } from '../../index';
 
 export class DesktopNavigation extends Widget implements DesktopNavigationModel {
@@ -32,8 +32,10 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
   layoutData: DesktopNavigationLayoutData;
   $body: JQuery;
   htmlCompBody: HtmlComponent;
+  $screenReaderStatus: JQuery;
 
   protected _outlinePropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Outline>>;
+  protected _outlineSelectedNodesChangeHandler: EventHandler<Event<Outline>>;
   protected _desktopPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Desktop>>;
   protected _viewButtonBoxPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, ViewButtonBox>>;
 
@@ -44,7 +46,9 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
     this.toolBoxVisible = false;
     this.viewButtonBox = null;
     this.handleVisible = true;
+    this.$screenReaderStatus = null;
     this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
+    this._outlineSelectedNodesChangeHandler = this._onOutlineSelectedNodesChange.bind(this);
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
     this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
   }
@@ -70,6 +74,8 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('desktop-navigation');
+    aria.role(this.$container, 'navigation');
+    aria.label(this.$container, this.session.text('ui.NavigationArea'));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new DesktopNavigationLayout(this));
     this.htmlComp.layoutData = this.layoutData;
@@ -79,7 +85,46 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
     this.htmlCompBody = HtmlComponent.install(this.$body, this.session);
     this.htmlCompBody.setLayout(new SingleLayout(null, {exact: true}));
 
+    this._addScreenReaderStatus();
     this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
+  }
+
+  protected _addScreenReaderStatus() {
+    this.$screenReaderStatus = this.$container.appendDiv();
+    aria.role(this.$screenReaderStatus, 'status');
+    aria.screenReaderOnly(this.$screenReaderStatus);
+  }
+
+  _renderScreenReaderStatus() {
+    if (!this.$screenReaderStatus || !this.outline) {
+      return;
+    }
+    this.$screenReaderStatus.empty();
+    let textRep = this.session.text('ui.NavigationX', this.outline.title);
+    let page = this.outline.selectedNode();
+    // there may be cases (i.e. after startup or outline switch) where there is no selected node, nonetheless we set the status to outline title so at least current outline is read
+    if (page) {
+      let outlinePath = [];
+      outlinePath.unshift(page);
+      // recursively go up in the tree until there is no more parent
+      while (page) {
+        page = page.parentNode;
+        if (page) {
+          outlinePath.unshift(page);
+        }
+      }
+
+      // for each node in the path announce its text and level in the tree
+      outlinePath.forEach(page => {
+        textRep += ' ' + strings.join(' ', this.session.text('ui.LevelX', (page.level + 1)), strings.plainText(page.text));
+      });
+      // if the last page (i.e. the current page) is expanded, notify the user how many child nodes there are
+      let lastPage = outlinePath[outlinePath.length - 1];
+      if (lastPage.expanded) {
+        textRep += ' ' + strings.join(' ', this.session.text('ui.Expanded'), this.session.text('ui.SubItemCountX', lastPage.childNodes?.length));
+      }
+    }
+    this.$screenReaderStatus.appendSpan().addClass('sr-outline-path').text(textRep);
   }
 
   protected override _remove() {
@@ -124,6 +169,7 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
     if (this.rendered) {
       this.outline.validateFocus();
     }
+    this._renderScreenReaderStatus();
   }
 
   setOutline(outline: Outline) {
@@ -134,6 +180,7 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
     let oldOutline = this.outline;
     if (this.outline) {
       this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
+      this.outline.off('nodesSelected', this._outlineSelectedNodesChangeHandler);
     }
     if (this.rendered) {
       this._removeOutline();
@@ -148,6 +195,7 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
       }
       this.outline.inBackground = this.desktop.inBackground;
       this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
+      this.outline.on('nodesSelected', this._outlineSelectedNodesChangeHandler);
       this._updateHandle();
     }
   }
@@ -267,6 +315,10 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
     }
   }
 
+  protected _onOutlineSelectedNodesChange() {
+    this._renderScreenReaderStatus();
+  }
+
   protected _onOutlinePropertyChange(event: PropertyChangeEvent<any, Outline>) {
     if (event.propertyName === 'displayStyle') {
       this._updateHandle();
@@ -287,4 +339,5 @@ export class DesktopNavigation extends Widget implements DesktopNavigationModel 
     }
   }
 }
+
 export type DesktopNavigationLayoutData = LayoutData & { fullWidth?: boolean };

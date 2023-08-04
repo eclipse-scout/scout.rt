@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, arrays, EnumObject, focusUtils, FormField, InitModelOf, objects, ParsingFailedStatus, scout, Status, StatusSeverity, StatusType, strings, ValidationFailedStatus, ValueFieldEventMap, ValueFieldModel
+  AbstractLayout, aria, arrays, EnumObject, focusUtils, FormField, InitModelOf, objects, ParsingFailedStatus, scout, Status, StatusSeverity, StatusType, strings, ValidationFailedStatus, ValueFieldEventMap, ValueFieldModel
 } from '../../index';
 import $ from 'jquery';
 
@@ -636,6 +636,8 @@ export class ValueField<TValue extends TModelValue, TModelValue = TValue> extend
     }
     this.$clearIcon = $parent.appendSpan('clear-icon unfocusable text-field-icon action')
       .on('mousedown', this._onClearIconMouseDown.bind(this));
+    aria.role(this.$clearIcon, 'button');
+    aria.label(this.$clearIcon, this.session.text('ui.ClearField'));
   }
 
   override addContainer($parent: JQuery, cssClass?: string, layout?: AbstractLayout) {

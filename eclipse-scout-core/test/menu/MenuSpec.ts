@@ -632,4 +632,89 @@ describe('Menu', () => {
       expect(menu.$submenuIcon.parent()[0]).toBe(menu.$text[0]);
     });
   });
+
+  describe('aria properties', () => {
+
+    it('has aria role menuitem', () => {
+      let testMenu = helper.createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo'
+      });
+      testMenu.render();
+      expect(testMenu.$container).toHaveAttr('role', 'menuitem');
+    });
+
+    it('has aria role separator if it is a separator', () => {
+      let testSeparator = helper.createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo',
+        separator: true
+      });
+      testSeparator.render();
+      expect(testSeparator.$container).toHaveAttr('role', 'separator');
+    });
+
+    it('has aria role menuitemcheckbox if it is a toggle action', () => {
+      let testMenu = helper.createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo',
+        toggleAction: true
+      });
+      testMenu.render();
+      expect(testMenu.$container).toHaveAttr('role', 'menuitemcheckbox');
+    });
+
+    it('has aria checked set correctly if it is a menuitemcheckbox', () => {
+      let testMenu = helper.createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo',
+        toggleAction: true
+      });
+      testMenu.render();
+      expect(testMenu.$container).toHaveAttr('role', 'menuitemcheckbox');
+      expect(testMenu.$container).toHaveAttr('aria-checked', 'false');
+      // also check that aria pressed is not set (not supported for menu items role)
+      expect(testMenu.$container.attr('aria-pressed')).toBeFalsy();
+      testMenu.setSelected(true);
+      expect(testMenu.$container).toHaveAttr('aria-checked', 'true');
+      expect(testMenu.$container.attr('aria-pressed')).toBeFalsy();
+    });
+
+    it('has aria-haspopup set to menu if it has child actions', () => {
+      let menuWithChildActions = scout.create(Menu, {
+        parent: session.desktop,
+        text: 'text',
+        childActions: [{objectType: Menu}]
+      });
+      menuWithChildActions.render();
+      expect(menuWithChildActions.$container).toHaveAttr('aria-haspopup', 'menu');
+    });
+
+    it('has aria-expanded set to true if it has child actions and is selected', () => {
+      let menuWithChildActions = scout.create(Menu, {
+        parent: session.desktop,
+        text: 'text',
+        childActions: [{objectType: Menu}]
+      });
+      menuWithChildActions.render();
+      expect(menuWithChildActions.$container).toHaveAttr('aria-expanded', 'false');
+      // also check that aria pressed is not set (not supported for menu items role)
+      expect(menuWithChildActions.$container.attr('aria-pressed')).toBeFalsy();
+      menuWithChildActions.setSelected(true);
+      expect(menuWithChildActions.$container).toHaveAttr('aria-expanded', 'true');
+      expect(menuWithChildActions.$container.attr('aria-pressed')).toBeFalsy();
+    });
+
+    it('behaves like a menu with child actions if it is an ellipsis menu', () => {
+      let ellipsis = scout.create(EllipsisMenu, {
+        parent: session.desktop
+      });
+      ellipsis.render();
+      expect(ellipsis.$container).toHaveAttr('role', 'menuitem');
+      expect(ellipsis.$container).toHaveAttr('aria-haspopup', 'menu');
+      expect(ellipsis.$container).toHaveAttr('aria-expanded', 'false');
+      ellipsis.setSelected(true);
+      expect(ellipsis.$container).toHaveAttr('aria-expanded', 'true');
+    });
+  });
 });

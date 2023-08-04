@@ -24,6 +24,9 @@ export class RadioButtonGroupLeftOrUpKeyStroke extends KeyStroke {
     let fieldBefore,
       focusedButton = $(event.target).data('radiobutton');
 
+    // continuously shift the target radio button through the selectable radio buttons to the right,
+    // until the next radio button is the radio button that received the keystroke.
+    // Then select that target radio button.
     this.field.radioButtons.some(radioButton => {
       if (fieldBefore && radioButton === focusedButton) {
         fieldBefore.select();

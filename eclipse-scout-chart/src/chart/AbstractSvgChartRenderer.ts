@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ObjectFactory, strings, styles} from '@eclipse-scout/core';
+import {aria, ObjectFactory, strings, styles} from '@eclipse-scout/core';
 import $ from 'jquery';
 import {AbstractChartRenderer, Chart} from '../index';
 import {ClickObject} from './Chart';
@@ -43,6 +43,9 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
   protected override _render() {
     if (!this.$svg) {
       this.$svg = this.chart.$container.appendSVG('svg', 'chart-svg');
+      aria.role(this.$svg, 'img');
+      // labeling has to be done here because otherwise the svg is ignored
+      this.linkChartWithFieldLabel(this.$svg);
     }
     this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$svg);
     // This works, because CSS specifies 100% width/height
@@ -63,6 +66,24 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
       return;
     }
     this._renderInternal();
+  }
+
+  /**
+   * Links chart svg with its field label so the field name is read when entering the chart
+   *
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby">ARIA: aria-labelledby</a>
+   */
+  linkChartWithFieldLabel($chartSvg: JQuery<Element>) {
+    if (!$chartSvg) {
+      return;
+    }
+    let $field = $chartSvg.parents('.chart-field');
+    if ($field.length > 0) {
+      let $fieldLabel = $field.eq(0).children('label');
+      if ($fieldLabel.length > 0) {
+        aria.linkElementWithLabel($chartSvg, $fieldLabel.eq(0));
+      }
+    }
   }
 
   protected _renderInternal() {

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ColumnUserFilter, FilterFieldsGroupBox, NumberColumn, NumberColumnUserFilterModel, NumberField, objects, PropertyChangeEvent, TableRow, TableUserFilterAddedEventData} from '../../index';
+import {aria, ColumnUserFilter, FilterFieldsGroupBox, NumberColumn, NumberColumnUserFilterModel, NumberField, objects, PropertyChangeEvent, TableRow, TableUserFilterAddedEventData} from '../../index';
 import $ from 'jquery';
 
 export class NumberColumnUserFilter extends ColumnUserFilter implements NumberColumnUserFilterModel {
@@ -79,5 +79,10 @@ export class NumberColumnUserFilter extends ColumnUserFilter implements NumberCo
     this.numberTo = this.numberToField.value;
     $.log.isDebugEnabled() && $.log.debug('(NumberColumnUserFilter#_onPropertyChange) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
     this.triggerFilterFieldsChanged();
+  }
+
+  override linkFieldsWithTitle($filterFieldsText: JQuery<HTMLDivElement>) {
+    aria.linkElementWithLabel(this.numberFromField.$field, $filterFieldsText);
+    aria.linkElementWithLabel(this.numberToField.$field, $filterFieldsText);
   }
 }

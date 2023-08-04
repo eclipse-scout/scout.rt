@@ -13,4 +13,5 @@ export interface ImageModel extends WidgetModel {
   autoFit?: boolean;
   imageUrl?: string;
   prepend?: boolean;
+  altText?: string;
 }

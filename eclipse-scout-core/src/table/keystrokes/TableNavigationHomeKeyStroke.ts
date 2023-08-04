@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractTableNavigationKeyStroke, arrays, keys, Table, TableRow} from '../../index';
+import {AbstractTableNavigationKeyStroke, aria, arrays, keys, Table, TableRow} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TableNavigationHomeKeyStroke extends AbstractTableNavigationKeyStroke {
@@ -47,11 +47,16 @@ export class TableNavigationHomeKeyStroke extends AbstractTableNavigationKeyStro
     } else {
       newSelectedRows = [firstRow];
     }
+
     table.selectionHandler.lastActionRow = firstRow;
     table.selectRows(newSelectedRows);
     table.scrollTo(firstRow);
     if (!table.isFocused()) {
       table.focus();
     }
+
+    // Set active descendant to the new row. This should be done last so selection state/focus/etc is
+    // all set correctly before the change of active descendant triggers the screen readers announcement.
+    aria.linkElementWithActiveDescendant(this.field.$container, firstRow.$row);
   }
 }

@@ -66,4 +66,24 @@ describe('Icon', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria role img and empty aria-label if it is a font icon', () => {
+      let icon = scout.create(Icon, {
+        parent: session.desktop,
+        iconDesc: icons.INFO
+      });
+      icon.render();
+      expect(icon.$container[0]).toHaveAttr('aria-hidden', 'true');
+    });
+
+    it('has empty alt attribute if html img element', () => {
+      let icon = scout.create(Icon, {
+        parent: session.desktop,
+        iconDesc: 'icon/image.png'
+      });
+      icon.render();
+      expect(icon.$container[0]).toHaveAttr('alt', '');
+    });
+  });
 });

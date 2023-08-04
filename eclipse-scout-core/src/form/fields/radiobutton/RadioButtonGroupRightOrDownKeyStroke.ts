@@ -20,6 +20,7 @@ export class RadioButtonGroupRightOrDownKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
+  // Find the radio button that received the keystroke, then find the next selectable radio button and select it
   override handle(event: JQuery.KeyboardEventBase) {
     let fieldBefore,
       focusedButton = $(event.target).data('radiobutton');
@@ -30,7 +31,8 @@ export class RadioButtonGroupRightOrDownKeyStroke extends KeyStroke {
         radioButton.focus();
         return true;
       }
-      if (radioButton === focusedButton && radioButton.enabledComputed && radioButton.visible) {
+      // do not check for enabled here, we also want the keystroke to work if the focused radio button was disabled dynamically
+      if (radioButton === focusedButton) {
         fieldBefore = radioButton;
       }
       return false;

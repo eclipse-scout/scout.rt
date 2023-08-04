@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel} from '../../../index';
+import {aria, Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel} from '../../../index';
 import $ from 'jquery';
 
 export class WizardProgressField extends FormField implements WizardProgressFieldModel {
@@ -28,6 +28,7 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
   keepActiveStepAtLeftBorder: boolean;
   animateScrolling: boolean;
   $wizardStepsBody: JQuery;
+  $screenReaderStatus: JQuery;
 
   constructor() {
     super();
@@ -39,6 +40,7 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
     this.$wizardStepsBody = null;
     this.keepActiveStepAtLeftBorder = Device.get().type === Device.Type.MOBILE;
     this.animateScrolling = Device.get().type === Device.Type.MOBILE;
+    this.$screenReaderStatus = null;
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -60,6 +62,8 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
 
     this.$wizardStepsBody = this.$field.appendDiv('wizard-steps-body');
 
+    this._addScreenReaderStatus();
+
     this._installScrollbars({
       axis: 'x',
       scrollShadow: 'none'
@@ -70,6 +74,12 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
       let form = this.parent.parent;
       form.$container.addClass('wizard-container-form');
     }
+  }
+
+  protected _addScreenReaderStatus() {
+    this.$screenReaderStatus = this.$field.appendDiv('screen-reader-steps-description');
+    aria.role(this.$screenReaderStatus, 'status');
+    aria.screenReaderOnly(this.$screenReaderStatus);
   }
 
   protected override _renderProperties() {
@@ -141,6 +151,34 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
     this.invalidateLayoutTree(false);
   }
 
+  protected _renderScreenReaderStatus($statusContainer: JQuery) {
+    $statusContainer.empty();
+    let activeStepIndex = this.steps.indexOf(this.stepsMap[this.activeStepIndex]);
+    this.steps.forEach((step, index) => {
+      let $stepDescription = $statusContainer.appendDiv('sr-step-description');
+
+      let stepIndex = this.steps.indexOf(step);
+      let stepType = '';
+      if (stepIndex === activeStepIndex) {
+        stepType += this.session.text('ui.Current');
+      } else if (stepIndex > activeStepIndex) {
+        stepType += this.session.text('ui.Subsequent');
+      } else {
+        stepType += this.session.text('ui.Previous');
+      }
+      $stepDescription.appendDiv('text').text(strings.join(' ', this.session.text('ui.Step'), String(index + 1), stepType));
+      if (strings.hasText(step.title)) {
+        $stepDescription.appendDiv('text').text(step.title);
+      }
+      if (strings.hasText(step.subTitle)) {
+        $stepDescription.appendDiv('text').text(step.subTitle);
+      }
+      if (strings.hasText(step.tooltipText)) {
+        $stepDescription.appendDiv('text').text(step.tooltipText);
+      }
+    });
+  }
+
   protected _setActiveStepIndex(activeStepIndex: number) {
     this.previousActiveStepIndex = this.activeStepIndex;
     // Ensure this.activeStepIndex always has a value. If the server has no active step set (may
@@ -150,6 +188,7 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
 
   protected _renderActiveStepIndex() {
     this.steps.forEach(this._updateStepClasses.bind(this));
+    this._renderScreenReaderStatus(this.$screenReaderStatus);
     this.invalidateLayoutTree(false);
   }
 

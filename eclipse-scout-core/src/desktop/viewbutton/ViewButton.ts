@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, ActionKeyStroke, Desktop, EventHandler, HtmlComponent, InitModelOf, PropertyChangeEvent, ViewButtonActionKeyStroke, ViewButtonDisplayStyle, ViewButtonEventMap, ViewButtonModel} from '../../index';
+import {Action, ActionKeyStroke, aria, Desktop, EventHandler, HtmlComponent, InitModelOf, PropertyChangeEvent, ViewButtonActionKeyStroke, ViewButtonDisplayStyle, ViewButtonEventMap, ViewButtonModel} from '../../index';
 
 export class ViewButton extends Action implements ViewButtonModel {
   declare model: ViewButtonModel;
@@ -79,7 +79,8 @@ export class ViewButton extends Action implements ViewButtonModel {
   }
 
   protected override _renderText() {
-    // No text
+    // render text as invisible label for screen readers
+    aria.label(this.$container, this.text);
   }
 
   setDisplayStyle(displayStyle: ViewButtonDisplayStyle) {

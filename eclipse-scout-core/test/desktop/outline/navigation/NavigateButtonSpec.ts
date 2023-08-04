@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {NavigateDownButton, NavigateUpButton} from '../../../../src/index';
+import {NavigateButton, NavigateDownButton, NavigateUpButton} from '../../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '../../../../src/testing/index';
 
 describe('NavigateButton', () => {
@@ -60,4 +60,23 @@ describe('NavigateButton', () => {
     expect(staticMenus[1].destroyed).toBe(true);
   });
 
+  describe('aria properties', () => {
+
+    it('has aria-label set', () => {
+      let model = helper.createModelFixture(3, 2, true);
+      model.nodes[0].detailForm = formHelper.createFormWithOneField();
+      model.nodes[0].detailFormVisible = true;
+      model.nodes[1].detailForm = formHelper.createFormWithOneField();
+      model.nodes[1].detailFormVisible = true;
+      let outline = helper.createOutline(model);
+      outline.nodes[0].detailForm.render();
+      let staticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
+      expect(staticMenus[0] instanceof NavigateUpButton).toBe(true);
+      expect(staticMenus[0].$container.attr('aria-label')).toBeTruthy();
+      expect(staticMenus[0].$container.attr('aria-labelledby')).toBeFalsy();
+      expect(staticMenus[1] instanceof NavigateDownButton).toBe(true);
+      expect(staticMenus[1].$container.attr('aria-label')).toBeTruthy();
+      expect(staticMenus[1].$container.attr('aria-labelledby')).toBeFalsy();
+    });
+  });
 });

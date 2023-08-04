@@ -64,5 +64,4 @@ describe('TableHeaderSpec', () => {
     expect(table.header.menuBar.hiddenByUi).toBe(false);
     expect(table.header.menuBar.visible).toBe(true);
   });
-
 });

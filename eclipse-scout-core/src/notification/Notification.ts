@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {HtmlComponent, Icon, InitModelOf, NotificationEventMap, NotificationModel, scout, Status, StatusOrModel, strings, texts, Widget} from '../index';
+import {aria, HtmlComponent, Icon, InitModelOf, NotificationEventMap, NotificationModel, scout, Status, StatusOrModel, strings, texts, Widget} from '../index';
 import $ from 'jquery';
 
 export class Notification extends Widget implements NotificationModel {
@@ -181,6 +181,8 @@ export class Notification extends Widget implements NotificationModel {
     this.$closer = this.$content
       .appendDiv('closer')
       .on('click', this._onCloseIconClick.bind(this));
+    aria.role(this.$closer, 'button');
+    aria.label(this.$closer, this.session.text('ui.Close'));
   }
 
   protected _onCloseIconClick(event: JQuery.ClickEvent) {

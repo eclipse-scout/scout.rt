@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {AbstractChartRenderer, ChartEventMap, ChartJsRenderer, ChartLayout, ChartModel, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
-import {arrays, ColorScheme, colorSchemes, EnumObject, HtmlComponent, InitModelOf, objects, Widget} from '@eclipse-scout/core';
+import {aria, arrays, ColorScheme, colorSchemes, EnumObject, HtmlComponent, InitModelOf, objects, Widget} from '@eclipse-scout/core';
 import {GreenAreaPosition} from './SpeedoChartRenderer';
 import {ChartConfiguration, LinearScaleOptions, RadialLinearScaleOptions} from 'chart.js';
 import $ from 'jquery';
@@ -83,6 +83,7 @@ export class Chart extends Widget implements ChartModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('chart');
+    aria.role(this.$container, 'none'); // ignore this container for screen readers, they care about the chart inside
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new ChartLayout(this));

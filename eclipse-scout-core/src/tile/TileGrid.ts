@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractGrid, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf,
+  AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf,
   KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range, scout, ScrollToOptions,
   TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler,
   TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
@@ -850,6 +850,11 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       return;
     }
     this.focusedTile = tile;
+    if (tile) {
+      tile.markAsActiveDescendantFor(this.$container);
+    } else {
+      aria.removeActiveDescendant(this.$container);
+    }
     if (!this.rendered || !tile || this.isFocused()) {
       return;
     }
@@ -1658,3 +1663,4 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 }
 
 export type TileGridMenuType = EnumObject<typeof TileGrid.MenuType>;
+

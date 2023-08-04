@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {InputFieldKeyStrokeContext, keys, KeyStrokeContext, keyStrokeModifier, Outline, scout, SearchOutlineEventMap, SearchOutlineLayout, SearchOutlineModel} from '../../index';
+import {aria, InputFieldKeyStrokeContext, keys, KeyStrokeContext, keyStrokeModifier, Outline, scout, SearchOutlineEventMap, SearchOutlineLayout, SearchOutlineModel} from '../../index';
 import $ from 'jquery';
 
 export class SearchOutline extends Outline implements SearchOutlineModel {
@@ -83,6 +83,7 @@ export class SearchOutline extends Outline implements SearchOutlineModel {
     // Move before search panel
     if (this.titleVisible) {
       this.$title.insertBefore(this.$searchPanel);
+      aria.linkElementWithLabel(this.$queryField, this.$title);
     }
   }
 

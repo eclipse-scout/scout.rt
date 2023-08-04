@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BrowserField, Device, EnumObject, FormFieldLayout, PropertyChangeEvent, Tile, WidgetTile} from '../../index';
+import {aria, BrowserField, Device, EnumObject, FormField, FormFieldLayout, PropertyChangeEvent, Tile, WidgetTile} from '../../index';
 
 export type FormFieldTileDisplayStyle = EnumObject<typeof FormFieldTile.DisplayStyle>;
 
@@ -54,6 +54,10 @@ export class FormFieldTile extends WidgetTile {
     if (this.tileWidget instanceof BrowserField) {
       this.tileWidget.$container.toggleClass('no-padding', !this.tileWidget.labelVisible && !this.tileWidget.errorStatus);
     }
+
+    if (this.tileWidget instanceof FormField && this.tileWidget.labelVisible) {
+      aria.linkElementWithHeader(this.$container, this.tileWidget.$label);
+    }
   }
 
   protected _renderCompact() {
@@ -66,6 +70,13 @@ export class FormFieldTile extends WidgetTile {
       if (this.rendered) {
         this._renderFieldLabelVisible();
       }
+    }
+  }
+
+  override markAsActiveDescendantFor($container: JQuery) {
+    if (this.displayStyle === FormFieldTile.DisplayStyle.DASHBOARD
+      && this.tileWidget instanceof FormField) {
+      aria.linkElementWithActiveDescendant(this.$container, this.tileWidget?.$field);
     }
   }
 }

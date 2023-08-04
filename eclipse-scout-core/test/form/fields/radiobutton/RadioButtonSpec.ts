@@ -18,20 +18,6 @@ describe('RadioButton', () => {
     session = sandboxSession();
   });
 
-  describe('label', () => {
-
-    it('is linked with the field', () => {
-      let field = scout.create(RadioButton, {
-        parent: session.desktop,
-        label: 'label'
-      });
-      field.render();
-      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
-      expect(field.$field.attr('aria-labelledby')).toBe(field.$buttonLabel.attr('id'));
-    });
-
-  });
-
   describe('keyStroke', () => {
 
     it('selects the button', () => {
@@ -77,5 +63,38 @@ describe('RadioButton', () => {
       expect(field.isFocused()).toBe(false);
     });
 
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria-labelledby set', () => {
+      let field = scout.create(RadioButton, {
+        parent: session.desktop,
+        label: 'label'
+      });
+      field.render();
+      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(field.$field.attr('aria-labelledby')).toBe(field.$buttonLabel.attr('id'));
+      expect(field.$field.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has aria role radio', () => {
+      let field = scout.create(RadioButton, {
+        parent: session.desktop
+      });
+      field.render();
+      expect(field.$radioButton).toHaveAttr('role', 'radio');
+    });
+
+    it('has aria-checked set to true if selected', () => {
+      let field = scout.create(RadioButton, {
+        parent: session.desktop
+      });
+      field.render();
+      expect(field.$radioButton).toHaveAttr('role', 'radio');
+      expect(field.$radioButton).toHaveAttr('aria-checked', 'false');
+      field.setSelected(true);
+      expect(field.$radioButton).toHaveAttr('aria-checked', 'true');
+    });
   });
 });

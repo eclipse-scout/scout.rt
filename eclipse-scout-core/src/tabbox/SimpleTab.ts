@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventHandler, GlassPaneContribution, InitModelOf, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
+import {aria, Event, EventHandler, GlassPaneContribution, InitModelOf, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
 
 export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C' | 'OUTLINE' | 'OUTLINE_SELECTOR' | 'PAGE_DETAIL' | 'PAGE_SEARCH' | 'PAGE_TABLE';
 
@@ -179,6 +179,8 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
       this.$container.addClass('closable');
       this.$close = this.$container.appendDiv('closer')
         .on('click', this._onClose.bind(this));
+      aria.role(this.$close, 'button');
+      aria.label(this.$close, this.session.text('ui.Close'));
     } else {
       if (!this.$close) {
         return;
@@ -281,6 +283,8 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
 
   protected _renderSelected() {
     this.$container.toggleClass('selected', this.selected);
+    aria.role(this.$titleLine, this.selected ? 'heading' : null);
+    aria.level(this.$titleLine, this.selected ? 1 : null);
   }
 
   protected _onMouseDown(event: JQuery.MouseDownEvent) {

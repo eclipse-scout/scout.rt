@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App} from '../src/index';
+import {App, scout} from '../src/index';
 import {AppModel} from '../src/App';
 import {TestingApp} from '../src/testing';
 
@@ -92,6 +92,20 @@ describe('App', () => {
         });
         return def.promise();
       };
+    });
+  });
+
+  describe('aria properties', () => {
+
+    it('has lang attribute set', done => {
+      let app = new App();
+      app.init();
+      app.when('init')
+        .then(() => {
+          expect(document.documentElement.lang).not.toBeEmpty();
+        })
+        .then(done)
+        .catch(fail);
     });
   });
 });

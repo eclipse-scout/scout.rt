@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Desktop, DesktopHeaderEventMap, DesktopHeaderLayout, DesktopHeaderModel, DesktopLogo, DesktopTabArea, DesktopToolBox, Event, EventHandler, Form, HtmlComponent, InitModelOf, Menu, MenuBar, ObjectOrChildModel, OutlineContent,
+  aria, Desktop, DesktopHeaderEventMap, DesktopHeaderLayout, DesktopHeaderModel, DesktopLogo, DesktopTabArea, DesktopToolBox, Event, EventHandler, Form, HtmlComponent, InitModelOf, Menu, MenuBar, ObjectOrChildModel, OutlineContent,
   PropertyChangeEvent, scout, ViewButtonBox, Widget
 } from '../../index';
 
@@ -67,6 +67,8 @@ export class DesktopHeader extends Widget implements DesktopHeaderModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('desktop-header');
+    aria.role(this.$container, 'banner');
+    aria.label(this.$container, this.session.text('ui.HeaderArea'));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new DesktopHeaderLayout(this));
     this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);

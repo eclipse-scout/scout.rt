@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, KeyStrokeContext, Menu, NavigateButtonModel, Outline, Page, SomeRequired} from '../../../index';
+import {Action, aria, KeyStrokeContext, Menu, NavigateButtonModel, Outline, Page, SomeRequired} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -50,6 +50,11 @@ export abstract class NavigateButton extends Menu implements NavigateButtonModel
     super._render();
     this.$container.addClass('navigate-button small');
     this.altKeyStrokeContext.registerKeyStroke(this);
+  }
+
+  protected override _renderProperties() {
+    super._renderProperties();
+    aria.label(this.$container, this.session.text(this._defaultText));
   }
 
   protected override _remove() {

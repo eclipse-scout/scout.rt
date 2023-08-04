@@ -74,4 +74,29 @@ describe('WizardProgressField', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has a non empty status container that represent current progress', () => {
+      field = scout.create(SpecWizardProgressField, {
+        parent: session.desktop
+      });
+      field.setProperty('activeStepIndex', 1);
+      field.setProperty('steps', [{
+        'index': 0,
+        'enabled': true,
+        'actionEnabled': true
+      }, {
+        'index': 1,
+        'enabled': true,
+        'actionEnabled': true
+      }]);
+      field.render();
+      expect(field.$screenReaderStatus).toBeDefined();
+      expect(field.$screenReaderStatus).toHaveAttr('role', 'status');
+      expect(field.$screenReaderStatus).toHaveClass('sr-only');
+      expect(field.$screenReaderStatus.children('.sr-step-description').length).toBe(2);
+      expect(field.$screenReaderStatus.children('.sr-step-description').eq(0)).not.toBeEmpty();
+      expect(field.$screenReaderStatus.children('.sr-step-description').eq(1)).not.toBeEmpty();
+    });
+  });
 });

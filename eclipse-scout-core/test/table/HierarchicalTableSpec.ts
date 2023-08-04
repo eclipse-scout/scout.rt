@@ -7,8 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Column, ColumnUserFilter, Table, TableRow, TableRowModel} from '../../src/index';
+import {arrays, Column, ColumnUserFilter, HierarchicalTableAccessibilityRenderer, Table, TableRow, TableRowModel} from '../../src/index';
 import {SpecTable, TableSpecHelper} from '../../src/testing/index';
+import $ from 'jquery';
 
 describe('HierarchicalTableSpec', () => {
   let session: SandboxSession;
@@ -905,6 +906,47 @@ describe('HierarchicalTableSpec', () => {
       table.collapseRow(table.rootRows[0]);
       table.rows[1].$row.stop(false, true); // Complete animation
       expect(table.$rows().length).toBe(1);
+    });
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria role treegrid', () => {
+      let model = helper.createModelFixture(1, 2);
+      let table = helper.createTable(model);
+      let rows = [
+        {cells: ['child0_row0'], parentRow: table.rows[0]},
+        {cells: ['child1_row0'], parentRow: table.rows[1]}
+      ];
+      table.insertRows(rows);
+      table.render();
+      expect(table.$container).toHaveAttr('role', 'treegrid');
+    });
+
+    it('has a HierarchicalTableAccessibilityRenderer set as its accessibility renderer', () => {
+      let model = helper.createModelFixture(1, 2);
+      let table = helper.createTable(model);
+      let rows = [
+        {cells: ['child0_row0'], parentRow: table.rows[0]},
+        {cells: ['child1_row0'], parentRow: table.rows[1]}
+      ];
+      table.insertRows(rows);
+      table.render();
+      expect(table.accessibilityRenderer instanceof HierarchicalTableAccessibilityRenderer).toBe(true);
+    });
+
+    it('has rows with aria-expanded set to true if rows are expanded', () => {
+      let model = helper.createModelFixture(1, 2);
+      let table = helper.createTable(model);
+      let rows = [
+        {cells: ['child0_row0'], parentRow: table.rows[0]},
+        {cells: ['child1_row0'], parentRow: table.rows[1]}
+      ];
+      table.insertRows(rows);
+      table.expandRow(table.rootRows[0]);
+      table.render();
+      expect(table.rootRows[0].$row).toHaveAttr('aria-expanded', 'true');
+      expect(table.rootRows[1].$row).toHaveAttr('aria-expanded', 'false');
     });
   });
 });

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, LookupRow, objects, ProposalChooser, ProposalTreeNode, scout, SmartFieldLookupResult, Tree, TreeLayoutResetter, TreeNode, TreeNodeClickEvent} from '../../../index';
+import {aria, arrays, LookupRow, objects, ProposalChooser, ProposalTreeNode, scout, SmartFieldLookupResult, Tree, TreeLayoutResetter, TreeNode, TreeNodeClickEvent, TreeNodesSelectedEvent} from '../../../index';
 
 export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, ProposalTreeNode<TValue>> {
 
@@ -19,7 +19,28 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
       textFilterEnabled: false
     });
     tree.on('nodeClick', this._onNodeClick.bind(this));
+    tree.on('nodesSelected', this._onNodeSelected.bind(this));
     return tree;
+  }
+
+  protected override _postRender() {
+    super._postRender();
+    let node = this.content.selectedNode();
+    this._renderSelectedNode(node);
+    aria.hasPopup(this.smartField.$field, 'tree');
+  }
+
+  protected _onNodeSelected(event: TreeNodesSelectedEvent) {
+    let node = this.content.selectedNode();
+    this._renderSelectedNode(node);
+  }
+
+  protected _renderSelectedNode(node: TreeNode) {
+    if (node && node.$node) {
+      aria.linkElementWithActiveDescendant(this.smartField.$field, node.$node);
+    } else {
+      aria.removeActiveDescendant(this.smartField.$field);
+    }
   }
 
   protected override _createLayoutResetter(): TreeLayoutResetter {

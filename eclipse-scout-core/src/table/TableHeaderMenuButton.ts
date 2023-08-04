@@ -24,6 +24,7 @@ export class TableHeaderMenuButton extends Action implements TableHeaderMenuButt
     super();
     this.textVisible = false;
     this.tabbable = true;
+    this.actionStyle = Action.ActionStyle.BUTTON;
   }
 
   protected override _initKeyStrokeContext() {
@@ -36,6 +37,8 @@ export class TableHeaderMenuButton extends Action implements TableHeaderMenuButt
     super._render();
     this.$container = this.$container.addClass('table-header-menu-command button')
       .unfocusable()
+      .on('focusin', this._onFocusIn.bind(this))
+      .on('focusout', this._onFocusOut.bind(this))
       .on('mouseenter', this._onMouseOver.bind(this))
       .on('mouseleave', this._onMouseOut.bind(this));
     this.$icon = this.$container.appendSpan('icon font-icon');
@@ -46,18 +49,36 @@ export class TableHeaderMenuButton extends Action implements TableHeaderMenuButt
     this._renderToggleAction();
   }
 
-  // Show 'remove' text when button is already selected
   protected _onMouseOver() {
-    let text = this.selected ? this.session.text('ui.remove') : this.text;
-    this.parent.appendText(text);
+    this._appendActionText();
   }
 
   protected _onMouseOut() {
     this.parent.resetText();
   }
 
-  protected _renderToggleAction() {
+  protected override _onFocusIn(event: FocusEvent | JQuery.FocusInEvent) {
+    super._onFocusIn(event);
+    this._appendActionText();
+  }
+
+  protected _onFocusOut() {
+    this.parent.resetText();
+  }
+
+  override _renderToggleAction() {
+    super._renderToggleAction();
     this.$container.toggleClass('togglable', this.toggleAction);
+  }
+
+  // Show 'remove' text when button is already selected
+  protected _appendActionText() {
+    let text = this.selected ? this.session.text('ui.remove') : this.text;
+    this.parent.appendText(text);
+  }
+
+  protected _resetText() {
+    this.parent.resetText();
   }
 
   protected override _renderIconId() {

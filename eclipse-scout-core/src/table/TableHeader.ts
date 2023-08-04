@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, objects, PropertyChangeEvent, scout, scrollbars, SomeRequired, strings, styles,
-  Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
+  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, objects, PropertyChangeEvent, scout, scrollbars, SomeRequired, strings,
+  styles, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget, widgets
 } from '../index';
 import $ from 'jquery';
 
@@ -25,6 +25,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
   columnMoved: boolean;
   menuBar: MenuBar;
   tableHeaderMenu: TableHeaderMenu;
+  headerLabelId: string;
   $menuBarContainer: JQuery;
   $filler: JQuery;
 
@@ -43,6 +44,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     this.dragging = false;
     this.headerMenusEnabled = true;
     this.table = null;
+    this.headerLabelId = null;
     this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
     this._tableAddFilterRemovedHandler = this._onTableAddFilterRemoved.bind(this);
     this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
@@ -66,6 +68,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
   protected override _render() {
     this.$container = this.table.$data.beforeDiv('table-header')
       .cssBorderLeftWidth(this.table.rowBorders.left || '');
+    aria.role(this.$container, 'row');
 
     // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
     this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
@@ -125,11 +128,16 @@ export class TableHeader extends Widget implements TableHeaderModel {
       .setEnabled(this.enabled) // enabledComputed not used on purpose
       .data('column', column);
 
+    aria.role($header, 'columnheader');
+
     let margins = graphics.margins($header);
     columnWidth -= margins.horizontal();
     $header.cssMinWidth(columnWidth).cssMaxWidth(columnWidth);
 
-    $header.appendSpan('table-header-item-text');
+    // add label id to header item text, so table cells can reference it for screen readers
+    this.headerLabelId = widgets.createUniqueId('lbl');
+    $header.appendSpan('table-header-item-text').attr('id', this.headerLabelId);
+
     if (this.enabled) { // enabledComputed not used on purpose
       $header
         .on('click', this._onHeaderItemClick.bind(this))
@@ -158,6 +166,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     }
     if (showSeparator) {
       let $separator = this.$filler.beforeDiv('table-header-resize');
+      aria.role($separator, 'none');
       if (column.fixedWidth || !this.enabled) { // enabledComputed not used on purpose
         $separator.setEnabled(false);
       } else {
@@ -371,6 +380,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     this._renderColumnLegacyStyle(column);
     this._renderColumnHeaderMenuEnabled(column);
     this._renderColumnHorizontalAlignment(column);
+    this._renderColumnTooltipText(column);
   }
 
   protected _renderColumnCssClass(column: Column<any>, oldColumnState?: ColumnModel<any>) {
@@ -392,6 +402,14 @@ export class TableHeader extends Widget implements TableHeaderModel {
     // Make sure empty header is as height as the others to make it properly clickable
     $headerText.htmlOrNbsp(text, 'empty');
     this._updateColumnIconAndTextStyle(column);
+  }
+
+  protected _renderColumnTooltipText(column: Column<any>) {
+    // add tooltip as invisible text for screen readers
+    if (column.$header && strings.hasText(column.headerTooltipText)) {
+      let $descriptionElement = column.$header.appendDiv().addClass('text').text(column.headerTooltipText);
+      aria.screenReaderOnly($descriptionElement);
+    }
   }
 
   protected _renderColumnIconId(column: Column<any>) {
@@ -435,8 +453,10 @@ export class TableHeader extends Widget implements TableHeaderModel {
     $header.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
     $state.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
 
+    let accessibleStateText = '';
     if (column.sortActive) {
       let sortDirection = column.sortAscending ? 'asc' : 'desc';
+      accessibleStateText += this.session.text('ui.Sorting') + ' ' + (column.sortAscending ? this.session.text('ui.ascending') : this.session.text('ui.descending'));
       if (column.grouped) {
         $header.addClass('group-' + sortDirection);
       }
@@ -450,16 +470,23 @@ export class TableHeader extends Widget implements TableHeaderModel {
       if (column.grouped) {
         $header.addClass('grouped');
         $state.addClass('grouped');
-        $left.appendDiv().text('G');
+        let $g = $left.appendDiv().text('G');
+        aria.hidden($g, true);
+        accessibleStateText += ' ' + this.session.text('ui.Grouping');
       }
       if (filtered) {
         $header.addClass('filtered');
         $state.addClass('filtered');
-        $left.appendDiv().text('F');
+        let $f = $left.appendDiv().text('F');
+        aria.hidden($f, true);
+        accessibleStateText += ' ' + this.session.text('ui.Filter');
       }
     }
+    let $accessibleState = $state.appendDiv().addClass('text').text(accessibleStateText);
+    aria.screenReaderOnly($accessibleState);
     // Contains sort arrow
-    $state.appendDiv('right');
+    let sortArrow = $state.appendDiv('right');
+    aria.hidden(sortArrow, true);
 
     this._adjustColumnMinWidth(column);
   }

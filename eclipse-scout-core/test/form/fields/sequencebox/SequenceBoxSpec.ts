@@ -517,23 +517,6 @@ describe('SequenceBox', () => {
 
   describe('label', () => {
 
-    it('is linked with the fields (also considers fields own label)', () => {
-      let field = createField();
-      field.setLabel('box label');
-      let stringField = field.fields[0] as StringField;
-      stringField.setLabel('first label');
-      let dateField = field.fields[1] as DateField;
-      dateField.setLabel('second label');
-      dateField.setHasTime(true);
-      field.render();
-      expect(stringField.$field.attr('aria-labelledby')).toBeTruthy();
-      expect(stringField.$field.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + stringField.$label.attr('id'));
-      expect(dateField.$dateField.attr('aria-labelledby')).toBeTruthy();
-      expect(dateField.$dateField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + dateField.$label.attr('id'));
-      expect(dateField.$timeField.attr('aria-labelledby')).toBeTruthy();
-      expect(dateField.$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + dateField.$label.attr('id'));
-    });
-
     it('focuses the first visible field when clicked', () => {
       let field = createField();
       field.render();
@@ -875,6 +858,31 @@ describe('SequenceBox', () => {
       field.fieldStatus.showContextMenu();
       expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(0).text()).toBe('seq menu');
       field.fieldStatus.hideContextMenu();
+    });
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria-labelledby set to sequence label + field label', () => {
+      let field = createField();
+      field.setLabel('box label');
+      let stringField = field.fields[0] as StringField;
+      stringField.setLabel('first label');
+      let dateField = field.fields[1] as DateField;
+      dateField.setLabel('second label');
+      dateField.setHasTime(true);
+      field.render();
+      expect(stringField.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(stringField.$field.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + stringField.$label.attr('id'));
+      expect(stringField.$field.attr('aria-label')).toBeFalsy();
+
+      expect(dateField.$dateField.attr('aria-labelledby')).toBeTruthy();
+      expect(dateField.$dateField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + dateField.$label.attr('id'));
+      expect(dateField.$dateField.attr('aria-label')).toBeFalsy();
+
+      expect(dateField.$timeField.attr('aria-labelledby')).toBeTruthy();
+      expect(dateField.$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + dateField.$label.attr('id'));
+      expect(dateField.$timeField.attr('aria-label')).toBeFalsy();
     });
   });
 });

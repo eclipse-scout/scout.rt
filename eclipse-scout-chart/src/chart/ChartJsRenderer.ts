@@ -14,7 +14,7 @@ import {
   TooltipModel, TooltipOptions
 } from 'chart.js';
 import 'chart.js/auto'; // Import from auto to register charts
-import {arrays, colorSchemes, graphics, numbers, objects, Point, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
+import {aria, arrays, colorSchemes, graphics, numbers, objects, Point, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
 import ChartDataLabels, {Context} from 'chartjs-plugin-datalabels';
 import $ from 'jquery';
 import {ChartAxis, ChartConfig, ChartData, ChartType, ClickObject, NumberFormatter} from './Chart';
@@ -232,6 +232,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
   protected override _render() {
     if (!this.$canvas) {
       this.$canvas = this.chart.$container.appendElement('<canvas>') as JQuery<HTMLCanvasElement>;
+      aria.hidden(this.$canvas, true); // aria not supported yet
     }
     this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$canvas);
     if (!chartJsGlobalsInitialized) {
