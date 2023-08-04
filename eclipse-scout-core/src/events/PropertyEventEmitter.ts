@@ -300,15 +300,15 @@ export class PropertyEventEmitter extends EventEmitter {
   }
 
   /**
-   * If the value is an object, the entries in the object are expected to be property dimensions.
+   * If the value is an object, the entries in the object are expected to be property dimensions and need to have the correct data type (`boolean`).
    * In that case, {@link setPropertyDimensions} is used to set the dimensions.
    * Otherwise, the `default` dimension for the given property is set using {@link setPropertyDimension}.
    */
   setMultiDimensionalProperty(propertyName: string, value: boolean | Record<string, boolean>): boolean {
-    if (typeof value === 'object') {
+    if (!objects.isNullOrUndefined(value) && typeof value === 'object' && Object.values(value).every(val => typeof val === 'boolean')) {
       return this.setPropertyDimensions(propertyName, value);
     }
-    return this.setPropertyDimension(propertyName, 'default', value);
+    return this.setPropertyDimension(propertyName, 'default', !!value);
   }
 
   /**
