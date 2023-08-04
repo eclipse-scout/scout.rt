@@ -371,6 +371,73 @@ describe('PropertyEventEmitter', () => {
         expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(false);
       });
 
+      it('only accepts objects with the correct structure for legacy reasons', () => {
+        // Prior to the multidimensional properties, not only real booleans were accepted
+        // but also falsy (null, undefined, empty string, 0) and truthy values (strings, objects, numbers etc.)
+        // Even though it is bad practise, people used it and without using TypeScript, such errors are hard to find
+        // -> falsy and truthy should still be supported as far as possible
+        let emitter = scout.create(DimensionalPropertyEventEmitter);
+        expect(emitter.getPropertyDimension('multiProp', 'default')).toBe(true);
+        expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(true);
+        expect(emitter.getProperty('multiProp')).toBe(true);
+
+        emitter.setProperty('multiProp', null);
+        expect(emitter.getPropertyDimension('multiProp', 'default')).toBe(false);
+        expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(true);
+        expect(emitter.getProperty('multiProp')).toBe(false);
+
+        emitter.setProperty('multiProp', {});
+        expect(emitter.getProperty('multiProp')).toBe(true);
+
+        emitter.setProperty('multiProp', undefined);
+        expect(emitter.getPropertyDimension('multiProp', 'default')).toBe(false);
+        expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(true);
+        expect(emitter.getProperty('multiProp')).toBe(false);
+
+        emitter.setProperty('multiProp', {});
+        expect(emitter.getProperty('multiProp')).toBe(true);
+
+        emitter.setProperty('multiProp', 0);
+        expect(emitter.getPropertyDimension('multiProp', 'default')).toBe(false);
+        expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(true);
+        expect(emitter.getProperty('multiProp')).toBe(false);
+
+        emitter.setProperty('multiProp', {});
+        expect(emitter.getProperty('multiProp')).toBe(true);
+
+        emitter.setProperty('multiProp', '');
+        expect(emitter.getPropertyDimension('multiProp', 'default')).toBe(false);
+        expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(true);
+        expect(emitter.getProperty('multiProp')).toBe(false);
+
+        emitter.setProperty('multiProp', {});
+        expect(emitter.getProperty('multiProp')).toBe(true);
+
+        emitter.setProperty('multiProp', NaN);
+        expect(emitter.getPropertyDimension('multiProp', 'default')).toBe(false);
+        expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(true);
+        expect(emitter.getProperty('multiProp')).toBe(false);
+
+        emitter.setProperty('multiProp', {});
+        expect(emitter.getProperty('multiProp')).toBe(true);
+
+        // Multidimensional properties only work with booleans
+        // If not all values in the given object are booleans, the object will be used as value for the default dimension
+        emitter.setProperty('multiProp', {dim1: 'asdf', default: false});
+        expect(emitter.getPropertyDimension('multiProp', 'default')).toBe(true);
+        expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(true);
+        expect(emitter.getProperty('multiProp')).toBe(true);
+
+        emitter.setProperty('multiProp', {dim1: false, default: true});
+        expect(emitter.getProperty('multiProp')).toBe(false);
+
+        // Assert that only default dimension is changed and dim1 stays false
+        emitter.setProperty('multiProp', {dim1: 'asdf', default: false});
+        expect(emitter.getPropertyDimension('multiProp', 'default')).toBe(true);
+        expect(emitter.getPropertyDimension('multiProp', 'dim1')).toBe(false);
+        expect(emitter.getProperty('multiProp')).toBe(false);
+      });
+
       it('clears the dimension object if dimensions are default', () => {
         let emitter = scout.create(DimensionalPropertyEventEmitter);
         expect(Object.keys(emitter.getPropertyDimensions('multiProp')).length).toBe(0);
