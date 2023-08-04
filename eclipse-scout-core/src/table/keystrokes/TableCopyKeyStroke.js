@@ -21,6 +21,14 @@ export default class TableCopyKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
+  _accept(event) {
+    if (this.field.footer?.$controlContainer?.has(event.target).length) {
+      // Allow text copy inside control container (labels, iframes etc.)
+      return false;
+    }
+    return super._accept(event);
+  }
+
   handle(event) {
     this.field.exportToClipboard();
   }
