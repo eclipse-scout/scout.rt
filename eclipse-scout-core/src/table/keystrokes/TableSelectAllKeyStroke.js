@@ -24,6 +24,14 @@ export default class TableSelectAllKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
+  _accept(event) {
+    if (this.field.footer?.$controlContainer?.has(event.target).length) {
+      // Allow text selection inside control container (labels, iframes etc.)
+      return false;
+    }
+    return super._accept(event);
+  }
+
   handle(event) {
     let table = this.field;
     table.toggleSelection();
