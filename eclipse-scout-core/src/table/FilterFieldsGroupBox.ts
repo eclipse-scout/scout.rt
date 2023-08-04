@@ -48,4 +48,8 @@ export class FilterFieldsGroupBox extends GroupBox implements FilterFieldsGroupB
     this.fields.push(field);
     this._prepareFields();
   }
+
+  linkFieldsWithTitle($filterFieldsText: JQuery<HTMLDivElement>) {
+    this.filter.linkFieldsWithTitle($filterFieldsText);
+  }
 }

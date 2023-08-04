@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, fields, graphics, HtmlComponent, Rectangle, SmartField, SmartFieldLayout, SmartFieldMultilineLayout} from '../../../index';
+import {aria, arrays, fields, graphics, HtmlComponent, Rectangle, SmartField, SmartFieldLayout, SmartFieldMultilineLayout} from '../../../index';
 
 export class SmartFieldMultiline<TValue> extends SmartField<TValue> {
   protected _$multilineLines: JQuery;
@@ -37,6 +37,9 @@ export class SmartFieldMultiline<TValue> extends SmartField<TValue> {
         .on('input', this._onFieldInput.bind(this));
     }
     this.addField($input);
+    aria.role($input, 'combobox');
+    aria.expanded($input, false);
+    this._addScreenReaderStatus();
 
     this._$multilineLines = this.$fieldContainer
       .appendDiv('multiline-lines')
@@ -46,6 +49,7 @@ export class SmartFieldMultiline<TValue> extends SmartField<TValue> {
     }
     this.addIcon();
     this.addStatus();
+    this._addAriaFieldDescription();
   }
 
   protected override _renderEnabled() {

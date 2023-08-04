@@ -102,4 +102,21 @@ describe('DateColumnUserFilter', () => {
     expect(filter.dateToField.hasTime).toBe(false);
   });
 
+  describe('aria properties', () => {
+
+    it('has filter fields that are linked with a label', () => {
+      let model = createSimpleModel(SpecFilterFieldsGroupBox, session) as FullModelOf<FilterFieldsGroupBox>,
+        filter = new DateColumnUserFilter(),
+        box = new SpecFilterFieldsGroupBox();
+      model.filter = filter;
+      model.label = 'boxLabel';
+      box.init(model);
+      filter.addFilterFields(box);
+      filter.dateFromField.label = 'dateFromField';
+      box.render();
+      expect(filter.dateFromField.$field.attr('aria-labelledBy')).toBeTruthy();
+      expect(filter.dateFromField.$field.attr('aria-labelledBy')).toBe(filter.dateFromField.$label.attr('id'));
+      expect(filter.dateFromField.$field.attr('aria-label')).toBeFalsy();
+    });
+  });
 });

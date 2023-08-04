@@ -1440,4 +1440,18 @@ describe('TileGrid', () => {
       expect(tile.$container.isVisible()).toBe(true);
     });
   });
+
+  describe('aria properties', () => {
+
+    it('has aria-activedescendant set if a tile receives focus', () => {
+      let tileGrid = createTileGrid(3, {
+        selectable: true
+      });
+      tileGrid.render();
+      expect(tileGrid.$container.attr('aria-activedescendant')).toBeFalsy();
+      let tile0 = tileGrid.tiles[0];
+      tileGrid.setFocusedTile(tile0);
+      expect(tileGrid.$container.attr('aria-activedescendant')).toBe(tile0.$container.attr('id'));
+    });
+  });
 });

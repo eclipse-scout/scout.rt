@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, InitModelOf, PropertyChangeEvent, scout, SomeRequired, Status, strings, TabEventMap, TabItem, TabModel, tooltips, Widget} from '../../../index';
+import {
+  aria, Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, InitModelOf, PropertyChangeEvent, scout, SomeRequired, Status, strings, TabEventMap, TabItem, TabModel, tooltips, Widget
+} from '../../../index';
 
 export class Tab extends Widget implements TabModel {
   declare model: TabModel;
@@ -83,6 +85,7 @@ export class Tab extends Widget implements TabModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('tab-item');
+    aria.role(this.$container, 'tab');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.$title = this.$container.appendDiv('title');
     this.$label = this.$title.appendDiv('label');
@@ -94,7 +97,8 @@ export class Tab extends Widget implements TabModel {
     tooltips.installForEllipsis(this.$subLabel, {
       parent: this
     });
-
+    aria.linkElementWithLabel(this.$container, this.$subLabel);
+    aria.linkElementWithLabel(this.$container, this.$label);
     this.fieldStatus.render();
     this.fieldStatus.$container.cssWidth(HtmlEnvironment.get().fieldStatusWidth);
 
@@ -216,6 +220,7 @@ export class Tab extends Widget implements TabModel {
   protected _renderSelected() {
     this.$container.select(this.selected);
     this.$container.setTabbable(this.selected && !Device.get().supportsOnlyTouch());
+    aria.selected(this.$container, this.selected || null);
   }
 
   setMarked(marked: boolean) {

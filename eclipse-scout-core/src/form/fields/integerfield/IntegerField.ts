@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DecimalFormat, Locale, NumberField} from '../../../index';
+import {aria, DecimalFormat, Locale, NumberField} from '../../../index';
 
 export class IntegerField extends NumberField {
 
@@ -29,5 +29,9 @@ export class IntegerField extends NumberField {
 
   protected override _setFractionDigits(fractionDigits: number) {
     super._setFractionDigits(0);
+  }
+
+  protected override _addAriaFieldDescription() {
+    aria.addHiddenDescriptionAndLinkToElement(this.$field, this.id + '-func-desc', this.session.text('ui.AriaIntegerFieldDescription'));
   }
 }

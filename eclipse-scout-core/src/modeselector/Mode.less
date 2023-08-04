@@ -68,6 +68,14 @@
       margin-right: 8px;
     }
   }
+
+  &:focus {
+    box-shadow: none;
+
+    &.keyboard-navigation {
+      #scout.focus-inset-box-shadow();
+    }
+  }
 }
 
 .mode-selector.alternative {

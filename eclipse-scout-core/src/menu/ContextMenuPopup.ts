@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, InitModelOf, Menu, MenuDestinations, MenuFilter, menuNavigationKeyStrokes, Popup, PopupLayout, PropertyChangeEvent, Rectangle,
-  RowLayout, scout, ScrollbarInstallOptions
+  AbstractLayout, Action, aria, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, InitModelOf, Menu, MenuDestinations, MenuFilter, menuNavigationKeyStrokes, Popup, PopupLayout, PropertyChangeEvent,
+  Rectangle, RowLayout, scout, ScrollbarInstallOptions
 } from '../index';
 import $ from 'jquery';
 
@@ -69,6 +69,7 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
   protected override _render() {
     super._render();
     this.$container.addClass('context-menu-popup');
+    aria.role(this.$container, 'menu');
     this._renderBody();
     this._installScrollbars();
     this._renderMenuItems();
@@ -510,7 +511,7 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     menuItemClass = menuItemClass ? menuItemClass : 'menu-item';
     let $all = this.$body.find('.' + menuItemClass);
     $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
-
+    aria.linkElementWithActiveDescendant(this.$container, $selectedItem);
     $all.removeClass('next-to-selected');
     if ($selectedItem.hasClass('selected')) {
       $selectedItem.nextAll(':visible').first().addClass('next-to-selected');

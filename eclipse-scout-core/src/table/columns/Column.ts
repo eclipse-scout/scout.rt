@@ -9,7 +9,7 @@
  */
 import {
   AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf, objects,
-  ObjectWithType, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, ValueField
+  ObjectWithType, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, ValueField, widgets
 } from '../../index';
 import $ from 'jquery';
 
@@ -335,7 +335,19 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   protected _buildCell(cell: Cell<TValue>, content: string, style: string, cssClass: string): string {
-    return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
+    let ariaAttributes = '';
+    if (this.table.accessibilityRenderer && strings.hasText(this.table.accessibilityRenderer.cellRole)) {
+      ariaAttributes = ' role="' + this.table.accessibilityRenderer.cellRole + '"';
+    }
+    // Set the label of the cell to header name + cell content. The reference to cell content is needed, because
+    // without it screen readers may only announce the header name without the cell content. If there is no header
+    // to reference, we do not need to reference the cell either, because screen readers will announce the cell
+    // content naturally if there is no aria-labelledby
+    if (this.table.header && strings.hasText(this.table.header.headerLabelId)) {
+      let cellLabelId = widgets.createUniqueId('lbl');
+      ariaAttributes += ' aria-labelledBy="' + this.table.header.headerLabelId + ' ' + cellLabelId + '" ' + 'id="' + cellLabelId + '"';
+    }
+    return '<div' + ariaAttributes + ' class="' + cssClass + '" style="' + style + '">' + content + '</div>';
   }
 
   protected _expandIcon(expanded: boolean, rowPadding: number): string {
@@ -344,7 +356,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     if (expanded) {
       cssClasses += ' expanded';
     }
-    return '<div class="' + cssClasses + '" style="' + style + '"></div>';
+    return '<div aria-hidden="true" class="' + cssClasses + '" style="' + style + '"></div>';
   }
 
   protected _icon(iconId: string, hasText: boolean): string {
@@ -359,10 +371,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     icon = icons.parseIconId(iconId);
     if (icon.isFontIcon()) {
       cssClass += ' font-icon';
-      return '<span class="' + icon.appendCssClass(cssClass) + '">' + icon.iconCharacter + '</span>';
+      return '<span aria-hidden="true" class="' + icon.appendCssClass(cssClass) + '">' + icon.iconCharacter + '</span>';
     }
     cssClass += ' image-icon';
-    return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
+    return '<img alt="" class="' + cssClass + '" src="' + icon.iconUrl + '">';
   }
 
   protected _text(cell: Cell<TValue>): string {
@@ -1018,7 +1030,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   setHeaderTooltipText(headerTooltipText: string) {
-    this.setProperty('headerTooltipText', headerTooltipText);
+    let changed = this.setProperty('headerTooltipText', headerTooltipText);
+    if (changed && this.table.header) {
+      this.table.header.updateHeader(this);
+    }
   }
 
   setHeaderTooltipHtmlEnabled(headerTooltipHtmlEnabled: boolean) {

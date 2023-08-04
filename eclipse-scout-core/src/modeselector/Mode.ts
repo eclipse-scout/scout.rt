@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, InitModelOf, ModeModel} from '../index';
+import {Action, aria, Device, InitModelOf, ModeModel} from '../index';
 
 export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
   declare model: ModeModel<TRef>;
@@ -28,7 +28,8 @@ export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
 
   protected override _render() {
     super._render();
-    this.$container.addClass('button mode');
+    this.$container.addClass('button mode')
+      .data('mode', this);
   }
 
   protected override _renderProperties() {
@@ -38,6 +39,12 @@ export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
 
   protected override _renderSelected() {
     this.$container.select(this.selected);
+    aria.checked(this.$container, this.selected);
+  }
+
+  protected override _renderTabbable() {
+    // should not lose tab index if disabled
+    this.$container.setTabbable(this.tabbable && !Device.get().supportsOnlyTouch());
   }
 
   override doAction(): boolean {
@@ -47,6 +54,7 @@ export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
 
     if (!this.selected) {
       this.setSelected(true);
+      this.focus();
     }
 
     return true;
@@ -77,5 +85,9 @@ export class Mode<TRef = any> extends Action implements ModeModel<TRef> {
   protected _updateLabelAndIconStyle() {
     let hasText = !!this.text;
     this.get$Icon().toggleClass('with-label', hasText);
+  }
+
+  protected override _renderActionStyle() {
+    aria.role(this.$container, 'radio');
   }
 }

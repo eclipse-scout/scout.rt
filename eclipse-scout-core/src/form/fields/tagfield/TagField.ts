@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Event, fields, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LookupCall, LookupCallOrModel, LookupResult, MaxLengthHandler, Popup, PropertyChangeEvent, scout, strings, TagBar,
+  aria, arrays, Event, fields, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LookupCall, LookupCallOrModel, LookupResult, MaxLengthHandler, Popup, PropertyChangeEvent, scout, strings, TagBar,
   TagBarTagRemoveEvent, TagChooserPopup, TagChooserPopupLookupRowSelectedEvent, TagFieldContainerLayout, TagFieldDeleteKeyStroke, TagFieldEnterKeyStroke, TagFieldEventMap, TagFieldLayout, TagFieldModel, TagFieldNavigationKeyStroke,
   TagFieldOpenPopupKeyStroke, ValueField
 } from '../../../index';
@@ -91,6 +91,11 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this.addField($field);
     this.maxLengthHandler.install($field);
     this.addStatus();
+    this._addAriaFieldDescription();
+  }
+
+  protected _addAriaFieldDescription() {
+    aria.addHiddenDescriptionAndLinkToElement(this.$field, this.id + '-func-desc', this.session.text('ui.AriaTagFieldDescription'));
   }
 
   protected override _renderProperties() {

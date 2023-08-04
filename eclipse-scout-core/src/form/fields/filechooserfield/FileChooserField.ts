@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, FileInputChangeEvent, InitModelOf, objects, scout, ValueField} from '../../../index';
+import {aria, arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, FileInputChangeEvent, InitModelOf, objects, scout, ValueField} from '../../../index';
 
 export class FileChooserField extends ValueField<File> implements FileChooserFieldModel {
   declare model: FileChooserFieldModel;
@@ -67,6 +67,7 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
     this._renderFileInput();
     this.addIcon();
     this.addStatus();
+    this._addAriaFieldDescription();
   }
 
   protected _renderFileInput() {
@@ -155,5 +156,9 @@ export class FileChooserField extends ValueField<File> implements FileChooserFie
     }
     let files = this.fileInput.files;
     return files && files.length ? files[0] : null;
+  }
+
+  protected _addAriaFieldDescription() {
+    aria.addHiddenDescriptionAndLinkToElement(this.fileInput.$fileInput, this.id + '-func-desc', this.session.text('ui.AriaFileChooserFieldDescription'));
   }
 }

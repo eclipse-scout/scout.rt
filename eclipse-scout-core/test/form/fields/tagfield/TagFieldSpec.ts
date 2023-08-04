@@ -169,4 +169,22 @@ describe('TagField', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria-describedby description for its functionality', () => {
+      let templatePropertyValue = 11;
+      let field = scout.create(TagField, {
+        parent: session.desktop,
+        lookupCall: {
+          objectType: SpecTagFieldLookupCall,
+          customProperty: templatePropertyValue
+        }
+      });
+      field.render();
+      let $fieldDescription = field.$container.find('#desc' + field.id + '-func-desc');
+      expect(field.$field.attr('aria-describedby')).toBeTruthy();
+      expect(field.$field.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+    });
+  });
 });

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, InitModelOf, Insets, KeyStrokeContext, LoadingSupport, ObjectOrChildModel, scout, tooltips, Widget
+  aria, Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, InitModelOf, Insets, KeyStrokeContext, LoadingSupport, ObjectOrChildModel, scout, tooltips, Widget
 } from '../index';
 import $ from 'jquery';
 import MouseDownEvent = JQuery.MouseDownEvent;
@@ -112,6 +112,11 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
     this.$collapseBorderRight = this.$footer.appendDiv('group-collapse-border');
     this.htmlFooter = HtmlComponent.install(this.$footer, this.session);
     this.$footer.on('mousedown', this._onFooterMouseDown.bind(this));
+    this._addAriaFieldDescription();
+  }
+
+  protected _addAriaFieldDescription() {
+    aria.addHiddenDescriptionAndLinkToElement(this.$header, this.id + '-func-desc', this.session.text('ui.AriaGroupDescription'));
   }
 
   protected override _renderProperties() {
@@ -300,6 +305,8 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
         this._renderTitleSuffix();
       }
     }
+    aria.role(this.$header, 'button');
+    aria.linkElementWithLabel(this.$header, this.$title);
     this.$header.on('mousedown', this._onHeaderMouseDown.bind(this));
     this.invalidateLayoutTree();
   }
@@ -308,6 +315,8 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
     this.body.render();
     this.body.$container.insertAfter(this.$header);
     this.body.$container.addClass('group-body');
+    aria.linkElementWithLabel(this.body.$container, this.$title);
+    aria.linkElementWithControls(this.$header, this.body.$container);
     this.body.invalidateLayoutTree();
   }
 
@@ -329,6 +338,7 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
   protected _renderCollapsed() {
     this.$container.toggleClass('collapsed', this.collapsed);
     this.$collapseIcon.toggleClass('collapsed', this.collapsed);
+    aria.expanded(this.$header, !this.collapsed);
     if (!this.collapsed && !this.bodyAnimating) {
       this._renderBody();
     }
@@ -348,6 +358,7 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
   protected _renderCollapsible() {
     this.$container.toggleClass('collapsible', this.collapsible);
     this.$header.toggleClass('disabled', !this.collapsible);
+    aria.disabled(this.$header, !this.collapsible || null);
     // footer is visible if collapseStyle is 'bottom' and either header is visible or has a (collapsible) body
     this.$footer.setVisible(this.collapseStyle === Group.CollapseStyle.BOTTOM && (this.headerVisible || this.collapsible));
     this.$collapseIcon.setVisible(this.collapsible);

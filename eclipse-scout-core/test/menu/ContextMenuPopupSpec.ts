@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ContextMenuPopup, Menu, Popup, scout, Widget} from '../../src/index';
-import {MenuSpecHelper} from '../../src/testing/index';
+import {ContextMenuPopup, keys, Menu, Popup, scout, Widget} from '../../src/index';
+import {JQueryTesting, MenuSpecHelper} from '../../src/testing/index';
 
 describe('ContextMenuPopup', () => {
   let helper: MenuSpecHelper, session: SandboxSession;
@@ -290,6 +290,41 @@ describe('ContextMenuPopup', () => {
       expect(popup.rendered).toBe(true); // <--
 
       popup.close();
+    });
+  });
+
+  describe('aria properties', () => {
+    let popup: ContextMenuPopup, menu: Menu, childMenu: Menu;
+
+    beforeEach(() => {
+      menu = helper.createMenu(helper.createModel());
+      childMenu = helper.createMenu(helper.createModel());
+      menu.childActions = [childMenu];
+    });
+
+    it('has role menu', () => {
+      let menuItems = [menu];
+      menu.render();
+      popup = scout.create(ContextMenuPopup, {
+        parent: session.desktop,
+        session: session,
+        menuItems: menuItems
+      });
+      popup.render();
+      expect(popup.$container).toHaveAttr('role', 'menu');
+    });
+
+    it('has aria-activedescendant set when navigating', () => {
+      let menuItems = [menu];
+      menu.render();
+      popup = scout.create(ContextMenuPopup, {
+        parent: session.desktop,
+        session: session,
+        menuItems: menuItems
+      });
+      popup.render();
+      JQueryTesting.triggerKeyDown(popup.$body, keys.DOWN);
+      expect(popup.$container.attr('aria-activedescendant')).toBeTruthy();
     });
   });
 });

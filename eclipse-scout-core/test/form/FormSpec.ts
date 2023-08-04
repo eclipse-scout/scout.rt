@@ -10,7 +10,7 @@
 import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
   App, CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox,
-  Session, SplitBox, Status, StringField, TabBox, TabItem, webstorage, WrappedFormField
+  Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -2014,6 +2014,96 @@ describe('Form', () => {
         })
         .catch(fail);
       jasmine.clock().tick(1000);
+    });
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria role dialog if it is a dialog', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            objectType: GroupBox
+          }]
+        }
+      });
+      form.setDisplayHint(Form.DisplayHint.DIALOG);
+      form.render();
+      expect(form.$container).toHaveAttr('role', 'dialog');
+    });
+
+    it('has aria role form if it is a view', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            objectType: GroupBox
+          }]
+        }
+      });
+      form.setDisplayHint(Form.DisplayHint.VIEW);
+      form.render();
+      expect(form.$container).toHaveAttr('role', 'form');
+    });
+
+    it('has aria-labelledby set if form is a dialog', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            objectType: GroupBox
+          }]
+        }
+      });
+      form.setTitle('testTitle');
+      form.setSubTitle('testSubTitle');
+      form.setDisplayHint(Form.DisplayHint.DIALOG);
+      form.render();
+      expect(form.$container.attr('aria-labelledby')).toBeTruthy();
+      expect(form.$container).toHaveAttr('aria-labelledby', strings.join(' ', form.$title.attr('id'), form.$subTitle.attr('id')));
+      expect(form.$container.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has aria-label set if form is a view', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            objectType: GroupBox
+          }]
+        }
+      });
+      form.setTitle('testTitle');
+      form.setSubTitle('testSubTitle');
+      form.setDisplayHint(Form.DisplayHint.VIEW);
+      form.render();
+      expect(form.$container.attr('aria-label')).toBeTruthy();
+      expect(form.$container).toHaveAttr('aria-label', 'testTitle testSubTitle');
+      expect(form.$container.attr('aria-labelledby')).toBeFalsy();
+    });
+
+    it('has aria-label set if form is a pop up', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: GroupBox,
+          fields: [{
+            objectType: GroupBox
+          }]
+        }
+      });
+      form.setTitle('testTitle');
+      form.setSubTitle('testSubTitle');
+      form.setDisplayHint(Form.DisplayHint.POPUP_WINDOW);
+      form.render();
+      expect(form.$container.attr('aria-label')).toBeTruthy();
+      expect(form.$container).toHaveAttr('aria-label', 'testTitle testSubTitle');
+      expect(form.$container.attr('aria-labelledby')).toBeFalsy();
     });
   });
 });

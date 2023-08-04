@@ -135,6 +135,43 @@ describe('DesktopNavigation', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria role navigation', () => {
+      desktop.render(session.$entryPoint);
+      expect(desktop.navigation.$container).toHaveAttr('role', 'navigation');
+    });
+
+    it('has aria-label set', () => {
+      desktop.render(session.$entryPoint);
+      expect(desktop.navigation.$container.attr('aria-label')).toBeTruthy();
+      expect(desktop.navigation.$container.attr('aria-labelledby')).toBeFalsy();
+    });
+
+    it('has a non empty status container that represent current outline state', () => {
+      _setupOutline(outlineHelper, desktop, true);
+      expect(desktop.navigation.$screenReaderStatus).toBeTruthy();
+      expect(desktop.navigation.$screenReaderStatus).toHaveAttr('role', 'status');
+      expect(desktop.navigation.$screenReaderStatus).toHaveClass('sr-only');
+      expect(desktop.navigation.$screenReaderStatus.children('.sr-outline-path').length).toBe(1);
+      expect(desktop.navigation.$screenReaderStatus.children('.sr-outline-path').eq(0)).not.toBeEmpty();
+    });
+
+    it('has a collapse handlers with role button', () => {
+      // test 2 step collapse/expand
+      _setupOutline(outlineHelper, desktop, true);
+      // both should have a label
+      expect(desktop.navigation.handle.$left.attr('aria-label')).toBeTruthy();
+      expect(desktop.navigation.handle.$right.attr('aria-label')).toBeTruthy();
+      // only left should be visible at first
+      expect(desktop.navigation.handle.$left.attr('aria-hidden')).toBeFalsy();
+      expect(desktop.navigation.handle.$right).toHaveAttr('aria-hidden', 'true');
+      // shrink navigation once so both handlers are visible
+      desktop.shrinkNavigation();
+      expect(desktop.navigation.handle.$left.attr('aria-hidden')).toBeFalsy();
+      expect(desktop.navigation.handle.$right.attr('aria-hidden')).toBeFalsy();
+    });
+  });
 });
 
 function _setupOutline(outlineHelper, desktop, toggleBreadcrumbStyleEnabled) {

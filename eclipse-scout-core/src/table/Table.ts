@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, AggregateTableControl, Alignment, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, Desktop, DesktopPopupOpenEvent,
-  Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HtmlComponent, IconColumn, InitModelOf, Insets,
-  KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate,
-  PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
-  TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
-  TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip,
-  TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, UpdateFilteredElementsOptions, ValueField, Widget
+  AbstractTableAccessibilityRenderer, Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke,
+  ContextMenuPopup, DefaultTableAccessibilityRenderer, Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult,
+  FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
+  NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles,
+  TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
+  TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke,
+  TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips,
+  UpdateFilteredElementsOptions, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -121,6 +122,7 @@ export class Table extends Widget implements TableModel {
   filterSupport: FilterSupport<TableRow>;
   filteredElementsDirty: boolean;
   defaultMenuTypes: string[];
+  accessibilityRenderer: AbstractTableAccessibilityRenderer;
 
   $data: JQuery;
   $emptyData: JQuery;
@@ -233,6 +235,7 @@ export class Table extends Widget implements TableModel {
     this.filterSupport = this._createFilterSupport();
     this.filteredElementsDirty = false;
     this.defaultMenuTypes = [Table.MenuType.EmptySpace];
+    this.accessibilityRenderer = new DefaultTableAccessibilityRenderer();
 
     this._doubleClickSupport = new DoubleClickSupport();
     this._permanentHeadSortColumns = [];
@@ -576,7 +579,9 @@ export class Table extends Widget implements TableModel {
   }
 
   protected override _render() {
-    this.$container = this.$parent.appendDiv('table').addDeviceClass();
+    this.$container = this.$parent.appendDiv('table')
+      .addDeviceClass();
+    this.accessibilityRenderer.renderTable(this.$container);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new TableLayout(this));
 
@@ -597,6 +602,7 @@ export class Table extends Widget implements TableModel {
   /** @internal */
   _renderData() {
     this.$data = this.$container.appendDiv('table-data');
+    this.accessibilityRenderer.renderRowGroup(this.$data);
     this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
       .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
       .on('dblclick', '.table-row', this._onRowDoubleClick.bind(this))
@@ -623,6 +629,8 @@ export class Table extends Widget implements TableModel {
     this._renderCheckableStyle();
     this._renderHierarchicalStyle();
     this._renderTextFilterEnabled();
+    this._renderMultiSelect();
+    this._renderMultiCheck();
   }
 
   protected override _setCssClass(cssClass: string) {
@@ -746,6 +754,7 @@ export class Table extends Widget implements TableModel {
         this.expandRow(row);
       }
     }
+
     // For checkableStyle TABLE_ROW & CHECKBOX_TABLE_ROW only: check row if left click OR clicked row was not checked yet
     if (scout.isOneOf(this.checkableStyle, Table.CheckableStyle.TABLE_ROW, Table.CheckableStyle.CHECKBOX_TABLE_ROW) &&
       (!isRightClick || !row.checked) &&
@@ -761,6 +770,11 @@ export class Table extends Widget implements TableModel {
       });
       return false;
     }
+
+    // set active descendant to the clicked row, so it is announced by screen readers.
+    // This should be done last so selection state/focus/etc is all set correctly before
+    // the change of active descendant triggers the screen readers announcement.
+    aria.linkElementWithActiveDescendant(this.$container, row.$row);
   }
 
   protected _isRowControl($target: JQuery): boolean {
@@ -1597,7 +1611,28 @@ export class Table extends Widget implements TableModel {
       rowClass += ' leaf';
     }
 
-    let rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px">';
+    let ariaAttributes = '';
+    if (strings.hasText(this.accessibilityRenderer.rowRole)) {
+      let selected = this.isRowSelected(row) === true;
+      let checked = String(row.checked === true);
+      let disabled = !row.enabled;
+      ariaAttributes = ' role="' + this.accessibilityRenderer.rowRole + '"';
+      if (selected) {
+        ariaAttributes += ' aria-selected="true"';
+      }
+      if (disabled) {
+        ariaAttributes += ' aria-disabled = "true"';
+      }
+      if (this.checkable) {
+        ariaAttributes += ' aria-checked="' + checked + '"';
+      }
+      if (this.hierarchical && row.expandable) {
+        let expanded = row.expanded;
+        ariaAttributes += ' aria-expanded="' + expanded + '"';
+      }
+    }
+
+    let rowDiv = '<div' + ariaAttributes + ' class="' + rowClass + '" style="width: ' + rowWidth + 'px">';
     for (let i = 0; i < this.columns.length; i++) {
       let column = this.columns[i];
       if (column.visible) {
@@ -2549,6 +2584,8 @@ export class Table extends Widget implements TableModel {
     let $aggregateRow = this.$container
       .makeDiv('table-aggregate-row')
       .data('aggregateRow', aggregateRow);
+    this.accessibilityRenderer.renderRow($aggregateRow);
+    aria.description($aggregateRow, this.session.text('ui.Aggregation'));
     $aggregateRow.toggleClass('grouping-style-top', onTop);
     $aggregateRow.toggleClass('grouping-style-bottom', !onTop);
     return $aggregateRow;
@@ -3153,7 +3190,9 @@ export class Table extends Widget implements TableModel {
     if (hierarchical) {
       this.removeAllColumnGroupings();
     }
-
+    if (hierarchical && !(this.accessibilityRenderer instanceof HierarchicalTableAccessibilityRenderer)) {
+      this.accessibilityRenderer = new HierarchicalTableAccessibilityRenderer();
+    }
     this._setProperty('hierarchical', hierarchical);
   }
 
@@ -3414,6 +3453,8 @@ export class Table extends Widget implements TableModel {
         followingRowSelected = false;
       }
 
+      aria.selected(row.$row, thisRowSelected || null);
+
       let classChanged =
         addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected, 'selected') +
         addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && !previousRowSelected && followingRowSelected, 'select-top') +
@@ -3445,6 +3486,7 @@ export class Table extends Widget implements TableModel {
       }
       row.$row.select(false);
       row.$row.toggleClass(Table.SELECTION_CLASSES, false);
+      aria.selected(row.$row, null);
     });
   }
 
@@ -4104,6 +4146,14 @@ export class Table extends Widget implements TableModel {
 
   protected _renderTextFilterEnabled() {
     this.filterSupport.renderFilterField();
+  }
+
+  protected _renderMultiSelect() {
+    aria.multiselectable(this.$container, this.multiSelect || this.multiCheck ? true : null);
+  }
+
+  protected _renderMultiCheck() {
+    aria.multiselectable(this.$container, this.multiSelect || this.multiCheck ? true : null);
   }
 
   updateFilteredElements(result: FilterResult<TableRow>, opts: UpdateFilteredElementsOptions) {
@@ -4886,8 +4936,10 @@ export class Table extends Widget implements TableModel {
         throw new Error('checkableColumn not set');
       }
       $styleElem = this.checkableColumn.$checkBox(row.$row);
+      aria.checked(row.$row, row.checked); // also set the row to aria checked
     }
     $styleElem.toggleClass('checked', row.checked);
+    aria.checked($styleElem, row.checked);
   }
 
   /** @see TableModel.checkable */

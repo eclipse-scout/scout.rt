@@ -3170,4 +3170,52 @@ describe('Tree', () => {
       expect(tree.$data[0].scrollTop).toBe(0);
     });
   });
+
+  describe('aria properties', () => {
+    let model;
+    let tree: SpecTree;
+    let node0;
+    let child0;
+
+    beforeEach(() => {
+      model = helper.createModelFixture(3, 3, true);
+      tree = helper.createTree(model);
+      node0 = tree.nodes[0];
+      child0 = node0.childNodes[0];
+    });
+
+    it('has aria role tree', () => {
+      tree.render();
+      expect(tree.$container).toHaveAttr('role', 'tree');
+    });
+
+    it('has aria-multiselectable set to true if multiCheck enabled', () => {
+      tree.multiCheck = false;
+      tree.render();
+      expect(tree.$container.attr('aria-multiselectable')).toBeFalsy();
+
+      tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.render();
+      expect(tree.$container).toHaveAttr('aria-multiselectable', 'true');
+    });
+
+    it('has nodes with aria role treeitem', () => {
+      tree.render();
+      let $allNodes = helper.findAllNodes(tree);
+      expect($allNodes.length).toBeGreaterThan(0);
+      $allNodes.each((index, $node) => {
+        expect($node).toHaveAttr('role', 'treeitem');
+      });
+    });
+
+    it('has nodes with a correct aria-level set', () => {
+      tree.render();
+      let $allNodes = helper.findAllNodes(tree);
+      expect($allNodes.length).toBeGreaterThan(0);
+      $allNodes.each((index, htmlNode) => {
+        expect($(htmlNode)).toHaveAttr('aria-level', String(parseInt($(htmlNode).attr('data-level')) + 1));
+      });
+    });
+  });
 });

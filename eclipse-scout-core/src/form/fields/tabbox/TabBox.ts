@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CompositeField, EnumObject, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectOrChildModel, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel,
-  TabItem
+  aria, arrays, CompositeField, EnumObject, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectOrChildModel, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap, TabBoxHeader, TabBoxLayout,
+  TabBoxModel, TabItem
 } from '../../../index';
 import $ from 'jquery';
 
@@ -84,11 +84,12 @@ export class TabBox extends CompositeField implements TabBoxModel {
 
   protected override _render() {
     this.addContainer(this.$parent, 'tab-box', new TabBoxLayout(this));
-
+    aria.role(this.$container, 'tablist');
     this.header.render(this.$container);
     this.addStatus();
 
     this._$tabContent = this.$container.appendDiv('tab-content');
+    aria.role(this._$tabContent, 'tabpanel');
     let htmlCompContent = HtmlComponent.install(this._$tabContent, this.session);
     htmlCompContent.setLayout(new SingleLayout());
   }

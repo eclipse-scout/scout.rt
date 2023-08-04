@@ -733,4 +733,13 @@ describe('MenuBar', () => {
       expect(button2.$container).toHaveClass('last');
     });
   });
+
+  describe('aria properties', () => {
+
+    it('has aria role menubar', () => {
+      let menubar = createMenuBar();
+      menubar.render();
+      expect(menubar.$container).toHaveAttr('role', 'menubar');
+    });
+  });
 });

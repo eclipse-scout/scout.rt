@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper} from '../../src/testing/index';
-import {ContextMenuPopup, Desktop, FormMenu, FormMenuModel, MenuBar, menus, scout} from '../../src/index';
+import {ContextMenuPopup, Desktop, FormMenu, FormMenuModel, Menu, MenuBar, menus, scout} from '../../src/index';
 
 describe('FormMenu', () => {
   let session: SandboxSession, desktop: Desktop, helper: FormSpecHelper;
@@ -318,6 +318,41 @@ describe('FormMenu', () => {
         menu.modelAdapter.onModelPropertyChange(event);
         expect(menu.setSelected).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria role menuitem', () => {
+      let testMenu = createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo'
+      });
+      testMenu.render();
+      expect(testMenu.$container).toHaveAttr('role', 'menuitem');
+    });
+
+    it('has aria-haspopup set to dialog', () => {
+      let testMenu = createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo'
+      });
+      testMenu.render();
+      expect(testMenu.$container).toHaveAttr('aria-haspopup', 'dialog');
+    });
+
+    it('has aria-expanded set to true if it is selected', () => {
+      let testMenu = createMenu({
+        text: 'My Test Menu',
+        tooltipText: 'moo'
+      });
+      testMenu.render();
+      expect(testMenu.$container).toHaveAttr('aria-expanded', 'false');
+      // also check that aria pressed is not set (not supported for menu items role)
+      expect(testMenu.$container.attr('aria-pressed')).toBeFalsy();
+      testMenu.setSelected(true);
+      expect(testMenu.$container).toHaveAttr('aria-expanded', 'true');
+      expect(testMenu.$container.attr('aria-pressed')).toBeFalsy();
     });
   });
 });

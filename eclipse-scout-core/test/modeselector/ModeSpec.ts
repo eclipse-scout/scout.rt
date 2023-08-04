@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Mode} from '../../src/index';
+import {Mode, scout} from '../../src/index';
 
 describe('Mode', () => {
   let session: SandboxSession;
@@ -23,6 +23,30 @@ describe('Mode', () => {
       let mode = new Mode();
       mode.init(createSimpleModel('Mode', session));
       expect(mode.selected).toBe(false);
+    });
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria role radio', () => {
+      let mode = scout.create(Mode, {
+        parent: session.desktop
+      });
+      mode.render();
+      expect(mode.$container).toHaveAttr('role', 'radio');
+    });
+
+    it('has aria-checked set if mode selected', () => {
+      let mode = scout.create(Mode, {
+        parent: session.desktop
+      });
+      mode.render();
+      expect(mode.$container).toHaveAttr('aria-checked', 'false');
+      // also check that aria pressed is not set (not supported for radio role)
+      expect(mode.$container.attr('aria-pressed')).toBeFalsy();
+      mode.setSelected(true);
+      expect(mode.$container).toHaveAttr('aria-checked', 'true');
+      expect(mode.$container.attr('aria-pressed')).toBeFalsy();
     });
   });
 });

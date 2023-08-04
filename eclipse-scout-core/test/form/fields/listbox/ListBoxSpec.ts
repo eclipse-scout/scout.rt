@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ListBox, ListBoxModel, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
+import {ListBox, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
 import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
 import {InitModelOf, ObjectOrModel} from '../../../../src/scout';
+import $ from 'jquery';
 
 describe('ListBox', () => {
   let session: SandboxSession, field: ListBox<any>, helper: FormSpecHelper;
@@ -433,16 +434,39 @@ describe('ListBox', () => {
 
   });
 
-  describe('label', () => {
+  describe('aria properties', () => {
 
-    it('is linked with the field', () => {
+    it('has aria-labelledby set', () => {
       let listBox = scout.create(ListBox, {
-        parent: session.desktop
+        parent: session.desktop,
+        label: 'hello'
       });
       listBox.render();
       expect(listBox.$field.attr('aria-labelledby')).toBeTruthy();
       expect(listBox.$field.attr('aria-labelledby')).toBe(listBox.$label.attr('id'));
+      expect(listBox.$field.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has a ListBoxTableAccessibilityRenderer set as its accessibility renderer', () => {
+      let listBox = createFieldWithLookupCall();
+      expect(listBox.table.accessibilityRenderer instanceof ListBoxTableAccessibilityRenderer).toBe(true);
+    });
+
+    it('has a table with aria role listbox', () => {
+      let listBox = createFieldWithLookupCall();
+      expect(listBox.table.$container).toHaveAttr('role', 'listbox');
+    });
+
+    it('has a data section with role group', () => {
+      let listBox = createFieldWithLookupCall();
+      expect(listBox.table.$data).toHaveAttr('role', 'group');
+    });
+
+    it('has rows with aria role option', () => {
+      let listBox = createFieldWithLookupCall();
+      listBox.table.rows.forEach(row => {
+        expect(row.$row).toHaveAttr('role', 'option');
+      });
     });
   });
-
 });

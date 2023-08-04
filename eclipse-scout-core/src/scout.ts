@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AdapterData, App, Device, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, Session, strings, ValueField, Widget, widgets} from './index';
+import {AdapterData, App, Device, Locale, locales, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, Session, strings, ValueField, Widget, widgets} from './index';
 import $ from 'jquery';
 
 let $activeElements = null;
@@ -222,6 +222,7 @@ export const scout = {
    * - Remove <scout-text> tags (they must have been processed before, see texts.readFromDOM())
    * - Remove <scout-version> tag (it must have been processed before, see App._initVersion())
    * - Add a device / browser class to the body tag to allow for device specific CSS rules.
+   * - Add browser locale to DOM so screen readers read text correctly (may get replaced if actual locale of user is loaded)
    * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
    */
   prepareDOM(targetDocument: Document) {
@@ -231,6 +232,9 @@ export const scout = {
     $('scout-text', targetDocument).remove();
     $('scout-version', targetDocument).remove();
     $('body', targetDocument).addDeviceClass();
+
+    // Set locale of the document so screen readers read text correctly
+    scout.setDocumentLocale(locales.getNavigatorLocale());
 
     // Prevent "Do you want to translate this page?" in Google Chrome
     if (Device.get().browser === Device.Browser.CHROME) {
@@ -280,6 +284,16 @@ export const scout = {
           });
           $activeElements = [];
         });
+    }
+  },
+
+  /**
+   * Sets locale of the document, important for screen readers
+   * @param locale
+   */
+  setDocumentLocale(locale: Locale) {
+    if (!objects.isNullOrUndefined(locale)) {
+      document.documentElement.lang = locale.languageTag;
     }
   },
 

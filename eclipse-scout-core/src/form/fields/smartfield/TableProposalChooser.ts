@@ -7,7 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Cell, Column, ColumnDescriptor, lookupField, LookupRow, objects, ProposalChooser, scout, SmartFieldLookupResult, Table, TableLayoutResetter, TableRow, TableRowClickEvent, TableRowModel} from '../../../index';
+import {
+  aria, arrays, Cell, Column, ColumnDescriptor, ListBoxTableAccessibilityRenderer, lookupField, LookupRow, objects, ProposalChooser, scout, SmartFieldLookupResult, Table, TableLayoutResetter, TableRow, TableRowClickEvent, TableRowModel,
+  TableRowsSelectedEvent
+} from '../../../index';
 
 export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table, TableRow> {
 
@@ -26,7 +29,10 @@ export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table,
     }
 
     let table = this._createTable(columns, headerVisible);
+    // this also renders smartfields with actual tables as list boxes, this seems to be fine
+    table.accessibilityRenderer = new ListBoxTableAccessibilityRenderer();
     table.on('rowClick', this._onRowClick.bind(this));
+    table.on('rowsSelected', this._onRowsSelected.bind(this));
 
     return table;
   }
@@ -86,6 +92,26 @@ export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table,
     }
     this.setBusy(true);
     this.triggerLookupRowSelected(row);
+  }
+
+  protected override _postRender() {
+    super._postRender();
+    let row = this.content.selectedRow();
+    this._renderSelectedRow(row);
+    aria.hasPopup(this.smartField.$field, 'grid');
+  }
+
+  protected _onRowsSelected(event: TableRowsSelectedEvent) {
+    let row = this.content.selectedRow();
+    this._renderSelectedRow(row);
+  }
+
+  protected _renderSelectedRow(row: TableRow) {
+    if (row && row.$row) {
+      aria.linkElementWithActiveDescendant(this.smartField.$field, row.$row);
+    } else {
+      aria.removeActiveDescendant(this.smartField.$field);
+    }
   }
 
   override selectedRow(): TableRow {

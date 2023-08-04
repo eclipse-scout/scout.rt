@@ -140,4 +140,56 @@ describe('Action', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria role button', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        toggleAction: false
+      });
+      action.render();
+      expect(action.$container).toHaveAttr('role', 'button');
+    });
+
+    it('has aria label set if text is not visible', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        toggleAction: false,
+        text: 'hello',
+        actionStyle: Action.ActionStyle.BUTTON
+      });
+      action.setTextVisible(false);
+      action.render();
+      expect(action.$container.attr('aria-label')).toBeTruthy();
+      expect(action.$container).toHaveAttr('aria-label', 'hello');
+      expect(action.$container.attr('aria-labelledBy')).toBeFalsy();
+    });
+
+    it('has aria description set if there is a tooltip', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        toggleAction: false,
+        tooltipText: 'hello',
+        actionStyle: Action.ActionStyle.BUTTON
+      });
+      action.render();
+
+      expect(action.$container.attr('aria-description')).toBeTruthy();
+      expect(action.$container.attr('aria-description')).toBe('hello');
+      expect(action.$container.attr('aria-describedby')).toBeFalsy();
+    });
+
+    it('has aria pressed set correctly if toggle action', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        toggleAction: true
+      });
+      action.render();
+      expect(action.$container).toHaveAttr('aria-pressed', 'false');
+      action.setSelected(true);
+      expect(action.$container).toHaveAttr('aria-pressed', 'true');
+      action.setToggleAction(false);
+      expect(action.$container.attr('aria-pressed')).toBeFalsy();
+    });
+  });
 });

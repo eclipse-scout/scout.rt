@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, objects, scout} from '@eclipse-scout/core';
+import {aria, arrays, objects, scout} from '@eclipse-scout/core';
 import {AbstractSvgChartRenderer, Chart} from '../index';
 import $ from 'jquery';
 import {UpdateChartOptions} from './Chart';
@@ -124,6 +124,8 @@ export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     } else {
       $arc.attr('d', this.pathSegment(0, end));
     }
+
+    aria.description(this.$svg, this.session.text('ui.FulfillmentChartAriaDescription', percentage));
   }
 
   pathSegment(start: number, end: number): string {

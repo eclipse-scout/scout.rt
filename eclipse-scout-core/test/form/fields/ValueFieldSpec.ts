@@ -856,4 +856,18 @@ describe('ValueField', () => {
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
   });
+
+  describe('aria properties', () => {
+
+    it('has clear icon with role button and a label', () => {
+      let formField = scout.create(StringField, {parent: session.desktop});
+      formField.render();
+      formField.setValue('Foo');
+
+      expect(formField.$clearIcon).toBeTruthy();
+      expect(formField.$clearIcon).toHaveAttr('role', 'button');
+      expect(formField.$clearIcon.attr('aria-label')).toBeTruthy();
+      expect(formField.$clearIcon.attr('aria-labelledby')).toBeFalsy();
+    });
+  });
 });

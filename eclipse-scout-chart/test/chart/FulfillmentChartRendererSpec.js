@@ -7,12 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FulfillmentChartRenderer} from '../../src/index';
+import {Chart, FulfillmentChartRenderer} from '../../src/index';
+import {scout} from '@eclipse-scout/core';
 
 describe('FulfillmentChartRendererSpec', () => {
+  let session;
 
   beforeEach(() => {
     setFixtures(sandbox());
+    session = sandboxSession();
   });
 
   describe('should animate remove on update', () => {
@@ -71,6 +74,33 @@ describe('FulfillmentChartRendererSpec', () => {
       config.options.fulfillment.startValue = 0;
       fulfillment = new FulfillmentChartRenderer(chart);
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(false);
+    });
+  });
+
+  describe('aria properties', () => {
+    it('has aria description set', () => {
+      let chart = scout.create(Chart, {
+        parent: session.desktop,
+        data: {
+          axes: [],
+          chartValueGroups: [{
+            values: [6]
+          }, {
+            values: [10]
+          }]
+        },
+        config: {
+          type: Chart.Type.FULFILLMENT,
+          options: {
+            fulfillment: {
+              startValue: 2
+            }
+          }
+        }
+      });
+      chart.render();
+      chart.chartRenderer.refresh();
+      expect(chart.chartRenderer.$svg.attr('aria-description')).toBeTruthy();
     });
   });
 });

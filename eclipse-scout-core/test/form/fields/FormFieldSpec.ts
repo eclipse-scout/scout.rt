@@ -189,7 +189,6 @@ describe('FormField', () => {
       formField.setTooltipText(null);
       expect(formField.$container).not.toHaveClass('has-tooltip');
     });
-
   });
 
   describe('property tooltipAnchor', () => {
@@ -838,6 +837,52 @@ describe('FormField', () => {
       expectNotVisited(groupBox);
       expectNotVisited(groupBox.fields[1]);
       expectNotVisited(groupBox.widget('MenuField', FormField));
+    });
+  });
+
+  describe('aria properties', () => {
+    let formField, model;
+
+    beforeEach(() => {
+      model = helper.createFieldModel();
+      formField = createFormField(model);
+    });
+
+    it('has aria-required set to true if mandatory', () => {
+      formField.render();
+      expect(formField.$field).not.toHaveAttr('aria-required');
+
+      formField.setMandatory(true);
+      expect(formField.$field).toHaveAttr('aria-required', 'true');
+    });
+
+    it('adds aria-description if there is a tooltip text', () => {
+      formField.tooltipText = 'hello';
+      formField.render();
+      expect(formField.$field.attr('aria-description')).toBeTruthy();
+      expect(formField.$field.attr('aria-description')).toBe('hello');
+      expect(formField.$field.attr('aria-describedby')).toBeFalsy();
+
+      formField.setTooltipText(null);
+      expect(formField.$field.attr('aria-description')).toBeFalsy();
+    });
+
+    it('has aria-labelledby set if label position is not on field', () => {
+      formField.labelPosition = FormField.LabelPosition.DEFAULT;
+      formField.label = 'hello';
+      formField.render();
+      expect(formField.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(formField.$field).toHaveAttr('aria-labelledby', formField.$label.attr('id'));
+      expect(formField.$field.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has aria-label set if label position is on field', () => {
+      formField.labelPosition = FormField.LabelPosition.ON_FIELD;
+      formField.label = 'hello';
+      formField.render();
+      expect(formField.$field.attr('aria-label')).toBeTruthy();
+      expect(formField.$field).toHaveAttr('aria-label', 'hello');
+      expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
     });
   });
 });

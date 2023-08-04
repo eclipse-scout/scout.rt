@@ -308,16 +308,6 @@ describe('StringField', () => {
 
   describe('label', () => {
 
-    it('is linked with the field', () => {
-      let field = scout.create(StringField, {
-        parent: session.desktop,
-        label: 'label'
-      });
-      field.render();
-      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
-      expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
-    });
-
     it('focuses the field when clicked', () => {
       let field = scout.create(StringField, {
         parent: session.desktop,
@@ -328,6 +318,20 @@ describe('StringField', () => {
       expect(field.$field).toBeFocused();
     });
 
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria-labelledby set', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        label: 'label'
+      });
+      field.render();
+      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
+      expect(field.$field.attr('aria-label')).toBeFalsy();
+    });
   });
 
   describe('selectionStart/End', () => {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Desktop, EventHandler, Form, HtmlComponent, InitModelOf, Outline, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOverviewFormEventMap, TileOverviewFormModel} from '../index';
+import {aria, Desktop, EventHandler, Form, HtmlComponent, InitModelOf, Outline, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOverviewFormEventMap, TileOverviewFormModel} from '../index';
 
 export class TileOverviewForm extends Form implements TileOverviewFormModel {
   declare model: TileOverviewFormModel;
@@ -118,6 +118,8 @@ export class TileOverviewForm extends Form implements TileOverviewFormModel {
     }
     this.$title.toggleClass('animated', animated);
     this.$title.toggleClass('removed', this.findDesktop().navigationVisible);
+    // hide title here if it is already rendered in navigation
+    aria.hidden(this.$title, this.findDesktop().navigationVisible ? true : null);
   }
 
   protected _onDesktopNavigationVisibilityChange(event: PropertyChangeEvent<boolean, Desktop>) {

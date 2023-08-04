@@ -39,4 +39,18 @@ describe('BusyIndicator', () => {
       busyIndicator.destroy();
     });
   });
+
+  describe('aria properties', () => {
+
+    it('has aria role alert', () => {
+      let $parent = session.$entryPoint.appendDiv();
+      let busyIndicator = scout.create(BusyIndicator, {
+        parent: session.desktop,
+        showTimeout: 0
+      });
+      busyIndicator.render($parent);
+      expect(busyIndicator.$container).toHaveAttr('role', 'alertdialog');
+      busyIndicator.destroy();
+    });
+  });
 });

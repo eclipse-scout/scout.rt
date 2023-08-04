@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, Event, graphics, icons, InitModelOf, Insets, ObjectOrChildModel, Point, Popup, PopupAlignment, PopupLayout, Resizable, ResizableMode, scout, Widget, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel} from '../index';
+import {
+  Action, aria, Event, graphics, icons, InitModelOf, Insets, ObjectOrChildModel, Point, Popup, PopupAlignment, PopupLayout, Resizable, ResizableMode, scout, Widget, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel
+} from '../index';
 import $ from 'jquery';
 
 export class WidgetPopup<TContent extends Widget = Widget> extends Popup implements WidgetPopupModel<TContent> {
@@ -66,6 +68,8 @@ export class WidgetPopup<TContent extends Widget = Widget> extends Popup impleme
   protected override _render() {
     super._render();
     this.$container.addClass('widget-popup');
+    // ignore this container for screen readers, the rendered content will have the relevant role
+    aria.role(this.$container, 'none');
   }
 
   protected override _renderProperties() {
@@ -120,7 +124,9 @@ export class WidgetPopup<TContent extends Widget = Widget> extends Popup impleme
     return scout.create(Action, {
       parent: this,
       cssClass: 'close-action menu-item',
-      iconId: icons.REMOVE
+      iconId: icons.REMOVE,
+      text: this.session.text('ui.Close'),
+      textVisible: false
     });
   }
 

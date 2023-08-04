@@ -73,5 +73,4 @@ describe('SimpleTabArea', () => {
     expect(tabBox.$tabArea.children().eq(2)).not.toHaveClass('selected');
     expect(tabBox.$tabArea.children().eq(2).text().trim()).toBe('Three');
   });
-
 });

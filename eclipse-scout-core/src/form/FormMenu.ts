@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActionKeyStroke, CloneOptions, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, InitModelOf, Menu, MobilePopup, ObjectOrChildModel, Popup, scout,
+  ActionKeyStroke, aria, CloneOptions, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, InitModelOf, Menu, MobilePopup, ObjectOrChildModel, Popup, scout,
   WidgetPopup
 } from '../index';
 
@@ -131,6 +131,7 @@ export class FormMenu extends Menu implements FormMenuModel {
 
     // Form menu always has a popup (form could be set later, so super call cannot set the class correctly)
     this.$container.addClass('has-popup');
+    aria.hasPopup(this.$container, 'dialog');
   }
 
   protected override _canOpenPopup(): boolean {
@@ -208,6 +209,11 @@ export class FormMenu extends Menu implements FormMenuModel {
 
   protected override _doActionTogglesPopup(): boolean {
     return !!this.form;
+  }
+
+  override updateAriaRole() {
+    // Always render as menuitem. The form may be installed later, which would falsely render a menuitemcheckbox.
+    aria.role(this.$container, 'menuitem');
   }
 
   protected override _handleSelectedInEllipsis() {

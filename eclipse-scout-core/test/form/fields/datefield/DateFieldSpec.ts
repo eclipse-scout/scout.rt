@@ -1496,19 +1496,6 @@ describe('DateField', () => {
 
   describe('label', () => {
 
-    it('is linked with the date and time fields', () => {
-      let field = scout.create(DateField, {
-        parent: session.desktop,
-        label: 'label',
-        hasTime: true
-      });
-      field.render();
-      expect(field.$dateField.attr('aria-labelledby')).toBeTruthy();
-      expect(field.$dateField.attr('aria-labelledby')).toBe(field.$label.attr('id'));
-      expect(field.$timeField.attr('aria-labelledby')).toBeTruthy();
-      expect(field.$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id'));
-    });
-
     it('focuses the date field when clicked', () => {
       let field = scout.create(DateField, {
         parent: session.desktop,
@@ -1539,4 +1526,87 @@ describe('DateField', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria-required set on date and time if mandatory', () => {
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        label: 'label',
+        mandatory: true,
+        hasTime: true
+      });
+      field.render();
+
+      expect(field.$field.attr('aria-required')).toBeFalsy();
+      expect(field.$dateField.attr('aria-required')).toBeTruthy();
+      expect(field.$timeField.attr('aria-required')).toBeTruthy();
+
+      field.setMandatory(false);
+
+      expect(field.$field.attr('aria-required')).toBeFalsy();
+      expect(field.$dateField.attr('aria-required')).toBeFalsy();
+      expect(field.$timeField.attr('aria-required')).toBeFalsy();
+    });
+
+    it('has aria-labelledby set on date and time', () => {
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        label: 'label',
+        hasTime: true
+      });
+      field.render();
+
+      expect(field.$dateField.attr('aria-labelledby')).toBeTruthy();
+      expect(field.$dateField.attr('aria-labelledby')).toBe(field.$label.attr('id'));
+      expect(field.$dateField.attr('aria-label')).toBeFalsy();
+
+      expect(field.$timeField.attr('aria-labelledby')).toBeTruthy();
+      expect(field.$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id'));
+      expect(field.$timeField.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has date and time field icons set to hidden', () => {
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        label: 'label',
+        hasTime: true
+      });
+      field.render();
+      expect(field.$dateFieldIcon).toHaveAttr('aria-hidden', 'true');
+      expect(field.$timeFieldIcon).toHaveAttr('aria-hidden', 'true');
+    });
+
+    it('has aria-describedby descriptions for its functionality', () => {
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        label: 'label',
+        hasTime: true
+      });
+      field.render();
+      let $dateFieldDescription = field.$fieldContainer.find('#desc' + field.id + '-date-func-desc');
+      expect(field.$dateField.attr('aria-describedby')).toBeTruthy();
+      expect(field.$dateField.attr('aria-describedby')).toBe($dateFieldDescription.eq(0).attr('id'));
+      expect(field.$dateField.attr('aria-description')).toBeFalsy();
+
+      let $timeFieldDescription = field.$fieldContainer.find('#desc' + field.id + '-time-func-desc');
+      expect(field.$timeField.attr('aria-describedby')).toBeTruthy();
+      expect(field.$timeField.attr('aria-describedby')).toBe($timeFieldDescription.eq(0).attr('id'));
+      expect(field.$timeField.attr('aria-description')).toBeFalsy();
+    });
+
+    it('has date and time clear icons correctly rendered with role button and a label', () => {
+      let field = scout.create(DateField, {
+        parent: session.desktop,
+        label: 'label',
+        hasTime: true
+      });
+      field.render();
+      expect(field.$dateClearIcon).toHaveAttr('role', 'button');
+      expect(field.$dateClearIcon).toHaveAttr('aria-label');
+      expect(field.$dateClearIcon.attr('aria-label')).not.toBe('');
+      expect(field.$timeClearIcon).toHaveAttr('role', 'button');
+      expect(field.$timeClearIcon).toHaveAttr('aria-label');
+      expect(field.$timeClearIcon.attr('aria-label')).not.toBe('');
+    });
+  });
 });

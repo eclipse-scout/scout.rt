@@ -162,4 +162,21 @@ describe('FieldStatus', () => {
     expect(popup.destroyed).toBe(true);
     expect(tooltip.menus[0].selected).toBe(false);
   });
+
+  describe('aria properties', () => {
+
+    it('alerts error message', () => {
+      let model = helper.createFieldModel();
+      let formField = new StringField();
+      formField.init(model);
+      formField.render();
+
+      let status1 = new Status({
+        message: 'Foo',
+        severity: Status.Severity.ERROR
+      });
+      formField.setErrorStatus(status1);
+      expect(formField.fieldStatus.tooltip.$content).toHaveAttr('role', 'alert');
+    });
+  });
 });

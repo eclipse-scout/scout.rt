@@ -52,23 +52,6 @@ describe('CheckBoxField', () => {
       expect(checkBox.$field.hasClass('disabled')).toBe(false);
       expect(checkBox.$checkBox.hasClass('disabled')).toBe(false);
     });
-
-  });
-
-  describe('label', () => {
-
-    it('is linked with the field', () => {
-      let field = scout.create(CheckBoxField, {
-        parent: session.desktop,
-        label: 'label'
-      });
-      field.render();
-      expect(field.$field.attr('aria-labelledby')).toBeTruthy();
-      // Actually only $checkBoxLabel needs to be linked, but since addField does it automatically $label is linked as well.
-      // It doesn't matter because it will always be empty anyway.
-      expect(field.$field.attr('aria-labelledby')).toBe(field.$checkBoxLabel.attr('id') + ' ' + field.$label.attr('id'));
-    });
-
   });
 
   describe('keyStroke', () => {
@@ -145,7 +128,6 @@ describe('CheckBoxField', () => {
     });
   });
 
-
   describe('saveNeeded', () => {
     it('is false initially', () => {
       let field = scout.create(CheckBoxField, {
@@ -171,6 +153,43 @@ describe('CheckBoxField', () => {
 
       field.setValue(false);
       expect(field.saveNeeded).toBe(false);
+    });
+  });
+
+  describe('aria properties', () => {
+    let checkBox: CheckBoxField;
+
+    beforeEach(() => {
+      let model = createSimpleModel('CheckBoxField', session);
+      checkBox = new CheckBoxField();
+      checkBox.init(model);
+    });
+
+    it('has aria role checkbox', () => {
+      let $div = $('<div>');
+      checkBox.render($div);
+      expect(checkBox.$checkBox).toHaveAttr('role', 'checkbox');
+    });
+
+    it('has aria-labelledby set', () => {
+      let $div = $('<div>');
+      checkBox.render($div);
+      expect(checkBox.$checkBox.attr('aria-labelledby')).toBeTruthy();
+      expect(checkBox.$checkBox.attr('aria-labelledby')).toBe(checkBox.$checkBoxLabel.attr('id'));
+      expect(checkBox.$checkBox.attr('aria-label')).toBeFalsy();
+    });
+
+    it('has aria-checked property set', () => {
+      let $div = $('<div>');
+      checkBox.render($div);
+
+      expect(checkBox.$checkBox).toHaveAttr('aria-checked', 'false');
+      checkBox.setValue(true);
+      expect(checkBox.$checkBox).toHaveAttr('aria-checked', 'true');
+
+      checkBox.setTriStateEnabled(true);
+      checkBox.setValue(null);
+      expect(checkBox.$checkBox).toHaveAttr('aria-checked', 'mixed');
     });
   });
 });

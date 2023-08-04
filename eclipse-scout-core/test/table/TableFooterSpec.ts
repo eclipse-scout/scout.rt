@@ -9,6 +9,7 @@
  */
 import {scout, Status, TableControl} from '../../src/index';
 import {JQueryTesting, TableSpecHelper} from '../../src/testing/index';
+import $ from 'jquery';
 
 describe('TableFooterSpec', () => {
   let session: SandboxSession;
@@ -290,4 +291,18 @@ describe('TableFooterSpec', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria role status set on the info sections', () => {
+      let model = helper.createModelFixture(2);
+      model.tableStatusVisible = true;
+      let table = helper.createTable(model);
+      table.render();
+      let infoItems = table.footer._$info.children('.table-info-item').not('.table-info-status');
+      expect(infoItems.length).toBeGreaterThan(0);
+      infoItems.each((index, infoItem) => {
+        expect($(infoItem)).toHaveAttr('role', 'status');
+      });
+    });
+  });
 });

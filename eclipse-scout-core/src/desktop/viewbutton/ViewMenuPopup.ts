@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ChildModelOf, CompositeTile, CompositeTileModel, Icon, InitModelOf, Label, scout, Tile, TileGrid, ViewButton, ViewMenuPopupEnterKeyStroke, ViewMenuPopupModel, WidgetPopup} from '../../index';
+import {aria, ChildModelOf, CompositeTile, CompositeTileModel, Icon, InitModelOf, Label, scout, Tile, TileGrid, ViewButton, ViewMenuPopupEnterKeyStroke, ViewMenuPopupModel, WidgetPopup} from '../../index';
 
 /**
  * Popup menu to switch between outlines.
@@ -50,6 +50,10 @@ export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
     if (tile) {
       this.content.selectTile(tile);
     }
+
+    this.content.on('propertyChange:selectedTiles', event => {
+      this._renderSelectedTiles();
+    });
   }
 
   protected _computeGridColumnCount(tiles: ChildModelOf<ViewButtonTile>[]): number {
@@ -97,6 +101,7 @@ export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
 
   protected override _renderContent() {
     super._renderContent();
+    aria.role(this.content.$container, 'menu');
     this.content.$container.on('click', '.tile', event => {
       let target = scout.widget(event.target);
       if (!(target instanceof Tile)) {
@@ -104,6 +109,30 @@ export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
       }
       this.activateTile(target as Tile);
     });
+
+    this._renderTiles();
+    this._renderSelectedTiles();
+  }
+
+  protected _renderTiles() {
+    this.content.tiles.forEach(tile => {
+      aria.role(tile.$container, 'menuitem');
+      this._linkWidgetLabels(tile);
+    });
+  }
+
+  protected _linkWidgetLabels(tile: ViewButtonTile) {
+    let $labels = tile.$container.children('.label');
+    if ($labels.length > 0) {
+      aria.linkElementWithLabel(tile.$container, $labels.eq(0));
+    }
+  }
+
+  protected _renderSelectedTiles() {
+    let selectedTiles = this.content.selectedTiles;
+    if (selectedTiles.length === 1) {
+      aria.linkElementWithActiveDescendant(this.content.$container, selectedTiles[0].$container);
+    }
   }
 
   activateTile(tile: Tile & { viewMenu?: ViewButton }) {
@@ -114,5 +143,6 @@ export class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
     this.close();
   }
 }
+
 export type ViewButtonTileModel = CompositeTileModel & { viewMenu?: ViewButton };
 export type ViewButtonTile = CompositeTile & { viewMenu?: ViewButton };

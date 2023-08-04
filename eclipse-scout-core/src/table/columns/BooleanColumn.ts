@@ -56,12 +56,19 @@ export class BooleanColumn extends Column<boolean> {
     }
 
     let checkBoxCssClass = 'check-box';
+    let ariaChecked = '';
     if (cell.value === true) {
       checkBoxCssClass += ' checked';
+      ariaChecked = 'aria-checked="true"';
+    }
+    if (cell.value === false) {
+      ariaChecked = 'aria-checked="false"';
     }
     if (this.triStateEnabled && cell.value !== true && cell.value !== false) {
       checkBoxCssClass += ' undefined';
+      ariaChecked = 'aria-checked="mixed"';
     }
+
     if (!enabled) {
       checkBoxCssClass += ' disabled';
     }
@@ -73,7 +80,8 @@ export class BooleanColumn extends Column<boolean> {
         cssClass += ' expanded';
       }
     }
-    content = content + '<div class="' + checkBoxCssClass + '"></div>';
+    // empty aria label added so screen readers finds the checkbox in the column (adding &nbsp in the div content would work, too)
+    content = content + '<div aria-label=" " role="checkbox" ' + ariaChecked + ' class="' + checkBoxCssClass + '"></div>';
 
     return this._buildCell(cell, content, style, cssClass);
   }

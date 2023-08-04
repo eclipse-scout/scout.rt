@@ -101,25 +101,6 @@ export const fields = {
   },
 
   /**
-   * Links the given element with the given label by setting aria-labelledby.<br>
-   * This allows screen readers to build a catalog of the elements on the screen and their relationships, for example, to read the label when the input is focused.
-   */
-  linkElementWithLabel($elem: JQuery, $label: JQuery) {
-    let labelId = $label.attr('id') as string;
-    if (!labelId) {
-      // Create an id if the element does not have one yet
-      labelId = widgets.createUniqueId('lbl');
-      $label.attr('id', labelId);
-    }
-    let labelledBy = $elem.attr('aria-labelledby') || '';
-    if (labelledBy) {
-      // Add to the existing value if there is one
-      labelId += ' ' + labelledBy;
-    }
-    $elem.attr('aria-labelledby', labelId);
-  },
-
-  /**
    * @param field a ValueField which works like a Proposal- or SmartField.
    * @returns Whether or not the target is on the field (including popup and tooltip)
    */

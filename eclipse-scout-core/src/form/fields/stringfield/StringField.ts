@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BasicField, DesktopNotification, EnumObject, fields, InitModelOf, InputFieldKeyStrokeContext, JQueryWheelEvent, MaxLengthHandler, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldEventMap,
+  aria, BasicField, DesktopNotification, EnumObject, fields, InitModelOf, InputFieldKeyStrokeContext, JQueryWheelEvent, MaxLengthHandler, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldEventMap,
   StringFieldLayout, StringFieldModel, strings, texts
 } from '../../../index';
 
@@ -191,6 +191,8 @@ export class StringField extends BasicField<string> {
   override addIcon($parent?: JQuery) {
     this.$icon = fields.appendIcon(this.$container)
       .on('click', this._onIconClick.bind(this));
+    aria.role(this.$icon, 'button');
+    aria.label(this.$icon, '', true);
   }
 
   /**

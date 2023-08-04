@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Button, Device, fields, LookupRow, RadioButtonEventMap, RadioButtonKeyStroke, RadioButtonLayout, RadioButtonModel, tooltips} from '../../../index';
+import {aria, Button, Device, LookupRow, RadioButtonEventMap, RadioButtonKeyStroke, RadioButtonLayout, RadioButtonModel, tooltips} from '../../../index';
 
 export class RadioButton<TValue> extends Button implements RadioButtonModel<TValue> {
   declare model: RadioButtonModel<TValue>;
@@ -43,13 +43,13 @@ export class RadioButton<TValue> extends Button implements RadioButtonModel<TVal
     this.$radioButton = this.$fieldContainer
       .appendDiv('radio-button-circle')
       .data('radiobutton', this);
-    this.addField(this.$radioButton);
 
     // $buttonLabel is used by Button.js as well -> Button.js handles label
     this.$buttonLabel = this.$fieldContainer
       .appendDiv('label');
 
-    fields.linkElementWithLabel(this.$radioButton, this.$buttonLabel);
+    aria.role(this.$radioButton, 'radio');
+    this.addField(this.$radioButton);
 
     this.$fieldContainer.on('mousedown', this._onMouseDown.bind(this));
 
@@ -92,6 +92,7 @@ export class RadioButton<TValue> extends Button implements RadioButtonModel<TVal
   protected override _renderSelected() {
     this.$fieldContainer.toggleClass('checked', this.selected);
     this.$field.toggleClass('checked', this.selected);
+    aria.checked(this.$radioButton, this.selected);
   }
 
   setTabbable(tabbable: boolean) {

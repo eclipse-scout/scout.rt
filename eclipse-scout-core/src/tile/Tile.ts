@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
+import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
 import $ from 'jquery';
 
 export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
@@ -151,7 +151,7 @@ export class Tile extends Widget implements TileModel {
   }
 
   get filterAccepted(): boolean {
-    return this.getProperty( 'filterAccepted');
+    return this.getProperty('filterAccepted');
   }
 
   /** @internal */
@@ -196,5 +196,17 @@ export class Tile extends Widget implements TileModel {
       });
     }
     this.invalidateParentLogicalGrid();
+  }
+
+  /**
+   * Marks the element of this tile that is "focused" as the active descendant of the
+   * container that has the "real" focus. You may override this to e.g. account for
+   * custom navigation concepts in your tile, or if your tile should be announced
+   * differently by screen readers.
+   *
+   * @param $container the focused container for which to mark the active descendant
+   */
+  markAsActiveDescendantFor($container: JQuery) {
+    aria.linkElementWithActiveDescendant($container, this.$container);
   }
 }

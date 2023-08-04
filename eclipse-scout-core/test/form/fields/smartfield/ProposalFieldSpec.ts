@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupRow, ProposalField, scout, Status} from '../../../../src/index';
+import {keys, LookupRow, ProposalField, scout, Status} from '../../../../src/index';
 import {SmartFieldLookupResult} from '../../../../src/form/fields/smartfield/SmartField';
 import {QueryBy} from '../../../../src';
+import {JQueryTesting} from '../../../../src/testing';
 
 describe('ProposalField', () => {
 
@@ -174,5 +175,68 @@ describe('ProposalField', () => {
     expect(field.errorStatus.containsStatus(Status)).toBe(true);
     field._acceptInput(false, 'Bar', false, true, null);
     expect(field['getErrorStatus']).toBeUndefined();
+  });
+
+  describe('aria properties', () => {
+
+    it('has aria role combobox', () => {
+      field.render();
+      expect(field.$field).toHaveAttr('role', 'combobox');
+    });
+
+    it('has aria-describedby description for its functionality', () => {
+      field.render();
+      let $fieldDescription = field.$container.find('#desc' + field.id + '-func-desc');
+      expect(field.$field.attr('aria-describedby')).toBeTruthy();
+      expect(field.$field.attr('aria-describedby')).toBe($fieldDescription.eq(0).attr('id'));
+      expect(field.$field.attr('aria-description')).toBeFalsy();
+    });
+
+    it('has a non empty status container that lists count of available options', () => {
+      field.render();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      // @ts-expect-error
+      field._onFieldKeyUp({});
+      jasmine.clock().tick(500);
+      expect(field.$screenReaderStatus).toHaveAttr('role', 'status');
+      expect(field.$screenReaderStatus).toHaveClass('sr-only');
+      expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(1);
+      expect(field.$screenReaderStatus.children('.sr-lookup-row-count').eq(0)).not.toBeEmpty();
+    });
+
+    it('has a aria-expanded set correctly if pop up is open/closed', () => {
+      field.render();
+      expect(field.$field).toHaveAttr('aria-expanded', 'false');
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      // @ts-expect-error
+      field._onFieldKeyUp({});
+      jasmine.clock().tick(500);
+      expect(field.$field).toHaveAttr('aria-expanded', 'true');
+      field.closePopup();
+    });
+
+    it('has a aria-controls set correctly if pop up is open/closed', () => {
+
+      field.render();
+      expect(field.$field.attr('aria-controls')).toBeFalsy();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      // @ts-expect-error
+      field._onFieldKeyUp({});
+      jasmine.clock().tick(500);
+      expect(field.$field.attr('aria-controls')).toBe(field.popup.$container.attr('id'));
+      field.closePopup();
+    });
+
+    it('has a aria-activedescendant set correctly if pop up is open/closed', () => {
+      field.render();
+      expect(field.$field.attr('aria-activedescendant')).toBeFalsy();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      // @ts-expect-error
+      field._onFieldKeyUp({});
+      jasmine.clock().tick(500);
+      JQueryTesting.triggerKeyDown(field.$field, keys.DOWN);
+      expect(field.$field.attr('aria-activedescendant')).toBeTruthy();
+      field.closePopup();
+    });
   });
 });

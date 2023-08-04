@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Desktop, EventHandler, HtmlComponent, InitModelOf, OutlineOverview, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOutlineOverviewEventMap, TileOutlineOverviewModel} from '../../../index';
+import {aria, Desktop, EventHandler, HtmlComponent, InitModelOf, OutlineOverview, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOutlineOverviewEventMap, TileOutlineOverviewModel} from '../../../index';
 
 export class TileOutlineOverview extends OutlineOverview implements TileOutlineOverviewModel {
   declare model: TileOutlineOverviewModel;
@@ -106,6 +106,8 @@ export class TileOutlineOverview extends OutlineOverview implements TileOutlineO
     }
     this.$title.toggleClass('animated', animated);
     this.$title.toggleClass('removed', this.findDesktop().navigationVisible);
+    // hide title here if it is already rendered in navigation
+    aria.hidden(this.$title, this.findDesktop().navigationVisible ? true : null);
   }
 
   protected _onDesktopNavigationVisibilityChange(event: PropertyChangeEvent<boolean, Desktop>) {

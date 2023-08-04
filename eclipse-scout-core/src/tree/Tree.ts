@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics,
+  Action, aria, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics,
   HtmlComponent, InitModelOf, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, scout, scrollbars, ScrollDirection,
   ScrollToOptions, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke,
   TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
@@ -399,6 +399,7 @@ export class Tree extends Widget implements TreeModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('tree');
+    aria.role(this.$container, 'tree');
     if (this._additionalContainerClasses) {
       this.$container.addClass(this._additionalContainerClasses);
     }
@@ -439,6 +440,7 @@ export class Tree extends Widget implements TreeModel {
   protected override _renderProperties() {
     super._renderProperties();
     this._renderTextFilterEnabled();
+    this._renderMultiCheck();
   }
 
   protected override _postRender() {
@@ -950,6 +952,7 @@ export class Tree extends Widget implements TreeModel {
     arrays.ensure(parentNode).forEach(p => {
       if (p && p.$node && p.childNodes.length === 0) {
         p.$node.removeClass('expanded lazy');
+        aria.expanded(p.$node, null);
       }
     });
     if (this.rendered) {
@@ -1078,8 +1081,10 @@ export class Tree extends Widget implements TreeModel {
 
     if (expanded) {
       $node.addClass('expanded');
+      aria.expanded($node, true);
     } else {
       $node.removeClass('expanded');
+      aria.expanded($node, false);
     }
   }
 
@@ -1123,6 +1128,7 @@ export class Tree extends Widget implements TreeModel {
 
       if (node.rendered) {
         node.$node.select(true);
+        aria.selected(node.$node, true);
       }
     });
 
@@ -1186,6 +1192,7 @@ export class Tree extends Widget implements TreeModel {
   protected _removeNodeSelection(node: TreeNode) {
     if (node.rendered) {
       node.$node.select(false);
+      aria.selected(node.$node, null);
     }
 
     // remove ancestor and child classes
@@ -2112,6 +2119,10 @@ export class Tree extends Widget implements TreeModel {
       this._expandAllParentNodes(this.selectedNodes[0]);
     }
 
+    if (this.selectedNodes.length === 1) {
+      aria.linkElementWithActiveDescendant(this.$container, this.selectedNodes[0].$node);
+    }
+
     this._updateItemPath(true);
     if (this.isBreadcrumbStyleActive()) {
       // In breadcrumb mode selected node has to be expanded
@@ -2990,6 +3001,10 @@ export class Tree extends Widget implements TreeModel {
 
   protected _renderTextFilterEnabled() {
     this.filterSupport.renderFilterField();
+  }
+
+  protected _renderMultiCheck() {
+    aria.multiselectable(this.$container, this.multiCheck || null);
   }
 
   /**

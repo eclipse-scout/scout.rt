@@ -16,12 +16,14 @@ export class IconDesc {
   font: string;
   iconCharacter: string;
   iconUrl: string;
+  altText: string;
 
   constructor() {
     this.iconType = null;
     this.font = null;
     this.iconCharacter = null;
     this.iconUrl = null;
+    this.altText = '';
   }
 
   static IconType = {

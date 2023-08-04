@@ -11,7 +11,7 @@
  * jQuery plugin with scout extensions
  */
 import $ from 'jquery';
-import {arrays, Device, Dimension, events, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
+import {aria, arrays, Device, Dimension, events, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
 // === internal methods ===
 
@@ -511,8 +511,10 @@ $.fn.appendTextNode = function(text) {
 
 $.fn.appendIcon = function(iconId, cssClass) {
   if (!iconId) {
-    return this.appendSpan(cssClass)
+    let $icon = this.appendSpan(cssClass)
       .addClass('icon');
+    aria.hidden($icon, true);
+    return $icon;
   }
   let icon;
   if (iconId instanceof IconDesc) {
@@ -521,12 +523,20 @@ $.fn.appendIcon = function(iconId, cssClass) {
     icon = icons.parseIconId(iconId);
   }
   if (icon.isFontIcon()) {
-    return this.makeSpan(cssClass, icon.iconCharacter)
+    let $icon = this.makeSpan(cssClass, icon.iconCharacter)
       .addClass('icon')
       .addClass(icon.appendCssClass('font-icon'))
       .appendTo(this);
+    if (strings.hasText(icon.altText)) {
+      aria.role($icon, 'img');
+      aria.label($icon, icon.altText, true);
+    } else {
+      aria.hidden($icon, true);
+    }
+    return $icon;
   }
   return this.appendImg(icon.iconUrl, cssClass)
+    .attr('alt', icon.altText)
     .addClass('icon image-icon');
 };
 
@@ -543,13 +553,15 @@ $.fn.icon = function(iconId, addToDomFunc) {
   if (iconId) {
     icon = icons.parseIconId(iconId);
     if (icon.isFontIcon()) {
-      getOrCreateIconElement.call(this, $icon, '<span>', addToDomFunc)
+      let $iconElem = getOrCreateIconElement.call(this, $icon, '<span>', addToDomFunc)
         .addClass('icon')
         .addClass(icon.appendCssClass('font-icon'))
         .text(icon.iconCharacter);
+      aria.hidden($iconElem, true);
     } else {
       getOrCreateIconElement.call(this, $icon, '<img>', addToDomFunc)
         .attr('src', icon.iconUrl)
+        .attr('alt', '')
         .addClass('icon image-icon');
     }
   } else {

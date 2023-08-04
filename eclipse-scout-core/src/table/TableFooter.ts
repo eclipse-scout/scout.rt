@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Event, EventHandler, fields, FocusFilterFieldKeyStroke, graphics, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, MenuBarLayout, PropertyChangeEvent, scout, SomeRequired, Status, strings, Table, TableControl,
+  aria, Event, EventHandler, fields, FocusFilterFieldKeyStroke, graphics, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, MenuBarLayout, PropertyChangeEvent, scout, SomeRequired, Status, strings, Table, TableControl,
   TableFilterAddedEvent, TableFilterRemovedEvent, TableFooterLayout, TableFooterModel, TableRowsInsertedEvent, TableRowsSelectedEvent, TableTextUserFilter, TableUserFilter, Tooltip, Widget
 } from '../index';
 import $ from 'jquery';
@@ -131,15 +131,21 @@ export class TableFooter extends Widget implements TableFooterModel {
       .appendDiv('table-info-item table-info-load')
       .on('click', '', this._onInfoLoadClick.bind(this));
 
+    aria.role(this._$infoLoad, 'status');
+
     // filter info ("X rows filtered by Y, click to remove filter")
     this._$infoFilter = this._$info
       .appendDiv('table-info-item table-info-filter')
       .on('click', '', this._onInfoFilterClick.bind(this));
 
+    aria.role(this._$infoFilter, 'status');
+
     // selection info ("X rows selected, click to select all/none")
     this._$infoSelection = this._$info
       .appendDiv('table-info-item table-info-selection')
       .on('click', '', this._onInfoSelectionClick.bind(this));
+
+    aria.role(this._$infoSelection, 'status');
 
     // table status
     this._$infoTableStatus = this._$info
@@ -287,6 +293,7 @@ export class TableFooter extends Widget implements TableFooterModel {
       maxRows = this.table.maxRowCount;
 
     $info.empty();
+    let $infoButton;
     if (!this._compactStyle) {
       if (numRows <= 1) {
         $info.appendSpan().text(this.session.text('ui.NumRowLoaded', this.computeCountInfo(numRows)));
@@ -298,12 +305,12 @@ export class TableFooter extends Widget implements TableFooterModel {
       if (this.table.hasReloadHandler) {
         if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
           if (estRows < maxRows) {
-            $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
+            $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
           } else {
-            $info.appendSpan('table-info-button').text(this.session.text('ui.LoadNData', this.computeCountInfo(maxRows))).appendTo($info);
+            $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadNData', this.computeCountInfo(maxRows))).appendTo($info);
           }
         } else {
-          $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
+          $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
         }
       }
     } else {
@@ -312,9 +319,14 @@ export class TableFooter extends Widget implements TableFooterModel {
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsLoadedMin'));
       }
-      $info.appendSpan('table-info-button').text(this.computeCountInfo(numRows));
+      $infoButton = $info.appendSpan('table-info-button').text(this.computeCountInfo(numRows));
     }
     $info.setEnabled(this.table.hasReloadHandler);
+
+    // hide info button from screen reader, screen reader users use shortcuts
+    if ($infoButton) {
+      aria.hidden($infoButton, true);
+    }
 
     if (!this.htmlComp.layouting) {
       this.invalidateLayoutTree(false);
@@ -327,6 +339,7 @@ export class TableFooter extends Widget implements TableFooterModel {
     let filteredBy = this.table.filteredBy().join(', '); // filteredBy() returns an array
 
     $info.empty();
+    let $infoButton;
     if (!this._compactStyle) {
       if (filteredBy) {
         if (numRowsFiltered <= 1) {
@@ -342,7 +355,7 @@ export class TableFooter extends Widget implements TableFooterModel {
         }
       }
       if (this.table.hasUserFilter()) {
-        $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
+        $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
       }
     } else {
       if (numRowsFiltered <= 1) {
@@ -350,7 +363,12 @@ export class TableFooter extends Widget implements TableFooterModel {
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsFilteredMin'));
       }
-      $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsFiltered));
+      $infoButton = $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsFiltered));
+    }
+
+    // hide info button from screen reader, screen reader users use shortcuts
+    if ($infoButton) {
+      aria.hidden($infoButton, true);
     }
 
     if (!this.htmlComp.layouting) {
@@ -365,20 +383,26 @@ export class TableFooter extends Widget implements TableFooterModel {
       all = numRows > 0 && numRows === numRowsSelected;
 
     $info.empty();
+    let $infoButton;
     if (!this._compactStyle) {
       if (numRowsSelected <= 1) {
         $info.appendSpan().text(this.session.text('ui.NumRowSelected', this.computeCountInfo(numRowsSelected)));
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this.computeCountInfo(numRowsSelected)));
       }
-      $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
+      $infoButton = $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
     } else {
       if (numRowsSelected <= 1) {
         $info.appendSpan().text(this.session.text('ui.NumRowSelectedMin'));
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));
       }
-      $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsSelected));
+      $infoButton = $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsSelected));
+    }
+
+    // hide info button from screen reader, screen reader users use shortcuts
+    if ($infoButton) {
+      aria.hidden($infoButton, true);
     }
 
     if (!this.htmlComp.layouting) {
@@ -684,6 +708,7 @@ export class TableFooter extends Widget implements TableFooterModel {
       this._tableStatusTooltip = null;
     });
     this._tableStatusTooltip.render();
+    aria.role(this._tableStatusTooltip.$content, 'alert');
 
     // Adjust icon style
     this._$infoTableStatus.addClass('tooltip-active');

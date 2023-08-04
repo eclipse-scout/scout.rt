@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CollapseHandle, EnlargeNavigationKeyStroke, KeyStrokeContext, ShrinkNavigationKeyStroke} from '../../index';
+import {aria, CollapseHandle, EnlargeNavigationKeyStroke, KeyStrokeContext, ShrinkNavigationKeyStroke} from '../../index';
 
 export class DesktopNavigationHandle extends CollapseHandle {
 
@@ -30,6 +30,9 @@ export class DesktopNavigationHandle extends CollapseHandle {
     super._render();
     this.$container.addClass('desktop-navigation-handle');
     this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+
+    aria.label(this.$left, this.session.text('ui.NavigationX', this.session.text('ui.Collapse')));
+    aria.label(this.$right, this.session.text('ui.NavigationX', this.session.text('ui.Expand')));
   }
 
   protected override _remove() {

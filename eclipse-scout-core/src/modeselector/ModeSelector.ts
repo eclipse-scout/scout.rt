@@ -7,7 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, EventHandler, events, graphics, HtmlComponent, InitModelOf, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, ObjectOrChildModel, PropertyChangeEvent, SwipeCallbackEvent, Widget} from '../index';
+import {
+  aria, arrays, EventHandler, events, graphics, HtmlComponent, InitModelOf, KeyStrokeContext, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorLeftOrUpKeyStroke, ModeSelectorModel, ModeSelectorRightOrDownKeyStroke,
+  ObjectOrChildModel, PropertyChangeEvent, SwipeCallbackEvent, Widget
+} from '../index';
 
 export class ModeSelector<TModeRef = any> extends Widget implements ModeSelectorModel<TModeRef> {
   declare model: ModeSelectorModel<TModeRef>;
@@ -45,6 +48,19 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
     this._setSelectedMode(this.selectedMode);
   }
 
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
+    return new KeyStrokeContext();
+  }
+
+  protected override _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+
+    this.keyStrokeContext.registerKeyStrokes([
+      new ModeSelectorLeftOrUpKeyStroke(this),
+      new ModeSelectorRightOrDownKeyStroke(this)
+    ]);
+  }
+
   protected override _render() {
     this.$container = this.$parent.appendDiv('mode-selector');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -55,6 +71,38 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
     super._renderProperties();
     this._renderSlider();
     this._renderModes();
+  }
+
+  override recomputeEnabled(parentEnabled?: boolean) {
+    super.recomputeEnabled(parentEnabled);
+    this._provideTabIndex();
+  }
+
+  protected _provideTabIndex() {
+    let tabSet;
+    this.modes.forEach(mode => {
+      if (mode.enabledComputed && !tabSet) {
+        mode.setTabbable(true);
+        tabSet = mode;
+      } else if (tabSet && this.enabledComputed && mode.enabledComputed && mode.selected) {
+        tabSet.setTabbable(false);
+        mode.setTabbable(true);
+        tabSet = mode;
+      } else {
+        mode.setTabbable(false);
+      }
+    }, this);
+  }
+
+  getTabbableMode(): Mode<TModeRef> {
+    return arrays.find(this.modes, mode => {
+      return mode.visible && mode.tabbable;
+    });
+  }
+
+  override getFocusableElement(): HTMLElement | JQuery {
+    // The first mode may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
+    return this.session.focusManager.findFirstFocusableElement(this.$container);
   }
 
   setModes(modes: ObjectOrChildModel<Mode<TModeRef>>[]) {
@@ -74,6 +122,7 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
 
   protected _renderSlider() {
     this.$slider = this.$container.appendDiv('mode-slider');
+    aria.role(this.$slider, 'radiogroup');
   }
 
   protected _renderModes() {
@@ -93,8 +142,24 @@ export class ModeSelector<TModeRef = any> extends Widget implements ModeSelector
     if (this.selectedMode && this.selectedMode !== selectedMode) {
       this.selectedMode.setSelected(false);
     }
-    if (selectedMode && !selectedMode.selected) {
-      selectedMode.setSelected(true);
+    if (selectedMode) {
+      if (!selectedMode.selected) {
+        selectedMode.setSelected(true);
+      }
+      let oldMode = this.getTabbableMode();
+      let newModeNeedsFocus = false;
+      if (oldMode) {
+        // Only one mode in the group should have a tab index -> remove it from the current tabbable mode after the new mode is tabbable.
+        // If that mode is focused the newly selected mode needs to gain the focus otherwise the focus would fall back to the body.
+        newModeNeedsFocus = oldMode.isFocused();
+      }
+      selectedMode.setTabbable(true);
+      if (newModeNeedsFocus) {
+        selectedMode.focus();
+      }
+      if (oldMode && oldMode !== selectedMode) {
+        oldMode.setTabbable(false);
+      }
     }
     this._setProperty('selectedMode', selectedMode);
     this._isModeChanging = false;

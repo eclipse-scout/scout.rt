@@ -646,4 +646,74 @@ describe('GroupBox', () => {
       expect(anchorAndDiffsExpanded.yDiff).toBe(anchorAndDiffs.yDiff);
     });
   });
+  describe('aria properties', () => {
+
+    it('has aria role group', () => {
+      let groupBox = helper.createGroupBoxWithFields(session.desktop, 1);
+      groupBox.render();
+      expect(groupBox.$body).toHaveAttr('role', 'group');
+    });
+
+    it('has a label with role heading and an aria-level and that level is also set on the group box itself', () => {
+      let groupBox = helper.createGroupBoxWithFields(session.desktop, 1);
+      groupBox.setLabel('test_label');
+      groupBox.render();
+      // contains a label div with role heading and a level
+      expect(groupBox.$label).toHaveAttr('role', 'heading');
+      expect(groupBox.$label).toHaveAttr('aria-level');
+      // group has data-aria-header-level set to same level
+      let headerLevel = groupBox.$label.attr('aria-level');
+      expect(groupBox.$container).toHaveAttr('data-aria-header-level', headerLevel);
+    });
+
+    it('has, if it is the mainbox, a label that is not a heading and there is no level assigned to the groupbox', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        mainBox: true,
+        scrollable: false
+      });
+      groupBox.render();
+      expect(groupBox.$label).not.toHaveAttr('role', 'heading');
+      expect(groupBox.$label).not.toHaveAttr('aria-level');
+      expect(groupBox.$container).not.toHaveAttr('data-aria-header-level');
+    });
+
+    it('has a correct header structure', () => {
+      let groupBoxLevel2 = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{
+          objectType: StringField
+        }, {
+          objectType: GroupBox,
+          fields: [{
+            objectType: StringField
+          }, {
+            objectType: GroupBox,
+            fields: [{
+              objectType: StringField
+            }, {
+              objectType: GroupBox,
+              fields: [{
+                objectType: StringField
+              }]
+            }]
+          }]
+        }]
+      });
+
+      let groupBoxLevel3 = groupBoxLevel2.fields[1] as GroupBox;
+      let groupBoxLevel4 = groupBoxLevel3.fields[1] as GroupBox;
+      let groupBoxLevel5 = groupBoxLevel4.fields[1] as GroupBox;
+
+      groupBoxLevel2.setLabel('header_level_2');
+      groupBoxLevel3.setLabel('header_level_3');
+      // leave level 4 out intentionally, should then be skipped in header order
+      groupBoxLevel5.setLabel('header_level_4');
+      groupBoxLevel2.render();
+      expect(groupBoxLevel2.$container).toHaveAttr('data-aria-header-level', '2');
+      expect(groupBoxLevel3.$container).toHaveAttr('data-aria-header-level', '3');
+      expect(groupBoxLevel4.$container).not.toHaveAttr('data-aria-header-level');
+      expect(groupBoxLevel5.$container).toHaveAttr('data-aria-header-level', '4');
+    });
+  });
 });

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CollapseHandleEventMap, CollapseHandleModel, EnumObject, Widget} from '../index';
+import {aria, CollapseHandleEventMap, CollapseHandleModel, EnumObject, Widget} from '../index';
 
 export type CollapseHandleHorizontalAlignment = EnumObject<typeof CollapseHandle.HorizontalAlignment>;
 
@@ -39,9 +39,14 @@ export class CollapseHandle extends Widget implements CollapseHandleModel {
   protected override _render() {
     this.$container = this.$parent.appendDiv('collapse-handle');
     this.$container.on('mousedown', this._onMouseDown.bind(this));
+    aria.role(this.$container, 'none'); // ignore this container, the buttons are important
 
     this.$left = this.$container.appendDiv('collapse-handle-body left');
+    aria.role(this.$left, 'button');
+    aria.label(this.$left, this.session.text('ui.Collapse'));
     this.$right = this.$container.appendDiv('collapse-handle-body right');
+    aria.role(this.$right, 'button');
+    aria.label(this.$right, this.session.text('ui.Expand'));
   }
 
   protected override _renderProperties() {
@@ -88,6 +93,8 @@ export class CollapseHandle extends Widget implements CollapseHandleModel {
     this.$left.toggleClass('both-visible', bothVisible);
     this.$right.toggleClass('both-visible', bothVisible);
     this.$container.toggleClass('one-visible', (this.leftVisible || this.rightVisible) && !bothVisible);
+    aria.hidden(this.$left, !this.leftVisible || null);
+    aria.hidden(this.$right, !this.rightVisible || null);
   }
 
   protected _onMouseDown(event: JQuery.MouseDownEvent) {

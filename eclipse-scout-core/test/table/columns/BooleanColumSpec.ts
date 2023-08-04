@@ -207,4 +207,54 @@ describe('BooleanColumn', () => {
       });
     });
   });
+
+  describe('aria properties', () => {
+
+    it('has cell content with aria role checkbox', () => {
+      let model = helper.createModelFixture(2, 2);
+      model.columns[0].objectType = BooleanColumn;
+      let table = helper.createTable(model);
+      table.render();
+      let $rows = table.$rows();
+      let column = table.columns[0] as BooleanColumn;
+      let $checkbox = column.$checkBox($rows.eq(0));
+      expect($checkbox).toHaveAttr('role', 'checkbox');
+      $checkbox = column.$checkBox($rows.eq(1));
+      expect($checkbox).toHaveAttr('role', 'checkbox');
+    });
+
+    it('renders aria-checked correctly', () => {
+      let model = helper.createModelFixture(2, 2);
+      model.columns[0].objectType = BooleanColumn;
+      let cell0 = model.rows[0].cells[0] as Cell<boolean>;
+      let cell1 = model.rows[1].cells[0] as Cell<boolean>;
+      cell0.value = true;
+      cell1.value = false;
+      let table = helper.createTable(model);
+      table.render();
+      let $rows = table.$rows();
+      let column = table.columns[0] as BooleanColumn;
+      let $checkbox = column.$checkBox($rows.eq(0));
+      expect($checkbox).toHaveAttr('aria-checked', 'true');
+      $checkbox = column.$checkBox($rows.eq(1));
+      expect($checkbox).toHaveAttr('aria-checked', 'false');
+    });
+
+    it('renders aria-checked correctly for tristate', () => {
+      let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
+      let table = helper.createTable(model);
+      let column0 = table.columns[0] as BooleanColumn;
+      column0.setTriStateEnabled(true);
+      column0.setEditable(true);
+      table.render();
+
+      expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveAttr('aria-checked', 'true');
+
+      column0.onMouseUp({} as JQuery.MouseUpEvent, table.rows[0].$row);
+      expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveAttr('aria-checked', 'mixed');
+
+      column0.onMouseUp({} as JQuery.MouseUpEvent, table.rows[0].$row);
+      expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveAttr('aria-checked', 'false');
+    });
+  });
 });

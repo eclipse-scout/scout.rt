@@ -17,16 +17,19 @@ export class Image extends Widget implements ImageModel {
   autoFit: boolean;
   imageUrl: string;
   prepend: boolean;
+  altText: string;
 
   constructor() {
     super();
     this.autoFit = false;
     this.imageUrl = null;
     this.prepend = false;
+    this.altText = '';
   }
 
   protected override _render() {
     this.$container = this.$parent.makeElement('<img>', 'image')
+      .attr('alt', this.altText)
       .addDeviceClass()
       .on('load', this._onImageLoad.bind(this))
       .on('error', this._onImageError.bind(this));
@@ -55,6 +58,10 @@ export class Image extends Widget implements ImageModel {
 
   setImageUrl(imageUrl: string) {
     this.setProperty('imageUrl', imageUrl);
+  }
+
+  setAltText(altText: string) {
+    this.setProperty('altText', altText);
   }
 
   protected _renderImageUrl() {

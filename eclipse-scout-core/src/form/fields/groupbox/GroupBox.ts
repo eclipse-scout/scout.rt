@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CloneOptions, CompositeField, EnumObject, fields, Form, FormField, FormFieldStatusPosition, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder,
+  AbstractLayout, Action, aria, arrays, Button, ButtonAdapterMenu, CloneOptions, CompositeField, EnumObject, fields, Form, FormField, FormFieldStatusPosition, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder,
   GroupBoxModel, GroupBoxResponsiveHandler, HAlign, HtmlComponent, InitModelOf, KeyStrokeRenderingHints, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, MenuBarEllipsisPosition, Notification,
   ObjectOrChildModel, ObjectOrModel, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid, WrappedFormField
 } from '../../../index';
@@ -241,6 +241,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
     this.addSubLabel();
     this.addStatus();
     this.$body = this.$container.appendDiv('group-box-body');
+    aria.role(this.$body, 'group');
     this.htmlBody = HtmlComponent.install(this.$body, this.session);
     this.htmlBody.setLayout(this._createBodyLayout());
   }
@@ -425,6 +426,9 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
       return;
     }
     this.$label = this.$title.appendDiv('label');
+    if (this._computeTitleVisible()) { // add it as a heading if its not the invisible main box
+      aria.linkElementWithHeader(this.$container, this.$label);
+    }
     tooltips.installForEllipsis(this.$label, {
       parent: this
     });
@@ -432,6 +436,11 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
 
   protected override _renderLabel() {
     this.$label.textOrNbsp(this.label);
+
+    if (this._computeTitleVisible()) {
+      aria.linkElementWithLabel(this.$body, this.$label); // label linked with body so group navigation announces the group when entering it
+    }
+
     if (this.rendered) {
       this._renderLabelVisible();
     }

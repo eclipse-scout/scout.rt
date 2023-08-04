@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {icons, InitModelOf, objects, ObjectWithType, scout, Session, SomeRequired, styles, texts, Tree, TreeNodeModel} from '../index';
+import {aria, icons, InitModelOf, objects, ObjectWithType, scout, Session, SomeRequired, styles, texts, Tree, TreeNodeModel} from '../index';
 import $ from 'jquery';
 
 export class TreeNode implements TreeNodeModel, ObjectWithType {
@@ -238,6 +238,10 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
       .data('node', this)
       .attr('data-nodeid', this.id)
       .attr('data-level', this.level);
+
+    aria.role(this.$node, 'treeitem');
+    aria.level(this.$node, this.level + 1); // starts counting from 1
+
     if (!objects.isNullOrUndefined(paddingLeft)) {
       this.$node.cssPaddingLeft(paddingLeft);
     }
@@ -270,6 +274,8 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
       .children('.tree-node-checkbox')
       .children('.check-box')
       .toggleClass('checked', this.checked);
+
+    aria.checked(this.$node, this.checked);
   }
 
   protected _renderIcon() {
@@ -301,6 +307,9 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
       .appendDiv('check-box')
       .toggleClass('checked', this.checked)
       .toggleClass('disabled', !this.enabled);
+    aria.role($checkbox, 'checkbox');
+    aria.checked($checkbox, this.checked);
+    aria.checked(this.$node, this.checked);
     $checkbox.toggleClass('children-checked', !!this.childrenChecked);
   }
 
@@ -327,9 +336,17 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
       .children('.check-box')
       .toggleClass('disabled', !this.enabled);
 
+    aria.disabled($node, $node.hasClass('disabled') || null);
+    aria.expanded($node, $node.hasClass('leaf') ? null : $node.hasClass('expanded'));
+
     if (!this.parentNode && tree.selectedNodes.length === 0 || // root nodes have class child-of-selected if no node is selected
       tree.isChildOfSelectedNodes(this)) {
       $node.addClass('child-of-selected');
+    }
+
+    if (this.parentNode) {
+      aria.posinset($node, this.childNodeIndex + 1); // starts counting from 1
+      aria.setsize($node, this.parentNode.childNodes.length);
     }
 
     this._renderText();

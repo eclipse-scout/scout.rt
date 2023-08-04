@@ -195,6 +195,10 @@ export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilte
   formatText(key: number): string {
     return this.xAxis.format(key);
   }
+
+  linkFieldsWithTitle($filterFieldsText: JQuery<HTMLDivElement>) {
+    // NOP
+  }
 }
 
 export type ColumnUserFilterValues = {

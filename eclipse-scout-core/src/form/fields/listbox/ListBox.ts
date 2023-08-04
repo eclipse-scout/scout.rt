@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Cell, Column, InitModelOf, ListBoxLayout, ListBoxModel, LookupBox, lookupField, LookupResult, LookupRow, scout, Table, TableRowModel, TableRowsCheckedEvent, Widget} from '../../../index';
+import {arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupBox, lookupField, LookupResult, LookupRow, scout, Table, TableRowModel, TableRowsCheckedEvent, Widget} from '../../../index';
 
 export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
   declare model: ListBoxModel<TValue>;
@@ -32,7 +32,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     if (!this.table) {
       this.table = this._createDefaultListBoxTable();
     }
-
+    this.table.accessibilityRenderer = new ListBoxTableAccessibilityRenderer();
     // align checkableColumn in table with checkboxes of tree fields
     if (this.table.checkableColumn) { // may be null if a non-default list-box-table with checkable=false is used
       this.table.checkableColumn.minWidth = 28;

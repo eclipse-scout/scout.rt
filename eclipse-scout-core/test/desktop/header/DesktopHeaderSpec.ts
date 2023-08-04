@@ -113,4 +113,15 @@ describe('DesktopHeader', () => {
 
   });
 
+  describe('aria properties', () => {
+
+    it('has aria role banner', () => {
+      expect(desktop.header.$container).toHaveAttr('role', 'banner');
+    });
+
+    it('has aria-label set', () => {
+      expect(desktop.header.$container.attr('aria-label')).toBeTruthy();
+      expect(desktop.header.$container.attr('aria-labelledby')).toBeFalsy();
+    });
+  });
 });

@@ -162,4 +162,45 @@ describe('TabBox', () => {
 
   });
 
+  describe('aria properties', () => {
+    let tabBox: TabBox, tabItem1: TabItem, tabItem2: TabItem;
+
+    beforeEach(() => {
+      tabItem1 = helper.createTabItem();
+      tabItem2 = helper.createTabItem();
+      tabBox = helper.createTabBoxWith([tabItem1, tabItem2]);
+    });
+
+    it('has aria role tablist', () => {
+      tabBox.render();
+      expect(tabBox.$container).toHaveAttr('role', 'tablist');
+    });
+
+    it('has a content area with aria role tabpanel', () => {
+      tabBox.render();
+      expect(tabBox._$tabContent).toHaveAttr('role', 'tabpanel');
+    });
+
+    it('has tabs with aria role tab', () => {
+      tabBox.render();
+      tabBox.header.tabArea.tabs.forEach(tab => {
+        expect(tab.$container).toHaveAttr('role', 'tab');
+      });
+      expect(tabBox._$tabContent).toHaveAttr('role', 'tabpanel');
+    });
+
+    it('has selected tabs aria-selected property set to true', () => {
+      tabBox.render();
+      // per default first tab is selected
+      expect(tabItem1.getTab().$container).toHaveAttr('aria-selected', 'true');
+      expect(tabItem2.getTab().$container.attr('aria-selected')).toBeFalsy();
+      // test switch back and forth
+      tabBox.setSelectedTab(tabItem2);
+      expect(tabItem1.getTab().$container.attr('aria-selected')).toBeFalsy();
+      expect(tabItem2.getTab().$container).toHaveAttr('aria-selected', 'true');
+      tabBox.setSelectedTab(tabItem1);
+      expect(tabItem1.getTab().$container).toHaveAttr('aria-selected', 'true');
+      expect(tabItem2.getTab().$container.attr('aria-selected')).toBeFalsy();
+    });
+  });
 });

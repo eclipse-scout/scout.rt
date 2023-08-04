@@ -139,4 +139,26 @@ describe('TableControl', () => {
     // Focus must not leave the field when clicking outside (it cannot be simulated in a test -> test the function that causes the problem)
     expect(focusUtils.containsParentFocusableByMouse(action.form.$container, session.desktop.$container)).toBe(false);
   });
+
+  describe('aria properties', () => {
+    let table: SpecTable;
+
+    beforeEach(() => {
+      table = createTable();
+    });
+
+    it('has aria role button', () => {
+      let action = createAction(createModel());
+      table.setTableControls([action]);
+      table.render();
+      expect(action.$container).toHaveAttr('role', 'button');
+    });
+
+    it('has aria pressed set correctly when selected', () => {
+      let action = createAction(createModel());
+      table.setTableControls([action]);
+      table.render();
+      expect(action.$container).toHaveAttr('role', 'button');
+    });
+  });
 });

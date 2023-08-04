@@ -78,6 +78,7 @@ export class Box {
       this.$logo = $('<img>')
         .addClass('logo')
         .attr('src', this.logoUrl)
+        .attr('alt', '')
         .appendTo(this.$header);
     }
   }

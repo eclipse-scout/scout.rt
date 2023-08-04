@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
+  aria, arrays, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
   MenuBarRightKeyStroke, MenuDestinations, MenuFilter, MenuOrder, menus, ObjectOrChildModel, OrderedMenuItems, PropertyChangeEvent, scout, TooltipPosition, Widget, widgets
 } from '../../index';
 
@@ -114,12 +114,13 @@ export class MenuBar extends Widget implements MenuBarModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('menubar');
+    aria.role(this.$container, 'menubar');
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new MenuBarLayout(this));
 
-    this.menuboxRight.render(this.$container);
     this.menuboxLeft.render(this.$container);
+    this.menuboxRight.render(this.$container);
   }
 
   protected override _renderProperties() {

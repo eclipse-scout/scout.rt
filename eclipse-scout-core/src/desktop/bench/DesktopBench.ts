@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, BenchColumn, BenchColumnLayoutData, BenchColumnViewActivateEvent, BenchColumnViewAddEvent, BenchColumnViewDeactivateEvent, BenchColumnViewRemoveEvent, BenchRowLayoutData, CollapseHandleActionEvent, Desktop, DesktopBenchEventMap,
-  DesktopBenchModel, DesktopNavigationHandle, DesktopTab, DesktopTabArea, DesktopTabSelectKeyStroke, DisplayViewId, Event, EventHandler, FlexboxLayout, FlexboxLayoutData, Form, HeaderTabBoxController, HtmlComponent, InitModelOf,
-  KeyStrokeContext, Outline, OutlineOverview, OutlinePageChangedEvent, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, SplitterMoveEvent, styles, Table, TreeNodesSelectedEvent, Widget, widgets
+  aria, arrays, BenchColumn, BenchColumnLayoutData, BenchColumnViewActivateEvent, BenchColumnViewAddEvent, BenchColumnViewDeactivateEvent, BenchColumnViewRemoveEvent, BenchRowLayoutData, CollapseHandleActionEvent, Desktop,
+  DesktopBenchEventMap, DesktopBenchModel, DesktopNavigationHandle, DesktopTab, DesktopTabArea, DesktopTabSelectKeyStroke, DisplayViewId, Event, EventHandler, FlexboxLayout, FlexboxLayoutData, Form, HeaderTabBoxController, HtmlComponent,
+  InitModelOf, KeyStrokeContext, Outline, OutlineOverview, OutlinePageChangedEvent, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, SplitterMoveEvent, styles, Table, TreeNodesSelectedEvent, Widget, widgets
 } from '../../index';
 import $ from 'jquery';
 
@@ -174,6 +174,8 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('desktop-bench');
+    aria.role(this.$container, 'main');
+    aria.label(this.$container, this.session.text('ui.MainArea'));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
     this.htmlComp.setLayout(this._createLayout());
@@ -834,4 +836,5 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     return displayViewId;
   }
 }
+
 export type OutlineContent = Form | Table | OutlineOverview;

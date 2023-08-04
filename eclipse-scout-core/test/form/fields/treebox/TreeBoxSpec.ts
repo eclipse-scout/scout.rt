@@ -425,15 +425,17 @@ describe('TreeBox', () => {
 
   });
 
-  describe('label', () => {
+  describe('aria properties', () => {
 
-    it('is linked with the field', () => {
+    it('has aria-labelledby set', () => {
       let treeBox = scout.create(TreeBox, {
-        parent: session.desktop
+        parent: session.desktop,
+        label: 'test'
       });
       treeBox.render();
       expect(treeBox.$field.attr('aria-labelledby')).toBeTruthy();
       expect(treeBox.$field.attr('aria-labelledby')).toBe(treeBox.$label.attr('id'));
+      expect(treeBox.$field.attr('aria-label')).toBeFalsy();
     });
   });
 

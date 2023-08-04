@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, ActionEventMap, ActionKeyStroke, ActionModel, Alignment, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, TooltipPosition, tooltips,
+  AbstractLayout, ActionEventMap, ActionKeyStroke, ActionModel, Alignment, aria, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, TooltipPosition, tooltips,
   TooltipSupport, Widget
 } from '../index';
 import $ from 'jquery';
@@ -151,6 +151,7 @@ export class Action extends Widget implements ActionModel {
     this._renderSelected();
     this._renderTabbable();
     this._renderCompact();
+    this._renderActionStyle();
     this._renderOverflown();
   }
 
@@ -183,6 +184,9 @@ export class Action extends Widget implements ActionModel {
       } else {
         this.$text.text(text);
       }
+    } else if (text) {
+      // add as label for screen readers
+      aria.label(this.$container, text);
     } else {
       this._removeText();
     }
@@ -281,6 +285,7 @@ export class Action extends Widget implements ActionModel {
     } else {
       tooltips.uninstall(this.$container);
     }
+    aria.description(this.$container, this.tooltipText);
   }
 
   protected _shouldInstallTooltip(): boolean {
@@ -314,6 +319,10 @@ export class Action extends Widget implements ActionModel {
   protected _renderCompact() {
     this.$container.toggleClass('compact', this.compact);
     this.invalidateLayoutTree();
+  }
+
+  protected _renderActionStyle() {
+    aria.role(this.$container, 'button');
   }
 
   /** @see ActionModel.tooltipPosition */
@@ -361,6 +370,10 @@ export class Action extends Widget implements ActionModel {
     return this.toggleAction;
   }
 
+  _renderToggleAction() {
+    aria.pressed(this.$container, this.isToggleAction() ? this.selected : null);
+  }
+
   /**
    * @returns true if the action may be executed, false if it should be ignored.
    */
@@ -382,6 +395,7 @@ export class Action extends Widget implements ActionModel {
 
   protected _renderSelected() {
     this.$container.toggleClass('selected', this.selected);
+    aria.pressed(this.$container, this.isToggleAction() ? this.selected : null);
     if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
       this._updateTooltip();
     }
