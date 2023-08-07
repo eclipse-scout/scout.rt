@@ -133,7 +133,7 @@ public abstract class AbstractJmsMomTest {
   protected <MOM extends FixtureMom> MOM installMom(Class<MOM> transportType) {
     assertNull("installMom was already called in this test", m_mom);
     IJmsMessageHandler messageHandler = mock(IJmsMessageHandler.class);
-    LOG.info("Registering IJmsMessageHandler mock '{}'.", messageHandler, new Exception("Register Stack"));
+    LOG.info("Registering IJmsMessageHandler mock '{}'.", messageHandler);
     m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IJmsMessageHandler.class, messageHandler).withAnnotation(AnnotationFactory.createApplicationScoped())));
     if (messageHandler != BEANS.get(IJmsMessageHandler.class)) {
       StringBuilder registeredBeans = new StringBuilder();

@@ -55,13 +55,13 @@ public class RestClientTestEchoServlet extends HttpServlet {
     try {
       final int statusCode = parseStatusCode(req.getParameter(STATUS));
 
-      if (LOG.isInfoEnabled()) {
+      if (LOG.isDebugEnabled()) {
         StringBuilder sb = new StringBuilder("HTTP Headers:");
         for (Enumeration<String> headers = req.getHeaderNames(); headers.hasMoreElements();) {
           String header = headers.nextElement();
           sb.append(String.format("%n  %s: '%s'", header, req.getHeader(header)));
         }
-        LOG.info(sb.toString());
+        LOG.debug(sb.toString());
       }
 
       String sleep = req.getParameter(SLEEP_SEC);
