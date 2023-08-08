@@ -56,10 +56,8 @@ public class OutlineDeepLinkHandler extends AbstractDeepLinkHandler {
   }
 
   /**
-   * @param outline
    * @param startup Set to true on startup while the default view is activated. Hides the
    *                path in the URL when set to true.
-   * @return
    */
   public BrowserHistoryEntry createBrowserHistoryEntry(IOutline outline, boolean startup) {
     return DeepLinkUriBuilder.createRelative()
@@ -69,13 +67,13 @@ public class OutlineDeepLinkHandler extends AbstractDeepLinkHandler {
         .createBrowserHistoryEntry();
   }
 
-  private static String outlineId(IOutline outline) {
+  protected String outlineId(IOutline outline) {
     int nameChecksum = fletcher16(outline);
     nameChecksum = Math.abs(nameChecksum);
     return StringUtility.lpad(String.valueOf(nameChecksum), "0", 5);
   }
 
-  private static short fletcher16(IOutline outline) {
+  protected static short fletcher16(IOutline outline) {
     short sum1 = 0;
     short sum2 = 0;
     short modulus = 255;
@@ -91,5 +89,4 @@ public class OutlineDeepLinkHandler extends AbstractDeepLinkHandler {
   public String getName() {
     return HANDLER_NAME;
   }
-
 }
