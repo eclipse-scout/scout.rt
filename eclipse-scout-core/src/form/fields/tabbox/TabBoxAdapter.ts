@@ -14,6 +14,7 @@ export class TabBoxAdapter extends CompositeFieldAdapter {
   constructor() {
     super();
     this._addRemoteProperties(['selectedTab']);
+    this._addOrderedProperties(['tabItems', 'selectedTab']);
   }
 
   override exportAdapterData(adapterData: AdapterData): AdapterData {

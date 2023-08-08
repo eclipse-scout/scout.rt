@@ -11,7 +11,14 @@ import {App, arrays, DateField, dates, objects, ParsingFailedStatus, RemoteEvent
 
 export class DateFieldAdapter extends ValueFieldAdapter {
 
-  static PROPERTIES_ORDER = ['hasTime', 'hasDate'];
+  constructor() {
+    super();
+    /**
+     * Make sure hasDate and hasTime are always set before displayText, otherwise toggling hasDate and hasTime dynamically
+     * won't work because renderDisplayText would try to write the time into the date field
+     */
+    this._addOrderedProperties(['hasTime', 'hasDate']);
+  }
 
   protected override _onWidgetAcceptInput(event: ValueFieldAcceptInputEvent<Date>) {
     let parsingFailedError = null;
@@ -37,14 +44,6 @@ export class DateFieldAdapter extends ValueFieldAdapter {
         return this.target === previous.target && this.type === previous.type;
       }
     });
-  }
-
-  /**
-   * Make sure hasDate and hasTime are always set before displayText, otherwise toggling hasDate and hasTime dynamically
-   * won't work because renderDisplayText would try to write the time into the date field
-   */
-  protected override _orderPropertyNamesOnSync(newProperties: Record<string, any>): string[] {
-    return Object.keys(newProperties).sort(this._createPropertySortFunc(DateFieldAdapter.PROPERTIES_ORDER));
   }
 
   static isDateAllowedRemote(this: DateField & { isDateAllowedOrig: typeof DateField.prototype.isDateAllowed }, date: Date): boolean {

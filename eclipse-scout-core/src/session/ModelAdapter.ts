@@ -35,6 +35,10 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
    * Widget properties which should be sent to server on property change.
    */
   protected _remoteProperties: string[];
+  /**
+   * Properties that need to be synced in a specific order.
+   */
+  protected _orderedProperties: string[];
   protected _widgetListener: EventListener;
   protected _propertyChangeEventFilter: PropertyChangeEventFilter;
   protected _widgetEventTypeFilter: WidgetEventTypeFilter;
@@ -50,6 +54,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
     this.widget = null;
     this._enabledBeforeOffline = true;
     this._remoteProperties = [];
+    this._orderedProperties = [];
     this._widgetListener = null;
     this._propertyChangeEventFilter = new PropertyChangeEventFilter();
     this._widgetEventTypeFilter = new WidgetEventTypeFilter();
@@ -188,6 +193,10 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
 
   protected _removeRemoteProperties(properties: string[] | string) {
     this._removeProperties('_remoteProperties', properties);
+  }
+
+  protected _addOrderedProperties(properties: string[] | string) {
+    this._addProperties('_orderedProperties', properties);
   }
 
   protected _addProperties(propertyName: string, properties: string[] | string) {
@@ -371,10 +380,16 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
   }
 
   /**
-   * May be overridden to return a custom order of how the properties will be set.
+   * Orders the properties based on {@link _orderedProperties}.
+   *
+   * @returns the ordered property names.
    */
   protected _orderPropertyNamesOnSync(newProperties: Record<string, any>): string[] {
-    return Object.keys(newProperties);
+    let propertyNames = Object.keys(newProperties);
+    if (this._orderedProperties.length > 0) {
+      propertyNames = propertyNames.sort(this._createPropertySortFunc(this._orderedProperties));
+    }
+    return propertyNames;
   }
 
   protected _createPropertySortFunc(order: string[]): (a: string, b: string) => number {

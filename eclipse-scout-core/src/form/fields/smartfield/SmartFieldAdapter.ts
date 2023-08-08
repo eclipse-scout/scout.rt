@@ -16,16 +16,15 @@ export class SmartFieldAdapter extends LookupFieldAdapter {
     super();
 
     this._addRemoteProperties(['activeFilter']);
+    /**
+     * Property lookup-row must be handled before value, since the smart-field has either a lookup-row
+     * or a value but never both (when we only have a value, the smart-field must perform a lookup by key
+     * in order to resolve the display name for that value).
+     *
+     * Intentionally don't re-use properties from super-classes.
+     */
+    this._orderedProperties = ['lookupRow', 'value', 'errorStatus', 'displayText'];
   }
-
-  /**
-   * Property lookup-row must be handled before value, since the smart-field has either a lookup-row
-   * or a value but never both (when we only have a value, the smart-field must perform a lookup by key
-   * in order to resolve the display name for that value).
-   * <br>
-   * Intentionally don't re-use properties from super-classes.
-   */
-  static PROPERTIES_ORDER = ['lookupRow', 'value', 'errorStatus', 'displayText'];
 
   /** @internal */
   override _postCreateWidget() {
@@ -47,10 +46,6 @@ export class SmartFieldAdapter extends LookupFieldAdapter {
   // When displayText comes from the server we must not call parseAndSetValue here.
   protected override _syncDisplayText(displayText: string) {
     this.widget.setDisplayText(displayText);
-  }
-
-  protected override _orderPropertyNamesOnSync(newProperties: Record<string, any>): string[] {
-    return Object.keys(newProperties).sort(this._createPropertySortFunc(SmartFieldAdapter.PROPERTIES_ORDER));
   }
 
   protected override _onWidgetEvent(event: Event<SmartField<any>>) {
