@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, Menu} from '../index';
+import {Action, Button, KeyStrokeContext, Menu, MenuExecKeyStroke} from '../index';
 
 export default class ButtonAdapterMenu extends Menu {
   constructor() {
@@ -21,6 +21,8 @@ export default class ButtonAdapterMenu extends Menu {
     this._addCloneProperties(['button']);
     this.button = null;
     this.menubar = null;
+
+    this.menuKeyStroke = new MenuExecKeyStroke(this);
   }
 
   /**
@@ -33,6 +35,37 @@ export default class ButtonAdapterMenu extends Menu {
     }
     this.button.adaptedBy = this;
     this._installListeners();
+  }
+
+  /**
+   * @override
+   */
+  _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+    this.formKeyStrokeContext = new KeyStrokeContext();
+    this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
+    this.formKeyStrokeContext.registerKeyStroke(this.menuKeyStroke);
+    this.formKeyStrokeContext.$bindTarget = function() {
+      if (this.keyStrokeScope) {
+        return this.keyStrokeScope.$container;
+      }
+      // use form if available
+      let form = this.getForm();
+      if (form) {
+        return form.$container;
+      }
+      // use desktop otherwise
+      return this.session.desktop.$container;
+    }.bind(this);
+  }
+
+  setKeyStroke(keyStroke) {
+    this.setProperty('keyStroke', keyStroke);
+  }
+
+  _setKeyStroke(keyStroke) {
+    this._setProperty('keyStroke', keyStroke);
+    this.menuKeyStroke.parseAndSetKeyStroke(this.keyStroke);
   }
 
   _destroy() {
@@ -54,6 +87,7 @@ export default class ButtonAdapterMenu extends Menu {
     super._render();
     // Convenience: Add ID of original button to DOM for debugging purposes
     this.$container.attr('data-buttonadapter', this.button.id);
+    this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
   }
 
   _onButtonPropertyChange(event) {
@@ -113,7 +147,7 @@ export default class ButtonAdapterMenu extends Menu {
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required
-    ['visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'cssClass', 'modelClass', 'classId', 'iconId', 'preventDoubleClick', 'enabled', 'inheritAccessibility', 'stackable', 'shrinkable'].forEach(prop => {
+    ['visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'keyStrokeScope', 'cssClass', 'modelClass', 'classId', 'iconId', 'preventDoubleClick', 'enabled', 'inheritAccessibility', 'stackable', 'shrinkable'].forEach(prop => {
       menuProperties[prop] = buttonProperties[prop];
     });
 
