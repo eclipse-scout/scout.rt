@@ -35,7 +35,21 @@ export class JsFormAdapter extends FormAdapter {
   }
 
   protected override _createWidget(model: FullModelOf<Form>): Form {
-    let widget = super._createWidget(model) as Form;
+    let widget;
+    if (model.exclusiveKey) {
+      widget = this.session.desktop.createFormExclusive(() => super._createWidget(model) as Form, model.exclusiveKey);
+      if (!widget.exclusiveAdapterKey) {
+        // Link the form with this adapter. The form may be an existing form created by JS code or created now by Java.
+        widget.exclusiveAdapterKey = this.id;
+      } else if (widget.exclusiveAdapterKey !== this.id) {
+        // If the found form belongs to this adapter, it can be opened exclusively.
+        // Otherwise, it needs to be opened separately because the server may send events for that form (formHide etc.).
+        // To prevent that, the server needs to ensure exclusiveness as well.
+        widget = super._createWidget(model) as Form;
+      }
+    } else {
+      widget = super._createWidget(model) as Form;
+    }
 
     if (!widget.showOnOpen) {
       widget.open();
