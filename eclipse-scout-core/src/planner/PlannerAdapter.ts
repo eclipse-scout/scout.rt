@@ -15,12 +15,7 @@ export class PlannerAdapter extends ModelAdapter {
   constructor() {
     super();
     this._addRemoteProperties(['displayMode', 'viewRange', 'selectionRange', 'selectedActivity']);
-  }
-
-  static PROPERTIES_ORDER = ['displayMode', 'viewRange'];
-
-  protected override _orderPropertyNamesOnSync(newProperties: Record<string, any>): string[] {
-    return Object.keys(newProperties).sort(this._createPropertySortFunc(PlannerAdapter.PROPERTIES_ORDER));
+    this._addOrderedProperties(['displayMode', 'viewRange']);
   }
 
   protected _sendViewRange(viewRange: DateRange) {

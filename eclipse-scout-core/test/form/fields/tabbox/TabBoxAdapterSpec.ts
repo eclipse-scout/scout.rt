@@ -52,6 +52,23 @@ describe('TabBoxAdapter', () => {
         sendQueuedAjaxCalls();
         expect(jasmine.Ajax.requests.count()).toBe(0);
       });
+
+      it('is correctly set even if tabItems property is sent as well', () => {
+        let tabBox = helper.createTabBox();
+        linkWidgetAndAdapter(tabBox, 'TabBoxAdapter');
+
+        let message = {
+          adapterData: mapAdapterData([{objectType: 'TabItem', id: 'ti1'}, {objectType: 'TabItem', id: 'ti2'}]),
+          events: [createPropertyChangeEvent(tabBox.modelAdapter, {
+            selectedTab: 'ti2',
+            tabItems: ['ti1', 'ti2'] // server may send it after selectedTab which is actually the wrong order
+          })]
+        };
+        session._processSuccessResponse(message);
+        expect(tabBox.tabItems.length).toBe(2);
+        expect(tabBox.selectedTab).toBe(tabBox.tabItems[1]);
+        expect(tabBox.header.tabArea.selectedTab).toBe(tabBox.header.tabArea.getTabForItem(tabBox.selectedTab));
+      });
     });
   });
 
