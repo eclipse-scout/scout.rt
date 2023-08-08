@@ -25,6 +25,9 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
  * <p>
  * To set the data property of the jsForm, use {@link IJsForm#setInputData(IDataObject)}. Once the jsForm is closed, the
  * updated data will be sent back to the server and can be retrieved using {@link IJsForm#getOutputData()}.
+ * <p>
+ * To open a form exclusively, you can use {@link #computeExclusiveKey()} as usual. If you also want to consider the
+ * jsForms opened directly with JavaScript, you need to pass the exclusiveKey as part of the {@link #getJsFormModel()}.
  */
 public interface IJsForm<IN extends IDataObject, OUT extends IDataObject> extends IForm {
 
