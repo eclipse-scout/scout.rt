@@ -108,12 +108,6 @@ export class TableLayout extends AbstractLayout {
         this.table._renderScrollTop();
       }
 
-      // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
-      this.table.tooltips.forEach(tooltip => {
-        if (tooltip.rendered) {
-          tooltip.position();
-        }
-      });
       if (this.table.cellEditorPopup && this.table.cellEditorPopup.rendered) {
         this.table.cellEditorPopup.position();
         this.table.cellEditorPopup.pack();

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Accordion, AccordionModel, Group, GroupModel, scout} from '../../src/index';
+import {Accordion, AccordionModel, graphics, Group, GroupBox, GroupModel, scout, Status, StringField} from '../../src/index';
 import {InitModelOf} from '../../src/scout';
 
 describe('Accordion', () => {
@@ -306,6 +306,125 @@ describe('Accordion', () => {
       expect($groups.eq(0).data('widget')).toBe(group2);
       expect($groups.eq(1).data('widget')).toBe(group1);
       expect($groups.eq(2).data('widget')).toBe(group0);
+    });
+  });
+
+  describe('collapsible', () => {
+
+    beforeEach(() => {
+      $('<style>' +
+        '.group.collapsed:not(.collapsing) > .group-body { display: none; }' +
+        '</style>').appendTo($('#sandbox'));
+    });
+
+    it('removes status when collapsed', async () => {
+      const accordion = createAccordion(0);
+      const group = createGroup({
+        parent: accordion,
+        body: {
+          objectType: GroupBox,
+          fields: [
+            {
+              objectType: StringField,
+              errorStatus: {
+                message: 'I am an error!!!'
+              }
+            }
+          ]
+        }
+      }) as Group<GroupBox>;
+      accordion.insertGroup(group);
+      const field = group.body.fields[0];
+
+      accordion.render();
+      expect(field.fieldStatus.tooltip.rendered).toBeTrue();
+      expect(field.fieldStatus.tooltip.$container.isVisible()).toBeTrue();
+
+      group.setCollapsed(true);
+      await group.when('bodyHeightChangeDone');
+      expect(field.fieldStatus).toBeNull();
+
+      field.clearErrorStatus();
+      expect(field.fieldStatus).toBeNull();
+
+      field.addErrorStatus(Status.error('I am a new error!!!'));
+      expect(field.fieldStatus).toBeNull();
+
+      group.setCollapsed(false);
+      await group.when('bodyHeightChangeDone');
+      expect(field.fieldStatus.tooltip.rendered).toBeTrue();
+      expect(field.fieldStatus.tooltip.$container.isVisible()).toBeTrue();
+    });
+
+    it('moves status when sibling is collapsed', async () => {
+      const accordion = createAccordion(0, {exclusiveExpand: false});
+      const group0 = createGroup({
+        parent: accordion,
+        body: {
+          objectType: GroupBox,
+          fields: [
+            {
+              objectType: StringField
+            }
+          ]
+        }
+      });
+      const group1 = createGroup({
+        parent: accordion,
+        body: {
+          objectType: GroupBox,
+          fields: [
+            {
+              objectType: StringField,
+              errorStatus: {
+                message: 'I am an error!!!'
+              }
+            }
+          ]
+        }
+      }) as Group<GroupBox>;
+      accordion.insertGroups([group0, group1]);
+      const fieldWithError = group1.body.fields[0];
+
+      const calcAnchorAndDiffs = t => {
+        const anchorBounds = graphics.offsetBounds(t.$anchor);
+        const tooltipBounds = graphics.offsetBounds(t.$container);
+        const xDiff = anchorBounds.x - tooltipBounds.x;
+        const yDiff = anchorBounds.y - tooltipBounds.y;
+        return {anchor: anchorBounds.point(), xDiff, yDiff};
+      };
+
+      accordion.render();
+      accordion.validateLayout();
+      const tooltip = fieldWithError.fieldStatus.tooltip;
+
+      expect(tooltip.rendered).toBeTrue();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const anchorAndDiffs = calcAnchorAndDiffs(tooltip);
+
+      group0.setCollapsed(true);
+      await group0.when('bodyHeightChangeDone');
+      accordion.validateLayout();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const anchorAndDiffsCollapsed = calcAnchorAndDiffs(tooltip);
+
+      expect(anchorAndDiffsCollapsed.anchor).not.toEqual(anchorAndDiffs.anchor);
+      expect(anchorAndDiffsCollapsed.xDiff).toBe(anchorAndDiffs.xDiff);
+      expect(anchorAndDiffsCollapsed.yDiff).toBe(anchorAndDiffs.yDiff);
+
+      group0.setCollapsed(false);
+      await group0.when('bodyHeightChangeDone');
+      accordion.validateLayout();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const anchorAndDiffsExpanded = calcAnchorAndDiffs(tooltip);
+
+      expect(anchorAndDiffsExpanded.anchor).not.toEqual(anchorAndDiffsCollapsed.anchor);
+      expect(anchorAndDiffsExpanded.anchor).toEqual(anchorAndDiffs.anchor);
+      expect(anchorAndDiffsExpanded.xDiff).toBe(anchorAndDiffs.xDiff);
+      expect(anchorAndDiffsExpanded.yDiff).toBe(anchorAndDiffs.yDiff);
     });
   });
 });

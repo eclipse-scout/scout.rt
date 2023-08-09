@@ -4073,6 +4073,8 @@ export class Table extends Widget implements TableModel {
         this._resizeAggregateCell(this.$cell(column, aggregateRow.$row));
       }
     });
+
+    this.findDesktop().repositionTooltips();
   }
 
   /** @internal */
@@ -5588,7 +5590,7 @@ export class Table extends Widget implements TableModel {
    * @param includeCompacted true to also include the columns that are invisible because they are compacted. Default is false which means compacted columns are not returned.
    */
   visibleColumns(includeGuiColumns?: boolean, includeCompacted?: boolean): Column<any>[] {
-    return this.filterColumns(column => scout.nvl(includeCompacted, false) ? column.visibleIgnoreCompacted: column.visible, includeGuiColumns);
+    return this.filterColumns(column => scout.nvl(includeCompacted, false) ? column.visibleIgnoreCompacted : column.visible, includeGuiColumns);
   }
 
   /**

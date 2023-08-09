@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, DoubleClickSupport, EventListener, EventSupport, Range, Table, TableFooter, TableRow} from '../../index';
+import {Column, DoubleClickSupport, EventListener, EventSupport, Range, Status, Table, TableFooter, TableRow} from '../../index';
 
 export class SpecTable extends Table {
   declare _filteredRows: TableRow[];
@@ -34,5 +34,9 @@ export class SpecTable extends Table {
 
   override _selectedRowsToText(): string {
     return super._selectedRowsToText();
+  }
+
+  override _showCellError(row: TableRow, $cell: JQuery, errorStatus: Status) {
+    super._showCellError(row, $cell, errorStatus);
   }
 }

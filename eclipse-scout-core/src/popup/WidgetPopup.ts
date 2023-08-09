@@ -202,7 +202,7 @@ export class WidgetPopup<TContent extends Widget = Widget> extends Popup impleme
     let layout = this.htmlComp.layout as PopupLayout;
     let autoSizeOrig = layout.autoSize;
     layout.autoSize = false;
-    this.htmlComp.revalidateLayout();
+    this.htmlComp.revalidateLayoutTree(false);
     layout.autoSize = autoSizeOrig;
     this._updateArrowPosition();
     return false;
