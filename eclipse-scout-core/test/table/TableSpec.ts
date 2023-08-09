@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BeanColumn, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, Range, RemoteEvent, scout, scrollbars, Table, TableField, TableRow} from '../../src/index';
+import {BeanColumn, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, Tooltip} from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
 
 describe('Table', () => {
@@ -950,7 +950,21 @@ describe('Table', () => {
 
   describe('resizeColumn', () => {
 
-    it('updates column model and sends resize event ', () => {
+    beforeEach(() => {
+      $('<style>' +
+        '.table-header-item { display: inline-flex; }' +
+        '.table-header-resize { display: inline-block; }' +
+        '.table-cell { display: table-cell; }' +
+        '.tooltip { position: absolute; }' +
+        '</style>').appendTo($('#sandbox'));
+      ObjectFactory.get().register(Tooltip, () => new SpecTooltip());
+    });
+
+    afterEach(() => {
+      ObjectFactory.get().register(Tooltip, () => new Tooltip());
+    });
+
+    it('updates column model and sends resize event', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
@@ -1006,7 +1020,7 @@ describe('Table', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('always updates model width, but only resizes cells of visible columns ', () => {
+    it('always updates model width, but only resizes cells of visible columns', () => {
       let model = helper.createModelFixture(5, 1);
       model.columns[0].width = 100;
       model.columns[1].width = 101;
@@ -1075,6 +1089,69 @@ describe('Table', () => {
       expect($rowCells.eq(2).cssWidth()).toBe(204);
     });
 
+    it('moves tooltip', () => {
+      const model = helper.createModelFixture(2, 1);
+      model.columns[0].width = 100;
+      model.columns[1].width = 100;
+      const table = helper.createTable(model);
+      const [column0, column1] = table.columns;
+
+      const calcOriginAndDiffs = t => {
+        const anchorBounds = graphics.offsetBounds(t.$anchor);
+        const tooltipBounds = graphics.offsetBounds(t.$container);
+        const origin = anchorBounds.translate(anchorBounds.width / 2, 0).point();
+        const xDiff = origin.x - tooltipBounds.x;
+        const yDiff = origin.y - tooltipBounds.y;
+        return {origin, xDiff, yDiff};
+      };
+
+      table.render();
+      const row = table.rows[0];
+      const $row = row.$row;
+      const $cell1 = table.$cell(column1, $row);
+      table._showCellError(row, $cell1, Status.error('I am an error!!!'));
+
+      expect(table.tooltips.length).toBe(1);
+
+      const tooltip = table.tooltips[0];
+
+      expect(tooltip.rendered).toBeTrue();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const originAndDiffs100100 = calcOriginAndDiffs(tooltip);
+
+      table.resizeColumn(column1, 200);
+
+      expect(tooltip.rendered).toBeTrue();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const originAndDiffs100200 = calcOriginAndDiffs(tooltip);
+      expect(originAndDiffs100200.origin).not.toEqual(originAndDiffs100100.origin);
+      expect(originAndDiffs100200.xDiff).toBe(originAndDiffs100100.xDiff);
+      expect(originAndDiffs100200.yDiff).toBe(originAndDiffs100100.yDiff);
+
+      table.resizeColumn(column0, 50);
+
+      expect(tooltip.rendered).toBeTrue();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const originAndDiffs50200 = calcOriginAndDiffs(tooltip);
+      expect(originAndDiffs50200.origin).not.toEqual(originAndDiffs100200.origin);
+      expect(originAndDiffs50200.origin).toEqual(originAndDiffs100100.origin);
+      expect(originAndDiffs50200.xDiff).toBe(originAndDiffs100100.xDiff);
+      expect(originAndDiffs50200.yDiff).toBe(originAndDiffs100100.yDiff);
+    });
+
+    class SpecTooltip extends Tooltip {
+      override position() {
+        const origin = this._getOrigin();
+        const offset = this._getOffset(origin);
+        const {x, y} = origin.point().add(offset);
+        this.$container
+          .cssLeft(x)
+          .cssTop(y);
+      }
+    }
   });
 
   describe('autoResizeColumns', () => {
@@ -2031,7 +2108,7 @@ describe('Table', () => {
     });
   });
 
-  describe('menu bar popup ', () => {
+  describe('menu bar popup', () => {
     let menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, emptySpaceMenu, table;
 
     beforeEach(() => {

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Form, graphics, keys, Menu, ObjectOrChildModel, Point, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget} from '../index';
+import {arrays, Desktop, Form, graphics, keys, Menu, ObjectOrChildModel, Point, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
 import KeyDownEvent = JQuery.KeyDownEvent;
 
@@ -35,13 +35,13 @@ export class Tooltip extends Widget implements TooltipModel {
   tooltipDirection: TooltipDirection;
   scrollType: TooltipScrollType;
   htmlEnabled: boolean;
-  dialog: Form;
   menus: Menu[];
   $anchor: JQuery;
   $arrow: JQuery;
   $content: JQuery;
   $menus: JQuery;
 
+  protected _popup: Form | WidgetPopup;
   protected _openLater: boolean;
   protected _mouseDownHandler: (event: MouseEvent) => boolean;
   protected _keydownHandler: (event: KeyDownEvent) => void;
@@ -72,6 +72,7 @@ export class Tooltip extends Widget implements TooltipModel {
     this.$content = null;
     this._addWidgetProperties(['menus']);
 
+    this._popup = null;
     this._openLater = false;
   }
 
@@ -91,7 +92,6 @@ export class Tooltip extends Widget implements TooltipModel {
     this.$container = this.$parent
       .appendDiv('tooltip')
       .data('tooltip', this);
-    this.findDesktop().adjustOverlayOrder(this);
     if (this.cssClass) {
       this.$container.addClass(this.cssClass);
     }
@@ -117,14 +117,19 @@ export class Tooltip extends Widget implements TooltipModel {
       scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
     }
 
-    // If the tooltip is rendered inside a (popup) dialog, get a reference to the dialog.
-    this.dialog = this.findParent(p => p instanceof Form && p.isDialog()) as Form;
-
-    // If inside a dialog, attach a listener to reposition the tooltip when the dialog is moved
-    if (this.dialog) {
-      this._moveHandler = this.position.bind(this);
-      this.dialog.on('move', this._moveHandler);
+    // If the tooltip is rendered inside a popup (dialog form or popup), get a reference to the popup.
+    this._popup = this.findParent(WidgetPopup);
+    if (!this._popup) {
+      this._popup = this.findParent(p => p instanceof Form && p.isDialog());
     }
+
+    // If inside a popup, attach a listener to reposition the tooltip when the popup is moved
+    if (this._popup) {
+      this._moveHandler = this.position.bind(this);
+      this._popup.on('move', this._moveHandler);
+    }
+
+    this.findDesktopIf$Parent()?.tooltipRendered(this);
   }
 
   protected override _postRender() {
@@ -146,14 +151,29 @@ export class Tooltip extends Widget implements TooltipModel {
       this._anchorScrollHandler = null;
     }
     if (this._moveHandler) {
-      if (this.dialog) {
-        this.dialog.off('move', this._moveHandler);
+      if (this._popup) {
+        this._popup.off('move', this._moveHandler);
       }
       this._moveHandler = null;
     }
-    this.dialog = null;
+    this._popup = null;
     this.$menus = null;
     super._remove();
+    this.findDesktopIf$Parent()?.tooltipRemoved(this);
+  }
+
+  /**
+   * Finds the desktop (see {@link Widget.findDesktop}) and checks whether the `$container` of this desktop is `this.$parent`.
+   */
+  findDesktopIf$Parent(): Desktop {
+    if (!this.$parent) {
+      return null;
+    }
+    const desktop = super.findDesktop();
+    if (desktop?.$container[0] === this.$parent[0]) {
+      return desktop;
+    }
+    return null;
   }
 
   override _destroy() {

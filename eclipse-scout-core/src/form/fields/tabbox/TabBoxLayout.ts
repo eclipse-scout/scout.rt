@@ -44,7 +44,6 @@ export class TabBoxLayout extends AbstractLayout {
       htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
       headerWidthHint = 0,
       headerSize = new Dimension(),
-      tooltip = this._tabBox.tooltip(),
       $status = this._tabBox.$status,
       statusPosition = this._tabBox.statusPosition;
 
@@ -76,11 +75,6 @@ export class TabBoxLayout extends AbstractLayout {
     tabContentSize = containerSize.subtract(htmlTabContent.margins());
     tabContentSize.height -= headerSize.height;
     htmlTabContent.setSize(tabContentSize);
-
-    // Make sure tooltip is at correct position after layouting, if there is one
-    if (tooltip && tooltip.rendered) {
-      tooltip.position();
-    }
   }
 
   protected _layoutStatus(height = 0) {

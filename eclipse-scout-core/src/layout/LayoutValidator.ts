@@ -111,10 +111,7 @@ export class LayoutValidator {
         arrays.remove(this._invalidComponents, comp);
       }
     });
-    this._postValidateFunctions.slice().forEach(func => {
-      func();
-      arrays.remove(this._postValidateFunctions, func);
-    });
+    this._postValidateFunctions.splice(0).forEach(func => func());
   }
 
   /**
@@ -146,8 +143,16 @@ export class LayoutValidator {
    * Runs the given function at the end of {@link validate}.
    */
   schedulePostValidateFunction(func: () => void) {
-    if (func) {
-      this._postValidateFunctions.push(func);
+    if (!func) {
+      return;
     }
+    this._postValidateFunctions.push(func);
+  }
+
+  removePostValidateFunction(func: () => void) {
+    if (!func) {
+      return;
+    }
+    arrays.remove(this._postValidateFunctions, func);
   }
 }

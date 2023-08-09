@@ -81,6 +81,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   protected _benchActiveViewChangedHandler: EventHandler<DesktopBenchViewActivateEvent>;
   protected _selectedViewDestroyHandler: EventHandler<Event<Form>>;
   protected _popstateHandler: (event: JQuery.TriggeredEvent) => void;
+  protected _repositionTooltipsHandler: () => void;
 
   constructor() {
     super();
@@ -135,6 +136,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this._glassPaneTargetFilters = [];
     this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
     this._selectedViewDestroyHandler = this._onSelectedViewDestroy.bind(this);
+    this._repositionTooltipsHandler = null;
   }
 
   static DisplayStyle = {
@@ -1809,6 +1811,32 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     } else {
       overlay.$container.insertAfter(parentOverlay ? parentOverlay.$container : this.$overlaySeparator);
     }
+  }
+
+  tooltipRendered(tooltip: Tooltip) {
+    this.adjustOverlayOrder(tooltip);
+    if (this._repositionTooltipsHandler) {
+      return;
+    }
+    if (!this.$container.children('.tooltip').length) {
+      return;
+    }
+    this._repositionTooltipsHandler = () => {
+      this.repositionTooltips();
+      this.session.layoutValidator.schedulePostValidateFunction(this._repositionTooltipsHandler);
+    };
+    this.session.layoutValidator.schedulePostValidateFunction(this._repositionTooltipsHandler);
+  }
+
+  tooltipRemoved(tooltip: Tooltip) {
+    if (!this._repositionTooltipsHandler) {
+      return;
+    }
+    if (this.$container.children('.tooltip').length) {
+      return;
+    }
+    this.session.layoutValidator.removePostValidateFunction(this._repositionTooltipsHandler);
+    this._repositionTooltipsHandler = null;
   }
 
   repositionTooltips() {

@@ -256,6 +256,7 @@ export class Popup extends Widget implements PopupModel {
         return;
       }
       this.$container.addClassForAnimation('animate-open');
+      this.$container.oneAnimationEnd(() => this.findDesktop().repositionTooltips());
     });
   }
 

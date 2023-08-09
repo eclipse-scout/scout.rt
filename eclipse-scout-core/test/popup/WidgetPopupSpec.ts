@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Form, GroupBox, scout, StringField, Widget, WidgetPopup} from '../../src/index';
+import {Form, graphics, GroupBox, ObjectFactory, scout, Status, StringField, Tooltip, Widget, WidgetPopup} from '../../src/index';
 
 describe('WidgetPopup', () => {
   let session: SandboxSession;
@@ -16,9 +16,14 @@ describe('WidgetPopup', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
+    jasmine.clock().install();
   });
 
-  function createPopupWithFormAnd2Fields(initialFocus?: Widget | string): WidgetPopup {
+  afterEach(() => {
+    jasmine.clock().uninstall();
+  });
+
+  function createPopupWithFormAnd2Fields(initialFocus?: Widget | string): WidgetPopup<Form> {
     return scout.create(WidgetPopup, {
       parent: session.desktop,
       content: {
@@ -36,7 +41,7 @@ describe('WidgetPopup', () => {
           }]
         }
       }
-    });
+    }) as WidgetPopup<Form>;
   }
 
   describe('withFocusContext', () => {
@@ -75,4 +80,43 @@ describe('WidgetPopup', () => {
       expect(field2.isFocused()).toBe(true);
     });
   });
+
+  describe('open', () => {
+
+    beforeEach(() => {
+      $('<style>' +
+        '.popup { position: absolute; }' +
+        '.tooltip { position: absolute; }' +
+        '</style>').appendTo($('#sandbox'));
+      ObjectFactory.get().register(Tooltip, () => new SpecTooltip());
+    });
+
+    afterEach(() => {
+      ObjectFactory.get().register(Tooltip, () => new Tooltip());
+    });
+
+    it('positions tooltip correctly', () => {
+      const popup = createPopupWithFormAnd2Fields();
+      const field = popup.content.rootGroupBox.fields[0];
+
+      field.addErrorStatus(Status.error('I am an error!!!'));
+      popup.open();
+      jasmine.clock().tick(1000);
+      popup.validateLayoutTree();
+
+      const anchorPoint = graphics.offsetBounds(field.fieldStatus.tooltip.$anchor).point();
+      const tooltipPoint = graphics.offsetBounds(field.fieldStatus.tooltip.$container).point();
+
+      expect(tooltipPoint).toEqual(anchorPoint);
+    });
+  });
+
+  class SpecTooltip extends Tooltip {
+    override position() {
+      const {x, y} = this._getOrigin();
+      this.$container
+        .cssLeft(x)
+        .cssTop(y);
+    }
+  }
 });
