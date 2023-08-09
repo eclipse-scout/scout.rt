@@ -85,11 +85,7 @@ export class DesktopLayout extends AbstractLayout {
         let benchSize = new Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
           .subtract(htmlBench.margins());
         if (!animated || fullWidthNavigation) {
-          let oldSize = htmlBench.size();
           htmlBench.setSize(benchSize);
-          if (!htmlBench.size().equals(oldSize)) {
-            desktop.repositionTooltips();
-          }
         }
 
         if (animated) {

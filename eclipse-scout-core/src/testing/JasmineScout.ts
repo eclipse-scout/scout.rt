@@ -80,6 +80,7 @@ window.sandboxSession = options => {
   let session = scout.create(Session, model, {
     ensureUniqueId: false
   }) as SandboxSession;
+  $sandbox.data('sandboxSession', session);
 
   // Install non-filtering requestToJson() function. This is required to test
   // the value of the "showBusyIndicator" using toContainEvents(). Usually, this
@@ -244,6 +245,16 @@ export const JasmineScout = {
 
     beforeEach(() => {
       jasmine.addMatchers(jasmineScoutMatchers);
+    });
+
+    afterEach(() => {
+      const $sandbox = $('#sandbox');
+      const session = $sandbox.data('sandboxSession');
+      $sandbox.removeData('sandboxSession');
+      if (session?.layoutValidator) {
+        (session.layoutValidator as { _postValidateFunctions: (() => void)[] })._postValidateFunctions = [];
+        session.layoutValidator.desktop = null;
+      }
     });
 
     context.keys().forEach(context);

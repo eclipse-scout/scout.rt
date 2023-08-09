@@ -55,7 +55,6 @@ export class FormFieldLayout extends AbstractLayout {
       fieldBounds: Rectangle,
       htmlContainer = HtmlComponent.get($container),
       formField = this.formField,
-      tooltip = formField.tooltip(),
       labelWidth = this.labelWidth(),
       statusWidth = this.statusWidth;
 
@@ -182,11 +181,6 @@ export class FormFieldLayout extends AbstractLayout {
       if (formField.$clearIcon) {
         this._layoutClearIcon(formField, fieldBounds, right, top);
       }
-    }
-
-    // Make sure tooltip is at correct position after layouting, if there is one
-    if (tooltip && tooltip.rendered) {
-      tooltip.position();
     }
 
     // Check for scrollbars, update them if necessary

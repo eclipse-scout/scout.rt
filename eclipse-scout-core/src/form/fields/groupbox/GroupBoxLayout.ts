@@ -45,7 +45,6 @@ export class GroupBoxLayout extends AbstractLayout {
       htmlContainer = this.groupBox.htmlComp,
       htmlGbBody = this._htmlGbBody(),
       htmlMenuBar = this._htmlMenuBar(),
-      tooltip = this.groupBox.tooltip(),
       $header = this.groupBox.$header,
       $title = this.groupBox.$title,
       containerSize = htmlContainer.availableSize()
@@ -94,11 +93,6 @@ export class GroupBoxLayout extends AbstractLayout {
     gbBodySize.height -= menuBarHeight;
     $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
     htmlGbBody.setSize(gbBodySize);
-
-    // Make sure tooltip is at correct position after layouting, if there is one
-    if (tooltip && tooltip.rendered) {
-      tooltip.position();
-    }
 
     if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0) {
       scrollbars.update(htmlGbBody.$comp);

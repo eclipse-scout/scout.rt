@@ -70,14 +70,6 @@ export class TableFooterLayout extends AbstractLayout {
     let animated = this._tableFooter.htmlComp.layouted;
     this._setInfoItemsSize($infoItems, animated);
 
-    let tableStatusTooltip = this._tableFooter._tableStatusTooltip;
-    if (tableStatusTooltip && tableStatusTooltip.rendered) {
-      tableStatusTooltip.position();
-    }
-    if (this._tableFooter._tableInfoTooltip && this._tableFooter._tableInfoTooltip.rendered) {
-      this._tableFooter._tableInfoTooltip.position();
-    }
-
     // Let table controls update their content according to the new footer size
     this._tableFooter.table.tableControls.forEach(control => control.revalidateLayout());
   }

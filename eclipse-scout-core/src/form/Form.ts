@@ -856,7 +856,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     let layout = this.htmlComp.layout as DialogLayout,
       autoSizeOld = layout.autoSize;
     layout.autoSize = false;
-    this.htmlComp.revalidateLayout();
+    this.htmlComp.revalidateLayoutTree(false);
     layout.autoSize = autoSizeOld;
     this.updateCacheBounds();
     return false;
