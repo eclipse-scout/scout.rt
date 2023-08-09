@@ -57,6 +57,8 @@ declare global {
   function uninstallUnloadHandlers(session: Session);
 
   function createPropertyChangeEvent(model: { id: string }, properties: object);
+
+  function sleep(duration?: number): JQuery.Promise<void>;
 }
 
 export interface SandboxSessionOptions {
@@ -215,6 +217,12 @@ window.uninstallUnloadHandlers = session => {
   $(window)
     .off('beforeunload.' + session.uiSessionId)
     .off('unload.' + session.uiSessionId);
+};
+
+window.sleep = duration => {
+  let deferred = $.Deferred();
+  setTimeout(() => deferred.resolve(), duration);
+  return deferred.promise();
 };
 
 window.createPropertyChangeEvent = (model, properties) => ({
