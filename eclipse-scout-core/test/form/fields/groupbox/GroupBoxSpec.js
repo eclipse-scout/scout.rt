@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DialogLayout, FormField, GroupBox, HorizontalGrid, scout, VerticalSmartGrid} from '../../../../src/index';
+import {DialogLayout, FormField, graphics, GroupBox, HorizontalGrid, scout, Status, VerticalSmartGrid} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('GroupBox', () => {
@@ -313,7 +313,7 @@ describe('GroupBox', () => {
     });
 
     it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', done => {
-      let $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
+      let $tmpStyle = $('<style>.dialog { position: absolute; }</style>')
         .appendTo($('head'));
 
       // stub function because when running in phantom js the window has an unpredictable size, it seems to get smaller when adding new specs...
@@ -489,14 +489,138 @@ describe('GroupBox', () => {
       // At the end
       let newField3 = scout.create('StringField', {parent: groupBox});
       sibling = groupBox.fields[2];
-      groupBox.insertFieldAfter(newField, sibling);
+      groupBox.insertFieldAfter(newField3, sibling);
       expect(groupBox.fields.length).toBe(4);
       expect(groupBox.controls.length).toBe(4);
-      expect(groupBox.fields[3]).toBe(newField);
-      expect(groupBox.controls[3]).toBe(newField);
+      expect(groupBox.fields[3]).toBe(newField3);
+      expect(groupBox.controls[3]).toBe(newField3);
       expect(groupBox.fields[2]).toBe(sibling);
       expect(groupBox.controls[2]).toBe(sibling);
     });
   });
 
+  describe('expandable', () => {
+
+    beforeEach(() => {
+      $('<style>' +
+        '.group-box.collapsed > .group-box-body { display: none; }' +
+        '</style>').appendTo($('#sandbox'));
+    });
+
+    it('removes status when collapsed', () => {
+      const form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          fields: [
+            {
+              objectType: 'GroupBox',
+              expandable: true,
+              fields: [
+                {
+                  objectType: 'StringField',
+                  errorStatus: {
+                    message: 'I am an error!!!'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      });
+      const groupBox = form.rootGroupBox.fields[0];
+      const field = groupBox.fields[0];
+
+      form.render();
+      expect(field.fieldStatus.tooltip.rendered).toBeTrue();
+      expect(field.fieldStatus.tooltip.$container.isVisible()).toBeTrue();
+
+      groupBox.setExpanded(false);
+      form.validateLayoutTree();
+      expect(field.fieldStatus.tooltip.$container.isVisible()).toBeFalse();
+
+      field.clearErrorStatus();
+      expect(field.fieldStatus.tooltip).toBeNull();
+
+      field.addErrorStatus(Status.error('I am a new error!!!'));
+      expect(field.fieldStatus.tooltip.rendered).toBeTrue();
+      expect(field.fieldStatus.tooltip.$container.isVisible()).toBeFalse();
+
+      groupBox.setExpanded(true);
+      form.validateLayoutTree();
+      expect(field.fieldStatus.tooltip.$container.isVisible()).toBeTrue();
+    });
+
+    it('moves status when sibling is collapsed', () => {
+      const form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          fields: [
+            {
+              objectType: 'GroupBox',
+              expandable: true,
+              fields: [
+                {
+                  objectType: 'StringField'
+                }
+              ]
+            },
+            {
+              objectType: 'GroupBox',
+              expandable: true,
+              fields: [
+                {
+                  objectType: 'StringField',
+                  errorStatus: {
+                    message: 'I am an error!!!'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      });
+      const groupBox0 = form.rootGroupBox.fields[0];
+      const groupBox1 = form.rootGroupBox.fields[1];
+      const fieldWithError = groupBox1.fields[0];
+
+      const calcAnchorAndDiffs = t => {
+        const anchorBounds = graphics.offsetBounds(t.$anchor);
+        const tooltipBounds = graphics.offsetBounds(t.$container);
+        const xDiff = anchorBounds.x - tooltipBounds.x;
+        const yDiff = anchorBounds.y - tooltipBounds.y;
+        return {anchor: anchorBounds.point(), xDiff, yDiff};
+      };
+
+      form.render();
+      const tooltip = fieldWithError.fieldStatus.tooltip;
+
+      expect(tooltip.rendered).toBeTrue();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const anchorAndDiffs = calcAnchorAndDiffs(tooltip);
+
+      groupBox0.setExpanded(false);
+      form.validateLayoutTree();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const anchorAndDiffsCollapsed = calcAnchorAndDiffs(tooltip);
+
+      expect(anchorAndDiffsCollapsed.anchor).not.toEqual(anchorAndDiffs.anchor);
+      expect(anchorAndDiffsCollapsed.xDiff).toBe(anchorAndDiffs.xDiff);
+      expect(anchorAndDiffsCollapsed.yDiff).toBe(anchorAndDiffs.yDiff);
+
+      groupBox0.setExpanded(true);
+      form.validateLayoutTree();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const anchorAndDiffsExpanded = calcAnchorAndDiffs(tooltip);
+
+      expect(anchorAndDiffsExpanded.anchor).not.toEqual(anchorAndDiffsCollapsed.anchor);
+      expect(anchorAndDiffsExpanded.anchor).toEqual(anchorAndDiffs.anchor);
+      expect(anchorAndDiffsExpanded.xDiff).toBe(anchorAndDiffs.xDiff);
+      expect(anchorAndDiffsExpanded.yDiff).toBe(anchorAndDiffs.yDiff);
+    });
+  });
 });

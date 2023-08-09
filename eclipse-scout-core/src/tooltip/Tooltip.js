@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, graphics, keys, Point, scout, scrollbars, Status, strings, Widget} from '../index';
+import {arrays, Form, graphics, keys, Point, scout, scrollbars, Status, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
 
 export default class Tooltip extends Widget {
@@ -66,7 +66,6 @@ export default class Tooltip extends Widget {
     this.$container = this.$parent
       .appendDiv('tooltip')
       .data('tooltip', this);
-    this.findDesktop().adjustOverlayOrder(this);
     if (this.cssClass) {
       this.$container.addClass(this.cssClass);
     }
@@ -93,14 +92,19 @@ export default class Tooltip extends Widget {
       scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
     }
 
-    // If the tooltip is rendered inside a (popup) dialog, get a reference to the dialog.
-    this.dialog = this.findParent(p => p instanceof Form && p.isDialog());
-
-    // If inside a dialog, attach a listener to reposition the tooltip when the dialog is moved
-    if (this.dialog) {
-      this._moveHandler = this.position.bind(this);
-      this.dialog.on('move', this._moveHandler);
+    // If the tooltip is rendered inside a popup (dialog form or popup), get a reference to the popup.
+    this._popup = this.findParent(p => p instanceof WidgetPopup);
+    if (!this._popup) {
+      this._popup = this.findParent(p => p instanceof Form && p.isDialog());
     }
+
+    // If inside a popup, attach a listener to reposition the tooltip when the popup is moved
+    if (this._popup) {
+      this._moveHandler = this.position.bind(this);
+      this._popup.on('move', this._moveHandler);
+    }
+
+    this.findDesktopIf$Parent()?.tooltipRendered(this);
   }
 
   _postRender() {
@@ -122,14 +126,29 @@ export default class Tooltip extends Widget {
       this._anchorScrollHandler = null;
     }
     if (this._moveHandler) {
-      if (this.dialog) {
-        this.dialog.off('move', this._moveHandler);
+      if (this._popup) {
+        this._popup.off('move', this._moveHandler);
       }
       this._moveHandler = null;
     }
-    this.dialog = null;
+    this._popup = null;
     this.$menus = null;
     super._remove();
+    this.findDesktopIf$Parent()?.tooltipRemoved(this);
+  }
+
+  /**
+   * Finds the desktop (see {@link Widget.findDesktop}) and checks whether the `$container` of this desktop is `this.$parent`.
+   */
+  findDesktopIf$Parent() {
+    if (!this.$parent) {
+      return null;
+    }
+    const desktop = super.findDesktop();
+    if (desktop?.$container[0] === this.$parent[0]) {
+      return desktop;
+    }
+    return null;
   }
 
   _onAttach() {

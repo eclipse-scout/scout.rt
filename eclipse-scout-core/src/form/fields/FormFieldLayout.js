@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -49,7 +49,6 @@ export default class FormFieldLayout extends AbstractLayout {
     let containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
       htmlContainer = HtmlComponent.get($container),
       formField = this.formField,
-      tooltip = formField._tooltip(),
       labelWidth = this.labelWidth(),
       statusWidth = this.statusWidth;
 
@@ -177,11 +176,6 @@ export default class FormFieldLayout extends AbstractLayout {
       if (formField.$clearIcon) {
         this._layoutClearIcon(formField, fieldBounds, right, top);
       }
-    }
-
-    // Make sure tooltip is at correct position after layouting, if there is one
-    if (tooltip && tooltip.rendered) {
-      tooltip.position();
     }
 
     // Check for scrollbars, update them if necessary

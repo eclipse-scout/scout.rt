@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -106,10 +106,7 @@ export default class LayoutValidator {
         arrays.remove(this._invalidComponents, comp);
       }
     }, this);
-    this._postValidateFunctions.slice().forEach(function(func) {
-      func();
-      arrays.remove(this._postValidateFunctions, func);
-    }, this);
+    this._postValidateFunctions.splice(0).forEach(func => func());
   }
 
   /**
@@ -141,8 +138,16 @@ export default class LayoutValidator {
    * Runs the given function at the end of validate().
    */
   schedulePostValidateFunction(func) {
-    if (func) {
-      this._postValidateFunctions.push(func);
+    if (!func) {
+      return;
     }
+    this._postValidateFunctions.push(func);
+  }
+
+  removePostValidateFunction(func) {
+    if (!func) {
+      return;
+    }
+    arrays.remove(this._postValidateFunctions, func);
   }
 }

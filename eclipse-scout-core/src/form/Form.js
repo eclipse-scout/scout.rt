@@ -623,7 +623,7 @@ export default class Form extends Widget {
   _onResize(event) {
     let autoSizeOld = this.htmlComp.layout.autoSize;
     this.htmlComp.layout.autoSize = false;
-    this.htmlComp.revalidateLayout();
+    this.htmlComp.revalidateLayoutTree(false);
     this.htmlComp.layout.autoSize = autoSizeOld;
     this.updateCacheBounds();
     return false;

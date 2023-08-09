@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -72,13 +72,6 @@ export default class TableFooterLayout extends AbstractLayout {
     // don't animate on the first layouting -> only animate on user interactions
     let animated = this._tableFooter.htmlComp.layouted;
     this._setInfoItemsSize($infoItems, animated);
-
-    if (this._tableFooter._tableStatusTooltip && this._tableFooter._tableStatusTooltip.rendered) {
-      this._tableFooter._tableStatusTooltip.position();
-    }
-    if (this._tableFooter._tableInfoTooltip && this._tableFooter._tableInfoTooltip.rendered) {
-      this._tableFooter._tableInfoTooltip.position();
-    }
 
     // Let table controls update their content according to the new footer size
     this._tableFooter.table.tableControls.forEach(control => {

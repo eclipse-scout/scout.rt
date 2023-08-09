@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BeanColumn, Column, Device, graphics, IconColumn, icons, MenuDestinations, Range, RemoteEvent, scout, scrollbars, Table, TableRow} from '../../src/index';
+// eslint-disable-next-line max-classes-per-file
+import {BeanColumn, Column, Device, graphics, IconColumn, icons, MenuDestinations, ObjectFactory, Range, RemoteEvent, scout, scrollbars, Status, Table, TableRow, Tooltip} from '../../src/index';
 import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
 
 /* global removePopups */
@@ -953,7 +954,21 @@ describe('Table', () => {
 
   describe('resizeColumn', () => {
 
-    it('updates column model and sends resize event ', () => {
+    beforeEach(() => {
+      $('<style>' +
+        '.table-header-item { display: inline-flex; }' +
+        '.table-header-resize { display: inline-block; }' +
+        '.table-cell { display: table-cell; }' +
+        '.tooltip { position: absolute; }' +
+        '</style>').appendTo($('#sandbox'));
+      ObjectFactory.get().register('Tooltip', () => new SpecTooltip());
+    });
+
+    afterEach(() => {
+      ObjectFactory.get().register('Tooltip', () => new Tooltip());
+    });
+
+    it('updates column model and sends resize event', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop);
@@ -1009,7 +1024,7 @@ describe('Table', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('always updates model width, but only resizes cells of visible columns ', () => {
+    it('always updates model width, but only resizes cells of visible columns', () => {
       let model = helper.createModelFixture(5, 1);
       model.columns[0].width = 100;
       model.columns[1].width = 101;
@@ -1078,6 +1093,69 @@ describe('Table', () => {
       expect($rowCells.eq(2).cssWidth()).toBe(204);
     });
 
+    it('moves tooltip', () => {
+      const model = helper.createModelFixture(2, 1);
+      model.columns[0].width = 100;
+      model.columns[1].width = 100;
+      const table = helper.createTable(model);
+      const [column0, column1] = table.columns;
+
+      const calcOriginAndDiffs = t => {
+        const anchorBounds = graphics.offsetBounds(t.$anchor);
+        const tooltipBounds = graphics.offsetBounds(t.$container);
+        const origin = anchorBounds.translate(anchorBounds.width / 2, 0).point();
+        const xDiff = origin.x - tooltipBounds.x;
+        const yDiff = origin.y - tooltipBounds.y;
+        return {origin, xDiff, yDiff};
+      };
+
+      table.render();
+      const row = table.rows[0];
+      const $row = row.$row;
+      const $cell1 = table.$cell(column1, $row);
+      table._showCellError(row, $cell1, Status.error('I am an error!!!'));
+
+      expect(table.tooltips.length).toBe(1);
+
+      const tooltip = table.tooltips[0];
+
+      expect(tooltip.rendered).toBeTrue();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const originAndDiffs100100 = calcOriginAndDiffs(tooltip);
+
+      table.resizeColumn(column1, 200);
+
+      expect(tooltip.rendered).toBeTrue();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const originAndDiffs100200 = calcOriginAndDiffs(tooltip);
+      expect(originAndDiffs100200.origin).not.toEqual(originAndDiffs100100.origin);
+      expect(originAndDiffs100200.xDiff).toBe(originAndDiffs100100.xDiff);
+      expect(originAndDiffs100200.yDiff).toBe(originAndDiffs100100.yDiff);
+
+      table.resizeColumn(column0, 50);
+
+      expect(tooltip.rendered).toBeTrue();
+      expect(tooltip.$container.isVisible()).toBeTrue();
+
+      const originAndDiffs50200 = calcOriginAndDiffs(tooltip);
+      expect(originAndDiffs50200.origin).not.toEqual(originAndDiffs100200.origin);
+      expect(originAndDiffs50200.origin).toEqual(originAndDiffs100100.origin);
+      expect(originAndDiffs50200.xDiff).toBe(originAndDiffs100100.xDiff);
+      expect(originAndDiffs50200.yDiff).toBe(originAndDiffs100100.yDiff);
+    });
+
+    class SpecTooltip extends Tooltip {
+      position() {
+        const origin = this._getOrigin();
+        const offset = this._getOffset(origin);
+        const {x, y} = origin.point().add(offset);
+        this.$container
+          .cssLeft(x)
+          .cssTop(y);
+      }
+    }
   });
 
   describe('autoResizeColumns', () => {
@@ -1263,7 +1341,7 @@ describe('Table', () => {
         column2.sortActive = true;
         column2.sortIndex = 0;
         table.updateColumnStructure(table.columns); // (re)initialize columns,
-        // have been initialised
+        // have been initialized
         // already during init
         render(table);
 
@@ -1297,7 +1375,7 @@ describe('Table', () => {
         column2.sortActive = true;
         column2.sortIndex = 0;
         table.updateColumnStructure(table.columns); // (re)initialize columns,
-        // have been initialised
+        // have been initialized
         // already during init
         render(table);
 
@@ -1331,7 +1409,7 @@ describe('Table', () => {
         column2.sortActive = true;
         column2.sortIndex = 0;
         table.updateColumnStructure(table.columns); // (re)initialize columns,
-        // have been initialised
+        // have been initialized
         // already during init
         render(table);
 
@@ -1872,7 +1950,7 @@ describe('Table', () => {
     });
   });
 
-  describe('menu bar popup ', () => {
+  describe('menu bar popup', () => {
     let menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, emptySpaceMenu, table;
 
     beforeEach(() => {

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -44,7 +44,6 @@ export default class GroupBoxLayout extends AbstractLayout {
       htmlContainer = this.groupBox.htmlComp,
       htmlGbBody = this._htmlGbBody(),
       htmlMenuBar = this._htmlMenuBar(),
-      tooltip = this.groupBox._tooltip(),
       $header = this.groupBox.$header,
       $title = this.groupBox.$title,
       containerSize = htmlContainer.availableSize()
@@ -93,11 +92,6 @@ export default class GroupBoxLayout extends AbstractLayout {
     gbBodySize.height -= menuBarHeight;
     $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
     htmlGbBody.setSize(gbBodySize);
-
-    // Make sure tooltip is at correct position after layouting, if there is one
-    if (tooltip && tooltip.rendered) {
-      tooltip.position();
-    }
 
     if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0) {
       scrollbars.update(htmlGbBody.$comp);

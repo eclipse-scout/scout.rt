@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -63,6 +63,7 @@ export default class Desktop extends Widget {
     this.dense = false;
     this._glassPaneTargetFilters = [];
     this.url = null;
+    this._repositionTooltipsHandler = null;
 
     this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm', 'focusedElement']);
     this._addPreserveOnPropertyChangeProperties(['focusedElement']);
@@ -1602,6 +1603,38 @@ export default class Desktop extends Widget {
     } else {
       overlay.$container.insertAfter(parentOverlay ? parentOverlay.$container : this.$overlaySeparator);
     }
+  }
+
+  /**
+   * @param {Tooltip} tooltip
+   */
+  tooltipRendered(tooltip) {
+    this.adjustOverlayOrder(tooltip);
+    if (this._repositionTooltipsHandler) {
+      return;
+    }
+    if (!this.$container.children('.tooltip').length) {
+      return;
+    }
+    this._repositionTooltipsHandler = () => {
+      this.repositionTooltips();
+      this.session.layoutValidator.schedulePostValidateFunction(this._repositionTooltipsHandler);
+    };
+    this.session.layoutValidator.schedulePostValidateFunction(this._repositionTooltipsHandler);
+  }
+
+  /**
+   * @param {Tooltip} tooltip
+   */
+  tooltipRemoved(tooltip) {
+    if (!this._repositionTooltipsHandler) {
+      return;
+    }
+    if (this.$container.children('.tooltip').length) {
+      return;
+    }
+    this.session.layoutValidator.removePostValidateFunction(this._repositionTooltipsHandler);
+    this._repositionTooltipsHandler = null;
   }
 
   repositionTooltips() {
