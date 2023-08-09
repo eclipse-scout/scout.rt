@@ -731,6 +731,10 @@ $.fn.isDisplayNone = function() {
   return this.css('display') === 'none';
 };
 
+$.fn.isVisibilityHidden = function() {
+  return this.css('visibility') === 'hidden';
+};
+
 $.fn.setTabbable = function(tabbable) {
   return this.attr('tabIndex', tabbable ? 0 : null);
 };
