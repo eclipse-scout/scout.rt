@@ -11,3 +11,7 @@
 .hidden {
   display: none !important; /* NOSONAR (!important is okay here) */
 }
+
+.invisible {
+  visibility: hidden !important; /* NOSONAR (!important is okay here) */
+}
