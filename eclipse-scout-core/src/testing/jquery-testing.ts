@@ -192,5 +192,13 @@ export const JQueryTesting = {
       cancelable: true
     });
     $elem[0].dispatchEvent(event);
+  },
+
+  whenAnimationEnd($elem: JQuery): JQuery.Promise<Document> {
+    let def = $.Deferred();
+    $elem.oneAnimationEnd(() => {
+      def.resolve();
+    });
+    return def.promise();
   }
 };

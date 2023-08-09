@@ -581,6 +581,11 @@ declare global {
     isDisplayNone(): boolean;
 
     /**
+     * returns true of the current element has the 'visibility' property set to 'hidden'.
+     */
+    isVisibilityHidden(): boolean;
+
+    /**
      * @param tabbable true, to make the component tabbable. False, to make it neither tabbable nor focusable.
      * @returns {$}
      */

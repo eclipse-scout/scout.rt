@@ -1214,4 +1214,197 @@ describe('TileGrid', () => {
 
   });
 
+  describe('tile visibility', () => {
+    beforeEach(() => {
+      $(`<style>
+      @keyframes nop { 0% { opacity: 1; } 100% { opacity: 1; } }
+      .tile.animate-visible { animation: nop; animation-duration: 100ms;}
+      .tile.animate-invisible { animation: nop; animation-duration: 100ms;}
+      .tile.animate-insert { animation: nop; animation-duration: 100ms;}
+      .tile.animate-remove { animation: nop; animation-duration: 100ms;}
+      .tile.newly-rendered { visibility: hidden !important;}
+      .tile.before-animate-insert { visibility: hidden !important;}
+
+      </style>`).appendTo($('#sandbox'));
+    });
+
+    it('is correct after insert animation', async () => {
+      let tileGrid = createTileGrid(0);
+      tileGrid.render();
+      tileGrid.insertTile({objectType: Tile});
+      let tile = tileGrid.tiles[0];
+      expect(tile.$container).not.toHaveClass('animate-insert');
+      expect(tile.$container.isVisibilityHidden()).toBe(true); // not visible until layout is done
+      expect(tile.$container.isVisible()).toBe(true);
+
+      tileGrid.validateLayout();
+      expect(tile.$container).toHaveClass('animate-insert');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      await JQueryTesting.whenAnimationEnd(tile.$container);
+      expect(tile.$container).not.toHaveClass('animate-insert');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+    });
+
+    it('is correct after hide animation', async () => {
+      let tileGrid = createTileGrid(1);
+      let tile = tileGrid.tiles[0];
+      tileGrid.render();
+      tileGrid.validateLayout();
+      expect(tile.$container).not.toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      tile.setVisible(false);
+      expect(tile.$container).toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      await JQueryTesting.whenAnimationEnd(tile.$container);
+      expect(tile.$container).not.toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(false);
+    });
+
+    it('is correct after show animation', async () => {
+      let tileGrid = createTileGrid(1);
+      let tile = tileGrid.tiles[0];
+      tile.setVisible(false);
+      tileGrid.render();
+      tileGrid.validateLayout();
+      expect(tile.$container).not.toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(false);
+
+      tile.setVisible(true);
+      expect(tile.$container).not.toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(true); // not visible until layout is done
+      expect(tile.$container.isVisible()).toBe(true);
+
+      tileGrid.validateLayoutTree();
+      expect(tile.$container).toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      await JQueryTesting.whenAnimationEnd(tile.$container);
+      expect(tile.$container).not.toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+    });
+
+    it('is correct after hide > show animation', async () => {
+      let tileGrid = createTileGrid(1);
+      let tile = tileGrid.tiles[0];
+      tileGrid.render();
+      tileGrid.validateLayout();
+
+      tile.setVisible(false);
+      expect(tile.$container).toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      // Animation is not complete yet
+      await sleep(10);
+      expect(tile.$container).toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      // Make it visible again while hide animation still runs
+      tile.setVisible(true);
+      expect(tile.$container).not.toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(true); // not visible until layout is done
+      expect(tile.$container.isVisible()).toBe(true);
+
+      tileGrid.validateLayoutTree();
+      expect(tile.$container).toHaveClass('animate-visible');
+      expect(tile.$container).not.toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      await JQueryTesting.whenAnimationEnd(tile.$container);
+      expect(tile.$container).not.toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+    });
+
+    it('is correct after show > hide animation', async () => {
+      let tileGrid = createTileGrid(1);
+      let tile = tileGrid.tiles[0];
+      tile.setVisible(false);
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tile.setVisible(true);
+
+      expect(tile.$container).not.toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(true); // not visible until layout is done
+      expect(tile.$container.isVisible()).toBe(true);
+
+      tileGrid.validateLayoutTree();
+      expect(tile.$container).toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      // Animation is not complete yet
+      await sleep(10);
+      expect(tile.$container).toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      tile.setVisible(false);
+      expect(tile.$container).toHaveClass('animate-invisible');
+      expect(tile.$container).not.toHaveClass('animate-visible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      await JQueryTesting.whenAnimationEnd(tile.$container);
+      expect(tile.$container).not.toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(false);
+    });
+
+    it('is correct after insert > hide > show animation', async () => {
+      let tileGrid = createTileGrid(1);
+      tileGrid.render();
+      tileGrid.validateLayout();
+
+      tileGrid.setTiles([{objectType: Tile}, tileGrid.tiles[0]]);
+      let tile = tileGrid.tiles[0];
+      expect(tile.$container).not.toHaveClass('animate-insert');
+      expect(tile.$container.isVisibilityHidden()).toBe(true);
+
+      tile.setVisible(false);
+      tile.setVisible(true);
+      expect(tile.$container.isVisibilityHidden()).toBe(true);
+
+      // During the tile grid layout, the inserted tile must not be visible because the insert animation has not been started yet, even if tile.setVisible(true) was called
+      // The layout animation needs a real viewport and sizes -> To make it easier in the test setup we suppress the layoutAnimationDone event to delay the start of the insert animation
+      let triggerSpy = spyOn(tileGrid, 'trigger');
+      let suppressedEvent;
+      triggerSpy.and.callFake((type, event): any => {
+        if (type === 'layoutAnimationDone') {
+          suppressedEvent = event;
+        } else {
+          triggerSpy.and.callThrough();
+        }
+      });
+      tileGrid.validateLayout();
+      tileGrid.validateLayoutTree(); // Triggers the scheduled post validate task in Tile._renderVisible
+      expect(tile.$container.isVisibilityHidden()).toBe(true);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      // Finish TileGridLayout -> Insert animation will start
+      triggerSpy.and.callThrough();
+      tileGrid.trigger('layoutAnimationDone', suppressedEvent);
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container).toHaveClass('animate-insert');
+      expect(tile.$container.isVisible()).toBe(true);
+
+      await JQueryTesting.whenAnimationEnd(tile.$container);
+      expect(tile.$container).not.toHaveClass('animate-insert');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+    });
+  });
 });

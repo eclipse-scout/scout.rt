@@ -373,13 +373,13 @@ export class TileGrid extends Widget implements TileGridModel {
       if (!tile.rendered) {
         return;
       }
-      tile.$container.addClass('invisible');
+      tile.$container.addClass('before-animate-insert');
       // Wait until the layout animation is done before animating the insert operation.
       // Also make them invisible to not cover existing tiles while they are moving or changing size.
       // Also do it for tiles which don't have an insert animation (e.g. placeholders), due to the same reason.
       this.one('layoutAnimationDone', () => {
         if (tile.rendered) {
-          tile.$container.removeClass('invisible');
+          tile.$container.removeClass('before-animate-insert');
           if (this._animateTileInsertion(tile)) {
             tile.$container.addClassForAnimation('animate-insert');
           }

@@ -8,8 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 .tile {
-  &.newly-rendered {
-    /* Tile should be invisible until it has the correct position, otherwise it might be visible in the top left corner in the time between rendering and layouting */
+  // Tile should be invisible until it has the correct position, otherwise it might be visible in the top left corner in the time between rendering and layouting
+  &.newly-rendered,
+    // Use a dedicated invisible class for the insert operation to not get in a mess with the invisible class from the tile.visible state
+  &.before-animate-insert {
     .invisible();
   }
 
