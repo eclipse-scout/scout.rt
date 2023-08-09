@@ -834,6 +834,10 @@ $.fn.isDisplayNone = function() {
   return this.css('display') === 'none';
 };
 
+$.fn.isVisibilityHidden = function() {
+  return this.css('visibility') === 'hidden';
+};
+
 /**
  * @param {boolean} tabbable true, to make the component tabbable. False, to make it neither tabbable nor focusable.
  * @returns {$}

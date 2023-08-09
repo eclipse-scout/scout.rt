@@ -57,6 +57,12 @@ window.uninstallUnloadHandlers = session => {
     .off('unload.' + session.uiSessionId);
 };
 
+window.sleep = duration => {
+  let deferred = $.Deferred();
+  setTimeout(() => deferred.resolve(), duration);
+  return deferred.promise();
+};
+
 window.createPropertyChangeEvent = (model, properties) => ({
   target: model.id,
   properties: properties,

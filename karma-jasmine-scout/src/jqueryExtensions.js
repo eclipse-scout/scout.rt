@@ -214,3 +214,11 @@ $.fn.triggerImageLoadCapture = function(opts) {
   this[0].dispatchEvent(event);
   return this;
 };
+
+$.fn.whenAnimationEnd = function() {
+  let def = $.Deferred();
+  this.oneAnimationEnd(() => {
+    def.resolve();
+  });
+  return def.promise();
+};
