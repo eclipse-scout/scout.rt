@@ -29,7 +29,7 @@ To set up the tool, do the following:
 ```json
 {
   "devDependencies": {
-    "@eclipse-scout/migrate": "~23.2.0"
+    "@eclipse-scout/migrate": "~24.1.0"
   }
 }
 ```
@@ -45,7 +45,7 @@ Some migrations require a `tsconfig.json`. You can add it as follows (do it only
 ```json
 {
   "devDependencies": {
-    "@eclipse-scout/tsconfig": "~23.2.0"
+    "@eclipse-scout/tsconfig": "~24.1.0"
   }
 }
 ```

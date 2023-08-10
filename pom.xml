@@ -14,13 +14,13 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>23.2.0-SNAPSHOT</version>
+    <version>23.2.0</version>
     <relativePath />
   </parent>
 
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt.root</artifactId>
-  <version>23.2-SNAPSHOT</version>
+  <version>24.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>root</name>
 
