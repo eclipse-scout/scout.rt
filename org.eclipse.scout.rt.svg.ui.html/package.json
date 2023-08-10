@@ -17,7 +17,7 @@
   "main": "./src/main/js/index.ts",
   "publishConfig": {
     "main": "./target/dist/dev/eclipse-scout-svg.js",
-    "types": "./target/dist/d.ts/index.d.ts"
+    "types": "./target/dist/d.ts/main/js/index.d.ts"
   },
   "files": [
     "src/main/js",

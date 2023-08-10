@@ -24,6 +24,7 @@ Once the `@eclipse-scout/tsconfig` package is installed, you can use it in your 
 {
   "extends": "@eclipse-scout/tsconfig/tsconfig.json",
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "target/dist/d.ts"
   },
   "include": [
