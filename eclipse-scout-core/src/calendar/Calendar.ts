@@ -254,6 +254,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _setSelectedDate(date: Date | string) {
     date = dates.ensure(date);
+    scout.assertParameter('selectedDate', date, Date);
     this._setProperty('selectedDate', date);
     this.yearPanel.selectDate(this.selectedDate);
   }

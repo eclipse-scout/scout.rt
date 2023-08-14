@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.Range;
@@ -548,9 +549,11 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
 
   @Override
   public void setSelectedDate(Date d) {
+    Assertions.assertNotNull(d);
     propertySupport.setProperty(PROP_SELECTED_DATE, d);
   }
 
+  @Override
   public Range<Date> getSelectedRange() {
     @SuppressWarnings("unchecked")
     Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_SELECTED_RANGE);
