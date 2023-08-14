@@ -40,6 +40,10 @@ describe('TreeBox', () => {
     return box;
   }
 
+  function expandAll(treeBox) {
+    treeBox.tree.visitNodes(node => treeBox.tree.expandNode(node, {renderAnimated: false}));
+  }
+
   describe('general behavior', () => {
     it('defaults', () => {
       expect(field.value).toEqual([]);
@@ -116,6 +120,101 @@ describe('TreeBox', () => {
       expect(field.getCheckedLookupRows()[0].key).toBe(2);
     });
 
+    it('shows lookup rows in the order defined by the lookup call', () => {
+      field = createFieldWithLookupCall({
+        lookupCall: {
+          objectType: 'StaticLookupCall',
+          data: [
+            ['a', 'A'],
+            ['c', 'C'],
+            ['b', 'B']
+          ]
+        }
+      });
+      jasmine.clock().tick(300);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;C;B');
+    });
+
+    it('supports hierarchical lookup calls', () => {
+      field = createFieldWithLookupCall({
+        lookupCall: {
+          objectType: 'StaticLookupCall',
+          hierarchical: true,
+          data: [
+            ['ab', 'A/B', 'a'],
+            ['aaa', 'A/A/A', 'aa'],
+            ['aa', 'A/A', 'a'],
+            ['a', 'A', null],
+            ['ca', 'C/A', 'c'],
+            ['c', 'C', null],
+            ['b', 'B', null],
+            ['aba', 'A/B/A', 'ab'],
+            ['cb', 'C/B', 'c']
+          ]
+        }
+      });
+      jasmine.clock().tick(300);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;C;B');
+      expandAll(field);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;A/B;A/B/A;A/A;A/A/A;C;C/A;C/B;B');
+    });
+
+    it('ignores lookup rows with null key', () => {
+      field = createFieldWithLookupCall({
+        lookupCall: {
+          objectType: 'StaticLookupCall',
+          hierarchical: true,
+          data: [
+            ['a', 'A', null],
+            [null, 'Null', 'a'], // should be ignored
+            ['b', 'B', null]
+          ]
+        }
+      });
+      jasmine.clock().tick(300);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;B');
+      expandAll(field);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;B');
+    });
+
+    it('ignores lookup rows that reference themselves', () => {
+      field = createFieldWithLookupCall({
+        lookupCall: {
+          objectType: 'StaticLookupCall',
+          hierarchical: true,
+          data: [
+            ['a', 'A', null],
+            ['c', 'C', 'c'], // should be ignored
+            ['b', 'B', 'a'],
+            ['a', 'A2', 'b'] // should be ignored
+          ]
+        }
+      });
+      jasmine.clock().tick(300);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A');
+      expandAll(field);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;B');
+    });
+
+    it('ignores lookup rows with disconnected sub-trees', () => {
+      field = createFieldWithLookupCall({
+        lookupCall: {
+          objectType: 'StaticLookupCall',
+          hierarchical: true,
+          data: [
+            ['a', 'A', null],
+            ['b', 'B', 'x'], // should be ignored
+            ['c', 'C', 'b'], // should be ignored
+            ['d', 'D', 'e'], // should be ignored
+            ['e', 'E', 'd'] //  should be ignored
+          ]
+        }
+      });
+      jasmine.clock().tick(300);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A');
+      expandAll(field);
+      expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A');
+    });
   });
 
   describe('clear', () => {

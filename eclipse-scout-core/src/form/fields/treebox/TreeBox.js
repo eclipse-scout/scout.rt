@@ -100,11 +100,11 @@ export default class TreeBox extends LookupBox {
         }
 
         this.uncheckAll(opts);
-        objects.values(this.tree.nodesMap).forEach(function(node) {
+        objects.values(this.tree.nodesMap).forEach(node => {
           if (arrays.containsAny(newValue, node.id)) {
             this.tree.checkNode(node, true, opts);
           }
-        }, this);
+        });
       }
 
       this._updateDisplayText();
@@ -130,7 +130,8 @@ export default class TreeBox extends LookupBox {
   _populateTree(result) {
     let topLevelNodes = [];
     this._populating = true;
-    this._populateTreeRecursive(null, topLevelNodes, result.lookupRows);
+    let lookupRows = this._extractValidLookupRows(result);
+    this._populateTreeRecursive(null, topLevelNodes, lookupRows);
 
     this.tree.deleteAllNodes();
     this.tree.insertNodes(topLevelNodes);
@@ -139,16 +140,34 @@ export default class TreeBox extends LookupBox {
     this._syncValueToTree(this.value);
   }
 
-  _populateTreeRecursive(parentKey, nodesArray, lookupRows) {
-    let node;
-    lookupRows.forEach(function(lookupRow) {
-      if (lookupRow.parentKey === parentKey) {
-        node = this._createNode(lookupRow);
-        this._populateTreeRecursive(node.id, node.childNodes, lookupRows);
-        node.leaf = !node.childNodes.length;
-        nodesArray.push(node);
+  _extractValidLookupRows(result) {
+    let keys = new Set();
+    return result.lookupRows.filter(lookupRow => {
+      if (!lookupRow) {
+        return false; // not a valid lookup row
       }
-    }, this);
+      if (objects.isNullOrUndefined(lookupRow.key)) {
+        return false; // invalid key (if null were allowed, the meaning of 'parentKey=null' would no longer be defined)
+      }
+      if (keys.has(lookupRow.key)) {
+        return false; // multiple lookup rows with the same key
+      }
+      if (lookupRow.parentKey === lookupRow.key) {
+        return false; // lookup row referencing itself
+      }
+      keys.add(lookupRow.key);
+      return lookupRow;
+    });
+  }
+
+  _populateTreeRecursive(parentKey, nodesArray, lookupRows) {
+    let currentLookupRows = lookupRows.filter(lookupRow => lookupRow.parentKey === parentKey);
+    currentLookupRows.forEach(currentLookupRow => {
+      let node = this._createNode(currentLookupRow);
+      this._populateTreeRecursive(currentLookupRow.key, node.childNodes, lookupRows);
+      node.leaf = !node.childNodes.length;
+      nodesArray.push(node);
+    });
   }
 
   /**
