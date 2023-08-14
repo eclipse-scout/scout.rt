@@ -162,8 +162,6 @@ export class Range {
   }
 
   toString(): string {
-    return 'scout.Range[' +
-      'from=' + (this.from === null ? 'null' : this.from) +
-      ' to=' + (this.to === null ? 'null' : this.to) + ']';
+    return `Range {from: ${this.from}, to: ${this.to}}`;
   }
 }

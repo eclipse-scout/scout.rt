@@ -37,7 +37,7 @@ describe('Range', () => {
       let range2 = new Range(11, 20);
       expect(() => {
         range1.add(range2);
-      }).toThrow(new Error('Range to add has to border on the existing range. scout.Range[from=0 to=10], scout.Range[from=11 to=20]'));
+      }).toThrow(new Error('Range to add has to border on the existing range. Range {from: 0, to: 10}, Range {from: 11, to: 20}'));
     });
 
     it('returns a copy of the non empty range if one range is empty', () => {

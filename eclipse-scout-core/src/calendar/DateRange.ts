@@ -27,9 +27,7 @@ export class DateRange {
   }
 
   toString(): string {
-    return 'scout.DateRange[' +
-      'from=' + (this.from === null ? 'null' : this.from.toUTCString()) +
-      ' to=' + (this.to === null ? 'null' : this.to.toUTCString()) + ']';
+    return `DateRange {from: ${this.from}, to: ${this.to}}`;
   }
 
   static ensure(dateRange: DateRange | JsonDateRange): DateRange {

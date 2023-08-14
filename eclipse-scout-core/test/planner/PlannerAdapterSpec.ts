@@ -34,6 +34,7 @@ describe('PlannerAdapter', () => {
     for (let i = 0; i < numResources; i++) {
       model.resources[i] = createResource('resource' + i);
     }
+    model.viewRange = {from: '2020-01-01 00:00:00.000Z', to: '2020-01-01 23:59:59.999Z'};
     return model;
   }
 
