@@ -30,8 +30,7 @@ module.exports = (config, specEntryPoint) => {
       compilerOptions: {
         // No need to create declarations for tests
         declaration: false,
-        declarationMap: false,
-        rootDir: findWorkspaceFileDir(__dirname)
+        declarationMap: false
       }
     }
   }, config.webpackArgs);
@@ -130,25 +129,3 @@ function searchSpecEntryPoint(specEntryPoint) {
   }
   return path.resolve('test', 'test-index.js');
 }
-
-/**
- * <b>Copy from update-version.js (eclipse-scout-releng)</b>
- *
- * Gets the directory closest to the file-system root that contains a 'pnpm-workspace.yaml' file. The search starts at the given start dir stepping up the parent directories.
- * @param dir where to start searching.
- * @returns {string | null} workspace directory.
- */
-const findWorkspaceFileDir = dir => {
-  let pnpmWorkspace = null;
-  let parentDir = dir;
-  let currentDir;
-  do {
-    currentDir = parentDir;
-    parentDir = path.join(currentDir, '../');
-    let candidate = path.join(currentDir, 'pnpm-workspace.yaml');
-    if (fs.existsSync(candidate)) {
-      pnpmWorkspace = currentDir;
-    }
-  } while (currentDir !== parentDir);
-  return pnpmWorkspace;
-};
