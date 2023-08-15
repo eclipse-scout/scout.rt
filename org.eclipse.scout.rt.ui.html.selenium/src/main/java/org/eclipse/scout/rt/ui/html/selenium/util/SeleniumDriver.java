@@ -102,6 +102,7 @@ public final class SeleniumDriver {
     // Add command line arguments
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
+    options.addArguments("--remote-allow-origins=*");
     // The following two lines are a replacement for --disable-infobars since this option
     // does not remove the "Chrome is being controlled..." info-bar anymore.
     // See: https://stackoverflow.com/questions/49169990/disable-infobars-argument-unable-to-hide-the-infobar-with-the-message-chrome-is
