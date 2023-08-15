@@ -131,8 +131,10 @@ describe('TreeBox', () => {
           ]
         }
       });
+      spyOn(field, '_logWarning').and.callThrough();
       jasmine.clock().tick(300);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;C;B');
+      expect(field._logWarning).toHaveBeenCalledTimes(0);
     });
 
     it('supports hierarchical lookup calls', () => {
@@ -153,10 +155,12 @@ describe('TreeBox', () => {
           ]
         }
       });
+      spyOn(field, '_logWarning').and.callThrough();
       jasmine.clock().tick(300);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;C;B');
       expandAll(field);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;A/B;A/B/A;A/A;A/A/A;C;C/A;C/B;B');
+      expect(field._logWarning).toHaveBeenCalledTimes(0);
     });
 
     it('ignores lookup rows with null key', () => {
@@ -171,10 +175,12 @@ describe('TreeBox', () => {
           ]
         }
       });
+      spyOn(field, '_logWarning').and.callThrough();
       jasmine.clock().tick(300);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;B');
       expandAll(field);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;B');
+      expect(field._logWarning).toHaveBeenCalledTimes(1);
     });
 
     it('ignores lookup rows that reference themselves', () => {
@@ -190,10 +196,12 @@ describe('TreeBox', () => {
           ]
         }
       });
+      spyOn(field, '_logWarning').and.callThrough();
       jasmine.clock().tick(300);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A');
       expandAll(field);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A;B');
+      expect(field._logWarning).toHaveBeenCalledTimes(2);
     });
 
     it('ignores lookup rows with disconnected sub-trees', () => {
@@ -210,10 +218,12 @@ describe('TreeBox', () => {
           ]
         }
       });
+      spyOn(field, '_logWarning').and.callThrough();
       jasmine.clock().tick(300);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A');
       expandAll(field);
       expect(field.tree.visibleNodesFlat.map(n => n.text).join(';')).toBe('A');
+      expect(field._logWarning).toHaveBeenCalledTimes(0);
     });
   });
 
