@@ -33,7 +33,7 @@
   --handle-size: 16px;
   --handle-top: 2px;
   --handle-left: 2px;
-  --handle-left-activated: 16px; // button-width - button-border-horizontal - handle-width - handle-margin-right
+  --handle-left-activated: calc(var(--width) - 2px - var(--handle-size) - var(--handle-left)); // button-width - button-border-horizontal - handle-width - handle-margin-right
   --handle-left-transition-duration: @switch-transition-duration;
   --handle-border-radius: none;
   --handle-background-color: @switch-handle-background-color;
@@ -176,7 +176,7 @@
   --handle-size: 18px;
   --handle-top: -7px; // (-1px = draw over button-border)
   --handle-left: -1px; // (-1px = draw over button-border)
-  --handle-left-activated: 21px; // button-width - handle-width (-1px = draw over button-border)
+  --handle-left-activated: calc(var(--width) - var(--handle-size) - 1px); // button-width - handle-width (-1px = draw over button-border)
   --handle-left-transition-duration: @switch-transition-duration-fast;
   --background-color: @switch-style-slider-background-color;
   --border-color: transparent;
