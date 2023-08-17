@@ -2072,9 +2072,16 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * @returns the first child for which the given function returns true.
+   * @param predicateOrClass may be a {@link Predicate} or a sub-class of {@link Widget}.
+   * @returns the first child for which the given predicate returns true or that matches the given widget type if a subclass of {@link Widget} is provided.
    */
-  findChild(predicate: Predicate<Widget>): Widget {
+  findChild<T extends Widget>(predicateOrClass: Predicate<Widget> | (abstract new() => T)): T {
+    let predicate;
+    if (objects.isSameOrExtendsClass(predicateOrClass, Widget)) {
+      predicate = widget => widget instanceof predicateOrClass;
+    } else {
+      predicate = predicateOrClass;
+    }
     let foundChild = null;
     this.visitChildren(child => {
       if (predicate(child)) {
