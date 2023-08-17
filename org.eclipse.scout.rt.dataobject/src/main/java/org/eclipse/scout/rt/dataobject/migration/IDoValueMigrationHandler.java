@@ -9,7 +9,9 @@
  */
 package org.eclipse.scout.rt.dataobject.migration;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IUuId;
@@ -100,7 +102,7 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
  *       return value; // no migration required
  *     }
  *
- *     return BEANS.get(DataObjectHelper.class).clone(value) // clone provided value to allow change detection by caller
+ *     return BEANS.get(DataObjectHelper.class).cloneLenient(value) // lenient clone of provided value to allow change detection by caller
  *         .withName(PREFIX + value.getName());
  *   }
  * }
@@ -164,6 +166,10 @@ public interface IDoValueMigrationHandler<T> {
    * and the returned value. Implementations must consider the input value as immutable and either return a completely
    * new object or a modified copy of the input value. If no migration is required, implementations may simply return
    * the provided input value.
+   * <p>
+   * Be aware that if the {@link #valueClass()} references a {@link IDoEntity}, the given value representing a DO entity
+   * was created by lenient deserialization (i.e. using {@link ILenientDataObjectMapper}). Thus, when creating a copy of
+   * such a data object before any modification, use {@link DataObjectHelper#cloneLenient(IDoEntity)}.
    *
    * @param value
    *          never {@code null}

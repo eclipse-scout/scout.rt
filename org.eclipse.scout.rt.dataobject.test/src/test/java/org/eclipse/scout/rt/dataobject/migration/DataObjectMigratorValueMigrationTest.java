@@ -24,6 +24,9 @@ import org.eclipse.scout.rt.dataobject.DoEntityHolder;
 import org.eclipse.scout.rt.dataobject.IDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrator.DataObjectMigratorResult;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureDo;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerGenderFixtureDoValueMigrationHandler_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerGenderFixtureEnum;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoStructureMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoValueMigrationHandler_1;
@@ -42,10 +45,12 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureDo
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureStringId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypesCollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypesFixture;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
@@ -79,6 +84,7 @@ public class DataObjectMigratorValueMigrationTest {
             new PetFixtureAlwaysAcceptDoValueMigrationHandler_3(),
             new RoomSizeFixtureDoValueMigrationHandler_2(),
             new RoomTypeFixtureDoValueMigrationHandler_2(),
+            new CustomerGenderFixtureDoValueMigrationHandler_2(),
             new HouseTypeFixtureDoValueMigrationHandler_2(),
             new HouseFixtureDoValueMigrationHandler_1()));
 
@@ -252,6 +258,41 @@ public class DataObjectMigratorValueMigrationTest {
         .withName("example")
         .withCustomData(BEANS.get(PetFixtureDo.class)
             .withName("Fluffy")); // migrated from "Nickname: Fluffy" to "Fluffy" by PetFixtureAlwaysAcceptDoValueMigrationHandler_3
+
+    assertEqualsWithComparisonFailure(expected, result.getDataObject());
+  }
+
+  /**
+   * Tests the behavior of {@link DataObjectMigrator} regarding invalid structures before executing value migration
+   * {@link CustomerGenderFixtureDoValueMigrationHandler_2}.
+   */
+  @Test
+  public void testValueMigrationWithInvalidStructure() {
+    // raw DoEntity data object
+    IDoEntity original = BEANS.get(DoEntityBuilder.class)
+        .put("_type", "alfaFixture.CustomerFixture")
+        .put("_typeVersion", AlfaFixture_3.VERSION.unwrap())
+        .put("firstName", "John")
+        .put("lastName", "Doe")
+        .put("gender", "m")
+        .build();
+
+    DataObjectMigrationContext localeMigrationContext = BEANS.get(DataObjectMigrationContext.class)
+        .putGlobal(BEANS.get(DoValueMigrationIdsContextData.class)
+            .withAppliedValueMigrationIds(CollectionUtility.hashSet(CustomerGenderFixtureDoValueMigrationHandler_2.ID)));
+
+    // using a migration context where CustomerGenderFixtureDoValueMigrationHandler_2 was already executed, so this method call will fail because gender "m" cannot be read by regular data object mapper
+    assertThrows(PlatformException.class, () -> s_migrator.migrateDataObject(localeMigrationContext, original, CustomerFixtureDo.class));
+
+    // in default migration context CustomerGenderFixtureDoValueMigrationHandler_2 will be executed resulting in a valid final data object (gender "male")
+    DataObjectMigratorResult<CustomerFixtureDo> result = s_migrator.migrateDataObject(s_migrationContext, original, CustomerFixtureDo.class);
+
+    assertTrue(result.isChanged());
+
+    CustomerFixtureDo expected = BEANS.get(CustomerFixtureDo.class)
+        .withFirstName("John")
+        .withLastName("Doe")
+        .withGender(CustomerGenderFixtureEnum.MALE);
 
     assertEqualsWithComparisonFailure(expected, result.getDataObject());
   }

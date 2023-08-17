@@ -18,6 +18,7 @@ import javax.annotation.Generated;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
@@ -71,6 +72,13 @@ public class TestEntityWithIIdDo extends DoEntity {
    */
   public DoValue<Map<IUuId, String>> iUuIdMap() {
     return doValue("iUuIdMap");
+  }
+
+  /**
+   * Used for testing {@link ILenientDataObjectMapper}.
+   */
+  public DoValue<Map<IUuId, TestItemDo>> iUuIdDoMap() {
+    return doValue("iUuIdDoMap");
   }
 
   public DoValue<List<FixtureLongId>> longIds() {
@@ -202,6 +210,23 @@ public class TestEntityWithIIdDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<IUuId, String> getIUuIdMap() {
     return iUuIdMap().get();
+  }
+
+  /**
+   * See {@link #iUuIdDoMap()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestEntityWithIIdDo withIUuIdDoMap(Map<IUuId, TestItemDo> iUuIdDoMap) {
+    iUuIdDoMap().set(iUuIdDoMap);
+    return this;
+  }
+
+  /**
+   * See {@link #iUuIdDoMap()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<IUuId, TestItemDo> getIUuIdDoMap() {
+    return iUuIdDoMap().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

@@ -142,7 +142,7 @@ public class QualifiedIIdSerializationTest {
     @Override
     public KeyDeserializer findKeyDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class) || type.hasRawClass(IId.class)) {
-        return new QualifiedIIdMapKeyDeserializer(type.getRawClass().asSubclass(IId.class));
+        return new QualifiedIIdMapKeyDeserializer(moduleContext, type.getRawClass().asSubclass(IId.class));
       }
       return null;
     }

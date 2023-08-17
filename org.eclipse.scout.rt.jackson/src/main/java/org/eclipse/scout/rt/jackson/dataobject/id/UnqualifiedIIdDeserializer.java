@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Custom deserializer for {@link IId} values.
@@ -35,6 +36,12 @@ public class UnqualifiedIIdDeserializer extends StdDeserializer<IId> {
 
   @Override
   public IId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    return m_idCodec.get().fromUnqualified(m_idClass, p.getText());
+    String rawValue = p.getText();
+    try {
+      return m_idCodec.get().fromUnqualified(m_idClass, rawValue);
+    }
+    catch (RuntimeException e) {
+      throw InvalidFormatException.from(p, "Failed to deserialize unqualified IId: " + e.getMessage(), rawValue, m_idClass);
+    }
   }
 }

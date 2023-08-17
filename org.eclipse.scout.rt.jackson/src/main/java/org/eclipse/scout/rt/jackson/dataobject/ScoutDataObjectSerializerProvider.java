@@ -62,7 +62,7 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
       return new DoEntitySerializer(moduleContext, type);
     }
     else if (ObjectUtility.isOneOf(rawClass, DoList.class, DoSet.class, DoCollection.class)) {
-      return new DoCollectionSerializer<>(type);
+      return new DoCollectionSerializer<>(moduleContext, type);
     }
     else if (Date.class.isAssignableFrom(rawClass)) {
       return new DoDateSerializer();
@@ -172,15 +172,15 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
     if (IId.class.isAssignableFrom(rawClass)) {
       Class<? extends IId> idClass = rawClass.asSubclass(IId.class);
       if (type.isConcrete()) {
-        return new UnqualifiedIIdMapKeyDeserializer(idClass);
+        return new UnqualifiedIIdMapKeyDeserializer(moduleContext, idClass);
       }
       else {
-        return new QualifiedIIdMapKeyDeserializer(idClass);
+        return new QualifiedIIdMapKeyDeserializer(moduleContext, idClass);
       }
     }
     else if (IEnum.class.isAssignableFrom(rawClass)) {
       Class<? extends IEnum> enumClass = rawClass.asSubclass(IEnum.class);
-      return new EnumMapKeyDeserializer(enumClass);
+      return new EnumMapKeyDeserializer(moduleContext, enumClass);
     }
 
     return null;
@@ -211,7 +211,7 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
   public JsonSerializer<?> findCollectionSerializer(ScoutDataObjectModuleContext moduleContext, CollectionType type, SerializationConfig config, BeanDescription beanDesc, TypeSerializer elementTypeSerializer,
       JsonSerializer<Object> elementValueSerializer) {
     if (Collection.class.isAssignableFrom(type.getRawClass())) {
-      return new DoCollectionSerializer<>(type);
+      return new DoCollectionSerializer<>(moduleContext, type);
     }
     return null;
   }

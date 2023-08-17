@@ -40,8 +40,8 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 public class DataObjectHelper {
 
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
-
   protected final LazyValue<IDataObjectMapper> m_dataObjectMapper = new LazyValue<>(IDataObjectMapper.class);
+  protected final LazyValue<ILenientDataObjectMapper> m_lenientDataObjectMapper = new LazyValue<>(ILenientDataObjectMapper.class);
 
   /**
    * Returns attribute {@code attributeName} converted to a {@link Integer} value.
@@ -127,12 +127,27 @@ public class DataObjectHelper {
    * @see IDataObjectMapper#readValue(String, Class)
    */
   public <T extends IDoEntity> T clone(T value) {
+    return cloneInternal(value, m_dataObjectMapper.get());
+  }
+
+  /**
+   * Clones the given object using lenient data object serialization and deserialization.
+   * <p>
+   * Use only in special cases when provided object was already deserialized by using lenient mode.
+   *
+   * @see ILenientDataObjectMapper#writeValue(Object)
+   * @see ILenientDataObjectMapper#readValue(String, Class)
+   */
+  public <T extends IDoEntity> T cloneLenient(T value) {
+    return cloneInternal(value, m_lenientDataObjectMapper.get());
+  }
+
+  protected <T extends IDoEntity> T cloneInternal(T value, IDataObjectMapper mapper) {
     if (value == null) {
       return null;
     }
     @SuppressWarnings("unchecked")
     Class<T> valueType = (Class<T>) value.getClass();
-    IDataObjectMapper mapper = m_dataObjectMapper.get();
     String clone = mapper.writeValue(value);
     return mapper.readValue(clone, valueType);
   }

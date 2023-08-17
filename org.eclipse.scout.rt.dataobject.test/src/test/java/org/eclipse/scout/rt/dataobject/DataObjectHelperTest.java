@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ListEntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureDo;
 import org.eclipse.scout.rt.dataobject.testing.TestingDataObjectHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -174,6 +175,18 @@ public class DataObjectHelperTest {
     assertNull(m_helper.clone(null));
     DoEntity clone = m_helper.clone(BEANS.get(DoEntity.class));
     assertSame(DESERIALIZED_DO_ENTITY_VALUE, clone);
+  }
+
+  @Test
+  public void testCloneLenient() {
+    assertNull(m_helper.cloneLenient(null));
+    CustomerFixtureDo customerFixture = BEANS.get(CustomerFixtureDo.class)
+        .withFirstName("John")
+        .withLastName("Doe");
+    customerFixture.put(customerFixture.gender().getAttributeName(), "m"); // an invalid enum
+
+    IDoEntity clone = m_helper.cloneLenient(customerFixture);
+    assertEquals(customerFixture, clone);
   }
 
   @Test
