@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Custom deserializer for {@link IEnum} values.
@@ -35,6 +36,12 @@ public class EnumDeserializer extends StdDeserializer<IEnum> {
 
   @Override
   public IEnum deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    return m_enumResolver.get().resolve(m_enumType, p.readValueAs(String.class));
+    String rawValue = p.readValueAs(String.class);
+    try {
+      return m_enumResolver.get().resolve(m_enumType, rawValue);
+    }
+    catch (RuntimeException e) {
+      throw InvalidFormatException.from(p, "Failed to deserialize IEnum: " + e.getMessage(), rawValue, m_enumType);
+    }
   }
 }

@@ -50,7 +50,7 @@ public class PetFixtureAlwaysAcceptDoValueMigrationHandler_3 extends AbstractDoV
       return value; // already migrated or nothing to migrate
     }
 
-    return BEANS.get(DataObjectHelper.class).clone(value) // clone provided value to allow change detection by caller
+    return BEANS.get(DataObjectHelper.class).cloneLenient(value) // clone provided value to allow change detection by caller
         .withName(StringUtility.removePrefixes(value.getName(), NAME_PREFIX));
   }
 }

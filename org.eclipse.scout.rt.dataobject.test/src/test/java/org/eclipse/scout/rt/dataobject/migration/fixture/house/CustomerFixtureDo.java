@@ -37,6 +37,10 @@ public class CustomerFixtureDo extends DoEntity {
     return doValue("lastName");
   }
 
+  public DoValue<CustomerGenderFixtureEnum> gender() {
+    return doValue("gender");
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -61,5 +65,16 @@ public class CustomerFixtureDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public String getLastName() {
     return lastName().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public CustomerFixtureDo withGender(CustomerGenderFixtureEnum gender) {
+    gender().set(gender);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public CustomerGenderFixtureEnum getGender() {
+    return gender().get();
   }
 }
