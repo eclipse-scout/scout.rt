@@ -30,7 +30,7 @@
       }
     },
     "ChartTableControl": {
-      "chartType": 3,
+      "chartType": "bar",
       "chartAggregation": {
         "modifier": -1
       }
