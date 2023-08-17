@@ -438,6 +438,74 @@ describe('Widget', () => {
     });
   });
 
+  describe('findChild', () => {
+    it('finds the first child which has the given type', () => {
+      let child = new SubTestWidget();
+      child.init({
+        id: 'child',
+        parent: parent
+      });
+      let grandChild1 = new AnotherTestWidget();
+      grandChild1.init({
+        id: 'grandChild1',
+        parent: child
+      });
+      let grandChild2 = new AnotherTestWidget();
+      grandChild2.init({
+        id: 'grandChild2',
+        parent: child
+      });
+      let grandGrandChild = new AnotherTestWidget();
+      grandGrandChild.init({
+        id: 'grandGrandChild',
+        parent: grandChild1
+      });
+      expect(parent.findChild(Widget)).toBe(child);
+      expect(parent.findChild(SubTestWidget)).toBe(child);
+      expect(parent.findChild(AnotherTestWidget)).toBe(grandChild1);
+      expect(child.findChild(AnotherTestWidget)).toBe(grandChild1);
+      expect(grandChild1.findChild(AnotherTestWidget)).toBe(grandGrandChild);
+      expect(child.findChild(TestWidget)).toBe(null);
+
+      let thrown;
+      try {
+        // @ts-expect-error TableRow does not extend widget -> it will be treated as predicate which won't work (TypeError: Class constructor TableRow cannot be invoked without 'new')
+        parent.findParent(TableRow);
+      } catch (error) {
+        thrown = true;
+      }
+      expect(thrown).toBe(true);
+    });
+
+    it('finds the first child that is accepted by the given predicate', () => {
+      let child = new SubTestWidget();
+      child.init({
+        id: 'child',
+        parent: parent
+      });
+      let grandChild1 = new AnotherTestWidget();
+      grandChild1.init({
+        id: 'grandChild1',
+        parent: child
+      });
+      let grandChild2 = new AnotherTestWidget();
+      grandChild2.init({
+        id: 'grandChild2',
+        parent: child
+      });
+      let grandGrandChild = new AnotherTestWidget();
+      grandGrandChild.init({
+        id: 'grandGrandChild',
+        parent: grandChild1
+      });
+      expect(parent.findChild(child => child.id === 'child')).toBe(child);
+      expect(parent.findChild(child => child.id === 'grandChild1')).toBe(grandChild1);
+      expect(parent.findChild(child => child.id === 'grandChild2')).toBe(grandChild2);
+      expect(parent.findChild(child => child.id === 'grandGrandChild')).toBe(grandGrandChild);
+      expect(parent.findChild(child => false)).toBe(null);
+    });
+  });
+
   describe('enabled', () => {
     it('should be propagated correctly', () => {
       let widget = createWidget({
