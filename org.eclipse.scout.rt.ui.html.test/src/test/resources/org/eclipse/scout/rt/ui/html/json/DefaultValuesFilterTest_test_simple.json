@@ -33,19 +33,21 @@
       "id": "5",
       "objectType": "Table",
       "enabled": false,
-      "rows": {
-        "enabled": false,
-        "cells": [
-          {
-            "editable": true,
-            "text": "cell1"
-        },
+      "rows": [
         {
-          "editable": false,
-          "text": "cell2"
+          "enabled": false,
+          "cells": [
+            {
+              "editable": true,
+              "text": "cell1"
+          },
+          {
+            "editable": false,
+            "text": "cell2"
+          }
+          ]
         }
-        ]
-      }
+      ]
     },
     {
       "id": "6",
