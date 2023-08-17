@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
@@ -150,10 +151,10 @@ public class DataObjectMigrator {
       ctx.getLogger().trace("Data object after structure migration: {}", dataObject);
     }
 
-    // Convert to typed object
-    IDataObjectMapper dataObjectMapper = BEANS.get(IDataObjectMapper.class);
-    String migratedJson = dataObjectMapper.writeValue(dataObject);
-    T typedDataObject = dataObjectMapper.readValue(migratedJson, valueType);
+    // Convert to typed object by using lenient data object mapper (value migrations might migrate additional values that cannot be put into valid typed structures yet)
+    IDataObjectMapper lenientDataObjectMapper = BEANS.get(ILenientDataObjectMapper.class);
+    String migratedJson = lenientDataObjectMapper.writeValue(dataObject);
+    T typedDataObject = lenientDataObjectMapper.readValue(migratedJson, valueType);
 
     // Apply intermediate migrations on typed data object (if any), start with global (defined on context) and continue with local (provided as method parameter)
     List<IDataObjectIntermediateMigration<T>> allIntermediateMigrations = CollectionUtility.combine(ctx.getIntermediateMigrations().all(valueType), localIntermediateMigrations);
@@ -178,6 +179,11 @@ public class DataObjectMigrator {
     if (valueChanged) {
       logger.trace("Data object after value migration: {}", migratedDataObject);
     }
+
+    // Convert to typed object by using regular data object mapper (if data object is not valid yet, it must fail, caller expects a valid data object)
+    IDataObjectMapper dataObjectMapper = BEANS.get(IDataObjectMapper.class);
+    String finalJson = dataObjectMapper.writeValue(migratedDataObject);
+    migratedDataObject = dataObjectMapper.readValue(finalJson, valueType);
 
     boolean objectChanged = structureChanged || intermediateChanged || valueChanged;
     if (objectChanged) {

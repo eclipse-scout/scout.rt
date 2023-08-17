@@ -186,6 +186,10 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       return p.getCodec().readValue(p, attributeType.getJavaType());
     }
     catch (InvalidFormatException e) {
+      if (m_moduleContext.isLenientMode()) {
+        //noinspection unchecked
+        return (T) e.getValue();
+      }
       // capture exception containing the deserialized value to throw a specific exception message with attribute name and entity class
       String msg = MessageFormatter.arrayFormat("Failed to deserialize attribute '{}' of entity {}, value was {}", new Object[]{attributeName, handledType().getName(), e.getValue()}).getMessage();
       InvalidFormatException ife = InvalidFormatException.from(p, msg, e.getValue(), e.getTargetType());
@@ -220,7 +224,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       Class<? extends IDoEntity> clazz = m_doEntityDeserializerTypeStrategy.resolveTypeName(entityType);
       if (clazz != null) {
         // (1) Class could be resolved by given entityType, validate that resolved class is assignable from class handled by this deserializer instance
-        if (!m_handledClass.isAssignableFrom(clazz)) {
+        if (!m_moduleContext.isLenientMode() && !m_handledClass.isAssignableFrom(clazz)) {
           throw JsonMappingException.from(ctxt, "Class resolved by parsed entity type is not assignable from class expected by deserializer. ["
               + "entityType=" + entityType + " resolvedClass=" + clazz.getName() + " handledClassByDeserializer=" + m_handledClass + "]");
         }
@@ -228,12 +232,12 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       }
       else {
         // (2) Class could be not resolved by given entityType, validate that handled class (e.g. class expected to be created by this deserializer instance) is of raw type
-        if (!ObjectUtility.isOneOf(m_handledClass, DoEntity.class, IDoEntity.class, IDataObject.class)) {
+        if (!m_moduleContext.isLenientMode() && !ObjectUtility.isOneOf(m_handledClass, DoEntity.class, IDoEntity.class, IDataObject.class)) {
           throw JsonMappingException.from(ctxt, "Could not resolve a class by parsed entity type and deserializer expect a concrete class to be created. ["
               + "entityType=" + entityType + " handledClassByDeserializer=" + m_handledClass + "]");
         }
         // Use generic DoEntity instance with a type attribute to preserve the type information even if correct DoEntity class could not be resolved
-        DoEntity entity = newObject(ctxt, DoEntity.class);
+        IDoEntity entity = newObject(ctxt, DoEntity.class);
         entity.put(m_moduleContext.getTypeAttributeName(), entityType);
         return entity;
       }
@@ -290,12 +294,17 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     return type.getBindings().getBoundType(0);
   }
 
-  protected <T extends IDoEntity> T newObject(DeserializationContext ctxt, Class<T> entityType) throws IOException {
+  protected IDoEntity newObject(DeserializationContext ctxt, Class<? extends IDoEntity> entityType) throws IOException {
     if (entityType == IDoEntity.class) {
       // fallback to default DoEntity implementation, if handled entity type is IDoEntity (e.g. class instance is unspecified)
-      return entityType.cast(BEANS.get(DoEntity.class));
+      return BEANS.get(DoEntity.class);
     }
     else if (BEANS.getBeanManager().isBean(entityType)) {
+      if (m_moduleContext.isLenientMode() && BEANS.getBeanManager().uniqueBean(entityType) == null) {
+        // In case there are multiple instances for a given entity type, BEANS#get will throw an exception, but #uniqueBean will return null.
+        // For lenient deserialization, a DoEntity is used instead of the concrete type.
+        return BEANS.get(DoEntity.class);
+      }
       return BEANS.get(entityType);
     }
     throw JsonMappingException.from(ctxt, "Could not instantiate class, " + (entityType == null ? null : entityType.getName()) + " is not a Scout bean");

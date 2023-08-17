@@ -36,6 +36,8 @@ public class ScoutDataObjectModuleContext {
 
   protected static final String CONTRIBUTIONS_ATTRIBUTE_NAME_KEY = "contributionsAttributeNameKey";
 
+  protected static final String LENIENT_MODE_KEY = "lenientModeKey";
+
   protected LazyValue<DoEntitySerializerAttributeNameComparator> m_comparator = new LazyValue<>(() -> BEANS.get(DoEntitySerializerAttributeNameComparator.class).init(this));
 
   protected final Map<String, Object> m_contextMap = new HashMap<>();
@@ -108,6 +110,20 @@ public class ScoutDataObjectModuleContext {
 
   public ScoutDataObjectModuleContext withContributionsAttributeName(String contributionsAttributeName) {
     put(CONTRIBUTIONS_ATTRIBUTE_NAME_KEY, contributionsAttributeName);
+    return this;
+  }
+
+  /**
+   * @return <code>true</code> if lenient serialization/deserialization should be used. Non-lenient
+   *         serialization/deserialization will fail if types don't match the expected ones according to the given
+   *         structure.
+   */
+  public boolean isLenientMode() {
+    return BooleanUtility.nvl(get(LENIENT_MODE_KEY, Boolean.class));
+  }
+
+  public ScoutDataObjectModuleContext withLenientMode(boolean lenientMode) {
+    put(LENIENT_MODE_KEY, true);
     return this;
   }
 }
