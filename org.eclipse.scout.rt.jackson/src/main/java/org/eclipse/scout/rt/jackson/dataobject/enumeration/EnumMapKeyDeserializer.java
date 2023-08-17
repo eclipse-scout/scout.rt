@@ -13,25 +13,38 @@ import java.io.IOException;
 
 import org.eclipse.scout.rt.dataobject.enumeration.EnumResolver;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
+import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Custom deserializer used for map keys of type {@link IEnum}.
  */
 public class EnumMapKeyDeserializer extends KeyDeserializer {
 
-  private final Class<? extends IEnum> m_enumClass;
   protected final LazyValue<EnumResolver> m_enumResolver = new LazyValue<>(EnumResolver.class);
 
-  public EnumMapKeyDeserializer(Class<? extends IEnum> enumClass) {
+  protected final ScoutDataObjectModuleContext m_moduleContext;
+  protected final Class<? extends IEnum> m_enumClass;
+
+  public EnumMapKeyDeserializer(ScoutDataObjectModuleContext moduleContext, Class<? extends IEnum> enumClass) {
+    m_moduleContext = moduleContext;
     m_enumClass = enumClass;
   }
 
   @Override
   public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-    return m_enumResolver.get().resolve(m_enumClass, key);
+    try {
+      return m_enumResolver.get().resolve(m_enumClass, key);
+    }
+    catch (RuntimeException e) {
+      if (m_moduleContext.isLenientMode()) {
+        return key;
+      }
+      throw InvalidFormatException.from(null, "Failed to deserialize map key IEnum: " + e.getMessage(), key, m_enumClass);
+    }
   }
 }

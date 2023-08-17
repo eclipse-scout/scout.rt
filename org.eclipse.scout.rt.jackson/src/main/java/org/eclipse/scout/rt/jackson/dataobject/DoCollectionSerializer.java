@@ -38,8 +38,11 @@ public class DoCollectionSerializer<COLLECTION extends Iterable<?>> extends StdS
 
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
-  public DoCollectionSerializer(JavaType type) {
+  protected final ScoutDataObjectModuleContext m_context;
+
+  public DoCollectionSerializer(ScoutDataObjectModuleContext context, JavaType type) {
     super(type);
+    m_context = context;
   }
 
   @Override
@@ -53,6 +56,7 @@ public class DoCollectionSerializer<COLLECTION extends Iterable<?>> extends StdS
   }
 
   protected void serializeList(Iterable<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    JavaType listElementType = null;
     JsonSerializer<Object> serializer = null;
     JsonStreamContext ctx = gen.getOutputContext();
     if (ctx.getCurrentValue() instanceof IDoEntity) {
@@ -60,13 +64,13 @@ public class DoCollectionSerializer<COLLECTION extends Iterable<?>> extends StdS
       Optional<AttributeType> typeOpt = getAttributeType(((IDoEntity) ctx.getCurrentValue()).getClass(), attributeName);
       if (typeOpt.isPresent()) {
         // Either DoCollection/DoList/DoSet or a Collection (e.g. Collection<X>)
-        JavaType listType = typeOpt.get().getJavaType().getBindings().getBoundType(0);
+        listElementType = typeOpt.get().getJavaType().getBindings().getBoundType(0);
 
         // Check for != Object is required because findTypedValueSerializer would otherwise return UnknownSerializer.
         // By not setting a serializer here, JsonGenerator#writeObject will be called further below, which will result in a value-based serialization.
-        // listType will be null for DoValue<IDataObject>
-        if (listType != null && listType.getRawClass() != Object.class) {
-          serializer = provider.findTypedValueSerializer(listType, true, null);
+        // listElementType will be null for DoValue<IDataObject>
+        if (listElementType != null && listElementType.getRawClass() != Object.class) {
+          serializer = provider.findTypedValueSerializer(listElementType, true, null);
         }
       }
     }
@@ -75,7 +79,11 @@ public class DoCollectionSerializer<COLLECTION extends Iterable<?>> extends StdS
     gen.writeStartArray();
     gen.setCurrentValue(value);
     for (Object item : value) {
-      if (serializer == null || item == null) { // JsonSerializer#serializer must not be called will a null value
+      if (serializer == null || item == null || (m_context.isLenientMode() && !listElementType.isTypeOrSuperTypeOf(item.getClass()))) {
+        // Use value-based serialization either:
+        // - if no type information on data object entity class is available for given attribute (serializer is null)
+        // - if item value is null (JsonSerializer#serializer must not be called will a null value)
+        // - if lenient mode and declared list element type is not equals/not a super type of the given item value
         gen.writeObject(item);
       }
       else {

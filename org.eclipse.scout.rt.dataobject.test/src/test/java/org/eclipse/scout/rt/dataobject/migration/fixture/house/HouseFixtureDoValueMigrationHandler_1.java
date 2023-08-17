@@ -54,7 +54,7 @@ public class HouseFixtureDoValueMigrationHandler_1 extends AbstractDoValueMigrat
         // We intentionally insert a value which needs to be migrated by RoomTypeFixtureDoValueMigrationHandler_2.
         .withRoomType(RoomTypeFixtureStringId.of("standard-room"));
 
-    return BEANS.get(DataObjectHelper.class).clone(value) // clone provided value to allow change detection by caller
+    return BEANS.get(DataObjectHelper.class).cloneLenient(value) // clone provided value to allow change detection by caller
         .withRooms(newRoom);
   }
 }

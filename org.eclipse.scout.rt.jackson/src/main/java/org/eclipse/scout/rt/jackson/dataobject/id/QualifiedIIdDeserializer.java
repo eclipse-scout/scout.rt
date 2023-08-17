@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Custom deserializer for {@link IId} instances - like {@link TypedIdDeserializer} it uses {@link IdCodec} for
@@ -39,6 +40,12 @@ public class QualifiedIIdDeserializer extends StdDeserializer<IId> {
   @Override
   public IId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
     // check required to prevent returning an instance that isn't compatible with requested ID class
-    return assertInstance(m_idCodec.get().fromQualified(p.getText()), m_idClass);
+    String rawValue = p.getText();
+    try {
+      return assertInstance(m_idCodec.get().fromQualified(rawValue), m_idClass);
+    }
+    catch (RuntimeException e) {
+      throw InvalidFormatException.from(p, "Failed to deserialize qualified IId: " + e.getMessage(), rawValue, m_idClass);
+    }
   }
 }

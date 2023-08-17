@@ -14,9 +14,12 @@ import static org.junit.Assert.*;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
@@ -24,10 +27,11 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.IUuId;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithIIdDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,10 +49,12 @@ public class IIdSerializationTest {
 
   protected DataObjectSerializationTestHelper m_testHelper;
   protected IDataObjectMapper m_dataObjectMapper;
+  protected IDataObjectMapper m_lenientDataObjectMapper;
 
   @Before
   public void before() {
     m_dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
+    m_lenientDataObjectMapper = BEANS.get(ILenientDataObjectMapper.class);
     m_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
   }
 
@@ -130,13 +136,86 @@ public class IIdSerializationTest {
         .put("iUuId", "scout.FixtureStringId:foo")
         .build());
 
-    assertThrows(AssertionException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
 
     String mapJson = m_dataObjectMapper.writeValue(BEANS.get(DoEntityBuilder.class)
         .put("iUuIdMap", Collections.singletonMap("scout.FixtureStringId:foo", "test"))
         .build());
 
-    assertThrows(AssertionException.class, () -> m_dataObjectMapper.readValue(mapJson, TestEntityWithIIdDo.class));
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(mapJson, TestEntityWithIIdDo.class));
+  }
+
+  @Test
+  public void testDeserializeInvalidUnqualifiedId() {
+    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"uuId\" : \"a;b;c\" }"; // composite-id format for non-composite id
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient.getUuId());
+    assertEquals("a;b;c", marshalledLenient.getString("uuId"));
+  }
+
+  @Test
+  public void testDeserializeInvalidUnqualifiedIdMapKey() {
+    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"map\" : { \"a;b;c\" : \"value\" } }"; // composite-id format for non-composite id
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    Map<FixtureStringId, String> map = marshalledLenient.getMap(); // accessing this way works due to missing checks for generics at runtime
+    assertEquals(1, map.size());
+    //noinspection AssertBetweenInconvertibleTypes
+    assertEquals("a;b;c", CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
+    assertEquals("value", CollectionUtility.firstElement(map.values()));
+  }
+
+  @Test
+  public void testDeserializeInvalidQualifiedId() {
+    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iid\" : \"scout.unknown:unknown\" }";
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient.getIid());
+    assertEquals("scout.unknown:unknown", marshalledLenient.getString("iid"));
+  }
+
+  @Test
+  public void testDeserializeInvalidQualifiedIdMapKey() {
+    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iUuIdMap\" : { \"scout.unknown:unknown\" : \"value\" } }";
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    Map<IUuId, String> map = marshalledLenient.getIUuIdMap(); // accessing this way works due to missing checks for generics at runtime
+    assertEquals(1, map.size());
+    //noinspection AssertBetweenInconvertibleTypes
+    assertEquals("scout.unknown:unknown", CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
+    assertEquals("value", CollectionUtility.firstElement(map.values()));
+  }
+
+  @Test
+  public void testDeserializeInvalidQualifiedIdMapKeyWithValidDo() {
+    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iUuIdDoMap\" : { \"scout.unknown:unknown\" : { \"_type\" : \"TestItem\", \"id\" : \"1\" } } }";
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    Map<IUuId, TestItemDo> map = marshalledLenient.getIUuIdDoMap(); // accessing this way works due to missing checks for generics at runtime
+    assertEquals(1, map.size());
+    //noinspection AssertBetweenInconvertibleTypes
+    assertEquals("scout.unknown:unknown", CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
+    assertEquals(BEANS.get(TestItemDo.class).withId("1"), CollectionUtility.firstElement(map.values())); // typed
+  }
+
+  @Test
+  public void testDeserializeValidQualifiedIdMapKeyWithInvalidDo() {
+    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iUuIdDoMap\" : { \"scout.FixtureUuId:e7a8792f-7ed1-48a6-9d14-5ebbfd1d00ff\" : { \"_type\" : \"unknown\", \"id\" : \"1\" } } }";
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    Map<IUuId, TestItemDo> map = marshalledLenient.getIUuIdDoMap(); // accessing this way works due to missing checks for generics at runtime
+    assertEquals(1, map.size());
+    assertEquals(FixtureUuId.of("e7a8792f-7ed1-48a6-9d14-5ebbfd1d00ff"), CollectionUtility.firstElement(map.keySet()));
+    DoEntity untypedDoEntity = CollectionUtility.firstElement(map.values()); // unknown -> untyped
+    assertEquals("unknown", untypedDoEntity.getString("_type"));
+    assertEquals("1", untypedDoEntity.getString("id"));
   }
 
   protected URL toURL(String resourceName) {

@@ -121,10 +121,12 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
     }
     else {
       Optional<AttributeType> attributeType = getAttributeType(attributeName);
-      if (attributeType.isPresent()) {
+      if (attributeType.isPresent() && (!m_context.isLenientMode() || attributeType.get().getJavaType().isTypeOrSuperTypeOf(obj.getClass()))) {
+        // use serialization by typed attribute if a type is present and if lenient, only if type matches (data object might have an invalid structure, e.g. string instead of an enum if deserialized lenient)
         serializeTypedAttribute(attributeName, obj, gen, provider, attributeType.get().getJavaType());
       }
       else {
+        // use serialization by value
         gen.writeObjectField(attributeName, obj);
       }
     }
@@ -135,43 +137,62 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    */
   protected void serializeMap(String attributeName, Map<?, ?> map, JsonGenerator gen, SerializerProvider provider) throws IOException {
     Optional<AttributeType> typeOpt = getAttributeType(attributeName);
+    JavaType keyType = null;
     JsonSerializer<Object> keySerializer = null;
+    JavaType valueType = null;
     JsonSerializer<Object> valueSerializer = null;
     if (typeOpt.isPresent()) {
       MapType mapType = (MapType) typeOpt.get().getJavaType();
 
       // A data object (e.g. DoValue<Map<TestItemDo, String>>) or a pojo (e.g. DoValue<Map<Pojo, String>>) should never be used as a key type of a map,
       // because SdtKeySerializers.Default will be used which would trigger toString on the given object (not really useful).
-      keySerializer = provider.findKeySerializer(mapType.getKeyType(), null);
+      keyType = mapType.getKeyType();
+      keySerializer = provider.findKeySerializer(keyType, null);
 
       // Check for != Object is required because findTypedValueSerializer would otherwise return UnknownSerializer.
       // By not setting a serializer here, JsonGenerator#writeObject will be called further below, which will result in a value-based serialization.
-      if (mapType.getContentType().getRawClass() != Object.class) {
-        valueSerializer = provider.findTypedValueSerializer(mapType.getContentType(), true, null);
+      valueType = mapType.getContentType();
+      if (valueType.getRawClass() != Object.class) {
+        valueSerializer = provider.findTypedValueSerializer(valueType, true, null);
       }
     }
 
-    // This "raw" map serialization forces Jackson to includes type information by using the appropriate serializer if a type is available
+    // This "raw" map serialization forces Jackson to include type information by using the appropriate serializer if a type is available
     // or use the default serialization via key serializer/JsonGenerator#writeObject otherwise.
     gen.writeFieldName(attributeName);
     gen.writeStartObject();
     gen.setCurrentValue(map);
     for (Entry<?, ?> entry : map.entrySet()) {
       // serialize map key
-      if (entry.getKey() == null) {
-        provider.getDefaultNullKeySerializer().serialize(entry.getKey(), gen, provider);
+      Object key = entry.getKey();
+      if (key == null) {
+        provider.getDefaultNullKeySerializer().serialize(key, gen, provider);
       }
       else {
-        JsonSerializer<Object> ser = keySerializer == null ? provider.findKeySerializer(entry.getKey().getClass(), null) : keySerializer;
-        ser.serialize(entry.getKey(), gen, provider);
+        JsonSerializer<Object> ser;
+        if (keySerializer == null || (m_context.isLenientMode() && !keyType.isTypeOrSuperTypeOf(key.getClass()))) {
+          // use serialization by value either:
+          // - if no type information is available (key serializer is null)
+          // - if lenient mode and declared key type is not equals/not a super type of the given value
+          ser = provider.findKeySerializer(key.getClass(), null);
+        }
+        else {
+          ser = keySerializer;
+        }
+        ser.serialize(key, gen, provider);
       }
 
       // serialize map value
-      if (valueSerializer == null || entry.getValue() == null) { // JsonSerializer#serializer must not be called will a null value
-        gen.writeObject(entry.getValue());
+      Object value = entry.getValue();
+      if (valueSerializer == null || value == null || (m_context.isLenientMode() && !valueType.isTypeOrSuperTypeOf(value.getClass()))) {
+        // use serialization by value either:
+        // - if no type information is available (value serializer is null)
+        // - if value is null (JsonSerializer#serializer must not be called will a null value)
+        // - if lenient mode and declared value type is not equals/not a super type of the given value
+        gen.writeObject(value);
       }
       else {
-        valueSerializer.serialize(entry.getValue(), gen, provider);
+        valueSerializer.serialize(value, gen, provider);
       }
     }
     gen.writeEndObject();

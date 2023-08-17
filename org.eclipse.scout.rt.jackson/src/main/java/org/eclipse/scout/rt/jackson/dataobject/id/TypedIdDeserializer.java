@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Custom deserializer for {@link TypedId} values.
@@ -34,6 +35,12 @@ public class TypedIdDeserializer extends StdDeserializer<TypedId<IId>> {
 
   @Override
   public TypedId<IId> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    return TypedId.of(m_idCodec.get().fromQualified(p.getText()));
+    String rawValue = p.getText();
+    try {
+      return TypedId.of(m_idCodec.get().fromQualified(rawValue));
+    }
+    catch (RuntimeException e) {
+      throw InvalidFormatException.from(p, "Failed to deserialize TypedId: " + e.getMessage(), rawValue, TypedId.class);
+    }
   }
 }

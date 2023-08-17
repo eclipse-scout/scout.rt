@@ -41,7 +41,7 @@ public class RoomSizeFixtureDoValueMigrationHandler_2 extends AbstractDoValueMig
 
   @Override
   public RoomFixtureDo migrate(DataObjectMigrationContext ctx, RoomFixtureDo value) {
-    return BEANS.get(DataObjectHelper.class).clone(value) // clone provided value to allow change detection by caller
+    return BEANS.get(DataObjectHelper.class).cloneLenient(value) // clone provided value to allow change detection by caller
         // increase area by 10
         // non-idempotent migration for testing purposes only, real-world value migrations must be idempotent!
         .withAreaInSquareMeter(NumberUtility.nvl(value.getAreaInSquareMeter(), 0) + 10);

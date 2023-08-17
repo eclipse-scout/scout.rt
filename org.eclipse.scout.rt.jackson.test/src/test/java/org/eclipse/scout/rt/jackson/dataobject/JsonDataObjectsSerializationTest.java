@@ -85,6 +85,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEmptyObject;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithArrayDoValueDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithDoValueOfObjectDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithGenericValuesDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithIIdDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface1Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface2Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithListsDo;
@@ -147,6 +148,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -155,6 +157,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
@@ -188,6 +191,7 @@ public class JsonDataObjectsSerializationTest {
   protected static DataObjectHelper s_dataObjectHelper;
 
   protected static ObjectMapper s_dataObjectMapper;
+  protected static ObjectMapper s_lenientDataObjectMapper;
   protected static ObjectMapper s_defaultJacksonObjectMapper;
 
   @SuppressWarnings("deprecation")
@@ -196,6 +200,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
     s_dataObjectHelper = BEANS.get(DataObjectHelper.class);
     s_dataObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).getObjectMapper();
+    s_lenientDataObjectMapper = BEANS.get(JacksonLenientDataObjectMapper.class).getObjectMapper();
 
     s_defaultJacksonObjectMapper = new ObjectMapper()
         .setSerializationInclusion(Include.NON_DEFAULT)
@@ -3201,6 +3206,12 @@ public class JsonDataObjectsSerializationTest {
 
     // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete class
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestMapDo.class));
+
+    TestMapDo marshalledLenient = s_lenientDataObjectMapper.readValue(serialized, TestMapDo.class);
+    IDoEntity doEntity = marshalledLenient.getStringDoTestItemMapAttribute().get("one");
+    assertEquals(DoEntity.class, doEntity.getClass()); // raw DO entity due to type mismatch
+    assertEquals("UnknownType", doEntity.getString("_type"));
+    assertEquals(12345, doEntity.getDecimal("nr").intValue());
   }
 
   /**
@@ -3247,6 +3258,13 @@ public class JsonDataObjectsSerializationTest {
 
     // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete class
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class));
+
+    TestItemEntityDo marshalledLenient = s_lenientDataObjectMapper.readValue(serialized, TestItemEntityDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient.getItem());
+    IDoEntity doEntity = marshalledLenient.item().get();
+    assertEquals(DoEntity.class, doEntity.getClass()); // raw DO entity due to type mismatch
+    assertEquals("UnknownType", doEntity.getString("_type"));
+    assertEquals(12345, doEntity.getDecimal("nr").intValue());
   }
 
   /**
@@ -3294,6 +3312,13 @@ public class JsonDataObjectsSerializationTest {
 
     // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete DO interface
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class));
+
+    TestItemEntityDo marshalledLenient = s_lenientDataObjectMapper.readValue(serialized, TestItemEntityDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient.getItemIfc());
+    IDoEntity doEntity = marshalledLenient.itemIfc().get(); // accessing this way works due to missing checks for generics at runtime
+    assertEquals(DoEntity.class, doEntity.getClass()); // raw DO entity due to type mismatch
+    assertEquals("UnknownType", doEntity.getString("_type"));
+    assertEquals(12345, doEntity.getDecimal("nr").intValue());
   }
 
   /**
@@ -3321,6 +3346,51 @@ public class JsonDataObjectsSerializationTest {
   }
 
   /**
+   * Tests that {@link DoEntitySerializer#serializeAttribute(String, Object, JsonGenerator, SerializerProvider)} takes
+   * into account {@link ScoutDataObjectModuleContext#isLenientMode()}.
+   */
+  @Test
+  public void testSerializeWithInvalidAttributeType() throws Exception {
+    TestEntityWithIIdDo doEntity = BEANS.get(TestEntityWithIIdDo.class);
+    doEntity.put(doEntity.iUuId().getAttributeName(), "unknown"); // invalid format of an IUuId
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
+
+    String serialized = s_lenientDataObjectMapper.writeValueAsString(doEntity);
+    assertEquals("{\"_type\":\"scout.TestEntityWithIId\",\"iUuId\":\"unknown\"}", serialized);
+  }
+
+  /**
+   * Tests that {@link DoEntitySerializer#serializeMap(String, Map, JsonGenerator, SerializerProvider)} takes into
+   * account {@link ScoutDataObjectModuleContext#isLenientMode()}.
+   */
+  @Test
+  public void testSerializeWithInvalidMapType() throws Exception {
+    TestEntityWithIIdDo doEntity = BEANS.get(TestEntityWithIIdDo.class);
+    Map<Object, Object> map = new HashMap<>();
+    map.put(FixtureUuId.of("1317fd5c-82f7-451e-b1a3-9cb837081e40"), 123); // valid key, invalid value
+    map.put("unknown", "a string"); // invalid key, valid value
+    doEntity.put(doEntity.iUuIdMap().getAttributeName(), map);
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
+
+    String serialized = s_lenientDataObjectMapper.writeValueAsString(doEntity);
+    assertEquals("{\"_type\":\"scout.TestEntityWithIId\",\"iUuIdMap\":{\"scout.FixtureUuId:1317fd5c-82f7-451e-b1a3-9cb837081e40\":123,\"unknown\":\"a string\"}}", serialized);
+  }
+
+  /**
+   * Tests that {@link DoCollectionSerializer#serializeList(Iterable, JsonGenerator, SerializerProvider)} takes into
+   * account {@link ScoutDataObjectModuleContext#isLenientMode()}.
+   */
+  @Test
+  public void testSerializeWithInvalidCollectionType() throws Exception {
+    TestEntityWithIIdDo doEntity = BEANS.get(TestEntityWithIIdDo.class);
+    doEntity.putList(doEntity.stringIdsAsDoList().getAttributeName(), List.of("unknown", FixtureStringId.of("known"))); // invalid format of an IUuId
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
+
+    String serialized = s_lenientDataObjectMapper.writeValueAsString(doEntity);
+    assertEquals("{\"_type\":\"scout.TestEntityWithIId\",\"stringIdsAsDoList\":[\"unknown\",\"known\"]}", serialized);
+  }
+
+  /**
    * JSON without type information, expect concrete class.
    */
   @Test
@@ -3341,16 +3411,25 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(TestItemEntityDo.class, marshalled.getClass());
     // NOK - read into wrong class
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
+
+    s_lenientDataObjectMapper.readValue(json, TestItemDo.class);
+
+    IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemDo.class);
+    assertEquals(TestItemEntityDo.class, marshalledLenient.getClass()); // different type than requested
   }
 
   /**
    * JSON with type information (class not known), expect concrete class.
    */
   @Test
-  public void testDeserializeType_ConcreteClass3() {
+  public void testDeserializeType_ConcreteClass3() throws JsonProcessingException {
     String json = "{\"_type\" : \"UnknownEntity\"}";
     // NOK - read into wrong class
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+
+    IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemEntityDo.class);
+    assertEquals(DoEntity.class, marshalledLenient.getClass()); // raw DO entity due to type mismatch
+    assertEquals("UnknownEntity", marshalledLenient.getString("_type"));
   }
 
   /**
@@ -3366,29 +3445,49 @@ public class JsonDataObjectsSerializationTest {
     // NOK - read into wrong class
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
 
+    IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemDo.class);
+    assertEquals(TestItemEntityDo.class, marshalledLenient.getClass()); // different type than requested
+
     // NOK - read into wrong class
     String json2 = "{\"_type\" : \"TestItemEntity\", \"item\" : {\"_type\" : \"TestItem2\"}}";
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, TestItemEntityDo.class));
+
+    TestItemEntityDo marshalledLenient2 = s_lenientDataObjectMapper.readValue(json2, TestItemEntityDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient2.getItem());
+    IDoEntity doEntity = marshalledLenient2.item().get(); // accessing this way works due to missing checks for generics at runtime
+    // TestItemPojo2 is deserialized as DoTypedEntity with type 'TestItem2'
+    assertEquals(DoEntity.class, doEntity.getClass()); // raw DO entity due to type mismatch
   }
 
   /**
    * JSON with type information (class available) and nested type information (class not known), expect concrete class.
    */
   @Test
-  public void testDeserializeType_ConcreteClass5() {
+  public void testDeserializeType_ConcreteClass5() throws JsonProcessingException {
     String json = "{\"_type\" : \"TestItemEntity\", \"item\" : {\"_type\" : \"UnknownEntity\"}}";
     // NOK - read into wrong class
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+
+    TestItemEntityDo marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemEntityDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient.getItem());
+
+    IDoEntity doEntity = marshalledLenient.item().get(); // accessing this way works due to missing checks for generics at runtime
+    assertEquals(DoEntity.class, doEntity.getClass()); // raw DO entity due to type mismatch
+    assertEquals("UnknownEntity", doEntity.getString("_type"));
   }
 
   /**
    * JSON without type information, expect concrete interface.
    */
   @Test
-  public void testDeserializeType_ConcreteIfc1() {
+  public void testDeserializeType_ConcreteIfc1() throws JsonProcessingException {
     String json = "{\"foo\" : \"bar\"}";
     // Assertion error: multiple instances found for query: interface org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo
     assertThrows(AssertionException.class, () -> s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class));
+
+    IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, ITestBaseEntityDo.class);
+    assertEquals(DoEntity.class, marshalledLenient.getClass()); // raw DO entity due to type mismatch
+    assertEquals("bar", marshalledLenient.getString("foo"));
   }
 
   /**
@@ -3403,16 +3502,24 @@ public class JsonDataObjectsSerializationTest {
     // NOK - read into wrong interface
     String json2 = "{\"_type\" : \"TestItem\"}";
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, ITestBaseEntityDo.class));
+    s_lenientDataObjectMapper.readValue(json, ITestBaseEntityDo.class);
+
+    IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json2, ITestBaseEntityDo.class);
+    assertEquals(TestItemDo.class, marshalledLenient.getClass()); // different type than requested
   }
 
   /**
    * JSON with type information (class not known), expect concrete interface.
    */
   @Test
-  public void testDeserializeType_ConcreteIfc3() {
+  public void testDeserializeType_ConcreteIfc3() throws JsonProcessingException {
     String json = "{\"_type\" : \"UnknownEntity\"}";
     // NOK - read into wrong interface
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class));
+
+    IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, ITestBaseEntityDo.class);
+    assertEquals(DoEntity.class, marshalledLenient.getClass()); // raw DO entity due to type mismatch
+    assertEquals("UnknownEntity", marshalledLenient.getString("_type"));
   }
 
   /**
@@ -3429,9 +3536,17 @@ public class JsonDataObjectsSerializationTest {
     // NOK - read into wrong class
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
 
+    IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemDo.class);
+    assertEquals(TestItemEntityDo.class, marshalledLenient.getClass()); // different type than requested
+
     // NOK - read into wrong class
     String json2 = "{\"_type\" : \"TestItemEntity\", \"itemIfc\" : {\"_type\" : \"TestItem\"}}";
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, TestItemEntityDo.class));
+
+    TestItemEntityDo marshalledLenient2 = s_lenientDataObjectMapper.readValue(json2, TestItemEntityDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient2.getItemIfc());
+    IDoEntity doEntity = marshalledLenient2.itemIfc().get(); // accessing this way works due to missing checks for generics at runtime
+    assertEquals(TestItemDo.class, doEntity.getClass()); // different type than requested
   }
 
   /**
@@ -3439,10 +3554,16 @@ public class JsonDataObjectsSerializationTest {
    * interface.
    */
   @Test
-  public void testDeserializeType_ConcreteIfc5() {
+  public void testDeserializeType_ConcreteIfc5() throws JsonProcessingException {
     String json = "{\"_type\" : \"TestItemEntity\", \"itemIfc\" : {\"_type\" : \"UnknownEntity\"}}";
     // NOK - read into wrong class
     assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+
+    TestItemEntityDo marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemEntityDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient.getItemIfc());
+    IDoEntity doEntity = marshalledLenient.itemIfc().get(); // accessing this way works due to missing checks for generics at runtime
+    assertEquals(DoEntity.class, doEntity.getClass()); // raw DO entity due to type mismatch
+    assertEquals("UnknownEntity", doEntity.getString("_type"));
   }
 
   /**
@@ -3619,6 +3740,10 @@ public class JsonDataObjectsSerializationTest {
     assertThrows(InvalidTypeIdException.class, () -> s_defaultJacksonObjectMapper.readValue(json, TestItemPojo2.class));
     // NOK - read unknown type into pojo class
     assertThrows(InvalidTypeIdException.class, () -> s_defaultJacksonObjectMapper.readValue("{\"_type\":\"Unknown\"}", TestItemPojo.class));
+
+    // no DO entity, even lenient data object mapper cannot deal with this
+    assertThrows(InvalidTypeIdException.class, () -> s_lenientDataObjectMapper.readValue(json, TestItemPojo2.class));
+    assertThrows(InvalidTypeIdException.class, () -> s_lenientDataObjectMapper.readValue("{\"_type\":\"Unknown\"}", TestItemPojo.class));
   }
 
   // ------------------------------------ common test helper methods ------------------------------------
