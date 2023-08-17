@@ -30,9 +30,13 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Bean
 public class DefaultValuesFilter {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultValuesFilter.class);
 
   public static final String PROP_DEFAULTS = "defaults";
   public static final String PROP_OBJECT_TYPE_HIERARCHY = "objectTypeHierarchy";
@@ -202,10 +206,10 @@ public class DefaultValuesFilter {
 
   protected boolean checkValueEqualToDefaultValue(Object value, Object defaultValue, FilterState filterState) {
     // Now compare the given value to the found default value
-    if (value == null && defaultValue == null) {
+    if (JSONObject.NULL.equals(value) && JSONObject.NULL.equals(defaultValue)) {
       return true;
     }
-    if (value == null || defaultValue == null) {
+    if (JSONObject.NULL.equals(value) || JSONObject.NULL.equals(defaultValue)) {
       return false;
     }
     if (defaultValue instanceof JSONObject) {
@@ -241,6 +245,7 @@ public class DefaultValuesFilter {
       value = TypeCastUtility.castValue(value, defaultValue.getClass());
     }
     catch (RuntimeException e) { // NOSONAR
+      LOG.warn("Could not cast value '{}' to default value type '{}' for property '{}'", value, defaultValue.getClass().getName(), filterState.getCurrentProperty());
       // Types do not match
       return false;
     }

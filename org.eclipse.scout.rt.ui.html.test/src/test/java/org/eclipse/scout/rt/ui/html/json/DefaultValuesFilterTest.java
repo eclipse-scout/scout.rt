@@ -73,8 +73,8 @@ public class DefaultValuesFilterTest {
 
     JSONObject table = (JSONObject) adapterData.get(4);
     assertEquals(Boolean.FALSE, table.opt("enabled"));
-    assertEquals(Boolean.FALSE, table.optJSONObject("rows").opt("enabled"));
-    JSONArray cells = table.optJSONObject("rows").optJSONArray("cells");
+    assertEquals(Boolean.FALSE, table.optJSONArray("rows").getJSONObject(0).opt("enabled"));
+    JSONArray cells = table.optJSONArray("rows").getJSONObject(0).optJSONArray("cells");
     for (int i = 0; i < cells.length(); i++) {
       filter.filter(cells.getJSONObject(i), "Cell"); // Custom type
     }
@@ -204,5 +204,42 @@ public class DefaultValuesFilterTest {
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_loopHierarchy.json");
     DefaultValuesFilter filter = new DefaultValuesFilter();
     filter.importConfiguration(jsonDefaultValueConfiguration);
+  }
+
+  @Test
+  public void testFilterJsonNullValue() {
+    runTestFilterJsonNullValue("foo", JSONObject.NULL, true);
+    runTestFilterJsonNullValue("", JSONObject.NULL, true);
+    runTestFilterJsonNullValue(null, JSONObject.NULL, false);
+    runTestFilterJsonNullValue(JSONObject.NULL, JSONObject.NULL, false);
+
+    runTestFilterJsonNullValue("foo", "defaultValue", true);
+    runTestFilterJsonNullValue("", "defaultValue", true);
+    runTestFilterJsonNullValue(null, "defaultValue", false);
+    runTestFilterJsonNullValue(JSONObject.NULL, "defaultValue", true);
+    runTestFilterJsonNullValue("defaultValue", "defaultValue", false);
+  }
+
+  protected void runTestFilterJsonNullValue(Object propValue, Object propDefaultValue, boolean expectedPropExists) {
+    JSONObject jsonDefaultValueConfiguration = new JSONObject()
+        .put("defaults", new JSONObject()
+            .put("FormField", new JSONObject()
+                .put("myProp", propDefaultValue)));
+    DefaultValuesFilter filter = new DefaultValuesFilter();
+    filter.importConfiguration(jsonDefaultValueConfiguration);
+
+    JSONObject adapterData = new JSONObject()
+        .put("objectType", "FormField")
+        .put("myProp", propValue);
+
+    filter.filter(adapterData);
+
+    if (expectedPropExists) {
+      assertTrue(adapterData.has("myProp"));
+      assertEquals(propValue, adapterData.opt("myProp"));
+    }
+    else {
+      assertFalse(adapterData.has("myProp"));
+    }
   }
 }
