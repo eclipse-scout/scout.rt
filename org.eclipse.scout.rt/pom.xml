@@ -26,6 +26,8 @@
   <description>Eclipse Scout RT</description>
 
   <modules>
+    <module>../org.eclipse.scout.jaxws.apt</module>
+
     <module>../org.eclipse.scout.json</module>
     <module>../org.eclipse.scout.rt.platform</module>
     <module>../org.eclipse.scout.rt.platform.test</module>
@@ -64,8 +66,6 @@
     <module>../org.eclipse.scout.rt.rest.jackson</module>
     <module>../org.eclipse.scout.rt.rest.jersey.client</module>
     <module>../org.eclipse.scout.rt.rest.jersey.test</module>
-
-    <module>../org.eclipse.scout.jaxws.apt</module>
 
     <module>../org.eclipse.scout.rt.client</module>
     <module>../org.eclipse.scout.rt.client.test</module>
