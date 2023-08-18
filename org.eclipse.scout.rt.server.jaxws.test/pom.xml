@@ -64,6 +64,13 @@
       <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
     </dependency>
 
+    <!-- Ensure apt module is always built before, only necessary for IntelliJ 2023.2, it works well with plain mvn build -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.jaxws.apt</artifactId>
+      <optional>true</optional>
+    </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
