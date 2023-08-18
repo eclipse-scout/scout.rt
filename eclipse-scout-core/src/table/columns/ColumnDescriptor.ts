@@ -18,7 +18,7 @@ export interface ColumnDescriptor {
    * Name of the corresponding property in the "additional table row data" or <code>null</code> if this descriptor describes the first (default) column.
    */
   propertyName?: string;
-  objectType?: ObjectType<Column>;
+  objectType?: ObjectType<Column<any>>;
   text?: string;
   headerIconId?: string;
   cssClass?: string;
