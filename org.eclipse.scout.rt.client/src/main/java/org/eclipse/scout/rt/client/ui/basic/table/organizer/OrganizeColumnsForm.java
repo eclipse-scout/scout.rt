@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
  *
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 
@@ -39,7 +40,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table;
@@ -451,12 +451,10 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 }
                 else {
                   String configName = getConfigNameColumn().getSelectedValue();
-                  applyAll(configName);
-                  getColumnsTableField().reloadTableData();
+                  applyConfig(configName);
                 }
                 getTable().deselectAllEnabledRows();
               }
-
             }
 
             protected boolean isOnlyCustomConfigsSelected() {
@@ -746,9 +744,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               if (isFormLoading()) {
                 return;
               }
-              for (ITableRow row : rows) {
-                setColumnVisible(row, row.isChecked());
-              }
+              updateColumnVisibilityAndOrder();
             }
 
             @Override
@@ -1496,12 +1492,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_organizedTable);
   }
 
-  public void setColumnVisible(ITableRow row, Boolean visible) {
-    getColumnsTableField().getTable().checkRow(row, visible);
-
-    updateColumnVisibilityAndOrder();
-  }
-
   public void moveUp(ITableRow row) {
     moveUp(row, row.getRowIndex() - 1);
   }
@@ -1604,55 +1594,51 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     }
   }
 
-  public void applyAll(String configName) {
-    applyViewForConfig(configName);
-    m_organizedTable.getColumnSet().applySortingAndGrouping(configName);
-  }
-
-  public void applyViewForConfig(String configName) {
-    ClientUIPreferences prefs = ClientUIPreferences.getInstance();
-    if (isCustomizable()) {
-      byte[] tableCustomizerData = prefs.getTableCustomizerData(m_organizedTable.getTableCustomizer(), configName);
-      if (tableCustomizerData != null) {
-        m_organizedTable.getTableCustomizer().removeAllColumns();
-        m_organizedTable.getTableCustomizer().setSerializedData(tableCustomizerData);
-      }
-      if (m_organizedTable.getReloadHandler() != null) {
-        m_organizedTable.resetColumnConfiguration();
-        m_organizedTable.getReloadHandler().reload(IReloadReason.ORGANIZE_COLUMNS);
-      }
-    }
-    for (IColumn<?> col : m_organizedTable.getColumnSet().getColumns()) {
-      col.setVisible(prefs.getTableColumnVisible(col, col.isInitialVisible(), configName));
-      col.setWidth(prefs.getTableColumnWidth(col, col.getInitialWidth(), configName));
-      col.setVisibleColumnIndexHint(prefs.getTableColumnViewIndex(col, col.getInitialSortIndex(), configName));
-      if (col instanceof INumberColumn) {
-        ((INumberColumn) col).setBackgroundEffect(prefs.getTableColumnBackgroundEffect(col, ((INumberColumn) col).getInitialBackgroundEffect(), configName));
-      }
-    }
-  }
-
   public void resetAll() {
     m_organizedTable.reset(false);
+    if (isCustomizable() && m_organizedTable.getReloadHandler() != null) {
+      m_organizedTable.getReloadHandler().reload(IReloadReason.ORGANIZE_COLUMNS);
+    }
     getColumnsTableField().reloadTableData();
   }
 
-  public void resetView() {
+  public void applyConfig(String configName) {
+    applyConfigImpl(configName);
+    if (isCustomizable() && m_organizedTable.getReloadHandler() != null) {
+      m_organizedTable.getReloadHandler().reload(IReloadReason.ORGANIZE_COLUMNS);
+    }
+    getColumnsTableField().reloadTableData();
+  }
+
+  protected void applyConfigImpl(String configName) {
     try {
       m_organizedTable.setTableChanging(true);
-      //
-      m_organizedTable.resetColumnVisibilities();
-      m_organizedTable.resetColumnWidths();
-      m_organizedTable.resetColumnOrder();
-      ITableCustomizer cst = m_organizedTable.getTableCustomizer();
-      if (cst != null) {
-        cst.removeAllColumns();
+
+      ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+      if (isCustomizable()) {
+        byte[] tableCustomizerData = prefs.getTableCustomizerData(m_organizedTable.getTableCustomizer(), configName);
+        if (tableCustomizerData != null) {
+          m_organizedTable.getTableCustomizer().removeAllColumns();
+          m_organizedTable.getTableCustomizer().setSerializedData(tableCustomizerData);
+        }
+        if (m_organizedTable.getReloadHandler() != null) {
+          m_organizedTable.resetColumnConfiguration();
+        }
       }
+      for (IColumn<?> col : m_organizedTable.getColumnSet().getColumns()) {
+        col.setVisible(prefs.getTableColumnVisible(col, col.isInitialVisible(), configName));
+        col.setWidth(prefs.getTableColumnWidth(col, col.getInitialWidth(), configName));
+        col.setVisibleColumnIndexHint(prefs.getTableColumnViewIndex(col, col.getInitialSortIndex(), configName));
+        if (col instanceof INumberColumn) {
+          ((INumberColumn) col).setBackgroundEffect(prefs.getTableColumnBackgroundEffect(col, ((INumberColumn) col).getInitialBackgroundEffect(), configName));
+        }
+      }
+
+      m_organizedTable.getColumnSet().applySortingAndGrouping(configName);
     }
     finally {
       m_organizedTable.setTableChanging(false);
     }
-    getColumnsTableField().reloadTableData();
   }
 
   protected boolean isColumnMovableUp(IColumn<?> column) {
