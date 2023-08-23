@@ -198,6 +198,11 @@
     #scout.font-text-normal();
     color: @text-color;
   }
+
+  // Prevent empty div from collapsing (without &nbsp;)
+  &::after {
+    content: '\200b'; // U+200B ZERO WIDTH SPACE
+  }
 }
 
 .desktop-notification-loader {
