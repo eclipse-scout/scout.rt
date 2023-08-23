@@ -86,12 +86,12 @@ export default class Notification extends Widget {
   _renderMessage() {
     let message = this.status.message || '';
     if (this.htmlEnabled) {
-      this.$messageText.htmlOrNbsp(message);
+      this.$messageText.html(message);
       // Add action to app-links
       this.$messageText.find('.app-link')
         .on('click', this._onAppLinkAction.bind(this));
     } else {
-      this.$messageText.htmlOrNbsp(strings.nl2br(message));
+      this.$messageText.html(strings.nl2br(message));
     }
     this.invalidateLayoutTree();
   }
