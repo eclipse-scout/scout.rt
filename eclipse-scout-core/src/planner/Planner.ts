@@ -1402,8 +1402,8 @@ export class Planner extends Widget implements PlannerModel {
   }
 
   protected _setViewRange(viewRange: DateRange | JsonDateRange) {
-    viewRange = DateRange.ensure(viewRange);
-    if (!viewRange || !viewRange.from || !viewRange.to || viewRange.from.valueOf() === viewRange.to.valueOf()) {
+    viewRange = DateRange.ensure(viewRange) || new DateRange();
+    if (viewRange.from && viewRange.from.valueOf() >= viewRange.to?.valueOf()) {
       throw new Error('Invalid viewRange provided: ' + viewRange);
     }
     this._setProperty('viewRange', viewRange);

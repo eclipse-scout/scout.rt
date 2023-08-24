@@ -889,11 +889,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   @Override
   public void setViewRange(Range<Date> viewRange) {
     LOG.debug("Setting view range to {}", viewRange);
-    if (viewRange == null || viewRange.getFrom() == null || viewRange.getTo() == null || viewRange.getFrom().getTime() == viewRange.getTo().getTime()) {
-      throw new IllegalArgumentException("Invalid viewRange provided: " + viewRange);
+    if (viewRange != null) {
+      viewRange.setFrom(ensureTruncated(viewRange.getFrom(), "from"));
+      viewRange.setTo(ensureTruncated(viewRange.getTo(), "to"));
+      if (viewRange.getFrom() != null && viewRange.getTo() != null && viewRange.getFrom().getTime() >= viewRange.getTo().getTime()) {
+        throw new IllegalArgumentException("Invalid viewRange provided: " + viewRange);
+      }
     }
-    viewRange.setFrom(ensureTruncated(viewRange.getFrom(), "from"));
-    viewRange.setTo(ensureTruncated(viewRange.getTo(), "to"));
     propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
   }
 
