@@ -130,6 +130,7 @@ export * from './code/CodeTypeModel';
 export * from './code/codes';
 export * from './code/CodeLookupCall';
 export * from './dataobject/DoEntity';
+export * from './dataobject/ValueDo';
 export * from './security/access';
 export * from './security/AccessControl';
 export * from './security/Permission';
