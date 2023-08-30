@@ -1263,4 +1263,18 @@ describe('SmartField', () => {
     });
   });
 
+  describe('proposalChooser', () => {
+
+    it('does not support mouse move selection', () => {
+      const field = createFieldWithLookupCall();
+      field.render();
+      field.$field.focus();
+      field._lookupByTextOrAllDone({
+        queryBy: QueryBy.ALL,
+        // @ts-expect-error
+        lookupRows: [1, 2, 3, 4, 5]
+      });
+      expect((field.popup as SmartFieldPopup<number>).proposalChooser.content.selectionHandler.mouseMoveSelectionEnabled).toBeFalse();
+    });
+  });
 });

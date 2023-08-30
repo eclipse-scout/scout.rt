@@ -64,7 +64,7 @@ export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table,
   }
 
   protected _createTable(columns: Column<TValue>[], headerVisible: boolean): Table {
-    return scout.create(Table, {
+    const table = scout.create(Table, {
       parent: this,
       headerVisible: headerVisible,
       autoResizeColumns: true,
@@ -75,6 +75,8 @@ export class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table,
       headerMenusEnabled: false,
       textFilterEnabled: false
     });
+    table.selectionHandler.mouseMoveSelectionEnabled = false;
+    return table;
   }
 
   protected _onRowClick(event: TableRowClickEvent) {
