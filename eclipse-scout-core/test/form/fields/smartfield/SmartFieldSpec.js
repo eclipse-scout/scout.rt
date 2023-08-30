@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -1027,4 +1027,17 @@ describe('SmartField', () => {
     });
   });
 
+  describe('proposalChooser', () => {
+
+    it('does not support mouse move selection', () => {
+      const field = createFieldWithLookupCall();
+      field.render();
+      field.$field.focus();
+      field._lookupByTextOrAllDone({
+        queryBy: QueryBy.ALL,
+        lookupRows: [1, 2, 3, 4, 5]
+      });
+      expect(field.popup.proposalChooser.model.selectionHandler.mouseMoveSelectionEnabled).toBeFalse();
+    });
+  });
 });
