@@ -58,6 +58,7 @@ export * from './widget/NullWidgetModel';
 export * from './widget/NullWidgetEventMap';
 export * from './widget/NullWidgetAdapter';
 export * from './util/arrays';
+export * from './util/BinaryResource';
 export * from './util/CallModel';
 export * from './util/Call';
 export * from './util/clipboard';
