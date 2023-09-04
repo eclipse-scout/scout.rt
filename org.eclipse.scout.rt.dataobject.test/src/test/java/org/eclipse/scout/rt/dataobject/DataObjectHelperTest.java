@@ -664,8 +664,8 @@ public class DataObjectHelperTest {
     final IDoEntity template = BEANS.get(DoEntityBuilder.class)
         .put("stringAttribute", "t2")
         .putList("stringList", Arrays.asList("x2", "y2", "z2")).build();
-    target.putSet("stringSet", CollectionUtility.hashSet("a2", "b2", "c2"));
-    target.putCollection("stringCollection", Arrays.asList("u2", "v2", "w2"));
+    template.putSet("stringSet", CollectionUtility.hashSet("a2", "b2", "c2"));
+    template.putCollection("stringCollection", Arrays.asList("u2", "v2", "w2"));
 
     final IDoEntity targetExtended = m_helper.extend(target, template);
     assertSame(target, targetExtended);
@@ -681,6 +681,72 @@ public class DataObjectHelperTest {
     template.putNode("foo", new DoNode<>(null, null, null));
 
     m_helper.extend(target, template);
+  }
+
+  @Test
+  public void testExtendNull() {
+    assertThrows(AssertionException.class, () -> m_helper.extend(null, null));
+    final IDoEntity target = BEANS.get(DoEntityBuilder.class).build();
+    assertEquals(target, m_helper.extend(target, null));
+  }
+
+  @Test
+  public void testApplyValues() {
+    final IDoEntity target = BEANS.get(DoEntityBuilder.class)
+        .put("stringAttribute", "s")
+        .putList("stringList", Arrays.asList("a", "b", "c"))
+        .build();
+
+    final IDoEntity template = BEANS.get(DoEntityBuilder.class)
+        .put("nullAttribute", null)
+        .put("stringAttribute", "t")
+        .put("otherAttribute", "t")
+        .putList("nullList", (List<?>) null)
+        .putList("stringList", Arrays.asList("x", "y", "z"))
+        .putList("otherList", Arrays.asList("x", "y", "z"))
+        .build();
+
+    final IDoEntity targetExtended = m_helper.applyValues(target, template);
+    assertSame(target, targetExtended);
+
+    // check JSON content
+    final IDoEntity expected = BEANS.get(DoEntityBuilder.class)
+        .put("stringAttribute", "t")
+        .putList("stringList", Arrays.asList("x", "y", "z"))
+        .put("nullAttribute", null)
+        .put("otherAttribute", "t")
+        .putList("nullList", (List<?>) null)
+        .putList("otherList", Arrays.asList("x", "y", "z"))
+        .build();
+
+    assertEquals(expected, target);
+    assertEquals(expected, targetExtended);
+  }
+
+  @Test
+  public void testApplyValuesAllDoNodeTypesAllExisting() {
+    final IDoEntity target = BEANS.get(DoEntityBuilder.class)
+        .put("stringAttribute", "t")
+        .putList("stringList", Arrays.asList("x", "y", "z")).build();
+    target.putSet("stringSet", CollectionUtility.hashSet("a", "b", "c"));
+    target.putCollection("stringCollection", Arrays.asList("u", "v", "w"));
+
+    final IDoEntity template = BEANS.get(DoEntityBuilder.class)
+        .put("stringAttribute", "t2")
+        .putList("stringList", Arrays.asList("x2", "y2", "z2")).build();
+    template.putSet("stringSet", CollectionUtility.hashSet("a2", "b2", "c2"));
+    template.putCollection("stringCollection", Arrays.asList("u2", "v2", "w2"));
+
+    final IDoEntity targetExtended = m_helper.applyValues(target, template);
+    assertSame(target, targetExtended);
+    assertEquals(template, targetExtended);
+  }
+
+  @Test
+  public void testApplyValuesNull() {
+    assertThrows(AssertionException.class, () -> m_helper.applyValues(null, null));
+    final IDoEntity target = BEANS.get(DoEntityBuilder.class).build();
+    assertEquals(target, m_helper.applyValues(target, null));
   }
 
   public static class FixtureDoEntity extends DoEntity {

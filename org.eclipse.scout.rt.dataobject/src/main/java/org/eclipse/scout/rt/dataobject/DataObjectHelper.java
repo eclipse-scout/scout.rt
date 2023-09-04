@@ -368,7 +368,7 @@ public class DataObjectHelper {
     }
     m_dataObjectInventory.get().getAttributesDescription(entity.getClass())
         .values()
-        .forEach(desc -> ensureNodeValue(entity, desc.getName(), desc.getType().getRawType(), null));
+        .forEach(desc -> ensureNodeValue(entity, desc.getName(), desc.getType().getRawType(), null, false));
     return entity;
   }
 
@@ -383,20 +383,44 @@ public class DataObjectHelper {
    * @return the {@code target} object that was potentially modified
    */
   public <E extends IDoEntity> E extend(E target, IDoEntity template) {
+    return ensureNodeValues(target, template, false);
+  }
+
+  /**
+   * Applies all attribute values from the {@code template} entity to the {@code target} entity, overriding existing
+   * values in @code target} entity. The operation is not recursive.
+   *
+   * @param target
+   *          target entity where attributes from the {@code template} are applied. Must not be {@code null}.
+   * @param template
+   *          entity all attributes are taken from. It is not modified and can be {@code null}.
+   * @return the {@code target} object that was potentially modified
+   */
+  public <E extends IDoEntity> E applyValues(E target, IDoEntity template) {
+    return ensureNodeValues(target, template, true);
+  }
+
+  /**
+   * Ensures that the all attributes of given data object {@code template} exists in data object {@code target}. If
+   * {@code force} is set to {@code false} only attributes which do not exist in {@code target} are applied, if
+   * {@code force} is set to {@code true} are attribute values from {@code template} are applied to {@code target}.
+   */
+  protected <E extends IDoEntity> E ensureNodeValues(E target, IDoEntity template, boolean force) {
     Assertions.assertNotNull(target, "target is required");
     if (template == null) {
       return target;
     }
-    template.allNodes().forEach((name, node) -> ensureNodeValue(target, name, node.getClass(), node.get()));
+    template.allNodes().forEach((name, node) -> ensureNodeValue(target, name, node.getClass(), node.get(), force));
     return target;
   }
 
   /**
-   * Ensures that the given data object node exists. If the node did not exist before, its value is set to the given
-   * {@code value} otherwise the value is unchanged.
+   * Ensures that the given data object node exists. If {@code force} is set to {@code false} and the node did not exist
+   * before, its value is set to the given {@code value} otherwise the value is unchanged. If {@code force} is set to
+   * {@code true}, the node value is set to the given {@code value} independent of its former value.
    */
-  protected void ensureNodeValue(IDoEntity entity, String attributeName, Type nodeType, Object value) {
-    if (entity.has(attributeName)) {
+  protected void ensureNodeValue(IDoEntity entity, String attributeName, Type nodeType, Object value, boolean force) {
+    if (!force && entity.has(attributeName)) {
       return;
     }
 
