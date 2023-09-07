@@ -7,10 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoEntity} from './DoEntity';
+import {DoEntity} from './../index';
 
 /**
- * <strong>Wrapper data object for a generic value.</strong>
+ * Wrapper data object for a generic value.
  *
  * In Java, we have a separate implementation for each data type. This
  * is because the Jackson object mapper cannot map a generic object.

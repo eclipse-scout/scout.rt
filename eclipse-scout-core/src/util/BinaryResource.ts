@@ -9,10 +9,9 @@
  */
 
 /**
- * Warper for binary content with metadata.
- * <p>
- * TypeScript's representation of Java class
- * org.eclipse.scout.rt.platform.resource.BinaryResource.
+ * Wrapper for binary content with metadata.
+ *
+ * @see "org.eclipse.scout.rt.platform.resource.BinaryResource"
  */
 export interface BinaryResource {
   filename: string;
