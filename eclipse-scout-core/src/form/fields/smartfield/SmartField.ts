@@ -703,7 +703,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     return this._invalidKeyLookup(result.key);
   }
 
-  protected _invalidKeyLookup(key : TValue) : string {
+  protected _invalidKeyLookup(key: TValue): string {
     // lookup call didn't return a result. Maybe the data belonging to the key has been deleted.
     let invalidValueMessage = this.session.text('ui.InvalidValue');
     this.setLookupRow(scout.create((LookupRow<TValue>), {
@@ -1556,6 +1556,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
         }
       }
     }
+    this.original()._currentLookupCall?.abort();
+    this.original()._currentLookupCall = null;
     super._setValue(value);
     this._notUnique = false;
   }
