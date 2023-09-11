@@ -70,7 +70,7 @@ export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilte
     this.availableValues = [];
     this.xAxis.forEach(key => {
       let deterministicKey = this.xAxis.keyToDeterministicKey(key);
-      let text = this.xAxis.format(key);
+      let text = this.formatText(key);
       let iconId: string = null;
       if (key !== null && this.xAxis.isIcon) {
         // Only display icon if isIcon (still display empty text if key is null)
@@ -190,6 +190,10 @@ export class ColumnUserFilter extends TableUserFilter implements ColumnUserFilte
 
   createComparator(): ColumnComparator {
     return comparators.NUMERIC;
+  }
+
+  formatText(key: number): string {
+    return this.xAxis.format(key);
   }
 }
 
