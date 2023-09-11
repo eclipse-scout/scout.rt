@@ -1033,6 +1033,68 @@ describe('SmartField', () => {
       expect(smartField.displayText).toBe('');
     });
 
+    it('aborts previous lookup call when setValue() is called multiple times', () => {
+
+      // --- Case 1: initial value exists, then value is set to null ---
+
+      let smartField = scout.create(SmartField, {
+        parent: session.desktop,
+        lookupCall,
+        value: 1
+      });
+      expect(smartField.value).toBe(1);
+      expect(smartField.displayText).toBe(null);
+
+      smartField.setValue(null);
+      expect(smartField.value).toBe(null);
+      expect(smartField.displayText).toBe('');
+
+      jasmine.clock().tick(300);
+      expect(smartField.value).toBe(null);
+      expect(smartField.displayText).toBe('');
+
+      // --- Case 2: value is set to '1', then to null again ---
+
+      smartField = scout.create(SmartField, {
+        parent: session.desktop,
+        lookupCall
+      });
+      expect(smartField.value).toBe(null);
+      expect(smartField.displayText).toBe('');
+
+      smartField.setValue(1);
+      expect(smartField.value).toBe(1);
+      expect(smartField.displayText).toBe('');
+
+      smartField.setValue(null);
+      expect(smartField.value).toBe(null);
+      expect(smartField.displayText).toBe('');
+
+      jasmine.clock().tick(300);
+      expect(smartField.value).toBe(null);
+      expect(smartField.displayText).toBe('');
+
+      // --- Case 3: value is set to '1', then to '2' ---
+
+      smartField = scout.create(SmartField, {
+        parent: session.desktop,
+        lookupCall
+      });
+      expect(smartField.value).toBe(null);
+      expect(smartField.displayText).toBe('');
+
+      smartField.setValue(1);
+      expect(smartField.value).toBe(1);
+      expect(smartField.displayText).toBe('');
+
+      smartField.setValue(2);
+      expect(smartField.value).toBe(2);
+      expect(smartField.displayText).toBe('');
+
+      jasmine.clock().tick(300);
+      expect(smartField.value).toBe(2);
+      expect(smartField.displayText).toBe('Bar');
+    });
   });
 
   describe('multiline', () => {
