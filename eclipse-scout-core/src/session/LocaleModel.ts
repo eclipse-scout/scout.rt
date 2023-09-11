@@ -22,6 +22,7 @@ export interface DecimalFormatSymbols {
   decimalSeparator: string;
   groupingSeparator: string;
   minusSign: string;
+  currency: string;
 }
 
 export interface DateFormatSymbols {

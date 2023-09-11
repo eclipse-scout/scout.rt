@@ -69,7 +69,8 @@ export class Locale implements LocaleModel {
     decimalFormatSymbols: {
       decimalSeparator: '.',
       groupingSeparator: ',',
-      minusSign: '-'
+      minusSign: '-',
+      currency: 'USD'
     },
     dateFormatSymbols: {
       months: [

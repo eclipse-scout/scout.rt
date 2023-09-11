@@ -25,6 +25,7 @@ export class DecimalFormat {
   lenientGroupingChars: string;
   groupLength: number;
   decimalSeparatorChar: string;
+  currency: string;
   zeroBefore: number;
   zeroAfter: number;
   allAfter: number;
@@ -48,6 +49,7 @@ export class DecimalFormat {
       '\u202F'; // narrow no-break space
     this.groupLength = 0;
     this.decimalSeparatorChar = locale.decimalFormatSymbols.decimalSeparator;
+    this.currency = locale.decimalFormatSymbols.currency;
     this.zeroBefore = 1;
     this.zeroAfter = 0;
     this.allAfter = 0;
@@ -63,8 +65,13 @@ export class DecimalFormat {
       this.roundingMode = options.roundingMode || RoundingMode.HALF_UP;
     }
 
-    let SYMBOLS = DecimalFormat.PATTERN_SYMBOLS;
-    // Check if there are separate subpatterns for positive and negative numbers ("PositivePattern;NegativePattern")
+    const SYMBOLS = DecimalFormat.PATTERN_SYMBOLS;
+
+    if (this.currency) {
+      this.pattern = this.pattern.replace(new RegExp('[' + SYMBOLS.currencySign + ']', 'g'), this.currency);
+    }
+
+    // Check if there are separate sub-patterns for positive and negative numbers ("PositivePattern;NegativePattern")
     let split = this.pattern.split(SYMBOLS.patternSeparator);
     // Use the first subpattern as positive prefix/suffix
     let positivePrefixAndSuffix = findPrefixAndSuffix(split[0]);
@@ -81,7 +88,7 @@ export class DecimalFormat {
       // No, there is no negative subpattern, so the positive prefix/suffix are used for both positive and negative numbers.
       // Check if there is a minus sign in the prefix/suffix.
       if (this.positivePrefix.indexOf(SYMBOLS.minusSign) !== -1 || this.positiveSuffix.indexOf(SYMBOLS.minusSign) !== -1) {
-        // Yes, there is a minus sign in the prefix/suffix. Use this a negativePrefix/Suffix and remove the minus sign from the posistivePrefix/Suffix.
+        // Yes, there is a minus sign in the prefix/suffix. Use this a negativePrefix/Suffix and remove the minus sign from the positivePrefix/Suffix.
         this.negativePrefix = this.positivePrefix.replace(SYMBOLS.minusSign, locale.decimalFormatSymbols.minusSign);
         this.negativeSuffix = this.positiveSuffix.replace(SYMBOLS.minusSign, locale.decimalFormatSymbols.minusSign);
         this.positivePrefix = this.positivePrefix.replace(SYMBOLS.minusSign, '');
@@ -251,21 +258,22 @@ export class DecimalFormat {
     if (!numberString) {
       return numberString;
     }
-    let result = numberString
-      .replace(new RegExp('[' + this.groupingChar + this.lenientGroupingChars + ']', 'g'), '')
-      .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.');
+    let result = numberString;
+
+    result = result.replace(new RegExp('[' + this.groupingChar + this.lenientGroupingChars + ']', 'g'), '');
+    result = result.replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.');
 
     if (strings.hasText(this.positivePrefix)) {
-      result = result.replace(new RegExp(this.positivePrefix, 'g'), '+');
+      result = result.replace(new RegExp(strings.quote(this.positivePrefix.trim()), 'gi'), '');
     }
     if (strings.hasText(this.positiveSuffix)) {
-      result = result.replace(new RegExp(this.positiveSuffix, 'g'), '');
+      result = result.replace(new RegExp(strings.quote(this.positiveSuffix.trim()), 'gi'), '');
     }
     if (strings.hasText(this.negativePrefix)) {
-      result = result.replace(new RegExp(this.negativePrefix, 'g'), '-');
+      result = result.replace(new RegExp(strings.quote(this.negativePrefix.trim()), 'gi'), '-');
     }
     if (strings.hasText(this.negativeSuffix)) {
-      result = result.replace(new RegExp(this.negativeSuffix, 'g'), '');
+      result = result.replace(new RegExp(strings.quote(this.negativeSuffix.trim()), 'gi'), '');
     }
 
     return result.replace(/\s/g, '');
@@ -282,7 +290,8 @@ export class DecimalFormat {
     decimalSeparator: '.',
     groupingSeparator: ',',
     minusSign: '-',
-    patternSeparator: ';'
+    patternSeparator: ';',
+    currencySign: '\u00A4'
   } as const;
 
   static ensure(locale: Locale, format: DecimalFormat | string | DecimalFormatOptions): DecimalFormat {

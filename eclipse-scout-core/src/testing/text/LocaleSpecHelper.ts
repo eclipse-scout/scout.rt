@@ -50,7 +50,8 @@ export class LocaleSpecHelper {
     return {
       'decimalSeparator': '.',
       'groupingSeparator': '\'',
-      'minusSign': '-'
+      'minusSign': '-',
+      'currency': 'USD'
     };
   }
 

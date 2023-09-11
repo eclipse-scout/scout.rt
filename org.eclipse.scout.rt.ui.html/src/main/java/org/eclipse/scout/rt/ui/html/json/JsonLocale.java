@@ -49,6 +49,7 @@ public class JsonLocale implements IJsonObject {
     json.put("decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
     json.put("groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
     json.put("minusSign", String.valueOf(symbols.getMinusSign()));
+    json.put("currency", String.valueOf(symbols.getCurrency()));
     return json;
   }
 

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.text.DecimalFormat;
 
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.json.JSONObject;
 
 /**
@@ -40,6 +41,7 @@ public class JsonDecimalFormat implements IJsonObject {
     json.put("pattern", getDecimalFormat().toPattern());
     json.put("multiplier", getDecimalFormat().getMultiplier());
     json.put("roundingMode", getDecimalFormat().getRoundingMode().name());
+    json.put("currency", getDecimalFormat().getCurrency().getSymbol(NlsLocale.get()));
     return json;
   }
 

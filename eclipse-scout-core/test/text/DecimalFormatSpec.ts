@@ -359,15 +359,25 @@ describe('DecimalFormat', () => {
       expect(decimalFormat.normalize('42')).toBe('42');
       expect(decimalFormat.normalize('42%')).toBe('42');
       expect(decimalFormat.normalize('42§')).toBe('42');
-      expect(decimalFormat.normalize('plus42')).toBe('+42');
-      expect(decimalFormat.normalize('plus42%')).toBe('+42');
-      expect(decimalFormat.normalize('plus42§')).toBe('+42');
+      expect(decimalFormat.normalize('plus42')).toBe('42');
+      expect(decimalFormat.normalize('plus42%')).toBe('42');
+      expect(decimalFormat.normalize('plus42§')).toBe('42');
       expect(decimalFormat.normalize('minus42')).toBe('-42');
       expect(decimalFormat.normalize('minus42%')).toBe('-42');
       expect(decimalFormat.normalize('minus42§')).toBe('-42');
 
-      expect(decimalFormat.normalize('plus42&')).toBe('+42&');
-      expect(decimalFormat.normalize('MiNuS42§')).toBe('MiNuS42');
+      expect(decimalFormat.normalize('plus42&')).toBe('42&');
+      expect(decimalFormat.normalize('MiNuS42§')).toBe('-42');
+      expect(decimalFormat.normalize('MiNu42§')).toBe('MiNu42');
+    });
+
+    it('can parse formulas with prefix and suffix', () => {
+      let decimalFormat = new DecimalFormat(locale, {
+        pattern: 'plus###0%;minus###0§'
+      });
+
+      expect(decimalFormat.normalize('( 1+20)*plus    2')).toBe('(1+20)*2');
+      expect(decimalFormat.normalize('plus40-2+4+.5+MINUS.5')).toBe('40-2+4+.5+-.5');
     });
   });
 });
