@@ -11,14 +11,16 @@ package org.eclipse.scout.rt.rest.param;
 
 import static org.junit.Assert.*;
 
-import java.util.UUID;
-
 import javax.ws.rs.ext.ParamConverter;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.dataobject.id.IUuId;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.QualifiedIIdParamConverter;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +29,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class IIdParamConverterProviderTest {
 
-  private static final UUID TEST_UUID = UUID.randomUUID();
+  private static final FixtureUuId TEST_UUID = FixtureUuId.of("d93072a6-05d3-47c8-84a6-3cca5ee286a6");
 
   private IIdParamConverterProvider m_provider;
 
@@ -43,13 +45,24 @@ public class IIdParamConverterProviderTest {
   }
 
   @Test
-  public void testGetConverter() {
+  public void testGetConverterUnqualified() {
     ParamConverter<FixtureUuId> uuIdConverter = m_provider.getConverter(FixtureUuId.class, null, null);
     assertNotNull(uuIdConverter);
     ParamConverter<FixtureStringId> stringIdConverter = m_provider.getConverter(FixtureStringId.class, null, null);
     assertNotNull(stringIdConverter);
     //noinspection AssertBetweenInconvertibleTypes
     assertNotSame(uuIdConverter, stringIdConverter);
+  }
+
+  @Test
+  public void testGetConverterQualified() {
+    ParamConverter<IUuId> uuIdConverter = m_provider.getConverter(IUuId.class, null, null);
+    assertNotNull(uuIdConverter);
+    ParamConverter<IId> idConverter = m_provider.getConverter(IId.class, null, null);
+    assertNotNull(idConverter);
+    assertSame(uuIdConverter, idConverter); // same application scoped bean is used for qualified converter
+    //noinspection AssertBetweenInconvertibleTypes
+    assertSame(uuIdConverter, BEANS.get(QualifiedIIdParamConverter.class));
   }
 
   @Test
@@ -61,16 +74,29 @@ public class IIdParamConverterProviderTest {
   }
 
   @Test
-  public void testIdParamConverterFromString() {
+  public void testIdParamConverterFromStringUnqualified() {
     ParamConverter<FixtureUuId> conv = m_provider.getConverter(FixtureUuId.class, null, null);
 
     assertNull(conv.fromString(null));
     assertThrows(PlatformException.class, () -> conv.fromString("invalid UUID"));
 
     assertNotNull(conv);
-    FixtureUuId id = conv.fromString(TEST_UUID.toString());
+    FixtureUuId id = conv.fromString(TEST_UUID.unwrapAsString());
     assertNotNull(id);
-    assertEquals(TEST_UUID, id.unwrap());
+    assertEquals(TEST_UUID, id);
+  }
+
+  @Test
+  public void testIdParamConverterFromStringQualified() {
+    ParamConverter<IUuId> conv = m_provider.getConverter(IUuId.class, null, null);
+
+    assertNull(conv.fromString(null));
+    assertThrows(PlatformException.class, () -> conv.fromString("invalid_type:invalid UUID"));
+
+    assertNotNull(conv);
+    IUuId id = conv.fromString("scout.FixtureUuId:" + TEST_UUID.unwrapAsString());
+    assertNotNull(id);
+    assertEquals(TEST_UUID, id);
   }
 
   @Test
@@ -81,19 +107,25 @@ public class IIdParamConverterProviderTest {
     assertThrows(PlatformException.class, () -> conv.fromString("invalid"));
 
     assertNotNull(conv);
-    FixtureCompositeId id = conv.fromString("abc;" + TEST_UUID);
+    FixtureCompositeId id = conv.fromString("abc;" + TEST_UUID.unwrapAsString());
     assertNotNull(id);
-    assertEquals(FixtureCompositeId.of("abc", TEST_UUID), id);
+    assertEquals(FixtureCompositeId.of(FixtureStringId.of("abc"), TEST_UUID), id);
   }
 
   @Test
-  public void testIdParamConverterToString() {
+  public void testIdParamConverterToStringUnqualified() {
     ParamConverter<FixtureUuId> conv = m_provider.getConverter(FixtureUuId.class, null, null);
 
     assertNull(conv.toString(null));
+    assertEquals(TEST_UUID.unwrapAsString(), conv.toString(TEST_UUID));
+  }
 
-    FixtureUuId id = FixtureUuId.of(TEST_UUID);
-    assertEquals(TEST_UUID.toString(), conv.toString(id));
+  @Test
+  public void testIdParamConverterToStringQualified() {
+    ParamConverter<IUuId> conv = m_provider.getConverter(IUuId.class, null, null);
+
+    assertNull(conv.toString(null));
+    assertEquals("scout.FixtureUuId:" + TEST_UUID.unwrapAsString(), conv.toString(TEST_UUID));
   }
 
   @Test
@@ -102,7 +134,7 @@ public class IIdParamConverterProviderTest {
 
     assertNull(conv.toString(null));
 
-    FixtureCompositeId id = FixtureCompositeId.of("abc", TEST_UUID);
-    assertEquals("abc;" + TEST_UUID, conv.toString(id));
+    FixtureCompositeId id = FixtureCompositeId.of(FixtureStringId.of("abc"), TEST_UUID);
+    assertEquals("abc;" + TEST_UUID.unwrapAsString(), conv.toString(id));
   }
 }

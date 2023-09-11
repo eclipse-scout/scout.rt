@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.rest.param;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -21,6 +22,7 @@ import javax.ws.rs.ext.ParamConverterProvider;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 /**
@@ -39,26 +41,32 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 @ApplicationScoped
 public class IIdParamConverterProvider implements ParamConverterProvider {
 
-  private final ConcurrentMap<Class<? extends IId>, IIdParamConverter> m_idParamConverters = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Class<? extends IId>, ParamConverter<? extends IId>> m_idParamConverters = new ConcurrentHashMap<>();
 
   @Override
   @SuppressWarnings("unchecked")
   public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
     if (IId.class.isAssignableFrom(rawType)) {
-      return (ParamConverter<T>) m_idParamConverters.computeIfAbsent(rawType.asSubclass(IId.class), IIdParamConverter::new);
+      Class<? extends IId> idClass = rawType.asSubclass(IId.class);
+      if (rawType.isInterface() || Modifier.isAbstract(rawType.getModifiers())) {
+        return (ParamConverter<T>) m_idParamConverters.computeIfAbsent(idClass, k -> BEANS.get(QualifiedIIdParamConverter.class));
+      }
+      else {
+        return (ParamConverter<T>) m_idParamConverters.computeIfAbsent(idClass, UnqualifiedIIdParamConverter::new);
+      }
     }
     return null;
   }
 
   /**
-   * {@link ParamConverter} handling {@link IId}.
+   * {@link ParamConverter} handling {@link IId} in unqualified form.
    */
-  public static class IIdParamConverter implements ParamConverter<IId> {
+  public static class UnqualifiedIIdParamConverter implements ParamConverter<IId> {
 
     protected final LazyValue<IdCodec> m_codec = new LazyValue<>(IdCodec.class);
     protected final Class<? extends IId> m_idClass;
 
-    public IIdParamConverter(Class<? extends IId> idClass) {
+    public UnqualifiedIIdParamConverter(Class<? extends IId> idClass) {
       m_idClass = idClass;
     }
 
@@ -76,6 +84,31 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
       return m_codec.get().toUnqualified(value);
+    }
+  }
+
+  /**
+   * {@link ParamConverter} handling {@link IId} in qualified form.
+   */
+  @ApplicationScoped // use same instance for all qualified IDs
+  public static class QualifiedIIdParamConverter implements ParamConverter<IId> {
+
+    protected final LazyValue<IdCodec> m_codec = new LazyValue<>(IdCodec.class);
+
+    @Override
+    public IId fromString(String value) {
+      if (value == null) {
+        return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
+      }
+      return m_codec.get().fromQualified(value);
+    }
+
+    @Override
+    public String toString(IId value) {
+      if (value == null) {
+        return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
+      }
+      return m_codec.get().toQualified(value);
     }
   }
 }
