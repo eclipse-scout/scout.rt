@@ -2844,7 +2844,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
     // if formSet contains only one element simply call doCancel on that form. Using the UnsavedFormChangesForm is not necessary in this case.
     if (!alwaysShowUnsavedChangesForm && formSet.size() == 1) {
-      CollectionUtility.firstElement(formSet).doCancel();
+      IForm form = CollectionUtility.firstElement(formSet);
+      form.activate();
+      form.doCancel();
       return true;
     }
     return continueClosingConsideringUnsavedForms(getUnsavedForms(formSet), false) && internalCloseForms(formSet);

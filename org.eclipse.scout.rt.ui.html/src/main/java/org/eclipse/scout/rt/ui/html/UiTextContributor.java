@@ -64,6 +64,8 @@ public class UiTextContributor implements IUiTextContributor {
         "NumberTooSmallMessageX",
         "UnsavedChangesTitle",
         "SaveChangesOfSelectedItems",
+        "CheckAll",
+        "UncheckAll",
         "TheRequestedResourceCouldNotBeFound",
         "FormsCannotBeSaved",
         "NotAllCheckedFormsCanBeSaved",
