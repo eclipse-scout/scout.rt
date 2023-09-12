@@ -11,6 +11,7 @@ import {
   Desktop, DesktopCancelFormsEvent, DesktopFormActivateEvent, DesktopHistoryState, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, Outline,
   RemoteEvent, Widget
 } from '../index';
+import $ from 'jquery';
 
 export class DesktopAdapter extends ModelAdapter {
   declare widget: Desktop;
@@ -118,14 +119,31 @@ export class DesktopAdapter extends ModelAdapter {
   }
 
   protected _onWidgetCancelAllForms(event: DesktopCancelFormsEvent) {
-    event.preventDefault();
-    let formIds: string[] = [];
-    if (event.forms) {
-      formIds = event.forms.map(form => form.modelAdapter.id);
+    const formIds: string[] = [];
+    const jsForms: Form[] = [];
+    for (const form of event.forms || []) {
+      if (form.modelAdapter) {
+        formIds.push(form.modelAdapter.id);
+      } else {
+        jsForms.push(form);
+      }
     }
-    this._send('cancelForms', {
-      formIds: formIds
-    });
+
+    if (!formIds.length) {
+      // no remote forms, return without preventDefault
+      // this will cancel the js forms implicitly
+      return;
+    }
+    event.preventDefault();
+    // cancel all js forms first
+    let cancelJsForms: JQuery.Promise<void> = $.resolvedPromise();
+    if (jsForms.length) {
+      cancelJsForms = this.widget.cancelViews(jsForms);
+    }
+    // cancel remote forms after js forms are canceled (i.e. the promise was resolved) or the js-form-cancellation was cancelled (i.e. the promise was rejected)
+    if (formIds.length) {
+      cancelJsForms.always(() => this._send('cancelForms', {formIds}));
+    }
   }
 
   protected _onMessageBoxShow(event: RemoteEvent) {

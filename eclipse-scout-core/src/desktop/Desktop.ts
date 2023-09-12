@@ -1439,23 +1439,25 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     });
   }
 
-  cancelViews(forms: Form[]) {
+  cancelViews(forms: Form[]): JQuery.Promise<void> {
     let event = this.trigger('cancelForms', {
       forms: forms
     });
     if (!event.defaultPrevented) {
-      this._cancelViews(forms);
+      return this._cancelViews(forms);
     }
+    return $.resolvedPromise();
   }
 
-  protected _cancelViews(forms: Form[]) {
+  protected _cancelViews(forms: Form[]): JQuery.Promise<void> {
     // do not cancel forms when the form child hierarchy does not get canceled.
     forms = forms.filter((form: Form) => !arrays.find(form.views, view => view.modal));
 
     // if there's only one form simply cancel it directly
     if (forms.length === 1) {
-      forms[0].cancel();
-      return;
+      const form = forms[0];
+      form.activate();
+      return form.cancel();
     }
 
     // collect all forms in the display child hierarchy with unsaved changes.
@@ -1479,8 +1481,11 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
         unsavedForms: unsavedForms
       });
       unsavedFormChangesForm.open();
-      // promise that is resolved when the UnsavedFormChangesForm is stored
-      waitFor = unsavedFormChangesForm.whenSave().then(() => {
+      // promise that is resolved when the UnsavedFormChangesForm is stored and rejected if it is cancelled
+      const deferred = $.Deferred();
+      waitFor = deferred.promise();
+
+      unsavedFormChangesForm.whenSave().then(() => {
         let formsToSave = unsavedFormChangesForm.openFormsField.value;
         formsToSave.forEach(form => {
           form.visitDisplayChildren(dialog => {
@@ -1493,10 +1498,14 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
           });
           form.ok();
         });
-        return formsToSave;
+        deferred.resolve(formsToSave);
       });
+      // reject promise if form is aborted or cancelled
+      // will also be executed when the form is saved but has no effect as the promise is already resolved in this case
+      unsavedFormChangesForm.whenClose().then(() => deferred.reject());
     }
-    waitFor.then(formsToSave => {
+    // only close the remaining forms if the UnsavedFormChangesForm is not aborted or cancelled (i.e. the promise is not rejected)
+    return waitFor.then(formsToSave => {
       if (formsToSave) {
         // already saved & closed forms (handled by the UnsavedFormChangesForm)
         arrays.removeAll(forms, formsToSave);
