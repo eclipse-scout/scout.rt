@@ -18,7 +18,7 @@ public interface ICalendarDescriptor {
   /**
    * Unique identifyer of a calendar. Calendar items reference this id with the {@link ICalendarItem#getCalendarId()}
    */
-  long getCalendarId();
+  Long getCalendarId();
 
   void setCalendarId(long id);
 
@@ -28,6 +28,13 @@ public interface ICalendarDescriptor {
   String getName();
 
   void setName(String name);
+
+  /**
+   * Unique identifyer of the parent calendar
+   */
+  Long getParentId();
+
+  void setParentId(Long parentId);
 
   /**
    * Indicates if the calendar is displayed
@@ -42,4 +49,11 @@ public interface ICalendarDescriptor {
   String getCssClass();
 
   void setCssClass(String cssClass);
+
+  /**
+   * Order of calendar
+   */
+  long getOrder();
+
+  void setOrder(long order);
 }

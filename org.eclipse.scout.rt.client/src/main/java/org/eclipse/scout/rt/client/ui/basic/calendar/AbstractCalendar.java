@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -1000,7 +1001,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
       try {
         pushUIProcessor();
         ICalendarDescriptor cal = getCalendars().stream()
-            .filter(desc -> desc.getCalendarId() == calendarId)
+            .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
             .findAny()
             .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar!"));
         cal.setVisible(visible);
@@ -1024,7 +1025,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
         }
         else {
           selectedCalendar = getCalendars().stream()
-              .filter(desc -> desc.getCalendarId() == calendarId)
+              .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
               .findAny()
               .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar for id " + calendarId));
         }

@@ -29,8 +29,10 @@ public class JsonCalendarDescriptor implements IJsonObject {
     JSONObject json = new JSONObject();
     json.put("calendarId", m_descriptor.getCalendarId());
     json.put("name", m_descriptor.getName());
+    json.put("parentId", m_descriptor.getParentId());
     json.put("visible", m_descriptor.isVisible());
     json.put("cssClass", m_descriptor.getCssClass());
+    json.put("order", m_descriptor.getOrder());
     return json;
   }
 }
