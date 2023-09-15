@@ -16,32 +16,57 @@ public class CalendarDescriptor implements ICalendarDescriptor {
 
   private long m_calendarId;
   private String m_name;
+  private Long m_parentId;
   private boolean m_visible;
   private String m_cssClass;
+  private long m_order;
 
   public CalendarDescriptor(String name) {
-    this(new Random().nextInt(), name);
+    this(Long.valueOf(new Random().nextInt(1000) + 1), name);
   }
 
-  public CalendarDescriptor(long calendarId, String name) {
+  public CalendarDescriptor(Long calendarId, String name) {
     this(calendarId, name, true);
   }
 
-  public CalendarDescriptor(long calendarId, String name, boolean visible) {
+  public CalendarDescriptor(Long calendarId, String name, boolean visible) {
     setCalendarId(calendarId);
     m_name = name;
     m_visible = visible;
   }
 
-  public CalendarDescriptor(long calendarId, String name, boolean visible, String cssClass) {
+  public CalendarDescriptor(Long calendarId, String name, Long parentId) {
+    setCalendarId(calendarId);
+    m_name = name;
+    m_parentId = parentId;
+  }
+
+  public CalendarDescriptor(Long calendarId, String name, boolean visible, String cssClass) {
     setCalendarId(calendarId);
     m_name = name;
     m_visible = visible;
     m_cssClass = cssClass;
   }
 
+  public CalendarDescriptor(Long calendarId, String name, Long parentId, String cssClass) {
+    setCalendarId(calendarId);
+    m_name = name;
+    m_parentId = parentId;
+    m_visible = true;
+    m_cssClass = cssClass;
+  }
+
+  public CalendarDescriptor(Long calendarId, String name, Long parentId, boolean visible, String cssClass, long order) {
+    setCalendarId(calendarId);
+    m_name = name;
+    m_parentId = parentId;
+    m_visible = visible;
+    m_cssClass = cssClass;
+    m_order = order;
+  }
+
   @Override
-  public long getCalendarId() {
+  public Long getCalendarId() {
     return m_calendarId;
   }
 
@@ -61,6 +86,16 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   @Override
   public void setName(String name) {
     m_name = name;
+  }
+
+  @Override
+  public Long getParentId() {
+    return m_parentId;
+  }
+
+  @Override
+  public void setParentId(Long parentId) {
+    m_parentId = parentId;
   }
 
   @Override
@@ -84,6 +119,16 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   }
 
   @Override
+  public long getOrder() {
+    return m_order;
+  }
+
+  @Override
+  public void setOrder(long order) {
+    m_order = order;
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -100,7 +145,13 @@ public class CalendarDescriptor implements ICalendarDescriptor {
     if (m_visible != that.m_visible) {
       return false;
     }
+    if (m_order != that.m_order) {
+      return false;
+    }
     if (!Objects.equals(m_name, that.m_name)) {
+      return false;
+    }
+    if (!Objects.equals(m_parentId, that.m_parentId)) {
       return false;
     }
     if (!Objects.equals(m_cssClass, that.m_cssClass)) {
@@ -114,8 +165,10 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   public int hashCode() {
     int result = (int) (m_calendarId ^ (m_calendarId >>> 32));
     result = 31 * result + (m_name != null ? m_name.hashCode() : 0);
+    result = 31 * result + (m_parentId != null ? m_parentId.hashCode() : 0);
     result = 31 * result + (m_visible ? 1 : 0);
     result = 31 * result + (m_cssClass != null ? m_cssClass.hashCode() : 0);
+    result = 31 * result + (int) (m_order ^ (m_order >>> 32));
     return result;
   }
 }

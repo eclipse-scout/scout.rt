@@ -12,4 +12,5 @@ import {TreeNodeModel} from '../index';
 
 export interface CalendarsPanelTreeNodeModel extends TreeNodeModel {
   calendarId?: number;
+  parentId?: number;
 }
