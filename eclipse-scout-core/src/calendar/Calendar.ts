@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, CalendarsPanel, CalendarsPanelTreeNode, ContextMenuPopup, DateRange, dates, Device,
-  EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, TreeNodeClickEvent,
-  ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, CalendarsPanel, CalendarsPanelTreeNode, comparators, ContextMenuPopup, DateRange,
+  dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings,
+  TreeNodeClickEvent, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -271,16 +271,32 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _setCalendars(calendars: CalendarDescriptor[]) {
     this._setProperty('calendars', calendars);
+    this._updateCalendarNodes();
+  }
+
+  protected _updateCalendarNodes() {
     this.calendarsPanel.tree.removeAllNodes();
-    this.calendars.forEach(descriptor => {
-      this.calendarsPanel.tree.insertNode(scout.create(CalendarsPanelTreeNode, {
-        parent: this.calendarsPanel.tree,
-        calendarId: descriptor.calendarId,
-        text: descriptor.name,
-        checked: descriptor.visible,
-        cssClass: descriptor.cssClass
-      }));
-    });
+    // Ensure to have parent nodes first
+    this.calendars.sort((cal1, cal2) => {
+      if (cal1.parentId && cal2.parentId) {
+        return 0;
+      } else if (cal1.parentId) {
+        return 1;
+      } else if (cal2.parentId) {
+        return -1;
+      }
+      return comparators.NUMERIC.compare(cal1.order, cal2.order);
+    })
+      .forEach(descriptor => {
+        this.calendarsPanel.tree.insertNode(scout.create(CalendarsPanelTreeNode, {
+          parent: this.calendarsPanel.tree,
+          calendarId: descriptor.calendarId,
+          parentId: descriptor.parentId,
+          text: descriptor.name,
+          checked: descriptor.visible,
+          cssClass: descriptor.cssClass
+        }), this.calendarsPanel.tree.nodes.find(node => node.calendarId === descriptor.parentId));
+      });
   }
 
   setSelectedDate(date: Date | string) {
@@ -1161,7 +1177,6 @@ export class Calendar extends Widget implements CalendarModel {
     } else {
       weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
     }
-
 
     $('.calendar-day-name > .calendar-column', this.$topGrid)
       .filter((i, element) => $(element).data('calendarId') === 'default')

@@ -10,6 +10,8 @@
 export interface CalendarDescriptor {
   calendarId: number;
   name: string;
+  parentId: number;
   visible: boolean;
   cssClass: string;
+  order: number;
 }

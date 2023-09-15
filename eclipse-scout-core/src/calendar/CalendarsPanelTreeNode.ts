@@ -14,6 +14,7 @@ export class CalendarsPanelTreeNode extends TreeNode implements CalendarsPanelTr
   declare model: CalendarsPanelTreeNodeModel;
 
   calendarId: number;
+  parentId: number;
 
   constructor() {
     super();
@@ -24,6 +25,6 @@ export class CalendarsPanelTreeNode extends TreeNode implements CalendarsPanelTr
   override init(model: InitModelOf<this>) {
     super.init(model);
 
-    this.leaf = true;
+    this.leaf = !!this.parentId;
   }
 }
