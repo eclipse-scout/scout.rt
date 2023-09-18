@@ -9,7 +9,7 @@
  */
 import {
   ButtonTile, ChildModelOf, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus, ObjectOrChildModel, Outline, PageEventMap,
-  PageModel, PropertyChangeEvent, scout, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -489,16 +489,18 @@ export class Page extends TreeNode implements PageModel {
   }
 
   /**
-   * This function creates the text property of this page. The default implementation returns the
-   * text from the first cell of the given row. It's allowed to ignore the given row entirely, when you override
-   * this function.
+   * This function creates the text property of this page. The default implementation returns the texts of the summary columns of the table or
+   * from the first cell of the given row. It's allowed to ignore the given row entirely, when you override this function.
    */
   computeTextForRow(row: TableRow): string {
-    let text = '';
-    if (row.cells.length >= 1) {
-      text = row.cells[0].text;
+    const summaryColumns = row.getTable().summaryColumns();
+    if (summaryColumns.length) {
+      return strings.join(' ', ...summaryColumns.map(summaryColumn => summaryColumn.cellText(row)));
     }
-    return text;
+    if (row.cells.length >= 1) {
+      return row.cells[0].text;
+    }
+    return '';
   }
 
   /**

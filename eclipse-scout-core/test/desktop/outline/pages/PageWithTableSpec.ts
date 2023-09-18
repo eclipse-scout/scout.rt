@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {arrays, Column, NumberColumn, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
-import {OutlineSpecHelper} from '../../../../src/testing/index';
+import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('PageWithTable', () => {
 
@@ -16,6 +16,7 @@ describe('PageWithTable', () => {
   let helper: OutlineSpecHelper;
   let outline: Outline;
   let page: SpecPageWithTable;
+  let tableHelper: TableSpecHelper;
 
   class SpecPageWithTable extends PageWithTable {
     override _createSearchFilter(): any {
@@ -32,6 +33,7 @@ describe('PageWithTable', () => {
     session = sandboxSession();
     helper = new OutlineSpecHelper(session);
     outline = helper.createOutline();
+    tableHelper = new TableSpecHelper(session);
 
     page = scout.create(SpecPageWithTable, {
       parent: outline,
@@ -252,5 +254,42 @@ describe('PageWithTable', () => {
     table.reload();
     jasmine.clock().tick(3);
     expect(outline.selectedNode()).toBe(page);
+  });
+
+  it('childPages text is updated from the summary columns of the table', () => {
+    const tablePage = scout.create(SpecPageWithTable, {
+      parent: outline,
+      detailTable: tableHelper.createTable(tableHelper.createModel(tableHelper.createModelColumns(5), []))
+    });
+
+    const data = [
+      {cells: ['a', 'b', 'c', 'd', 'e']},
+      {cells: ['1', '2', '3', '4', '5']}
+    ];
+    tablePage._loadTableData = () => $.resolvedPromise(data);
+    tablePage.createChildPage = () => scout.create(PageWithNodes, {parent: outline});
+
+    const table = tablePage.detailTable;
+    table.reload();
+    jasmine.clock().tick(3);
+
+    const [pageAbc, page123] = table.rows.map(r => r.page);
+
+    expect(pageAbc.text).toBe('a');
+    expect(page123.text).toBe('1');
+
+    table.columns[1].setSummary(true);
+    expect(pageAbc.text).toBe('b');
+    expect(page123.text).toBe('2');
+
+    table.columns[4].setSummary(true);
+    expect(pageAbc.text).toBe('b e');
+    expect(page123.text).toBe('2 5');
+
+    table.columns[0].setSummary(true);
+    table.columns[1].setSummary(false);
+    table.columns[3].setSummary(true);
+    expect(pageAbc.text).toBe('a d e');
+    expect(page123.text).toBe('1 4 5');
   });
 });

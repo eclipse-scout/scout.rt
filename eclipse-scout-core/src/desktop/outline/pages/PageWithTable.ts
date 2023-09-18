@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, InitModelOf, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableReloadEvent, TableRow,
-  TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableReloadEvent, TableRow, TableRowActionEvent,
+  TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -39,10 +39,6 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this._tableRowActionHandler = this._onTableRowAction.bind(this);
     this._tableRowOrderChangeHandler = this._onTableRowOrderChanged.bind(this);
     this._tableDataLoadHandler = this.loadTableData.bind(this);
-  }
-
-  override init(model: InitModelOf<this>) {
-    super.init(model);
   }
 
   protected override _initDetailTable(table: Table) {
