@@ -152,23 +152,6 @@ public final class TreeChains {
     }
   }
 
-  public static class TreeAutoCheckChildNodesChain extends AbstractTreeChain {
-
-    public TreeAutoCheckChildNodesChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
-      super(extensions);
-    }
-
-    public void execAutoCheckChildNodes(final List<ITreeNode> nodes, final boolean checked, final boolean enabledNodesOnly) {
-      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
-        @Override
-        protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
-          next.execAutoCheckChildNodes(TreeAutoCheckChildNodesChain.this, nodes, checked, enabledNodesOnly);
-        }
-      };
-      callChain(methodInvocation);
-    }
-  }
-
   public static class TreeHyperlinkActionChain extends AbstractTreeChain {
 
     public TreeHyperlinkActionChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {

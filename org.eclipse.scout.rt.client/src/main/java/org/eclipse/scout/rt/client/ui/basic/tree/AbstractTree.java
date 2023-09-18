@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDragNodeChain;
@@ -99,13 +98,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   private final Map<Object, ITreeNode> m_deletedNodes;
   private final List<ITreeNodeFilter> m_nodeFilters;
   private final ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>> m_objectExtensions;
-
-  /**
-   * In autoCheckChildren mode only the effectively checked parent nodes should cause nodesChecked Events (to minimize
-   * network traffic). setNodesChecked is called recursively by the intercepter. The m_currentParentNodes list is used
-   * to avoid firing events inside the recursion.
-   */
-  private List<ITreeNode> m_currentParentNodes;
 
   /**
    * Provides 4 boolean flags.<br>
@@ -353,8 +345,29 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
+  @Deprecated
   protected boolean getConfiguredAutoCheckChildNodes() {
     return false;
+  }
+
+  /**
+   * Configures the default auto-check mode of the tree. There are three modes:
+   * <ul>
+   * <li>NONE: No nodes are auto-checked</li>
+   * <li>CHILDREN: All child nodes will be checked/unchecked together with their parent</li>
+   * <li>CHILDREN_AND_PARENT: The state of the node is a representation of its children</li>
+   * </ul>
+   * <p>
+   * Only has an effect if the tree is checkable.
+   *
+   * @see AutoCheckStyle
+   * @see #getConfiguredCheckable()
+   * @since 5.1
+   */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(105)
+  protected AutoCheckStyle getConfiguredAutoCheckStyle() {
+    return AutoCheckStyle.NONE;
   }
 
   /**
@@ -431,13 +444,25 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
+  @Deprecated
   public boolean isAutoCheckChildNodes() {
-    return propertySupport.getPropertyBool(PROP_AUTO_CHECK_CHILDREN);
+    return getAutoCheckStyle().equals(AutoCheckStyle.CHILDREN);
   }
 
   @Override
+  @Deprecated
   public void setAutoCheckChildNodes(boolean b) {
-    propertySupport.setPropertyBool(PROP_AUTO_CHECK_CHILDREN, b);
+    setAutoCheckStyle(b ? AutoCheckStyle.CHILDREN : AutoCheckStyle.NONE);
+  }
+
+  @Override
+  public AutoCheckStyle getAutoCheckStyle() {
+    return propertySupport.getProperty(PROP_AUTO_CHECK_STYLE, AutoCheckStyle.class);
+  }
+
+  @Override
+  public void setAutoCheckStyle(AutoCheckStyle autoCheckStyle) {
+    propertySupport.setProperty(PROP_AUTO_CHECK_STYLE, autoCheckStyle);
   }
 
   @ConfigOperation
@@ -548,16 +573,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   protected void execNodesChecked(List<ITreeNode> nodes) {
   }
 
-  @ConfigOperation
-  protected void execAutoCheckChildNodes(List<? extends ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
-    for (ITreeNode node : nodes) {
-      for (ITreeNode childNode : node.getFilteredChildNodes()) {
-        childNode.setChecked(checked, enabledNodesOnly);
-        interceptAutoCheckChildNodes(CollectionUtility.arrayList(childNode), checked, enabledNodesOnly);
-      }
-    }
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -586,6 +601,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     setScrollToSelection(getConfiguredScrollToSelection());
     setSaveAndRestoreScrollbars(getConfiguredSaveAndRestoreScrollbars());
     setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
+    setAutoCheckStyle(getConfiguredAutoCheckStyle());
     setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
     setDisplayStyle(getConfiguredDisplayStyle());
     setToggleBreadcrumbStyleEnabled(getConfiguredToggleBreadcrumbStyleEnabled());
@@ -1435,23 +1451,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       }
     }
     if (!changedNodes.isEmpty()) {
-      if (isAutoCheckChildNodes() && isMultiCheck()) {
-        if (m_currentParentNodes == null) {
-          m_currentParentNodes = nodes;
-        }
-        try {
-          interceptAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
-        }
-        catch (RuntimeException ex) {
-          BEANS.get(ExceptionHandler.class).handle(ex);
-        }
-        if (nodes.equals(m_currentParentNodes)) {
-          m_currentParentNodes = null;
-        }
-      }
-      if (m_currentParentNodes == null) {
-        fireNodesChecked(changedNodes);
-      }
+      fireNodesChecked(changedNodes);
     }
   }
 
@@ -2384,12 +2384,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     chain.execNodesChecked(nodes);
   }
 
-  protected void interceptAutoCheckChildNodes(List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
-    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
-    TreeAutoCheckChildNodesChain chain = new TreeAutoCheckChildNodesChain(extensions);
-    chain.execAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
-  }
-
   private void fireNodeAction(ITreeNode node) {
     if (isActionRunning()) {
       return;
@@ -2768,7 +2762,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
           setTreeChanging(true);
           nodes = resolveNodes(nodes);
           if (!nodes.isEmpty()) {
-            setNodesChecked(nodes, checked, true);
+            // With AutoCheckStyle.CHILDREN_AND_PARENT it's possible to check disabled nodes from UI
+            setNodesChecked(nodes, checked, !getAutoCheckStyle().equals(AutoCheckStyle.CHILDREN_AND_PARENT));
           }
         }
         finally {
@@ -3054,11 +3049,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     @Override
     public void execNodesChecked(TreeNodesCheckedChain chain, List<ITreeNode> nodes) {
       getOwner().execNodesChecked(nodes);
-    }
-
-    @Override
-    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
-      getOwner().execAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
     }
   }
 

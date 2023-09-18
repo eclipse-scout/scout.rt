@@ -899,50 +899,6 @@ public class JsonTreeTest {
     }
   }
 
-  /**
-   * Test for ticket 218516. When autoCheckChildNodes is set to true the JSON layer should send the state of all child
-   * nodes for a given parent node.
-   */
-  @Test
-  public void testAllNodesUnchecked() {
-    ITree tree = new Tree();
-    tree.setRootNode(new TreeNode("Root"));
-    tree.setAutoCheckChildNodes(true);
-    tree.setCheckable(true);
-
-    ITreeNode parent = new TreeNode("Parent");
-    parent.setParentNodeInternal(tree.getRootNode());
-    ITreeNode child1 = new TreeNode("Child1");
-    child1.setParentNodeInternal(parent);
-    ITreeNode child2 = new TreeNode("Child2");
-    child2.setParentNodeInternal(parent);
-
-    tree.addChildNode(tree.getRootNode(), parent);
-    tree.addChildNode(parent, child1);
-    tree.addChildNode(parent, child2);
-
-    // set tree state before we start with the test case
-    m_uiSession.createJsonAdapter(tree, new JsonAdapterMock());
-    tree.setNodeChecked(parent, true);
-    assertTrue(child1.isChecked());
-    assertTrue(child2.isChecked());
-    JsonTestUtility.endRequest(m_uiSession);
-
-    tree.setNodeChecked(parent, false); // <-- test case
-
-    JsonTestUtility.processBufferedEvents(m_uiSession);
-    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
-    assertEquals(1, events.size());
-    JsonEvent event = events.get(0);
-    assertEquals("nodesChecked", event.getType());
-    JSONArray nodes = event.getData().getJSONArray("nodes");
-    assertEquals(3, nodes.length());
-    for (int i = 0; i < nodes.length(); i++) {
-      JSONObject jsonNode = (JSONObject) nodes.get(i);
-      assertFalse(jsonNode.getBoolean("checked"));
-    }
-  }
-
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {
     String desktopId = "x"; // never used
     JSONObject data = new JSONObject();

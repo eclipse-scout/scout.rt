@@ -111,8 +111,10 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
 
   void setAutoExpandAll(boolean b);
 
+  @Deprecated
   boolean isAutoCheckChildNodes();
 
+  @Deprecated
   void setAutoCheckChildNodes(boolean b);
 
   boolean isLoadIncremental();

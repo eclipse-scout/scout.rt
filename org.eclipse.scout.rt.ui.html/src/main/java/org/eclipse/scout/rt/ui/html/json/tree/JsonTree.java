@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.tree.AutoCheckStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.CheckableStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -180,10 +181,15 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         return getModel().isLazyExpandingEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<>(ITree.PROP_AUTO_CHECK_CHILDREN, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_AUTO_CHECK_STYLE, model) {
       @Override
-      protected Boolean modelValue() {
-        return getModel().isAutoCheckChildNodes();
+      protected AutoCheckStyle modelValue() {
+        return getModel().getAutoCheckStyle();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return ((AutoCheckStyle) value).name().toLowerCase();
       }
     });
     putJsonProperty(new JsonProperty<>(ITree.PROP_SCROLL_TO_SELECTION, model) {
@@ -703,12 +709,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     JSONArray jsonNodes = new JSONArray();
     for (ITreeNode node : modelNodes) {
       addJsonNodesChecked(jsonNodes, node);
-
-      if (getModel().isAutoCheckChildNodes()) {
-        for (ITreeNode childNode : collectChildNodesCheckedRec(node)) {
-          addJsonNodesChecked(jsonNodes, childNode);
-        }
-      }
     }
     if (jsonNodes.length() == 0) {
       return;
