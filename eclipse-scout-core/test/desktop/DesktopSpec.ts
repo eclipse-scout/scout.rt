@@ -1293,8 +1293,11 @@ describe('Desktop', () => {
       });
 
       desktop.showForm(view);
+      expect(desktop.activeForm).toBe(view);
+
       outline.selectNode(outline.nodes[0]);
       desktop.bringOutlineToFront();
+      expect(desktop.activeForm).toBeNull();
 
       desktop.activateForm(view);
       outline.deselectAll();
@@ -1396,6 +1399,28 @@ describe('Desktop', () => {
         .always(done);
     });
 
+    it('must not be a removed form', () => {
+      const outline = outlineHelper.createOutlineWithOneDetailForm();
+      const page = outline.nodes[0];
+
+      desktop.setOutline(outline);
+      outline.selectNode(page);
+
+      const form = formHelper.createFormWithOneField({
+        displayHint: Form.DisplayHint.DIALOG,
+        displayParent: page.detailForm
+      });
+
+      desktop.showForm(form);
+      expect(desktop.activeForm).toBe(form);
+
+      outline.selectNode(outline.nodes[1]);
+      desktop.bringOutlineToFront();
+      expect(desktop.activeForm).toBeNull();
+
+      outline.selectNode(page);
+      expect(desktop.activeForm).toBe(form);
+    });
   });
 
   describe('createFormExclusive', () => {
