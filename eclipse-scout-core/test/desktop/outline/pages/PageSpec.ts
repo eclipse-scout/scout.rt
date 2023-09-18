@@ -161,6 +161,35 @@ describe('Page', () => {
     }]);
   });
 
+  describe('computeTextForRow', () => {
+
+    it('considers summary columns', () => {
+      const page = scout.create(Page, {parent: outline});
+      const table = tableHelper.createTable(tableHelper.createModel(
+        tableHelper.createModelColumns(5),
+        $.extend(true, [], tableHelper.createModelRows(5, 2), [{cells: ['a', 'b', 'c', 'd', 'e']}, {cells: ['1', '2', '3', '4', '5']}])
+      ));
+      const [rowAbc, row123] = table.rows;
+
+      expect(page.computeTextForRow(rowAbc)).toBe('a');
+      expect(page.computeTextForRow(row123)).toBe('1');
+
+      table.columns[1].setSummary(true);
+      expect(page.computeTextForRow(rowAbc)).toBe('b');
+      expect(page.computeTextForRow(row123)).toBe('2');
+
+      table.columns[4].setSummary(true);
+      expect(page.computeTextForRow(rowAbc)).toBe('b e');
+      expect(page.computeTextForRow(row123)).toBe('2 5');
+
+      table.columns[0].setSummary(true);
+      table.columns[1].setSummary(false);
+      table.columns[3].setSummary(true);
+      expect(page.computeTextForRow(rowAbc)).toBe('a d e');
+      expect(page.computeTextForRow(row123)).toBe('1 4 5');
+    });
+  });
+
   function createAndInsertPage(detailTable: ChildModelOf<Table>, detailForm: ChildModelOf<Form>, parentPage?: Page): PageWithLazyCreationCounter {
     const page = createPage(detailTable, detailForm);
     insertPage(page, parentPage);

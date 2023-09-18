@@ -5671,6 +5671,20 @@ export class Table extends Widget implements TableModel {
   }
 
   /**
+   * @returns all columns marked as primaryKey column (see {@link Column.primaryKey})
+   */
+  primaryKeyColumns(): Column[] {
+    return this.filterColumns(column => column.primaryKey);
+  }
+
+  /**
+   * @returns all columns marked as summary column (see {@link Column.summary})
+   */
+  summaryColumns(): Column[] {
+    return this.filterColumns(column => column.summary);
+  }
+
+  /**
    * @param includeGuiColumns true to also include columns created by the UI (e.g. {@link rowIconColumn} or {@link checkableColumn}). Default is true.
    */
   filterColumns(filter: Predicate<Column<any>>, includeGuiColumns?: boolean): Column<any>[] {

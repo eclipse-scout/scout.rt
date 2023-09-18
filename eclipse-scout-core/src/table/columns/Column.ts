@@ -721,6 +721,15 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.table.updateRows(this.table.rows);
   }
 
+  setSummary(summary: boolean) {
+    const changed = this.setProperty('summary', summary);
+    if (!changed) {
+      return;
+    }
+
+    this.table.updateRows(this.table.rows);
+  }
+
   setWidth(width: number) {
     let changed = this.setProperty('width', width);
     if (!changed) {

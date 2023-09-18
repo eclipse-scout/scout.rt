@@ -131,7 +131,7 @@ export class TableRow implements TableRowModel, ObjectWithType {
     if (!this.cells?.length) {
       return [];
     }
-    let columns = this.getTable().columns.filter(column => column.primaryKey);
+    let columns = this.getTable().primaryKeyColumns();
     if (!columns.length) {
       columns = this.getTable().columns;
     }

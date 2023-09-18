@@ -3546,4 +3546,38 @@ describe('Table', () => {
       expect(table.selectedRows).toEqual([table.rows[1]]);
     });
   });
+
+  describe('primaryKeyColumns', () => {
+
+    it('returns the correct columns', () => {
+      let table = helper.createTable(helper.createModel([], []));
+      expect(table.primaryKeyColumns()).toEqual([]);
+
+      table = helper.createTable(helper.createModel(helper.createModelColumns(3), []));
+      expect(table.primaryKeyColumns()).toEqual([]);
+
+      table = helper.createTable(helper.createModel($.extend(true, [], helper.createModelColumns(3), [{}, {primaryKey: true}, {primaryKey: false}]), []));
+      expect(table.primaryKeyColumns()).toEqual([table.columns[1]]);
+
+      table = helper.createTable(helper.createModel($.extend(true, [], helper.createModelColumns(3), [{primaryKey: true}, {}, {primaryKey: true}]), []));
+      expect(table.primaryKeyColumns()).toEqual([table.columns[0], table.columns[2]]);
+    });
+  });
+
+  describe('summaryColumns', () => {
+
+    it('returns the correct columns', () => {
+      let table = helper.createTable(helper.createModel([], []));
+      expect(table.summaryColumns()).toEqual([]);
+
+      table = helper.createTable(helper.createModel(helper.createModelColumns(3), []));
+      expect(table.summaryColumns()).toEqual([]);
+
+      table = helper.createTable(helper.createModel($.extend(true, [], helper.createModelColumns(3), [{}, {summary: true}, {summary: false}]), []));
+      expect(table.summaryColumns()).toEqual([table.columns[1]]);
+
+      table = helper.createTable(helper.createModel($.extend(true, [], helper.createModelColumns(3), [{summary: true}, {}, {summary: true}]), []));
+      expect(table.summaryColumns()).toEqual([table.columns[0], table.columns[2]]);
+    });
+  });
 });

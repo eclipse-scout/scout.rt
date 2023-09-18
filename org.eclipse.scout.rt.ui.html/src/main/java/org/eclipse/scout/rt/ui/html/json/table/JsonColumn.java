@@ -76,7 +76,6 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     if (getColumn().getInitialWidth() != getColumn().getWidth()) {
       json.put("initialWidth", getColumn().getInitialWidth());
     }
-    json.put("summary", getColumn().isSummary());
     json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, getColumn().getHorizontalAlignment());
     if (getColumn().isSortActive()) {
       json.put("sortActive", true);
