@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -466,6 +466,13 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public void setChecked(boolean checked, boolean enabledNodesOnly) {
     if (getTree() != null) {
       getTree().setNodeChecked(this, checked, enabledNodesOnly);
+    }
+  }
+
+  @Override
+  public void setChecked(boolean checked, boolean enabledNodesOnly, boolean forceUpdateNode) {
+    if (getTree() != null) {
+      getTree().setNodeChecked(this, checked, enabledNodesOnly, forceUpdateNode);
     }
   }
 

@@ -235,15 +235,11 @@ export class TreeAdapter extends ModelAdapter {
       }
     });
 
-    this.addFilterForWidgetEventType('nodesChecked');
-
     this.widget.checkNodes(checkedNodes, {
       checked: true,
-      checkChildren: false,
       checkOnlyEnabled: false
     });
     this.widget.uncheckNodes(uncheckedNodes, {
-      checkChildren: false,
       checkOnlyEnabled: false
     });
   }

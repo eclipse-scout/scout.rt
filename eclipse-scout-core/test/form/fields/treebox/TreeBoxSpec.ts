@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupCall, LookupCallModel, LookupResult, LookupRow, QueryBy, scout, Status, TreeBox, TreeBoxModel} from '../../../../src/index';
+import {LookupCall, LookupCallModel, LookupResult, LookupRow, QueryBy, scout, Status, Tree, TreeBox, TreeBoxModel} from '../../../../src/index';
 import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
 import {InitModelOf} from '../../../../src/scout';
 
@@ -366,6 +366,39 @@ describe('TreeBox', () => {
     });
   });
 
+  describe('setValue', () => {
+    it('should check children in autoCheckMode', () => {
+      // Arrange
+      let field = createFieldWithLookupCall();
+      field.tree.setAutoCheckStyle(Tree.AutoCheckStyle.CHILDREN_AND_PARENT);
+      jasmine.clock().tick(500);
+
+      // Act
+      field.setValue([1]);
+
+      // Assert
+      expect(field.value).toEqual([1, 2, 3]);
+      expect(field.tree.checkedNodes.length).toBe(3);
+    });
+
+    it('should not change value when value is set twice', () => {
+      // Arrange
+      let field = createFieldWithLookupCall();
+      field.tree.setAutoCheckStyle(Tree.AutoCheckStyle.CHILDREN_AND_PARENT);
+      jasmine.clock().tick(500);
+
+      // Act
+      field.setValue([1]);
+      let valueBetween = field.value;
+      field.setValue([1]);
+
+      // Assert
+      expect(field.value).toEqual(valueBetween);
+      expect(field.value).toEqual([1, 2, 3]);
+      expect(field.tree.checkedNodes.length).toBe(3);
+    });
+  });
+
   describe('_formatValue', () => {
     let lookupCall;
 
@@ -408,21 +441,6 @@ describe('TreeBox', () => {
       expect(treeBox.value).toEqual([]);
       expect(treeBox.displayText).toBe('');
     });
-
-    it('does not auto-check child nodes if node is checked by model', () => {
-      let model = helper.createFieldModel(TreeBox, session.desktop, {
-        lookupCall: lookupCall
-      });
-      let treeBox = scout.create(TreeBox, model);
-      treeBox.tree.autoCheckChildren = true;
-
-      // Checking nodes by model should not auto-check child nodes
-      treeBox.setValue([1]);
-      jasmine.clock().tick(300);
-      expect(treeBox.value).toEqual([1]);
-      expect(treeBox.tree.checkedNodes.length).toBe(1);
-    });
-
   });
 
   describe('aria properties', () => {

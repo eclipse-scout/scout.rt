@@ -36,7 +36,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   String PROP_MULTI_SELECT = "multiSelect";
   String PROP_MULTI_CHECK = "multiCheck";
   String PROP_CHECKABLE = "checkable";
-  String PROP_AUTO_CHECK_CHILDREN = "autoCheckChildren";
+  String PROP_AUTO_CHECK_STYLE = "autoCheckStyle";
   String PROP_LAZY_EXPANDING_ENABLED = "lazyExpandingEnabled";
   /**
    * Integer default -1
@@ -194,9 +194,15 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   Set<ITreeNode> getSelectedNodes();
 
+  @Deprecated
   boolean isAutoCheckChildNodes();
 
+  @Deprecated
   void setAutoCheckChildNodes(boolean autoCheckChildNodes);
+
+  AutoCheckStyle getAutoCheckStyle();
+
+  void setAutoCheckStyle(AutoCheckStyle autoCheckStyle);
 
   boolean isSelectedNode(ITreeNode node);
 
@@ -398,9 +404,13 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   void setNodeChecked(ITreeNode node, boolean checked, boolean enabledNodesOnly);
 
+  void setNodeChecked(ITreeNode node, boolean checked, boolean enabledNodesOnly, boolean forceUpdateNode);
+
   void setNodesChecked(List<ITreeNode> nodes, boolean checked);
 
   void setNodesChecked(List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly);
+
+  void setNodesChecked(List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly, boolean forceUpdateNode);
 
   boolean isNodeChecked(ITreeNode node);
 

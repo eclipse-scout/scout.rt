@@ -311,6 +311,20 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
     aria.checked($checkbox, this.checked);
     aria.checked(this.$node, this.checked);
     $checkbox.toggleClass('children-checked', !!this.childrenChecked);
+
+    this._renderChildrenChecked();
+  }
+
+  /** @internal */
+  _renderChildrenChecked() {
+    // if node is not rendered, do nothing
+    if (!this.$node) {
+      return;
+    }
+
+    this.$node.children('.tree-node-checkbox')
+      .children('.check-box')
+      .toggleClass('children-checked', !!this.childrenChecked);
   }
 
   /** @internal */
