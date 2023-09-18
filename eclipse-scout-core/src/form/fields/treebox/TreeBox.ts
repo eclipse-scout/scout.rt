@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -79,7 +79,7 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
     this._valueSyncing = true;
     let opts = {
       checkOnlyEnabled: false,
-      checkChildren: false
+      autoCheckStyle: this.tree.autoCheckStyle
     };
     try {
       if (arrays.empty(newValue)) {
@@ -102,6 +102,10 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
       this._updateDisplayText();
     } finally {
       this._valueSyncing = false;
+    }
+    if (opts.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
+      // The value can change because of parent nodes checking their children
+      this._syncTreeToValue();
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -789,11 +789,13 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
+  @Deprecated
   public boolean isAutoCheckChildNodes() {
     return getTree().isAutoCheckChildNodes();
   }
 
   @Override
+  @Deprecated
   public void setAutoCheckChildNodes(boolean b) {
     getTree().setAutoCheckChildNodes(b);
   }
@@ -896,21 +898,20 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       //
       Set<T> checkedKeys = getCheckedKeys();
       Collection<ITreeNode> checkedNodes = m_tree.findNodes(checkedKeys);
+      Set<ITreeNode> checkedNodesSet = new HashSet<>(checkedNodes);
       IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
         @Override
         public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
-          element.setChecked(false);
+          if (!checkedNodesSet.contains(element)) {
+            element.setChecked(false);
+          }
           return TreeVisitResult.CONTINUE;
         }
       };
       getTree().visitTree(v);
-      // Checking nodes by model should not auto-check child nodes
-      boolean autoCheckChildNodes = getTree().isAutoCheckChildNodes();
-      getTree().setAutoCheckChildNodes(false);
       for (ITreeNode node : checkedNodes) {
-        node.setChecked(true);
+        node.setChecked(true, false, true);
       }
-      getTree().setAutoCheckChildNodes(autoCheckChildNodes);
       if (!getTree().isCheckable()) {
         getTree().selectNodes(checkedNodes, false);
       }

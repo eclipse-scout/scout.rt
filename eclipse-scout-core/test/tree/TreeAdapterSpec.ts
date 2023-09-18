@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -236,7 +236,7 @@ describe('TreeAdapter', () => {
 
   describe('checkNodes', () => {
 
-    it('does not send checked event if triggered by server', () => {
+    it('does send checked event of checked node if triggered by server', () => {
       let model = helper.createModelFixture(2, 2);
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop) as Tree;
@@ -253,9 +253,79 @@ describe('TreeAdapter', () => {
       });
       expect(tree.nodes[1].checked).toBe(true);
       sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(0);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
     });
 
+    it('does send checked event of checked node and its children if triggered by server', () => {
+      let model = helper.createModelFixture(2, 1);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
+      tree.checkable = true;
+      tree.setAutoCheckChildren(true);
+
+      // Arrange
+      let node = tree.nodes[0];
+      let childNode1 = node.childNodes[0];
+      let childNode2 = node.childNodes[1];
+
+      // Act
+      adapter.onModelAction({
+        target: model.id,
+        type: 'nodesChecked',
+        nodes: [{
+          id: node.id,
+          checked: true
+        }]
+      });
+
+      // Assert
+      expect(node.checked).toBe(true);
+      expect(childNode1.checked).toBe(true);
+      expect(childNode2.checked).toBe(true);
+      sendQueuedAjaxCalls();
+      let nodeIds = getNodesOfLastEventAjaxCall().map(n => n.nodeId);
+      expect(nodeIds).toEqual(jasmine.arrayWithExactContents([node.id, childNode1.id, childNode2.id]));
+    });
+
+    it('does send checked event of checked node and its children if triggered by server', () => {
+      let model = helper.createModelFixture(2, 1);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
+      tree.checkable = true;
+      tree.setAutoCheckChildren(true);
+
+      // Arrange
+      let node = tree.nodes[0];
+      let childNode1 = node.childNodes[0];
+      let childNode2 = node.childNodes[1];
+      tree.checkNode(childNode1);
+
+      // Act
+      adapter.onModelAction({
+        target: model.id,
+        type: 'nodesChecked',
+        nodes: [{
+          id: childNode2.id,
+          checked: true
+        }]
+      });
+
+      // Assert
+      expect(node.checked).toBe(true);
+      expect(childNode1.checked).toBe(true);
+      expect(childNode2.checked).toBe(true);
+      sendQueuedAjaxCalls();
+      let nodeIds = getNodesOfLastEventAjaxCall(1).map(n => n.nodeId);
+      expect(nodeIds).toEqual(jasmine.arrayWithExactContents([node.id, childNode2.id]));
+    });
+
+    const getNodesOfLastEventAjaxCall = (eventIndex = 0, request?: JasmineAjaxRequest) => {
+      return getLastEvents(request)[eventIndex].nodes as { nodeId: string, checked: boolean }[];
+    };
+
+    const getLastEvents = (request = jasmine.Ajax.requests.mostRecent()): RemoteEvent[] => {
+      return (<any>request.data()).events as RemoteEvent[];
+    };
   });
 
   describe('setNodesExpanded', () => {
