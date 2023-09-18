@@ -22,7 +22,8 @@ export class Tree extends Widget implements TreeModel {
 
   toggleBreadcrumbStyleEnabled: boolean;
   breadcrumbTogglingThreshold: number;
-  autoCheckChildren: boolean;
+  autoCheckChildren: boolean; // This is to maintain backwards compatibility. Use autoCheckStyle.
+  autoCheckStyle: AutoCheckStyle;
   checkable: boolean;
   checkableStyle: TreeCheckableStyle;
   displayStyle: TreeDisplayStyle;
@@ -106,6 +107,7 @@ export class Tree extends Widget implements TreeModel {
     this.toggleBreadcrumbStyleEnabled = false;
     this.breadcrumbTogglingThreshold = null;
     this.autoCheckChildren = false;
+    this.autoCheckStyle = Tree.AutoCheckStyle.NONE;
     this.checkable = false;
     this.checkableStyle = Tree.CheckableStyle.CHECKBOX_TREE_NODE;
     this.displayStyle = Tree.DisplayStyle.DEFAULT;
@@ -195,6 +197,12 @@ export class Tree extends Widget implements TreeModel {
     SingleSelection: 'Tree.SingleSelection',
     MultiSelection: 'Tree.MultiSelection',
     Header: 'Tree.Header'
+  } as const;
+
+  static AutoCheckStyle = {
+    NONE: 'none',
+    AUTO_CHECK_CHILD_NODES: 'auto_check_child_nodes',
+    SYNCH_CHILD_AND_PARENT_STATE: 'synch_child_and_parent_state'
   } as const;
 
   /**
@@ -297,6 +305,39 @@ export class Tree extends Widget implements TreeModel {
       new TreeNavigationEndKeyStroke(this, modifierBitMask),
       new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
     ]);
+  }
+
+  /**
+   * @deprecated use {@link setAutoCheckStyle}
+   * @param autoCheckChildren
+   */
+  setAutoCheckChildren(autoCheckChildren: boolean) {
+    this.setProperty('autoCheckChildren', autoCheckChildren);
+  }
+
+  protected _setAutoCheckChildren(autoCheckChildren: boolean) {
+    this._setProperty('autoCheckChildren', autoCheckChildren);
+    let mode: AutoCheckStyle;
+    if (autoCheckChildren) {
+      mode = Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES;
+    } else {
+      if (this.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
+        mode = Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE;
+      } else {
+        mode = Tree.AutoCheckStyle.NONE;
+      }
+    }
+    this.setAutoCheckStyle(mode);
+  }
+
+  setAutoCheckStyle(autoCheckStyle: AutoCheckStyle) {
+    this.setProperty('autoCheckStyle', autoCheckStyle);
+  }
+
+  protected _setAutoCheckStyle(autoCheckStyle: AutoCheckStyle) {
+    this._setProperty('autoCheckStyle', autoCheckStyle);
+    // Is used to synch both properties
+    this.setAutoCheckChildren(autoCheckStyle === Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES);
   }
 
   protected _setMenus(argMenus: Menu[]) {
@@ -2564,9 +2605,16 @@ export class Tree extends Widget implements TreeModel {
       checked: true,
       checkOnlyEnabled: true,
       checkChildren: this.autoCheckChildren,
+      autoCheckStyle: this.autoCheckStyle,
       triggerNodesChecked: true
     };
     $.extend(opts, options);
+
+    // Ensure new method is used
+    if (opts.checkChildren) {
+      this.autoCheckStyle = Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES;
+    }
+
     let updatedNodes: TreeNode[] = [];
     // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
     if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
@@ -2575,7 +2623,7 @@ export class Tree extends Widget implements TreeModel {
     nodes = arrays.ensure(nodes);
     nodes.forEach(node => {
       if (!node.enabled && opts.checkOnlyEnabled || node.checked === opts.checked || !node.filterAccepted) {
-        if (opts.checkChildren) {
+        if (opts.autoCheckStyle === Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES) {
           this.checkNodes(node.childNodes, opts);
         }
         return;
@@ -2596,7 +2644,7 @@ export class Tree extends Widget implements TreeModel {
       }
       updatedNodes.push(node);
       this._updateMarkChildrenChecked(node, false, opts.checked, true);
-      if (opts.checkChildren) {
+      if (opts.autoCheckStyle === Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES) {
         let childOpts = $.extend({}, opts, {
           triggerNodesChecked: false
         });
@@ -3372,6 +3420,7 @@ export class Tree extends Widget implements TreeModel {
 export type TreeDisplayStyle = EnumObject<typeof Tree.DisplayStyle>;
 export type TreeCheckableStyle = EnumObject<typeof Tree.CheckableStyle>;
 export type TreeMenuType = EnumObject<typeof Tree.MenuType>;
+export type AutoCheckStyle = EnumObject<typeof Tree.AutoCheckStyle>;
 export type TreeNodeExpandOptions = {
   /**
    * Default is derived from {@link TreeNode.expandedLazy} and {@link TreeNode.lazyExpandingEnabled} if the node is expanded and false otherwise.
@@ -3410,9 +3459,14 @@ export type TreeNodeCheckOptions = {
    */
   checkOnlyEnabled?: boolean;
   /**
+   * @deprecated use {@link autoCheckStyle}
    * Default is {@link Tree.autoCheckChildren}
    */
   checkChildren?: boolean;
+  /**
+   * Default is {@link Tree.AutoCheckStyle.NONE}
+   */
+  autoCheckStyle?: AutoCheckStyle;
   /**
    * Specifies if a 'nodesChecked' event should be triggered. Default is true.
    */

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, TreeCheckableStyle, TreeDisplayStyle, TreeNode, WidgetModel} from '../index';
+import {Action, AutoCheckStyle, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, TreeCheckableStyle, TreeDisplayStyle, TreeNode, WidgetModel} from '../index';
 
 export interface TreeModel extends WidgetModel {
   /**
@@ -17,8 +17,13 @@ export interface TreeModel extends WidgetModel {
   breadcrumbTogglingThreshold?: number;
   /**
    * Default is false.
+   * @deprecated since version 23.2, use {@link autoCheckStyle}
    */
   autoCheckChildren?: boolean;
+  /**
+   * Default is {@link AutoCheckStyle.NONE}
+   */
+  autoCheckStyle?: AutoCheckStyle;
   /**
    * Default is false.
    */
