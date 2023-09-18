@@ -35,6 +35,7 @@ class CalendarsPanelTree extends Tree {
     super();
 
     this._scrollDirections = 'y';
+    this.autoCheckStyle = Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE;
   }
 
   override insertNode(node: ObjectOrModel<CalendarsPanelTreeNode>, parentNode?: CalendarsPanelTreeNode, index?: number) {
