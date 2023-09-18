@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -196,8 +196,8 @@ export default class FormController {
       return false;
     }
 
-    dialog.on('remove', () => {
-      let formToActivate = this._findFormToActivateAfterDialogRemove();
+    dialog.on('remove', e => {
+      let formToActivate = this._findFormToActivateAfterDialogRemove(e.source);
       if (formToActivate) {
         desktop._setFormActivated(formToActivate);
       } else {
@@ -221,9 +221,10 @@ export default class FormController {
     }
   }
 
-  _findFormToActivateAfterDialogRemove() {
-    if (this.displayParent.dialogs.length > 0) {
-      return this.displayParent.dialogs[this.displayParent.dialogs.length - 1];
+  _findFormToActivateAfterDialogRemove(removedDialog) {
+    const dialogs = this.displayParent.dialogs.filter(d => d !== removedDialog);
+    if (dialogs.length > 0) {
+      return dialogs[dialogs.length - 1];
     }
     if (this.displayParent instanceof Form && !this.displayParent.detailForm) {
       // activate display parent, but not if it is the detail form
