@@ -10,7 +10,7 @@
 import {
   arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, CalendarsPanel, CalendarsPanelTreeNode, comparators, ContextMenuPopup, DateRange,
   dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings,
-  TreeNodeClickEvent, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  TreeNodesCheckedEvent, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -248,7 +248,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.yearPanel = this.calendarSidebar.yearPanel;
     this.calendarsPanel = this.calendarSidebar.calendarsPanel;
 
-    this.calendarsPanel.tree.on('nodeClick', this._onCalendarTreeNodeSelected.bind(this));
+    this.calendarsPanel.tree.on('nodesChecked', this._onCalendarTreeNodeSelected.bind(this));
 
     this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
     this.modesMenu = scout.create(CalendarModesMenu, {
@@ -556,7 +556,7 @@ export class Calendar extends Widget implements CalendarModel {
       .data('calendarId', 'default');
 
     // Add new calendar columns
-    this.calendars.forEach(calendar => {
+    this._getCalendarsWithoutGroups().forEach(calendar => {
       $dayName.appendDiv('calendar-column')
         .data('calendarId', calendar.calendarId)
         .attr('data-calendar-name', calendar.name);
@@ -1052,7 +1052,7 @@ export class Calendar extends Widget implements CalendarModel {
     // layout calendar columns
     let columnWidth = 0;
     if (this.isDay() && this.splitDay) {
-      columnWidth = Math.round(contentW / (this.calendars.filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
+      columnWidth = Math.round(contentW / (this._getCalendarsWithoutGroups().filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
     } else if (this.isWorkWeek()) {
       columnWidth = Math.round(contentW / this.workDayIndices.length);
     } else {
@@ -1512,22 +1512,23 @@ export class Calendar extends Widget implements CalendarModel {
     this.session.onRequestsDone(func, event, allowedType);
   }
 
-  protected _onCalendarTreeNodeSelected(event: TreeNodeClickEvent) {
-    let node = event.node as CalendarsPanelTreeNode;
-    if (!node.calendarId) {
-      return;
-    }
-    let calendar = this.calendars.find(calendar => calendar.calendarId === node.calendarId);
-    if (!calendar) {
-      return;
-    }
-    calendar.visible = node.checked;
-    this.trigger('calendarVisibilityChange', {
-      calendarId: node.calendarId,
-      visible: node.checked
+  protected _onCalendarTreeNodeSelected(event: TreeNodesCheckedEvent) {
+    (event.nodes as CalendarsPanelTreeNode[]).forEach(node => {
+      if (!node.calendarId) {
+        return;
+      }
+      let calendar = this.calendars.find(calendar => calendar.calendarId === node.calendarId);
+      if (!calendar) {
+        return;
+      }
+      calendar.visible = node.checked;
+      this.trigger('calendarVisibilityChange', {
+        calendarId: node.calendarId,
+        visible: node.checked
+      });
+      this.calendars.find(calendar => calendar.calendarId === node.calendarId).visible = node.checked;
     });
-    this.calendars.find(calendar => calendar.calendarId === node.calendarId).visible = node.checked;
-    if (!this.isDay() || node.checked) {
+    if (!this.isDay()) {
       // No re-rendering required when on day -> component is hidden by layouyt
       this._renderComponents();
     }
@@ -2000,6 +2001,10 @@ export class Calendar extends Widget implements CalendarModel {
       $elem = $elem.parent();
     }
     return null;
+  }
+
+  protected _getCalendarsWithoutGroups(): CalendarDescriptor[] {
+    return this.calendars.filter(calendar => !this.calendars.find(cal => cal.parentId === calendar.calendarId));
   }
 
   protected _newMoveData(event: JQuery.MouseDownEvent): CalendarMoveData {
