@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, FormField, Menu, objects, scout, Widget} from '../../src/index';
+import {Action, arrays, FormField, Menu, objects, scout, Widget} from '../../src/index';
 
 describe('objects', () => {
 
@@ -579,10 +579,15 @@ describe('objects', () => {
       expect(objects.equals('', '')).toBe(true);
       expect(objects.equals(true, true)).toBe(true);
       expect(objects.equals(null, null)).toBe(true);
-      expect(objects.equals([], [])).toBe(false);
-      let arr01 = [1, 2, 3];
+      expect(objects.equals([], [])).toBe(true);
+      expect(objects.equals([42], [42])).toBe(false);
+      let arr01: number[] & {equals?: (o: any) => boolean} = [1, 2, 3];
       expect(objects.equals(arr01, arr01)).toBe(true);
       expect(objects.equals(arr01, [1, 2, 3])).toBe(false);
+      arr01.equals = a => objects.isArray(a) && arrays.equalsIgnoreOrder(arr01, a);
+      const arr02: number[] & {equals?: (o: any) => boolean} = [2, 1, 3];
+      arr02.equals = a => objects.isArray(a) && arrays.equalsIgnoreOrder(arr02, a);
+      expect(objects.equals(arr01, arr02)).toBe(true);
       let a = {};
       expect(objects.equals(a, a)).toBe(true);
       expect(objects.equals({}, {})).toBe(false);
