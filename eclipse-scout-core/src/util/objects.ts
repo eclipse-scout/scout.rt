@@ -424,6 +424,9 @@ export const objects = {
     if (objA && objB && (objA.equals && objB.equals)) {
       return objA.equals(objB);
     }
+    if (objects.isArray(objA) && objects.isArray(objB) && !objA.length && !objB.length) {
+      return true;
+    }
     return false;
   },
 
