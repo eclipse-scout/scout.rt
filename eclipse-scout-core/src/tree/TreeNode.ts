@@ -265,11 +265,16 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
     if (!this.rendered) {
       return;
     }
+    let checked = this.checked;
+    // When this specific AutoCheckStyle is selected, the childrenChecked state has more priority
+    if (this.parent.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
+      checked = checked && !this.childrenChecked;
+    }
 
     this.$node
       .children('.tree-node-checkbox')
       .children('.check-box')
-      .toggleClass('checked', this.checked);
+      .toggleClass('checked', checked);
   }
 
   protected _renderIcon() {
@@ -296,12 +301,19 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
 
   /** @internal */
   _renderCheckbox() {
-    let $checkboxContainer = this.$node.prependDiv('tree-node-checkbox');
-    let $checkbox = $checkboxContainer
+    this.$node.prependDiv('tree-node-checkbox')
       .appendDiv('check-box')
       .toggleClass('checked', this.checked)
       .toggleClass('disabled', !this.enabled);
-    $checkbox.toggleClass('children-checked', !!this.childrenChecked);
+
+    this._renderChildrenChecked();
+  }
+
+  /** @internal */
+  _renderChildrenChecked() {
+    this.$node.children('.tree-node-checkbox')
+      .children('.check-box')
+      .toggleClass('children-checked', !!this.childrenChecked);
   }
 
   /** @internal */
