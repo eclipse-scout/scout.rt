@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Accordion, arrays, Comparator, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, InitModelOf, KeyStrokeContext, ObjectOrChildModel, objects, PropertyChangeEvent, scout, TextFilter, Tile,
-  TileAccordionEventMap, TileAccordionLayout, TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
+  Accordion, arrays, Comparator, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, InitModelOf, KeyStrokeContext, ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, scout,
+  TextFilter, Tile, TileAccordionEventMap, TileAccordionLayout, TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
 } from '../../index';
 
 export class TileAccordion<TTile extends Tile = Tile> extends Accordion implements TileAccordionModel {
@@ -85,6 +85,7 @@ export class TileAccordion<TTile extends Tile = Tile> extends Accordion implemen
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.setFilters(this.filters);
+    this._setTileGridLayoutConfig(this.tileGridLayoutConfig);
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -194,12 +195,16 @@ export class TileAccordion<TTile extends Tile = Tile> extends Accordion implemen
   }
 
   /** @see TileAccordionModel.tileGridLayoutConfig */
-  setTileGridLayoutConfig(layoutConfig: TileGridLayoutConfig) {
+  setTileGridLayoutConfig(layoutConfig: ObjectOrModel<TileGridLayoutConfig>) {
     this.groups.forEach(group => {
       group.body.setLayoutConfig(layoutConfig);
       layoutConfig = group.body.layoutConfig; // May be converted from plain object to TileGridLayoutConfig
     });
     this.setProperty('tileGridLayoutConfig', layoutConfig);
+  }
+
+  protected _setTileGridLayoutConfig(layoutConfig: ObjectOrModel<TileGridLayoutConfig>) {
+    this._setProperty('tileGridLayoutConfig', TileGridLayoutConfig.ensure(layoutConfig));
   }
 
   /** @see TileAccordionModel.withPlaceholders */

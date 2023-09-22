@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, FilterOrFunction, Group, InitModelOf, ObjectOrChildModel, objects, PropertyChangeEvent, scout, ScrollToOptions, Table, TableAllRowsDeletedEvent, TableFilterAddedEvent,
-  TableFilterRemovedEvent, TableGroupEvent, TableRow, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile,
-  TileAccordion, TileActionEvent, TileClickEvent, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
+  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, FilterOrFunction, Group, InitModelOf, ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, scout, ScrollToOptions, Table, TableAllRowsDeletedEvent,
+  TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableRow, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent, TableRowTileMapping, TableTileGridMediatorEventMap,
+  TableTileGridMediatorModel, Tile, TileAccordion, TileActionEvent, TileClickEvent, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -98,6 +98,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
 
     this.table = this.parent;
 
+    this._setTileGridLayoutConfig(this.tileGridLayoutConfig);
     if (!this.tileAccordion) {
       this.tileAccordion = this._createTileAccordion();
       this._installListeners();
@@ -153,8 +154,13 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     }
   }
 
-  setTileGridLayoutConfig(tileGridLayoutConfig: TileGridLayoutConfig) {
+  setTileGridLayoutConfig(tileGridLayoutConfig: ObjectOrModel<TileGridLayoutConfig>) {
     this.setProperty('tileGridLayoutConfig', tileGridLayoutConfig);
+  }
+
+  protected _setTileGridLayoutConfig(tileGridLayoutConfig: ObjectOrModel<TileGridLayoutConfig>) {
+    tileGridLayoutConfig = TileGridLayoutConfig.ensure(tileGridLayoutConfig);
+    this._setProperty('tileGridLayoutConfig', tileGridLayoutConfig);
     if (this.tileAccordion) {
       this.tileAccordion.setTileGridLayoutConfig(tileGridLayoutConfig);
     }
