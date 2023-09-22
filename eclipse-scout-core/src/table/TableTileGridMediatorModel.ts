@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ObjectOrChildModel, Table, TableRowTileMapping, Tile, TileAccordion, TileGridLayoutConfig, WidgetModel} from '../index';
+import {ObjectOrChildModel, ObjectOrModel, Table, TableRowTileMapping, Tile, TileAccordion, TileGridLayoutConfig, WidgetModel} from '../index';
 
 export interface TableTileGridMediatorModel extends WidgetModel {
   parent?: Table;
   tileAccordion?: ObjectOrChildModel<TileAccordion>;
   gridColumnCount?: number;
-  tileGridLayoutConfig?: TileGridLayoutConfig;
+  tileGridLayoutConfig?: ObjectOrModel<TileGridLayoutConfig>;
   withPlaceholders?: boolean;
   tileMappings?: ObjectOrChildModel<TableRowTileMapping>[];
   tiles?: ObjectOrChildModel<Tile>[];
