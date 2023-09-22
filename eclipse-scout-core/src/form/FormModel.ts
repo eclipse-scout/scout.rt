@@ -64,7 +64,7 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
    *
    * Default is {}.
    */
-  data?: object;
+  data?: any;
   /**
    * The exclusive key is used by {@link Desktop.createFormExclusive} to check whether a similar form is already open, and if yes, activate that form instead of opening a new one.
    *
