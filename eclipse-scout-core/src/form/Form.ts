@@ -435,7 +435,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * Method may be implemented to load the data.
    * By default, a resolved promise containing {@link this.data} is returned.
    */
-  protected _load(): JQuery.Promise<object> {
+  protected _load(): JQuery.Promise<any> {
     return $.resolvedPromise().then(() => {
       return this.data;
     });
@@ -653,7 +653,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
    *
    * The data given to this function is the result of {@link exportData} which was called in advance.
    */
-  protected _save(data: object): JQuery.Promise<void> {
+  protected _save(data: any): JQuery.Promise<void> {
     return $.resolvedPromise();
   }
 
