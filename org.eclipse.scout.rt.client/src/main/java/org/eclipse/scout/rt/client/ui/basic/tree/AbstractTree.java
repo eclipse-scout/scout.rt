@@ -358,6 +358,26 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   /**
+   * Configures the default auto-check mode of the tree. There are three modes:
+   * <ul>
+   * <li>NONE: No nodes are auto-checked</li>
+   * <li>AUTO_CHECK_CHILD_NODES: All child nodes will be checked/unchecked together with their parent</li>
+   * <li>SYNCH_CHILD_AND_PARENT_STATE: The state of the node is a representation of its children</li>
+   * </ul>
+   * <p>
+   * Only has an effect if the tree is checkable.
+   *
+   * @see AutoCheckStyle
+   * @see #getConfiguredCheckable()
+   * @since 5.1
+   */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(105)
+  protected AutoCheckStyle getConfiguredAutoCheckStyle() {
+    return AutoCheckStyle.NONE;
+  }
+
+  /**
    * Configures whether it should be possible that child nodes may added lazily to the tree when expanding the node.
    * This property controls whether the feature is available at all. If set to true you need to define which nodes are
    * affected by using {@link ITreeNode#setLazyExpandingEnabled(boolean)}
@@ -438,6 +458,16 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   @Override
   public void setAutoCheckChildNodes(boolean b) {
     propertySupport.setPropertyBool(PROP_AUTO_CHECK_CHILDREN, b);
+  }
+
+  @Override
+  public AutoCheckStyle getAutoCheckStyle() {
+    return propertySupport.getProperty(PROP_AUTO_CHECK_STYLE, AutoCheckStyle.class);
+  }
+
+  @Override
+  public void setAutoCheckStyle(AutoCheckStyle autoCheckStyle) {
+    propertySupport.setProperty(PROP_AUTO_CHECK_STYLE, autoCheckStyle);
   }
 
   @ConfigOperation
@@ -586,6 +616,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     setScrollToSelection(getConfiguredScrollToSelection());
     setSaveAndRestoreScrollbars(getConfiguredSaveAndRestoreScrollbars());
     setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
+    setAutoCheckStyle(getConfiguredAutoCheckStyle());
     setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
     setDisplayStyle(getConfiguredDisplayStyle());
     setToggleBreadcrumbStyleEnabled(getConfiguredToggleBreadcrumbStyleEnabled());

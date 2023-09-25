@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.tree.AutoCheckStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.CheckableStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -184,6 +185,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       @Override
       protected Boolean modelValue() {
         return getModel().isAutoCheckChildNodes();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ITree.PROP_AUTO_CHECK_STYLE, model) {
+      @Override
+      protected AutoCheckStyle modelValue() {
+        return getModel().getAutoCheckStyle();
       }
     });
     putJsonProperty(new JsonProperty<>(ITree.PROP_SCROLL_TO_SELECTION, model) {
