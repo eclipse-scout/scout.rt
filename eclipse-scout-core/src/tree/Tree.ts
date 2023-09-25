@@ -200,9 +200,9 @@ export class Tree extends Widget implements TreeModel {
   } as const;
 
   static AutoCheckStyle = {
-    NONE: 'none',
-    AUTO_CHECK_CHILD_NODES: 'auto_check_child_nodes',
-    SYNCH_CHILD_AND_PARENT_STATE: 'synch_child_and_parent_state'
+    NONE: 'NONE',
+    AUTO_CHECK_CHILD_NODES: 'AUTO_CHECK_CHILD_NODES',
+    SYNCH_CHILD_AND_PARENT_STATE: 'SYNCH_CHILD_AND_PARENT_STATE'
   } as const;
 
   /**
@@ -1287,7 +1287,7 @@ export class Tree extends Widget implements TreeModel {
       return unrenderedNodes;
     }
 
-    if (!render) {
+    if (render === undefined) {
       render = true;
     }
 
@@ -2636,6 +2636,86 @@ export class Tree extends Widget implements TreeModel {
   }
 
   checkNodes(nodes: TreeNode | TreeNode[], options?: TreeNodeCheckOptions) {
+    this.newCheckNodes(nodes, options);
+    // let opts: TreeNodeCheckOptions = {
+    //   checked: true,
+    //   checkOnlyEnabled: true,
+    //   checkChildren: this.autoCheckChildren,
+    //   autoCheckStyle: this.autoCheckStyle,
+    //   triggerNodesChecked: true
+    // };
+    // $.extend(opts, options);
+    //
+    // // Ensure new option is used
+    // if (opts.checkChildren) {
+    //   opts.autoCheckStyle = Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES;
+    // }
+    // if (!opts.autoCheckStyle) {
+    //   opts.autoCheckStyle = Tree.AutoCheckStyle.NONE;
+    // }
+    //
+    // let updatedNodes: TreeNode[] = [];
+    // // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
+    // if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
+    //   return;
+    // }
+    //
+    // nodes = arrays.ensure(nodes);
+    // nodes.forEach(node => {
+    //   // Update child nodes, even though this node can't be updated
+    //   if (!node.enabled && opts.checkOnlyEnabled || node.checked === opts.checked || !node.filterAccepted) {
+    //     if (opts.autoCheckStyle === Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES
+    //       || opts.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
+    //       this.checkNodes(node.childNodes, opts);
+    //     }
+    //     return;
+    //   }
+    //
+    //   // Handle single selection (uncheck all nodes)
+    //   if (!this.multiCheck && opts.checked) {
+    //     for (let i = 0; i < this.checkedNodes.length; i++) {
+    //       this.checkedNodes[i].checked = false;
+    //       this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
+    //       updatedNodes.push(this.checkedNodes[i]);
+    //     }
+    //     this.checkedNodes = [];
+    //   }
+    //
+    //   // Update node state
+    //   node.checked = opts.checked;
+    //   if (node.checked) {
+    //     this.checkedNodes.push(node);
+    //   } else {
+    //     arrays.remove(this.checkedNodes, node);
+    //   }
+    //   if(Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
+    //     node.childrenChecked = false;
+    //   }
+    //   updatedNodes.push(node);
+    //   updatedNodes.push(...this._updateMarkChildrenChecked(node, false, opts.checked, true, false));
+    //   if (opts.autoCheckStyle === Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES) {
+    //     let childOpts = $.extend({}, opts, {
+    //       triggerNodesChecked: false
+    //     });
+    //     this.checkNodes(node.childNodes, childOpts);
+    //   } else if (opts.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
+    //     this.checkNodes(node.childNodes, $.extend({}, opts));
+    //   }
+    // });
+    //
+    // // Trigger update event
+    // if (opts.triggerNodesChecked && updatedNodes.length > 0) {
+    //   this.trigger('nodesChecked', {
+    //     nodes: updatedNodes
+    //   });
+    // }
+    // if (this.rendered) {
+    //   updatedNodes.forEach(node => this._renderNode(node));
+    // }
+  }
+
+  newCheckNodes(nodes: TreeNode | TreeNode[], options?: TreeNodeCheckOptions) {
+    // Build options
     let opts: TreeNodeCheckOptions = {
       checked: true,
       checkOnlyEnabled: true,
@@ -2653,61 +2733,127 @@ export class Tree extends Widget implements TreeModel {
       opts.autoCheckStyle = Tree.AutoCheckStyle.NONE;
     }
 
-    let updatedNodes: TreeNode[] = [];
     // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
     if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
       return;
     }
 
+    let updatedNodes: TreeNode[] = [];
     nodes = arrays.ensure(nodes);
+
+    // Handle single selection
+    if (!this.multiCheck && opts.checked) {
+      let uncheckedNodes = this._uncheckAll();
+      updatedNodes.push(...uncheckedNodes);
+    }
+
     nodes.forEach(node => {
-      // Update child nodes, even though this node can't be updated
-      if (!node.enabled && opts.checkOnlyEnabled || node.checked === opts.checked || !node.filterAccepted) {
-        if (opts.autoCheckStyle === Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES
-          || opts.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
-          this.checkNodes(node.childNodes, opts);
-        }
-        return;
-      }
-
-      // Handle single selection (uncheck all nodes)
-      if (!this.multiCheck && opts.checked) {
-        for (let i = 0; i < this.checkedNodes.length; i++) {
-          this.checkedNodes[i].checked = false;
-          this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
-          updatedNodes.push(this.checkedNodes[i]);
-        }
-        this.checkedNodes = [];
-      }
-
-      // Update node state
-      node.checked = opts.checked;
-      if (node.checked) {
-        this.checkedNodes.push(node);
-      } else {
-        arrays.remove(this.checkedNodes, node);
-      }
+      // Step 1: Update this node
+      this._checkNode(node, opts.checked);
       updatedNodes.push(node);
-      updatedNodes.push(...this._updateMarkChildrenChecked(node, false, opts.checked, true, false));
-      if (opts.autoCheckStyle === Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES) {
-        let childOpts = $.extend({}, opts, {
-          triggerNodesChecked: false
-        });
-        this.checkNodes(node.childNodes, childOpts);
-      } else if (opts.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
-        this.checkNodes(node.childNodes, $.extend({}, opts));
+
+      // Step 2: Update child nodes when necessary
+      if (scout.isOneOf(opts.autoCheckStyle, Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES, Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) && this.multiCheck) {
+        let updatedChildren = this._checkChildrenRecursive(node, opts.checked);
+        updatedNodes.push(...updatedChildren);
       }
+
+      // Step 3: Update parent nodes
+      let updatedParents = this._checkParentsRecursive(node, opts.autoCheckStyle);
+      updatedNodes.push(...updatedParents);
     });
 
-    // Trigger update event
-    if (opts.triggerNodesChecked && updatedNodes.length > 0) {
-      this.trigger('nodesChecked', {
-        nodes: updatedNodes
-      });
-    }
+    // TODO: Trigger events
+
+    // Render
     if (this.rendered) {
-      updatedNodes.forEach(node => node._renderChecked());
+      this._renderNodes(updatedNodes);
     }
+  }
+
+  protected _checkChildrenRecursive(node: TreeNode, check: boolean): TreeNode[] {
+    let updatedNodes: TreeNode[] = [];
+    node.childNodes.forEach(n => {
+      if (n.checked !== check) {
+        this._checkNode(n, check);
+        updatedNodes.push(n);
+      }
+      // Remove children checked status (only present, when a port of the children is selected)
+      if (n.childrenChecked) {
+        n.childrenChecked = false;
+        updatedNodes.push(n);
+      }
+      updatedNodes.push(...this._checkChildrenRecursive(n, check));
+    });
+    return updatedNodes;
+  }
+
+  protected _checkParentsRecursive(node: TreeNode, autoCheckStyle: AutoCheckStyle): TreeNode[] {
+    let updatedNodes: TreeNode[] = [];
+    let children = node.childNodes;
+    let childrenCount = children.length;
+    let childrenCheckedCount = children.filter(n => n.checked || n.childrenChecked).length;
+    let childrenFullyCheckedCount = children.filter(n => n.checked && !n.childrenChecked).length;
+
+    // No children present, jump directly to its parent
+    if (childrenCount === 0 && node.parentNode) {
+      return this._checkParentsRecursive(node.parentNode, autoCheckStyle);
+    }
+
+    // No child checked
+    if (childrenCheckedCount === 0 && node.childrenChecked) {
+      node.childrenChecked = false;
+      updatedNodes.push(node);
+    }
+    if (autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE && childrenCheckedCount === 0 && node.checked) {
+      this._checkNode(node, false);
+      updatedNodes.push(node);
+    }
+
+    // Some children checked (but in synch mode, not all children may be selected)
+    if (childrenCheckedCount > 0 && !node.childrenChecked && !(autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE && childrenFullyCheckedCount === childrenCount)) {
+      node.childrenChecked = true;
+      updatedNodes.push(node);
+    }
+
+    // All children checked
+    if (childrenFullyCheckedCount === childrenCount && autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE && (!node.checked || node.childrenChecked)) {
+      this._checkNode(node, true);
+      node.childrenChecked = false; // Only on partly selected nodes
+      updatedNodes.push(node);
+    }
+
+    // Update its parent, if updated
+    if (updatedNodes.length > 0 && node.parentNode) {
+      let parentUpdatedNodes = this._checkParentsRecursive(node.parentNode, autoCheckStyle);
+      updatedNodes.push(...parentUpdatedNodes);
+    }
+
+    return updatedNodes;
+  }
+
+  protected _checkNode(node: TreeNode, check: boolean) {
+    node.checked = check;
+    if (check) {
+      this.checkedNodes.push(node);
+    } else {
+      arrays.remove(this.checkedNodes, node);
+    }
+  }
+
+  protected _uncheckAll(render?: boolean): TreeNode[] {
+    let updatedNodes: TreeNode[] = [];
+    for (let i = 0; i < this.checkedNodes.length; i++) {
+      let node = this.checkedNodes[i];
+      node.checked = false;
+      node.childrenChecked = false;
+      updatedNodes.push(node);
+    }
+    this.checkedNodes = [];
+    if (render) {
+      this._renderNodes(updatedNodes);
+    }
+    return updatedNodes;
   }
 
   uncheckNode(node: TreeNode, options?: TreeNodeUncheckOptions) {
