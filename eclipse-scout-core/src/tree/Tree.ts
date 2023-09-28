@@ -1281,14 +1281,10 @@ export class Tree extends Widget implements TreeModel {
       });
   }
 
-  protected _updateMarkChildrenChecked(node: TreeNode, init: boolean, checked: boolean, checkChildrenChecked?: boolean, render?: boolean): TreeNode[] {
+  protected _updateMarkChildrenChecked(node: TreeNode, init: boolean, checked: boolean, checkChildrenChecked?: boolean, render = true): TreeNode[] {
     let unrenderedNodes: TreeNode[] = [];
     if (!this.checkable) {
       return unrenderedNodes;
-    }
-
-    if (render === undefined) {
-      render = true;
     }
 
     // 1. Update this node
@@ -2748,13 +2744,15 @@ export class Tree extends Widget implements TreeModel {
     }
 
     nodes.forEach(node => {
-      // Step 1: Update this node
-      this._checkNode(node, opts.checked);
-      updatedNodes.push(node);
+      // Step 1: Update this node, if possible
+      if (node.checked !== opts.checked && this._isNodeEditable(node, opts.checkOnlyEnabled)) {
+        this._checkNode(node, opts.checked);
+        updatedNodes.push(node);
+      }
 
       // Step 2: Update child nodes when necessary
       if (scout.isOneOf(opts.autoCheckStyle, Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES, Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) && this.multiCheck) {
-        let updatedChildren = this._checkChildrenRecursive(node, opts.checked);
+        let updatedChildren = this._checkChildrenRecursive(node, opts);
         updatedNodes.push(...updatedChildren);
       }
 
@@ -2771,24 +2769,36 @@ export class Tree extends Widget implements TreeModel {
     }
   }
 
-  protected _checkChildrenRecursive(node: TreeNode, check: boolean): TreeNode[] {
+  protected _checkChildrenRecursive(parentNode: TreeNode, opts: TreeNodeCheckOptions): TreeNode[] {
     let updatedNodes: TreeNode[] = [];
-    node.childNodes.forEach(n => {
-      if (n.checked !== check) {
-        this._checkNode(n, check);
-        updatedNodes.push(n);
+    parentNode.childNodes.forEach(node => {
+
+      // Update node if possible
+      let editable = this._isNodeEditable(node, opts.checkOnlyEnabled);
+      if (node.checked !== opts.checked && editable) {
+        this._checkNode(node, opts.checked);
+        updatedNodes.push(node);
       }
-      // Remove children checked status (only present, when a port of the children is selected)
-      if (n.childrenChecked) {
-        n.childrenChecked = false;
-        updatedNodes.push(n);
+      // Remove children checked status
+      if (node.childrenChecked && editable) {
+        node.childrenChecked = false;
+        updatedNodes.push(node);
       }
-      updatedNodes.push(...this._checkChildrenRecursive(n, check));
+
+      // Go down recursive to check its childs
+      updatedNodes.push(...this._checkChildrenRecursive(node, opts));
+
+      // If this node is not editable, but has children, the state update will not be executed
+      // To cover this case, we will call the _checkParentsRecursive just for this node (recursive = false)
+      if (!editable && node.childNodes.length > 0) {
+        let updatedParents = this._checkParentsRecursive(node, opts.autoCheckStyle, false);
+        updatedNodes.push(...updatedParents);
+      }
     });
     return updatedNodes;
   }
 
-  protected _checkParentsRecursive(node: TreeNode, autoCheckStyle: AutoCheckStyle): TreeNode[] {
+  protected _checkParentsRecursive(node: TreeNode, autoCheckStyle: AutoCheckStyle, recursive = true): TreeNode[] {
     let updatedNodes: TreeNode[] = [];
     let children = node.childNodes;
     let childrenCount = children.length;
@@ -2823,8 +2833,8 @@ export class Tree extends Widget implements TreeModel {
       updatedNodes.push(node);
     }
 
-    // Update its parent, if updated
-    if (updatedNodes.length > 0 && node.parentNode) {
+    // Update parent, if this node has been updated
+    if (updatedNodes.length > 0 && node.parentNode && recursive) {
       let parentUpdatedNodes = this._checkParentsRecursive(node.parentNode, autoCheckStyle);
       updatedNodes.push(...parentUpdatedNodes);
     }
@@ -2854,6 +2864,10 @@ export class Tree extends Widget implements TreeModel {
       this._renderNodes(updatedNodes);
     }
     return updatedNodes;
+  }
+
+  protected _isNodeEditable(node: TreeNode, checkOnlyEnabled = true) {
+    return checkOnlyEnabled && node.enabled && node.filterAccepted;
   }
 
   uncheckNode(node: TreeNode, options?: TreeNodeUncheckOptions) {
