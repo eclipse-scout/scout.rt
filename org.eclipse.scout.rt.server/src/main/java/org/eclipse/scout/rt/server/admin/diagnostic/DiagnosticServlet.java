@@ -10,9 +10,7 @@
 package org.eclipse.scout.rt.server.admin.diagnostic;
 
 import java.io.IOException;
-import java.security.AccessController;
 
-import javax.security.auth.Subject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,10 +35,10 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
 
   @Override
   protected void doGet(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
-    if (Subject.getSubject(AccessController.getContext()) == null) {
-      servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
-      return;
-    }
+//    if (Subject.getSubject(AccessController.getContext()) == null) {
+//      servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
+//      return;
+//    }
 
     lazyInit(servletRequest, servletResponse);
 
