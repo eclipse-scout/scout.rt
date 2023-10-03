@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/core",
-  "version": "23.2.0-snapshot",
+  "version": "23.2.5",
   "description": "Eclipse Scout runtime",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -63,7 +63,7 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=23.2.0-snapshot <23.2.0",
+    "@eclipse-scout/cli": "23.2.5",
     "@eclipse-scout/releng": "^22.0.0",
     "jasmine-core": "4.6.0",
     "jasmine-ajax": "4.0.0",

@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.archetypes</groupId>
   <artifactId>scout-jaxws-module</artifactId>
-  <version>23.2-SNAPSHOT</version>
+  <version>23.2.5</version>
   <packaging>maven-archetype</packaging>
 
   <name>Scout JaxWs Module</name>
