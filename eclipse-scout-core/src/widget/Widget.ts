@@ -1445,10 +1445,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   protected _triggerChildrenOnDetach() {
-    this.children.forEach(child => {
+    for (let i = 0; i < this.children.length; i++) {
+      const child = this.children[i];
       child._onDetach();
       child._triggerChildrenOnDetach();
-    });
+    }
   }
 
   /**
