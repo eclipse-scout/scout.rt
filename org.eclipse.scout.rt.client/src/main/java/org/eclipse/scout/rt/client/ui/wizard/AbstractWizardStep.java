@@ -361,7 +361,11 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
           }
           switch (e.getType()) {
             case FormEvent.TYPE_CLOSED: {
-              setForm(null);
+              // Only reset form if it hasn't changed in the meantime.
+              // This can happen when interceptFormClosed within this listener created a new form for the current step as fallback for an exception or similar.
+              if (f == m_form) {
+                setForm(null);
+              }
               break;
             }
           }
