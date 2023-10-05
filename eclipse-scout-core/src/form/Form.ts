@@ -363,7 +363,14 @@ export class Form extends Widget implements FormModel, DisplayParent {
     if (!allowReload && this.formLoaded) {
       return $.resolvedPromise();
     }
-    return this._withBusyHandling(() => this.lifecycle.load());
+    try {
+      return this._withBusyHandling(() => this.lifecycle.load())
+        .catch(error => {
+          return this._handleLoadErrorInternal(error);
+        });
+    } catch (error) {
+      return this._handleLoadErrorInternal(error);
+    }
   }
 
   protected _withBusyHandling<T>(action: () => JQuery.Promise<T>): JQuery.Promise<T> {
@@ -373,6 +380,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
         .always(() => this.setBusy(false));
     } catch (error) {
       this.setBusy(false);
+      throw error;
     }
   }
 
@@ -401,13 +409,10 @@ export class Form extends Widget implements FormModel, DisplayParent {
           this.formLoaded = true;
           this.trigger('load');
         })
-        .catch(error => {
-          this._setFormLoading(false);
-          return this._handleLoadErrorInternal(error);
-        });
+        .always(() => this._setFormLoading(false));
     } catch (error) {
       this._setFormLoading(false);
-      return this._handleLoadErrorInternal(error);
+      throw error;
     }
   }
 
@@ -528,20 +533,21 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   protected _onLifecycleSave(): JQuery.Promise<void> {
-    return this._withBusyHandling(() => {
-      try {
+    try {
+      return this._withBusyHandling(() => {
         let data = this.exportData();
         return this._save(data)
           .then(() => {
             this.formSaved = true;
             this.setData(data);
             this.trigger('save');
-          })
-          .catch(error => this._handleSaveErrorInternal(error));
-      } catch (error) {
+          });
+      }).catch(error => {
         return this._handleSaveErrorInternal(error);
-      }
-    });
+      });
+    } catch (error) {
+      return this._handleSaveErrorInternal(error);
+    }
   }
 
   /**

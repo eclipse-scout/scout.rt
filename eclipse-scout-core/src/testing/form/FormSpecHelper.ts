@@ -25,20 +25,32 @@ export class FormSpecHelper {
       return;
     }
     let button = option || MessageBox.Buttons.YES;
+    this.findMessageBoxes().forEach(messageBox => messageBox.trigger('action', {option: button}));
+  }
+
+  findMessageBoxes(): Set<MessageBox> {
+    if (!this.session) {
+      return new Set();
+    }
+
+    const result: Set<MessageBox> = new Set();
+
     if (this.session.$entryPoint) {
-      // close rendered MessageBoxes
+      // collect rendered MessageBoxes
       this.session.$entryPoint
         .find('.messagebox').get()
         .map(domElement => scout.widget(domElement, MessageBox))
         .filter(messageBox => !!messageBox)
-        .forEach(messageBox => messageBox.trigger('action', {option: button}));
+        .forEach(messageBox => result.add(messageBox));
     }
 
-    // close the remaining (possibly not rendered) boxes on the Desktop
+    // collect the remaining (possibly not rendered) boxes on the Desktop
     if (this.session.desktop) {
       this.session.desktop.messageBoxes
-        .forEach(messageBox => messageBox.trigger('action', {option: button}));
+        .forEach(messageBox => result.add(messageBox));
     }
+
+    return result;
   }
 
   createViewWithOneField(model?: FormModel): SpecForm {
