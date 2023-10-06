@@ -1278,6 +1278,156 @@ describe('Tree', () => {
       }, node.childNodes);
     });
 
+    it('does check the children if tree is in sync mode', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
+      tree.render();
+
+      // Arrange
+      let node = tree.nodes[0];
+      // Act
+      tree.checkNode(node, true);
+      // Assert
+      expect(node.checked).toEqual(true);
+      // every descendant needs to be checked
+      Tree.visitNodes(node => {
+        expect(node.checked).toEqual(true);
+      }, node.childNodes);
+    });
+
+    it('does uncheck the children if tree is in sync mode', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
+      tree.render();
+
+      // Arrange
+      let node = tree.nodes[0];
+      let childNode = node.childNodes[0];
+      tree.checkNode(childNode, true); // Check child node, so it has to actually uncheck something
+
+      // Act
+      tree.checkNode(node, false);
+
+      // Assert
+      expect(node.checked).toEqual(false);
+      // every descendant needs to be checked
+      Tree.visitNodes(node => {
+        expect(node.checked).toEqual(false);
+      }, node.childNodes);
+    });
+
+    it('does set node in children-checked-state when not all child nodes are selected the in sync mode', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
+      tree.render();
+
+      // Arrange
+      let node = tree.nodes[0];
+      tree.checkNode(node, true);
+      let childNode = node.childNodes[0];
+
+      // Act
+      tree.checkNode(childNode, false);
+
+      // Assert
+      expect(node.checked).toEqual(true);
+      expect(node.childrenChecked).toEqual(true);
+    });
+
+    it('does check parent node when all childs are checked in sync mode', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
+      tree.render();
+
+      // Arrange
+      let parent = tree.nodes[0];
+
+      // Act
+      parent.childNodes.forEach(childNode => {
+        tree.checkNode(childNode, true);
+      });
+
+      // Arrange
+      expect(parent.checked).toEqual(true);
+    });
+
+    it('does uncheck parent node when all childs are unchecked in sync mode', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
+      tree.render();
+
+      // Arrange
+      let parent = tree.nodes[0];
+      tree.checkNode(parent); // All childs are also selected
+
+      // Act
+      parent.childNodes.forEach(childNode => {
+        tree.checkNode(childNode, false);
+      });
+
+      // Arrange
+      expect(parent.checked).toEqual(false);
+    });
+
+    it('does partly-check all parent nodes when child is checked', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
+      tree.render();
+
+      // Arrange
+      let parent = tree.nodes[0];
+      let parent2 = parent.childNodes[0];
+      let childNode = parent2.childNodes[0];
+
+      // Act
+      tree.checkNode(childNode, true);
+
+      // Assert
+      expect(parent.childrenChecked).toBe(true);
+      expect(parent2.childrenChecked).toBe(true);
+    });
+
+    it('does partly-check disabled nodes when children are checked in synch mode', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
+      tree.render();
+
+      // Arrange
+      let nodeLevel1 = tree.nodes[0];
+      let nodeLevel2 = nodeLevel1.childNodes[0];
+      let nodeLevel3 = nodeLevel2.childNodes[0];
+
+      // Act
+      nodeLevel3.enabled = false;
+      tree.checkNode(nodeLevel1, true);
+
+      // Assert
+      expect(nodeLevel1.childrenChecked).toBe(true);
+      expect(nodeLevel2.childrenChecked).toBe(true);
+      expect(nodeLevel3.checked).toBe(false);
+    });
+
     it('does not check nodes if checkable is set to false', () => {
       let model = helper.createModelFixture(4, 4);
       let tree = helper.createTree(model);
