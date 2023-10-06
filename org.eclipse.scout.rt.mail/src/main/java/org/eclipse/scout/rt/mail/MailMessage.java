@@ -277,7 +277,7 @@ public class MailMessage {
   }
 
   /**
-   * Adds the attachment.
+   * Adds the inline attachment.
    */
   public MailMessage withInlineAttachment(MailAttachment inlineAttachment) {
     m_inlineAttachments.add(inlineAttachment);
