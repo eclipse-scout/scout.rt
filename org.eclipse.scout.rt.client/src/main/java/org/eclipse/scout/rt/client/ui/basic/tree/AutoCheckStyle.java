@@ -29,5 +29,5 @@ public enum AutoCheckStyle {
    * </ul>
    * When a node with children is selected, its children will be auto-checked
    */
-  SYNCH_CHILD_AND_PARENT_STATE
+  SYNC_CHILD_AND_PARENT_STATE
 }
