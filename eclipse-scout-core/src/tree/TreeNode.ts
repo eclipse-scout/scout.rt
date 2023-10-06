@@ -267,7 +267,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
     }
     let checked = this.checked;
     // When this specific AutoCheckStyle is selected, the childrenChecked state has more priority
-    if (this.parent.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
+    if (this.parent.autoCheckStyle === Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE) {
       checked = checked && !this.childrenChecked;
     }
 

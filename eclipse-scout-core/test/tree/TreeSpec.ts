@@ -1244,12 +1244,12 @@ describe('Tree', () => {
       expect(checkedNodes.length).toBe(1);
     });
 
-    it('checks children if autoCheckChildren is set to true', () => {
+    it('checks children if tree is in autoCheckChildren mode', () => {
       let model = helper.createModelFixture(2, 2);
       let tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
-      tree.autoCheckChildren = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES;
       tree.render();
 
       let node = tree.nodes[0];
@@ -1261,12 +1261,12 @@ describe('Tree', () => {
       }, node.childNodes);
     });
 
-    it('does not check the children if autoCheckChildren is set to false', () => {
+    it('does not check the children if tree is not in autoCheckChildren mode', () => {
       let model = helper.createModelFixture(4, 4);
       let tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
-      tree.autoCheckChildren = false;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.NONE;
       tree.render();
 
       let node = tree.nodes[0];

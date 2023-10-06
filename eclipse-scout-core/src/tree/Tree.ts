@@ -206,7 +206,7 @@ export class Tree extends Widget implements TreeModel {
   static AutoCheckStyle = {
     NONE: 'NONE',
     AUTO_CHECK_CHILD_NODES: 'AUTO_CHECK_CHILD_NODES',
-    SYNCH_CHILD_AND_PARENT_STATE: 'SYNCH_CHILD_AND_PARENT_STATE'
+    SYNC_CHILD_AND_PARENT_STATE: 'SYNC_CHILD_AND_PARENT_STATE'
   } as const;
 
   /**
@@ -325,8 +325,8 @@ export class Tree extends Widget implements TreeModel {
     if (autoCheckChildren) {
       mode = Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES;
     } else {
-      if (this.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
-        mode = Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE;
+      if (this.autoCheckStyle === Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE) {
+        mode = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
       } else {
         mode = Tree.AutoCheckStyle.NONE;
       }
@@ -1286,7 +1286,7 @@ export class Tree extends Widget implements TreeModel {
       });
   }
 
-  protected _updateMarkChildrenChecked(node: TreeNode, triggerUpdates = this.autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) {
+  protected _updateMarkChildrenChecked(node: TreeNode, triggerUpdates = this.autoCheckStyle === Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE) {
     let treeNodeUpdate = this._checkParentsRecursive(node);
     this._renderNodes(treeNodeUpdate.getNodesForRendering());
 
@@ -2591,7 +2591,7 @@ export class Tree extends Widget implements TreeModel {
       }
 
       // Step 2: Update child nodes when necessary
-      if (scout.isOneOf(opts.autoCheckStyle, Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES, Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE) && this.multiCheck) {
+      if (scout.isOneOf(opts.autoCheckStyle, Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES, Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE) && this.multiCheck) {
         let updatedChildren = this._checkChildrenRecursive(node, opts);
         updatedNodes.add(updatedChildren);
       }
@@ -2665,19 +2665,19 @@ export class Tree extends Widget implements TreeModel {
       node.childrenChecked = false;
       updatedNodes.addNodeForRendering(node);
     }
-    if (autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE && childrenCheckedCount === 0 && node.checked) {
+    if (autoCheckStyle === Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE && childrenCheckedCount === 0 && node.checked) {
       this._checkNode(node, false);
       updatedNodes.addNodeForRenderingAndEventTrigger(node);
     }
 
     // Some children checked (but in synch mode, not all children may be selected)
-    if (childrenCheckedCount > 0 && !node.childrenChecked && !(autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE && childrenFullyCheckedCount === childrenCount)) {
+    if (childrenCheckedCount > 0 && !node.childrenChecked && !(autoCheckStyle === Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE && childrenFullyCheckedCount === childrenCount)) {
       node.childrenChecked = true;
       updatedNodes.addNodeForRendering(node);
     }
 
     // All children checked
-    if (childrenFullyCheckedCount === childrenCount && autoCheckStyle === Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE && (!node.checked || node.childrenChecked)) {
+    if (childrenFullyCheckedCount === childrenCount && autoCheckStyle === Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE && (!node.checked || node.childrenChecked)) {
       this._checkNode(node, true);
       node.childrenChecked = false; // Only on partly selected nodes
       updatedNodes.addNodeForRenderingAndEventTrigger(node);
