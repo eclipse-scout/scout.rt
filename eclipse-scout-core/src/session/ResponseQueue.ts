@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {RemoteRequest, RemoteResponse, Session, strings} from '../index';
+import {RemoteRequest, RemoteResponse, Session} from '../index';
 
 export class ResponseQueue {
   session: Session;
@@ -90,7 +90,7 @@ export class ResponseQueue {
       // For elements with a sequence number, check if they are in the expected order
       if (sequenceNo) {
         if (this.nextExpectedSequenceNo && !this.force && !missingResponse) {
-          missingResponse = (this.nextExpectedSequenceNo !== sequenceNo);
+          missingResponse = this._checkMissingResponse(sequenceNo);
         }
         if (missingResponse) {
           // Sequence is not complete, process those messages later
@@ -100,7 +100,7 @@ export class ResponseQueue {
       }
 
       // Handle the element
-      let success = this.session.processJsonResponseInternal(el);
+      let success = this._handleResponse(el);
       // Only return success value of the response that was passed to the process() call
       if (response && el === response) {
         responseSuccess = success;
@@ -124,6 +124,14 @@ export class ResponseQueue {
     return this.queue.length;
   }
 
+  protected _handleResponse(response: RemoteResponse): boolean {
+    return this.session.processJsonResponseInternal(response);
+  }
+
+  protected _checkMissingResponse(sequenceNo: number): boolean {
+    return this.nextExpectedSequenceNo !== sequenceNo;
+  }
+
   protected _checkTimeout() {
     // If there are non-processed elements, schedule a job that forces the processing of those
     // elements after a certain timeout to prevent the "blocked forever syndrome" if a response
@@ -134,16 +142,7 @@ export class ResponseQueue {
     } else if (!this.forceTimeoutId) {
       this.forceTimeoutId = setTimeout(() => {
         try {
-          let s = '[';
-          for (let i = 0; i < this.queue.length; i++) {
-            if (i > 0) {
-              s += ', ';
-            }
-            s += (strings.box('#', this.queue[i]['#'] + '') || '<none>');
-          }
-          s += ']';
-          this.session.sendLogRequest('Expected response #' + this.nextExpectedSequenceNo + ' still missing after ' +
-            ResponseQueue.FORCE_TIMEOUT + ' ms. Forcing response queue to process ' + this.size() + ' elements: ' + s);
+          this._logTimeout();
         } catch (error) {
           // nop
         }
@@ -158,6 +157,11 @@ export class ResponseQueue {
     }
   }
 
+  protected _logTimeout() {
+    this.session.sendLogRequest('Expected response #' + this.nextExpectedSequenceNo + ' still missing after ' +
+      ResponseQueue.FORCE_TIMEOUT + ' ms. Forcing response queue to process ' + this.size() + ' elements: ' + this.queueToString());
+  }
+
   prepareRequest(request: RemoteRequest) {
     request['#ACK'] = this.lastProcessedSequenceNo;
   }
@@ -165,5 +169,9 @@ export class ResponseQueue {
   prepareHttpRequest(ajaxOptions: JQuery.AjaxSettings) {
     ajaxOptions.headers = ajaxOptions.headers || {};
     ajaxOptions.headers['X-Scout-#ACK'] = this.lastProcessedSequenceNo + '';
+  }
+
+  queueToString(): string {
+    return '[' + this.queue.map(el => '#' + el['#']).join(', ') + ']';
   }
 }
