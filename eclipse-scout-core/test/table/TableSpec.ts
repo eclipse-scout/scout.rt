@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BeanColumn, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, Tooltip} from '../../src/index';
+import {
+  BeanColumn, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, TableRowModel, Tooltip
+} from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
 
 describe('Table', () => {
@@ -3544,6 +3546,66 @@ describe('Table', () => {
       table.on('reload', loadSome);
       table.reload();
       expect(table.selectedRows).toEqual([table.rows[1]]);
+    });
+
+    it('expands necessary rows if selection to keep is a collapsed child row', () => {
+      const [rowA, rowB, rowC] = helper.createModelRows(0, 3);
+      const [rowAA, rowAB, rowAC] = helper.createModelRows(0, 3, rowA.id);
+      const [rowBA, rowBB, rowBC] = helper.createModelRows(0, 3, rowB.id);
+      const [rowCA, rowCB, rowCC] = helper.createModelRows(0, 3, rowC.id);
+      const [rowAAA, rowAAB] = helper.createModelRows(0, 2, rowAA.id);
+      const [rowBBA, rowBBB] = helper.createModelRows(0, 2, rowBB.id);
+      const [rowCCA, rowCCB] = helper.createModelRows(0, 2, rowCC.id);
+      const rows = [
+        rowA, rowB, rowC,
+        rowAA, rowAB, rowAC,
+        rowBA, rowBB, rowBC,
+        rowCA, rowCB, rowCC,
+        rowAAA, rowAAB,
+        rowBBA, rowBBB,
+        rowCCA, rowCCB
+      ];
+      rows.forEach(row => row.cells.push(helper.createModelCell(row.id, row.id)));
+      const rowModels = () => $.extend(true, [], rows); // copy models as table modifies the given array
+      const table = helper.createTable($.extend(helper.createModel(helper.createModelColumns(1), rowModels()), {
+        hierarchical: true
+      }));
+      const load = () => table.replaceRows(rowModels());
+      const findRow = (row: TableRowModel) => table.rows.find(r => r.id === row.id);
+
+      table.render();
+      table.hasReloadHandler = true;
+      table.on('reload', load);
+
+      expect(table.selectedRows).toEqual([]);
+      table.rows.forEach(r => expect(r.expanded).toBeFalse());
+
+      table.expandRows([findRow(rowA), findRow(rowAA), findRow(rowAB), findRow(rowC)]);
+      expect(table.rows.filter(row => row.expanded).length).toBe(4);
+
+      table.reload();
+      table.rows.forEach(r => expect(r.expanded).toBeFalse());
+
+      table.expandRows([findRow(rowA), findRow(rowAA), findRow(rowAB), findRow(rowC)]);
+      expect(table.rows.filter(row => row.expanded).length).toBe(4);
+
+      table.selectRows([findRow(rowAAB), findRow(rowC), findRow(rowCA)]);
+      expect(table.selectedRows.length).toBe(3);
+
+      table.reload();
+      expect(table.selectedRows.length).toBe(3);
+      expect(table.rows.filter(row => row.expanded).length).toBe(3);
+      expect(findRow(rowA).expanded).toBeTrue();
+      expect(findRow(rowAA).expanded).toBeTrue();
+      expect(findRow(rowC).expanded).toBeTrue();
+
+      table.selectRow(findRow(rowCA));
+      expect(table.selectedRows.length).toBe(1);
+
+      table.reload();
+      expect(table.selectedRows.length).toBe(1);
+      expect(table.rows.filter(row => row.expanded).length).toBe(1);
+      expect(findRow(rowC).expanded).toBeTrue();
     });
   });
 });
