@@ -3541,11 +3541,29 @@ export class Table extends Widget implements TableModel {
 
   /**
    * Restores the selection by the given selectedKeys. Rows matching these given values (see {@link Table.getRowsByKey}) will be selected.
+   * If the table is {@link Table.hierarchical} all parent rows of selected rows will be expanded.
    *
    * @param selectedKeys array of key values (see {@link TableRow.getKeyValues}) of the rows to select.
    */
   restoreSelection(selectedKeys: any[][]) {
-    this.selectRows(this.getRowsByKey(selectedKeys));
+    const rows = this.getRowsByKey(selectedKeys);
+    if (this.hierarchical) {
+      // collect all parentRows of selectedRows and expand them
+      const parentRows = new Set<TableRow>();
+      const remaining = new Set(rows);
+      for (const r of remaining) {
+        const parentRow = r.parentRow;
+        if (!parentRow) {
+          continue;
+        }
+        parentRows.add(parentRow);
+        // the iterator will iterate over newly added elements
+        // therefore new elements added here will be processed
+        remaining.add(parentRow);
+      }
+      this.expandRows([...parentRows]);
+    }
+    this.selectRows(rows);
   }
 
   /**
