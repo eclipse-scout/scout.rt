@@ -24,13 +24,6 @@ public interface IFormHandler {
    */
   void setFormInternal(IForm form);
 
-  // TODO [24.1] rst remove
-  /**
-   * @deprecated methode will be removed with scout 24.1
-   */
-  @Deprecated
-  String getHandlerId();
-
   boolean isGuiLess();
 
   void setOpenExclusive(boolean openExclusive);

@@ -106,22 +106,6 @@ public interface ICacheBuilder<K, V> {
    */
   ICacheBuilder<K, V> withThreadSafe(boolean threadSafe);
 
-  // TODO [24.1] rst remove
-  /**
-   * This property has no effect anymore and will be deprecated in scout 23.2
-   *
-   * @param atomicInsertion
-   *          if set to true, a cache might concurrently resolve a key, but the get operations that issued these
-   *          resolves will return the same value. This option is only valid if threadSafe is set to true. Typically,
-   *          set this option to true if the cache value is modifiable. (Default false)
-   * @return this builder
-   * @deprecated will be removed in scout 24
-   */
-  @Deprecated
-  default ICacheBuilder<K, V> withAtomicInsertion(boolean atomicInsertion) {
-    return this; // nop
-  }
-
   /**
    * @param clusterEnabled
    *          if true a cache that runs in a clustered server (<code>IClusterSynchronizationService#isEnabled()</code>)

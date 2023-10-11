@@ -183,14 +183,6 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public String getHandlerId() {
-    String s = getClass().getName();
-    int i = Math.max(s.lastIndexOf('$'), s.lastIndexOf('.'));
-    s = s.substring(i + 1);
-    return s;
-  }
-
-  @Override
   public boolean isGuiLess() {
     return getConfiguredGuiLess();
   }
