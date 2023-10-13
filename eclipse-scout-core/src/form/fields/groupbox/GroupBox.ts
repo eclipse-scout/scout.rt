@@ -116,6 +116,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
       property: 'menuBarPosition',
       constType: GroupBox.MenuBarPosition
     }]);
+    this.resolveTextKeys(['subLabel']);
     this._setBodyLayoutConfig(this.bodyLayoutConfig);
     this.menuBar = scout.create(MenuBar, {
       parent: this,
