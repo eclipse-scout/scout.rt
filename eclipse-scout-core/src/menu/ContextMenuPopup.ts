@@ -534,10 +534,20 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
     if (event.propertyName === 'visible') {
       this._updateFirstLastClass();
     } else if (event.propertyName === 'selected') {
-      // Key stroke navigation marks the currently focused item as selected.
+      // Keystroke navigation marks the currently focused item as selected.
       // When a sub menu item is opened while another element is selected (focused), make sure the other element gets unselected.
-      // Otherwise two items would be selected when the sub menu is closed again.
+      // Otherwise, two items would be selected when the sub menu is closed again.
       this._deselectSiblings(event.source as Menu);
+    } else if (event.propertyName === 'iconId') {
+      if (this.rendered) {
+        // Update text alignment if an icon changes while popup is open
+        // Rendering of the icon happens after the property change event -> update text later
+        queueMicrotask(() => {
+          if (this.rendered) {
+            this._adjustTextAlignment();
+          }
+        });
+      }
     }
     // Make sure menu is positioned correctly afterwards (if it is opened upwards hiding/showing a menu item makes it necessary to reposition)
     this.position();
