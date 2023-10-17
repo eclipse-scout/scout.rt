@@ -409,29 +409,35 @@ export const strings = {
 
   /**
    * Truncates the given text and appends '...' so it fits into the given horizontal space.
+   *
    * @param text the text to be truncated
    * @param horizontalSpace the horizontal space the text needs to fit into
    * @param measureText a function that measures the span of a text, it needs to return an object containing a 'width' property.
+   *                    If not provided, the width equals to the number of characters.
    * @returns the truncated text
    */
-  truncateText(text: string, horizontalSpace: number, measureText: (text: string) => { width: number }): string {
-    if (text && horizontalSpace && measureText && horizontalSpace > 0 && measureText(text).width > horizontalSpace) {
-      text = text.trim();
-      if (measureText(text).width <= horizontalSpace) {
-        return text;
+  truncateText(text: string, horizontalSpace: number, measureText?: (text: string) => { width: number }): string {
+      if (!text || !horizontalSpace || horizontalSpace <= 0) {
+          return text;
       }
-      let upperBound = text.length, // exclusive
-        lowerBound = 0; // inclusive
+      if (!measureText) {
+          measureText = text => ({width: (text || '').length});
+      }
+      text = text.trim();
+      let textWidth = measureText(text).width;
+      if (textWidth <= horizontalSpace) {
+          return text;
+      }
+      let upperBound = text.length; // exclusive
+      let lowerBound = 0; // inclusive
       while (lowerBound + 1 < upperBound) {
-        let textLength = Math.round((upperBound + lowerBound) / 2);
-        if (measureText(text.slice(0, textLength) + '...').width > horizontalSpace) {
-          upperBound = textLength;
-        } else {
-          lowerBound = textLength;
-        }
+          let textLength = Math.round((upperBound + lowerBound) / 2);
+          if (measureText(text.slice(0, textLength) + '...').width > horizontalSpace) {
+              upperBound = textLength;
+          } else {
+              lowerBound = textLength;
+          }
       }
       return text.slice(0, lowerBound).trim() + '...';
-    }
-    return text;
   }
 };
