@@ -185,7 +185,6 @@ public class PropertiesHelper {
   /**
    * Parse env file with variables
    *
-   * @param propertyProvider
    * @return true if the file exists
    */
   protected boolean parseEnvFile(IPropertyProvider propertyProvider) {
@@ -209,7 +208,6 @@ public class PropertiesHelper {
   /**
    * Parse regular config.properties
    *
-   * @param propertyProvider
    * @return true if the file exists
    */
   protected boolean parse(IPropertyProvider propertyProvider) {
@@ -525,7 +523,8 @@ public class PropertiesHelper {
       return defaultValue;
     }
 
-    Map<String, String> resultAsMap = getPropertyMap(key, null, namespace);
+    // due to the single key use case, the key without [\d] pattern might contain no JSON but only a single entry, thus use lenient JSON deserialization
+    Map<String, String> resultAsMap = getPropertyMap(key, null, namespace, true);
     if (resultAsMap == null) {
       // try single key
       String value = getProperty(key, null, namespace);
@@ -632,6 +631,16 @@ public class PropertiesHelper {
    *         otherwise.
    */
   public Map<String, String> getPropertyMap(String key, Map<String, String> defaultValue, String namespace) {
+    return getPropertyMap(key, defaultValue, namespace, false);
+  }
+
+  /**
+   * @param lenientJsonDeserialization
+   *          <code>true</code> to skip if the given property doesn't correspond to a readable JSON format,
+   *          <code>false</code> otherwise.
+   * @see #getProperty(String, String, String)
+   */
+  protected Map<String, String> getPropertyMap(String key, Map<String, String> defaultValue, String namespace, boolean lenientJsonDeserialization) {
     if (!StringUtility.hasText(key)) {
       return defaultValue;
     }
@@ -639,9 +648,22 @@ public class PropertiesHelper {
     String keyPrefix = toCollectionKeyPrefix(key, namespace).toString();
 
     Map<String, String> result = new HashMap<>();
+
+    // collect entries from JSON before those with key pattern including []
+
+    // properties files
+    collectMapEntriesFromJson(key, namespace, this::getConfigPropertyValue, result, lenientJsonDeserialization);
     collectMapEntriesWith(keyPrefix, m_configProperties.keySet(), this::getConfigPropertyValue, result);
+
+    // environment files
+    collectMapEntriesFromJson(key, namespace, this::getEnvFilePropertyValue, result, lenientJsonDeserialization);
     collectMapEntriesWith(keyPrefix, m_envProperties.keySet(), this::getEnvFilePropertyValue, result);
-    collectMapEntriesFromEnvironment(key, namespace, result);
+
+    // environment variables (only JSON support for map)
+    collectMapEntriesFromJson(key, namespace, this::lookupEnvironmentVariableValue, result, lenientJsonDeserialization);
+
+    // system properties
+    collectMapEntriesFromJson(key, namespace, this::getSystemPropertyValue, result, lenientJsonDeserialization);
     collectMapEntriesWith(keyPrefix, System.getProperties().keySet(), this::getSystemPropertyValue, result);
 
     if (result.isEmpty()) {
@@ -938,31 +960,42 @@ public class PropertiesHelper {
     }
   }
 
-  protected void collectMapEntriesFromEnvironment(String key, String namespace, Map<String, String> collector) {
+  /**
+   * @param lenientJsonDeserialization
+   *          <code>true</code> to skip if the given property doesn't correspond to a readable JSON format,
+   *          <code>false</code> otherwise.
+   */
+  protected void collectMapEntriesFromJson(String key, String namespace, Function<String, String> propertyValueRetriever, Map<String, String> collector, boolean lenientJsonDeserialization) {
     String propertyKey = toPropertyKey(key, namespace).toString();
-    String valueFromEnv = lookupEnvironmentVariableValue(propertyKey);
-    if (StringUtility.hasText(valueFromEnv)) {
+    String value = propertyValueRetriever.apply(propertyKey);
+    if (StringUtility.hasText(value)) {
       IJsonPropertyReader jsonPropertyReader = BEANS.opt(IJsonPropertyReader.class);
 
       if (jsonPropertyReader == null) {
-        throw new PlatformException("No {} instance found while trying to decode the value of property map '{}' from an environment variable. " +
-            "Make sure to provide an appropriate implementation or unset the respective environment variable.", IJsonPropertyReader.class.getSimpleName(), propertyKey);
+        throw new PlatformException("No {} instance found while trying to decode the value of property map '{}' from a property. " +
+            "Make sure to provide an appropriate implementation or unset the respective property.", IJsonPropertyReader.class.getSimpleName(), propertyKey);
       }
 
       try {
-        Map<String, String> decodedValue = jsonPropertyReader.readJsonPropertyValue(valueFromEnv);
+        Map<String, String> decodedValue = jsonPropertyReader.readJsonPropertyValue(value);
 
         for (Entry<String, String> entry : decodedValue.entrySet()) {
           if (entry.getValue() == null) {
             collector.remove(entry.getKey());
           }
           else {
-            collector.put(entry.getKey(), resolve((String) entry.getValue(), PLACEHOLDER_PATTERN));
+            collector.put(entry.getKey(), resolve(entry.getValue(), PLACEHOLDER_PATTERN));
           }
         }
       }
       catch (RuntimeException e) {
-        throw new IllegalArgumentException(String.format("Error parsing value of property map '%s' as JSON value from an environment variable.", propertyKey), e);
+        if (lenientJsonDeserialization) {
+          //noinspection PlaceholderCountMatchesArgumentCount
+          LOG.info("Value '{}' of property map '{}' is not a JSON value, ignored for map as lenient deserialization is used", value, key, LOG.isDebugEnabled() ? e : null);
+        }
+        else {
+          throw new IllegalArgumentException(String.format("Error parsing value of property map '%s' as JSON value from a property.", propertyKey), e);
+        }
       }
     }
   }
@@ -1046,7 +1079,8 @@ public class PropertiesHelper {
   }
 
   protected void importSystemImports(Set<String> importsToIgnore, Pattern pat) {
-    Collection<String> systemImports = getPropertyMap(IMPORT_KEY).values();
+    // import map key might contain any text, not relevant, but that's why getPropertyList cannot be used here (expects increasing indexes)
+    Collection<String> systemImports = getPropertyMap(IMPORT_KEY, Collections.emptyMap(), null, true).values();
     if (systemImports.isEmpty()) {
       return;
     }
