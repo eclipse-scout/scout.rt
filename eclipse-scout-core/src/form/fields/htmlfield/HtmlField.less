@@ -19,6 +19,14 @@
   & > .field {
     margin-left: @mandatory-indicator-width;
 
+    &[placeholder].empty::before {
+      #scout.fake-placeholder();
+    }
+
+    &[placeholder].disabled.empty::before {
+      #scout.placeholder-disabled();
+    }
+
     &:focus {
       outline: none;
     }
