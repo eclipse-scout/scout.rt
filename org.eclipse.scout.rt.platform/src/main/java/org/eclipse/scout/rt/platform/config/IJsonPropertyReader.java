@@ -33,6 +33,10 @@ public interface IJsonPropertyReader {
    * <li><code>null</code> > <code>null</code></li>
    * <li>empty string > empty map
    * </ul>
+   * Calls with a value not representing a JSON map must fail, e.g. arguments such as: a, true, &quot;a&quot;. This is
+   * required to support reading a list property with only a single entry, in which case the reading of the JSON map
+   * must fail to use the fallback instead.
+   * <p>
    * Example:
    *
    * <pre>

@@ -80,11 +80,11 @@ public class PropertiesHelperTest {
   private static final String MAP_KEY = "mapKey";
   private static final String EMPTY_KEY = "emptyKey";
 
-  private static final List<IBean<?>> s_beans = new ArrayList<>();
+  private static final List<IBean<?>> S_BEANS = new ArrayList<>();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    s_beans.addAll(BEANS.get(BeanTestingHelper.class).registerBeans(new BeanMetaData(TestJsonPropertyReader.class)));
+    S_BEANS.addAll(BEANS.get(BeanTestingHelper.class).registerBeans(new BeanMetaData(TestJsonPropertyReader.class)));
   }
 
   @Before
@@ -94,7 +94,7 @@ public class PropertiesHelperTest {
 
   @AfterClass
   public static void afterClass() throws Exception {
-    BEANS.get(BeanTestingHelper.class).unregisterBeans(s_beans);
+    BEANS.get(BeanTestingHelper.class).unregisterBeans(S_BEANS);
   }
 
   @Test
@@ -112,9 +112,9 @@ public class PropertiesHelperTest {
   public void testNamespaceProperty() {
     PropertiesHelper instance = new PropertiesHelper(new ConfigPropertyProvider(SAMPLE_CONFIG_PROPS));
     assertEquals(NAMESPACE_PROP_VAL, instance.getProperty(NAMESPACE_PROP, null, NAMESPACE));
-    assertEquals(null, instance.getProperty(NAMESPACE_PROP));
-    assertEquals(null, instance.getProperty(NAMESPACE_PROP + "-not-existing", null, NAMESPACE));
-    assertEquals(null, instance.getProperty(NAMESPACE_PROP, null, NAMESPACE + "-not-existing"));
+    assertNull(instance.getProperty(NAMESPACE_PROP));
+    assertNull(instance.getProperty(NAMESPACE_PROP + "-not-existing", null, NAMESPACE));
+    assertNull(instance.getProperty(NAMESPACE_PROP, null, NAMESPACE + "-not-existing"));
     assertEquals("defaultval", instance.getProperty(NAMESPACE_PROP, "defaultval", NAMESPACE + "-not-existing"));
 
     PropertiesHelper spiedInstance = spy(instance);
@@ -173,8 +173,31 @@ public class PropertiesHelperTest {
     PropertiesHelper h = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
     String thirdKey = "mapKey[third]";
     String fourthKey = "mapKey[fourth]";
+
     System.setProperty(fourthKey, "four");
     System.setProperty(thirdKey, "changed");
+
+    String map2Key = "map2Key";
+    String map2ThreeKey = map2Key + "[three]";
+    String map2FourKey = map2Key + "[four]"; // not defined in *.properties file
+    System.setProperty(map2ThreeKey, "three-system");
+    System.setProperty(map2FourKey, "four-system");
+
+    String map3Key = "map3Key";
+    String map3TwoKey = map3Key + "[two]";
+    String map3JsonValue = "{\"one\": \"one-system-json\", \"two\": \"two-system-json\"}";
+    System.setProperty(map3Key, map3JsonValue);
+    System.setProperty(map3TwoKey, "two-system-json-overwrite");
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping("{\"one\": \"one-file-json\", \"two\": \"two-file-json\", \"three\": \"three-file-json\"}", CollectionUtility.hashMap(
+        new ImmutablePair<>("one", "one-file-json"),
+        new ImmutablePair<>("two", "two-file-json"),
+        new ImmutablePair<>("three", "three-file-json")));
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping(map3JsonValue, CollectionUtility.hashMap(
+        new ImmutablePair<>("one", "one-system-json"),
+        new ImmutablePair<>("two", "two-system-json")));
+
     try {
       Map<String, String> map1 = h.getPropertyMap(MAP_KEY);
       assertEquals(6, map1.size());
@@ -184,6 +207,18 @@ public class PropertiesHelperTest {
       assertEquals("four", map1.get("fourth"));
       assertNull(map1.get("empty"));
       assertEquals("last", map1.get("last"));
+
+      Map<String, String> map2 = h.getPropertyMap(map2Key);
+      assertEquals(4, map2.size());
+      assertEquals("one-file-json", map2.get("one"));
+      assertEquals("two-file-overwrite", map2.get("two"));
+      assertEquals("three-system", map2.get("three"));
+      assertEquals("four-system", map2.get("four"));
+
+      Map<String, String> map3 = h.getPropertyMap(map3Key);
+      assertEquals(2, map3.size());
+      assertEquals("one-system-json", map3.get("one"));
+      assertEquals("two-system-json-overwrite", map3.get("two"));
 
       try {
         h.getPropertyMap(MAP_KEY, "namespace");
@@ -253,6 +288,17 @@ public class PropertiesHelperTest {
     catch (IllegalArgumentException e) {
       Assert.assertNotNull(e);
     }
+
+    // behavior of real IJsonPropertyReader is verified by DataObjectJsonPropertyReaderTest
+    assertEquals(List.of("a"), listProps.getPropertyList("listWithSingleEntryText"));
+
+    BEANS.get(TestJsonPropertyReader.class).setThrowExceptionOnRead(true);
+    assertEquals(List.of("true"), listProps.getPropertyList("listWithSingleEntryBoolean"));
+    assertEquals(List.of("\"a\""), listProps.getPropertyList("listWithSingleEntryQuotes"));
+
+    BEANS.get(TestJsonPropertyReader.class).setThrowExceptionOnRead(false);
+    BEANS.get(TestJsonPropertyReader.class).putMapping("{\"0\": \"a\", \"1\": \"b\"}", Map.of("0", "a", "1", "b"));
+    assertEquals(List.of("a", "b"), listProps.getPropertyList("listWithJson"));
   }
 
   @Test
@@ -419,7 +465,7 @@ public class PropertiesHelperTest {
     when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"second\": \"zwei\" \"third\": null}"); // missing comma after "zwei"
 
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> spiedInstance.getPropertyMap("mapKey"));
-    assertThat(exception.getMessage(), is("Error parsing value of property map 'mapKey' as JSON value from an environment variable."));
+    assertThat(exception.getMessage(), is("Error parsing value of property map 'mapKey' as JSON value from a property."));
   }
 
   @Test
@@ -433,8 +479,8 @@ public class PropertiesHelperTest {
     when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"second\": \"zwei\", \"third\": null}");
     try {
       PlatformException exception = assertThrows(PlatformException.class, () -> spiedInstance.getPropertyMap("mapKey"));
-      assertThat(exception.getMessage(), is("No IJsonPropertyReader instance found while trying to decode the value of property map 'mapKey' from an environment variable. " +
-          "Make sure to provide an appropriate implementation or unset the respective environment variable."));
+      assertThat(exception.getMessage(), is("No IJsonPropertyReader instance found while trying to decode the value of property map 'mapKey' from a property. " +
+          "Make sure to provide an appropriate implementation or unset the respective property."));
     }
     finally {
       BeanTestingHelper.get().registerBean(new BeanMetaData(TestJsonPropertyReader.class));
@@ -442,7 +488,7 @@ public class PropertiesHelperTest {
   }
 
   @Test
-  public void testCorrectBehaviorWhenIJsonPropertyReaderIsNotPresentButAlsoNotNeeded() throws Exception {
+  public void testCorrectBehaviorWhenIJsonPropertyReaderIsNotPresentButAlsoNotNeeded() {
     PropertiesHelper helper = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
 
     Platform.get().getBeanManager().unregisterClass(TestJsonPropertyReader.class);
@@ -491,7 +537,7 @@ public class PropertiesHelperTest {
     PropertiesHelper instance = new PropertiesHelper(new ConfigPropertyProvider(SAMPLE_CONFIG_PROPS));
     assertEquals(ATTR_STRING_VALUE, instance.getProperty(ATTR_STRING_KEY));
     assertEquals(ATTR_STRING_VALUE, instance.getProperty(ATTR_STRING_KEY, "defaultValue"));
-    assertEquals(null, instance.getProperty(null));
+    assertNull(instance.getProperty(null));
     assertFalse(instance.hasProperty("not-existing"));
     assertTrue(instance.hasProperty(ATTR_STRING_KEY));
 
@@ -853,7 +899,7 @@ public class PropertiesHelperTest {
           return super.getPropertyProvider(configUrl);
         }
       };
-      assertEquals(null, h.getProperty("dbPort"));
+      assertNull(h.getProperty("dbPort"));
       assertEquals("derby", h.getProperty("dbName"));
     }
     finally {
