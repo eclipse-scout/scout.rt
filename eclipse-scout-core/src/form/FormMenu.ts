@@ -16,6 +16,7 @@ export class FormMenu extends Menu implements FormMenuModel {
   declare model: FormMenuModel;
   declare eventMap: FormMenuEventMap;
   declare self: FormMenu;
+  declare popup: WidgetPopup;
 
   form: Form;
   popupStyle: FormMenuPopupStyle;
@@ -219,6 +220,24 @@ export class FormMenu extends Menu implements FormMenuModel {
 
   protected override _createActionKeyStroke(): ActionKeyStroke {
     return new FormMenuActionKeyStroke(this);
+  }
+
+  setPopupClosable(popupClosable: boolean) {
+    if (this.setProperty('popupClosable', popupClosable) && this.popup) {
+      this.popup.setClosable(popupClosable);
+    }
+  }
+
+  setPopupMovable(popupMovable: boolean) {
+    if (this.setProperty('popupMovable', popupMovable) && this.popup) {
+      this.popup.setMovable(popupMovable);
+    }
+  }
+
+  setPopupResizable(popupResizable: boolean) {
+    if (this.setProperty('popupResizable', popupResizable) && this.popup) {
+      this.popup.setResizable(popupResizable);
+    }
   }
 }
 
