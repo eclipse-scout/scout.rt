@@ -40,7 +40,7 @@ export const strings = {
     insertText = strings.asString(insertText);
     // @ts-expect-error
     if (insertText && (typeof position === 'number' || position instanceof Number) && position >= 0) {
-      return text.substr(0, position) + insertText + text.substr(position);
+      return text.substring(0, position) + insertText + text.substring(position);
     }
     return text;
   },
@@ -98,33 +98,21 @@ export const strings = {
   },
 
   startsWith(fullString: string, startString: string): boolean {
-    if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
+    if (objects.isNullOrUndefined(fullString) || objects.isNullOrUndefined(startString)) {
       return false;
     }
     fullString = strings.asString(fullString);
     startString = strings.asString(startString);
-    if (startString.length === 0) {
-      return true; // every string starts with the empty string
-    }
-    if (fullString.length === 0) {
-      return false; // empty string cannot start with non-empty string
-    }
-    return (fullString.substr(0, startString.length) === startString);
+    return fullString.startsWith(startString);
   },
 
   endsWith(fullString: string, endString: string): boolean {
-    if (fullString === undefined || fullString === null || endString === undefined || endString === null) {
+    if (objects.isNullOrUndefined(fullString) || objects.isNullOrUndefined(endString)) {
       return false;
     }
     fullString = strings.asString(fullString);
     endString = strings.asString(endString);
-    if (endString.length === 0) {
-      return true; // every string ends with the empty string
-    }
-    if (fullString.length === 0) {
-      return false; // empty string cannot end with non-empty string
-    }
-    return (fullString.substr(-endString.length) === endString);
+    return fullString.endsWith(endString);
   },
 
   /**
@@ -409,29 +397,35 @@ export const strings = {
 
   /**
    * Truncates the given text and appends '...' so it fits into the given horizontal space.
+   *
    * @param text the text to be truncated
    * @param horizontalSpace the horizontal space the text needs to fit into
    * @param measureText a function that measures the span of a text, it needs to return an object containing a 'width' property.
+   *                    If not provided, the width corresponds to the number of characters.
    * @returns the truncated text
    */
-  truncateText(text: string, horizontalSpace: number, measureText: (text: string) => { width: number }): string {
-    if (text && horizontalSpace && measureText && horizontalSpace > 0 && measureText(text).width > horizontalSpace) {
-      text = text.trim();
-      if (measureText(text).width <= horizontalSpace) {
-        return text;
-      }
-      let upperBound = text.length, // exclusive
-        lowerBound = 0; // inclusive
-      while (lowerBound + 1 < upperBound) {
-        let textLength = Math.round((upperBound + lowerBound) / 2);
-        if (measureText(text.slice(0, textLength) + '...').width > horizontalSpace) {
-          upperBound = textLength;
-        } else {
-          lowerBound = textLength;
-        }
-      }
-      return text.slice(0, lowerBound).trim() + '...';
+  truncateText(text: string, horizontalSpace: number, measureText?: (text: string) => { width: number }): string {
+    if (!text || !horizontalSpace || horizontalSpace <= 0) {
+      return text;
     }
-    return text;
+    if (!measureText) {
+      measureText = text => ({width: (text || '').length});
+    }
+    text = text.trim();
+    let textWidth = measureText(text).width;
+    if (textWidth <= horizontalSpace) {
+      return text;
+    }
+    let upperBound = text.length; // exclusive
+    let lowerBound = 0; // inclusive
+    while (lowerBound + 1 < upperBound) {
+      let textLength = Math.round((upperBound + lowerBound) / 2);
+      if (measureText(text.slice(0, textLength) + '...').width > horizontalSpace) {
+        upperBound = textLength;
+      } else {
+        lowerBound = textLength;
+      }
+    }
+    return text.slice(0, lowerBound).trim() + '...';
   }
 };
