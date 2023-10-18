@@ -1405,7 +1405,7 @@ describe('Tree', () => {
       expect(parent2.childrenChecked).toBe(true);
     });
 
-    it('does partly-check disabled nodes when children are checked in synch mode', () => {
+    it('does not check disabled nodes when no children are present in synch mode', () => {
       let model = helper.createModelFixture(4, 4);
       let tree = helper.createTree(model);
       tree.multiCheck = true;
@@ -1426,6 +1426,29 @@ describe('Tree', () => {
       expect(nodeLevel1.childrenChecked).toBe(true);
       expect(nodeLevel2.childrenChecked).toBe(true);
       expect(nodeLevel3.checked).toBe(false);
+    });
+
+    it('does check disabled nodes when all children are checked in synch mode', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckStyle = Tree.AutoCheckStyle.SYNC_CHILD_AND_PARENT_STATE;
+      tree.render();
+
+      // Arrange
+      let nodeLevel1 = tree.nodes[0];
+      let nodeLevel2 = nodeLevel1.childNodes[0];
+      let nodeLevel3 = nodeLevel2.childNodes[0];
+
+      // Act
+      nodeLevel2.enabled = false;
+      tree.checkNode(nodeLevel1, true);
+
+      // Assert
+      expect(nodeLevel1.checked).toBe(true);
+      expect(nodeLevel2.checked).toBe(true);
+      expect(nodeLevel3.checked).toBe(true);
     });
 
     it('does not check nodes if checkable is set to false', () => {

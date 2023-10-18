@@ -2597,7 +2597,7 @@ export class Tree extends Widget implements TreeModel {
       }
 
       // Step 3: Update parent nodes
-      let updatedParents = this._checkParentsRecursive(node, opts.autoCheckStyle, true, true);
+      let updatedParents = this._checkParentsRecursive(node, opts.autoCheckStyle, true);
       updatedNodes.add(updatedParents);
     });
 
@@ -2616,6 +2616,7 @@ export class Tree extends Widget implements TreeModel {
 
   protected _checkChildrenRecursive(parentNode: TreeNode, opts: TreeNodeCheckOptions): TreeNodeUpdate {
     let updatedNodes = new TreeNodeUpdate();
+    let hasDisabledNodes = !this._isNodeEditable(parentNode, opts.checkOnlyEnabled);
     parentNode.childNodes.forEach(node => {
 
       // Update node if possible
@@ -2638,17 +2639,21 @@ export class Tree extends Widget implements TreeModel {
       // Go down recursive to check its childs
       updatedNodes.add(this._checkChildrenRecursive(node, opts));
 
-      // If this node is not editable, but has children, the state update will not be executed
-      // To cover this case, we will call the _checkParentsRecursive just for this node (recursive = false)
-      if (!editable && node.childNodes.length > 0) {
-        let updatedParents = this._checkParentsRecursive(node, opts.autoCheckStyle, false);
-        updatedNodes.add(updatedParents);
+      // If this node is not editable, the parent node has to re-validate its state
+      if (!editable) {
+        hasDisabledNodes = true;
       }
     });
+
+    if (hasDisabledNodes) {
+      let updatedParents = this._checkParentsRecursive(parentNode, opts.autoCheckStyle);
+      updatedNodes.add(updatedParents);
+    }
+
     return updatedNodes;
   }
 
-  protected _checkParentsRecursive(node: TreeNode, autoCheckStyle: AutoCheckStyle = this.autoCheckStyle, recursive = true, checkParentsAnyways = false): TreeNodeUpdate {
+  protected _checkParentsRecursive(node: TreeNode, autoCheckStyle: AutoCheckStyle = this.autoCheckStyle, checkParentsAnyways = false): TreeNodeUpdate {
     let updatedNodes = new TreeNodeUpdate();
     let children = node.childNodes;
     let childrenCount = children.length;
@@ -2656,7 +2661,7 @@ export class Tree extends Widget implements TreeModel {
     let childrenFullyCheckedCount = children.filter(n => n.checked && !n.childrenChecked).length;
 
     // No children present, jump directly to its parent
-    if (childrenCount === 0 && node.parentNode && recursive) {
+    if (childrenCount === 0 && node.parentNode) {
       return this._checkParentsRecursive(node.parentNode, autoCheckStyle);
     }
 
@@ -2684,7 +2689,7 @@ export class Tree extends Widget implements TreeModel {
     }
 
     // Update parent, if this node has been updated or checkParentsAnyways flag is set
-    if ((updatedNodes.getNodesForRendering().length > 0 || checkParentsAnyways) && node.parentNode && recursive) {
+    if ((updatedNodes.getNodesForRendering().length > 0 || checkParentsAnyways) && node.parentNode) {
       let parentUpdatedNodes = this._checkParentsRecursive(node.parentNode, autoCheckStyle);
       updatedNodes.add(parentUpdatedNodes);
     }
