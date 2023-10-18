@@ -243,19 +243,20 @@ export class GroupBoxResponsiveHandler extends ResponsiveHandler {
   }
 
   /**
-   * Vertical alignment
+   * Set vertical align to bottom for checkboxes, buttons and fields with gridH = 1 and an on-field label
+   * to make them align with fields having a top label in the same grid row.
    */
   protected _transformVerticalAlignment(field: FormField, apply: boolean) {
     let isDefaultButton = field instanceof Button && field.displayStyle === Button.DisplayStyle.DEFAULT;
     let isCheckbox = field instanceof CheckBoxField;
-    let isSingleHeightOnFieldLabelField = field.labelPosition === FormField.LabelPosition.ON_FIELD && field.gridData && field.gridData.h === 1;
+    let gridData = this.getGridData(field);
+    let isSingleHeightOnFieldLabelField = field.labelPosition === FormField.LabelPosition.ON_FIELD && gridData.h === 1;
 
     if (!(isDefaultButton || isCheckbox || isSingleHeightOnFieldLabelField) ||
       !field.gridData) {
       return;
     }
 
-    let gridData = this.getGridData(field);
     if (apply) {
       this._storeFieldProperty(field, 'fillVertical', gridData.fillVertical);
       this._storeFieldProperty(field, 'verticalAlignment', gridData.verticalAlignment);
