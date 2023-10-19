@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, HtmlFieldEventMap, HtmlFieldModel, scrollbars, ValueField} from '../../../index';
+import {AppLinkKeyStroke, HtmlFieldEventMap, HtmlFieldModel, scrollbars, SelectAllTextInFieldKeyStroke, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export class HtmlField extends ValueField<string> implements HtmlFieldModel {
@@ -30,6 +30,7 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
   protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
     this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
+    this.keyStrokeContext.registerKeyStroke(new SelectAllTextInFieldKeyStroke(this));
   }
 
   protected override _render() {

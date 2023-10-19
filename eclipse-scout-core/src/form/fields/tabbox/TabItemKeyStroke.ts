@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {HAlign, KeyStroke, ScoutKeyboardEvent, TabItem} from '../index';
+import {HAlign, KeyStroke, ScoutKeyboardEvent, TabItem} from '../../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TabItemKeyStroke extends KeyStroke {
