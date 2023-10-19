@@ -2719,7 +2719,7 @@ export class Tree extends Widget implements TreeModel {
   }
 
   protected _isNodeEditable(node: TreeNode, checkOnlyEnabled = true) {
-    return checkOnlyEnabled && node.enabled && node.filterAccepted;
+    return (checkOnlyEnabled ? node.enabled : true) && node.filterAccepted;
   }
 
   uncheckNode(node: TreeNode, options?: TreeNodeUncheckOptions) {
