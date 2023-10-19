@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LabelFieldEventMap, LabelFieldModel, strings, texts, ValueField} from '../../../index';
+import {LabelFieldEventMap, LabelFieldModel, SelectAllTextInFieldKeyStroke, strings, texts, ValueField} from '../../../index';
 
 export class LabelField extends ValueField<string> implements LabelFieldModel {
   declare model: LabelFieldModel;
@@ -33,6 +33,11 @@ export class LabelField extends ValueField<string> implements LabelFieldModel {
   protected override _initValue(value: string) {
     value = texts.resolveText(value, this.session.locale.languageTag);
     super._initValue(value);
+  }
+
+  protected override _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+    this.keyStrokeContext.registerKeyStroke(new SelectAllTextInFieldKeyStroke(this));
   }
 
   protected override _render() {
