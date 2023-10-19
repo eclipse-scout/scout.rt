@@ -492,7 +492,7 @@ export class HtmlComponent {
   /**
    * Delegates to {@link graphics.bounds}.
    */
-  bounds(options?: BoundsOptions): Rectangle {
+  bounds(options?: BoundsOptions | boolean): Rectangle {
     return graphics.bounds(this.$comp, options);
   }
 
