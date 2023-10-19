@@ -10,7 +10,17 @@
 import {ValueFieldModel} from '../../../index';
 
 export interface HtmlFieldModel extends ValueFieldModel<string> {
+  /**
+   * Configures whether scrollbars should be shown if the content is bigger than the available size.
+   *
+   * Default is false.
+   */
   scrollBarEnabled?: boolean;
+  /**
+   * Configures whether the text should be selectable.
+   *
+   * Default is true.
+   */
   selectable?: boolean;
   scrollToAnchor?: string;
 }
