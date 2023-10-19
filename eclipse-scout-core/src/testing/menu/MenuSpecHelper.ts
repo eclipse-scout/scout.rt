@@ -21,8 +21,7 @@ export class MenuSpecHelper {
     $.extend(model, {
       text: text,
       iconId: iconId,
-      menuTypes: menuTypes,
-      visible: true
+      menuTypes: menuTypes
     });
     return model;
   }

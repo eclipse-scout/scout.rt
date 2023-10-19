@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, ComboMenu, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
+  arrays, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, InitModelOf, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
   MenuBarRightKeyStroke, MenuDestinations, MenuFilter, MenuOrder, menus, ObjectOrChildModel, OrderedMenuItems, PropertyChangeEvent, scout, TooltipPosition, Widget, widgets
 } from '../../index';
 
@@ -301,7 +301,7 @@ export class MenuBar extends Widget implements MenuBarModel {
       if (this.defaultMenu && this.defaultMenu.isTabTarget()) {
         this.setTabbableMenu(this.defaultMenu);
       } else {
-        this.setTabbableMenu(arrays.find(this.orderedMenuItems.all, item => item.isTabTarget()));
+        this.setTabbableMenu(this.allMenusAsFlatList().find(item => item.isTabTarget()));
       }
     }
   }
@@ -463,11 +463,6 @@ export class MenuBar extends Widget implements MenuBarModel {
   }
 
   allMenusAsFlatList(): Menu[] {
-    return arrays.flatMap(this.orderedMenuItems.all, item => {
-      if (item instanceof ComboMenu) {
-        return item.childActions;
-      }
-      return [item];
-    });
+    return menus.flatTopLevelMenus(this.orderedMenuItems.all);
   }
 }
