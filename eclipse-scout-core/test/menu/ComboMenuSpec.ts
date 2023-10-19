@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ComboMenu, EllipsisMenu, Menu, scout, Session} from '../../src/index';
+import {ComboMenu, EllipsisMenu, Menu, MenuBar, scout, Session} from '../../src/index';
 
 describe('ComboMenu', () => {
 
@@ -96,6 +96,25 @@ describe('ComboMenu', () => {
       ellipsis.setChildActions([]);
       expect(comboMenu.childActions[0].isTabTarget()).toBeTrue();
       expect(comboMenu.childActions[1].isTabTarget()).toBeTrue();
+    });
+  });
+
+  describe('tabbable', () => {
+    it('is set on first child action to true if combo menu is the first menu in the menu bar', () => {
+      let menuBar = scout.create(MenuBar, {
+        parent: session.desktop
+      });
+      let menu1 = createComboMenu();
+      let menu2 = scout.create(Menu, {parent: session.desktop, text: 'Menu2'});
+      menuBar.setMenuItems([menu1, menu2]);
+      menuBar.render();
+
+      expect(menu1.tabbable).toBe(false);
+      expect(menu1.$container.attr('tabindex')).toBe(undefined);
+      expect(menu1.childActions[0].tabbable).toBe(true);
+      expect(menu1.childActions[0].$container.attr('tabindex')).toBe('0');
+      expect(menu2.tabbable).toBe(false);
+      expect(menu2.$container.attr('tabindex')).toBe(undefined);
     });
   });
 

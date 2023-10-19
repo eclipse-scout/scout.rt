@@ -137,25 +137,23 @@ describe('MenuBar', () => {
     });
 
     it('hides unnecessary explicit separator menus', () => {
-      let menuModel = helper.createModel();
+      let sep1a = helper.createMenu({id: 'test.sep1a', separator: true});
+      let sep1b = helper.createMenu({id: 'test.sep1b', separator: true});
+      let menu1 = helper.createMenu({id: 'test.menu1', text: 'Menu 1 (L)'});
+      let sep12a = helper.createMenu({id: 'test.sep12a', separator: true});
+      let sep12b = helper.createMenu({id: 'test.sep12b', separator: true, menuTypes: [Table.MenuType.SingleSelection]}); // <-- will generate an additional artificial separator menu
+      let menu2 = helper.createMenu({id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: [Table.MenuType.SingleSelection]});
+      let sep2a = helper.createMenu({id: 'test.sep2a', separator: true, menuTypes: [Table.MenuType.SingleSelection]});
+      let sep2b = helper.createMenu({id: 'test.sep2b', separator: true, menuTypes: [Table.MenuType.SingleSelection]});
 
-      let sep1a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1a', separator: true}));
-      let sep1b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1b', separator: true}));
-      let menu1 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu1', text: 'Menu 1 (L)'}));
-      let sep12a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12a', separator: true}));
-      let sep12b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12b', separator: true, menuTypes: [Table.MenuType.SingleSelection]})); // <-- will generate an additional artificial separator menu
-      let menu2 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: [Table.MenuType.SingleSelection]}));
-      let sep2a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2a', separator: true, menuTypes: [Table.MenuType.SingleSelection]}));
-      let sep2b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2b', separator: true, menuTypes: [Table.MenuType.SingleSelection]}));
-
-      let sep3a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3a', horizontalAlignment: 1, separator: true}));
-      let sep3b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3b', horizontalAlignment: 1, separator: true}));
-      let menu3 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu3', horizontalAlignment: 1, text: 'Menu 3 (R)'}));
-      let sep34a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep34a', horizontalAlignment: 1, separator: true}));
-      let sep34b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep34b', horizontalAlignment: 1, separator: true}));
-      let menu4 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu4', horizontalAlignment: 1, text: 'Menu 4 (R)'}));
-      let sep4a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep4a', horizontalAlignment: 1, separator: true}));
-      let sep4b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep4b', horizontalAlignment: 1, separator: true}));
+      let sep3a = helper.createMenu({id: 'test.sep3a', horizontalAlignment: 1, separator: true});
+      let sep3b = helper.createMenu({id: 'test.sep3b', horizontalAlignment: 1, separator: true});
+      let menu3 = helper.createMenu({id: 'test.menu3', horizontalAlignment: 1, text: 'Menu 3 (R)'});
+      let sep34a = helper.createMenu({id: 'test.sep34a', horizontalAlignment: 1, separator: true});
+      let sep34b = helper.createMenu({id: 'test.sep34b', horizontalAlignment: 1, separator: true});
+      let menu4 = helper.createMenu({id: 'test.menu4', horizontalAlignment: 1, text: 'Menu 4 (R)'});
+      let sep4a = helper.createMenu({id: 'test.sep4a', horizontalAlignment: 1, separator: true});
+      let sep4b = helper.createMenu({id: 'test.sep4b', horizontalAlignment: 1, separator: true});
 
       let menuBar = createMenuBar();
       menuBar.render();
@@ -186,13 +184,22 @@ describe('MenuBar', () => {
 
   });
 
-  describe('focus', () => {
-    it('MenuBar must update tabbable when a menu item is focused', () => {
-      // otherwise the menu item can not have the focus, because the DOM element is not focusable without a tabindex.
-      let menuModel = helper.createModel();
+  describe('tabbable', () => {
+    it('is set to the first menu that is a tab target', () => {
+      let menuBar = createMenuBar();
+      let menu1 = helper.createMenu({text: 'Menu 1'});
+      let menu2 = helper.createMenu({text: 'Menu 2'});
+      menuBar.setMenuItems([menu1, menu2]);
+      menuBar.render();
 
-      let menu1 = helper.createMenu($.extend({}, menuModel, {id: 'menu1', text: 'Menu 1'}));
-      let menu2 = helper.createMenu($.extend({}, menuModel, {id: 'menu2', text: 'Menu 2'}));
+      expect(menu1.$container.attr('tabindex')).toBe('0');
+      expect(menu2.$container.attr('tabindex')).toBe(undefined);
+    });
+
+    it('is updated when a menu item is focused', () => {
+      // otherwise the menu item can not have the focus, because the DOM element is not focusable without a tabindex.
+      let menu1 = helper.createMenu({text: 'Menu 1'});
+      let menu2 = helper.createMenu({text: 'Menu 2'});
 
       let menuBar = createMenuBar();
       menuBar.render();
@@ -243,7 +250,7 @@ describe('MenuBar', () => {
       let menu1 = helper.createMenu(createModel('Menu 1'));
       let menu2 = helper.createMenu(createModel('Menu 2'));
       let menu3 = helper.createMenu(createModel('Menu 3'));
-      let separator = helper.createMenu($.extend({}, createModel(), {separator: true}));
+      let separator = helper.createMenu({separator: true});
 
       let menuBar = createMenuBar();
       menuBar.render();

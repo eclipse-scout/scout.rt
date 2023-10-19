@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, EllipsisMenu, InitModelOf, Menu, MenuDestinations, scout} from '../index';
+import {Action, arrays, ComboMenu, EllipsisMenu, InitModelOf, Menu, MenuDestinations, scout} from '../index';
 import $ from 'jquery';
 
 export type MenuFilterOptions = {
@@ -191,5 +191,17 @@ export const menus = {
     if (!menu.rendered) {
       menu.render($parent);
     }
+  },
+
+  /**
+   * If the given menus contain a {@link ComboMenu}, the resulting array contains the child actions of the combo menu instead of the combo menu itself.
+   */
+  flatTopLevelMenus<TAction extends Action>(menus: TAction[]): TAction[] {
+    return arrays.flatMap(menus, item => {
+      if (item instanceof ComboMenu) {
+        return item.childActions;
+      }
+      return [item];
+    });
   }
 };
