@@ -1406,7 +1406,7 @@ describe('Tree', () => {
     });
 
     it('does not check disabled nodes when no children are present in synch mode', () => {
-      let model = helper.createModelFixture(4, 4);
+      let model = helper.createModelFixture(4, 2);
       let tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
