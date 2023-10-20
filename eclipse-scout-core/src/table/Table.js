@@ -2387,13 +2387,17 @@ export default class Table extends Widget {
     animate = scout.nvl(animate, false);
 
     this._aggregateRows.forEach(function(aggregateRow, r) {
-      if (aggregateRow.$row) {
-        // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (e.g. in insertRows -> renderRows)
+      let refRow = onTop ? aggregateRow.nextRow : aggregateRow.prevRow;
+      if (!refRow || !refRow.$row) {
+        if (aggregateRow.$row) {
+          // corresponding refRow is no longer rendered (e.g. outside view range) -> remove aggregateRow
+          this._removeRow(aggregateRow);
+        }
         return;
       }
 
-      let refRow = onTop ? aggregateRow.nextRow : aggregateRow.prevRow;
-      if (!refRow || !refRow.$row) {
+      if (aggregateRow.$row) {
+        // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (e.g. in insertRows -> renderRows)
         return;
       }
 
@@ -5128,7 +5132,6 @@ export default class Table extends Widget {
     }
 
     this._renderRangeMarkers();
-    this._removeAggregateRows();
     this._renderAggregateRows();
     this._renderFiller();
     this._renderEmptyData();
