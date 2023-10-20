@@ -28,13 +28,13 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=24.1.0-snapshot <24.1.0",
+    "@eclipse-scout/cli": "24.1.0-cs.2",
     "@eclipse-scout/releng": "^22.0.0",
-    "@eclipse-scout/tsconfig": ">=24.1.0-snapshot <24.1.0",
+    "@eclipse-scout/tsconfig": "24.1.0-cs.2",
     "@types/jquery": "3.5.16"
   },
   "dependencies": {
-    "@eclipse-scout/core": ">=24.1.0-snapshot <24.1.0",
+    "@eclipse-scout/core": "24.1.0-cs.2",
     "jquery": "3.6.0"
   }
 }
