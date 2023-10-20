@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
-@TypeName("UiNotificationMessage")
+@TypeName("scout.UiNotificationMessage")
 public class UiNotificationMessageDo extends DoEntity implements Serializable {
   private static final long serialVersionUID = 1L;
 
