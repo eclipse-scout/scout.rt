@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.rt.client.fixture;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -23,15 +25,13 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceUtility;
 
-import com.google.api.client.http.HttpResponse;
-
 @IgnoreBean
 public class MockServiceTunnel extends ClientHttpServiceTunnel {
 
   private final HashMap<Long, Thread> m_runningMap = new HashMap<>();
 
   public MockServiceTunnel() throws Exception {
-    super(UriUtility.toUrl("http://mock/process"));
+    super(UriUtility.toUri("http://mock/process"));
     resetRequestSequenceGenerator();
   }
 
@@ -73,7 +73,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
   }
 
   @Override
-  protected HttpResponse executeRequest(ServiceTunnelRequest call, byte[] callData) {
+  protected HttpResponse<InputStream> executeRequest(ServiceTunnelRequest call, byte[] callData) {
     return null;
   }
 }

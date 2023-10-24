@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.client.servicetunnel.http;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
@@ -41,8 +41,8 @@ public class ClientHttpServiceTunnel extends HttpServiceTunnel implements IClien
     super();
   }
 
-  public ClientHttpServiceTunnel(URL url) {
-    super(url);
+  public ClientHttpServiceTunnel(URI uri) {
+    super(uri);
   }
 
   @Override

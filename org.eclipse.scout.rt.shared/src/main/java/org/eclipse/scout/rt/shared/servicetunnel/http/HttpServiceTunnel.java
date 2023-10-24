@@ -10,8 +10,14 @@
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -25,6 +31,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
+import org.eclipse.scout.rt.shared.http.HttpClientManager;
 import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
@@ -33,12 +40,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpResponse;
 
 /**
  * Abstract tunnel used to invoke a service through HTTP.
@@ -49,27 +50,27 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
 
   private IServiceTunnelContentHandler m_contentHandler;
-  private final URL m_serverUrl;
-  private final GenericUrl m_genericUrl;
+  private final URI m_serverUri;
   private final boolean m_active;
 
   public HttpServiceTunnel() {
-    this(getConfiguredServerUrl());
+    this(getConfiguredServerUri());
   }
 
-  public HttpServiceTunnel(URL url) {
-    m_serverUrl = url;
-    m_genericUrl = url != null ? new GenericUrl(url) : null;
-    m_active = url != null;
+  public HttpServiceTunnel(URI uri) {
+    m_serverUri = uri;
+    URL url = UriUtility.uriToUrl(uri);
+    m_active = uri != null
+        && ("http".equalsIgnoreCase(url.getProtocol()) || !"https".equalsIgnoreCase(url.getProtocol())); // fast check of wrong URL's for this tunnel
   }
 
-  protected static URL getConfiguredServerUrl() {
-    String url = BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue();
+  protected static URI getConfiguredServerUri() {
+    String uri = BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue();
     try {
-      return UriUtility.toUrl(url);
+      return UriUtility.toUri(uri);
     }
     catch (RuntimeException e) {
-      throw new IllegalArgumentException("targetUrl: " + url, e);
+      throw new IllegalArgumentException("targetUrl: " + uri, e);
     }
   }
 
@@ -78,12 +79,8 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     return m_active;
   }
 
-  public GenericUrl getGenericUrl() {
-    return m_genericUrl;
-  }
-
-  public URL getServerUrl() {
-    return m_serverUrl;
+  public URI getServerUri() {
+    return m_serverUri;
   }
 
   /**
@@ -97,26 +94,24 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
    *          write post data (if required)
    * @throws IOException
    *           override this method to customize the creation of the {@link HttpResponse} see
-   *           {@link #addCustomHeaders(HttpRequest, ServiceTunnelRequest, byte[])}
+   *           {@link #addCustomHeaders(HttpRequest.Builder, ServiceTunnelRequest, byte[])}
    */
-  protected HttpResponse executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException {
-    // fast check of wrong URL's for this tunnel
-    if (!"http".equalsIgnoreCase(getServerUrl().getProtocol()) && !"https".equalsIgnoreCase(getServerUrl().getProtocol())) {
-      throw new IOException("URL '" + getServerUrl().toString() + "' is not supported by this tunnel ('" + getClass().getName() + "').");
-    }
+  protected HttpResponse<InputStream> executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException, InterruptedException {
     if (!isActive()) {
       String key = BEANS.get(ServiceTunnelTargetUrlProperty.class).getKey();
-      throw new IllegalArgumentException("No target URL configured. Please specify a target URL in the config.properties using property '" + key + "'.");
+      throw new IllegalArgumentException("Unsupported or no target URL configured. Please specify a target URL in the config.properties using property '" + key + "'.");
     }
 
-    HttpRequestFactory requestFactory = getHttpTransportManager().getHttpRequestFactory();
-    HttpRequest request = requestFactory.buildPostRequest(getGenericUrl(), new ByteArrayContentEx(null, callData, false));
-    HttpHeaders headers = request.getHeaders();
-    headers.setCacheControl("no-cache");
-    headers.setContentType(getContentHandler().getContentType());
-    headers.put("Pragma", "no-cache");
-    addCustomHeaders(request, call, callData);
-    return request.execute();
+    HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(getServerUri())
+        .POST(BodyPublishers.ofByteArray(callData))
+        .header("Content-Type", getContentHandler().getContentType())
+        .header("Cache-Control", "no-cache")
+        .header("Pragma", "no-cache");
+    addCustomHeaders(requestBuilder, call, callData);
+
+    return BEANS.get(HttpClientManager.class).getHttpClient().send(
+        requestBuilder.build(),
+        BodyHandlers.ofInputStream());
   }
 
   /**
@@ -127,27 +122,24 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
-   * @param httpRequest
-   *          request object
-   * @param method
-   *          GET or POST override this method to add custom HTTP headers
+   * @param httpRequestBuilder
+   *          request builder
    * @param call
    *          request information
    * @param callData
    *          data as byte array
-   * @throws IOException
    * @since 6.0
    */
-  protected void addCustomHeaders(HttpRequest httpRequest, ServiceTunnelRequest call, byte[] callData) throws IOException {
-    addSignatureHeader(httpRequest, callData);
-    addCorrelationId(httpRequest);
+  protected void addCustomHeaders(HttpRequest.Builder httpRequestBuilder, ServiceTunnelRequest call, byte[] callData) throws IOException {
+    addSignatureHeader(httpRequestBuilder, callData);
+    addCorrelationId(httpRequestBuilder);
   }
 
-  protected void addSignatureHeader(HttpRequest httpRequest, byte[] callData) throws IOException {
+  protected void addSignatureHeader(HttpRequest.Builder httpRequestBuilder, byte[] callData) throws IOException {
     try {
       DefaultAuthToken token = BEANS.get(DefaultAuthTokenSigner.class).createDefaultSignedToken(DefaultAuthToken.class);
       if (token != null) {
-        httpRequest.getHeaders().put(TOKEN_AUTH_HTTP_HEADER, token.toString());
+        httpRequestBuilder.header(TOKEN_AUTH_HTTP_HEADER, token.toString());
       }
     }
     catch (RuntimeException e) {
@@ -158,10 +150,10 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   /**
    * Method invoked to add the <em>correlation ID</em> as HTTP header to the request.
    */
-  protected void addCorrelationId(final HttpRequest httpRequest) {
+  protected void addCorrelationId(final HttpRequest.Builder httpRequestBuilder) {
     final String cid = CorrelationId.CURRENT.get();
     if (cid != null) {
-      httpRequest.getHeaders().put(CorrelationId.HTTP_HEADER_NAME, cid);
+      httpRequestBuilder.header(CorrelationId.HTTP_HEADER_NAME, cid);
     }
   }
 
@@ -174,7 +166,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
-   * @param msgEncoder
+   * @param e
    *          that can encode and decode a request / response to and from the binary stream. Default is the
    *          {@link BinaryServiceTunnelContentHandler} which handles binary messages
    */

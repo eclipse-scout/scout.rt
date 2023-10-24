@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,7 +100,7 @@ public class HttpServiceTunnelNetworkTest {
   }
 
   @Test
-  public void testPostWithChunkedResponseAndSuccess() throws SecurityException {
+  public void testPostWithChunkedResponseAndSuccess() throws SecurityException, URISyntaxException {
     m_client.withSocketReadInterceptor(() -> new ISocketReadInterceptor() {
       @Override
       public int read(InputStream in, byte[] buf, int off, int len) throws IOException {
@@ -136,7 +137,7 @@ public class HttpServiceTunnelNetworkTest {
       }
     });
 
-    HttpServiceTunnel tunnel = new HttpServiceTunnel(m_server.getServletUrl()) {
+    HttpServiceTunnel tunnel = new HttpServiceTunnel(m_server.getServletUrl().toURI()) {
       @Override
       protected IHttpTransportManager getHttpTransportManager() {
         return m_client;
@@ -174,7 +175,7 @@ public class HttpServiceTunnelNetworkTest {
    * tunnel - calling {@link IRunMonitorCancelService#cancel(long)}.
    */
   @Test
-  public void testPostWithChunkedResponseThatIsCancelled() throws SecurityException {
+  public void testPostWithChunkedResponseThatIsCancelled() throws SecurityException, URISyntaxException {
     m_client.withSocketReadInterceptor(() -> new ISocketReadInterceptor() {
       int m_contentStart;
       int m_truncatedContentLength;
@@ -258,7 +259,7 @@ public class HttpServiceTunnelNetworkTest {
       }
     });
 
-    HttpServiceTunnel tunnel = new HttpServiceTunnel(m_server.getServletUrl()) {
+    HttpServiceTunnel tunnel = new HttpServiceTunnel(m_server.getServletUrl().toURI()) {
       @Override
       protected IHttpTransportManager getHttpTransportManager() {
         return m_client;
@@ -333,7 +334,7 @@ public class HttpServiceTunnelNetworkTest {
   }
 
   public interface IFixturePageService {
-    public String getGlobalSearchRowCount(String arg);
+    String getGlobalSearchRowCount(String arg);
   }
 
   @IgnoreBean

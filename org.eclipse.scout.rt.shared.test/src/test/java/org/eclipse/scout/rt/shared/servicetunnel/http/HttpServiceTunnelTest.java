@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
 import org.eclipse.scout.rt.shared.http.AbstractHttpTransportManager;
-import org.eclipse.scout.rt.shared.http.IHttpTransportBuilder;
 import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -42,9 +41,6 @@ public class HttpServiceTunnelTest {
 
   @BeanMock
   private ServiceTunnelTargetUrlProperty mockUrl;
-
-  @BeanMock
-  private IServiceTunnelContentHandler m_contentHandler;
 
   @Test
   public void testTunnel() throws IOException {
@@ -94,12 +90,6 @@ public class HttpServiceTunnelTest {
           public HttpRequestFactory getHttpRequestFactory() {
             return m_transport.createRequestFactory(createHttpRequestInitializer());
           }
-
-          @Override
-          public void interceptNewHttpTransport(IHttpTransportBuilder builder) {
-            // nop
-          }
-
         };
       }
     };
@@ -112,7 +102,7 @@ public class HttpServiceTunnelTest {
   @Test
   public void testNullUrlConfig() {
     HttpServiceTunnel tunnel = new HttpServiceTunnel();
-    assertNull(tunnel.getServerUrl());
+    assertNull(tunnel.getServerUri());
     assertFalse(tunnel.isActive());
   }
 
@@ -123,7 +113,7 @@ public class HttpServiceTunnelTest {
   public void testEmptyUrlConfig() {
     when(mockUrl.getValue()).thenReturn(" ");
     HttpServiceTunnel tunnel = new HttpServiceTunnel();
-    assertNull(tunnel.getServerUrl());
+    assertNull(tunnel.getServerUri());
     assertFalse(tunnel.isActive());
   }
 
@@ -140,7 +130,7 @@ public class HttpServiceTunnelTest {
   public void testValidUrlConfig() {
     when(mockUrl.getValue()).thenReturn("http://localhost");
     HttpServiceTunnel tunnel = new HttpServiceTunnel();
-    assertNotNull(tunnel.getServerUrl());
+    assertNotNull(tunnel.getServerUri());
     assertTrue(tunnel.isActive());
   }
 

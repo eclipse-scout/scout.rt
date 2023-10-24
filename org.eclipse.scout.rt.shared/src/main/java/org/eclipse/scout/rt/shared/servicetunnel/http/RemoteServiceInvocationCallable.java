@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.ConnectException;
+import java.net.http.HttpResponse;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -30,8 +31,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.api.client.http.HttpResponse;
 
 /**
  * This class is a {@link Callable} to invoke the service operation as described by {@link ServiceTunnelRequest}
@@ -74,33 +73,21 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       nBytes = requestData.length;
 
       // Send the request to the server.
-      HttpResponse resp = m_tunnel.executeRequest(m_serviceRequest, requestData);
-      try {
+      HttpResponse<InputStream> resp = m_tunnel.executeRequest(m_serviceRequest, requestData);
+      try (InputStream in = resp.body()) { // see javadoc of e HttpResponse.BodySubscribers.ofInputStream, stream must be closed in any case (even though we do not even want to start reading it)
         // Receive the response.
         m_tunnel.interceptHttpResponse(resp, m_serviceRequest);
-        if (resp.getStatusCode() != 0 && (resp.getStatusCode() < 200 || resp.getStatusCode() > 299)) {
-          return new ServiceTunnelResponse(new HttpServiceTunnelException(resp.getStatusCode(), "Service tunnel request failed with status code {}", resp.getStatusCode()));
+        if (resp.statusCode() != 0 && (resp.statusCode() < 200 || resp.statusCode() > 299)) {
+          return new ServiceTunnelResponse(new HttpServiceTunnelException(resp.statusCode(), "Service tunnel request failed with status code {}", resp.statusCode()));
         }
 
-        try (InputStream in = resp.getContent()) {
-          ServiceTunnelResponse response = m_tunnel.getContentHandler().readResponse(in);
-          if (response == null) {
-            return new ServiceTunnelResponse(new ProcessingException("Response contains no content")
-                .withContextInfo("http-status", "{} {}", resp.getStatusCode(), resp.getStatusMessage())
-                .withContextInfo("content-charset", resp.getContentCharset())
-                .withContextInfo("content-encoding", resp.getContentEncoding())
-                .withContextInfo("content-type", resp.getContentType())
-                .withContextInfo("http-headers", resp.getHeaders() + ""));
-          }
-          return response;
+        ServiceTunnelResponse response = m_tunnel.getContentHandler().readResponse(in);
+        if (response == null) {
+          return new ServiceTunnelResponse(new ProcessingException("Response contains no content")
+              .withContextInfo("http-status", "{}", resp.statusCode())
+              .withContextInfo("http-headers", resp.headers() + ""));
         }
-      }
-      finally {
-        // response must always be disconnected even if an exception occurs during intermediate methods or
-        // an intermediate ServiceTunnelResponse is returned, for successful responses it is actually already
-        // disconnected as input stream close also disconnects the response, but a final call to disconnect in
-        // any case should not be harmful
-        resp.disconnect();
+        return response;
       }
     }
     catch (IOException e) {
@@ -121,7 +108,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       }
       else if (e instanceof ConnectException) { // NOSONAR
         // only single line logging for ConnectException (server not ready yet)
-        LOG.error("Connection to {} failed: {}", m_tunnel.getServerUrl(), e.getLocalizedMessage());
+        LOG.error("Connection to {} failed: {}", m_tunnel.getServerUri(), e.getLocalizedMessage());
         PlatformException pe = new PlatformException("Connection failed");
         pe.consume();
         return new ServiceTunnelResponse(pe);
