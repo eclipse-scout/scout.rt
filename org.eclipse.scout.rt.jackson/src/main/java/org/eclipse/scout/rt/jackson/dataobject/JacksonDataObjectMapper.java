@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -133,7 +134,8 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     prepareScoutDataModuleContext(scoutDataObjectModule.getModuleContext());
     om.registerModule(scoutDataObjectModule);
     om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // FIXME [9.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
-    om.disableDefaultTyping(); // disabled for security reasons
+    om.deactivateDefaultTyping(); // disabled for security reasons
+    om.enable(MapperFeature.BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES); // enabled block-unsafe for security reasons
     return om;
   }
 

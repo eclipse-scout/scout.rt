@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -56,6 +57,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.logging.IUiRunContextDiagnostics;
@@ -172,7 +174,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         return;
       }
       catch (RejectedResourceException e) { // NOSONAR
-        // verifyFileName and verifyFileIntegrity are the only methods throwing this exception
+        // verifyFileName and verifyFileIntegrity and maxFileCount are the only methods throwing this exception
         //mark resources as FAILED
         uploadResources = null;
         uploadProperties = null;
@@ -219,7 +221,14 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     ServletFileUpload upload = new ServletFileUpload();
     upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
     upload.setSizeMax(uploadable.getMaximumUploadSize());
+    upload.setFileCountMax(CONFIG.getPropertyValue(UiHtmlConfigProperties.MaxUploadFileCountProperty.class));
+    int fileCount = 0;
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
+      fileCount++;
+      //the first entry in an upload multipart is typically a "rowId" entry. be tolerant with one more file.
+      if (upload.getFileCountMax() > 0 && (fileCount - 1) > upload.getFileCountMax()) {
+        throw new RejectedResourceException("Too many files ({}).", fileCount);
+      }
       FileItemStream item = it.next();
       String filename = item.getName();
       if (StringUtility.hasText(filename)) {
