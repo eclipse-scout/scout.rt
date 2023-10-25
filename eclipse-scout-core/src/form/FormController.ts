@@ -195,8 +195,8 @@ export class FormController implements FormControllerModel, ObjectWithType {
     }
 
     let desktop = this.session.desktop;
-    dialog.on('remove', () => {
-      let formToActivate = this._findFormToActivateAfterDialogRemove();
+    dialog.on('remove', e => {
+      let formToActivate = this._findFormToActivateAfterDialogRemove(e.source);
       if (formToActivate) {
         desktop._setFormActivated(formToActivate);
       } else {
@@ -220,9 +220,10 @@ export class FormController implements FormControllerModel, ObjectWithType {
     }
   }
 
-  protected _findFormToActivateAfterDialogRemove(): Form {
-    if (this.displayParent.dialogs.length > 0) {
-      return this.displayParent.dialogs[this.displayParent.dialogs.length - 1];
+  protected _findFormToActivateAfterDialogRemove(removedDialog: Form): Form {
+    const dialogs = this.displayParent.dialogs.filter(d => d !== removedDialog);
+    if (dialogs.length > 0) {
+      return dialogs[dialogs.length - 1];
     }
     if (this.displayParent instanceof Form && !this.displayParent.detailForm) {
       // activate display parent, but not if it is the detail form

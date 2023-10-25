@@ -116,7 +116,7 @@ public class JmsConnectionWrapper {
   }
 
   public boolean isConnected() {
-    return !m_closing.get() && m_impl != null;
+    return !isClosing() && m_impl != null;
   }
 
   public void close() {
@@ -124,31 +124,30 @@ public class JmsConnectionWrapper {
       return;
     }
     //this thread is closing
-    synchronized (m_connectionFunction) {
-      //close all sessions
-      int n = m_sessionWrappers.size();
-      LOG.info("close {} connection and {} sessions", m_impl != null ? 1 : 0, n);
-      int i = 0;
-      for (JmsSessionProviderWrapper s : m_sessionWrappers.keySet()) {
-        i++;
-        LOG.info("closing session {} of {}", i, n);
-        s.close();
-      }
-      //close real connection
-      if (m_impl == null) {
-        return;
-      }
-      try {
-        LOG.info("closing connection");
-        m_impl.close();
-        LOG.info("connection closed");
-      }
-      catch (JMSException e) {
-        BEANS.get(MomExceptionHandler.class).handle(e);
-      }
-      finally {
-        m_impl = null;
-      }
+    Connection tmp = m_impl;
+    //close all sessions
+    int n = m_sessionWrappers.size();
+    LOG.info("close {} connection and {} sessions", tmp != null ? 1 : 0, n);
+    int i = 0;
+    for (JmsSessionProviderWrapper s : m_sessionWrappers.keySet()) {
+      i++;
+      LOG.info("closing session {} of {}", i, n);
+      s.close();
+    }
+    //close real connection
+    if (tmp == null) {
+      return;
+    }
+    try {
+      LOG.info("closing connection");
+      tmp.close();
+      LOG.info("connection closed");
+    }
+    catch (JMSException e) {
+      BEANS.get(MomExceptionHandler.class).handle(e);
+    }
+    finally {
+      m_impl = null;
     }
   }
 
@@ -160,6 +159,7 @@ public class JmsConnectionWrapper {
       return;
     }
 
+    //noinspection SynchronizeOnNonFinalField
     synchronized (m_connectionFunction) {
       if (m_impl != affectedConnection) {
         return;
@@ -203,7 +203,6 @@ public class JmsConnectionWrapper {
    * @return the current connection, may block until a connection is available
    *         <p>
    *         Do not keep references to this value, it may change after reconnect attempts.
-   * @throws JMSException
    */
   public Connection getConnection() throws JMSException {
     int retry = 0;
@@ -220,14 +219,15 @@ public class JmsConnectionWrapper {
   }
 
   protected Connection tryConnection() throws JMSException {
+    //noinspection SynchronizeOnNonFinalField
     synchronized (m_connectionFunction) {
       if (isClosing()) {
         throw new ProcessingException("closed");
       }
-      if (m_impl != null) {
-        return m_impl;
+      Connection tmp = m_impl;
+      if (tmp != null) {
+        return tmp;
       }
-      Connection tmp = null;
       try {
         tmp = m_connectionFunction.create();
         if (isClosing()) {
@@ -243,6 +243,9 @@ public class JmsConnectionWrapper {
             }
             BEANS.get(MomExceptionHandler.class).handle(e1);
           });
+        }
+        if (isClosing()) {
+          throw new ProcessingException("closed");
         }
         //success
         m_impl = tmp;
@@ -265,8 +268,6 @@ public class JmsConnectionWrapper {
 
   /**
    * Check if retry should be done and wait some time
-   *
-   * @throws JMSException
    */
   protected void waitForRetry(int retry, JMSException e) throws JMSException {
     if (retry > m_connectionRetryCount) {

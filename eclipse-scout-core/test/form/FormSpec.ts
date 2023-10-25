@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
-  App, CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, NotificationBadgeStatus, NullWidget, NumberField, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session,
-  SplitBox, Status, StringField, TabBox, TabItem, webstorage, WrappedFormField
+  App, CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox,
+  Session, SplitBox, Status, StringField, TabBox, TabItem, webstorage, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -1833,6 +1833,7 @@ describe('Form', () => {
 
   describe('error', () => {
 
+    let originalErrorHandlerSession: Session;
     let form: FixtureErrorForm;
     let catchCalled: boolean;
 
@@ -1875,14 +1876,21 @@ describe('Form', () => {
           objectType: GroupBox
         }
       });
+      // add the session to the error handler in order to show message boxes for errors
+      originalErrorHandlerSession = App.get().errorHandler.session;
+      App.get().errorHandler.session = session;
       spyOn(App.get().errorHandler, 'handleErrorInfo').and.callThrough();
     });
 
     afterEach(() => {
+      // reset session of the error handler
+      App.get().errorHandler.session = originalErrorHandlerSession;
       jasmine.clock().uninstall();
     });
 
     it('is automatically handled in load', done => {
+      expect(session.desktop.busy).toBe(false);
+
       form.throwInLoad = true;
       form.load()
         .then(fail)
@@ -1895,6 +1903,17 @@ describe('Form', () => {
           expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
           done();
         });
+
+      jasmine.clock().tick(1000);
+
+      const messageBoxes = helper.findMessageBoxes();
+      expect(messageBoxes.size).toBe(1);
+      expect(session.desktop.busy).toBe(false);
+
+      const messageBox: MessageBox = messageBoxes.values().next().value;
+      expect(messageBox.$container.children('.glasspane').length).toBe(0); // not blocked
+
+      helper.closeMessageBoxes();
       jasmine.clock().tick(1000);
     });
 
@@ -1911,6 +1930,8 @@ describe('Form', () => {
     });
 
     it('is automatically handled in save', done => {
+      expect(session.desktop.busy).toBe(false);
+
       form.throwInSave = true;
       form.load()
         .then(() => {
@@ -1929,6 +1950,17 @@ describe('Form', () => {
             });
         })
         .catch(fail);
+
+      jasmine.clock().tick(1000);
+
+      const messageBoxes = helper.findMessageBoxes();
+      expect(messageBoxes.size).toBe(1);
+      expect(session.desktop.busy).toBe(false);
+
+      const messageBox: MessageBox = messageBoxes.values().next().value;
+      expect(messageBox.$container.children('.glasspane').length).toBe(0); // not blocked
+
+      helper.closeMessageBoxes();
       jasmine.clock().tick(1000);
     });
 

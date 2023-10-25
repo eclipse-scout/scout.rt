@@ -9,35 +9,15 @@
  */
 package org.eclipse.scout.rt.dataobject.config;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
-import org.eclipse.scout.rt.dataobject.DoEntity;
-import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
-import org.eclipse.scout.rt.dataobject.IDataObject;
-import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IgnoreBean;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
-import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,189 +27,101 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class DataObjectJsonPropertyReaderTest {
 
-  private static final List<IBean<?>> s_beans = new ArrayList<>();
-
-  private static final Map<String, Supplier<? extends IDoEntity>> m_propertyValueToDoEntityMap = new HashMap<>();
-
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    s_beans.addAll(BEANS.get(BeanTestingHelper.class).registerBeans(new BeanMetaData(TestingDataObjectMapper.class)));
-  }
-
-  @Before
-  public void before() {
-    m_propertyValueToDoEntityMap.clear();
-  }
-
-  @AfterClass
-  public static void afterClass() throws Exception {
-    BEANS.get(BeanTestingHelper.class).unregisterBeans(s_beans);
+  @Test
+  public void testNullArgument() {
+    assertNull(read(null));
   }
 
   @Test
-  public void testNullArgument() throws Exception {
-    Map<String, String> actualResult = new DataObjectJsonPropertyReader().readJsonPropertyValue(null);
-    assertThat(actualResult, is(nullValue()));
+  public void testEmptyArgument() {
+    assertEquals(Collections.emptyMap(), read(""));
   }
 
   @Test
-  public void testEmptyStringArgument() throws Exception {
-    testReadJsonPropertyValue(
-        "",
-        () -> {
-          throw new RuntimeException("Data object mapper called with an empty string argument. Handle empty string arguments separately, don't pass to the data object mapper.");
-        },
-        Collections.emptyMap());
+  public void testSingleStringArgument() {
+    assertThrows(RuntimeException.class, () -> read("a"));
   }
 
   @Test
-  public void testReadEmptyJsonObjectString() throws Exception {
-    testReadJsonPropertyValue(
-        "{}",
-        () -> BEANS.get(DoEntity.class),
-        Collections.emptyMap());
+  public void testSingleBooleanArgument() {
+    assertThrows(RuntimeException.class, () -> read("true"));
   }
 
   @Test
-  public void testReadJsonObjectWithSingleEmptyStringProperty() throws Exception {
-    testReadJsonPropertyValue(
-        "{\"testKey\": \"\"}",
-        () -> BEANS.get(DoEntityBuilder.class)
-            .put("testKey", "")
-            .build(),
-        CollectionUtility.hashMap(
-            new ImmutablePair<>("testKey", "")));
+  public void testSingleIntegerArgument() {
+    assertThrows(RuntimeException.class, () -> read("1"));
   }
 
   @Test
-  public void testReadJsonObjectWithSingleStringProperty() throws Exception {
-    testReadJsonPropertyValue(
-        "{\"testKey\": \"testValue\"}",
-        () -> BEANS.get(DoEntityBuilder.class)
-            .put("testKey", "testValue")
-            .build(),
-        CollectionUtility.hashMap(
-            new ImmutablePair<>("testKey", "testValue")));
+  public void testSingleQuotedStringArgument() {
+    assertThrows(RuntimeException.class, () -> read("\"a\""));
   }
 
   @Test
-  public void testReadJsonObjectWithMultipleStringProperties() throws Exception {
-    testReadJsonPropertyValue(
-        "{\"testKey1\": \"testValue1\", \"testKey2\": \"testValue2\"}",
-        () -> BEANS.get(DoEntityBuilder.class)
-            .put("testKey1", "testValue1")
-            .put("testKey2", "testValue2")
-            .build(),
-        CollectionUtility.hashMap(
-            new ImmutablePair<>("testKey1", "testValue1"),
-            new ImmutablePair<>("testKey2", "testValue2")));
+  public void testReadEmptyJsonObjectString() {
+    assertEquals(Collections.emptyMap(), read("{}"));
   }
 
   @Test
-  public void testReadJsonObjectWithPropertyWithNullValue() throws Exception {
-    testReadJsonPropertyValue(
-        "{\"testKey1\": null, \"testKey2\": \"testValue2\"}",
-        () -> BEANS.get(DoEntityBuilder.class)
-            .put("testKey1", null)
-            .put("testKey2", "testValue2")
-            .build(),
-        CollectionUtility.hashMap(
-            new ImmutablePair<>("testKey1", null),
-            new ImmutablePair<>("testKey2", "testValue2")));
+  public void testReadJsonObjectWithSingleEmptyStringProperty() {
+    assertEquals(Map.of("testKey", ""), read("{\"testKey\": \"\"}"));
   }
 
   @Test
-  public void testReadJsonObjectWithIntegerProperty() throws Exception {
-    testReadJsonPropertyValue(
-        "{\"testKey1\": 1, \"testKey2\": \"testValue2\"}",
-        () -> BEANS.get(DoEntityBuilder.class)
-            .put("testKey1", 1)
-            .put("testKey2", "testValue2")
-            .build(),
-        CollectionUtility.hashMap(
-            new ImmutablePair<>("testKey1", "1"),
-            new ImmutablePair<>("testKey2", "testValue2")));
+  public void testReadJsonObjectWithSingleStringProperty() {
+    assertEquals(Map.of("testKey", "testValue"), read("{\"testKey\": \"testValue\"}"));
   }
 
   @Test
-  public void testReadJsonObjectWithBooleanProperty() throws Exception {
-    testReadJsonPropertyValue(
-        "{\"testKey1\": true, \"testKey2\": \"testValue2\"}",
-        () -> BEANS.get(DoEntityBuilder.class)
-            .put("testKey1", true)
-            .put("testKey2", "testValue2")
-            .build(),
-        CollectionUtility.hashMap(
-            new ImmutablePair<>("testKey1", "true"),
-            new ImmutablePair<>("testKey2", "testValue2")));
+  public void testReadJsonObjectWithMultipleStringProperties() {
+    assertEquals(Map.of(
+        "testKey1", "testValue1",
+        "testKey2", "testValue2"),
+        read("{\"testKey1\": \"testValue1\", \"testKey2\": \"testValue2\"}"));
   }
 
   @Test
-  public void testReadJsonObjectWithDoubleProperty() throws Exception {
-    testReadJsonPropertyValue(
-        "{\"testKey1\": 1.2, \"testKey2\": \"testValue2\"}",
-        () -> BEANS.get(DoEntityBuilder.class)
-            .put("testKey1", 1.2)
-            .put("testKey2", "testValue2")
-            .build(),
-        CollectionUtility.hashMap(
-            new ImmutablePair<>("testKey1", "1.2"),
-            new ImmutablePair<>("testKey2", "testValue2")));
+  public void testReadJsonObjectWithPropertyWithNullValue() {
+    assertEquals(CollectionUtility.hashMap( // Map.of cannot be used with a null value
+        ImmutablePair.of("testKey1", null),
+        ImmutablePair.of("testKey2", "testValue2")),
+        read("{\"testKey1\": null, \"testKey2\": \"testValue2\"}"));
   }
 
   @Test
-  public void testReadJsonObjectWithJsonStringProperty() throws Exception {
-    testReadJsonPropertyValue(
-        "{\"testKey1\": {\"subKey1\": \"subValue1\", \"subKey2\": \"subValue2\"}, \"testKey2\": [\"testValue2Sub1\", \"testValue2Sub2\", \"testValue2Sub3\"]}",
-        () -> BEANS.get(DoEntityBuilder.class)
-            .put("testKey1", "{\"subKey1\": \"subValue1\", \"subKey2\": \"subValue2\"}")
-            .put("testKey2", "[\"testValue2Sub1\", \"testValue2Sub2\", \"testValue2Sub3\"]")
-            .build(),
-        CollectionUtility.hashMap(
-            new ImmutablePair<>("testKey1", "{\"subKey1\": \"subValue1\", \"subKey2\": \"subValue2\"}"),
-            new ImmutablePair<>("testKey2", "[\"testValue2Sub1\", \"testValue2Sub2\", \"testValue2Sub3\"]")));
+  public void testReadJsonObjectWithIntegerProperty() {
+    assertEquals(Map.of(
+        "testKey1", "1",
+        "testKey2", "testValue2"),
+        read("{\"testKey1\": 1, \"testKey2\": \"testValue2\"}"));
   }
 
-  protected void testReadJsonPropertyValue(String json, Supplier<? extends IDoEntity> dataObjectMapperResultSupplier, Map<String, String> expectedValue) {
-    m_propertyValueToDoEntityMap.put(json, dataObjectMapperResultSupplier);
-    Map<String, String> actualValue = new DataObjectJsonPropertyReader().readJsonPropertyValue(json);
-    assertThat(actualValue, is(expectedValue));
+  @Test
+  public void testReadJsonObjectWithBooleanProperty() {
+    assertEquals(Map.of(
+        "testKey1", "true",
+        "testKey2", "testValue2"),
+        read("{\"testKey1\": true, \"testKey2\": \"testValue2\"}"));
   }
 
-  @IgnoreBean
-  public static class TestingDataObjectMapper implements IDataObjectMapper {
+  @Test
+  public void testReadJsonObjectWithDoubleProperty() {
+    assertEquals(Map.of(
+        "testKey1", "1.2",
+        "testKey2", "testValue2"),
+        read("{\"testKey1\": 1.2, \"testKey2\": \"testValue2\"}"));
+  }
 
-    @Override
-    public <T> T readValue(InputStream inputStream, Class<T> valueType) {
-      throw new UnsupportedOperationException();
-    }
+  @Test
+  @Ignore // unsupported, Objects#toString is applied on all map values, which will result in an unwanted representation if map value are data objects again
+  public void testReadJsonObjectWithJsonStringProperty() {
+    assertEquals(Map.of(
+        "testKey1", "{\"subKey1\": \"subValue1\",\"subKey2\": \"subValue2\"}",
+        "testKey2", "[\"testValue2Sub1\", \"testValue2Sub2\", \"testValue2Sub3\"]"),
+        read("{\"testKey1\": {\"subKey1\": \"subValue1\", \"subKey2\": \"subValue2\"}, \"testKey2\": [\"testValue2Sub1\", \"testValue2Sub2\", \"testValue2Sub3\"]}"));
+  }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T readValue(String value, Class<T> valueType) {
-      Assertions.assertTrue(IDoEntity.class.equals(valueType), "Only valueType of {} is supported.", DoEntity.class);
-      Assertions.assertTrue(m_propertyValueToDoEntityMap.containsKey(value), "Prepare mapping for value {} before using this {}.", value, this.getClass());
-      return (T) m_propertyValueToDoEntityMap.get(value).get();
-    }
-
-    @Override
-    public IDataObject readValueRaw(InputStream inputStream) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public IDataObject readValueRaw(String value) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void writeValue(OutputStream outputStream, Object value) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String writeValue(Object value) {
-      throw new UnsupportedOperationException();
-    }
+  protected Map<String, String> read(String propertyValue) {
+    return new DataObjectJsonPropertyReader().readJsonPropertyValue(propertyValue);
   }
 }

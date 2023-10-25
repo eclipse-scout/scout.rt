@@ -498,6 +498,10 @@ public final class SecurityUtility {
   }
 
   public static void main(String[] args) {
-    System.out.println(new SecurityUtility());
+    // do not change the behavior of this method: it is part of the documentation that new key pairs should be generated using this main function.
+    KeyPairBytes keyPair = generateKeyPair();
+    System.out.format("base64 encoded key pair:%n  private key: %s%n  public key:  %s%n",
+        Base64Utility.encode(keyPair.getPrivateKey()),
+        Base64Utility.encode(keyPair.getPublicKey()));
   }
 }
