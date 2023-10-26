@@ -482,10 +482,10 @@ export class Calendar extends Widget implements CalendarModel {
     this.modesMenu.render(this.$commands);
     this.$commands.appendDiv('calendar-toggle-year')
       .on('click', this._onYearClick.bind(this));
-    this.$commands.appendDiv('calendar-toggle-list')
-      .on('click', this._onListClick.bind(this));
     this.$commands.appendDiv('calendar-toggle-calendars')
       .on('click', this._onCalendarsClick.bind(this));
+    this.$commands.appendDiv('calendar-toggle-list')
+      .on('click', this._onListClick.bind(this));
 
     // Append the top grid (day/week views)
     let $weekHeader = this.$topGrid.appendDiv('calendar-week-header');
@@ -2171,7 +2171,11 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _findSelectedCalendarColumn(selectedDate: Date): JQuery {
     let calendarId = this.selectedCalendar ? this.selectedCalendar.calendarId : 'default';
-    return this._findDayInCalendar(selectedDate)
+    let $day = this._findDayInCalendar(selectedDate);
+    if (!$day) {
+      return null;
+    }
+    return $day
       .find('.calendar-column')
       .filter((i, e) => $(e).data('calendarId') === calendarId);
   }
