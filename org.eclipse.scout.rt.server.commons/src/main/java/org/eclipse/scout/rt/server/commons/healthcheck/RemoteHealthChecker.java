@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.RemoteHealthCheckUrlsProperty;
 import org.eclipse.scout.rt.shared.http.DefaultHttpTransportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -30,6 +33,8 @@ import com.google.api.client.http.HttpResponse;
  * @since 6.1
  */
 public class RemoteHealthChecker extends AbstractHealthChecker {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RemoteHealthChecker.class);
 
   private final List<String> m_remoteUrls;
 
@@ -48,25 +53,30 @@ public class RemoteHealthChecker extends AbstractHealthChecker {
   }
 
   @Override
-  protected boolean execCheckHealth(HealthCheckCategoryId category) throws Exception {
-    boolean status = true;
+  protected boolean execCheckHealth(HealthCheckCategoryId category) {
     if (m_remoteUrls != null) {
       for (String remote : m_remoteUrls) {
         GenericUrl remoteUrl = remote != null ? new GenericUrl(remote) : null;
         if (remoteUrl != null && category != null) {
           remoteUrl.put(HealthCheckServlet.QUERY_PARAMETER_NAME_CATEGORY, category.unwrap());
         }
-        HttpRequest req = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildHeadRequest(remoteUrl);
-        req.getHeaders().setCacheControl("no-cache");
-        HttpResponse resp = req.execute();
-        int statusCode = resp.getStatusCode();
-        if (statusCode < 200 || statusCode >= 400) {
-          status = false;
-          break;
+        try {
+          HttpRequest req = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildHeadRequest(remoteUrl);
+          req.getHeaders().setCacheControl("no-cache");
+          HttpResponse resp = req.execute();
+          int statusCode = resp.getStatusCode();
+          if (statusCode < 200 || statusCode >= 400) {
+            return false;
+          }
+        }
+        catch (IOException e) {
+          //noinspection PlaceholderCountMatchesArgumentCount
+          LOG.info("{} failed, message={}", getName(), e.getMessage(), LOG.isDebugEnabled() ? e : null);
+          return false;
         }
       }
     }
-    return status;
+    return true;
   }
 
   @Override
