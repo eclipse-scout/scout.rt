@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.hc.core5.http.NoHttpResponseException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
@@ -144,57 +145,6 @@ public class HttpRetryTest {
   }
 
   /**
-   * Expect retry on apache level
-   */
-  @Test
-  public void testPostWithUnsupportedRetryAndFailureWhileHeadersAreSent() throws IOException {
-    //emulate a header write error
-    AtomicInteger count = new AtomicInteger(1);
-    m_client.withRequestInterceptor(
-        (request, conn, context, superCall) -> {
-          if (count.getAndIncrement() < 2) {
-            conn.close();
-          }
-          return superCall.call();
-        });
-
-    HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
-      @Override
-      public void writeTo(OutputStream out) throws IOException {
-        out.write("bar".getBytes());
-      }
-
-      @Override
-      public boolean retrySupported() {
-        return false;
-      }
-
-      @Override
-      public String getType() {
-        return "text/plain;charset=UTF-8";
-      }
-
-      @Override
-      public long getLength() {
-        return 3;
-      }
-    });
-    req.getHeaders().set(CORRELATION_ID, "02");
-    HttpResponse resp = req.execute();
-    byte[] bytes;
-    try (InputStream in = resp.getContent()) {
-      bytes = IOUtility.readBytes(in);
-    }
-    String text = new String(bytes, StandardCharsets.UTF_8).trim();
-    assertEquals(text, "Post bar");
-    assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
-    assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
-    assertEquals(Arrays.asList("02"), servletPostLog);
-    assertNull(servletPostError);
-  }
-
-  /**
    * Expect no-retry on apache and google level
    */
   @Test
@@ -232,7 +182,7 @@ public class HttpRetryTest {
     try {
       req.execute();
     }
-    catch (org.apache.http.client.ClientProtocolException e) {
+    catch (SocketException e) {
       //the request was partially sent, resulting in a servlet side org.eclipse.jetty.io.EofException: Early EOF
       // awaiting completion of that exception
       for (int i = 0; i < 100 && servletPostError == null; i++) {
@@ -289,7 +239,7 @@ public class HttpRetryTest {
     try {
       req.execute();
     }
-    catch (org.apache.http.NoHttpResponseException e) {
+    catch (NoHttpResponseException e) {
       assertEquals(Arrays.asList(), servletPostLog);
       assertNull(servletPostError);
       return;
@@ -377,9 +327,7 @@ public class HttpRetryTest {
       }
     });
     req.getHeaders().set(CORRELATION_ID, "06");
-    servletFailOnce = (hreq, hresp) -> {
-      hresp.sendError(400);
-    };
+    servletFailOnce = (hreq, hresp) -> hresp.sendError(400);
     req.setThrowExceptionOnExecuteError(false);
     HttpResponse resp = req.execute();
     assertEquals(400, resp.getStatusCode());

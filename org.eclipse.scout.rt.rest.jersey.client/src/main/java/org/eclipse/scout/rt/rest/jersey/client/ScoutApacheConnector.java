@@ -30,46 +30,47 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.HttpConnectionFactory;
-import org.apache.http.conn.ManagedHttpClientConnection;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.ProxyAuthenticationStrategy;
-import org.apache.http.impl.conn.DefaultHttpResponseParserFactory;
-import org.apache.http.impl.conn.ManagedHttpClientConnectionFactory;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
-import org.apache.http.impl.io.DefaultHttpRequestWriterFactory;
-import org.apache.http.protocol.HTTP;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.ConnectionConfig.Builder;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.impl.DefaultAuthenticationStrategy;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.ManagedHttpClientConnectionFactory;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.client5.http.io.ManagedHttpClientConnection;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.protocol.RedirectLocations;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.LayeredConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HeaderElements;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.impl.io.DefaultHttpRequestWriterFactory;
+import org.apache.hc.core5.http.io.HttpConnectionFactory;
+import org.apache.hc.core5.http.io.entity.AbstractHttpEntity;
+import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
+import org.apache.hc.core5.util.TimeValue;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -122,7 +123,6 @@ public class ScoutApacheConnector implements Connector {
     SSLContext sslContext = client.getSslContext();
     clientBuilder.setConnectionManager(createConnectionManager(client, config, sslContext));
     clientBuilder.setConnectionManagerShared(isConnectionManagerShared());
-    clientBuilder.setSSLContext(sslContext);
 
     // (2) setup proxy configuration
     initProxyConfig(config, clientBuilder);
@@ -155,13 +155,13 @@ public class ScoutApacheConnector implements Connector {
       sslConnectionSocketFactory = new SSLConnectionSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault(), sslProtocols, sslCipherSuites, hostnameVerifier);
     }
 
-    HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection> connFactory = null;
+    HttpConnectionFactory<ManagedHttpClientConnection> connFactory = null;
     IRestHttpRequestUriEncoder uriEncoder = (IRestHttpRequestUriEncoder) config.getProperty(RestClientProperties.REQUEST_URI_ENCODER);
     if (uriEncoder != null) {
       // explicitly create connection factory to replace default LineFormatter
-      connFactory = new ManagedHttpClientConnectionFactory(
-          new DefaultHttpRequestWriterFactory(new LineFormatterWithUriEncoder(uriEncoder)),
-          DefaultHttpResponseParserFactory.INSTANCE);
+      connFactory = ManagedHttpClientConnectionFactory.builder()
+          .requestWriterFactory(new DefaultHttpRequestWriterFactory(new LineFormatterWithUriEncoder(uriEncoder)))
+          .build();
     }
 
     final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
@@ -169,11 +169,14 @@ public class ScoutApacheConnector implements Connector {
             .register("http", PlainConnectionSocketFactory.getSocketFactory())
             .register("https", sslConnectionSocketFactory)
             .build(),
-        connFactory, null, null, getKeepAliveTimeoutMillis(), TimeUnit.MILLISECONDS);
+        null, null, TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis()), connFactory);
+
+    Builder connectionConfigBuilder = ConnectionConfig.custom()
+        .setTimeToLive(TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis()));
 
     final int validateAfterInactivityMillis = getValidateAfterInactivityMillis();
     if (validateAfterInactivityMillis > 0) {
-      connectionManager.setValidateAfterInactivity(validateAfterInactivityMillis);
+      connectionConfigBuilder.setValidateAfterInactivity(validateAfterInactivityMillis, TimeUnit.MILLISECONDS);
     }
 
     final int maxTotal = getMaxConnectionsTotal();
@@ -186,6 +189,7 @@ public class ScoutApacheConnector implements Connector {
       connectionManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
     }
 
+    connectionManager.setDefaultConnectionConfig(connectionConfigBuilder.build());
     return connectionManager;
   }
 
@@ -245,17 +249,17 @@ public class ScoutApacheConnector implements Connector {
     Object proxyUri = config.getProperty(RestClientProperties.PROXY_URI);
     if (proxyUri != null) {
       URI uri = parseProxyUri(proxyUri);
-      HttpHost proxy = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+      HttpHost proxy = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
       String userName = ClientProperties.getValue(config.getProperties(), RestClientProperties.PROXY_USERNAME, String.class);
       if (userName != null) {
         String password = ClientProperties.getValue(config.getProperties(), RestClientProperties.PROXY_PASSWORD, String.class);
         if (password != null) {
-          CredentialsProvider credsProvider = new BasicCredentialsProvider();
+          BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
           credsProvider.setCredentials(
               new AuthScope(uri.getHost(), uri.getPort()),
-              new UsernamePasswordCredentials(userName, password));
+              new UsernamePasswordCredentials(userName, password.toCharArray()));
           clientBuilder.setDefaultCredentialsProvider(credsProvider);
-          clientBuilder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+          clientBuilder.setProxyAuthenticationStrategy(DefaultAuthenticationStrategy.INSTANCE);
         }
       }
       clientBuilder.setProxy(proxy);
@@ -285,7 +289,7 @@ public class ScoutApacheConnector implements Connector {
       requestConfigBuilder.setCookieSpec(cookieSpec);
     }
     else {
-      requestConfigBuilder.setCookieSpec(CookieSpecs.IGNORE_COOKIES);
+      requestConfigBuilder.setCookieSpec(StandardCookieSpec.IGNORE);
     }
     return enableCookies;
   }
@@ -299,7 +303,7 @@ public class ScoutApacheConnector implements Connector {
     return null;
   }
 
-  protected RequestConfig buildRequestConfig(Builder requestConfigBuilder) {
+  protected RequestConfig buildRequestConfig(RequestConfig.Builder requestConfigBuilder) {
     return requestConfigBuilder.build();
   }
 
@@ -321,25 +325,25 @@ public class ScoutApacheConnector implements Connector {
     IRegistrationHandle cancellableHandle = registerCancellable(clientRequest, request);
 
     try {
-      CloseableHttpResponse response;
+      ClassicHttpResponse response;
       HttpClientContext context = HttpClientContext.create();
 
-      HttpHost target = new HttpHost(request.getURI().getHost(), request.getURI().getPort(), request.getURI().getScheme());
+      HttpHost target = new HttpHost(request.getUri().getScheme(), request.getUri().getHost(), request.getUri().getPort());
       //noinspection resource (will be closed by ClosingInputStream in ClientResponse)
-      response = m_client.execute(target, request, context);
+      response = m_client.executeOpen(target, request, context);
       HeaderUtils.checkHeaderChanges(clientHeadersSnapshot, clientRequest.getHeaders(), this.getClass().getName(), clientRequest.getConfiguration());
 
-      Response.StatusType status = response.getStatusLine().getReasonPhrase() == null
-          ? Statuses.from(response.getStatusLine().getStatusCode())
-          : Statuses.from(response.getStatusLine().getStatusCode(), response.getStatusLine().getReasonPhrase());
+      Response.StatusType status = response.getReasonPhrase() == null
+          ? Statuses.from(response.getCode())
+          : Statuses.from(response.getCode(), response.getReasonPhrase());
 
       ClientResponse responseContext = new ClientResponse(status, clientRequest);
-      List<URI> redirectLocations = context.getRedirectLocations();
-      if (redirectLocations != null && !redirectLocations.isEmpty()) {
+      RedirectLocations redirectLocations = context.getRedirectLocations();
+      if (redirectLocations != null && redirectLocations.size() > 0) {
         responseContext.setResolvedRequestUri(redirectLocations.get(redirectLocations.size() - 1));
       }
 
-      Header[] respHeaders = response.getAllHeaders();
+      Header[] respHeaders = response.getHeaders();
       MultivaluedMap<String, String> headers = responseContext.getHeaders();
       for (Header header : respHeaders) {
         String headerName = header.getName();
@@ -357,9 +361,9 @@ public class ScoutApacheConnector implements Connector {
           headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(entity.getContentLength()));
         }
 
-        Header contentEncoding = entity.getContentEncoding();
+        String contentEncoding = entity.getContentEncoding();
         if (headers.get(HttpHeaders.CONTENT_ENCODING) == null && contentEncoding != null) {
-          headers.add(HttpHeaders.CONTENT_ENCODING, contentEncoding.getValue());
+          headers.add(HttpHeaders.CONTENT_ENCODING, contentEncoding);
         }
       }
       responseContext.setEntityStream(getResponseInputStream(request, response));
@@ -374,9 +378,9 @@ public class ScoutApacheConnector implements Connector {
   }
 
   /**
-   * Setup {@link HttpUriRequest} based on given {@link ClientRequest}.
+   * Setup {@link HttpRequest} based on given {@link ClientRequest}.
    */
-  protected HttpUriRequest getUriHttpRequest(final ClientRequest clientRequest) {
+  protected HttpUriRequestBase getUriHttpRequest(final ClientRequest clientRequest) {
     RequestConfig.Builder requestConfigBuilder = RequestConfig.copy(m_requestConfig);
 
     initConnectTimeout(clientRequest, requestConfigBuilder);
@@ -388,39 +392,41 @@ public class ScoutApacheConnector implements Connector {
     boolean bufferingEnabled = BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.DISABLE_CHUNKED_TRANSFER_ENCODING, Boolean.class));
     HttpEntity entity = getHttpEntity(clientRequest, bufferingEnabled);
 
-    return RequestBuilder
-        .create(clientRequest.getMethod())
-        .setUri(clientRequest.getUri())
-        .setConfig(requestConfigBuilder.build())
-        .setEntity(entity)
-        .build();
+    HttpUriRequestBase request = new HttpUriRequestBase(clientRequest.getMethod(), clientRequest.getUri());
+    request.setEntity(entity);
+    request.setConfig(requestConfigBuilder.build());
+    return request;
   }
 
-  protected void initConnectTimeout(ClientRequest clientRequest, Builder requestConfigBuilder) {
+  protected void initConnectTimeout(ClientRequest clientRequest, RequestConfig.Builder requestConfigBuilder) {
     // check if connect timeout was set by Scout RestClientProperties
     Long scoutConnectTimeout = clientRequest.resolveProperty(RestClientProperties.CONNECT_TIMEOUT, -1L);
     if (scoutConnectTimeout != null && scoutConnectTimeout >= 0) {
-      requestConfigBuilder.setConnectTimeout(Math.toIntExact(scoutConnectTimeout));
+      // connect timeout per request is mandatory
+      //noinspection deprecation
+      requestConfigBuilder.setConnectTimeout(Math.toIntExact(scoutConnectTimeout), TimeUnit.MILLISECONDS);
       return;
     }
     // check if connect timeout was set using JerseyClientBuilder.connectTimeout() (ClientBuilder helper method)
     Integer jerseyConnectTimeout = clientRequest.resolveProperty(ClientProperties.CONNECT_TIMEOUT, -1);
     if (jerseyConnectTimeout != null && jerseyConnectTimeout >= 0) {
-      requestConfigBuilder.setConnectTimeout(Math.toIntExact(jerseyConnectTimeout));
+      // connect timeout per request is mandatory
+      //noinspection deprecation
+      requestConfigBuilder.setConnectTimeout(Math.toIntExact(jerseyConnectTimeout), TimeUnit.MILLISECONDS);
     }
   }
 
-  protected void initSocketTimeout(ClientRequest clientRequest, Builder requestConfigBuilder) {
+  protected void initSocketTimeout(ClientRequest clientRequest, RequestConfig.Builder requestConfigBuilder) {
     // check if socket timeout was set by Scout RestClientProperties
     Long scoutSocketTimeout = clientRequest.resolveProperty(RestClientProperties.READ_TIMEOUT, -1L);
     if (scoutSocketTimeout != null && scoutSocketTimeout >= 0) {
-      requestConfigBuilder.setSocketTimeout(Math.toIntExact(scoutSocketTimeout));
+      requestConfigBuilder.setResponseTimeout(Math.toIntExact(scoutSocketTimeout), TimeUnit.MILLISECONDS);
       return;
     }
     // check if socket timeout was set using JerseyClientBuilder.readTimeout() (ClientBuilder helper method)
     Integer jerseySocketTimeout = clientRequest.resolveProperty(ClientProperties.READ_TIMEOUT, -1);
     if (jerseySocketTimeout != null && jerseySocketTimeout >= 0) {
-      requestConfigBuilder.setSocketTimeout(Math.toIntExact(jerseySocketTimeout));
+      requestConfigBuilder.setResponseTimeout(Math.toIntExact(jerseySocketTimeout), TimeUnit.MILLISECONDS);
     }
   }
 
@@ -456,9 +462,9 @@ public class ScoutApacheConnector implements Connector {
   protected void ensureHttpHeaderCloseConnection(ClientRequest clientRequest, HttpUriRequest httpRequest) {
     boolean closeConnection = BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.CONNECTION_CLOSE, CONFIG.getPropertyValue(RestEnsureHttpHeaderConnectionCloseProperty.class)), true);
     MultivaluedMap<String, Object> headers = clientRequest.getHeaders();
-    if (closeConnection && !headers.containsKey(HTTP.CONN_DIRECTIVE)) {
-      LOG.trace("Adding HTTP header '" + HTTP.CONN_DIRECTIVE + ": " + HTTP.CONN_CLOSE + "'");
-      httpRequest.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
+    if (closeConnection && !headers.containsKey(HttpHeaders.CONNECTION)) {
+      LOG.trace("Adding HTTP header '" + HttpHeaders.CONNECTION + ": " + HeaderElements.CLOSE + "'");
+      httpRequest.setHeader(HttpHeaders.CONNECTION, HeaderElements.CLOSE);
     }
   }
 
@@ -519,7 +525,7 @@ public class ScoutApacheConnector implements Connector {
   }
 
   @SuppressWarnings("resource")
-  protected InputStream getResponseInputStream(HttpUriRequest httpUriRequest, CloseableHttpResponse response) throws IOException {
+  protected InputStream getResponseInputStream(HttpUriRequest httpUriRequest, ClassicHttpResponse response) throws IOException {
     InputStream inputStream;
 
     if (response.getEntity() == null) {
@@ -577,13 +583,10 @@ public class ScoutApacheConnector implements Connector {
     protected final boolean m_bufferingEnabled;
 
     protected NonStreamingHttpEntity(ClientRequest clientRequest, boolean bufferingEnabled) {
+      super(clientRequest.getHeaderString(HttpHeaders.CONTENT_TYPE), clientRequest.getHeaderString(HttpHeaders.CONTENT_ENCODING));
+
       m_clientRequest = clientRequest;
       m_bufferingEnabled = bufferingEnabled;
-    }
-
-    @Override
-    public boolean isRepeatable() {
-      return false;
     }
 
     @Override
@@ -613,6 +616,11 @@ public class ScoutApacheConnector implements Connector {
     public boolean isStreaming() {
       return false;
     }
+
+    @Override
+    public void close() throws IOException {
+      m_clientRequest.close();
+    }
   }
 
   /**
@@ -621,10 +629,10 @@ public class ScoutApacheConnector implements Connector {
    */
   protected static class ClosingInputStream extends FilterInputStream {
 
-    protected final CloseableHttpResponse m_response;
+    protected final ClassicHttpResponse m_response;
     protected final HttpUriRequest m_httpUriRequest;
 
-    protected ClosingInputStream(HttpUriRequest httpUriRequest, CloseableHttpResponse response, InputStream in) {
+    protected ClosingInputStream(HttpUriRequest httpUriRequest, ClassicHttpResponse response, InputStream in) {
       super(in);
       m_response = response;
       m_httpUriRequest = httpUriRequest;

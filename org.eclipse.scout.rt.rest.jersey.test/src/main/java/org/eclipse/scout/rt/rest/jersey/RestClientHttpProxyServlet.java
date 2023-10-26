@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.auth.AUTH;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
@@ -52,9 +52,9 @@ public class RestClientHttpProxyServlet extends HttpServlet {
     // set common response headers
     resp.setHeader(CorrelationId.HTTP_HEADER_NAME, req.getHeader(CorrelationId.HTTP_HEADER_NAME)); // NOSONAR findbugs:HRS_REQUEST_PARAMETER_TO_HTTP_HEADER
 
-    if (req.getHeader(AUTH.PROXY_AUTH_RESP) != null) {
+    if (req.getHeader(HttpHeaders.PROXY_AUTHORIZATION) != null) {
       // Case 1) Request contains proxy authentication credentials -> validate
-      String proxyAuth = StringUtility.substring(req.getHeader(AUTH.PROXY_AUTH_RESP), 6);
+      String proxyAuth = StringUtility.substring(req.getHeader(HttpHeaders.PROXY_AUTHORIZATION), 6);
       String decoded = new String(Base64Utility.decode(proxyAuth), StandardCharsets.ISO_8859_1);
       String expectedCreds = req.getParameter(ProxyServletParameters.PROXY_USER) + ":" + req.getParameter(ProxyServletParameters.PROXY_PASSWORD);
       assertEquals(expectedCreds, decoded);
@@ -63,7 +63,7 @@ public class RestClientHttpProxyServlet extends HttpServlet {
     else if (req.getParameter(ProxyServletParameters.REQUIRE_AUTH) != null) {
       // Case 2) Request requires proxy auth, but did not provide credentials
       resp.setStatus(Status.PROXY_AUTHENTICATION_REQUIRED.getStatusCode());
-      resp.setHeader(AUTH.PROXY_AUTH, "Basic realm=\"MockProxy\"");
+      resp.setHeader(HttpHeaders.PROXY_AUTHENTICATE, "Basic realm=\"MockProxy\"");
     }
     else {
       // Case 3) Proxy request without authentication

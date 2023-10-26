@@ -130,7 +130,7 @@
     <activemq.version>5.18.3</activemq.version>
     <artemis.version>2.26.0</artemis.version>
     <com.google.http-client.version>1.42.3</com.google.http-client.version>
-    <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
+    <org.apache.httpcomponents.version>5.2.1</org.apache.httpcomponents.version>
     <opentelemetry.version>1.31.0</opentelemetry.version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.rt/target/jacoco-all.exec</master_coverage_jacoco_destFile>
@@ -909,13 +909,20 @@
 
       <dependency>
         <groupId>com.google.http-client</groupId>
-        <artifactId>google-http-client-apache-v2</artifactId>
-        <version>${com.google.http-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.http-client</groupId>
         <artifactId>google-http-client</artifactId>
         <version>${com.google.http-client.version}</version>
+        <exclusions>
+          <!-- excluded: explicitly httpclient5 (and not the provided version 4) will be used (with custom com.google.api.client.http.HttpTransport provided by Scout to support this) -->
+          <exclusion>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+          </exclusion>
+          <!-- excluded: see above -->
+          <exclusion>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
@@ -943,8 +950,8 @@
       </dependency>
 
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5</artifactId>
         <version>${org.apache.httpcomponents.version}</version>
         <exclusions>
           <exclusion>

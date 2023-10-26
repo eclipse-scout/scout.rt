@@ -12,11 +12,15 @@ package org.eclipse.scout.rt.shared.http.retry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Set;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpRequest;
+import org.apache.hc.core5.function.Supplier;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpEntityContainer;
+import org.apache.hc.core5.http.HttpRequest;
+
 
 /**
  * A Proxy class for {@link org.apache.http.HttpEntity} that supports retry regardless of the enclosed
@@ -29,10 +33,10 @@ public class OneTimeRepeatableRequestEntityProxy implements HttpEntity {
   private boolean m_consumed;
 
   public static void installRetry(HttpRequest request) {
-    if (request instanceof HttpEntityEnclosingRequest) {
-      final HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+    if (request instanceof HttpEntityContainer) {
+      final HttpEntity entity = ((HttpEntityContainer) request).getEntity();
       if (entity != null && !(entity instanceof OneTimeRepeatableRequestEntityProxy)) {
-        ((HttpEntityEnclosingRequest) request).setEntity(new OneTimeRepeatableRequestEntityProxy(entity));
+        ((HttpEntityContainer) request).setEntity(new OneTimeRepeatableRequestEntityProxy(entity));
       }
     }
   }
@@ -56,17 +60,22 @@ public class OneTimeRepeatableRequestEntityProxy implements HttpEntity {
   }
 
   @Override
+  public Set<String> getTrailerNames() {
+    return m_original.getTrailerNames();
+  }
+
+  @Override
   public long getContentLength() {
     return m_original.getContentLength();
   }
 
   @Override
-  public Header getContentType() {
+  public String getContentType() {
     return m_original.getContentType();
   }
 
   @Override
-  public Header getContentEncoding() {
+  public String getContentEncoding() {
     return m_original.getContentEncoding();
   }
 
@@ -86,11 +95,9 @@ public class OneTimeRepeatableRequestEntityProxy implements HttpEntity {
     return m_original.isStreaming();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
-  public void consumeContent() throws IOException {
-    m_consumed = true;
-    m_original.consumeContent();
+  public Supplier<List<? extends Header>> getTrailers() {
+    return m_original.getTrailers();
   }
 
   @Override
@@ -100,5 +107,10 @@ public class OneTimeRepeatableRequestEntityProxy implements HttpEntity {
         .append(m_original)
         .append('}')
         .toString();
+  }
+
+  @Override
+  public void close() throws IOException {
+    m_original.close();
   }
 }

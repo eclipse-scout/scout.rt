@@ -13,45 +13,23 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.function.Supplier;
 
-import org.apache.http.HttpClientConnection;
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.config.ConnectionConfig;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpRequestExecutor;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory;
-import org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory.ApacheHttpTransportBuilder;
 import org.eclipse.scout.rt.shared.http.DefaultHttpTransportManager;
-import org.eclipse.scout.rt.shared.http.IHttpTransportBuilder;
+import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 
 import com.google.api.client.http.HttpTransport;
 
 /**
- * HTTP Client supporting interception of http. Used to trigger and force errors and failures.
+ * HTTP Client supporting socket level interception of http requests/responses. Used to trigger and force errors and failures.
  */
 @IgnoreBean
 public class TestingHttpClient extends DefaultHttpTransportManager {
-  public static final int BUFFER_SIZE = 32;
-
-  @FunctionalInterface
-  public interface IResponseProvider {
-    HttpResponse call() throws IOException, HttpException;
-  }
-
-  @FunctionalInterface
-  public interface IRequestInterceptor {
-    HttpResponse intercept(HttpRequest request, HttpClientConnection conn, HttpContext context, IResponseProvider superCall) throws IOException, HttpException;
-  }
-
-  @FunctionalInterface
-  public interface IResponseInterceptor {
-    HttpResponse intercept(HttpRequest request, HttpClientConnection conn, HttpContext context, IResponseProvider superCall);
-  }
 
   /**
    * Add interception on socket level
@@ -78,20 +56,15 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
     }
 
     @Override
-    protected HttpClientConnectionManager createHttpClientConnectionManager() {
-      PoolingHttpClientConnectionManager connManager = (PoolingHttpClientConnectionManager) super.createHttpClientConnectionManager();
+    protected HttpClientConnectionManager createHttpClientConnectionManager(IHttpTransportManager manager) {
+      PoolingHttpClientConnectionManager connManager = (PoolingHttpClientConnectionManager) super.createHttpClientConnectionManager(manager);
       connManager.setDefaultConnectionConfig(
           ConnectionConfig
               .custom()
-              .setFragmentSizeHint(BUFFER_SIZE)
-              .setBufferSize(BUFFER_SIZE)
               .build());
       return connManager;
     }
   }
-
-  private IRequestInterceptor m_requestInterceptor;
-  private IResponseInterceptor m_responseInterceptor;
 
   private Supplier<SocketWithInterception.ISocketReadInterceptor> m_socketReadInterceptor;
   private Supplier<SocketWithInterception.ISocketWriteInterceptor> m_socketWriteInterceptor;
@@ -99,48 +72,6 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
   @Override
   protected HttpTransport createHttpTransport() {
     return new ApacheHttpTransportFactoryEx().newHttpTransport(this);
-  }
-
-  @Override
-  public void interceptNewHttpTransport(IHttpTransportBuilder builder) {
-    ApacheHttpTransportBuilder builder0 = (ApacheHttpTransportBuilder) builder;
-    builder0.getBuilder().setRequestExecutor(new HttpRequestExecutor() {
-      @Override
-      protected HttpResponse doSendRequest(HttpRequest request, HttpClientConnection conn, HttpContext context) throws IOException, HttpException {
-        if (m_requestInterceptor != null) {
-          return m_requestInterceptor.intercept(request, conn, context, () -> super.doSendRequest(request, conn, context));
-        }
-        else {
-          return super.doSendRequest(request, conn, context);
-        }
-      }
-
-      @Override
-      protected HttpResponse doReceiveResponse(HttpRequest request, HttpClientConnection conn, HttpContext context) throws HttpException, IOException {
-        if (m_responseInterceptor != null) {
-          return m_responseInterceptor.intercept(request, conn, context, () -> super.doReceiveResponse(request, conn, context));
-        }
-        else {
-          return super.doReceiveResponse(request, conn, context);
-        }
-      }
-    });
-  }
-
-  /**
-   * Install a handler that intercepts all requests. Can be used to simulate network interruptions or socket errors.
-   */
-  public TestingHttpClient withRequestInterceptor(IRequestInterceptor requestInterceptor) {
-    m_requestInterceptor = requestInterceptor;
-    return this;
-  }
-
-  /**
-   * Install a handler that intercepts all responses. Can be used to simulate network interruptions or socket errors.
-   */
-  public TestingHttpClient withResponseInterceptor(IResponseInterceptor responseInterceptor) {
-    m_responseInterceptor = responseInterceptor;
-    return this;
   }
 
   public TestingHttpClient withSocketReadInterceptor(Supplier<SocketWithInterception.ISocketReadInterceptor> socketReadInterceptor) {
