@@ -803,15 +803,21 @@ export class Calendar extends Widget implements CalendarModel {
       return;
     }
 
-    if (withTime && (this.isDay() || this.isWeek() || this.isWorkWeek())) {
+    let rangeSelectionPossible = withTime && (this.isDay() || this.isWeek() || this.isWorkWeek());
+    // Set seconds of date
+    if (rangeSelectionPossible) {
       let seconds = this._getSelectedSeconds(event);
       if (seconds < 60 * 60 * 24) {
         selectedDate.setSeconds(seconds);
         timeChanged = true;
       }
+    }
+
+    this._setSelection(selectedDate, selectedCalendarId, null, false, timeChanged);
+
+    if (rangeSelectionPossible) {
       this._startRangeSelection(event);
     }
-    this._setSelection(selectedDate, selectedCalendarId, null, false, timeChanged);
   }
 
   protected _getSelectedDate(event: JQuery.MouseEventBase): Date {
@@ -886,7 +892,8 @@ export class Calendar extends Widget implements CalendarModel {
     } else {
       newSelectedCalendar = selectedCalendar as CalendarDescriptor;
     }
-    if (newSelectedCalendar !== this.selectedCalendar) {
+    let selectable = newSelectedCalendar ? newSelectedCalendar.selectable : true;
+    if (newSelectedCalendar !== this.selectedCalendar && selectable) {
       this.selectedCalendar = newSelectedCalendar;
       this.trigger('selectedCalendarChange', {
         calendarId: newSelectedCalendar ? newSelectedCalendar.calendarId : null
@@ -1121,14 +1128,14 @@ export class Calendar extends Widget implements CalendarModel {
         }
         if (animate) {
           $e.animateAVCSD('height', h, () => {
-            if (h === 0) {
-              $e.addClass('hidden');
-            }
-            this._afterLayout($e, animate);
-          },
-          () => {
-            this._afterLayout($e, animate);
-          });
+              if (h === 0) {
+                $e.addClass('hidden');
+              }
+              this._afterLayout($e, animate);
+            },
+            () => {
+              this._afterLayout($e, animate);
+            });
         } else {
           $e.css('height', h);
           if (h === 0) {
@@ -2115,6 +2122,15 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _startRangeSelection(event: JQuery.MouseDownEvent) {
     if (!this.rangeSelectionAllowed || this._rangeSelectionStarted || Device.get().type === Device.Type.MOBILE) {
+      return;
+    }
+
+    // No range selection when calendar is not selectable
+    let currentCalendarId = $(event.delegateTarget).data('calendarId');
+    let selectable = currentCalendarId === 'default'
+      ? true
+      : this.calendars.find(c => c.calendarId === currentCalendarId).selectable;
+    if (!selectable) {
       return;
     }
 

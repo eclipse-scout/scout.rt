@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
 import java.util.Objects;
-import java.util.Random;
 
 public class CalendarDescriptor implements ICalendarDescriptor {
 
@@ -18,51 +17,15 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   private String m_name;
   private Long m_parentId;
   private boolean m_visible;
+  private boolean m_selectable;
   private String m_cssClass;
   private long m_order;
 
-  public CalendarDescriptor(String name) {
-    this(Long.valueOf(new Random().nextInt(1000) + 1), name);
-  }
-
   public CalendarDescriptor(Long calendarId, String name) {
-    this(calendarId, name, true);
-  }
-
-  public CalendarDescriptor(Long calendarId, String name, boolean visible) {
-    setCalendarId(calendarId);
+    m_calendarId = calendarId;
     m_name = name;
-    m_visible = visible;
-  }
-
-  public CalendarDescriptor(Long calendarId, String name, Long parentId) {
-    setCalendarId(calendarId);
-    m_name = name;
-    m_parentId = parentId;
-  }
-
-  public CalendarDescriptor(Long calendarId, String name, boolean visible, String cssClass) {
-    setCalendarId(calendarId);
-    m_name = name;
-    m_visible = visible;
-    m_cssClass = cssClass;
-  }
-
-  public CalendarDescriptor(Long calendarId, String name, Long parentId, String cssClass) {
-    setCalendarId(calendarId);
-    m_name = name;
-    m_parentId = parentId;
     m_visible = true;
-    m_cssClass = cssClass;
-  }
-
-  public CalendarDescriptor(Long calendarId, String name, Long parentId, boolean visible, String cssClass, long order) {
-    setCalendarId(calendarId);
-    m_name = name;
-    m_parentId = parentId;
-    m_visible = visible;
-    m_cssClass = cssClass;
-    m_order = order;
+    m_selectable = true;
   }
 
   @Override
@@ -71,21 +34,8 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   }
 
   @Override
-  public void setCalendarId(long calendarId) {
-    if (calendarId == 0) {
-      throw new IllegalArgumentException("Can not set calendarId. The value 0 is a reserved value");
-    }
-    m_calendarId = calendarId;
-  }
-
-  @Override
   public String getName() {
     return m_name;
-  }
-
-  @Override
-  public void setName(String name) {
-    m_name = name;
   }
 
   @Override
@@ -94,18 +44,9 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   }
 
   @Override
-  public void setParentId(Long parentId) {
+  public CalendarDescriptor withParentId(Long parentId) {
     m_parentId = parentId;
-  }
-
-  @Override
-  public String getCssClass() {
-    return m_cssClass;
-  }
-
-  @Override
-  public void setCssClass(String cssClass) {
-    m_cssClass = cssClass;
+    return this;
   }
 
   @Override
@@ -114,8 +55,31 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   }
 
   @Override
-  public void setVisible(boolean visible) {
+  public CalendarDescriptor withVisible(boolean visible) {
     m_visible = visible;
+    return this;
+  }
+
+  @Override
+  public boolean isSelectable() {
+    return m_selectable;
+  }
+
+  @Override
+  public CalendarDescriptor withSelectable(boolean selectable) {
+    m_selectable = selectable;
+    return this;
+  }
+
+  @Override
+  public String getCssClass() {
+    return m_cssClass;
+  }
+
+  @Override
+  public CalendarDescriptor withCssClass(String cssClass) {
+    m_cssClass = cssClass;
+    return this;
   }
 
   @Override
@@ -124,8 +88,9 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   }
 
   @Override
-  public void setOrder(long order) {
+  public CalendarDescriptor withOrder(long order) {
     m_order = order;
+    return this;
   }
 
   @Override
@@ -145,10 +110,13 @@ public class CalendarDescriptor implements ICalendarDescriptor {
     if (m_visible != that.m_visible) {
       return false;
     }
+    if (m_selectable != that.m_selectable) {
+      return false;
+    }
     if (m_order != that.m_order) {
       return false;
     }
-    if (!Objects.equals(m_name, that.m_name)) {
+    if (!m_name.equals(that.m_name)) {
       return false;
     }
     if (!Objects.equals(m_parentId, that.m_parentId)) {
@@ -164,9 +132,10 @@ public class CalendarDescriptor implements ICalendarDescriptor {
   @Override
   public int hashCode() {
     int result = (int) (m_calendarId ^ (m_calendarId >>> 32));
-    result = 31 * result + (m_name != null ? m_name.hashCode() : 0);
+    result = 31 * result + m_name.hashCode();
     result = 31 * result + (m_parentId != null ? m_parentId.hashCode() : 0);
     result = 31 * result + (m_visible ? 1 : 0);
+    result = 31 * result + (m_selectable ? 1 : 0);
     result = 31 * result + (m_cssClass != null ? m_cssClass.hashCode() : 0);
     result = 31 * result + (int) (m_order ^ (m_order >>> 32));
     return result;
