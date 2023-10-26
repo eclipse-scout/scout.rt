@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.shared.http;
 
 import java.net.SocketException;
 
-import org.apache.http.NoHttpResponseException;
+import org.apache.hc.core5.http.NoHttpResponseException;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 
@@ -157,30 +157,6 @@ public final class HttpConfigurationProperties {
     @Override
     public String getKey() {
       return "scout.http.retryOnSocketExceptionByConnectionReset";
-    }
-  }
-
-  /**
-   * Enable redirect of POST requests (includes non-idempotent requests). Default is true.
-   *
-   * @since 7.0
-   */
-  public static class ApacheHttpTransportRedirectPostProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public Boolean getDefaultValue() {
-      return true;
-    }
-
-    @Override
-    public String description() {
-      return "Enable redirect of POST requests (includes non-idempotent requests). "
-          + "The default value is true";
-    }
-
-    @Override
-    public String getKey() {
-      return "scout.http.redirectPost";
     }
   }
 }

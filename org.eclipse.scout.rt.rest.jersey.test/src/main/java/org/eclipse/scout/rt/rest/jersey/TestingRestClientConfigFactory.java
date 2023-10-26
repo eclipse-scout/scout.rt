@@ -13,7 +13,7 @@ import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Configuration;
 
-import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.rest.jersey.client.JerseyClientConfigFactory;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector;

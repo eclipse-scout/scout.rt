@@ -29,13 +29,13 @@ public final class RestClientProperties {
   public static final String ENABLE_COOKIES = "scout.rest.client.enableCookies";
 
   /**
-   * Standard cookie specification used by underlying http client. See {@code org.apache.http.client.config.CookieSpecs}
+   * Standard cookie specification used by underlying http client. See {@code org.apache.hc.client5.http.cookie.StandardCookieSpec}
    * for details.
    * <p>
    * The value MUST be an instance convertible to {@link java.lang.String}.
    * </p>
    * <p>
-   * The default value is {@code "default"}.
+   * The default value is {@code "relaxed"}.
    * </p>
    * <p>
    * The name of the configuration property is <tt>{@value}</tt>.

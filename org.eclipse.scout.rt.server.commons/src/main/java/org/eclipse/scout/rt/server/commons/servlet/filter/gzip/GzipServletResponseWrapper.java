@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.http.protocol.HTTP;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
 
   @Override
   public void setHeader(String name, String value) {
-    if (HTTP.CONTENT_LEN.equalsIgnoreCase(name)) {
+    if (HttpHeaders.CONTENT_LENGTH.equalsIgnoreCase(name)) {
       // see setContentLength
       return;
     }
@@ -104,7 +104,7 @@ public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
 
   @Override
   public void addHeader(String name, String value) {
-    if (HTTP.CONTENT_LEN.equalsIgnoreCase(name)) {
+    if (HttpHeaders.CONTENT_LENGTH.equalsIgnoreCase(name)) {
       // see setContentLength
       return;
     }

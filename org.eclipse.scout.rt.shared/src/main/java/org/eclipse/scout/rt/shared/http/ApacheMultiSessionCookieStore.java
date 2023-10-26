@@ -12,15 +12,16 @@ package org.eclipse.scout.rt.shared.http;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.http.client.CookieStore;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.client5.http.cookie.CookieStore;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link AbstractMultiSessionCookieStore} implementation for Apache HTTP Client.
+ * <p>{@link AbstractMultiSessionCookieStore} implementation for Apache HTTP Client.</p>
+ * <p>This class is intended to be used only for synchronous requests as it recognizes the current session using a {@link ThreadLocal}. If requests are executed async (in another thread) sessions would not be respected.</p>
  */
 public class ApacheMultiSessionCookieStore extends AbstractMultiSessionCookieStore<CookieStore> implements CookieStore {
 
@@ -47,6 +48,7 @@ public class ApacheMultiSessionCookieStore extends AbstractMultiSessionCookieSto
     return getDelegate().getCookies();
   }
 
+  @SuppressWarnings("deprecation") // deprecated method must be implemented, required by interface
   @Override
   public boolean clearExpired(Date date) {
     return getDelegate().clearExpired(date);
@@ -86,6 +88,7 @@ public class ApacheMultiSessionCookieStore extends AbstractMultiSessionCookieSto
       m_cookieStore.clear();
     }
 
+    @SuppressWarnings("deprecation") // deprecated method must be implemented, required by interface
     @Override
     public boolean clearExpired(Date date) {
       return m_cookieStore.clearExpired(date);

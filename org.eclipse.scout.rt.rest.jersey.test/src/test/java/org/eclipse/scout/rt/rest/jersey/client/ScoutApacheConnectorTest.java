@@ -36,8 +36,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.core5.util.Timeout;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -88,7 +89,7 @@ public class ScoutApacheConnectorTest {
   public void testCookiesEnabled_DefaultCookieSpec() {
     runTestCookie((helper, clientBuilder) -> {
       clientBuilder.property(RestClientProperties.ENABLE_COOKIES, true);
-      clientBuilder.property(RestClientProperties.COOKIE_SPEC, CookieSpecs.DEFAULT);
+      clientBuilder.property(RestClientProperties.COOKIE_SPEC, StandardCookieSpec.STRICT);
     }, true);
   }
 
@@ -97,7 +98,7 @@ public class ScoutApacheConnectorTest {
     runTestCookie((helper, clientBuilder) -> {
       clientBuilder.property(RestClientProperties.ENABLE_COOKIES, true);
       // ignore cookies overrides enable-cookie property
-      clientBuilder.property(RestClientProperties.COOKIE_SPEC, CookieSpecs.IGNORE_COOKIES);
+      clientBuilder.property(RestClientProperties.COOKIE_SPEC, StandardCookieSpec.IGNORE);
     }, false);
   }
 
@@ -428,7 +429,8 @@ public class ScoutApacheConnectorTest {
   @Test
   public void testConnectTimeout_default() {
     RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
-    assertEquals(-1, requestConfigBuilder.build().getSocketTimeout());
+    //noinspection deprecation
+    assertNull(requestConfigBuilder.build().getConnectTimeout());
     runTestConnectTimeout(c -> {}, -1);
   }
 
@@ -485,13 +487,14 @@ public class ScoutApacheConnectorTest {
     ClientRequest clientRequest = Mockito.mock(ClientRequest.class);
     clientRequestConsumer.accept(clientRequest);
     connector.initConnectTimeout(clientRequest, requestConfigBuilder);
-    assertEquals(expectedTimeout, requestConfigBuilder.build().getConnectTimeout());
+    //noinspection deprecation
+    assertEquals(expectedTimeout >= 0 ? Timeout.ofMilliseconds(expectedTimeout) : null, requestConfigBuilder.build().getConnectTimeout());
   }
 
   @Test
   public void testSocketTimeout_default() {
     RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
-    assertEquals(-1, requestConfigBuilder.build().getSocketTimeout());
+    assertNull(requestConfigBuilder.build().getResponseTimeout());
     runTestSocketTimeout(c -> {}, -1);
   }
 
@@ -548,6 +551,6 @@ public class ScoutApacheConnectorTest {
     ClientRequest clientRequest = Mockito.mock(ClientRequest.class);
     clientRequestConsumer.accept(clientRequest);
     connector.initSocketTimeout(clientRequest, requestConfigBuilder);
-    assertEquals(expectedTimeout, requestConfigBuilder.build().getSocketTimeout());
+    assertEquals(expectedTimeout >= 0 ? Timeout.ofMilliseconds(expectedTimeout) : null, requestConfigBuilder.build().getResponseTimeout());
   }
 }

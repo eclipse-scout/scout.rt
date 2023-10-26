@@ -25,9 +25,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.BEANS;
+import org.apache.hc.client5.http.impl.classic.RedirectExec;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRedirectPostProperty;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.After;
@@ -49,9 +48,6 @@ import com.google.api.client.http.HttpResponse;
  * However in its core it uses a http transport - hers it is Apache HTTP Client.
  * <p>
  * Apache HTTP client also handles various http retry scenarios in its exec loop.
- * <p>
- * This test simulates redirects of http GET and POST requests to the same URL as it typically happens in web
- * application firewalls (WAF) and reverse proxy authentication filters.
  */
 
 @RunWith(PlatformTestRunner.class)
@@ -64,9 +60,11 @@ public class HttpRedirectTest {
   private final List<String> m_servletGetLog = Collections.synchronizedList(new ArrayList<>());
   private final List<String> m_servletPostLog = Collections.synchronizedList(new ArrayList<>());
   private final Queue<String> m_redirectUrls = new ArrayBlockingQueue<>(10);
+  private int m_redirectCode = 302;
 
   @Before
   public void before() {
+    m_redirectCode = 302;
     m_servletGetLog.clear();
     m_servletPostLog.clear();
     m_client = new TestingHttpClient();
@@ -98,19 +96,20 @@ public class HttpRedirectTest {
     m_servletPostLog.add(req.getHeader(CORRELATION_ID));
     String redirectUrl = m_redirectUrls.poll();
     if (redirectUrl != null) {
-      resp.sendRedirect(redirectUrl);
+      if (m_redirectCode == 302) {
+        resp.sendRedirect(redirectUrl);
+      }
+      else {
+        resp.setStatus(m_redirectCode);
+        resp.addHeader("Location", redirectUrl);
+      }
       return;
     }
     String arg = null;
-    try {
-      assertEquals("text/plain;charset=UTF-8", req.getContentType());
-      assertEquals("UTF-8", req.getCharacterEncoding());
-      assertEquals(3, req.getContentLength());
-      arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
-    }
-    catch (Exception e) {
-      throw e;
-    }
+    assertEquals("text/plain;charset=UTF-8", req.getContentType());
+    assertEquals("UTF-8", req.getCharacterEncoding());
+    assertEquals(3, req.getContentLength());
+    arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
     resp.setContentType("text/plain;charset=UTF-8");
     resp.getOutputStream().println("HTTP-POST:" + arg);
   }
@@ -141,48 +140,47 @@ public class HttpRedirectTest {
   }
 
   /**
-   * Expect redirect on apache level due to {@link HttpContent#retrySupported()} true
+   * Expect redirect on apache level due to {@link HttpContent#retrySupported()} true; however expect redirect to be a
+   * GET request (see {@link RedirectExec} resp.
+   * <a href="https://www.rfc-editor.org/rfc/rfc9110#status.302">specification</a>).
    */
   @Test
-  public void testPostRedirectWithSupportedPostRetry() throws IOException {
-    String url = m_server.getServletUrl().toExternalForm();
-    m_redirectUrls.add(url);
-
-    HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(url), new HttpContent() {
-      @Override
-      public void writeTo(OutputStream out) throws IOException {
-        out.write("bar".getBytes());
-      }
-
-      @Override
-      public boolean retrySupported() {
-        return true;
-      }
-
-      @Override
-      public String getType() {
-        return "text/plain;charset=UTF-8";
-      }
-
-      @Override
-      public long getLength() {
-        return 3;
-      }
-    });
-    req.getHeaders().set(CORRELATION_ID, "05");
-    HttpResponse resp = req.execute();
-    byte[] bytes;
+  public void testPostRedirectWithSupportedPostRetry_302() throws IOException {
+    HttpResponse resp = testPostRedirectInternal(true);
     try (InputStream in = resp.getContent()) {
-      bytes = IOUtility.readBytes(in);
+      byte[] bytes = IOUtility.readBytes(in);
+      String text = new String(bytes, StandardCharsets.UTF_8).trim();
+      assertEquals("HTTP-GET:Hello null", text); // http response 302 leads to a redirect as a GET request
+      assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
+      assertEquals(new String(bytes), 21, bytes.length);//text + CR + LF
+
     }
     assertEquals(200, resp.getStatusCode());
-    String text = new String(bytes, StandardCharsets.UTF_8).trim();
-    assertEquals("HTTP-POST:bar", text);
-    assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
-    assertEquals(new String(bytes), 15, bytes.length);//text + CR + LF
     //two calls due to redirect
-    assertEquals(Arrays.asList("05", "05"), m_servletPostLog);
+    assertEquals(Collections.singletonList("05"), m_servletPostLog);
+    assertEquals(Collections.singletonList(null), m_servletGetLog); // header correlation-id is also not resent for new GET request; therefore do not expect any correlation id
+  }
+
+  /**
+   * Expect redirect on apache level due to {@link HttpContent#retrySupported()} true; expect redirect to repeat POST
+   * request (see {@link RedirectExec} resp.
+   * <a href="https://www.rfc-editor.org/rfc/rfc9110#status.307">specification</a>).
+   */
+  @Test
+  public void testPostRedirectWithSupportedPostRetry_307() throws IOException {
+    m_redirectCode = 307;
+    HttpResponse resp = testPostRedirectInternal(true);
+    try (InputStream in = resp.getContent()) {
+      byte[] bytes = IOUtility.readBytes(in);
+      String text = new String(bytes, StandardCharsets.UTF_8).trim();
+      assertEquals("HTTP-POST:bar", text); // http response 302 leads to a redirect as a GET request
+      assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
+      assertEquals(new String(bytes), 15, bytes.length);//text + CR + LF
+
+    }
+    assertEquals(200, resp.getStatusCode());
+    //two calls due to redirect
+    assertEquals(List.of("05", "05"), m_servletPostLog);
   }
 
   /**
@@ -191,52 +189,17 @@ public class HttpRedirectTest {
    */
   @Test
   public void testPostRedirectWithUnsupportedPostRetry() throws IOException {
-    String url = m_server.getServletUrl().toExternalForm();
-    m_redirectUrls.add(url);
-
-    HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(url), new HttpContent() {
-      @Override
-      public void writeTo(OutputStream out) throws IOException {
-        out.write("bar".getBytes());
-      }
-
-      @Override
-      public boolean retrySupported() {
-        return false;
-      }
-
-      @Override
-      public String getType() {
-        return "text/plain;charset=UTF-8";
-      }
-
-      @Override
-      public long getLength() {
-        return 3;
-      }
-    });
-    req.getHeaders().set(CORRELATION_ID, "05");
-    HttpResponse resp = req.execute();
-    byte[] bytes;
+    HttpResponse resp = testPostRedirectInternal(false);
     try (InputStream in = resp.getContent()) {
-      bytes = IOUtility.readBytes(in);
+      byte[] bytes = IOUtility.readBytes(in);
+      assertArrayEquals(new byte[0], bytes);
     }
     assertEquals(302, resp.getStatusCode());
-    assertArrayEquals(new byte[0], bytes);
     // one calls due to non-repeatable
     assertEquals(Arrays.asList("05"), m_servletPostLog);
   }
 
-  /**
-   * Expect no redirect on apache level due to {@link HttpContent#retrySupported()} false. This leads to a 302 post
-   * response which fails.
-   */
-  @Test
-  public void testPostRedirectWithUnsupportedPostRetryAndConfigPropertyFalse() throws IOException {
-    //disable ApacheHttpTransportRedirectPostProperty
-    BEANS.get(ApacheHttpTransportRedirectPostProperty.class).setValue(false);
-
+  protected HttpResponse testPostRedirectInternal(boolean retrySupported) throws IOException {
     String url = m_server.getServletUrl().toExternalForm();
     m_redirectUrls.add(url);
 
@@ -249,7 +212,7 @@ public class HttpRedirectTest {
 
       @Override
       public boolean retrySupported() {
-        return false;
+        return retrySupported;
       }
 
       @Override
@@ -264,13 +227,6 @@ public class HttpRedirectTest {
     });
     req.getHeaders().set(CORRELATION_ID, "05");
     HttpResponse resp = req.execute();
-    byte[] bytes;
-    try (InputStream in = resp.getContent()) {
-      bytes = IOUtility.readBytes(in);
-    }
-    assertEquals(302, resp.getStatusCode());
-    assertEquals(0, bytes.length);
-    //one calls due to failed second redirect
-    assertEquals(Arrays.asList("05"), m_servletPostLog);
+    return resp;
   }
 }

@@ -35,9 +35,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.HttpHost;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.HttpRoute;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.HttpHost;
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.dataobject.exception.ResourceNotFoundException;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -273,7 +273,7 @@ public class RestClientProxyInvocationTest {
     @SuppressWarnings("resource")
     PoolingHttpClientConnectionManager poolingConnectionManager = assertInstance(manager, PoolingHttpClientConnectionManager.class, "This test works with Apache HTTP client only. Adapt it for other libraries.");
     URI uri = URI.create(m_helper.getBaseUri());
-    HttpHost target = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+    HttpHost target = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
     assertEquals(1, poolingConnectionManager.getMaxPerRoute(new HttpRoute(target)));
 
     // invoke actual service

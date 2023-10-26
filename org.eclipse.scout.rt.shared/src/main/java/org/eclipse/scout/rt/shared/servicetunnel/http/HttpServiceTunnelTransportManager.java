@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.http.AbstractHttpTransportManager;
 import org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory.ApacheHttpTransportBuilder;
@@ -36,10 +36,6 @@ public class HttpServiceTunnelTransportManager extends AbstractHttpTransportMana
 
         cm.setDefaultMaxPerRoute(CONFIG.getPropertyValue(HttpServiceTunnelTransportMaxConnectionsPerRouteProperty.class));
         cm.setMaxTotal(CONFIG.getPropertyValue(HttpServiceTunnelTransportMaxConnectionsTotalProperty.class));
-      }
-      else {
-        builder.getBuilder().setMaxConnPerRoute(CONFIG.getPropertyValue(HttpServiceTunnelTransportMaxConnectionsPerRouteProperty.class));
-        builder.getBuilder().setMaxConnTotal(CONFIG.getPropertyValue(HttpServiceTunnelTransportMaxConnectionsTotalProperty.class));
       }
     }
   }

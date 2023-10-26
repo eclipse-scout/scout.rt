@@ -9,10 +9,11 @@
  */
 package org.eclipse.scout.rt.rest.jersey.client;
 
-import org.apache.http.RequestLine;
-import org.apache.http.message.BasicLineFormatter;
-import org.apache.http.message.LineFormatter;
-import org.apache.http.util.CharArrayBuffer;
+import org.apache.hc.core5.http.message.BasicLineFormatter;
+import org.apache.hc.core5.http.message.LineFormatter;
+import org.apache.hc.core5.http.message.RequestLine;
+import org.apache.hc.core5.util.Args;
+import org.apache.hc.core5.util.CharArrayBuffer;
 import org.eclipse.scout.rt.rest.IRestHttpRequestUriEncoder;
 
 /**
@@ -30,21 +31,16 @@ public class LineFormatterWithUriEncoder extends BasicLineFormatter {
   }
 
   @Override
-  protected void doFormatRequestLine(CharArrayBuffer buffer, RequestLine reqline) {
-    final String method = reqline.getMethod();
-
+  public void formatRequestLine(final CharArrayBuffer buffer, final RequestLine reqline) {
+    Args.notNull(buffer, "Char array buffer");
+    Args.notNull(reqline, "Request line");
+    buffer.append(reqline.getMethod());
+    buffer.append(' ');
     // <customized>
     String uri = m_requestUriEncoder.encodeRequestUri(reqline.getUri());
-    // </customized>
-
-    // room for "GET /index.html HTTP/1.1"
-    final int len = method.length() + 1 + uri.length() + 1 + estimateProtocolVersionLen(reqline.getProtocolVersion());
-    buffer.ensureCapacity(len);
-
-    buffer.append(method);
-    buffer.append(' ');
     buffer.append(uri);
+    // </customized>
     buffer.append(' ');
-    appendProtocolVersion(buffer, reqline.getProtocolVersion());
+    buffer.append(reqline.getProtocolVersion().format()); // super.formatProtocolVersion not visible..
   }
 }

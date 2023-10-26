@@ -13,21 +13,18 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.util.PublicSuffixMatcherLoader;
-import org.apache.http.impl.NoConnectionReuseStrategy;
-import org.apache.http.impl.client.DefaultClientConnectionReuseStrategy;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.HttpsSupport;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -35,15 +32,13 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportKeepAliveProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsTotalProperty;
-import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRedirectPostProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
-import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
+import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryStrategy;
+import org.eclipse.scout.rt.shared.http.transport.ApacheHttpTransport;
 
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 
 /**
  * Factory to create the {@link ApacheHttpTransport} instances.
@@ -59,7 +54,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
 
     setConnectionKeepAliveAndRetrySettings(builder);
 
-    HttpClientConnectionManager cm = createHttpClientConnectionManager();
+    HttpClientConnectionManager cm = createHttpClientConnectionManager(manager);
     if (cm != null) {
       builder.setConnectionManager(cm);
     }
@@ -82,7 +77,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
       builder.setConnectionReuseStrategy(DefaultClientConnectionReuseStrategy.INSTANCE);
     }
     else {
-      builder.setConnectionReuseStrategy(NoConnectionReuseStrategy.INSTANCE);
+      builder.setConnectionReuseStrategy(((request, response, context) -> false));
     }
   }
 
@@ -90,21 +85,15 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     final boolean retryOnNoHttpResponseException = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty.class);
     final boolean retryOnSocketExceptionByConnectionReset = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty.class);
     if (retryOnNoHttpResponseException || retryOnSocketExceptionByConnectionReset) {
-      builder.setRetryHandler(new CustomHttpRequestRetryHandler(1, false, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset));
+      builder.setRetryStrategy(new CustomHttpRequestRetryStrategy(1, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset));
     }
     else {
-      builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, false));
+      builder.setRetryStrategy(new DefaultHttpRequestRetryStrategy());
     }
   }
 
   protected void addRedirectSettings(HttpClientBuilder builder) {
-    final boolean redirectPost = CONFIG.getPropertyValue(ApacheHttpTransportRedirectPostProperty.class);
-    if (redirectPost) {
-      builder.setRedirectStrategy(EnhancedLaxRedirectStrategy.INSTANCE);
-    }
-    else {
-      builder.setRedirectStrategy(DefaultRedirectStrategy.INSTANCE);
-    }
+    builder.setRedirectStrategy(DefaultRedirectStrategy.INSTANCE);
   }
 
   /**
@@ -112,24 +101,26 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * {@link HttpClientBuilder}. Caution: Returning a custom connection manager overrides several properties of the
    * {@link HttpClientBuilder}.
    */
-  protected HttpClientConnectionManager createHttpClientConnectionManager() {
-    final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
-        RegistryBuilder.<ConnectionSocketFactory> create()
-            .register("http", createPlainSocketFactory())
-            .register("https", createSSLConnectionSocketFactory())
-            .build(),
-        null, null, null, CONFIG.getPropertyValue(ApacheHttpTransportConnectionTimeToLiveProperty.class), TimeUnit.MILLISECONDS);
-    connectionManager.setValidateAfterInactivity(1);
+  protected HttpClientConnectionManager createHttpClientConnectionManager(IHttpTransportManager manager) {
+    PoolingHttpClientConnectionManagerBuilder builder = PoolingHttpClientConnectionManagerBuilder.create();
+
+    builder.setSSLSocketFactory(createSSLConnectionSocketFactory());
+    builder.setDefaultConnectionConfig(ConnectionConfig.custom()
+        .setTimeToLive(CONFIG.getPropertyValue(ApacheHttpTransportConnectionTimeToLiveProperty.class), TimeUnit.MILLISECONDS)
+        .setValidateAfterInactivity(1, TimeUnit.MILLISECONDS)
+        .build());
 
     Integer maxTotal = CONFIG.getPropertyValue(ApacheHttpTransportMaxConnectionsTotalProperty.class);
     if (maxTotal != null && maxTotal > 0) {
-      connectionManager.setMaxTotal(maxTotal);
+      builder.setMaxConnTotal(maxTotal);
     }
     Integer defaultMaxPerRoute = CONFIG.getPropertyValue(ApacheHttpTransportMaxConnectionsPerRouteProperty.class);
     if (defaultMaxPerRoute > 0) {
-      connectionManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
+      builder.setMaxConnPerRoute(defaultMaxPerRoute);
     }
-    return connectionManager;
+    interceptNewHttpClientConnectionManager(builder, manager);
+
+    return builder.build();
   }
 
   protected SSLConnectionSocketFactory createSSLConnectionSocketFactory() {
@@ -139,7 +130,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
         (SSLSocketFactory) SSLSocketFactory.getDefault(),
         sslProtocols != null && sslProtocols.length > 0 ? sslProtocols : null,
         sslCipherSuites != null && sslCipherSuites.length > 0 ? sslCipherSuites : null,
-        new DefaultHostnameVerifier(PublicSuffixMatcherLoader.getDefault()));
+        HttpsSupport.getDefaultHostnameVerifier());
   }
 
   protected PlainConnectionSocketFactory createPlainSocketFactory() {
@@ -154,7 +145,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   }
 
   /**
-   * Install a {@link MultiSessionCookieStore} to store cookies by session.
+   * Install {@link ApacheMultiSessionCookieStore} to store cookies by session.
    */
   protected void installMultiSessionCookieStore(HttpClientBuilder builder) {
     builder.setDefaultCookieStore(BEANS.get(ApacheMultiSessionCookieStore.class));
@@ -164,6 +155,13 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * Intercept the building of the new {@link HttpTransport}.
    */
   protected void interceptNewHttpTransport(HttpClientBuilder builder, IHttpTransportManager manager) {
+    // nop
+  }
+
+  /**
+   * Intercept the building of the connection manager
+   */
+  protected void interceptNewHttpClientConnectionManager(PoolingHttpClientConnectionManagerBuilder builder, IHttpTransportManager manager) {
     // nop
   }
 

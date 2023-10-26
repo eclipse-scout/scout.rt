@@ -11,9 +11,9 @@ package org.eclipse.scout.rt.rest.jersey.client;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.http.ProtocolVersion;
-import org.apache.http.message.BasicRequestLine;
-import org.apache.http.util.CharArrayBuffer;
+import org.apache.hc.core5.http.ProtocolVersion;
+import org.apache.hc.core5.http.message.RequestLine;
+import org.apache.hc.core5.util.CharArrayBuffer;
 import org.eclipse.scout.rt.rest.IRestHttpRequestUriEncoder;
 import org.junit.Test;
 
@@ -21,11 +21,11 @@ public class LineFormatterWithUriEncoderTest {
 
   @Test
   public void testDoFormatRequestLine() {
-    BasicRequestLine reqLine = new BasicRequestLine("GET", "/a,b", new ProtocolVersion("HTTP", 1, 1));
+    RequestLine reqLine = new RequestLine("GET", "/a,b", new ProtocolVersion("HTTP", 1, 1));
     LineFormatterWithUriEncoder lineFormatter = new LineFormatterWithUriEncoder(new MockUriEncoder());
 
     CharArrayBuffer buffer = new CharArrayBuffer(20);
-    buffer = lineFormatter.formatRequestLine(buffer, reqLine);
+    lineFormatter.formatRequestLine(buffer, reqLine);
 
     assertEquals("GET /a%2Cb HTTP/1.1", buffer.toString());
   }
