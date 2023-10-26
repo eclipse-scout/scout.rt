@@ -1003,7 +1003,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
             .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
             .findAny()
             .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar!"));
-        cal.setVisible(visible);
+        cal.withVisible(visible);
         // Trigger reload when new calendar is selected
         if (visible) {
           reloadCalendarItems();

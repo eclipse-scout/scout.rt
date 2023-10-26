@@ -16,44 +16,51 @@ package org.eclipse.scout.rt.shared.services.common.calendar;
 public interface ICalendarDescriptor {
 
   /**
-   * Unique identifyer of a calendar. Calendar items reference this id with the {@link ICalendarItem#getCalendarId()}
+   * Unique identifyer of a calendar. Calendar items reference this ID with the {@link ICalendarItem#getCalendarId()}
+   * <br>
+   * Required property, set via constructor
    */
   Long getCalendarId();
 
-  void setCalendarId(long id);
-
   /**
-   * Name of the Calendar E.g. Jeremy White
+   * Name of the Calendar E.g. Jeremy White <br>
+   * Required property, set via constructor
    */
   String getName();
 
-  void setName(String name);
-
   /**
-   * Unique identifyer of the parent calendar
+   * Unique identifyer of the parent calendar. <br>
+   * Do not set this, if ths is a calendar group or a top level calendar.
    */
   Long getParentId();
 
-  void setParentId(Long parentId);
+  ICalendarDescriptor withParentId(Long parentId);
 
   /**
    * Indicates if the calendar is displayed
    */
   boolean isVisible();
 
-  void setVisible(boolean visible);
+  ICalendarDescriptor withVisible(boolean visible);
+
+  /**
+   * Indicates if the calendar can be selected via range selection
+   */
+  boolean isSelectable();
+
+  ICalendarDescriptor withSelectable(boolean selectable);
 
   /**
    * Css class of the calendar
    */
   String getCssClass();
 
-  void setCssClass(String cssClass);
+  ICalendarDescriptor withCssClass(String cssClass);
 
   /**
    * Order of calendar
    */
   long getOrder();
 
-  void setOrder(long order);
+  ICalendarDescriptor withOrder(long order);
 }
