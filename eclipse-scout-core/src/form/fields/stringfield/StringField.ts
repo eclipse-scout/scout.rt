@@ -200,6 +200,16 @@ export class StringField extends BasicField<string> {
     return super.isClearable() && !this.multilineText;
   }
 
+  selectAll() {
+    this.setSelectionStart(0);
+    this.setSelectionEnd(this.displayText.length);
+  }
+
+  setCursorAtEnd() {
+    this.setSelectionStart(this.displayText.length);
+    this.setSelectionEnd(this.displayText.length);
+  }
+
   setSelectionStart(selectionStart: number) {
     this.setProperty('selectionStart', selectionStart);
   }
