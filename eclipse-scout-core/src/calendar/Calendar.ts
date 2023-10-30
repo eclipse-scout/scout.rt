@@ -276,7 +276,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _updateCalendarNodes() {
     this.calendarsPanel.tree.removeAllNodes();
-    // Ensure to have parent nodes first
+    // Ensure to add parent nodes first to the tree
     this.calendars.sort((cal1, cal2) => {
       if (cal1.parentId && cal2.parentId) {
         return 0;
@@ -1663,13 +1663,15 @@ export class Calendar extends Widget implements CalendarModel {
       if (!c.stack) {
         c.stack = {};
       }
-      c.stack[this._calculateStackKey(day, c.item.calendarId)] = {};
+      let calendarId = c.item ? c.item.calendarId : null;
+      c.stack[this._calculateStackKey(day, calendarId)] = {};
     }
 
     for (let i = 0; i < components.length; i++) {
       let c = components[i];
       let r = c.getPartDayPosition(day); // Range [from,to]
-      key = this._calculateStackKey(day, c.item.calendarId);
+      let calendarId = c.item ? c.item.calendarId : null;
+      key = this._calculateStackKey(day, calendarId);
 
       // reduce number of columns, if all components end before this one
       if (columns.length > 0 && this._allEndBefore(columns, r.from, day)) {
@@ -1735,8 +1737,11 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  protected _calculateStackKey(date: Date, calendarId: number): string {
-    if (!this.isDay() || calendarId === 0) {
+  /**
+   * @internal
+   */
+  _calculateStackKey(date: Date, calendarId?: number): string {
+    if (!this.isDay() || !calendarId || calendarId === 0) {
       return 'default';
     }
     return date + '' + calendarId ? calendarId.toString() : 'default';

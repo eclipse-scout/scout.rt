@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponent, DateRange, dates, scout} from '../../src/index';
+import {Calendar, CalendarComponent, CalendarDescriptor, DateRange, dates, scout} from '../../src/index';
 
 describe('Calendar', () => {
   let session: SandboxSession;
@@ -145,6 +145,11 @@ describe('Calendar', () => {
     });
 
     describe('arrangeComponents', () => {
+      let stackKey;
+
+      beforeAll(() => {
+        stackKey = cal._calculateStackKey(day);
+      });
 
       it('does nothing for no components', () => {
         let components = [];
@@ -156,8 +161,8 @@ describe('Calendar', () => {
         let components = [c1];
         cal._arrange(components, day);
         expect(components[0]).toEqual(c1);
-        expect(c1.stack[day + ''].x).toEqual(0);
-        expect(c1.stack[day + ''].w).toEqual(1);
+        expect(c1.stack[stackKey].x).toEqual(0);
+        expect(c1.stack[stackKey].w).toEqual(1);
       });
 
       it('arranges intersecting components', () => {
@@ -165,10 +170,10 @@ describe('Calendar', () => {
         cal._arrange(components, day);
         expect(components[0]).toEqual(c1);
         expect(components[1]).toEqual(c5);
-        expect(c1.stack[day + ''].x).toEqual(0);
-        expect(c1.stack[day + ''].w).toEqual(2);
-        expect(c5.stack[day + ''].x).toEqual(1);
-        expect(c5.stack[day + ''].w).toEqual(2);
+        expect(c1.stack[stackKey].x).toEqual(0);
+        expect(c1.stack[stackKey].w).toEqual(2);
+        expect(c5.stack[stackKey].x).toEqual(1);
+        expect(c5.stack[stackKey].w).toEqual(2);
       });
 
       it('arranges equal components', () => {
@@ -176,10 +181,10 @@ describe('Calendar', () => {
         cal._arrange(components, day);
         expect(components[0]).toEqual(c6);
         expect(components[1]).toEqual(c7);
-        expect(c6.stack[day + ''].x).toEqual(0);
-        expect(c6.stack[day + ''].w).toEqual(2);
-        expect(c7.stack[day + ''].x).toEqual(1);
-        expect(c7.stack[day + ''].w).toEqual(2);
+        expect(c6.stack[stackKey].x).toEqual(0);
+        expect(c6.stack[stackKey].w).toEqual(2);
+        expect(c7.stack[stackKey].x).toEqual(1);
+        expect(c7.stack[stackKey].w).toEqual(2);
       });
 
       it('arranges intersecting and non-intersecting components', () => {
@@ -191,19 +196,19 @@ describe('Calendar', () => {
         expect(components[3]).toEqual(c2);
         expect(components[4]).toEqual(c3);
         expect(components[5]).toEqual(c4);
-        expect(c1.stack[day + ''].w).toEqual(3);
-        expect(c2.stack[day + ''].w).toEqual(3);
-        expect(c3.stack[day + ''].w).toEqual(3);
-        expect(c4.stack[day + ''].w).toEqual(3);
-        expect(c5.stack[day + ''].w).toEqual(3);
-        expect(c6.stack[day + ''].w).toEqual(3);
+        expect(c1.stack[stackKey].w).toEqual(3);
+        expect(c2.stack[stackKey].w).toEqual(3);
+        expect(c3.stack[stackKey].w).toEqual(3);
+        expect(c4.stack[stackKey].w).toEqual(3);
+        expect(c5.stack[stackKey].w).toEqual(3);
+        expect(c6.stack[stackKey].w).toEqual(3);
 
-        expect(c6.stack[day + ''].x).toEqual(0);
-        expect(c1.stack[day + ''].x).toEqual(1);
-        expect(c5.stack[day + ''].x).toEqual(2);
-        expect(c2.stack[day + ''].x).toEqual(0);
-        expect(c3.stack[day + ''].x).toEqual(0);
-        expect(c4.stack[day + ''].x).toEqual(1);
+        expect(c6.stack[stackKey].x).toEqual(0);
+        expect(c1.stack[stackKey].x).toEqual(1);
+        expect(c5.stack[stackKey].x).toEqual(2);
+        expect(c2.stack[stackKey].x).toEqual(0);
+        expect(c3.stack[stackKey].x).toEqual(0);
+        expect(c4.stack[stackKey].x).toEqual(1);
       });
 
       it('reduces rows when arranging components', () => {
@@ -212,13 +217,13 @@ describe('Calendar', () => {
         expect(components[0]).toEqual(c6);
         expect(components[1]).toEqual(c1);
         expect(components[2]).toEqual(c3);
-        expect(c6.stack[day + ''].w).toEqual(2);
-        expect(c1.stack[day + ''].w).toEqual(2);
-        expect(c3.stack[day + ''].w).toEqual(1);
+        expect(c6.stack[stackKey].w).toEqual(2);
+        expect(c1.stack[stackKey].w).toEqual(2);
+        expect(c3.stack[stackKey].w).toEqual(1);
 
-        expect(c6.stack[day + ''].x).toEqual(0);
-        expect(c1.stack[day + ''].x).toEqual(1);
-        expect(c3.stack[day + ''].x).toEqual(0);
+        expect(c6.stack[stackKey].x).toEqual(0);
+        expect(c1.stack[stackKey].x).toEqual(1);
+        expect(c3.stack[stackKey].x).toEqual(0);
       });
 
       it('arranges intersecting components spanning more than one day', () => {
@@ -228,11 +233,11 @@ describe('Calendar', () => {
         cal._arrange(components, day1);
         expect(components[0]).toEqual(c8);
         expect(components[1]).toEqual(c3);
-        expect(c8.stack[day1 + ''].w).toEqual(2);
-        expect(c3.stack[day1 + ''].w).toEqual(2);
+        expect(c8.stack[stackKey].w).toEqual(2);
+        expect(c3.stack[stackKey].w).toEqual(2);
 
-        expect(c8.stack[day1 + ''].x).toEqual(0);
-        expect(c3.stack[day1 + ''].x).toEqual(1);
+        expect(c8.stack[stackKey].x).toEqual(0);
+        expect(c3.stack[stackKey].x).toEqual(1);
       });
 
     });
@@ -488,6 +493,55 @@ describe('Calendar', () => {
       // because the day was shifted to 29 while navigating over Feb. 2016
       expect(cal.selectedDate).toEqual(dates.parseJsonDate('2016-01-29 12:00:00.000'));
     });
+  });
 
+  describe('multiple calendars', () => {
+    let cal: SpecCalendar,
+      businessCalendar: CalendarDescriptor,
+      externalCalendar: CalendarDescriptor,
+      comp1: CalendarComponent,
+      day;
+
+    let businessCalendarDescripor = {
+      calendarId: 1,
+      name: 'Business Calendar',
+      visible: true,
+      selectable: true
+    };
+
+    let externalCalendarDescripor = {
+      calendarId: 2,
+      name: 'External Calendar',
+      visible: true,
+      selectable: false
+    };
+
+    let model1 = {
+      fromDate: '2023-10-27 12:00:00.000',
+      toDate: '2023-10-27 12:30:00.000'
+    };
+
+    beforeEach(() => {
+      cal = scout.create(SpecCalendar, {parent: session.desktop});
+      comp1 = scout.create(CalendarComponent, $.extend({parent: cal}, model1));
+      day = dates.parseJsonDate('2023-10-27 00:00:00.000');
+      businessCalendar = businessCalendarDescripor;
+      externalCalendar = externalCalendarDescripor;
+      cal.render();
+      comp1.render();
+    });
+
+    it('should render components without calendarId in default column in day view', () => {
+      // Arrange
+      let $compContainer = comp1._$parts[0];
+      cal.setDisplayMode(Calendar.DisplayMode.DAY);
+      cal._arrange([comp1], day);
+
+      // Act
+      let calendarIdData = $compContainer.parent().data('calendarId');
+
+      // Assert
+      expect(calendarIdData).toEqual('default');
+    });
   });
 });
