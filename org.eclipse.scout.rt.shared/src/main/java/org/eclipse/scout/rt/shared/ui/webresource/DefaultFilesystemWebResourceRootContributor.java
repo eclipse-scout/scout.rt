@@ -16,6 +16,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class DefaultFilesystemWebResourceRootContributor implements IFilesystemWebResourceRootContributor {
+
+  public static final String WEBPACK_CONFIG_JS = "webpack.config.js";
+
   @Override
   public List<Path> getRoots() {
     Path moduleRoot = findModuleRoot();
@@ -31,24 +34,36 @@ public class DefaultFilesystemWebResourceRootContributor implements IFilesystemW
     if (parentDir == null) {
       return null;
     }
+
+    // try module without .dev/-dev suffix
     String folderName = workingDir.getFileName().toString();
     String appModuleName = folderName;
     if (folderName.endsWith(".dev") || folderName.endsWith("-dev")) {
       appModuleName = folderName.substring(0, folderName.length() - 4);
     }
     Path resourceRoot = parentDir.resolve(appModuleName);
-    if (Files.isDirectory(resourceRoot) && Files.isReadable(resourceRoot)) {
+    if (isValidRootModule(resourceRoot)) {
       return resourceRoot;
     }
 
+    // try module without .app/-app suffix
     if (appModuleName.endsWith(".app") || appModuleName.endsWith("-app")) {
       appModuleName = appModuleName.substring(0, appModuleName.length() - 4);
     }
     resourceRoot = parentDir.resolve(appModuleName);
-    if (Files.isDirectory(resourceRoot) && Files.isReadable(resourceRoot)) {
+    if (isValidRootModule(resourceRoot)) {
       return resourceRoot;
     }
 
     return workingDir;
+  }
+
+  /**
+   * A module is considered valid if a file {@link #WEBPACK_CONFIG_JS} exists.
+   */
+  protected static boolean isValidRootModule(Path module) {
+    return Files.isDirectory(module)
+        && Files.isReadable(module)
+        && Files.exists(module.resolve(WEBPACK_CONFIG_JS));
   }
 }
