@@ -43,7 +43,7 @@ export class ModeSelectorLayout extends AbstractLayout {
       .forEach(mode => {
         let oldModeStyle = mode.$container.attr('style');
         mode.$container.css('flex', 'none');
-        let modeWidth = mode.htmlComp.prefSize().width;
+        let modeWidth = mode.htmlComp.prefSize({includeMargin: true}).width;
         if (modeWidth > maxWidth) {
           maxWidth = modeWidth;
         }
