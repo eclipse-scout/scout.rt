@@ -209,6 +209,20 @@ describe('StringField', () => {
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
     });
 
+    it('supports undo operation', () => {
+      field.render();
+      field.insertText('Test1');
+      field.insertText('ABC2');
+      expect(field.value).toBe('Test1ABC2');
+
+      document.execCommand('undo');
+      field.acceptInput();
+      expect(field.value).toBe('Test1');
+
+      document.execCommand('undo');
+      field.acceptInput();
+      expect(field.value).toBe(null);
+    });
   });
 
   describe('trim', () => {
