@@ -11,7 +11,7 @@ import {Device, FormField, FormFieldStatusPosition, Popup, scout, strings, TabIt
 
 /**
  * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with #makeInputOrDiv().
- * Works as setter when called with 2 arguments, works a getter when called with 1 arguments.
+ * Works as setter when called with 2 arguments, works a getter when called with 1 argument.
  *
  * @returns when called with 1 argument: $field.text() or $field.val()
  */
@@ -184,5 +184,15 @@ export const fields = {
     if (box.htmlComp) {
       box.htmlComp.suppressInvalidate = false;
     }
+  },
+
+  /**
+   * Focuses the given input and calls the insertText command to insert the text at the current cursor position.
+   *
+   * Using the exec command allows the user to undo the operation (e.g. using ctrl-z).
+   */
+  focusAndInsertText($input: JQuery<HTMLInputElement | HTMLTextAreaElement>, text: string) {
+    $input[0].focus();
+    $input.document(true).execCommand('insertText', false, text);
   }
 };
