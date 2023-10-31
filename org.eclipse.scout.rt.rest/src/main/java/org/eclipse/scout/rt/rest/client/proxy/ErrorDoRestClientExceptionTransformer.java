@@ -56,30 +56,31 @@ public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestCli
   }
 
   protected RuntimeException transformClientError(RuntimeException e, Response response, BiFunction<String, RuntimeException, VetoException> vetoExceptionFactory) {
-    return safeTransformEntityErrorResponse(e, response, () -> {
-      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-      return vetoExceptionFactory.apply(error.getMessage(), e)
-          .withTitle(error.getTitle())
-          .withCode(error.getErrorCodeAsInt())
-          .withSeverity(error.getSeverityAsInt());
-    }, () -> {
-      StatusType statusInfo = response.getStatusInfo();
-      return vetoExceptionFactory.apply(statusInfo.getReasonPhrase(), e);
-    });
+    return safeTransformEntityErrorResponse(e, response,
+        () -> buildProcessingException(e, response, vetoExceptionFactory, response.readEntity(ErrorResponse.class).getError()),
+        () -> buildProcessingException(e, response, vetoExceptionFactory, null));
   }
 
   @Override
   protected RuntimeException defaultTransform(RuntimeException e, Response response) {
-    return safeTransformEntityErrorResponse(e, response, () -> {
-      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-      return new ProcessingException(error.getMessage(), e)
+    return safeTransformEntityErrorResponse(e, response,
+        () -> buildProcessingException(e, response, ProcessingException::new, response.readEntity(ErrorResponse.class).getError()),
+        () -> buildProcessingException(e, response, ProcessingException::new, null));
+  }
+
+  protected ProcessingException buildProcessingException(RuntimeException e, Response response, BiFunction<String, RuntimeException, ? extends ProcessingException> exceptionFactory, ErrorDo error) {
+    if (error != null) {
+      return exceptionFactory.apply(error.getMessage(), e)
           .withTitle(error.getTitle())
           .withCode(error.getErrorCodeAsInt())
           .withSeverity(error.getSeverityAsInt());
-    }, () -> {
-      StatusType statusInfo = response.getStatusInfo();
-      return new ProcessingException("REST call failed: {} {}", statusInfo.getStatusCode(), statusInfo.getReasonPhrase(), e);
-    });
+    }
+
+    // ErrorDo might be missing, if a ServletFilter aborts the request with an e.g. forbidden http status code.
+    // The servlet container might then return a generic json response which does not contain a Scout ErrorDo.
+    // Such a response could look like: {"servlet":"ServletName","message":"Forbidden","url":"/api/","status":"403"}
+    StatusType statusInfo = response.getStatusInfo();
+    return exceptionFactory.apply("REST call failed: " + statusInfo.getStatusCode() + " " + statusInfo.getReasonPhrase(), e);
   }
 
   protected RuntimeException transformUnavailableResponse(RuntimeException e, Response response) {

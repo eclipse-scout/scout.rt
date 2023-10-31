@@ -111,7 +111,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testSyncGetForbiddenEmptyBody() {
     VetoException ve = Assert.assertThrows(VetoException.class, () -> webTargetGet(Status.FORBIDDEN, Content.EMPTY_BODY, Execution.SYNC));
-    assertEquals("Forbidden", ve.getDisplayMessage());
+    assertEquals("REST call failed: 403 Forbidden", ve.getDisplayMessage());
   }
 
   @Test
@@ -123,7 +123,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testSyncGetNotFoundEmptyBody() {
     ProcessingException pe = Assert.assertThrows(ProcessingException.class, () -> webTargetGet(Status.NOT_FOUND, Content.EMPTY_BODY, Execution.SYNC));
-    assertEquals("Not Found", pe.getDisplayMessage());
+    assertEquals("REST call failed: 404 Not Found", pe.getDisplayMessage());
   }
 
   @Test
@@ -155,7 +155,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testAsyncGetForbiddenEmptyBody() {
     VetoException ve = Assert.assertThrows(VetoException.class, () -> webTargetGet(Status.FORBIDDEN, Content.EMPTY_BODY, Execution.ASYNC));
-    assertEquals("Forbidden", ve.getDisplayMessage());
+    assertEquals("REST call failed: 403 Forbidden", ve.getDisplayMessage());
   }
 
   @Test
@@ -167,7 +167,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testAsyncGetNotFoundEmptyBody() {
     ResourceNotFoundException pe = Assert.assertThrows(ResourceNotFoundException.class, () -> webTargetGet(Status.NOT_FOUND, Content.EMPTY_BODY, Execution.ASYNC));
-    assertEquals("Not Found", pe.getDisplayMessage());
+    assertEquals("REST call failed: 404 Not Found", pe.getDisplayMessage());
   }
 
   @Test
@@ -332,7 +332,7 @@ public class RestClientProxyInvocationTest {
       .request()
       .accept(MediaType.APPLICATION_JSON)
       .get(RestClientTestEchoResponse.class));
-    assertEquals("Forbidden", ve.getDisplayMessage());
+    assertEquals("REST call failed: 403 Forbidden", ve.getDisplayMessage());
   }
 
   @Test
@@ -353,7 +353,7 @@ public class RestClientProxyInvocationTest {
       .request()
       .accept(MediaType.APPLICATION_JSON)
       .get(RestClientTestEchoResponse.class));
-    assertEquals("Not Found", pe.getDisplayMessage());
+    assertEquals("REST call failed: 404 Not Found", pe.getDisplayMessage());
   }
 
   @Test
@@ -394,7 +394,7 @@ public class RestClientProxyInvocationTest {
       .get(RestClientTestEchoResponse.class)
       .get());
     assertEquals(AccessForbiddenException.class, ee.getCause().getClass());
-    assertEquals("Forbidden", ((AccessForbiddenException) ee.getCause()).getDisplayMessage());
+    assertEquals("REST call failed: 403 Forbidden", ((AccessForbiddenException) ee.getCause()).getDisplayMessage());
   }
 
   @Test
@@ -421,7 +421,7 @@ public class RestClientProxyInvocationTest {
       .get(RestClientTestEchoResponse.class)
       .get());
     assertEquals(ResourceNotFoundException.class, ee.getCause().getClass());
-    assertEquals("Not Found", ((ResourceNotFoundException) ee.getCause()).getDisplayMessage());
+    assertEquals("REST call failed: 404 Not Found", ((ResourceNotFoundException) ee.getCause()).getDisplayMessage());
   }
 
   @Test
@@ -497,7 +497,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testClientInvocationSyncGetEntityForbiddenEmptyBody() {
     VetoException ve = Assert.assertThrows(VetoException.class, () -> clientInvocationGetEntity(Status.FORBIDDEN, Content.EMPTY_BODY, Execution.SYNC));
-    assertEquals("Forbidden", ve.getDisplayMessage());
+    assertEquals("REST call failed: 403 Forbidden", ve.getDisplayMessage());
   }
 
   @Test
@@ -509,7 +509,7 @@ public class RestClientProxyInvocationTest {
   @Test
   public void testClientInvocationSyncGetEntityNotFoundEmptyBody() {
     ProcessingException pe = Assert.assertThrows(ProcessingException.class, () -> clientInvocationGetEntity(Status.NOT_FOUND, Content.EMPTY_BODY, Execution.SYNC));
-    assertEquals("Not Found", pe.getDisplayMessage());
+    assertEquals("REST call failed: 404 Not Found", pe.getDisplayMessage());
   }
 
   @Test
@@ -530,7 +530,7 @@ public class RestClientProxyInvocationTest {
   public void testClientInvocationAsyncGetEntityForbiddenEmptyBody() {
     ExecutionException ee = Assert.assertThrows(ExecutionException.class, () -> clientInvocationGetEntity(Status.FORBIDDEN, Content.EMPTY_BODY, Execution.ASYNC));
     assertEquals(AccessForbiddenException.class, ee.getCause().getClass());
-    assertEquals("Forbidden", ((AccessForbiddenException) ee.getCause()).getDisplayMessage());
+    assertEquals("REST call failed: 403 Forbidden", ((AccessForbiddenException) ee.getCause()).getDisplayMessage());
   }
 
   @Test
@@ -544,7 +544,7 @@ public class RestClientProxyInvocationTest {
   public void testClientInvocationAsyncGetEntityNotFoundEmptyBody() {
     ExecutionException ee = Assert.assertThrows(ExecutionException.class, () -> clientInvocationGetEntity(Status.NOT_FOUND, Content.EMPTY_BODY, Execution.ASYNC));
     assertEquals(ResourceNotFoundException.class, ee.getCause().getClass());
-    assertEquals("Not Found", ((ResourceNotFoundException) ee.getCause()).getDisplayMessage());
+    assertEquals("REST call failed: 404 Not Found", ((ResourceNotFoundException) ee.getCause()).getDisplayMessage());
   }
 
   protected RestClientTestEchoResponse clientInvocationGetEntity(Status status, Content content, Execution execution) throws Exception {
@@ -604,7 +604,7 @@ public class RestClientProxyInvocationTest {
         .buildGet();
 
     VetoException ve = Assert.assertThrows(VetoException.class, () -> invocation.invoke(RestClientTestEchoResponse.class));
-    assertEquals("Forbidden", ve.getDisplayMessage());
+    assertEquals("REST call failed: 403 Forbidden", ve.getDisplayMessage());
   }
 
   @Test
@@ -645,7 +645,7 @@ public class RestClientProxyInvocationTest {
 
     ExecutionException ee = Assert.assertThrows(ExecutionException.class, () -> invocation.submit(RestClientTestEchoResponse.class).get());
     assertEquals(AccessForbiddenException.class, ee.getCause().getClass());
-    assertEquals("Forbidden", ((AccessForbiddenException) ee.getCause()).getDisplayMessage());
+    assertEquals("REST call failed: 403 Forbidden", ((AccessForbiddenException) ee.getCause()).getDisplayMessage());
   }
 
   @Test

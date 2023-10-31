@@ -57,6 +57,25 @@ public class ErrorDoRestClientExceptionTransformerTest {
   }
 
   @Test
+  public void testWithoutErrorDo() {
+    String message = "mock";
+    RuntimeException mockCause = new RuntimeException(message);
+    ErrorResponse errorResponse = BEANS.get(ErrorResponse.class);
+    RuntimeException actualException = m_exceptionTransformer.transform(mockCause, mockResponse(Status.MOVED_PERMANENTLY, errorResponse));
+    assertProcessingException(ProcessingException.class, mockCause, null, 0, actualException);
+    assertEquals("REST call failed: 301 Moved Permanently [severity=ERROR]", actualException.getMessage());
+    assertEquals(message, actualException.getCause().getMessage());
+  }
+
+  @Test
+  public void testWithoutException() {
+    ErrorResponse errorResponse = BEANS.get(ErrorResponse.class);
+    RuntimeException actualException = m_exceptionTransformer.transform(null, mockResponse(Status.FORBIDDEN, errorResponse));
+    assertProcessingException(AccessForbiddenException.class, null, null, 0, actualException);
+    assertEquals("REST call failed: 403 Forbidden [severity=ERROR]", actualException.getMessage());
+  }
+
+  @Test
   public void testTransformByResponseStatus() {
     RuntimeException mockCause = new RuntimeException("mock");
     int mockCode = 100;
@@ -117,5 +136,6 @@ public class ErrorDoRestClientExceptionTransformerTest {
     assertEquals(expectedCause, actual.getCause());
     assertEquals(expectedTitle, processingException.getStatus().getTitle());
     assertEquals(expectedCode != null ? expectedCode.intValue() : 0, processingException.getStatus().getCode());
+    assertEquals(0, processingException.getSuppressed().length); // nothing should be suppressed
   }
 }
