@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionData;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
+import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractServerSession.class);
+
+  protected static final String SESSION_TYPE = "server";
+
+  protected final transient SessionMetricsHelper m_sessionMetrics = BEANS.get(SessionMetricsHelper.class);
 
   private final transient FastListenerList<ISessionListener> m_eventListeners;
 
@@ -69,6 +74,8 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_sessionData = new SessionData();
     m_sharedVariableMap = new SharedVariableMap();
     m_objectExtensions = new ObjectExtensions<>(this, true);
+
+    m_sessionMetrics.sessionCreated(SESSION_TYPE);
     if (autoInitConfig) {
       interceptInitConfig();
     }
@@ -273,6 +280,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
       m_active = false;
       m_stopping = false;
       fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
+      m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
       LOG.info("Server session stopped [session={}, user={}]", this, getUserId());
     }
   }
