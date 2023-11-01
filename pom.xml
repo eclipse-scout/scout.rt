@@ -22,7 +22,6 @@
   <artifactId>org.eclipse.scout.rt.root</artifactId>
   <version>24.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>root</name>
 
   <modules>
     <module>org.eclipse.scout.rt</module>
