@@ -69,6 +69,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
+import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
 import org.eclipse.scout.rt.shared.session.Sessions;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
@@ -115,6 +116,10 @@ public class UiSession implements IUiSession {
   private static final LazyValue<HttpSessionHelper> HTTP_SESSION_HELPER = new LazyValue<>(HttpSessionHelper.class);
   private static final LazyValue<JsonRequestHelper> JSON_REQUEST_HELPER = new LazyValue<>(JsonRequestHelper.class);
   private static final String URL_PARAM_THEME = "theme";
+
+  protected static final String SESSION_TYPE = "ui";
+
+  protected SessionMetricsHelper m_sessionMetrics = BEANS.get(SessionMetricsHelper.class);
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;
@@ -209,6 +214,7 @@ public class UiSession implements IUiSession {
 
     // Set initial "touch" time
     touch();
+    m_sessionMetrics.sessionCreated(SESSION_TYPE);
 
     try {
       BEANS.get(SessionMonitorMBean.class).weakRegister(this);
@@ -617,6 +623,8 @@ public class UiSession implements IUiSession {
     m_jsonAdapterRegistry.disposeAdapters();
     m_httpContext.clear();
     m_currentJsonResponse = null;
+
+    m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
   }
 
   @Override

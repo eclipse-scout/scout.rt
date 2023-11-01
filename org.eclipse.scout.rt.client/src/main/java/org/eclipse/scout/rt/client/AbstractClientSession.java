@@ -56,6 +56,7 @@ import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionData;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
+import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
@@ -64,6 +65,10 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractClientSession extends AbstractPropertyObserver implements IClientSession, IExtensibleObject {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractClientSession.class);
+
+  protected static final String SESSION_TYPE = "client";
+
+  protected final SessionMetricsHelper m_sessionMetrics = BEANS.get(SessionMetricsHelper.class);
 
   private final FastListenerList<ISessionListener> m_eventListeners;
   private final IExecutionSemaphore m_modelJobSemaphore = Jobs.newExecutionSemaphore(1).seal();
@@ -99,6 +104,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_objectExtensions = new ObjectExtensions<>(this, true);
     m_sharedVariableMap = new SharedVariableMap();
 
+    m_sessionMetrics.sessionCreated(SESSION_TYPE);
     setLocale(NlsLocale.get());
 
     if (autoInitConfig) {
@@ -425,6 +431,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     finally {
       setActive(false);
       fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
+      m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
       LOG.info("Client session stopped [session={}, user={}]", this, getUserId());
     }
   }
