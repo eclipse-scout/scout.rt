@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.management.SessionMonitorMBean;
 import org.slf4j.Logger;
@@ -52,6 +53,10 @@ import org.slf4j.LoggerFactory;
  */
 public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   private static final Logger LOG = LoggerFactory.getLogger(SessionStore.class);
+
+  protected static final String SESSION_TYPE = "http";
+
+  protected final SessionMetricsHelper m_sessionMetrics = BEANS.get(SessionMetricsHelper.class);
 
   private final HttpSession m_httpSession;
   private final String m_httpSessionId; // because getId() cannot be called on an invalid session
@@ -112,6 +117,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     m_readLock = lock.readLock();
     m_writeLock = lock.writeLock();
     BEANS.get(SessionMonitorMBean.class).weakRegister(httpSession);
+    m_sessionMetrics.sessionCreated(SESSION_TYPE);
   }
 
   @Override
@@ -469,6 +475,8 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         //the housekeeping may run immediately, this call may cancel a pending housekeeping job iff it did not start already
         doHousekeepingOutsideWriteLock(clientSession);
       }
+
+      m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
     }
   }
 
