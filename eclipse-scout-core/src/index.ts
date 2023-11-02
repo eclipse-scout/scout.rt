@@ -594,7 +594,7 @@ export * from './tree/TreeModel';
 export * from './tree/TreeAdapter';
 export * from './tree/TreeNode';
 export * from './tree/TreeNodeModel';
-export * from './tree/TreeNodeUpdate';
+export * from './tree/TreeCheckNodesResult';
 export * from './tree/TreeLayout';
 export * from './tree/LazyNodeFilter';
 export * from './tree/TreeBreadcrumbFilter';

@@ -192,6 +192,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       protected AutoCheckStyle modelValue() {
         return getModel().getAutoCheckStyle();
       }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return ((AutoCheckStyle) value).name().toLowerCase();
+      }
     });
     putJsonProperty(new JsonProperty<>(ITree.PROP_SCROLL_TO_SELECTION, model) {
       @Override

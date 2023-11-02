@@ -239,11 +239,9 @@ export class TreeAdapter extends ModelAdapter {
 
     this.widget.checkNodes(checkedNodes, {
       checked: true,
-      autoCheckStyle: Tree.AutoCheckStyle.NONE,
       checkOnlyEnabled: false
     });
     this.widget.uncheckNodes(uncheckedNodes, {
-      autoCheckStyle: Tree.AutoCheckStyle.NONE,
       checkOnlyEnabled: false
     });
   }

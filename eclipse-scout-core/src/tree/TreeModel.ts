@@ -21,6 +21,8 @@ export interface TreeModel extends WidgetModel {
    */
   autoCheckChildren?: boolean;
   /**
+   * Describes the behavior of children and parent nodes, when a node is checked/unchecked.
+   *
    * Default is {@link AutoCheckStyle.NONE}
    */
   autoCheckStyle?: AutoCheckStyle;
