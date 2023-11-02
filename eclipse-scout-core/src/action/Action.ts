@@ -35,6 +35,10 @@ export class Action extends Widget implements ActionModel {
   text: string;
   textPosition: ActionTextPosition;
   htmlEnabled: boolean;
+  /**
+   * May be set to true if the action does not fit into the container and is for example moved into an overflow-menu.
+   */
+  overflown: boolean;
   textVisible: boolean;
   textVisibleOrig: boolean;
   toggleAction: boolean;
@@ -61,6 +65,7 @@ export class Action extends Widget implements ActionModel {
     this.text = null;
     this.textPosition = Action.TextPosition.DEFAULT;
     this.htmlEnabled = false;
+    this.overflown = false;
     this.textVisible = true;
     this.toggleAction = false;
     this.tooltipText = null;
@@ -139,6 +144,7 @@ export class Action extends Widget implements ActionModel {
     this._renderSelected();
     this._renderTabbable();
     this._renderCompact();
+    this._renderOverflown();
   }
 
   protected override _remove() {
@@ -416,6 +422,23 @@ export class Action extends Widget implements ActionModel {
   /** @see ActionModel.preventDoubleClick */
   setPreventDoubleClick(preventDoubleClick: boolean) {
     this.setProperty('preventDoubleClick', preventDoubleClick);
+  }
+
+  /**
+   * @internal
+   */
+  _setOverflown(overflown: boolean) {
+    if (this.overflown === overflown) {
+      return;
+    }
+    this._setProperty('overflown', overflown);
+    if (this.rendered) {
+      this._renderOverflown();
+    }
+  }
+
+  protected _renderOverflown() {
+    this.$container.toggleClass('overflown', this.overflown);
   }
 
   protected _allowMouseEvent(event: JQuery.MouseEventBase): boolean {

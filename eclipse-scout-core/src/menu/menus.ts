@@ -194,10 +194,10 @@ export const menus = {
   },
 
   /**
-   * If the given menus contain a {@link ComboMenu}, the resulting array contains the child actions of the combo menu instead of the combo menu itself.
+   * If the given actions contain a {@link ComboMenu}, the resulting array contains the child actions of the combo menu instead of the combo menu itself.
    */
-  flatTopLevelMenus<TAction extends Action>(menus: TAction[]): TAction[] {
-    return arrays.flatMap(menus, item => {
+  flatTopLevelActions<TAction extends Action>(actions: TAction[]): TAction[] {
+    return arrays.flatMap(actions, item => {
       if (item instanceof ComboMenu) {
         return item.childActions;
       }
