@@ -24,7 +24,7 @@ export class Tree extends Widget implements TreeModel {
   breadcrumbTogglingThreshold: number;
   /**
    * @deprecated This is to maintain backwards compatibility. Use this.autoCheckStyle instead.
-   * @see Tree.AutoCheckStyle.AUTO_CHECK_CHILD_NODES
+   * @see Tree.AutoCheckStyle.CHILDREN
    */
   autoCheckChildren: boolean;
   autoCheckStyle: AutoCheckStyle;
