@@ -463,6 +463,6 @@ export class MenuBar extends Widget implements MenuBarModel {
   }
 
   allMenusAsFlatList(): Menu[] {
-    return menus.flatTopLevelMenus(this.orderedMenuItems.all);
+    return menus.flatTopLevelActions(this.orderedMenuItems.all);
   }
 }

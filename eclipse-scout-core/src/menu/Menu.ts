@@ -27,14 +27,7 @@ export class Menu extends Action implements MenuModel {
   menuTypes: string[];
   menuStyle: MenuStyle;
   uiCssClass: string;
-
-  /**
-   * This property is true when the menu instance was moved into an overflow-menu
-   * when there's not enough space on the screen (see MenuBarLayout). When set to true, button style menus must be displayed as regular menus.
-   */
-  overflown: boolean;
   overflowMenu: Menu;
-
   /**
    * This property is set if this is a subMenu
    */
@@ -62,7 +55,6 @@ export class Menu extends Action implements MenuModel {
     this.excludedByFilter = false;
     this.menuTypes = [];
     this.menuStyle = Menu.MenuStyle.NONE;
-    this.overflown = false;
     this.parentMenu = null;
     this.popup = null;
     this.popupHorizontalAlignment = undefined;
@@ -131,7 +123,6 @@ export class Menu extends Action implements MenuModel {
 
   protected override _renderProperties() {
     super._renderProperties();
-    this._renderOverflown();
     this._renderMenuStyle();
     this._renderActionStyle();
     this._updateIconAndTextStyle();
@@ -671,23 +662,8 @@ export class Menu extends Action implements MenuModel {
     this.invalidateLayoutTree();
   }
 
-  /**
-   * For internal usage only.
-   * Used by the MenuBarLayout when a menu is moved to the ellipsis drop down.
-   * @internal
-   */
-  _setOverflown(overflown: boolean) {
-    if (this.overflown === overflown) {
-      return;
-    }
-    this._setProperty('overflown', overflown);
-    if (this.rendered) {
-      this._renderOverflown();
-    }
-  }
-
-  protected _renderOverflown() {
-    this.$container.toggleClass('overflown', this.overflown);
+  protected override _renderOverflown() {
+    super._renderOverflown();
     this._renderActionStyle();
   }
 

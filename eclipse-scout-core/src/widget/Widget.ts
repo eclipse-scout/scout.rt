@@ -393,12 +393,12 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * Creates the UI by creating HTML elements and appending them to the DOM.
    * <p>
    * The actual rendering happens in the methods {@link _render}, which appends the main container to the parent element, and {@link _renderProperties}, which calls the methods for each property that needs to be rendered.
-   * After the rendering, the created {@link this.$container} will be linked with the widget, so the widget can be found by using {@link scout.widget}.
+   * After the rendering, the created {@link $container} will be linked with the widget, so the widget can be found by using {@link scout.widget}.
    * Finally, the widget sets the property {@link rendered} to true and triggers a 'render' event.
    *
-   * @param $parent jQuery element which is used as {@link this.$parent} when rendering this widget.
-   * It will be put onto the widget and is therefore accessible as {@link this.$parent} in the {@link _render} method.
-   * If not specified, the {@link this.$container} of the parent is used.
+   * @param $parent jQuery element which is used as {@link $parent} when rendering this widget.
+   * It will be put onto the widget and is therefore accessible as {@link $parent} in the {@link _render} method.
+   * If not specified, the {@link $container} of the parent is used.
    */
   render($parent?: JQuery) {
     $.log.isTraceEnabled() && $.log.trace('Rendering widget: ' + this);
@@ -429,8 +429,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * Creates the UI by creating HTML elements and appending them to the DOM.
    * <p>
-   * A typical widget creates exactly one container element and stores it to {@link this.$container}.
-   * If it needs JS based layouting, it creates a {@link HtmlComponent} for that container and stores it to {@link this.htmlComp}.
+   * A typical widget creates exactly one container element and stores it to {@link $container}.
+   * If it needs JS based layouting, it creates a {@link HtmlComponent} for that container and stores it to {@link htmlComp}.
    * <p>
    * The rendering of individual properties should be done in the corresponding render methods of the properties, called by {@link _renderProperties} instead of doing it here.
    * This has the advantage that the render methods can also be called on property changes, allowing individual widget parts to be dynamically re-rendered.
@@ -1106,6 +1106,13 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
   }
 
+  /**
+   * @returns true, if the {@link cssClass} property contains the given css class.
+   */
+  hasCssClass(cssClass: string): boolean {
+    return this.cssClassAsArray().includes(cssClass);
+  }
+
   cssClassAsArray(): string[] {
     return Widget.cssClassAsArray(this.cssClass);
   }
@@ -1259,7 +1266,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   /**
    * Marks the logical grid as dirty.<br>
    * Does nothing, if there is no logical grid.
-   * @param invalidateLayout true, to invalidate the layout afterwards using {@link invalidateLayoutTree}, false if not. Default is true.
+   * @param invalidateLayout true, to invalidate the layout afterward using {@link invalidateLayoutTree}, false if not. Default is true.
    */
   invalidateLogicalGrid(invalidateLayout?: boolean) {
     if (!this.initialized) {
@@ -1276,7 +1283,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   /**
    * Invalidates the logical grid of the parent widget. Typically, done when the visibility of the widget changes.
-   * @param invalidateLayout true, to invalidate the layout of the parent of {@link this.htmlComp}, false if not. Default is true.
+   * @param invalidateLayout true, to invalidate the layout of the parent of {@link htmlComp}, false if not. Default is true.
    */
   invalidateParentLogicalGrid(invalidateLayout?: boolean) {
     this.parent.invalidateLogicalGrid(false);
@@ -1313,7 +1320,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * @returns the entry-point for this Widget or its parent. If the widget is part of the main-window it returns {@link this.session.$entryPoint},
+   * @returns the entry-point for this Widget or its parent. If the widget is part of the main-window it returns {@link session.$entryPoint},
    * for popup-window this function will return the body of the document in the popup window.
    */
   entryPoint(): JQuery {
@@ -1337,7 +1344,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * This method attaches the detached {@link this.$container} to the DOM.
+   * This method attaches the detached {@link $container} to the DOM.
    */
   attach() {
     if (this.attached || !this.rendered) {
@@ -1354,7 +1361,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   /**
    * Override this method to do something when the widget is attached again. Typically,
-   * you will append {@link this.$container} to {@link this.$parent}.
+   * you will append {@link $container} to {@link $parent}.
    */
   protected _attach() {
     // NOP
@@ -2051,7 +2058,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * @param predicateOrClass may be a {@link Predicate} or a sub-class of {@link Widget}.
+   * @param predicateOrClass may be a {@link Predicate} or a subclass of {@link Widget}.
    * @returns the first ancestor for which the given predicate returns true or that matches the given widget type if a subclass of {@link Widget} is provided.
    */
   findParent<T extends Widget>(predicateOrClass: Predicate<Widget> | (abstract new() => T)): T {
@@ -2072,7 +2079,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * @param predicateOrClass may be a {@link Predicate} or a sub-class of {@link Widget}.
+   * @param predicateOrClass may be a {@link Predicate} or a subclass of {@link Widget}.
    * @returns the first child for which the given predicate returns true or that matches the given widget type if a subclass of {@link Widget} is provided.
    */
   findChild<T extends Widget>(predicateOrClass: Predicate<Widget> | (abstract new() => T)): T {
@@ -2292,7 +2299,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Returns the jQuery element which is supposed to be scrollable. This element will be used by the scroll functions like {@link _installScrollbars}, {@link setScrollTop}, {@link setScrollLeft}, {@link scrollToBottom} etc..
+   * Returns the jQuery element which is supposed to be scrollable. This element will be used by the scroll functions like {@link _installScrollbars}, {@link setScrollTop}, {@link setScrollLeft}, {@link scrollToBottom} etc.
    * The element won't be used unless {@link _installScrollbars} is called.
    * If the widget is mainly a wrapper for a scrollable widget and does not have a scrollable element by itself, you can use @{link #getDelegateScrollable} instead.
    */
