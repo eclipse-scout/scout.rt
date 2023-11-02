@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {dates, DoEntity, JsonObject, Session, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src';
+import {BackgroundJobPollingStatus, dates, DoEntity, JsonObject, Session, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src';
 
 describe('uiNotifications', () => {
 
@@ -690,6 +690,8 @@ describe('uiNotifications', () => {
         receivedMsg = event.message;
       });
       expect(pollers().size).toBe(1);
+      const poller = pollers().values().next().value;
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
       let response: UiNotificationResponse = {
         notifications: [{
@@ -712,6 +714,7 @@ describe('uiNotifications', () => {
         a: 'aaa'
       } as DoEntity);
       expect(pollers().size).toBe(0);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
     });
   });
 

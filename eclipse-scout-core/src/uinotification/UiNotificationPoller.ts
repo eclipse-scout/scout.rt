@@ -19,7 +19,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
   /**
    * Configures in milliseconds the time to wait after a connection error occurs, before the polling will be retried.
    */
-  static RETRY_INTERVAL= 5000;
+  static RETRY_INTERVAL = 5000;
 
   /**
    * The number of notifications per topic that should be kept until the topic is unsubscribed.
@@ -98,6 +98,9 @@ export class UiNotificationPoller extends PropertyEventEmitter {
   }
 
   protected _schedulePoll(timeout?: number) {
+    if (this.status === BackgroundJobPollingStatus.STOPPED) {
+      return;
+    }
     setTimeout(() => this.poll(), scout.nvl(timeout, 0));
   }
 
