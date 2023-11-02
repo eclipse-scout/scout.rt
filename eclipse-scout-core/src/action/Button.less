@@ -174,5 +174,9 @@
     & > .loading-indicator {
       #scout.loading-indicator(20px);
     }
+
+    &.default > .loading-indicator::before {
+      border-color: @default-button-color;
+    }
   }
 }
