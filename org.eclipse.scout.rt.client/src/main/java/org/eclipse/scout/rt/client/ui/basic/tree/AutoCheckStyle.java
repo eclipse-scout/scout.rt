@@ -18,7 +18,7 @@ public enum AutoCheckStyle {
   /**
    * All child nodes will be checked/unchecked together with their parent
    */
-  AUTO_CHECK_CHILD_NODES,
+  CHILDREN,
 
   /**
    * The state of the node is a representation of its children.
@@ -29,5 +29,5 @@ public enum AutoCheckStyle {
    * </ul>
    * When a node with children is selected, its children will be auto-checked
    */
-  SYNC_CHILD_AND_PARENT_STATE
+  CHILDREN_AND_PARENT
 }

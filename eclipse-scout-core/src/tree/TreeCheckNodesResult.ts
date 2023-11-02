@@ -17,7 +17,7 @@ import {TreeNode} from './TreeNode';
  * - TreeNodes which have to be rendered
  * - TreeNodes which triggered an update event
  */
-export class TreeNodeUpdate {
+export class TreeCheckNodesResult {
   protected _requireRenderTreeNodes: TreeNode[];
   protected _requireTriggerEventNodes: TreeNode[];
 
@@ -47,7 +47,7 @@ export class TreeNodeUpdate {
     return this._requireTriggerEventNodes;
   }
 
-  add(treeNodeUpdate: TreeNodeUpdate) {
+  add(treeNodeUpdate: TreeCheckNodesResult) {
     this.addNodeForRendering(...treeNodeUpdate.getNodesForRendering());
     this.addNodeForEventTrigger(...treeNodeUpdate.getNodesForEventTrigger());
   }
