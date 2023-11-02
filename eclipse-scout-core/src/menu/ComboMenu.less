@@ -44,6 +44,16 @@
       }
     }
   }
+
+  &.loading > .menu-item {
+    & > .text,
+    & > .icon,
+    & > .submenu-icon,
+    &::before {
+      opacity: 0;
+      transition: opacity @loading-fade-duration;
+    }
+  }
 }
 
 .combo-menu.menu-button {

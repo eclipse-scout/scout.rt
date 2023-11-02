@@ -26,4 +26,17 @@
   &.overflown {
     display: none;
   }
+
+  &.loading {
+    & > .text,
+    & > .icon,
+    & > .submenu-icon {
+      opacity: 0;
+      transition: opacity @loading-fade-duration;
+    }
+
+    & > .loading-indicator {
+      #scout.loading-indicator(20px);
+    }
+  }
 }

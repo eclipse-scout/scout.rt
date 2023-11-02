@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, ActionEventMap, ActionKeyStroke, ActionModel, Alignment, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, NullLayout, scout, TooltipPosition, tooltips, TooltipSupport, Widget
+  AbstractLayout, ActionEventMap, ActionKeyStroke, ActionModel, Alignment, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, TooltipPosition, tooltips,
+  TooltipSupport, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -101,6 +102,12 @@ export class Action extends Widget implements ActionModel {
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
+  }
+
+  protected override _createLoadingSupport(): LoadingSupport {
+    return new LoadingSupport({
+      widget: this
+    });
   }
 
   protected override _init(model: InitModelOf<this>) {
