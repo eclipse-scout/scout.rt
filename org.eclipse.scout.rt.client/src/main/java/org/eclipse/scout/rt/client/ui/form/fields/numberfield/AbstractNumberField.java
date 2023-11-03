@@ -120,11 +120,11 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     return CollectionUtility.hashSet(
         '\'', '´', '`', '’', // apostrophe and variations
         ',', '.',
-        "\u00B7".charAt(0), // middle dot
-        "\u0020".charAt(0), // space
-        "\u00A0".charAt(0), // no-break space
-        "\u2009".charAt(0), // thin space
-        "\u202F".charAt(0) // narrow no-break space
+        '·', // U+00B7 middle dot
+        ' ', // U+0020 space
+        ' ', // U+00A0 no-break space
+        ' ', // U+2009 thin space
+        ' ' // U+202F narrow no-break space
     );
   }
 
@@ -559,7 +559,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    *         alpha-numerical characters) or is <code>null</code>
    */
   public static boolean isWithinNumberFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
-    if (insertText == null || insertText.length() < 1) {
+    if (insertText == null || insertText.isEmpty()) {
       return true;
     }
 
@@ -615,7 +615,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   public static String createNumberWithinFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
     // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
     // When changing this implementation also consider updating the js version!
-    if (insertText == null || insertText.length() < 1) {
+    if (insertText == null || insertText.isEmpty()) {
       insertText = "";
     }
     StringBuilder result = new StringBuilder();

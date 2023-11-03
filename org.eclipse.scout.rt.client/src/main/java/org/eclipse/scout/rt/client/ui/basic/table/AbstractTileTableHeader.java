@@ -307,8 +307,8 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
       for (IColumn col : getTable().getColumns()) {
         if (col.isVisible() && isColumnTypeAllowedForSorting(col)) {
           String colLabel = ObjectUtility.nvl(col.getHeaderCell().getText(), col.getHeaderCell().getTooltipText());
-          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), colLabel + " \u2191"));
-          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), colLabel + " \u2193"));
+          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), colLabel + " ↑")); // U+2191
+          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), colLabel + " ↓")); // U+2193
         }
       }
 
