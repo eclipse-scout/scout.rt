@@ -35,16 +35,28 @@ export interface StringFieldModel extends BasicFieldModel<string> {
    */
   multilineText?: boolean;
   /**
-   * Default is 0.
+   * Configures the start of the text selection.
+   *
+   * If the value is < 0, the browser takes care of the selection and typically sets the cursor at the end of the text.
+   * The value will be updated whenever the selection changes but only if {@link selectionTrackingEnabled} is true.
+   *
+   * Default is -1 .
    */
   selectionStart?: number;
   /**
-   * Default is 0.
+   * Configures the end of the text selection.
+   *
+   * If the value is < 0, the browser takes care of the selection and typically sets the cursor at the end of the text.
+   * The value will be updated whenever the selection changes but only if {@link selectionTrackingEnabled} is true.
+   *
+   * Default is -1 .
    */
   selectionEnd?: number;
   /**
-   * Define whether selection tracking should be enabled.
-   * If false, selectionStart and selectionEnd might not reflect the actual selection.
+   * Defines whether a {@link StringFieldSelectionChangeEvent} should be triggered when the selection changes.
+   *
+   * Also, if set to true, {@link selectionStart} and {@link selectionEnd} will be updated when the selection changes.
+   * Otherwise, {@link selectionStart} and {@link selectionEnd} won't reflect the actual selection.
    *
    * Default is false.
    */
