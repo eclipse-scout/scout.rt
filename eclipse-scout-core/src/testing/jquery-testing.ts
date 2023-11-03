@@ -200,5 +200,37 @@ export const JQueryTesting = {
       def.resolve();
     });
     return def.promise();
+  },
+
+  /**
+   * Selects text in the given html element.
+   *
+   * @param $elem a text node or a html element containing a text node
+   * @param customWindow Needs to be specified if a text inside an iframe should be selected. Otherwise, the regular window object will be used.
+   */
+  selectText($elem: JQuery<HTMLElement>, begin: number, end: number, customWindow?: Window) {
+    let win = customWindow || $elem.window(true);
+    let range = document.createRange();
+    let textNode;
+    if ($elem[0].nodeType === 3) {
+      textNode = $elem[0];
+    } else {
+      textNode = $elem[0].childNodes[0];
+    }
+    range.setStart(textNode, begin);
+    range.setEnd(textNode, end);
+    win.getSelection().removeAllRanges();
+    win.getSelection().addRange(range);
+  },
+
+  /**
+   * The returned promise resolves when the document of the iframe is loaded.
+   */
+  whenDocLoad($iframe: JQuery<HTMLIFrameElement>): JQuery.Promise<Document> {
+    let def = $.Deferred();
+    $iframe.on('load', () => {
+      def.resolve($iframe[0].contentDocument);
+    });
+    return def.promise();
   }
 };
