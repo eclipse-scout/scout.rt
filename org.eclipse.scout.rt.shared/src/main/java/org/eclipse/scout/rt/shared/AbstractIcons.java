@@ -28,8 +28,8 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Null = "null";
 
   /* default font icons (sans-serif, arial) */
-  public static final String TableSortAsc = "font:\u2191";
-  public static final String TableSortDesc = "font:\u2193";
+  public static final String TableSortAsc = "font:↑"; // U+2191 UPWARDS ARROW
+  public static final String TableSortDesc = "font:↓"; // U+2193 DOWNWARDS ARROW
 
   /* custom icons */
   public static final String ExclamationMarkCircle = "font:\uE001";

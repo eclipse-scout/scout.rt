@@ -118,9 +118,9 @@ public class StringUtilityTest {
     assertEquals("", res1);
     String res2 = StringUtility.join(del1, (String) null);
     assertEquals("", res2);
-    String res3 = StringUtility.join(del1, a, (String) null, c);
+    String res3 = StringUtility.join(del1, a, null, c);
     assertEquals(a + del1 + c, res3);
-    String res4 = StringUtility.join(del1, (String) null, b, c);
+    String res4 = StringUtility.join(del1, null, b, c);
     assertEquals(b + del1 + c, res4);
   }
 
@@ -193,13 +193,7 @@ public class StringUtilityTest {
 
   @Test
   public void testDecompress_umlauts() {
-
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < 100000; i++) {
-      builder.append(CHARACTERS);
-    }
-
-    String original = builder.toString();
+    String original = CHARACTERS.repeat(100000);
     String decompressed = StringUtility.decompress(StringUtility.compress(original));
 
     assertEquals(original, decompressed);
@@ -469,7 +463,7 @@ public class StringUtilityTest {
     assertEquals("0.000000", StringUtility.formatNanos(0L));
     assertEquals("0.000000", StringUtility.formatNanos(-0L));
     assertEquals("0.000001", StringUtility.formatNanos(1L));
-    assertEquals("1.000000", StringUtility.formatNanos((long) (1 * 1000 * 1000)));
+    assertEquals("1.000000", StringUtility.formatNanos(1000 * 1000));
     assertEquals("1.234567", StringUtility.formatNanos(1234567L));
     assertEquals("12.345678", StringUtility.formatNanos(12345678L));
     assertEquals("123.456789", StringUtility.formatNanos(123456789L));
@@ -625,7 +619,7 @@ public class StringUtilityTest {
     assertEquals(0, StringUtility.length(null));
     assertEquals(0, StringUtility.length(""));
     assertEquals(1, StringUtility.length("a"));
-    assertEquals(4, StringUtility.length("a\\ \u00B6"));
+    assertEquals(4, StringUtility.length("a\\ ¶")); // U+00B6 PILCROW SIGN
   }
 
   @Test
@@ -766,7 +760,8 @@ public class StringUtilityTest {
     assertEquals("", StringUtility.removePrefixes("", "prefix"));
 
     assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData"));
-    assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", null));
+    assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", (String) null));
+    assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", (String[]) null));
     assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", ""));
     assertEquals("CompanyFormData", StringUtility.removePrefixes("CompanyFormData", " "));
 
@@ -785,7 +780,8 @@ public class StringUtilityTest {
     assertEquals(null, StringUtility.removeSuffixes(null, "suffix"));
     assertEquals("", StringUtility.removeSuffixes("", "suffix"));
     assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData"));
-    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", null));
+    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", (String) null));
+    assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", (String[]) null));
     assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", ""));
     assertEquals("CompanyFormData", StringUtility.removeSuffixes("CompanyFormData", " "));
 
