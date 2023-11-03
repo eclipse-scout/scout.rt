@@ -73,14 +73,6 @@ describe('IFrame', () => {
       pressed = false;
     });
 
-    function whenDocLoad(): JQuery.Promise<Document> {
-      let def = $.Deferred();
-      iframe.$iframe.on('load', () => {
-        def.resolve(iframe.$iframe[0].contentDocument);
-      });
-      return def.promise();
-    }
-
     function focusElemAndTriggerKey(doc: Document, id: string, key: number, modifier?: KeyStrokeModifier) {
       let elem = doc.getElementById(id);
       elem.focus();
@@ -89,14 +81,14 @@ describe('IFrame', () => {
 
     it('work even if focus is in iframe ', async () => {
       outerField.widget('KeyStroke', Action).setKeyStroke('ESC');
-      let doc = await whenDocLoad();
+      let doc = await JQueryTesting.whenDocLoad(iframe.$iframe);
       focusElemAndTriggerKey(doc, 'no_input', keys.ESC);
       expect(pressed).toBe(true);
     });
 
     it('are partially disabled if focus is in an input of the iframe', async () => {
       outerField.widget('KeyStroke', Action).setKeyStroke('BACKSPACE');
-      let doc = await whenDocLoad();
+      let doc = await JQueryTesting.whenDocLoad(iframe.$iframe);
       focusElemAndTriggerKey(doc, 'input', keys.BACKSPACE);
       expect(pressed).toBe(false);
 
@@ -106,7 +98,7 @@ describe('IFrame', () => {
 
     it('are partially disabled if focus is on a button of the iframe', async () => {
       outerField.widget('KeyStroke', Action).setKeyStroke('SPACE');
-      let doc = await whenDocLoad();
+      let doc = await JQueryTesting.whenDocLoad(iframe.$iframe);
       focusElemAndTriggerKey(doc, 'button', keys.SPACE);
       expect(pressed).toBe(false);
 
@@ -119,7 +111,7 @@ describe('IFrame', () => {
 
     it('are partially disabled if focus is in an textarea of the iframe', async () => {
       outerField.widget('KeyStroke', Action).setKeyStroke('ctrl-shift-up');
-      let doc = await whenDocLoad();
+      let doc = await JQueryTesting.whenDocLoad(iframe.$iframe);
       focusElemAndTriggerKey(doc, 'input', keys.UP, 'ctrl-shift');
       expect(pressed).toBe(true);
 
