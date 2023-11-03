@@ -242,6 +242,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     setDropType(configuredDropType);
     setDropMaximumSize(getConfiguredDropMaximumSize());
     setSelectionTrackingEnabled(getConfiguredSelectionTrackingEnabled());
+    select(-1, -1);
     setSpellCheckEnabled(computeSpellCheckEnabled());
   }
 
@@ -408,7 +409,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   /**
-   * @see {@link #getConfiguredSelectionTrackingEnabled()}
+   * @see #getConfiguredSelectionTrackingEnabled()
    */
   @Override
   public boolean isSelectionTrackingEnabled() {
@@ -416,7 +417,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   /**
-   * @see {@link #getConfiguredSelectionTrackingEnabled()}
+   * @see #getConfiguredSelectionTrackingEnabled()
    */
   @Override
   public void setSelectionTrackingEnabled(boolean selectionTrackingEnabled) {
