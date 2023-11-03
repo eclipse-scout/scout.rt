@@ -32,6 +32,10 @@ describe('StringField', () => {
     override _getSelection(): StringFieldSelection {
       return super._getSelection();
     }
+
+    override _updateSelection() {
+      return super._updateSelection();
+    }
   }
 
   function createField(model: InitModelOf<StringField>): SpecStringField {
@@ -326,4 +330,146 @@ describe('StringField', () => {
 
   });
 
+  describe('selectionStart/End', () => {
+    beforeEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('does nothing by default', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'value'
+      });
+      field.render();
+      let input = field.$field[0] as HTMLInputElement;
+      expect(input.selectionStart).toBe(5);
+      expect(input.selectionEnd).toBe(5); // Cursor is at end of text
+    });
+
+    it('selects text if > -1', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'value',
+        selectionStart: 3,
+        selectionEnd: 5
+      });
+      field.render();
+      let input = field.$field[0] as HTMLInputElement;
+      expect(input.selectionStart).toBe(3);
+      expect(input.selectionEnd).toBe(5);
+    });
+
+    it('can be changed dynamically', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'value'
+      });
+      field.render();
+      field.setSelectionStart(2);
+      field.setSelectionEnd(3);
+      let input = field.$field[0] as HTMLInputElement;
+      expect(input.selectionStart).toBe(2);
+      expect(input.selectionEnd).toBe(3);
+    });
+
+    it('will be reset to -1 if selection changes unless selectionTrackingEnabled is true', async () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'value',
+        selectionStart: 3,
+        selectionEnd: 5
+      });
+      field.render();
+      let input = field.$field[0] as HTMLInputElement;
+      expect(input.selectionStart).toBe(3);
+      expect(input.selectionEnd).toBe(5);
+
+      input.focus();
+      input.selectionStart = 1;
+      input.selectionEnd = 2;
+      await field.when('selectionChange');
+      expect(field.selectionStart).toBe(-1);
+      expect(field.selectionEnd).toBe(-1);
+    });
+
+    it('is saved and triggers updates if selectionTrackingEnabled is true', async () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'value',
+        selectionStart: 3,
+        selectionEnd: 5,
+        selectionTrackingEnabled: true
+      });
+      field.render();
+      let input = field.$field[0] as HTMLInputElement;
+      expect(input.selectionStart).toBe(3);
+      expect(input.selectionEnd).toBe(5);
+
+      input.selectionStart = 1;
+      input.selectionEnd = 2;
+      let event = await field.when('selectionChange');
+      expect(field.selectionStart).toBe(1);
+      expect(field.selectionEnd).toBe(2);
+      expect(event.selectionStart).toBe(1);
+      expect(event.selectionEnd).toBe(2);
+    });
+
+    it('is used by selectAll', async () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        value: 'value'
+      });
+      field.selectAll();
+      field.render();
+      let input = field.$field[0] as HTMLInputElement;
+      expect(input.selectionStart).toBe(0);
+      expect(input.selectionEnd).toBe(5);
+    });
+
+    it('works with multilineText as well', async () => {
+      let field = scout.create(SpecStringField, {
+        parent: session.desktop,
+        value: 'value',
+        multilineText: true,
+        selectionStart: 3,
+        selectionEnd: 5
+      });
+      field.render();
+
+      let input = field.$field[0] as HTMLInputElement;
+      expect(input.selectionStart).toBe(3);
+      expect(input.selectionEnd).toBe(5);
+
+      field.setSelectionStart(1);
+      field.setSelectionEnd(2);
+      expect(input.selectionStart).toBe(1);
+      expect(input.selectionEnd).toBe(2);
+
+      field.selectAll();
+      expect(input.selectionStart).toBe(0);
+      expect(input.selectionEnd).toBe(5);
+
+      let selectionEventCount = 0;
+      field.on('selectionChange', () => {
+        selectionEventCount++;
+      });
+      expect(selectionEventCount).toBe(0);
+
+      // Does not trigger an event if tracking is disabled
+      input.selectionStart = 3;
+      input.selectionEnd = 4;
+      field._updateSelection();
+      expect(selectionEventCount).toBe(0);
+
+      field.setSelectionTrackingEnabled(true);
+      input.selectionStart = 1;
+      input.selectionEnd = 2;
+      let event = await field.when('selectionChange');
+      expect(field.selectionStart).toBe(1);
+      expect(field.selectionEnd).toBe(2);
+      expect(event.selectionStart).toBe(1);
+      expect(event.selectionEnd).toBe(2);
+      expect(selectionEventCount).toBe(1);
+    });
+  });
 });

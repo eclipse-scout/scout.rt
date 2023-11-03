@@ -223,8 +223,8 @@
       "maxLength": 4000,
       "multilineText": false,
       "selectionTrackingEnabled": false,
-      "selectionStart": 0,
-      "selectionEnd": 0,
+      "selectionStart": -1,
+      "selectionEnd": -1,
       "spellCheckEnabled": false,
       "trimText": true,
       "wrapText": false

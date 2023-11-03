@@ -33,7 +33,7 @@ export class StringField extends BasicField<string> {
   trimText: boolean;
   wrapText: boolean;
   mouseClicked: boolean;
-  protected _onSelectionChangingActionHandler: (event: JQuery.TriggeredEvent) => void;
+  protected _selectionChangingActionHandler: (event: JQuery.TriggeredEvent) => void;
 
   constructor() {
     super();
@@ -47,14 +47,14 @@ export class StringField extends BasicField<string> {
       target: this
     });
     this.multilineText = false;
-    this.selectionStart = 0;
-    this.selectionEnd = 0;
+    this.selectionStart = -1;
+    this.selectionEnd = -1;
     this.selectionTrackingEnabled = false;
     this.spellCheckEnabled = false;
     this.trimText = true;
     this.wrapText = false;
 
-    this._onSelectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
+    this._selectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
   }
 
   static Format = {
@@ -107,6 +107,11 @@ export class StringField extends BasicField<string> {
     } else {
       $field = fields.makeTextField(this.$parent);
     }
+    $field
+      .on('select', this._selectionChangingActionHandler)
+      .on('mousedown', this._selectionChangingActionHandler)
+      .on('keydown', this._selectionChangingActionHandler)
+      .on('input', this._selectionChangingActionHandler);
 
     this.addField($field);
     this.maxLengthHandler.install($field);
@@ -114,37 +119,34 @@ export class StringField extends BasicField<string> {
   }
 
   protected _makeMultilineField(): JQuery {
-    let mouseDownHandler = function() {
-      this.mouseClicked = true;
-    }.bind(this);
-
-    return this.$parent.makeElement('<textarea>')
+    let $field = this.$parent.makeElement('<textarea>')
       .on('wheel', this._onMouseWheel.bind(this))
-      .on('mousedown', mouseDownHandler)
-      .on('focus', event => {
-        (this.$field as JQuery).off('mousedown', mouseDownHandler);
-        if (!this.mouseClicked) { // only trigger on tab focus in
-          setTimeout(() => {
-            if (!this.rendered || this.session.focusManager.isElementCovertByGlassPane(this.$field)) {
-              return;
-            }
-            this._renderSelectionStart();
-            this._renderSelectionEnd();
-          });
-        }
-        this.mouseClicked = false;
-      })
-      .on('focusout', () => {
-        this.$field.on('mousedown', mouseDownHandler);
-      })
       .addDeviceClass();
+    this._addRestoreSelectionFocusHandler($field);
+    return $field;
+  }
+
+  /**
+   * Adds a focus handler that renders the selection if the field was focused using keyboard (TAB).
+   * Actually, this is only for Safari because Chrome and Firefox restore the selection by default but Safari doesn't.
+   */
+  protected _addRestoreSelectionFocusHandler($field: JQuery) {
+    $field.on('focus', event => {
+      if (!this.$field.hasClass('keyboard-navigation')) {
+        return;
+      }
+      setTimeout(() => {
+        if (!this.rendered || this.session.focusManager.isElementCovertByGlassPane(this.$field)) {
+          return;
+        }
+        this._renderSelectionStart();
+        this._renderSelectionEnd();
+      });
+    });
   }
 
   protected override _onFieldBlur(event: JQuery.BlurEvent) {
     super._onFieldBlur(event);
-    if (this.multilineText) {
-      this._updateSelection();
-    }
     if (this.inputObfuscated) {
       // Restore obfuscated display text.
       this.$field.val(this.displayText);
@@ -178,10 +180,8 @@ export class StringField extends BasicField<string> {
     this._renderSpellCheckEnabled();
     this._renderHasAction();
     this._renderMaxLength();
-    this._renderSelectionTrackingEnabled();
-    // Do not render selectionStart and selectionEnd here, because that would cause the focus to
-    // be set to <textarea>s in IE. Instead, the selection is rendered when the focus has entered
-    // the field, see _render(). #168648
+    this._renderSelectionStart();
+    this._renderSelectionEnd();
     this._renderDropType();
   }
 
@@ -215,7 +215,7 @@ export class StringField extends BasicField<string> {
   }
 
   protected _renderSelectionStart() {
-    if (scout.nvl(this.selectionStart, null) !== null) {
+    if (this.selectionStart >= 0) {
       (this.$field[0] as HTMLInputElement).selectionStart = this.selectionStart;
     }
   }
@@ -225,28 +225,13 @@ export class StringField extends BasicField<string> {
   }
 
   protected _renderSelectionEnd() {
-    if (scout.nvl(this.selectionEnd, null) !== null) {
+    if (this.selectionEnd >= 0) {
       (this.$field[0] as HTMLInputElement).selectionEnd = this.selectionEnd;
     }
   }
 
   setSelectionTrackingEnabled(selectionTrackingEnabled: boolean) {
     this.setProperty('selectionTrackingEnabled', selectionTrackingEnabled);
-  }
-
-  protected _renderSelectionTrackingEnabled() {
-    (this.$field as JQuery)
-      .off('select', this._onSelectionChangingActionHandler)
-      .off('mousedown', this._onSelectionChangingActionHandler)
-      .off('keydown', this._onSelectionChangingActionHandler)
-      .off('input', this._onSelectionChangingActionHandler);
-    if (this.selectionTrackingEnabled) {
-      (this.$field as JQuery)
-        .on('select', this._onSelectionChangingActionHandler)
-        .on('mousedown', this._onSelectionChangingActionHandler)
-        .on('keydown', this._onSelectionChangingActionHandler)
-        .on('input', this._onSelectionChangingActionHandler);
-    }
   }
 
   setInputMasked(inputMasked: boolean) {
@@ -484,8 +469,9 @@ export class StringField extends BasicField<string> {
   }
 
   protected _getSelection(): StringFieldSelection {
-    let start = scout.nvl((this.$field[0] as HTMLInputElement).selectionStart, null);
-    let end = scout.nvl((this.$field[0] as HTMLInputElement).selectionEnd, null);
+    let input = this.$field[0] as HTMLInputElement;
+    let start = scout.nvl(input.selectionStart, null);
+    let end = scout.nvl(input.selectionEnd, null);
     if (start === null || end === null) {
       start = 0;
       end = 0;
@@ -503,17 +489,32 @@ export class StringField extends BasicField<string> {
       selectionEnd = selectionStartOrSelection.end;
       selectionStartOrSelection = selectionStartOrSelection.start;
     }
-    (this.$field[0] as HTMLInputElement).selectionStart = selectionStartOrSelection;
-    (this.$field[0] as HTMLInputElement).selectionEnd = selectionEnd;
+    let input = this.$field[0] as HTMLInputElement;
+    input.selectionStart = selectionStartOrSelection;
+    input.selectionEnd = selectionEnd;
     this._updateSelection();
   }
 
   protected _updateSelection() {
+    if (!this.rendered) {
+      return;
+    }
     let oldSelectionStart = this.selectionStart;
     let oldSelectionEnd = this.selectionEnd;
-    this.selectionStart = (this.$field[0] as HTMLInputElement).selectionStart;
-    this.selectionEnd = (this.$field[0] as HTMLInputElement).selectionEnd;
-    if (this.selectionTrackingEnabled) {
+    let input = this.$field[0] as HTMLInputElement;
+    let triggerUpdate = this.selectionTrackingEnabled;
+    if (!this.multilineText && !this.selectionTrackingEnabled) {
+      // If selection tracking is disabled, do not store the values on the widget for single line fields to make it consistent with other fields.
+      // -> if a field is rendered anew, the selection is not restored.
+      // However, multiline fields store the values because the browser also treats them in a different way (TAB will restore selection instead of selecting the whole field).
+      this.selectionStart = -1;
+      this.selectionEnd = -1;
+      triggerUpdate = true;
+    } else {
+      this.selectionStart = input.selectionStart;
+      this.selectionEnd = input.selectionEnd;
+    }
+    if (triggerUpdate) {
       let selectionChanged = this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd;
       if (selectionChanged) {
         this.triggerSelectionChange();
