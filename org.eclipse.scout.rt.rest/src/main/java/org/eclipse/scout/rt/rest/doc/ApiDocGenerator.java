@@ -477,10 +477,10 @@ public class ApiDocGenerator {
       elements.add(HTML.tag("a").addAttribute("name", r.getAnchor()));
       elements.add(HTML.h2(
           r.getName(),
-          HTML.link("#" + r.getAnchor(), "\u2693\uFE0E") // anchor + "VS15 variant selector = text style"
+              HTML.link("#" + r.getAnchor(), "⚓︎") // U+2693 U+FE0E = anchor + "VS15 variant selector = text style"
               .cssClass("title-link first")
               .addAttribute("title", "Link to this section"),
-          HTML.link("#", "\u2B61") // up arrow
+              HTML.link("#", "⭡") // U+2B61 UPWARDS ARROW
               .cssClass("title-link")
               .addAttribute("title", "Go to top"))
           .cssClass("title"));
@@ -934,7 +934,7 @@ public class ApiDocGenerator {
           .map(type -> type.getTypeClass().getSimpleName() + " " + type.getName())
           .collect(Collectors.joining(", "));
       String ex = "";
-      if (m_exceptionTypes != null && m_exceptionTypes.size() > 0) {
+      if (CollectionUtility.hasElements(m_exceptionTypes)) {
         ex = " throws " + m_exceptionTypes.stream()
             .map(TypeDescriptor::getTypeClass)
             .map(Class::getSimpleName)

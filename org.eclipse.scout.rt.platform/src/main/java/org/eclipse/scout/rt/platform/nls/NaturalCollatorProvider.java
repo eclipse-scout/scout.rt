@@ -77,14 +77,14 @@ public class NaturalCollatorProvider {
   }
 
   /**
-   * Extends the rules of an original collator in a way that it sorts spaces (<code>\u0020</code>) and hyphens
-   * (<code>\u002D</code>) before underscores (<code>\u005f</code>).
+   * Extends the rules of an original collator in a way that it sorts spaces (<code> </code>, U+0020) and hyphens
+   * (<code>-</code>, U+002D) before underscores (<code>_</code>, U+005F).
    *
    * @param origRules
    *          original rules
    * @return replaced rules
    */
   protected String replaceRules(String origRules) {
-    return origRules.replaceAll("<'\u005f'", "<'\u0020','\u002D'<'\u005f'");
+    return origRules.replaceAll("<'_'", "<' ','-'<'_'");
   }
 }

@@ -26,6 +26,7 @@ import junit.framework.TestCase;
  * Changes to the original code:
  * -----------------------------
  * - Applied Scout code formatting rules
+ * - Added @SuppressWarnings("CatchMayIgnoreException")
  *
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
@@ -33,6 +34,7 @@ import junit.framework.TestCase;
 /**
  * This black box test was written without inspecting the non-free org.json sourcecode.
  */
+@SuppressWarnings("CatchMayIgnoreException")
 public class JSONStringerTest extends TestCase {
 
   public void testEmptyStringer() {
@@ -237,7 +239,7 @@ public class JSONStringerTest extends TestCase {
     assertEscapedAllWays("]", "]");
     assertEscapedAllWays("\\u0000", "\0");
     assertEscapedAllWays("\\u0019", "\u0019");
-    assertEscapedAllWays(" ", "\u0020");
+    assertEscapedAllWays(" ", " ");
   }
 
   private void assertEscapedAllWays(String escaped, String original) throws JSONException {

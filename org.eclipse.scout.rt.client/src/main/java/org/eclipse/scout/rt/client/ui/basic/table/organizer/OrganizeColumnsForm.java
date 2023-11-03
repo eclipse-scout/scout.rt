@@ -85,8 +85,8 @@ import org.slf4j.LoggerFactory;
 public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumnsForm {
 
   private static final Logger LOG = LoggerFactory.getLogger(OrganizeColumnsForm.class);
-  private static final String UNICODE_ARROW_UP = "\u2191";
-  private static final String UNICODE_ARROW_DOWN = "\u2193";
+  private static final String UNICODE_ARROW_UP = "↑"; // U+2191
+  private static final String UNICODE_ARROW_DOWN = "↓"; // U+2193
   private static final String VISIBLE_DIMENSION_HIERARCHICAL = "dim_hierarchical";
 
   public enum ConfigType {
@@ -221,11 +221,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         @Order(10)
         @ClassId("f96ddd7f-634b-486b-a4be-fbb69b5162e4")
         public class ProfilesTableField extends AbstractTableField<ProfilesTableField.Table> {
-
-          @Override
-          protected int getConfiguredGridH() {
-            return 3;
-          }
 
           @Override
           protected boolean getConfiguredGridUseUiHeight() {
@@ -610,11 +605,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         @Order(10)
         @ClassId("eefd05cf-b8b6-4c07-82c9-91aaafe9b8b6")
         public class ColumnsTableField extends AbstractTableField<Table> {
-
-          @Override
-          protected int getConfiguredGridH() {
-            return 3;
-          }
 
           @Override
           protected int getConfiguredGridW() {
@@ -1752,7 +1742,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         if (col.isGroupingActive()) {
           cellContents.add(HTML.span(TEXTS.get("GroupingAbbreviation")).cssClass("group-symbol"));
         }
-        if (cellContents.size() > 0) {
+        if (CollectionUtility.hasElements(cellContents)) {
           columnsTable.getGroupAndSortColumn().setValue(row, HTML.fragment(cellContents).toHtml());
         }
 
