@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {graphics, icons, objects, Page, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode} from '../../src/index';
+import {graphics, icons, objects, Page, Range, scout, scrollbars, strings, Tree, TreeField, TreeModel, TreeNode, TreeNodeModel} from '../../src/index';
 import {JQueryTesting, SpecTree, TreeSpecHelper} from '../../src/testing/index';
 
 describe('Tree', () => {
@@ -1278,7 +1278,7 @@ describe('Tree', () => {
       }, node.childNodes);
     });
 
-    describe('AutoCheckStyle children_and_parent', () => {
+    describe('with children_and_parent AutoCheckStyle', () => {
 
       it('does check children', () => {
         let model = helper.createModelFixture(4, 4);
@@ -1451,6 +1451,100 @@ describe('Tree', () => {
         expect(nodeLevel1.checked).toBe(true);
         expect(nodeLevel2.checked).toBe(true);
         expect(nodeLevel3.checked).toBe(true);
+      });
+
+      it('does not check new inserted nodes on top level', () => {
+        let model = helper.createModelFixture(1, 0);
+        let tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.render();
+
+        // Arrange
+        let node = {text: 'New TreeNode'} as TreeNodeModel;
+
+        // Act
+        tree.insertNode(node);
+        let insertedNode = tree.nodes[1];
+
+        // Assert
+        expect(insertedNode.checked).toBe(false);
+      });
+
+      it('does remove parent node from tree.checkedNodes when child is unchecked', () => {
+        let model = helper.createModelFixture(2, 1);
+        let tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.render();
+
+        // Arrange
+        let parentNode = tree.nodes[0];
+        let childNode = parentNode.childNodes[0];
+        let childNode2 = parentNode.childNodes[1];
+
+        // Act
+        tree.checkNode(parentNode);
+        tree.uncheckNode(childNode);
+        tree.checkNode(childNode);
+
+        // Assert
+        // arrayWithExactContents ignores the order of the elements in the array
+        expect(tree.checkedNodes).toEqual(jasmine.arrayWithExactContents([parentNode, childNode, childNode2]));
+      });
+
+      it('does uncheck parent node, when not all children are selected', () => {
+        let model = helper.createModelFixture(2, 1);
+        let tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.render();
+
+        // Arrange
+        let parentNode = tree.nodes[0];
+        let childNode = parentNode.childNodes[0];
+        let childNode2 = parentNode.childNodes[1];
+
+        // Act
+        tree.checkNode(parentNode);
+        tree.uncheckNode(childNode);
+
+        // Assert
+        expect(parentNode.checked).toBe(false);
+        expect(parentNode.childrenChecked).toBe(true);
+        expect(childNode.checked).toBe(false);
+        expect(childNode2.checked).toBe(true);
+      });
+
+      it('does uncheck all nodes when muiltiCheck is false', () => {
+        let model = helper.createModelFixture(2, 1);
+        let tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.render();
+
+        // Arrange
+        let parentNode = tree.nodes[0];
+        let childNode1 = parentNode.childNodes[0];
+        let childNode2 = parentNode.childNodes[1];
+
+        // Act
+        tree.checkNode(parentNode);
+        tree.multiCheck = false;
+        tree.uncheckNode(childNode1);
+
+        // Assert
+        expect(tree.checkedNodes).toEqual([]);
+        expect(parentNode.checked).toBe(false);
+        expect(parentNode.childrenChecked).toBe(false);
+        expect(childNode1.checked).toBe(false);
+        expect(childNode1.childrenChecked).toBe(false);
+        expect(childNode2.checked).toBe(false);
+        expect(childNode2.childrenChecked).toBe(false);
       });
     });
 

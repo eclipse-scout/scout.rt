@@ -2594,12 +2594,18 @@ export class Tree extends Widget implements TreeModel {
     }
 
     let updatedNodes = new TreeCheckNodesResult();
-    nodes = arrays.ensure(nodes);
+    nodes = arrays.ensure(nodes).filter(e => !!e); // Filter empty array elements
 
     // Handle single selection
-    if (!this.multiCheck && opts.checked) {
+    if (!this.multiCheck) {
       let uncheckedNodes = this._uncheckAll();
       updatedNodes.add(uncheckedNodes);
+
+      if (opts.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
+        // The configuration of this AutoCheckStyle and no muiltiCheck does not make sense.
+        // All nodes will be unselected and no new node is selected.
+        nodes = []; // Like a return but with render, does not run through the forEach
+      }
     }
 
     nodes.forEach(node => {
@@ -2679,9 +2685,13 @@ export class Tree extends Widget implements TreeModel {
     let childrenCheckedCount = children.filter(n => n.checked || n.childrenChecked).length;
     let childrenFullyCheckedCount = children.filter(n => n.checked && !n.childrenChecked).length;
 
-    // No children present, jump directly to its parent
-    if (childrenCount === 0 && node.parentNode) {
-      return this._checkParentsRecursive(node.parentNode, autoCheckStyle);
+    // No children present
+    if (childrenCount === 0) {
+      // Jump directly to its parent, when available
+      if (node.parentNode) {
+        return this._checkParentsRecursive(node.parentNode, autoCheckStyle);
+      }
+      return updatedNodes;
     }
 
     // No child checked
@@ -2717,6 +2727,10 @@ export class Tree extends Widget implements TreeModel {
   }
 
   protected _checkNode(node: TreeNode, check: boolean) {
+    // Do nothing when node is already checked
+    if (node.checked === check) {
+      return;
+    }
     node.checked = check;
     if (check) {
       this.checkedNodes.push(node);
@@ -2731,6 +2745,7 @@ export class Tree extends Widget implements TreeModel {
       let node = this.checkedNodes[i];
       node.checked = false;
       node.childrenChecked = false;
+      updatedNodes.add(this._checkParentsRecursive(node));
       updatedNodes.addNodeForRenderingAndEventTrigger(node);
     }
     this.checkedNodes = [];
