@@ -268,6 +268,7 @@ export default class FocusManager {
    *        Use object, boolean is deprecated
    * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
    * @param {boolean} [options.onlyIfReady] prevents focusing if not ready
+   * @param {boolean} [options.selectText] automatically selects the text content of the element if supported (defaults to false)
    * @return {boolean} true if focus was gained, false otherwise.
    */
   requestFocus(element, filter, options) {

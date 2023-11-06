@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {filters, focusUtils, graphics, keys, Point, scrollbars} from '../index';
+import {filters, focusUtils, graphics, keys, objects, Point, scrollbars} from '../index';
 import $ from 'jquery';
 
 /**
@@ -123,7 +123,9 @@ export default class FocusContext {
       // Don't change the focus here --> will be handled by browser
     } else {
       // Set focus manually to the target element
-      this.validateAndSetFocus(elementToFocus);
+      this.validateAndSetFocus(elementToFocus, null, {
+        selectText: elementToFocus.tagName === 'INPUT'
+      });
       $.suppressEvent(event);
     }
 
@@ -198,6 +200,7 @@ export default class FocusContext {
    *        filter that controls which element should be focused, or null to accept all focusable candidates.
    * @param {object} [options]
    * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
+   * @param {boolean} [options.selectText] automatically selects the text content of the element if supported (defaults to false)
    */
   validateAndSetFocus(element, filter, options) {
     // Ensure the element to be a child element, or set it to null otherwise.
@@ -244,6 +247,7 @@ export default class FocusContext {
    *        the element to focus, or null to focus the context's first focusable element matching the given filter.
    * @param {object} [options]
    * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
+   * @param {boolean} [options.selectText] automatically selects the text content of the element if supported (defaults to false)
    */
   _focus(elementToFocus, options) {
     options = options || {};
@@ -286,6 +290,10 @@ export default class FocusContext {
     elementToFocus.focus({
       preventScroll: scout.nvl(options.preventScroll, false)
     });
+    // If requested and possible, select the text content
+    if (options.selectText && objects.isFunction(elementToFocus.select)) {
+      elementToFocus.select();
+    }
 
     $.log.isDebugEnabled() && $.log.debug('Focus set to ' + graphics.debugOutput(elementToFocus));
   }
