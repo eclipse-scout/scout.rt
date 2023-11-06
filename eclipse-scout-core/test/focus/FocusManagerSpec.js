@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusManagerSpecHelper, FormSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../src/testing/index';
-import {Device, FocusRule, focusUtils, scout} from '../../src/index';
+import {FocusManagerSpecHelper, FormSpecHelper} from '../../src/testing/index';
+import {FocusRule, focusUtils, scout} from '../../src/index';
 
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -35,8 +35,8 @@ describe('scout.FocusManager', () => {
 
   function createDivWithTwoInputs() {
     let $container = session.$entryPoint.makeDiv();
-    $container.appendElement('<input type="text" val="input1" class="input1">');
-    $container.appendElement('<input type="text" val="input2" class="input2">');
+    $container.appendElement('<input type="text" value="input1" class="input1">');
+    $container.appendElement('<input type="text" value="input2" class="input2">');
     return $container;
   }
 
@@ -276,6 +276,50 @@ describe('scout.FocusManager', () => {
       expect(focusManager.evaluateFocusRule($container, null)).toBe(input1);
       expect(focusManager.evaluateFocusRule($container, 'invalid-rule')).toBe('invalid-rule');
       expect(focusManager.evaluateFocusRule($container, input2)).toBe(input2);
+    });
+  });
+
+  describe('focusNextTabbable', () => {
+
+    it('selects text content on focus', () => {
+      let $container = session.$entryPoint.appendDiv();
+      let $input1 = $container.appendElement('<input type="text" value="lorem">');
+      let $input2 = $container.appendElement('<input type="text" value="ipsum">');
+      let $input3 = $container.appendElement('<textarea>dolor</textarea>');
+      let $input4 = $container.appendElement('<div contenteditable="true" tabindex="0">magna</div>');
+
+      focusManager.installFocusContext($container);
+      focusManager.requestFocus($input1[0]);
+      expect(document.activeElement).toBe($input1[0]);
+      // Text not selected initially
+      expect(document.activeElement.selectionStart).toBe(0);
+      expect(document.activeElement.selectionEnd).toBe(0);
+
+      focusManager.focusNextTabbable(document.activeElement);
+      expect(document.activeElement).toBe($input2[0]);
+      // Text selected (because of selectText=true in #focusNextTabbable)
+      expect(document.activeElement.selectionStart).toBe(0);
+      expect(document.activeElement.selectionEnd).toBe(5);
+
+      focusManager.focusNextTabbable(document.activeElement);
+      expect(document.activeElement).toBe($input3[0]);
+      // No text selected (element is not a simple <input> field)
+      expect(document.activeElement.selectionStart).toBe(0);
+      expect(document.activeElement.selectionEnd).toBe(0);
+
+      focusManager.focusNextTabbable(document.activeElement);
+      expect(document.activeElement).toBe($input4[0]);
+      // No text selected (not a HTMLInputField, therefore no 'selectionStart' property)
+      expect(document.activeElement.selectionStart).toBe(undefined);
+      expect(document.activeElement.selectionEnd).toBe(undefined);
+      expect(document.getSelection().getRangeAt(0).startOffset).toBe(0);
+      expect(document.getSelection().getRangeAt(0).endOffset).toBe(0);
+
+      focusManager.focusNextTabbable(document.activeElement);
+      expect(document.activeElement).toBe($input1[0]);
+      // TExt selected (because of selectText=true in #focusNextTabbable)
+      expect(document.activeElement.selectionStart).toBe(0);
+      expect(document.activeElement.selectionEnd).toBe(5);
     });
   });
 });
