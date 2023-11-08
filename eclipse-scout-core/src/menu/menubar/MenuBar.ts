@@ -247,7 +247,6 @@ export class MenuBar extends Widget implements MenuBarModel {
       // add ellipsis to the correct position
       if (this.ellipsisPosition === MenuBar.EllipsisPosition.RIGHT) {
         // try right
-        // noinspection JSVoidFunctionReturnValueUsed
         let reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.right.slice().reverse());
         if (reverseIndexPosition > -1) {
           ellipsisIndex = orderedMenuItems.right.length - reverseIndexPosition;
@@ -255,7 +254,6 @@ export class MenuBar extends Widget implements MenuBarModel {
           orderedMenuItems.right.splice(ellipsisIndex, 0, ellipsis);
         } else {
           // try left
-          // noinspection JSVoidFunctionReturnValueUsed
           reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.left.slice().reverse());
           if (reverseIndexPosition > -1) {
             ellipsisIndex = orderedMenuItems.left.length - reverseIndexPosition;

@@ -122,7 +122,7 @@ export class TabArea extends Widget implements TabAreaModel {
   }
 
   protected _renderSelectedTab() {
-    // force a relayout in case the selected tab is overflown. The layout will ensure the selected tab is visible.
+    // force a re-layout in case the selected tab is overflown. The layout will ensure the selected tab is visible.
     if (this.selectedTab && this.selectedTab.overflown) {
       this.invalidateLayoutTree();
     }
@@ -173,7 +173,6 @@ export class TabArea extends Widget implements TabAreaModel {
   }
 
   protected _renderTabs() {
-    // noinspection JSVoidFunctionReturnValueUsed Obviously an IntelliJ bug, it assumes reverse is from Animation rather than from Array
     this.tabs.slice().reverse().forEach((tab, index, items) => {
       if (!tab.rendered) {
         tab.render();

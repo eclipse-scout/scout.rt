@@ -68,7 +68,6 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
   protected _renderTabs() {
     // reverse since tab.renderAfter() called without sibling=true argument (see _renderTab)
     // will _prepend_ themselves into the container.
-    // noinspection JSVoidFunctionReturnValueUsed
     this.tabs.slice().reverse().forEach(tab => this._renderTab(tab));
     widgets.updateFirstLastMarker(this.tabs);
   }

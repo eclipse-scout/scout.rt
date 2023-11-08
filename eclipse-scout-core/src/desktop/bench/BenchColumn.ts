@@ -225,7 +225,6 @@ export class BenchColumn extends Widget implements BenchColumnModel {
     }
     this.components.forEach((c, i) => {
       if (c instanceof Splitter) {
-        // noinspection JSVoidFunctionReturnValueUsed
         let componentsBefore = this.components.slice(0, i).reverse() as SimpleTabBox<OutlineContent>[];
         let componentsAfter = this.components.slice(i + 1) as SimpleTabBox<OutlineContent>[];
         // shrink

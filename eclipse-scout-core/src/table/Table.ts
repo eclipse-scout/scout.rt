@@ -971,7 +971,6 @@ export class Table extends Widget implements TableModel {
         let $clone = $cell.clone();
         $clone.children('.table-cell-icon').setVisible(true);
         if ($cell.css('direction') === 'rtl') {
-          // noinspection JSVoidFunctionReturnValueUsed
           let childrenHtml = $clone.children().get().map(c => c.outerHTML).reverse();
           return strings.join('', ...childrenHtml);
         }
@@ -1177,13 +1176,13 @@ export class Table extends Widget implements TableModel {
     };
 
     if (this.hierarchical) {
-      // sort tree and set flat row array afterwards.
+      // sort tree and set flat row array afterward.
       this._sortHierarchical(sortFunction);
       let sortedFlatRows: TableRow[] = [];
       this.visitRows(row => sortedFlatRows.push(row));
       this.rows = sortedFlatRows;
     } else {
-      // sort the flat rows and set the rootRows afterwards.
+      // sort the flat rows and set the rootRows afterward.
       this.rows.sort(sortFunction);
       this.rootRows = this.rows;
     }
@@ -2890,7 +2889,7 @@ export class Table extends Widget implements TableModel {
   }
 
   /**
-   * Replaces all current rows by the given ones and tries to restore the selection afterwards (see {@link restoreSelection}).
+   * Replaces all current rows by the given ones and tries to restore the selection afterward (see {@link restoreSelection}).
    */
   replaceRows(rows: ObjectOrModel<TableRow> | ObjectOrModel<TableRow>[]) {
     const selectedKeys = this.getSelectedKeys();
@@ -4134,7 +4133,7 @@ export class Table extends Widget implements TableModel {
         .css('width', this.rowWidth);
 
       // If resized column contains cells with wrapped text, view port needs to be updated
-      // Remove row height for non rendered rows because it may have changed due to resizing (wrap text)
+      // Remove row height for non-rendered rows because it may have changed due to resizing (wrap text)
       this._updateRowHeights();
       this._renderFiller();
       this._renderViewport();

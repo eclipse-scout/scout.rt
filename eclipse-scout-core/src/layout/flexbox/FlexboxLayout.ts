@@ -145,7 +145,6 @@ export class FlexboxLayout extends AbstractLayout {
 
   protected _layoutDelta(children: HtmlComponent[], deltaComp: HtmlComponent, containerSize: Dimension) {
     this.ensureInitialValues(children, containerSize);
-    // noinspection JSVoidFunctionReturnValueUsed
     let delta = (<FlexboxLayoutData>deltaComp.layoutData).diff,
       componentsBefore = children.slice(0, children.indexOf(deltaComp)).reverse(),
       componentsAfter = children.slice(children.indexOf(deltaComp) + 1),

@@ -122,7 +122,6 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       this.headerTabAreaController.install(this, this.headerTabArea);
       // for all views
       let tabBox = this.getTabBox('C');
-      // noinspection JSVoidFunctionReturnValueUsed
       tabBox.viewStack.slice().reverse().forEach(view => {
         // @ts-expect-error
         this.headerTabAreaController._onViewAdd({view: view});
@@ -598,7 +597,6 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     }
     this.components.forEach((c, i) => {
       if (c instanceof Splitter) {
-        // noinspection JSVoidFunctionReturnValueUsed
         let componentsBefore = this.components.slice(0, i).reverse() as BenchColumn[];
         let componentsAfter = this.components.slice(i + 1) as BenchColumn[];
         // shrink

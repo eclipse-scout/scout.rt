@@ -328,7 +328,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
 
     // Destroy children in reverse order
-    // noinspection JSVoidFunctionReturnValueUsed Obviously an IntelliJ bug, it assumes reverse is from Animation rather than from Array
     this._destroyChildren(this.children.slice().reverse());
     this.remove();
     this._destroy();
@@ -570,7 +569,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       this._$lastFocusedElement = null;
     }
     // remove children in reverse order.
-    // noinspection JSVoidFunctionReturnValueUsed Obviously an IntelliJ bug, it assumes reverse is from Animation rather than from Array
     this.children.slice().reverse()
       .forEach(child => {
         // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
