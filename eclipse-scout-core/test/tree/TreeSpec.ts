@@ -1341,7 +1341,8 @@ describe('Tree', () => {
         tree.checkNode(childNode, false);
 
         // Assert
-        expect(node.checked).toEqual(true);
+        expect(childNode.checked).toBe(false);
+        expect(node.checked).toEqual(false);
         expect(node.childrenChecked).toEqual(true);
       });
 
