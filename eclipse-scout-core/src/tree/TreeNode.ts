@@ -265,16 +265,11 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
     if (!this.rendered) {
       return;
     }
-    let checked = this.checked;
-    // When this specific AutoCheckStyle is selected, the childrenChecked state has more priority
-    if (this.parent.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
-      checked = checked && !this.childrenChecked;
-    }
 
     this.$node
       .children('.tree-node-checkbox')
       .children('.check-box')
-      .toggleClass('checked', checked);
+      .toggleClass('checked', this.checked);
   }
 
   protected _renderIcon() {

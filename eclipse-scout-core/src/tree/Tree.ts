@@ -2708,6 +2708,10 @@ export class Tree extends Widget implements TreeModel {
     if (childrenCheckedCount > 0 && !node.childrenChecked && !(autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT && childrenFullyCheckedCount === childrenCount)) {
       node.childrenChecked = true;
       updatedNodes.addNodeForRendering(node);
+      if (autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT && node.checked) {
+        this._checkNode(node, false);
+        updatedNodes.addNodeForEventTrigger(node);
+      }
     }
 
     // All children checked
@@ -2741,8 +2745,9 @@ export class Tree extends Widget implements TreeModel {
 
   protected _uncheckAll(): TreeCheckNodesResult {
     let updatedNodes = new TreeCheckNodesResult();
-    for (let i = 0; i < this.checkedNodes.length; i++) {
-      let node = this.checkedNodes[i];
+    let checkedNodes = [...this.checkedNodes]; // Create copy, array may be modified
+    for (let i = 0; i < checkedNodes.length; i++) {
+      let node = checkedNodes[i];
       node.checked = false;
       node.childrenChecked = false;
       updatedNodes.add(this._checkParentsRecursive(node));
