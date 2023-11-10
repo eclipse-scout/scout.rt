@@ -283,6 +283,7 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
       bodyLayoutConfig = new LogicalGridLayoutConfig();
     }
     this._setProperty('bodyLayoutConfig', LogicalGridLayoutConfig.ensure(bodyLayoutConfig));
+    LogicalGridLayoutConfig.initHtmlEnvChangeHandler(this, () => this.bodyLayoutConfig, layoutConfig => this.setBodyLayoutConfig(layoutConfig));
   }
 
   protected _renderBodyLayoutConfig() {
