@@ -1306,11 +1306,15 @@ export class Tree extends Widget implements TreeModel {
       });
   }
 
-  protected _updateMarkChildrenChecked(node: TreeNode, init?: boolean) {
+  protected _updateMarkChildrenChecked(node: TreeNode, init?: boolean, triggerEvents = this.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
     let treeNodeUpdate = this._checkParentsRecursive(node);
 
     if (!init) {
-      this._renderNodesChecked(treeNodeUpdate.getNodesForRendering());
+      return;
+    }
+    this._renderNodesChecked(treeNodeUpdate.getNodesForRendering());
+
+    if (triggerEvents) {
       this.trigger('nodesChecked', {
         nodes: treeNodeUpdate.getNodesForEventTrigger()
       });
