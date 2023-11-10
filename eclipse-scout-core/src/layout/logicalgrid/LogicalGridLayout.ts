@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutConfigModel, LogicalGridLayoutInfo, ObjectOrModel,
-  Rectangle, Widget
+  AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutConfigModel, LogicalGridLayoutInfo, ObjectOrModel, Rectangle, Widget
 } from '../../index';
 import $ from 'jquery';
 
@@ -44,31 +43,8 @@ export class LogicalGridLayout extends AbstractLayout {
     this.widget = widget;
     this.info = null;
 
-    this._initDefaults();
     this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {} as LogicalGridLayoutConfigModel);
     this.layoutConfig.applyToLayout(this);
-
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
-    HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this.widget.one('remove', () => {
-      HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    });
-  }
-
-  protected _initDefaults() {
-    let env = HtmlEnvironment.get();
-    this.hgap = env.formColumnGap;
-    this.vgap = env.formRowGap;
-    this.columnWidth = env.formColumnWidth;
-    this.rowHeight = env.formRowHeight;
-    this.minWidth = 0;
-  }
-
-  protected _onHtmlEnvironmentPropertyChange() {
-    this._initDefaults();
-    this.layoutConfig.applyToLayout(this);
-    this.widget.invalidateLayoutTree();
-    this.widget.invalidateLogicalGrid();
   }
 
   validateLayout($container: JQuery, options: HtmlCompPrefSizeOptions) {

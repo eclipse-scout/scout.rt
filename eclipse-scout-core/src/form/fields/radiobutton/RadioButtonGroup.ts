@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow, ObjectOrChildModel,
-  ObjectOrModel, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout,
+  aria, arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow,
+  ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout,
   Status, ValueField
 } from '../../../index';
 import $ from 'jquery';
@@ -126,8 +126,8 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     this._renderLayoutConfig();
   }
 
-  protected _createBodyLayout(): RadioButtonGroupLayout {
-    return new RadioButtonGroupLayout(this, this.layoutConfig);
+  protected _createBodyLayout(): LogicalGridLayout {
+    return new LogicalGridLayout(this, this.layoutConfig);
   }
 
   protected override _setLogicalGrid(logicalGrid: LogicalGrid | string) {
@@ -149,14 +149,12 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
   }
 
   protected _setLayoutConfig(layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
-    if (!layoutConfig) {
-      layoutConfig = new LogicalGridLayoutConfig();
-    }
-    this._setProperty('layoutConfig', LogicalGridLayoutConfig.ensure(layoutConfig));
+    this._setProperty('layoutConfig', LogicalGridLayoutConfig.prepareSmallHgapConfig(layoutConfig));
+    LogicalGridLayoutConfig.initHtmlEnvChangeHandler(this, () => this.layoutConfig, layoutConfig => this.setLayoutConfig(layoutConfig));
   }
 
   protected _renderLayoutConfig() {
-    this.layoutConfig.applyToLayout(this.htmlBody.layout as RadioButtonGroupLayout);
+    this.layoutConfig.applyToLayout(this.htmlBody.layout as LogicalGridLayout);
     if (this.rendered) {
       this.htmlBody.invalidateLayoutTree();
     }
@@ -400,9 +398,7 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
   protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
       widget: this,
-      $container: function() {
-        return this.$body;
-      }.bind(this)
+      $container: () => this.$body
     });
   }
 
