@@ -1578,6 +1578,30 @@ describe('Tree', () => {
         expect(parent2.childrenChecked).toBe(false);
         expect(child21.checked).toBe(true);
       });
+
+      it('does update parent nodes when child is deleted', () => {
+        let model = helper.createModelFixture(2, 1);
+        let tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.render();
+
+        // Arrange
+        let parent = tree.nodes[0];
+        let child1 = parent.childNodes[0];
+        let child2 = parent.childNodes[1];
+        tree.checkNode(parent);
+        tree.uncheckNode(child1);
+
+        // Act
+        tree.deleteNode(child1);
+
+        // Assert
+        expect(parent.checked).toBe(true);
+        expect(child2.checked).toBe(true);
+        expect(tree.checkedNodes).toEqual(jasmine.arrayWithExactContents([parent, child2]));
+      });
     });
 
     it('does not check nodes if checkable is set to false', () => {
