@@ -121,17 +121,17 @@ describe('FormLifecycle', () => {
       expect(lifecycleComplete).toBe(expected);
     }
 
-    it('should call _validate function on form', () => {
+    it('should call _lifecycleValidate function on form', () => {
       // validate should always be called, even when there is not a single touched field in the form
       let form2 = helper.createFormWithOneField();
       form2.lifecycle = scout.create(SpecLifecycle, {
         widget: form2
       });
       let validateCalled = false;
-      Object.getPrototypeOf(form2)._validate = () => {
+      form2.addValidator(() => {
         validateCalled = true;
         return Status.ok();
-      };
+      });
       form2.ok();
       expect(validateCalled).toBe(true);
 

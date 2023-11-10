@@ -89,8 +89,7 @@ export class UnsavedFormChangesForm extends Form implements UnsavedFormChangesFo
     this.on('postLoad', (event: Event<Form>) => this.touch());
   }
 
-  /** @internal */
-  override _validate(): Status {
+  protected override _validate(): Status {
     let invalidForms = this.getInvalidForms();
     if (invalidForms.length > 0) {
       let msg: string[] = [];

@@ -74,7 +74,7 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
   }
 
   protected override _validateWidget(): Status | JQuery.Promise<Status> {
-    return this.widget._validate();
+    return this.widget._lifecycleValidate();
   }
 
   protected override _handleInvalid(status: Status): JQuery.Promise<Status> {
