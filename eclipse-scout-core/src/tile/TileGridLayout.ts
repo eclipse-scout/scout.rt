@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LogicalGridLayout, Point, Rectangle, scout, scrollbars, styles, Tile, TileGrid, TileGridLayoutConfig, Widget} from '../index';
+import {arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LogicalGridLayout, Point, Rectangle, scout, scrollbars, Tile, TileGrid, TileGridLayoutConfig, Widget} from '../index';
 import $ from 'jquery';
 
 export class TileGridLayout extends LogicalGridLayout {
@@ -24,29 +24,6 @@ export class TileGridLayout extends LogicalGridLayout {
     this.containerScrollTop = null;
     this.tiles = [];
     this._calculatingPrimitivePrefSize = false;
-  }
-
-  protected static _DEFAULT_SIZE = undefined;
-
-  static getTileDimensions(): Rectangle {
-    if (!(TileGridLayout._DEFAULT_SIZE instanceof Rectangle)) {
-      let h = styles.getSize('tile-grid-layout-config', 'height', 'height', -1);
-      let w = styles.getSize('tile-grid-layout-config', 'width', 'width', -1);
-      let horizontalGap = styles.getSize('tile-grid-layout-config', 'margin-left', 'marginLeft', -1);
-      let verticalGap = styles.getSize('tile-grid-layout-config', 'margin-top', 'marginTop', -1);
-      TileGridLayout._DEFAULT_SIZE = new Rectangle(horizontalGap, verticalGap, w, h);
-    }
-    return TileGridLayout._DEFAULT_SIZE;
-  }
-
-  protected override _initDefaults() {
-    super._initDefaults();
-    let dim = TileGridLayout.getTileDimensions();
-    this.hgap = dim.x;
-    this.vgap = dim.y;
-    this.columnWidth = dim.width;
-    this.rowHeight = dim.height;
-    this.maxWidth = -1;
   }
 
   /**

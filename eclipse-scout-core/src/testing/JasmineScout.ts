@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, Desktop, FullModelOf, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectFactory, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session, SessionStartupResponse, Widget, WidgetModel
+  AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectFactory, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session, SessionStartupResponse, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, LocaleSpecHelper, TestingApp} from './index';
 import 'jasmine-jquery';
@@ -255,6 +255,8 @@ export const JasmineScout = {
         (session.layoutValidator as { _postValidateFunctions: (() => void)[] })._postValidateFunctions = [];
         session.layoutValidator.desktop = null;
       }
+      // Remove every handler to avoid a memory leak because widgets are not destroyed properly after tests, so they won't unregister their handlers
+      HtmlEnvironment.get().off('propertyChange');
     });
 
     context.keys().forEach(context);

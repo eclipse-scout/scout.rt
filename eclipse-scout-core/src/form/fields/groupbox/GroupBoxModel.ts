@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,10 +40,12 @@ export interface GroupBoxModel extends FormFieldModel {
    */
   notification?: ObjectOrChildModel<Notification>;
   /**
-   * Configures layouting hints for the logical grid like the {@link LogicalGridLayoutConfig.rowHeight} or {@link LogicalGridLayoutConfig.columnWidth}
+   * Configures layouting hints for the logical grid like {@link LogicalGridLayoutConfig.rowHeight}, {@link LogicalGridLayoutConfig.columnWidth}
    * or the gaps between the cells ({@link LogicalGridLayoutConfig.hgap}, {@link LogicalGridLayoutConfig.vgap}).
    *
-   * By default, an empty {@link LogicalGridLayoutConfig} is used which means the hints are read from CSS.
+   * If no explicit values are set, the values are initialized using the {@link HtmlEnvironment} which reads them from CSS.
+   *
+   * @see LogicalGridLayoutConfig.
    */
   bodyLayoutConfig?: ObjectOrModel<LogicalGridLayoutConfig>;
   /**

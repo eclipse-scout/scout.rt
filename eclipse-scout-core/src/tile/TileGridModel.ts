@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,8 +43,9 @@ export interface TileGridModel extends WidgetModel {
   /**
    * Specifies the layouting hints for the tile grid used by {@link TileGridLayout}.
    *
-   * By default, an empty {@link TileGridLayoutConfig} is used which means the values are read by CSS.
-   * @see TileGridLayout._initDefaults
+   * If no explicit values are set, the values are initialized using CSS.
+   *
+   * @see TileGridLayoutConfig.getTileDefaultLayoutConfig
    */
   layoutConfig?: ObjectOrModel<TileGridLayoutConfig>;
   menus?: ObjectOrChildModel<Menu>[];

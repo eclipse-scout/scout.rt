@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   CheckBoxField, CloneOptions, CompositeField, DateField, dates, EventHandler, FormField, FormFieldSuppressStatus, HorizontalGrid, HtmlComponent, InitModelOf, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu,
-  ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, StatusOrModel, ValueField, Widget
+  ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, ValueField, Widget
 } from '../../../index';
 
 export class SequenceBox extends CompositeField implements SequenceBoxModel {
@@ -100,7 +100,7 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
   }
 
   protected _createBodyLayout(): LogicalGridLayout {
-    return new SequenceBoxLayout(this, this.layoutConfig);
+    return new LogicalGridLayout(this, this.layoutConfig);
   }
 
   protected override _remove() {
@@ -130,15 +130,12 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
   }
 
   protected _setLayoutConfig(layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
-    if (!layoutConfig) {
-      layoutConfig = new LogicalGridLayoutConfig();
-    }
-    this._setProperty('layoutConfig', LogicalGridLayoutConfig.ensure(layoutConfig));
+    this._setProperty('layoutConfig', LogicalGridLayoutConfig.ensure(layoutConfig || {}).withSmallHgapDefaults());
+    LogicalGridLayoutConfig.initHtmlEnvChangeHandler(this, () => this.layoutConfig, layoutConfig => this.setLayoutConfig(layoutConfig));
   }
 
   protected _renderLayoutConfig() {
-    let layout = this.htmlBody.layout as LogicalGridLayout;
-    this.layoutConfig.applyToLayout(layout);
+    this.layoutConfig.applyToLayout(this.htmlBody.layout as LogicalGridLayout);
     if (this.rendered) {
       this.htmlBody.invalidateLayoutTree();
     }
