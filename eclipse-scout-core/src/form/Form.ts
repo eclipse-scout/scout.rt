@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, App, aria, AriaLabelledByInsertPosition, BusyIndicatorOptions, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler, FileChooser,
+  AbortKeyStroke, App, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler, FileChooser,
   FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke,
-  KeyStrokeContext, MessageBox, MessageBoxController, MessageBoxes, NotificationBadgeStatus, ObjectOrChildModel, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult,
+  KeyStrokeContext, MessageBox, MessageBoxController, MessageBoxes, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status, StatusOrModel, strings, tooltips, TreeVisitResult,
   ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
@@ -73,6 +73,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
   detailForm: boolean;
   /** @internal */
   blockRendering: boolean;
+  validators: FormValidator[];
+  protected _defaultValidator: FormValidator;
 
   $statusIcons: JQuery[];
   $header: JQuery;
@@ -139,6 +141,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.iconId = null;
     this.formLoading = false;
     this.formLoaded = false;
+    this.validators = [];
+    this._defaultValidator = this._validate.bind(this);
 
     this.$statusIcons = [];
     this.$header = null;
@@ -185,6 +189,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this._installLifecycle();
     this._setClosable(this.closable);
     this._setExclusiveKey(this.exclusiveKey);
+    this._setValidators(this.validators);
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -609,17 +614,77 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
+   * The function is called every time {@link _lifecycleValidate} is called. The function should be used
+   * to implement an overall validate logic which is not related to a specific field. For instance, you
+   * could validate the state of an internal member variable.
+   *
+   * You should return a {@link Status} object with severity ERROR or WARNING in case the validation fails.
+   */
+  protected _validate(): Status | JQuery.Promise<Status> {
+    return Status.ok();
+  }
+
+  /**
    * This function is called by the lifecycle, for instance when the 'ok' function is called.
    * The function is called every time the 'ok' function is called, which means it runs even when
    * there is not a single touched field. The function should be used to implement an overall validate
    * logic which is not related to a specific field. For instance, you could validate the state of an
    * internal member variable.
    *
-   * You should return a {@link Status} object with severity ERROR or WARNING in case the validation fails.
-   * @internal
+   * Do not override this method, use {@link _validate} instead.
    */
-  _validate(): Status | JQuery.Promise<Status> {
-    return Status.ok();
+  _lifecycleValidate(): Status | JQuery.Promise<Status> {
+    const combineStatuses = (statuses: Status[]) => {
+      const status = Status.ok();
+      statuses.forEach(s => status.addStatus(s));
+      return status;
+    };
+
+    // separate statuses from promises
+    const statuses: Status[] = [];
+    const promises: JQuery.Promise<Status>[] = [];
+    for (const statusOrPromise of this.validators.map(validator => validator(this))) {
+      if (objects.isPromise(statusOrPromise)) {
+        promises.push(statusOrPromise);
+        continue;
+      }
+      statuses.push(statusOrPromise);
+    }
+
+    // return combined status if there are no promises
+    const status = combineStatuses(statuses);
+    if (!promises.length) {
+      return status;
+    }
+
+    // wait for promises and combine results
+    return $.promiseAll([$.resolvedPromise(status), ...promises])
+      .then((...statusArr: Status[]) => combineStatuses(statusArr));
+  }
+
+  /** @see FormModel.validators */
+  addValidator(validator: FormValidator) {
+    let validators = this.validators.slice();
+    validators.push(validator);
+    this.setValidators(validators);
+  }
+
+  /** @see FormModel.validators */
+  removeValidator(validator: FormValidator) {
+    let validators = this.validators.slice();
+    arrays.remove(validators, validator);
+    this.setValidators(validators);
+  }
+
+  /** @see FormModel.validators */
+  setValidators(validators: FormValidator | FormValidator[]) {
+    this.setProperty('validators', validators);
+  }
+
+  protected _setValidators(validators: FormValidator | FormValidator[]) {
+    validators = arrays.ensure(validators).slice();
+    arrays.pushSet(validators, this._defaultValidator);
+    this._setProperty('validators', validators);
   }
 
   /**
@@ -1626,3 +1691,5 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return form;
   }
 }
+
+export type FormValidator = (form: Form) => Status | JQuery.Promise<Status>;

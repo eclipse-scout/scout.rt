@@ -1829,6 +1829,80 @@ describe('Form', () => {
       jasmine.clock().tick(1000);
       jasmine.clock().uninstall();
     });
+
+    it('waits for all validators to complete and returns true if all are valid', done => {
+      jasmine.clock().install();
+
+      mandatoryStringField.setValue('whatever');
+      numberField.setValue(42);
+
+      const deferred1 = $.Deferred();
+      const deferred2 = $.Deferred();
+      const deferred3 = $.Deferred();
+
+      form.setValidators([f => deferred1.promise(), f => deferred2.promise(), f => deferred3.promise()]);
+
+      const validate = form.validate();
+      validate
+        .then(status => {
+          expect(status.isValid()).toBeTrue();
+        })
+        .catch(fail)
+        .then(done);
+
+      jasmine.clock().tick(1000);
+      expect(validate.state()).toBe('pending');
+
+      deferred1.resolve(Status.ok());
+      deferred2.resolve(Status.ok());
+      jasmine.clock().tick(1000);
+      expect(validate.state()).toBe('pending');
+
+      deferred3.resolve(Status.ok());
+      jasmine.clock().tick(1000);
+      expect(validate.state()).toBe('resolved');
+
+      jasmine.clock().uninstall();
+    });
+
+    it('waits for all validators to complete and returns false if at least one is invalid', done => {
+      jasmine.clock().install();
+
+      mandatoryStringField.setValue('whatever');
+      numberField.setValue(42);
+
+      const deferred1 = $.Deferred();
+      const deferred2 = $.Deferred();
+      const deferred3 = $.Deferred();
+
+      form.setValidators([f => deferred1.promise(), f => deferred2.promise(), f => deferred3.promise()]);
+
+      const validate = form.validate();
+      validate
+        .then(status => {
+          expect(status.isValid()).toBeFalse();
+        })
+        .catch(fail)
+        .then(done);
+
+      jasmine.clock().tick(1000);
+      expect(validate.state()).toBe('pending');
+
+      deferred1.resolve(Status.ok());
+      deferred2.resolve(Status.error());
+      jasmine.clock().tick(1000);
+      expect(validate.state()).toBe('pending');
+
+      deferred3.resolve(Status.ok());
+      jasmine.clock().tick(1000);
+      expect(validate.state()).toBe('pending');
+
+      helper.closeMessageBoxes();
+      jasmine.clock().tick(1000);
+      expect(validate.state()).toBe('resolved');
+
+      jasmine.clock().uninstall();
+    });
   });
 
   describe('error', () => {

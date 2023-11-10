@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DisplayHint, DisplayParent, DisplayViewId, Event, Form, GroupBox, PropertyChangeEvent, Status, ValidationResult, WidgetEventMap} from '../index';
+import {DisplayHint, DisplayParent, DisplayViewId, Event, Form, FormValidator, GroupBox, PropertyChangeEvent, Status, ValidationResult, WidgetEventMap} from '../index';
 
 export interface FormRevealInvalidFieldEvent<F extends Form = Form> extends Event<F> {
   validationResult: ValidationResult;
@@ -60,5 +60,6 @@ export interface FormEventMap extends WidgetEventMap {
   'propertyChange:status': PropertyChangeEvent<Status>;
   'propertyChange:subTitle': PropertyChangeEvent<string>;
   'propertyChange:title': PropertyChangeEvent<string>;
+  'propertyChange:validators': PropertyChangeEvent<FormValidator[]>;
   'propertyChange:views': PropertyChangeEvent<Form[]>;
 }

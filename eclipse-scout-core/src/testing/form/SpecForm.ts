@@ -21,6 +21,10 @@ export class SpecForm extends Form {
     return super._save(data);
   }
 
+  override _validate(): Status | JQuery.Promise<Status> {
+    return super._validate();
+  }
+
   override _showFormInvalidMessageBox(status: Status): JQuery.Promise<Status> {
     return super._showFormInvalidMessageBox(status);
   }

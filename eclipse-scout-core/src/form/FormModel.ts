@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DisplayHint, DisplayParent, DisplayParentModel, DisplayViewId, Form, GroupBox, ObjectOrChildModel, StatusOrModel, Widget, WidgetModel} from '../index';
+import {DisplayHint, DisplayParent, DisplayParentModel, DisplayViewId, Form, FormValidator, GroupBox, ObjectOrChildModel, StatusOrModel, Widget, WidgetModel} from '../index';
 
 export interface FormModel extends WidgetModel, DisplayParentModel {
   /**
@@ -229,4 +229,13 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
    * If set, the status will be displayed in the form header or {@link DesktopTab} tab.
    */
   status?: StatusOrModel;
+  /**
+   * Configures the validators to be used when the form needs to be validated (e.g. when the form is saved).
+   *
+   * When the form is validated, every validator is called and has to agree.
+   * If one validation fails, the form is considered invalid.
+   *
+   * By default, the list is empty.
+   */
+  validators?: FormValidator[];
 }
