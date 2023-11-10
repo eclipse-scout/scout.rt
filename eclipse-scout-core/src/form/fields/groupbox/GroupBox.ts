@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -279,10 +279,8 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
   }
 
   protected _setBodyLayoutConfig(bodyLayoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
-    if (!bodyLayoutConfig) {
-      bodyLayoutConfig = new LogicalGridLayoutConfig();
-    }
-    this._setProperty('bodyLayoutConfig', LogicalGridLayoutConfig.ensure(bodyLayoutConfig));
+    this._setProperty('bodyLayoutConfig', LogicalGridLayoutConfig.ensure(bodyLayoutConfig || {}));
+    LogicalGridLayoutConfig.initHtmlEnvChangeHandler(this, () => this.bodyLayoutConfig, layoutConfig => this.setBodyLayoutConfig(layoutConfig));
   }
 
   protected _renderBodyLayoutConfig() {
