@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormField, LabelField, RadioButton, RadioButtonGroup, RadioButtonGroupLayout, scout} from '../../../../src/index';
+import {FormField, LabelField, LogicalGridLayout, RadioButton, RadioButtonGroup, scout} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('RadioButtonGroup', () => {
@@ -60,7 +60,7 @@ describe('RadioButtonGroup', () => {
       expect(radioButtonGroup.gridColumnCount).toBe(4);
 
       expect(radioButtonGroup.logicalGrid.dirty).toBe(true);
-      let layout = radioButtonGroup.htmlBody.layout as RadioButtonGroupLayout;
+      let layout = radioButtonGroup.htmlBody.layout as LogicalGridLayout;
       expect(layout.valid).toBe(false);
     });
   });
