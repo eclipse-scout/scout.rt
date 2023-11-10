@@ -1547,6 +1547,37 @@ describe('Tree', () => {
         expect(childNode2.checked).toBe(false);
         expect(childNode2.childrenChecked).toBe(false);
       });
+
+      it('does preserve the setted value after init', () => {
+        let model = helper.createModelFixture(2, 2);
+        let tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.render();
+
+        // Arrange
+        let parent1 = tree.nodes[0];
+        let parent2 = tree.nodes[1];
+        let child11 = parent1.childNodes[0];
+        let child12 = parent1.childNodes[1];
+        let child21 = parent2.childNodes[0];
+        tree.checkNode(parent1);
+        tree.uncheckNode(child11);
+        tree.checkNode(parent2);
+
+        // Act
+        tree._initNodes(tree.nodes);
+
+        // Assert
+        expect(parent1.checked).toBe(false);
+        expect(parent1.childrenChecked).toBe(true);
+        expect(child11.checked).toBe(false);
+        expect(child12.checked).toBe(true);
+        expect(parent2.checked).toBe(true);
+        expect(parent2.childrenChecked).toBe(false);
+        expect(child21.checked).toBe(true);
+      });
     });
 
     it('does not check nodes if checkable is set to false', () => {

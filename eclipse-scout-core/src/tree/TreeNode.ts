@@ -307,9 +307,10 @@ export class TreeNode implements TreeNodeModel, ObjectWithType {
   /** @internal */
   _renderChildrenChecked() {
     // if node is not rendered, do nothing
-    if (!this.rendered) {
+    if (!this.$node) {
       return;
     }
+
     this.$node.children('.tree-node-checkbox')
       .children('.check-box')
       .toggleClass('children-checked', !!this.childrenChecked);
