@@ -1593,7 +1593,7 @@ export class Table extends Widget implements TableModel {
     if (!row.filterAccepted) {
       rowClass += ' filter-not-accepted';
     }
-    if (arrays.empty(row.childRows)) {
+    if (this.hierarchical && arrays.empty(row.childRows)) {
       rowClass += ' leaf';
     }
 
