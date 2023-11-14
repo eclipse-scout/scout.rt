@@ -1,0 +1,117 @@
+/*
+ * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package org.eclipse.scout.rt.shared.http.async;
+
+import java.io.IOException;
+
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+
+/**
+ * <p>
+ * Acts as factory and cache for {@link org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient} (client is
+ * initialized only once); implementations use different {@link HttpAsyncClients} methods and configurations to build
+ * this client.
+ * </p>
+ * <p>
+ * Also acts a {@link IPlatformListener}, listening for platform change events. In case of a
+ * {@link State#PlatformStopping} event, the underlying {@link CloseableHttpAsyncClient} is shut down.
+ * </p>
+ */
+@ApplicationScoped
+public abstract class AbstractAsyncHttpClientManager<BUILDER> implements IPlatformListener {
+
+  /**
+   * Flag indicating if {@link AbstractAsyncHttpClientManager} is still active.
+   */
+  protected volatile boolean m_active = true;
+
+  /**
+   * Flag indicating if {@link AbstractAsyncHttpClientManager} was successfully initialized.
+   */
+  protected volatile boolean m_initialized = false;
+
+  /**
+   * Cached {@link CloseableHttpAsyncClient}.
+   */
+  protected volatile CloseableHttpAsyncClient m_client;
+
+  public CloseableHttpAsyncClient getClient() {
+    init();
+    return m_client;
+  }
+
+  /**
+   * Initialize the manager (if not initialized yet). Method call should be cheap as this method is called plenty of
+   * times.
+   */
+  protected void init() {
+    if (!m_initialized) {
+      initSynchronized();
+    }
+  }
+
+  /**
+   * Create the {@link CloseableHttpAsyncClient} (using outer factory), fill {@link #m_client} field.
+   */
+  protected synchronized void initSynchronized() {
+    if (m_initialized || !m_active) {
+      return;
+    }
+
+    BUILDER builder = createBuilder();
+    interceptCreateClient(builder);
+
+    m_client = createClient(builder);
+    m_client.start();
+
+    m_initialized = true;
+  }
+
+  protected abstract BUILDER createBuilder();
+
+  protected void interceptCreateClient(BUILDER builder) {
+  }
+
+  protected abstract CloseableHttpAsyncClient createClient(BUILDER builder);
+
+  @Override
+  public void stateChanged(PlatformEvent event) {
+    if (event.getState() == State.PlatformStopping && m_client != null) {
+      removeClient();
+    }
+  }
+
+  /**
+   * Remove/close {@link CloseableHttpAsyncClient}
+   */
+  protected synchronized void removeClient() {
+    if (m_client == null) {
+      return;
+    }
+
+    try {
+      m_client.close();
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error during {} shut down.", m_client, e);
+    }
+    finally {
+      m_active = false;
+      m_client = null;
+      m_initialized = false;
+    }
+  }
+}

@@ -9,14 +9,16 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import java.io.ByteArrayInputStream;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -24,31 +26,50 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.EntityDetails;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
+import org.apache.hc.core5.http.nio.CapacityChannel;
+import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
+import org.apache.hc.core5.http.nio.support.classic.AbstractClassicEntityConsumer;
+import org.apache.hc.core5.http.nio.support.classic.AbstractClassicEntityProducer;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.http.support.AbstractRequestBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.http.DefaultHttpTransportManager;
-import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
+import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
+import org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.InputStreamContent;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Forwards HTTP requests to the given remote URL.
@@ -57,13 +78,16 @@ import com.google.api.client.http.InputStreamContent;
 public class HttpProxy {
   private static final Logger LOG = LoggerFactory.getLogger(HttpProxy.class);
 
-  private IHttpTransportManager m_httpTransportManager;
+  private AbstractAsyncHttpClientManager m_httpClientManager;
+  private int m_initialBufferSize = 4096;
   private String m_remoteBaseUrl;
   private final List<IHttpHeaderFilter> m_requestHeaderFilters;
   private final List<IHttpHeaderFilter> m_responseHeaderFilters;
+  private Executor m_blockingOperationExecutor;
+  private Supplier<HttpClientContext> m_httpClientContextSupplier;
 
   public HttpProxy() {
-    m_httpTransportManager = BEANS.get(DefaultHttpTransportManager.class);
+    m_httpClientManager = BEANS.get(CONFIG.getPropertyValue(HttpProxyAsyncHttpClientManagerConfigProperty.class));
     m_requestHeaderFilters = new ArrayList<>();
     m_responseHeaderFilters = new ArrayList<>();
   }
@@ -105,6 +129,12 @@ public class HttpProxy {
 
     // remove null header from response headers
     m_responseHeaderFilters.add(new HttpHeaderNameFilter(null));
+
+    m_blockingOperationExecutor = createBlockingOperationExecutor();
+  }
+
+  protected ExecutorService createBlockingOperationExecutor() {
+    return BEANS.get(JobManager.class).getExecutor();
   }
 
   /**
@@ -122,7 +152,7 @@ public class HttpProxy {
    *         This is mostly relevant for form submissions (content type <code>application/x-www-form-urlencoded</code>).
    *         Because the servlet container parses the parameters from the payload, they cannot be read again from the
    *         request body. Instead, they have to be read from the parameter map and be converted back to a valid body.
-   * @see #writeRequestParameters(HttpServletRequest, HttpRequest)
+   * @see #writeRequestParameters(HttpServletRequest, AsyncRequestBuilder)
    */
   protected boolean shouldWriteParametersAsPayload(HttpServletRequest req) {
     if (req.getParameterMap().isEmpty()) {
@@ -159,34 +189,41 @@ public class HttpProxy {
    *          optional options for this request
    */
   public void proxy(HttpServletRequest req, HttpServletResponse resp, HttpProxyRequestOptions options) throws IOException {
+    // response processing is async, start async context as processing must still be possible after exiting this method
+    AsyncContext asyncContext = req.startAsync(req, resp);
+
     if (options == null) {
       options = new HttpProxyRequestOptions();
     }
 
     String url = rewriteUrl(req, options);
-    HttpRequest httpReq = getHttpTransportManager().getHttpRequestFactory().buildRequest(req.getMethod(), new GenericUrl(url), null);
-    httpReq = prepareRequest(httpReq);
+    LOG.debug("Forwarding {} request to {}", req.getMethod(), url);
 
-    writeRequestHeaders(req, httpReq);
-    writeCustomRequestHeaders(httpReq, options.getCustomRequestHeaders());
+    AsyncRequestBuilder asyncRequestBuilder = prepareRequest(AsyncRequestBuilder
+        .create(req.getMethod())
+        .setUri(url));
+
+    writeRequestHeaders(req, asyncRequestBuilder);
+    writeCustomRequestHeaders(asyncRequestBuilder, options.getCustomRequestHeaders());
 
     if (shouldIncludeRequestPayload(req)) {
       // Payload is empty if parameters are used (usually with content type = application/x-www-form-urlencoded)
       // -> write parameters if there are any, otherwise write the raw payload
       if (shouldWriteParametersAsPayload(req)) {
-        writeRequestParameters(req, httpReq);
+        writeRequestParameters(req, asyncRequestBuilder);
       }
       else {
-        writeRequestPayload(req, httpReq);
+        asyncRequestBuilder.setEntity(createEntityProducer(req));
       }
     }
-    HttpResponse httpResp = httpReq.execute();
 
-    writeResponseHeaders(resp, httpResp);
-    writeResponseStatus(resp, httpResp);
-    writeResponsePayload(resp, httpResp);
+    LOG.trace("Executing request for {}", url);
+    getHttpClientManager().getClient().execute(asyncRequestBuilder.build(), createAsyncResponseConsumer(resp), createHttpContext(), createExecuteCallback(resp, asyncContext));
+  }
 
-    LOG.debug("Forwarded {} request to {}", req.getMethod(), url);
+  protected HttpContext createHttpContext() {
+    Supplier<HttpClientContext> httpClientContextSupplier = getHttpClientContextSupplier();
+    return httpClientContextSupplier != null ? httpClientContextSupplier.get() : HttpClientContext.create();
   }
 
   /**
@@ -202,11 +239,11 @@ public class HttpProxy {
     return StringUtility.join("", getRemoteBaseUrl(), pathInfo, StringUtility.box("?", req.getQueryString(), ""));
   }
 
-  protected HttpRequest prepareRequest(HttpRequest httpReq) {
-    return httpReq;
+  protected AsyncRequestBuilder prepareRequest(AsyncRequestBuilder asyncRequestBuilder) {
+    return asyncRequestBuilder;
   }
 
-  protected void writeRequestHeaders(HttpServletRequest req, HttpRequest httpReq) {
+  protected void writeRequestHeaders(HttpServletRequest req, AbstractRequestBuilder asyncRequestBuilder) {
     Enumeration<String> headerNames = req.getHeaderNames();
     final Set<String> hopByHopHeaderNames = getConnectionHeaderValues(req);
     while (headerNames.hasMoreElements()) {
@@ -220,8 +257,7 @@ public class HttpProxy {
         value = filter.filter(name, value);
       }
       if (value != null) {
-        HttpHeaders headers = httpReq.getHeaders();
-        headers.set(name, Collections.singletonList(value));
+        asyncRequestBuilder.addHeader(name, value);
         LOG.trace("Added request header: {}: {}", name, value);
       }
       else {
@@ -230,26 +266,30 @@ public class HttpProxy {
     }
   }
 
-  protected void writeCustomRequestHeaders(HttpRequest httpReq, Map<String, String> customHeaders) {
+  protected void writeCustomRequestHeaders(AsyncRequestBuilder asyncRequestBuilder, Map<String, String> customHeaders) {
     if (customHeaders == null) {
       return;
     }
     for (Entry<String, String> header : customHeaders.entrySet()) {
-      httpReq.getHeaders().set(header.getKey(), header.getValue());
+      asyncRequestBuilder.addHeader(header.getKey(), header.getValue());
       LOG.trace("Added custom request header: {}: {}", header.getValue(), header.getValue());
     }
   }
 
-  protected void writeRequestPayload(HttpServletRequest req, HttpRequest httpReq) throws IOException {
-    httpReq.setContent(new InputStreamContent(null, req.getInputStream()));
+  protected void writeRequestPayload(HttpServletRequest req, OutputStream outputStream) throws IOException {
+    ServletInputStream inputStream = req.getInputStream();
+    if (inputStream == null) {
+      return;
+    }
+    IOUtility.writeFromToStream(outputStream, inputStream);
   }
 
-  protected void writeRequestParameters(HttpServletRequest req, HttpRequest httpReq) throws IOException {
+  protected void writeRequestParameters(HttpServletRequest req, AsyncRequestBuilder requestBuilder) {
     String parameters = formatFormParameters(req.getParameterMap());
-    httpReq.setContent(new InputStreamContent(null, new ByteArrayInputStream(parameters.getBytes(StandardCharsets.UTF_8))));
+    requestBuilder.setEntity(parameters);
   }
 
-  protected String formatFormParameters(Map<String, String[]> parameterMap) throws UnsupportedEncodingException {
+  protected String formatFormParameters(Map<String, String[]> parameterMap) {
     StringBuilder parameters = new StringBuilder();
     for (Entry<String, String[]> entry : parameterMap.entrySet()) {
       for (String value : entry.getValue()) {
@@ -257,28 +297,22 @@ public class HttpProxy {
           parameters.append("&");
         }
         parameters
-            .append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.name()))
+            .append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8))
             .append("=")
-            .append(URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
+            .append(URLEncoder.encode(value, StandardCharsets.UTF_8));
       }
     }
     return parameters.toString();
   }
 
-  /**
-   * Writes the response payload of forwarded request to the servlet response.
-   */
-  protected void writeResponsePayload(HttpServletResponse resp, HttpResponse httpResp) throws IOException {
-    try (InputStream in = httpResp.getContent()) {
-      writeResponsePayload(resp, in);
-    }
-  }
-
   protected void writeResponseStatus(HttpServletResponse resp, HttpResponse httpResp) {
-    int responseCode = httpResp.getStatusCode();
+    int responseCode = httpResp.getCode();
     resp.setStatus(responseCode);
   }
 
+  /**
+   * Writes the response payload of forwarded request to the servlet response.
+   */
   protected void writeResponsePayload(HttpServletResponse resp, InputStream inputStream) throws IOException {
     if (inputStream == null) {
       return;
@@ -288,9 +322,9 @@ public class HttpProxy {
 
   protected void writeResponseHeaders(HttpServletResponse resp, HttpResponse httpResp) {
     final Set<String> hopByHopHeaderNames = getConnectionHeaderValues(httpResp);
-    for (Entry<String, Object> entry : httpResp.getHeaders().entrySet()) {
-      String name = entry.getKey();
-      String value = Objects.toString(entry.getValue() instanceof Collection<?> ? CollectionUtility.firstElement((Collection<?>) entry.getValue()) : entry.getValue());
+    for (Header header : httpResp.getHeaders()) {
+      String name = header.getName();
+      String value = header.getValue();
       if (name != null && hopByHopHeaderNames.contains(name.toLowerCase(Locale.US))) {
         LOG.trace("Removed hop-by-hop response header: {} (original value: {})", name, value);
         continue;
@@ -300,8 +334,8 @@ public class HttpProxy {
         value = filter.filter(name, value);
       }
       if (value != null) {
-        resp.setHeader(entry.getKey(), value);
-        LOG.trace("Added response header: {}: {}", entry.getKey(), value);
+        resp.setHeader(name, value);
+        LOG.trace("Added response header: {}: {}", name, value);
       }
       else {
         LOG.trace("Removed response header: {} (original value: {})", name, originalValue);
@@ -335,9 +369,9 @@ public class HttpProxy {
    * @return set of distinct, non-null connection values in lower-case or an empty set, if the header is not set.
    */
   protected Set<String> getConnectionHeaderValues(HttpResponse httpResp) {
-    return httpResp.getHeaders()
-        .getHeaderStringValues("Connection")
-        .stream()
+    return Arrays.stream(httpResp.getHeaders())
+        .filter(h -> "Connection".equals(h.getName()))
+        .map(Header::getValue)
         .flatMap(v -> Stream.of(StringUtility.split(v, ",")))
         .filter(StringUtility::hasText)
         .map(StringUtility::trim)
@@ -345,17 +379,35 @@ public class HttpProxy {
         .collect(Collectors.toSet());
   }
 
-  public IHttpTransportManager getHttpTransportManager() {
-    return m_httpTransportManager;
+  public AbstractAsyncHttpClientManager getHttpClientManager() {
+    return m_httpClientManager;
   }
 
   /**
    * @param manager
-   *          the {@link IHttpTransportManager} used to execute the http requests. By default the
-   *          {@link DefaultHttpTransportManager} is used.
+   *          used to initialize {@link CloseableHttpAsyncClient}, by default {@link DefaultAsyncHttpClientManager} is
+   *          used
    */
-  public HttpProxy withHttpTransportManager(IHttpTransportManager manager) {
-    m_httpTransportManager = manager;
+  public HttpProxy withHttpClientManager(AbstractAsyncHttpClientManager manager) {
+    m_httpClientManager = manager;
+    return this;
+  }
+
+  public int getInitialBufferSize(HttpServletRequest request) {
+    return m_initialBufferSize;
+  }
+
+  public int getInitialBufferSize(HttpServletResponse response) {
+    return m_initialBufferSize;
+  }
+
+  /**
+   * @param initialBufferSize
+   *          specify the initialBufferSize used for {@link AbstractClassicEntityConsumer} and
+   *          {@link AbstractClassicEntityProducer}
+   */
+  public HttpProxy withInitialBufferSize(int initialBufferSize) {
+    m_initialBufferSize = initialBufferSize;
     return this;
   }
 
@@ -403,5 +455,163 @@ public class HttpProxy {
   public HttpProxy withResponseHeaderFilter(IHttpHeaderFilter filter) {
     m_responseHeaderFilters.add(filter);
     return this;
+  }
+
+  public Executor getBlockingOperationExecutor() {
+    return m_blockingOperationExecutor;
+  }
+
+  public Supplier<HttpClientContext> getHttpClientContextSupplier() {
+    return m_httpClientContextSupplier;
+  }
+
+  /**
+   * Create a supplier for {@link HttpClientContext} which is called upon each request.
+   */
+  public HttpProxy withHttpClientContextSupplier(Supplier<HttpClientContext> httpClientContextSupplier) {
+    m_httpClientContextSupplier = httpClientContextSupplier;
+    return this;
+  }
+
+  /**
+   * <p>
+   * Create an {@link AsyncEntityProducer} which will read data supplied by {@link HttpServletRequest} amd write it to
+   * the proxy request (as soon as data is requested).
+   * </p>
+   */
+  protected AsyncEntityProducer createEntityProducer(HttpServletRequest req) {
+    return new AbstractClassicEntityProducer(getInitialBufferSize(req), null, getBlockingOperationExecutor()) {
+      @Override
+      protected void produceData(ContentType contentType, OutputStream outputStream) throws IOException {
+        LOG.trace("Producing data for forwarded request (original uri: {})", req.getRequestURI());
+        writeRequestPayload(req, outputStream);
+      }
+    };
+  }
+
+  /**
+   * <p>
+   * Create an {@link AsyncEntityConsumer} which will write incoming data to the {@link HttpServletResponse} payload.
+   * </p>
+   * <p>
+   * This consumer writes the entity data immediately to the output consumer to avoid caching the data; therefore the
+   * return type is just boolean to mark data has been written successfully (no exception occurred).
+   * </p>
+   */
+  protected AsyncEntityConsumer<Boolean> createEntityConsumer(HttpServletResponse resp) {
+    return new AbstractClassicEntityConsumer<>(getInitialBufferSize(resp), getBlockingOperationExecutor()) {
+      @Override
+      protected Boolean consumeData(ContentType contentType, InputStream inputStream) throws IOException {
+        LOG.trace("Consuming data with contentType {}", contentType);
+        writeResponsePayload(resp, inputStream);
+        return true;
+      }
+    };
+  }
+
+  /**
+   * <p>
+   * Create the {@link AsyncResponseConsumer} which will internally call
+   * {@link #createEntityConsumer(HttpServletResponse)} to consume the response.
+   * </p>
+   * <p>
+   * Before the actual response payload is consumed the methods
+   * {@link #writeResponseHeaders(HttpServletResponse, HttpResponse)} and
+   * {@link #writeResponseStatus(HttpServletResponse, HttpResponse)} are called (in this order) to forward header and
+   * status.
+   * </p>
+   */
+  protected AsyncResponseConsumer<Boolean> createAsyncResponseConsumer(HttpServletResponse resp) {
+    return new AsyncResponseConsumer<>() {
+
+      private volatile AsyncEntityConsumer<Boolean> m_dataConsumer = createEntityConsumer(resp);
+
+      @Override
+      public void consumeResponse(HttpResponse response, EntityDetails entityDetails, HttpContext context, FutureCallback<Boolean> resultCallback) throws HttpException, IOException {
+        LOG.trace("Consuming response (protocol version: {})", context.getProtocolVersion());
+        writeResponseHeaders(resp, response);
+        writeResponseStatus(resp, response);
+
+        if (entityDetails != null) {
+          LOG.trace("Starting stream for entity (content-type: {})", entityDetails.getContentType());
+          m_dataConsumer.streamStart(entityDetails, resultCallback);
+        }
+        else {
+          LOG.trace("No entity data for response");
+          resultCallback.completed(true);
+        }
+      }
+
+      @Override
+      public void informationResponse(HttpResponse response, HttpContext context) {
+        // just informal
+      }
+
+      @Override
+      public void failed(Exception cause) {
+        LOG.trace("Response consumer failed: ", cause);
+        try {
+          BEANS.get(ExceptionHandler.class).handle(cause);
+        }
+        finally {
+          releaseResources();
+        }
+      }
+
+      @Override
+      public void updateCapacity(CapacityChannel capacityChannel) throws IOException {
+        m_dataConsumer.updateCapacity(capacityChannel);
+      }
+
+      @Override
+      public void consume(ByteBuffer src) throws IOException {
+        m_dataConsumer.consume(src);
+      }
+
+      @Override
+      public void streamEnd(List<? extends Header> trailers) throws HttpException, IOException {
+        m_dataConsumer.streamEnd(trailers);
+      }
+
+      @Override
+      public void releaseResources() {
+        if (m_dataConsumer != null) {
+          m_dataConsumer.releaseResources();
+        }
+        m_dataConsumer = null;
+      }
+    };
+  }
+
+  /**
+   * Provide the {@link FutureCallback} for requests which will call {@link AsyncContext#complete()} (to also complete
+   * the outer proxied request) after request has either completed or failed.
+   */
+  protected FutureCallback<Boolean> createExecuteCallback(HttpServletResponse resp, AsyncContext asyncContext) {
+    return new FutureCallback<>() {
+      @Override
+      public void completed(Boolean result) {
+        LOG.trace("Request execution completed with result: {}", result);
+        assertTrue(result);
+        asyncContext.complete();
+      }
+
+      @Override
+      public void failed(Exception ex) {
+        LOG.trace("Request execution failed", ex);
+        BEANS.get(ExceptionHandler.class).handle(ex);
+        boolean alreadyCommitted = resp.isCommitted();
+        if (!alreadyCommitted) {
+          resp.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        }
+        asyncContext.complete();
+      }
+
+      @Override
+      public void cancelled() {
+        LOG.trace("Request execution cancelled");
+        asyncContext.complete();
+      }
+    };
   }
 }
