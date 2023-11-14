@@ -10,51 +10,123 @@
 package org.eclipse.scout.rt.server.commons.servlet;
 
 import static java.util.Collections.*;
-import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashMap;
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.*;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Random;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.hc.core5.http.ConnectionClosedException;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.Method;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.http.message.BasicHttpResponse;
+import org.apache.hc.core5.http.support.BasicRequestBuilder;
+import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.EnumerationUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
+import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
+import org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager;
+import org.eclipse.scout.rt.shared.http.async.ForceHttp2DefaultAsyncHttpClientManager;
+import org.eclipse.scout.rt.shared.http.async.H2AsyncHttpClientManager;
+import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.NonParameterized;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedPlatformTestRunner;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EnumerationUtility;
-import org.eclipse.scout.rt.platform.util.ImmutablePair;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.testing.http.MockHttpTransport.Builder;
-import com.google.api.client.testing.http.MockLowLevelHttpRequest;
-import com.google.api.client.testing.http.MockLowLevelHttpResponse;
-
-@RunWith(PlatformTestRunner.class)
+@RunWith(ParameterizedPlatformTestRunner.class)
 public class HttpProxyTest {
 
   private HttpProxy m_proxy;
+  private Server m_server;
+  private HandlerCollection m_handlerCollection;
+
+  private HttpProxyTestParameter m_httpProxyTestParameter;
+
+  @Parameters
+  public static List<IScoutTestParameter> getParameters() {
+    return List.of(
+        new HttpProxyTestParameter(BEANS.get(DefaultAsyncHttpClientManager.class), server -> new ServerConnector(server, new HttpConnectionFactory())),
+        new HttpProxyTestParameter(BEANS.get(H2AsyncHttpClientManager.class), server -> new ServerConnector(server, new HTTP2CServerConnectionFactory(new HttpConfiguration()))),
+        new HttpProxyTestParameter(BEANS.get(ForceHttp2DefaultAsyncHttpClientManager.class), server -> new ServerConnector(server, new HTTP2CServerConnectionFactory(new HttpConfiguration()))));
+  }
+
+  public HttpProxyTest(HttpProxyTestParameter testParameter) {
+    m_httpProxyTestParameter = testParameter;
+  }
 
   @Before
   public void before() {
     m_proxy = BEANS.get(HttpProxy.class);
+
+    if (m_httpProxyTestParameter != null) {
+      m_proxy.withHttpClientManager(m_httpProxyTestParameter.getClientManager());
+    }
+  }
+
+  @Before
+  public void createHttpServer() throws Exception {
+    if (m_httpProxyTestParameter == null) {
+      return;
+    }
+
+    m_server = new Server();
+    m_handlerCollection = new HandlerCollection(true);
+    m_server.setHandler(m_handlerCollection);
+    @SuppressWarnings("ressource")
+    ServerConnector connector = m_httpProxyTestParameter.getServerConnectorFunction().apply(m_server);
+    m_server.setConnectors(new Connector[]{connector});
+    m_server.start();
+  }
+
+  @After
+  public void uninstallHttpServer() throws Exception {
+    if (m_server == null) {
+      return;
+    }
+
+    m_server.stop();
+    m_server = null;
   }
 
   @Test
+  @NonParameterized
   public void testRewriteUrl() {
     HttpProxy proxy = m_proxy
         .withRemoteBaseUrl("http://internal.example.com:1234/api");
@@ -70,9 +142,10 @@ public class HttpProxyTest {
   }
 
   @Test
+  @NonParameterized
   public void testShouldWriteParametersAsPayload() {
-    Map<String, String[]> oneParameter = CollectionUtility.hashMap(ImmutablePair.of("maxRows", new String[]{"2"}));
-    Map<String, String[]> multiParameters = CollectionUtility.hashMap(ImmutablePair.of("name", new String[]{"alice"}), ImmutablePair.of("pets", new String[]{"dog", "cat"}));
+    Map<String, String[]> oneParameter = hashMap(ImmutablePair.of("maxRows", new String[]{"2"}));
+    Map<String, String[]> multiParameters = hashMap(ImmutablePair.of("name", new String[]{"alice"}), ImmutablePair.of("pets", new String[]{"dog", "cat"}));
 
     assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", null, null)));
     assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", null, oneParameter)));
@@ -114,7 +187,8 @@ public class HttpProxyTest {
   }
 
   @Test
-  public void testGetConnectionHeaderValuesHttpRequest() throws Exception {
+  @NonParameterized
+  public void testGetConnectionHeaderValuesHttpRequest() {
     assertGetConnectionHeaderValues(null);
     assertGetConnectionHeaderValues("Keep-Alive", "keep-alive");
     assertGetConnectionHeaderValues("Keep-alive, trailers, Foo", "keep-alive", "trailers", "foo");
@@ -122,7 +196,7 @@ public class HttpProxyTest {
     assertGetConnectionHeaderValues("Keep-alive,, ,  , \t", "keep-alive");
   }
 
-  protected void assertGetConnectionHeaderValues(String receivedHeaderValue, String... expectedValues) throws IOException {
+  protected void assertGetConnectionHeaderValues(String receivedHeaderValue, String... expectedValues) {
     // verify HttpServletRequest
     HttpServletRequest req = mock(HttpServletRequest.class);
     if (receivedHeaderValue != null) {
@@ -132,28 +206,20 @@ public class HttpProxyTest {
       when(req.getHeaders("Connection")).thenReturn(EnumerationUtility.asEnumeration(stream.iterator()));
     }
 
-    assertEquals(CollectionUtility.hashSet(expectedValues), m_proxy.getConnectionHeaderValues(req));
+    assertEquals(hashSet(expectedValues), m_proxy.getConnectionHeaderValues(req));
     verify(req).getHeaders("Connection");
     verifyNoMoreInteractions(req);
 
     // verify HttpResponse
-    MockLowLevelHttpResponse mockResponse = new MockLowLevelHttpResponse();
-    if (receivedHeaderValue != null) {
-      mockResponse.addHeader("Connection", receivedHeaderValue);
-    }
-    HttpResponse httpResponse = new Builder()
-        .setLowLevelHttpResponse(
-            mockResponse)
-        .build()
-        .createRequestFactory()
-        .buildGetRequest(new GenericUrl("http://www.example.org/test"))
-        .execute();
+    HttpResponse httpResponse = new BasicHttpResponse(HttpStatus.SC_OK);
+    httpResponse.addHeader(new BasicHeader("Connection", receivedHeaderValue));
 
-    assertEquals(CollectionUtility.hashSet(expectedValues), m_proxy.getConnectionHeaderValues(httpResponse));
+    assertEquals(hashSet(expectedValues), m_proxy.getConnectionHeaderValues(httpResponse));
   }
 
   @Test
-  public void testFilterHopByHopRequestHeaders() throws Exception {
+  @NonParameterized
+  public void testFilterHopByHopRequestHeaders() {
     assertRewriteRequestHeaders(emptyMap(), emptyMap());
     assertRewriteRequestHeaders(singletonMap("foo", "bar"), singletonMap("foo", "bar"));
 
@@ -172,10 +238,11 @@ public class HttpProxyTest {
         hashMap(new ImmutablePair<>("Connection", "foo, bar"), new ImmutablePair<>("Foo", "bar"), new ImmutablePair<>("foobar", "bar")));
   }
 
-  protected void assertRewriteRequestHeaders(Map<String, String> expectedHeaders, Map<String, String> receivedHeaders) throws IOException {
+  protected void assertRewriteRequestHeaders(Map<String, String> expectedHeaders, Map<String, String> receivedHeaders) {
     // mock HttpServletRequest
     HttpServletRequest req = mock(HttpServletRequest.class);
-    when(req.getHeaderNames()).thenReturn(Collections.enumeration(receivedHeaders.keySet()));
+    when(req.getHeaderNames()).thenReturn(enumeration(receivedHeaders.keySet()));
+    //noinspection SuspiciousMethodCalls
     when(req.getHeader(anyString())).thenAnswer(invocation -> receivedHeaders.get(invocation.getArgument(0)));
     when(req.getHeaders("Connection")).thenAnswer(invocation -> {
       Stream<String> stream = Stream.of(StringUtility.split(receivedHeaders.get("Connection"), ","))
@@ -184,24 +251,17 @@ public class HttpProxyTest {
       return EnumerationUtility.asEnumeration(stream.iterator());
     });
 
-    HttpRequest httpReq = new Builder()
-        .setLowLevelHttpRequest(new MockLowLevelHttpRequest())
-        .build()
-        .createRequestFactory()
-        .buildGetRequest(new GenericUrl("http://www.example.org/test"));
+    BasicRequestBuilder httpReq = BasicRequestBuilder.get();
 
     // perform actual operation
     BEANS.get(HttpProxy.class).writeRequestHeaders(req, httpReq);
 
     assertEquals(
-        expectedHeaders.entrySet().stream()
-            .collect(Collectors.toMap(Entry::getKey, e -> Arrays.asList(e.getValue()))),
-        httpReq.getHeaders()
-            .entrySet()
-            .stream()
+        expectedHeaders,
+        Arrays.stream(ObjectUtility.nvlOpt(httpReq.getHeaders(), () -> new Header[]{}))
             // filter automatically added accept-encoding header unless it has been set explicitly
-            .filter(e -> !"accept-encoding".equalsIgnoreCase(e.getKey()) || receivedHeaders.containsKey("accept-encoding"))
-            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(e -> !"accept-encoding".equalsIgnoreCase(e.getName()) || receivedHeaders.containsKey("accept-encoding"))
+            .collect(Collectors.toMap(Header::getName, Header::getValue)));
 
     verify(req).getHeaders("Connection");
     verify(req, atLeastOnce()).getHeaderNames();
@@ -210,7 +270,8 @@ public class HttpProxyTest {
   }
 
   @Test
-  public void testFilterHopByHopResponseHeaders() throws Exception {
+  @NonParameterized
+  public void testFilterHopByHopResponseHeaders() {
     final String acceptEncodingHeaderName = "accept-encoding";
     assertRewriteResponseHeaders(emptyMap(), emptyMap());
     assertRewriteResponseHeaders(singletonMap("foo", "bar"), singletonMap("foo", "bar"));
@@ -230,21 +291,14 @@ public class HttpProxyTest {
         hashMap(new ImmutablePair<>("Connection", "foo, bar"), new ImmutablePair<>("Foo", "bar"), new ImmutablePair<>("foobar", "bar")));
   }
 
-  protected void assertRewriteResponseHeaders(Map<String, String> expectedHeaders, Map<String, String> receivedHeaders) throws IOException {
+  protected void assertRewriteResponseHeaders(Map<String, String> expectedHeaders, Map<String, String> receivedHeaders) {
     // mock HttpServletResponse
     HttpServletResponse res = mock(HttpServletResponse.class);
     Map<String, String> collectedHeaders = new HashMap<>();
     doAnswer(invocation -> collectedHeaders.put(invocation.getArgument(0), invocation.getArgument(1))).when(res).setHeader(anyString(), anyString());
 
-    MockLowLevelHttpResponse mockResponse = new MockLowLevelHttpResponse();
-    receivedHeaders.entrySet().forEach(e -> mockResponse.addHeader(e.getKey(), e.getValue()));
-
-    HttpResponse httpResponse = new Builder()
-        .setLowLevelHttpResponse(mockResponse)
-        .build()
-        .createRequestFactory()
-        .buildGetRequest(new GenericUrl("http://www.example.org/test"))
-        .execute();
+    BasicHttpResponse httpResponse = new BasicHttpResponse(HttpStatus.SC_OK);
+    receivedHeaders.forEach((k, v) -> httpResponse.addHeader(k, v));
 
     // perform actual operation
     BEANS.get(HttpProxy.class).writeResponseHeaders(res, httpResponse);
@@ -252,5 +306,170 @@ public class HttpProxyTest {
     assertEquals(expectedHeaders, collectedHeaders);
     verify(res, atLeast(0)).setHeader(anyString(), anyString());
     verifyNoMoreInteractions(res);
+  }
+
+  @Test
+  public void testProxyRequest_noContent() throws IOException {
+    testProxyRequestWithStatusCodeAndContent_Internal(200, new byte[]{}, true);
+    testProxyRequestWithStatusCodeAndContent_Internal(200, new byte[]{}, false);
+  }
+
+  @Test
+  public void testProxyRequest_200() throws IOException {
+    testProxyRequestWithStatusCodeAndContent_Internal(200, new byte[]{0x01}, true);
+  }
+
+  @Test
+  public void testProxyRequest_numerousRequests() throws IOException {
+    // keep number of requests low on CI (at least as long as we do not run tests in parallel), however can be increased for testing locally
+    testProxyRequestWithStatusCodeAndContent_Internal(200, new byte[]{0x01}, true, 25);
+  }
+
+  @Test
+  public void testProxyRequest_404() throws IOException {
+    testProxyRequestWithStatusCodeAndContent_Internal(404, new byte[]{0x02}, true);
+  }
+
+  @Test
+  public void testProxyRequest_500() throws IOException {
+    testProxyRequestWithStatusCodeAndContent_Internal(500, new byte[]{0x02}, true);
+  }
+
+  @Test
+  public void testProxyRequest_largeContent() throws IOException {
+    // keep size pseudo-large (could be larger) on CI (at least as long as we do not run tests in parallel), however can be increased for testing locally
+    byte[] content = new byte[65536 * 32];
+    new Random().nextBytes(content); // for tests alright not to use SecureRandom
+    testProxyRequestWithStatusCodeAndContent_Internal(200, content, true);
+    testProxyRequestWithStatusCodeAndContent_Internal(200, content, false);
+  }
+
+  protected void testProxyRequestWithStatusCodeAndContent_Internal(int statusCode, byte[] content, boolean specifyContentLength) throws IOException {
+    testProxyRequestWithStatusCodeAndContent_Internal(statusCode, content, specifyContentLength, 1);
+  }
+
+  protected void testProxyRequestWithStatusCodeAndContent_Internal(int statusCode, byte[] content, boolean specifyContentLength, int numberOfRequests) throws IOException {
+    AbstractHandler handler = new AbstractHandler() {
+      @Override
+      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setStatus(statusCode);
+        if (specifyContentLength) {
+          response.setContentLength(content.length);
+        }
+        ServletOutputStream outputStream = response.getOutputStream();
+        outputStream.write(content);
+        outputStream.flush();
+        baseRequest.setHandled(true);
+        response.flushBuffer();
+      }
+    };
+
+    HttpServletResponse resp = testProxyRequestInternal(handler, numberOfRequests);
+
+    verify(resp, times(numberOfRequests)).setStatus(statusCode);
+    byte[] expectedContent = new byte[numberOfRequests * content.length];
+    IntStream.range(0, numberOfRequests).forEach(i -> System.arraycopy(content, 0, expectedContent, i * content.length, content.length));
+    assertArrayEquals(expectedContent, ((BufferedServletOutputStream) resp.getOutputStream()).getContent());
+  }
+
+  @Ignore // do not run this (long) test on CI (at least as long as we do not run tests in parallel), however can be used for testing locally
+  @Test
+  public void testProxyRequest_longDuration() throws IOException {
+    AbstractHandler handler = new AbstractHandler() {
+      @Override
+      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setStatus(HttpStatus.SC_OK);
+        ServletOutputStream outputStream = response.getOutputStream();
+        outputStream.write(0x42);
+        outputStream.flush();
+        baseRequest.setHandled(true);
+        response.flushBuffer();
+      }
+    };
+
+    HttpServletResponse resp = testProxyRequestInternal(handler, 6 * 60 * 1000L, 1);
+
+    verify(resp).setStatus(200);
+    assertArrayEquals(new byte[]{0x42}, ((BufferedServletOutputStream) resp.getOutputStream()).getContent());
+  }
+
+  @Test
+  public void testProxyRequest_Failure() throws IOException {
+    HttpServletResponse resp = testProxyRequestInternal(new AbstractHandler() {
+      @Override
+      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        throw new IOException();
+      }
+    }, 1);
+
+    verify(resp).setStatus(500);
+
+    List<Throwable> handledThrowables = BEANS.get(JUnitExceptionHandler.class).getErrors();
+    assertTrue(handledThrowables.stream().allMatch(t -> t instanceof ConnectionClosedException));
+    handledThrowables.clear(); // do not fail test because there were handled exceptions (see JUnitExceptionHandler)
+  }
+
+  public HttpServletResponse testProxyRequestInternal(Handler handler, int numberOfRequests) throws IOException {
+    return testProxyRequestInternal(handler, 30 * 1000L, numberOfRequests);
+  }
+
+  public HttpServletResponse testProxyRequestInternal(Handler handler, long timeoutUntilCompletion, int numberOfRequests) {
+    try {
+      m_handlerCollection.addHandler(handler);
+      m_proxy.withRemoteBaseUrl(m_server.getURI().toString());
+
+      AsyncContext asyncContext = mock(AsyncContext.class);
+
+      HttpServletRequest httpReq = mock(HttpServletRequest.class);
+      when(httpReq.getMethod()).thenReturn(Method.GET.toString());
+      when(httpReq.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
+      when(httpReq.startAsync(any(), any())).thenReturn(asyncContext);
+
+      HttpServletResponse httpResp = mock(HttpServletResponse.class);
+      BufferedServletOutputStream outputStream = new BufferedServletOutputStream();
+      when(httpResp.getOutputStream()).thenReturn(outputStream);
+
+      IntStream.range(0, numberOfRequests).parallel().forEach(i -> {
+        try {
+          m_proxy.proxy(httpReq, httpResp, mock(HttpProxyRequestOptions.class));
+        }
+        catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
+
+      verify(asyncContext, timeout(timeoutUntilCompletion).times(numberOfRequests)).complete();
+      return httpResp;
+    }
+    catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    finally {
+      m_handlerCollection.removeHandler(handler);
+    }
+  }
+
+  public static class HttpProxyTestParameter implements IScoutTestParameter {
+
+    private final AbstractAsyncHttpClientManager<?> m_clientManager;
+    private final Function<Server, ServerConnector> m_serverConnectorFunction;
+
+    public HttpProxyTestParameter(AbstractAsyncHttpClientManager<?> clientManager, Function<Server, ServerConnector> serverConnectorFunction) {
+      m_clientManager = clientManager;
+      m_serverConnectorFunction = serverConnectorFunction;
+    }
+
+    public AbstractAsyncHttpClientManager<?> getClientManager() {
+      return m_clientManager;
+    }
+
+    public Function<Server, ServerConnector> getServerConnectorFunction() {
+      return m_serverConnectorFunction;
+    }
+
+    @Override
+    public String getName() {
+      return m_clientManager.getClass().getSimpleName();
+    }
   }
 }

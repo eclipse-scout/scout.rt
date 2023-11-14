@@ -47,6 +47,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
 
   @Override
   public HttpTransport newHttpTransport(IHttpTransportManager manager) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.interceptCreateClient(HttpAsyncClientBuilder), unfortunately there is no common interface
     HttpClientBuilder builder = HttpClients.custom();
 
     installConfigurableProxySelector(builder);
@@ -66,12 +67,14 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   }
 
   protected void setConnectionKeepAliveAndRetrySettings(HttpClientBuilder builder) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.setConnectionKeepAliveAndRetrySettings(HttpAsyncClientBuilder), unfortunately there is no common interface
     addConnectionKeepAliveSettings(builder);
     addRetrySettings(builder);
     addRedirectSettings(builder);
   }
 
   protected void addConnectionKeepAliveSettings(HttpClientBuilder builder) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.addConnectionKeepAliveSettings(HttpAsyncClientBuilder), unfortunately there is no common interface
     final boolean keepAliveProp = CONFIG.getPropertyValue(ApacheHttpTransportKeepAliveProperty.class);
     if (keepAliveProp) {
       builder.setConnectionReuseStrategy(DefaultClientConnectionReuseStrategy.INSTANCE);
@@ -82,6 +85,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   }
 
   protected void addRetrySettings(HttpClientBuilder builder) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.addRetrySettings(HttpAsyncClientBuilder), unfortunately there is no common interface
     final boolean retryOnNoHttpResponseException = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty.class);
     final boolean retryOnSocketExceptionByConnectionReset = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty.class);
     if (retryOnNoHttpResponseException || retryOnSocketExceptionByConnectionReset) {
@@ -93,6 +97,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   }
 
   protected void addRedirectSettings(HttpClientBuilder builder) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.addRedirectSettings(HttpAsyncClientBuilder), unfortunately there is no common interface
     builder.setRedirectStrategy(DefaultRedirectStrategy.INSTANCE);
   }
 
@@ -102,6 +107,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * {@link HttpClientBuilder}.
    */
   protected HttpClientConnectionManager createHttpClientConnectionManager(IHttpTransportManager manager) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.createConnectionManager(), unfortunately there is no common interface
     PoolingHttpClientConnectionManagerBuilder builder = PoolingHttpClientConnectionManagerBuilder.create();
 
     builder.setSSLSocketFactory(createSSLConnectionSocketFactory());
@@ -141,6 +147,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * Install an instance of the {@link ConfigurableProxySelector} to select proxies.
    */
   protected void installConfigurableProxySelector(HttpClientBuilder builder) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory.installConfigurableProxySelector(HttpClientBuilder), unfortunately there is no common interface
     builder.setRoutePlanner(new SystemDefaultRoutePlanner(BEANS.get(ConfigurableProxySelector.class)));
   }
 
@@ -148,6 +155,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * Install {@link ApacheMultiSessionCookieStore} to store cookies by session.
    */
   protected void installMultiSessionCookieStore(HttpClientBuilder builder) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.installMultiSessionCookieStore(HttpAsyncClientBuilder), unfortunately there is no common interface
     builder.setDefaultCookieStore(BEANS.get(ApacheMultiSessionCookieStore.class));
   }
 
