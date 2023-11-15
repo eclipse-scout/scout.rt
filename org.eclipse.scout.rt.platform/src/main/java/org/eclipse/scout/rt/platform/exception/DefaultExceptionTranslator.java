@@ -13,6 +13,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.AccessController;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.security.auth.Subject;
 
@@ -29,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
  * {@link ExecutionException}, its cause is unwrapped prior translation.
  * <p>
  * If the exception is of the type {@link Error}, it is not translated, but thrown instead. That is because an
- * {@link Error} indicates a serious problem due to a abnormal condition.
+ * {@link Error} indicates a serious problem due to an abnormal condition.
  */
 public class DefaultExceptionTranslator implements IExceptionTranslator<Exception> {
 
@@ -69,6 +71,66 @@ public class DefaultExceptionTranslator implements IExceptionTranslator<Exceptio
       t = t.getCause();
     }
     return t;
+  }
+
+  /**
+   * Visits the given {@link Throwable} and all of its causes calling the given {@link Predicate visitor} for each
+   * {@link Throwable cause} (including the start throwable itself).
+   *
+   * @param start
+   *     The starting {@link Throwable}. Will be visited first.
+   * @param visitor
+   *     The visitor to call. Each {@link Throwable} discovered will be passed to the {@link Predicate}. The given
+   *     Throwable is never {@code null}. The start {@link Throwable} will be the first argument continued by all
+   *     its causes. The visiting stops as soon as the {@link Predicate} returns {@code true} for the first time.
+   * @return {@code true} if the visitor returned {@code true} for a {@link Throwable} (which means visiting was
+   * aborted) or {@code false} otherwise (if all causes have been visited without the visitor to return
+   * {@code true} for any of the causes).
+   */
+  public boolean throwableCausesAccept(Throwable start, Predicate<Throwable> visitor) {
+    if (start == null || visitor == null) {
+      return false;
+    }
+
+    Function<Throwable, Boolean> v = t -> {
+      if (visitor.test(t)) {
+        return true;
+      }
+      return null; // continue visiting
+    };
+    return visitThrowableCauses(start, v) != null;
+  }
+
+  /**
+   * Visits the given {@link Throwable} and all of its causes calling the given {@link Function visitor} for each
+   * {@link Throwable cause} (including the start throwable itself).
+   *
+   * @param start
+   *     The starting {@link Throwable}. Will be visited first.
+   * @param visitor
+   *     The visitor to call. Each {@link Throwable} discovered will be passed to the function. The given Throwable
+   *     is never {@code null}. The start {@link Throwable} will be the first argument continued by all its causes.
+   *     The visiting stops as soon as the {@link Function} returns a non-null value for the first time.
+   * @return The first non-null value returned by the visitor or {@code null} otherwise.
+   */
+  public <T> T visitThrowableCauses(Throwable start, Function<Throwable, T> visitor) {
+    if (start == null || visitor == null) {
+      return null;
+    }
+
+    Throwable cause = start;
+    Throwable previousCause = null;
+    while (cause != null && cause != previousCause) { // second check avoids endless loops
+      T result = visitor.apply(cause);
+      if (result != null) {
+        return result; // early abort requested by visitor (result available)
+      }
+      // set previous cause
+      previousCause = cause;
+      // set next cause
+      cause = cause.getCause();
+    }
+    return null; // completely visited (visitor never returned a non-null value)
   }
 
   /**

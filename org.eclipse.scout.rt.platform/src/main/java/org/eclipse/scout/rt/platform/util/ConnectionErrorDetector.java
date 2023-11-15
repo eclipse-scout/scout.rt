@@ -13,30 +13,32 @@ import java.io.InterruptedIOException;
 import java.net.SocketException;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 
 @ApplicationScoped
 public class ConnectionErrorDetector {
 
   public boolean isConnectionError(Throwable e) {
-    Throwable cause = e;
-    Throwable previousCause = null;
-    while (cause != null && cause != previousCause) { // second check avoids endless loops
-      String simpleName = cause.getClass().getSimpleName();
-      String message = cause.getMessage();
-      if ((cause instanceof SocketException
-          || "EofException".equalsIgnoreCase(simpleName)
-          || "ClientAbortException".equalsIgnoreCase(simpleName)
-          || cause instanceof InterruptedIOException
-          || "IOException".equalsIgnoreCase(simpleName))
-          && (StringUtility.containsStringIgnoreCase(message, "Connection reset by peer")
-           || StringUtility.containsStringIgnoreCase(message, "Broken pipe"))) {
-        return true;
-      }
-      // set previous cause
-      previousCause = cause;
-      // set next cause
-      cause = cause.getCause();
+    return BEANS.get(DefaultExceptionTranslator.class).throwableCausesAccept(e, t -> isConnectionErrorThrowable(t) && isConnectionErrorMessage(t));
+  }
+
+  protected boolean isConnectionErrorThrowable(Throwable t) {
+    if (t instanceof SocketException || t instanceof InterruptedIOException) {
+      return true;
     }
-    return false;
+    String simpleName = t.getClass().getSimpleName();
+    return "EofException".equalsIgnoreCase(simpleName)
+        || "ClientAbortException".equalsIgnoreCase(simpleName)
+        || "IOException".equalsIgnoreCase(simpleName);
+  }
+
+  protected boolean isConnectionErrorMessage(Throwable t) {
+    String message = t.getMessage();
+    return StringUtility.containsStringIgnoreCase(message, "Connection reset")
+        || StringUtility.containsStringIgnoreCase(message, "Closed")
+        || StringUtility.containsStringIgnoreCase(message, "connection was aborted")
+        || StringUtility.containsStringIgnoreCase(message, "cancel_stream_error")
+        || StringUtility.containsStringIgnoreCase(message, "Broken pipe");
   }
 }

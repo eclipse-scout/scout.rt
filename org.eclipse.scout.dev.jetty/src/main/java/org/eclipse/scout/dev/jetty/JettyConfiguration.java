@@ -9,8 +9,12 @@
  */
 package org.eclipse.scout.dev.jetty;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPortConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public final class JettyConfiguration {
 
@@ -46,7 +50,31 @@ public final class JettyConfiguration {
 
     @Override
     public String description() {
-      return "Setting this property enables the jetty https connector. For example 'file:/dev/my-https.jks'";
+      return "Setting this property enables the jetty https connector using this keystore. "
+          + "For example 'classpath:/dev/my-https.jks' or 'file:///C:/Users/usr/Desktop/my-store.jks' or 'C:/Users/usr/Desktop/my-store.jks'.";
+    }
+  }
+
+  /**
+   * @since 24.1
+   */
+  public static class ScoutJettyUseTlsProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jetty.useTls";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies if the Jetty server should use TLS. If true, the server must either be started in development mode (then a new self-singed certificate is created automatically),"
+          + "or a Java KeyStore must be configured using property '" + BEANS.get(ScoutJettyKeyStorePathProperty.class).getKey() + "'."
+          + "By default this property is true, if a Java KeyStore has been specified.";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return StringUtility.hasText(CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class));
     }
   }
 
@@ -61,10 +89,10 @@ public final class JettyConfiguration {
 
     @Override
     public String description() {
-      return "Setting this property to a valid X-500 name will automatically generate a self-signed SSL certificate and store it in the keystore file path specified.\n"
-          + "This property is the X500 name (DN) for which the certificate is issued.\n"
+      return "Specifies the X-500 name to use in the self-signed certificate when starting Jetty in development mode with TLS enabled."
           + "For example 'CN=my-host.my-domain.com,C=US,ST=CA,L=Sunnyvale,O=My Company Inc.'.\n"
-          + "Use in development only!";
+          + "This property is only used in development mode and only if the property '" + BEANS.get(ScoutJettyUseTlsProperty.class).getKey() + "' is true "
+          + "and no existing Java keystore is specified (property '" + BEANS.get(ScoutJettyKeyStorePathProperty.class).getKey() + "').";
     }
   }
 
@@ -94,7 +122,7 @@ public final class JettyConfiguration {
 
     @Override
     public String description() {
-      return "Https private key password. Supports obfuscated values prefixed with 'OBF:'.";
+      return "The password (if any) for the specific key within the key store. Supports obfuscated values prefixed with 'OBF:'.";
     }
   }
 
@@ -109,7 +137,7 @@ public final class JettyConfiguration {
 
     @Override
     public String description() {
-      return "Https certificate alias in keystore.";
+      return "Https certificate alias of the key in the keystore to use.";
     }
   }
 }

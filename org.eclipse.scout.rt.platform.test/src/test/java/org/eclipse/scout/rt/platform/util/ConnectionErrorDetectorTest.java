@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.SocketException;
@@ -33,12 +35,14 @@ public class ConnectionErrorDetectorTest {
   @Parameters
   public static List<IScoutTestParameter> getParameters() {
     List<IScoutTestParameter> parametersList = new LinkedList<>();
+    parametersList.add(new ExceptionTestParameter(null, false));
     parametersList.add(new ExceptionTestParameter(new SocketException(CONNECTION_RESET_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new SocketException(BROKEN_PIPE_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new SocketException("unknown error"), false));
 
     parametersList.add(new ExceptionTestParameter(new EofException(CONNECTION_RESET_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new EofException(BROKEN_PIPE_MESSAGE), true));
+    parametersList.add(new ExceptionTestParameter(new EofException("cancel_stream_error"), true));
     parametersList.add(new ExceptionTestParameter(new EofException("unknown error"), false));
 
     parametersList.add(new ExceptionTestParameter(new ClientAbortException(CONNECTION_RESET_MESSAGE), true));
@@ -50,6 +54,8 @@ public class ConnectionErrorDetectorTest {
     parametersList.add(new ExceptionTestParameter(new InterruptedIOException("unknown error"), false));
 
     parametersList.add(new ExceptionTestParameter(new IOException(CONNECTION_RESET_MESSAGE), true));
+    parametersList.add(new ExceptionTestParameter(new IOException("Connection reset"), true));
+    parametersList.add(new ExceptionTestParameter(new IOException("An established connection was aborted by the software in your host machine"), true));
     parametersList.add(new ExceptionTestParameter(new IOException(BROKEN_PIPE_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new IOException("unknown error"), false));
 
@@ -86,7 +92,7 @@ public class ConnectionErrorDetectorTest {
     return cycledCauseException;
   }
 
-  private final ExceptionTestParameter m_testParameter;
+  public final ExceptionTestParameter m_testParameter;
 
   public ConnectionErrorDetectorTest(ExceptionTestParameter testParameter) {
     m_testParameter = testParameter;
@@ -95,12 +101,7 @@ public class ConnectionErrorDetectorTest {
   @Test
   public void testIsConnectionError() {
     ConnectionErrorDetector connectionErrorDetector = BEANS.get(ConnectionErrorDetector.class);
-    if (m_testParameter.isDetectable()) {
-      Assert.assertTrue(connectionErrorDetector.isConnectionError(m_testParameter.getException()));
-    }
-    else {
-      Assert.assertFalse(connectionErrorDetector.isConnectionError(m_testParameter.getException()));
-    }
+    assertEquals(m_testParameter.isDetectable(), connectionErrorDetector.isConnectionError(m_testParameter.getException()));
   }
 
   private static class ClientAbortException extends IOException {
@@ -148,13 +149,13 @@ public class ConnectionErrorDetectorTest {
     }
   }
 
-  private static class ExceptionTestParameter extends AbstractScoutTestParameter {
+  public static class ExceptionTestParameter extends AbstractScoutTestParameter {
 
     private Exception m_exception;
     private boolean m_isDetectable;
 
     public ExceptionTestParameter(Exception exception, boolean isDetectable) {
-      super(exception.getClass().getSimpleName() + ":" + exception.getMessage());
+      super(exception == null ? "null" : exception.getClass().getSimpleName() + ":" + exception.getMessage());
       m_exception = exception;
       m_isDetectable = isDetectable;
     }

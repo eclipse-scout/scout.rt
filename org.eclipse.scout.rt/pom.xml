@@ -757,6 +757,19 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- This dependency only exists to specify the exclusion. -->
+      <dependency>
+        <groupId>org.eclipse.jetty.http2</groupId>
+        <artifactId>http2-server</artifactId>
+        <version>${jetty.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- The jetty-servlet-api contains (amongst others) the same classes as jakarta.servlet-api -->
+            <groupId>org.eclipse.jetty.toolchain</groupId>
+            <artifactId>jetty-servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <dependency>
         <groupId>com.sun.activation</groupId>
         <artifactId>jakarta.activation</artifactId>

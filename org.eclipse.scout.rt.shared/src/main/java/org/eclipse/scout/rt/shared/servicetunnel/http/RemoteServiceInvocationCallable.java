@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -18,9 +17,11 @@ import java.net.ConnectException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -112,7 +113,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
         LOG.debug("Ignoring IOException for cancelled thread.", e);
         return new ServiceTunnelResponse(new FutureCancelledError("RunMonitor is cancelled.", e));
       }
-      else if (e instanceof EOFException) { // NOSONAR
+      else if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(e)) {
         ISession session = ISession.CURRENT.get();
         if (session == null || session.isStopping() || !session.isActive()) {
           LOG.debug("EOF detected for non-existing/stopping/non-active session.", e);

@@ -14,9 +14,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyStore;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -31,7 +35,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
+import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -50,9 +56,12 @@ import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyCertificateAlias
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePasswordProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePathProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyPrivateKeyPasswordProperty;
+import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyUseTlsProperty;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
+import org.eclipse.scout.rt.platform.config.PropertiesHelper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.ICertificateProvider;
@@ -111,7 +120,7 @@ public class JettyServer {
   }
 
   protected boolean isUseTls() {
-    return CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class) != null;
+    return CONFIG.getPropertyValue(ScoutJettyUseTlsProperty.class);
   }
 
   protected void startInternal() throws Exception {
@@ -233,7 +242,8 @@ public class JettyServer {
     HttpConfiguration httpConfig = new HttpConfiguration();
     httpConfig.setSendServerVersion(false);
     httpConfig.setSendDateHeader(false);
-    ServerConnector http = new ServerConnector(m_server, new HttpConnectionFactory(httpConfig));
+    httpConfig.setSendXPoweredBy(false);
+    ServerConnector http = new ServerConnector(m_server, new HttpConnectionFactory(httpConfig), new HTTP2CServerConnectionFactory(httpConfig));
     http.setPort(port);
     return http;
   }
@@ -244,25 +254,59 @@ public class JettyServer {
     httpsConfig.addCustomizer(new SecureRequestCustomizer());
     httpsConfig.setSendServerVersion(false);
     httpsConfig.setSendDateHeader(false);
-    ServerConnector https = new ServerConnector(m_server, new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()), new HttpConnectionFactory(httpsConfig));
+    httpsConfig.setSendXPoweredBy(false);
+
+    HttpConnectionFactory http11 = new HttpConnectionFactory(httpsConfig);
+    HTTP2ServerConnectionFactory http2 = new HTTP2ServerConnectionFactory(httpsConfig);
+
+    ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
+    alpn.setDefaultProtocol(http11.getProtocol());
+
+    SslConnectionFactory tls = new SslConnectionFactory(sslContextFactory, alpn.getProtocol());
+    ServerConnector https = new ServerConnector(m_server, tls, alpn, http2, http11);
+
     https.setPort(port);
     return https;
   }
 
   protected SslContextFactory.Server createSslContextFactory() {
     SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
-    String keyStorePath = resolveKeyStorePath(CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class));
-    String autoCertName = CONFIG.getPropertyValue(ScoutJettyAutoCreateSelfSignedCertificateProperty.class);
-    String storepass = CONFIG.getPropertyValue(ScoutJettyKeyStorePasswordProperty.class);
-    String keypass = CONFIG.getPropertyValue(ScoutJettyPrivateKeyPasswordProperty.class);
+    Path keyStorePath = resolveKeyStorePath(CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class));
+    String keyStoreUri = keyStorePath == null ? null : keyStorePath.toUri().toString();
+    String storePass = ObjectUtility.nvl(CONFIG.getPropertyValue(ScoutJettyKeyStorePasswordProperty.class), "");
+    String keyPass = ObjectUtility.nvl(CONFIG.getPropertyValue(ScoutJettyPrivateKeyPasswordProperty.class), "");
     String certAlias = CONFIG.getPropertyValue(ScoutJettyCertificateAliasProperty.class);
-    if (autoCertName != null) {
-      BEANS.optional(ICertificateProvider.class).ifPresent(p -> p.autoCreateSelfSignedCertificate(keyStorePath, storepass.toCharArray(), keypass.toCharArray(), certAlias, autoCertName));
+
+    boolean keyStoreExists = keyStorePath != null && Files.isRegularFile(keyStorePath);
+    if (Platform.get().inDevelopmentMode() && !keyStoreExists) {
+      String autoCertNamePropValue = CONFIG.getPropertyValue(ScoutJettyAutoCreateSelfSignedCertificateProperty.class);
+      String autoCertName = StringUtility.hasText(autoCertNamePropValue) ? autoCertNamePropValue : "CN=localhost";
+      if (!StringUtility.hasText(certAlias)) {
+        certAlias = "localhost";
+      }
+
+      LOG.info("No existing keystore was provided to setup TLS. Creating a self-signed certificate '{}'.", autoCertName);
+      ICertificateProvider certificateProvider = BEANS.optional(ICertificateProvider.class)
+          .orElseThrow(() -> new PlatformException("No certificate-provider available to create a self-signed certificate to use for TLS."
+              + " Add a certificate-provider or specify an existing keystore using property '{}'.", BEANS.get(ScoutJettyKeyStorePathProperty.class).getKey()));
+      if (keyStorePath == null) {
+        // no path available: create in memory only
+        KeyStore ks = certificateProvider.createSelfSignedCertificate(certAlias, autoCertName, storePass.toCharArray(), keyPass.toCharArray());
+        sslContextFactory.setKeyStore(ks);
+      }
+      else {
+        // a non-existing key-store path was provided: create a new keystore file at that location
+        LOG.info("Storing created keystore in '{}'.", keyStoreUri);
+        certificateProvider.autoCreateSelfSignedCertificate(keyStoreUri, storePass.toCharArray(), keyPass.toCharArray(), certAlias, autoCertName);
+        sslContextFactory.setKeyStorePath(keyStoreUri);
+      }
     }
-    LOG.info("Setup SSL certificate using alias '{}' from keystore '{}'.", certAlias, keyStorePath);
-    sslContextFactory.setKeyStorePath(keyStorePath);
-    sslContextFactory.setKeyStorePassword(storepass);
-    sslContextFactory.setKeyManagerPassword(keypass);
+    else {
+      LOG.info("Setup TLS certificate using alias '{}' from keystore '{}'.", certAlias, keyStoreUri);
+      sslContextFactory.setKeyStorePath(keyStoreUri);
+    }
+    sslContextFactory.setKeyStorePassword(storePass);
+    sslContextFactory.setKeyManagerPassword(keyPass);
     sslContextFactory.setCertAlias(certAlias);
     sslContextFactory.setEndpointIdentificationAlgorithm("https");
     sslContextFactory.setIncludeCipherSuites(
@@ -291,11 +335,13 @@ public class JettyServer {
     return sslContextFactory;
   }
 
-  protected String resolveKeyStorePath(String path) {
-    if (path != null && path.startsWith("classpath:")) {
-      String subPath = path.substring(10);
-      URL res;
-      res = getClass().getResource(subPath);
+  protected Path resolveKeyStorePath(String path) {
+    if (!StringUtility.hasText(path)) {
+      return null;
+    }
+    if (path.startsWith(PropertiesHelper.CLASSPATH_PREFIX)) {
+      String subPath = path.substring(PropertiesHelper.CLASSPATH_PREFIX.length());
+      URL res = getClass().getResource(subPath);
       if (res == null) {
         res = getClass().getClassLoader().getResource(subPath);
       }
@@ -303,13 +349,17 @@ public class JettyServer {
         res = ClassLoader.getSystemClassLoader().getResource(subPath);
       }
       if (res == null) {
-        throw new ProcessingException("Missing resource defined by config property: {}={}",
-            BEANS.get(ScoutJettyKeyStorePathProperty.class).getKey(),
-            path);
+        throw new ProcessingException("Missing resource defined by config property: {}={}", BEANS.get(ScoutJettyKeyStorePathProperty.class).getKey(), path);
       }
-      return res.toExternalForm();
+      path = res.toExternalForm();
     }
-    return path;
+    try {
+      return Paths.get(URI.create(path));
+    }
+    catch (Exception e) {
+      LOG.debug("Path '{}' is no valid URI. Trying to read as file path.", path, e);
+      return Paths.get(path);
+    }
   }
 
   protected static class P_WebAppContext extends WebAppContext {
@@ -382,7 +432,7 @@ public class JettyServer {
    * redirected.
    * <p>
    * Example for contextPath = <code>/myapp</code>:
-   * <table border=1 cellspacing=0 cellpadding=3>
+   * <table border=1>
    * <tr>
    * <th>Request URI</th>
    * <th>Redirected to</th>
