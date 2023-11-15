@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.resource.MimeType;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
@@ -126,7 +127,11 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
           .run(() -> handleJsonRequest(IUiSession.CURRENT.get(), JsonRequest.CURRENT.get(), req, resp), DefaultExceptionTranslator.class);
     }
     catch (Exception | PlatformError e) {
-      if (jsonRequest == null || uiSession == null || jsonRequest.getRequestType() == RequestType.STARTUP_REQUEST) {
+      if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(e)) {
+        LOG.debug("Connection error detected: exception class={}, message={}.", e.getClass().getSimpleName(), e.getMessage(), e);
+        // no need to send any response here as the connection is broken anyway. May throw IllegalStateException otherwise which hides the original exception.
+      }
+      else if (jsonRequest == null || uiSession == null || jsonRequest.getRequestType() == RequestType.STARTUP_REQUEST) {
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing UI session", e);
@@ -349,7 +354,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     // The "sync" request needs to acquire the UI session lock. If a request is still executing,
     // this will cause the "sync" request to block. It is important to wait for the other request
     // to finish, because we don't know if that request is still "connected" to a response channel.
-    // If it is not (because the connection was lost in the mean time), we would miss it's response.
+    // If it is not (because the connection was lost in the meantime), we would miss its response.
     final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
     uiSessionLock.lock();
     try {

@@ -235,7 +235,8 @@ public class ServletFilterHelper {
   }
 
   /**
-   * Forwards the request to the login.html. In case forwarding would not work, the request will be redirected, see {@link #redirectToLoginFormIfNecessary(HttpServletRequest, HttpServletResponse)}.
+   * Forwards the request to the login.html. In case forwarding would not work, the request will be redirected, see
+   * {@link #redirectToLoginFormIfNecessary(HttpServletRequest, HttpServletResponse)}.
    */
   public void forwardToLoginForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
     if (!acceptForwardOrRedirect(req, resp, req.getPathInfo(), true)) {
@@ -250,11 +251,11 @@ public class ServletFilterHelper {
   /**
    * Redirects to /login if forwarding would not work.
    * <p>
-   * Forwarding won't work if the requested path has subfolders because the resources loaded by login.html are addressed
+   * Forwarding won't work if the requested path has sub-folders because the resources loaded by login.html are addressed
    * relatively.
    * <p>
    * Example: if the request url is /folder/file, forwarding to /login.html would correctly return login.html but the
-   * resources (login.js etc) could not be loaded because the location of the browser still is /folder/file. The
+   * resources (login.js etc.) could not be loaded because the location of the browser still is /folder/file. The
    * requests would fail because they expect the resources to be in the root folder (e.g. /login.js) instead of the
    * subfolder (e.g. /folder/login.js).
    */
@@ -313,7 +314,7 @@ public class ServletFilterHelper {
    * javax.servlet.ServletResponse)). This has the same effect as if the user had requested the target location from the
    * beginning.
    * </ul>
-   * If the client expects JSON as response (accept header contains 'application/json'), no redirection happens, but a
+   * If the client expects JSON as response (accept-header contains 'application/json'), no redirection happens, but a
    * JSON timeout message is sent. Also for POST requests no forwarding/redirection will happen but error code 403
    * (forbidden) returned.
    */
@@ -362,7 +363,7 @@ public class ServletFilterHelper {
   }
 
   /**
-   * If the request has a HTTP session attached, the session is invalidated.
+   * If the request has an HTTP session attached, the session is invalidated.
    */
   public void doLogout(HttpServletRequest req) {
     HttpSession session = req.getSession(false);
@@ -377,7 +378,7 @@ public class ServletFilterHelper {
    * {@link ServletFilterHelper#SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT} is set, a new session is created and the attribute
    * copied to the new session. The next request (which will be the reload request executed by the login page) will read
    * this attribute and return a redirect instruction with the value of the attribute (see
-   * {@link #redirectAfterLogin(HttpServletRequest, HttpServletResponse, ServletFilterHelper)}.
+   * {@link #redirectAfterLogin(HttpServletRequest, HttpServletResponse, ServletFilterHelper)}).
    * <p>
    * If that session attribute is not set, no new session will be created.
    */

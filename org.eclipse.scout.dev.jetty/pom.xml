@@ -40,6 +40,15 @@
       <artifactId>jetty-plus</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-server</artifactId>
+    </dependency>
+    <dependency>
+      <!-- alpn implementation, needed to enable HTTP/2 over TLS, see https://xy2401.com/local-docs/java/jetty.9.4.24.v20191120/alpn-chapter.html -->
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-alpn-java-server</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.platform</artifactId>
     </dependency>

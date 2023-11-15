@@ -10,8 +10,6 @@
 package org.eclipse.scout.rt.server;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.SocketException;
 import java.security.AccessController;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongPredicate;
@@ -25,6 +23,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.transaction.TransactionCancelledError;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
@@ -52,8 +51,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Use this Servlet to dispatch scout UI service requests using {@link IServiceTunnelRequest},
- * {@link IServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
+ * Use this Servlet to dispatch scout UI service requests using {@link ServiceTunnelRequest},
+ * {@link ServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
  */
 public class ServiceTunnelServlet extends AbstractHttpServlet {
   private static final long serialVersionUID = 1L;
@@ -154,9 +153,9 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     catch (Throwable e) {//NOSONAR
       final boolean interrupted = Thread.interrupted();
       if (isConnectionError(e)) {
-        // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
+        // Ignore disconnect errors: do not throw an exception, if the client closed the connection.
         LOG.debug("Connection Error{}", interruptInfo(interrupted), e);
-        servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Connection probably dropped by client");
+        // do not call sendError, as the connection is invalid anyway. May throw IllegalStateException otherwise hiding the original exception.
       }
       else if (isInterruption(e)) {
         if (isCancellation(e)) {
@@ -215,13 +214,10 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
       LongPredicate duplicateRequestDetector = (LongPredicate) session
           .computeDataIfAbsent(DUPLICATE_REQUEST_DETECTOR_SESSION_KEY, this::createRequestSequenceValidator);
       if (!duplicateRequestDetector.test(serviceRequest.getRequestSequence())) {
-        StringBuilder buf = new StringBuilder()
-            .append("clientNodeId: ").append(serviceRequest.getClientNodeId())
-            .append(", ")
-            .append("sessionId: ").append(serviceRequest.getSessionId())
-            .append(", ")
-            .append("operation: ").append(serviceRequest.getServiceInterfaceClassName()).append(".").append(serviceRequest.getOperation());
-        throw DuplicateRequestException.create(buf.toString(), serviceRequest.getRequestSequence());
+        String msg = "clientNodeId: " + serviceRequest.getClientNodeId() + ", "
+            + "sessionId: " + serviceRequest.getSessionId() + ", "
+            + "operation: " + serviceRequest.getServiceInterfaceClassName() + "." + serviceRequest.getOperation();
+        throw DuplicateRequestException.create(msg, serviceRequest.getRequestSequence());
       }
     }
     return serverRunContext;
@@ -296,53 +292,20 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
   }
 
   protected boolean isConnectionError(Throwable e) {
-    Throwable cause = e;
-    while (cause != null) {
-      if (cause instanceof SocketException) {
-        return true;
-      }
-      if ("EofException".equalsIgnoreCase(cause.getClass().getSimpleName())) {
-        return true;
-      }
-      if (cause instanceof InterruptedIOException) {
-        return true;
-      }
-      // next
-      cause = cause.getCause();
-    }
-    return false;
+    return BEANS.get(ConnectionErrorDetector.class).isConnectionError(e);
   }
 
   protected boolean isInterruption(Throwable e) {
-    Throwable cause = e;
-    while (cause != null) {
-      if (cause instanceof AbstractInterruptionError) {
-        return true;
-      }
-      // next
-      cause = cause.getCause();
-    }
-    return false;
+    return BEANS.get(DefaultExceptionTranslator.class).throwableCausesAccept(e, t -> t instanceof AbstractInterruptionError);
   }
 
   /**
    * Special case of {@link AbstractInterruptionError}.
    */
   protected boolean isCancellation(Throwable e) {
-    Throwable cause = e;
-    while (cause != null) {
-      if (cause instanceof FutureCancelledError) {
-        return true;
-      }
-      if (cause instanceof TransactionCancelledError) {
-        return true;
-      }
-      if (cause instanceof ThreadInterruptedError) {
-        return true;
-      }
-      // next
-      cause = cause.getCause();
-    }
-    return false;
+    return BEANS.get(DefaultExceptionTranslator.class).throwableCausesAccept(e,
+        t -> t instanceof FutureCancelledError
+            || t instanceof TransactionCancelledError
+            || t instanceof ThreadInterruptedError);
   }
 }

@@ -13,6 +13,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,12 @@ public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
 
   @Override
   public Response toResponseImpl(Exception exception) {
-    LOG.error("Exception occurred while processing REST request", exception);
+    if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(exception)) {
+      LOG.debug("Connection error occurred while processing REST request", exception);
+    }
+    else {
+      LOG.error("Exception occurred while processing REST request", exception);
+    }
     return createResponse(exception);
   }
 
