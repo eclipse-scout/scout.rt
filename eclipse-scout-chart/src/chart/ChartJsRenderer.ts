@@ -10,8 +10,7 @@
 import {AbstractChartRenderer, Chart, chartJsDateAdapter} from '../index';
 import {
   _adapters as chartJsAdapters, ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint,
-  FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle,
-  TooltipModel, TooltipOptions
+  FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
 } from 'chart.js';
 import 'chart.js/auto'; // Import from auto to register charts
 import {aria, arrays, colorSchemes, graphics, numbers, objects, Point, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
@@ -1086,8 +1085,8 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       tooltipPosition = (0 <= angle && angle < Math.PI) ? 'bottom' : 'top';
       tooltipDirection = (-Math.PI / 2 <= angle && angle < Math.PI / 2) ? 'right' : 'left';
     } else if (config.type === Chart.Type.RADAR) {
-      let element = (chart.getDatasetMeta(datasetIndex).data[dataIndex] as unknown as RadarPointElement).getProps(['angle']);
-      let angle = element.angle;
+      let element = (chart.getDatasetMeta(datasetIndex).data[dataIndex] as unknown as PointElement).getProps(['angle']);
+      let angle = element.angle as number;
       tooltipPosition = (0 <= angle && angle < Math.PI) ? 'bottom' : 'top';
       tooltipDirection = (-Math.PI / 2 <= angle && angle < Math.PI / 2) ? 'right' : 'left';
     } else if (scout.isOneOf(config.type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
@@ -1230,8 +1229,10 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         beginAtZero: this._isHorizontalBar(config),
         offset: type === Chart.Type.BUBBLE,
         grid: {
-          drawBorder: false,
           drawTicks: false
+        },
+        border: {
+          display: false
         },
         ticks: {
           padding: 5
@@ -1241,8 +1242,10 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       scales.x = $.extend(true, {}, {
         offset: true,
         grid: {
-          display: false,
-          drawBorder: false
+          display: false
+        },
+        border: {
+          display: false
         }
       }, scales.x);
     }
@@ -1267,16 +1270,20 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     if (this._isHorizontalBar(config)) {
       scales.y = $.extend(true, {}, {
         grid: {
-          display: false,
-          drawBorder: false
+          display: false
+        },
+        border: {
+          display: false
         }
       }, scales.y);
     } else {
       scales.y = $.extend(true, {}, {
         beginAtZero: !scout.isOneOf(type, Chart.Type.BUBBLE, Chart.Type.SCATTER),
         grid: {
-          drawBorder: false,
           drawTicks: false
+        },
+        border: {
+          display: false
         },
         ticks: {
           padding: 5
@@ -2750,9 +2757,9 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       yAxisDiffType.grid.drawOnChartArea = false;
     }
 
-    yAxis.grid.drawBorder = true;
+    yAxis.border.display = true;
     yAxis.grid.drawTicks = true;
-    yAxisDiffType.grid.drawBorder = true;
+    yAxisDiffType.border.display = true;
     yAxisDiffType.grid.drawTicks = true;
 
     let yAxisType = (datasets[0].type || type),
@@ -2817,11 +2824,11 @@ export type LegendLabelGenerator = (chart: ChartJsChart) => LegendItem[];
 export type ChartEventHandler = (event: ChartEvent, items: ActiveElement[]) => void;
 export type LegendEventHandler = (e: ChartEvent, legendItem: LegendItem, legend: LegendElement<any>) => void;
 export type ResizeHandler = (chart: ChartJsChart | ChartJs, size: { width: number; height: number }) => void;
-export type TooltipTitleGenerator = (tooltipItems: TooltipItem<any>[]) => string | string[];
+export type TooltipTitleGenerator = (tooltipItems: TooltipItem<any>[]) => string | string[] | void;
 export type TooltipItemsGenerator = (tooltipItems: TooltipItem<any>[], tooltipLabel: TooltipLabelGenerator, tooltipLabelValue: TooltipLabelValueGenerator, tooltipColor: TooltipLabelColorGenerator) => string;
-export type TooltipLabelGenerator = (tooltipItem: TooltipItem<any>) => string | string[];
+export type TooltipLabelGenerator = (tooltipItem: TooltipItem<any>) => string | string[] | void;
 export type TooltipLabelValueGenerator = (tooltipItem: TooltipItem<any>) => string | { x: string; y: string };
-export type TooltipLabelColorGenerator = (tooltipItem: TooltipItem<any>) => TooltipLabelStyle;
+export type TooltipLabelColorGenerator = (tooltipItem: TooltipItem<any>) => TooltipLabelStyle | void;
 export type TooltipRenderer = (context: { chart: ChartJs; tooltip: TooltipModel<any> }) => void;
 
 export type DatasetColors = {
@@ -2886,12 +2893,4 @@ declare module 'chart.js' {
     items: TooltipItemsGenerator;
     labelValue: TooltipLabelValueGenerator;
   }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface RadarPointElement<T extends RadarProps = RadarProps, O extends PointOptions = PointOptions> extends PointElement<T, O> {
-}
-
-export interface RadarProps extends PointProps {
-  angle: number;
 }
