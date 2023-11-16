@@ -24,6 +24,7 @@
     "module": "./dist/eclipse-scout-chart.esm.js",
     "types": "./dist/d.ts/index.d.ts"
   },
+  "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "files": [
@@ -57,7 +58,7 @@
   "dependencies": {
     "@eclipse-scout/core": ">=24.1.0-snapshot <24.1.0",
     "jquery": "3.6.0",
-    "chart.js": "3.9.1",
-    "chartjs-plugin-datalabels": "2.1.0"
+    "chart.js": "4.4.0",
+    "chartjs-plugin-datalabels": "2.2.0"
   }
 }
