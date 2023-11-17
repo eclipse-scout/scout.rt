@@ -391,11 +391,15 @@
 @chart-min-width: 75px;
 
 /* use padding area for label, legend */
-.tile > .form-field > .field.chart {
-  overflow: visible;
+.tile > .form-field {
+  overflow: hidden;
 
-  & > svg {
+  & > .field.chart {
     overflow: visible;
+
+    & > svg {
+      overflow: visible;
+    }
   }
 }
 

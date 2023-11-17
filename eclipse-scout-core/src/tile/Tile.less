@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,6 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+@move-support-drag-placeholder-background-color: @background-color;
+@move-support-drag-placeholder-border-color: @palette-blue-3;
+
 .tile {
   // Tile should be invisible until it has the correct position, otherwise it might be visible in the top left corner in the time between rendering and layouting
   &.newly-rendered,
@@ -35,6 +38,77 @@
     #scout.animation-name(fadeout-shrink-blur);
     #scout.animation-duration(0.2s);
     #scout.animation-fill-mode(forwards);
+  }
+
+  // TODO CGU extract generics to move support.less (and create mixin?) compare with analytics
+  &.dragged {
+    z-index: -1; // draw behind all other elements (during animation)
+
+    &.releasing {
+      opacity: 0;
+      transition: opacity 500ms;
+
+      &.moved {
+        transition: none;
+      }
+    }
+
+    // Overlay over currently dragged element
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0; // TODO CGU consider border (-1 if border -> easier config?), or just remove border on dragged elem?
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: inherit;
+      background-color: @move-support-drag-placeholder-background-color;
+      border: 2px dashed @move-support-drag-placeholder-border-color;
+      z-index: 2; // draw over elements inside the tile having a z-index
+    }
+
+    & .scroll-shadow {
+      // Scroll shadow would be drawn over after element -> hide it
+      --scroll-shadow-size: transparent !important;
+      transition: none;
+    }
+  }
+
+  // done class is added when dragging is finished and original state restored right before dragged and dragged-end classes are removed
+  // the class will be removed about 50ms later and is used to disable the opacity transition. This ensures the dragged element does not flicker when shown again.
+  &.drag-done {
+    transition: none !important;
+  }
+
+  &.dragging {
+    --dragging-scale: 1;
+    --animation-duration-factor: 1;
+    transform: scale(var(--dragging-scale));
+    transition-duration: calc(300ms * var(--animation-duration-factor));
+    transition-property: transform, opacity, box-shadow;
+    opacity: 0.7;
+    z-index: 2; // draw over scrollbars
+
+    &.releasing {
+      opacity: 1;
+    }
+
+    // Dedicated shadow element (so it can be animated)
+    & > .shadow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      #scout.drop-shadow-large();
+      opacity: 0;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+  }
+
+  &.dragover {
+    filter: brightness(0.8);
   }
 }
 

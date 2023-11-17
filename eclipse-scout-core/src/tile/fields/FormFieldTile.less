@@ -13,7 +13,6 @@
   color: @tile-default-color;
   --tile-background-color: @tile-default-background-color;
   background-color: var(--tile-background-color);
-  overflow: hidden;
 
   #scout.double-drop-shadow(@spread1: 1px, @color1: @dashboard-tile-border-color, @y2: 0px, @blur2: 0px);
 
@@ -348,7 +347,7 @@
     }
   }
 
-  &.selected {
+  &.selected:not(.dragged) {
     --box-shadow-1-spread: 2px;
     --box-shadow-1-color: @dashboard-tile-default-selected-border-color;
 

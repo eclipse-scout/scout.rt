@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout} from '@eclipse-scout/core';
-import {UpdateChartOptions, Chart} from '../index';
+import {AbstractLayout, FormFieldTile} from '@eclipse-scout/core';
+import {Chart, ChartJsRenderer, UpdateChartOptions} from '../index';
 
 export class ChartLayout extends AbstractLayout {
   chart: Chart;
@@ -32,6 +32,15 @@ export class ChartLayout extends AbstractLayout {
     // attached anymore because some other view tab is in front when the setTimeout() functions is finally called.
     if (!this.chart.session.ready) {
       opts.debounce = false;
+    }
+    // TODO CGU is there a better solution for the next two statements?
+    if (this.chart.findParent(FormFieldTile)?.$container.hasClass('dragged')) {
+      opts.debounce = false;
+    }
+    // TODO CGU disable responsive false because it is not necessary? Maybe also pass width and height
+    // Ensure chart has the correct size right after the layout.
+    if (this.chart.chartRenderer instanceof ChartJsRenderer) {
+      this.chart.chartRenderer.chartJs?.resize();
     }
     this.chart.updateChart(opts);
   }

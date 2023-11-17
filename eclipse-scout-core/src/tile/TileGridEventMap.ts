@@ -22,6 +22,7 @@ export interface TileClickEvent<T = TileGrid> extends Event<T> {
 export interface TileGridEventMap extends WidgetEventMap {
   'tileAction': TileActionEvent;
   'tileClick': TileClickEvent;
+  'layoutDone': Event;
   'layoutAnimationDone': Event;
   'propertyChange:empty': PropertyChangeEvent<boolean>;
   'propertyChange:filteredTiles': PropertyChangeEvent<Tile[]>;
