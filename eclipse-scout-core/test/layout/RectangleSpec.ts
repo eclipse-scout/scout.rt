@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Rectangle} from '../../src/index';
+import {Point, Rectangle} from '../../src/index';
 
 describe('Rectangle', () => {
 
@@ -99,6 +99,23 @@ describe('Rectangle', () => {
     it('returns an empty rectangle if the second rectangle is null or empty', () => {
       expect(new Rectangle(2, 3, 10, 8).intersect(null)).toEqual(new Rectangle());
       expect(new Rectangle().intersect(new Rectangle())).toEqual(new Rectangle());
+    });
+  });
+
+  describe('translate', () => {
+    it('moves the rectangle by the given values', () => {
+      let rect = new Rectangle(10, 20, 10, 5);
+      expect(rect.translate(5, 10)).toEqual(new Rectangle(15, 30, 10, 5));
+      expect(rect.translate(-5, -10)).toEqual(new Rectangle(5, 10, 10, 5));
+      expect(rect.translate(new Point(3, 4))).toEqual(new Rectangle(13, 24, 10, 5));
+    });
+  });
+
+  describe('moveTo', () => {
+    it('moves the rectangle to the new position', () => {
+      let rect = new Rectangle(10, 20, 10, 5);
+      expect(rect.moveTo(30, 40)).toEqual(new Rectangle(30, 40, 10, 5));
+      expect(rect.moveTo(new Point(100, 200))).toEqual(new Rectangle(100, 200, 10, 5));
     });
   });
 });

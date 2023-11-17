@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, ObjectOrModel, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
+import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, ObjectOrModel, scrollbars, SingleLayout, TileEventMap, TileModel, TileMoveHandler, Widget} from '../index';
 import $ from 'jquery';
 
 export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
@@ -25,6 +25,8 @@ export class Tile extends Widget implements TileModel {
   rowId: string;
   selected: boolean;
   selectable: boolean;
+  movable: boolean;
+  movableProducer: () => TileMoveHandler;
   plainText: string;
 
   constructor() {
@@ -37,6 +39,7 @@ export class Tile extends Widget implements TileModel {
     this.colorScheme = null;
     this.selected = false;
     this.selectable = false;
+    this.movable = false;
     this.plainText = null;
     // Null to let TileGrid decide whether to enable animation
     this.animateRemoval = null;
@@ -73,6 +76,11 @@ export class Tile extends Widget implements TileModel {
     this._renderSelectable();
     this._renderSelected();
     this._renderDisplayStyle();
+  }
+
+  protected override _renderEnabled() {
+    super._renderEnabled();
+    this._renderMovable();
   }
 
   protected override _postRender() {
@@ -150,6 +158,43 @@ export class Tile extends Widget implements TileModel {
 
   protected _renderSelectable() {
     this.$container.toggleClass('selectable', this.selectable);
+  }
+
+  setMovableProducer(producer: () => TileMoveHandler) {
+    this.setProperty('movableProducer', producer);
+  }
+
+  protected _renderMovableProducer() {
+    this._removeMovable();
+    this._renderMovable();
+  }
+
+  setMovable(movable: boolean) {
+    this.setProperty('movable', movable);
+  }
+
+  protected _renderMovable() {
+    let movableHandler: TileMoveHandler = this.$container.data('movable');
+    if (this.movable && this.enabledComputed) {
+      if (movableHandler) {
+        return;
+      }
+      movableHandler = this.movableProducer && this.movableProducer();
+      if (!movableHandler) {
+        return;
+      }
+      this.$container.data('movable', movableHandler);
+    } else {
+      this._removeMovable();
+    }
+  }
+
+  protected _removeMovable() {
+    let movableHandler: TileMoveHandler = this.$container.data('movable');
+    if (movableHandler) {
+      movableHandler.destroy();
+      this.$container.removeData('movable');
+    }
   }
 
   setFilterAccepted(filterAccepted: boolean) {

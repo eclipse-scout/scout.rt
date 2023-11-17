@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+#scout {
+
+  .move-support() {
+
+    // Is added to the dragged element when the element is grabbed and will be removed when the move operation is finished.
+    &.dragged {
+      z-index: -1; // draw behind all other elements (during animation)
+      border: 0 !important; // remove border (if there is one) while dragging so the overlay covers the whole element
+
+      // Is added when the clone is released and about to be moved to its target position.
+      &.releasing {
+        // Hide dragged element while clone will be moved to the new position
+        opacity: 0;
+        // Smoothly hide dragged element
+        // Transition may have to be deactivated if dragged element is not yet at the correct position
+        // (depending on the implementation, the element may be moved to the target position while dragging or at the end after releasing)
+        transition: opacity 500ms;
+      }
+
+      // Overlay over currently dragged element
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: inherit;
+        background-color: @move-support-drag-placeholder-background-color;
+        border: 2px dashed @move-support-drag-placeholder-border-color;
+        z-index: 2; // draw over elements inside the tile having a z-index
+      }
+    }
+
+    // When an element is dragged, a clone of the dragged element is created
+    &.dragged-clone {
+      --dragging-scale: 1;
+      --animation-duration-factor: 1;
+      transform: scale(var(--dragging-scale));
+      transition-duration: calc(300ms * var(--animation-duration-factor));
+      transition-property: transform, opacity, box-shadow;
+      opacity: 0.7;
+      z-index: 2; // draw over scrollbars
+
+      // Is added when the clone is released and about to be moved to its target position.
+      &.releasing {
+        opacity: 1;
+      }
+
+      // Dedicated shadow element (so it can be animated)
+      & > .shadow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        #scout.drop-shadow-large();
+        opacity: 0;
+        pointer-events: none;
+        border-radius: inherit;
+      }
+
+      & > .resizable-handle {
+        // Disable interaction with handles on the clone while dragging
+        // Cannot be deactivated on the clone itself because it would enable the interaction with elements behind the clone
+        pointer-events: none;
+      }
+    }
+  }
+}

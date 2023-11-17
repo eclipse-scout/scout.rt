@@ -1018,4 +1018,23 @@ describe('scout.arrays', () => {
     });
   });
 
+  describe('swap', () => {
+
+    it('swaps two elements in the array', () => {
+      let arr = [1, 2, 3, 4];
+      arrays.swap(arr, 2, 4);
+      expect(arr).toEqual([1, 4, 3, 2]);
+
+      arrays.swap(arr, 10, 2);
+      expect(arr).toEqual([1, 4, 3, 2]);
+
+      arrays.swap(null, 10, 2);
+      expect(arr).toEqual([1, 4, 3, 2]);
+
+      // @ts-expect-error
+      arrays.swap();
+      expect(arr).toEqual([1, 4, 3, 2]);
+    });
+  });
+
 });

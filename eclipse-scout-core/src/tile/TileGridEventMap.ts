@@ -24,6 +24,7 @@ export type TileOf<T> = T extends TileGrid<infer TTile> | TileAccordion<infer TT
 export interface TileGridEventMap extends WidgetEventMap {
   'tileAction': TileActionEvent;
   'tileClick': TileClickEvent;
+  'layoutDone': Event;
   'layoutAnimationDone': Event;
   'propertyChange:empty': PropertyChangeEvent<boolean>;
   'propertyChange:filteredTiles': PropertyChangeEvent<Tile[]>;

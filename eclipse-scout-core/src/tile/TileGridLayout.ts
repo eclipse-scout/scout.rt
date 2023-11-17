@@ -101,6 +101,7 @@ export class TileGridLayout extends LogicalGridLayout {
       arrays.pushAll(this.tiles, newTiles);
       this._layout($container);
     }
+    this.widget.trigger('layoutDone');
 
     let promises = [];
     if (animated) {

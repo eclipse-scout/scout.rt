@@ -1413,13 +1413,14 @@ describe('TileGrid', () => {
 
       // During the tile grid layout, the inserted tile must not be visible because the insert animation has not been started yet, even if tile.setVisible(true) was called
       // The layout animation needs a real viewport and sizes -> To make it easier in the test setup we suppress the layoutAnimationDone event to delay the start of the insert animation
+      let origTrigger = tileGrid.trigger.bind(tileGrid);
       let triggerSpy = spyOn(tileGrid, 'trigger');
       let suppressedEvent;
       triggerSpy.and.callFake((type, event): any => {
         if (type === 'layoutAnimationDone') {
           suppressedEvent = event;
         } else {
-          triggerSpy.and.callThrough();
+          origTrigger(type, event);
         }
       });
       tileGrid.validateLayout();
