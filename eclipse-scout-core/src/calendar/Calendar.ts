@@ -265,15 +265,6 @@ export class Calendar extends Widget implements CalendarModel {
     this.viewRange = this._calcViewRange();
   }
 
-  setCalendars(calendars: CalendarDescriptor[]) {
-    this.setProperty('calendars', calendars);
-  }
-
-  protected _setCalendars(calendars: CalendarDescriptor[]) {
-    this._setProperty('calendars', calendars);
-    this._updateCalendarNodes();
-  }
-
   protected _updateCalendarNodes() {
     this.calendarsPanel.tree.removeAllNodes();
     // Ensure to add parent nodes first to the tree
@@ -537,6 +528,15 @@ export class Calendar extends Widget implements CalendarModel {
     this._renderDisplayMode();
   }
 
+  setCalendars(calendars: CalendarDescriptor[]) {
+    this.setProperty('calendars', calendars);
+  }
+
+  protected _setCalendars(calendars: CalendarDescriptor[]) {
+    this._setProperty('calendars', calendars);
+    this._updateCalendarNodes();
+  }
+
   protected _renderCalendars() {
     let $dayName = this.$topGrid.find('.calendar-week-header > .calendar-day-name');
     let $fullDay = this.$topGrid.find('.calendar-week-allday-container > .calendar-day');
@@ -573,6 +573,14 @@ export class Calendar extends Widget implements CalendarModel {
     this.$topGrid.find('.calendar-column').on('mousedown', mousedownCallback);
 
     this._renderComponents();
+  }
+
+  setComponents(components: CalendarComponent[]) {
+    this.setProperty('components', components);
+  }
+
+  addComponents(components: CalendarComponent[]) {
+    this.setComponents([...this.components, ...components]);
   }
 
   protected _renderComponents() {
