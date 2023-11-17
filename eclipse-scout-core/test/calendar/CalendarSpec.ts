@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponent, CalendarDescriptor, DateRange, dates, scout} from '../../src/index';
+import {Calendar, CalendarComponent, CalendarItem, DateRange, dates, scout} from '../../src/index';
 
 describe('Calendar', () => {
   let session: SandboxSession;
@@ -496,52 +496,94 @@ describe('Calendar', () => {
   });
 
   describe('multiple calendars', () => {
-    let cal: SpecCalendar,
-      businessCalendar: CalendarDescriptor,
-      externalCalendar: CalendarDescriptor,
-      comp1: CalendarComponent,
-      day;
+    let cal: Calendar;
+    let day = dates.parseJsonDate('2023-10-27 00:00:00.000');
+    let dateRangeNoon = {from: '2023-10-27 12:00:00.000', to: '2023-10-27 12:30:00.000'};
 
-    let businessCalendarDescripor = {
+    let businessCalendar = {
       calendarId: 1,
       name: 'Business Calendar',
       visible: true,
       selectable: true
     };
 
-    let externalCalendarDescripor = {
+    let externalCalendar = {
       calendarId: 2,
       name: 'External Calendar',
       visible: true,
       selectable: false
     };
 
-    let model1 = {
-      fromDate: '2023-10-27 12:00:00.000',
-      toDate: '2023-10-27 12:30:00.000'
+    const createCalendarComponent = (calendar: Calendar, fromDate: string, toDate: string, calendarId?: string | number): CalendarComponent => {
+      let model = {
+        parent: calendar,
+        item: {
+          calendarId: calendarId
+        } as unknown as CalendarItem,
+        fromDate: fromDate,
+        toDate: toDate,
+        coveredDaysRange: {
+          from: fromDate,
+          to: toDate
+        }
+      };
+      let comp = scout.create(CalendarComponent, model);
+      cal.addComponents([comp]);
+      return comp;
+    };
+
+    const calculateCurrentCalendarId = (comp: CalendarComponent): string | number => {
+      return comp._$parts[0].parent().data('calendarId');
     };
 
     beforeEach(() => {
-      cal = scout.create(SpecCalendar, {parent: session.desktop});
-      comp1 = scout.create(CalendarComponent, $.extend({parent: cal}, model1));
-      day = dates.parseJsonDate('2023-10-27 00:00:00.000');
-      businessCalendar = businessCalendarDescripor;
-      externalCalendar = externalCalendarDescripor;
+      cal = scout.create(SpecCalendar, {
+        parent: session.desktop,
+        selectedDate: day,
+        calendars: [businessCalendar, externalCalendar]
+      });
       cal.render();
-      comp1.render();
     });
 
     it('should render components without calendarId in default column in day view', () => {
       // Arrange
-      let $compContainer = comp1._$parts[0];
       cal.setDisplayMode(Calendar.DisplayMode.DAY);
-      cal._arrange([comp1], day);
+      let comp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to);
 
       // Act
-      let calendarIdData = $compContainer.parent().data('calendarId');
+      let calendarIdData = calculateCurrentCalendarId(comp);
 
       // Assert
       expect(calendarIdData).toEqual('default');
+    });
+
+    it('should render components with calendarId in corresponding column in day view', () => {
+      // Arrange
+      let calendarId = businessCalendar.calendarId;
+      cal.setDisplayMode(Calendar.DisplayMode.DAY);
+      let comp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, calendarId);
+
+      // Act
+      let calendarIdData = calculateCurrentCalendarId(comp);
+
+      // Assert
+      expect(calendarIdData).toEqual(calendarId);
+    });
+
+    it('should move component from default to corresponding calendar column when displayMode is changed', () => {
+      // Arrange
+      let calendarId = businessCalendar.calendarId;
+      cal.setDisplayMode(Calendar.DisplayMode.WORK_WEEK);
+      let comp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, calendarId);
+
+      // Act
+      let calendarIdBeforeMove = calculateCurrentCalendarId(comp);
+      cal.setDisplayMode(Calendar.DisplayMode.DAY);
+      let calendarIdAfterMove = calculateCurrentCalendarId(comp);
+
+      // Assert
+      expect(calendarIdBeforeMove).toBe('default');
+      expect(calendarIdAfterMove).toBe(calendarId);
     });
   });
 });
