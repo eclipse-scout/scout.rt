@@ -499,20 +499,8 @@ describe('Calendar', () => {
     let cal: Calendar;
     let day = dates.parseJsonDate('2023-10-27 00:00:00.000');
     let dateRangeNoon = {from: '2023-10-27 12:00:00.000', to: '2023-10-27 12:30:00.000'};
-
-    let businessCalendar = {
-      calendarId: 1,
-      name: 'Business Calendar',
-      visible: true,
-      selectable: true
-    };
-
-    let externalCalendar = {
-      calendarId: 2,
-      name: 'External Calendar',
-      visible: true,
-      selectable: false
-    };
+    let businessCalendar;
+    let externalCalendar;
 
     const createCalendarComponent = (calendar: Calendar, fromDate: string, toDate: string, calendarId?: string | number): CalendarComponent => {
       let model = {
@@ -537,17 +525,29 @@ describe('Calendar', () => {
     };
 
     beforeEach(() => {
+      businessCalendar = {
+        calendarId: 1,
+        name: 'Business Calendar',
+        visible: true,
+        selectable: true
+      };
+      externalCalendar = {
+        calendarId: 2,
+        name: 'External Calendar',
+        visible: true,
+        selectable: false
+      };
       cal = scout.create(SpecCalendar, {
         parent: session.desktop,
         selectedDate: day,
         calendars: [businessCalendar, externalCalendar]
       });
       cal.render();
+      cal.setDisplayMode(Calendar.DisplayMode.DAY);
     });
 
     it('should render components without calendarId in default column in day view', () => {
       // Arrange
-      cal.setDisplayMode(Calendar.DisplayMode.DAY);
       let comp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to);
 
       // Act
@@ -560,7 +560,6 @@ describe('Calendar', () => {
     it('should render components with calendarId in corresponding column in day view', () => {
       // Arrange
       let calendarId = businessCalendar.calendarId;
-      cal.setDisplayMode(Calendar.DisplayMode.DAY);
       let comp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, calendarId);
 
       // Act
@@ -572,18 +571,34 @@ describe('Calendar', () => {
 
     it('should move component from default to corresponding calendar column when displayMode is changed', () => {
       // Arrange
-      let calendarId = businessCalendar.calendarId;
       cal.setDisplayMode(Calendar.DisplayMode.WORK_WEEK);
-      let comp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, calendarId);
+      let comp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, businessCalendar.calendarId);
 
       // Act
-      let calendarIdBeforeMove = calculateCurrentCalendarId(comp);
+      let calendarIdForWeek = calculateCurrentCalendarId(comp);
       cal.setDisplayMode(Calendar.DisplayMode.DAY);
-      let calendarIdAfterMove = calculateCurrentCalendarId(comp);
+      let calendarIdForDay = calculateCurrentCalendarId(comp);
+      cal.setDisplayMode(Calendar.DisplayMode.MONTH);
+      let calendarIdForMonth = calculateCurrentCalendarId(comp);
 
       // Assert
-      expect(calendarIdBeforeMove).toBe('default');
-      expect(calendarIdAfterMove).toBe(calendarId);
+      expect(calendarIdForWeek).toBe('default');
+      expect(calendarIdForDay).toBe(businessCalendar.calendarId);
+      expect(calendarIdForMonth).toBe('default');
+    });
+
+    it('should hide components, when calendar is made invisible', () => {
+      // Arrange
+      cal.setDisplayMode(Calendar.DisplayMode.WEEK);
+      let businessComp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, businessCalendar.calendarId);
+      let externalComp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, externalCalendar.calendarId);
+
+      // Act
+      cal._updateCalendarVisibility([[externalCalendar.calendarId, false]]);
+
+      // Assert
+      expect(businessComp.visible).toBe(true);
+      expect(externalComp.visible).toBe(false);
     });
   });
 });
