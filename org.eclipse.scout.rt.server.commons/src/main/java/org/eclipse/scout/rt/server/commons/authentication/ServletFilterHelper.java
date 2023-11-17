@@ -48,6 +48,7 @@ public class ServletFilterHelper {
 
   public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = ServletFilterHelper.class.getName() + ".PRINCIPAL";
   public static final String SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT = ServletFilterHelper.class.getName() + ".LOGIN_REDIRECT";
+  public static final String SESSION_ATTRIBUTE_FOR_2FA_PRINCIPAL = ServletFilterHelper.class.getName() + ".2FA_PRINCIPAL";
   public static final String HTTP_HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
   public static final String HTTP_HEADER_AUTHORIZED = "Authorized";
@@ -251,8 +252,8 @@ public class ServletFilterHelper {
   /**
    * Redirects to /login if forwarding would not work.
    * <p>
-   * Forwarding won't work if the requested path has sub-folders because the resources loaded by login.html are addressed
-   * relatively.
+   * Forwarding won't work if the requested path has sub-folders because the resources loaded by login.html are
+   * addressed relatively.
    * <p>
    * Example: if the request url is /folder/file, forwarding to /login.html would correctly return login.html but the
    * resources (login.js etc.) could not be loaded because the location of the browser still is /folder/file. The
@@ -374,15 +375,25 @@ public class ServletFilterHelper {
   }
 
   /**
+   * <p>
    * Invalidates the current session. If the session attribute
    * {@link ServletFilterHelper#SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT} is set, a new session is created and the attribute
-   * copied to the new session. The next request (which will be the reload request executed by the login page) will read
+   * copied to the new session.
+   * </p>
+   * <p>
+   * For successful logins: The next request (which will be the reload request executed by the login page) will read
    * this attribute and return a redirect instruction with the value of the attribute (see
    * {@link #redirectAfterLogin(HttpServletRequest, HttpServletResponse, ServletFilterHelper)}).
+   * </p>
+   * <p>
+   * For unsuccessful logins (e.g. invalid second factor token): The next request may be another login request which
+   * might be successful, redirect property should be kept for a possibly successful login in the future.
+   * </p>
    * <p>
    * If that session attribute is not set, no new session will be created.
+   * </p>
    */
-  public void invalidateSessionAfterLogin(HttpServletRequest request) {
+  public void invalidateSessionForLogin(HttpServletRequest request) {
     final HttpSession session = request.getSession(false);
     if (session == null) {
       return;

@@ -43,6 +43,11 @@ public interface ICredentialVerifier {
   int AUTH_CREDENTIALS_REQUIRED = 1 << 3;
 
   /**
+   * Require second factor.
+   */
+  int AUTH_2FA_REQUIRED = 1 << 4;
+
+  /**
    * Attempts to verify the given credentials.
    *
    * @param username
