@@ -150,6 +150,8 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         .addClass(calendarCssClass)
         .data('component', this)
         .data('partDay', partDay)
+        .on('mouseenter', this._onMouseEnter.bind(this))
+        .on('mouseleave', this._onMouseLeave.bind(this))
         .on('mouseup', this._onMouseUp.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
       $part.appendDiv('calendar-component-leftcolorborder');
@@ -301,6 +303,14 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
 
   updateSelectedComponent($part: JQuery, updateScrollPosition: boolean) {
     this.parent._selectedComponentChanged(this, this.item.calendarId, $part.data('partDay') as Date, updateScrollPosition);
+  }
+
+  protected _onMouseEnter(event: JQuery.MouseEnterEvent) {
+    this._$parts.forEach($part => $part.addClass('hover'));
+  }
+
+  protected _onMouseLeave(evenet: JQuery.MouseLeaveEvent) {
+    this._$parts.forEach($part => $part.removeClass('hover'));
   }
 
   protected _onMouseUp(event: JQuery.MouseUpEvent) {
