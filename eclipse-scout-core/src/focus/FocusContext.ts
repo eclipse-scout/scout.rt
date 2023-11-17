@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {filters, FocusManager, focusUtils, graphics, keys, Point, scout, scrollbars} from '../index';
+import {filters, FocusManager, focusUtils, graphics, keys, objects, Point, scout, scrollbars} from '../index';
 import $ from 'jquery';
 import KeyDownEvent = JQuery.KeyDownEvent;
 import FocusInEvent = JQuery.FocusInEvent;
@@ -137,7 +137,9 @@ export class FocusContext {
       // Don't change the focus here --> will be handled by browser
     } else {
       // Set focus manually to the target element
-      this.validateAndSetFocus(elementToFocus);
+      this.validateAndSetFocus(elementToFocus, null, {
+        selectText: elementToFocus.tagName === 'INPUT'
+      });
       $.suppressEvent(event);
     }
 
@@ -210,9 +212,9 @@ export class FocusContext {
    *        the element to focus, or null to focus the context's first focusable element matching the given filter.
    * @param filter
    *        filter that controls which element should be focused, or null to accept all focusable candidates.
-   * @param options prevents scrolling to new focused element (default is false)
+   * @param options options to customize to focus
    */
-  validateAndSetFocus(element?: HTMLElement, filter?: () => boolean, options?: { preventScroll?: boolean }) {
+  validateAndSetFocus(element?: HTMLElement, filter?: () => boolean, options?: FocusContextFocusOptions) {
     // Ensure the element to be a child element, or set it to null otherwise.
     if (element && !$.contains(this.$container[0], element)) {
       element = null;
@@ -254,9 +256,9 @@ export class FocusContext {
    * Focuses the requested element.
    *
    * @param element the element to focus, or null to focus the context's first focusable element matching the given filter.
-   * @param options prevents scrolling to new focused element (default is false)
+   * @param options options to customize to focus
    */
-  protected _focus(elementToFocus: HTMLElement, options?: { preventScroll?: boolean }) {
+  protected _focus(elementToFocus: HTMLElement, options?: FocusContextFocusOptions) {
     options = options || {};
     // Only focus element if focus manager is active
     if (!this.focusManager.active) {
@@ -297,7 +299,22 @@ export class FocusContext {
     elementToFocus.focus({
       preventScroll: scout.nvl(options.preventScroll, false)
     });
+    // If requested and possible, select the text content
+    if (options.selectText && 'select' in elementToFocus && objects.isFunction(elementToFocus.select)) {
+      elementToFocus.select();
+    }
 
     $.log.isDebugEnabled() && $.log.debug('Focus set to ' + graphics.debugOutput(elementToFocus));
   }
+}
+
+export interface FocusContextFocusOptions {
+  /**
+   * prevents scrolling to new focused element (defaults to false)
+   */
+  preventScroll?: boolean;
+  /**
+   * automatically selects the text content of the element if supported (defaults to false)
+   */
+  selectText?: boolean;
 }
