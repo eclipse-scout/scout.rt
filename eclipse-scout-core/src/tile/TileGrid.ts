@@ -11,7 +11,7 @@ import {
   AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf,
   KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range, scout,
   ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler,
-  TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
+  TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileMoveHandler, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -61,6 +61,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   updateTextFilterText: string;
   defaultMenuTypes: string[];
   wrappable: boolean;
+  movableProducer: (tile: Tile) => TileMoveHandler;
   $filterFieldContainer: JQuery;
   $fillBefore: JQuery;
   $fillAfter: JQuery;
@@ -105,6 +106,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.withPlaceholders = false;
     this.placeholderProducer = null;
     this.wrappable = true;
+    this.movableProducer = this._createMovableProducer();
 
     this.$filterFieldContainer = null;
     this.textFilterEnabled = false;
@@ -146,6 +148,17 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
+  }
+
+  protected _createMovableProducer(): (tile: Tile) => TileMoveHandler {
+    return tile => scout.create(TileMoveHandler, {
+      tileGrid: this,
+      $container: tile.$container
+    });
+  }
+
+  setMovableProducer(producer: (tile: Tile) => TileMoveHandler) {
+    this.setProperty('movableProducer', producer);
   }
 
   protected _initVirtualScrolling() {
@@ -193,6 +206,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   protected _initTile(tile: (TTile | PlaceholderTile)) {
     tile.setSelectable(this.selectable);
     tile.setSelected(this.selectedTiles.indexOf(tile as TTile) >= 0);
+    tile.setMovableProducer(() => this.movableProducer(tile));
 
     // Set proper state in case tile was used in another grid
     tile.setParent(this);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,6 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+@move-support-drag-placeholder-background-color: @background-color;
+@move-support-drag-placeholder-border-color: @palette-blue-3;
+
 .tile {
   // Tile should be invisible until it has the correct position, otherwise it might be visible in the top left corner in the time between rendering and layouting
   &.newly-rendered,
@@ -35,6 +38,24 @@
     #scout.animation-name(fadeout-shrink-blur);
     #scout.animation-duration(0.2s);
     #scout.animation-fill-mode(forwards);
+  }
+
+  #scout.move-support();
+
+  &.dragover {
+    filter: brightness(0.8);
+  }
+
+  &.dragged.releasing {
+    // Remove opacity transition added by releasing class in MoveSupport.less to make dragged tile invisible immediately while the clone will be moved to the target position.
+    transition: none;
+  }
+
+  // The class is added when dragging is finished and original state restored right before dragged and releasing classes are removed.
+  // The class will be removed about 100ms later and is used to disable the opacity transition added by TileGrid.less.
+  // This ensures the dragged element does not flicker when shown again.
+  &.drag-done {
+    transition: none !important;
   }
 }
 

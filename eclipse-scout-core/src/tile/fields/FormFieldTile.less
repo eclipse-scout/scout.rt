@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,6 @@
   color: @tile-default-color;
   --tile-background-color: @tile-default-background-color;
   background-color: var(--tile-background-color);
-  overflow: hidden;
 
   #scout.double-drop-shadow(@spread1: 1px, @color1: @dashboard-tile-border-color, @y2: 0px, @blur2: 0px);
 
@@ -348,7 +347,7 @@
     }
   }
 
-  &.selected {
+  &.selected:not(.dragged) {
     --box-shadow-1-spread: 2px;
     --box-shadow-1-color: @dashboard-tile-default-selected-border-color;
 
@@ -364,6 +363,11 @@
     &.inverted.color-alternative {
       --box-shadow-1-color: @dashboard-tile-alternative-inverted-selected-border-color;
     }
+  }
+
+  &.dragged-clone > .form-field {
+    // Disable interaction with elements on the clone while dragging
+    pointer-events: none;
   }
 }
 

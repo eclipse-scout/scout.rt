@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout} from '@eclipse-scout/core';
-import {UpdateChartOptions, Chart} from '../index';
+import {AbstractLayout, Tile} from '@eclipse-scout/core';
+import {Chart, ChartJsRenderer, UpdateChartOptions} from '../index';
 
 export class ChartLayout extends AbstractLayout {
   chart: Chart;
@@ -32,6 +32,14 @@ export class ChartLayout extends AbstractLayout {
     // attached anymore because some other view tab is in front when the setTimeout() functions is finally called.
     if (!this.chart.session.ready) {
       opts.debounce = false;
+    }
+    // Don't debounce if the chart is inside a tile that is being dragged so the state is correct immediately when it is dropped
+    if (this.chart.findParent(Tile)?.$container.hasClass('dragged')) {
+      opts.debounce = false;
+    }
+    // Ensure chart has the correct size right after the layout.
+    if (this.chart.chartRenderer instanceof ChartJsRenderer) {
+      this.chart.chartRenderer.chartJs?.resize();
     }
     this.chart.updateChart(opts);
   }
