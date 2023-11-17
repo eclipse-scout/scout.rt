@@ -22,6 +22,7 @@ export interface TileGridModel extends WidgetModel {
    * If a comparator is set, the tiles are sorted according to that comparator. Default is null.
    */
   comparator?: Comparator<Tile>;
+  draggable?: boolean; // TODO CGU better use movable?
   /**
    * The filters control which tiles are allowed to be displayed in the grid.
    *

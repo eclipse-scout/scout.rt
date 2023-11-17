@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,8 +10,8 @@
 import {
   AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf,
   KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range, scout,
-  ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler,
-  TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
+  ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridMoveSupport, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke,
+  TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -31,6 +31,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   animateTileInsertion: boolean;
   comparator: Comparator<TTile>;
   contextMenu: ContextMenuPopup;
+  draggable: boolean;
   empty: boolean;
   filters: Filter<TTile>[];
   filteredElementsDirty: boolean;
@@ -65,12 +66,14 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   $filterFieldContainer: JQuery;
   $fillBefore: JQuery;
   $fillAfter: JQuery;
+  protected _moveData: any;
   protected _tiles: (TTile | PlaceholderTile)[];
   protected _filteredTiles: (TTile | PlaceholderTile)[];
   protected _doubleClickSupport: DoubleClickSupport;
   protected _filterMenusHandler: (menuItems: Menu[], destination: MenuDestinations) => Menu[];
   protected _renderViewPortAfterAttach: boolean;
   protected _scrollParentScrollHandler: (event: JQuery.ScrollEvent) => void;
+  protected _dragTileMouseDownHandler: (event: JQuery.MouseDownEvent) => void;
 
   constructor() {
     super();
@@ -78,6 +81,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.animateTileInsertion = true;
     this.comparator = null;
     this.contextMenu = null;
+    this.draggable = false;
     this._doubleClickSupport = new DoubleClickSupport();
     this.empty = false;
     this.filters = [];
@@ -118,6 +122,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this._filterMenusHandler = this._filterMenus.bind(this);
     this._renderViewPortAfterAttach = false;
     this._scrollParentScrollHandler = this._onScrollParentScroll.bind(this);
+    this._dragTileMouseDownHandler = this._onDragTileMouseDown.bind(this);
     this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
     this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
     this._addComputedProperties(['tiles', 'filteredTiles']);
@@ -223,6 +228,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this._renderSelectable();
     this._renderEmpty();
     this._renderTextFilterEnabled();
+    this._renderDraggable();
   }
 
   protected override _remove() {
@@ -1007,6 +1013,24 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   /** @see TileGridModel.wrappable */
   setWrappable(wrappable: boolean) {
     this.setProperty('wrappable', wrappable);
+  }
+
+  setDraggable(draggable: boolean) {
+    this.setProperty('draggable', draggable);
+  }
+
+  protected _renderDraggable() {
+    if (this.draggable) {
+      this.$container.on('mousedown touchstart', TILE_SELECTOR, this._dragTileMouseDownHandler);
+    } else {
+      this.$container.off('mousedown touchstart', TILE_SELECTOR, this._dragTileMouseDownHandler);
+    }
+  }
+
+  protected _onDragTileMouseDown(event: JQuery.MouseDownEvent) {
+    let tile = scout.widget($(event.currentTarget)) as Tile;
+    // Install move support for each drag operation so that a tile can be dragged even if another one is still finishing dragging
+    new TileGridMoveSupport(this).start(event, this.tiles, tile);
   }
 
   protected _onTileMouseDown(event: JQuery.MouseDownEvent): boolean {
