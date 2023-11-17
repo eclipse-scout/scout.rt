@@ -20,11 +20,15 @@ export interface RequestFocusOptions {
   /**
    * prevents scrolling to new focused element (defaults to false)
    */
-  onlyIfReady?: boolean;
+  preventScroll?: boolean;
   /**
    * prevents focusing if not ready
    */
-  preventScroll?: boolean;
+  onlyIfReady?: boolean;
+  /**
+   * automatically selects the text content of the element if supported (defaults to false)
+   */
+  selectText?: boolean;
 }
 
 /**
