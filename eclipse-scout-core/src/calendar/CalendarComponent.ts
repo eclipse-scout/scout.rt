@@ -95,6 +95,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     }
 
     let loopDay = this._startLoopDay();
+    let item = this.item || {} as CalendarItem;
 
     let appointmentToDate: Date | string = dates.parseJsonDate(this.toDate);
     let appointmentFromDate = dates.parseJsonDate(this.fromDate);
@@ -138,14 +139,14 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       }
 
       // Find corresponding calendar
-      let $calendar = this._findCalendarColumnInDay($day, this.item.calendarId);
+      let $calendar = this._findCalendarColumnInDay($day, item.calendarId);
       if (!$calendar) {
         continue;
       }
       $part = $calendar.appendDiv('calendar-component');
 
       $part
-        .addClass(this.item.cssClass)
+        .addClass(item.cssClass)
         .addClass(calendarCssClass)
         .data('component', this)
         .data('partDay', partDay)
@@ -156,7 +157,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       if (this.item.subjectIconId) {
         $partContent.appendIcon(this.item.subjectIconId);
       }
-      $partContent.appendSpan('subject', this.item.subject);
+      $partContent.appendSpan('subject', item.subject);
 
       this._$parts.push($part);
 
