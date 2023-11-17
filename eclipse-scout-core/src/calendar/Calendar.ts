@@ -902,6 +902,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
     let selectable = newSelectedCalendar ? newSelectedCalendar.selectable : true;
     if (newSelectedCalendar !== this.selectedCalendar && selectable) {
+      changed = true;
       this.selectedCalendar = newSelectedCalendar;
       this.trigger('selectedCalendarChange', {
         calendarId: newSelectedCalendar ? newSelectedCalendar.calendarId : null
@@ -1528,26 +1529,41 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _onCalendarTreeNodeSelected(event: TreeNodesCheckedEvent) {
-    (event.nodes as CalendarsPanelTreeNode[]).forEach(node => {
-      if (!node.calendarId) {
-        return;
-      }
-      let calendar = this.calendars.find(calendar => calendar.calendarId === node.calendarId);
-      if (!calendar) {
-        return;
-      }
-      calendar.visible = node.checked;
-      this.trigger('calendarVisibilityChange', {
-        calendarId: node.calendarId,
-        visible: node.checked
-      });
-      this.calendars.find(calendar => calendar.calendarId === node.calendarId).visible = node.checked;
+    let tupelArray = event.nodes
+      .map(node => node as CalendarsPanelTreeNode)
+      .map(node => [node.calendarId, node.checked] as [number, boolean]);
+    this._updateCalendarVisibility(tupelArray);
+  }
+
+  /**
+   * @internal
+   */
+  _updateCalendarVisibility(updatedCalendars: [calendarId: number, visible: boolean][]) {
+    updatedCalendars.forEach(tuple => {
+      this._updateCalendarVisibleProperty(tuple[0], tuple[1]);
     });
     if (!this.isDay()) {
       // No re-rendering required when on day -> component is hidden by layouyt
       this._renderComponents();
     }
     this.layoutSize(true);
+  }
+
+  protected _updateCalendarVisibleProperty(calendarId: number, visible: boolean) {
+    if (!calendarId) {
+      // No update
+      return;
+    }
+    let calendar = this.calendars.find(calendar => calendar.calendarId === calendarId);
+    if (!calendar || calendar.visible === visible) {
+      // No update
+      return;
+    }
+    calendar.visible = visible;
+    this.trigger('calendarVisibilityChange', {
+      calendarId: calendarId,
+      visible: visible
+    });
   }
 
   /* -- components, arrangement------------------------------------ */
