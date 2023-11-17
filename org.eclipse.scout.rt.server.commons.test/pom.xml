@@ -40,5 +40,11 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.jackson</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

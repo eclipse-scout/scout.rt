@@ -10,6 +10,8 @@
 package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +20,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
@@ -87,13 +91,11 @@ public class FormBasedAccessController implements IAccessController {
    */
   @SuppressWarnings({"squid:RedundantThrowsDeclarationCheck", "DuplicatedCode"}) // required so that overriding subclasses can throw ServletExceptions
   protected boolean handleAuthRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    // Never cache authentication requests.
-    response.setHeader("Cache-Control", "private, no-store, no-cache, max-age=0"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setDateHeader("Expires", 0); // prevents caching at the proxy server
+    setDefaultHeaders(request, response);
 
-    // requests on /auth should have the default headers as this might also be called using GET which returns a 404 html page (container dependent)
-    BEANS.get(HttpServletControl.class).doDefaults(null, request, response);
+    if (request.getParameter("token") != null) {
+      return handleSecondFactorRequest(request, response);
+    }
 
     Pair<String, char[]> credentials = readCredentials(request);
     if (credentials == null) {
@@ -102,6 +104,11 @@ public class FormBasedAccessController implements IAccessController {
     }
 
     int status = m_config.getCredentialVerifier().verify(credentials.getLeft(), credentials.getRight());
+    if (status == ICredentialVerifier.AUTH_2FA_REQUIRED && m_config.getSecondFactorVerifier() != null) {
+      // authentication alright but a second factor is required
+      handleSecondFactorRequired(request, response, credentials.getLeft());
+      return true;
+    }
     if (status != ICredentialVerifier.AUTH_OK) {
       handleForbidden(status, response);
       return true;
@@ -109,12 +116,81 @@ public class FormBasedAccessController implements IAccessController {
 
     // OWASP: force a new HTTP session to be created.
     ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
-    helper.invalidateSessionAfterLogin(request);
+    helper.invalidateSessionForLogin(request);
 
     // Put authenticated principal onto (new) HTTP session
     Principal principal = m_config.getPrincipalProducer().produce(credentials.getLeft());
     helper.putPrincipalOnSession(request, principal);
     return true;
+  }
+
+  protected void handleSecondFactorRequired(HttpServletRequest request, HttpServletResponse response, String firstFactorAuthenticatedUsername) throws IOException {
+    // store first factor authenticated principal as separate session attribute
+    // if (and only if) second factor authorization is also successful this principal may be transferred to the regular SESSION_ATTRIBUTE_FOR_PRINCIPAL
+    Principal principal = m_config.getPrincipalProducer().produce(firstFactorAuthenticatedUsername);
+    request.getSession().setAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_2FA_PRINCIPAL, principal);
+
+    // write response that a second factor is required (handled by LoginBox)
+    PrintWriter out = response.getWriter();
+    response.setContentType(MimeType.JSON.getType());
+    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+    out.write(BEANS.get(DoEntityBuilder.class)
+        .put("twoFactorRequired", true)
+        .buildString());
+    out.flush();
+  }
+
+  @SuppressWarnings({"squid:RedundantThrowsDeclarationCheck", "DuplicatedCode"}) // required so that overriding subclasses can throw ServletExceptions
+  protected boolean handleSecondFactorRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
+    Principal firstFactorCompletedPrincipal;
+    try {
+      setDefaultHeaders(request, response);
+
+      firstFactorCompletedPrincipal = (Principal) request.getSession().getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_2FA_PRINCIPAL);
+      if (firstFactorCompletedPrincipal == null) {
+        // no first factor has been completed or it does not exist on session anymore, restart authentication
+        handleForbidden(ICredentialVerifier.AUTH_CREDENTIALS_REQUIRED, response);
+        return true;
+      }
+
+      ICredentialVerifier secondFactorVerifier = m_config.getSecondFactorVerifier();
+      if (secondFactorVerifier == null) {
+        // no way to verify a possibly set second factor (actually in this case handleAuthRequest should not even redirect to 2FA)
+        handleForbidden(ICredentialVerifier.AUTH_FORBIDDEN, response);
+        return true;
+      }
+
+      String token = request.getParameter("token");
+      if (token == null || token.isBlank()) {
+        handleForbidden(ICredentialVerifier.AUTH_CREDENTIALS_REQUIRED, response);
+        return true;
+      }
+      int status = secondFactorVerifier.verify(firstFactorCompletedPrincipal.getName(), token.toCharArray());
+      if (status != ICredentialVerifier.AUTH_OK) {
+        handleForbidden(status, response);
+        return true;
+      }
+    }
+    finally {
+      // OWASP: force a new HTTP session to be created (even after successful login)
+      // however invalidate sessions in any case even after unsuccessful attempt, firstFactorCompletedPrincipal needs to be invalidated too
+      helper.invalidateSessionForLogin(request);
+    }
+
+    // firstFactorCompletedPrincipal has now also complected second factor, put authenticated principal onto (new) HTTP session
+    helper.putPrincipalOnSession(request, firstFactorCompletedPrincipal);
+    return true;
+  }
+
+  protected void setDefaultHeaders(HttpServletRequest request, HttpServletResponse response) {
+    // Never cache authentication requests.
+    response.setHeader("Cache-Control", "private, no-store, no-cache, max-age=0"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // prevents caching at the proxy server
+
+    // requests on /auth should have the default headers as this might also be called using GET which returns a 404 html page (container dependent)
+    BEANS.get(HttpServletControl.class).doDefaults(null, request, response);
   }
 
   /**
@@ -162,6 +238,7 @@ public class FormBasedAccessController implements IAccessController {
     private boolean m_enabled = true;
     private long m_status403WaitMillis = 500L;
     private ICredentialVerifier m_credentialVerifier;
+    private ICredentialVerifier m_secondFactorVerifier;
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
 
     public boolean isEnabled() {
@@ -182,6 +259,18 @@ public class FormBasedAccessController implements IAccessController {
      */
     public FormBasedAuthConfig withCredentialVerifier(ICredentialVerifier credentialVerifier) {
       m_credentialVerifier = credentialVerifier;
+      return this;
+    }
+
+    public ICredentialVerifier getSecondFactorVerifier() {
+      return m_secondFactorVerifier;
+    }
+
+    /**
+     * Sets the {@link ICredentialVerifier} to verify user's second factor.
+     */
+    public FormBasedAuthConfig withSecondFactorVerifier(ICredentialVerifier secondFactorVerifier) {
+      m_secondFactorVerifier = secondFactorVerifier;
       return this;
     }
 

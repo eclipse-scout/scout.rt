@@ -19,6 +19,7 @@ export class LoginBox extends Box {
   redirectUrl: string;
   userDataKey: string;
   passwordDataKey: string;
+  tokenDataKey: string;
   additionalData: Record<string, any>;
   prepareRedirectUrlFunc: (url: string) => string;
   messageKey: string;
@@ -27,6 +28,7 @@ export class LoginBox extends Box {
   $form: JQuery;
   $user: JQuery;
   $password: JQuery;
+  $token: JQuery;
   $button: JQuery;
 
   constructor() {
@@ -36,11 +38,12 @@ export class LoginBox extends Box {
       type: 'POST'
     };
     this.authUrl = 'auth';
-    this.onPostDoneFunc = this.redirect.bind(this);
+    this.onPostDoneFunc = this.checkTwoFactorResponse.bind(this);
     this.redirectUrl = null;
     this.logoUrl = 'logo.png';
     this.userDataKey = 'user';
     this.passwordDataKey = 'password';
+    this.tokenDataKey = 'token';
     this.additionalData = {};
     this.prepareRedirectUrlFunc = LoginBox.prepareRedirectUrl;
     this.messageKey = null;
@@ -49,6 +52,7 @@ export class LoginBox extends Box {
     this.$form = null;
     this.$user = null;
     this.$password = null;
+    this.$token = null;
     this.$button = null;
   }
 
@@ -58,7 +62,8 @@ export class LoginBox extends Box {
       'ui.Login': 'Login',
       'ui.LoginFailed': 'Login failed',
       'ui.User': 'Username',
-      'ui.Password': 'Password'
+      'ui.Password': 'Password',
+      'ui.Token': 'Token'
     }, options.texts);
     delete options.texts;
     options.ajaxOptions = $.extend(this.ajaxOptions, options.ajaxOptions);
@@ -89,9 +94,7 @@ export class LoginBox extends Box {
       .attr('autocorrect', 'off')
       .placeholder(this.texts.get('ui.User'))
       .appendTo(this.$form);
-    this.$password = $('<input>')
-      .attr('type', 'password')
-      .placeholder(this.texts.get('ui.Password'))
+    this.$password = this._createPasswortField()
       .appendTo(this.$form);
     this.$button = $('<button>')
       .attr('type', 'submit')
@@ -100,6 +103,12 @@ export class LoginBox extends Box {
       .appendTo(this.$form);
 
     this.$user.focus();
+  }
+
+  protected _createPasswortField() {
+    return $('<input>')
+      .attr('type', 'password')
+      .placeholder(this.texts.get('ui.Password'));
   }
 
   protected _resetButtonText() {
@@ -111,7 +120,11 @@ export class LoginBox extends Box {
   data(): Record<string, any> {
     let data = {};
     data[this.userDataKey] = this.$user.val();
-    data[this.passwordDataKey] = this.$password.val();
+    if (this.$password) {
+      data[this.passwordDataKey] = this.$password.val();
+    } else if (this.$token) {
+      data[this.tokenDataKey] = this.$token.val();
+    }
     $.extend(data, this.additionalData);
     return data;
   }
@@ -127,7 +140,9 @@ export class LoginBox extends Box {
       .removeClass('login-error')
       .setEnabled(false);
     this.$user.off('input.resetLoginError');
-    this.$password.off('input.resetLoginError');
+    if (this.$password) {
+      this.$password.off('input.resetLoginError');
+    }
     if (Device.get().supportsCssAnimation()) {
       this.$button
         .html('')
@@ -141,6 +156,32 @@ export class LoginBox extends Box {
     $.ajax(options)
       .done(this._onPostDone.bind(this))
       .fail(this._onPostFail.bind(this));
+  }
+
+  checkTwoFactorResponse(data: Record<string, any>) {
+    if (data && data.twoFactorRequired) {
+      // execute delayed to make sure loading animation is visible, otherwise (if it is very fast), it flickers
+      setTimeout(this._enableTwoFactor.bind(this), 300);
+    } else {
+      this.remove();
+      this.redirect(data);
+    }
+  }
+
+  protected _enableTwoFactor() {
+    this.$button
+      .setEnabled(true)
+      .html('')
+      .text(this.texts.get('ui.Login'));
+    this.$user
+      .setEnabled(false);
+    this.$token = $('<input>')
+      .attr('type', 'password')
+      .placeholder(this.texts.get('ui.Token'));
+    this.$password
+      .replaceWith(this.$token);
+    this.$password = null;
+    this.$token.focus();
   }
 
   redirect(data: Record<string, any>) {
@@ -173,7 +214,6 @@ export class LoginBox extends Box {
   }
 
   protected _onPostDone(data: Record<string, any>) {
-    this.remove();
     this.onPostDoneFunc.call(this, data);
   }
 
@@ -183,12 +223,20 @@ export class LoginBox extends Box {
   }
 
   protected _onPostFailImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+    if (this.$token) {
+      this.$password = this._createPasswortField();
+      this.$token
+        .replaceWith(this.$password);
+      this.$token = null;
+    }
+
     this.$button
       .setEnabled(true)
       .html('')
       .text(this.texts.get('ui.LoginFailed'))
       .addClass('login-error');
     this.$user
+      .setEnabled(true)
       .val('')
       .focus();
     this.$password
