@@ -123,7 +123,7 @@
     <io.netty-version>4.1.94.Final</io.netty-version>
     <apache.tika-version>2.4.0</apache.tika-version>
     <batik.version>1.17</batik.version>
-    <activemq.version>5.17.3</activemq.version>
+    <activemq.version>5.18.3</activemq.version>
     <artemis.version>2.20.0</artemis.version>
     <com.google.http-client.version>1.40.1</com.google.http-client.version>
     <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
@@ -954,9 +954,8 @@
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>okhttp</artifactId>
-        <version>4.11.0</version>
+        <version>4.12.0</version>
       </dependency>
-
       <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-bom</artifactId>
