@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponent, CalendarItem, DateRange, dates, scout} from '../../src/index';
+import {Calendar, CalendarComponent, CalendarDescriptor, CalendarItem, DateRange, dates, scout} from '../../src/index';
 
 describe('Calendar', () => {
   let session: SandboxSession;
@@ -31,6 +31,30 @@ describe('Calendar', () => {
 
     override _updateFullDayIndices(fullDayComponents?: CalendarComponent[]) {
       super._updateFullDayIndices(fullDayComponents);
+    }
+
+    override _setSelection(selectedDate: Date, selectedCalendar: number | CalendarDescriptor | 'default', selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
+      super._setSelection(selectedDate, selectedCalendar, selectedComponent, updateScrollPosition, timeChanged);
+    }
+
+    override _updateCalendarVisibility(updatedCalendars: [calendarId: number, visible: boolean][]) {
+      super._updateCalendarVisibility(updatedCalendars);
+    }
+
+    override _calculateStackKey(date: Date, calendarId?: number): string {
+      return super._calculateStackKey(date, calendarId);
+    }
+
+    override _onNextClick() {
+      super._onNextClick();
+    }
+
+    override _onPreviousClick() {
+      super._onPreviousClick();
+    }
+
+    override _arrange(components: CalendarComponent[], day: Date) {
+      super._arrange(components, day);
     }
   }
 
@@ -433,7 +457,7 @@ describe('Calendar', () => {
       // empty parent div
       let $div = $('<div></div>');
 
-      let cal = scout.create(Calendar, {
+      let cal = scout.create(SpecCalendar, {
         parent: session.desktop,
         selectedDate: '2016-01-01 12:00:00.000',
         displayMode: Calendar.DisplayMode.MONTH
@@ -465,7 +489,7 @@ describe('Calendar', () => {
       // empty parent div
       let $div = $('<div></div>');
 
-      let cal = scout.create(Calendar, {
+      let cal = scout.create(SpecCalendar, {
         parent: session.desktop,
         selectedDate: '2016-01-31 12:00:00.000',
         displayMode: Calendar.DisplayMode.MONTH
@@ -496,13 +520,14 @@ describe('Calendar', () => {
   });
 
   describe('multiple calendars', () => {
-    let cal: Calendar;
-    let day = dates.parseJsonDate('2023-10-27 00:00:00.000');
+    let cal: SpecCalendar;
+    let stringDay = '2023-10-27 00:00:00.000';
+    let day = dates.parseJsonDate(stringDay);
     let dateRangeNoon = {from: '2023-10-27 12:00:00.000', to: '2023-10-27 12:30:00.000'};
     let businessCalendar;
     let externalCalendar;
 
-    const createCalendarComponent = (calendar: Calendar, fromDate: string, toDate: string, calendarId?: string | number): CalendarComponent => {
+    const createCalendarComponent = (calendar: Calendar, fromDate: string, toDate: string, calendarId?: string | number, fullDay?: boolean): CalendarComponent => {
       let model = {
         parent: calendar,
         item: {
@@ -513,7 +538,8 @@ describe('Calendar', () => {
         coveredDaysRange: {
           from: fromDate,
           to: toDate
-        }
+        },
+        fullDay: fullDay
       };
       let comp = scout.create(CalendarComponent, model);
       cal.addComponents([comp]);
@@ -521,7 +547,7 @@ describe('Calendar', () => {
     };
 
     const calculateCurrentCalendarId = (comp: CalendarComponent): string | number => {
-      return comp._$parts[0].parent().data('calendarId');
+      return comp._$parts[0].parents('.calendar-column').data('calendarId');
     };
 
     beforeEach(() => {
@@ -569,7 +595,7 @@ describe('Calendar', () => {
       expect(calendarIdData).toEqual(calendarId);
     });
 
-    it('should move component from default to corresponding calendar column when displayMode is changed', () => {
+    it('should move component from default to corresponding calendar column when displayMode is changed from week to day', () => {
       // Arrange
       cal.setDisplayMode(Calendar.DisplayMode.WORK_WEEK);
       let comp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, businessCalendar.calendarId);
@@ -587,7 +613,7 @@ describe('Calendar', () => {
       expect(calendarIdForMonth).toBe('default');
     });
 
-    it('should hide components, when calendar is made invisible', () => {
+    it('should hide components, when calendar is made invisible on week view', () => {
       // Arrange
       cal.setDisplayMode(Calendar.DisplayMode.WEEK);
       let businessComp = createCalendarComponent(cal, dateRangeNoon.from, dateRangeNoon.to, businessCalendar.calendarId);
@@ -599,6 +625,30 @@ describe('Calendar', () => {
       // Assert
       expect(businessComp.visible).toBe(true);
       expect(externalComp.visible).toBe(false);
+    });
+
+    // No range selection on disabled column
+    it('should not apply a selection on calendars which are not selectable', () => {
+      // Act
+      cal._setSelection(cal.selectedDate, externalCalendar, null, false, false);
+
+      // Assert
+      expect(cal.selectedCalendar).not.toBe(externalCalendar);
+    });
+
+    it('should correctly update full day indices on day', () => {
+      // Arrange
+      let businessComp = createCalendarComponent(cal, stringDay, stringDay, businessCalendar.calendarId, true);
+      let secondBusniessComp = createCalendarComponent(cal, stringDay, stringDay, businessCalendar.calendarId, true);
+      let externalComp = createCalendarComponent(cal, stringDay, stringDay, externalCalendar.calendarId, true);
+
+      // Act
+      cal._updateFullDayIndices(cal.components);
+
+      // Assert
+      expect(businessComp.fullDayIndex).toBe(0);
+      expect(secondBusniessComp.fullDayIndex).toBe(1);
+      expect(externalComp.fullDayIndex).toBe(0);
     });
   });
 });
