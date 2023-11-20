@@ -665,13 +665,11 @@ export class Calendar extends Widget implements CalendarModel {
 
   /* -- basics, events -------------------------------------------- */
 
-  /** @internal */
-  _onPreviousClick() {
+  protected _onPreviousClick() {
     this._navigateDate(Calendar.Direction.BACKWARD);
   }
 
-  /** @internal */
-  _onNextClick() {
+  protected _onNextClick() {
     this._navigateDate(Calendar.Direction.FORWARD);
   }
 
@@ -1238,7 +1236,7 @@ export class Calendar extends Widget implements CalendarModel {
     fullDayComponents.sort(this._sortFromTo);
 
     const {from, to} = this._exactRange;
-    const usedIndicesMap = new Map();
+    const usedIndicesMap = new Map<string, number[]>();
     let maxComponentsPerDay = 0;
 
     for (const component of fullDayComponents) {
@@ -1253,7 +1251,8 @@ export class Calendar extends Widget implements CalendarModel {
         date = from;
       }
 
-      let usedIndices = arrays.ensure(usedIndicesMap.get(date.valueOf()));
+      let key = this._calculateFullDayIndiciesKey(component, date);
+      let usedIndices = arrays.ensure(usedIndicesMap.get(key));
 
       // get the first unused index
       // create [0, 1, 2, ..., maxIndex, maxIndex + 1] remove the used indices
@@ -1268,16 +1267,21 @@ export class Calendar extends Widget implements CalendarModel {
       // none of these indices can be used already due to the order of the components
       while (date <= component.coveredDaysRange.to && date <= to) {
         usedIndices.push(index);
-        usedIndicesMap.set(date.valueOf(), usedIndices);
+        usedIndicesMap.set(key, usedIndices);
 
         date = dates.shift(date, 0, 0, 1);
-        usedIndices = arrays.ensure(usedIndicesMap.get(date.valueOf()));
+        key = this._calculateFullDayIndiciesKey(component, date);
+        usedIndices = arrays.ensure(usedIndicesMap.get(key));
       }
 
       maxComponentsPerDay = Math.max(index + 1, maxComponentsPerDay);
     }
 
     this.$grids.css('--full-day-components', maxComponentsPerDay);
+  }
+
+  protected _calculateFullDayIndiciesKey(component: CalendarComponent, date: Date): string {
+    return this.getCalendarIdForComponent(component) + strings.asString(date.valueOf());
   }
 
   layoutYearPanel() {
@@ -1535,10 +1539,7 @@ export class Calendar extends Widget implements CalendarModel {
     this._updateCalendarVisibility(tupelArray);
   }
 
-  /**
-   * @internal
-   */
-  _updateCalendarVisibility(updatedCalendars: [calendarId: number, visible: boolean][]) {
+  protected _updateCalendarVisibility(updatedCalendars: [calendarId: number, visible: boolean][]) {
     updatedCalendars.forEach(tuple => {
       this._updateCalendarVisibleProperty(tuple[0], tuple[1]);
     });
@@ -1672,9 +1673,8 @@ export class Calendar extends Widget implements CalendarModel {
 
   /**
    * Arrange components (stack width, stack index) per day
-   * @internal
    */
-  _arrange(components: CalendarComponent[], day: Date) {
+  protected _arrange(components: CalendarComponent[], day: Date) {
     let columns: CalendarComponent[] = [],
       key = day + '';
 
@@ -1761,10 +1761,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  /**
-   * @internal
-   */
-  _calculateStackKey(date: Date, calendarId?: number): string {
+  protected _calculateStackKey(date: Date, calendarId?: number): string {
     if (!this.isDay() || !calendarId || calendarId === 0) {
       return 'default';
     }
@@ -2326,5 +2323,12 @@ export class Calendar extends Widget implements CalendarModel {
       this.selectedRange = null;
     }
     this.trigger('selectedRangeChange');
+  }
+
+  getCalendarIdForComponent(component: CalendarComponent): number | 'default' {
+    if (!component || !component.item) {
+      return 'default';
+    }
+    return scout.nvl(component.item.calendarId, 'default');
   }
 }
