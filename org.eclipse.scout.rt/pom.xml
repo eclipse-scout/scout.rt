@@ -108,7 +108,7 @@
     <jackson.version>2.11.4</jackson.version>
     <io.netty-version>4.1.94.Final</io.netty-version>
     <batik.version>1.17</batik.version>
-    <activemq.version>5.17.3</activemq.version>
+    <activemq.version>5.18.3</activemq.version>
     <artemis.version>2.20.0</artemis.version>
     <com.google.http-client.version>1.38.1</com.google.http-client.version>
     <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
