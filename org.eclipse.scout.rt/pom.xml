@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>23.2.0</version>
+    <version>24.1-SNAPSHOT</version>
     <relativePath />
   </parent>
 
@@ -708,13 +708,6 @@
         <groupId>com.sun.xml.ws</groupId>
         <artifactId>jaxws-rt</artifactId>
         <version>${master_dependency_jaxws_version}</version>
-        <exclusions>
-          <exclusion>
-            <!-- The jaxws-rt also includes the jakarta.activation (impl). The impl also includes the api classes. Therefore not necessary to include the api jar as well. -->
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- Build Dependencies (Provided) -->
