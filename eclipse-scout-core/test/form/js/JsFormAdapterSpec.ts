@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper} from '../../../src/testing';
-import {Desktop, DesktopAdapter, Form, FormModel, ObjectFactory, RemoteEvent} from '../../../src';
+import {AdapterData, Desktop, DesktopAdapter, DisplayHint, Form, FormModel, ObjectFactory, RemoteEvent} from '../../../src';
 import Deferred = JQuery.Deferred;
 
 describe('JsFormAdapter', () => {
@@ -87,6 +87,37 @@ describe('JsFormAdapter', () => {
     form.deferred.resolve();
     await form.whenPostLoad();
     expect(form.rendered).toBe(true);
+  });
+
+  it('does not register forms twice on its displayParent if already set in the sessions startupResponse', async () => {
+    // create a session with a desktop that already contains a JsForm, i.e. the form is already set in the desktops views/dialogs
+    // this happens e.g. when the browser is reloaded while there are open forms on the server
+    // await the form to be loaded and then return the desktop
+    const startupSessionWithJsForm: ((displayHint: DisplayHint) => Promise<Desktop>) = async displayHint => {
+      // create a session and process the startupResponse
+      const s = sandboxSession();
+      // using the startupResponse ensures that all widgets are created by the corresponding ModelAdapters, which is needed for the JsForm
+      s._processStartupResponse({
+        startupData: {
+          clientSession: '7'
+        },
+        adapterData: {
+          7: {desktop: '13'} as unknown as AdapterData,
+          13: $.extend({objectType: 'Desktop'}, displayHint === Form.DisplayHint.VIEW ? {views: ['42']} : {dialogs: ['42']}),
+          42: $.extend(createAdapterData('42', 'jsformspec.JsForm'), {displayHint})
+        }
+      });
+      const d = s.desktop;
+      const form = displayHint === Form.DisplayHint.VIEW ? d.views[0] : d.dialogs[0];
+
+      expect(form).toBeDefined();
+      await form.whenPostLoad();
+
+      return d;
+    };
+
+    expect((await startupSessionWithJsForm(Form.DisplayHint.VIEW)).views.length).toBe(1);
+    expect((await startupSessionWithJsForm(Form.DisplayHint.DIALOG)).dialogs.length).toBe(1);
   });
 
   it('does not try to show the form if form is closed during load', async () => {
