@@ -42,7 +42,9 @@ export default class TouchPopup extends Popup {
 
     // clone original touch field
     // original and clone both point to the same popup instance
-    this._field = this._touchField.clone(this._fieldOverrides());
+    this._field = this._touchField.clone(this._fieldOverrides(), {
+      delegateEventsToOriginal: this._initDelegatedEvents()
+    });
     this._touchField.on('propertyChange', this._touchFieldPropertyChangeListener);
     this._initWidget(options);
     this.doneAction = scout.create('Menu', {
@@ -73,6 +75,14 @@ export default class TouchPopup extends Popup {
       touchMode: false,
       clearable: ValueField.Clearable.ALWAYS
     };
+  }
+
+  /**
+   * @return {string[]|[]}
+   * @protected
+   */
+  _initDelegatedEvents() {
+    return [];
   }
 
   _initWidget(options) {
