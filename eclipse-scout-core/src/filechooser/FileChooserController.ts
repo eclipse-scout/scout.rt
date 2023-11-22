@@ -67,7 +67,7 @@ export class FileChooserController {
     if (fileChooser.rendered) {
       return;
     }
-    if (register) {
+    if (register && !arrays.contains(this.displayParent.fileChoosers, fileChooser)) {
       this.displayParent.fileChoosers.push(fileChooser);
     }
 

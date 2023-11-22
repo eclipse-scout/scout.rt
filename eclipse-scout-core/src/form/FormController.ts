@@ -139,7 +139,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
     if (view.rendered || view.blockRendering) {
       return;
     }
-    if (register) {
+    if (register && !arrays.contains(this.displayParent.views, view)) {
       if (position !== undefined) {
         arrays.insert(this.displayParent.views, view, position);
       } else {
@@ -181,7 +181,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
       return;
     }
 
-    if (register) {
+    if (register && !arrays.contains(this.displayParent.dialogs, dialog)) {
       this.displayParent.dialogs.push(dialog);
     }
 
