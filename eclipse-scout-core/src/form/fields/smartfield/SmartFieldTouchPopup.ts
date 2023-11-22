@@ -39,6 +39,10 @@ export class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFie
     this.addCssClass('smart-field-touch-popup');
   }
 
+  protected override _initDelegatedEvents(): string[] {
+    return ['prepareLookupCall', 'lookupCallDone'];
+  }
+
   protected override _initWidget(options: SmartFieldTouchPopupModel<TValue>) {
     this._widget = this._createProposalChooser();
     this._widget.on('lookupRowSelected', this._triggerEvent.bind(this));
