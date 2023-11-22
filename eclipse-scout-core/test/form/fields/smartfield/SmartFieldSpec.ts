@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  fields, keys, LookupResult, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, StaticLookupCall, Status, strings, ValidationFailedStatus
+  fields, keys, LookupResult, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, StaticLookupCall, Status,
+  strings, ValidationFailedStatus
 } from '../../../../src/index';
 import {ColumnDescriptorDummyLookupCall, DelayedStaticLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting, MicrotaskStaticLookupCall} from '../../../../src/testing/index';
 import {LookupCall} from '../../../../src/lookup/LookupCall';
@@ -385,6 +386,36 @@ describe('SmartField', () => {
       let popup = field.popup as SpecSmartFieldTouchPopup;
       expect(popup._field.tooltip().rendered).toBe(true);
       expect(popup._field.tooltip().$container.find('.glasspane').length).toBe(0);
+    });
+
+    it('delegates lookup events to original field', () => {
+      let field = createFieldWithLookupCall({
+        touchMode: true
+      });
+      let prepareLookupCallCounter = 0;
+      let lookupCallDoneCounter = 0;
+      let onPrepareLookupCall = () => {
+        prepareLookupCallCounter++;
+      };
+      let onLookupCallDone = () => {
+        lookupCallDoneCounter++;
+      };
+      field.on('prepareLookupCall', onPrepareLookupCall.bind(field));
+      field.on('lookupCallDone', onLookupCallDone.bind(field));
+      field.render();
+      jasmine.clock().tick(500);
+      JQueryTesting.triggerClick(field.$field);
+      jasmine.clock().tick(500);
+
+      let popup = field.popup as SpecSmartFieldTouchPopup;
+      let oldPrepareLookupCallCounter = prepareLookupCallCounter;
+      let oldLookupCallDoneCounter = lookupCallDoneCounter;
+      popup._field.setValue(1);
+      jasmine.clock().tick(500);
+      JQueryTesting.triggerClick(field.$field);
+
+      expect(prepareLookupCallCounter).toBe(oldPrepareLookupCallCounter + 1);
+      expect(lookupCallDoneCounter).toBe(oldLookupCallDoneCounter + 1);
     });
 
   });
