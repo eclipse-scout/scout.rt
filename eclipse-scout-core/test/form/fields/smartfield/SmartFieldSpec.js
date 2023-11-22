@@ -328,6 +328,36 @@ describe('SmartField', () => {
       expect(field.popup._field._tooltip().$container.find('.glasspane').length).toBe(0);
     });
 
+    it('delegates lookup events to original field', () => {
+      let field = createFieldWithLookupCall({
+        touchMode: true
+      });
+      let prepareLookupCallCounter = 0;
+      let lookupCallDoneCounter = 0;
+      let onPrepareLookupCall = () => {
+        prepareLookupCallCounter++;
+      };
+      let onLookupCallDone = () => {
+        lookupCallDoneCounter++;
+      };
+      field.on('prepareLookupCall', onPrepareLookupCall.bind(field));
+      field.on('lookupCallDone', onLookupCallDone.bind(field));
+      field.render();
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+      jasmine.clock().tick(500);
+
+      let popup = field.popup;
+      let oldPrepareLookupCallCounter = prepareLookupCallCounter;
+      let oldLookupCallDoneCounter = lookupCallDoneCounter;
+      popup._field.setValue(1);
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+
+      expect(prepareLookupCallCounter).toBe(oldPrepareLookupCallCounter + 1);
+      expect(lookupCallDoneCounter).toBe(oldLookupCallDoneCounter + 1);
+    });
+
   });
 
   describe('acceptInput', () => {

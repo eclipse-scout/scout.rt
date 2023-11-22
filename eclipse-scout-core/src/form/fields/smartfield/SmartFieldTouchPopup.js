@@ -32,6 +32,10 @@ export default class SmartFieldTouchPopup extends TouchPopup {
     this.addCssClass('smart-field-touch-popup');
   }
 
+  _initDelegatedEvents() {
+    return ['prepareLookupCall', 'lookupCallDone'];
+  }
+
   _initWidget(options) {
     this._widget = this._createProposalChooser();
     this._widget.on('lookupRowSelected', this._triggerEvent.bind(this));
