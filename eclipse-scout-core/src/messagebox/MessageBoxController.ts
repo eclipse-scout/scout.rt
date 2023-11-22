@@ -67,7 +67,7 @@ export class MessageBoxController {
     if (messageBox.rendered) {
       return;
     }
-    if (register) {
+    if (register && !arrays.contains(this.displayParent.messageBoxes, messageBox)) {
       this.displayParent.messageBoxes.push(messageBox);
     }
     // Use parent's function or (if not implemented) our own.
