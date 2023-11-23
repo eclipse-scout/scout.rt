@@ -24,6 +24,7 @@
       <groupId>${groupId}</groupId>
       <artifactId>${rootArtifactId}.persistence</artifactId>
       <exclusions>
+        <!-- Remove the activation-api, Scout includes the implementation anyway, and it includes the api classes as well. -->
         <exclusion>
           <groupId>jakarta.activation</groupId>
           <artifactId>jakarta.activation-api</artifactId>

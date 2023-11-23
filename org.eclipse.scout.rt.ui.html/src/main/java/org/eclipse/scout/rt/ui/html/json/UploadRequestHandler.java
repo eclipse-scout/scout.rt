@@ -28,14 +28,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.FileItemInput;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
+import org.apache.commons.fileupload2.core.FileUploadException;
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -64,6 +60,10 @@ import org.eclipse.scout.rt.ui.html.res.IUploadable;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This handler contributes to the {@link UiServlet} as the POST handler for /upload
@@ -99,7 +99,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     final String targetAdapterId = matcher.group(2);
 
     // Check if is really a file upload
-    if (!ServletFileUpload.isMultipartContent(req)) {
+    if (!JakartaServletFileUpload.isMultipartContent(req)) {
       return false;
     }
 
@@ -216,18 +216,18 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    */
   protected void readUploadData(HttpServletRequest httpReq, IUploadable uploadable, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException {
     Set<String> validFileExtensions = getValidFileExtensionsFor(uploadable, uploadProperties);
-    ServletFileUpload upload = new ServletFileUpload();
-    upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
+    JakartaServletFileUpload upload = new JakartaServletFileUpload();
+    upload.setHeaderCharset(StandardCharsets.UTF_8);
     upload.setSizeMax(uploadable.getMaximumUploadSize());
     upload.setFileCountMax(CONFIG.getPropertyValue(UiHtmlConfigProperties.MaxUploadFileCountProperty.class));
     int fileCount = 0;
-    for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
+    for (FileItemInputIterator it = upload.getItemIterator(httpReq); it.hasNext(); ) {
       fileCount++;
       //the first entry in an upload multipart is typically a "rowId" entry. be tolerant with one more file.
       if (upload.getFileCountMax() > 0 && (fileCount - 1) > upload.getFileCountMax()) {
         throw new RejectedResourceException("Too many files ({}).", fileCount);
       }
-      FileItemStream item = it.next();
+      FileItemInput item = it.next();
       String filename = item.getName();
       if (StringUtility.hasText(filename)) {
         String[] parts = StringUtility.split(filename, "[/\\\\]");
@@ -244,7 +244,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         verifyFileName(validFileExtensions, filename, ext);
       }
       byte[] content;
-      try (InputStream in = item.openStream()) {
+      try (InputStream in = item.getInputStream()) {
         content = IOUtility.readBytes(in);
       }
       BinaryResource res = BinaryResources.create()
@@ -280,7 +280,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * <p>
    * The content is passed as well to allow for a custom content type detection logic.
    */
-  protected String detectContentType(String filename, FileItemStream item, byte[] content) {
+  protected String detectContentType(String filename, FileItemInput item, byte[] content) {
     if (filename != null) {
       return null;
     }
