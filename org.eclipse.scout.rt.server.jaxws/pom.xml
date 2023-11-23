@@ -32,8 +32,8 @@
       <groupId>jakarta.xml.ws</groupId>
       <artifactId>jakarta.xml.ws-api</artifactId>
       <exclusions>
+        <!-- Remove the activation-api, Scout includes the implementation anyway, and it includes the api classes as well. -->
         <exclusion>
-          <!-- replace the activation-api with the impl. Scout includes the impl anyway and it includes the api classes as well. -->
           <groupId>jakarta.activation</groupId>
           <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
