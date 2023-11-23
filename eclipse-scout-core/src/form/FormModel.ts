@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -176,14 +176,6 @@ export interface FormModel extends WidgetModel, DisplayParentModel {
    * Every form needs exactly one root group box that can contain one or more {@link FormField}s.
    */
   rootGroupBox?: ObjectOrChildModel<GroupBox>;
-  /**
-   * Defines whether the form needs to be saved because the values of the form fields have changed.
-   *
-   * If set to true, a marker will be visible in the form header or tab, unless {@link saveNeededVisible} is set to false.
-   *
-   * Default is false.
-   */
-  saveNeeded?: boolean;
   /**
    * Whether a changed form should display the save {@link saveNeeded} state in the form header or tab.
    *

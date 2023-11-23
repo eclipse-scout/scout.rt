@@ -47,6 +47,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
   resizable: boolean;
   movable: boolean;
   rootGroupBox: GroupBox;
+  /**
+   * Indicates whether the form needs to be saved.
+   * If set to true, a marker will be visible in the form header or tab, unless {@link saveNeededVisible} is set to false.
+   *
+   * The value will be computed by {@link updateSaveNeeded}.
+   */
   saveNeeded: boolean;
   saveNeededVisible: boolean;
   formController: FormController;
@@ -791,7 +797,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   /**
    * This function is called when the user presses the "x" icon.
    *
-   * It will either call {@link #close()} or {@link #cancel()}, depending on the enabled and visible system buttons, see {@link _abort()}.
+   * It will either call {@link #close()} or {@link #cancel()}, depending on the enabled and visible system buttons, see {@link _abort}.
    */
   abort() {
     let event = new Event();
@@ -1060,12 +1066,40 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this.invalidateLayoutTree();
   }
 
+  /**
+   * Updates the {@link saveNeeded} property based on the {@link GroupBox.saveNeeded} state of the {@link rootGroupBox} and the result of {@link _computeSaveNeeded}.
+   */
   updateSaveNeeded() {
-    this.setSaveNeeded(this.rootGroupBox ? this.rootGroupBox.saveNeeded : false);
+    if (!this.initialized || this.destroying) {
+      return;
+    }
+    this.setSaveNeeded(this.rootGroupBox?.saveNeeded || this._computeSaveNeeded());
   }
 
+  /**
+   * Used by {@link updateSaveNeeded} to update the {@link saveNeeded} property.
+   *
+   * Can be implemented to add a custom save needed check for this specific form.
+   *
+   * By default, there is no implementation and {@link saveNeeded} depends on the state of the {@link rootGroupBox} which itself depends on the state of its fields.
+   *
+   * @returns true if the form needs to be saved, false if only the state of the group should be considered
+   */
+  protected _computeSaveNeeded(): boolean {
+    return false;
+  }
+
+  /**
+   * Marks the root group box as saved so that {@link saveNeeded} returns false.
+   *
+   * *Note*: {@link saveNeeded} may still return true afterward if a custom save needed computation is active, see {@link _computeSaveNeeded}.
+   *
+   * @see GroupBox.markAsSaved
+   * @see touch
+   */
   markAsSaved() {
     this.rootGroupBox?.markAsSaved();
+    this.updateSaveNeeded();
   }
 
   protected setSaveNeeded(saveNeeded: boolean) {
@@ -1591,6 +1625,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
   }
 
+  /**
+   * Touches the {@link rootGroupBox} so that {@link saveNeeded} returns true even if no field value has changed.
+   *
+   * @see GroupBox.touch
+   * @see markAsSaved
+   */
   touch() {
     this.rootGroupBox?.touch();
   }
