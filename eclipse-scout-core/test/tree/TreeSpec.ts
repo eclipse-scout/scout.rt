@@ -1279,10 +1279,19 @@ describe('Tree', () => {
     });
 
     describe('with children_and_parent AutoCheckStyle', () => {
+      let tree: Tree;
+
+      beforeEach(() => {
+        tree = null;
+      });
+
+      afterEach(() => {
+        ensureRenderedCorrectly(tree.nodes);
+      });
 
       it('checks children', () => {
         let model = helper.createModelFixture(4, 4);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1302,7 +1311,7 @@ describe('Tree', () => {
 
       it('does uncheck the children', () => {
         let model = helper.createModelFixture(4, 4);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1326,7 +1335,7 @@ describe('Tree', () => {
 
       it('does set node in children-checked-state when not all child nodes are selected', () => {
         let model = helper.createModelFixture(4, 4);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1348,7 +1357,7 @@ describe('Tree', () => {
 
       it('checks parent node when all children are checked', () => {
         let model = helper.createModelFixture(4, 4);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1368,7 +1377,7 @@ describe('Tree', () => {
 
       it('does uncheck parent node when all children are unchecked', () => {
         let model = helper.createModelFixture(4, 4);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1389,7 +1398,7 @@ describe('Tree', () => {
 
       it('does partly-check all parent nodes when child is checked', () => {
         let model = helper.createModelFixture(4, 4);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1410,7 +1419,7 @@ describe('Tree', () => {
 
       it('does not check disabled nodes when no children are present', () => {
         let model = helper.createModelFixture(4, 2);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1433,7 +1442,7 @@ describe('Tree', () => {
 
       it('checks disabled nodes when all children are checked', () => {
         let model = helper.createModelFixture(4, 4);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1456,7 +1465,7 @@ describe('Tree', () => {
 
       it('does not check new inserted nodes on top level', () => {
         let model = helper.createModelFixture(1, 0);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1475,7 +1484,7 @@ describe('Tree', () => {
 
       it('does remove parent node from tree.checkedNodes when child is unchecked', () => {
         let model = helper.createModelFixture(2, 1);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1498,7 +1507,7 @@ describe('Tree', () => {
 
       it('does uncheck parent node, when not all children are selected', () => {
         let model = helper.createModelFixture(2, 1);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1522,7 +1531,7 @@ describe('Tree', () => {
 
       it('does uncheck all nodes when multiCheck is false', () => {
         let model = helper.createModelFixture(2, 1);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1550,7 +1559,7 @@ describe('Tree', () => {
 
       it('does preserve the setted value after init', () => {
         let model = helper.createModelFixture(2, 2);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1581,7 +1590,7 @@ describe('Tree', () => {
 
       it('does update parent nodes when child is deleted', () => {
         let model = helper.createModelFixture(2, 1);
-        let tree = helper.createTree(model);
+        tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
         tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
@@ -1602,6 +1611,72 @@ describe('Tree', () => {
         expect(child2.checked).toBe(true);
         expect(tree.checkedNodes).toEqual(jasmine.arrayWithExactContents([parent, child2]));
       });
+
+      it('does uncheck parent when new unchecked child is inserted', () => {
+        let model = helper.createModelFixture(1, 0);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.render();
+
+        // Arrange
+        let node = tree.nodes[0];
+
+        // Act
+        tree.checkNode(node);
+        tree.insertNode(helper.createModelNode(), node);
+        let childNode = node.childNodes[0];
+
+        // Assert
+        expect(node.checked).toBe(false);
+        expect(childNode.checked).toBe(false);
+      });
+
+      it('does partly check parent when a new unchecked child is inserted beside a already checked child', () => {
+        let model = helper.createModelFixture(1, 1);
+        tree = helper.createTree(model);
+        tree.multiCheck = true;
+        tree.checkable = true;
+        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.render();
+
+        // Arrange
+        let node = tree.nodes[0];
+        let childNode = node.childNodes[0];
+
+        // Act
+        tree.checkNode(node);
+        tree.insertNode(helper.createModelNode(), node);
+        let insertedNode = node.childNodes[1];
+
+        // Assert
+        expect(node.checked).toBe(false);
+        expect(node.childrenChecked).toBe(true);
+        expect(childNode.checked).toBe(true);
+        expect(insertedNode.checked).toBe(false);
+      });
+
+      const ensureRenderedCorrectly = (nodes: TreeNode[]) => {
+        Tree.visitNodes(node => {
+          if (!node.$node) {
+            return;
+          }
+
+          let hascheckedCssClass = node.$node
+            .children('.tree-node-checkbox')
+            .children('.check-box')
+            .hasClass('checked');
+
+          let hasChildrenCheckedCssClass = node.$node
+            .children('.tree-node-checkbox')
+            .children('.check-box')
+            .hasClass('children-checked');
+
+          expect(node.checked).toBe(hascheckedCssClass);
+          expect(node.childrenChecked).toBe(hasChildrenCheckedCssClass);
+        }, nodes);
+      };
     });
 
     it('does not check nodes if checkable is set to false', () => {

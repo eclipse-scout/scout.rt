@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TreeNode} from './TreeNode';
+import {arrays} from '../util/arrays';
 
 /**
  * This object is needed during an update in the tree. It
@@ -45,6 +46,11 @@ export class TreeCheckNodesResult {
 
   getNodesForEventTrigger(): TreeNode[] {
     return this._requireTriggerEventNodes;
+  }
+
+  removeNode(node: TreeNode) {
+    arrays.remove(this._requireRenderTreeNodes, node);
+    arrays.remove(this._requireTriggerEventNodes, node);
   }
 
   add(treeNodeUpdate: TreeCheckNodesResult) {
