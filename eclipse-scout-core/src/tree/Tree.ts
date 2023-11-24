@@ -421,7 +421,7 @@ export class Tree extends Widget implements TreeModel {
       this.checkedNodes.push(node);
     }
     this._initTreeNodeInternal(node, parentNode);
-    this._updateMarkChildrenChecked(node, true);
+    this._updateMarkChildrenChecked(node);
     node.initialized = true;
   }
 
@@ -1306,10 +1306,10 @@ export class Tree extends Widget implements TreeModel {
       });
   }
 
-  protected _updateMarkChildrenChecked(node: TreeNode, init?: boolean, triggerEvents = this.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
+  protected _updateMarkChildrenChecked(node: TreeNode, triggerEvents = this.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
     let treeNodeUpdate = this._checkParentsRecursive(node);
     // No rendering during init, redering is triggered after init
-    if (init) {
+    if (!node.initialized) {
       return;
     }
     this._renderNodesChecked(treeNodeUpdate.getNodesForRendering());
