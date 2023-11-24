@@ -431,11 +431,14 @@ export const objects = {
   },
 
   /**
-   * Compare two objects and all its child elements recursively.
+   * Compares two objects and all its child elements recursively ignoring the order of the keys.
+   *
    * @returns true if both objects and all child elements are equals by value or implemented equals method
    */
   equalsRecursive(objA: any, objB: any): boolean {
-    let i;
+    if (objA === objB) {
+      return true;
+    }
     if (objects.isPlainObject(objA) && objects.isPlainObject(objB)) {
       if (objects.isFunction(objA.equals) && objects.isFunction(objB.equals)) {
         return objA.equals(objB);
@@ -445,25 +448,25 @@ export const objects = {
       if (!arrays.equalsIgnoreOrder(keysA, keysB)) {
         return false;
       }
-      for (i = 0; i < keysA.length; i++) {
-        if (!objects.equalsRecursive(objA[keysA[i]], objB[keysA[i]])) {
+      for (let key of keysA) {
+        if (!objects.equalsRecursive(objA[key], objB[key])) {
           return false;
         }
       }
       return true;
-    } else if (objects.isArray(objA) && objects.isArray(objB)) {
+    }
+    if (objects.isArray(objA) && objects.isArray(objB)) {
       if (objA.length !== objB.length) {
         return false;
       }
-      for (i = 0; i < objA.length; i++) {
+      for (let i = 0; i < objA.length; i++) {
         if (!objects.equalsRecursive(objA[i], objB[i])) {
           return false;
         }
       }
-
       return true;
     }
-    return objA === objB;
+    return false;
   },
 
   /**
