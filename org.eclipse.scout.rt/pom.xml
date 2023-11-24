@@ -126,7 +126,7 @@
     <logback.version>1.3.8</logback.version>
     <jackson.version>2.16.0</jackson.version>
     <io.netty-version>4.1.94.Final</io.netty-version>
-    <apache.tika-version>2.6.0</apache.tika-version>
+    <apache.tika-version>2.9.1</apache.tika-version>
     <batik.version>1.17</batik.version>
     <activemq.version>5.18.3</activemq.version>
     <artemis.version>2.31.2</artemis.version>
@@ -256,7 +256,7 @@
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-java</artifactId>
-        <version>4.6.0</version>
+        <version>4.15.0</version>
       </dependency>
 
       <dependency>
@@ -949,9 +949,9 @@
         <artifactId>tika-parser-text-module</artifactId>
         <version>${apache.tika-version}</version>
         <exclusions>
-          <!-- org.apache.tika.parser.txt.UniversalEncodingDetector is currently not used -->
+          <!-- org.apache.tika.parser.txt.UniversalEncodingListener is currently not used -->
           <exclusion>
-            <groupId>com.googlecode.juniversalchardet</groupId>
+            <groupId>com.github.albfernandez</groupId>
             <artifactId>juniversalchardet</artifactId>
           </exclusion>
           <!-- org.apache.tika.parser.csv.TextAndCSVParser is currently not used -->
