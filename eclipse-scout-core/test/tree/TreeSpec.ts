@@ -1280,7 +1280,7 @@ describe('Tree', () => {
 
     describe('with children_and_parent AutoCheckStyle', () => {
 
-      it('does check children', () => {
+      it('checks children', () => {
         let model = helper.createModelFixture(4, 4);
         let tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1346,7 +1346,7 @@ describe('Tree', () => {
         expect(node.childrenChecked).toEqual(true);
       });
 
-      it('does check parent node when all children are checked', () => {
+      it('checks parent node when all children are checked', () => {
         let model = helper.createModelFixture(4, 4);
         let tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1431,7 +1431,7 @@ describe('Tree', () => {
         expect(nodeLevel3.checked).toBe(false);
       });
 
-      it('does check disabled nodes when all children are checked', () => {
+      it('checks disabled nodes when all children are checked', () => {
         let model = helper.createModelFixture(4, 4);
         let tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1520,7 +1520,7 @@ describe('Tree', () => {
         expect(childNode2.checked).toBe(true);
       });
 
-      it('does uncheck all nodes when muiltiCheck is false', () => {
+      it('does uncheck all nodes when multiCheck is false', () => {
         let model = helper.createModelFixture(2, 1);
         let tree = helper.createTree(model);
         tree.multiCheck = true;
