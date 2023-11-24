@@ -1308,9 +1308,10 @@ export class Tree extends Widget implements TreeModel {
 
   protected _updateMarkChildrenChecked(node: TreeNode, triggerEvents = this.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
     let treeNodeUpdate = this._checkParentsRecursive(node);
-    // No rendering during init, redering is triggered after init
+
     if (!node.initialized) {
-      return;
+      // No rendering of nodes which have not been initialized yet
+      treeNodeUpdate.removeNode(node);
     }
     this._renderNodesChecked(treeNodeUpdate.getNodesForRendering());
 
