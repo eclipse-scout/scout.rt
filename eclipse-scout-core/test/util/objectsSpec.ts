@@ -623,7 +623,7 @@ describe('objects', () => {
       let a = {};
       expect(objects.equalsRecursive(a, a)).toBe(true);
       expect(objects.equalsRecursive({}, {})).toBe(true);
-      expect(objects.equalsRecursive({a: '1', b: '2'}, {b: '2', a: '1'})).toBe(true);
+      expect(objects.equalsRecursive({a: '1', b: '2'}, {a: '1', b: '2'})).toBe(true);
       expect(objects.equalsRecursive({a: [{a: '1', b: '2'}, {a: '3', b: '4'}]}, {a: [{a: '1', b: '2'}, {a: '3', b: '4'}]})).toBe(true);
       expect(objects.equalsRecursive({a: [{a: '3', b: '4'}, {a: '1', b: '2'}]}, {a: [{a: '1', b: '2'}, {a: '3', b: '4'}]})).toBe(false);
       expect(objects.equalsRecursive({
@@ -633,6 +633,19 @@ describe('objects', () => {
       })).toBe(true);
     });
 
+    it('ignores key order', () => {
+      expect(objects.equalsRecursive({a: '1', b: '2'}, {b: '2', a: '1'})).toBe(true);
+      expect(objects.equalsRecursive({a: {b: '1', c: '2'}}, {a: {c: '2', b: '1'}})).toBe(true);
+
+      // Object.keys() returns key based on insertion order -> assert that this won't matter
+      let a = {};
+      let b = {};
+      a['c'] = '1';
+      a['d'] = '2';
+      b['d'] = '2';
+      b['c'] = '1';
+      expect(objects.equalsRecursive(a, b)).toBe(true);
+    })
   });
 
   describe('Constant resolving from plain object / JSON model', () => {
