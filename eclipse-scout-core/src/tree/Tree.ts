@@ -1306,20 +1306,19 @@ export class Tree extends Widget implements TreeModel {
       });
   }
 
-  protected _updateMarkChildrenChecked(node: TreeNode, triggerEvents = this.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
+  protected _updateMarkChildrenChecked(node: TreeNode) {
     let treeNodeUpdate = this._checkParentsRecursive(node);
 
     if (!node.initialized) {
       // No rendering of nodes which have not been initialized yet
       treeNodeUpdate.removeNode(node);
     }
-    this._renderNodesChecked(treeNodeUpdate.getNodesForRendering());
 
-    if (triggerEvents) {
-      this.trigger('nodesChecked', {
-        nodes: treeNodeUpdate.getNodesForEventTrigger()
-      });
-    }
+    // Trigger events and render
+    this._renderNodesChecked(treeNodeUpdate.getNodesForRendering());
+    this.trigger('nodesChecked', {
+      nodes: treeNodeUpdate.getNodesForEventTrigger()
+    });
   }
 
   protected _renderNodesChecked(treeNodes: TreeNode[]) {
@@ -2616,10 +2615,8 @@ export class Tree extends Widget implements TreeModel {
 
     nodes.forEach(node => {
       // Step 1: Update this node, if possible
-      if (node.checked !== opts.checked && this._isNodeEditable(node, opts.checkOnlyEnabled)) {
-        this._checkNode(node, opts.checked);
-        updatedNodes.addNodeForRenderingAndEventTrigger(node);
-      }
+      let update = this._checkNode(node, opts.checked);
+      updatedNodes.add(update);
 
       // Step 2: Update child nodes when necessary
       if (scout.isOneOf(opts.autoCheckStyle, Tree.AutoCheckStyle.CHILDREN, Tree.AutoCheckStyle.CHILDREN_AND_PARENT) && this.multiCheck) {
@@ -2651,17 +2648,11 @@ export class Tree extends Widget implements TreeModel {
     parentNode.childNodes.forEach(node => {
 
       // Update node if possible
-      let editable = this._isNodeEditable(node, opts.checkOnlyEnabled);
-      if (node.checked !== opts.checked && editable) {
-        this._checkNode(node, opts.checked);
-        if (opts.autoCheckStyle === Tree.AutoCheckStyle.CHILDREN) {
-          // In this mode, no events are triggered for selected child nodes.
-          updatedNodes.addNodeForRendering(node);
-        } else {
-          updatedNodes.addNodeForRenderingAndEventTrigger(node);
-        }
-      }
+      let update = this._checkNode(node, opts.checked);
+      updatedNodes.add(update);
+
       // Remove children checked status
+      let editable = this._isNodeEditable(node, opts.checkOnlyEnabled);
       if (node.childrenChecked && editable) {
         node.childrenChecked = false;
         updatedNodes.addNodeForRendering(node);
@@ -2705,26 +2696,30 @@ export class Tree extends Widget implements TreeModel {
       node.childrenChecked = false;
       updatedNodes.addNodeForRendering(node);
     }
-    if (autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT && childrenCheckedCount === 0 && node.checked) {
-      this._checkNode(node, false);
-      updatedNodes.addNodeForRenderingAndEventTrigger(node);
+    if (autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT && childrenCheckedCount === 0) {
+      let update = this._checkNode(node, false);
+      updatedNodes.add(update);
     }
 
     // Some children checked (but in child_and_parent mode, not all children may be selected)
     if (childrenCheckedCount > 0 && !node.childrenChecked && !(autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT && childrenFullyCheckedCount === childrenCount)) {
       node.childrenChecked = true;
       updatedNodes.addNodeForRendering(node);
-      if (autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT && node.checked) {
-        this._checkNode(node, false);
-        updatedNodes.addNodeForEventTrigger(node);
+      if (autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
+        let update = this._checkNode(node, false);
+        updatedNodes.add(update);
       }
     }
 
     // All children checked
-    if (childrenFullyCheckedCount === childrenCount && autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT && (!node.checked || node.childrenChecked)) {
-      this._checkNode(node, true);
-      node.childrenChecked = false; // Only on partly selected nodes
-      updatedNodes.addNodeForRenderingAndEventTrigger(node);
+    if (childrenFullyCheckedCount === childrenCount && autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
+      let update = this._checkNode(node, true);
+      updatedNodes.add(update);
+
+      if (node.childrenChecked) {
+        node.childrenChecked = false; // Only on partly selected nodes
+        updatedNodes.addNodeForRendering(node);
+      }
     }
 
     // Update parent, if this node has been updated or checkParentsAnyways flag is set
@@ -2736,17 +2731,20 @@ export class Tree extends Widget implements TreeModel {
     return updatedNodes;
   }
 
-  protected _checkNode(node: TreeNode, check: boolean) {
-    // Do nothing when node is already checked
-    if (node.checked === check) {
-      return;
+  protected _checkNode(node: TreeNode, check: boolean, checkOnlyEnabledNodes = true): TreeCheckNodesResult {
+    let update = new TreeCheckNodesResult();
+    // Do nothing when node is already checked or is not editable
+    if (node.checked === check || !this._isNodeEditable(node, checkOnlyEnabledNodes)) {
+      return update;
     }
     node.checked = check;
+    update.addNodeForRenderingAndEventTrigger(node);
     if (check) {
       this.checkedNodes.push(node);
     } else {
       arrays.remove(this.checkedNodes, node);
     }
+    return update;
   }
 
   protected _uncheckAll(): TreeCheckNodesResult {
