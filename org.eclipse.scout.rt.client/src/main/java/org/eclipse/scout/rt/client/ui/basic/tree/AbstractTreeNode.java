@@ -71,6 +71,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private int m_initializing = 0; // >0 is true
   private ITree m_tree;
   private ITreeNode m_parentNode;
+  private ITreeNode m_oldParentNode;
   private final OptimisticLock m_childrenLoadedLock;
   private final Cell m_cell;
 
@@ -784,7 +785,15 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    */
   @Override
   public void setParentNodeInternal(ITreeNode parent) {
+    if (parent == null && m_parentNode != null) {
+      m_oldParentNode = m_parentNode;
+    }
     m_parentNode = parent;
+  }
+
+  @Override
+  public ITreeNode getOldParentNode() {
+    return m_oldParentNode;
   }
 
   @Override
