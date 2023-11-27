@@ -278,8 +278,7 @@ public class OwaspDeserializationTest {
         "(byte|char|short|int|long|double|float|boolean)",
         "java\\..*",
         "org\\.eclipse\\.scout\\..*",
-        "org\\.eclipsescout\\..*",
-        "net\\.sourceforge\\.spnego\\.SpnegoAuthenticatorWithCache.*");
+        "org\\.eclipsescout\\..*");
     List<String> classpath = SerializationTestUtility.collectAllSerializableClasses();
     String report = SerializationTestUtility.createVulnerabilityReport(classpath, whitelist);
     System.out.println(report);

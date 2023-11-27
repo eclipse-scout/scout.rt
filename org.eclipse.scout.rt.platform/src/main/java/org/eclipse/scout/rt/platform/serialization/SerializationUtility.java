@@ -90,7 +90,6 @@ public final class SerializationUtility {
   java\..*
   org\.eclipse\.scout\..*
   org\.eclipsescout\..*
-  net\.sourceforge\.spnego\.SpnegoAuthenticatorWithCache.*
    * </pre>
    *
    * @since 11.0
@@ -101,8 +100,7 @@ public final class SerializationUtility {
         "(byte|char|short|int|long|double|float|boolean)",
         "java\\..*",
         "org\\.eclipse\\.scout\\..*",
-        "org\\.eclipsescout\\..*",
-        "net\\.sourceforge\\.spnego\\.SpnegoAuthenticatorWithCache.*");
+        "org\\.eclipsescout\\..*");
   }
 
   /**
