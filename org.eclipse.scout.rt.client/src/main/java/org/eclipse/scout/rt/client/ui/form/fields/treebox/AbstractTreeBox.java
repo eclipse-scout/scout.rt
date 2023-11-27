@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNodeBuilder;
+import org.eclipse.scout.rt.client.ui.basic.tree.AutoCheckStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
@@ -789,11 +790,13 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
+  @Deprecated
   public boolean isAutoCheckChildNodes() {
     return getTree().isAutoCheckChildNodes();
   }
 
   @Override
+  @Deprecated
   public void setAutoCheckChildNodes(boolean b) {
     getTree().setAutoCheckChildNodes(b);
   }
@@ -905,12 +908,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       };
       getTree().visitTree(v);
       // Checking nodes by model should not auto-check child nodes
-      boolean autoCheckChildNodes = getTree().isAutoCheckChildNodes();
-      getTree().setAutoCheckChildNodes(false);
+      AutoCheckStyle autoCheckStyle = getTree().getAutoCheckStyle();
+      getTree().setAutoCheckStyle(AutoCheckStyle.NONE);
       for (ITreeNode node : checkedNodes) {
         node.setChecked(true);
       }
-      getTree().setAutoCheckChildNodes(autoCheckChildNodes);
+      getTree().setAutoCheckStyle(autoCheckStyle);
       if (!getTree().isCheckable()) {
         getTree().selectNodes(checkedNodes, false);
       }
