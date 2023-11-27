@@ -104,7 +104,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         typesToDelete.addAll(getExpansionRelatedEvents());
       }
       else if ((type == TreeEvent.TYPE_NODES_DELETED || type == TreeEvent.TYPE_ALL_CHILD_NODES_DELETED) && event.hasNodes()) {
-        // Built a set of all nodes that were newly added to the tree.
+        // Build a set of all nodes that were newly added to the tree.
         // (This will only be required when processing delete events, therefore we create it lazily here.)
         if (newNodes == null) {
           newNodes = new HashSet<>();
@@ -620,7 +620,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         // is a directly inserted node. The nodeToRemove will then not be contained in the insertion
         // event, but because one of its parents was inserted recently, the deletion event is not
         // required anymore (the insertion event does not contain deleted nodes).
-        ITreeNode parentToCheck = nodeToRemove.getParentNode();
+        ITreeNode parentToCheck = ObjectUtility.nvl(nodeToRemove.getParentNode(), nodeToRemove.getOldParentNode());
         while (parentToCheck != null) {
           if (event.containsNode(parentToCheck)) {
             it.remove();
@@ -628,7 +628,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
             updateNodesToRemove(nodeToRemove);
             break;
           }
-          parentToCheck = parentToCheck.getParentNode();
+          parentToCheck = ObjectUtility.nvl(parentToCheck.getParentNode(), parentToCheck.getOldParentNode());
         }
       }
       return m_allNodesToRemove.isEmpty();

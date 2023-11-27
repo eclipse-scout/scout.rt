@@ -252,6 +252,11 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
   ITreeNode getParentNode();
 
   /**
+   * @return the parent node before the node was deleted.
+   */
+  ITreeNode getOldParentNode();
+
+  /**
    * @return the immediate parent node if it is of type T, null otherwise
    */
   <T extends ITreeNode> T getParentNode(Class<T> type);
