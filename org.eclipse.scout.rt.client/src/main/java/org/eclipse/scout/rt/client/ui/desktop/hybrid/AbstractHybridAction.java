@@ -70,7 +70,7 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
     hybridManager().addWidget(getId(), widget);
   }
 
-  protected void addWidgets(Map<String, IWidget> widgets) {
+  protected void addWidgets(Map<String, ? extends IWidget> widgets) {
     assertInitialized();
     hybridManager().addWidgets(Optional.ofNullable(widgets).orElse(Map.of())
         .entrySet().stream()
