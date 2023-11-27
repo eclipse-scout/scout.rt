@@ -139,6 +139,10 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   void setVisibleGranted(boolean b);
 
+  <T extends IPage> List<T> findPages(Class<T> pageType);
+
+  <T extends IPage> List<T> findPages(Class<T> pageType, IPage rootPage);
+
   void setVisiblePermission(Permission p);
 
   boolean isNavigateButtonsVisible();

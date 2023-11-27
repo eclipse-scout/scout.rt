@@ -476,6 +476,30 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
+  public <T extends IPage> List<T> findPages(final Class<T> pageType) {
+    return findPages(pageType, getRootPage());
+  }
+
+  @Override
+  public <T extends IPage> List<T> findPages(final Class<T> pageType, IPage rootPage) {
+    final List<T> result = CollectionUtility.emptyArrayList();
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
+      @Override
+      @SuppressWarnings("unchecked")
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        IPage<?> page = (IPage) element;
+        Class<? extends IPage> pageClass = page.getClass();
+        if (pageType.isAssignableFrom(pageClass)) {
+          result.add((T) page);
+        }
+        return TreeVisitResult.CONTINUE;
+      }
+    };
+    visitNode(rootPage, v);
+    return result;
+  }
+
+  @Override
   public void setVisiblePermission(Permission p) {
     boolean b = true;
     if (p != null) {
