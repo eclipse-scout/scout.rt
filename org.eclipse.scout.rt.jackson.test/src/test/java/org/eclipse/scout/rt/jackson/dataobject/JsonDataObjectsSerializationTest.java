@@ -1797,6 +1797,24 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testSerializeDeserialize_RawEntityWithDouble() throws  Exception {
+    DoEntity entity = BEANS.get(DoEntity.class);
+    entity.put("attribute", 45.69);
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    DoEntity doMarshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+    assertEquals(new BigDecimal("45.69"), doMarshalled.get("attribute"));
+  }
+
+  @Test
+  public void testSerializeDeserialize_RawEntityWithDoubleList() throws  Exception {
+    DoEntity entity = BEANS.get(DoEntity.class);
+    entity.put("attribute", List.of(45.69));
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    DoEntity doMarshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+    assertEquals(new BigDecimal("45.69"), doMarshalled.getList("attribute").get(0));
+  }
+
+  @Test
   public void testSerializeDeserialize_TestMapDo() throws Exception {
     TestMapDo mapDo = new TestMapDo();
     Map<String, String> stringStringMap = new HashMap<>();
@@ -3141,27 +3159,28 @@ public class JsonDataObjectsSerializationTest {
     assertArrayEquals(exception.getStackTrace(), marshalled.getException().getStackTrace());
   }
 
+  /**
+   * {@link Optional} is currently not serializable/deserializable using Scout Jackson implementation.
+   */
   @Test
   public void testSerializeDeserializeOptionalDo() throws Exception {
     @SuppressWarnings("unchecked")
     TestOptionalDo optional = BEANS.get(TestOptionalDo.class)
-        .withOptString(Optional.ofNullable(null))
-        .withOptStringList(Optional.empty(), Optional.ofNullable("foo"));
-    String json = s_dataObjectMapper.writeValueAsString(optional);
+        .withOptString(Optional.empty())
+        .withOptStringList(Optional.empty(), Optional.of("foo"));
 
-    // currently serializable using Scout Jackson implementation, but without values, e.g. useless!
-    assertJsonEquals("TestOptionalDo.json", json);
+    // Expect:
+    // com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 optional type `java.util.Optional<java.lang.String>`
+    // not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jdk8" to enable handling
+    JsonMappingException writeException = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.writeValueAsString(optional));
+    assertTrue("expected InvalidDefinitionException, got " + writeException, writeException instanceof InvalidDefinitionException);
 
-    // currently not deserializable using Scout Jackson implementation
+    // Expect:
+    // com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 optional type `java.util.Optional<java.lang.String>`
+    // not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jdk8" to enable handling
+    String json = readResourceAsString("TestOptionalDo.json");
     JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
-
-    // TODO [23.1] pbz remove when JDK 11 is no longer supported
-    if ("11".equals(System.getProperty("java.specification.version"))) {
-      assertTrue("expected cause UnrecognizedPropertyException, got " + exception.getCause(), exception.getCause() instanceof UnrecognizedPropertyException);
-    }
-    else {
-      assertTrue("expected cause InvalidDefinitionException, got " + exception.getCause(), exception.getCause() instanceof InvalidDefinitionException);
-    }
+    assertTrue("expected InvalidDefinitionException, got " + exception.getCause(), exception.getCause() instanceof InvalidDefinitionException);
   }
 
   @Test

@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.function.Supplier;
 
@@ -74,8 +75,17 @@ public class DoCollectionDeserializer<COLLECTION_NODE extends IDoCollection<?, ?
     }
     else {
       // all JSON scalar values are deserialized as bound type (if available) and as fallback as raw object using default jackson typing
-      return ObjectUtility.nvl(m_collectionType.getBindings().getBoundType(0), TypeFactory.unknownType());
+      return ObjectUtility.nvl(m_collectionType.getBindings().getBoundType(0), resolveFallbackListElementType(p));
     }
+  }
+
+  protected ResolvedType resolveFallbackListElementType(JsonParser p) {
+    if (p.getCurrentToken() == JsonToken.VALUE_NUMBER_FLOAT) {
+      // deserialize floating point numbers as BigDecimal
+      return TypeFactory.defaultInstance().constructType(BigDecimal.class);
+    }
+    // JSON scalar values are deserialized as raw object using default jackson typing
+    return TypeFactory.unknownType();
   }
 
   @Override
