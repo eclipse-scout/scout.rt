@@ -2713,7 +2713,7 @@ export class Tree extends Widget implements TreeModel {
 
     // All children checked
     if (childrenFullyCheckedCount === childrenCount && autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
-      let update = this._checkNode(node, true);
+      let update = this._checkNode(node, true, false);
       updatedNodes.add(update);
 
       if (node.childrenChecked) {
