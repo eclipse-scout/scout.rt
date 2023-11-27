@@ -958,27 +958,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     resetFilterCache();
   }
 
-  /**
-   * do not use this internal method
-   */
-  public final void replaceChildNodeInternal(int index, ITreeNode newNode) {
-    ITreeNode oldNode;
-    synchronized (m_childNodeListLock) {
-      //remove old
-      oldNode = m_childNodeList.get(index);
-      oldNode.setTreeInternal(null, true);
-      oldNode.setParentNodeInternal(null);
-      //add new
-      m_childNodeList.set(index, newNode);
-      newNode.setTreeInternal(m_tree, true);
-      newNode.setParentNodeInternal(this);
-      m_childNodeList.get(index).setChildNodeIndexInternal(index);
-    }
-    postProcessRemoveRec(oldNode, m_tree, true, true);
-    postProcessAddRec(newNode, true);
-    resetFilterCache();
-  }
-
   private void postProcessAddRec(ITreeNode node, boolean includeSubtree) {
     if (node.getTree() != null) {
       try {
