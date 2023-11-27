@@ -33,8 +33,8 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
   protected void initConfig() {
     super.initConfig();
     m_implementorContextProperties.put(PROP_HTTP_RESPONSE_CODE, "org.apache.cxf.message.Message.RESPONSE_CODE");
-    m_implementorContextProperties.put(PROP_SOCKET_CONNECT_TIMEOUT, "javax.xml.ws.client.connectionTimeout");
-    m_implementorContextProperties.put(PROP_SOCKET_READ_TIMEOUT, "javax.xml.ws.client.receiveTimeout");
+    m_implementorContextProperties.put(PROP_SOCKET_CONNECT_TIMEOUT, "jakarta.xml.ws.client.connectionTimeout");
+    m_implementorContextProperties.put(PROP_SOCKET_READ_TIMEOUT, "jakarta.xml.ws.client.receiveTimeout");
   }
 
   @Override

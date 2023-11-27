@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Proxy;
 import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -177,7 +178,7 @@ public abstract class AbstractJaxWsClientTest {
       fail("invocation is expected to be cancelled");
     }
     catch (WebServiceException e) {
-      if (!(e.getCause() instanceof SocketTimeoutException)) {
+      if (!isTimeoutCause(e)) {
         throw e;
       }
     }
@@ -289,7 +290,7 @@ public abstract class AbstractJaxWsClientTest {
       fail("invocation is expected to be cancelled");
     }
     catch (WebServiceException e) {
-      if (!(e.getCause() instanceof SocketTimeoutException)) {
+      if (!isTimeoutCause(e)) {
         throw e;
       }
     }
@@ -324,7 +325,7 @@ public abstract class AbstractJaxWsClientTest {
       fail("invocation is expected to be cancelled");
     }
     catch (WebServiceException e) {
-      if (!(e.getCause() instanceof SocketTimeoutException)) {
+      if (!isTimeoutCause(e)) {
         throw e;
       }
     }
@@ -439,7 +440,7 @@ public abstract class AbstractJaxWsClientTest {
       fail("invocation is expected to be cancelled");
     }
     catch (WebServiceException e) {
-      if (!(e.getCause() instanceof SocketTimeoutException)) {
+      if (!isTimeoutCause(e)) {
         throw e;
       }
     }
@@ -692,5 +693,9 @@ public abstract class AbstractJaxWsClientTest {
     else {
       assertNotSame(p0, p1);
     }
+  }
+
+  protected boolean isTimeoutCause(WebServiceException e) {
+    return e.getCause() instanceof SocketTimeoutException || e.getCause() instanceof HttpTimeoutException;
   }
 }
