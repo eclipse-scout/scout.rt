@@ -825,6 +825,51 @@ public class JsonTreeTest {
   }
 
   @Test
+  public void testInsertAndDeleteChildrenInSameRequest() {
+    ITree tree = new Tree();
+    tree.setRootNode(new TreeNode("Root"));
+
+    IJsonAdapter<? super ITree> jsonTree = m_uiSession.createJsonAdapter(tree, new JsonAdapterMock());
+    m_uiSession.currentJsonResponse().addAdapter(jsonTree);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #1: " + response);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------------
+
+    // (root)
+    //   +-[A]
+    //      +-[B]
+    //        +-[C]
+    ITreeNode nodeA = new TreeNode("A");
+    ITreeNode nodeB = new TreeNode("B");
+    ITreeNode nodeC = new TreeNode("C");
+
+    // Insert A, B and C in one "tree changing" batch
+    tree.setTreeChanging(true);
+    tree.addChildNode(tree.getRootNode(), nodeA);
+    tree.addChildNode(nodeA, nodeB);
+    tree.addChildNode(nodeB, nodeC);
+    tree.setTreeChanging(false);
+
+    // Remove all child nodes of B (-> C)
+    tree.removeAllChildNodes(nodeB);
+    assertEquals(0, nodeB.getChildNodeCount());
+
+    // Process the buffer
+    // -> TreeEventBuffer should remove delete event
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(1, events.size());
+    assertEquals("nodesInserted", events.get(0).getType());
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #2: " + response);
+    JsonTestUtility.endRequest(m_uiSession);
+  }
+
+
+  @Test
   public void testDeletionOfAllChildrenOfUnknownNode() {
     IOutline outline = new Outline(new ArrayList<>());
 
