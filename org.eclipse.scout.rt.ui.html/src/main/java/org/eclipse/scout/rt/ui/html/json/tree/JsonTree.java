@@ -181,12 +181,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         return getModel().isLazyExpandingEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<>(ITree.PROP_AUTO_CHECK_CHILDREN, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isAutoCheckChildNodes();
-      }
-    });
     putJsonProperty(new JsonProperty<>(ITree.PROP_AUTO_CHECK_STYLE, model) {
       @Override
       protected AutoCheckStyle modelValue() {

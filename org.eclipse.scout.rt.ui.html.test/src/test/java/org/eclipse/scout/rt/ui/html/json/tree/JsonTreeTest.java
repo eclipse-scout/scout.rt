@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.basic.tree.AutoCheckStyle;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
@@ -907,7 +908,7 @@ public class JsonTreeTest {
   public void testAllNodesUnchecked() {
     ITree tree = new Tree();
     tree.setRootNode(new TreeNode("Root"));
-    tree.setAutoCheckChildNodes(true);
+    tree.setAutoCheckStyle(AutoCheckStyle.CHILDREN);
     tree.setCheckable(true);
 
     ITreeNode parent = new TreeNode("Parent");

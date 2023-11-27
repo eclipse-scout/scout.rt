@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDragNodeChain;
@@ -353,6 +352,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
+  @Deprecated
   protected boolean getConfiguredAutoCheckChildNodes() {
     return false;
   }
@@ -451,13 +451,15 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
+  @Deprecated
   public boolean isAutoCheckChildNodes() {
-    return propertySupport.getPropertyBool(PROP_AUTO_CHECK_CHILDREN);
+    return getAutoCheckStyle().equals(AutoCheckStyle.CHILDREN);
   }
 
   @Override
+  @Deprecated
   public void setAutoCheckChildNodes(boolean b) {
-    propertySupport.setPropertyBool(PROP_AUTO_CHECK_CHILDREN, b);
+    setAutoCheckStyle(b ? AutoCheckStyle.CHILDREN : AutoCheckStyle.NONE);
   }
 
   @Override
@@ -576,16 +578,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   @ConfigOperation
   @Order(90)
   protected void execNodesChecked(List<ITreeNode> nodes) {
-  }
-
-  @ConfigOperation
-  protected void execAutoCheckChildNodes(List<? extends ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
-    for (ITreeNode node : nodes) {
-      for (ITreeNode childNode : node.getFilteredChildNodes()) {
-        childNode.setChecked(checked, enabledNodesOnly);
-        interceptAutoCheckChildNodes(CollectionUtility.arrayList(childNode), checked, enabledNodesOnly);
-      }
-    }
   }
 
   @Override
@@ -1466,20 +1458,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       }
     }
     if (!changedNodes.isEmpty()) {
-      if (isAutoCheckChildNodes() && isMultiCheck()) {
-        if (m_currentParentNodes == null) {
-          m_currentParentNodes = nodes;
-        }
-        try {
-          interceptAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
-        }
-        catch (RuntimeException ex) {
-          BEANS.get(ExceptionHandler.class).handle(ex);
-        }
-        if (nodes.equals(m_currentParentNodes)) {
-          m_currentParentNodes = null;
-        }
-      }
       if (m_currentParentNodes == null) {
         fireNodesChecked(changedNodes);
       }
@@ -2415,12 +2393,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     chain.execNodesChecked(nodes);
   }
 
-  protected void interceptAutoCheckChildNodes(List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
-    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
-    TreeAutoCheckChildNodesChain chain = new TreeAutoCheckChildNodesChain(extensions);
-    chain.execAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
-  }
-
   private void fireNodeAction(ITreeNode node) {
     if (isActionRunning()) {
       return;
@@ -3085,11 +3057,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     @Override
     public void execNodesChecked(TreeNodesCheckedChain chain, List<ITreeNode> nodes) {
       getOwner().execNodesChecked(nodes);
-    }
-
-    @Override
-    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
-      getOwner().execAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
     }
   }
 
