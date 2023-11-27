@@ -2127,16 +2127,12 @@ export class Table extends Widget implements TableModel {
   }
 
   protected _showCellErrorForRow(row: TableRow) {
-    let $cells = this.$cellsForRow(row.$row),
-      that = this;
-
-    $cells.each(function(index) {
-      let $cell = $(this);
-      let cell = that.cellByCellIndex(index, row);
+    for (let column of this.visibleColumns()) {
+      let cell = this.cell(column, row);
       if (cell.errorStatus) {
-        that._showCellError(row, $cell, cell.errorStatus);
+        this._showCellError(row, this.$cell(column, row.$row), cell.errorStatus);
       }
-    });
+    }
   }
 
   protected _showCellError(row: TableRow, $cell: JQuery, errorStatus: Status) {
