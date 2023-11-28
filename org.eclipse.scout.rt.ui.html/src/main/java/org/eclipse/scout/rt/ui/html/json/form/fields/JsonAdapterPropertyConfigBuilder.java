@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,7 @@ public class JsonAdapterPropertyConfigBuilder {
 
   private static final JsonAdapterPropertyConfig GLOBAL = new JsonAdapterPropertyConfigBuilder().global().build();
 
-  private boolean m_global;
+  private Predicate<Object> m_global;
   private boolean m_disposeOnChange;
   private Predicate<?> m_filter;
 
@@ -26,8 +26,13 @@ public class JsonAdapterPropertyConfigBuilder {
   }
 
   public JsonAdapterPropertyConfigBuilder global() {
-    m_global = true;
+    m_global = model -> true;
     m_disposeOnChange = false;
+    return this;
+  }
+
+  public JsonAdapterPropertyConfigBuilder global(Predicate<Object> global) {
+    m_global = global;
     return this;
   }
 

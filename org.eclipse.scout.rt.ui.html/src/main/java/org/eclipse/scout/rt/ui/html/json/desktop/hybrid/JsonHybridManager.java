@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridEvent;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridEventListener;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridManager;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -72,8 +73,9 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
         return new JsonAdapterPropertyConfigBuilder()
-            .global()
-            .disposeOnChange(false)
+            // Create global adapters only for forms because forms initiate disposing by themselves.
+            // Every other adapter needs to be disposed by the hybrid manager
+            .global(model -> model instanceof IForm)
             .build();
       }
 
@@ -89,6 +91,18 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
         }
         if (modelValue instanceof Map) {
           ((Map<?, ?>) modelValue).values().forEach(this::createAdapter);
+          return;
+        }
+        throw new IllegalArgumentException("modelValue must be a Map");
+      }
+
+      @Override
+      protected void disposeObsoleteAdapters(Object newModels) {
+        if (newModels == null) {
+          return;
+        }
+        if (newModels instanceof Map) {
+          super.disposeObsoleteAdapters(((Map<?, ?>) newModels).values());
           return;
         }
         throw new IllegalArgumentException("modelValue must be a Map");

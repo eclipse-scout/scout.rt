@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 @SuppressWarnings("squid:S00118")
 public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MODEL_ELEMENT> {
   private final IUiSession m_uiSession;
-  private final boolean m_global;
+  private final Predicate<Object> m_global;
   private final boolean m_disposeOnChange;
   private final Predicate<Object> m_filter;
   private final Set<IJsonAdapter<?>> m_ownedAdapters = new HashSet<>();
@@ -31,7 +31,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
     super(propertyName, model);
     m_uiSession = session;
     JsonAdapterPropertyConfig config = createConfig();
-    m_global = config.isGlobal();
+    m_global = config.getGlobal();
     m_disposeOnChange = config.isDisposeOnChange();
     m_filter = config.getFilter();
   }
@@ -45,7 +45,14 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   }
 
   protected boolean isGlobal() {
-    return m_global;
+    return isGlobal(null);
+  }
+
+  /**
+   * @return true whether a global adapter should be created for the given model.
+   */
+  protected boolean isGlobal(Object model) {
+    return m_global.test(model);
   }
 
   public boolean isDisposeOnChange() {
@@ -102,7 +109,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
     if (!accept()) {
       return;
     }
-    if (m_global) {
+    if (isGlobal(model)) {
       m_uiSession.getRootJsonAdapter().attachAdapter(model, m_filter);
     }
     else {
