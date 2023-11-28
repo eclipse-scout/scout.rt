@@ -10,9 +10,9 @@
   },
   "license": "EPL-2.0",
   "engines": {
-    "node": ">=18.12.1",
-    "npm": ">=9.1.1",
-    "pnpm": ">=7.16.0"
+    "node": ">=20.10.0",
+    "npm": ">=10.2.3",
+    "pnpm": ">=8.11.0"
   },
   "main": "./src/main/js/index.ts",
   "publishConfig": {
