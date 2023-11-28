@@ -535,7 +535,7 @@ public class JSONArrayTest extends TestCase {
   }
 
   public void testCreate() throws JSONException {
-    JSONArray array = new JSONArray(Arrays.asList(5.5, true));
+    JSONArray array = new JSONArray(Arrays.<Object>asList(5.5, true));
     assertEquals(2, array.length());
     assertEquals(5.5, array.getDouble(0));
     assertEquals(true, array.get(1));
