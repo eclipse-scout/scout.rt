@@ -236,7 +236,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   protected void handleLogRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonRequest) throws IOException {
-    String message = jsonRequest.getMessage();
+    String message = truncateLogMessage(jsonRequest.getMessage());
     JSONObject event = jsonRequest.getEvent();
     String level = ObjectUtility.nvl(jsonRequest.getRequestObject().optString("level"), "error").toLowerCase();
     String header = "JavaScript log message";
@@ -249,10 +249,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       header += " while processing event " + type + " for adapter " + uiSession.getJsonAdapter(target);
     }
     message = header + "\n" + message;
-    if (message.length() > 10000) {
-      // Truncate the message to prevent log inflation by malicious log requests
-      message = message.substring(0, 10000) + "...";
-    }
     switch (level) {
       case "trace":
         LOG.trace(message);
@@ -271,6 +267,14 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         break;
     }
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse());
+  }
+
+  protected String truncateLogMessage(String message) {
+    if (message.length() > 10_000) {
+      // Truncate the message to prevent log inflation by malicious log requests
+      return message.substring(0, 10_000) + "...";
+    }
+    return message;
   }
 
   protected void handleCancelRequest(HttpServletResponse resp, IUiSession uiSession) throws IOException {
