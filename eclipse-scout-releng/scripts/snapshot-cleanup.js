@@ -49,7 +49,7 @@ const getSnapshots = async (artifactoryUrl, repoName, config, verbose) => {
 
   if (data && data.results) {
     for (const item of data.results) {
-      // group the snapshots by package and version to ensure that old versions wont be deleted e.g. groupName = @scout/cli-10.0.0
+      // group the snapshots by package and version to ensure that old versions won't be deleted e.g. groupName = @scout/cli-10.0.0
       const groupName = `${getScopeName(item.path)}/${getPackageName(item.name)}`;
 
       let groupSet = snapshotMap.get(groupName);

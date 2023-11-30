@@ -758,29 +758,7 @@ JMS (1.1)
 
 * License: Common Development and Distribution License
 
-jquery (2.1.1)
-
-* License: MIT License
-
-jquery (2.1.4)
-
-* License: MIT License
-* Project: https://jquery.com/
-* Source: http://code.jquery.com/jquery-2.1.4.js
-
-jquery (3.2.1)
-
-* License: MIT
-* Project: https://jquery.com/
-* Source: http://code.jquery.com/jquery-3.2.1.js
-
-jQuery (3.3.1)
-
-* License: MIT
-* Project: http://jquery.com/
-* Source: https://github.com/jquery/jquery/tree/3.3.1
-
-jQuery (3.4.1)
+jQuery (3.7.1)
 
 * License: MIT
 
@@ -849,7 +827,7 @@ JUnit (4.12)
 
 * License: Eclipse Public License
 
-less (1.7.4)
+less (4.2.0)
 
 * License: Apache License, 2.0
 * Project: http://lesscss.org/

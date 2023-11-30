@@ -119,7 +119,7 @@ In order to run the TypeScript migration, do the following:
 - Ensure you have a clean Git working tree (no uncommitted files).
 - Create a `tsconfig.json` as described [here](#tsconfig)
 - Add scripts in your `package.json` as described below.
-- Add an `override` in your `package.json` to fix the TypeScript version to 4.8.3 (the migrate tool will skip some migrations and print a warning about the wrong version otherwise). This is only needed for the migration and has to be
+- Add an `override` in your `package.json` to fix the TypeScript version to 5.3.2 (the migrate tool will skip some migrations and print a warning about the wrong version otherwise). This is only needed for the migration and has to be
   removed afterwards.
 - Adjust the module map as described in the chapter [Module Map](#module-map)
 - Add custom type maps if you have a large code base and would like to automate a little more, see [Type Map](#type-map)
@@ -150,7 +150,7 @@ In order to run the TypeScript migration, do the following:
   },
   "pnpm": {
     "overrides": {
-      "typescript": "4.8.3"
+      "typescript": "5.3.2"
     }
   }
 }
