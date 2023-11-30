@@ -2625,7 +2625,7 @@ export class Tree extends Widget implements TreeModel {
       }
 
       // Step 3: Update parent nodes
-      let updatedParents = this._checkParentsRecursive(node, opts.autoCheckStyle, true);
+      let updatedParents = this._checkParentsRecursive(node, opts, true);
       updatedNodes.add(updatedParents);
     });
 
@@ -2648,7 +2648,7 @@ export class Tree extends Widget implements TreeModel {
     parentNode.childNodes.forEach(node => {
 
       // Update node if possible
-      let update = this._checkNode(node, opts.checked);
+      let update = this._checkNode(node, opts.checked, opts.checkOnlyEnabled);
       updatedNodes.add(update);
 
       // Remove children checked status
@@ -2668,15 +2668,16 @@ export class Tree extends Widget implements TreeModel {
     });
 
     if (hasDisabledNodes) {
-      let updatedParents = this._checkParentsRecursive(parentNode, opts.autoCheckStyle);
+      let updatedParents = this._checkParentsRecursive(parentNode, opts);
       updatedNodes.add(updatedParents);
     }
 
     return updatedNodes;
   }
 
-  protected _checkParentsRecursive(node: TreeNode, autoCheckStyle: AutoCheckStyle = this.autoCheckStyle, checkParentsAnyways = false): TreeCheckNodesResult {
+  protected _checkParentsRecursive(node: TreeNode, opts: TreeNodeCheckOptions = {}, checkParentsAnyways = false): TreeCheckNodesResult {
     let updatedNodes = new TreeCheckNodesResult();
+    let autoCheckStyle = opts.autoCheckStyle || this.autoCheckStyle;
     let children = node.childNodes;
     let childrenCount = children.length;
     let childrenCheckedCount = children.filter(n => n.checked || n.childrenChecked).length;
@@ -2686,7 +2687,7 @@ export class Tree extends Widget implements TreeModel {
     if (childrenCount === 0) {
       // Jump directly to its parent, when available
       if (node.parentNode) {
-        return this._checkParentsRecursive(node.parentNode, autoCheckStyle);
+        return this._checkParentsRecursive(node.parentNode, opts);
       }
       return updatedNodes;
     }
@@ -2697,7 +2698,7 @@ export class Tree extends Widget implements TreeModel {
       updatedNodes.addNodeForRendering(node);
     }
     if (autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT && childrenCheckedCount === 0) {
-      let update = this._checkNode(node, false);
+      let update = this._checkNode(node, false, false);
       updatedNodes.add(update);
     }
 
@@ -2706,7 +2707,7 @@ export class Tree extends Widget implements TreeModel {
       node.childrenChecked = true;
       updatedNodes.addNodeForRendering(node);
       if (autoCheckStyle === Tree.AutoCheckStyle.CHILDREN_AND_PARENT) {
-        let update = this._checkNode(node, false);
+        let update = this._checkNode(node, false, opts.checkOnlyEnabled);
         updatedNodes.add(update);
       }
     }
@@ -2724,7 +2725,7 @@ export class Tree extends Widget implements TreeModel {
 
     // Update parent, if this node has been updated or checkParentsAnyways flag is set
     if ((updatedNodes.getNodesForRendering().length > 0 || checkParentsAnyways) && node.parentNode) {
-      let parentUpdatedNodes = this._checkParentsRecursive(node.parentNode, autoCheckStyle);
+      let parentUpdatedNodes = this._checkParentsRecursive(node.parentNode, opts);
       updatedNodes.add(parentUpdatedNodes);
     }
 
