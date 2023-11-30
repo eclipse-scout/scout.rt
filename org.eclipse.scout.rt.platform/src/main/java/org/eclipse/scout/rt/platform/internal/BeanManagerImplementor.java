@@ -63,9 +63,9 @@ public class BeanManagerImplementor implements IBeanManager {
   }
 
   protected <T> List<IBean<T>> querySingle(Class<T> beanClazz) {
+    checkAccess();
     m_lock.readLock().lock();
     try {
-      checkAccess();
       @SuppressWarnings("unchecked")
       BeanHierarchy<T> h = m_beanHierarchies.get(beanClazz);
       if (h == null) {
