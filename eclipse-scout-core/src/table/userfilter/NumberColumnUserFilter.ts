@@ -40,7 +40,7 @@ export class NumberColumnUserFilter extends ColumnUserFilter implements NumberCo
     return objects.isNumber(this.numberFrom) || objects.isNumber(this.numberTo);
   }
 
-  override acceptByFields(key: any, normKey: number | string, row: TableRow): boolean {
+  override acceptByFields(key: any, normKey: number, row: TableRow): boolean {
     let
       hasFrom = objects.isNumber(this.numberFrom),
       hasTo = objects.isNumber(this.numberTo);

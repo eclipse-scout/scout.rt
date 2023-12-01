@@ -186,14 +186,21 @@ export class Planner extends Widget implements PlannerModel {
     });
   }
 
-  protected _initResource(resource: PlannerResource) {
+  protected _initResource(resource: PlannerResourceModel): PlannerResource {
     resource.activities.forEach(activity => this._initActivity(activity));
-    this.resourceMap[resource.id] = resource;
+    let res = resource as unknown as PlannerResource;
+    this.resourceMap[resource.id] = res;
+    return res;
   }
 
-  protected _initActivity(activity: PlannerActivity) {
-    activity.beginTime = dates.parseJsonDate(activity.beginTime as string);
-    activity.endTime = dates.parseJsonDate(activity.endTime as string);
+  protected _initActivity(activityModel: PlannerActivityModel) {
+    let activity = activityModel as unknown as PlannerActivity;
+    if (typeof activityModel.beginTime === 'string') {
+      activity.beginTime = dates.parseJsonDate(activityModel.beginTime);
+    }
+    if (typeof activityModel.endTime === 'string') {
+      activity.endTime = dates.parseJsonDate(activityModel.endTime);
+    }
     this.activityMap[activity.id] = activity;
   }
 
@@ -895,8 +902,8 @@ export class Planner extends Widget implements PlannerModel {
       backgroundColor = styles.modelToCssColor(activity.backgroundColor),
       foregroundColor = styles.modelToCssColor(activity.foregroundColor),
       levelColor = styles.modelToCssColor(activity.levelColor),
-      beginTime = activity.beginTime as Date,
-      endTime = activity.endTime as Date,
+      beginTime = activity.beginTime,
+      endTime = activity.endTime,
       begin = beginTime.valueOf(),
       end = endTime.valueOf();
 
@@ -1668,17 +1675,19 @@ export class Planner extends Widget implements PlannerModel {
     return deselected;
   }
 
-  insertResources(resources: PlannerResource[]) {
+  insertResources(resources: PlannerResourceModel[]) {
+    let allNew: PlannerResource[] = [];
     // Update model
     resources.forEach(resource => {
-      this._initResource(resource);
+      let res = this._initResource(resource);
+      allNew.push(res);
       // Always insert new rows at the end, if the order is wrong a rowOrderChanged event will follow
-      this.resources.push(resource);
+      this.resources.push(res);
     });
 
     // Update HTML
     if (this.rendered) {
-      this._renderResources(resources);
+      this._renderResources(allNew);
       this.invalidateLayoutTree();
     }
   }
@@ -1719,7 +1728,7 @@ export class Planner extends Widget implements PlannerModel {
     this.selectRange(new DateRange());
   }
 
-  updateResources(resources: PlannerResource[]) {
+  updateResources(resources: PlannerResourceModel[]) {
     resources.forEach(updatedResource => {
       let oldResource = this.resourceMap[updatedResource.id];
       if (!oldResource) {
@@ -1728,16 +1737,17 @@ export class Planner extends Widget implements PlannerModel {
 
       // Replace old resource
       this._initResource(updatedResource);
-      arrays.replace(this.resources, oldResource, updatedResource);
-      arrays.replace(this.selectedResources, oldResource, updatedResource);
+      let newResource = updatedResource as unknown as PlannerResource;
+      arrays.replace(this.resources, oldResource, newResource);
+      arrays.replace(this.selectedResources, oldResource, newResource);
 
       // Replace old $resource
       if (this.rendered && oldResource.$resource) {
-        let $updatedResource = $(this._buildResourceHtml(updatedResource));
+        let $updatedResource = $(this._buildResourceHtml(newResource));
         oldResource.$resource.replaceWith($updatedResource);
         $updatedResource.css('min-width', oldResource.$resource.css('min-width'));
-        this._linkResource($updatedResource, updatedResource);
-        this._linkActivitiesForResource(updatedResource);
+        this._linkResource($updatedResource, newResource);
+        this._linkActivitiesForResource(newResource);
       }
     });
   }
@@ -1748,7 +1758,7 @@ export type PlannerDirection = EnumObject<typeof Planner.Direction>;
 export type PlannerResourceSelectionMode = EnumObject<typeof Planner.ResourceSelectionMode>;
 export type PlannerMenuType = EnumObject<typeof Planner.MenuType>;
 
-export interface PlannerActivity {
+export interface PlannerActivityModel {
   id: string;
   beginTime: string | Date;
   endTime: string | Date;
@@ -1762,12 +1772,21 @@ export interface PlannerActivity {
   $activity?: JQuery;
 }
 
-export interface PlannerResource {
+export interface PlannerActivity extends PlannerActivityModel {
+  beginTime: Date;
+  endTime: Date;
+}
+
+export interface PlannerResourceModel {
   id: string;
-  resourceCell: CellModel<any>;
-  activities: PlannerActivity[];
+  resourceCell: CellModel;
+  activities: PlannerActivityModel[];
   $resource?: JQuery;
   $cells?: JQuery;
+}
+
+export interface PlannerResource extends PlannerResourceModel {
+  activities: PlannerActivity[];
 }
 
 export interface PlannerDisplayModeOptions {

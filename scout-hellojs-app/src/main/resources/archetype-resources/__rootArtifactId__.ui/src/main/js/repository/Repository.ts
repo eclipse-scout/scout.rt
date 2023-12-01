@@ -1,5 +1,5 @@
 import {ajax, dates, ObjectWithType, scout} from '@eclipse-scout/core';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export abstract class Repository implements ObjectWithType {
   objectType: string;

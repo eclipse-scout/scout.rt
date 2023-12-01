@@ -10,6 +10,7 @@
 
 // Extends Object is necessary to prevent weak type checking.
 // -> TS2559: Type 'xy' has no properties in common with type 'LayoutData' in implementing classes
+// eslint-disable-next-line @typescript-eslint/ban-types
 export interface LayoutData extends Object {
   isValidateRoot?(): boolean;
 }

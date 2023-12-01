@@ -966,30 +966,32 @@ export class ChartTableControl extends TableControl implements ChartTableControl
     }
   }
 
-  protected _formatLabel(label: number | string, axis: TableMatrixKeyAxis): string {
-    if (axis) {
-      if (axis.column instanceof DateColumn) {
-        label = label as number + axis.min;
-        if (label !== parseInt('' + label) || (axis.length < 2 && (label < axis.min || label > axis.max))) {
-          return null;
-        }
-      }
-      if (axis.indexOf(null) !== -1) {
-        if (label === axis.max) {
-          label = null;
-        } else if (label > axis.max) {
-          return null;
-        }
-      }
-      label = axis.format(label as number);
-      if (axis.isIcon) {
-        let icon = icons.parseIconId(label);
-        if (icon && icon.isFontIcon()) {
-          label = icon.iconCharacter;
-        }
+  protected _formatLabel(label: number, axis: TableMatrixKeyAxis): string {
+    if (!axis) {
+      return '' + label;
+    }
+
+    if (axis.column instanceof DateColumn) {
+      label = label + axis.min;
+      if (label !== parseInt('' + label) || (axis.length < 2 && (label < axis.min || label > axis.max))) {
+        return null;
       }
     }
-    return '' + label;
+    if (axis.indexOf(null) !== -1) {
+      if (label === axis.max) {
+        label = null;
+      } else if (label > axis.max) {
+        return null;
+      }
+    }
+    let formatted = axis.format(label);
+    if (axis.isIcon) {
+      let icon = icons.parseIconId(formatted);
+      if (icon && icon.isFontIcon()) {
+        formatted = icon.iconCharacter;
+      }
+    }
+    return formatted;
   }
 
   protected _adjustConfig(config: ChartConfig) {

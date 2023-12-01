@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {defaultValues, FullModelOf, ObjectFactory, Planner, PlannerAdapter, PlannerResource} from '../../src/index';
+import {defaultValues, FullModelOf, ObjectFactory, Planner, PlannerAdapter, PlannerResourceModel} from '../../src/index';
 
 describe('PlannerAdapter', () => {
   let session: SandboxSession;
@@ -53,7 +53,7 @@ describe('PlannerAdapter', () => {
     };
   }
 
-  function createResource(text?: string): PlannerResource {
+  function createResource(text?: string): PlannerResourceModel {
     return {
       id: ObjectFactory.get().createUniqueId(),
       resourceCell: {

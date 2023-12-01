@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DateRange, dates, ObjectFactory, Planner, PlannerModel, Widget} from '../../src/index';
+import {DateRange, dates, ObjectFactory, Planner, PlannerActivity, PlannerModel, PlannerResourceModel, Widget} from '../../src/index';
 import {ObjectType} from '../../src/ObjectFactory';
 import {PlannerResource} from '../../src/planner/Planner';
 import {InitModelOf} from '../../src/scout';
@@ -47,7 +47,7 @@ describe('Planner', () => {
     return model;
   }
 
-  function createResource(text?: string): PlannerResource {
+  function createResource(text?: string): PlannerResourceModel {
     return {
       id: ObjectFactory.get().createUniqueId(),
       resourceCell: {
@@ -75,7 +75,7 @@ describe('Planner', () => {
     return planner.$grid.find('.planner-resource');
   }
 
-  function find$ActivitiesForResource(resource: PlannerResource): JQuery {
+  function find$ActivitiesForResource(resource: PlannerResourceModel): JQuery {
     return resource.$cells.children('.planner-activity');
   }
 
@@ -89,9 +89,9 @@ describe('Planner', () => {
     beforeEach(() => {
       model = createPlannerModel(3);
       planner = createPlanner(model);
-      resource0 = model.resources[0];
-      resource1 = model.resources[1];
-      resource2 = model.resources[2];
+      resource0 = model.resources[0] as PlannerResource;
+      resource1 = model.resources[1] as PlannerResource;
+      resource2 = model.resources[2] as PlannerResource;
     });
 
     it('deletes resources from model', () => {
@@ -149,9 +149,9 @@ describe('Planner', () => {
     beforeEach(() => {
       model = createPlannerModel(3);
       planner = createPlanner(model);
-      resource0 = model.resources[0];
-      resource1 = model.resources[1];
-      resource2 = model.resources[2];
+      resource0 = model.resources[0] as PlannerResource;
+      resource1 = model.resources[1] as PlannerResource;
+      resource2 = model.resources[2] as PlannerResource;
     });
 
     it('updates resources in model', () => {
@@ -195,7 +195,7 @@ describe('Planner', () => {
       planner.updateResources([updatedResource]);
       $resource1 = find$Resources(planner).eq(1);
       $activity0 = find$ActivitiesForResource(updatedResource);
-      let updatedActivity = updatedResource.activities[0];
+      let updatedActivity = updatedResource.activities[0] as PlannerActivity;
       expect($activity0.text()).toBe('updated activity');
       expect($activity0[0]).toBe(updatedActivity.$activity[0]);
       expect($activity0.data('activity')).toBe(updatedActivity);

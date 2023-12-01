@@ -12,7 +12,7 @@ import {
   LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, Predicate, PropertyDecoration, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session,
   SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
   declare model: WidgetModel;

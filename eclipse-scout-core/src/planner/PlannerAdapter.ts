@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner, PlannerActivity, PlannerResource, PlannerResourcesSelectedEvent, RemoteEvent} from '../index';
+import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner, PlannerActivity, PlannerActivityModel, PlannerResource, PlannerResourceModel, PlannerResourcesSelectedEvent, RemoteEvent} from '../index';
 
 export class PlannerAdapter extends ModelAdapter {
   declare widget: Planner;
@@ -60,7 +60,7 @@ export class PlannerAdapter extends ModelAdapter {
     }
   }
 
-  protected _onResourcesInserted(resources: PlannerResource[]) {
+  protected _onResourcesInserted(resources: PlannerResourceModel[]) {
     this.widget.insertResources(resources);
   }
 
@@ -87,7 +87,7 @@ export class PlannerAdapter extends ModelAdapter {
     this.widget.selectResources(resources);
   }
 
-  protected _onResourcesUpdated(resources: PlannerResource[]) {
+  protected _onResourcesUpdated(resources: PlannerResourceModel[]) {
     this.widget.updateResources(resources);
   }
 
@@ -107,14 +107,14 @@ export class PlannerAdapter extends ModelAdapter {
     }
   }
 
-  protected static _initResourceRemote(this: Planner & { _initResourceOrig }, resource: PlannerResource) {
+  protected static _initResourceRemote(this: Planner & { _initResourceOrig }, resource: PlannerResourceModel) {
     if (this.modelAdapter) {
       defaultValues.applyTo(resource, 'Resource');
     }
     return this._initResourceOrig(resource);
   }
 
-  protected static _initActivityRemote(this: Planner & { _initActivityOrig }, activity: PlannerActivity) {
+  protected static _initActivityRemote(this: Planner & { _initActivityOrig }, activity: PlannerActivityModel) {
     if (this.modelAdapter) {
       defaultValues.applyTo(activity, 'Activity');
     }

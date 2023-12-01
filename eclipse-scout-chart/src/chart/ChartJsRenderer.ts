@@ -1074,10 +1074,10 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         let avg = (value.x[0] + value.x[1]) / 2;
         tooltipDirection = avg < 0 ? 'left' : 'right';
       } else {
-        tooltipDirection = value < 0 ? 'left' : 'right';
+        tooltipDirection = (value as number) < 0 ? 'left' : 'right';
       }
     } else if ((dataset.type || config.type) === Chart.Type.BAR) {
-      tooltipPosition = value < 0 ? 'bottom' : 'top';
+      tooltipPosition = (value as number) < 0 ? 'bottom' : 'top';
     } else if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
       let element = (chart.getDatasetMeta(datasetIndex).data[dataIndex] as unknown as ArcElement).getProps(['startAngle', 'endAngle']);
       let startAngle = element.startAngle,
