@@ -47,6 +47,8 @@ export interface FormEventMap extends WidgetEventMap {
   'propertyChange:displayHint': PropertyChangeEvent<DisplayHint>;
   'propertyChange:displayParent': PropertyChangeEvent<DisplayParent>;
   'propertyChange:displayViewId': PropertyChangeEvent<DisplayViewId>;
+  'propertyChange:exclusiveKey': PropertyChangeEvent<() => any>;
+  'propertyChange:formLoading': PropertyChangeEvent<boolean>;
   'propertyChange:headerVisible': PropertyChangeEvent<boolean>;
   'propertyChange:iconId': PropertyChangeEvent<string>;
   'propertyChange:maximized': PropertyChangeEvent<boolean>;
