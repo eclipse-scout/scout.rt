@@ -50,6 +50,11 @@
     <module>../org.eclipse.scout.rt.api</module>
     <module>../org.eclipse.scout.rt.api.data</module>
 
+    <module>../org.eclipse.scout.rt.app</module>
+    <module>../org.eclipse.scout.rt.app.test</module>
+    <module>../org.eclipse.scout.rt.app.test.affix</module>
+    <module>../org.eclipse.scout.rt.jetty</module>
+
     <module>../org.eclipse.scout.rt.mom.api</module>
     <module>../org.eclipse.scout.rt.mom.api.test</module>
     <module>../org.eclipse.scout.rt.mom.jms</module>
@@ -87,10 +92,6 @@
     <module>../org.eclipse.scout.rt.ui.html.test</module>
     <module>../org.eclipse.scout.rt.ui.html.selenium</module>
     <module>../org.eclipse.scout.rt.svg.ui.html</module>
-
-    <module>../org.eclipse.scout.dev.jetty</module>
-    <module>../org.eclipse.scout.dev.jetty.test</module>
-    <module>../org.eclipse.scout.dev.jetty.test.affix</module>
 
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout-core</module>
@@ -454,6 +455,27 @@
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.app</artifactId>
+        <version>24.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.app.test</artifactId>
+        <version>24.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.app.test.affix</artifactId>
+        <version>24.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.jetty</artifactId>
+        <version>24.1-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client</artifactId>
         <version>24.1-SNAPSHOT</version>
       </dependency>
@@ -499,21 +521,6 @@
         <version>24.1-SNAPSHOT</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.dev.jetty</artifactId>
-        <version>24.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.dev.jetty.test</artifactId>
-        <version>24.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.dev.jetty.test.affix</artifactId>
-        <version>24.1-SNAPSHOT</version>
-      </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.charsetdetect</artifactId>
