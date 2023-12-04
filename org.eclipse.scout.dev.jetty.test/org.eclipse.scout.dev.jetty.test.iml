@@ -12,23 +12,23 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.dev.jetty" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util-ajax:9.4.51.v20230217" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util-ajax:9.4.53.v20231009" level="project" />
     <orderEntry type="library" name="Maven: jakarta.servlet:jakarta.servlet-api:4.0.4" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-annotations:9.4.51.v20230217" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-annotations:9.4.53.v20231009" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:7.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-commons:7.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:7.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:7.3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-plus:9.4.51.v20230217" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-jndi:9.4.51.v20230217" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-plus:9.4.53.v20231009" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-jndi:9.4.53.v20231009" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.platform" />
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.2.1.Final" level="project" />
     <orderEntry type="library" name="Maven: jakarta.annotation:jakarta.annotation-api:1.3.5" level="project" />
