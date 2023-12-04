@@ -115,7 +115,7 @@
     <scout.base.version>22.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
-    <jetty.version>10.0.17</jetty.version>
+    <jetty.version>10.0.18</jetty.version>
     <slf4j.version>1.7.32</slf4j.version>
     <logback.version>1.2.10</logback.version>
     <jackson.bom.version>2.13.4.20221013</jackson.bom.version>
