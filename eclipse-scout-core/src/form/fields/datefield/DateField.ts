@@ -1205,7 +1205,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this.setSuppressStatus(FormField.SuppressStatus.ALL);
     let $predictionField = $inputField.clone()
       .addClass('predict')
-      .attr('tabIndex', '-1')
+      .attr('tabindex', '-1')
       .insertBefore($inputField);
     if ($inputField.hasClass('has-error')) {
       $predictionField.addClass('has-error');

@@ -736,15 +736,15 @@ $.fn.isVisibilityHidden = function() {
 };
 
 $.fn.setTabbable = function(tabbable) {
-  return this.attr('tabIndex', tabbable ? 0 : null);
+  return this.attr('tabindex', tabbable ? 0 : null);
 };
 
 $.fn.setTabbableOrFocusable = function(tabbable) {
-  return this.attr('tabIndex', tabbable ? 0 : -1);
+  return this.attr('tabindex', tabbable ? 0 : -1);
 };
 
 $.fn.isTabbable = function() {
-  return this.attr('tabIndex') >= 0;
+  return this.attr('tabindex') >= 0;
 };
 
 $.fn.placeholder = function(placeholder) {

@@ -116,7 +116,7 @@ export class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
     });
     this._filterField.render(this.$container);
 
-    this._filterField.$field.attr('tabIndex', -1);
+    this._filterField.$field.attr('tabindex', -1);
 
     if (!this.widget.rendered) {
       this.widget.session.layoutValidator.schedulePostValidateFunction(this._updateFilterFieldBackgroundColor.bind(this));
