@@ -97,7 +97,7 @@
     <scout.base.version>10.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
-    <jetty.version>9.4.51.v20230217</jetty.version>
+    <jetty.version>9.4.53.v20231009</jetty.version>
     <slf4j.version>1.7.36</slf4j.version>
     <logback.version>1.2.12</logback.version>
     <!-- careful: jackson breaks api with Double/BigDecimal from 2.11 to 2.12 -->
