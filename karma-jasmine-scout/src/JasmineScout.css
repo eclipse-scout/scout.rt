@@ -14,3 +14,7 @@
 .invisible {
   visibility: hidden !important; /* NOSONAR (!important is okay here) */
 }
+
+.sr-only {
+  display: none;
+}
