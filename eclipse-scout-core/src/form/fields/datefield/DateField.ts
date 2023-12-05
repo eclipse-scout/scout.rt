@@ -217,6 +217,8 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       this.$dateField = fields.makeInputOrDiv(this, 'date')
         .on('mousedown', this._onDateFieldMouseDown.bind(this))
         .appendTo(this.$field);
+      this._linkWithLabel(this.$dateField);
+      aria.addHiddenDescriptionAndLinkToElement(this.$dateField, this.id + '-date-func-desc', this.session.text('ui.AriaDateFieldDescription', this.dateFormatPattern));
       if (this.$timeField) {
         // make sure date field comes before time field, otherwise tab won't work as expected
         this.$dateField.insertBefore(this.$timeField);
@@ -228,8 +230,6 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
           .on('blur', this._onDateFieldBlur.bind(this))
           .on('focus', this._onDateFieldFocus.bind(this));
       }
-      this._linkWithLabel(this.$dateField);
-      aria.addHiddenDescriptionAndLinkToElement(this.$dateField, this.id + '-date-func-desc', this.session.text('ui.AriaDateFieldDescription', this.dateFormatPattern));
       HtmlComponent.install(this.$dateField, this.session);
 
       this.$dateFieldIcon = fields.appendIcon(this.$field, 'date')
@@ -271,6 +271,8 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       this.$timeField = fields.makeInputOrDiv(this, 'time')
         .on('mousedown', this._onTimeFieldMouseDown.bind(this))
         .appendTo(this.$field);
+      this._linkWithLabel(this.$timeField);
+      aria.addHiddenDescriptionAndLinkToElement(this.$timeField, this.id + '-time-func-desc', this.session.text('ui.AriaTimeFieldDescription', this.timeFormatPattern));
       if (this.$dateField) {
         // make sure time field comes after date field, otherwise tab won't work as expected
         this.$timeField.insertAfter(this.$dateField);
@@ -282,8 +284,6 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
           .on('blur', this._onTimeFieldBlur.bind(this))
           .on('focus', this._onTimeFieldFocus.bind(this));
       }
-      this._linkWithLabel(this.$timeField);
-      aria.addHiddenDescriptionAndLinkToElement(this.$timeField, this.id + '-time-func-desc', this.session.text('ui.AriaTimeFieldDescription', this.timeFormatPattern));
       HtmlComponent.install(this.$timeField, this.session);
 
       this.$timeFieldIcon = fields.appendIcon(this.$field, 'time')

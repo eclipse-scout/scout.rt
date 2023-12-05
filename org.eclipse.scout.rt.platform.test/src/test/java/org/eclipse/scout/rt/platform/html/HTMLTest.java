@@ -79,7 +79,7 @@ public class HTMLTest {
   @Test
   public void testImageNoBinds() {
     String html = HTML.img("logo.png").toHtml();
-    assertEquals("<img src=\"logo.png\">", html);
+    assertEquals("<img src=\"logo.png\" alt=\"\">", html);
   }
 
   @Test
@@ -323,7 +323,7 @@ public class HTMLTest {
 
   @Test
   public void testIconFromImage() {
-    assertEquals("<img src=\"iconId:logo\">", HTML.icon("logo").toHtml());
+    assertEquals("<img src=\"iconId:logo\" alt=\"\">", HTML.icon("logo").toHtml());
   }
 
   @Test

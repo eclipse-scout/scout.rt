@@ -49,14 +49,14 @@ public class JsonHtmlFieldTest extends BaseFormFieldTest {
     m_model.setDisplayText(HTML.imgByIconId("test_icon").toHtml());
     JSONObject json = m_htmlField.toJson();
     // currently no icon provider services are available during html ui test, therefore any icon string should be replaced by null
-    assertEquals("<img src=\"null\">", json.get(IHtmlField.PROP_DISPLAY_TEXT));
+    assertEquals("<img src=\"null\" alt=\"\">", json.get(IHtmlField.PROP_DISPLAY_TEXT));
   }
 
   @Test
   public void testToImageByBinaryResourceReplacement() throws JSONException {
     m_model.setDisplayText(HTML.imgByBinaryResource("test_resource").toHtml());
     JSONObject json = m_htmlField.toJson();
-    assertEquals("<img src=\"dynamic/" + m_session.getUiSessionId() + "/" + m_htmlField.getId() + "/test_resource\">", json.get(IHtmlField.PROP_DISPLAY_TEXT));
+    assertEquals("<img src=\"dynamic/" + m_session.getUiSessionId() + "/" + m_htmlField.getId() + "/test_resource\" alt=\"\">", json.get(IHtmlField.PROP_DISPLAY_TEXT));
   }
 
 }
