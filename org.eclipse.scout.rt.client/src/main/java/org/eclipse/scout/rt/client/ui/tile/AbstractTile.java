@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileLoadDataTile
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
@@ -347,7 +348,11 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
-    return getParent().classId() + ID_CONCAT_SYMBOL + simpleClassId;
+    IWidget parent = getParent();
+    if (parent == null) {
+      return simpleClassId;
+    }
+    return parent.classId() + ID_CONCAT_SYMBOL + simpleClassId;
   }
 
   @Override
