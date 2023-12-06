@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.http.HttpCookie.SameSite;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.Handler;
@@ -55,6 +56,8 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationKeyStorePa
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationPortProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationPrivateKeyPasswordProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigHttpOnlyProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSameSiteProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutInSecondsProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationWebappDirectoryProperty;
@@ -71,7 +74,6 @@ import org.eclipse.scout.rt.platform.config.PropertiesHelper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.ICertificateProvider;
-import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -366,7 +368,7 @@ public class Application {
     }
     else {
       // use non web.xml mode
-      boolean sessionEnabled = BooleanUtility.nvl(CONFIG.getPropertyValue(ScoutApplicationHttpSessionEnabledProperty.class));
+      boolean sessionEnabled = CONFIG.getPropertyValue(ScoutApplicationHttpSessionEnabledProperty.class);
       LOG.info("Creating servlet context handler (non-resource-based) with {}", sessionEnabled ? "sessions" : "no sessions");
 
       handler = new ServletContextHandler(sessionEnabled ? ServletContextHandler.SESSIONS : ServletContextHandler.NO_SESSIONS);
@@ -376,13 +378,27 @@ public class Application {
       if (sessionEnabled) {
         // See https://github.com/jetty/jetty.project/blob/jetty-11.0.18/jetty-webapp/src/main/java/org/eclipse/jetty/webapp/StandardDescriptorProcessor.java#L650
         // for how session properties are applied from web.xml to Java classes.
+        int sessionTimeoutInSeconds = CONFIG.getPropertyValue(ScoutApplicationSessionTimeoutInSecondsProperty.class);
+        boolean httpOnly = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigHttpOnlyProperty.class);
+        boolean secure = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSecureProperty.class);
+        SameSite sameSite = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSameSiteProperty.class);
+
+        LOG.info("[Session config] timeout: {} s, HTTP only: {}, secure: {}, same site: {}", sessionTimeoutInSeconds, httpOnly, secure, sameSite.getAttributeValue());
+
         SessionHandler sessionHandler = handler.getSessionHandler();
-        sessionHandler.setMaxInactiveInterval(CONFIG.getPropertyValue(ScoutApplicationSessionTimeoutInSecondsProperty.class));
-        sessionHandler.getSessionCookieConfig().setHttpOnly(BooleanUtility.nvl(CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigHttpOnlyProperty.class)));
+        sessionHandler.setMaxInactiveInterval(sessionTimeoutInSeconds);
+        sessionHandler.getSessionCookieConfig().setHttpOnly(httpOnly);
+        sessionHandler.getSessionCookieConfig().setSecure(secure);
+        sessionHandler.setSameSite(sameSite);
       }
     }
 
     handler.setDisplayName(CONFIG.getPropertyValue(ApplicationNameProperty.class));
+
+    // Prevent LogbackServletContainerInitializer to register LogbackServletContextListener as a listener which would shut down the logger facility to early,
+    // Scout platform handles shutdown of logging framework instead.
+    // Only relevant in case the dependency org.eclipse.jetty:jetty-annotations is on the classpath.
+    handler.setInitParameter("logbackDisableServletContainerInitializer", Boolean.TRUE.toString());
 
     // Register servlets/servlet filters
     BEANS.all(IServletContributor.class).forEach(c -> c.contribute(handler));

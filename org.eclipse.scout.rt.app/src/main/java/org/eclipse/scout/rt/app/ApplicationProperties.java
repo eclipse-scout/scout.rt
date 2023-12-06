@@ -11,8 +11,10 @@ package org.eclipse.scout.rt.app;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jetty.http.HttpCookie.SameSite;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
@@ -180,6 +182,57 @@ public final class ApplicationProperties {
     @Override
     public String description() {
       return "Specifies whether the HTTP session cookie is HTTP only or not. The default value is true.";
+    }
+  }
+
+  public static class ScoutApplicationSessionCookieConfigSecureProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.sessionCookieConfigSecure";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return !Platform.get().inDevelopmentMode(); // except for dev mode, use secure = true
+    }
+
+    @Override
+    public String description() {
+      return "Specifies whether any session tracking cookies created by the web application will be marked as secure. "
+          + "If true, the session tracking cookie will be marked as secure even if the request initiated the corresponding session using plain HTTP instead of HTTPS (e.g. Scout application behind reverse proxy terminating SSL). "
+          + "If false, the session tracking cookie will only be marked as secure if the request initiated the corresponding session is secure (using HTTPS). "
+          + "The default value is true for non-development mode.";
+    }
+  }
+
+  public static class ScoutApplicationSessionCookieConfigSameSiteProperty extends AbstractConfigProperty<SameSite, String> {
+
+    @Override
+    public String getKey() {
+      return "scout.app.sessionCookieConfigSameSite";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the SameSite attribute of the HTTP session cookie. Valid values are: "
+          + "'" + SameSite.NONE.getAttributeValue() + "', "
+          + "'" + SameSite.STRICT.getAttributeValue() + "' or "
+          + "'" + SameSite.LAX.getAttributeValue() + "'. "
+          + "Default value is '" + getDefaultValue().getAttributeValue() + "'.";
+    }
+
+    @Override
+    public SameSite getDefaultValue() {
+      return SameSite.LAX;
+    }
+
+    @Override
+    protected SameSite parse(String value) {
+      return Arrays.stream(SameSite.values())
+          .filter(e -> value.equals(e.getAttributeValue()))
+          .findFirst()
+          .orElseThrow();
     }
   }
 
