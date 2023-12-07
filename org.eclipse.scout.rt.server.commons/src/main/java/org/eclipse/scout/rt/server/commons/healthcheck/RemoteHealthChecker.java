@@ -54,6 +54,17 @@ public class RemoteHealthChecker extends AbstractHealthChecker {
 
   @Override
   protected boolean execCheckHealth(HealthCheckCategoryId category) {
+    return checkHealthInternal(category, false);
+  }
+
+  /**
+   * Silently executes a remote health check, i.e. without logging in case of failure.
+   */
+  public boolean checkHealthSilent() {
+    return checkHealthInternal(null, true);
+  }
+
+  protected boolean checkHealthInternal(HealthCheckCategoryId category, boolean silent) {
     if (m_remoteUrls != null) {
       for (String remote : m_remoteUrls) {
         GenericUrl remoteUrl = remote != null ? new GenericUrl(remote) : null;
@@ -70,8 +81,10 @@ public class RemoteHealthChecker extends AbstractHealthChecker {
           }
         }
         catch (IOException e) {
-          //noinspection PlaceholderCountMatchesArgumentCount
-          LOG.info("{} failed, message={}", getName(), e.getMessage(), LOG.isDebugEnabled() ? e : null);
+          if (!silent || LOG.isDebugEnabled()) {
+            //noinspection PlaceholderCountMatchesArgumentCount
+            LOG.info("{} failed, message={}", getName(), e.getMessage(), LOG.isDebugEnabled() ? e : null);
+          }
           return false;
         }
       }
