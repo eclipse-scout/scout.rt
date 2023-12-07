@@ -24,7 +24,7 @@ export class HorizontalGridMatrix extends LogicalGridMatrix {
       let gridData = new GridData(hints);
       gridData.w = Math.min(hints.w, this.getColumnCount());
       this._add(widget, hints, gridData);
-      widget.gridData = gridData;
+      widget._setGridData(gridData)
     });
     this._cursor.rowCount = this.rowCount;
     return true;

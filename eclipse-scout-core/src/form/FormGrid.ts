@@ -19,6 +19,6 @@ export class FormGrid extends LogicalGrid {
     }
     // The form does not have a real logical grid but needs the gridData anyway (widthInPixel, heightInPixel, see GroupBoxLayout).
     // Grid.w is not relevant for the form, no need to pass a gridColumnCount
-    form.rootGroupBox.gridData = GridData.createFromHints(form.rootGroupBox);
+    form.rootGroupBox._setGridData(GridData.createFromHints(form.rootGroupBox));
   }
 }

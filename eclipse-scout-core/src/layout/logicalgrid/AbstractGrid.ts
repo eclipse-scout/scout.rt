@@ -42,7 +42,7 @@ export abstract class AbstractGrid extends LogicalGrid {
           notContainingGridXYCount++;
         }
       } else {
-        widget.gridData = GridData.createFromHints(widget, 1);
+        widget._setGridData(GridData.createFromHints(widget, 1));
       }
     });
     if (containingGridXYCount > 0 && notContainingGridXYCount === 0) {
@@ -66,7 +66,7 @@ export abstract class AbstractGrid extends LogicalGrid {
       return y1 > x ? y1 : x;
     }, 0);
     widgets.forEach(v => {
-      v.gridData = GridData.createFromHints(v, totalGridW);
+      v._setGridData(GridData.createFromHints(v, totalGridW));
     });
     this.gridRows = totalGridH;
     this.gridColumns = totalGridW;
