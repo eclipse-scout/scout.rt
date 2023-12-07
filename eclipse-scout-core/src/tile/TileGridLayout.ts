@@ -97,7 +97,7 @@ export class TileGridLayout extends LogicalGridLayout {
     }
 
     // If content does not fit, the columnCount will be reduced until it fits
-    while (!contentFits && this.widget.gridColumnCount > 1) {
+    while (!contentFits && this.widget.wrappable && this.widget.gridColumnCount > 1) {
       this.widget.gridColumnCount--;
       this.widget.invalidateLayout();
       this.widget.invalidateLogicalGrid(false);

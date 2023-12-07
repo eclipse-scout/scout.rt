@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -104,6 +104,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     setAnimateTileRemoval(getConfiguredAnimateTileRemoval());
     setAnimateTileInsertion(getConfiguredAnimateTileInsertion());
     setTextFilterEnabled(getConfiguredTextFilterEnabled());
+    setWrappable(getConfiguredWrappable());
 
     OrderedCollection<T> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
@@ -300,6 +301,27 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Order(100)
   protected boolean getConfiguredTextFilterEnabled() {
     return false;
+  }
+
+  /**
+   * Defines whether the grid column count should be dynamically adjusted if the preferred width of the grid exceeds the available width.
+   * <br>
+   * Default: {@code true}
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(110)
+  protected boolean getConfiguredWrappable() {
+    return true;
+  }
+
+  @Override
+  public boolean isWrappable() {
+    return propertySupport.getPropertyBool(PROP_WRAPPABLE);
+  }
+
+  @Override
+  public void setWrappable(boolean wrappable) {
+    propertySupport.setPropertyBool(PROP_WRAPPABLE, wrappable);
   }
 
   @Override

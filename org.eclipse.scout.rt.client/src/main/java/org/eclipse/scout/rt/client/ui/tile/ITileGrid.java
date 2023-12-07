@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,6 +41,7 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
   String PROP_ANIMATE_TILE_REMOVAL = "animateTileRemoval";
   String PROP_ANIMATE_TILE_INSERTION = "animateTileInsertion";
   String PROP_TEXT_FILTER_ENABLED = "textFilterEnabled";
+  String PROP_WRAPPABLE = "wrappable";
 
   String PROP_ASYNC_LOAD_JOBNAME_PREFIX = "tileAsyncDataLoadJob";
   String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
@@ -95,6 +96,10 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
   boolean isScrollable();
 
   void setScrollable(boolean scrollable);
+
+  boolean isWrappable();
+
+  void setWrappable(boolean wrappable);
 
   String getLogicalGrid();
 
