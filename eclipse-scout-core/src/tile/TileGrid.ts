@@ -60,6 +60,8 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   createTextFilter: () => TextFilter<TTile>;
   updateTextFilterText: string;
   defaultMenuTypes: string[];
+  wrappable: boolean;
+
   $filterFieldContainer: JQuery;
   $fillBefore: JQuery;
   $fillAfter: JQuery;
@@ -103,6 +105,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.virtualScrolling = null;
     this.withPlaceholders = false;
     this.placeholderProducer = null;
+    this.wrappable = true;
 
     this.$filterFieldContainer = null;
     this.textFilterEnabled = false;
@@ -998,6 +1001,11 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       return false;
     }
     return graphics.offsetBounds(tile.$container).intersects(graphics.offsetBounds($scrollable));
+  }
+
+  /** @see TileGridModel.wrappable */
+  setWrappable(wrappable: boolean) {
+    this.setProperty('wrappable', wrappable);
   }
 
   protected _onTileMouseDown(event: JQuery.MouseDownEvent): boolean {
