@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Group, InitModelOf, PlaceholderTile, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel} from '../../src/index';
+import {GridData, Group, InitModelOf, PlaceholderTile, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel, TileModel} from '../../src/index';
 import {JQueryTesting} from '../../src/testing/index';
 
 describe('TileGrid', () => {
@@ -1452,6 +1452,42 @@ describe('TileGrid', () => {
       let tile0 = tileGrid.tiles[0];
       tileGrid.setFocusedTile(tile0);
       expect(tileGrid.$container.attr('aria-activedescendant')).toBe(tile0.$container.attr('id'));
+    });
+  });
+
+  describe('logical grid', () => {
+    it('triggers a property change event if grid data of a tile changes', () => {
+      let tileGrid = createTileGrid(3);
+      tileGrid.render();
+      tileGrid.validateLogicalGrid();
+      let tile = tileGrid.tiles[0];
+      let triggered = false;
+      tile.on('propertyChange:gridData', event => {
+        triggered = true;
+      });
+      tile.setGridDataHints(new GridData({w: 10}));
+      expect(triggered).toBe(false); // Real grid data not computed yet
+
+      tileGrid.validateLogicalGrid();
+      expect(triggered).toBe(true);
+    });
+
+    it('does not trigger a property change event if new grid data is equal to the old one', () => {
+      let tileGrid = createTileGrid(3);
+      tileGrid.render();
+      tileGrid.validateLogicalGrid();
+      let tile = tileGrid.tiles[0];
+      let triggered = false;
+      tile.on('propertyChange:gridData', event => {
+        triggered = true;
+      });
+      tile.setGridDataHints(new GridData(tile.gridDataHints));
+      tileGrid.validateLogicalGrid();
+      expect(triggered).toBe(false);
+
+      // Verify that it works without using hints
+      tile._setGridData(new GridData(tile.gridData));
+      expect(triggered).toBe(false);
     });
   });
 });

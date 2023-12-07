@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -847,10 +847,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   protected _setGridDataHints(gridData: GridData) {
-    if (!gridData) {
-      gridData = new GridData();
-    }
-    this._setProperty('gridDataHints', GridData.ensure(gridData));
+    this._setProperty('gridDataHints', GridData.ensure(gridData || new GridData()));
   }
 
   protected _renderGridDataHints() {
@@ -859,10 +856,7 @@ export class FormField extends Widget implements FormFieldModel {
 
   /** @internal */
   _setGridData(gridData: GridData) {
-    if (!gridData) {
-      gridData = new GridData();
-    }
-    this._setProperty('gridData', GridData.ensure(gridData));
+    this._setProperty('gridData', GridData.ensure(gridData || new GridData()));
   }
 
   protected _renderGridData() {

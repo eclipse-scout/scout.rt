@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DialogLayout, Dimension, Form, FormField, graphics, GroupBox, GroupBoxModel, HorizontalGrid, InitModelOf, LabelField, scout, Status, StringField, VerticalSmartGrid, Widget} from '../../../../src/index';
+import {DialogLayout, Dimension, Form, FormField, graphics, GridData, GroupBox, GroupBoxModel, HorizontalGrid, InitModelOf, LabelField, scout, Status, StringField, VerticalSmartGrid, Widget} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('GroupBox', () => {
@@ -305,13 +305,13 @@ describe('GroupBox', () => {
     it('may be specified using the object type', () => {
       let groupBox = scout.create(GroupBox, {
         parent: session.desktop,
-        logicalGrid: 'HorizontalGrid'
+        logicalGrid: HorizontalGrid
       });
       expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);
 
       groupBox = scout.create(GroupBox, {
         parent: session.desktop,
-        logicalGrid: 'VerticalSmartGrid'
+        logicalGrid: VerticalSmartGrid
       });
       expect(groupBox.logicalGrid instanceof VerticalSmartGrid).toBe(true);
 
@@ -362,6 +362,66 @@ describe('GroupBox', () => {
         })
         .catch(fail)
         .always(done);
+    });
+
+    it('triggers a property change event if grid data of a form field changes', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{objectType: StringField}]
+      });
+      groupBox.render();
+      groupBox.validateLogicalGrid();
+      let field = groupBox.fields[0];
+      let triggered = false;
+      field.on('propertyChange:gridData', event => {
+        triggered = true;
+      });
+      field.setGridDataHints(new GridData({w: 10}));
+      expect(triggered).toBe(false); // Real grid data not computed yet
+
+      groupBox.validateLogicalGrid();
+      expect(triggered).toBe(true);
+    });
+
+    it('triggers a property change event if grid data of a form field changes also with horizontal grid', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{objectType: StringField}],
+        logicalGrid: HorizontalGrid
+      });
+      groupBox.render();
+      groupBox.validateLogicalGrid();
+      let field = groupBox.fields[0];
+      let triggered = false;
+      field.on('propertyChange:gridData', event => {
+        triggered = true;
+      });
+      field.setGridDataHints(new GridData({w: 10}));
+      expect(triggered).toBe(false); // Real grid data not computed yet
+
+      groupBox.validateLogicalGrid();
+      expect(triggered).toBe(true);
+    });
+
+    it('does not trigger a property change event if new grid data is equal to the old one', () => {
+      let groupBox = scout.create(GroupBox, {
+        parent: session.desktop,
+        fields: [{objectType: StringField}]
+      });
+      groupBox.render();
+      groupBox.validateLogicalGrid();
+      let field = groupBox.fields[0];
+      let triggered = false;
+      field.on('propertyChange:gridData', event => {
+        triggered = true;
+      });
+      field.setGridDataHints(new GridData(field.gridDataHints));
+      groupBox.validateLogicalGrid();
+      expect(triggered).toBe(false);
+
+      // Verify that it works without using hints
+      field._setGridData(new GridData(field.gridData));
+      expect(triggered).toBe(false);
     });
   });
 
