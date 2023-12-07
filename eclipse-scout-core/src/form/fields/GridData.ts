@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Alignment, FormField, LogicalGridWidget} from '../../index';
+import {Alignment, FormField, LogicalGridWidget, objects} from '../../index';
 import $ from 'jquery';
 
 export class GridData {
@@ -166,6 +166,13 @@ export class GridData {
     this.heightInPixel = 0;
 
     $.extend(this, model);
+  }
+
+  equals?(other: GridData) {
+    if (!other || !(other instanceof GridData)) {
+      return false;
+    }
+    return objects.propertiesEquals(this, other, Object.keys(this));
   }
 
   static createFromHints(field: LogicalGridWidget, gridColumnCount?: number): GridData {
