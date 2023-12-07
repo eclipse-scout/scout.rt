@@ -93,10 +93,12 @@ export class Tile extends Widget implements TileModel {
   }
 
   protected _setGridDataHints(gridData: GridData) {
-    if (!gridData) {
-      gridData = new GridData();
-    }
-    this._setProperty('gridDataHints', GridData.ensure(gridData));
+    this._setProperty('gridDataHints', GridData.ensure(gridData || new GridData()));
+  }
+
+  /** @internal */
+  _setGridData(gridData: GridData) {
+    this._setProperty('gridData', GridData.ensure(gridData || new GridData()));
   }
 
   /** @see TileModel.colorScheme */
