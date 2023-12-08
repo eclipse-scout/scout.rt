@@ -981,6 +981,10 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.addTilesToSelection([tile]);
   }
 
+  isTileSelected(tile: TTile): boolean {
+    return this.selectedTiles.includes(tile);
+  }
+
   /**
    * @returns true if the tile is completely or partially visible in the first scrollable parent.
    */
