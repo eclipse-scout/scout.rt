@@ -52,7 +52,7 @@ public interface IDesktopUIFacade {
   void fireGuiAttached();
 
   /**
-   * GUI fires this event when the application/workbench is closing
+   * GUI fires this event when the UiSession is disposing.
    */
   void fireGuiDetached();
 
