@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -573,35 +573,6 @@ public class UiSession implements IUiSession {
 
   @Override
   public void dispose() {
-
-    // Inform the model the UI has been detached. There are different cases we handle here:
-    // 1. page reload (unload event) dispose method is called once
-    // 2. logout (Session.stop()) dispose method is called _twice_, 1st call sets the disposing flag,
-    //    on the 2nd call, the desktop is already gone.
-    final IClientSession clientSession = getClientSession();
-    if (m_attachedToDesktop && !m_disposing && clientSession != null && clientSession.isActive() && !clientSession.isStopping()) {
-      final Runnable detachGui = () -> {
-        if (m_attachedToDesktop) {
-          m_attachedToDesktop = false;
-          if (clientSession.isActive() && !clientSession.isStopping() && clientSession.getDesktop() != null) {
-            clientSession.getDesktop().getUIFacade().fireGuiDetached();
-          }
-        }
-      };
-      // Current thread is the model thread if dispose is called by clientSession.stop(), otherwise (e.g. page reload) dispose is called from the UI thread
-      if (ModelJobs.isModelThread()) {
-        detachGui.run();
-      }
-      else {
-        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
-        ModelJobs.schedule(
-            detachGui::run,
-            ModelJobs.newInput(clientRunContext)
-                .withName("Detaching Gui")
-                .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
-      }
-    }
-
     if (isProcessingJsonRequest()) {
       // If there is a request in progress just mark the session as being disposed.
       // The actual disposing happens before returning to the client, see processJsonRequest().
@@ -625,7 +596,42 @@ public class UiSession implements IUiSession {
     m_httpContext.clear();
     m_currentJsonResponse = null;
 
+    // Inform the desktop that the UI has been detached.
+    // The model may trigger events during detaching the desktop, that need to be sent back to the browser if the ui session weren't disposed.
+    // Therefore, detach the desktop after the UiSession is disposed completely in order to ensure that none of these events will be processed by a half disposed UiSession or JsonAdapter.
+    detachDesktop();
+
     m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
+  }
+
+  protected void detachDesktop() {
+    // Inform the model the UI has been detached. There are different cases we handle here:
+    // 1. page reload (unload event) dispose method is called once
+    // 2. logout (Session.stop()) dispose method is called _twice_, 1st call sets the disposing flag,
+    //    on the 2nd call, the desktop is already gone.
+    final IClientSession clientSession = getClientSession();
+    if (m_attachedToDesktop && clientSession != null && clientSession.isActive() && !clientSession.isStopping()) {
+      final Runnable detachGui = () -> {
+        if (m_attachedToDesktop) {
+          m_attachedToDesktop = false;
+          if (clientSession.isActive() && !clientSession.isStopping() && clientSession.getDesktop() != null) {
+            clientSession.getDesktop().getUIFacade().fireGuiDetached();
+          }
+        }
+      };
+      // Current thread is the model thread if dispose is called by clientSession.stop(), otherwise (e.g. page reload) dispose is called from the UI thread
+      if (ModelJobs.isModelThread()) {
+        detachGui.run();
+      }
+      else {
+        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
+        ModelJobs.schedule(
+            detachGui::run,
+            ModelJobs.newInput(clientRunContext)
+                .withName("Detaching Gui")
+                .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
+      }
+    }
   }
 
   @Override
