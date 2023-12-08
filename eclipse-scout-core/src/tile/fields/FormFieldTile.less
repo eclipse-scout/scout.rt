@@ -349,8 +349,7 @@
     #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-default-selected-border-color, @y2: 0px, @blur2: 0px);
 
     &.inverted {
-      --tile-background-color: @dashboard-tile-default-inverted-background-color;
-      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-default-inverted-selected-border-color, @y2: 0px, @blur2: 0px);
+      #scout.double-drop-shadow(@spread1: 3px, @color1: @dashboard-tile-default-inverted-selected-border-color, @y2: 0px, @blur2: 0px);
     }
 
     &.color-alternative {
@@ -358,15 +357,14 @@
     }
 
     &.inverted.color-alternative {
-      --tile-background-color: @dashboard-tile-alternative-inverted-background-color;
-      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-alternative-inverted-selected-border-color, @y2: 0px, @blur2: 0px);
+      #scout.double-drop-shadow(@spread1: 3px, @color1: @dashboard-tile-alternative-inverted-selected-border-color, @y2: 0px, @blur2: 0px);
     }
 
     .dimmed-background & {
       #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-default-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
 
       &.inverted {
-        #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-default-inverted-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
+        #scout.double-drop-shadow(@spread1: 3px, @color1: @dashboard-tile-default-inverted-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
       }
 
       &.color-alternative {
@@ -374,7 +372,7 @@
       }
 
       &.inverted.color-alternative {
-        #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-alternative-inverted-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
+        #scout.double-drop-shadow(@spread1: 3px, @color1: @dashboard-tile-alternative-inverted-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
       }
     }
   }

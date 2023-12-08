@@ -85,10 +85,9 @@
 }
 
 .button-tile.dashboard {
-  background-color: inherit;
+  --tile-background-color: @tile-default-background-color;
 
   & > .tile-button {
-    background-color: @tile-default-background-color;
 
     & > .field > .label {
       color: @link-color;
@@ -96,26 +95,22 @@
   }
 
   &:hover {
+    --tile-background-color: @tile-button-default-hover-background-color;
 
     .dimmed-background & {
       #scout.drop-shadow(); // More intense than regular dashboard shadow
     }
-
-    & > .tile-button {
-      background-color: @tile-button-default-hover-background-color;
-    }
   }
 
-  &:active > .tile-button,
-  &.active > .tile-button {
-    background-color: @tile-button-default-active-background-color;
+  &:active,
+  &.active {
+    --tile-background-color: @tile-button-default-active-background-color;
   }
 
   &.inverted {
+    --tile-background-color: @tile-default-inverted-background-color;
 
     & > .tile-button {
-      background-color: @tile-default-inverted-background-color;
-
       & > .field {
         & > .label {
           color: @tile-button-default-inverted-color;
@@ -127,22 +122,28 @@
       }
     }
 
-    &:hover > .tile-button {
-      background-color: @tile-button-default-inverted-hover-background-color;
-      border-color: @tile-button-default-inverted-hover-background-color;
+    &:hover {
+      --tile-background-color: @tile-button-default-inverted-hover-background-color;
+
+      & > .tile-button {
+        border-color: @tile-button-default-inverted-hover-background-color;
+      }
     }
 
-    &:active > .tile-button,
-    &.active > .tile-button {
-      background-color: @tile-button-default-inverted-active-background-color;
-      border-color: @tile-button-default-inverted-active-background-color;
+    &:active,
+    &.active {
+      --tile-background-color: @tile-button-default-inverted-active-background-color;
+
+      & > .tile-button {
+        border-color: @tile-button-default-inverted-active-background-color;
+      }
     }
   }
 
   &.color-alternative.inverted {
-    & > .tile-button {
-      background-color: @tile-alternative-inverted-background-color;
+    --tile-background-color: @tile-alternative-inverted-background-color;
 
+    & > .tile-button {
       & > .field {
         & > .label {
           color: @tile-button-alternative-inverted-color;
@@ -154,15 +155,21 @@
       }
     }
 
-    &:hover > .tile-button {
-      background-color: @tile-button-alternative-inverted-hover-background-color;
-      border-color: @tile-button-alternative-inverted-hover-background-color;
+    &:hover {
+      --tile-background-color: @tile-button-alternative-inverted-hover-background-color;
+
+      & > .tile-button {
+        border-color: @tile-button-alternative-inverted-hover-background-color;
+      }
     }
 
-    &:active > .tile-button,
-    &.active > .tile-button {
-      background-color: @tile-button-alternative-inverted-active-background-color;
-      border-color: @tile-button-alternative-inverted-active-background-color;
+    &:active,
+    &.active {
+      --tile-background-color: @tile-button-alternative-inverted-active-background-color;
+
+      & > .tile-button {
+        border-color: @tile-button-alternative-inverted-active-background-color;
+      }
     }
   }
 
