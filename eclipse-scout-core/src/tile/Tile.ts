@@ -36,6 +36,8 @@ export class Tile extends Widget implements TileModel {
     this.selected = false;
     this.selectable = false;
     this.plainText = null;
+    // Null to let TileGrid decide whether to enable animation
+    this.animateRemoval = null;
     this._addPropertyDimensionAlias('visible', 'filterAccepted');
   }
 
