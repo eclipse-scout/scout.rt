@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventHandler, InitModelOf, ObjectOrChildModel, PropertyChangeEvent, Tile, TileEventMap, TileModel, Widget} from '../index';
+import {EventHandler, InitModelOf, ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, Tile, TileEventMap, TileModel, Widget} from '../index';
 
 export interface WidgetTileModel extends TileModel {
   /** The widget that should be embedded in the tile */
@@ -74,6 +74,10 @@ export class WidgetTile extends Tile implements WidgetTileModel {
     } else if (event.propertyName === 'disabledStyle') {
       this.setDisabledStyle(event.newValue);
     }
+  }
+
+  setTileWidget(tileWidget: ObjectOrModel<Widget>) {
+    this.setProperty('tileWidget', tileWidget);
   }
 
   protected _setTileWidget(tileWidget: Widget) {
