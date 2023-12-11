@@ -98,7 +98,6 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   protected void initTileInternal() {
-    Assertions.assertNotNull(getParent(), "Tile is not connected to a container");
     if (getConfiguredAutoLoadDataOnInit()) {
       loadData();
     }
