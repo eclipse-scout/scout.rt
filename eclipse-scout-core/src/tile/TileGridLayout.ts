@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LogicalGridLayout, PlaceholderTile, Point, Rectangle, scout, scrollbars, styles, Tile, TileGrid, TileGridLayoutConfig, Widget} from '../index';
+import {arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LogicalGridLayout, Point, Rectangle, scout, scrollbars, styles, Tile, TileGrid, TileGridLayoutConfig, Widget} from '../index';
 import $ from 'jquery';
 
 export class TileGridLayout extends LogicalGridLayout {
@@ -217,7 +217,7 @@ export class TileGridLayout extends LogicalGridLayout {
 
     let bounds = graphics.cssBounds(tile.$container);
     let fromBounds = tile.$container.data('oldBounds');
-    if (tile instanceof PlaceholderTile && !tile.$container.data('was-layouted')) {
+    if (!tile.$container.data('was-layouted')) {
       // Placeholders may not have fromBounds because they are added while layouting
       // Just let them appear at the correct position
       fromBounds = bounds.clone();
