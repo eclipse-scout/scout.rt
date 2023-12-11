@@ -159,7 +159,7 @@ public final class BinaryResource implements Serializable {
     if (getCharset() != null) {
       charset = Charset.forName(getCharset());
     }
-    return new String(m_content, charset);
+    return m_content != null ? new String(m_content, charset) : null;
   }
 
   /**
