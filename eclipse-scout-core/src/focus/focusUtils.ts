@@ -77,6 +77,14 @@ export const focusUtils = {
   },
 
   /**
+   * @returns true if the element or one of its parents is draggable.
+   */
+  isDraggable(element: HTMLElement | JQuery): boolean {
+    let $element = $.ensure(element);
+    return $element.attr('draggable') === 'true' || $element.parents('[draggable="true"]').length > 0;
+  },
+
+  /**
    * Returns true if the given HTML element is the active element in its own document, false otherwise
    * @param element
    */
@@ -94,5 +102,22 @@ export const focusUtils = {
       activeElement = ownerDocument.activeElement;
     }
     return activeElement === element;
+  },
+
+  /**
+   * Stores the currently focused element and focuses this element again in the next animation frame if the focus changed to the entry point element.
+   * This is useful if the current task would focus the entry point element which cannot be prevented.
+   */
+  restoreFocusLater($entryPoint: JQuery) {
+    // queueMicrotask does not work, it looks like the microtask will be executed before the focus change.
+    // requestAnimationFrame also prevents flickering (compared to setTimeout)
+    let doc = $entryPoint.document(true);
+    let prevFocusedElement = doc.activeElement as HTMLElement;
+    requestAnimationFrame(() => {
+      let focusedElement = doc.activeElement;
+      if (focusedElement === $entryPoint[0]) {
+        prevFocusedElement.focus();
+      }
+    });
   }
 };
