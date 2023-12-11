@@ -149,11 +149,11 @@ public final class ApplicationProperties {
     }
   }
 
-  public static class ScoutApplicationSessionTimeoutInSecondsProperty extends AbstractPositiveIntegerConfigProperty {
+  public static class ScoutApplicationSessionTimeoutProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.app.httpSessionTimeoutInSeconds";
+      return "scout.app.httpSessionTimeout";
     }
 
     @Override

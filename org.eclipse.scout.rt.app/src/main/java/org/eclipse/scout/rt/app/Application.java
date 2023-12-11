@@ -58,7 +58,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationPrivateKey
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigHttpOnlyProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSameSiteProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
-import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutInSecondsProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationWebappDirectoryProperty;
 import org.eclipse.scout.rt.jetty.IServletContributor;
@@ -378,7 +378,7 @@ public class Application {
       if (sessionEnabled) {
         // See https://github.com/jetty/jetty.project/blob/jetty-11.0.18/jetty-webapp/src/main/java/org/eclipse/jetty/webapp/StandardDescriptorProcessor.java#L650
         // for how session properties are applied from web.xml to Java classes.
-        int sessionTimeoutInSeconds = CONFIG.getPropertyValue(ScoutApplicationSessionTimeoutInSecondsProperty.class);
+        int sessionTimeoutInSeconds = CONFIG.getPropertyValue(ScoutApplicationSessionTimeoutProperty.class);
         boolean httpOnly = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigHttpOnlyProperty.class);
         boolean secure = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSecureProperty.class);
         SameSite sameSite = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSameSiteProperty.class);
