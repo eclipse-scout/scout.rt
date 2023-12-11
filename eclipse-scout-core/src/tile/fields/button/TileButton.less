@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -98,7 +98,7 @@
     --tile-background-color: @tile-button-default-hover-background-color;
 
     .dimmed-background & {
-      #scout.drop-shadow(); // More intense than regular dashboard shadow
+      --box-shadow-2-alpha: @drop-shadow-alpha; // More intense than regular dashboard shadow
     }
   }
 
@@ -176,7 +176,7 @@
   &.disabled {
 
     .dimmed-background & {
-      #scout.drop-shadow(@alpha: @dashboard-tile-drop-shadow-light-alpha);
+      --box-shadow-2-alpha: @dashboard-tile-drop-shadow-light-alpha;
     }
 
     & > .tile-button {

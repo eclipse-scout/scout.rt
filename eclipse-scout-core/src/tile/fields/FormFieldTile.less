@@ -18,19 +18,22 @@
   #scout.double-drop-shadow(@spread1: 1px, @color1: @dashboard-tile-border-color, @y2: 0px, @blur2: 0px);
 
   &.inverted {
-    #scout.double-drop-shadow(@spread1: 1px, @color1: @tile-default-inverted-background-color, @y2: 0px, @blur2: 0px);
+    --box-shadow-1-color: @tile-default-inverted-background-color;
   }
 
   &.inverted.color-alternative {
-    #scout.double-drop-shadow(@spread1: 1px, @color1: @tile-alternative-inverted-background-color, @y2: 0px, @blur2: 0px);
+    --box-shadow-1-color: @tile-alternative-inverted-background-color;
   }
 
   .dimmed-background & {
-    #scout.drop-shadow(@alpha: @dashboard-tile-drop-shadow-light-alpha);
+    --box-shadow-1-spread: 0;
+    --box-shadow-2-y: @drop-shadow-y;
+    --box-shadow-2-blur: @drop-shadow-blur;
+    --box-shadow-2-alpha: @dashboard-tile-drop-shadow-light-alpha;
 
     &.disabled,
     &.inverted {
-      #scout.drop-shadow(@alpha: @dashboard-tile-drop-shadow-dark-alpha);
+      --box-shadow-2-alpha: @dashboard-tile-drop-shadow-dark-alpha;
     }
   }
 
@@ -346,34 +349,20 @@
   }
 
   &.selected {
-    #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-default-selected-border-color, @y2: 0px, @blur2: 0px);
+    --box-shadow-1-spread: 2px;
+    --box-shadow-1-color: @dashboard-tile-default-selected-border-color;
 
     &.inverted {
-      #scout.double-drop-shadow(@spread1: 3px, @color1: @dashboard-tile-default-inverted-selected-border-color, @y2: 0px, @blur2: 0px);
+      --box-shadow-1-spread: 3px;
+      --box-shadow-1-color: @dashboard-tile-default-inverted-selected-border-color;
     }
 
     &.color-alternative {
-      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-alternative-selected-border-color, @y2: 0px, @blur2: 0px);
+      --box-shadow-1-color: @dashboard-tile-alternative-selected-border-color;
     }
 
     &.inverted.color-alternative {
-      #scout.double-drop-shadow(@spread1: 3px, @color1: @dashboard-tile-alternative-inverted-selected-border-color, @y2: 0px, @blur2: 0px);
-    }
-
-    .dimmed-background & {
-      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-default-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
-
-      &.inverted {
-        #scout.double-drop-shadow(@spread1: 3px, @color1: @dashboard-tile-default-inverted-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
-      }
-
-      &.color-alternative {
-        #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-alternative-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
-      }
-
-      &.inverted.color-alternative {
-        #scout.double-drop-shadow(@spread1: 3px, @color1: @dashboard-tile-alternative-inverted-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
-      }
+      --box-shadow-1-color: @dashboard-tile-alternative-inverted-selected-border-color;
     }
   }
 }
