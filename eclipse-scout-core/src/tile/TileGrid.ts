@@ -453,7 +453,8 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   }
 
   protected _animateTileRemoval(tile: TTile | PlaceholderTile): boolean {
-    return this.animateTileRemoval && tile && tile.visible && !(tile instanceof PlaceholderTile);
+    // Explicitly check animateRemoval !== false to only enable animated removal if value is null or true to make it possible to disable it
+    return this.animateTileRemoval && tile && tile.visible && !(tile instanceof PlaceholderTile) && tile.animateRemoval !== false;
   }
 
   protected _animateTileInsertion(tile: TTile | PlaceholderTile): boolean {
