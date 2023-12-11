@@ -42,12 +42,6 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
   }
 
   @Override
-  protected void initConfig() {
-    super.initConfig();
-    initTileWidgetConfig();
-  }
-
-  @Override
   protected void handleInitException(Exception exception) {
     LOG.error("Error while initializing tile {}: {}", getTileWidget(), exception.getMessage(), exception);
     getTileWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
@@ -64,6 +58,14 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
     }
     else {
       getTileWidget().addErrorStatus(TEXTS.get("ErrorWhileLoadingData"));
+    }
+  }
+
+  @Override
+  public void setTileWidget(T widget) {
+    super.setTileWidget(widget);
+    if (widget != null) {
+      initTileWidgetConfig();
     }
   }
 
