@@ -30,7 +30,18 @@
   }
 
   .double-drop-shadow(@x1: 0, @y1: 0, @blur1: 0, @spread1: 0, @color1: @palette-black, @x2: 0px, @y2: 6px, @blur2: 13px, @spread2: 0px, @alpha2: @drop-shadow-alpha) {
-    box-shadow: @x1 @y1 @blur1 @spread1 @color1, @x2 @y2 @blur2 @spread2 rgba(0, 0, 0, @alpha2);
+    --box-shadow-1-x: @x1;
+    --box-shadow-1-y: @y1;
+    --box-shadow-1-blur: @blur1;
+    --box-shadow-1-spread: @spread1;
+    --box-shadow-1-color: @color1;
+    --box-shadow-2-x: @x2;
+    --box-shadow-2-y: @y2;
+    --box-shadow-2-blur: @blur2;
+    --box-shadow-2-spread: @spread2;
+    --box-shadow-2-alpha: @alpha2;
+
+    box-shadow: var(--box-shadow-1-x) var(--box-shadow-1-y) var(--box-shadow-1-blur) var(--box-shadow-1-spread) var(--box-shadow-1-color), var(--box-shadow-2-x) var(--box-shadow-2-y) var(--box-shadow-2-blur) var(--box-shadow-2-spread) rgba(0, 0, 0, var(--box-shadow-2-alpha));
   }
 
   .drop-shadow-large(@x: 0px, @y: @drop-shadow-large-y, @blur: @drop-shadow-large-blur, @spread: 0px, @alpha: @drop-shadow-large-alpha) {
