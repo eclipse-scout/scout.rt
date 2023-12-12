@@ -302,8 +302,8 @@ public final class ApplicationProperties {
 
     @Override
     public String description() {
-      return "Setting this property enables the HTTPS connector. The value of this property must point to the local key store. "
-          + "For example 'classpath:/dev/my-https.jks' or 'file:///C:/Users/usr/Desktop/my-store.jks' or 'C:/Users/usr/Desktop/my-store.jks'.";
+      return "Setting this property enables the HTTPS connector. The value of this property must point to the local key store.\n"
+          + "Example: 'classpath:/dev/my-https.jks' or 'file:///C:/Users/usr/Desktop/my-store.jks' or 'C:/Users/usr/Desktop/my-store.jks'.";
     }
   }
 
@@ -320,7 +320,7 @@ public final class ApplicationProperties {
     @Override
     public String description() {
       return "Specifies the X-500 name to use in the self-signed certificate when starting Scout application in development mode with TLS enabled.\n"
-          + "For example 'CN=my-host.my-domain.com,C=US,ST=CA,L=Sunnyvale,O=My Company Inc.'.\n"
+          + "Example: 'CN=my-host.my-domain.com,C=US,ST=CA,L=Sunnyvale,O=My Company Inc.'.\n"
           + "This property is only used in development mode and only if the property '" + BEANS.get(ScoutApplicationUseTlsProperty.class).getKey() + "' is true "
           + "and no existing Java keystore is specified (property '" + BEANS.get(ScoutApplicationKeyStorePathProperty.class).getKey() + "').";
     }

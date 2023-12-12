@@ -18,6 +18,7 @@ import static org.eclipse.scout.rt.platform.util.StringUtility.*;
 import static org.eclipse.scout.rt.platform.util.TypeCastUtility.getGenericsParameterClass;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,9 +30,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +54,7 @@ public class ConfigDescriptionExporter {
       outFile = null;
     }
     new ConfigDescriptionExporter().exportToAdoc(outFile);
+    Platform.get().stop();
   }
 
   public void exportToAdoc() {
@@ -99,8 +103,10 @@ public class ConfigDescriptionExporter {
     @Override
     @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE") // targetFile() cannot be null
     public void accept(final Stream<IConfigProperty<?>> configProperties) {
-      final StringBuilder adoc = asciiDoctorDescFor(configProperties);
-      final byte[] rawContent = StandardCharsets.UTF_8.encode(wrap(adoc)).array();
+      StringBuilder adoc = asciiDoctorDescFor(configProperties);
+      ByteBuffer buffer = StandardCharsets.UTF_8.encode(wrap(adoc));
+      byte[] rawContent = new byte[buffer.remaining()];
+      buffer.get(rawContent);
       try {
         createDirectories(targetFile().getParent());
         write(targetFile(), rawContent, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -112,22 +118,9 @@ public class ConfigDescriptionExporter {
     }
 
     protected StringBuilder asciiDoctorDescFor(final Stream<IConfigProperty<?>> configProperties) {
-      final AsciiDoctorTableBuilder builder = get(AsciiDoctorTableBuilder.class);
-      builder
-          .withName("Config Properties")
-          .withColumn("Key", 2)
-          .withColumn("Description", 4)
-          .withColumn("Data Type", 1)
-          .withColumn("Kind", 1);
-
-      configProperties
-          .forEach(p -> builder
-              .withCell('`' + p.getKey() + '`')
-              .withCell(p.description())
-              .withCell(dataTypeOf(p))
-              .withCell("Config Property"));
-
-      return builder.build();
+      AsciiDoctorListBuilder builder = get(AsciiDoctorListBuilder.class);
+      configProperties.forEach(p -> builder.appendProperty(p.getKey(), p.description(), dataTypeOf(p)));
+      return builder.get();
     }
 
     @SuppressWarnings("findbugs:RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE") // getGenericsParameterClass may return null
@@ -166,6 +159,30 @@ public class ConfigDescriptionExporter {
 
     public Path targetFile() {
       return m_targetFile;
+    }
+  }
+
+  @Bean
+  public static class AsciiDoctorListBuilder {
+    private static final Pattern NL_PAT = Pattern.compile("\\r?\\n");
+    private static final Pattern EXAMPLE_PAT = Pattern.compile("\\r?\\nExample:\\s");
+    private static final String NL = "\n";
+    private static final String ADOC_LIST_NL = NL + "+" + NL;
+    private static final String ADOC_LISTING = NL + "Example:" + ADOC_LIST_NL + "[listing]" + NL;
+    private StringBuilder m_builder = new StringBuilder();
+
+    public void appendProperty(String propertyKey, String description, String dataType) {
+      m_builder.append("`").append(propertyKey).append("` ::").append(NL);
+      String desc = NL_PAT.matcher(description).replaceAll(ADOC_LIST_NL);
+      desc = EXAMPLE_PAT.matcher(desc).replaceAll(ADOC_LISTING);
+      desc = desc.replace('\'', '`');
+      desc = desc.replace("[listing]\n+\n", "[listing]\n");
+      m_builder.append(desc).append(ADOC_LIST_NL);
+      m_builder.append("Data type: ").append(dataType.replace('\'', '`')).append(NL).append(NL);
+    }
+
+    public StringBuilder get() {
+      return m_builder;
     }
   }
 

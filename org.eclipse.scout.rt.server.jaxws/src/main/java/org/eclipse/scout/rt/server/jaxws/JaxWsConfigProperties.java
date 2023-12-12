@@ -139,7 +139,7 @@ public final class JaxWsConfigProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("To indicate whether to pool webservice clients.\n"
-          + "Creating new service and Port instances is expensive due to WSDL and schema validation. Using the pool helps reducing these costs. The default value is true.\n"
+          + "Creating new service and Port instances is expensive due to WSDL and schema validation. Using the pool helps to reduce these costs. The default value is true.\n"
           + "The pool size is unlimited but its elements are removed after a certain time (configurable)\n"
           + "If this value is true, the value of property '%s' has no effect.", BEANS.get(JaxWsPortCacheEnabledProperty.class).getKey());
     }
@@ -161,7 +161,7 @@ public final class JaxWsConfigProperties {
     public String description() {
       return "Indicates whether to use a preemptive port cache for webservice clients.\n"
           + "Depending on the implementor used, cached ports may increase performance, because port creation is an expensive operation due to WSDL and schema validation.\n"
-          + "The cache is based on a 'corePoolSize', meaning that that number of ports is created on a preemptive basis. If more ports than that number is required, they are are created on demand and also added to the cache until expired, which is useful at a high load.\n"
+          + "The cache is based on a 'corePoolSize', meaning that that number of ports is created on a preemptive basis. If more ports than that number is required, they are created on demand and also added to the cache until expired, which is useful at a high load.\n"
           + "The default value is true.";
     }
 

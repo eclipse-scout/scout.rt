@@ -184,10 +184,10 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
       return String.format("Specifies the known credentials (username & passwords) of the '%s'.\n"
           + "Credentials are separated by semicolon. Username and password information are separated by colon. Usernames are case-insensitive and it is recommended that they should only consist of ASCII characters. Plain text passwords are case-sensitive.\n"
           + "By default the password information consists of Base64 encoded salt followed by a dot followed by the Base64 encoded SHA-512 hash of the password (using UTF-16).\n"
-          + "Example: username1:base64EncodedSalt.base64EncodedPasswordHash;username2:base64EncodedSalt.base64EncodedPasswordHash\n"
+              + "Example: %s=username1:base64EncodedSalt.base64EncodedPasswordHash;username2:base64EncodedSalt.base64EncodedPasswordHash\n"
           + "To create a salt and hash tuples based on a clear text password use the '%s.main()' method that can be invoked from the command line.\n"
           + "If '%s' is set to 'true' the password information just consists of the cleartext password.",
-          ConfigFileCredentialVerifier.class.getName(), ConfigFileCredentialVerifier.class.getName(), BEANS.get(CredentialPlainTextProperty.class).getKey());
+          ConfigFileCredentialVerifier.class.getName(), getKey(), ConfigFileCredentialVerifier.class.getName(), BEANS.get(CredentialPlainTextProperty.class).getKey());
     }
   }
 

@@ -276,7 +276,7 @@ public class MailBounceDetector implements IMailBounceDetector {
 
     @Override
     public String description() {
-      return "Non standard email bounce detection: sender is checked against the provided list of heuristic sender prefixes (prefix match, case-insensitive)";
+      return "Non-standard email bounce detection: sender is checked against the provided list of heuristic sender prefixes (prefix match, case-insensitive)";
     }
 
     @Override
@@ -296,7 +296,7 @@ public class MailBounceDetector implements IMailBounceDetector {
 
     @Override
     public String description() {
-      return "Non standard email bounce detection: subject is checked against the provided list of heuristic subjects (partial match, case-insensitive)";
+      return "Non-standard email bounce detection: subject is checked against the provided list of heuristic subjects (partial match, case-insensitive)";
     }
 
     @Override
@@ -319,7 +319,7 @@ public class MailBounceDetector implements IMailBounceDetector {
 
     @Override
     public String description() {
-      return "Non standard email bounce detection: content is checked against the provided list of heuristic contents (partial match, case-insensitive)";
+      return "Non-standard email bounce detection: content is checked against the provided list of heuristic contents (partial match, case-insensitive)";
     }
 
     @Override

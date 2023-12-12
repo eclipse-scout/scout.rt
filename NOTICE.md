@@ -543,23 +543,11 @@ jackson-databind (2.8.7)
 
 * License: Apache-2.0
 
-Jandex (1.2.2)
+Jandex (3.1.6)
 
 * License: Apache License, 2.0
-* Project: https://github.com/wildfly/jandex
-* Source: https://github.com/wildfly/jandex/tree/1.2.2.Final
-
-Jandex (2.0.3)
-
-* License: Apache-2.0
-* Project: https://github.com/wildfly/jandex
-* Source: https://github.com/wildfly/jandex/releases/tag/2.0.3.Final
-
-Jandex (2.0.5)
-
-* License: Apache-2.0
-* Project: https://github.com/wildfly/jandex
-* Source: https://github.com/wildfly/jandex
+* Project: https://github.com/smallrye/jandex
+* Source: https://github.com/smallrye/jandex/tree/3.1.6
 
 jasmine (2.0)
 

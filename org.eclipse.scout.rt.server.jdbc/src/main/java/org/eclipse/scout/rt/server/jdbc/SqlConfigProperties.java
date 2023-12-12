@@ -161,7 +161,7 @@ public final class SqlConfigProperties {
 
     @Override
     public String description() {
-      return "If true a direct JDBC connection is created. Otherwise a JNDI connection is used. The default value is true.";
+      return "If true a direct JDBC connection is created. Otherwise, a JNDI connection is used. The default value is true.";
     }
   }
 

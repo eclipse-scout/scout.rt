@@ -29,7 +29,7 @@ public final class HttpConfigurationProperties {
 
     @Override
     public String description() {
-      return "Specifies the maximum life time in milliseconds for kept alive connections of the Apache HTTP client. The default value is 1 hour.";
+      return "Specifies the maximum lifetime in milliseconds for kept alive connections of the Apache HTTP client. The default value is 1 hour.";
     }
 
     @Override
@@ -101,8 +101,6 @@ public final class HttpConfigurationProperties {
    * Enable retry of request (includes non-idempotent requests) on {@link NoHttpResponseException}
    * <p>
    * Assuming that the cause of the exception was most probably a stale socket channel on the server side.
-   * <p>
-   * For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659
    *
    * @since 7.0
    */
@@ -118,7 +116,6 @@ public final class HttpConfigurationProperties {
     public String description() {
       return "Enable retry of request (includes non-idempotent requests) on NoHttpResponseException\n"
           + "Assuming that the cause of the exception was most probably a stale socket channel on the server side.\n"
-          + "For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659\n"
           + "The default value is true";
     }
 
@@ -133,8 +130,6 @@ public final class HttpConfigurationProperties {
    * reset"
    * <p>
    * Assuming that the cause of the exception was most probably a stale socket channel on the server side.
-   * <p>
-   * For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659
    *
    * @since 7.0
    */
@@ -150,7 +145,6 @@ public final class HttpConfigurationProperties {
     public String description() {
       return "Enable retry of request (includes non-idempotent requests) on {@link SocketException} with message 'Connection reset'\n"
           + "Assuming that the cause of the exception was most probably a stale socket channel on the server side.\n"
-          + "For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659\n"
           + "The default value is true";
     }
 

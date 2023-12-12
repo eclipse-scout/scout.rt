@@ -122,7 +122,7 @@ public class AnonymousAccessController implements IAccessController {
 
     @Override
     public String description() {
-      return String.format("Specifies if the '%s' is enabled. Therefore if a security filter uses this controller no login is required.", AnonymousAccessController.class.getSimpleName());
+      return String.format("Specifies if the '%s' is enabled. Therefore, if a security filter uses this controller no login is required.", AnonymousAccessController.class.getSimpleName());
     }
 
     @Override

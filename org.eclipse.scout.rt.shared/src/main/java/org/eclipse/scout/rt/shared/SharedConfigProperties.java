@@ -42,7 +42,7 @@ public final class SharedConfigProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("Specifies the Base64 encoded private key for signing requests from the UI server to the backend server. By validating the signature the server can ensure the request is trustworthy.\n" +
-          "Furthermore the CookieAccessController uses this private key to sign the cookie.\n" +
+          "Furthermore, the CookieAccessController uses this private key to sign the cookie.\n" +
           "New public-private-key-pairs can be created by invoking the class '%s' on the command line.", SecurityUtility.class.getName());
     }
   }
@@ -76,9 +76,9 @@ public final class SharedConfigProperties {
     @Override
     public String description() {
       return "Specifies if the application should look for web resources (like .js, .html or .css) on the local filesystem. " +
-        "If true, the resources will be searched in modules that follow the Scout naming conventions (e.g. name.ui.app.dev, name.ui.app, name.ui) on the local filesystem first and (if not found) on the classpath second. " +
-        "If false, the resources are searched on the Java classpath only. " +
-        "By default this property is true in dev mode and false otherwise.";
+          "If true, the resources will be searched in modules that follow the Scout naming conventions (e.g. name.ui.app.dev, name.ui.app, name.ui) on the local filesystem first and (if not found) on the classpath second. " +
+          "If false, the resources are searched on the Java classpath only. " +
+          "By default this property is true in dev mode and false otherwise.";
     }
   }
 
@@ -115,8 +115,9 @@ public final class SharedConfigProperties {
 
     @Override
     public String description() {
-      return "The URL of the scout backend server (without any servlets). E.g.: http://localhost:8080\n"
-          + "By default this property is null.";
+      return String.format("The URL of the scout backend server (without any servlets).\n"
+          + "Example: %s=http://localhost:8080\n"
+          + "By default this property is null.", getKey());
     }
 
     @Override
@@ -141,9 +142,9 @@ public final class SharedConfigProperties {
 
     @Override
     public String description() {
-      return "Absolute URL to the deployed http(s):// base of the web-application. The URL should include proxies, redirects, etc.\n" +
-          "Example: https://www.my-company.com/my-scout-application/.\n" +
-          "This URL is used to replace '<scout:base />' tags.";
+      return String.format("Absolute URL to the deployed http(s):// base of the web-application. The URL should include proxies, redirects, etc.\n" +
+          "Example: %s=https://www.my-company.com/my-scout-application/.\n" +
+          "This URL is used to replace '<scout:base />' tags.", getKey());
     }
 
     @Override
