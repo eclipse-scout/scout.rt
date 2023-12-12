@@ -383,6 +383,9 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   }
 
   protected _renderInsertTiles(tiles: (TTile | PlaceholderTile)[]) {
+    if (!this.animateTileInsertion) {
+      return;
+    }
     tiles.forEach(tile => {
       if (!tile.rendered) {
         return;
