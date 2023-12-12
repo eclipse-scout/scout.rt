@@ -58,7 +58,7 @@ module.exports = (env, args) => {
       });
   }
 
-  const minimizerTarget = ['firefox69', 'chrome71', 'safari12.1'];
+  const minimizerTarget = ['firefox69', 'chrome71', 'safari13'];
   const babelOptions = {
     compact: false,
     cacheDirectory: true,
@@ -69,7 +69,7 @@ module.exports = (env, args) => {
         targets: {
           firefox: '69',
           chrome: '71',
-          safari: '12.1'
+          safari: '13'
         }
       }]
     ]

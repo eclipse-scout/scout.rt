@@ -275,7 +275,7 @@ export class Device implements DeviceModel, ObjectWithType {
     let browsers = Device.Browser;
     return (browser === browsers.CHROME && version >= 71)
       || (browser === browsers.FIREFOX && version >= 69)
-      || (browser === browsers.SAFARI && version >= 12.1);
+      || (browser === browsers.SAFARI && version >= 13);
   }
 
   /**
