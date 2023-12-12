@@ -28,10 +28,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.fileupload2.core.FileItemInput;
-import org.apache.commons.fileupload2.core.FileItemInputIterator;
-import org.apache.commons.fileupload2.core.FileUploadException;
-import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -61,12 +57,15 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 /**
- * This handler contributes to the {@link UiServlet} as the POST handler for /upload
+ * This handler contributes to the {@link UiServlet} as the POST handler for /upload.<br>
+ * See Session.uploadFiles() method in {@code Session.ts}.
  */
 @Order(4520)
 public class UploadRequestHandler extends AbstractUiServletRequestHandler {
@@ -99,7 +98,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     final String targetAdapterId = matcher.group(2);
 
     // Check if is really a file upload
-    if (!JakartaServletFileUpload.isMultipartContent(req)) {
+    if (!isMultipartContent(req)) {
       return false;
     }
 
@@ -139,7 +138,15 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     return true;
   }
 
-  protected void handleUploadFileRequest(IUiSession uiSession, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String targetAdapterId) throws IOException, FileUploadException {
+  protected boolean isMultipartContent(HttpServletRequest request) {
+    String contentType = request.getContentType();
+    if (contentType == null) {
+      return false;
+    }
+    return contentType.toLowerCase(Locale.ENGLISH).startsWith("multipart/");
+  }
+
+  protected void handleUploadFileRequest(IUiSession uiSession, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String targetAdapterId) throws IOException, ServletException {
     // If client sent ACK#, cleanup response history accordingly
     uiSession.confirmResponseProcessed(getAckSequenceNo(httpServletRequest));
 
@@ -214,21 +221,17 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * Since 5.2 this performs a {@link MalwareScanner#scan(BinaryResource)} on the resources and throws a
    * {@link PlatformException} if some resources are unsafe
    */
-  protected void readUploadData(HttpServletRequest httpReq, IUploadable uploadable, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException {
+  protected void readUploadData(HttpServletRequest httpReq, IUploadable uploadable, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws IOException, ServletException {
     Set<String> validFileExtensions = getValidFileExtensionsFor(uploadable, uploadProperties);
-    JakartaServletFileUpload upload = new JakartaServletFileUpload();
-    upload.setHeaderCharset(StandardCharsets.UTF_8);
-    upload.setSizeMax(uploadable.getMaximumUploadSize());
-    upload.setFileCountMax(CONFIG.getPropertyValue(UiHtmlConfigProperties.MaxUploadFileCountProperty.class));
+    long maxFileCount = CONFIG.getPropertyValue(UiHtmlConfigProperties.MaxUploadFileCountProperty.class);
     int fileCount = 0;
-    for (FileItemInputIterator it = upload.getItemIterator(httpReq); it.hasNext(); ) {
+    for (Part part : httpReq.getParts()) {
       fileCount++;
       //the first entry in an upload multipart is typically a "rowId" entry. be tolerant with one more file.
-      if (upload.getFileCountMax() > 0 && (fileCount - 1) > upload.getFileCountMax()) {
+      if (maxFileCount > 0 && (fileCount - 1) > maxFileCount) {
         throw new RejectedResourceException("Too many files ({}).", fileCount);
       }
-      FileItemInput item = it.next();
-      String filename = item.getName();
+      String filename = part.getSubmittedFileName();
       if (StringUtility.hasText(filename)) {
         String[] parts = StringUtility.split(filename, "[/\\\\]");
         filename = parts[parts.length - 1];
@@ -243,21 +246,24 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         }
         verifyFileName(validFileExtensions, filename, ext);
       }
+      verifyMaximumUploadSize(uploadable, part);
+
       byte[] content;
-      try (InputStream in = item.getInputStream()) {
+      try (InputStream in = part.getInputStream()) {
         content = IOUtility.readBytes(in);
       }
       BinaryResource res = BinaryResources.create()
           .withFilename(filename)
-          .withContentType(detectContentType(filename, item, content))
+          .withContentType(detectContentType(filename, part, content))
           .withContent(content)
           .build();
       verifyFileSafety(res);
       verifyFileIntegrity(res);
 
-      if (item.isFormField()) {
+      // properties are sent as form fields without file name by UI (see Session.ts)
+      if (StringUtility.isNullOrEmpty(part.getSubmittedFileName())) {
         // Handle non-file fields (interpreted as properties)
-        String name = item.getFieldName();
+        String name = part.getName();
         uploadProperties.put(name, new String(content, StandardCharsets.UTF_8));
       }
       else {
@@ -280,11 +286,11 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * <p>
    * The content is passed as well to allow for a custom content type detection logic.
    */
-  protected String detectContentType(String filename, FileItemInput item, byte[] content) {
+  protected String detectContentType(String filename, Part part, byte[] content) {
     if (filename != null) {
       return null;
     }
-    return item.getContentType();
+    return part.getContentType();
   }
 
   /**
@@ -356,6 +362,18 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   protected void verifyFileName(Set<String> validFileExtensions, String filename, String ext) {
     if (!validFileExtensions.isEmpty() && !validFileExtensions.contains("*") && !validFileExtensions.contains(ext)) {
       throw new RejectedResourceException("Filename '{}' has no accepted extension.", filename);
+    }
+  }
+
+  /**
+   * Checks if the uploaded file exceeds the maximum allowed upload size for given {@code uploadable}.
+   *
+   * @throws RejectedResourceException
+   *           when size of part exceeds the allowed upload size
+   */
+  protected void verifyMaximumUploadSize(IUploadable uploadable, Part part) {
+    if (part.getSize() > uploadable.getMaximumUploadSize()) {
+      throw new RejectedResourceException("The field {} exceeds its maximum permitted size of {} bytes.", part.getName(), uploadable.getMaximumUploadSize());
     }
   }
 

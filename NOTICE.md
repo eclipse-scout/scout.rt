@@ -366,14 +366,6 @@ commons-discovery-0.2.jar (0.2)
 
 * License: Apache Software License 1.1
 
-commons-fileupload (1.3.2)
-
-* License: Apache License, 2.0
-
-commons-fileupload (1.3.3)
-
-* License: Apache-2.0
-
 commons-io (2.2)
 
 * License: Apache License, 2.0

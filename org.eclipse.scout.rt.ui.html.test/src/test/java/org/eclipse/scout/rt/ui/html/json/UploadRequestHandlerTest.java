@@ -9,6 +9,9 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.fileupload2.core.FileUploadException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -31,17 +33,23 @@ import org.eclipse.scout.rt.platform.security.RejectedResourceException;
 import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.server.commons.BufferedServletInputStream;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties;
 import org.eclipse.scout.rt.ui.html.res.IUploadable;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMultipart;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 
+@RunWith(PlatformTestRunner.class)
 public class UploadRequestHandlerTest {
 
   @Test
@@ -111,7 +119,7 @@ public class UploadRequestHandlerTest {
   }
 
   @Test
-  public void testFileCount() throws IOException, FileUploadException, MessagingException {
+  public void testFileCount() throws IOException, MessagingException, ServletException {
     BeanTestingHelper testingHelper = BEANS.get(BeanTestingHelper.class);
     List<IBean<?>> mocked = new ArrayList<>();
     //limit upload file count to 10
@@ -138,41 +146,74 @@ public class UploadRequestHandlerTest {
       new UploadRequestHandler().readUploadData(createUploadRequest(10), uploadable, props, result);
       //11 files fail
       result.clear();
-      try {
-        new UploadRequestHandler().readUploadData(createUploadRequest(11), uploadable, props, result);
-        Assert.fail("must fail");
-      }
-      catch (RejectedResourceException e) {
-        //expected
-      }
+      assertThrows(RejectedResourceException.class, () -> new UploadRequestHandler().readUploadData(createUploadRequest(11), uploadable, props, result));
     }
     finally {
       testingHelper.unregisterBeans(mocked);
     }
   }
 
-  private static HttpServletRequest createUploadRequest(int fileCount) throws MessagingException, IOException {
+  @Test
+  public void testMaximumUploadSizeExceeded() {
+    IUploadable uploadable = () -> 3;
+    Map<String, String> props = new HashMap<>();
+    List<BinaryResource> result = new ArrayList<>();
+    assertThrows(RejectedResourceException.class, () -> new UploadRequestHandler().readUploadData(createUploadRequest(1), uploadable, props, result));
+  }
+
+  private static HttpServletRequest createUploadRequest(int fileCount) throws MessagingException, IOException, ServletException {
     MimeMultipart multipart = new MimeMultipart("form-data");
 
+    Collection<Part> parts = new ArrayList<>();
     MimeBodyPart magicPart = new MimeBodyPart();
     magicPart.setDisposition("form-data; name=\"rowId\"");
     magicPart.setText("");
     multipart.addBodyPart(magicPart);
+    parts.add(mockPart("rowId", null, 0));
 
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
     for (int i = 1; i <= fileCount; i++) {
       MimeBodyPart filePart = new MimeBodyPart();
       filePart.setDisposition("form-data; name=\"files\"");
       filePart.setFileName("file" + i + ".txt");
       filePart.setText("Text " + i);
       multipart.addBodyPart(filePart);
+      parts.add(mockPart("filesId", filePart.getFileName(), filePart.getContent().toString().length()));
     }
-
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
     multipart.writeTo(out);
 
+    ServletInputStream is = new BufferedServletInputStream(out.toByteArray());
+    for (Part part : parts) {
+      doReturn(is).when(part).getInputStream();
+    }
     HttpServletRequest req = Mockito.mock(HttpServletRequest.class);
-    Mockito.doReturn(multipart.getContentType()).when(req).getContentType();
-    Mockito.doReturn(new BufferedServletInputStream(out.toByteArray())).when(req).getInputStream();
+    doReturn(multipart.getContentType()).when(req).getContentType();
+    doReturn(parts).when(req).getParts();
+    doReturn(is).when(req).getInputStream();
+    return req;
+  }
+
+  private static Part mockPart(String name, String fileName, long size) {
+    Part part = mock(Part.class);
+    doReturn(name).when(part).getName();
+    doReturn(fileName).when(part).getSubmittedFileName();
+    doReturn(size).when(part).getSize();
+    return part;
+  }
+
+  @Test
+  public void testIsMultipartContent() {
+    UploadRequestHandler handler = new UploadRequestHandler();
+    assertTrue(handler.isMultipartContent(mockRequest("multipart/form-data")));
+    assertTrue(handler.isMultipartContent(mockRequest("mulTIparT/form-data")));
+    assertFalse(handler.isMultipartContent(mockRequest("multimock")));
+    assertFalse(handler.isMultipartContent(mockRequest("application/text")));
+    assertFalse(handler.isMultipartContent(mockRequest(null)));
+  }
+
+  protected HttpServletRequest mockRequest(String contentType) {
+    HttpServletRequest req = Mockito.mock(HttpServletRequest.class);
+    doReturn(contentType).when(req).getContentType();
     return req;
   }
 }

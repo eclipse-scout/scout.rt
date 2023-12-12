@@ -594,12 +594,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-fileupload2-jakarta</artifactId>
-        <version>2.0.0-M1</version>    <!-- FIXME PBZ JAKARTA dependency will be removed, see https://github.com/eclipse-scout/scout.rt/pull/817 -->
-      </dependency>
-
-      <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
         <version>1.16.0</version>
