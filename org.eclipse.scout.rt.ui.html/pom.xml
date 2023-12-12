@@ -40,10 +40,6 @@
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.json</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-fileupload2-jakarta</artifactId>
-    </dependency>
   </dependencies>
 
   <!-- primarily for license header generation -->
