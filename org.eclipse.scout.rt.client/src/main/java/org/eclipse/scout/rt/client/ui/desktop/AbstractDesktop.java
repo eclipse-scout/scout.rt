@@ -1109,7 +1109,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
     final IOutline newOutline = resolveOutline(outline);
     if (m_outline == newOutline) {
-      if (m_outline != null && getActiveForm() != null) {
+      if (m_outline != null) { // The active ScoutJS form is not tracked in UI. Active form check removed to support this case.
         m_outline.createDisplayParentRunContext().run(this::fireOutlineContentActivate);
       }
       return;
