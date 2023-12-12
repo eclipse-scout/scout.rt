@@ -423,12 +423,19 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   }
 
   protected _renderInsertTiles(tiles: (TTile | PlaceholderTile)[]) {
-    if (!this.animateTileInsertion) {
-      return;
+    if (this.animateTileInsertion) {
+      this._animateInsertTiles(tiles);
     }
-    tiles.forEach(tile => {
+    if (!this.htmlComp.layouting) {
+      // no need to invalidate when tile placeholders are added or removed while layouting
+      this.invalidateLayoutTree();
+    }
+  }
+
+  protected _animateInsertTiles(tiles: (TTile | PlaceholderTile)[]) {
+    for (let tile of tiles) {
       if (!tile.rendered) {
-        return;
+        continue;
       }
       tile.$container.addClass('before-animate-insert');
       // Wait until the layout animation is done before animating the insert operation.
@@ -442,11 +449,6 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
           }
         }
       });
-    });
-
-    if (!this.htmlComp.layouting) {
-      // no need to invalidate when tile placeholders are added or removed while layouting
-      this.invalidateLayoutTree();
     }
   }
 
