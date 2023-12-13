@@ -86,6 +86,18 @@ public final class SeleniumDriver {
     System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
     logProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
 
+    // ensure proxy properties do not contain an empty string
+    String proxyHostProperty = "http.proxyHost";
+    String proxyHost = System.getProperty(proxyHostProperty);
+    if (!StringUtility.hasText(proxyHost)) {
+      System.clearProperty(proxyHostProperty);
+    }
+    String proxyPortProperty = "http.proxyPort";
+    String proxyPort = System.getProperty(proxyPortProperty);
+    if (!StringUtility.hasText(proxyPort)) {
+      System.clearProperty(proxyPortProperty);
+    }
+
     // Prepare options
     ChromeOptions options = new ChromeOptions();
     String chromeBinary = System.getProperty("chrome.binary");
