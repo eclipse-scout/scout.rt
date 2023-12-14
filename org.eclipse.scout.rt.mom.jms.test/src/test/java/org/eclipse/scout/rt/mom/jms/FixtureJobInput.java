@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.mom.jms;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;

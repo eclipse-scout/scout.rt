@@ -11,9 +11,9 @@ package org.eclipse.scout.rt.server.session;
 
 import java.io.Serializable;
 
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
-import javax.servlet.http.HttpSessionListener;
+import jakarta.servlet.http.HttpSessionBindingEvent;
+import jakarta.servlet.http.HttpSessionBindingListener;
+import jakarta.servlet.http.HttpSessionListener;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.slf4j.Logger;

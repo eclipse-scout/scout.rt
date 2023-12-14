@@ -131,7 +131,7 @@ public class DevelopmentWebAppContext extends WebAppContext {
      * relative to the /META-INF/resources directory of a JAR file inside the web application's /WEB-INF/lib
      * directory.</>
      *
-     * @see javax.servlet.ServletContext#getResource(String)
+     * @see jakarta.servlet.ServletContext#getResource(String)
      */
     @Override
     public URL getResource(String path) throws MalformedURLException {
@@ -160,7 +160,7 @@ public class DevelopmentWebAppContext extends WebAppContext {
      * relative to the '/META-INF/resources' directory of a JAR file inside the web application's '/WEB-INF/lib'
      * directory.</>
      *
-     * @see javax.servlet.ServletContext#getResourcePaths(String)
+     * @see jakarta.servlet.ServletContext#getResourcePaths(String)
      */
     @Override
     public Set<String> getResourcePaths(String path) {

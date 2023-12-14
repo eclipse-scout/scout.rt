@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
+import jakarta.ws.rs.client.Client;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;

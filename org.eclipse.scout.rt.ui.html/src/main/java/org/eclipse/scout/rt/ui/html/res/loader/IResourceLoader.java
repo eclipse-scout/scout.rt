@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 
 /**
  * This is the interface for all individual resource loaders that are collected by
- * {@link ResourceLoaders#create(javax.servlet.http.HttpServletRequest, String)}
+ * {@link ResourceLoaders#create(jakarta.servlet.http.HttpServletRequest, String)}
  */
 public interface IResourceLoader {
 

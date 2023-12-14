@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.client;
 
-import javax.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientRequestFilter;
 
 import org.eclipse.scout.rt.platform.Bean;
 

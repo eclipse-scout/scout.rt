@@ -16,15 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.xml.ws.WebServiceClient;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.soap.MTOM;
+import jakarta.xml.ws.WebServiceClient;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.soap.MTOM;
 
 import org.eclipse.scout.jaxws.apt.internal.util.AnnotationUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BooleanSupplier;
 
-import javax.jms.JMSException;
+import jakarta.jms.JMSException;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;

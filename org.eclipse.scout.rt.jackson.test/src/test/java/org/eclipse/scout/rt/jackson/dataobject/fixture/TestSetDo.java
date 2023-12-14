@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 import java.util.Date;
 import java.util.Set;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;

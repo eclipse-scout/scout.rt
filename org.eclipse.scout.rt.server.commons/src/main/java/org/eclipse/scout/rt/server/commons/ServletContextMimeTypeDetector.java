@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.server.commons;
 
 import java.nio.file.Path;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;

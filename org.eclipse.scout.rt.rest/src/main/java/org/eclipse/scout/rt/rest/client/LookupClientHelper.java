@@ -9,10 +9,10 @@
  */
 package org.eclipse.scout.rt.rest.client;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRestrictionDo;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRowDo;

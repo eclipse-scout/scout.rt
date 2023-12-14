@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.mom.jms;
 
-import javax.jms.Message;
+import jakarta.jms.Message;
 
 /**
  * Properties used in {@link JmsMomImplementor} implementation.

@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.rest.jersey.client;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.core.Configuration;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.core.Configuration;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.glassfish.jersey.client.spi.Connector;

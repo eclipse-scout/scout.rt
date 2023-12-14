@@ -13,7 +13,7 @@ import static org.mockito.Mockito.*;
 
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.util.DownloadResponseHelper;
 import org.junit.Assert;

@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.mail;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 

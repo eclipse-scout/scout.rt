@@ -13,8 +13,8 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.dataobject.exception.ResourceNotFoundException;
@@ -42,11 +42,11 @@ public class ErrorDoRestClientExceptionTransformerTest {
 
   @Test
   public void testTransformJaxRsException() {
-    javax.ws.rs.ProcessingException exception = new javax.ws.rs.ProcessingException("call nok");
+    jakarta.ws.rs.ProcessingException exception = new jakarta.ws.rs.ProcessingException("call nok");
     assertException(RemoteSystemUnavailableException.class, null, m_exceptionTransformer.transform(exception, null));
 
     RuntimeException mockCause = new RuntimeException("mock");
-    javax.ws.rs.ProcessingException exception2 = new javax.ws.rs.ProcessingException("call nok", mockCause);
+    jakarta.ws.rs.ProcessingException exception2 = new jakarta.ws.rs.ProcessingException("call nok", mockCause);
     assertException(RemoteSystemUnavailableException.class, mockCause, m_exceptionTransformer.transform(exception2, null));
   }
 

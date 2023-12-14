@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.mom.jms;
 
 import java.util.Map;
 
-import javax.jms.Message;
+import jakarta.jms.Message;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
@@ -39,7 +39,7 @@ public interface IJmsMessageHandler {
   void init(Map<Object, Object> properties);
 
   /**
-   * Handles JMS messages consumed by a {@link javax.jms.MessageConsumer}.
+   * Handles JMS messages consumed by a {@link jakarta.jms.MessageConsumer}.
    * <p>
    * This method is called directly after a JMS message has been received.
    * <p>
@@ -48,7 +48,7 @@ public interface IJmsMessageHandler {
   void handleIncoming(IDestination<?> destination, Message message, IMarshaller marshaller);
 
   /**
-   * Handles JMS messages being sent by a {@link javax.jms.MessageProducer}.
+   * Handles JMS messages being sent by a {@link jakarta.jms.MessageProducer}.
    * <p>
    * This method is called directly before a JMS message is "sent" by the <i>MessageProducer</i>. "Sent" means that the
    * <i>send</i> method of the message producer is called. Therefore it is not guaranteed that the time, at which this

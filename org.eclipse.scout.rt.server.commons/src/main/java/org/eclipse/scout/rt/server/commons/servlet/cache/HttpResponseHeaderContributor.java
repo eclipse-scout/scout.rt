@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * An {@link IHttpResponseInterceptor} that adds a HTTP header from the given key/value pair to the response.

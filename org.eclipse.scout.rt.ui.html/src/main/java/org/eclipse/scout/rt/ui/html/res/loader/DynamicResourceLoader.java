@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;

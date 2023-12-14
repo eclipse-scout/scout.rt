@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.jersey.client;
 
-import javax.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
 
 import org.eclipse.scout.rt.rest.client.IGlobalRestClientConfigurator;
 import org.glassfish.jersey.client.spi.InvocationBuilderListener;

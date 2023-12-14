@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.client.IClientSession;
 
@@ -81,7 +81,7 @@ public interface ISessionStore {
    *
    * @param uiSession
    *          is the new UI session that runs
-   *          {@link UiSession#init(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.eclipse.scout.rt.ui.html.json.JsonStartupRequest)}
+   *          {@link UiSession#init(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse, org.eclipse.scout.rt.ui.html.json.JsonStartupRequest)}
    * @param queryClientSessionId
    *          is the id of a possibly existing and still valid clientSession
    * @return the associated and still valid, active {@link IClientSession} or null

@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.ContributesTo;
 import org.eclipse.scout.rt.dataobject.DoEntity;

@@ -17,12 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.jms.BytesMessage;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
-import javax.jms.TextMessage;
+import jakarta.jms.BytesMessage;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
 
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
@@ -196,7 +196,7 @@ public class JmsMessageWriter {
   /**
    * Finish writing and get the message.
    * <p>
-   * If the message is a {@link javax.jms.BytesMessage}, the message body is put in read-only mode and repositions the
+   * If the message is a {@link jakarta.jms.BytesMessage}, the message body is put in read-only mode and repositions the
    * stream of bytes to the beginning.
    *
    * @return the JMS message in read-only mode

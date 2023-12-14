@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.api.uinotification;
 
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

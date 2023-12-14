@@ -10,8 +10,8 @@
 package org.eclipse.scout.rt.rest.jersey;
 
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.core.Configuration;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.core.Configuration;
 
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.eclipse.scout.rt.platform.Replace;

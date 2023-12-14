@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.platform;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

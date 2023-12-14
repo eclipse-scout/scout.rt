@@ -11,13 +11,13 @@ package org.eclipse.scout.rt.mail.smtp;
 
 import java.util.Map;
 
-import javax.mail.Session;
+import jakarta.mail.Session;
 
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * Configuration object for SMTP server used by
- * {@link SmtpHelper#sendMessage(SmtpServerConfig, javax.mail.internet.MimeMessage)}.
+ * {@link SmtpHelper#sendMessage(SmtpServerConfig, jakarta.mail.internet.MimeMessage)}.
  */
 @Bean
 public class SmtpServerConfig {

@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.container;
 
-import javax.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.ContainerResponseFilter;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.rest.RestApplication;

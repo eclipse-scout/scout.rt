@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.rest.client.proxy;
 
 import java.util.function.Supplier;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
@@ -25,8 +25,8 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
   @Override
   public RuntimeException transform(RuntimeException e, Response response) {
     if (response == null) {
-      if (e instanceof javax.ws.rs.ProcessingException) {
-        return transformJaxRsProcessingException((javax.ws.rs.ProcessingException) e);
+      if (e instanceof jakarta.ws.rs.ProcessingException) {
+        return transformJaxRsProcessingException((jakarta.ws.rs.ProcessingException) e);
       }
       return e;
     }
@@ -39,12 +39,12 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
   }
 
   /**
-   * Transforms {@link javax.ws.rs.ProcessingException} into a {@link RemoteSystemUnavailableException}.
+   * Transforms {@link jakarta.ws.rs.ProcessingException} into a {@link RemoteSystemUnavailableException}.
    * <p>
-   * In case there is no response at all, a {@link javax.ws.rs.ProcessingException} indicates that something went wrong
+   * In case there is no response at all, a {@link jakarta.ws.rs.ProcessingException} indicates that something went wrong
    * while trying to reach the remote system, like the remote system host is down or configuration parameters are wrong.
    */
-  protected RuntimeException transformJaxRsProcessingException(javax.ws.rs.ProcessingException e) {
+  protected RuntimeException transformJaxRsProcessingException(jakarta.ws.rs.ProcessingException e) {
     Throwable cause = e.getCause();
     return new RemoteSystemUnavailableException(cause != null ? cause.getMessage() : null, cause);
   }

@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.jaxws.implementor;
 import java.io.Closeable;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.xml.ws.BindingProvider;
+import jakarta.annotation.PostConstruct;
+import jakarta.xml.ws.BindingProvider;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.slf4j.Logger;

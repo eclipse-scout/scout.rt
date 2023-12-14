@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.extension.dto.fixture;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTableData.OrigPageWithTableRowData;

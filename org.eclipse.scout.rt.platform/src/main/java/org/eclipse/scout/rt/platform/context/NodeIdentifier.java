@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.platform.context;
 
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;

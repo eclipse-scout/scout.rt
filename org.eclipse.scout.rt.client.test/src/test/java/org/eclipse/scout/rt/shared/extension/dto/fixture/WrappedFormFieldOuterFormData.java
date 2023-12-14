@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;

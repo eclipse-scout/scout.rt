@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.server.jaxws.provider.auth.handler;
 
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.http.HTTPException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.http.HTTPException;
 
 /**
  * Exception to be thrown, if the call chain should be exit with a {@link HTTPException}.

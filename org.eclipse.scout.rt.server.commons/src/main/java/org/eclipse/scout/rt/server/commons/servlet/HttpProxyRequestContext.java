@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.Bean;
 

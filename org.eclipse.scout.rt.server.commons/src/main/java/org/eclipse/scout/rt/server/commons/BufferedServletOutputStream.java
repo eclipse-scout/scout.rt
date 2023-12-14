@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.commons;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 

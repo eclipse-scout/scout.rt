@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.dataobject.value;
 
 import java.math.BigDecimal;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;

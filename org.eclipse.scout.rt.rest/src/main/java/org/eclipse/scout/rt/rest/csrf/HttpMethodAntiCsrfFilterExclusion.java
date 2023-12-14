@@ -13,8 +13,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 public class HttpMethodAntiCsrfFilterExclusion implements IAntiCsrfFilterExclusion {
   private final Set<String> m_methodsToIgnore;

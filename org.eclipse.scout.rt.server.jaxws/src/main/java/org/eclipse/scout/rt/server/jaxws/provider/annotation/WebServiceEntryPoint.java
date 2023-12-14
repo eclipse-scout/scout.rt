@@ -15,8 +15,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceClient;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceClient;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -143,7 +143,7 @@ public @interface WebServiceEntryPoint {
 
   /**
    * Specifies the handlers to be installed. The order of the handlers is as declared. A handler is looked up as a bean,
-   * and must implement {@link javax.xml.ws.handler.Handler} interface.
+   * and must implement {@link jakarta.xml.ws.handler.Handler} interface.
    * <ul>
    * <li>A handler can be configured to run in a {@link RunContext} by annotating it with {@link RunWithRunContext}
    * annotation.</li>

@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.jackson;
 
-import javax.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.jackson.dataobject.JacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;

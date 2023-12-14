@@ -16,8 +16,8 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionBindingListener;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -156,7 +156,7 @@ public class UiSessionTest {
 
   /**
    * Tests that session invalidation still works even if the model is blocking during its disposal. Especially the
-   * {@link HttpSessionBindingListener#valueUnbound(javax.servlet.http.HttpSessionBindingEvent)} method is expected not
+   * {@link HttpSessionBindingListener#valueUnbound(jakarta.servlet.http.HttpSessionBindingEvent)} method is expected not
    * to be blocked by the {@link SessionStore} (the method is invoked by the servlet container and blocking its thread
    * could interfere with the application server itself, for example when a background thread is cleaning up timed out
    * sessions).

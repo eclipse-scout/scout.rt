@@ -22,27 +22,27 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotAcceptableException;
-import javax.ws.rs.NotAllowedException;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.NotSupportedException;
-import javax.ws.rs.RedirectionException;
-import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.ServiceUnavailableException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.AsyncInvoker;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotAcceptableException;
+import jakarta.ws.rs.NotAllowedException;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotSupportedException;
+import jakarta.ws.rs.RedirectionException;
+import jakarta.ws.rs.ServerErrorException;
+import jakarta.ws.rs.ServiceUnavailableException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.AsyncInvoker;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.InvocationCallback;
+import jakarta.ws.rs.client.ResponseProcessingException;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates proxy instances around REST client resources which provide the following features:
  * <ul>
- * <li><b>Exception handling:</b> {@link WebApplicationException}s and {@link javax.ws.rs.ProcessingException}s are
+ * <li><b>Exception handling:</b> {@link WebApplicationException}s and {@link jakarta.ws.rs.ProcessingException}s are
  * transformed by an {@link IRestClientExceptionTransformer} which allows to extract additional service-dependent
  * payload.</li>
  * </ul>
@@ -259,8 +259,8 @@ public class RestClientProxyFactory {
         return getExceptionTransformer().transform(e, e.getResponse());
       }
 
-      if (t instanceof javax.ws.rs.ProcessingException) {
-        javax.ws.rs.ProcessingException e = (javax.ws.rs.ProcessingException) t;
+      if (t instanceof jakarta.ws.rs.ProcessingException) {
+        jakarta.ws.rs.ProcessingException e = (jakarta.ws.rs.ProcessingException) t;
         return getExceptionTransformer().transform(e, null);
       }
 

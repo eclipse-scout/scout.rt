@@ -11,8 +11,8 @@ package org.eclipse.scout.rt.server.commons.servlet.cache;
 
 import java.io.Serializable;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Interceptor that is called before the HTTP response is sent back to the client. This can be useful to alter the

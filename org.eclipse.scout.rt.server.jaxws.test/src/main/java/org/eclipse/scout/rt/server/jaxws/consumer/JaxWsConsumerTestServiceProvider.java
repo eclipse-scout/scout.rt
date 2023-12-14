@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.EchoRequest;
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.EchoResponse;

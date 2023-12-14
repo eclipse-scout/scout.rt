@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.extension;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;

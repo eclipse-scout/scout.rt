@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.BEANS;

@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.List;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;

@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.client.services.lookup;
 
 import java.util.Collection;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.TypeName;

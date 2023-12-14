@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.mom.jms;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;

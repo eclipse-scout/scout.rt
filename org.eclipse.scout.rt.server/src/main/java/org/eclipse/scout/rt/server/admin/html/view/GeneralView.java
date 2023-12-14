@@ -14,7 +14,7 @@ import java.security.Principal;
 import java.util.Date;
 
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;

@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.mail.smtp;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import jakarta.mail.NoSuchProviderException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
