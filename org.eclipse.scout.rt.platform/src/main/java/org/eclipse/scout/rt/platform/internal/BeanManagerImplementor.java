@@ -41,6 +41,9 @@ public class BeanManagerImplementor implements IBeanManager {
   private static final Logger LOG = LoggerFactory.getLogger(BeanManagerImplementor.class);
 
   private final ReentrantReadWriteLock m_lock;
+  /**
+   * BeanHierarchies are only accessed when we have acquired {@link #m_lock}.
+   */
   private final Map<Class<?>, BeanHierarchy> m_beanHierarchies;
   private IBeanDecorationFactory m_beanDecorationFactory;
 
@@ -170,7 +173,7 @@ public class BeanManagerImplementor implements IBeanManager {
 
   @SuppressWarnings("unchecked")
   @Override
-  public synchronized void unregisterBean(IBean<?> bean) {
+  public void unregisterBean(IBean<?> bean) {
     m_lock.writeLock().lock();
     try {
       Assertions.assertNotNull(bean);
@@ -260,8 +263,14 @@ public class BeanManagerImplementor implements IBeanManager {
 
   protected Set<IBean<?>> getAllBeans() {
     Set<IBean<?>> all = new HashSet<>();
-    for (BeanHierarchy<?> h : m_beanHierarchies.values()) {
-      all.addAll(h.getBeans());
+    m_lock.readLock().lock();
+    try {
+      for (BeanHierarchy<?> h : m_beanHierarchies.values()) {
+        all.addAll(h.getBeans());
+      }
+    }
+    finally {
+      m_lock.readLock().unlock();
     }
     return all;
   }
