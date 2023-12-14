@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import org.eclipse.scout.jaxws.consumer.jaxwspingtestservice.JaxWsPingTestServicePortType;
 import org.eclipse.scout.jaxws.consumer.jaxwspingtestservice.PingRequest;

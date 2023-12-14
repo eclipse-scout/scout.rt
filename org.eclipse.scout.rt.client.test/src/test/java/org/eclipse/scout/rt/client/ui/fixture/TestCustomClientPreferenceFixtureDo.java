@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.fixture;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.client.ui.fixture.ScoutTestFixtureTypeVersions.ScoutTestFixture_1_0_0;
 import org.eclipse.scout.rt.dataobject.DoEntity;

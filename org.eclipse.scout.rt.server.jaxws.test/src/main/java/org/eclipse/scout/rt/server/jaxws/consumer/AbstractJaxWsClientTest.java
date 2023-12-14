@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.WebServiceException;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.WebServiceException;
 
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.EchoRequest;
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.EchoResponse;

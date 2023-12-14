@@ -9,12 +9,12 @@
  */
 package org.eclipse.scout.rt.rest.client.proxy;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Strategy used by proxied REST clients for transforming technical REST exceptions ({@link WebApplicationException} and
- * {@link javax.ws.rs.ProcessingException}) into the current application context.
+ * {@link jakarta.ws.rs.ProcessingException}) into the current application context.
  */
 @FunctionalInterface
 public interface IRestClientExceptionTransformer {
@@ -29,7 +29,7 @@ public interface IRestClientExceptionTransformer {
    * Transforms the given {@link RuntimeException} and optional {@link Response}.
    *
    * @param e
-   *          {@link WebApplicationException} or {@link javax.ws.rs.ProcessingException} caught during REST service
+   *          {@link WebApplicationException} or {@link jakarta.ws.rs.ProcessingException} caught during REST service
    *          invocation.
    * @param response
    *          optional response extracted from the given exception. <b>Note:</b> Could be null.

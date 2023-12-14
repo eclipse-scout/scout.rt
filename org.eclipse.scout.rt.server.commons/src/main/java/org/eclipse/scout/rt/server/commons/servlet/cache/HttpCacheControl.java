@@ -9,9 +9,9 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
@@ -62,7 +62,7 @@ public class HttpCacheControl {
    * Writes disabled cache headers if the obj is null or cannot safely be returned resp. should not be cached at all.
    * <p>
    * Does nothing if this request is a forward such as
-   * {@link RequestDispatcher#forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)}
+   * {@link RequestDispatcher#forward(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse)}
    *
    * @param obj
    *          is the cache object that decides if cache is to be used or not, may be null to disable caching

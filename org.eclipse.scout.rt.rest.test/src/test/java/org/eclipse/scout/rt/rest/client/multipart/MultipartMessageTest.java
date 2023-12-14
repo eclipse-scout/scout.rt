@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.rest.client.multipart;
 
 import static org.junit.Assert.*;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;

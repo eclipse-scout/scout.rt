@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Collection;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;

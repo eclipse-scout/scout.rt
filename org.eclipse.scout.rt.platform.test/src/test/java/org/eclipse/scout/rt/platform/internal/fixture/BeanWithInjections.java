@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.internal.fixture;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;

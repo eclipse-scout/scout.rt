@@ -3,22 +3,22 @@
 #set( $symbol_escape = '\' )
 package ${package}.api.person;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
 
-import ${package}.core.person.PersonService;
-import ${package}.data.person.PersonDo;
-import ${package}.data.person.PersonResponse;
+{package}.core.person.PersonService;
+{package}.data.person.PersonDo;
+{package}.data.person.PersonResponse;
 import ${package}.data.person.PersonRestrictionDo;
 
 @Path("persons")

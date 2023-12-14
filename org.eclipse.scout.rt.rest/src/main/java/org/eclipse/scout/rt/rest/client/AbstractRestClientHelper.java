@@ -16,15 +16,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
@@ -165,7 +165,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   /**
    * @return proxied {@link Client} instance that delegates {@link WebApplicationException}s and
-   *         {@link javax.ws.rs.ProcessingException}s to {@link #transformException(RuntimeException, Response)}.
+   *         {@link jakarta.ws.rs.ProcessingException}s to {@link #transformException(RuntimeException, Response)}.
    */
   public Client client() {
     return client(this::transformException);
@@ -173,7 +173,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   /**
    * @return proxied {@link Client} instance that delegates {@link WebApplicationException}s and
-   *         {@link javax.ws.rs.ProcessingException}s to the given {@link IRestClientExceptionTransformer}. The
+   *         {@link jakarta.ws.rs.ProcessingException}s to the given {@link IRestClientExceptionTransformer}. The
    *         {@code null}-transformer returns the passed exception unchanged.
    */
   public Client client(IRestClientExceptionTransformer exceptionTransformer) {
@@ -227,7 +227,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   protected abstract String getBaseUri();
 
   /**
-   * Call-back method for transforming {@link WebApplicationException} and {@link javax.ws.rs.ProcessingException}
+   * Call-back method for transforming {@link WebApplicationException} and {@link jakarta.ws.rs.ProcessingException}
    * thrown during a REST service invocation. Subclasses may extract service-specific error objects.
    * <p>
    * This default implementation just returns the passed exception.

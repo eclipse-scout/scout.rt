@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.rest.exception;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;

@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.mom.jms;
 
 import java.util.Map;
 
-import javax.jms.Message;
+import jakarta.jms.Message;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;

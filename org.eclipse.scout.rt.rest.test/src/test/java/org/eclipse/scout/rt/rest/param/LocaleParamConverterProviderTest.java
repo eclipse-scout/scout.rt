@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 import java.util.Locale;
 
-import javax.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverter;
 
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;

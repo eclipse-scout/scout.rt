@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.jaxws.provider.handler;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler;
 

@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.rest.jackson;
 
-import javax.annotation.Priority;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;

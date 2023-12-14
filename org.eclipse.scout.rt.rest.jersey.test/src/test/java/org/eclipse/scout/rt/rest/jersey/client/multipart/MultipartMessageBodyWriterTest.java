@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.rest.jersey.client.multipart;
 
 import static org.junit.Assert.*;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.rest.client.multipart.MultipartMessage;
 import org.eclipse.scout.rt.rest.client.multipart.MultipartPart;

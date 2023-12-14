@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.client.services.extension;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;

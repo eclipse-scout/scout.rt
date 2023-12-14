@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.rest.client;
 
 import java.io.IOException;
 
-import javax.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestContext;
 
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.rest.csrf.AntiCsrfHelper;

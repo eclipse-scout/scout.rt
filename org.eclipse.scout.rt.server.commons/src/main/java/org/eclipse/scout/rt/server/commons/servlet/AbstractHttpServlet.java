@@ -14,16 +14,16 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * This servlet ensures that {@link HttpServletRequest} and {@link HttpServletResponse} are wrapped and will be
- * invalidated after {@link HttpServlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)} method has
+ * invalidated after {@link HttpServlet#service(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse)} method has
  * been completed. Any further access to those objects will throw an {@link IllegalStateException}.
  * <p>
  * Some application containers already prevent asynchronous access to released/invalid resources. This servlet enables

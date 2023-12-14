@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.client.ui.action.menu.form.fields.fixture;
 
 import java.math.BigDecimal;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;

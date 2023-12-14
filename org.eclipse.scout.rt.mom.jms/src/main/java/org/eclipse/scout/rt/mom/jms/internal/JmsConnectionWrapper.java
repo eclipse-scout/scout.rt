@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
+import jakarta.jms.Connection;
+import jakarta.jms.JMSException;
 
 import org.eclipse.scout.rt.mom.api.IMom.ConnectionRetryCountProperty;
 import org.eclipse.scout.rt.mom.api.IMom.ConnectionRetryIntervalMillisProperty;

@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.mail.imap;
 
 import java.util.Map;
 
-import javax.mail.Session;
+import jakarta.mail.Session;
 
 import org.eclipse.scout.rt.oauth2.OAuth2Config;
 import org.eclipse.scout.rt.platform.Bean;

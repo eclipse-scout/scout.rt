@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.ui.html;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;

@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.rest.csrf;
 
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;

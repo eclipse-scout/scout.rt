@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.server.jaxws.provider.context;
 
-import javax.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceContext;
 
 /**
  * Interface to hold information about an ongoing webservice request.

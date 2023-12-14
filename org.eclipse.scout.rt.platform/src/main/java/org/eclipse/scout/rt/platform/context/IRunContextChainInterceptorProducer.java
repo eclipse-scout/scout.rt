@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;

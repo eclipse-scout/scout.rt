@@ -11,9 +11,9 @@ package org.eclipse.scout.rt.server.jaxws.consumer;
 
 import java.util.List;
 
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.MessageContext;
 
 /**
  * Classes implementing this interface provide web service ports. Whether these ports are created directly when

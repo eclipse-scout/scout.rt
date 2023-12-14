@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
 import java.math.BigDecimal;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;

@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.server.session;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.concurrent.GroupedSynchronizer;

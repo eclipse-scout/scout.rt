@@ -15,8 +15,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
 import javax.management.ObjectName;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;

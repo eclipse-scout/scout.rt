@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.mom.jms;
 
-import javax.jms.JMSException;
-import javax.jms.Session;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 
 import org.eclipse.scout.rt.mom.jms.internal.JmsSessionProviderWrapper;
 

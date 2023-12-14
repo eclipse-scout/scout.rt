@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.jws.WebMethod;
-import javax.xml.ws.BindingProvider;
+import jakarta.jws.WebMethod;
+import jakarta.xml.ws.BindingProvider;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;

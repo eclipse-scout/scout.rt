@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.rest.client.proxy;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.ws.rs.client.Client;
+import jakarta.ws.rs.client.Client;
 
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;

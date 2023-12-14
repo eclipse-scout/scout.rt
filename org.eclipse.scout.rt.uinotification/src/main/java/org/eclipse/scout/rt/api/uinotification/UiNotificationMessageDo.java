@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.api.uinotification;
 
 import java.io.Serializable;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationDo;
 import org.eclipse.scout.rt.dataobject.DoEntity;

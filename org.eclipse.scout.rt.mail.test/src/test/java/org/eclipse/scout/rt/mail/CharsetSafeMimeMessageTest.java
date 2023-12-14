@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.mail;
 
 import static org.junit.Assert.*;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import org.junit.Test;
 

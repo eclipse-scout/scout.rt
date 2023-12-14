@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jms.Message;
+import jakarta.jms.Message;
 
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;

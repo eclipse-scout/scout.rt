@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.AttributeName;
 import org.eclipse.scout.rt.dataobject.DoEntity;

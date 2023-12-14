@@ -9,9 +9,9 @@
  */
 package org.eclipse.scout.rt.server.jaxws.provider.context;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.http.HTTPException;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.http.HTTPException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;

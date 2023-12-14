@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.commons.authentication;
 import java.security.Principal;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 

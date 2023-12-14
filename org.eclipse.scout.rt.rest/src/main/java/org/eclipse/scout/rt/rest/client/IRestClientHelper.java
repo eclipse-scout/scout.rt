@@ -11,8 +11,8 @@ package org.eclipse.scout.rt.rest.client;
 
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.WebTarget;
 
 import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
 
@@ -38,7 +38,7 @@ public interface IRestClientHelper {
    *          would be encoded).
    * @param exceptionTransformer
    *          optional {@link IRestClientExceptionTransformer} used by the returned {@link WebTarget} and any objects it
-   *          creates to transform {@link WebApplicationException}s and {@link javax.ws.rs.ProcessingException}s. The
+   *          creates to transform {@link WebApplicationException}s and {@link jakarta.ws.rs.ProcessingException}s. The
    *          {@code null}-transformer returns the passed exception unchanged.
    */
   WebTarget target(String resourcePath, IRestClientExceptionTransformer exceptionTransformer);

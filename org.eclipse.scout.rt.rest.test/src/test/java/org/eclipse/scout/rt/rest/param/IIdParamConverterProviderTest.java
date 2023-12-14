@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.rest.param;
 
 import static org.junit.Assert.*;
 
-import javax.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverter;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;

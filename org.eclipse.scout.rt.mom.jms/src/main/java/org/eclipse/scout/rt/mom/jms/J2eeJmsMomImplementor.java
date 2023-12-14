@@ -11,10 +11,10 @@ package org.eclipse.scout.rt.mom.jms;
 
 import java.util.Map;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Session;
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMom;
@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.mom.jms.internal.JmsConnectionWrapper;
  * <ul>
  * <li>Each {@link Session} requires its own {@link Connection}
  * <li>ClientId should not be set on {@link Connection}
- * <li>ExceptionListener should not be set with {@link Connection#setExceptionListener(javax.jms.ExceptionListener)}
+ * <li>ExceptionListener should not be set with {@link Connection#setExceptionListener(jakarta.jms.ExceptionListener)}
  * <li>Async send (CompletionListener) is not supported
  * <li>Async receive (MessageListener) is not supported
  * </ul>

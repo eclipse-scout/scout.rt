@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.mom.jms;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.jms.MessageConsumer;
+import jakarta.jms.MessageConsumer;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMessageListener;

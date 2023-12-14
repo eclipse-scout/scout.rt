@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Interface to hold information about an ongoing Servlet call.

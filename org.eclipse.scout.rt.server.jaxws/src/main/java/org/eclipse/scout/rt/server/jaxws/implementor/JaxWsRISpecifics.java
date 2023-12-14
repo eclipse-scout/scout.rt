@@ -13,8 +13,8 @@ import java.io.Closeable;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.xml.ws.handler.MessageContext;
+import jakarta.annotation.PostConstruct;
+import jakarta.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.WebServiceRequestRejectedException;

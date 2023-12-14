@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.jaxws.consumer;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;

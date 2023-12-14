@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
 
