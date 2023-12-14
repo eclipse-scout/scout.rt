@@ -57,6 +57,7 @@ public class PlatformImplementor implements IPlatform {
   private volatile CountDownLatch m_platformStarting = new CountDownLatch(1);
   private final AtomicReference<State> m_state; // may be read at any time by any thread
   private BeanManagerImplementor m_beanManager;
+  private volatile boolean m_initializedSuccessfully;
 
   public PlatformImplementor() {
     m_state = new AtomicReference<>(State.PlatformStopped);
@@ -69,6 +70,9 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public IBeanManager getBeanManager() {
+    if (m_initializedSuccessfully) {
+      return m_beanManager;
+    }
     // use lock to ensure the caller waits until the platform has been started completely
     m_platformLock.readLock().lock();
     try {
@@ -154,6 +158,7 @@ public class PlatformImplementor implements IPlatform {
         m_platformLock.writeLock().unlock();
       }
       changeState(State.PlatformStarted, true);
+      m_initializedSuccessfully = true;
     }
     finally {
       notifyPlatformStarted();
@@ -249,6 +254,7 @@ public class PlatformImplementor implements IPlatform {
     m_beanManager.callPreDestroyOnBeans();
     changeState(State.PlatformStopping, true);
 
+    m_initializedSuccessfully = false;
     m_platformLock.writeLock().lock();
     try {
       changeState(State.PlatformStopped, false);
