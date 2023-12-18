@@ -124,6 +124,9 @@ export class TileGridLayout extends LogicalGridLayout {
 
   protected _storeBounds(tiles: Tile[]) {
     tiles.forEach((tile, i) => {
+      if (!tile.animateBoundsChange) {
+        return;
+      }
       let bounds = graphics.cssBounds(tile.$container);
       tile.$container.data('oldBounds', bounds);
       tile.$container.data('was-layouted', tile.htmlComp.layouted);
