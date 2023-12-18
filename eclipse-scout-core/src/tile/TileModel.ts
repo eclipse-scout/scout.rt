@@ -11,6 +11,12 @@ import {ColorScheme, GridData, TileDisplayStyle, WidgetModel} from '../index';
 
 export interface TileModel extends WidgetModel {
   /**
+   * Specifies whether position or size changes should be animated.
+   *
+   * Default is true.
+   */
+  animateBoundsChange?: boolean;
+  /**
    * Specifies the color scheme of the tile.
    *
    * It may be a {@link ColorScheme} object or a string.
