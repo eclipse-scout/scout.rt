@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -123,6 +123,10 @@ export class TileGridLayout extends LogicalGridLayout {
 
   protected _storeBounds(tiles: Tile[]) {
     tiles.forEach((tile, i) => {
+      if (!tile.animateBoundsChange) {
+        // There is no need to read and store bounds if the tile should not be animated
+        return;
+      }
       let bounds = graphics.cssBounds(tile.$container);
       tile.$container.data('oldBounds', bounds);
       tile.$container.data('was-layouted', tile.htmlComp.layouted);
@@ -156,6 +160,9 @@ export class TileGridLayout extends LogicalGridLayout {
     // Animate the position change of the tiles
     let promises = [];
     this.tiles.forEach((tile, i) => {
+      if (!tile.animateBoundsChange) {
+        return;
+      }
       if (!tile.rendered) {
         // Only animate tiles which were there at the beginning of the layout
         // RenderViewPort may remove or render some, the removed ones cannot be animated because $container is missing and don't need to anyway, the rendered ones cannot because fromBounds are missing
@@ -175,8 +182,6 @@ export class TileGridLayout extends LogicalGridLayout {
   }
 
   protected _animateTile(tile: Tile): void | JQuery.Promise<void> {
-    let htmlComp = this.widget.htmlComp;
-
     // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
     // It may also happen that while the animation of a tile is in progress, the layout is triggered again but the tile should not be animated anymore
     // (e.g. if it is not in the viewport anymore). In that case the animation must be stopped otherwise it may be placed at a wrong position
@@ -200,6 +205,7 @@ export class TileGridLayout extends LogicalGridLayout {
       fromBounds = bounds.clone();
     }
 
+    let htmlComp = this.widget.htmlComp;
     if (!htmlComp.layouted && (this.widget.startupAnimationDone || !this.widget.startupAnimationEnabled) && this.widget.renderAnimationEnabled) {
       // This is a small, discreet render animation, just move the tiles a little
       // It will happen if the startup animation is disabled or done and every time the tiles are rendered anew

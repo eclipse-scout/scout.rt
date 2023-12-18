@@ -17,6 +17,7 @@ export class Tile extends Widget implements TileModel {
   declare eventMap: TileEventMap;
   declare self: Tile;
 
+  animateBoundsChange: boolean;
   colorScheme: ColorScheme;
   displayStyle: TileDisplayStyle;
   gridData: GridData;
@@ -28,6 +29,7 @@ export class Tile extends Widget implements TileModel {
 
   constructor() {
     super();
+    this.animateBoundsChange = true;
     this.displayStyle = Tile.DisplayStyle.DEFAULT;
     this.gridData = null;
     this.rowId = null;
