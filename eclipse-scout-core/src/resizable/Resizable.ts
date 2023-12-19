@@ -13,17 +13,6 @@ import MouseDownEvent = JQuery.MouseDownEvent;
 import MouseUpEvent = JQuery.MouseUpEvent;
 import MouseMoveEvent = JQuery.MouseMoveEvent;
 
-export interface ResizableContext {
-  initialBounds: Rectangle;
-  minBounds: Rectangle;
-  maxBounds: Rectangle;
-  distance: number[];
-  edge: string;
-  mousedownEvent: MouseDownEvent;
-}
-
-export type ResizableMode = EnumObject<typeof Resizable.MODES>;
-
 /**
  * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given model.$container. This is primarily used for (modal) dialogs.
  */
@@ -34,6 +23,7 @@ export class Resizable implements ResizableModel, ObjectWithType {
   objectType: string;
   modes: ResizableMode[];
   boundaries: Insets;
+  useOverlay: boolean;
   $container: JQuery;
   $window: JQuery<Window>;
   $resizableS: JQuery;
@@ -44,6 +34,7 @@ export class Resizable implements ResizableModel, ObjectWithType {
   $resizableN: JQuery;
   $resizableNW: JQuery;
   $resizableNE: JQuery;
+  $resizingOverlay: JQuery;
 
   protected _context: ResizableContext;
   protected _mouseDownHandler: (event: MouseDownEvent) => void;
@@ -58,6 +49,7 @@ export class Resizable implements ResizableModel, ObjectWithType {
     this.$window = model.$container.window();
     this.setModes(model.modes);
     this.setBoundaries(model.boundaries);
+    this.useOverlay = scout.nvl(model.useOverlay, false);
     this.$resizableS = null;
     this.$resizableE = null;
     this.$resizableSE = null;
@@ -234,6 +226,7 @@ export class Resizable implements ResizableModel, ObjectWithType {
 
     this._context = {
       initialBounds: initialBounds,
+      currentBounds: initialBounds.clone(),
       minBounds: new Rectangle(
         initialBounds.right() - minWidth,
         initialBounds.bottom() - minHeight,
@@ -251,7 +244,13 @@ export class Resizable implements ResizableModel, ObjectWithType {
       mousedownEvent: event
     };
 
-    $resizable.addClass('resizable-resizing');
+    if (this.useOverlay) {
+      this.$resizingOverlay = $resizable.parent().appendDiv('resizing-overlay');
+      this.$resizingOverlay.css('border-radius', $resizable.css('border-radius'));
+      graphics.setBounds(this.$resizingOverlay, initialBounds);
+    }
+
+    $resizable.addClass('resizing');
     this.$window
       .off('mouseup.resizable', this._mouseUpHandler)
       .off('mousemove.resizable', this._mousemoveHandler)
@@ -261,45 +260,70 @@ export class Resizable implements ResizableModel, ObjectWithType {
   }
 
   protected _onMouseUp(event: MouseUpEvent) {
-    this.$container.removeClass('resizable-resizing');
+    this.$container.removeClass('resizing');
+    if (this.$resizingOverlay) {
+      this.$resizingOverlay.remove();
+      this.$resizingOverlay = null;
+    }
     this.$window
       .off('mouseup.resizable', this._mouseUpHandler)
       .off('mousemove.resizable', this._mousemoveHandler);
     $('iframe').removeClass('dragging-in-progress');
+    this._resizeEnd();
     this._context = null;
   }
 
   protected _onMousemove(event: MouseMoveEvent) {
-    let ctx = this._context,
-      newBounds = ctx.initialBounds.clone(),
-      distance = this._calcDistance(ctx.mousedownEvent, event);
+    let newBounds = this._computeBounds(event);
+    if (newBounds) {
+      $.throttle(this._resizeHandler, Resizable.FPS)(newBounds);
+    }
+  }
 
+  protected _computeBounds(event: MouseMoveEvent) {
+    let ctx = this._context;
+    let newBounds = ctx.initialBounds.clone();
+    let distance = this._calcDistance(ctx.mousedownEvent, event);
     if (scout.isOneOf(ctx.edge, 'ne', 'e', 'se')) {
-      newBounds.width = Math.max(ctx.minBounds.width,
-        Math.min(ctx.maxBounds.width, ctx.initialBounds.width + distance[0]));
+      newBounds.width = Math.max(ctx.minBounds.width, Math.min(ctx.maxBounds.width, ctx.initialBounds.width + distance[0]));
     } else if (scout.isOneOf(ctx.edge, 'nw', 'w', 'sw')) {
       // Resize to the left
-      newBounds.x = Math.min(ctx.minBounds.x,
-        Math.max(ctx.maxBounds.x, ctx.initialBounds.x + distance[0]));
+      newBounds.x = Math.min(ctx.minBounds.x, Math.max(ctx.maxBounds.x, ctx.initialBounds.x + distance[0]));
       newBounds.width += ctx.initialBounds.x - newBounds.x;
     }
     if (scout.isOneOf(ctx.edge, 'sw', 's', 'se')) {
-      newBounds.height = Math.max(ctx.minBounds.height,
-        Math.min(ctx.maxBounds.height, ctx.initialBounds.height + distance[1]));
+      newBounds.height = Math.max(ctx.minBounds.height, Math.min(ctx.maxBounds.height, ctx.initialBounds.height + distance[1]));
     } else if (scout.isOneOf(ctx.edge, 'nw', 'n', 'ne')) {
       // Resize to the bottom
-      newBounds.y = Math.min(ctx.minBounds.y,
-        Math.max(ctx.maxBounds.y, ctx.initialBounds.y + distance[1]));
+      newBounds.y = Math.min(ctx.minBounds.y, Math.max(ctx.maxBounds.y, ctx.initialBounds.y + distance[1]));
       newBounds.height += ctx.initialBounds.y - newBounds.y;
     }
-    $.throttle(this._resizeHandler, Resizable.FPS)(newBounds);
+    return newBounds;
   }
 
   protected _resize(newBounds: Rectangle) {
     this._cropToBoundaries(newBounds);
-    graphics.setBounds(this.$container, newBounds);
+    if (this._context.currentBounds.equals(newBounds)) {
+      return;
+    }
+    this._context.currentBounds = newBounds;
+    if (this.useOverlay) {
+      graphics.setBounds(this.$resizingOverlay, newBounds);
+    } else {
+      graphics.setBounds(this.$container, newBounds);
+    }
     this.$container.trigger('resize', {
       newBounds: newBounds,
+      initialBounds: this._context.initialBounds
+    });
+  }
+
+  protected _resizeEnd() {
+    if (this._context.currentBounds.equals(this._context.initialBounds)) {
+      return;
+    }
+    this.$container.trigger('resizeend', {
+      newBounds: this._context.currentBounds,
       initialBounds: this._context.initialBounds
     });
   }
@@ -332,3 +356,15 @@ export class Resizable implements ResizableModel, ObjectWithType {
     return [distX, distY];
   }
 }
+
+export interface ResizableContext {
+  initialBounds: Rectangle;
+  currentBounds: Rectangle;
+  minBounds: Rectangle;
+  maxBounds: Rectangle;
+  distance: number[];
+  edge: string;
+  mousedownEvent: MouseDownEvent;
+}
+
+export type ResizableMode = EnumObject<typeof Resizable.MODES>;
