@@ -84,7 +84,7 @@ public class HttpCacheControlTest {
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(resp, ONCE).setHeader(HttpCacheControl.CACHE_CONTROL, "private, no-store, no-cache, max-age=0");
   }
 
@@ -106,7 +106,7 @@ public class HttpCacheControlTest {
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
@@ -133,7 +133,7 @@ public class HttpCacheControlTest {
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
@@ -159,7 +159,7 @@ public class HttpCacheControlTest {
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
@@ -186,7 +186,7 @@ public class HttpCacheControlTest {
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
@@ -213,7 +213,7 @@ public class HttpCacheControlTest {
     Assert.assertTrue(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
@@ -239,7 +239,7 @@ public class HttpCacheControlTest {
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
@@ -266,7 +266,7 @@ public class HttpCacheControlTest {
     Assert.assertFalse(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
@@ -293,7 +293,7 @@ public class HttpCacheControlTest {
     Assert.assertTrue(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);
@@ -319,7 +319,7 @@ public class HttpCacheControlTest {
     Assert.assertTrue(b);
 
     Mockito.verify(req, ANY_TIMES).getPathInfo();
-    Mockito.verify(req, ANY_TIMES).getAttribute("javax.servlet.forward.path_info");
+    Mockito.verify(req, ANY_TIMES).getAttribute("jakarta.servlet.forward.path_info");
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.ETAG);
     Mockito.verify(req, ANY_TIMES).getHeader(HttpCacheControl.IF_NONE_MATCH);
     Mockito.verify(req, ANY_TIMES).getDateHeader(HttpCacheControl.IF_MODIFIED_SINCE);

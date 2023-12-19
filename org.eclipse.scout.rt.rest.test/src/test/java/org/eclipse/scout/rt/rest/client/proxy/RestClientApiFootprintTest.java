@@ -35,11 +35,12 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class RestClientApiFootprintTest {
 
+  // FIXME PBZ JAKARTA check with ABR
   @Test
   @Ignore
   public void verifyApiSignatures() throws IOException {
     ApiSignatureDo api = BEANS.get(ApiSignature.class)
-        .classFilter(c -> c.getPackage() != null && c.getPackage().getName().startsWith("javax.ws.rs."))
+        .classFilter(c -> c.getPackage() != null && c.getPackage().getName().startsWith("jakarta.ws.rs."))
         .methodFilter(m -> !"$jacocoInit".equals(m.getName())) // ignore methods created by code coverage
         .collect(Client.class)
         .build();

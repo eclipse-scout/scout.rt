@@ -311,8 +311,8 @@ public class ServletFilterHelper {
    * <li><b>redirect=true</b>: A HTTP redirect response (302) is sent, using
    * {@link HttpServletResponse#sendRedirect(String)}.
    * <li><b>redirect=false</b>: The request is forwarded to a dispatcher using the new location, using
-   * {@link RequestDispatcher#forward(ServletRequest, ServletResponse)} (javax.servlet.ServletRequest,
-   * javax.servlet.ServletResponse)). This has the same effect as if the user had requested the target location from the
+   * {@link RequestDispatcher#forward(ServletRequest, ServletResponse)} (jakarta.servlet.ServletRequest,
+   * jakarta.servlet.ServletResponse)). This has the same effect as if the user had requested the target location from the
    * beginning.
    * </ul>
    * If the client expects JSON as response (accept-header contains 'application/json'), no redirection happens, but a

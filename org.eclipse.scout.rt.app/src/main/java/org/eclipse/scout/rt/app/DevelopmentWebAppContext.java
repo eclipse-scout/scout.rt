@@ -48,7 +48,7 @@ public class DevelopmentWebAppContext extends WebAppContext {
    * '/META-INF/resources' folder.
    * <p>
    * This method works for both, packed and unpacked JAR files, which is crucial when running the application from
-   * within the IDE. see 'javax.servlet.ServletContext.getResourcePaths(String)' for the specification.
+   * within the IDE. see 'jakarta.servlet.ServletContext.getResourcePaths(String)' for the specification.
    */
   protected Set<String> getResourcePathsFromDependentJars(ClassLoader classloader, String path) {
     path = path.endsWith(URIUtil.SLASH) ? path : path + URIUtil.SLASH;

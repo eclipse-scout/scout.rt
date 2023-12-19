@@ -23,7 +23,7 @@ public class DevelopmentWebAppContextTest {
   }
 
   /**
-   * Test Use Case: see JavaDoc of javax.servlet.ServletContext.getResourcePaths(String)
+   * Test Use Case: see JavaDoc of jakarta.servlet.ServletContext.getResourcePaths(String)
    */
   @Test
   public void testFindResourcesFromDependentJars1() {
@@ -36,7 +36,7 @@ public class DevelopmentWebAppContextTest {
   }
 
   /**
-   * Test Use Case: see JavaDoc of javax.servlet.ServletContext.getResourcePaths(String)
+   * Test Use Case: see JavaDoc of jakarta.servlet.ServletContext.getResourcePaths(String)
    */
   @Test
   public void testFindResourcesFromDependentJars2() {
@@ -49,7 +49,7 @@ public class DevelopmentWebAppContextTest {
   }
 
   /**
-   * Test Use Case: see JavaDoc of javax.servlet.ServletContext.getResourcePaths(String)
+   * Test Use Case: see JavaDoc of jakarta.servlet.ServletContext.getResourcePaths(String)
    */
   @Test
   public void testFindResourcesFromDependentJars3() {

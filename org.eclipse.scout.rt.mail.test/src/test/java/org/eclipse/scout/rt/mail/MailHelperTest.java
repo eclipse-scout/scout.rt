@@ -720,7 +720,7 @@ public class MailHelperTest {
 
     MailHelper helper = BEANS.get(MailHelper.class);
     MimeMessage message = helper.createMessageFromBytes(eml.getBytes(StandardCharsets.UTF_8));
-    assertEquals("Lorem", helper.getPlainText(message)); // failed with javax.mail.internet.ParseException: Expected disposition, got null
+    assertEquals("Lorem", helper.getPlainText(message)); // failed with jakarta.mail.internet.ParseException: Expected disposition, got null
   }
 
   @Test
