@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {arrays} from '../../src/index';
 
-describe('scout.arrays', () => {
+describe('arrays', () => {
 
   describe('init', () => {
 
@@ -323,6 +323,48 @@ describe('scout.arrays', () => {
       expect(arr).toEqual([undefined, 'a', 'b', 'c', 'd']);
     });
 
+  });
+
+  describe('moveAfter', () => {
+    it('moves element after the given sibling', () => {
+      let arr = arrays.moveAfter(['a', 'b', 'c', 'd'], 'b', 'd');
+      expect(arr).toEqual(['a', 'c', 'd', 'b']);
+
+      arr = arrays.moveAfter(['a', 'b', 'c', 'd'], 'd', 'a');
+      expect(arr).toEqual(['a', 'd', 'b', 'c']);
+
+      arr = arrays.moveAfter([] as string[], 'b', 'c');
+      expect(arr).toEqual([]);
+    });
+  });
+
+  describe('moveBefore', () => {
+    it('moves element before the given sibling', () => {
+      let arr = arrays.moveBefore( ['a', 'b', 'c', 'd'], 'b', 'd');
+      expect(arr).toEqual(['a', 'c', 'b', 'd']);
+
+      arr = arrays.moveBefore(['a', 'b', 'c', 'd'], 'd', 'a');
+      expect(arr).toEqual(['d', 'a', 'b', 'c']);
+
+      arr = arrays.moveBefore([] as string[], 'b', 'a');
+      expect(arr).toEqual([]);
+    });
+  });
+
+  describe('moveTo', () => {
+    it('moves element to the given position', () => {
+      let arr = arrays.moveTo(['a', 'b', 'c', 'd'], 'b', 0);
+      expect(arr).toEqual(['b', 'a', 'c', 'd']);
+
+      arr = arrays.moveTo(['a', 'b', 'c', 'd'], 'a', 3);
+      expect(arr).toEqual(['b', 'c', 'a', 'd']);
+
+      arr = arrays.moveTo(['a', 'b', 'c', 'd'], 'a', 4);
+      expect(arr).toEqual(['b', 'c', 'd', 'a']);
+
+      arr = arrays.moveTo([], 'b', 0);
+      expect(arr).toEqual([]);
+    });
   });
 
   describe('union', () => {

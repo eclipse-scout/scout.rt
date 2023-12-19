@@ -61,7 +61,7 @@ export class Rectangle {
 
   contains(xOrPoint: number | Point, y?: number): boolean {
     let point = new Point(xOrPoint, y);
-    return point.y >= this.y && point.y < this.y + this.height && point.x >= this.x && point.x < this.x + this.width;
+    return point.y >= this.y && point.y < this.bottom() && point.x >= this.x && point.x < this.right();
   }
 
   /**

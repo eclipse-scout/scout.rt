@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Alignment, FormField, GridDataModel, InitModelOf, LogicalGridWidget, ObjectOrModel, objects} from '../../index';
+import {Alignment, FormField, GridDataModel, InitModelOf, LogicalGridWidget, ObjectOrModel, objects, Rectangle} from '../../index';
 import $ from 'jquery';
 
 export class GridData implements GridDataModel {
@@ -64,6 +64,10 @@ export class GridData implements GridDataModel {
       return false;
     }
     return objects.propertiesEquals(this, other, Object.keys(this));
+  }
+
+  toRectangle(): Rectangle {
+    return new Rectangle(this.x, this.y, this.w, this.h);
   }
 
   static createFromHints(field: LogicalGridWidget, gridColumnCount?: number): GridData {

@@ -182,11 +182,70 @@ export const arrays = {
   },
 
   /**
+   * Moves the element at fromIndex to toIndex.
+   *
    * This function uses {@link insert} which relies on Array.prototype.splice(). Check its js-doc for details.
    */
   move<T>(arr: T[], fromIndex: number, toIndex: number) {
     let element = arr.splice(fromIndex, 1)[0];
     arrays.insert(arr, element, toIndex);
+  },
+
+  /**
+   * Moves the given element before the sibling and returns the array with the new order.
+   */
+  moveBefore<T>(arr: T[], elementToMove: T, sibling: T): T[] {
+    let elements = [];
+    for (let elem of arr) {
+      if (elem === elementToMove) {
+        continue;
+      }
+      if (elem === sibling) {
+        elements.push(elementToMove);
+      }
+      elements.push(elem);
+    }
+    return elements;
+  },
+
+  /**
+   * Moves the given element after the sibling and returns the array with the new order.
+   */
+  moveAfter<T>(arr: T[], elementToMove: T, sibling: T): T[] {
+    let elements = [];
+    for (let elem of arr) {
+      if (elem === elementToMove) {
+        continue;
+      }
+      elements.push(elem);
+      if (elem === sibling) {
+        elements.push(elementToMove);
+      }
+    }
+    return elements;
+  },
+
+  /**
+   * Moves the given element to the position returns the array with the new order.
+   */
+  moveTo<T>(arr: T[], elementToMove: T, position: number): T[] {
+    let elements = [];
+    arr = arrays.ensure(arr);
+    if (arr.length === 0) {
+      return elements;
+    }
+    for (let i= 0; i < arr.length; i++) {
+      if (i === position) {
+        elements.push(elementToMove);
+      }
+      if (arr[i] !== elementToMove) {
+        elements.push(arr[i]);
+      }
+    }
+    if (position >= arr.length) {
+      elements.push(elementToMove);
+    }
+    return elements;
   },
 
   contains<T>(haystack: T[], needle: T): boolean {
