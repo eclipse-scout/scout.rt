@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CompositeField, FormField, FormFieldLabelPosition, graphics, GridData, LayoutData, Widget} from '../../index';
+import {CompositeField, FormField, FormFieldLabelPosition, graphics, GridData, LayoutData, Rectangle, Widget} from '../../index';
 
 export interface LogicalGridWidget extends Widget {
   _setGridData(gridData: GridData);
@@ -164,5 +164,9 @@ export class LogicalGridData implements LayoutData {
 
   isValidateRoot(): boolean {
     return !this.useUiHeight && !this.useUiWidth && this.fillVertical && this.fillHorizontal;
+  }
+
+  toRectangle(): Rectangle {
+    return new Rectangle(this.gridx, this.gridy, this.gridw, this.gridh);
   }
 }

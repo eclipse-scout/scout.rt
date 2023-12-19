@@ -9,9 +9,10 @@
  */
 import {
   AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf,
-  KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range, scout,
-  ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler,
-  TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileMoveHandler, TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
+  KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range,
+  Resizable, scout, ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke,
+  TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileMoveHandler, TileResizeHandler, TileTextFilter, UpdateFilteredElementsOptions,
+  VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -62,6 +63,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   defaultMenuTypes: string[];
   wrappable: boolean;
   movableProducer: (tile: Tile) => TileMoveHandler;
+  resizableProducer: (tile: Tile) => Resizable;
   $filterFieldContainer: JQuery;
   $fillBefore: JQuery;
   $fillAfter: JQuery;
@@ -107,6 +109,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.placeholderProducer = null;
     this.wrappable = true;
     this.movableProducer = this._createMovableProducer();
+    this.resizableProducer = this._createResizableProducer();
 
     this.$filterFieldContainer = null;
     this.textFilterEnabled = false;
@@ -161,6 +164,18 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.setProperty('movableProducer', producer);
   }
 
+  protected _createResizableProducer(): (tile: Tile) => Resizable {
+    return tile => scout.create(TileResizeHandler, {
+      tileGrid: this,
+      $container: tile.$container,
+      useOverlay: true
+    });
+  }
+
+  setResizableProducer(producer: (tile: Tile) => Resizable) {
+    this.setProperty('resizableProducer', producer);
+  }
+
   protected _initVirtualScrolling() {
     this.virtualScrolling = this._createVirtualScrolling();
   }
@@ -207,6 +222,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     tile.setSelectable(this.selectable);
     tile.setSelected(this.selectedTiles.indexOf(tile as TTile) >= 0);
     tile.setMovableProducer(() => this.movableProducer(tile));
+    tile.setResizableProducer(() => this.resizableProducer(tile));
 
     // Set proper state in case tile was used in another grid
     tile.setParent(this);
@@ -306,6 +322,16 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 
   deleteAllTiles() {
     this.setTiles([]);
+  }
+
+  moveTileBefore(tileToMove: TTile, sibling: TTile) {
+    let tiles = arrays.moveBefore(this._tiles, tileToMove, sibling);
+    this._setTilesInternal(tiles);
+  }
+
+  moveTileAfter(tileToMove: TTile, sibling: TTile) {
+    let tiles = arrays.moveAfter(this._tiles, tileToMove, sibling);
+    this._setTilesInternal(tiles);
   }
 
   setTiles(tilesOrModels: ObjectOrChildModel<TTile> | ObjectOrChildModel<TTile>[]) {
@@ -1690,4 +1716,3 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 }
 
 export type TileGridMenuType = EnumObject<typeof TileGrid.MenuType>;
-
