@@ -65,7 +65,7 @@ public class UiServlet extends AbstractHttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(UiServlet.class);
 
-  private static final Set<String> HTTP_METHODS_SUPPORTED_BY_JAVAX_HTTP_SERVLET = new HashSet<>(Arrays.asList(
+  private static final Set<String> HTTP_METHODS_SUPPORTED_BY_JAKARTA_HTTP_SERVLET = new HashSet<>(Arrays.asList(
       "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"));
 
   // Remember bean instances to save lookups on each request
@@ -77,8 +77,8 @@ public class UiServlet extends AbstractHttpServlet {
     m_uiThreadInterruption = BEANS.get(UiThreadInterruption.class);
   }
 
-  protected boolean isHttpMethodSupportedByJavaxHttpServlet(String method) {
-    return HTTP_METHODS_SUPPORTED_BY_JAVAX_HTTP_SERVLET.contains(method);
+  protected boolean isHttpMethodSupportedByJakartaHttpServlet(String method) {
+    return HTTP_METHODS_SUPPORTED_BY_JAKARTA_HTTP_SERVLET.contains(method);
   }
 
   protected RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
@@ -140,8 +140,8 @@ public class UiServlet extends AbstractHttpServlet {
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    // Use methods provided by javax.servlet.http.HttpServlet because HttpServlet#service contains some special behavior depending on the http method.
-    if (isHttpMethodSupportedByJavaxHttpServlet(req.getMethod())) {
+    // Use methods provided by jakarta.servlet.http.HttpServlet because HttpServlet#service contains some special behavior depending on the http method.
+    if (isHttpMethodSupportedByJakartaHttpServlet(req.getMethod())) {
       // Will delegate to corresponding doX method below (which in turn will delegate to handleRequest).
       // Wrapping the call is done is super.service (from AbstractHttpServlet).
       super.service(req, resp);
@@ -149,7 +149,7 @@ public class UiServlet extends AbstractHttpServlet {
     else {
       // Handle any other method too.
       // Manual wrapping required because no super call is made.
-      wrap(req, resp, this::handleHttpMethodsNotSupportedByJavaxHttpServlet);
+      wrap(req, resp, this::handleHttpMethodsNotSupportedByJakartaHttpServlet);
     }
   }
 
@@ -208,9 +208,9 @@ public class UiServlet extends AbstractHttpServlet {
 
   /**
    * Called in {@link #service(HttpServletRequest, HttpServletResponse)} when
-   * {@link #isHttpMethodSupportedByJavaxHttpServlet(String)} return <code>false</code>.
+   * {@link #isHttpMethodSupportedByJakartaHttpServlet(String)} return <code>false</code>.
    */
-  protected void handleHttpMethodsNotSupportedByJavaxHttpServlet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void handleHttpMethodsNotSupportedByJakartaHttpServlet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     if (!handleRequest(req, resp)) {
       resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "HTTP method not supported");
     }

@@ -840,7 +840,7 @@ public class MailHelper {
 
   /**
    * Careful: this method returns null when the list of addresses is empty! This is a (stupid) default by
-   * javax.mime.Message.
+   * jakarta.mime.Message.
    * <p>
    * Array instead of list is returned in order to directly used to result with
    * {@link MimeMessage#setRecipients(RecipientType, jakarta.mail.Address[])}.

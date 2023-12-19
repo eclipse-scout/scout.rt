@@ -90,7 +90,7 @@ import com.sun.codemodel.JVar;
  */
 @SuppressWarnings("squid:S00117")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes({"javax.jws.WebService", "org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint"})
+@SupportedAnnotationTypes({"jakarta.jws.WebService", "org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint"})
 public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
   protected static final String LOGGER_FIELD_NAME = "LOG";
