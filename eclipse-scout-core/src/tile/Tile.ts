@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
+import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, Resizable, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
 import $ from 'jquery';
 
 export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
@@ -25,6 +25,8 @@ export class Tile extends Widget implements TileModel {
   rowId: string;
   selected: boolean;
   selectable: boolean;
+  resizable: boolean;
+  resizableProducer: () => Resizable;
   plainText: string;
 
   constructor() {
@@ -37,6 +39,7 @@ export class Tile extends Widget implements TileModel {
     this.colorScheme = null;
     this.selected = false;
     this.selectable = false;
+    this.resizable = false;
     this.plainText = null;
     // Null to let TileGrid decide whether to enable animation
     this.animateRemoval = null;
@@ -73,6 +76,7 @@ export class Tile extends Widget implements TileModel {
     this._renderSelectable();
     this._renderSelected();
     this._renderDisplayStyle();
+    this._renderResizable();
   }
 
   protected override _postRender() {
@@ -150,6 +154,43 @@ export class Tile extends Widget implements TileModel {
 
   protected _renderSelectable() {
     this.$container.toggleClass('selectable', this.selectable);
+  }
+
+  setResizableProducer(producer: () => Resizable) {
+    this.setProperty('resizableProducer', producer);
+  }
+
+  protected _renderResizableProducer() {
+    this._removeResizable();
+    this._renderResizable();
+  }
+
+  setResizable(resizable: boolean) {
+    this.setProperty('resizable', resizable);
+  }
+
+  protected _renderResizable() {
+    let resizableHandler: Resizable = this.$container.data('resizable');
+    if (this.resizable) {
+      if (resizableHandler) {
+        return;
+      }
+      resizableHandler = this.resizableProducer && this.resizableProducer();
+      if (!resizableHandler) {
+        return;
+      }
+      this.$container.data('resizable', resizableHandler);
+    } else {
+      this._removeResizable();
+    }
+  }
+
+  protected _removeResizable() {
+    let resizableHandler: Resizable = this.$container.data('resizable');
+    if (resizableHandler) {
+      resizableHandler.destroy();
+      this.$container.removeData('resizable');
+    }
   }
 
   setFilterAccepted(filterAccepted: boolean) {

@@ -13,4 +13,5 @@ export interface ResizableModel extends ObjectModel<Resizable> {
   $container?: JQuery;
   modes?: ResizableMode[];
   boundaries?: Insets;
+  useOverlay?: boolean;
 }
