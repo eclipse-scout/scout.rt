@@ -161,7 +161,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
  * Various test cases serializing and deserializing Scout data objects from/to JSON
@@ -1797,7 +1796,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_RawEntityWithDouble() throws  Exception {
+  public void testSerializeDeserialize_RawEntityWithDouble() throws Exception {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute", 45.69);
     String json = s_dataObjectMapper.writeValueAsString(entity);
@@ -1806,7 +1805,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_RawEntityWithDoubleList() throws  Exception {
+  public void testSerializeDeserialize_RawEntityWithDoubleList() throws Exception {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute", List.of(45.69));
     String json = s_dataObjectMapper.writeValueAsString(entity);
@@ -3763,6 +3762,24 @@ public class JsonDataObjectsSerializationTest {
     // no DO entity, even lenient data object mapper cannot deal with this
     assertThrows(InvalidTypeIdException.class, () -> s_lenientDataObjectMapper.readValue(json, TestItemPojo2.class));
     assertThrows(InvalidTypeIdException.class, () -> s_lenientDataObjectMapper.readValue("{\"_type\":\"Unknown\"}", TestItemPojo.class));
+  }
+
+  @Test
+  public void testNestedRaw() throws Exception {
+    String inputJson = readResourceAsString("TestNestedRawDo.json");
+    TestNestedRawDo testDo = s_dataObjectMapper.readValue(inputJson, TestNestedRawDo.class);
+
+    TestNestedRawDo expected = BEANS.get(TestNestedRawDo.class)
+        .withDoEntity(BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-0"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-0")))
+        .withIDoEntity(BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-1"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-1")));
+
+    assertEquals(expected, testDo);
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    assertJsonEquals("TestNestedRawDo.json", json);
   }
 
   // ------------------------------------ common test helper methods ------------------------------------

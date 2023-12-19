@@ -1,0 +1,13 @@
+{
+  "_type" : "TestNestedRaw",
+  "doEntity" : {
+    "_type" : "scout.TestTypedUntypedInner",
+    "iId" : "scout.FixtureStringId:qualified-string-id-0",
+    "stringId" : "unqualified-string-id-0"
+  },
+  "iDoEntity" : {
+    "_type" : "scout.TestTypedUntypedInner",
+    "iId" : "scout.FixtureStringId:qualified-string-id-1",
+    "stringId" : "unqualified-string-id-1"
+  }
+}
