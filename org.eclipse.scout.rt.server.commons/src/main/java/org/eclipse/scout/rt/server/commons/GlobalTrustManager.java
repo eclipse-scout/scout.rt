@@ -37,6 +37,10 @@ import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.ConfigPropertyProvider;
 import org.eclipse.scout.rt.platform.config.ConfigUtility;
@@ -224,7 +228,8 @@ public class GlobalTrustManager {
       return remoteFilesToCertificates(certRemoteFiles);
     }
     catch (RuntimeException e) {
-      LOG.error("Could not access folder '{}' to import trusted certificates.", PATH_CERTS, e);
+      RuntimeException e0 = LOG.isDebugEnabled() ? e : null;
+      LOG.info("Unable to import trusted certificates from remote folder '{}'.", PATH_CERTS, e0);
       return Collections.emptyList();
     }
   }
@@ -351,6 +356,17 @@ public class GlobalTrustManager {
         }
       }
       return trustedCertsAll.toArray(new X509Certificate[0]);
+    }
+  }
+
+  @Order(4000)
+  public static class P_GlobalTrustManagerInstaller implements IPlatformListener {
+
+    @Override
+    public void stateChanged(PlatformEvent event) {
+      if (event.getState() == State.BeanManagerValid) {
+        BEANS.get(GlobalTrustManager.class).installGlobalTrustManager();
+      }
     }
   }
 }
