@@ -29,6 +29,14 @@ public abstract class AbstractModeSelectorField<T> extends AbstractValueField<T>
 
   private boolean m_valueAndSelectionMediatorActive;
 
+  public AbstractModeSelectorField() {
+    this(true);
+  }
+
+  public AbstractModeSelectorField(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -37,11 +45,21 @@ public abstract class AbstractModeSelectorField<T> extends AbstractValueField<T>
     OrderedCollection<IMode<T>> modes = new OrderedCollection<>();
     for (Class<? extends IMode<T>> modeClazz : configuredModes) {
       IMode<T> mode = ConfigurationUtility.newInnerInstance(this, modeClazz);
-      mode.init();
-      mode.addPropertyChangeListener(new P_ModePropertyChangeListener());
       modes.addOrdered(mode);
     }
+    injectModesInternal(modes);
+    for (IMode<T> mode : modes) {
+      initMode(mode);
+    }
     setModesInternal(modes.getOrderedList());
+  }
+
+  protected void injectModesInternal(OrderedCollection<IMode<T>> modes) {
+  }
+
+  protected void initMode(IMode<T> mode) {
+    mode.init();
+    mode.addPropertyChangeListener(new P_ModePropertyChangeListener());
   }
 
   @SuppressWarnings("unchecked")
