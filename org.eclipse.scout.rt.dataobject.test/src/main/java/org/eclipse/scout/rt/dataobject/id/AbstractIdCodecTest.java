@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.dataobject.id;
 import static org.junit.Assert.*;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureWrapperCompositeId;
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IdCodecFlag;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -513,19 +516,19 @@ public abstract class AbstractIdCodecTest {
   @Test
   public void testFromQualifiedLenient_Default() {
     FixtureUuId id = FixtureUuId.of(TEST_UUID);
-    IId id2 = getCodec().fromQualifiedLenient("scout.FixtureUuId:" + TEST_UUID);
+    var id2 = getCodec().fromQualified("scout.FixtureUuId:" + TEST_UUID, IdCodecFlag.LENIENT);
     assertEquals(id, id2);
   }
 
   @Test
   public void testFromQualifiedLenient_UnknownType() {
-    IId id = getCodec().fromQualifiedLenient("DoesNotExist:" + TEST_UUID);
+    var id = getCodec().fromQualified("DoesNotExist:" + TEST_UUID, IdCodecFlag.LENIENT);
     assertNull(id);
   }
 
   @Test
   public void testFromQualifiedLenient_WrongFormat() {
-    IId id = getCodec().fromQualifiedLenient("Does:Not:Exist:" + TEST_UUID);
+    var id = getCodec().fromQualified("Does:Not:Exist:" + TEST_UUID, IdCodecFlag.LENIENT);
     assertNull(id);
   }
 
@@ -534,6 +537,58 @@ public abstract class AbstractIdCodecTest {
     assertThrows(AssertionException.class, () -> getCodec().registerRawTypeMapper(null, x -> x, x -> "x"));
     assertThrows(AssertionException.class, () -> getCodec().registerRawTypeMapper(String.class, null, x -> "x"));
     assertThrows(AssertionException.class, () -> getCodec().registerRawTypeMapper(String.class, x -> x, null));
+  }
+
+  @Test
+  public void testQualifiedEncryption() {
+    var ids = new HashSet<IId>();
+    collectEncryptionIds(ids);
+    ids.forEach(id -> {
+      var encrypted = getCodec().toQualified(id, IdCodecFlag.ENCRYPTION);
+      var decrypted = getCodec().fromQualified(encrypted, IdCodecFlag.ENCRYPTION);
+      assertQualifiedEncryption(id, encrypted, decrypted);
+    });
+  }
+
+  @Test
+  public void testUnqualifiedEncryption() {
+    var ids = new HashSet<IId>();
+    collectEncryptionIds(ids);
+    ids.forEach(id -> {
+      var encrypted = getCodec().toUnqualified(id, IdCodecFlag.ENCRYPTION);
+      var decrypted = getCodec().fromUnqualified(id.getClass(), encrypted, IdCodecFlag.ENCRYPTION);
+      assertUnqualifiedEncryption(id, encrypted, decrypted);
+    });
+  }
+
+  protected void assertQualifiedEncryption(IId id, String encrypted, IId decrypted) {
+    assertEncryption(id, encrypted, decrypted);
+  }
+
+  protected void assertUnqualifiedEncryption(IId id, String encrypted, IId decrypted) {
+    assertEncryption(id, encrypted, decrypted);
+  }
+
+  protected void assertEncryption(IId id, String encrypted, IId decrypted) {
+    assertEquals(id, decrypted);
+  }
+
+  protected void collectEncryptionIds(Set<IId> ids) {
+    ids.add(FixtureUuId.of(TEST_UUID));
+    ids.add(FixtureStringId.of(TEST_STRING));
+    ids.add(FixtureDateId.of(TEST_DATE));
+    ids.add(FixtureLocaleId.of(Locale.ITALY));
+    ids.add(FixtureCompositeId.of(TEST_STRING, TEST_UUID));
+    ids.add(FixtureWrapperCompositeId.of(TEST_STRING, TEST_UUID, TEST_STRING_2));
+    ids.add(FixtureCompositeWithNullValuesId.of(null, UUID.fromString("711dc5d6-0a42-4f54-b79c-50110b9e742a")));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("foo", ""));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("", "bar"));
+    ids.add(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY));
   }
 
   @IdTypeName("scout.FixtureDateId")

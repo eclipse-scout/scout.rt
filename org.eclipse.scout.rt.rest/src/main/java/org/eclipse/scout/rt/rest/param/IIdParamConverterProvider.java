@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,17 +12,23 @@ package org.eclipse.scout.rt.rest.param;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.ext.ParamConverter;
 import jakarta.ws.rs.ext.ParamConverterProvider;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IIdCodecFlag;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 /**
@@ -43,16 +49,19 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
 
   private final ConcurrentMap<Class<? extends IId>, ParamConverter<? extends IId>> m_idParamConverters = new ConcurrentHashMap<>();
 
+  @Inject
+  private Provider<IdCodecFlags> m_idCodecFlagsProvider;
+
   @Override
   @SuppressWarnings("unchecked")
   public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
     if (IId.class.isAssignableFrom(rawType)) {
       Class<? extends IId> idClass = rawType.asSubclass(IId.class);
       if (rawType.isInterface() || Modifier.isAbstract(rawType.getModifiers())) {
-        return (ParamConverter<T>) m_idParamConverters.computeIfAbsent(idClass, k -> BEANS.get(QualifiedIIdParamConverter.class));
+        return (ParamConverter<T>) m_idParamConverters.computeIfAbsent(idClass, k -> new QualifiedIIdParamConverter(m_idCodecFlagsProvider));
       }
       else {
-        return (ParamConverter<T>) m_idParamConverters.computeIfAbsent(idClass, UnqualifiedIIdParamConverter::new);
+        return (ParamConverter<T>) m_idParamConverters.computeIfAbsent(idClass, clazz -> new UnqualifiedIIdParamConverter(clazz, m_idCodecFlagsProvider));
       }
     }
     return null;
@@ -65,9 +74,18 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
 
     protected final LazyValue<IdCodec> m_codec = new LazyValue<>(IdCodec.class);
     protected final Class<? extends IId> m_idClass;
+    private final Provider<IdCodecFlags> m_idCodecFlagsProvider;
 
-    public UnqualifiedIIdParamConverter(Class<? extends IId> idClass) {
+    public UnqualifiedIIdParamConverter(Class<? extends IId> idClass, Provider<IdCodecFlags> idCodecFlagsProvider) {
       m_idClass = idClass;
+      m_idCodecFlagsProvider = idCodecFlagsProvider;
+    }
+
+    protected Set<IIdCodecFlag> idCodecFlags() {
+      return Optional.ofNullable(m_idCodecFlagsProvider)
+          .map(Provider::get)
+          .map(IdCodecFlags::get)
+          .orElse(Collections.emptySet());
     }
 
     @Override
@@ -75,7 +93,7 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
-      return m_codec.get().fromUnqualified(m_idClass, value);
+      return m_codec.get().fromUnqualified(m_idClass, value, idCodecFlags());
     }
 
     @Override
@@ -83,24 +101,35 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
-      return m_codec.get().toUnqualified(value);
+      return m_codec.get().toUnqualified(value, idCodecFlags());
     }
   }
 
   /**
    * {@link ParamConverter} handling {@link IId} in qualified form.
    */
-  @ApplicationScoped // use same instance for all qualified IDs
   public static class QualifiedIIdParamConverter implements ParamConverter<IId> {
 
     protected final LazyValue<IdCodec> m_codec = new LazyValue<>(IdCodec.class);
+    private final Provider<IdCodecFlags> m_idCodecFlagsProvider;
+
+    public QualifiedIIdParamConverter(Provider<IdCodecFlags> idCodecFlagsProvider) {
+      m_idCodecFlagsProvider = idCodecFlagsProvider;
+    }
+
+    protected Set<IIdCodecFlag> idCodecFlags() {
+      return Optional.ofNullable(m_idCodecFlagsProvider)
+          .map(Provider::get)
+          .map(IdCodecFlags::get)
+          .orElse(Collections.emptySet());
+    }
 
     @Override
     public IId fromString(String value) {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
-      return m_codec.get().fromQualified(value);
+      return m_codec.get().fromQualified(value, idCodecFlags());
     }
 
     @Override
@@ -108,7 +137,11 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
-      return m_codec.get().toQualified(value);
+      return m_codec.get().toQualified(value, idCodecFlags());
     }
+  }
+
+  public static class IdCodecFlags extends AtomicReference<Set<IIdCodecFlag>> {
+    private static final long serialVersionUID = 1L;
   }
 }
