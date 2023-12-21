@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,13 @@
  */
 package org.eclipse.scout.rt.rest.param;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
+import java.util.Set;
+
+import jakarta.inject.Provider;
 import jakarta.ws.rs.ext.ParamConverter;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
@@ -18,24 +23,34 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IUuId;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IdCodecFlag;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.IdCodecFlags;
 import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.QualifiedIIdParamConverter;
+import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.UnqualifiedIIdParamConverter;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 @RunWith(PlatformTestRunner.class)
 public class IIdParamConverterProviderTest {
 
   private static final FixtureUuId TEST_UUID = FixtureUuId.of("d93072a6-05d3-47c8-84a6-3cca5ee286a6");
 
+  protected IdCodecFlags m_idCodecFlags;
+  @Mock
+  protected Provider<IdCodecFlags> m_idCodecFlagsProvider;
+
+  @InjectMocks
   private IIdParamConverterProvider m_provider;
 
   @Before
   public void before() {
-    m_provider = new IIdParamConverterProvider();
+    m_idCodecFlags = new IdCodecFlags();
+    when(m_idCodecFlagsProvider.get()).thenReturn(m_idCodecFlags);
   }
 
   @Test
@@ -60,9 +75,8 @@ public class IIdParamConverterProviderTest {
     assertNotNull(uuIdConverter);
     ParamConverter<IId> idConverter = m_provider.getConverter(IId.class, null, null);
     assertNotNull(idConverter);
-    assertSame(uuIdConverter, idConverter); // same application scoped bean is used for qualified converter
-    //noinspection AssertBetweenInconvertibleTypes
-    assertSame(uuIdConverter, BEANS.get(QualifiedIIdParamConverter.class));
+    assertEquals(uuIdConverter.getClass(), idConverter.getClass());
+    assertEquals(QualifiedIIdParamConverter.class, idConverter.getClass());
   }
 
   @Test
@@ -136,5 +150,37 @@ public class IIdParamConverterProviderTest {
 
     FixtureCompositeId id = FixtureCompositeId.of(FixtureStringId.of("abc"), TEST_UUID);
     assertEquals("abc;" + TEST_UUID.unwrapAsString(), conv.toString(id));
+  }
+
+  @Test
+  public void testConverterIdCodecFlags() {
+    var conv1 = m_provider.getConverter(FixtureUuId.class, null, null);
+    var unqualifiedConv = assertInstance(conv1, UnqualifiedIIdParamConverter.class);
+
+    var conv2 = m_provider.getConverter(IUuId.class, null, null);
+    var qualifiedConv = assertInstance(conv2, QualifiedIIdParamConverter.class);
+
+    assertEquals(Set.of(), unqualifiedConv.idCodecFlags());
+    assertEquals(Set.of(), qualifiedConv.idCodecFlags());
+
+    m_idCodecFlags.set(Set.of(IdCodecFlag.SIGNATURE));
+
+    assertEquals(Set.of(IdCodecFlag.SIGNATURE), unqualifiedConv.idCodecFlags());
+    assertEquals(Set.of(IdCodecFlag.SIGNATURE), qualifiedConv.idCodecFlags());
+
+    m_idCodecFlags.set(Set.of(IdCodecFlag.LENIENT));
+
+    assertEquals(Set.of(IdCodecFlag.LENIENT), unqualifiedConv.idCodecFlags());
+    assertEquals(Set.of(IdCodecFlag.LENIENT), qualifiedConv.idCodecFlags());
+
+    m_idCodecFlags.set(null);
+
+    assertEquals(Set.of(), unqualifiedConv.idCodecFlags());
+    assertEquals(Set.of(), qualifiedConv.idCodecFlags());
+
+    m_idCodecFlags.set(Set.of(IdCodecFlag.LENIENT, IdCodecFlag.SIGNATURE));
+
+    assertEquals(Set.of(IdCodecFlag.LENIENT, IdCodecFlag.SIGNATURE), unqualifiedConv.idCodecFlags());
+    assertEquals(Set.of(IdCodecFlag.LENIENT, IdCodecFlag.SIGNATURE), qualifiedConv.idCodecFlags());
   }
 }

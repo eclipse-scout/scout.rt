@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,8 +29,10 @@ public class IdInventory {
 
   private static final Logger LOG = LoggerFactory.getLogger(IdInventory.class);
 
+
   protected final Map<String, Class<? extends IId>> m_nameToClassMap = new HashMap<>();
   protected final Map<Class<? extends IId>, String> m_classToNameMap = new HashMap<>();
+  protected final Map<Class<? extends IId>, Boolean> m_classToIdSignatureMap = new HashMap<>();
 
   @PostConstruct
   protected void createClassCache() {
@@ -46,6 +48,18 @@ public class IdInventory {
       }
     }
     LOG.debug("Registered {} id types", m_nameToClassMap.size());
+
+    for (IClassInfo classInfo : ClassInventory.get().getKnownAnnotatedTypes(IdSignature.class)) {
+      Class<?> idClass = classInfo.resolveClass();
+      if (IId.class.isAssignableFrom(idClass)) {
+        //noinspection unchecked
+        registerIdSignature((Class<? extends IId>) idClass, idClass.getAnnotation(IdSignature.class).value());
+      }
+      else {
+        LOG.warn("Class {} is annotated with @{} but does not implement {}. Skipping class.", idClass.getName(), IdSignature.class.getSimpleName(), IId.class.getName());
+      }
+    }
+    LOG.debug("Registered {} id signature mappings", m_classToIdSignatureMap.size());
   }
 
   /**
@@ -67,6 +81,17 @@ public class IdInventory {
   protected void checkDuplicateIdTypeNames(Class<?> clazz, String typeName, Class<?> existingClass, String existingName) {
     assertNull(existingClass, "{} and {} have the same type name '{}'. Use an unique @{} annotation value.", clazz, existingClass, typeName, IdTypeName.class.getSimpleName());
     assertNull(existingName, "{} is annotated with @{} value '{}', but was already registered with type name '{}'. Register each class only once.", clazz, IdTypeName.class.getSimpleName(), typeName, existingName);
+  }
+
+  /**
+   * Register id class with {@link IdSignature} annotation present.
+   * <p>
+   * Note: The access to the data structure is not synchronized and therefore not thread safe. Use this method to set up
+   * the {@link IdInventory} instance directly after platform start and not to change the {@link IdInventory} behavior
+   * dynamically at runtime.
+   */
+  public void registerIdSignature(Class<? extends IId> idClass, boolean signature) {
+    m_classToIdSignatureMap.put(idClass, signature);
   }
 
   /**
@@ -95,5 +120,33 @@ public class IdInventory {
    */
   public Class<? extends IId> getIdClass(String typeName) {
     return m_nameToClassMap.get(typeName);
+  }
+
+  /**
+   * @return Whether the {@link IId} needs to be serialized and deserialized using a signature or not. For more details
+   *         see {@link IdSignature}.
+   */
+  public boolean isIdSignature(Class<? extends IId> idClass) {
+    synchronized (m_classToIdSignatureMap) {
+      if (m_classToIdSignatureMap.containsKey(idClass)) {
+        return m_classToIdSignatureMap.get(idClass);
+      }
+
+      boolean signature;
+      IdSignature idSignature = idClass.getAnnotation(IdSignature.class);
+      if (idSignature != null) {
+        signature = idSignature.value();
+      }
+      else if (idClass.getSuperclass() != null && IId.class.isAssignableFrom(idClass.getSuperclass())) {
+        //noinspection unchecked
+        signature = isIdSignature((Class<? extends IId>) idClass.getSuperclass());
+      }
+      else {
+        signature = IId.class.getAnnotation(IdSignature.class).value();
+      }
+
+      m_classToIdSignatureMap.put(idClass, signature);
+      return m_classToIdSignatureMap.get(idClass);
+    }
   }
 }

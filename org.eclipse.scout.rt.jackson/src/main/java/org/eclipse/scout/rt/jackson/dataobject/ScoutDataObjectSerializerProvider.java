@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -75,14 +75,14 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
     }
     else if (IId.class.isAssignableFrom(rawClass)) {
       if (type.isConcrete()) {
-        return new UnqualifiedIIdSerializer(type);
+        return new UnqualifiedIIdSerializer(moduleContext, type);
       }
       else {
-        return new QualifiedIIdSerializer();
+        return new QualifiedIIdSerializer(moduleContext);
       }
     }
     else if (TypedId.class.isAssignableFrom(rawClass)) {
-      return new TypedIdSerializer();
+      return new TypedIdSerializer(moduleContext);
     }
     else if (IEnum.class.isAssignableFrom(rawClass)) {
       return new EnumSerializer(type);
@@ -125,7 +125,7 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
     else if (IId.class.isAssignableFrom(rawClass)) {
       Class<? extends IId> idClass = rawClass.asSubclass(IId.class);
       if (type.isConcrete()) {
-        return new UnqualifiedIIdDeserializer(idClass);
+        return new UnqualifiedIIdDeserializer(moduleContext, idClass);
       }
       else {
         return new QualifiedIIdDeserializer(moduleContext, idClass);
@@ -146,10 +146,10 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
     }
     if (IId.class.isAssignableFrom(rawClass)) {
       if (type.isConcrete()) {
-        return new UnqualifiedIIdMapKeySerializer();
+        return new UnqualifiedIIdMapKeySerializer(moduleContext);
       }
       else {
-        return new QualifiedIIdMapKeySerializer();
+        return new QualifiedIIdMapKeySerializer(moduleContext);
       }
     }
     if (IEnum.class.isAssignableFrom(rawClass)) {

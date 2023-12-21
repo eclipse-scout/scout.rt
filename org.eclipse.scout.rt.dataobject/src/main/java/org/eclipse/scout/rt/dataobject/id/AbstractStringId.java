@@ -13,8 +13,12 @@ package org.eclipse.scout.rt.dataobject.id;
  * Abstract base implementation for all {@link String} based {@link IId} classes. The wrapped id is guaranteed to be
  * non-null.
  * <p>
+ * Usually not used for transactional data ids which should be saved from being probed. Therefore, {@link IdSignature}
+ * is disabled.
+ * <p>
  * For details, see {@link IStringId}.
  */
+@IdSignature(false)
 public abstract class AbstractStringId extends AbstractRootId<String> implements IStringId {
   private static final long serialVersionUID = 1L;
 

@@ -10,7 +10,9 @@
 package org.eclipse.scout.rt.dataobject.fixture;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractRootId;
+import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 
+@IdTypeName("scout.FixtureIntegerId")
 public final class FixtureIntegerId extends AbstractRootId<Integer> {
   private static final long serialVersionUID = 1L;
 
