@@ -27,8 +27,8 @@
     <orderEntry type="module" module-name="org.eclipse.scout.rt.jackson.test" scope="TEST" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.jackson" scope="TEST" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.dataobject.test" scope="TEST" />
-    <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-classic:1.2.12" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-core:1.2.12" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-classic:1.2.13" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-core:1.2.13" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.36" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.activemq:activemq-broker:5.18.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.activemq:activemq-client:5.18.3" level="project" />

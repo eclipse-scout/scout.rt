@@ -74,8 +74,8 @@
     <orderEntry type="library" name="Maven: com.sun.xml.messaging.saaj:saaj-impl:1.5.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.fasterxml.woodstox:woodstox-core:6.5.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.codehaus.woodstox:stax2-api:4.1" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.2.12" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.2.12" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.2.13" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.2.13" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.36" level="project" />
   </component>
 </module>
