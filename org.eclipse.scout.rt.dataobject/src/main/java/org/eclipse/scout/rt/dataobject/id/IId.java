@@ -25,6 +25,7 @@ import java.io.Serializable;
  * @see IRootId
  * @see ICompositeId
  */
+@IdSignature
 public interface IId extends Serializable {
 
   /**

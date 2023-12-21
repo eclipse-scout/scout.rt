@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IdCodecFlag;
 import org.eclipse.scout.rt.dataobject.mapping.AbstractToDoFunction;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -212,7 +213,7 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
     @Override
     public String apply(Object id) {
       if (id instanceof IId) {
-        return BEANS.get(IdCodec.class).toQualified((IId) id);
+        return BEANS.get(IdCodec.class).toQualified((IId) id, IdCodecFlag.SIGNATURE);
       }
       return null;
     }

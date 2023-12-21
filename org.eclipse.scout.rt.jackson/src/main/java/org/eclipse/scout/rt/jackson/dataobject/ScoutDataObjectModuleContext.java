@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,6 +40,8 @@ public class ScoutDataObjectModuleContext {
   protected static final String CONTRIBUTIONS_ATTRIBUTE_NAME_KEY = "contributionsAttributeNameKey";
 
   protected static final String LENIENT_MODE_KEY = "lenientModeKey";
+
+  protected static final String ID_SIGNATURE_KEY = "idSignatureKey";
 
   protected LazyValue<DoEntitySerializerAttributeNameComparator> m_comparator = new LazyValue<>(() -> BEANS.get(DoEntitySerializerAttributeNameComparator.class).init(this));
 
@@ -138,7 +140,16 @@ public class ScoutDataObjectModuleContext {
   }
 
   public ScoutDataObjectModuleContext withLenientMode(boolean lenientMode) {
-    put(LENIENT_MODE_KEY, true);
+    put(LENIENT_MODE_KEY, lenientMode);
+    return this;
+  }
+
+  public boolean isIdSignature() {
+    return BooleanUtility.nvl(get(ID_SIGNATURE_KEY, Boolean.class));
+  }
+
+  public ScoutDataObjectModuleContext withIdSignature(boolean idSignature) {
+    put(ID_SIGNATURE_KEY, idSignature);
     return this;
   }
 }

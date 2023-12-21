@@ -78,6 +78,7 @@
     <module>../org.eclipse.scout.rt.jackson.test</module>
     <module>../org.eclipse.scout.rt.rest.jackson</module>
     <module>../org.eclipse.scout.rt.rest.jersey.client</module>
+    <module>../org.eclipse.scout.rt.rest.jersey.server</module>
     <module>../org.eclipse.scout.rt.rest.jersey.test</module>
 
     <module>../org.eclipse.scout.rt.client</module>
@@ -371,6 +372,12 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest.jersey.client</artifactId>
+        <version>24.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.rest.jersey.server</artifactId>
         <version>24.2-SNAPSHOT</version>
       </dependency>
 
@@ -676,6 +683,13 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
+      <dependency>
+        <groupId>jakarta.inject</groupId>
+        <artifactId>jakarta.inject-api</artifactId>
+        <version>2.0.1</version>
+      </dependency>
+
 
       <!-- JAX-WS with METRO (not bundled with JRE) -->
       <dependency>

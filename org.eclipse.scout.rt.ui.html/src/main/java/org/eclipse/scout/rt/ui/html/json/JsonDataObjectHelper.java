@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IIdSignatureDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.json.JSONArray;
@@ -26,14 +27,19 @@ import org.json.JSONObject;
 @Bean
 public class JsonDataObjectHelper {
 
-  protected final IDataObjectMapper m_defaultDataObjectMapper = BEANS.get(IDataObjectMapper.class);
-  protected IDataObjectMapper m_dataObjectMapper = null;
+  /**
+   * This helper solely converts {@link JSONObject}s to {@link IDataObject}s and vice versa that are received from or
+   * sent to the browser. Therefore, the {@link IDataObjectMapper} always needs to be an
+   * {@link IIdSignatureDataObjectMapper}.
+   */
+  protected final IIdSignatureDataObjectMapper m_defaultDataObjectMapper = BEANS.get(IIdSignatureDataObjectMapper.class);
+  protected IIdSignatureDataObjectMapper m_dataObjectMapper = null;
 
-  public IDataObjectMapper getDataObjectMapper() {
+  public IIdSignatureDataObjectMapper getDataObjectMapper() {
     return (m_dataObjectMapper == null ? m_defaultDataObjectMapper : m_dataObjectMapper);
   }
 
-  public JsonDataObjectHelper withDataObjectMapper(IDataObjectMapper dataObjectMapper) {
+  public JsonDataObjectHelper withDataObjectMapper(IIdSignatureDataObjectMapper dataObjectMapper) {
     m_dataObjectMapper = dataObjectMapper;
     return this;
   }

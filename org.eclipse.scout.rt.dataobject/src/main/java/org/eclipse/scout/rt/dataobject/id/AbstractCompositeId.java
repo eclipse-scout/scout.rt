@@ -18,6 +18,7 @@ import java.util.List;
  * multiple {@link IId}'s as components. The type(s) of the raw (wrapped) ids is required to be an instance of
  * {@link IId}.
  */
+@IdSignature
 public abstract class AbstractCompositeId implements ICompositeId {
   private static final long serialVersionUID = 1L;
 

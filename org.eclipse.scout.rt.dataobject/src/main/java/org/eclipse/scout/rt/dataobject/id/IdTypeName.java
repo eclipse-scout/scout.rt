@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,12 +17,14 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IIdCodecFlag;
+
 /**
  * Annotation used to define the unique type name for an {@link IId} class, used when serializing or deserializing
  * instances.
  *
- * @see IdCodec#toQualified(IId)
- * @see IdCodec#fromQualified(String)
+ * @see IdCodec#toQualified(IId, IIdCodecFlag...)
+ * @see IdCodec#fromQualified(String, IIdCodecFlag...)
  * @see TypedId
  */
 @Documented

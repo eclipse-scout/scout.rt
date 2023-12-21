@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IIds;
 import org.eclipse.scout.rt.dataobject.id.IRootId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IIdCodecFlag;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
@@ -50,7 +51,7 @@ public class CompositeIdDataObjectVisitorExtension extends AbstractDataObjectVis
   }
 
   /**
-   * Similar as in {@link IdCodec#toUnqualified(IId)}.
+   * Similar as in {@link IdCodec#toUnqualified(IId, IIdCodecFlag...)}.
    */
   protected void unwrap(IId component, List<Object> unwrappedComponents) {
     if (component instanceof IRootId) {
