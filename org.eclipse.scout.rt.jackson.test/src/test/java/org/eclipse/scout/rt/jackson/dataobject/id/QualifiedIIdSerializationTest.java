@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -117,7 +117,7 @@ public class QualifiedIIdSerializationTest {
     @Override
     public JsonSerializer<?> findSerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription beanDesc) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class)) {
-        return new QualifiedIIdSerializer();
+        return new QualifiedIIdSerializer(moduleContext);
       }
 
       return null;
@@ -134,7 +134,7 @@ public class QualifiedIIdSerializationTest {
     @Override
     public JsonSerializer<?> findKeySerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription beanDesc) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class)) {
-        return new QualifiedIIdMapKeySerializer();
+        return new QualifiedIIdMapKeySerializer(moduleContext);
       }
       return null;
     }

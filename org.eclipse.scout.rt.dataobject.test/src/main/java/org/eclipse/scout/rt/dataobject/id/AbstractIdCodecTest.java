@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,9 +11,12 @@ package org.eclipse.scout.rt.dataobject.id;
 
 import static org.junit.Assert.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
@@ -22,11 +25,17 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureWrapperCompositeId;
+import org.eclipse.scout.rt.dataobject.id.IdCodec.IdCodecFlag;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.IDateProvider;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -39,6 +48,22 @@ public abstract class AbstractIdCodecTest {
   protected static final String TEST_STRING = "foobar";
   protected static final String TEST_STRING_2 = "bazäöl";
   protected static final Date TEST_DATE = new Date(123456789);
+
+  protected IBean<?> m_codecBean;
+
+  @Before
+  public void before() {
+    m_codecBean = BeanTestingHelper.get().registerBean(new BeanMetaData(getCodecReplacementType()).withReplace(true));
+  }
+
+  @After
+  public void after() {
+    BeanTestingHelper.get().unregisterBean(m_codecBean);
+  }
+
+  protected Class<? extends IdCodec> getCodecReplacementType() {
+    return P_IdCodec.class;
+  }
 
   /**
    * @return IdCodec instance used for tests
@@ -571,13 +596,13 @@ public abstract class AbstractIdCodecTest {
   @Test
   public void testFromQualifiedLenient_Default() {
     FixtureUuId id = FixtureUuId.of(TEST_UUID);
-    IId id2 = getCodec().fromQualifiedLenient("scout.FixtureUuId:" + TEST_UUID);
+    IId id2 = getCodec().fromQualified("scout.FixtureUuId:" + TEST_UUID, IdCodecFlag.LENIENT);
     assertEquals(id, id2);
   }
 
   @Test
   public void testFromQualifiedLenient_UnknownType() {
-    IId id = getCodec().fromQualifiedLenient("DoesNotExist:" + TEST_UUID);
+    IId id = getCodec().fromQualified("DoesNotExist:" + TEST_UUID, IdCodecFlag.LENIENT);
     assertTrue(id instanceof UnknownId);
     UnknownId uid = (UnknownId) id;
     assertEquals("DoesNotExist", uid.getIdTypeName());
@@ -589,7 +614,7 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromQualifiedLenient_CompositeUnknownType() {
-    IId id = getCodec().fromQualifiedLenient("DoesNotExist:abc;123");
+    IId id = getCodec().fromQualified("DoesNotExist:abc;123", IdCodecFlag.LENIENT);
     assertTrue(id instanceof UnknownId);
     UnknownId uid = (UnknownId) id;
     assertEquals("DoesNotExist", uid.getIdTypeName());
@@ -601,7 +626,7 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromQualifiedLenient_WrongFormat() {
-    IId id = getCodec().fromQualifiedLenient("Does:Not:Exist:" + TEST_UUID);
+    IId id = getCodec().fromQualified("Does:Not:Exist:" + TEST_UUID, IdCodecFlag.LENIENT);
     assertTrue(id instanceof UnknownId);
     UnknownId uid = (UnknownId) id;
     assertEquals("Does", uid.getIdTypeName());
@@ -613,7 +638,7 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromQualifiedLenient_NoIdTypeName() {
-    IId id = getCodec().fromQualifiedLenient("Foo" + TEST_UUID);
+    IId id = getCodec().fromQualified("Foo" + TEST_UUID, IdCodecFlag.LENIENT);
     assertTrue(id instanceof UnknownId);
     UnknownId uid = (UnknownId) id;
     assertNull(uid.getIdTypeName());
@@ -625,7 +650,7 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromQualifiedLenient_CompositeWrongCardinalityToSmall() {
-    IId id = getCodec().fromQualifiedLenient("scout.FixtureCompositeId:" + TEST_UUID);
+    IId id = getCodec().fromQualified("scout.FixtureCompositeId:" + TEST_UUID, IdCodecFlag.LENIENT);
     assertTrue(id instanceof UnknownId);
     UnknownId uid = (UnknownId) id;
     assertEquals("scout.FixtureCompositeId", uid.getIdTypeName());
@@ -637,7 +662,7 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromQualifiedLenient_CompositeWrongCardinalityToHigh() {
-    IId id = getCodec().fromQualifiedLenient("scout.FixtureCompositeId:" + "a;b;c");
+    IId id = getCodec().fromQualified("scout.FixtureCompositeId:" + "a;b;c", IdCodecFlag.LENIENT);
     assertTrue(id instanceof UnknownId);
     UnknownId uid = (UnknownId) id;
     assertEquals("scout.FixtureCompositeId", uid.getIdTypeName());
@@ -652,6 +677,89 @@ public abstract class AbstractIdCodecTest {
     assertThrows(AssertionException.class, () -> getCodec().registerRawTypeMapper(null, x -> x, x -> "x"));
     assertThrows(AssertionException.class, () -> getCodec().registerRawTypeMapper(String.class, null, x -> "x"));
     assertThrows(AssertionException.class, () -> getCodec().registerRawTypeMapper(String.class, x -> x, null));
+  }
+
+  @Test
+  public void testQualifiedSignature() {
+    var ids = new HashSet<IId>();
+    collectSignatureIds(ids);
+    ids.forEach(id -> {
+      String serialized = getCodec().toQualified(id, IdCodecFlag.SIGNATURE);
+      IId deserialized = getCodec().fromQualified(serialized, IdCodecFlag.SIGNATURE);
+      assertQualifiedSignature(id, serialized, deserialized);
+
+      serialized = getCodec().toQualified(id, Set.of(IdCodecFlag.SIGNATURE));
+      deserialized = getCodec().fromQualified(serialized, Set.of(IdCodecFlag.SIGNATURE));
+      assertQualifiedSignature(id, serialized, deserialized);
+    });
+  }
+
+  @Test
+  public void testUnqualifiedSignature() {
+    var ids = new HashSet<IId>();
+    collectSignatureIds(ids);
+    ids.forEach(id -> {
+      String serialized = getCodec().toUnqualified(id, IdCodecFlag.SIGNATURE);
+      IId deserialized = getCodec().fromUnqualified(id.getClass(), serialized, IdCodecFlag.SIGNATURE);
+      assertUnqualifiedSignature(id, serialized, deserialized);
+
+      serialized = getCodec().toUnqualified(id, Set.of(IdCodecFlag.SIGNATURE));
+      deserialized = getCodec().fromUnqualified(id.getClass(), serialized, Set.of(IdCodecFlag.SIGNATURE));
+      assertUnqualifiedSignature(id, serialized, deserialized);
+    });
+  }
+
+  protected void assertQualifiedSignature(IId id, String serialized, IId deserialized) {
+    assertSignature(id, serialized, deserialized);
+  }
+
+  protected void assertUnqualifiedSignature(IId id, String serialized, IId deserialized) {
+    assertSignature(id, serialized, deserialized);
+  }
+
+  protected void assertSignature(IId id, String serialized, IId deserialized) {
+    assertEquals(id, deserialized);
+  }
+
+  protected void collectSignatureIds(Set<IId> ids) {
+    ids.add(FixtureUuId.of(TEST_UUID));
+    ids.add(FixtureStringId.of(TEST_STRING));
+    ids.add(FixtureDateId.of(TEST_DATE));
+    ids.add(FixtureLocaleId.of(Locale.ITALY));
+    ids.add(FixtureCompositeId.of(TEST_STRING, TEST_UUID));
+    ids.add(FixtureWrapperCompositeId.of(TEST_STRING, TEST_UUID, TEST_STRING_2));
+    ids.add(FixtureCompositeWithNullValuesId.of(null, UUID.fromString("711dc5d6-0a42-4f54-b79c-50110b9e742a")));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("foo", ""));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("", "bar"));
+    ids.add(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY));
+  }
+
+  @Test
+  public void testEmptyIdWithSignature() {
+    assertThrows(AssertionException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(AssertionException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+  }
+
+  @Test
+  public void testSignatureIdWithoutPassword() {
+    BeanTestingHelper.get().unregisterBean(m_codecBean);
+
+    var stringId = FixtureStringId.of("some");
+    assertEquals("scout.FixtureStringId:some", getCodec().toQualified(stringId, IdCodecFlag.SIGNATURE));
+    assertEquals("some", getCodec().toUnqualified(stringId, IdCodecFlag.SIGNATURE));
+    assertEquals(stringId, getCodec().fromQualified("scout.FixtureStringId:some", IdCodecFlag.SIGNATURE));
+    assertEquals(stringId, getCodec().fromUnqualified(FixtureStringId.class, "some", IdCodecFlag.SIGNATURE));
+
+    var integerId = FixtureIntegerId.of(42);
+    assertThrows(AssertionException.class, () -> getCodec().toQualified(integerId, IdCodecFlag.SIGNATURE));
+    assertThrows(AssertionException.class, () -> getCodec().toUnqualified(integerId, IdCodecFlag.SIGNATURE));
+    assertThrows(AssertionException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(AssertionException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
   }
 
   @IdTypeName("scout.FixtureDateId")
@@ -810,6 +918,14 @@ public abstract class AbstractIdCodecTest {
         return null;
       }
       return new FixtureCustomComparableRawDataId(date);
+    }
+  }
+
+  protected static class P_IdCodec extends IdCodec {
+
+    @Override
+    protected byte[] getIdSignaturePassword() {
+      return "42".getBytes(StandardCharsets.UTF_8);
     }
   }
 }

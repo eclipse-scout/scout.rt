@@ -16,14 +16,8 @@ import org.eclipse.scout.rt.platform.BEANS;
  */
 public class IdCodecTest extends AbstractIdCodecTest {
 
-  protected IdCodec m_idCodec;
-
-  public IdCodecTest() {
-    m_idCodec = BEANS.get(IdCodec.class);
-  }
-
   @Override
   protected IdCodec getCodec() {
-    return m_idCodec;
+    return BEANS.get(IdCodec.class);
   }
 }
