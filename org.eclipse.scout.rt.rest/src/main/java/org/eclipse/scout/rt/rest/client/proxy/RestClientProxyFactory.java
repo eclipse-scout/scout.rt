@@ -40,6 +40,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.ResponseProcessingException;
+import javax.ws.rs.client.RxInvoker;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -73,6 +74,7 @@ public class RestClientProxyFactory {
   private static final Logger LOG = LoggerFactory.getLogger(RestClientProxyFactory.class);
 
   static final String INVOCATION_SUBMIT_METHOD_NAME = "submit";
+  static final String INVOCATION_BUILDER_RX_METHOD_NAME = "rx";
 
   private final LazyValue<Set<Method>> m_invocationCallbackMethods = new LazyValue<>(this::collectDiscouragedMethods);
 
@@ -126,12 +128,19 @@ public class RestClientProxyFactory {
   protected Set<Method> collectDiscouragedMethods() {
     Set<Method> discouragedMethods = new HashSet<>();
 
-    // collect methods of AsyncInvoker
+    // collect methods of AsyncInvoker and RxInvoker
     Collections.addAll(discouragedMethods, AsyncInvoker.class.getDeclaredMethods());
+    Collections.addAll(discouragedMethods, RxInvoker.class.getDeclaredMethods());
 
     // collect methods of Invocation named 'submit'
     for (Method method : Invocation.class.getDeclaredMethods()) {
       if (INVOCATION_SUBMIT_METHOD_NAME.equals(method.getName())) {
+        discouragedMethods.add(method);
+      }
+    }
+    // collect methods of Invocation.Builder named 'rx'
+    for (Method method : Invocation.Builder.class.getDeclaredMethods()) {
+      if (INVOCATION_BUILDER_RX_METHOD_NAME.equals(method.getName())) {
         discouragedMethods.add(method);
       }
     }

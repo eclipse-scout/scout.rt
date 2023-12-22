@@ -17,6 +17,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.RxInvoker;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
@@ -57,6 +58,8 @@ public class RestClientProxyFactoryTest {
     assertTrue(getFactory().isDiscouraged(AsyncInvoker.class.getDeclaredMethod("post", Entity.class, GenericType.class)));
     assertTrue(getFactory().isDiscouraged(AsyncInvoker.class.getDeclaredMethod("post", Entity.class, InvocationCallback.class)));
     assertTrue(getFactory().isDiscouraged(Invocation.class.getDeclaredMethod("submit")));
+    assertTrue(getFactory().isDiscouraged(Invocation.Builder.class.getDeclaredMethod("rx")));
+    assertTrue(getFactory().isDiscouraged(RxInvoker.class.getDeclaredMethod("post", Entity.class, GenericType.class)));
   }
 
   @Test
