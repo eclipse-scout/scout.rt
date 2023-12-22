@@ -268,6 +268,313 @@
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
+    "interfaces" : [ "javax.ws.rs.client.RxInvoker" ],
+    "methods" : [ {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "head",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<javax.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "delete",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "delete",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "delete",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "get",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "get",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "get",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "head",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity", "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity", "javax.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "options",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "options",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "options",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity", "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity", "javax.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity", "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity", "javax.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "trace",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "trace",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "trace",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    } ],
+    "modifier" : 1537,
+    "name" : "javax.ws.rs.client.CompletionStageRxInvoker",
+    "superclass" : null
+  }, {
+    "_type" : "scout.ClassSignature",
     "interfaces" : [ ],
     "methods" : [ {
       "_type" : "scout.MethodSignature",
@@ -466,6 +773,12 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
+      "name" : "rx",
+      "parameterTypes" : [ ],
+      "returnType" : "javax.ws.rs.client.CompletionStageRxInvoker"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
       "name" : "build",
       "parameterTypes" : [ "java.lang.String" ],
       "returnType" : "javax.ws.rs.client.Invocation"
@@ -565,6 +878,12 @@
       "name" : "property",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
       "returnType" : "javax.ws.rs.client.Invocation$Builder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "rx",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "T"
     } ],
     "modifier" : 1545,
     "name" : "javax.ws.rs.client.Invocation$Builder",
@@ -587,6 +906,163 @@
     } ],
     "modifier" : 1537,
     "name" : "javax.ws.rs.client.InvocationCallback",
+    "superclass" : null
+  }, {
+    "_type" : "scout.ClassSignature",
+    "interfaces" : [ ],
+    "methods" : [ {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "head",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "javax.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    } ],
+    "modifier" : 1537,
+    "name" : "javax.ws.rs.client.RxInvoker",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -1335,6 +1811,12 @@
       "returnType" : "java.lang.String"
     }, {
       "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "forInstance",
+      "parameterTypes" : [ "java.lang.Object" ],
+      "returnType" : "javax.ws.rs.core.GenericType"
+    }, {
+      "_type" : "scout.MethodSignature",
       "modifiers" : 8,
       "name" : "getTypeArgument",
       "parameterTypes" : [ "java.lang.Class<?>", "java.lang.Class<?>" ],
@@ -1661,7 +2143,7 @@
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
-    "interfaces" : [ ],
+    "interfaces" : [ "java.lang.AutoCloseable" ],
     "methods" : [ {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -1930,6 +2412,12 @@
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "status",
+      "parameterTypes" : [ "int", "java.lang.String" ],
+      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "status",
       "parameterTypes" : [ "javax.ws.rs.core.Response$Status" ],
       "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
     }, {
@@ -2082,6 +2570,12 @@
       "modifiers" : 1025,
       "name" : "status",
       "parameterTypes" : [ "int" ],
+      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "status",
+      "parameterTypes" : [ "int", "java.lang.String" ],
       "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
@@ -2242,6 +2736,12 @@
       "name" : "getFamily",
       "parameterTypes" : [ ],
       "returnType" : "javax.ws.rs.core.Response$Status$Family"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "toEnum",
+      "parameterTypes" : [ ],
+      "returnType" : "javax.ws.rs.core.Response$Status"
     } ],
     "modifier" : 1545,
     "name" : "javax.ws.rs.core.Response$StatusType",
