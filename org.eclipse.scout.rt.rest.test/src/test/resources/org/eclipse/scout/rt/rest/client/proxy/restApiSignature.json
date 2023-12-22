@@ -8,7 +8,19 @@
       "modifiers" : 1025,
       "name" : "delete",
       "parameterTypes" : [ ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "jakarta.ws.rs.client.InvocationCallback<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -18,21 +30,21 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "delete",
-      "parameterTypes" : [ "javax.ws.rs.client.InvocationCallback<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
+      "name" : "get",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "delete",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "name" : "get",
+      "parameterTypes" : [ "jakarta.ws.rs.client.InvocationCallback<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "get",
-      "parameterTypes" : [ ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -42,33 +54,57 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "get",
-      "parameterTypes" : [ "javax.ws.rs.client.InvocationCallback<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "get",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
       "name" : "head",
       "parameterTypes" : [ ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "head",
-      "parameterTypes" : [ "javax.ws.rs.client.InvocationCallback<javax.ws.rs.core.Response>" ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "parameterTypes" : [ "jakarta.ws.rs.client.InvocationCallback<jakarta.ws.rs.core.Response>" ],
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "method",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.client.InvocationCallback<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.InvocationCallback<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -78,45 +114,21 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "name" : "options",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "javax.ws.rs.client.InvocationCallback<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.InvocationCallback<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.core.GenericType<T>" ],
+      "name" : "options",
+      "parameterTypes" : [ "jakarta.ws.rs.client.InvocationCallback<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "options",
-      "parameterTypes" : [ ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -126,95 +138,113 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "options",
-      "parameterTypes" : [ "javax.ws.rs.client.InvocationCallback<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "options",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.client.InvocationCallback<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "post",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "post",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "post",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.client.InvocationCallback<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "post",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "put",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "put",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.client.InvocationCallback<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "put",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.client.InvocationCallback<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "put",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "trace",
       "parameterTypes" : [ ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "jakarta.ws.rs.client.InvocationCallback<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "trace",
       "parameterTypes" : [ "java.lang.Class<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "trace",
-      "parameterTypes" : [ "javax.ws.rs.client.InvocationCallback<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "trace",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
       "returnType" : "java.util.concurrent.Future<T>"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.client.AsyncInvoker",
+    "name" : "jakarta.ws.rs.client.AsyncInvoker",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
-    "interfaces" : [ "javax.ws.rs.core.Configurable" ],
+    "interfaces" : [ "jakarta.ws.rs.core.Configurable" ],
     "methods" : [ {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "invocation",
+      "parameterTypes" : [ "jakarta.ws.rs.core.Link" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "target",
+      "parameterTypes" : [ "jakarta.ws.rs.core.Link" ],
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "target",
+      "parameterTypes" : [ "jakarta.ws.rs.core.UriBuilder" ],
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "target",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "target",
+      "parameterTypes" : [ "java.net.URI" ],
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
+    }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "getHostnameVerifier",
@@ -229,42 +259,319 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "invocation",
-      "parameterTypes" : [ "javax.ws.rs.core.Link" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "target",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "target",
-      "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "target",
-      "parameterTypes" : [ "javax.ws.rs.core.Link" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "target",
-      "parameterTypes" : [ "javax.ws.rs.core.UriBuilder" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
       "name" : "close",
       "parameterTypes" : [ ],
       "returnType" : "void"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.client.Client",
+    "name" : "jakarta.ws.rs.client.Client",
+    "superclass" : null
+  }, {
+    "_type" : "scout.ClassSignature",
+    "interfaces" : [ "jakarta.ws.rs.client.RxInvoker" ],
+    "methods" : [ {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "head",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.CompletionStage<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.CompletionStage<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "delete",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "delete",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "delete",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "get",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "get",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "get",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "head",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity", "jakarta.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity", "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "options",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "options",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "options",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity", "jakarta.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity", "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity", "jakarta.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity", "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "trace",
+      "parameterTypes" : [ ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "trace",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType" ],
+      "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 4161,
+      "name" : "trace",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "java.lang.Object"
+    } ],
+    "modifier" : 1537,
+    "name" : "jakarta.ws.rs.client.CompletionStageRxInvoker",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -281,6 +588,18 @@
       "name" : "hashCode",
       "parameterTypes" : [ ],
       "returnType" : "int"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "getMediaType",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.MediaType"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "getVariant",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Variant"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,
@@ -313,91 +632,79 @@
       "returnType" : "java.util.Locale"
     }, {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 1,
-      "name" : "getMediaType",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.MediaType"
+      "modifiers" : 9,
+      "name" : "entity",
+      "parameterTypes" : [ "T", "jakarta.ws.rs.core.MediaType" ],
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
     }, {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 1,
-      "name" : "getVariant",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Variant"
+      "modifiers" : 9,
+      "name" : "entity",
+      "parameterTypes" : [ "T", "jakarta.ws.rs.core.MediaType", "java.lang.annotation.Annotation[]" ],
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "entity",
+      "parameterTypes" : [ "T", "jakarta.ws.rs.core.Variant" ],
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "entity",
+      "parameterTypes" : [ "T", "jakarta.ws.rs.core.Variant", "java.lang.annotation.Annotation[]" ],
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "entity",
       "parameterTypes" : [ "T", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 9,
-      "name" : "entity",
-      "parameterTypes" : [ "T", "javax.ws.rs.core.MediaType" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 9,
-      "name" : "entity",
-      "parameterTypes" : [ "T", "javax.ws.rs.core.MediaType", "java.lang.annotation.Annotation[]" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 9,
-      "name" : "entity",
-      "parameterTypes" : [ "T", "javax.ws.rs.core.Variant" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 9,
-      "name" : "entity",
-      "parameterTypes" : [ "T", "javax.ws.rs.core.Variant", "java.lang.annotation.Annotation[]" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "form",
-      "parameterTypes" : [ "javax.ws.rs.core.Form" ],
-      "returnType" : "javax.ws.rs.client.Entity<javax.ws.rs.core.Form>"
+      "parameterTypes" : [ "jakarta.ws.rs.core.Form" ],
+      "returnType" : "jakarta.ws.rs.client.Entity<jakarta.ws.rs.core.Form>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "form",
-      "parameterTypes" : [ "javax.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.String>" ],
-      "returnType" : "javax.ws.rs.client.Entity<javax.ws.rs.core.Form>"
+      "parameterTypes" : [ "jakarta.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.String>" ],
+      "returnType" : "jakarta.ws.rs.client.Entity<jakarta.ws.rs.core.Form>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "html",
       "parameterTypes" : [ "T" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "json",
       "parameterTypes" : [ "T" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "text",
       "parameterTypes" : [ "T" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "xhtml",
       "parameterTypes" : [ "T" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "xml",
       "parameterTypes" : [ "T" ],
-      "returnType" : "javax.ws.rs.client.Entity<T>"
+      "returnType" : "jakarta.ws.rs.client.Entity<T>"
     } ],
     "modifier" : 17,
-    "name" : "javax.ws.rs.client.Entity",
+    "name" : "jakarta.ws.rs.client.Entity",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -405,169 +712,181 @@
     "methods" : [ {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "invoke",
-      "parameterTypes" : [ "java.lang.Class<T>" ],
-      "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "invoke",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
-      "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "submit",
-      "parameterTypes" : [ ],
-      "returnType" : "java.util.concurrent.Future<javax.ws.rs.core.Response>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "submit",
-      "parameterTypes" : [ "java.lang.Class<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "submit",
-      "parameterTypes" : [ "javax.ws.rs.client.InvocationCallback<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "submit",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
-      "returnType" : "java.util.concurrent.Future<T>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
       "name" : "property",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.client.Invocation"
+      "returnType" : "jakarta.ws.rs.client.Invocation"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "invoke",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response"
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "invoke",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "invoke",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "submit",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.concurrent.Future<jakarta.ws.rs.core.Response>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "submit",
+      "parameterTypes" : [ "jakarta.ws.rs.client.InvocationCallback<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "submit",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "submit",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "java.util.concurrent.Future<T>"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.client.Invocation",
+    "name" : "jakarta.ws.rs.client.Invocation",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
-    "interfaces" : [ "javax.ws.rs.client.SyncInvoker" ],
+    "interfaces" : [ "jakarta.ws.rs.client.SyncInvoker" ],
     "methods" : [ {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "async",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.client.AsyncInvoker"
+      "returnType" : "jakarta.ws.rs.client.AsyncInvoker"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "rx",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.client.CompletionStageRxInvoker"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "build",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.client.Invocation"
+      "returnType" : "jakarta.ws.rs.client.Invocation"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "build",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "javax.ws.rs.client.Invocation"
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "buildDelete",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.client.Invocation"
+      "returnType" : "jakarta.ws.rs.client.Invocation"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "buildGet",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.client.Invocation"
+      "returnType" : "jakarta.ws.rs.client.Invocation"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "buildPost",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "javax.ws.rs.client.Invocation"
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "buildPut",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "javax.ws.rs.client.Invocation"
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1153,
+      "name" : "accept",
+      "parameterTypes" : [ "jakarta.ws.rs.core.MediaType[]" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "accept",
       "parameterTypes" : [ "java.lang.String[]" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1153,
-      "name" : "accept",
-      "parameterTypes" : [ "javax.ws.rs.core.MediaType[]" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "acceptEncoding",
       "parameterTypes" : [ "java.lang.String[]" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "acceptLanguage",
       "parameterTypes" : [ "java.lang.String[]" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "acceptLanguage",
       "parameterTypes" : [ "java.util.Locale[]" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "cacheControl",
-      "parameterTypes" : [ "javax.ws.rs.core.CacheControl" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.CacheControl" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "cookie",
+      "parameterTypes" : [ "jakarta.ws.rs.core.Cookie" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "cookie",
       "parameterTypes" : [ "java.lang.String", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "cookie",
-      "parameterTypes" : [ "javax.ws.rs.core.Cookie" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "header",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "headers",
-      "parameterTypes" : [ "javax.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.Object>" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.Object>" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "property",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "rx",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "T"
     } ],
     "modifier" : 1545,
-    "name" : "javax.ws.rs.client.Invocation$Builder",
+    "name" : "jakarta.ws.rs.client.Invocation$Builder",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -586,7 +905,7 @@
       "returnType" : "void"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.client.InvocationCallback",
+    "name" : "jakarta.ws.rs.client.InvocationCallback",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -595,13 +914,230 @@
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "delete",
-      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "parameterTypes" : [ ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "delete",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "head",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<R>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "java.lang.Class<R>" ],
+      "returnType" : "T"
+    } ],
+    "modifier" : 1537,
+    "name" : "jakarta.ws.rs.client.RxInvoker",
+    "superclass" : null
+  }, {
+    "_type" : "scout.ClassSignature",
+    "interfaces" : [ ],
+    "methods" : [ {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "head",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "options",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "put",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>" ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "delete",
+      "parameterTypes" : [ "java.lang.Class<T>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "get",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
@@ -612,8 +1148,20 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "get",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "method",
+      "parameterTypes" : [ "java.lang.String", "jakarta.ws.rs.core.GenericType<T>" ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
@@ -624,20 +1172,8 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
-      "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
-      "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.core.GenericType<T>" ],
+      "name" : "options",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
@@ -648,32 +1184,32 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "options",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
+      "name" : "post",
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "post",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
-      "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "post",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "put",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "jakarta.ws.rs.core.GenericType<T>" ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "put",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>", "javax.ws.rs.core.GenericType<T>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.client.Entity<?>", "java.lang.Class<T>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "trace",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
@@ -681,160 +1217,100 @@
       "name" : "trace",
       "parameterTypes" : [ "java.lang.Class<T>" ],
       "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "trace",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
-      "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "delete",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "get",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "head",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "method",
-      "parameterTypes" : [ "java.lang.String", "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "javax.ws.rs.core.Response"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "options",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "post",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "javax.ws.rs.core.Response"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "put",
-      "parameterTypes" : [ "javax.ws.rs.client.Entity<?>" ],
-      "returnType" : "javax.ws.rs.core.Response"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "trace",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.client.SyncInvoker",
+    "name" : "jakarta.ws.rs.client.SyncInvoker",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
-    "interfaces" : [ "javax.ws.rs.core.Configurable" ],
+    "interfaces" : [ "jakarta.ws.rs.core.Configurable" ],
     "methods" : [ {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getUri",
-      "parameterTypes" : [ ],
-      "returnType" : "java.net.URI"
-    }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "request",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1153,
+      "name" : "request",
+      "parameterTypes" : [ "jakarta.ws.rs.core.MediaType[]" ],
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "request",
       "parameterTypes" : [ "java.lang.String[]" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1153,
-      "name" : "request",
-      "parameterTypes" : [ "javax.ws.rs.core.MediaType[]" ],
-      "returnType" : "javax.ws.rs.client.Invocation$Builder"
+      "returnType" : "jakarta.ws.rs.client.Invocation$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "matrixParam",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "path",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "queryParam",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "resolveTemplate",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "resolveTemplate",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object", "boolean" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "resolveTemplateFromEncoded",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "resolveTemplates",
       "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "resolveTemplates",
       "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>", "boolean" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "resolveTemplatesFromEncoded",
       "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>" ],
-      "returnType" : "javax.ws.rs.client.WebTarget"
+      "returnType" : "jakarta.ws.rs.client.WebTarget"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "getUriBuilder",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getUri",
+      "parameterTypes" : [ ],
+      "returnType" : "java.net.URI"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.client.WebTarget",
+    "name" : "jakarta.ws.rs.client.WebTarget",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -952,7 +1428,7 @@
       "modifiers" : 9,
       "name" : "valueOf",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.CacheControl"
+      "returnType" : "jakarta.ws.rs.core.CacheControl"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,
@@ -1003,7 +1479,7 @@
       "returnType" : "void"
     } ],
     "modifier" : 1,
-    "name" : "javax.ws.rs.core.CacheControl",
+    "name" : "jakarta.ws.rs.core.CacheControl",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -1067,10 +1543,10 @@
       "modifiers" : 1025,
       "name" : "getConfiguration",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Configuration"
+      "returnType" : "jakarta.ws.rs.core.Configuration"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.core.Configurable",
+    "name" : "jakarta.ws.rs.core.Configurable",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -1079,13 +1555,13 @@
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "isEnabled",
-      "parameterTypes" : [ "java.lang.Class<? extends javax.ws.rs.core.Feature>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.core.Feature" ],
       "returnType" : "boolean"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "isEnabled",
-      "parameterTypes" : [ "javax.ws.rs.core.Feature" ],
+      "parameterTypes" : [ "java.lang.Class<? extends jakarta.ws.rs.core.Feature>" ],
       "returnType" : "boolean"
     }, {
       "_type" : "scout.MethodSignature",
@@ -1099,6 +1575,12 @@
       "name" : "isRegistered",
       "parameterTypes" : [ "java.lang.Object" ],
       "returnType" : "boolean"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getRuntimeType",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.RuntimeType"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -1135,15 +1617,9 @@
       "name" : "getInstances",
       "parameterTypes" : [ ],
       "returnType" : "java.util.Set<java.lang.Object>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getRuntimeType",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.RuntimeType"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.core.Configuration",
+    "name" : "jakarta.ws.rs.core.Configuration",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -1201,10 +1677,10 @@
       "modifiers" : 9,
       "name" : "valueOf",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Cookie"
+      "returnType" : "jakarta.ws.rs.core.Cookie"
     } ],
     "modifier" : 1,
-    "name" : "javax.ws.rs.core.Cookie",
+    "name" : "jakarta.ws.rs.core.Cookie",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -1244,10 +1720,10 @@
       "modifiers" : 9,
       "name" : "valueOf",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.EntityTag"
+      "returnType" : "jakarta.ws.rs.core.EntityTag"
     } ],
     "modifier" : 1,
-    "name" : "javax.ws.rs.core.EntityTag",
+    "name" : "jakarta.ws.rs.core.EntityTag",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -1256,18 +1732,18 @@
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "configure",
-      "parameterTypes" : [ "javax.ws.rs.core.FeatureContext" ],
+      "parameterTypes" : [ "jakarta.ws.rs.core.FeatureContext" ],
       "returnType" : "boolean"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.core.Feature",
+    "name" : "jakarta.ws.rs.core.Feature",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
-    "interfaces" : [ "javax.ws.rs.core.Configurable" ],
+    "interfaces" : [ "jakarta.ws.rs.core.Configurable" ],
     "methods" : [ ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.core.FeatureContext",
+    "name" : "jakarta.ws.rs.core.FeatureContext",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -1277,16 +1753,16 @@
       "modifiers" : 1,
       "name" : "param",
       "parameterTypes" : [ "java.lang.String", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Form"
+      "returnType" : "jakarta.ws.rs.core.Form"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,
       "name" : "asMap",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.String>"
+      "returnType" : "jakarta.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.String>"
     } ],
     "modifier" : 1,
-    "name" : "javax.ws.rs.core.Form",
+    "name" : "jakarta.ws.rs.core.Form",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -1335,18 +1811,30 @@
       "returnType" : "java.lang.String"
     }, {
       "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "forInstance",
+      "parameterTypes" : [ "java.lang.Object" ],
+      "returnType" : "jakarta.ws.rs.core.GenericType"
+    }, {
+      "_type" : "scout.MethodSignature",
       "modifiers" : 8,
       "name" : "getTypeArgument",
       "parameterTypes" : [ "java.lang.Class<?>", "java.lang.Class<?>" ],
       "returnType" : "java.lang.reflect.Type"
     } ],
     "modifier" : 1,
-    "name" : "javax.ws.rs.core.GenericType",
+    "name" : "jakarta.ws.rs.core.GenericType",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
     "interfaces" : [ ],
     "methods" : [ {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getUriBuilder",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "getRel",
@@ -1390,61 +1878,55 @@
       "returnType" : "java.util.Map<java.lang.String, java.lang.String>"
     }, {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getUriBuilder",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "valueOf",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link"
+      "returnType" : "jakarta.ws.rs.core.Link"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromLink",
-      "parameterTypes" : [ "javax.ws.rs.core.Link" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.Link" ],
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromMethod",
       "parameterTypes" : [ "java.lang.Class<?>", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromPath",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromResource",
       "parameterTypes" : [ "java.lang.Class<?>" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromUri",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromUri",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromUriBuilder",
-      "parameterTypes" : [ "javax.ws.rs.core.UriBuilder" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.UriBuilder" ],
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     } ],
     "modifier" : 1025,
-    "name" : "javax.ws.rs.core.Link",
+    "name" : "jakarta.ws.rs.core.Link",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -1454,82 +1936,82 @@
       "modifiers" : 1153,
       "name" : "build",
       "parameterTypes" : [ "java.lang.Object[]" ],
-      "returnType" : "javax.ws.rs.core.Link"
+      "returnType" : "jakarta.ws.rs.core.Link"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "buildRelativized",
       "parameterTypes" : [ "java.net.URI", "java.lang.Object[]" ],
-      "returnType" : "javax.ws.rs.core.Link"
+      "returnType" : "jakarta.ws.rs.core.Link"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "baseUri",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "baseUri",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "link",
+      "parameterTypes" : [ "jakarta.ws.rs.core.Link" ],
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "link",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "link",
-      "parameterTypes" : [ "javax.ws.rs.core.Link" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "param",
       "parameterTypes" : [ "java.lang.String", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "rel",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "title",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "type",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "uri",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "uri",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "uriBuilder",
-      "parameterTypes" : [ "javax.ws.rs.core.UriBuilder" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.UriBuilder" ],
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
     } ],
     "modifier" : 1545,
-    "name" : "javax.ws.rs.core.Link$Builder",
+    "name" : "jakarta.ws.rs.core.Link$Builder",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
@@ -1550,7 +2032,7 @@
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,
       "name" : "isCompatible",
-      "parameterTypes" : [ "javax.ws.rs.core.MediaType" ],
+      "parameterTypes" : [ "jakarta.ws.rs.core.MediaType" ],
       "returnType" : "boolean"
     }, {
       "_type" : "scout.MethodSignature",
@@ -1570,6 +2052,12 @@
       "name" : "hashCode",
       "parameterTypes" : [ ],
       "returnType" : "int"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "withCharset",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.MediaType"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,
@@ -1596,19 +2084,13 @@
       "returnType" : "java.util.Map<java.lang.String, java.lang.String>"
     }, {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 1,
-      "name" : "withCharset",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.MediaType"
-    }, {
-      "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "valueOf",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.MediaType"
+      "returnType" : "jakarta.ws.rs.core.MediaType"
     } ],
     "modifier" : 1,
-    "name" : "javax.ws.rs.core.MediaType",
+    "name" : "jakarta.ws.rs.core.MediaType",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -1617,7 +2099,7 @@
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "equalsIgnoreValueOrder",
-      "parameterTypes" : [ "javax.ws.rs.core.MultivaluedMap<K, V>" ],
+      "parameterTypes" : [ "jakarta.ws.rs.core.MultivaluedMap<K, V>" ],
       "returnType" : "boolean"
     }, {
       "_type" : "scout.MethodSignature",
@@ -1657,11 +2139,11 @@
       "returnType" : "void"
     } ],
     "modifier" : 1537,
-    "name" : "javax.ws.rs.core.MultivaluedMap",
+    "name" : "jakarta.ws.rs.core.MultivaluedMap",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
-    "interfaces" : [ ],
+    "interfaces" : [ "java.lang.AutoCloseable" ],
     "methods" : [ {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -1695,9 +2177,63 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
+      "name" : "getEntityTag",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.EntityTag"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getLink",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.Link"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getLinkBuilder",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.Link$Builder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getMediaType",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.MediaType"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getMetadata",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.Object>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getStringHeaders",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.String>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "getStatusInfo",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response$StatusType"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
       "name" : "getEntity",
       "parameterTypes" : [ ],
       "returnType" : "java.lang.Object"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "readEntity",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>" ],
+      "returnType" : "T"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "readEntity",
+      "parameterTypes" : [ "jakarta.ws.rs.core.GenericType<T>", "java.lang.annotation.Annotation[]" ],
+      "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -1709,18 +2245,6 @@
       "modifiers" : 1025,
       "name" : "readEntity",
       "parameterTypes" : [ "java.lang.Class<T>", "java.lang.annotation.Annotation[]" ],
-      "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "readEntity",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>" ],
-      "returnType" : "T"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "readEntity",
-      "parameterTypes" : [ "javax.ws.rs.core.GenericType<T>", "java.lang.annotation.Annotation[]" ],
       "returnType" : "T"
     }, {
       "_type" : "scout.MethodSignature",
@@ -1757,7 +2281,7 @@
       "modifiers" : 1025,
       "name" : "getCookies",
       "parameterTypes" : [ ],
-      "returnType" : "java.util.Map<java.lang.String, javax.ws.rs.core.NewCookie>"
+      "returnType" : "java.util.Map<java.lang.String, jakarta.ws.rs.core.NewCookie>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -1769,49 +2293,7 @@
       "modifiers" : 1025,
       "name" : "getLinks",
       "parameterTypes" : [ ],
-      "returnType" : "java.util.Set<javax.ws.rs.core.Link>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getEntityTag",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.EntityTag"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getLink",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getLinkBuilder",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Link$Builder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getMediaType",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.MediaType"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getMetadata",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.Object>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getStringHeaders",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.String>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getStatusInfo",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$StatusType"
+      "returnType" : "java.util.Set<jakarta.ws.rs.core.Link>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -1823,130 +2305,136 @@
       "modifiers" : 1,
       "name" : "getHeaders",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.Object>"
+      "returnType" : "jakarta.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.Object>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "accepted",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "accepted",
       "parameterTypes" : [ "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "created",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromResponse",
-      "parameterTypes" : [ "javax.ws.rs.core.Response" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.Response" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "noContent",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "notAcceptable",
-      "parameterTypes" : [ "java.util.List<javax.ws.rs.core.Variant>" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "java.util.List<jakarta.ws.rs.core.Variant>" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "notModified",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "notModified",
+      "parameterTypes" : [ "jakarta.ws.rs.core.EntityTag" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "notModified",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 9,
-      "name" : "notModified",
-      "parameterTypes" : [ "javax.ws.rs.core.EntityTag" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "ok",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "ok",
       "parameterTypes" : [ "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "ok",
+      "parameterTypes" : [ "java.lang.Object", "jakarta.ws.rs.core.MediaType" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "ok",
+      "parameterTypes" : [ "java.lang.Object", "jakarta.ws.rs.core.Variant" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "ok",
       "parameterTypes" : [ "java.lang.Object", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 9,
-      "name" : "ok",
-      "parameterTypes" : [ "java.lang.Object", "javax.ws.rs.core.MediaType" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 9,
-      "name" : "ok",
-      "parameterTypes" : [ "java.lang.Object", "javax.ws.rs.core.Variant" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "seeOther",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "serverError",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "status",
       "parameterTypes" : [ "int" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "status",
-      "parameterTypes" : [ "javax.ws.rs.core.Response$Status" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "int", "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "status",
-      "parameterTypes" : [ "javax.ws.rs.core.Response$StatusType" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.Response$Status" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "status",
+      "parameterTypes" : [ "jakarta.ws.rs.core.Response$StatusType" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "temporaryRedirect",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     } ],
     "modifier" : 1025,
-    "name" : "javax.ws.rs.core.Response",
+    "name" : "jakarta.ws.rs.core.Response",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -1956,206 +2444,218 @@
       "modifiers" : 12,
       "name" : "newInstance",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "build",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response"
+      "returnType" : "jakarta.ws.rs.core.Response"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "allow",
       "parameterTypes" : [ "java.lang.String[]" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "allow",
       "parameterTypes" : [ "java.util.Set<java.lang.String>" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "cacheControl",
-      "parameterTypes" : [ "javax.ws.rs.core.CacheControl" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.CacheControl" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "clone",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "contentLocation",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "cookie",
-      "parameterTypes" : [ "javax.ws.rs.core.NewCookie[]" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.NewCookie[]" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "encoding",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "entity",
       "parameterTypes" : [ "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "entity",
       "parameterTypes" : [ "java.lang.Object", "java.lang.annotation.Annotation[]" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "expires",
       "parameterTypes" : [ "java.util.Date" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "header",
       "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "language",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "language",
       "parameterTypes" : [ "java.util.Locale" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "lastModified",
       "parameterTypes" : [ "java.util.Date" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "link",
       "parameterTypes" : [ "java.lang.String", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "link",
       "parameterTypes" : [ "java.net.URI", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "links",
-      "parameterTypes" : [ "javax.ws.rs.core.Link[]" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.Link[]" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "location",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "replaceAll",
-      "parameterTypes" : [ "javax.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.Object>" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.MultivaluedMap<java.lang.String, java.lang.Object>" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "status",
       "parameterTypes" : [ "int" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "status",
+      "parameterTypes" : [ "int", "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "tag",
+      "parameterTypes" : [ "jakarta.ws.rs.core.EntityTag" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "tag",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "tag",
-      "parameterTypes" : [ "javax.ws.rs.core.EntityTag" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "name" : "type",
+      "parameterTypes" : [ "jakarta.ws.rs.core.MediaType" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "type",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "type",
-      "parameterTypes" : [ "javax.ws.rs.core.MediaType" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
       "name" : "variant",
-      "parameterTypes" : [ "javax.ws.rs.core.Variant" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "variants",
-      "parameterTypes" : [ "java.util.List<javax.ws.rs.core.Variant>" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.Variant" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "variants",
-      "parameterTypes" : [ "javax.ws.rs.core.Variant[]" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.Variant[]" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "variants",
+      "parameterTypes" : [ "java.util.List<jakarta.ws.rs.core.Variant>" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "status",
+      "parameterTypes" : [ "jakarta.ws.rs.core.Response$Status" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "status",
+      "parameterTypes" : [ "jakarta.ws.rs.core.Response$StatusType" ],
+      "returnType" : "jakarta.ws.rs.core.Response$ResponseBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 4161,
       "name" : "clone",
       "parameterTypes" : [ ],
       "returnType" : "java.lang.Object"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1,
-      "name" : "status",
-      "parameterTypes" : [ "javax.ws.rs.core.Response$Status" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1,
-      "name" : "status",
-      "parameterTypes" : [ "javax.ws.rs.core.Response$StatusType" ],
-      "returnType" : "javax.ws.rs.core.Response$ResponseBuilder"
     } ],
     "modifier" : 1033,
-    "name" : "javax.ws.rs.core.Response$ResponseBuilder",
+    "name" : "jakarta.ws.rs.core.Response$ResponseBuilder",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
-    "interfaces" : [ "javax.ws.rs.core.Response$StatusType" ],
+    "interfaces" : [ "jakarta.ws.rs.core.Response$StatusType" ],
     "methods" : [ {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,
       "name" : "getStatusCode",
       "parameterTypes" : [ ],
       "returnType" : "int"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "getFamily",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response$Status$Family"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,
@@ -2170,31 +2670,25 @@
       "returnType" : "java.lang.String"
     }, {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 1,
-      "name" : "getFamily",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$Status$Family"
-    }, {
-      "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromStatusCode",
       "parameterTypes" : [ "int" ],
-      "returnType" : "javax.ws.rs.core.Response$Status"
+      "returnType" : "jakarta.ws.rs.core.Response$Status"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "valueOf",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$Status"
+      "returnType" : "jakarta.ws.rs.core.Response$Status"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "values",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$Status[]"
+      "returnType" : "jakarta.ws.rs.core.Response$Status[]"
     } ],
     "modifier" : 16409,
-    "name" : "javax.ws.rs.core.Response$Status",
+    "name" : "jakarta.ws.rs.core.Response$Status",
     "superclass" : "java.lang.Enum"
   }, {
     "_type" : "scout.ClassSignature",
@@ -2204,22 +2698,22 @@
       "modifiers" : 9,
       "name" : "familyOf",
       "parameterTypes" : [ "int" ],
-      "returnType" : "javax.ws.rs.core.Response$Status$Family"
+      "returnType" : "jakarta.ws.rs.core.Response$Status$Family"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "valueOf",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.Response$Status$Family"
+      "returnType" : "jakarta.ws.rs.core.Response$Status$Family"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "values",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$Status$Family[]"
+      "returnType" : "jakarta.ws.rs.core.Response$Status$Family[]"
     } ],
     "modifier" : 16409,
-    "name" : "javax.ws.rs.core.Response$Status$Family",
+    "name" : "jakarta.ws.rs.core.Response$Status$Family",
     "superclass" : "java.lang.Enum"
   }, {
     "_type" : "scout.ClassSignature",
@@ -2233,28 +2727,190 @@
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
+      "name" : "getFamily",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.Response$Status$Family"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
       "name" : "getReasonPhrase",
       "parameterTypes" : [ ],
       "returnType" : "java.lang.String"
     }, {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "getFamily",
+      "modifiers" : 1,
+      "name" : "toEnum",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Response$Status$Family"
+      "returnType" : "jakarta.ws.rs.core.Response$Status"
     } ],
     "modifier" : 1545,
-    "name" : "javax.ws.rs.core.Response$StatusType",
+    "name" : "jakarta.ws.rs.core.Response$StatusType",
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
     "interfaces" : [ ],
     "methods" : [ {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 12,
-      "name" : "newInstance",
+      "modifiers" : 1025,
+      "name" : "clone",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "fragment",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "host",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1153,
+      "name" : "matrixParam",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "path",
+      "parameterTypes" : [ "java.lang.Class" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "path",
+      "parameterTypes" : [ "java.lang.Class", "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "path",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "path",
+      "parameterTypes" : [ "java.lang.reflect.Method" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "port",
+      "parameterTypes" : [ "int" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1153,
+      "name" : "queryParam",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "replaceMatrix",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1153,
+      "name" : "replaceMatrixParam",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "replacePath",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "replaceQuery",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1153,
+      "name" : "replaceQueryParam",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "resolveTemplate",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "resolveTemplate",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Object", "boolean" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "resolveTemplateFromEncoded",
+      "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "resolveTemplates",
+      "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "resolveTemplates",
+      "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>", "boolean" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "resolveTemplatesFromEncoded",
+      "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "scheme",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "schemeSpecificPart",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1153,
+      "name" : "segment",
+      "parameterTypes" : [ "java.lang.String[]" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "uri",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "uri",
+      "parameterTypes" : [ "java.net.URI" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "userInfo",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -2299,168 +2955,6 @@
       "returnType" : "java.net.URI"
     }, {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "clone",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "fragment",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "host",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1153,
-      "name" : "matrixParam",
-      "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "path",
-      "parameterTypes" : [ "java.lang.Class" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "path",
-      "parameterTypes" : [ "java.lang.Class", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "path",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "path",
-      "parameterTypes" : [ "java.lang.reflect.Method" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "port",
-      "parameterTypes" : [ "int" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1153,
-      "name" : "queryParam",
-      "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "replaceMatrix",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1153,
-      "name" : "replaceMatrixParam",
-      "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "replacePath",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "replaceQuery",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1153,
-      "name" : "replaceQueryParam",
-      "parameterTypes" : [ "java.lang.String", "java.lang.Object[]" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "resolveTemplate",
-      "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "resolveTemplate",
-      "parameterTypes" : [ "java.lang.String", "java.lang.Object", "boolean" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "resolveTemplateFromEncoded",
-      "parameterTypes" : [ "java.lang.String", "java.lang.Object" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "resolveTemplates",
-      "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "resolveTemplates",
-      "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>", "boolean" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "resolveTemplatesFromEncoded",
-      "parameterTypes" : [ "java.util.Map<java.lang.String, java.lang.Object>" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "scheme",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "schemeSpecificPart",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1153,
-      "name" : "segment",
-      "parameterTypes" : [ "java.lang.String[]" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "uri",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "uri",
-      "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
-      "name" : "userInfo",
-      "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
-    }, {
-      "_type" : "scout.MethodSignature",
       "modifiers" : 4161,
       "name" : "clone",
       "parameterTypes" : [ ],
@@ -2469,41 +2963,47 @@
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromLink",
-      "parameterTypes" : [ "javax.ws.rs.core.Link" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.Link" ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromMethod",
       "parameterTypes" : [ "java.lang.Class<?>", "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromPath",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromResource",
       "parameterTypes" : [ "java.lang.Class<?>" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromUri",
       "parameterTypes" : [ "java.lang.String" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "fromUri",
       "parameterTypes" : [ "java.net.URI" ],
-      "returnType" : "javax.ws.rs.core.UriBuilder"
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 9,
+      "name" : "newInstance",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.UriBuilder"
     } ],
     "modifier" : 1025,
-    "name" : "javax.ws.rs.core.UriBuilder",
+    "name" : "jakarta.ws.rs.core.UriBuilder",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -2520,6 +3020,12 @@
       "name" : "hashCode",
       "parameterTypes" : [ ],
       "returnType" : "int"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "getMediaType",
+      "parameterTypes" : [ ],
+      "returnType" : "jakarta.ws.rs.core.MediaType"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,
@@ -2546,31 +3052,25 @@
       "returnType" : "java.util.Locale"
     }, {
       "_type" : "scout.MethodSignature",
-      "modifiers" : 1,
-      "name" : "getMediaType",
-      "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.MediaType"
-    }, {
-      "_type" : "scout.MethodSignature",
       "modifiers" : 137,
       "name" : "encodings",
       "parameterTypes" : [ "java.lang.String[]" ],
-      "returnType" : "javax.ws.rs.core.Variant$VariantListBuilder"
+      "returnType" : "jakarta.ws.rs.core.Variant$VariantListBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 137,
       "name" : "languages",
       "parameterTypes" : [ "java.util.Locale[]" ],
-      "returnType" : "javax.ws.rs.core.Variant$VariantListBuilder"
+      "returnType" : "jakarta.ws.rs.core.Variant$VariantListBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 137,
       "name" : "mediaTypes",
-      "parameterTypes" : [ "javax.ws.rs.core.MediaType[]" ],
-      "returnType" : "javax.ws.rs.core.Variant$VariantListBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.MediaType[]" ],
+      "returnType" : "jakarta.ws.rs.core.Variant$VariantListBuilder"
     } ],
     "modifier" : 1,
-    "name" : "javax.ws.rs.core.Variant",
+    "name" : "jakarta.ws.rs.core.Variant",
     "superclass" : "java.lang.Object"
   }, {
     "_type" : "scout.ClassSignature",
@@ -2578,42 +3078,42 @@
     "methods" : [ {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
-      "name" : "build",
-      "parameterTypes" : [ ],
-      "returnType" : "java.util.List<javax.ws.rs.core.Variant>"
-    }, {
-      "_type" : "scout.MethodSignature",
-      "modifiers" : 1025,
       "name" : "add",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Variant$VariantListBuilder"
+      "returnType" : "jakarta.ws.rs.core.Variant$VariantListBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "encodings",
       "parameterTypes" : [ "java.lang.String[]" ],
-      "returnType" : "javax.ws.rs.core.Variant$VariantListBuilder"
+      "returnType" : "jakarta.ws.rs.core.Variant$VariantListBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "languages",
       "parameterTypes" : [ "java.util.Locale[]" ],
-      "returnType" : "javax.ws.rs.core.Variant$VariantListBuilder"
+      "returnType" : "jakarta.ws.rs.core.Variant$VariantListBuilder"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1153,
       "name" : "mediaTypes",
-      "parameterTypes" : [ "javax.ws.rs.core.MediaType[]" ],
-      "returnType" : "javax.ws.rs.core.Variant$VariantListBuilder"
+      "parameterTypes" : [ "jakarta.ws.rs.core.MediaType[]" ],
+      "returnType" : "jakarta.ws.rs.core.Variant$VariantListBuilder"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1025,
+      "name" : "build",
+      "parameterTypes" : [ ],
+      "returnType" : "java.util.List<jakarta.ws.rs.core.Variant>"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 9,
       "name" : "newInstance",
       "parameterTypes" : [ ],
-      "returnType" : "javax.ws.rs.core.Variant$VariantListBuilder"
+      "returnType" : "jakarta.ws.rs.core.Variant$VariantListBuilder"
     } ],
     "modifier" : 1033,
-    "name" : "javax.ws.rs.core.Variant$VariantListBuilder",
+    "name" : "jakarta.ws.rs.core.Variant$VariantListBuilder",
     "superclass" : "java.lang.Object"
   } ]
 }

@@ -12,17 +12,16 @@ package org.eclipse.scout.rt.rest.client.proxy;
 import java.io.IOException;
 import java.io.InputStream;
 
-import jakarta.ws.rs.client.Client;
-
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.client.proxy.api.ApiSignature;
 import org.eclipse.scout.rt.rest.client.proxy.api.ApiSignatureDo;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import jakarta.ws.rs.client.Client;
 
 /**
  * This test creates an inventory of all JAX-RS client classes and compares it with the one created at the time the
@@ -35,9 +34,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class RestClientApiFootprintTest {
 
-  // FIXME PBZ JAKARTA check with ABR
   @Test
-  @Ignore
   public void verifyApiSignatures() throws IOException {
     ApiSignatureDo api = BEANS.get(ApiSignature.class)
         .classFilter(c -> c.getPackage() != null && c.getPackage().getName().startsWith("jakarta.ws.rs."))
