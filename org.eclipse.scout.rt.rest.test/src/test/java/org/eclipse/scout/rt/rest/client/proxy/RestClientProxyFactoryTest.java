@@ -11,17 +11,6 @@ package org.eclipse.scout.rt.rest.client.proxy;
 
 import static org.junit.Assert.*;
 
-import jakarta.ws.rs.client.AsyncInvoker;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.Invocation;
-import jakarta.ws.rs.client.Invocation.Builder;
-import jakarta.ws.rs.client.InvocationCallback;
-import jakarta.ws.rs.client.SyncInvoker;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.GenericType;
-import jakarta.ws.rs.core.MediaType;
-
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,6 +18,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.mockito.Mockito;
+
+import jakarta.ws.rs.client.AsyncInvoker;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.InvocationCallback;
+import jakarta.ws.rs.client.RxInvoker;
+import jakarta.ws.rs.client.SyncInvoker;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
 
 public class RestClientProxyFactoryTest {
 
@@ -57,6 +58,8 @@ public class RestClientProxyFactoryTest {
     assertTrue(getFactory().isDiscouraged(AsyncInvoker.class.getDeclaredMethod("post", Entity.class, GenericType.class)));
     assertTrue(getFactory().isDiscouraged(AsyncInvoker.class.getDeclaredMethod("post", Entity.class, InvocationCallback.class)));
     assertTrue(getFactory().isDiscouraged(Invocation.class.getDeclaredMethod("submit")));
+    assertTrue(getFactory().isDiscouraged(Invocation.Builder.class.getDeclaredMethod("rx")));
+    assertTrue(getFactory().isDiscouraged(RxInvoker.class.getDeclaredMethod("post", Entity.class, GenericType.class)));
   }
 
   @Test
