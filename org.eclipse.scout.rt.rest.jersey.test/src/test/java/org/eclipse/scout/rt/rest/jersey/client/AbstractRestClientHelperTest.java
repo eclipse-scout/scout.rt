@@ -9,16 +9,21 @@
  */
 package org.eclipse.scout.rt.rest.jersey.client;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;
 import org.eclipse.scout.rt.rest.client.AntiCsrfClientFilter;
 import org.eclipse.scout.rt.rest.client.HttpHeadersRequestFilter;
@@ -27,7 +32,10 @@ import org.eclipse.scout.rt.rest.jackson.ObjectMapperResolver;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.LanguageAndCorrelationIdRestRequestFilter;
 import org.eclipse.scout.rt.rest.jersey.client.multipart.MultipartMessageBodyWriter;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Various test cases for {@link AbstractRestClientHelper}.
@@ -58,5 +66,39 @@ public class AbstractRestClientHelperTest {
     Client client1 = BEANS.get(RestClientProxyFactory.class).unwrap(restClientHelper.client());
     Client client2 = BEANS.get(RestClientProxyFactory.class).unwrap(restClientHelper.client());
     assertEquals("expect same client instance on multiple calls", client1, client2);
+  }
+
+  @Test
+  public void testDuplicatedContextResolverAsBean() {
+    IBean<?> bean = BeanTestingHelper.get().registerBean(new BeanMetaData(ObjectMapperResolver2.class));
+    try {
+      JerseyTestRestClientHelper restClientHelper = new JerseyTestRestClientHelper();  // use separate instance to force re-init
+      assertThrows(AssertionException.class, () -> restClientHelper.client());
+    }
+    finally {
+      BeanTestingHelper.get().unregisterBean(bean);
+    }
+  }
+
+  @Test
+  public void testDuplicatedContextResolverManualRegister() {
+    JerseyTestRestClientHelper restClientHelper = new JerseyTestRestClientHelperEx();
+    assertThrows(AssertionException.class, () -> restClientHelper.client());
+  }
+
+  static class JerseyTestRestClientHelperEx extends JerseyTestRestClientHelper {
+    @Override
+    protected List<ContextResolver> getContextResolversToRegister() {
+      List<ContextResolver> resolvers = super.getContextResolversToRegister();
+      resolvers.add(new ObjectMapperResolver2());
+      return resolvers;
+    }
+  }
+
+  protected static class ObjectMapperResolver2 implements ContextResolver<ObjectMapper> {
+    @Override
+    public ObjectMapper getContext(Class<?> type) {
+      return null;
+    }
   }
 }
