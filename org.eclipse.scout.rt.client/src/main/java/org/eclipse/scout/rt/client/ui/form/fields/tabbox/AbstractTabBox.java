@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -192,7 +192,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
         result.add((IGroupBox) field);
       }
       else {
-        LOG.warn("Tabboxes only allow instance of IGroupBox as inner fields. '{}' is not instance of IGroupBox!", field.getClass().getName());
+        LOG.warn("TabBoxes only allow instance of IGroupBox as inner fields. '{}' is not instance of IGroupBox!", field.getClass().getName());
       }
     }
     return result;
@@ -249,9 +249,8 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   @Override
   public void removeField(IFormField f) {
     super.removeField(f);
-    // if tabitem (groupbox) is removed from tabbox, we must also reset the selected tab
-    // because otherwise the property would point to a tabitem that is no longer a child
-    // of this tabbox
+    // if TabItem (groupbox) is removed from TabBox, we must also reset the selected tab because otherwise the property
+    // would point to a TabItem that is no longer a child of this TabBox
     if (f == getSelectedTab()) {
       setSelectedTab(findNewSelectedTab(null));
     }
