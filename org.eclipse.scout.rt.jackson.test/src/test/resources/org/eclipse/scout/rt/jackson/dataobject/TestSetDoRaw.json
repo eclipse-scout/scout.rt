@@ -1,0 +1,19 @@
+{
+  "dateSetAttribute" : [ "2017-11-30 17:29:12.583", "1990-10-20 00:00:00.000" ],
+  "integerSetAttribute" : [ 21, 42 ],
+  "itemDoSetAttribute" : [ {
+    "id" : "item-key3",
+    "stringAttribute" : "value3"
+  }, {
+    "id" : "item-key4",
+    "stringAttribute" : "value4"
+  } ],
+  "itemPojoSetAttribute" : [ {
+    "id" : "item-key1",
+    "stringAttribute" : "value1"
+  }, {
+    "id" : "item-key2",
+    "stringAttribute" : "value2"
+  } ],
+  "stringSetAttribute" : [ "foo", "bar" ]
+}

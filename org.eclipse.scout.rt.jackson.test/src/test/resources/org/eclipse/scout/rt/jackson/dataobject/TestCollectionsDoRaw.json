@@ -5,24 +5,87 @@
   }, {
     "id" : "d3",
     "stringAttribute" : "itemDo-as-collection-item-2"
-  } ],
+  }, null ],
   "itemDoAttribute" : {
     "id" : "d1",
     "stringAttribute" : "itemDo-as-attribute"
   },
+  "itemDoCollectionAttribute" : [ {
+    "id" : "d12",
+    "stringAttribute" : "itemDo-as-DoCollection-item-1"
+  }, {
+    "id" : "d13",
+    "stringAttribute" : "itemDo-as-DoCollection-item-2"
+  } ],
+  "itemDoListAbstractAttribute" : [ {
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }, {
+    "city" : "Example",
+    "id" : "physicAddress"
+  } ],
   "itemDoListAttribute" : [ {
+    "id" : "d8",
+    "stringAttribute" : "itemDo-as-DoList-item-1"
+  }, {
+    "id" : "d9",
+    "stringAttribute" : "itemDo-as-DoList-item-2"
+  } ],
+  "itemDoListInterfaceAttribute" : [ {
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }, {
+    "city" : "Example",
+    "id" : "physicAddress"
+  } ],
+  "itemDoSetAttribute" : [ {
+    "id" : "d10",
+    "stringAttribute" : "itemDo-as-DoSet-item-1"
+  }, {
+    "id" : "d11",
+    "stringAttribute" : "itemDo-as-DoSet-item-2"
+  } ],
+  "itemListAbstractAttribute" : [ {
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
+  }, {
+    "city" : "Example",
+    "id" : "physicAddress"
+  } ],
+  "itemListAttribute" : [ {
     "id" : "d4",
     "stringAttribute" : "itemDo-as-list-item-1"
   }, {
     "id" : "d5",
     "stringAttribute" : "itemDo-as-list-item-2"
   } ],
-  "itemDoSetAttribute" : [ {
-    "id" : "d6",
-    "stringAttribute" : "itemDo-as-set-item-1"
+  "itemListInterfaceAttribute" : [ {
+    "email" : "foo@bar.de",
+    "id" : "elecAddress"
   }, {
-    "id" : "d7",
-    "stringAttribute" : "itemDo-as-set-item-2"
+    "city" : "Example",
+    "id" : "physicAddress"
+  } ],
+  "itemPojo2DoCollectionAttribute" : [ {
+    "id" : "p18",
+    "stringAttribute" : "itemPojo2-as-DoCollection-item-1"
+  }, {
+    "id" : "p19",
+    "stringAttribute" : "itemPojo2-as-DoCollection-item-2"
+  } ],
+  "itemPojo2DoListAttribute" : [ {
+    "id" : "p10",
+    "stringAttribute" : "itemPojo2-as-DoList-item-1"
+  }, {
+    "id" : "p11",
+    "stringAttribute" : "itemPojo2-as-DoList-item-2"
+  } ],
+  "itemPojo2DoSetAttribute" : [ {
+    "id" : "p14",
+    "stringAttribute" : "itemPojo2-as-DoSet-item-1"
+  }, {
+    "id" : "p15",
+    "stringAttribute" : "itemPojo2-as-DoSet-item-2"
   } ],
   "itemPojoAttribute" : {
     "id" : "p1",
@@ -35,18 +98,32 @@
     "id" : "p3",
     "stringAttribute" : "itemPojo-as-collection-item-2"
   } ],
+  "itemPojoDoCollectionAttribute" : [ {
+    "id" : "p16",
+    "stringAttribute" : "itemPojo-as-DoCollection-item-1"
+  }, {
+    "id" : "p17",
+    "stringAttribute" : "itemPojo-as-DoCollection-item-2"
+  } ],
+  "itemPojoDoListAttribute" : [ {
+    "id" : "p8",
+    "stringAttribute" : "itemPojo-as-DoList-item-1"
+  }, {
+    "id" : "p9",
+    "stringAttribute" : "itemPojo-as-DoList-item-2"
+  } ],
+  "itemPojoDoSetAttribute" : [ {
+    "id" : "p12",
+    "stringAttribute" : "itemPojo-as-DoSet-item-1"
+  }, {
+    "id" : "p13",
+    "stringAttribute" : "itemPojo-as-DoSet-item-2"
+  } ],
   "itemPojoListAttribute" : [ {
     "id" : "p4",
     "stringAttribute" : "itemPojo-as-list-item-1"
   }, {
     "id" : "p5",
     "stringAttribute" : "itemPojo-as-list-item-2"
-  } ],
-  "itemPojoSetAttribute" : [ {
-    "id" : "p6",
-    "stringAttribute" : "itemPojo-as-set-item-1"
-  }, {
-    "id" : "p7",
-    "stringAttribute" : "itemPojo-as-set-item-2"
   } ]
 }
