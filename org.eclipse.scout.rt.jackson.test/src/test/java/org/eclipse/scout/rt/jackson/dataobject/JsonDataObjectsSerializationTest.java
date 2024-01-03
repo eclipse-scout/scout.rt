@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoCollection;
@@ -148,6 +149,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -2964,8 +2966,8 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerializeDeserialize_CustomTypePropertyName() throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(BEANS.get(ScoutDataObjectModule.class).withTypeAttributeName("_customType"));
+    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withTypeAttributeName("_customType"));
+    mapper.disable(SerializationFeature.INDENT_OUTPUT);
 
     TestComplexEntityDo entityDo = BEANS.get(TestComplexEntityDo.class);
     entityDo.withId("foo");
@@ -2975,6 +2977,39 @@ public class JsonDataObjectsSerializationTest {
     DoEntity marshalled = mapper.readValue(json, DoEntity.class);
     assertEquals(TestComplexEntityDo.class, marshalled.getClass());
     assertEquals("foo", ((TestComplexEntityDo) marshalled).getId());
+  }
+
+  @Test
+  public void testSerializeDeserializeComplexEntity_SuppressType() throws Exception {
+    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withSuppressTypeAttribute(true));
+    TestComplexEntityDo entityDo = createTestDo();
+    String json = mapper.writeValueAsString(entityDo);
+    assertJsonEquals("TestComplexEntityDoRaw.json", json);
+  }
+
+  @Test
+  public void testSerializeDeserializeCollection_SuppressType() throws Exception {
+    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withSuppressTypeAttribute(true));
+    // disable Jackson typing for pojo classes (suppress flag is only for data objects)
+    mapper.addMixIn(TestItemPojo.class, NoTypes.class);
+    mapper.addMixIn(TestItemPojo2.class, NoTypes.class);
+    TestCollectionsDo testDo = createTestCollectionsDo();
+    String json = mapper.writeValueAsString(testDo);
+    assertJsonEquals("TestCollectionsDoRaw.json", json);
+  }
+
+  @Test
+  public void testSerializeDeserializeSet_SuppressType() throws Exception {
+    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withSuppressTypeAttribute(true));
+    // disable Jackson typing for pojo classes (suppress flag is only for data objects)
+    mapper.addMixIn(TestItemPojo.class, NoTypes.class);
+    TestSetDo setDo = createTestSetDo();
+    String json = mapper.writeValueAsString(setDo);
+    assertJsonEquals("TestSetDoRaw.json", json);
+  }
+
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+  static class NoTypes {
   }
 
   // ------------------------------------ tests with type version ------------------------------------
@@ -3034,9 +3069,8 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerializeDeserialize_CustomTypeVersionPropertyName() throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(BEANS.get(ScoutDataObjectModule.class).withTypeVersionAttributeName("_customTypeVersion"));
-
+    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withTypeVersionAttributeName("_customTypeVersion"));
+    mapper.disable(SerializationFeature.INDENT_OUTPUT);
     TestVersionedDo entityDo = BEANS.get(TestVersionedDo.class);
     entityDo.withName("foo");
     String json = mapper.writeValueAsString(entityDo);
@@ -3783,6 +3817,17 @@ public class JsonDataObjectsSerializationTest {
   }
 
   // ------------------------------------ common test helper methods ------------------------------------
+
+  protected ObjectMapper createCustomScoutDoObjectMapper(Consumer<ScoutDataObjectModuleContext> contextConsumer) {
+    //noinspection deprecation
+    return new JacksonPrettyPrintDataObjectMapper() {
+      @Override
+      protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
+        super.prepareScoutDataModuleContext(moduleContext);
+        contextConsumer.accept(moduleContext);
+      }
+    }.getObjectMapper();
+  }
 
   protected TestComplexEntityDo createTestDo() {
     TestComplexEntityDo testDo = BEANS.get(TestComplexEntityDo.class);

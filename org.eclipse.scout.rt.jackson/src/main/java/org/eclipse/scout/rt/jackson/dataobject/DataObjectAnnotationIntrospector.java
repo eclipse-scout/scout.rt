@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
+import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 
 /**
  * Jackson {@link AnnotationIntrospector} implementation adding type resolver for all {@link IDoEntity} data object
@@ -40,6 +41,9 @@ public class DataObjectAnnotationIntrospector extends JacksonAnnotationIntrospec
   @Override
   public TypeResolverBuilder<?> findTypeResolver(MapperConfig<?> config, AnnotatedClass ac, JavaType baseType) {
     if (IDoEntity.class.isAssignableFrom(ac.getRawType())) {
+      if (m_moduleContext.isSuppressTypeAttribute()) {
+        return StdTypeResolverBuilder.noTypeInfoBuilder();
+      }
       DataObjectTypeResolverBuilder doTypeResolverBuilder = BEANS.get(DataObjectTypeResolverBuilder.class);
       doTypeResolverBuilder.init(JsonTypeInfo.Id.NAME, BEANS.get(DataObjectTypeIdResolver.class));
       doTypeResolverBuilder.inclusion(JsonTypeInfo.As.PROPERTY);

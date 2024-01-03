@@ -12,7 +12,11 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -33,6 +37,8 @@ public class ScoutDataObjectModuleContext {
   protected static final String TYPE_VERSION_ATTRIBUTE_NAME_KEY = "typeVersionAttributeNameKey";
 
   protected static final String IGNORE_TYPE_ATTRIBUTE_KEY = "ignoreTypeAttributeKey";
+
+  protected static final String SUPPRESS_TYPE_ATTRIBUTE_KEY = "suppressTypeAttributeKey";
 
   protected static final String CONTRIBUTIONS_ATTRIBUTE_NAME_KEY = "contributionsAttributeNameKey";
 
@@ -95,12 +101,39 @@ public class ScoutDataObjectModuleContext {
     return this;
   }
 
+  /**
+   * @see #withIgnoreTypeAttribute(boolean)
+   */
   public boolean isIgnoreTypeAttribute() {
     return BooleanUtility.nvl(get(IGNORE_TYPE_ATTRIBUTE_KEY, Boolean.class));
   }
 
+  /**
+   * Flag to ignore type attributes when deserializing a JSON document structure. Forces to create raw {@link DoEntity}
+   * instances for each deserialized JSON object instead.
+   */
   public ScoutDataObjectModuleContext withIgnoreTypeAttribute(boolean ignoreTypeAttribute) {
     put(IGNORE_TYPE_ATTRIBUTE_KEY, ignoreTypeAttribute);
+    return this;
+  }
+
+  /**
+   * @see #withSuppressTypeAttribute(boolean)
+   */
+  public boolean isSuppressTypeAttribute() {
+    return BooleanUtility.nvl(get(SUPPRESS_TYPE_ATTRIBUTE_KEY, Boolean.class));
+  }
+
+  /**
+   * Flag to suppress writing type attributes (e.g. '_type' attribute in JSON document) when serializing a data object
+   * with {@link TypeName} annotation into a JSON document.
+   * <p>
+   * <b>NOTE:</b> A JSON document written without type information may not be deserialized correctly if any polymorphic
+   * types are used within the data object structure, e.g. a {@link DoList} typed with {@link IDoEntity} containing
+   * different data object subclasses.
+   */
+  public ScoutDataObjectModuleContext withSuppressTypeAttribute(boolean suppressTypeAttribute) {
+    put(SUPPRESS_TYPE_ATTRIBUTE_KEY, suppressTypeAttribute);
     return this;
   }
 
