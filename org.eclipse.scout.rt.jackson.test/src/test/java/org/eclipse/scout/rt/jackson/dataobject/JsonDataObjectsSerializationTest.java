@@ -161,7 +161,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
  * Various test cases serializing and deserializing Scout data objects from/to JSON
@@ -951,6 +950,7 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerializeDeserialize_PojoWithJacksonAnnotations() throws Exception {
     // custom DoObjectMapper configured like default object mapper
+    @SuppressWarnings("deprecation")
     final ObjectMapper customDoObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).createObjectMapperInstance(false)
         .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
         .setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN));
@@ -1708,7 +1708,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(expectedDo.getItemDoAttribute().getId(), doMarhalled.get("itemDoAttribute", DoEntity.class).get("id"));
 
     List<DoEntity> list = doMarhalled.getList("itemDoListAttribute", DoEntity.class);
-    assertEquals(expectedDo.getItemListAttribute().get(0).getId(), list.get(0).get("id"));
+    assertEquals(expectedDo.getItemDoListAttribute().get(0).getId(), list.get(0).get("id"));
 
     String serialized = s_dataObjectMapper.writeValueAsString(doMarhalled);
     s_testHelper.assertJsonEquals(json, serialized);
@@ -1955,32 +1955,7 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerializeDeserialize_TestSetDo() throws Exception {
-    TestSetDo setDo = new TestSetDo();
-    Set<String> stringSet = new LinkedHashSet<>();
-    stringSet.add("foo");
-    stringSet.add("bar");
-    setDo.withStringSetAttribute(stringSet);
-
-    Set<Integer> integerSet = new LinkedHashSet<>();
-    integerSet.add(21);
-    integerSet.add(42);
-    setDo.withIntegerSetAttribute(integerSet);
-
-    Set<TestItemPojo> pojoSet = new LinkedHashSet<>();
-    pojoSet.add(createTestItemPojo("item-key1", "value1"));
-    pojoSet.add(createTestItemPojo("item-key2", "value2"));
-    setDo.withItemPojoSetAttribute(pojoSet);
-
-    Set<TestItemDo> doSet = new LinkedHashSet<>();
-    doSet.add(createTestItemDo("item-key3", "value3"));
-    doSet.add(createTestItemDo("item-key4", "value4"));
-    setDo.withItemDoSetAttribute(doSet);
-
-    Set<Date> dateSet = new LinkedHashSet<>();
-    dateSet.add(DATE);
-    dateSet.add(DATE_TRUNCATED);
-    setDo.withDateSetAttribute(dateSet);
-
+    TestSetDo setDo = createTestSetDo();
     String json = s_dataObjectMapper.writeValueAsString(setDo);
     assertJsonEquals("TestSetDo.json", json);
 
@@ -2009,6 +1984,48 @@ public class JsonDataObjectsSerializationTest {
       assertEquals(expectedPojo.get(i).getId(), actualPojo.get(i).getId());
       assertEquals(expectedPojo.get(i).getStringAttribute(), actualPojo.get(i).getStringAttribute());
     }
+  }
+
+  @Test
+  public void testSerializeDeserialize_TestSetDoRaw() throws Exception {
+    String json = readResourceAsString("TestSetDoRaw.json");
+    DoEntity doMarhalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+
+    TestSetDo expectedDo = createTestSetDo();
+    assertTrue(CollectionUtility.equalsCollection(expectedDo.getStringSetAttribute(), doMarhalled.getList("stringSetAttribute"), false));
+    assertTrue(CollectionUtility.equalsCollection(expectedDo.getIntegerSetAttribute(), doMarhalled.getList("integerSetAttribute"), false));
+
+    String serialized = s_dataObjectMapper.writeValueAsString(doMarhalled);
+    s_testHelper.assertJsonEquals(json, serialized);
+  }
+
+  protected TestSetDo createTestSetDo() {
+    TestSetDo setDo = new TestSetDo();
+    Set<String> stringSet = new LinkedHashSet<>();
+    stringSet.add("foo");
+    stringSet.add("bar");
+    setDo.withStringSetAttribute(stringSet);
+
+    Set<Integer> integerSet = new LinkedHashSet<>();
+    integerSet.add(21);
+    integerSet.add(42);
+    setDo.withIntegerSetAttribute(integerSet);
+
+    Set<TestItemPojo> pojoSet = new LinkedHashSet<>();
+    pojoSet.add(createTestItemPojo("item-key1", "value1"));
+    pojoSet.add(createTestItemPojo("item-key2", "value2"));
+    setDo.withItemPojoSetAttribute(pojoSet);
+
+    Set<TestItemDo> doSet = new LinkedHashSet<>();
+    doSet.add(createTestItemDo("item-key3", "value3"));
+    doSet.add(createTestItemDo("item-key4", "value4"));
+    setDo.withItemDoSetAttribute(doSet);
+
+    Set<Date> dateSet = new LinkedHashSet<>();
+    dateSet.add(DATE);
+    dateSet.add(DATE_TRUNCATED);
+    setDo.withDateSetAttribute(dateSet);
+    return setDo;
   }
 
   @Test
