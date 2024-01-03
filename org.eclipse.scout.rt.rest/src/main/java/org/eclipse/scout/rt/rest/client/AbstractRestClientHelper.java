@@ -16,6 +16,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.platform.util.StreamUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.UriBuilder;
+import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
+import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
+
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -25,15 +37,6 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Configuration;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ContextResolver;
-
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
-import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.UriBuilder;
-import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
-import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
 
 /**
  * Abstract implementation of a REST client helper dealing with REST requests to a API server.
@@ -122,9 +125,29 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   protected void registerContextResolvers(ClientBuilder clientBuilder) {
     // Context resolver, e.g. resolver for ObjectMapper
-    for (ContextResolver resolver : getContextResolversToRegister()) {
+    for (ContextResolver resolver : validateContextResolvers(getContextResolversToRegister())) {
       clientBuilder.register(resolver);
     }
+  }
+
+  /**
+   * Validates given list of {@link ContextResolver} and checks for resolvers providing a value for the same context resolver type.
+   */
+  protected List<ContextResolver> validateContextResolvers(List<ContextResolver> contextResolvers) {
+    //noinspection ResultOfMethodCallIgnored
+    contextResolvers.stream()
+        .collect(StreamUtility.toMap(
+            r -> getContextResolverType(r),
+            r -> r,
+            (u, v) -> Assertions.fail("Duplicated context resolver for type {}, resolvers: [{}, {}]", getContextResolverType(u), u.getClass(), v.getClass())));
+    return contextResolvers;
+  }
+
+  /**
+   * @return generic type of given {@link ContextResolver}.
+   */
+  protected Class<?> getContextResolverType(ContextResolver contextResolver) {
+    return TypeCastUtility.getGenericsParameterClass(contextResolver.getClass(), ContextResolver.class);
   }
 
   protected void registerRequestFilters(ClientBuilder clientBuilder) {
