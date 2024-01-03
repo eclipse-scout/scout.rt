@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -81,11 +84,24 @@ public class ScoutDataObjectModule extends Module {
   }
 
   /**
-   * Setup {@link ScoutDataObjectModule} to ignore type attributes when deserializing JSON document structures and
-   * create raw {@link DoEntity} instances instead.
+   * Setup {@link ScoutDataObjectModule} to ignore type attributes when deserializing a JSON document structure. Forces
+   * to create raw {@link DoEntity} instances for each deserialized JSON object instead.
    */
   public ScoutDataObjectModule withIgnoreTypeAttribute(boolean ignoreTypeAttribute) {
     m_moduleContext.withIgnoreTypeAttribute(ignoreTypeAttribute);
+    return this;
+  }
+
+  /**
+   * Setup {@link ScoutDataObjectModule} to suppress writing type attributes (e.g. '_type' attribute in JSON document)
+   * when serializing a data object with {@link TypeName} annotation into a JSON document.
+   * <p>
+   * <b>NOTE:</b> A JSON document written without type information may not be deserialized correctly if any polymorphic
+   * types are used within the data object structure, e.g. a {@link DoList} typed with {@link IDoEntity} containing
+   * different data object subclasses.
+   */
+  public ScoutDataObjectModule withSuppressTypeAttribute(boolean suppressTypeAttribute) {
+    m_moduleContext.withSuppressTypeAttribute(suppressTypeAttribute);
     return this;
   }
 
@@ -118,15 +134,5 @@ public class ScoutDataObjectModule extends Module {
 
     context.addTypeModifier(BEANS.get(DataObjectTypeModifier.class).withModuleContext(m_moduleContext));
     context.insertAnnotationIntrospector(BEANS.get(DataObjectAnnotationIntrospector.class).withModuleContext(m_moduleContext));
-  }
-
-  @Override
-  public int hashCode() {
-    return NAME.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    return this == o;
   }
 }
