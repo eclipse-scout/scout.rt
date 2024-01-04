@@ -24,12 +24,36 @@ public class TestNestedRawDo extends DoEntity {
     return doValue("doEntity");
   }
 
+  public DoValue<DoEntity> doEntity2() {
+    return doValue("doEntity2");
+  }
+
   public DoValue<IDoEntity> iDoEntity() {
     return doValue("iDoEntity");
   }
 
+  public DoValue<IDoEntity> iDoEntity2() {
+    return doValue("iDoEntity2");
+  }
+
   public DoValue<IDataObject> iDataObject() {
     return doValue("iDataObject");
+  }
+
+  public DoValue<IDataObject> iDataObject2() {
+    return doValue("iDataObject2");
+  }
+
+  public DoValue<ITestTypedUntypedInnerDo> iTestTypedUntypedInner() {
+    return doValue("iTestTypedUntypedInner");
+  }
+
+  public DoValue<ITestTypedUntypedInnerDataObjectDo> iTestTypedUntypedInnerDataObject() {
+    return doValue("iTestTypedUntypedInnerDataObject");
+  }
+
+  public DoValue<AbstractTestTypedUntypedInnerDo> abstractTestTypedUntypedInner() {
+    return doValue("abstractTestTypedUntypedInner");
   }
 
   /* **************************************************************************
@@ -48,6 +72,17 @@ public class TestNestedRawDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withDoEntity2(DoEntity doEntity2) {
+    doEntity2().set(doEntity2);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public DoEntity getDoEntity2() {
+    return doEntity2().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public TestNestedRawDo withIDoEntity(IDoEntity iDoEntity) {
     iDoEntity().set(iDoEntity);
     return this;
@@ -59,6 +94,17 @@ public class TestNestedRawDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withIDoEntity2(IDoEntity iDoEntity2) {
+    iDoEntity2().set(iDoEntity2);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IDoEntity getIDoEntity2() {
+    return iDoEntity2().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public TestNestedRawDo withIDataObject(IDataObject iDataObject) {
     iDataObject().set(iDataObject);
     return this;
@@ -67,5 +113,49 @@ public class TestNestedRawDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public IDataObject getIDataObject() {
     return iDataObject().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withIDataObject2(IDataObject iDataObject2) {
+    iDataObject2().set(iDataObject2);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IDataObject getIDataObject2() {
+    return iDataObject2().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withITestTypedUntypedInner(ITestTypedUntypedInnerDo iTestTypedUntypedInner) {
+    iTestTypedUntypedInner().set(iTestTypedUntypedInner);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public ITestTypedUntypedInnerDo getITestTypedUntypedInner() {
+    return iTestTypedUntypedInner().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withITestTypedUntypedInnerDataObject(ITestTypedUntypedInnerDataObjectDo iTestTypedUntypedInnerDataObject) {
+    iTestTypedUntypedInnerDataObject().set(iTestTypedUntypedInnerDataObject);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public ITestTypedUntypedInnerDataObjectDo getITestTypedUntypedInnerDataObject() {
+    return iTestTypedUntypedInnerDataObject().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withAbstractTestTypedUntypedInner(AbstractTestTypedUntypedInnerDo abstractTestTypedUntypedInner) {
+    abstractTestTypedUntypedInner().set(abstractTestTypedUntypedInner);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractTestTypedUntypedInnerDo getAbstractTestTypedUntypedInner() {
+    return abstractTestTypedUntypedInner().get();
   }
 }
