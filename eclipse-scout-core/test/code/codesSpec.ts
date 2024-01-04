@@ -47,11 +47,8 @@ describe('codes', () => {
     expect(codeType.id).toEqual(CODE_TYPE);
   });
 
-  it('finds a code by ID (single and two parameter call)', () => {
+  it('finds a code by ID', () => {
     let code = codes.get(CODE_TYPE, CODE);
-    expect(code instanceof Code).toBe(true);
-    let codeRef = CODE_TYPE + ' ' + CODE;
-    code = codes.get(codeRef);
     expect(code instanceof Code).toBe(true);
     expect(code.id).toEqual(CODE);
   });

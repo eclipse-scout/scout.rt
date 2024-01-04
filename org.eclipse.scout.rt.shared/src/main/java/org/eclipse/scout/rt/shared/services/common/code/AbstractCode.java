@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.api.data.code.CodeDo;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.OrderedComparator;
@@ -551,6 +553,16 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   @Override
   public String classId() {
     return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+  }
+
+  @Override
+  public CodeDo newCodeDo() {
+    return BEANS.get(CodeDo.class);
+  }
+
+  @Override
+  public CodeDo toDo() {
+    return BEANS.get(CodeDoConverter.class).convert(this);
   }
 
   /**

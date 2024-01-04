@@ -7,52 +7,95 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, CodeTypeModel, FullModelOf, InitModelOf, ObjectOrModel, ObjectWithType, scout, TreeVisitor, TreeVisitResult} from '../index';
+import {Code, codes, CodeTypeModel, FullModelOf, InitModelOf, Locale, ObjectOrModel, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
 export class CodeType<TCodeId> implements ObjectWithType {
 
   declare model: CodeTypeModel<TCodeId>;
 
-  objectType: string;
   id: string;
+  objectType: string;
   modelClass: string;
-  codes: Code<TCodeId>[];
-  codeMap: Record<string, Code<TCodeId>>;
+  iconId: string;
+  isHierarchical: boolean;
+  maxLevel: number;
+  codeMap: Map<TCodeId, Code<TCodeId>>; // all codes recursively
+
+  protected _textKey: string;
+  protected _textKeyPlural: string;
 
   constructor() {
-    this.codes = [];
-    this.codeMap = {};
+    this.maxLevel = 2147483647; // default from Scout Classic
+    this.isHierarchical = false;
+    this.codeMap = new Map();
   }
 
   init(model: InitModelOf<this>) {
     scout.assertParameter('id', model.id);
     this.id = model.id;
     this.modelClass = model.modelClass;
+    this.iconId = model.iconId;
+    this.isHierarchical = !!model.isHierarchical;
+    if (model.maxLevel) {
+      this.maxLevel = model.maxLevel;
+    }
+    this._textKey = this._registerTexts('texts', model.texts);
+    this._textKeyPlural = this._registerTexts('textsPlural', model.textsPlural);
 
     if (model.codes) {
       for (let i = 0; i < model.codes.length; i++) {
-        this._initCode(model.codes[i]);
+        let codeModel = model.codes[i];
+        codeModel.codeType = this;
+        let code = Code.ensure(codeModel);
+        if (code) {
+          this._add(code);
+        }
       }
     }
   }
 
-  protected _initCode(modelCode: FullModelOf<Code<TCodeId>>, parent?: Code<TCodeId>) {
-    let code = scout.create(modelCode);
-    this.add(code, parent);
-    if (modelCode.children) {
-      for (let i = 0; i < modelCode.children.length; i++) {
-        this._initCode(modelCode.children[i], code);
-      }
-    }
+  protected _add(code: Code<TCodeId>) {
+    this.codeMap.set(code.id, code);
+    code.visitChildren(c => {
+      this.codeMap.set(c.id, c);
+    });
   }
 
-  add(code: Code<TCodeId>, parent?: Code<TCodeId>) {
-    this.codes.push(code);
-    this.codeMap[code.id + ''] = code;
-    if (parent) {
-      parent.children.push(code);
-      code.parent = parent;
+  protected _registerTexts(suffix: string, textMap: Record<string, string>): string {
+    if (!textMap) {
+      return;
     }
+    let key = '__codeType.' + this.id + '.' + suffix;
+    codes.registerTexts(key, textMap);
+    return texts.buildKey(key);
+  }
+
+  /**
+   * @param vararg The language tag or the {@link Locale} to load the text for.
+   */
+  text(vararg: string | Locale): string {
+    return this._text(this._textKey, vararg);
+  }
+
+  /**
+   * @param vararg The language tag or the {@link Locale} to load the text for.
+   */
+  textPlural(vararg: string | Locale): string {
+    return this._text(this._textKeyPlural, vararg);
+  }
+
+  protected _text(key: string, vararg: string | Locale): string {
+    let languageTag: string;
+    if (typeof vararg === 'object') {
+      languageTag = vararg.languageTag;
+    } else {
+      languageTag = vararg;
+    }
+    return texts.resolveText(key, languageTag);
+  }
+
+  get codes(): Code<TCodeId>[] {
+    return [...this.codeMap.values()];
   }
 
   /**
@@ -72,20 +115,21 @@ export class CodeType<TCodeId> implements ObjectWithType {
    * @returns code for the given codeId or undefined if code does not exist
    */
   optGet(codeId: TCodeId): Code<TCodeId> {
-    return this.codeMap[codeId + ''];
+    return this.codeMap.get(codeId);
   }
 
   getCodes(rootOnly?: boolean): Code<TCodeId>[] {
-    if (rootOnly) {
-      let rootCodes = [];
-      for (let i = 0; i < this.codes.length; i++) {
-        if (!this.codes[i].parent) {
-          rootCodes.push(this.codes[i]);
-        }
-      }
-      return rootCodes;
+    let allCodes = this.codes;
+    if (!rootOnly) {
+      return allCodes;
     }
-    return this.codes;
+    let rootCodes = [];
+    for (let i = 0; i < allCodes.length; i++) {
+      if (!allCodes[i].parent) {
+        rootCodes.push(allCodes[i]);
+      }
+    }
+    return rootCodes;
   }
 
   /**
@@ -114,11 +158,15 @@ export class CodeType<TCodeId> implements ObjectWithType {
 
   static ensure<TCodeId>(codeType: ObjectOrModel<CodeType<TCodeId>>): CodeType<TCodeId> {
     if (!codeType) {
-      return codeType as CodeType<TCodeId>;
+      return null;
     }
     if (codeType instanceof CodeType) {
       return codeType;
     }
-    return scout.create(CodeType, codeType) as CodeType<TCodeId>;
+    if (!codeType.objectType) {
+      codeType.objectType = CodeType;
+    }
+    let codeTypeModel = codeType as FullModelOf<CodeType<TCodeId>>;
+    return scout.create(codeTypeModel) as CodeType<TCodeId>;
   }
 }

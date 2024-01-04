@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
@@ -82,4 +83,8 @@ public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITy
 
   <T extends ICode<CODE_ID>> boolean visit(ICodeVisitor<T> visitor, boolean activeOnly);
 
+  /**
+   * @see CodeTypeDoConverter#convert(ICodeType)
+   */
+  CodeTypeDo toDo();
 }

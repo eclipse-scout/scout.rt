@@ -85,25 +85,6 @@ describe('CodeType', () => {
     });
   });
 
-  describe('add', () => {
-    it('adds new root code to codeType', () => {
-      let codeType = codes.codeType('codeType0');
-      let code = new Code();
-      codeType.add(code);
-      expect(code.parent).toBe(undefined);
-      expect(code.children.length).toBe(0);
-    });
-
-    it('adds new child code to codeType', () => {
-      let codeType = codes.codeType('codeType0');
-      let code2 = codeType.get('code2');
-      let childCode = new Code();
-      codeType.add(childCode, code2);
-      expect(childCode.parent).toBe(code2);
-      expect(childCode.children.length).toBe(0);
-    });
-  });
-
   describe('get', () => {
     it('returns code with codeId', () => {
       let codeType = codes.codeType('codeType0');

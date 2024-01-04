@@ -7,13 +7,31 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, FullModelOf, ObjectModel} from '../index';
+import {Code, CodeType, FullModelOf, ObjectModel} from '../index';
 
 export interface CodeModel<TCodeId> extends ObjectModel<Code<TCodeId>, TCodeId> {
-  active?: boolean;
-  sortCode?: number;
   modelClass?: string;
+  active?: boolean;
+  enabled?: boolean;
+  iconId?: string;
+  tooltipText?: string;
+  backgroundColor?: string;
+  foregroundColor?: string;
+  font?: string;
+  cssClass?: string;
+  extKey?: string;
+  value?: number;
+  partitionId?: number;
+  sortCode?: number;
+  fieldName?: string;
+  /**
+   * Text Key
+   */
   text?: string;
+  /**
+   * Map of languageTag to the corresponding text in that language
+   */
   texts?: Record<string, string>;
   children?: FullModelOf<Code<TCodeId>>[];
+  codeType?: CodeType<TCodeId>;
 }

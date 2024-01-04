@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 
 /**
- * Utilities and factory methods for {@link CodeTypeCache}
+ * Utilities and factory methods for {@link CodeService}
  */
 @ApplicationScoped
 public class CodeTypeCacheUtility {
@@ -25,7 +25,6 @@ public class CodeTypeCacheUtility {
   /**
    * Creates a new code type cache key. Method hook allows to customize cache key instances.
    *
-   * @param type
    * @return new cache key
    */
   public <T extends ICodeType<?, ?>> CodeTypeCacheKey createCacheKey(Class<T> type) {

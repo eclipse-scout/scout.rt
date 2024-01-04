@@ -11,5 +11,10 @@ import {Code, CodeType, FullModelOf, ObjectModel} from '../index';
 
 export interface CodeTypeModel<TCodeId> extends ObjectModel<CodeType<TCodeId>> {
   modelClass?: string;
+  iconId?: string;
+  isHierarchical?: boolean;
+  maxLevel?: number;
+  texts?: Record<string, string>;
+  textsPlural?: Record<string, string>;
   codes?: FullModelOf<Code<TCodeId>>[];
 }

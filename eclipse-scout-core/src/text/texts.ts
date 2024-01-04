@@ -57,7 +57,7 @@ export const texts = {
    */
   link(languageTag: string) {
     let tags = texts.createOrderedLanguageTags(languageTag);
-    let child;
+    let child: TextMap;
     tags.forEach(tag => {
       let textMap: TextMap = texts._get(tag);
       if (!textMap) {
@@ -149,8 +149,9 @@ export const texts = {
   },
 
   /**
-   * @param key to convert into a string with the form '${textKey:AKey}'.
-   * @returns text containing the text key like like '${textKey:AKey}'.
+   * Converts a key to the form '${textKey:AKey}'.
+   * @param key to convert (e.g. 'AKey')
+   * @returns text containing the text key like '${textKey:AKey}'.
    */
   buildKey(key: string): string {
     return '${textKey:' + key + '}';
@@ -171,7 +172,7 @@ export const texts = {
   /**
    * @param value text which contains a text key like '${textKey:AKey}'.
    * @param languageTag the languageTag to use for the text lookup with the resolved key.
-   * @returns the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
+   * @returns the resolved text in the given language or the unchanged text if the text key could not be extracted.
    */
   resolveText(value: string, languageTag: string): string {
     let key = texts.resolveKey(value);

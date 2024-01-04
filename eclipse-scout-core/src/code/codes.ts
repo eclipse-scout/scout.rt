@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Code, CodeType, ObjectOrModel, objects, scout, texts} from '../index';
+import {arrays, Code, CodeType, ObjectOrModel, objects, texts} from '../index';
 import $ from 'jquery';
 
 export const codes = {
@@ -44,7 +44,9 @@ export const codes = {
     let types = arrays.ensure(codeTypes);
     types.forEach(codeTypeOrModel => {
       let codeType = CodeType.ensure(codeTypeOrModel);
-      codes.registry[codeType.id] = codeType;
+      if (codeType) {
+        codes.registry[codeType.id] = codeType;
+      }
     });
   },
 
@@ -65,63 +67,24 @@ export const codes = {
   },
 
   /**
-   * Returns a code for the given codeId. When you work with hard-coded codes
-   * you should always use this function and not <code>optGet</code>.
-   *
-   * The codeId is a string in the following format:
-   *
-   * "[CodeType.id] [Code.id]"
-   *
-   * Examples:
-   * "71074 104860"
-   * "MessageChannel Phone"
-   *
-   * CodeType.id and {@link Code.id} are separated by a space.
-   * The {@link Code.id} alone is not unique, that's why the {@link CodeType.id} must be always provided.
-   *
-   * You can also call this function with two arguments. In that case the first argument
-   * is the codeTypeId and the second is the codeId.
-   *
-   * @param vararg either only "[CodeType.id]" or "[CodeType.id] [Code.id]"
-   * @param codeId
-   * @returns a code for the given codeId
-   * @throw Error if code does not exist
+   * Returns a code for the given codeId in the CodeType with given codeTypeId.
+   * @returns a code for the given codeTypeId and codeId.
+   * @throw Error if CodeType or Code does not exist
    */
-  get<T>(vararg: string, codeId?: T): Code<T> {
-    // eslint-disable-next-line prefer-rest-params
-    return codes._get('get', objects.argumentsToArray(arguments));
+  get<T>(codeTypeId: string, codeId: T): Code<T> {
+    return codes.codeType(codeTypeId).get(codeId);
   },
 
   /**
-   * Same as <code>get</code>, but does not throw an error if the code does not exist.
-   * You should always use this function when you work with codes coming from a dynamic data source.
-   *
-   * @param vararg
-   * @param codeId
-   * @returns code for the given codeId or undefined if code does not exist
+   * Same as {@link get}, but does not throw an error if the CodeType or Code does not exist.
+   * @returns Code for the given codeTypeId and codeId or null/undefined.
    */
-  optGet<T>(vararg: string, codeId?: T): Code<T> {
-    // eslint-disable-next-line prefer-rest-params
-    return codes._get('optGet', objects.argumentsToArray(arguments));
-  },
-
-  /** @internal */
-  _get(funcName: string, funcArgs: any[]): Code<any> {
-    let codeTypeId, codeId;
-    if (funcArgs.length === 2) {
-      codeTypeId = funcArgs[0];
-      codeId = funcArgs[1];
-    } else {
-      let tmp = funcArgs[0].split(' ');
-      if (tmp.length !== 2) {
-        throw new Error('Invalid string. Must have format "[CodeType.id] [Code.id]"');
-      }
-      codeTypeId = tmp[0];
-      codeId = tmp[1];
+  optGet<T>(codeTypeId: string, codeId: T): Code<T> {
+    let codeType = codes.codeType(codeTypeId, true);
+    if (!codeType) {
+      return null;
     }
-    scout.assertParameter('codeTypeId', codeTypeId);
-    scout.assertParameter('codeId', codeId);
-    return codes.codeType(codeTypeId)[funcName](codeId);
+    return codeType.optGet(codeId);
   },
 
   codeType(codeTypeId: string, optional?: boolean): CodeType<any> {
@@ -132,22 +95,25 @@ export const codes = {
     return codeType;
   },
 
-  generateTextKey(code: Code<any>): string {
-    // Use __ as prefix to reduce the possibility of overriding 'real' keys
-    return '__code.' + code.id;
+  codeTypeByClass<T>(clazz: new() => T): T {
+    let allCodeTypes = objects.values(codes.registry);
+    for (let codeType of allCodeTypes) {
+      if (codeType instanceof clazz) {
+        return codeType;
+      }
+    }
+    return null;
   },
 
   /**
    * Registers texts for a code. It uses the method generateTextKey to generate the text key.
    * The texts for the default locale specified by defaultLanguage are used as default texts.
    *
-   * @param code the code to register the text for
+   * @param key the text key under which the given textsArg map will be registered.
    * @param textsArg an object with the languageTag as key and the translated text as value
-   * @returns the generated text key
+   * @returns the generated text key for the given object.
    */
-  registerTexts(code: Code<any>, textsArg: Record<string, string>): string {
-    let key = codes.generateTextKey(code);
-
+  registerTexts(key: string, textsArg: Record<string, string>) {
     // In case of changed defaultLanguage clear the 'default' entry
     texts.get('default').remove(key);
 
@@ -159,6 +125,5 @@ export const codes = {
       }
       texts.get(languageTag).add(key, text);
     }
-    return key;
   }
 };

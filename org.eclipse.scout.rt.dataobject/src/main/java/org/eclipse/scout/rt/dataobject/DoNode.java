@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
- * This is the base type for all building blocks of of a data object such as {@link DoValue}, {@link DoList},
+ * This is the base type for all building blocks of a data object such as {@link DoValue}, {@link DoList},
  * {@link DoSet} and {@link DoCollection}.
  */
 public class DoNode<T> {

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -187,7 +189,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
         return ctor.newInstance(newRow);
       }
       catch (Exception e) {
-        throw new ProcessingException("Could not create a new instance of code row! Override the execCreateCode mehtod.", e);
+        throw new ProcessingException("Could not create a new instance of code row! Override the execCreateCode method.", e);
       }
     }
     else {
@@ -510,7 +512,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
         this.addRootCodeInternal(-1, code);
       }
     }
-    // 3 mark all chidren of inactive codes also as inactive
+    // 3 mark all children of inactive codes also as inactive
     visit((code, treeLevel) -> {
       final ICode<CODE_ID> parentCode = code.getParentCode();
       if (parentCode != null && !parentCode.isActive() && code.isActive() && code instanceof AbstractCode<?>) {
@@ -526,7 +528,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * do not use this internal method unless the intention is in fact to change the structure of the possibly shared
    * {@link ICodeType}
    * <p>
-   * Add a new root code, owerwrite (drop) existing root code
+   * Add a new root code, overwrite (drop) existing root code
    *
    * @since 4.0
    * @param index
@@ -630,6 +632,11 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @Override
   public String classId() {
     return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+  }
+
+  @Override
+  public CodeTypeDo toDo() {
+    return BEANS.get(CodeTypeDoConverter.class).convert(this);
   }
 
   /**
