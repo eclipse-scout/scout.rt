@@ -84,6 +84,12 @@
   <servlet>
     <servlet-name>UiServlet</servlet-name>
     <servlet-class>org.eclipse.scout.rt.ui.html.UiServlet</servlet-class>
+    <multipart-config>
+      <location>/tmp</location>
+      <max-file-size>104857600</max-file-size>  <!-- 100mb -->
+      <max-request-size>104857600</max-request-size>   <!-- 100mb -->
+      <file-size-threshold>20971520</file-size-threshold>   <!-- 20mb -->
+    </multipart-config>
   </servlet>
   <servlet-mapping>
     <servlet-name>UiServlet</servlet-name>
