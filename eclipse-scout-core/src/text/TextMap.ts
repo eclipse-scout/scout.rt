@@ -24,7 +24,7 @@ export class TextMap {
    * Returns the text for the given key.
    * If the key does not exist in this text map, a lookup in the parent text map is done.
    *
-   * @param textKey key to lookup the text
+   * @param textKey key to look up the text
    * @param vararg texts to replace the placeholders specified by {0}, {1}, etc.
    */
   get(textKey: string, ...vararg: any[]): string {

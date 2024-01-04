@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Code, CodeType, ObjectOrModel, objects, scout, texts} from '../index';
+import {arrays, CodeType, ModelOf, ObjectOrModel, texts} from '../index';
 import $ from 'jquery';
 
 export const codes = {
@@ -16,7 +16,7 @@ export const codes = {
    */
   defaultLanguage: 'en',
 
-  registry: {} as Record<string, CodeType<any>>,
+  registry: new Map<string /* CodeType.id */, CodeType<any>>,
 
   bootstrap(url: string): JQuery.Promise<any> {
     let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise({});
@@ -25,7 +25,10 @@ export const codes = {
 
   /** @internal */
   _preInit(url: string, data: any) {
-    if (data && data.error) {
+    if (!data) {
+      return;
+    }
+    if (data.error) {
       // The result may contain a json error (e.g. session timeout) -> abort processing
       throw {
         error: data.error,
@@ -35,119 +38,53 @@ export const codes = {
     codes.init(data);
   },
 
-  init(data?: any) {
-    data = data || {};
-    Object.keys(data).forEach(codeTypeId => codes.add(data[codeTypeId]));
+  init(data?: ModelOf<CodeType<any>>[]) {
+    codes.add(data);
   },
 
-  add(codeTypes: ObjectOrModel<CodeType<any>> | ObjectOrModel<CodeType<any>>[]) {
-    let types = arrays.ensure(codeTypes);
-    types.forEach(codeTypeOrModel => {
+  add(codeTypes: ObjectOrModel<CodeType<any>> | ObjectOrModel<CodeType<any>>[]): CodeType<any>[] {
+    let createdCodeTypes = [];
+    arrays.ensure(codeTypes).forEach(codeTypeOrModel => {
       let codeType = CodeType.ensure(codeTypeOrModel);
-      codes.registry[codeType.id] = codeType;
+      if (codeType && codeType.id) {
+        codes.registry.set(codeType.id, codeType);
+        createdCodeTypes.push(codeType);
+      }
     });
+    return createdCodeTypes;
   },
 
   /**
    * @param codeTypes code types or code type ids to remove
    */
   remove(codeTypes: string | CodeType<any> | (string | CodeType<any>)[]) {
-    let types = arrays.ensure(codeTypes);
-    types.forEach(codeType => {
-      let id;
-      if (typeof codeType === 'string') {
-        id = codeType;
-      } else {
-        id = codeType.id;
-      }
-      delete codes.registry[id];
-    });
+    arrays.ensure(codeTypes)
+      .map(codeTypeOrId => typeof codeTypeOrId === 'string' ? codeTypeOrId : codeTypeOrId.id)
+      .forEach(id => codes.registry.delete(id));
   },
 
-  /**
-   * Returns a code for the given codeId. When you work with hard-coded codes
-   * you should always use this function and not <code>optGet</code>.
-   *
-   * The codeId is a string in the following format:
-   *
-   * "[CodeType.id] [Code.id]"
-   *
-   * Examples:
-   * "71074 104860"
-   * "MessageChannel Phone"
-   *
-   * CodeType.id and {@link Code.id} are separated by a space.
-   * The {@link Code.id} alone is not unique, that's why the {@link CodeType.id} must be always provided.
-   *
-   * You can also call this function with two arguments. In that case the first argument
-   * is the codeTypeId and the second is the codeId.
-   *
-   * @param vararg either only "[CodeType.id]" or "[CodeType.id] [Code.id]"
-   * @param codeId
-   * @returns a code for the given codeId
-   * @throw Error if code does not exist
-   */
-  get<T>(vararg: string, codeId?: T): Code<T> {
-    // eslint-disable-next-line prefer-rest-params
-    return codes._get('get', objects.argumentsToArray(arguments));
-  },
-
-  /**
-   * Same as <code>get</code>, but does not throw an error if the code does not exist.
-   * You should always use this function when you work with codes coming from a dynamic data source.
-   *
-   * @param vararg
-   * @param codeId
-   * @returns code for the given codeId or undefined if code does not exist
-   */
-  optGet<T>(vararg: string, codeId?: T): Code<T> {
-    // eslint-disable-next-line prefer-rest-params
-    return codes._get('optGet', objects.argumentsToArray(arguments));
-  },
-
-  /** @internal */
-  _get(funcName: string, funcArgs: any[]): Code<any> {
-    let codeTypeId, codeId;
-    if (funcArgs.length === 2) {
-      codeTypeId = funcArgs[0];
-      codeId = funcArgs[1];
-    } else {
-      let tmp = funcArgs[0].split(' ');
-      if (tmp.length !== 2) {
-        throw new Error('Invalid string. Must have format "[CodeType.id] [Code.id]"');
-      }
-      codeTypeId = tmp[0];
-      codeId = tmp[1];
+  get<T extends CodeType<any>>(codeTypeIdOrClassRef: string | (new() => T)): T {
+    if (typeof codeTypeIdOrClassRef === 'string') {
+      return codes.registry.get(codeTypeIdOrClassRef) as T;
     }
-    scout.assertParameter('codeTypeId', codeTypeId);
-    scout.assertParameter('codeId', codeId);
-    return codes.codeType(codeTypeId)[funcName](codeId);
-  },
 
-  codeType(codeTypeId: string, optional?: boolean): CodeType<any> {
-    let codeType = codes.registry[codeTypeId];
-    if (!optional && !codeType) {
-      throw new Error('No CodeType found for id=' + codeTypeId);
+    for (let codeType of codes.registry.values()) {
+      if (codeType instanceof codeTypeIdOrClassRef) {
+        return codeType as T;
+      }
     }
-    return codeType;
-  },
-
-  generateTextKey(code: Code<any>): string {
-    // Use __ as prefix to reduce the possibility of overriding 'real' keys
-    return '__code.' + code.id;
+    return undefined; // class not found
   },
 
   /**
    * Registers texts for a code. It uses the method generateTextKey to generate the text key.
    * The texts for the default locale specified by defaultLanguage are used as default texts.
    *
-   * @param code the code to register the text for
+   * @param key the text key under which the given textsArg map will be registered.
    * @param textsArg an object with the languageTag as key and the translated text as value
-   * @returns the generated text key
+   * @returns the generated text key for the given object.
    */
-  registerTexts(code: Code<any>, textsArg: Record<string, string>): string {
-    let key = codes.generateTextKey(code);
-
+  registerTexts(key: string, textsArg: Record<string, string>) {
     // In case of changed defaultLanguage clear the 'default' entry
     texts.get('default').remove(key);
 
@@ -159,6 +96,5 @@ export const codes = {
       }
       texts.get(languageTag).add(key, text);
     }
-    return key;
   }
 };

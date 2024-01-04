@@ -33,8 +33,8 @@ describe('Code', () => {
 
       let code = new Code();
       code.init(model);
-      expect(texts.get('de').get('__code.123xy')).toBe('Code 123xy auf Deutsch');
-      expect(texts.get('en').get('__code.123xy')).toBe('Code 123xy in English');
+      expect(texts.get('de').get('__code..123xy')).toBe('Code 123xy auf Deutsch');
+      expect(texts.get('en').get('__code..123xy')).toBe('Code 123xy in English');
     });
 
     it('uses the language configured by codes.defaultLanguage as default', () => {
@@ -50,7 +50,7 @@ describe('Code', () => {
       code.init(model);
       expect(codes.defaultLanguage).toBe('en');
       // fr is not defined -> use English / defaultLanguage
-      expect(texts.get('fr').get('__code.123xy')).toBe('Code 123xy in English');
+      expect(texts.get('fr').get('__code..123xy')).toBe('Code 123xy in English');
     });
 
     it('fails if text and texts are set', () => {

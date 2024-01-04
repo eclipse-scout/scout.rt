@@ -22,7 +22,7 @@ public class UiTextContributionFilter implements Predicate<Entry<String, String>
 
   public UiTextContributionFilter(List<IUiTextContributor> contributors) {
     for (IUiTextContributor contributor : contributors) {
-      contributor.contributeUiTextKeys(m_acceptedTexts);
+      contributor.contribute(m_acceptedTexts);
     }
   }
 

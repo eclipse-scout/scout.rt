@@ -13,9 +13,9 @@ import {Cell, CodeLookupCall, codes, Column, InitModelOf, LookupCall, LookupCall
  * Column where each cell fetches its value using a lookup call.
  *
  * A 'prepareLookupCall' event gets triggered before executing the lookup call and contains two properties, 'lookupCall' and 'row'. Here, 'lookupCall' is the
- * lookup call which is used to fetch one ore more values for a cell. 'row' is the row containing the cell and usually corresponds to the selected row.
+ * lookup call which is used to fetch one or more values for a cell. 'row' is the row containing the cell and usually corresponds to the selected row.
  * It should be used instead of the property selectedRows from Table.js which must not be used here.
- * 'row' can be null or undefined in some cases. Hence some care is needed when listening to this event.
+ * 'row' can be null or undefined in some cases. Hence, some care is needed when listening to this event.
  */
 export class SmartColumn<TValue> extends Column<TValue> {
   declare model: SmartColumnModel<TValue>;
@@ -60,7 +60,11 @@ export class SmartColumn<TValue> extends Column<TValue> {
     if (!this.codeType) {
       return null;
     }
-    let code = codes.get(this.codeType, cell.value);
+    let codeType = codes.get(this.codeType);
+    if (!codeType) {
+      return null;
+    }
+    let code = codeType.get(cell.value);
     return code ? code.sortCode : null;
   }
 
@@ -238,7 +242,7 @@ export class SmartColumn<TValue> extends Column<TValue> {
     cell.setText(newText);
 
     // Update cell value
-    // We cannot use setCellValue since it would add the update event to the updateBuffer but we need the row update to be sync to prevent the flickering
+    // We cannot use setCellValue since it would add the update event to the updateBuffer, but we need the row update to be sync to prevent the flickering
     this._setCellValue(row, field.value, cell);
 
     // Update row -> Render row, trigger update event

@@ -7,42 +7,96 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CodeModel, codes, InitModelOf, Locale, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
+import {CodeModel, codes, CodeType, FullModelOf, InitModelOf, Locale, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
 export class Code<TCodeId> implements ObjectWithType {
   declare model: CodeModel<TCodeId>;
 
-  objectType: string;
-  active: boolean;
   id: TCodeId;
-  parent?: Code<TCodeId>;
-  children: Code<TCodeId>[];
-  sortCode: number;
+  objectType: string;
   modelClass: string;
+  active: boolean;
+  enabled: boolean;
+  iconId: string;
+  tooltipText: string;
+  backgroundColor: string;
+  foregroundColor: string;
+  font: string;
+  cssClass: string;
+  extKey: string;
+  value: number;
+  partitionId: number;
+  sortCode: number;
+  children: Code<TCodeId>[];
+  parent?: Code<TCodeId>;
+  codeType: CodeType<TCodeId>;
 
   protected _text: string; // e.g. "${textKey:key}"
 
   constructor() {
+    this.active = true;
+    this.enabled = true;
+    this.partitionId = 0;
+    this.sortCode = -1;
     this.children = [];
+    this.codeType = null;
   }
 
   init(model: InitModelOf<this>) {
     scout.assertParameter('id', model.id);
 
-    this.active = model.active;
     this.id = model.id;
-    this.sortCode = model.sortCode;
-    this._text = model.text;
     this.modelClass = model.modelClass;
+    this.active = scout.nvl(model.active, this.active);
+    this.enabled = scout.nvl(model.enabled, this.enabled);
+    this.iconId = model.iconId;
+    this.tooltipText = model.tooltipText;
+    this.backgroundColor = model.backgroundColor;
+    this.foregroundColor = model.foregroundColor;
+    this.font = model.font;
+    this.cssClass = model.cssClass;
+    this.extKey = model.extKey;
+    this.value = model.value;
+    this.partitionId = scout.nvl(model.partitionId, this.partitionId);
+    this.sortCode = scout.nvl(model.sortCode, this.sortCode);
+    this.codeType = model.codeType;
+    this._text = model.text;
 
     // If model contains a text map, generate a text key and add the texts to the text maps of the session
     if (model.texts) {
       if (this._text) {
         throw new Error('Either set texts or text property, not both.');
       }
-      let key = codes.registerTexts(this, model.texts);
-      // Convert to ${textKey:key} so that text() may resolve it
+      let codeTypeId = scout.nvl(this.codeType?.id, '');
+      let key = '__code.' + codeTypeId + '.' + this.id;
+      codes.registerTexts(key, model.texts);
       this._text = texts.buildKey(key);
+    }
+
+    if (model.children) {
+      for (let i = 0; i < model.children.length; i++) {
+        let childCodeModel = model.children[i];
+        childCodeModel.codeType = this.codeType;
+        let code = Code.ensure(childCodeModel);
+        if (code) {
+          code.parent = this;
+          this.children.push(code);
+        }
+      }
+    }
+    this._initCodeTypeField(this.codeType, model.fieldName);
+  }
+
+  protected _initCodeTypeField(codeType: CodeType<TCodeId>, fieldName: string) {
+    if (!codeType || !fieldName) {
+      return;
+    }
+    if (!codeType.hasOwnProperty(fieldName)) {
+      return; // property is not declared
+    }
+    let existing = codeType[fieldName];
+    if (!existing) {
+      codeType[fieldName] = this;
     }
   }
 
@@ -50,10 +104,13 @@ export class Code<TCodeId> implements ObjectWithType {
    * @param vararg The language tag or the {@link Locale} to load the text for.
    */
   text(vararg: string | Locale): string {
+    let languageTag: string;
     if (typeof vararg === 'object') {
-      return texts.resolveText(this._text, vararg.languageTag);
+      languageTag = vararg.languageTag;
+    } else {
+      languageTag = vararg;
     }
-    return texts.resolveText(this._text, vararg);
+    return texts.resolveText(this._text, languageTag);
   }
 
   visitChildren(visitor: TreeVisitor<Code<TCodeId>>): boolean | TreeVisitResult {
@@ -70,5 +127,19 @@ export class Code<TCodeId> implements ObjectWithType {
         }
       }
     }
+  }
+
+  static ensure<TCodeId>(code: CodeModel<TCodeId> | Code<TCodeId>): Code<TCodeId> {
+    if (!code) {
+      return null;
+    }
+    if (code instanceof Code) {
+      return code;
+    }
+    if (!code.objectType) {
+      code.objectType = Code;
+    }
+    let codeModel = code as FullModelOf<Code<TCodeId>>;
+    return scout.create(codeModel) as Code<TCodeId>;
   }
 }

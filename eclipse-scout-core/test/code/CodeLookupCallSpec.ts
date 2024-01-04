@@ -15,7 +15,7 @@ describe('CodeLookupCall', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    codes.registry = {};
+    codes.registry = new Map();
     codeType123 = scout.create((CodeType<string>), {
       id: 'codeType.123',
       codes: [{

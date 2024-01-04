@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, codes, LookupCallModel, LookupRow, Predicate, scout, StaticLookupCall, strings} from '../index';
+import {Code, codes, CodeType, LookupCallModel, LookupRow, Predicate, scout, StaticLookupCall, strings} from '../index';
 
 export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
   declare model: CodeLookupCallModel<TCodeId>;
-  codeType: string;
+  codeType: string | (new() => CodeType<any>);
 
   constructor() {
     super();
@@ -19,11 +19,11 @@ export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
   }
 
   protected override _lookupRowByKey(key: TCodeId): LookupRow<TCodeId> {
-    let codeType = codes.codeType(this.codeType, true);
+    let codeType = codes.get(this.codeType);
     if (!codeType) {
       return null;
     }
-    return this._createLookupRow(codeType.optGet(key));
+    return this._createLookupRow(codeType.get(key));
   }
 
   protected override _lookupRowsByAll(): LookupRow<TCodeId>[] {
@@ -42,7 +42,7 @@ export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
   }
 
   protected _collectLookupRows(predicate?: Predicate<LookupRow<TCodeId>>): LookupRow<TCodeId>[] {
-    let codeType = codes.codeType(this.codeType, true);
+    let codeType = codes.get(this.codeType);
     if (!codeType) {
       return [];
     }
@@ -70,7 +70,7 @@ export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
 
 export interface CodeLookupCallModel<TCodeId> extends LookupCallModel<TCodeId> {
   /**
-   * CodeTypeId {@link CodeType.id}
+   * CodeTypeId {@link CodeType.id} or CodeType ref
    */
-  codeType: string;
+  codeType: string | (new() => CodeType<any>);
 }

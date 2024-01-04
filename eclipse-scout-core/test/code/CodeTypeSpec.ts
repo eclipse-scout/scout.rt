@@ -12,44 +12,43 @@ import {Code, codes, CodeType} from '../../src/index';
 describe('CodeType', () => {
 
   beforeEach(() => {
-    codes.init({
-      codeType0: {
-        objectType: CodeType,
-        id: 'codeType0',
-        codes: [{
-          id: 'code0',
+    codes.init([{
+      objectType: CodeType,
+      id: 'codeType0',
+      codes: [{
+        id: 'code0',
+        objectType: Code,
+        children: [{
+          id: 'code01',
+          objectType: Code
+        }, {
+          id: 'code02',
           objectType: Code,
           children: [{
-            id: 'code01',
-            objectType: Code
-          }, {
-            id: 'code02',
-            objectType: Code,
-            children: [{
-              id: 'code021',
-              objectType: Code
-            }]
-          }]
-        }, {
-          id: 'code1',
-          objectType: Code,
-          children: [{
-            id: 'code11',
+            id: 'code021',
             objectType: Code
           }]
-        }, {
-          id: 'code2',
+        }]
+      }, {
+        id: 'code1',
+        objectType: Code,
+        children: [{
+          id: 'code11',
           objectType: Code
         }]
-      }
-    });
+      }, {
+        id: 'code2',
+        objectType: Code
+      }]
+    }
+    ]);
   });
 
   describe('init', () => {
 
     it('creates codes and hierarchy', () => {
-      let codeType = codes.codeType('codeType0');
-      expect(codeType.codes.length).toBe(7);
+      let codeType = codes.get('codeType0');
+      expect(codeType.codes().length).toBe(7);
 
       let code0 = codeType.get('code0');
       expect(code0.children.length).toBe(2);
@@ -85,50 +84,28 @@ describe('CodeType', () => {
     });
   });
 
-  describe('add', () => {
-    it('adds new root code to codeType', () => {
-      let codeType = codes.codeType('codeType0');
-      let code = new Code();
-      codeType.add(code);
-      expect(code.parent).toBe(undefined);
-      expect(code.children.length).toBe(0);
-    });
-
-    it('adds new child code to codeType', () => {
-      let codeType = codes.codeType('codeType0');
-      let code2 = codeType.get('code2');
-      let childCode = new Code();
-      codeType.add(childCode, code2);
-      expect(childCode.parent).toBe(code2);
-      expect(childCode.children.length).toBe(0);
-    });
-  });
-
   describe('get', () => {
     it('returns code with codeId', () => {
-      let codeType = codes.codeType('codeType0');
+      let codeType = codes.get('codeType0');
       let code = codeType.get('code11');
       expect(code.id).toBe('code11');
     });
 
-    it('throws error for unknown codeId', () => {
-      let codeType = codes.codeType('codeType0');
-      expect(() => {
-        codeType.get('code6');
-      }).toThrow(new Error('No code found for id=code6'));
+    it('returns undefined for unknown codeId', () => {
+      expect(codes.get('codeType0').get('code6')).toBeUndefined();
     });
   });
 
-  describe('getCodes', () => {
+  describe('codes', () => {
     it('returns all codes', () => {
-      let codeType = codes.codeType('codeType0');
-      let codeArr = codeType.getCodes();
+      let codeType = codes.get('codeType0');
+      let codeArr = codeType.codes();
       expect(codeArr.length).toBe(7);
     });
 
     it('returns root codes', () => {
-      let codeType = codes.codeType('codeType0');
-      let codeArr = codeType.getCodes(true);
+      let codeType = codes.get('codeType0');
+      let codeArr = codeType.codes(true);
       expect(codeArr[0]).toBe(codeType.get('code0'));
       expect(codeArr[1]).toBe(codeType.get('code1'));
       expect(codeArr[2]).toBe(codeType.get('code2'));

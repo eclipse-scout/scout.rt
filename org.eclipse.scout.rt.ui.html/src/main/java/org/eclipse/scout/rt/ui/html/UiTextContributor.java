@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 public class UiTextContributor implements IUiTextContributor {
 
   @Override
-  public void contributeUiTextKeys(Set<String> textKeys) {
+  public void contribute(Set<String> textKeys) {
     // Automatically include all texts of the org.eclipse.scout.rt.ui.html module
     textKeys.addAll(BEANS.get(UiTextProviderService.class).getTextMap(null).keySet());
 

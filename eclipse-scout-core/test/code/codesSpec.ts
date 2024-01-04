@@ -16,73 +16,53 @@ describe('codes', () => {
 
   // Some dummy data used to make the tests below work
   beforeEach(() => {
-    codes.init({
-      12345: {
-        id: '12345',
-        objectType: CodeType,
-        codes: [
-          {
-            id: 12346,
-            objectType: Code,
-            texts: {
-              'de': 'Foo-de',
-              'en': 'Foo-en'
-            }
+    codes.init([{
+      id: '12345',
+      objectType: CodeType,
+      codes: [
+        {
+          id: 12346,
+          objectType: Code,
+          texts: {
+            'de': 'Foo-de',
+            'en': 'Foo-en'
           }
-        ]
-      }
-    });
+        }
+      ]
+    }
+    ]);
   });
 
   it('can init without data', () => {
-    let emptyRegistry = {};
+    let emptyRegistry = new Map();
     codes.registry = emptyRegistry;
     codes.init();
     expect(codes.registry).toBe(emptyRegistry);
   });
 
   it('finds a code type by ID', () => {
-    let codeType = codes.codeType(CODE_TYPE);
+    let codeType = codes.get(CODE_TYPE);
     expect(codeType instanceof CodeType).toBe(true);
     expect(codeType.id).toEqual(CODE_TYPE);
   });
 
-  it('finds a code by ID (single and two parameter call)', () => {
-    let code = codes.get(CODE_TYPE, CODE);
-    expect(code instanceof Code).toBe(true);
-    let codeRef = CODE_TYPE + ' ' + CODE;
-    code = codes.get(codeRef);
+  it('finds a code by ID', () => {
+    let code = codes.get(CODE_TYPE).get(CODE);
     expect(code instanceof Code).toBe(true);
     expect(code.id).toEqual(CODE);
   });
 
-  it('throws an error when code type is not found', () => {
-    let func = codes.codeType.bind(codes, 'DoesNotExist');
-    expect(func).toThrowError();
+  it('returns undefined when code type is not found', () => {
+    expect(codes.get('DoesNotExist')).toBeUndefined();
   });
 
-  it('throws an error when code is not found', () => {
-    let codeType = codes.codeType(CODE_TYPE);
-    let func = codeType.get.bind(codeType, 'DoesNotExist');
-    expect(func).toThrowError();
-  });
-
-  describe('optGet', () => {
-
-    it('should work as get if code exists', () => {
-      let code = codes.optGet(CODE_TYPE, CODE);
-      expect(code instanceof Code).toBe(true);
-    });
-
-    it('should return null if code does not exist', () => {
-      let code = codes.optGet(CODE_TYPE, 'DoesNotExist');
-      expect(code).toBe(undefined);
-    });
-
+  it('returns undefined when code is not found', () => {
+    expect(codes.get(CODE_TYPE).get('DoesNotExist')).toBeUndefined();
   });
 
   describe('add', () => {
     it('adds a code type or an array of code types', () => {
+      let origSize = codes.registry.size;
       let codeType = {
         id: 'codeType.123',
         objectType: CodeType,
@@ -92,14 +72,16 @@ describe('codes', () => {
           text: 'a text'
         }]
       };
-      expect(codes.registry['codeType.123']).toBeUndefined();
+      expect(codes.get('codeType.123')).toBeUndefined();
 
       codes.add(codeType);
-      expect(codes.codeType('codeType.123').id).toBe('codeType.123');
-      expect(codes.codeType('codeType.123').get('code.123').id).toBe('code.123');
+      expect(codes.get('codeType.123').id).toBe('codeType.123');
+      expect(codes.get('codeType.123').get('code.123').id).toBe('code.123');
+      expect(codes.registry.size).toBe(origSize + 1);
 
       // cleanup
-      delete codes.registry['codeType.123'];
+      codes.remove('codeType.123');
+      expect(codes.registry.size).toBe(origSize);
     });
   });
 });

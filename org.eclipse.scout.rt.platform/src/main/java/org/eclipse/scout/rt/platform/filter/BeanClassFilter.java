@@ -22,7 +22,7 @@ public class BeanClassFilter implements Predicate<IClassInfo> {
   /**
    * Checks whether the given class can be registered as a bean
    *
-   * @return Returns <code>true</code> if the class is instanciable and not ignored with {@link IgnoreBean},
+   * @return Returns <code>true</code> if the class is instantiable and not ignored with {@link IgnoreBean},
    *         <code>false</code> otherwise.
    */
   @Override
