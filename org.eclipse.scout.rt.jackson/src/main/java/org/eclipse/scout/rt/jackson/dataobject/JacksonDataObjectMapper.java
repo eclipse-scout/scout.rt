@@ -120,6 +120,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
    * @deprecated Use Scout data object mapper instead, see BEANS.get(IDataObjectMapper.class)
    */
   @Deprecated
+  @SuppressWarnings("DeprecatedIsStillUsed")
   public ObjectMapper getObjectMapper() {
     return m_objectMapper.get();
   }
@@ -143,6 +144,6 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
    * Override this method to add custom properties to {@code moduleContext}.
    */
   protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
-    moduleContext.withDataObjectMapperClass(getClass());
+    // nop
   }
 }
