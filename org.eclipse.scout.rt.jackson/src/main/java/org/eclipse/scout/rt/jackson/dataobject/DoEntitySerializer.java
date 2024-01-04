@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
@@ -121,8 +122,13 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
     }
     else {
       Optional<AttributeType> attributeType = getAttributeType(attributeName);
-      if (attributeType.isPresent() && (!m_context.isLenientMode() || attributeType.get().getJavaType().isTypeOrSuperTypeOf(obj.getClass()))) {
-        // use serialization by typed attribute if a type is present and if lenient, only if type matches (data object might have an invalid structure, e.g. string instead of an enum if deserialized lenient)
+      if (attributeType.isPresent()
+          && (!m_context.isLenientMode() || attributeType.get().getJavaType().isTypeOrSuperTypeOf(obj.getClass()))
+          && !(attributeType.get().getJavaType().isTypeOrSubTypeOf(IDataObject.class))) {
+        // Use serialization by typed attribute if:
+        // (1) an attribute type is present
+        // (2) if lenient mode, only if attribute type matches (data object might have an invalid structure, e.g. string instead of an enum if deserialized lenient)
+        // (3) if attribute type is not a data object type (favor value based serialization for attributes declared as data object or subclasses/subinterfaces)
         serializeTypedAttribute(attributeName, obj, gen, provider, attributeType.get().getJavaType());
       }
       else {
