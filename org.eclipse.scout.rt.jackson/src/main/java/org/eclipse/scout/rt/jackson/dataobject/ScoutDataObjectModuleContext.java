@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
-import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -29,8 +28,6 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
  */
 @Bean
 public class ScoutDataObjectModuleContext {
-
-  protected static final String DATA_OBJECT_MAPPER_CLASS_KEY = "dataObjectMapperClassKey";
 
   protected static final String TYPE_ATTRIBUTE_NAME_KEY = "typeAttributeNameKey";
 
@@ -63,21 +60,6 @@ public class ScoutDataObjectModuleContext {
   /* **************************************************************************
    * NAMED PROPERTIES
    * *************************************************************************/
-
-  public boolean belongsTo(Class<? extends IDataObjectMapper> dataObjectMapperClass) {
-    Class<? extends IDataObjectMapper> actualDataObjectMapperClass = getDataObjectMapperClass();
-    return actualDataObjectMapperClass != null && dataObjectMapperClass.isAssignableFrom(actualDataObjectMapperClass);
-  }
-
-  @SuppressWarnings("unchecked")
-  public Class<? extends IDataObjectMapper> getDataObjectMapperClass() {
-    return (Class<? extends IDataObjectMapper>) get(DATA_OBJECT_MAPPER_CLASS_KEY, Class.class);
-  }
-
-  public ScoutDataObjectModuleContext withDataObjectMapperClass(Class<? extends IDataObjectMapper> dataObjectMapperClass) {
-    put(DATA_OBJECT_MAPPER_CLASS_KEY, dataObjectMapperClass);
-    return this;
-  }
 
   public DoEntitySerializerAttributeNameComparator getComparator() {
     return m_comparator.get();
