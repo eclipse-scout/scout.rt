@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractFromToSequenceBoxTest.FromToSequenceTestForm.MainBox.GroupBox.FromToSequenceBox;
@@ -120,6 +121,38 @@ public class AbstractFromToSequenceBoxTest {
     f.getEndField().setValue(2L);
     assertEquals("from-to-label from 1 to 2", f.getSearchFilter().getDisplayTexts()[0]);
     f.doClose();
+  }
+
+  @Test
+  public void testCompoundLabel() {
+    FromToSequenceTestForm f = new FromToSequenceTestForm();
+
+    assertLabel(f.getFromToSequenceBox(), "from-to-label", true);
+    assertLabel(f.getStartField(), null, false);
+    assertLabel(f.getEndField(), "-", true);
+
+    f.getStartField().setLabel("foo");
+    assertLabel(f.getFromToSequenceBox(), "from-to-label foo", true);
+    assertLabel(f.getStartField(), "foo", false);
+    assertLabel(f.getEndField(), "-", true);
+
+    f.getStartField().setLabelVisible(false);
+    f.getStartField().setLabel("bar");
+    assertLabel(f.getFromToSequenceBox(), "from-to-label", true);
+    assertLabel(f.getStartField(), "bar", false);
+    assertLabel(f.getEndField(), "-", true);
+
+    f.getFromToSequenceBox().setLabel(null);
+    assertLabel(f.getFromToSequenceBox(), "", true);
+    assertLabel(f.getStartField(), "bar", false);
+    assertLabel(f.getEndField(), "-", true);
+
+    f.doClose();
+  }
+
+  protected void assertLabel(IFormField field, String expectedLabel, boolean expectedLabelVisible) {
+    assertEquals(expectedLabel, field.getLabel());
+    assertEquals(expectedLabelVisible, field.isLabelVisible());
   }
 
   /**

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
@@ -78,5 +79,13 @@ public abstract class AbstractFromToSequenceBox extends AbstractSequenceBox {
           getLabel() + " "
               + TEXTS.get("to") + " " + field2.getDisplayText());
     }
+  }
+
+  @Override
+  protected boolean execIsLabelSuffixCandidate(IFormField formField) {
+    if (getFieldIndex(formField) > 0) {
+      return false; // never show the label of the second field in the label of the sequence box
+    }
+    return super.execIsLabelSuffixCandidate(formField);
   }
 }
