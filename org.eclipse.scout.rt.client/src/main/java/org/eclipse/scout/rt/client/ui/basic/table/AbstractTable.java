@@ -3540,15 +3540,15 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    */
   @Override
   public void discardRows(Collection<? extends ITableRow> rows) {
+    boolean oldAutoDiscardOnDelete = isAutoDiscardOnDelete();
     try {
       setTableChanging(true);
+      setAutoDiscardOnDelete(true);
       //
-      for (ITableRow row : rows) {
-        row.setStatus(ITableRow.STATUS_INSERTED);
-      }
       deleteRows(rows);
     }
     finally {
+      setAutoDiscardOnDelete(oldAutoDiscardOnDelete);
       setTableChanging(false);
     }
   }
@@ -4053,6 +4053,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   private void applyRowValueChanges(Map<Integer, Set<ITableRow>> changes) {
+    // performance quick-check
+    if (changes.isEmpty()) {
+      return;
+    }
     try {
       for (ITableRow tableRow : getRows()) {
         tableRow.setRowChanging(true);
@@ -4075,6 +4079,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @SuppressWarnings("unchecked")
   private void applyRowDecorations(Set<ITableRow> rows) {
+    // performance quick-check
+    if (rows.isEmpty()) {
+      return;
+    }
     try {
       for (ITableRow tableRow : rows) {
         tableRow.setRowChanging(true);
