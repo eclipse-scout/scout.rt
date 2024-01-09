@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -93,7 +93,6 @@ export class UiNotificationPoller extends PropertyEventEmitter {
 
   poll() {
     this._poll();
-
     this.setStatus(BackgroundJobPollingStatus.RUNNING);
   }
 
@@ -101,7 +100,12 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     if (this.status === BackgroundJobPollingStatus.STOPPED) {
       return;
     }
-    setTimeout(() => this.poll(), scout.nvl(timeout, 0));
+    setTimeout(() => {
+      if (this.status === BackgroundJobPollingStatus.STOPPED) {
+        return;
+      }
+      this.poll();
+    }, scout.nvl(timeout, 0));
   }
 
   protected _poll() {

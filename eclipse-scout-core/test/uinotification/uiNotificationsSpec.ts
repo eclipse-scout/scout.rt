@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,8 +16,8 @@ describe('uiNotifications', () => {
   });
 
   afterEach(() => {
-    jasmine.Ajax.uninstall();
     uiNotifications.tearDown();
+    jasmine.Ajax.uninstall();
   });
 
   function mostRecentRequestData() {
@@ -38,7 +38,7 @@ describe('uiNotifications', () => {
       expect(pollers().size).toBe(1);
 
       let poller = pollers().get('main');
-      expect(poller.status).toBe('running');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
     it('registers the topics in the poller to send them as data', () => {
@@ -61,9 +61,9 @@ describe('uiNotifications', () => {
       let poller = pollers().get('main');
       expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}]);
 
-      poller.one('propertyChange:status', event => event.newValue === 'stopped');
+      poller.one('propertyChange:status', event => event.newValue === BackgroundJobPollingStatus.STOPPED);
       uiNotifications.subscribe('bbb', () => undefined);
-      expect(poller.status).toBe('running');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}, {name: 'bbb'}]);
     });
 
@@ -332,14 +332,14 @@ describe('uiNotifications', () => {
       expect(pollers().size).toBe(1);
 
       let poller = pollers().get('main');
-      expect(poller.status).toBe('running');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
       uiNotifications.registerSystem('sys2', '/api2/ui-notifications');
       uiNotifications.subscribe('bbb', () => undefined, 'sys2');
       expect(pollers().size).toBe(2);
 
       let poller2 = pollers().get('sys2');
-      expect(poller2.status).toBe('running');
+      expect(poller2.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(poller2).not.toBe(poller);
 
       uiNotifications.subscribe('ccc', () => undefined, 'sys2');
@@ -574,20 +574,24 @@ describe('uiNotifications', () => {
       let aaaHandler = () => undefined;
       uiNotifications.subscribe('aaa', aaaHandler);
       expect(pollers().size).toBe(1);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
 
       let poller = pollers().get('main');
-      expect(poller.status).toBe('running');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
       let bbbHandler = () => undefined;
       uiNotifications.subscribe('bbb', bbbHandler);
       expect(pollers().size).toBe(1); // still 1
+      expect(jasmine.Ajax.requests.count()).toBe(2); // Existing request is canceled and a new one started
 
       uiNotifications.unsubscribe('aaa', aaaHandler);
       expect(pollers().size).toBe(1); // still 1
+      expect(jasmine.Ajax.requests.count()).toBe(3); // Existing request is canceled and a new one started
 
       uiNotifications.unsubscribe('bbb', bbbHandler);
       expect(pollers().size).toBe(0);
-      expect(poller.status).toBe('stopped');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
+      expect(jasmine.Ajax.requests.count()).toBe(3); // No new poll request must be started
 
       uiNotifications.unsubscribe('bbb', bbbHandler); // should not fail if already unsubscribed
     });
@@ -597,10 +601,45 @@ describe('uiNotifications', () => {
 
       let aaaHandler = () => undefined;
       uiNotifications.subscribeOne('aaa', aaaHandler);
+      let poller = pollers().values().next().value;
       expect(pollers().size).toBe(1);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
       uiNotifications.unsubscribe('aaa', aaaHandler);
       expect(pollers().size).toBe(0);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
+      expect(jasmine.Ajax.requests.count()).toBe(1); // No new poll request must be started
+    });
+
+    it('stops the poller even if unsubscribe was called right after subscriptionStart', async () => {
+      expect(pollers().size).toBe(0);
+
+      let aaaHandler = () => undefined;
+      uiNotifications.subscribe('aaa', aaaHandler);
+      let poller = pollers().values().next().value;
+      expect(pollers().size).toBe(1);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+
+      let response: UiNotificationResponse = {
+        notifications: [{
+          id: '100',
+          topic: 'aaa',
+          nodeId: 'node1',
+          creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000'),
+          subscriptionStart: true
+        }]
+      };
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 200,
+        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+      });
+
+      // Execute UiNotificationPoller._onSuccess handler which schedules a new poll request but don't execute scheduled poll yet (setTimeout / sleep would do that)
+      await Promise.resolve().then();
+      uiNotifications.unsubscribe('aaa', aaaHandler);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
+      expect(pollers().size).toBe(0);
+      expect(jasmine.Ajax.requests.count()).toBe(1); // No new poll request must be started
     });
 
     it('unregisters the topics in the poller to not send them as data anymore', () => {
@@ -622,7 +661,7 @@ describe('uiNotifications', () => {
 
       uiNotifications.unsubscribe('aaa', aaaHandler);
       expect(Array.from(poller.topics)).toEqual([]);
-      expect(poller.status).toBe('stopped');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
     });
 
     it('removes the notifications from the history', async () => {
@@ -734,10 +773,10 @@ describe('uiNotifications', () => {
         status: 500
       });
       jasmine.clock().tick(1);
-      expect(poller.status).toBe('failure');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
 
       jasmine.clock().tick(UiNotificationPoller.RETRY_INTERVAL + 1000);
-      expect(poller.status).toBe('running');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
     });
 
     it('does not restart if operation is not allowed', () => {
@@ -747,10 +786,10 @@ describe('uiNotifications', () => {
         status: 403
       });
       jasmine.clock().tick(1);
-      expect(poller.status).toBe('stopped');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
       jasmine.clock().tick(UiNotificationPoller.RETRY_INTERVAL + 1000);
-      expect(poller.status).toBe('stopped'); // still stopped
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED); // still stopped
     });
 
     it('does not restart on session timeout', () => {
@@ -761,10 +800,10 @@ describe('uiNotifications', () => {
         responseText: JSON.stringify({error: {code: Session.JsonResponseError.SESSION_TIMEOUT}})
       });
       jasmine.clock().tick(1);
-      expect(poller.status).toBe('stopped');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
       jasmine.clock().tick(UiNotificationPoller.RETRY_INTERVAL + 1000);
-      expect(poller.status).toBe('stopped'); // still stopped
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED); // still stopped
     });
 
     it('does not process any notification if stopped right before notification arrives', () => {
@@ -789,8 +828,25 @@ describe('uiNotifications', () => {
 
       poller.stop();
       jasmine.clock().tick(1);
-      expect(poller.status).toBe('stopped');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
       expect(receivedEvent).toBeUndefined();
+    });
+  });
+
+  describe('tearDown', () => {
+    it('stops every poller', () => {
+      uiNotifications.subscribe('aaa', () => undefined);
+      let poller = pollers().get('main');
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+
+      uiNotifications.registerSystem('sys2', '/api2/ui-notifications');
+      uiNotifications.subscribe('bbb', () => undefined, 'sys2');
+      let poller2 = pollers().get('sys2');
+      expect(poller2.status).toBe(BackgroundJobPollingStatus.RUNNING);
+
+      uiNotifications.tearDown();
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
+      expect(poller2.status).toBe(BackgroundJobPollingStatus.STOPPED);
     });
   });
 });
