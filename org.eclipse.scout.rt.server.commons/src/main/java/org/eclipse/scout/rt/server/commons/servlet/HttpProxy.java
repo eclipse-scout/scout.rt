@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -69,6 +70,8 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -221,7 +224,9 @@ public class HttpProxy {
     }
 
     LOG.trace("Executing request for {}", url);
-    getHttpClientManager().getClient().execute(asyncRequestBuilder.build(), createAsyncResponseConsumer(resp), createHttpContext(), createExecuteCallback(resp, asyncContext));
+    // Execute request and add a listener potentially cancelling the proxy request if async context times out/fails (if incoming request is not available anymore)
+    Future<Boolean> future = getHttpClientManager().getClient().execute(asyncRequestBuilder.build(), createAsyncResponseConsumer(resp), createHttpContext(), createExecuteCallback(resp, asyncContext));
+    addCancelListener(asyncContext, future);
   }
 
   protected HttpContext createHttpContext() {
@@ -380,6 +385,41 @@ public class HttpProxy {
         .map(StringUtility::trim)
         .map(s -> s.toLowerCase(Locale.US))
         .collect(Collectors.toSet());
+  }
+
+  protected void addCancelListener(AsyncContext asyncContext, Future<Boolean> future) {
+    try {
+      asyncContext.addListener(createCancelListener(future));
+    }
+    catch (IllegalStateException e) {
+      LOG.info("Unable to add timeout/error listener for proxy request, maybe request was already completed", e);
+    }
+  }
+
+  protected AsyncListener createCancelListener(Future<Boolean> future) {
+    return new AsyncListener() {
+      @Override
+      public void onComplete(AsyncEvent event) {
+        // nop
+      }
+
+      @Override
+      public void onTimeout(AsyncEvent event) {
+        LOG.info("Servlet request timed-out, cancelling proxy request", event.getThrowable());
+        future.cancel(true);
+      }
+
+      @Override
+      public void onError(AsyncEvent event) {
+        LOG.info("Error while forwarding servlet request to proxy, cancelling proxy request", event.getThrowable());
+        future.cancel(true);
+      }
+
+      @Override
+      public void onStartAsync(AsyncEvent event) {
+        // nop
+      }
+    };
   }
 
   public AbstractAsyncHttpClientManager getHttpClientManager() {
@@ -603,9 +643,14 @@ public class HttpProxy {
       public void failed(Exception ex) {
         LOG.trace("Request execution failed", ex);
         BEANS.get(ExceptionHandler.class).handle(ex);
-        boolean alreadyCommitted = resp.isCommitted();
-        if (!alreadyCommitted) {
-          resp.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        try {
+          boolean alreadyCommitted = resp.isCommitted();
+          if (!alreadyCommitted) {
+            resp.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+          }
+        }
+        catch (AlreadyInvalidatedException e) {
+          LOG.trace("Response is invalidated", e);
         }
         asyncContext.complete();
       }

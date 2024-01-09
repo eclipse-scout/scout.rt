@@ -14,7 +14,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +126,7 @@ public abstract class AbstractHttpServlet extends HttpServlet {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
       if (!m_valid) {
-        throw new PlatformException("Access to '{}' is not allowed because {} is no longer valid (request has been completed).", method, (m_origin instanceof HttpServletRequest ? "HTTP servlet request" : "HTTP servlet response"));
+        throw new AlreadyInvalidatedException(method, m_origin);
       }
       return method.invoke(m_origin, args);
     }
