@@ -60,6 +60,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.HttpProxyConfigProperties.HttpProxyAsyncHttpClientManagerConfigProperty;
+import org.eclipse.scout.rt.server.commons.servlet.HttpProxyConfigProperties.HttpProxyAsyncTimeoutConfigProperty;
 import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager;
 import org.slf4j.Logger;
@@ -191,6 +193,7 @@ public class HttpProxy {
   public void proxy(HttpServletRequest req, HttpServletResponse resp, HttpProxyRequestOptions options) throws IOException {
     // response processing is async, start async context as processing must still be possible after exiting this method
     AsyncContext asyncContext = req.startAsync(req, resp);
+    asyncContext.setTimeout(CONFIG.getPropertyValue(HttpProxyAsyncTimeoutConfigProperty.class));
 
     if (options == null) {
       options = new HttpProxyRequestOptions();
