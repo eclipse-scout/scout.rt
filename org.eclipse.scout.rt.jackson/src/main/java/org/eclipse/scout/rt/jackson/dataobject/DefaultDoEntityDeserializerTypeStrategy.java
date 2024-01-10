@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.platform.Bean;
@@ -47,8 +48,17 @@ public class DefaultDoEntityDeserializerTypeStrategy implements IDoEntityDeseria
 
   @Override
   public void putContributions(IDoEntity doEntity, String attributeName, Collection<?> contributions) {
-    // add contributions to corresponding list in do entity
-    if (!CollectionUtility.isEmpty(contributions)) {
+    if (CollectionUtility.isEmpty(contributions)) {
+      return;
+    }
+
+    if (doEntity.getClass() == DoEntity.class) {
+      // doEntity itself has an unknown type name -> assume that contributions might be unknown too and don't put in typed contributions list,
+      // otherwise serialization might fail due to a ClassCastException in DoEntitySerializer#validateContributions because IDoEntity (unknown contribution) is cast to IDoEntityContribution.
+      doEntity.putList(attributeName, CollectionUtility.arrayList(contributions));
+    }
+    else {
+      // add contributions to corresponding list in do entity
       //noinspection unchecked
       doEntity.getContributions().addAll((Collection<? extends IDoEntityContribution>) contributions);
     }
