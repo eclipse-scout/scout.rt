@@ -93,6 +93,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithNestedEntit
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithVariousIdsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDoEntityMapDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestIDoEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItem3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemContributionOneDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemContributionTwoDo;
@@ -2752,6 +2753,34 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(1, marshalledDoEntity.getContributions().size());
     // throws due to tried casting
     assertThrows(ClassCastException.class, () -> CollectionUtility.firstElement(marshalledDoEntity.getContributions()).getString("name"));
+  }
+
+  @Test
+  public void testDeserializeSerialize_DoEntityWithUnknownDoEntityWithContribution() throws Exception {
+    String json = readResourceAsString("TestDoEntityWithUnknownDoEntityWithContribution.json");
+    TestIDoEntityDo marshalledDoEntity = s_dataObjectMapper.readValue(json, TestIDoEntityDo.class);
+    assertEquals("lorem", marshalledDoEntity.getId());
+    IDoEntity doEntity = marshalledDoEntity.getValue();
+    assertNotNull("DO entity is missing", doEntity);
+    assertSame("DO entity with unknown type is not not loaded raw", DoEntity.class, doEntity.getClass());
+    assertEquals("ipsum", doEntity.getString("id"));
+
+    // contributions of a DO entity that has an unknown type and is therefore loaded untyped, must not be put to the typed contributions list
+    assertTrue("Expected that contributions are put into untyped contributions list", doEntity.has(ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME));
+    assertFalse(doEntity.hasContributions());
+    List<IDoEntity> untypedContributions = doEntity.getList(ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME, IDoEntity.class);
+    assertEquals(2, untypedContributions.size());
+    IDoEntity contribution1 = untypedContributions.get(0);
+    assertSame("DO entity with unknown type is not loaded raw", DoEntity.class, contribution1.getClass()); // if DO wouldn't use an unknown type name, it would be typed, see case 2 below
+    assertEquals("dolor", contribution1.getString("name"));
+
+    IDoEntity contribution2 = untypedContributions.get(1);
+    assertTrue("DO entity with known type is loaded raw", contribution2 instanceof TestItemContributionOneDo);
+    assertEquals("sid", ((TestItemContributionOneDo) contribution2).getName());
+
+    // make sure that no ClassCastException is thrown, see DefaultDoEntityDeserializerTypeStrategy.putContributions
+    String unmarshalledJson = s_dataObjectMapper.writeValueAsString(marshalledDoEntity);
+    s_testHelper.assertJsonEquals(json, unmarshalledJson);
   }
 
   @Test
