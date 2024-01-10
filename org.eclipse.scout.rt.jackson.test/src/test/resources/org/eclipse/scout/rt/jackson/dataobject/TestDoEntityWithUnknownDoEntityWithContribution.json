@@ -1,0 +1,15 @@
+{
+  "_type" : "scout.TestIDoEntity",
+  "id" : "lorem",
+  "value" : {
+    "_type" : "scout.TestUnknown",
+    "id" : "ipsum",
+    "_contributions" : [ {
+      "_type" : "scout.TestUnknownContribution",
+      "name" : "dolor"
+    }, {
+      "_type" : "scout.TestItemContributionOne",
+      "name" : "sid"
+    } ]
+  }
+}
