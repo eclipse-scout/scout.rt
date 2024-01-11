@@ -24,7 +24,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.AbstractStringListConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory;
@@ -34,8 +38,8 @@ import org.slf4j.LoggerFactory;
 /**
  * <p>
  * An implementation of a {@link ProxySelector}, an instance (created using the default constructor) is installed by
- * default for all Apache HTTP Clients created using {@link ApacheHttpTransportFactory}. It may also be used as
- * system-wide (VM-wide) {@link ProxySelector} for other connections but must be installed manually using
+ * default for all Apache HTTP Clients created using {@link ApacheHttpTransportFactory}. Additionally an instance using
+ * the default constructor is also installed as default system-wide (VM-wide) {@link ProxySelector} using
  * {@link ProxySelector#setDefault(ProxySelector)}.
  * </p>
  * <p>
@@ -188,4 +192,24 @@ public class ConfigurableProxySelector extends ProxySelector {
     LOG.error("Connection to {} using {} as proxy failed.", uri, sa, ioe);
   }
 
+  /**
+   * Install an instance of {@link ConfigurableProxySelector} as default using
+   * {@link ProxySelector#setDefault(ProxySelector)}
+   */
+  public static class ProxySelectorInstaller implements IPlatformListener {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProxySelectorInstaller.class);
+
+    @Override
+    public void stateChanged(PlatformEvent event) {
+      if (event.getState() == State.BeanManagerPrepared) {
+        ProxySelector.setDefault(createProxySelector());
+        LOG.trace("Installed default proxy selector");;
+      }
+    }
+
+    protected ConfigurableProxySelector createProxySelector() {
+      return BEANS.get(ConfigurableProxySelector.class);
+    }
+  }
 }
