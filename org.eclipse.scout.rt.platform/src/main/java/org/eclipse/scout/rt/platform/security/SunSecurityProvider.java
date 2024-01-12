@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.security.DigestInputStream;
+import java.security.DigestOutputStream;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -69,7 +71,7 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
  * @since 6.1
  */
 @Order(5500)
-public class SunSecurityProvider implements ISecurityProvider {
+public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityProvider {
 
   /**
    * Buffer size for {@link InputStream} read.
@@ -307,6 +309,28 @@ public class SunSecurityProvider implements ISecurityProvider {
     byte[] rnd = new byte[numBytes];
     createSecureRandom().nextBytes(rnd);
     return rnd;
+  }
+
+  @Override
+  public DigestInputStream toHashingStream(InputStream stream) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance(getDigestAlgorithm(), getDigestAlgorithmProvider());
+      return new DigestInputStream(stream, digest);
+    }
+    catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+      throw new ProcessingException("Unable to hash.", e);
+    }
+  }
+
+  @Override
+  public DigestOutputStream toHashingStream(OutputStream stream) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance(getDigestAlgorithm(), getDigestAlgorithmProvider());
+      return new DigestOutputStream(stream, digest);
+    }
+    catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+      throw new ProcessingException("Unable to hash.", e);
+    }
   }
 
   @Override
