@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,14 +10,19 @@
 package org.eclipse.scout.rt.platform.security;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.DigestInputStream;
+import java.security.DigestOutputStream;
 import java.util.Arrays;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -129,45 +134,51 @@ public class SecurityUtilityTest {
   @Test
   public void testHash() {
     final byte[] data = "testdata".getBytes(ENCODING);
-    final byte[] salt = SecurityUtility.createRandomBytes();
-    final byte[] salt2 = SecurityUtility.createRandomBytes();
-    byte[] hash = SecurityUtility.hash(data, salt);
-    byte[] hash2 = SecurityUtility.hash(data, salt);
-    byte[] hash3 = SecurityUtility.hash(data, salt2);
-    byte[] hash4 = SecurityUtility.hash(data, salt);
-    byte[] hash5 = SecurityUtility.hash(new byte[]{}, salt);
-
-    // ensure null input throws exception
-    boolean nullNotAllowed = false;
-    try {
-      SecurityUtility.hash((byte[]) null, salt);
-    }
-    catch (AssertionException e) {
-      nullNotAllowed = true;
-    }
-    Assert.assertTrue(nullNotAllowed);
-
-    nullNotAllowed = false;
-    try {
-      SecurityUtility.hash((InputStream) null, salt);
-    }
-    catch (AssertionException e) {
-      nullNotAllowed = true;
-    }
-    Assert.assertTrue(nullNotAllowed);
+    byte[] hash = SecurityUtility.hash(data);
+    byte[] hash2 = SecurityUtility.hash(data);
+    byte[] hash3 = SecurityUtility.hash(new byte[]{});
 
     // ensure hashing was executed
     Assert.assertFalse(Arrays.equals(data, hash));
-    Assert.assertFalse(Arrays.equals(data, hash3));
-
-    // ensure different salts matter
-    Assert.assertFalse(Arrays.equals(hash, hash3));
 
     // ensure same input -> same output
     Assert.assertArrayEquals(hash, hash2);
 
     // ensure different input -> different output
-    Assert.assertFalse(Arrays.equals(hash4, hash5));
+    Assert.assertFalse(Arrays.equals(hash, hash3));
+
+    // ensure unchanged hashing result compared to legacy security provider
+    Assert.assertArrayEquals(BEANS.get(ILegacySecurityProvider.class).createHash(new ByteArrayInputStream(data), null, 1), hash);
+  }
+
+  @Test
+  public void testHashStability() {
+    final byte[] data = "my text to hash".getBytes(ENCODING);
+    Assert.assertEquals("JqpRPiojKrf7Pb4rkfTrLjyz5noCYCWLJVVQo3TwV+t83ZG6dR6QNyB5yXbBL1fhkO0Xh0qr05Xor33blAuHrw==", Base64Utility.encode(SecurityUtility.hash(data)));
+  }
+
+  @Test
+  public void testToHashingStream_InputStream() throws IOException {
+    final byte[] data = "test.input.stream".getBytes(ENCODING);
+    DigestInputStream hashingStream = SecurityUtility.toHashingStream(new ByteArrayInputStream(data));
+    byte[] hash = hashingStream.getMessageDigest().digest();
+    // ensure data has been read
+    Assert.assertArrayEquals(data, hashingStream.readAllBytes());
+    // ensure hashing was executed
+    Assert.assertFalse(Arrays.equals(hash, hashingStream.getMessageDigest().digest()));
+  }
+
+  @Test
+  public void testToHashingStream_OutputStream() throws IOException {
+    final byte[] data = "test.output.stream".getBytes(ENCODING);
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    DigestOutputStream hashingStream = SecurityUtility.toHashingStream(outputStream);
+    byte[] hash = hashingStream.getMessageDigest().digest();
+    // ensure data has been written
+    hashingStream.write(data);
+    Assert.assertArrayEquals(data, outputStream.toByteArray());
+    // ensure hashing was executed
+    Assert.assertFalse(Arrays.equals(hash, hashingStream.getMessageDigest().digest()));
   }
 
   @Test
@@ -179,7 +190,7 @@ public class SecurityUtilityTest {
     ByteBuffer bytes = StandardCharsets.UTF_16.encode(CharBuffer.wrap(password));
     byte[] passwordBytes = new byte[bytes.remaining()];
     bytes.get(passwordBytes);
-    Assert.assertArrayEquals(expectedHash, SecurityUtility.hash(passwordBytes, salt));
+    Assert.assertArrayEquals(expectedHash, BEANS.get(ILegacySecurityProvider.class).createHash(passwordBytes, salt));
     Assert.assertTrue(SecurityUtility.verifyPasswordHash(password, salt, expectedHash));
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -490,6 +490,6 @@ public class UiNotificationRegistry {
    * @return the hash of the current node id. Because it will be sent to the UI and may contain the name of the server, a hash is used instead of the plain node id.
    */
   public String currentNodeId() {
-    return Base64Utility.encode(SecurityUtility.hash(NodeId.current().toString().getBytes(), "UiNotificationRegistrySalt".getBytes()));
+    return Base64Utility.encode(SecurityUtility.hash(NodeId.current().toString().getBytes()));
   }
 }

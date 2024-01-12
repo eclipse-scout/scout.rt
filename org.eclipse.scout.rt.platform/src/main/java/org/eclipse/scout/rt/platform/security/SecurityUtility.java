@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.net.URL;
+import java.security.DigestInputStream;
+import java.security.DigestOutputStream;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -325,32 +327,45 @@ public final class SecurityUtility {
   }
 
   /**
-   * Creates a hash for the given data using the given salt.<br>
-   * <br>
+   * Creates a hash for the given data using the given salt.
+   * <p>
    * <b>Important:</b> For hashing of passwords use {@link #hashPassword(char[], byte[])}!
+   * </p>
    *
    * @param data
    *          The data to hash. Must not be {@code null}.
-   * @param salt
-   *          The salt to use. Use {@link #createRandomBytes(int)} to generate a random salt per instance.
    * @return the hash
    * @throws ProcessingException
    *           If there is an error creating the hash
    * @throws AssertionException
    *           If data is {@code null}.
-   * @see ISecurityProvider#createHash(InputStream, byte[], int)
+   * @see ISecurityProvider#toHashingStream(InputStream)
    * @see ISecurityProvider#createPasswordHash(char[], byte[])
    */
-  public static byte[] hash(byte[] data, byte[] salt) {
+  public static byte[] hash(byte[] data) {
     Assertions.assertNotNull(data, "no data provided");
-    return hash(new ByteArrayInputStream(data), salt);
+    DigestInputStream stream = toHashingStream(new ByteArrayInputStream(data));
+    try {
+      stream.readAllBytes();
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Unable to hash.", e);
+    }
+    return stream.getMessageDigest().digest();
   }
 
   /**
-   * See {@link ISecurityProvider#createHash(InputStream, byte[], int)}
+   * @see ISecurityProvider#toHashingStream(InputStream)
    */
-  public static byte[] hash(InputStream data, byte[] salt) {
-    return SECURITY_PROVIDER.get().createHash(data, salt, 3557 /* number of default cycles for backwards compatibility */);
+  public static DigestInputStream toHashingStream(InputStream stream) {
+    return SECURITY_PROVIDER.get().toHashingStream(stream);
+  }
+
+  /**
+   * @see ISecurityProvider#toHashingStream(OutputStream)
+   */
+  public static DigestOutputStream toHashingStream(OutputStream stream) {
+    return SECURITY_PROVIDER.get().toHashingStream(stream);
   }
 
   /**

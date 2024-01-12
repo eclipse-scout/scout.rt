@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.platform.security;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.DigestOutputStream;
 import java.security.SecureRandom;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -120,24 +122,40 @@ public interface ISecurityProvider {
   KeyPairBytes createKeyPair();
 
   /**
-   * Creates a hash for the given data using the given salt.<br>
-   * <br>
+   * Wraps the specified {@link InputStream} into a digest input stream.
+   * <p>
+   * After the specified input stream has been read, the hash can be accessed by
+   * <code>DigestInputStream.getMessageDigest().digest()</code>.
+   * </p>
+   * <p>
    * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[])}!
+   * </p>
    *
-   * @param data
+   * @param stream
    *          The {@link InputStream} providing the data to hash.
-   * @param salt
-   *          the salt to use or {@code null} if not salt should be used (not recommended!). Use
-   *          {@link #createSecureRandomBytes(int)} to generate a random salt per instance.
-   * @param iterations
-   *          the number of hashing iterations. There is always at least one cycle executed.
-   * @return the hash
-   * @throws AssertionException
-   *           If data is {@code null}.
+   * @return the digest input stream wrapping the given {@link InputStream}
    * @throws ProcessingException
-   *           If there is an error creating the hash
+   *           If there is an error creating the digest input stream
    */
-  byte[] createHash(InputStream data, byte[] salt, int iterations);
+  DigestInputStream toHashingStream(InputStream stream);
+
+  /**
+   * Wraps the specified {@link OutputStream} into a digest output stream.
+   * <p>
+   * After the specified output stream has been written, the hash can be accessed by
+   * <code>DigestInputStream.getMessageDigest().digest()</code>.
+   * </p>
+   * <p>
+   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[])}!
+   * </p>
+   *
+   * @param stream
+   *          The {@link OutputStream} providing the data to hash.
+   * @return the digest output stream wrapping the given {@link OutputStream}
+   * @throws ProcessingException
+   *           If there is an error creating the digest output stream
+   */
+  DigestOutputStream toHashingStream(OutputStream stream);
 
   /**
    * Creates a hash for the given password.<br>
