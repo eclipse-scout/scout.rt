@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${rootArtifactId}</artifactId>
+    <version>${version}</version>
+    <relativePath>../${rootArtifactId}</relativePath>
+  </parent>
+
+  <!-- Application leaf module with dependencies only relevant for docker image build including config.properties/logback.xml -->
+  <artifactId>${rootArtifactId}.${artifactId}</artifactId>
+
+  <profiles>
+    <profile>
+      <!--  set property docker.app.image.registry before activating profile -->
+      <id>exec.docker.image</id>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <configuration>
+              <to>
+                <image>${docker.app.image.registry}/${simpleArtifactName}-server</image>
+                <tags>
+                  <tag>${docker.app.image.tag}</tag>
+                </tags>
+              </to>
+              <from>
+                <image>${docker.java.image}</image>
+              </from>
+              <container>
+                <entrypoint>INHERIT</entrypoint>
+                <mainClass>org.eclipse.scout.rt.app.Application</mainClass>
+                <ports>
+                  <port>8080</port>
+                </ports>
+                <environment>
+                  <scout_app_port>8080</scout_app_port>
+                </environment>
+              </container>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <dependencies>
+    <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>${rootArtifactId}.server.app</artifactId>
+    </dependency>
+
+    <dependency>
+      <!-- logback.xml: LogstashEncoder -->
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+    </dependency>
+  </dependencies>
+</project>

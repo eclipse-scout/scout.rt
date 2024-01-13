@@ -19,17 +19,26 @@
     <requiredProperty key="simpleArtifactName">
       <defaultValue>helloscout</defaultValue>
     </requiredProperty>
+    <requiredProperty key="versionWithoutSnapshot">
+      <!-- 1.0-SNAPSHOT -> 1.0 -->
+      <defaultValue>${version.replaceAll("^(\d+\.\d+(?:\.\d+)?)-SNAPSHOT", "$1")}</defaultValue>
+    </requiredProperty>
     <requiredProperty key="userName">
       <defaultValue>Scout Robot</defaultValue>
     </requiredProperty>
-    <!-- debug output for postprocessing groovy script -->
     <requiredProperty key="debug">
+      <!-- debug output for postprocessing groovy script -->
+      <defaultValue>false</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="skipChangeMeReplacement">
+      <!-- skips the replacement of 'changeme' markers -->
+      <!-- this property is only used to create identical outputs if archetype is generated multiple times -->
       <defaultValue>false</defaultValue>
     </requiredProperty>
   </requiredProperties>
   <fileSets>
     <fileSet filtered="true" encoding="UTF-8">
-      <directory/>
+      <directory />
       <includes>
         <include>**/*.yaml</include>
         <include>**/.editorconfig</include>
@@ -152,7 +161,34 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="server.app.war" dir="__rootArtifactId__.server.app.war" name="server.app.war">
+    <module id="server.app" dir="__rootArtifactId__.server.app" name="server.app">
+      <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/main/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="server.app.image" dir="__rootArtifactId__.server.app.image" name="server.app.image">
+      <fileSets>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.properties</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="server.app.zip" dir="__rootArtifactId__.server.app.zip" name="server.app.zip">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -162,9 +198,16 @@
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/webapp</directory>
+          <directory>src/assembly</directory>
           <includes>
             <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/bin</directory>
+          <includes>
+            <include>**/*.cmd</include>
+            <include>**/*.sh</include>
           </includes>
         </fileSet>
       </fileSets>
@@ -178,18 +221,12 @@
             <include>**/*.properties</include>
           </includes>
         </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/webapp</directory>
-          <includes>
-            <include>**/*.xml</include>
-          </includes>
-        </fileSet>
       </fileSets>
     </module>
     <module id="ui.html" dir="__rootArtifactId__.ui.html" name="ui.html">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
+          <directory />
           <includes>
             <include>**/*gitignore</include>
             <include>**/*.js</include>
@@ -229,7 +266,34 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="ui.html.app.war" dir="__rootArtifactId__.ui.html.app.war" name="ui.html.app.war">
+    <module id="ui.html.app" dir="__rootArtifactId__.ui.html.app" name="ui.html.app">
+      <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/main/java</directory>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="ui.html.app.image" dir="__rootArtifactId__.ui.html.app.image" name="ui.html.app.image">
+      <fileSets>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.properties</include>
+          </includes>
+        </fileSet>
+      </fileSets>
+    </module>
+    <module id="ui.html.app.zip" dir="__rootArtifactId__.ui.html.app.zip" name="ui.html.app.zip">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -239,9 +303,16 @@
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/webapp</directory>
+          <directory>src/assembly</directory>
           <includes>
             <include>**/*.xml</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/bin</directory>
+          <includes>
+            <include>**/*.cmd</include>
+            <include>**/*.sh</include>
           </includes>
         </fileSet>
       </fileSets>
@@ -255,14 +326,8 @@
             <include>**/*.properties</include>
           </includes>
         </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/webapp</directory>
-          <includes>
-            <include>**/*.xml</include>
-          </includes>
-        </fileSet>
         <fileSet encoding="UTF-8">
-          <directory/>
+          <directory />
           <includes>
             <include>**/*.nls</include>
           </includes>

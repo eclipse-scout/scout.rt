@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <contextListener class="org.eclipse.scout.rt.platform.logger.AutoRegisteringJulLevelChangePropagator" />
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder" /> <!-- for JSON -->
+    <!-- <encoder class="org.eclipse.scout.rt.platform.logger.FixedPatternLogbackEncoder" /> --> <!-- for plain text -->
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+  <logger name="org.quartz" level="WARN" />
+</configuration>

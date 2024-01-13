@@ -16,9 +16,9 @@ import jakarta.ws.rs.core.MediaType;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
 
-{package}.core.person.PersonService;
-{package}.data.person.PersonDo;
-{package}.data.person.PersonResponse;
+import ${package}.core.person.PersonService;
+import ${package}.data.person.PersonDo;
+import ${package}.data.person.PersonResponse;
 import ${package}.data.person.PersonRestrictionDo;
 
 @Path("persons")

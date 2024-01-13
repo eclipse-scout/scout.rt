@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>${groupId}</groupId>
+    <artifactId>${rootArtifactId}</artifactId>
+    <version>${version}</version>
+    <relativePath>../${rootArtifactId}</relativePath>
+  </parent>
+
+  <!-- Application base module that collects all dependencies relevant for all application leafs (dev, image, ...) -->
+  <artifactId>${rootArtifactId}.${artifactId}</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>${groupId}</groupId>
+      <artifactId>${rootArtifactId}.ui.html</artifactId>
+    </dependency>
+
+    <!-- Scout app (Jetty) -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.app</artifactId>
+    </dependency>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+    </dependency>
+  </dependencies>
+</project>

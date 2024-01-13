@@ -21,10 +21,6 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.util.concurrent.atomic.AtomicReference;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http.HttpCookie.SameSite;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
@@ -81,6 +77,10 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.WebappEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @ApplicationScoped
 public class Application {
@@ -401,8 +401,8 @@ public class Application {
     handler.setInitParameter("logbackDisableServletContainerInitializer", Boolean.TRUE.toString());
 
     // Register servlets/servlet filters
-    BEANS.all(IServletContributor.class).forEach(c -> c.contribute(handler));
     BEANS.all(IServletFilterContributor.class).forEach(c -> c.contribute(handler));
+    BEANS.all(IServletContributor.class).forEach(c -> c.contribute(handler));
 
     String contextPath = CONFIG.getPropertyValue(ScoutApplicationContextPathProperty.class);
     handler.setContextPath(contextPath);

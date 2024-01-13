@@ -158,12 +158,13 @@ public final class ApplicationProperties {
 
     @Override
     public Integer getDefaultValue() {
-      return (int) TimeUnit.MINUTES.toSeconds(5);
+      // Do not use a short timeout in DEV mode to allow longer debugging sessions
+      return (int) TimeUnit.MINUTES.toSeconds(Platform.get().inDevelopmentMode() ? 60 : 5);
     }
 
     @Override
     public String description() {
-      return "The session timeout in seconds to use if HTTP sessions are enabled. The default value is 300 seconds (5 minutes).";
+      return "The session timeout in seconds to use if HTTP sessions are enabled. The default value is 300 seconds (5 minutes) for non-development mode, 3600 seconds (60 minutes) for development mode.";
     }
   }
 

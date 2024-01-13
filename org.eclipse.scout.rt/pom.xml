@@ -196,6 +196,12 @@
         <version>${logback.version}</version>
       </dependency>
       <dependency>
+        <!-- Logstash encoder for logback.xml -->
+        <groupId>net.logstash.logback</groupId>
+        <artifactId>logstash-logback-encoder</artifactId>
+        <version>7.4</version>
+      </dependency>
+      <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
         <version>2.3.2</version>
@@ -718,7 +724,7 @@
         <version>${jetty.version}</version>
         <exclusions>
           <exclusion>
-            <!-- The jetty-jakarta-servlet-api contains (amongst others) the same classes as jakarta.servlet-api, Scout depends on jakarta.annotation-api directly -->
+            <!-- The jetty-jakarta-servlet-api contains (amongst others) the same classes as jakarta.servlet-api, scout.rt.jetty depends on jakarta.servlet-api directly -->
             <groupId>org.eclipse.jetty.toolchain</groupId>
             <artifactId>jetty-jakarta-servlet-api</artifactId>
           </exclusion>
@@ -731,7 +737,7 @@
         <version>${jetty.version}</version>
         <exclusions>
           <exclusion>
-            <!-- The jetty-jakarta-servlet-api contains (amongst others) the same classes as jakarta.servlet-api, Scout depends on jakarta.annotation-api directly -->
+            <!-- The jetty-jakarta-servlet-api contains (amongst others) the same classes as jakarta.servlet-api, scout.rt.jetty depends on jakarta.servlet-api directly -->
             <groupId>org.eclipse.jetty.toolchain</groupId>
             <artifactId>jetty-jakarta-servlet-api</artifactId>
           </exclusion>

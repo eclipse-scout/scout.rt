@@ -9,6 +9,7 @@
     <relativePath>../${rootArtifactId}</relativePath>
   </parent>
 
+  <!-- Application base module that collects all dependencies relevant for all application leafs (dev, image, ...) -->
   <artifactId>${rootArtifactId}.app</artifactId>
 
   <dependencies>
@@ -30,6 +31,47 @@
           <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <!-- Scout app (Jetty) -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.app</artifactId>
+    </dependency>
+
+    <!-- Jackson -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.rest.jackson</artifactId>
+    </dependency>
+
+    <!-- JAX-RS Jersey Server -->
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-json-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Activates Servlet 3 container to enable async processing -->
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
+    </dependency>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
     </dependency>
   </dependencies>
 </project>

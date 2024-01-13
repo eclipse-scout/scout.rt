@@ -9,47 +9,13 @@
     <relativePath>../${rootArtifactId}</relativePath>
   </parent>
 
+  <!-- Application leaf module with dependencies only relevant for development including config.properties/logback.xml -->
   <artifactId>${rootArtifactId}.app.dev</artifactId>
-  <packaging>war</packaging>
 
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>${rootArtifactId}.app</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.rest.jackson</artifactId>
-    </dependency>
-
-    <!-- JAX-RS Jersey -->
-    <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-servlet-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.inject</groupId>
-      <artifactId>jersey-hk2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.media</groupId>
-      <artifactId>jersey-media-json-jackson</artifactId>
-    </dependency>
-
-    <!-- Jetty Server -->
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.app</artifactId>
-    </dependency>
-
-    <!-- Logging -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
     </dependency>
   </dependencies>
 </project>

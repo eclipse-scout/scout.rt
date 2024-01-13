@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <contextListener class="org.eclipse.scout.rt.platform.logger.AutoRegisteringJulLevelChangePropagator" />
+
+  <!-- This configuration saves the log in a human-readable plain text format -->
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILEPLAIN">
+    <file>logs/app.plain.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/app-%d{yyyy-MM-dd}.plain.log</fileNamePattern>
+      <maxHistory>100</maxHistory>
+    </rollingPolicy>
+    <encoder class="org.eclipse.scout.rt.platform.logger.FixedPatternLogbackEncoder" />
+  </appender>
+
+  <!-- This configuration saves the log in a machine-readable JSON format -->
+  <!-- See: https://github.com/logstash/logstash-logback-encoder#loggingevent_fields -->
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILEJSON">
+    <file>logs/app.json.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/app-%d{yyyy-MM-dd}.json.log</fileNamePattern>
+      <maxHistory>100</maxHistory>
+    </rollingPolicy>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="FILEPLAIN" />
+    <appender-ref ref="FILEJSON" />
+  </root>
+
+  <logger name="org.quartz" level="WARN" />
+</configuration>
