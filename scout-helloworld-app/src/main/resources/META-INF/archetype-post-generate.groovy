@@ -29,8 +29,10 @@ File runConfigsFile = parentModulePath.resolve('run-configs').toFile()
 File uiHtmlModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html')).toFile()
 File serverAppDevModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.server.app.dev')).toFile()
 File uiAppDevModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html.app.dev')).toFile()
-File serverAppWarModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.server.app.war')).toFile()
-File uiAppWarModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html.app.war')).toFile()
+File serverAppImageModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.server.app.image')).toFile()
+File uiAppImageModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html.app.image')).toFile()
+File serverAppZipModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.server.app.zip')).toFile()
+File uiAppZipModuleFile = projectsDirectoryPath.resolve(artifactId.concat('.ui.html.app.zip')).toFile()
 
 String osName = System.properties.get('os.name')
 log('Starting archetype post processing')
@@ -62,8 +64,11 @@ renameFile(new File(runConfigsFile, 'js build.run_.xml'), 'js build.run.xml')
 renameFile(new File(runConfigsFile, 'pnpm-install.run_.xml'), 'pnpm-install.run.xml')
 renameFile(new File(uiHtmlModuleFile, 'dotgitignore'), '.gitignore')
 
-writeKeyPair(serverAppWarModuleFile, uiAppWarModuleFile)
-writeKeyPair(serverAppDevModuleFile, uiAppDevModuleFile)
+if (request.properties.get('skipChangeMeReplacement') != 'true') {
+  writeKeyPair(serverAppImageModuleFile, uiAppImageModuleFile)
+  writeKeyPair(serverAppZipModuleFile, uiAppZipModuleFile)
+  writeKeyPair(serverAppDevModuleFile, uiAppDevModuleFile)
+}
 
 log('Post processing done.')
 

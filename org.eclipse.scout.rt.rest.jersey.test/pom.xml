@@ -46,6 +46,7 @@
       <artifactId>jetty-webapp</artifactId>
     </dependency>
     <dependency>
+      <!-- include jakarta servlet API because Jetty API excluded via dependency management -->
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
     </dependency>

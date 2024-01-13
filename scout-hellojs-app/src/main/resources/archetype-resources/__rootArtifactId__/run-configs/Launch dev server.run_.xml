@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Launch ${rootArtifactId} dev server" type="Application" factoryName="Application">
+  <configuration default="false" name="[webapp] dev server" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.eclipse.scout.rt.app.Application" />
     <module name="${rootArtifactId}.app.dev" />
     <option name="VM_PARAMETERS" value="-Dscout.app.port=8084" />

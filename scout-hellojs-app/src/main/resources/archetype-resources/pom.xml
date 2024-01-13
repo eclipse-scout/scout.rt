@@ -13,7 +13,6 @@
   <artifactId>${rootArtifactId}-root</artifactId>
   <version>${version}</version>
   <packaging>pom</packaging>
-  <name>${displayName} Root</name>
 
   <build>
     <plugins>

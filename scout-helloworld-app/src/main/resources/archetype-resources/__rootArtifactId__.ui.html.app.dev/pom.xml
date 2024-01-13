@@ -10,19 +10,13 @@
     <relativePath>../${rootArtifactId}</relativePath>
   </parent>
 
+  <!-- Application leaf module with dependencies only relevant for development including config.properties/logback.xml -->
   <artifactId>${rootArtifactId}.${artifactId}</artifactId>
-  <packaging>war</packaging>
-
-  <name>${displayName} HTML UI Application (Development)</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.app</artifactId>
-    </dependency>
-    <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${rootArtifactId}.ui.html</artifactId>
+      <artifactId>${rootArtifactId}.ui.html.app</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -12,8 +12,6 @@
 
   <artifactId>${rootArtifactId}.${artifactId}</artifactId>
 
-  <name>${displayName} Client</name>
-
   <dependencies>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>

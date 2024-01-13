@@ -65,7 +65,9 @@ renameFile(new File(runConfigsFile, 'Setup local dev database.run_.xml'), 'Setup
 renameFile(new File(uiModuleFile,  'dotgitignore'), '.gitignore')
 renameFile(new File(appModuleFile,  'dotgitignore'), '.gitignore')
 
-writeDbPassword(appDevModuleFile)
+if (request.properties.get('skipChangeMeReplacement') != 'true') {
+  writeDbPassword(appDevModuleFile)
+}
 
 log('Post processing done.')
 

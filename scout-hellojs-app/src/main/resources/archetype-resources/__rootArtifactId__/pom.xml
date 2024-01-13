@@ -18,6 +18,16 @@
     <org.jooq.version>3.16.16</org.jooq.version>
     <derby.version>10.15.2.0</derby.version>
     <master_npm_release_dependency_mapping>--mapping.0.regex=@eclipse-scout --mapping.0.version=${org.eclipse.scout.rt.version}</master_npm_release_dependency_mapping>
+
+    <!-- docker image build settings -->
+    <!-- build target (push) -->
+    <docker.app.image.registry>localhost:5000</docker.app.image.registry> <!-- set a desired registry before using profile exec.docker.image (e.g. registry.hub.docker.com/yourusername) -->
+    <docker.app.image.tag>${versionWithoutSnapshot}-latest</docker.app.image.tag>
+    <!-- java source image (pull) -->
+    <docker.java.image.registry>docker.io</docker.java.image.registry>
+    <docker.java.image.name>eclipse-temurin</docker.java.image.name>
+    <docker.java.image.tag>17-jdk-jammy</docker.java.image.tag>
+    <docker.java.image>${docker.java.image.registry}/${docker.java.image.name}:${docker.java.image.tag}</docker.java.image>
   </properties>
 
   <modules>
@@ -30,12 +40,67 @@
 
     <!-- App modules -->
     <module>../${rootArtifactId}.app</module>
-    <module>../${rootArtifactId}.app.war</module>
     <module>../${rootArtifactId}.app.dev</module>
+    <module>../${rootArtifactId}.app.image</module>
+    <module>../${rootArtifactId}.app.zip</module>
 
     <!-- DB modules -->
     <module>../${rootArtifactId}.db</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <!-- required for .app.image module to apply filtering on config.properties -->
+      <id>filter.config.property</id>
+      <activation>
+        <file>
+          <exists>${basedir}${file.separator}src${file.separator}main${file.separator}resources${file.separator}config.properties</exists>
+        </file>
+      </activation>
+      <build>
+        <resources>
+          <resource>
+            <directory>${project.basedir}${file.separator}src${file.separator}main${file.separator}resources</directory>
+            <filtering>true</filtering>
+          </resource>
+        </resources>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <configuration>
+            <overWriteReleases>false</overWriteReleases>
+            <overWriteSnapshots>true</overWriteSnapshots>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <!-- required for .app.image module to build and publish docker image -->
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>build</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <dependencyManagement>
     <dependencies>
@@ -65,7 +130,7 @@
         <version>${derby.version}</version>
       </dependency>
 
-     <!-- Application dependencies -->
+      <!-- Application dependencies -->
       <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${rootArtifactId}.ui</artifactId>
@@ -83,7 +148,12 @@
       </dependency>
       <dependency>
         <groupId>${groupId}</groupId>
-        <artifactId>${rootArtifactId}.app.war</artifactId>
+        <artifactId>${rootArtifactId}.app.image</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>${rootArtifactId}.app.zip</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -113,55 +183,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <configuration>
-            <overWriteReleases>false</overWriteReleases>
-            <overWriteSnapshots>true</overWriteSnapshots>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>webapp_src_folder</id>
-      <activation>
-        <file>
-          <exists>${basedir}/src/main/webapp</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-webapp-resource</id>
-                <goals>
-                  <goal>add-resource</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>src/main/webapp</directory>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
   <repositories>
     <repository>

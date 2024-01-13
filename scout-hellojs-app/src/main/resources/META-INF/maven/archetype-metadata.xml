@@ -23,14 +23,23 @@
     <requiredProperty key="simpleArtifactName">
       <defaultValue>helloscout</defaultValue>
     </requiredProperty>
-    <!-- debug output for postprocessing groovy script -->
+    <requiredProperty key="versionWithoutSnapshot">
+      <!-- 1.0-SNAPSHOT -> 1.0 -->
+      <defaultValue>${version.replaceAll("^(\d+\.\d+(?:\.\d+)?)-SNAPSHOT", "$1")}</defaultValue>
+    </requiredProperty>
     <requiredProperty key="debug">
+      <!-- debug output for postprocessing groovy script -->
+      <defaultValue>false</defaultValue>
+    </requiredProperty>
+    <requiredProperty key="skipChangeMeReplacement">
+      <!-- skips the replacement of 'changeme' markers -->
+      <!-- this property is only used to create identical outputs if archetype is generated multiple times -->
       <defaultValue>false</defaultValue>
     </requiredProperty>
   </requiredProperties>
   <fileSets>
     <fileSet filtered="true" encoding="UTF-8">
-      <directory/>
+      <directory />
       <includes>
         <include>**/*.yaml</include>
         <include>**/.editorconfig</include>
@@ -74,12 +83,18 @@
     <module id="app" dir="__rootArtifactId__.app" name="app">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
+          <directory />
           <includes>
             <include>**/*gitignore</include>
             <include>**/*.js</include>
             <include>**/*.ts</include>
             <include>**/*.less</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+          <directory>src/main/java</directory>
+          <includes>
+            <include>**/*.java</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
@@ -110,16 +125,20 @@
             <include>**/*.xml</include>
           </includes>
         </fileSet>
+      </fileSets>
+    </module>
+    <module id="app.image" dir="__rootArtifactId__.app.image" name="app.image">
+      <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/webapp</directory>
+          <directory>src/main/resources</directory>
           <includes>
             <include>**/*.xml</include>
-            <include>**/*.html</include>
+            <include>**/*.properties</include>
           </includes>
         </fileSet>
       </fileSets>
     </module>
-    <module id="app.war" dir="__rootArtifactId__.app.war" name="app.war">
+    <module id="app.zip" dir="__rootArtifactId__.app.zip" name="app.zip">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -129,10 +148,16 @@
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/webapp</directory>
+          <directory>src/assembly</directory>
           <includes>
             <include>**/*.xml</include>
-            <include>**/*.html</include>
+          </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory>src/main/bin</directory>
+          <includes>
+            <include>**/*.cmd</include>
+            <include>**/*.sh</include>
           </includes>
         </fileSet>
       </fileSets>
@@ -140,7 +165,7 @@
     <module id="core" dir="__rootArtifactId__.core" name="core">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
+          <directory />
           <includes>
             <include>**/*.nls</include>
           </includes>
@@ -249,7 +274,7 @@
     <module id="ui" dir="__rootArtifactId__.ui" name="ui">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
+          <directory />
           <includes>
             <include>**/*gitignore</include>
             <include>**/*.js</include>

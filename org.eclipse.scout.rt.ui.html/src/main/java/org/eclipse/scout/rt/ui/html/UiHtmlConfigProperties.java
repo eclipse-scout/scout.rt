@@ -13,7 +13,10 @@ import static java.util.Collections.unmodifiableList;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -22,7 +25,13 @@ import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+
+import jakarta.servlet.MultipartConfigElement;
 
 /**
  * This class provides all properties configured in the config.properties file that affect the HTML UI module.
@@ -173,6 +182,77 @@ public final class UiHtmlConfigProperties {
     @Override
     public String getKey() {
       return "scout.ui.maxUploadFileCount";
+    }
+  }
+
+  /**
+   * {@link MultipartConfigElement} for {@link UiServlet}.
+   */
+  public static class UiServletMultipartConfigProperty extends AbstractConfigProperty<MultipartConfigElement, Map<String, String>> {
+
+    private static final String LOCATION = "location";
+    private static final String MAX_FILE_SIZE = "maxFileSize";
+    private static final String MAX_REQUEST_SIZE = "maxRequestSize";
+    private static final String FILE_SIZE_THRESHOLD = "fileSizeThreshold";
+
+    @Override
+    public String getKey() {
+      return "scout.uiServletMultipartConfig";
+    }
+
+    @Override
+    public String description() {
+      return String.format("Multipart configuration for inbound servlet.\n"
+              + "Map property with the keys as follows:\n"
+              + "- %s: the directory location where files will be stored temporarily (default: temp directory)\n"
+              + "- %s: the maximum size allowed in MB for uploaded files (default: %d MB) \n"
+              + "- %s: the maximum size allowed in MB for multipart/form-data requests (default: %d MB) \n"
+              + "- %s: the size threshold in MB after which files will written to disk (default: %d MB) \n",
+          LOCATION,
+          MAX_FILE_SIZE, getDefaultMaxFileSizeMB(),
+          MAX_REQUEST_SIZE, getDefaultMaxRequestSizeMB(),
+          FILE_SIZE_THRESHOLD, getDefaultFileSizeThresholdMB());
+    }
+
+    @Override
+    public Map<String, String> readFromSource(String namespace) {
+      return ConfigUtility.getPropertyMap(getKey(), null, namespace);
+    }
+
+    @Override
+    public MultipartConfigElement getDefaultValue() {
+      return parse(Collections.emptyMap()); // defaults are on a per key base
+    }
+
+    protected String getDefaultLocation() {
+      return System.getProperty("java.io.tmpdir");
+    }
+
+    protected long getDefaultMaxFileSizeMB() {
+      return 50; // 50 MB
+    }
+
+    protected long getDefaultMaxRequestSizeMB() {
+      return 100; // 100 MB
+    }
+
+    protected int getDefaultFileSizeThresholdMB() {
+      return 20; // 20 MB
+    }
+
+    @Override
+    protected MultipartConfigElement parse(Map<String, String> value) {
+      Set<String> invalidMapKeys = new HashSet<>(value.keySet());
+      Arrays.asList(LOCATION, MAX_FILE_SIZE, MAX_REQUEST_SIZE, FILE_SIZE_THRESHOLD).forEach(invalidMapKeys::remove);
+      if (!invalidMapKeys.isEmpty()) {
+        throw new PlatformException("Invalid values for map property {}: {}", getKey(), invalidMapKeys);
+      }
+
+      String location = ObjectUtility.nvl(StringUtility.nullIfEmpty(value.get(LOCATION)), getDefaultLocation());
+      long maxFileSize = ObjectUtility.nvl(TypeCastUtility.castValue(value.get(MAX_FILE_SIZE), Long.class), getDefaultMaxFileSizeMB()) * 1024 * 1024;
+      long maxRequestSize = ObjectUtility.nvl(TypeCastUtility.castValue(value.get(MAX_REQUEST_SIZE), Long.class), getDefaultMaxRequestSizeMB()) * 1024 * 1024;
+      int fileSizeThreshold = ObjectUtility.nvl(TypeCastUtility.castValue(value.get(FILE_SIZE_THRESHOLD), Integer.class), getDefaultFileSizeThresholdMB()) * 1024 * 1024;
+      return new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold);
     }
   }
 }

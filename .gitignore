@@ -7,8 +7,9 @@
 # Package Files #
 *.jar
 *.war
-*.ear
+!*.war/
 *.zip
+!*.zip/
 
 *.log
 
