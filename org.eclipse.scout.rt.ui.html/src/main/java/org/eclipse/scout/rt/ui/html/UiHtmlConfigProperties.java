@@ -197,7 +197,7 @@ public final class UiHtmlConfigProperties {
 
     @Override
     public String getKey() {
-      return "scout.uiServletMultipartConfig";
+      return "scout.ui.servletMultipartConfig";
     }
 
     @Override
@@ -205,8 +205,8 @@ public final class UiHtmlConfigProperties {
       return String.format("Multipart configuration for inbound servlet.\n"
               + "Map property with the keys as follows:\n"
               + "- %s: the directory location where files will be stored temporarily (default: temp directory)\n"
-              + "- %s: the maximum size allowed in MB for uploaded files (default: %d MB) \n"
-              + "- %s: the maximum size allowed in MB for multipart/form-data requests (default: %d MB) \n"
+              + "- %s: the maximum size allowed in MB for uploaded files, -1 means unlimited (default: %d MB) \n"
+              + "- %s: the maximum size allowed in MB for multipart/form-data requests, -1 means unlimited (default: %d MB) \n"
               + "- %s: the size threshold in MB after which files will written to disk (default: %d MB) \n",
           LOCATION,
           MAX_FILE_SIZE, getDefaultMaxFileSizeMB(),
@@ -229,11 +229,11 @@ public final class UiHtmlConfigProperties {
     }
 
     protected long getDefaultMaxFileSizeMB() {
-      return 50; // 50 MB
+      return -1; // unlimited (limited on field base by org.eclipse.scout.rt.ui.html.res.IUploadable)
     }
 
     protected long getDefaultMaxRequestSizeMB() {
-      return 100; // 100 MB
+      return -1; // unlimited (limited on field base by org.eclipse.scout.rt.ui.html.res.IUploadable)
     }
 
     protected int getDefaultFileSizeThresholdMB() {
