@@ -33,7 +33,6 @@
                 <image>${docker.java.image}</image>
               </from>
               <container>
-                <entrypoint>INHERIT</entrypoint>
                 <mainClass>org.eclipse.scout.rt.app.Application</mainClass>
                 <ports>
                   <port>8080</port>

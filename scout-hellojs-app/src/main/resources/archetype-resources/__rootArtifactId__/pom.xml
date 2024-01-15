@@ -10,7 +10,6 @@
 
   <artifactId>${rootArtifactId}</artifactId>
   <packaging>pom</packaging>
-  <name>${displayName}</name>
 
   <properties>
     <jdk.source.version>${javaVersion}</jdk.source.version>
