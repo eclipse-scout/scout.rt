@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,20 +16,18 @@ import $ from 'jquery';
 
 let instance: App = null;
 let listeners: EventListener[] = [];
+let bootstrappers: (() => JQuery.Promise<void>)[] = [];
 
 export interface AppModel {
   /**
    * Object to configure the session, see {@link Session.init} for the available options.
    */
   session?: SessionModel;
-
   bootstrap?: AppBootstrapOptions;
-
   /**
    * True, to check whether the browser fulfills all requirements to run the application. If the check fails, a notification is shown to warn the user about his old browser. Default is true.
    */
   checkBrowserCompatibility?: boolean;
-
   version?: string;
 }
 
@@ -45,26 +43,29 @@ export interface AppBootstrapOptions {
    * To disable preloading entirely, set fonts to an empty array.
    */
   fonts?: FontDescriptor[];
-
   /**
-   *  URL or multiple URLs pointing to a json resource containing texts that will be available through {@link texts}.
+   *  URL or multiple URLs pointing to a resource providing texts that will be available through {@link texts}.
    */
   textsUrl?: string | string[];
-
   /**
-   * URL pointing to a json resource containing locale information processed by {@link locales}.
+   * URL pointing to a resource providing locale information processed by {@link locales}.
    */
   localesUrl?: string;
-
   /**
-   *  URL pointing to a json resources containing codes that will be available through {@link codes}.
+   *  URL pointing to a resource providing codes that will be available through {@link codes}.
    */
   codesUrl?: string;
-
   /**
-   * URL pointing to a json resource that provides information about permissions (see {@link PermissionCollectionModel}).
+   * URL pointing to a resource providing permissions that will be available through {@link access}.
+   *
+   * @see PermissionCollectionModel
    */
   permissionsUrl?: string;
+  /**
+   * Custom functions that needs to be executed while bootstrapping.
+   * All custom and default bootrappers need to finish successfully before the app will proceed with the initialization.
+   */
+  bootstrappers?: (() => JQuery.Promise<void>)[];
 }
 
 export class App extends EventEmitter {
@@ -79,6 +80,17 @@ export class App extends EventEmitter {
       listeners.push(listener);
     }
     return listener;
+  }
+
+  /**
+   * Adds a function that needs to be executed while bootstrapping.
+   * @see AppModel.bootstrappers
+   */
+  static addBootstrapper(bootrapper: () => JQuery.Promise<void>) {
+    if (bootstrappers.indexOf(bootrapper) > -1) {
+      throw new Error('Bootstrapper is already registered.');
+    }
+    bootstrappers.push(bootrapper);
   }
 
   static get(): App {
@@ -101,6 +113,7 @@ export class App extends EventEmitter {
   sessions: Session[];
   errorHandler: ErrorHandler;
   version: string;
+  bootstrappers: (() => JQuery.Promise<void>)[];
   protected _loadingTimeoutId: number;
 
   constructor() {
@@ -108,6 +121,7 @@ export class App extends EventEmitter {
     this.remote = false;
     this.initialized = false;
     this.sessions = [];
+    this.bootstrappers = [];
     this._loadingTimeoutId = null;
 
     // register the listeners which were added to scout before the app is created
@@ -165,38 +179,37 @@ export class App extends EventEmitter {
   }
 
   /**
-   * Executes the default bootstrap functions and returns an array of promises.
+   * Executes the bootstrappers.
    *
-   * The actual session startup begins only when every of these promises are completed.
-   * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful session startup.
-   * The individual bootstrap functions may return null or undefined, a single promise or multiple promises as an array.
+   * The actual session startup begins only when all promises of the bootstrappers are completed.
+   * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful application startup.
    */
   protected _bootstrap(options: AppBootstrapOptions): JQuery.Promise<any> {
     options = options || {};
+    this.bootstrappers = [
+      ...this._defaultBootstrappers(options),
+      ...this.bootstrappers,
+      ...bootstrappers
+    ].filter(bootstrapper => !!bootstrapper);
 
-    let promises = [];
-    this._doBootstrap(options).forEach(value => {
-      if (Array.isArray(value)) {
-        promises.concat(value);
-      } else if (value) {
-        promises.push(value);
-      }
-    });
-
-    return $.promiseAll(promises)
-      .done(this._bootstrapDone.bind(this, options))
+    return $.promiseAll(this._doBootstrap())
+      .then(this._bootstrapDone.bind(this, options))
       .catch(this._bootstrapFail.bind(this, options));
   }
 
-  protected _doBootstrap(options: AppBootstrapOptions): Array<JQuery.Promise<any> | JQuery.Promise<any>[]> {
+  protected _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
     return [
-      Device.get().bootstrap(),
-      fonts.bootstrap(options.fonts),
-      locales.bootstrap(options.localesUrl),
-      texts.bootstrap(options.textsUrl),
-      codes.bootstrap(options.codesUrl),
-      access.bootstrap(options.permissionsUrl)
+      Device.get().bootstrap.bind(Device.get()),
+      fonts.bootstrap.bind(fonts, options.fonts),
+      locales.bootstrap.bind(locales, options.localesUrl),
+      texts.bootstrap.bind(texts, options.textsUrl),
+      codes.bootstrap.bind(codes, options.codesUrl),
+      access.bootstrap.bind(access, options.permissionsUrl)
     ];
+  }
+
+  protected _doBootstrap(): JQuery.Promise<any>[] {
+    return this.bootstrappers.map(bootstrapper => bootstrapper());
   }
 
   protected _bootstrapDone(options: AppBootstrapOptions) {
