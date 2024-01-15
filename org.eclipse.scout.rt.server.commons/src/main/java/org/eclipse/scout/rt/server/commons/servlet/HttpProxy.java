@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -60,6 +61,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyConfigProperties.HttpProxyAsyncHttpClientManagerConfigProperty;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyConfigProperties.HttpProxyAsyncTimeoutConfigProperty;
 import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
@@ -199,7 +201,7 @@ public class HttpProxy {
       options = new HttpProxyRequestOptions();
     }
 
-    String url = rewriteUrl(req, options);
+    URI url = rewriteUrl(req, options);
     LOG.debug("Forwarding {} request to {}", req.getMethod(), url);
 
     AsyncRequestBuilder asyncRequestBuilder = prepareRequest(AsyncRequestBuilder
@@ -233,13 +235,20 @@ public class HttpProxy {
    * Rewrites the <code>pathInfo</code> part of the current request if the rewriteRule and rewriteReplacement is set on
    * the options object. This allows to redirect the request to a different URL than the URL that has been requested.
    */
-  protected String rewriteUrl(HttpServletRequest req, HttpProxyRequestOptions options) {
+  protected URI rewriteUrl(HttpServletRequest req, HttpProxyRequestOptions options) {
     String pathInfo = req.getPathInfo();
     IRewriteRule rewriteRule = options.getRewriteRule();
     if (rewriteRule != null) {
       pathInfo = rewriteRule.rewrite(pathInfo);
     }
-    return StringUtility.join("", getRemoteBaseUrl(), pathInfo, StringUtility.box("?", req.getQueryString(), ""));
+    UriBuilder uriBuilder = new UriBuilder(getRemoteBaseUrl());
+    if (StringUtility.startsWith(pathInfo, "/")) {
+      // addPath on UriBuilder adds a beginning slash on its own; strip our beginning slash to avoid duplicated slashes
+      pathInfo = pathInfo.substring(1);
+    }
+    uriBuilder.addPath(pathInfo);
+    uriBuilder.queryString(req.getQueryString());
+    return uriBuilder.createURI();
   }
 
   protected AsyncRequestBuilder prepareRequest(AsyncRequestBuilder asyncRequestBuilder) {
