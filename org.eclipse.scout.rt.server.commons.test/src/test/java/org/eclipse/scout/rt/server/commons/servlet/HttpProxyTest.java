@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -130,17 +131,31 @@ public class HttpProxyTest {
   @Test
   @NonParameterized
   public void testRewriteUrl() {
-    HttpProxy proxy = m_proxy
-        .withRemoteBaseUrl("http://internal.example.com:1234/api");
-
     HttpProxyRequestOptions options = new HttpProxyRequestOptions()
         .withRewriteRule(new SimpleRegexRewriteRule("/my-api/", "/"));
 
-    HttpServletRequest req = mock(HttpServletRequest.class);
-    when(req.getPathInfo()).thenReturn("/my-api/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview");
+    testRewriteUrlInternal("http://internal.example.com:1234/api/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview",
+        "/my-api/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview", null, options);
+    testRewriteUrlInternal("http://internal.example.com:1234/api",
+        null, null, options);
+    testRewriteUrlInternal("http://internal.example.com:1234/api/lorem",
+        "/lorem", null, options);
+    testRewriteUrlInternal("http://internal.example.com:1234/api/lorem?ipsum",
+        "/lorem", "ipsum", new HttpProxyRequestOptions());
+    testRewriteUrlInternal("http://internal.example.com:1234/api/lorem?foo=%25bar%25",
+        "/lorem", "foo=%bar%", new HttpProxyRequestOptions());
+  }
 
-    String url = proxy.rewriteUrl(req, options);
-    assertEquals("http://internal.example.com:1234/api/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview", url);
+  protected void testRewriteUrlInternal(String expectedResult, String pathInfo, String queryString, HttpProxyRequestOptions options) {
+    HttpProxy proxy = m_proxy
+        .withRemoteBaseUrl("http://internal.example.com:1234/api");
+
+    HttpServletRequest req = mock(HttpServletRequest.class);
+    when(req.getPathInfo()).thenReturn(pathInfo);
+    when(req.getQueryString()).thenReturn(queryString);
+
+    URI url = proxy.rewriteUrl(req, options);
+    assertEquals(expectedResult, url.toString());
   }
 
   @Test
@@ -322,9 +337,14 @@ public class HttpProxyTest {
   }
 
   @Test
+  public void testProxyRequest_spaceInPath() throws IOException {
+    testProxyRequestWithStatusCodeAndContent_Internal(200, new byte[]{0x02}, true, 1, "/a b/c d/lorem ipsum.htm");
+  }
+
+  @Test
   public void testProxyRequest_numerousRequests() throws IOException {
     // keep number of requests low on CI (at least as long as we do not run tests in parallel), however can be increased for testing locally
-    testProxyRequestWithStatusCodeAndContent_Internal(200, new byte[]{0x01}, true, 25);
+    testProxyRequestWithStatusCodeAndContent_Internal(200, new byte[]{0x01}, true, 25, null);
   }
 
   @Test
@@ -347,10 +367,10 @@ public class HttpProxyTest {
   }
 
   protected void testProxyRequestWithStatusCodeAndContent_Internal(int statusCode, byte[] content, boolean specifyContentLength) throws IOException {
-    testProxyRequestWithStatusCodeAndContent_Internal(statusCode, content, specifyContentLength, 1);
+    testProxyRequestWithStatusCodeAndContent_Internal(statusCode, content, specifyContentLength, 1, null);
   }
 
-  protected void testProxyRequestWithStatusCodeAndContent_Internal(int statusCode, byte[] content, boolean specifyContentLength, int numberOfRequests) throws IOException {
+  protected void testProxyRequestWithStatusCodeAndContent_Internal(int statusCode, byte[] content, boolean specifyContentLength, int numberOfRequests, String pathInfo) throws IOException {
     AbstractHandler handler = new AbstractHandler() {
       @Override
       public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -366,7 +386,7 @@ public class HttpProxyTest {
       }
     };
 
-    HttpServletResponse resp = testProxyRequestInternal(handler, numberOfRequests);
+    HttpServletResponse resp = testProxyRequestInternal(handler, numberOfRequests, pathInfo);
 
     verify(resp, times(numberOfRequests)).setStatus(statusCode);
     byte[] expectedContent = new byte[numberOfRequests * content.length];
@@ -390,7 +410,7 @@ public class HttpProxyTest {
       }
     };
 
-    HttpServletResponse resp = testProxyRequestInternal(handler, 6 * 60 * 1000L, 1);
+    HttpServletResponse resp = testProxyRequestInternal(handler, 6 * 60 * 1000L, 1, null);
 
     verify(resp).setStatus(200);
     assertArrayEquals(new byte[]{0x42}, ((BufferedServletOutputStream) resp.getOutputStream()).getContent());
@@ -403,7 +423,7 @@ public class HttpProxyTest {
       public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
         throw new IOException();
       }
-    }, 1);
+    }, 1, null);
 
     verify(resp).setStatus(500);
 
@@ -412,11 +432,11 @@ public class HttpProxyTest {
     handledThrowables.clear(); // do not fail test because there were handled exceptions (see JUnitExceptionHandler)
   }
 
-  public HttpServletResponse testProxyRequestInternal(Handler handler, int numberOfRequests) throws IOException {
-    return testProxyRequestInternal(handler, 30 * 1000L, numberOfRequests);
+  public HttpServletResponse testProxyRequestInternal(Handler handler, int numberOfRequests, String pathInfo) {
+    return testProxyRequestInternal(handler, 30 * 1000L, numberOfRequests, pathInfo);
   }
 
-  public HttpServletResponse testProxyRequestInternal(Handler handler, long timeoutUntilCompletion, int numberOfRequests) {
+  public HttpServletResponse testProxyRequestInternal(Handler handler, long timeoutUntilCompletion, int numberOfRequests, String pathInfo) {
     try {
       m_handlerCollection.addHandler(handler);
       m_proxy.withRemoteBaseUrl(m_server.getURI().toString());
@@ -425,6 +445,7 @@ public class HttpProxyTest {
 
       HttpServletRequest httpReq = mock(HttpServletRequest.class);
       when(httpReq.getMethod()).thenReturn(Method.GET.toString());
+      when(httpReq.getPathInfo()).thenReturn(pathInfo != null ? pathInfo : "/");
       when(httpReq.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
       when(httpReq.startAsync(any(), any())).thenReturn(asyncContext);
 

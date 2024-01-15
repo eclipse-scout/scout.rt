@@ -29,6 +29,6 @@ public class SimpleRegexRewriteRule implements IRewriteRule {
 
   @Override
   public String rewrite(String pathInfo) {
-    return pathInfo.replaceAll(m_regex, m_replacement);
+    return pathInfo != null ? pathInfo.replaceAll(m_regex, m_replacement) : null;
   }
 }
