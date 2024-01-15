@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1249,7 +1249,7 @@ describe('Tree', () => {
       let tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
-      tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN;
+      tree.setAutoCheckChildren(true);
       tree.render();
 
       let node = tree.nodes[0];
@@ -1266,7 +1266,6 @@ describe('Tree', () => {
       let tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
-      tree.autoCheckStyle = Tree.AutoCheckStyle.NONE;
       tree.render();
 
       let node = tree.nodes[0];
@@ -1294,7 +1293,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1314,7 +1313,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1338,7 +1337,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1360,7 +1359,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1380,7 +1379,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1401,7 +1400,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1422,7 +1421,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1445,7 +1444,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1468,7 +1467,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1487,7 +1486,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1510,7 +1509,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1534,7 +1533,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1562,7 +1561,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1593,7 +1592,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1617,7 +1616,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange
@@ -1638,7 +1637,7 @@ describe('Tree', () => {
         tree = helper.createTree(model);
         tree.multiCheck = true;
         tree.checkable = true;
-        tree.autoCheckStyle = Tree.AutoCheckStyle.CHILDREN_AND_PARENT;
+        tree.setAutoCheckChildren(true);
         tree.render();
 
         // Arrange

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -336,38 +336,26 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   /**
-   * Checks / unchecks all visible child nodes if the parent node gets checked / unchecked.
+   * When set to {@code true}, all children of a node will be checked/unchecked together with their parents.
+   * <p>
+   * The state of a node is a representation of its children.
+   *  <ul>
+   *  <li>When none of the children are checked, the node is unchecked</li>
+   *  <li>When some of the children are checked, the node is partly checked</li>
+   *  <li>When all of the children are checked, the node is also checked</li>
+   *  </ul>
    * <p>
    * Only has an effect if the tree is checkable.
+   * <p>
+   * Default is {@code false}
    *
    * @see #getConfiguredCheckable()
-   * @since 5.1
+   * @since 24.1
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
-  @Deprecated
   protected boolean getConfiguredAutoCheckChildNodes() {
     return false;
-  }
-
-  /**
-   * Configures the default auto-check mode of the tree. There are three modes:
-   * <ul>
-   * <li>NONE: No nodes are auto-checked</li>
-   * <li>CHILDREN: All child nodes will be checked/unchecked together with their parent</li>
-   * <li>CHILDREN_AND_PARENT: The state of the node is a representation of its children</li>
-   * </ul>
-   * <p>
-   * Only has an effect if the tree is checkable.
-   *
-   * @see AutoCheckStyle
-   * @see #getConfiguredCheckable()
-   * @since 5.1
-   */
-  @ConfigProperty(ConfigProperty.OBJECT)
-  @Order(105)
-  protected AutoCheckStyle getConfiguredAutoCheckStyle() {
-    return AutoCheckStyle.NONE;
   }
 
   /**
@@ -444,25 +432,13 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
-  @Deprecated
   public boolean isAutoCheckChildNodes() {
-    return getAutoCheckStyle().equals(AutoCheckStyle.CHILDREN);
+    return propertySupport.getPropertyBool(PROP_AUTO_CHECK_CHILDREN);
   }
 
   @Override
-  @Deprecated
   public void setAutoCheckChildNodes(boolean b) {
-    setAutoCheckStyle(b ? AutoCheckStyle.CHILDREN : AutoCheckStyle.NONE);
-  }
-
-  @Override
-  public AutoCheckStyle getAutoCheckStyle() {
-    return propertySupport.getProperty(PROP_AUTO_CHECK_STYLE, AutoCheckStyle.class);
-  }
-
-  @Override
-  public void setAutoCheckStyle(AutoCheckStyle autoCheckStyle) {
-    propertySupport.setProperty(PROP_AUTO_CHECK_STYLE, autoCheckStyle);
+    propertySupport.setPropertyBool(PROP_AUTO_CHECK_CHILDREN, b);
   }
 
   @ConfigOperation
@@ -601,7 +577,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     setScrollToSelection(getConfiguredScrollToSelection());
     setSaveAndRestoreScrollbars(getConfiguredSaveAndRestoreScrollbars());
     setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
-    setAutoCheckStyle(getConfiguredAutoCheckStyle());
     setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
     setDisplayStyle(getConfiguredDisplayStyle());
     setToggleBreadcrumbStyleEnabled(getConfiguredToggleBreadcrumbStyleEnabled());
@@ -2772,8 +2747,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
           setTreeChanging(true);
           nodes = resolveNodes(nodes);
           if (!nodes.isEmpty()) {
-            // With AutoCheckStyle.CHILDREN_AND_PARENT it's possible to check disabled nodes from UI
-            setNodesChecked(nodes, checked, !getAutoCheckStyle().equals(AutoCheckStyle.CHILDREN_AND_PARENT));
+            // With isAutoCheckChildNodes() it's possible to check disabled nodes from UI
+            setNodesChecked(nodes, checked, !isAutoCheckChildNodes());
           }
         }
         finally {

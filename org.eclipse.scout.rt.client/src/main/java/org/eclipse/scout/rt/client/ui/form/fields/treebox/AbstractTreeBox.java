@@ -789,13 +789,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  @Deprecated
   public boolean isAutoCheckChildNodes() {
     return getTree().isAutoCheckChildNodes();
   }
 
   @Override
-  @Deprecated
   public void setAutoCheckChildNodes(boolean b) {
     getTree().setAutoCheckChildNodes(b);
   }
