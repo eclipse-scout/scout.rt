@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   String PROP_MULTI_SELECT = "multiSelect";
   String PROP_MULTI_CHECK = "multiCheck";
   String PROP_CHECKABLE = "checkable";
-  String PROP_AUTO_CHECK_STYLE = "autoCheckStyle";
+  String PROP_AUTO_CHECK_CHILDREN = "autoCheckChildren";
   String PROP_LAZY_EXPANDING_ENABLED = "lazyExpandingEnabled";
   /**
    * Integer default -1
@@ -194,15 +194,9 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   Set<ITreeNode> getSelectedNodes();
 
-  @Deprecated
   boolean isAutoCheckChildNodes();
 
-  @Deprecated
   void setAutoCheckChildNodes(boolean autoCheckChildNodes);
-
-  AutoCheckStyle getAutoCheckStyle();
-
-  void setAutoCheckStyle(AutoCheckStyle autoCheckStyle);
 
   boolean isSelectedNode(ITreeNode node);
 

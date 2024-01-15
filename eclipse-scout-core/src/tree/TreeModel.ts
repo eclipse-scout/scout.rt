@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, AutoCheckStyle, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, TreeCheckableStyle, TreeDisplayStyle, TreeNode, WidgetModel} from '../index';
+import {Action, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, TreeCheckableStyle, TreeDisplayStyle, TreeNode, WidgetModel} from '../index';
 
 export interface TreeModel extends WidgetModel {
   /**
@@ -16,16 +16,11 @@ export interface TreeModel extends WidgetModel {
   toggleBreadcrumbStyleEnabled?: boolean;
   breadcrumbTogglingThreshold?: number;
   /**
-   * Default is false.
-   * @deprecated since version 23.2, use {@link autoCheckStyle}
+   * Describes the behavior of children and parent nodes, when a node is checked/unchecked
+   *
+   * Default is {@code false}
    */
   autoCheckChildren?: boolean;
-  /**
-   * Describes the behavior of children and parent nodes, when a node is checked/unchecked.
-   *
-   * Default is {@link AutoCheckStyle.NONE}
-   */
-  autoCheckStyle?: AutoCheckStyle;
   /**
    * Default is false.
    */

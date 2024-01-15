@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupCall, LookupCallModel, LookupResult, LookupRow, QueryBy, scout, Status, Tree, TreeBox, TreeBoxModel} from '../../../../src/index';
+import {LookupCall, LookupCallModel, LookupResult, LookupRow, QueryBy, scout, Status, TreeBox, TreeBoxModel} from '../../../../src/index';
 import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
 import {InitModelOf} from '../../../../src/scout';
 
@@ -370,7 +370,7 @@ describe('TreeBox', () => {
     it('should check children in autoCheckMode', () => {
       // Arrange
       let field = createFieldWithLookupCall();
-      field.tree.setAutoCheckStyle(Tree.AutoCheckStyle.CHILDREN_AND_PARENT);
+      field.tree.setAutoCheckChildren(true);
       jasmine.clock().tick(500);
 
       // Act
@@ -384,7 +384,7 @@ describe('TreeBox', () => {
     it('should not change value when value is set twice', () => {
       // Arrange
       let field = createFieldWithLookupCall();
-      field.tree.setAutoCheckStyle(Tree.AutoCheckStyle.CHILDREN_AND_PARENT);
+      field.tree.setAutoCheckChildren(true);
       jasmine.clock().tick(500);
 
       // Act
