@@ -10,7 +10,6 @@
 
   <artifactId>${rootArtifactId}</artifactId>
   <packaging>pom</packaging>
-  <name>${displayName}</name>
 
   <properties>
     <${groupId}.${rootArtifactId}.version>${project.version}</${groupId}.${rootArtifactId}.version>
