@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@ import {App, InitModelOf, RemoteApp, Session} from '../index';
 
 export class TestingApp extends RemoteApp {
 
-  protected override _doBootstrapDefaultValues(): JQuery.Promise<void> {
+  protected override _defaultValuesBootrapper(): () => JQuery.Promise<void> {
     // nop for testing
     return null;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,14 +17,12 @@ export class RemoteApp extends App {
     this.remote = true;
   }
 
-  protected override _doBootstrap(options: AppBootstrapOptions): Array<JQuery.Promise<any> | JQuery.Promise<any>[]> {
-    return super._doBootstrap(options).concat([
-      this._doBootstrapDefaultValues()
-    ]);
+  protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
+    return super._defaultBootstrappers(options).concat(this._defaultValuesBootrapper());
   }
 
-  protected _doBootstrapDefaultValues(): JQuery.Promise<void> {
-    return defaultValues.bootstrap();
+  protected _defaultValuesBootrapper(): () => JQuery.Promise<void> {
+    return defaultValues.bootstrap.bind(defaultValues);
   }
 
   protected override _createErrorHandler(opts?: InitModelOf<ErrorHandler>): ErrorHandler {
