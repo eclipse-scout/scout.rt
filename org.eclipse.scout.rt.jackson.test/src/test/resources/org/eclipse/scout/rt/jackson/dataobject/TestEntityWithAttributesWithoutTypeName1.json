@@ -1,0 +1,14 @@
+{
+  "_type" : "TestEntityWithAttributesWithoutTypeName",
+  "listAttribute" : [ {
+    "id" : "withoutName1"
+  }, {
+    "id" : "withoutName2"
+  }, {
+    "_type" : "TestWithoutTypeNameSubclassWithTypename",
+    "id" : "withName3"
+  } ],
+  "valueAttribute" : {
+    "id" : "withName4"
+  }
+}

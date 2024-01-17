@@ -15,12 +15,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import jakarta.annotation.Generated;
-
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
+
+import jakarta.annotation.Generated;
 
 @TypeName("TestMap")
 public class TestMapDo extends DoEntity {
@@ -52,6 +52,10 @@ public class TestMapDo extends DoEntity {
 
   public DoValue<Map<String, IDoEntity>> stringIDoEntityMapAttribute() {
     return doValue("stringIDoEntityMapAttribute");
+  }
+
+  public DoValue<Map<String, DoEntity>> stringDoEntityMapAttribute() {
+    return doValue("stringDoEntityMapAttribute");
   }
 
   public DoValue<IDoEntity> iDoEntityAttribute() {
@@ -150,6 +154,17 @@ public class TestMapDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<String, IDoEntity> getStringIDoEntityMapAttribute() {
     return stringIDoEntityMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withStringDoEntityMapAttribute(Map<String, DoEntity> stringDoEntityMapAttribute) {
+    stringDoEntityMapAttribute().set(stringDoEntityMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, DoEntity> getStringDoEntityMapAttribute() {
+    return stringDoEntityMapAttribute().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

@@ -84,6 +84,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDuplicatedAttributeDo
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestElectronicAddressDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEmptyObject;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithArrayDoValueDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithAttributesWithoutTypeNameDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithDoValueOfObjectDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithGenericValuesDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithIIdDo;
@@ -105,6 +106,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo2;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestMapDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestMixedRawBigIntegerDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestNestedListRawDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestNestedRawDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestOptionalDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPersonDo;
@@ -1640,6 +1642,38 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestCollectionsIDoEntity.json", json);
   }
 
+  @Test
+  public void testSerializeDeserialize_CollectionsIDoEntityDoWithoutTypename() throws Exception {
+    List<IDoEntity> entities = List.of(
+        BEANS.get(TestWithoutTypeNameDo.class).withId("foo"),
+        BEANS.get(TestWithoutTypeNameSubclassDo.class).withId("bar"),
+        BEANS.get(TestWithoutTypeNameSubclassWithTypeNameDo.class).withId("baz"));
+
+    TestCollectionsIDoEntityDo entity = BEANS.get(TestCollectionsIDoEntityDo.class)
+        .withDoEntityAttribute(entities.get(0))
+        .withDoEntityDoListAttribute(entities)
+        .withDoEntityCollectionAttribute(entities)
+        .withDoEntityListAttribute(new ArrayList<>(entities));
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestCollectionsIDoEntityWithoutTypename.json", json);
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithAttributeWithoutTypename() throws Exception {
+    TestEntityWithAttributesWithoutTypeNameDo entity = BEANS.get(TestEntityWithAttributesWithoutTypeNameDo.class)
+        .withListAttribute(
+            BEANS.get(TestWithoutTypeNameDo.class).withId("withoutName1"),
+            BEANS.get(TestWithoutTypeNameSubclassDo.class).withId("withoutName2"),
+            BEANS.get(TestWithoutTypeNameSubclassWithTypeNameDo.class).withId("withName3"))
+        .withValueAttribute(BEANS.get(TestWithoutTypeNameDo.class).withId("withName4"));
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestEntityWithAttributesWithoutTypeName1.json", json);
+
+    entity.withValueAttribute(BEANS.get(TestWithoutTypeNameSubclassWithTypeNameDo.class).withId("withName5"));
+    json = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestEntityWithAttributesWithoutTypeName2.json", json);
+  }
+
   // ------------------------------------ DoEntity with collections test cases ------------------------------------
 
   @Test
@@ -1849,6 +1883,16 @@ public class JsonDataObjectsSerializationTest {
     stringAbstractDoMap.put("doAbstractKey1", BEANS.get(TestElectronicAddressDo.class).withId("elecAddress").withEmail("foo@bar.de"));
     stringAbstractDoMap.put("doAbstractKey2", BEANS.get(TestPhysicalAddressDo.class).withId("physicAddress").withCity("Example"));
     mapDo.withStringDoAbstractAddressMapAttribute(stringAbstractDoMap);
+
+    Map<String, IDoEntity> stringIDoEntityMap = new HashMap<>();
+    stringIDoEntityMap.put("iDoEntityKey1", createTestItemDo("1", "foo"));
+    stringIDoEntityMap.put("iDoEntityKey2", createTestItemDo("2", "bar"));
+    mapDo.withStringIDoEntityMapAttribute(stringIDoEntityMap);
+
+    Map<String, DoEntity> stringDoEntityMap = new HashMap<>();
+    stringDoEntityMap.put("doEntityKey1", createTestItemDo("1", "foo"));
+    stringDoEntityMap.put("doEntityKey2", createTestItemDo("2", "bar"));
+    mapDo.withStringDoEntityMapAttribute(stringDoEntityMap);
 
     Map<Double, TestItemDo> doubleDoMap = new HashMap<>();
     doubleDoMap.put(1.11, createTestItemDo("item-key5", "value5"));
@@ -3891,7 +3935,27 @@ public class JsonDataObjectsSerializationTest {
             .withIId(FixtureStringId.of("qualified-string-id-10"))
             .withStringId(FixtureStringId.of("unqualified-string-id-10"))
             .withIId2(FixtureStringId.of("qualified-string-id-11"))
-            .withStringId2(FixtureStringId.of("unqualified-string-id-11")));
+            .withStringId2(FixtureStringId.of("unqualified-string-id-11")))
+        .withStringDoEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-12"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-13"))))
+        .withStringIDoEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-14"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-15"))))
+        .withStringIDataObjectEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-16"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-17"))))
+        .withStringITestTypedUntypedInnerEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerIfcDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-18"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-19"))))
+        .withStringITestTypedUntypedInnerDataObjectEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerDataObjectIfcDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-20"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-21"))))
+        .withStringAbstractTestTypedUntypedInnerEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerAbsDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-22"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-23"))
+            .withIId2(FixtureStringId.of("qualified-string-id-24"))
+            .withStringId2(FixtureStringId.of("unqualified-string-id-25"))));
 
     // assert JSON-equality
     String json = s_dataObjectMapper.writeValueAsString(testDo);
@@ -3899,7 +3963,89 @@ public class JsonDataObjectsSerializationTest {
     json = s_dataObjectMapper.writeValueAsString(expected);
     assertJsonEquals("TestNestedRawDo.json", json);
 
-    // assert partial Java-equality, excluding untyped attributes, see NOTE above)
+    // assert partial Java-equality, excluding untyped attributes, see NOTE above
+    expected.remove(expected::doEntity2);
+    expected.remove(expected::iDataObject2);
+    expected.remove(expected::iDoEntity2);
+    testDo.remove(testDo::doEntity2);
+    testDo.remove(testDo::iDataObject2);
+    testDo.remove(testDo::iDoEntity2);
+    assertEqualsWithComparisonFailure(expected, testDo);
+  }
+
+  @Test
+  public void testSerializeDeserializeNestedListRawDoTypes() throws Exception {
+    String inputJson = readResourceAsString("TestNestedListRawDo.json");
+    TestNestedListRawDo testDo = s_dataObjectMapper.readValue(inputJson, TestNestedListRawDo.class);
+
+    DoEntity entity2 = BEANS.get(DoEntity.class);
+    // NOTE: This test-case is not a supposed real-world example. An IId as part of an untyped DoEntity is serialized unqualified and may never be deserialized correctly.
+    entity2.put("iId", FixtureStringId.of("unqualified-string-id-0"));
+    entity2.put("stringId", FixtureStringId.of("unqualified-string-id-0"));
+
+    @SuppressWarnings("unchecked")
+    TestNestedListRawDo expected = BEANS.get(TestNestedListRawDo.class)
+        .withDoEntity(BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-1"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-1")))
+        .withDoEntity2(entity2)
+        .withIDataObject(BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-2"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-2")))
+        .withIDataObject2(DoList.of(
+            // NOTE: This test-case is not a supposed real-world example. An IId as part of an untyped DoList is serialized unqualified and may never be deserialized correctly.
+            List.of(FixtureStringId.of("unqualified-string-id-3"),
+                FixtureStringId.of("unqualified-string-id-3"))))
+        .withIDoEntity(BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-4"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-4")))
+        .withIDoEntity2(BEANS.get(DoEntityBuilder.class)
+            // NOTE: This test-case is not a supposed real-world example. An IId as part of an untyped IDoEntity is serialized unqualified and may never be deserialized correctly.
+            .put("iId", FixtureStringId.of("unqualified-string-id-5"))
+            .put("stringId", FixtureStringId.of("unqualified-string-id-5")).build())
+        .withITestTypedUntypedInner(BEANS.get(TestTypedUntypedInnerIfcDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-6"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-6"))
+            .withIId2(FixtureStringId.of("qualified-string-id-7"))
+            .withStringId2(FixtureStringId.of("unqualified-string-id-7")))
+        .withAbstractTestTypedUntypedInner(BEANS.get(TestTypedUntypedInnerAbsDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-8"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-8"))
+            .withIId2(FixtureStringId.of("qualified-string-id-9"))
+            .withStringId2(FixtureStringId.of("unqualified-string-id-9")))
+        .withITestTypedUntypedInnerDataObject(BEANS.get(TestTypedUntypedInnerDataObjectIfcDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-10"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-10"))
+            .withIId2(FixtureStringId.of("qualified-string-id-11"))
+            .withStringId2(FixtureStringId.of("unqualified-string-id-11")))
+        .withStringDoEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-12"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-13"))))
+        .withStringIDoEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-14"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-15"))))
+        .withStringIDataObjectEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-16"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-17"))))
+        .withStringITestTypedUntypedInnerEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerIfcDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-18"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-19"))))
+        .withStringITestTypedUntypedInnerDataObjectEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerDataObjectIfcDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-20"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-21"))))
+        .withStringAbstractTestTypedUntypedInnerEntityMap(Map.of("one", BEANS.get(TestTypedUntypedInnerAbsDo.class)
+            .withIId(FixtureStringId.of("qualified-string-id-22"))
+            .withStringId(FixtureStringId.of("unqualified-string-id-23"))
+            .withIId2(FixtureStringId.of("qualified-string-id-24"))
+            .withStringId2(FixtureStringId.of("unqualified-string-id-25"))));
+
+    // assert JSON-equality
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    assertJsonEquals("TestNestedListRawDo.json", json);
+    json = s_dataObjectMapper.writeValueAsString(expected);
+    assertJsonEquals("TestNestedListRawDo.json", json);
+
+    // assert partial Java-equality, excluding untyped attributes, see NOTE above
     expected.remove(expected::doEntity2);
     expected.remove(expected::iDataObject2);
     expected.remove(expected::iDoEntity2);

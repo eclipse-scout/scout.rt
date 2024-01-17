@@ -36,6 +36,18 @@
       "id" : "elecAddress"
     }
   },
+  "stringDoEntityMapAttribute" : {
+    "doEntityKey1" : {
+      "_type" : "TestItem",
+      "id" : "1",
+      "stringAttribute" : "foo"
+    },
+    "doEntityKey2" : {
+      "_type" : "TestItem",
+      "id" : "2",
+      "stringAttribute" : "bar"
+    }
+  },
   "stringDoTestItemMapAttribute" : {
     "doKey1" : {
       "_type" : "TestItem",
@@ -48,6 +60,18 @@
       "stringAttribute" : "value4"
     },
     "doKey3" : null
+  },
+  "stringIDoEntityMapAttribute" : {
+    "iDoEntityKey2" : {
+      "_type" : "TestItem",
+      "id" : "2",
+      "stringAttribute" : "bar"
+    },
+    "iDoEntityKey1" : {
+      "_type" : "TestItem",
+      "id" : "1",
+      "stringAttribute" : "foo"
+    }
   },
   "stringMapStringMapStringListTestItemDoMapAttribute" : {
     "complex1" : {
