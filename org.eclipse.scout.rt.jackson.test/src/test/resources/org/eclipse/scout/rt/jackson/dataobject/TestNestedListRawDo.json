@@ -1,51 +1,51 @@
 {
-  "_type" : "TestNestedRaw",
-  "abstractTestTypedUntypedInner" : {
+  "_type" : "TestNestedListRaw",
+  "abstractTestTypedUntypedInner" : [ {
     "_type" : "scout.TestTypedUntypedInnerAbsDo",
     "iId" : "scout.FixtureStringId:qualified-string-id-8",
     "iId2" : "scout.FixtureStringId:qualified-string-id-9",
     "stringId" : "unqualified-string-id-8",
     "stringId2" : "unqualified-string-id-9"
-  },
-  "doEntity" : {
+  } ],
+  "doEntity" : [ {
     "_type" : "scout.TestTypedUntypedInner",
     "iId" : "scout.FixtureStringId:qualified-string-id-1",
     "stringId" : "unqualified-string-id-1"
-  },
-  "doEntity2" : {
+  } ],
+  "doEntity2" : [ {
     "iId" : "unqualified-string-id-0",
     "stringId" : "unqualified-string-id-0"
-  },
-  "iDataObject" : {
+  } ],
+  "iDataObject" : [ {
     "_type" : "scout.TestTypedUntypedInner",
     "iId" : "scout.FixtureStringId:qualified-string-id-2",
     "stringId" : "unqualified-string-id-2"
-  },
-  "iDataObject2" : [ "unqualified-string-id-3", "unqualified-string-id-3" ],
-  "iDoEntity" : {
+  } ],
+  "iDataObject2" : [ [ "unqualified-string-id-3", "unqualified-string-id-3" ] ],
+  "iDoEntity" : [ {
     "_type" : "scout.TestTypedUntypedInner",
     "iId" : "scout.FixtureStringId:qualified-string-id-4",
     "stringId" : "unqualified-string-id-4"
-  },
-  "iDoEntity2" : {
+  } ],
+  "iDoEntity2" : [ {
     "iId" : "unqualified-string-id-5",
     "stringId" : "unqualified-string-id-5"
-  },
-  "iTestTypedUntypedInner" : {
+  } ],
+  "iTestTypedUntypedInner" : [ {
     "_type" : "scout.TestTypedUntypedInnerIfc",
     "iId" : "scout.FixtureStringId:qualified-string-id-6",
     "iId2" : "scout.FixtureStringId:qualified-string-id-7",
     "stringId" : "unqualified-string-id-6",
     "stringId2" : "unqualified-string-id-7"
-  },
-  "iTestTypedUntypedInnerDataObject" : {
+  } ],
+  "iTestTypedUntypedInnerDataObject" : [ {
     "_type" : "scout.TestTypedUntypedInnerDataObjectIfc",
     "iId" : "scout.FixtureStringId:qualified-string-id-10",
     "iId2" : "scout.FixtureStringId:qualified-string-id-11",
     "stringId" : "unqualified-string-id-10",
     "stringId2" : "unqualified-string-id-11"
-  },
-  "stringAbstractTestTypedUntypedInnerEntityMap" : {
+  } ],
+  "stringAbstractTestTypedUntypedInnerEntityMap" : [ {
     "one" : {
       "_type" : "scout.TestTypedUntypedInnerAbsDo",
       "iId" : "scout.FixtureStringId:qualified-string-id-22",
@@ -53,7 +53,7 @@
       "stringId" : "unqualified-string-id-23",
       "stringId2" : "unqualified-string-id-25"
     }
-  },
+  } ],
   "stringDoEntityMap" : {
     "one" : {
       "_type" : "scout.TestTypedUntypedInner",
@@ -61,32 +61,32 @@
       "stringId" : "unqualified-string-id-13"
     }
   },
-  "stringIDataObjectEntityMap" : {
+  "stringIDataObjectEntityMap" : [ {
     "one" : {
       "_type" : "scout.TestTypedUntypedInner",
       "iId" : "scout.FixtureStringId:qualified-string-id-16",
       "stringId" : "unqualified-string-id-17"
     }
-  },
-  "stringIDoEntityMap" : {
+  } ],
+  "stringIDoEntityMap" : [ {
     "one" : {
       "_type" : "scout.TestTypedUntypedInner",
       "iId" : "scout.FixtureStringId:qualified-string-id-14",
       "stringId" : "unqualified-string-id-15"
     }
-  },
-  "stringITestTypedUntypedInnerDataObjectEntityMap" : {
+  } ],
+  "stringITestTypedUntypedInnerDataObjectEntityMap" : [ {
     "one" : {
       "_type" : "scout.TestTypedUntypedInnerDataObjectIfc",
       "iId" : "scout.FixtureStringId:qualified-string-id-20",
       "stringId" : "unqualified-string-id-21"
     }
-  },
-  "stringITestTypedUntypedInnerEntityMap" : {
+  } ],
+  "stringITestTypedUntypedInnerEntityMap" : [ {
     "one" : {
       "_type" : "scout.TestTypedUntypedInnerIfc",
       "iId" : "scout.FixtureStringId:qualified-string-id-18",
       "stringId" : "unqualified-string-id-19"
     }
-  }
+  } ]
 }

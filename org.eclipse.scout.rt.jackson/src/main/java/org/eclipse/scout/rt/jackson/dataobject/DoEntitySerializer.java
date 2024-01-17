@@ -121,15 +121,9 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
       gen.writeObjectField(attributeName, obj);
     }
     else {
-      Optional<AttributeType> attributeType = getAttributeType(attributeName);
-      if (attributeType.isPresent()
-          && (!m_context.isLenientMode() || attributeType.get().getJavaType().isTypeOrSuperTypeOf(obj.getClass()))
-          && !(attributeType.get().getJavaType().isTypeOrSubTypeOf(IDataObject.class))) {
-        // Use serialization by typed attribute if:
-        // (1) an attribute type is present
-        // (2) if lenient mode, only if attribute type matches (data object might have an invalid structure, e.g. string instead of an enum if deserialized lenient)
-        // (3) if attribute type is not a data object type (favor value based serialization for attributes declared as data object or subclasses/subinterfaces)
-        serializeTypedAttribute(attributeName, obj, gen, provider, attributeType.get().getJavaType());
+      JavaType declaredAttributeType = getAttributeType(attributeName).map(AttributeType::getJavaType).orElse(null);
+      if (isSerializeByDeclaredType(declaredAttributeType, obj.getClass())) {
+        serializeTypedAttribute(attributeName, obj, gen, provider, declaredAttributeType);
       }
       else {
         // use serialization by value
@@ -190,18 +184,40 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
 
       // serialize map value
       Object value = entry.getValue();
-      if (valueSerializer == null || value == null || (m_context.isLenientMode() && !valueType.isTypeOrSuperTypeOf(value.getClass()))) {
-        // use serialization by value either:
-        // - if no type information is available (value serializer is null)
-        // - if value is null (JsonSerializer#serializer must not be called will a null value)
-        // - if lenient mode and declared value type is not equals/not a super type of the given value
-        gen.writeObject(value);
+      if (valueSerializer != null && value != null && isSerializeByDeclaredType(valueType, value.getClass())) {
+        // Use serialization by typed attribute if:
+        // (1) a value serializer and a value is available
+        // (2) if attribute value type eligible for typed serialization
+        valueSerializer.serialize(value, gen, provider);
       }
       else {
-        valueSerializer.serialize(value, gen, provider);
+        gen.writeObject(value);
       }
     }
     gen.writeEndObject();
+  }
+
+  /**
+   * Checks if serialization according to declared type should be used. Conditions are:
+   * <ul>
+   * <li>Declared attribute type is available (e.g. attribute is not part of an untyped DoEntity</li>
+   * <li>If lenient mode: Only if attribute type matches the declared attribute type (data object might have an invalid
+   * structure, e.g. string instead of an enum if deserialized lenient)</li>
+   * <li>Attribute type is not a data object type or subclass/subinterface (favor value based serialization for
+   * attributes declared as data object or subclasses/subinterfaces)</li>
+   * </ul>
+   * <br>
+   * NOTE: If this method is changed, check the similar statement in
+   * org.eclipse.scout.rt.jackson.dataobject.DoCollectionSerializer#serializeList(java.lang.Iterable,
+   * com.fasterxml.jackson.core.JsonGenerator, com.fasterxml.jackson.databind.SerializerProvider)
+   *
+   * @return {@code true} if for given {@code declaredAttributeType} and given {@code attributeType} serialization using
+   * the declared type should be used. Returns {@code false} otherwise.
+   */
+  protected boolean isSerializeByDeclaredType(JavaType declaredAttributeType, Class<?> attributeType) {
+    return declaredAttributeType != null
+        && (!m_context.isLenientMode() || declaredAttributeType.isTypeOrSuperTypeOf(attributeType))
+        && !(declaredAttributeType.isTypeOrSubTypeOf(IDataObject.class));
   }
 
   /**

@@ -1,0 +1,30 @@
+{
+  "_type" : "TestCollectionsIDoEntity",
+  "doEntityAttribute" : {
+    "id" : "foo"
+  },
+  "doEntityCollectionAttribute" : [ {
+    "id" : "foo"
+  }, {
+    "id" : "bar"
+  }, {
+    "_type" : "TestWithoutTypeNameSubclassWithTypename",
+    "id" : "baz"
+  } ],
+  "doEntityDoListAttribute" : [ {
+    "id" : "foo"
+  }, {
+    "id" : "bar"
+  }, {
+    "_type" : "TestWithoutTypeNameSubclassWithTypename",
+    "id" : "baz"
+  } ],
+  "doEntityListAttribute" : [ {
+    "id" : "foo"
+  }, {
+    "id" : "bar"
+  }, {
+    "_type" : "TestWithoutTypeNameSubclassWithTypename",
+    "id" : "baz"
+  } ]
+}

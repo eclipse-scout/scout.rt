@@ -54,6 +54,10 @@ public class TestMapDo extends DoEntity {
     return doValue("stringIDoEntityMapAttribute");
   }
 
+  public DoValue<Map<String, DoEntity>> stringDoEntityMapAttribute() {
+    return doValue("stringDoEntityMapAttribute");
+  }
+
   public DoValue<IDoEntity> iDoEntityAttribute() {
     return doValue("iDoEntityAttribute");
   }
@@ -150,6 +154,17 @@ public class TestMapDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<String, IDoEntity> getStringIDoEntityMapAttribute() {
     return stringIDoEntityMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withStringDoEntityMapAttribute(Map<String, DoEntity> stringDoEntityMapAttribute) {
+    stringDoEntityMapAttribute().set(stringDoEntityMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, DoEntity> getStringDoEntityMapAttribute() {
+    return stringDoEntityMapAttribute().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
