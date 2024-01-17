@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -31,9 +31,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.StreamUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -943,22 +943,15 @@ public class PropertiesHelper {
     String propertyKey = toPropertyKey(key, namespace).toString();
     String valueFromEnv = lookupEnvironmentVariableValue(propertyKey);
     if (StringUtility.hasText(valueFromEnv)) {
-      IJsonPropertyReader jsonPropertyReader = BEANS.opt(IJsonPropertyReader.class);
-
-      if (jsonPropertyReader == null) {
-        throw new PlatformException("No {} instance found while trying to decode the value of property map '{}' from an environment variable. " +
-            "Make sure to provide an appropriate implementation or unset the respective environment variable.", IJsonPropertyReader.class.getSimpleName(), propertyKey);
-      }
-
       try {
-        Map<String, String> decodedValue = jsonPropertyReader.readJsonPropertyValue(valueFromEnv);
+        Map<String, String> decodedValue = parseJson(valueFromEnv);
 
         for (Entry<String, String> entry : decodedValue.entrySet()) {
           if (entry.getValue() == null) {
             collector.remove(entry.getKey());
           }
           else {
-            collector.put(entry.getKey(), resolve((String) entry.getValue(), PLACEHOLDER_PATTERN));
+            collector.put(entry.getKey(), resolve(entry.getValue(), PLACEHOLDER_PATTERN));
           }
         }
       }
@@ -966,6 +959,74 @@ public class PropertiesHelper {
         throw new IllegalArgumentException(String.format("Error parsing value of property map '%s' as JSON value from an environment variable.", propertyKey), e);
       }
     }
+  }
+
+  /**
+   * This method receives a JSON string and is expected to return a Map holding the JSON's attribute names as keys and
+   * their respective values in their string representation. In addition, <code>null</code> values in the JSON object
+   * must be preserved as Java <code>null</code> values. Values which are JSON objects or arrays must be preserved in
+   * their string representation even though they may be reformatted (e.g. spaces removed as they will still be parsed).<br>
+   * Consumers of this method should catch {@link RuntimeException} in order to handle errors that occur while parsing the
+   * provided String as a JSON object.<br>
+   * Although {@link PropertiesHelper} will never call this method with a <code>null</code> or empty string argument,
+   * implementers are still expected to handle these cases as follows:
+   * <ul>
+   * <li><code>null</code> > <code>null</code></li>
+   * <li>empty string > empty map
+   * </ul>
+   * Calls with a value not representing a JSON map must fail, e.g. arguments such as: a, true, &quot;a&quot;. This is
+   * required to support reading a list property with only a single entry, in which case the reading of the JSON map
+   * must fail to use the fallback instead.
+   * <p>
+   * Example:
+   *
+   * <pre>
+   * {
+   *     "key1": "value1",
+   *     "key2": null,
+   *     "key3": "",
+   *     "key4": 1,
+   *     "key5": "1",
+   *     "key6": true,
+   *     "key7": {"key71": "value71", "key72": "value72", "key73": "value73"},
+   *     "key8": ["value81", "value82", "value83"]
+   * }
+   * </pre>
+   * <p>
+   * must yield the following Map
+   *
+   * <pre>
+   * [
+   *     "key1": "value1",
+   *     "key2": null,
+   *     "key3": "",
+   *     "key4": "1",
+   *     "key5": "1"
+   *     "key6": "true",
+   *     "key7": "{\"key71\": \"value71\", \"key72\": \"value72\", \"key73\": \"value73\"}",
+   *     "key8": "[\"value81\", \"value82\", \"value83\"]"
+   * ]
+   * </pre>
+   *
+   * @param propertyValue
+   *     The JSON string to parse into a {@link Map}. May be <code>null</code> or an empty string.
+   * @throws RuntimeException
+   *     Thrown in case of errors that occur while parsing the provided string as a JSON object (or anything
+   *     else).
+   */
+  protected Map<String, String> parseJson(String propertyValue) {
+    if (propertyValue == null) {
+      return null;
+    }
+    if (!StringUtility.hasText(propertyValue)) {
+      return Collections.emptyMap();
+    }
+
+    JSONObject jsonObject = new JSONObject(propertyValue);
+    return jsonObject.keySet().stream().collect(
+        StreamUtility.toMap(
+            key -> key,
+            key -> jsonObject.isNull(key) ? null : jsonObject.getString(key)));
   }
 
   protected int toListIndex(String mapKey, String requestedKey) {
