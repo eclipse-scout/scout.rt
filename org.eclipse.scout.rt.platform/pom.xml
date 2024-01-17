@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2024 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -39,7 +39,17 @@
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
-   </dependency>
+    </dependency>
+
+    <!--
+    Lightweight JSON parsing module to enable JSON parsing when bean manager is not yet available (during initialization by org.eclipse.scout.rt.platform.config.PropertiesHelper).
+    Regularly it is recommended to use org.eclipse.scout.rt.dataobject and org.eclipse.scout.rt.jackson instead (more sophisticated JSON parsing modules).
+    -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.json</artifactId>
+    </dependency>
+
     <!-- optional logger dependencies -->
 
     <!-- support for java.util.logging to slf4j -->
