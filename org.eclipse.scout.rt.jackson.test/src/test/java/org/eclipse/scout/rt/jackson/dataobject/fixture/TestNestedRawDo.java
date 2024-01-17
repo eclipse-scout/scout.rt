@@ -9,13 +9,15 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import jakarta.annotation.Generated;
+import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
+
+import jakarta.annotation.Generated;
 
 @TypeName("TestNestedRaw")
 public class TestNestedRawDo extends DoEntity {
@@ -54,6 +56,30 @@ public class TestNestedRawDo extends DoEntity {
 
   public DoValue<AbstractTestTypedUntypedInnerDo> abstractTestTypedUntypedInner() {
     return doValue("abstractTestTypedUntypedInner");
+  }
+
+  public DoValue<Map<String, DoEntity>> stringDoEntityMap() {
+    return doValue("stringDoEntityMap");
+  }
+
+  public DoValue<Map<String, IDoEntity>> stringIDoEntityMap() {
+    return doValue("stringIDoEntityMap");
+  }
+
+  public DoValue<Map<String, IDataObject>> stringIDataObjectEntityMap() {
+    return doValue("stringIDataObjectEntityMap");
+  }
+
+  public DoValue<Map<String, ITestTypedUntypedInnerDo>> stringITestTypedUntypedInnerEntityMap() {
+    return doValue("stringITestTypedUntypedInnerEntityMap");
+  }
+
+  public DoValue<Map<String, ITestTypedUntypedInnerDataObjectDo>> stringITestTypedUntypedInnerDataObjectEntityMap() {
+    return doValue("stringITestTypedUntypedInnerDataObjectEntityMap");
+  }
+
+  public DoValue<Map<String, AbstractTestTypedUntypedInnerDo>> stringAbstractTestTypedUntypedInnerEntityMap() {
+    return doValue("stringAbstractTestTypedUntypedInnerEntityMap");
   }
 
   /* **************************************************************************
@@ -157,5 +183,71 @@ public class TestNestedRawDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public AbstractTestTypedUntypedInnerDo getAbstractTestTypedUntypedInner() {
     return abstractTestTypedUntypedInner().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withStringDoEntityMap(Map<String, DoEntity> stringDoEntityMap) {
+    stringDoEntityMap().set(stringDoEntityMap);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, DoEntity> getStringDoEntityMap() {
+    return stringDoEntityMap().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withStringIDoEntityMap(Map<String, IDoEntity> stringIDoEntityMap) {
+    stringIDoEntityMap().set(stringIDoEntityMap);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, IDoEntity> getStringIDoEntityMap() {
+    return stringIDoEntityMap().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withStringIDataObjectEntityMap(Map<String, IDataObject> stringIDataObjectEntityMap) {
+    stringIDataObjectEntityMap().set(stringIDataObjectEntityMap);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, IDataObject> getStringIDataObjectEntityMap() {
+    return stringIDataObjectEntityMap().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withStringITestTypedUntypedInnerEntityMap(Map<String, ITestTypedUntypedInnerDo> stringITestTypedUntypedInnerEntityMap) {
+    stringITestTypedUntypedInnerEntityMap().set(stringITestTypedUntypedInnerEntityMap);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, ITestTypedUntypedInnerDo> getStringITestTypedUntypedInnerEntityMap() {
+    return stringITestTypedUntypedInnerEntityMap().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withStringITestTypedUntypedInnerDataObjectEntityMap(Map<String, ITestTypedUntypedInnerDataObjectDo> stringITestTypedUntypedInnerDataObjectEntityMap) {
+    stringITestTypedUntypedInnerDataObjectEntityMap().set(stringITestTypedUntypedInnerDataObjectEntityMap);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, ITestTypedUntypedInnerDataObjectDo> getStringITestTypedUntypedInnerDataObjectEntityMap() {
+    return stringITestTypedUntypedInnerDataObjectEntityMap().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestNestedRawDo withStringAbstractTestTypedUntypedInnerEntityMap(Map<String, AbstractTestTypedUntypedInnerDo> stringAbstractTestTypedUntypedInnerEntityMap) {
+    stringAbstractTestTypedUntypedInnerEntityMap().set(stringAbstractTestTypedUntypedInnerEntityMap);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, AbstractTestTypedUntypedInnerDo> getStringAbstractTestTypedUntypedInnerEntityMap() {
+    return stringAbstractTestTypedUntypedInnerEntityMap().get();
   }
 }
