@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 
 /**
- * Jackson {@link AnnotationIntrospector} implementation adding type resolver for all {@link IDoEntity} data object
+ * Jackson {@link AnnotationIntrospector} implementation adding type resolver for all {@link IDataObject} data object
  * instances.
  */
 @Bean
@@ -40,7 +40,7 @@ public class DataObjectAnnotationIntrospector extends JacksonAnnotationIntrospec
 
   @Override
   public TypeResolverBuilder<?> findTypeResolver(MapperConfig<?> config, AnnotatedClass ac, JavaType baseType) {
-    if (IDoEntity.class.isAssignableFrom(ac.getRawType())) {
+    if (IDataObject.class.isAssignableFrom(ac.getRawType())) {
       if (m_moduleContext.isSuppressTypeAttribute()) {
         return StdTypeResolverBuilder.noTypeInfoBuilder();
       }

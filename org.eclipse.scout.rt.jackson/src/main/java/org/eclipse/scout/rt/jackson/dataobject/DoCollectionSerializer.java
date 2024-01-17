@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoSet;
+import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
@@ -79,15 +80,20 @@ public class DoCollectionSerializer<COLLECTION extends Iterable<?>> extends StdS
     gen.writeStartArray();
     gen.setCurrentValue(value);
     for (Object item : value) {
-      if (serializer == null || item == null || (m_context.isLenientMode() && !listElementType.isTypeOrSuperTypeOf(item.getClass()))) {
-        // Use value-based serialization either:
-        // - if no type information on data object entity class is available for given attribute (serializer is null)
-        // - if item value is null (JsonSerializer#serializer must not be called will a null value)
-        // - if lenient mode and declared list element type is not equals/not a super type of the given item value
-        gen.writeObject(item);
+      // NOTE: If this statement is changed, check the similar statement in org.eclipse.scout.rt.jackson.dataobject.DoEntitySerializer.isSerializeByDeclaredType
+      if (serializer != null
+          && item != null
+          && (!m_context.isLenientMode() || listElementType.isTypeOrSuperTypeOf(item.getClass()))
+          && !(listElementType.isTypeOrSubTypeOf(IDataObject.class))) {
+        // Use serialization by typed attribute:
+        // (1) if type information on data object entity class is available for given attribute (e.g. serializer is not null)
+        // (2) if lenient mode, only if attribute type matches (data object might have an invalid structure, e.g. string instead of an enum if deserialized lenient)
+        // (3) if attribute type is not a data object type (favor value based serialization for attributes declared as data object or subclasses/subinterfaces)
+        serializer.serialize(item, gen, provider);
       }
       else {
-        serializer.serialize(item, gen, provider);
+        // use serialization by value in other cases
+        gen.writeObject(item);
       }
     }
     gen.writeEndArray();
