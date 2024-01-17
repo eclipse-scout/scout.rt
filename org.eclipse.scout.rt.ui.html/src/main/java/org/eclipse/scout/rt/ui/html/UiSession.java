@@ -739,7 +739,7 @@ public class UiSession implements IUiSession {
   public JSONObject processJsonRequest(final HttpServletRequest servletRequest, final HttpServletResponse servletResponse, final JsonRequest jsonRequest) {
     if (isAlreadyProcessed(jsonRequest)) {
       JSONObject response = m_responseHistory.getResponseForRequest(jsonRequest.getSequenceNo());
-      LOG.debug("Request #{} was already processed. Sending back response from history.", jsonRequest.getSequenceNo());
+      LOG.info("Request #{} was already processed. Sending back response from history.", jsonRequest.getSequenceNo());
       return response;
     }
 
@@ -970,7 +970,9 @@ public class UiSession implements IUiSession {
       links.forEach(array::put);
       json.put("links", array);
     }
-    LOG.debug("Uploaded " + links.size() + " resources. Returning links to resource=" + json);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Uploaded " + links.size() + " resources. Returning links to resource=" + json);
+    }
     return json;
   }
 

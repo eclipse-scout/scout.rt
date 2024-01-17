@@ -183,7 +183,13 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       // because the poller-induced "heart beat" mechanism would stop. Therefore, if the lock cannot be acquired,
       // an empty response is sent back to the UI.
       if (!uiSession.uiSessionLock().tryLock()) {
-        writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createEmptyResponse());
+        if (uiSession.isDisposed()) {
+          handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
+        }
+        else {
+          LOG.info("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
+          writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createEmptyResponse());
+        }
         return;
       }
     }
@@ -206,6 +212,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   protected void handleEvents(HttpServletRequest req, HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     JSONObject jsonResp = uiSession.processJsonRequest(req, resp, jsonReq);
     if (jsonResp == null) {
+      LOG.info("Creating empty response [{}, #{}, #ACK {}]", "CER_HE", jsonReq.getSequenceNo(), jsonReq.getAckSequenceNo());
       jsonResp = m_jsonRequestHelper.createEmptyResponse();
     }
     writeJsonResponse(resp, jsonResp);
@@ -353,12 +360,13 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     // The "sync" request needs to acquire the UI session lock. If a request is still executing,
     // this will cause the "sync" request to block. It is important to wait for the other request
     // to finish, because we don't know if that request is still "connected" to a response channel.
-    // If it is not (because the connection was lost in the mean time), we would miss it's response.
+    // If it is not (because the connection was lost in the meantime), we would miss its response.
     final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
     uiSessionLock.lock();
     try {
       JSONObject response = uiSession.processSyncResponseQueueRequest(jsonReq);
       if (response == null) {
+        LOG.info("Creating empty response [{}, #{}, #ACK {}]", "CER_HSRQR", jsonReq.getSequenceNo(), jsonReq.getAckSequenceNo());
         response = m_jsonRequestHelper.createEmptyResponse();
       }
       writeJsonResponse(resp, response);
@@ -373,9 +381,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
 
     final long startNanos = System.nanoTime();
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("JSON request started");
-    }
     LOG.debug("Creating new UI session....");
     IUiSession uiSession = BEANS.get(IUiSession.class);
     uiSession.init(req, resp, jsonStartupReq);
