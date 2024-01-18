@@ -1440,6 +1440,20 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     }
   }
 
+  @Override
+  public void setAllNodesChecked(boolean checked) {
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
+      @Override
+      public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
+        if (element.isChecked() != checked) {
+          setNodeChecked(element, checked);
+        }
+        return TreeVisitResult.CONTINUE;
+      }
+    };
+    visitTree(v);
+  }
+
   /**
    * Recursively checks/unchecks the subtree of <code>parent</code>.
    */

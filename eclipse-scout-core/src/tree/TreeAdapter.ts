@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,26 @@ export class TreeAdapter extends ModelAdapter {
   constructor() {
     super();
     this._addRemoteProperties(['displayStyle']);
+  }
+
+  override _postCreateWidget() {
+    super._postCreateWidget();
+    this._autoCheckChildNodes();
+  }
+
+  protected _autoCheckChildNodes() {
+    if (!this.widget.autoCheckChildren) {
+      return;
+    }
+
+    // When the Java model provides a checked parent node having non-checked child nodes
+    // then we want the child nodes to be auto checked.
+    Tree.visitNodes((node: TreeNode, parentNode: TreeNode) => {
+      if (node.checked) {
+        this.widget.checkNodes(node, {checked: true});
+        return true; // Skip subtree
+      }
+    }, this.widget.nodes, null);
   }
 
   protected _sendNodesSelected(nodeIds: string[], debounceSend: boolean) {
@@ -269,6 +289,15 @@ export class TreeAdapter extends ModelAdapter {
     return 'TreeNode';
   }
 
+  protected static _updateMarkChildrenCheckedRemote(this: Tree & { modelAdapter: TreeAdapter; _updateMarkChildrenCheckedOrig }, node: TreeNode) {
+    // In autoCheckChildren mode, don't change the checked state of parent nodes while the tree is initializing if nodes come from Java.
+    // This is necessary to set the checked state of the child nodes correctly, see _autoCheckChildNodes.
+    if (this.modelAdapter && this.autoCheckChildren && !this.initialized) {
+      return;
+    }
+    return this._updateMarkChildrenCheckedOrig(node);
+  }
+
   /**
    * 'this' in this function refers to the Tree
    */
@@ -288,6 +317,7 @@ export class TreeAdapter extends ModelAdapter {
     }
 
     objects.replacePrototypeFunction(Tree, '_createTreeNode', TreeAdapter._createTreeNodeRemote, true);
+    objects.replacePrototypeFunction(Tree, '_updateMarkChildrenChecked', TreeAdapter._updateMarkChildrenCheckedRemote, true);
   }
 }
 
