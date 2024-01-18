@@ -21,7 +21,19 @@ export class TreeAdapter extends ModelAdapter {
   }
 
   override _postCreateWidget() {
-    this.widget._postInitNodes();
+    super._postCreateWidget();
+    if (!this.widget.autoCheckChildren) {
+      return;
+    }
+
+    // When the java model provides a parent node, which is checked, having one child node,
+    // which is not checked, then we want the child node to be auto checked.
+    Tree.visitNodes((node: TreeNode, parentNode: TreeNode) => {
+      if (node.checked) {
+        this.widget.checkNodes(node, {checked: true});
+        return true; // Skip subtree
+      }
+    }, this.widget.nodes, null);
   }
 
   protected _sendNodesSelected(nodeIds: string[], debounceSend: boolean) {
@@ -273,6 +285,18 @@ export class TreeAdapter extends ModelAdapter {
     return 'TreeNode';
   }
 
+  protected static _updateMarkChildrenCheckedRemote(this: Tree & { modelAdapter: TreeAdapter; _updateMarkChildrenCheckedOrig }, node: TreeNode) {
+    if (!this.modelAdapter) {
+      return this._updateMarkChildrenCheckedOrig(node);
+    }
+    // When a modelAdapter exists (init of the Widgets comes from the java) and autoCheckChildren is enabled,
+    // do not update the childrenChecked mark. This is because it will get updated in the _postCreateWidget
+    // function of the TreeAdapter.
+    if (this.initialized || !this.autoCheckChildren) {
+      return this._updateMarkChildrenCheckedOrig(node);
+    }
+  }
+
   /**
    * 'this' in this function refers to the Tree
    */
@@ -292,6 +316,7 @@ export class TreeAdapter extends ModelAdapter {
     }
 
     objects.replacePrototypeFunction(Tree, '_createTreeNode', TreeAdapter._createTreeNodeRemote, true);
+    objects.replacePrototypeFunction(Tree, '_updateMarkChildrenChecked', TreeAdapter._updateMarkChildrenCheckedRemote, true);
   }
 }
 

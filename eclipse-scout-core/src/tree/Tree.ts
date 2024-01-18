@@ -301,19 +301,6 @@ export class Tree extends Widget implements TreeModel {
   }
 
   /**
-   * @internal
-   */
-  _postInitNodes() {
-    Tree.visitNodes((node: TreeNode, parentNode: TreeNode) => {
-      // Check all children, in when autoCheckChildren is true
-      if (node.checked && this.autoCheckChildren) {
-        this.checkNodes(node.childNodes, {checked: true});
-      }
-      this._updateMarkChildrenChecked(node);
-    }, this.nodes, null);
-  }
-
-  /**
    * @param autoCheckChildren
    */
   setAutoCheckChildren(autoCheckChildren: boolean) {
@@ -381,10 +368,7 @@ export class Tree extends Widget implements TreeModel {
       this.checkedNodes.push(node);
     }
     this._initTreeNodeInternal(node, parentNode);
-    if (this.initialized) {
-      // Only execute, when Tree has already been initialized
-      this._updateMarkChildrenChecked(node);
-    }
+    this._updateMarkChildrenChecked(node);
     node.initialized = true;
   }
 
