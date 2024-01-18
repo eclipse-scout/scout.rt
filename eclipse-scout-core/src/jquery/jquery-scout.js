@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1504,6 +1504,20 @@ $.fn.onPassive = function(eventType, handler) {
 $.fn.offPassive = function(eventType, handler) {
   let options = events.passiveOptions();
   this[0].removeEventListener(eventType, handler, options);
+  return this;
+};
+
+/**
+ * Focuses the element if it is focusable.
+ *
+ * The focus function of jQuery triggers a focus event instead of focusing the element (since 3.7.1 even if the element is not focusable).
+ * Because that is not the expected behavior, this replacement calls the native focus function.
+ */
+$.fn.focus = function() {
+  if (this.length === 0) {
+    return this;
+  }
+  this[0].focus();
   return this;
 };
 
