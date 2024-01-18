@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -549,6 +549,11 @@ declare global {
      * @returns true if the current element has the class 'selected', false if not.
      */
     isSelected(): boolean;
+
+    /**
+     * Focuses the element if it is focusable.
+     */
+    focus(): this;
 
     /**
      * Toggles the class 'disabled'. Also toggles 'disabled' attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
