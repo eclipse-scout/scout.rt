@@ -320,7 +320,7 @@ describe('TreeAdapter', () => {
     });
 
     const getNodesOfLastEventAjaxCall = (eventIndex = 0, request?: JasmineAjaxRequest) => {
-      return getLastEvents(request)[eventIndex].nodes as { nodeId: string, checked: boolean }[];
+      return getLastEvents(request)[eventIndex].nodes as { nodeId: string; checked: boolean }[];
     };
 
     const getLastEvents = (request = jasmine.Ajax.requests.mostRecent()): RemoteEvent[] => {

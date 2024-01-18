@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.testing.platform.runner;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -93,6 +93,20 @@ public class JUnitExceptionHandlerTest {
     finally {
       Platform.get().getBeanManager().unregisterBean(customExceptionHandler);
     }
+  }
+
+  @Test
+  public void testIgnoreExceptionOnceCorrectType() throws Exception {
+    JUnitExceptionHandler exceptionHandler = BEANS.get(JUnitExceptionHandler.class);
+    exceptionHandler.ignoreExceptionOnce(TestException1.class, () -> exceptionHandler.handle(new TestException1()));
+    assertTrue(exceptionHandler.getErrors().isEmpty());
+  }
+
+  @Test(expected = TestException1.class)
+  public void testIgnoreExceptionOnceOtherType() throws Exception {
+    JUnitExceptionHandler exceptionHandler = BEANS.get(JUnitExceptionHandler.class);
+    exceptionHandler.ignoreExceptionOnce(TestException2.class, () -> exceptionHandler.handle(new TestException1()));
+    assertEquals(1, exceptionHandler.getErrors().size());
   }
 
   // === Test classes ===
