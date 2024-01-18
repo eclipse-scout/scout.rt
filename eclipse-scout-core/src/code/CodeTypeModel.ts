@@ -7,14 +7,35 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, CodeType, FullModelOf, ObjectModel} from '../index';
+import {Code, CodeType, ModelOf, ObjectModel} from '../index';
 
 export interface CodeTypeModel<TCodeId> extends ObjectModel<CodeType<TCodeId>> {
+  /**
+   * If the Code is loaded from the Scout Java server and the application is running in dev mode, this property stores the Java Code class this code comes from.
+   */
   modelClass?: string;
+  /**
+   * Icon to use for this code.
+   */
   iconId?: string;
+  /**
+   * Specifies if the CodeType is hierarchical. Default is false.
+   */
   hierarchical?: boolean;
+  /**
+   * Specifies the max level of this CodeType. Default is 2147483647.
+   */
   maxLevel?: number;
+  /**
+   * Map of languageTag to the corresponding text in that language.
+   */
   texts?: Record<string, string>;
+  /**
+   * Map of languageTag to the corresponding plural text in that language.
+   */
   textsPlural?: Record<string, string>;
-  codes?: FullModelOf<Code<TCodeId>>[];
+  /**
+   * The root Codes of the CodeType.
+   */
+  codes?: ModelOf<Code<TCodeId>>[];
 }

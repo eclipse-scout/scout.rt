@@ -78,7 +78,7 @@ export class CodeType<TCodeId> implements ObjectWithType {
   }
 
   /**
-   * @param vararg The language tag or the {@link Locale} to load the text for.
+   * @param vararg The language tag or the {@link Locale} to load the plural text for.
    */
   textPlural(vararg: string | Locale): string {
     return this._text(this._textKeyPlural, vararg);
@@ -94,6 +94,11 @@ export class CodeType<TCodeId> implements ObjectWithType {
     return texts.resolveText(key, languageTag);
   }
 
+  /**
+   * Gets the codes of this CodeType.
+   * @param rootOnly true if only the root Codes should be returned. The default value is false.
+   * @return the root Codes of this CodeType if rootOnly is true and all Codes recursively otherwise.
+   */
   codes(rootOnly?: boolean): Code<TCodeId>[] {
     if (!rootOnly) {
       // all codes recursively
@@ -109,12 +114,17 @@ export class CodeType<TCodeId> implements ObjectWithType {
     return rootCodes;
   }
 
+  /**
+   * Gets the Code with given id. All codes recursively are searched.
+   * @param codeId The Code id to search
+   * @return The Code with given id or null.
+   */
   get(codeId: TCodeId): Code<TCodeId> {
     return this.codeMap.get(codeId);
   }
 
   /**
-   * Visits all codes and their children.
+   * Visits all codes and their children recursively.
    * <p>
    * In order to abort visiting, the visitor can return true or TreeVisitResult.TERMINATE.
    * To only abort the visiting of a subtree, the visitor can return SKIP_SUBTREE.

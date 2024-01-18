@@ -34,8 +34,7 @@ describe('codes', () => {
   });
 
   it('can init without data', () => {
-    let emptyRegistry = new Map();
-    codes.registry = emptyRegistry;
+    let emptyRegistry = codes.registry;
     codes.init();
     expect(codes.registry).toBe(emptyRegistry);
   });
@@ -61,14 +60,12 @@ describe('codes', () => {
   });
 
   describe('add', () => {
-    it('adds a code type or an array of code types', () => {
+    it('adds a code type or an array of code types and removes it afterwards', () => {
       let origSize = codes.registry.size;
       let codeType = {
         id: 'codeType.123',
-        objectType: CodeType,
         codes: [{
           id: 'code.123',
-          objectType: Code,
           text: 'a text'
         }]
       };

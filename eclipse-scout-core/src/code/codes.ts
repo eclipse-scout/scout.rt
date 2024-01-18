@@ -16,8 +16,14 @@ export const codes = {
    */
   defaultLanguage: 'en',
 
+  /**
+   * Map of Code id to Code instance. Do not access directly. Instead, use {@link codes.get}.
+   */
   registry: new Map<string /* CodeType.id */, CodeType<any>>,
 
+  /**
+   * Initialize the code type map with the result of the given REST url.
+   */
   bootstrap(url: string): JQuery.Promise<any> {
     let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise({});
     return promise.then(codes._preInit.bind(this, url));
@@ -38,24 +44,33 @@ export const codes = {
     codes.init(data);
   },
 
+  /**
+   * Adds all given CodeType models to the registry. The registry is not cleaned but existing entries with the same ids are overwritten.
+   */
   init(data?: ModelOf<CodeType<any>>[]) {
     codes.add(data);
   },
 
+  /**
+   * Adds the given CodeType models to the registry. Existing entries with the same ids are overwritten.
+   * @return The registered CodeType instances.
+   */
   add(codeTypes: ObjectOrModel<CodeType<any>> | ObjectOrModel<CodeType<any>>[]): CodeType<any>[] {
-    let createdCodeTypes = [];
+    let registeredCodeTypes = [];
     arrays.ensure(codeTypes).forEach(codeTypeOrModel => {
       let codeType = CodeType.ensure(codeTypeOrModel);
       if (codeType && codeType.id) {
         codes.registry.set(codeType.id, codeType);
-        createdCodeTypes.push(codeType);
+        registeredCodeTypes.push(codeType);
       }
     });
-    return createdCodeTypes;
+    return registeredCodeTypes;
   },
 
   /**
-   * @param codeTypes code types or code type ids to remove
+   * Removes the given CodeTypes from the registry.
+   *
+   * @param codeTypes code types or code type ids to remove.
    */
   remove(codeTypes: string | CodeType<any> | (string | CodeType<any>)[]) {
     arrays.ensure(codeTypes)
@@ -63,6 +78,11 @@ export const codes = {
       .forEach(id => codes.registry.delete(id));
   },
 
+  /**
+   * Gets the CodeType with given id or Class.
+   * @param codeTypeIdOrClassRef The CodeType id or Class
+   * @return The CodeType instance or undefined if not found.
+   */
   get<T extends CodeType<any>>(codeTypeIdOrClassRef: string | (new() => T)): T {
     if (typeof codeTypeIdOrClassRef === 'string') {
       return codes.registry.get(codeTypeIdOrClassRef) as T;
@@ -77,12 +97,11 @@ export const codes = {
   },
 
   /**
-   * Registers texts for a code. It uses the method generateTextKey to generate the text key.
+   * Registers texts for a code.
    * The texts for the default locale specified by defaultLanguage are used as default texts.
    *
    * @param key the text key under which the given textsArg map will be registered.
    * @param textsArg an object with the languageTag as key and the translated text as value
-   * @returns the generated text key for the given object.
    */
   registerTexts(key: string, textsArg: Record<string, string>) {
     // In case of changed defaultLanguage clear the 'default' entry

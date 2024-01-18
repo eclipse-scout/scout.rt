@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CodeModel, codes, CodeType, FullModelOf, InitModelOf, Locale, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
+import {CodeModel, codes, CodeType, FullModelOf, InitModelOf, Locale, ModelOf, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
 export class Code<TCodeId> implements ObjectWithType {
   declare model: CodeModel<TCodeId>;
@@ -101,6 +101,8 @@ export class Code<TCodeId> implements ObjectWithType {
   }
 
   /**
+   * Gets the text of this Code in the given language.
+   *
    * @param vararg The language tag or the {@link Locale} to load the text for.
    */
   text(vararg: string | Locale): string {
@@ -113,6 +115,9 @@ export class Code<TCodeId> implements ObjectWithType {
     return texts.resolveText(this._text, languageTag);
   }
 
+  /**
+   * Visits all children of this Code recursively without visiting this Code itself.
+   */
   visitChildren(visitor: TreeVisitor<Code<TCodeId>>): boolean | TreeVisitResult {
     for (let i = 0; i < this.children.length; i++) {
       let child = this.children[i];
@@ -129,7 +134,7 @@ export class Code<TCodeId> implements ObjectWithType {
     }
   }
 
-  static ensure<TCodeId>(code: CodeModel<TCodeId> | Code<TCodeId>): Code<TCodeId> {
+  static ensure<TCodeId>(code: ModelOf<Code<TCodeId>> | Code<TCodeId>): Code<TCodeId> {
     if (!code) {
       return null;
     }

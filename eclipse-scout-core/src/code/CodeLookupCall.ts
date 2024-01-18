@@ -62,6 +62,14 @@ export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
     }
     return scout.create(LookupRow, {
       key: code.id,
+      foregroundColor: code.foregroundColor,
+      backgroundColor: code.backgroundColor,
+      active: code.active,
+      enabled: code.enabled,
+      cssClass: code.cssClass,
+      font: code.font,
+      iconId: code.iconId,
+      tooltipText: code.tooltipText,
       text: code.text(this.session.locale),
       parentKey: code.parent && code.parent.id
     }) as LookupRow<TCodeId>;

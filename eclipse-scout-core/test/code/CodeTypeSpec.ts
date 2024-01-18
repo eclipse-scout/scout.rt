@@ -34,14 +34,19 @@ describe('CodeType', () => {
         objectType: Code,
         children: [{
           id: 'code11',
-          objectType: Code
+          objectType: Code,
+          fieldName: 'id' // is ignored as the CodeType already has such a property
         }]
       }, {
         id: 'code2',
-        objectType: Code
+        objectType: Code,
+        active: false,
+        enabled: false,
+        partitionId: 4,
+        sortCode: 3,
+        fieldName: 'iconId'
       }]
-    }
-    ]);
+    }]);
   });
 
   describe('init', () => {
@@ -49,38 +54,57 @@ describe('CodeType', () => {
     it('creates codes and hierarchy', () => {
       let codeType = codes.get('codeType0');
       expect(codeType.codes().length).toBe(7);
+      expect(codeType.id).toBe('codeType0'); // fieldName of code1 must not override an already existing CodeType property value
+      expect(codeType.maxLevel).toBe(2147483647); // default from Scout Classic
+      expect(codeType.hierarchical).toBeFalse();
 
       let code0 = codeType.get('code0');
       expect(code0.children.length).toBe(2);
-      expect(code0.parent).toBe(undefined);
+      expect(code0.parent).toBeUndefined();
+      expect(code0.codeType).toBe(codeType);
+      expect(code0.active).toBeTrue();
+      expect(code0.enabled).toBeTrue();
+      expect(code0.partitionId).toBe(0);
+      expect(code0.sortCode).toBe(-1);
 
       let code01 = codeType.get('code01');
       expect(code01.children.length).toBe(0);
       expect(code0.children[0]).toBe(code01);
       expect(code01.parent).toBe(code0);
+      expect(code01.codeType).toBe(codeType);
 
       let code02 = codeType.get('code02');
       expect(code02.children.length).toBe(1);
       expect(code0.children[1]).toBe(code02);
       expect(code02.parent).toBe(code0);
+      expect(code02.codeType).toBe(codeType);
 
       let code021 = codeType.get('code021');
       expect(code021.children.length).toBe(0);
       expect(code02.children[0]).toBe(code021);
       expect(code021.parent).toBe(code02);
+      expect(code021.codeType).toBe(codeType);
 
       let code1 = codeType.get('code1');
       expect(code1.parent).toBe(undefined);
       expect(code1.children.length).toBe(1);
+      expect(code1.codeType).toBe(codeType);
 
       let code11 = codeType.get('code11');
       expect(code11.children.length).toBe(0);
       expect(code1.children[0]).toBe(code11);
       expect(code11.parent).toBe(code1);
+      expect(code11.codeType).toBe(codeType);
 
       let code2 = codeType.get('code2');
       expect(code2.parent).toBe(undefined);
       expect(code2.children.length).toBe(0);
+      expect(code2.codeType).toBe(codeType);
+      expect(code2.active).toBeFalse();
+      expect(code2.enabled).toBeFalse();
+      expect(code2.partitionId).toBe(4);
+      expect(code2.sortCode).toBe(3);
+      expect(codeType.iconId as any).toBe(code2); // fieldName is used and written, as this field exists and is falsy.
     });
   });
 
@@ -106,6 +130,7 @@ describe('CodeType', () => {
     it('returns root codes', () => {
       let codeType = codes.get('codeType0');
       let codeArr = codeType.codes(true);
+      expect(codeArr.length).toBe(3);
       expect(codeArr[0]).toBe(codeType.get('code0'));
       expect(codeArr[1]).toBe(codeType.get('code1'));
       expect(codeArr[2]).toBe(codeType.get('code2'));
