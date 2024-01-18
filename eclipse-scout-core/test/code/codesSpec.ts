@@ -34,7 +34,8 @@ describe('codes', () => {
   });
 
   it('can init without data', () => {
-    let emptyRegistry = codes.registry;
+    let emptyRegistry = new Map();
+    codes.registry = emptyRegistry;
     codes.init();
     expect(codes.registry).toBe(emptyRegistry);
   });
