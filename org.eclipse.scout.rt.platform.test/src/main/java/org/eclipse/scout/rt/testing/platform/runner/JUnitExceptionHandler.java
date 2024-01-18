@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.testing.platform.runner;
 
+import static java.util.function.Predicate.not;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,5 +75,25 @@ public class JUnitExceptionHandler extends ExceptionHandler {
     final Throwable throwable = m_errors.get(0);
     m_errors.clear();
     throw throwable;
+  }
+
+  /**
+   * Ignores a specified {@link Throwable} (or a subclass of it) once regarding this exception handler exception memory.
+   * This method only removes an instance of the specified {@link Throwable} once from the error list, see
+   * {@link #getErrors()}. If {@link Throwable} is thrown by the specified {@link IRunnable} it is not catched by this
+   * method.
+   */
+  public void ignoreExceptionOnce(Class<? extends Throwable> throwableToBeIgnored, IRunnable runnable) throws Exception {
+    ArrayList<Throwable> previousErrors = new ArrayList<>(m_errors);
+    try {
+      runnable.run();
+    }
+    finally {
+      m_errors.stream()
+          .filter(throwableToBeIgnored::isInstance)
+          .filter(not(previousErrors::contains))
+          .findFirst()
+          .ifPresent(m_errors::remove);
+    }
   }
 }
