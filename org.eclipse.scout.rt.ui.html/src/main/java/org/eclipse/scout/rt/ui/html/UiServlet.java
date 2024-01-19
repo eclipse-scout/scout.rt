@@ -21,8 +21,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
@@ -43,9 +41,7 @@ import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -93,42 +89,6 @@ public class UiServlet extends AbstractHttpServlet {
         .withLocale(getPreferredLocale(req))
         .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId())
         .withUserAgent(userAgent);
-  }
-
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    checkSessionCookieConfig(config.getServletContext().getSessionCookieConfig());
-  }
-
-  @SuppressWarnings("bsiRulesDefinition:htmlInString")
-  protected void checkSessionCookieConfig(SessionCookieConfig sessionCookieConfig) throws ServletException {
-    if (sessionCookieConfig == null) {
-      LOG.warn("Cannot validate the configuration of the session cookie!");
-      return;
-    }
-
-    boolean checkSessionCookieSecureFlag = CONFIG.getPropertyValue(CheckSessionCookieSecureFlagProperty.class).booleanValue();
-    boolean secureFlagOk = !checkSessionCookieSecureFlag || sessionCookieConfig.isSecure();
-    boolean isValid = true;
-    if (!sessionCookieConfig.isHttpOnly()) {
-      LOG.error("'HttpOnly' flag has not been set on session cookie. Enable the flag via property 'scout.app.sessionCookieConfigHttpOnly' or in your web.xml (<session-config>...<cookie-config>...<http-only>true</http-only>...</cookie-config>...</session-config>)");
-      isValid = false;
-    }
-
-    if (!secureFlagOk) {
-      LOG.error("'Secure' flag has not been set on session cookie. Enable the flag via property `scout.app.sessionCookieConfigSecure` or in your web.xml "
-          + "(<session-config>...<cookie-config>...<secure>true</secure>...</cookie-config>...</session-config>)"
-          + " or disable the 'Secure' flag check using property '{}=false' if no encrypted channel (https) to the end user is used.", BEANS.get(CheckSessionCookieSecureFlagProperty.class).getKey());
-      isValid = false;
-    }
-
-    if (!isValid) {
-      // don't give detailed error message to clients!
-      ServletException ex = new ServletException("Internal Server Error. See server log for details.");
-      ex.setStackTrace(new StackTraceElement[]{});
-      throw ex;
-    }
   }
 
   protected Locale getPreferredLocale(HttpServletRequest req) {
@@ -282,26 +242,5 @@ public class UiServlet extends AbstractHttpServlet {
     // No handler was able to handle the request
     LOG.info("404_NOT_FOUND: {} {}", req.getMethod(), req.getPathInfo());
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-  }
-
-  public static class CheckSessionCookieSecureFlagProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.auth.cookieSessionValidateSecure";
-    }
-
-    @Override
-    public String description() {
-      return "Specifies if the UI server should ensure a secure cookie configuration of the webapp.\n"
-          + "If enabled the application validates that the 'httpOnly' and 'Secure' flags are set in the cookie configuration.\n"
-          + "This property should be disabled if no secure connection (https) is used to the client browser (not recommended).\n"
-          + "The default value is true.";
-    }
-
-    @Override
-    public Boolean getDefaultValue() {
-      return Boolean.TRUE;
-    }
   }
 }
