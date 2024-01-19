@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,7 +35,7 @@ class CalendarsPanelTree extends Tree {
     super();
 
     this._scrollDirections = 'y';
-    this.autoCheckStyle = Tree.AutoCheckStyle.SYNCH_CHILD_AND_PARENT_STATE;
+    this.autoCheckChildren = true;
   }
 
   override insertNode(node: ObjectOrModel<CalendarsPanelTreeNode>, parentNode?: CalendarsPanelTreeNode, index?: number) {
