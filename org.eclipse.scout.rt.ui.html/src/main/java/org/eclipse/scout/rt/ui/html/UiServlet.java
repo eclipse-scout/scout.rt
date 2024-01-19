@@ -18,12 +18,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.security.auth.Subject;
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.SessionCookieConfig;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -48,6 +42,13 @@ import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Instances of this class must be registered as global handler for "/*".
@@ -111,12 +112,12 @@ public class UiServlet extends AbstractHttpServlet {
     boolean secureFlagOk = !checkSessionCookieSecureFlag || sessionCookieConfig.isSecure();
     boolean isValid = true;
     if (!sessionCookieConfig.isHttpOnly()) {
-      LOG.error("'HttpOnly' flag has not been set on session cookie. Enable the flag in your web.xml (<session-config>...<cookie-config>...<http-only>true</http-only>...</cookie-config>...</session-config>)");
+      LOG.error("'HttpOnly' flag has not been set on session cookie. Enable the flag via property 'scout.app.sessionCookieConfigHttpOnly' or in your web.xml (<session-config>...<cookie-config>...<http-only>true</http-only>...</cookie-config>...</session-config>)");
       isValid = false;
     }
 
     if (!secureFlagOk) {
-      LOG.error("'Secure' flag has not been set on session cookie. Enable the flag in your web.xml "
+      LOG.error("'Secure' flag has not been set on session cookie. Enable the flag via property `scout.app.sessionCookieConfigSecure` or in your web.xml "
           + "(<session-config>...<cookie-config>...<secure>true</secure>...</cookie-config>...</session-config>)"
           + " or disable the 'Secure' flag check using property '{}=false' if no encrypted channel (https) to the end user is used.", BEANS.get(CheckSessionCookieSecureFlagProperty.class).getKey());
       isValid = false;
@@ -293,7 +294,7 @@ public class UiServlet extends AbstractHttpServlet {
     @Override
     public String description() {
       return "Specifies if the UI server should ensure a secure cookie configuration of the webapp.\n"
-          + "If enabled the application validates that the 'httpOnly' and 'Secure' flags are set in the cookie configuration in the web.xml.\n"
+          + "If enabled the application validates that the 'httpOnly' and 'Secure' flags are set in the cookie configuration.\n"
           + "This property should be disabled if no secure connection (https) is used to the client browser (not recommended).\n"
           + "The default value is true.";
     }

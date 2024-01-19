@@ -11,18 +11,19 @@ package org.eclipse.scout.rt.server.commons;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpSessionEvent;
-import jakarta.servlet.http.HttpSessionListener;
-
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
+
 /**
  * Provides a mutex for {@link HttpSession}s to synchronize on.
  * <p>
- * This class should be registered as listener in the {@code web.xml} to create a mutex for each session.
+ * This class should be registered as listener via {@link org.eclipse.scout.rt.jetty.IServletFilterContributor} or in
+ * the {@code web.xml} to create a mutex for each session.
  * <p>
  * This class should not be instanced by clients!
  */
@@ -35,7 +36,8 @@ public final class HttpSessionMutex implements HttpSessionListener {
   /**
    * Initializes the given {@link HttpSession} with a session mutex.
    * <p>
-   * This method can be called by registering this class as {@link HttpSessionListener} in the {@code web.xml}.
+   * This method can be called by registering this class as {@link HttpSessionListener} via
+   * {@link org.eclipse.scout.rt.jetty.IServletFilterContributor} or in the {@code web.xml}.
    * <p>
    * Please note that some containers in some special conditions do not call the session listener on newly created
    * sessions.
@@ -57,7 +59,8 @@ public final class HttpSessionMutex implements HttpSessionListener {
    * Gets the mutex for the given {@link HttpSession} to synchronize on.
    * <p>
    * Returns the session mutex object ({@link #SESSION_MUTEX_ATTRIBUTE_NAME}) if available. To make this mutex object
-   * available register the class {@link HttpSessionMutex} as listener in the {@code web.xml}.
+   * available register the class {@link HttpSessionMutex} as listener via
+   * {@link org.eclipse.scout.rt.jetty.IServletFilterContributor} or in the {@code web.xml}.
    * <p>
    * If no mutex object is available, the {@link HttpSession} itself is returned as mutex. This is valid for many cases
    * and servlet containers.
@@ -83,7 +86,7 @@ public final class HttpSessionMutex implements HttpSessionListener {
     if (mutex != null) {
       return mutex;
     }
-    LOG.info("Session without mutex: {}. Consider registering {} as listener in the web.xml", httpSession.getId(), HttpSessionMutex.class, new Exception("origin"));
+    LOG.info("Session without mutex: {}. Consider registering {} as listener via org.eclipse.scout.rt.jetty.IServletFilterContributor or in the web.xml", httpSession.getId(), HttpSessionMutex.class, new Exception("origin"));
     return httpSession;
   }
 

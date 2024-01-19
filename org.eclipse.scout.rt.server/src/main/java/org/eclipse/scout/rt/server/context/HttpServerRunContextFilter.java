@@ -11,6 +11,12 @@ package org.eclipse.scout.rt.server.context;
 
 import java.io.IOException;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.commons.context.HttpRunContextFilter;
+import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -20,12 +26,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.commons.context.HttpRunContextFilter;
-import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
-
 /**
  * A {@link Filter} that creates a {@link ServerRunContext}.
  * <p>
@@ -33,6 +33,19 @@ import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
  * If {@code true}, the Scout server session will be stored on the HTTP session and will be automatically stopped and
  * removed if the HTTP session is invalidated. This means if session support is enabled a cookie capable HTTP client is
  * required! Furthermore a class implementing {@link IServerSession} must be present on the class-path.
+ * <p>
+ * Example of a registration via {@link org.eclipse.scout.rt.jetty.IServletFilterContributor}:
+ *
+ * <pre>
+ * public static class ApiServerRunContextFilterContributor implements IServletFilterContributor {
+ *
+ *   &#064;Override
+ *   public void contribute(ServletContextHandler handler) {
+ *     FilterHolder filter = handler.addFilter(HttpServerRunContextFilter.class, "/api/*", null);
+ *     filter.setInitParameter("session", "false");
+ *   }
+ * }
+ * </pre>
  * <p>
  * Example config for the web.xml:
  *
