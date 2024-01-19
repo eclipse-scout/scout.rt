@@ -78,8 +78,7 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
 
     this._valueSyncing = true;
     let opts = {
-      checkOnlyEnabled: false,
-      checkChildren: this.tree.autoCheckChildren
+      checkOnlyEnabled: false
     };
     try {
       if (arrays.empty(newValue)) {
@@ -103,7 +102,7 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
     } finally {
       this._valueSyncing = false;
     }
-    if (opts.checkChildren) {
+    if (this.tree.autoCheckChildren) {
       // The value can change because of parent nodes checking their children
       this._syncTreeToValue();
     }

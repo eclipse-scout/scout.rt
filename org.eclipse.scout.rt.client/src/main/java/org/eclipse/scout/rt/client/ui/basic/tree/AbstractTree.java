@@ -1441,6 +1441,16 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
+  public void checkAllNodes() {
+    setAllNodesChecked(true);
+  }
+
+  @Override
+  public void uncheckAllNodes() {
+    setAllNodesChecked(false);
+  }
+
+  @Override
   public void setAllNodesChecked(boolean checked) {
     IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
       @Override
@@ -2761,7 +2771,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
           setTreeChanging(true);
           nodes = resolveNodes(nodes);
           if (!nodes.isEmpty()) {
-            // With isAutoCheckChildNodes() it's possible to check disabled nodes from UI
+            // By checking all children of a disabled node, it is possible to
+            // check a disabled node from UI when autoCheckChildNodes is enabled.
             setNodesChecked(nodes, checked, !isAutoCheckChildNodes());
           }
         }

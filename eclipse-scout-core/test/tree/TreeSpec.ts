@@ -1244,23 +1244,6 @@ describe('Tree', () => {
       expect(checkedNodes.length).toBe(1);
     });
 
-    it('checks children if tree is in autoCheckChildren mode', () => {
-      let model = helper.createModelFixture(2, 2);
-      let tree = helper.createTree(model);
-      tree.multiCheck = true;
-      tree.checkable = true;
-      tree.setAutoCheckChildren(true);
-      tree.render();
-
-      let node = tree.nodes[0];
-      tree.checkNode(node, true);
-      expect(node.checked).toEqual(true);
-      // every descendant needs to be checked
-      Tree.visitNodes(node => {
-        expect(node.checked).toEqual(true);
-      }, node.childNodes);
-    });
-
     it('does not check the children if tree is not in autoCheckChildren mode', () => {
       let model = helper.createModelFixture(4, 4);
       let tree = helper.createTree(model);
@@ -1277,8 +1260,8 @@ describe('Tree', () => {
       }, node.childNodes);
     });
 
-    describe('with children_and_parent AutoCheckStyle', () => {
-      let tree: Tree;
+    describe('autoCheckChildren', () => {
+      let tree: SpecTree;
 
       beforeEach(() => {
         tree = null;
@@ -1308,7 +1291,7 @@ describe('Tree', () => {
         }, node.childNodes);
       });
 
-      it('does uncheck the children', () => {
+      it('unchecks the children', () => {
         let model = helper.createModelFixture(4, 4);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1332,7 +1315,7 @@ describe('Tree', () => {
         }, node.childNodes);
       });
 
-      it('does set node in children-checked-state when not all child nodes are selected', () => {
+      it('sets node in children-checked-state when not all child nodes are selected', () => {
         let model = helper.createModelFixture(4, 4);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1374,7 +1357,7 @@ describe('Tree', () => {
         expect(parent.checked).toEqual(true);
       });
 
-      it('does uncheck parent node when all children are unchecked', () => {
+      it('unchecks parent node when all children are unchecked', () => {
         let model = helper.createModelFixture(4, 4);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1395,7 +1378,7 @@ describe('Tree', () => {
         expect(parent.checked).toEqual(false);
       });
 
-      it('does partly-check all parent nodes when child is checked', () => {
+      it('partly-checks all parent nodes when child is checked', () => {
         let model = helper.createModelFixture(4, 4);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1481,7 +1464,7 @@ describe('Tree', () => {
         expect(insertedNode.checked).toBe(false);
       });
 
-      it('does remove parent node from tree.checkedNodes when child is unchecked', () => {
+      it('removes parent node from tree.checkedNodes when child is unchecked', () => {
         let model = helper.createModelFixture(2, 1);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1504,7 +1487,7 @@ describe('Tree', () => {
         expect(tree.checkedNodes).toEqual(jasmine.arrayWithExactContents([parentNode, childNode, childNode2]));
       });
 
-      it('does uncheck parent node, when not all children are selected', () => {
+      it('unchecks parent node, when not all children are selected', () => {
         let model = helper.createModelFixture(2, 1);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1528,7 +1511,7 @@ describe('Tree', () => {
         expect(childNode2.checked).toBe(true);
       });
 
-      it('does uncheck all nodes when multiCheck is false', () => {
+      it('unchecks all nodes when multiCheck is false', () => {
         let model = helper.createModelFixture(2, 1);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1556,7 +1539,7 @@ describe('Tree', () => {
         expect(childNode2.childrenChecked).toBe(false);
       });
 
-      it('does preserve the setted value after init', () => {
+      it('preserves value after init', () => {
         let model = helper.createModelFixture(2, 2);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1587,7 +1570,7 @@ describe('Tree', () => {
         expect(child21.checked).toBe(true);
       });
 
-      it('does update parent nodes when child is deleted', () => {
+      it('updates parent nodes when child is deleted', () => {
         let model = helper.createModelFixture(2, 1);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1611,7 +1594,7 @@ describe('Tree', () => {
         expect(tree.checkedNodes).toEqual(jasmine.arrayWithExactContents([parent, child2]));
       });
 
-      it('does uncheck parent when new unchecked child is inserted', () => {
+      it('unchecks parent when new unchecked child is inserted', () => {
         let model = helper.createModelFixture(1, 0);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1632,7 +1615,7 @@ describe('Tree', () => {
         expect(childNode.checked).toBe(false);
       });
 
-      it('does partly check parent when a new unchecked child is inserted beside a already checked child', () => {
+      it('partly-checks parent when a new unchecked child is inserted beside a already checked child', () => {
         let model = helper.createModelFixture(1, 1);
         tree = helper.createTree(model);
         tree.multiCheck = true;
@@ -1662,7 +1645,7 @@ describe('Tree', () => {
             return;
           }
 
-          let hascheckedCssClass = node.$node
+          let hasCheckedCssClass = node.$node
             .children('.tree-node-checkbox')
             .children('.check-box')
             .hasClass('checked');
@@ -1672,7 +1655,7 @@ describe('Tree', () => {
             .children('.check-box')
             .hasClass('children-checked');
 
-          expect(node.checked).toBe(hascheckedCssClass);
+          expect(node.checked).toBe(hasCheckedCssClass);
           expect(node.childrenChecked).toBe(hasChildrenCheckedCssClass);
         }, nodes);
       };
