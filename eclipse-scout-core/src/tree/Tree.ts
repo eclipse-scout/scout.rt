@@ -230,9 +230,8 @@ export class Tree extends Widget implements TreeModel {
 
   /**
    * Initialize nodes, applies filters and updates flat list
-   * @internal
    */
-  _initNodes(nodes: TreeNode[], parentNode?: TreeNode) {
+  protected _initNodes(nodes: TreeNode[], parentNode?: TreeNode) {
     if (!nodes) {
       nodes = this.nodes;
     }
@@ -300,9 +299,6 @@ export class Tree extends Widget implements TreeModel {
     ]);
   }
 
-  /**
-   * @param autoCheckChildren
-   */
   setAutoCheckChildren(autoCheckChildren: boolean) {
     this.setProperty('autoCheckChildren', autoCheckChildren);
   }

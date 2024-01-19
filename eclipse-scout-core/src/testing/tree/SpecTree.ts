@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,10 @@ import {DoubleClickSupport, Range, Tree, TreeNode} from '../../index';
 
 export class SpecTree extends Tree {
   declare _doubleClickSupport: DoubleClickSupport & { _lastTimestamp: number };
+
+  override _initNodes(nodes: TreeNode[], parentNode?: TreeNode) {
+    super._initNodes(nodes, parentNode);
+  }
 
   override _calculateCurrentViewRange(): Range {
     return super._calculateCurrentViewRange();

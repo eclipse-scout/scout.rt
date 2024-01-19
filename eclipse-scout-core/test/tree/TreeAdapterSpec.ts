@@ -236,7 +236,7 @@ describe('TreeAdapter', () => {
 
   describe('checkNodes', () => {
 
-    it('does send checked event of checked node if triggered by server', () => {
+    it('sends checked event of checked node if triggered by server', () => {
       let model = helper.createModelFixture(2, 2);
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop) as Tree;
@@ -256,7 +256,7 @@ describe('TreeAdapter', () => {
       expect(jasmine.Ajax.requests.count()).toBe(1);
     });
 
-    it('does send checked event of checked node and its children if triggered by server', () => {
+    it('sends checked event of checked node and its children if triggered by server', () => {
       let model = helper.createModelFixture(2, 1);
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop) as Tree;
@@ -287,7 +287,7 @@ describe('TreeAdapter', () => {
       expect(nodeIds).toEqual(jasmine.arrayWithExactContents([node.id, childNode1.id, childNode2.id]));
     });
 
-    it('does send checked event of checked node and its children if triggered by server', () => {
+    it('sends checked event of checked node and its children if triggered by server', () => {
       let model = helper.createModelFixture(2, 1);
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop) as Tree;

@@ -406,6 +406,10 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   void setNodesChecked(List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly, boolean forceUpdateNode);
 
+  void checkAllNodes();
+
+  void uncheckAllNodes();
+
   void setAllNodesChecked(boolean checked);
 
   boolean isNodeChecked(ITreeNode node);

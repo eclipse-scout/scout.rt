@@ -16,9 +16,16 @@ export interface TreeModel extends WidgetModel {
   toggleBreadcrumbStyleEnabled?: boolean;
   breadcrumbTogglingThreshold?: number;
   /**
-   * Describes the behavior of children and parent nodes, when a node is checked/unchecked
+   * When set to true, all children of a node will be checked/unchecked together with their parents.
    *
-   * Default is {@code false}
+   * The state of a node is a representation of its children.
+   * - When none of the children are checked, the node is unchecked
+   * - When some of the children are checked, the node is partly checked
+   * - When all of the children are checked, the node is also checked
+   *
+   * Only has an effect if the tree is checkable.
+   *
+   * Default is false
    */
   autoCheckChildren?: boolean;
   /**
