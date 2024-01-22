@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -636,6 +636,10 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
+  protected _updateScrollShadow() {
+    scrollbars.updateScrollShadow(this.$grid);
+  }
+
   protected _scrollToSelectedComponent(animate: boolean) {
     if (this.selectedComponent && this.selectedComponent._$parts[0] && this.selectedComponent._$parts[0].parent() && this.selectedComponent._$parts[0].isVisible()) {
       scrollbars.scrollTo(this.selectedComponent._$parts[0].parent(), this.selectedComponent._$parts[0], {
@@ -1205,6 +1209,7 @@ export class Calendar extends Widget implements CalendarModel {
       scrollbars.update($(elem), true);
     });
     this.updateScrollPosition(animate);
+    this._updateScrollShadow();
   }
 
   protected _uninstallComponentScrollbars($parent: JQuery) {
@@ -1540,6 +1545,10 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _updateCalendarVisibility(updatedCalendars: [calendarId: number, visible: boolean][]) {
+    if (!this.initialized) {
+      // Is called after init
+      return;
+    }
     updatedCalendars.forEach(tuple => {
       this._updateCalendarVisibleProperty(tuple[0], tuple[1]);
     });
