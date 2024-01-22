@@ -51,8 +51,6 @@
     <module>../org.eclipse.scout.rt.api.data</module>
 
     <module>../org.eclipse.scout.rt.app</module>
-    <module>../org.eclipse.scout.rt.app.test</module>
-    <module>../org.eclipse.scout.rt.app.test.affix</module>
     <module>../org.eclipse.scout.rt.jetty</module>
 
     <module>../org.eclipse.scout.rt.mom.api</module>
@@ -452,16 +450,6 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.app</artifactId>
-        <version>24.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.app.test</artifactId>
-        <version>24.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.app.test.affix</artifactId>
         <version>24.1-SNAPSHOT</version>
       </dependency>
       <dependency>

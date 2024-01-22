@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.app;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -71,34 +69,6 @@ public final class ApplicationProperties {
     @Override
     public String description() {
       return "The port under which the application will be running. Default value is " + getDefaultValue() + ".";
-    }
-  }
-
-  public static class ScoutApplicationWebappDirectoryProperty extends AbstractConfigProperty<File, String> {
-
-    public static final String DEFAULT_VALUE = "/src/main/webapp/";
-
-    @Override
-    public String getKey() {
-      return "scout.app.webappDirectory";
-    }
-
-    @Override
-    protected File parse(String value) {
-      if (StringUtility.hasText(value)) {
-        return new File(value);
-      }
-      return null;
-    }
-
-    @Override
-    public File getDefaultValue() {
-      return new File(Paths.get(".").toAbsolutePath().normalize().toFile(), DEFAULT_VALUE);
-    }
-
-    @Override
-    public String description() {
-      return "The folder to find the webapp resources. The default value is '" + DEFAULT_VALUE + "'";
     }
   }
 

@@ -32,8 +32,7 @@ public final class ServerServletContributors {
     public void contribute(ServletContextHandler handler) {
       FilterHolder filter = handler.addFilter(ServerServletFilter.class, "/*", null);
       // values needs to be defined relative to application root path (which isn't always the same as servlet root path)
-      List<String> filterExcludes = Arrays.asList(
-        "/jaxws");
+      List<String> filterExcludes = Arrays.asList(); // add exclusions from auth filter, e.g. "/ext/*"
       filter.setInitParameter("filter-exclude", StringUtility.join("\n", filterExcludes));
     }
   }
