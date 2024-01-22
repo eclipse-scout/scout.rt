@@ -12,5 +12,8 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.dataobject.mapping.IToDoFunction;
 
+/**
+ * {@link IToDoFunction} that converts an {@link ICode} to a {@link CodeDo}.
+ */
 public interface ICodeToDoFunction extends IToDoFunction<ICode<?>, CodeDo> {
 }

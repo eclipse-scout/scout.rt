@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -112,5 +112,13 @@ public interface ICode<T> extends ITypeWithClassId, IOrdered {
    */
   ICodeRow<T> toCodeRow();
 
+  /**
+   * Converts this Code to a {@link CodeDo}.
+   *
+   * @return The {@link CodeDo} with the attributes of this Code copied to the data object. Child Codes are converted
+   * and added to the resulting data object recursively. May return {@code null} if this Code does not support
+   * conversion to a data object.
+   * @see ICodeToDoFunction
+   */
   CodeDo toDo();
 }

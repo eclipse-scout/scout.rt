@@ -21,6 +21,10 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
+/**
+ * Base implementation of {@link ICodeTypeToDoFunction}. It transfers all attributes from {@link ICodeType} to the
+ * corresponding attribute in {@link CodeTypeDo}.
+ */
 public abstract class AbstractCodeTypeToDoFunction<EXPLICIT_SOURCE extends ICodeType<?, ?>, EXPLICIT_TARGET extends CodeTypeDo>
     extends AbstractToDoFunction<EXPLICIT_SOURCE, EXPLICIT_TARGET, ICodeType<?, ?>, CodeTypeDo>
     implements ICodeTypeToDoFunction {
@@ -71,10 +75,23 @@ public abstract class AbstractCodeTypeToDoFunction<EXPLICIT_SOURCE extends ICode
     return codeType.getCodes();
   }
 
+  /**
+   * @return the {@link Function} used to convert a CodeType id to a {@link String}. By default
+   * {@link AbstractCodeToDoFunction#convertId(Object)} is used.
+   * @see AbstractCodeToDoFunction#convertId(Object)
+   */
   public Function<Object, String> getIdConverter() {
     return m_idConverter;
   }
 
+  /**
+   * Changes the {@link Function} used to convert a CodeType id to a {@link String}. By default
+   * {@link AbstractCodeToDoFunction#convertId(Object)} is used. May be used to change the conversion logic application
+   * wide.
+   *
+   * @param idConverter
+   *          The new conversion {@link Function}. {@code null} values are ignored.
+   */
   public void setIdConverter(Function<Object, String> idConverter) {
     if (idConverter == null) {
       return;

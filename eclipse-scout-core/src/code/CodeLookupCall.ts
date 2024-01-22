@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -78,7 +78,7 @@ export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
 
 export interface CodeLookupCallModel<TCodeId> extends LookupCallModel<TCodeId> {
   /**
-   * CodeTypeId {@link CodeType.id} or CodeType ref
+   * CodeTypeId {@link CodeType.id} or CodeType ref. See {@link codes.get}.
    */
   codeType: string | (new() => CodeType<any>);
 }

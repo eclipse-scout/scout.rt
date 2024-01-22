@@ -11,7 +11,16 @@ package org.eclipse.scout.rt.api.data;
 
 import java.util.Set;
 
+/**
+ * Root interface to contribute Scout elements that are exposed by the built-in Scout REST api.
+ */
 @FunctionalInterface
 public interface IApiExposedItemContributor<T> {
-  void contribute(Set<T> itemsToPublish);
+  /**
+   * Callback to contribute to the items that should be exposed.
+   *
+   * @param itemsToExpose
+   *     Live {@link Set} of elements that should be exposed to the UI.
+   */
+  void contribute(Set<T> itemsToExpose);
 }

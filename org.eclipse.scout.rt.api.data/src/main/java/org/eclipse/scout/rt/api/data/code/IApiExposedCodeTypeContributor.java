@@ -14,12 +14,16 @@ import java.util.Set;
 import org.eclipse.scout.rt.api.data.IApiExposedItemContributor;
 import org.eclipse.scout.rt.platform.Bean;
 
+/**
+ * Contributor for CodeTypes that should be exposed by the Scout REST api.
+ */
 @Bean
 public interface IApiExposedCodeTypeContributor extends IApiExposedItemContributor<CodeTypeDo> {
   /**
-   * @param codeTypeClassNamesToPublish
-   *          Live view of CodeTypeDos which are published in a REST resource.
+   * @param codeTypes
+   *          Live {@link Set} of {@link CodeTypeDo} which are published in the Scout REST resource. The {@link Set} may
+   *          be directly modified.
    */
   @Override
-  void contribute(Set<CodeTypeDo> codeTypeClassNamesToPublish);
+  void contribute(Set<CodeTypeDo> codeTypes);
 }

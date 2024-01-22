@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,5 +83,13 @@ public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITy
 
   <T extends ICode<CODE_ID>> boolean visit(ICodeVisitor<T> visitor, boolean activeOnly);
 
+  /**
+   * Converts this CodeType to a {@link CodeTypeDo}.
+   *
+   * @return The {@link CodeTypeDo} with the attributes of this CodeType copied to the data object. Child Codes are
+   * converted and added to the resulting data object recursively. May return {@code null} if this CodeType does
+   * not support conversion to a data object.
+   * @see ICodeTypeToDoFunction
+   */
   CodeTypeDo toDo();
 }

@@ -17,6 +17,16 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Marks elements that should be exposed by the Scout REST api.
+ * <p>
+ * Important: If this annotation is added to a supported Scout element (like a CodeType), this element is exposed to the
+ * Scout REST api by default and is therefore accessible e.g. by the browser. Do not add this annotation to elements
+ * that contain sensitive or privacy relevant data!
+ * <p>
+ * Typically, an {@link IApiExposedItemContributor} is implemented which contributes all elements having this
+ * annotation.
+ */
 @Inherited
 @Documented
 @Target({TYPE, FIELD, METHOD})

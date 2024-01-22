@@ -17,10 +17,23 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.rt.dataobject.TypeName;
+
+/**
+ * Specifies the {@value ApiExposeHelper#OBJECT_TYPE_ATTRIBUTE_NAME} for a Scout element. It is used when creating the
+ * corresponding element in the Scout TypeScript code on the browser. This allows to customize the class that will be
+ * instantiated when creating the element in the Browser.
+ * <p>
+ * It has nothing to do with the {@link TypeName} annotation which must not control anything on the client and only
+ * supports data objects.
+ */
 @Inherited
 @Documented
 @Target({TYPE})
 @Retention(RUNTIME)
 public @interface ObjectType {
+  /**
+   * @return The {@value ApiExposeHelper#OBJECT_TYPE_ATTRIBUTE_NAME} value.
+   */
   String value();
 }

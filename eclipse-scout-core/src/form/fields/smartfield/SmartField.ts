@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, aria, arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport, LookupCall,
-  LookupCallOrModel, LookupResult, LookupRow, MaxLengthHandler, objects, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldEventMap,
-  SmartFieldLayout, SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValidationFailedStatus, ValueField
+  AjaxError, aria, arrays, CellEditorPopup, CellEditorRenderedOptions, CodeLookupCall, CodeType, ColumnDescriptor, Device, EnumObject, fields, FormField, InitModelOf, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LoadingSupport,
+  LookupCall, LookupCallOrModel, LookupResult, LookupRow, MaxLengthHandler, objects, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke,
+  SmartFieldEventMap, SmartFieldLayout, SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValidationFailedStatus, ValueField
 } from '../../../index';
 import $ from 'jquery';
 
@@ -21,7 +21,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
   popup: SmartFieldTouchPopup<TValue> | SmartFieldPopup<TValue>;
   lookupCall: LookupCall<TValue>;
-  codeType: string;
+  codeType: string | (new() => CodeType<any>);
   lookupRow: LookupRow<TValue>;
   browseHierarchy: boolean;
   browseMaxRowCount: number;
@@ -683,7 +683,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this._syncBrowseMaxRowCountWithLookupCall();
   }
 
-  protected _setCodeType(codeType: string) {
+  protected _setCodeType(codeType: string | (new() => CodeType<any>)) {
     this._setProperty('codeType', codeType);
     if (!codeType) {
       return;

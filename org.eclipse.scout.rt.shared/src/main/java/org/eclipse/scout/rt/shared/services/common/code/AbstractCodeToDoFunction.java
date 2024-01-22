@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.api.data.ApiExposeHelper;
 import org.eclipse.scout.rt.api.data.code.CodeDo;
+import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.dataobject.mapping.AbstractToDoFunction;
@@ -29,6 +31,10 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
+/**
+ * Base implementation of {@link ICodeToDoFunction}. It transfers all attributes from {@link ICode} to the corresponding
+ * attribute in {@link CodeDo}.
+ */
 public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>, EXPLICIT_TARGET extends CodeDo>
     extends AbstractToDoFunction<EXPLICIT_SOURCE, EXPLICIT_TARGET, ICode<?>, CodeDo>
     implements ICodeToDoFunction {
@@ -121,22 +127,41 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
     return code.getChildCodes();
   }
 
-  public List<CodeDo> codesToDos(List<? extends ICode<?>> codesToExport) {
+  /**
+   * Converts the codes given to data objects.
+   *
+   * @param codesToExport
+   *     The codes to export.
+   * @return The created data objects as immutable {@link List}. The list may contain fewer elements than the input
+   * collection if a {@link ICode} cannot be converted to a data object or has no valid id.
+   */
+  public List<CodeDo> codesToDos(Collection<? extends ICode<?>> codesToExport) {
     if (CollectionUtility.isEmpty(codesToExport)) {
       return Collections.emptyList();
     }
     return codesToExport.stream()
         .filter(Objects::nonNull)
-        .filter(code -> code.getId() != null) // id is mandatory
         .map(ICode::toDo)
         .filter(Objects::nonNull)
+        .filter(code -> code.getId() != null) // id is mandatory
         .collect(Collectors.toList());
   }
 
+  /**
+   * @return the {@link Function} used to convert a Code id to a {@link String}. By default {@link #convertId(Object)}
+   *         is used.
+   */
   public Function<Object, String> getIdConverter() {
     return m_idConverter;
   }
 
+  /**
+   * Changes the {@link Function} used to convert a Code id to a {@link String}. By default {@link #convertId(Object)}
+   * is used. May be used to change the conversion logic application wide.
+   *
+   * @param idConverter
+   *          The new conversion {@link Function}. {@code null} values are ignored.
+   */
   public void setIdConverter(Function<Object, String> idConverter) {
     if (idConverter == null) {
       return;
@@ -144,6 +169,18 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
     m_idConverter = idConverter;
   }
 
+  /**
+   * converts a Code id ({@link ICode#getId()}) or CodeType id ({@link ICodeType#getId()}) to a {@link String} which can
+   * be put to a {@link CodeDo} or {@link CodeTypeDo}.
+   * <p>
+   * All {@link ICodeTypeDoIdConverter} instances are asked first to convert the id. If none can handle the value,
+   * {@link Object#toString()} will be invoked.
+   *
+   * @param id
+   *          The id to convert or {@code null}.
+   * @return The {@link String} representation of the id or {@code null} if the id was {@code null}.
+   * @see ICodeTypeDoIdConverter
+   */
   public static String convertId(Object id) {
     if (id == null) {
       return null;
@@ -155,10 +192,19 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
         .orElseGet(() -> id.toString());
   }
 
+  /**
+   * Adapter interface that converts a Code id ({@link ICode#getId()}) or CodeType id ({@link ICodeType#getId()}) to a
+   * {@link String} which can be put to a {@link CodeDo} or {@link CodeTypeDo}. The converter should return {@code null}
+   * for values it cannot handle (unsupported data type). The first (according to bean order, see {@link Order})
+   * non-null conversion will be used as result.
+   */
   @Bean
   public interface ICodeTypeDoIdConverter extends Function<Object, String> {
   }
 
+  /**
+   * Default Code id converter supporting {@link IId IIds}.
+   */
   @Order(-5000)
   public static class IIdCodeTypeDoIdConverter implements ICodeTypeDoIdConverter {
     @Override

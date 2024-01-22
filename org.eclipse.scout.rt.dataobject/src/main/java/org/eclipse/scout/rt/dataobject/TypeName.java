@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,13 @@ import java.lang.annotation.Target;
  *   ...
  * }
  * </pre>
+ *
+ * The value is actually used when deserializing a data object to its Java representation (to find the corresponding
+ * data object). It is also written when serializing the data object so that it is directly known when sending the
+ * serialized object back to the deserializer.
+ * <p>
+ * The value of this annotation should not control any behavior on clients. It may only be used by the deserializer and
+ * may therefore change without notice. To send data to clients use custom attributes on the data object directly.
  *
  * @see DoEntity
  */

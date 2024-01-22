@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, CodeLookupCall, codes, Column, InitModelOf, LookupCall, LookupCallOrModel, LookupRow, objects, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
+import {Cell, CodeLookupCall, codes, CodeType, Column, InitModelOf, LookupCall, LookupCallOrModel, LookupRow, objects, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
 
 /**
  * Column where each cell fetches its value using a lookup call.
@@ -22,7 +22,7 @@ export class SmartColumn<TValue> extends Column<TValue> {
   declare eventMap: SmartColumnEventMap<TValue>;
   declare self: SmartColumn<any>;
 
-  codeType: string;
+  codeType: string | (new() => CodeType<any>);
   lookupCall: LookupCall<TValue>;
   browseHierarchy: boolean;
   browseMaxRowCount: number;
@@ -84,11 +84,11 @@ export class SmartColumn<TValue> extends Column<TValue> {
     }
   }
 
-  setCodeType(codeType: string) {
+  setCodeType(codeType: string | (new() => CodeType<any>)) {
     this.setProperty('codeType', codeType);
   }
 
-  protected _setCodeType(codeType: string) {
+  protected _setCodeType(codeType: string | (new() => CodeType<any>)) {
     this._setProperty('codeType', codeType);
     if (codeType) {
       let codeLookupCall = CodeLookupCall<TValue>;
