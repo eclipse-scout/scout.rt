@@ -290,6 +290,13 @@ export class Calendar extends Widget implements CalendarModel {
       });
   }
 
+  protected _updateCalendarsMenuVisibility() {
+    if (!this.$commands) {
+      return;
+    }
+    this.$commands.children('.calendar-toggle-calendars').toggleClass('hidden', this.calendars.length < 2);
+  }
+
   setSelectedDate(date: Date | string) {
     this.setProperty('selectedDate', date);
   }
@@ -471,10 +478,13 @@ export class Calendar extends Widget implements CalendarModel {
       .attr('data-mode', Calendar.DisplayMode.MONTH)
       .on('click', this._onDisplayModeClick.bind(this));
     this.modesMenu.render(this.$commands);
+
+    // Top-right menus
     this.$commands.appendDiv('calendar-toggle-year')
       .on('click', this._onYearClick.bind(this));
     this.$commands.appendDiv('calendar-toggle-calendars')
       .on('click', this._onCalendarsClick.bind(this));
+    this._updateCalendarsMenuVisibility();
     this.$commands.appendDiv('calendar-toggle-list')
       .on('click', this._onListClick.bind(this));
 
@@ -534,6 +544,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _setCalendars(calendars: CalendarDescriptor[]) {
     this._setProperty('calendars', calendars);
+    this._updateCalendarsMenuVisibility();
     this._updateCalendarNodes();
   }
 
