@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,11 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ColumnDescriptor, LookupCallOrModel, LookupRow, SmartFieldActiveFilter, SmartFieldDisplayStyle, ValueFieldModel} from '../../../index';
+import {CodeType, ColumnDescriptor, LookupCallOrModel, LookupRow, SmartFieldActiveFilter, SmartFieldDisplayStyle, ValueFieldModel} from '../../../index';
 
 export interface SmartFieldModel<TValue> extends ValueFieldModel<TValue> {
   lookupCall?: LookupCallOrModel<TValue>;
-  codeType?: string;
+  /**
+   * CodeTypeId {@link CodeType.id} or CodeType ref. See {@link codes.get}.
+   */
+  codeType?: string | (new() => CodeType<any>);
   lookupRow?: LookupRow<TValue>;
   /**
    * Default is false.

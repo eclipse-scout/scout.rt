@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.platform.Order;
 
+/**
+ * Default function that converts a {@link ICode} to a {@link CodeDo}.
+ */
 @Order(5050) // last converter for all remaining CodeTypes
 public class CodeToDoFunction extends AbstractCodeToDoFunction<ICode<?>, CodeDo> {
 }

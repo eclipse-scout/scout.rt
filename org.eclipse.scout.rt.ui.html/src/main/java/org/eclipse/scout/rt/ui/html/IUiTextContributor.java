@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,9 +15,8 @@ import org.eclipse.scout.rt.api.data.IApiExposedItemContributor;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * Implementations of this interface contribute to the list of text keys that are sent as (translated) text sent to the
- * UI on session startup (i.e. static UI texts that are required by JavaScript classes). Dynamic texts are always sent
- * as regular (form-)data and must <i>not</i> be contributed here.
+ * Implementations of this interface contribute to the set of text keys that are sent as (translated) text to the UI on
+ * session startup (i.e. static UI texts that are required by TypeScript classes).
  */
 @ApplicationScoped
 @FunctionalInterface

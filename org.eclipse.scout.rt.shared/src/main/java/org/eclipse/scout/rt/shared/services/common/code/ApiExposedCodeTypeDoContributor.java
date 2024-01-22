@@ -12,29 +12,34 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.util.Objects;
 import java.util.Set;
 
+import org.eclipse.scout.rt.api.data.ApiExposeHelper;
+import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeContributor;
-import org.eclipse.scout.rt.api.data.ApiExposeHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
 
+/**
+ * Default {@link IApiExposedCodeTypeContributor} that exposes all {@link ICodeType} instances which have the
+ * {@link ApiExposed} annotation.
+ */
 @Order(-5000) // this provider should come first so that custom providers can modify the result
 public class ApiExposedCodeTypeDoContributor implements IApiExposedCodeTypeContributor {
   private final ApiExposeHelper m_apiExposeHelper = BEANS.get(ApiExposeHelper.class);
 
   @Override
-  public void contribute(Set<CodeTypeDo> codeTypeDos) {
+  public void contribute(Set<CodeTypeDo> codeTypes) {
     BEANS.getBeanManager().getBeans(ICodeType.class).stream()
-        .filter(this::isPublishCodeType)
+        .filter(this::isApiExposedCodeType)
         .map(IBean::getInstance)
-        .filter(codeType -> codeType.getId() != null) // id is mandatory
         .map(ICodeType::toDo)
         .filter(Objects::nonNull)
-        .forEach(codeTypeDos::add);
+        .filter(codeType -> codeType.getId() != null) // id is mandatory
+        .forEach(codeTypes::add);
   }
 
-  protected boolean isPublishCodeType(IBean<ICodeType> codeTypeBean) {
+  protected boolean isApiExposedCodeType(IBean<ICodeType> codeTypeBean) {
     return m_apiExposeHelper.hasApiExposedAnnotation(codeTypeBean);
   }
 }

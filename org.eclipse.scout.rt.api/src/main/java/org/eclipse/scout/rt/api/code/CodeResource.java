@@ -42,11 +42,12 @@ public class CodeResource implements IRestResource {
   private static final Logger LOG = LoggerFactory.getLogger(CodeResource.class);
 
   /**
-   * Gets all CodeTypes which should be published to the UI.
+   * Gets all CodeTypes which should be published to the UI on application startup (bootstrap)
    *
    * @param allLanguages
    *          {@code true} if all application languages should be exported. {@code false} if only the texts for the
-   *          current {@link NlsLocale} should be part of the response.
+   *          current {@link NlsLocale} should be part of the response. Customize {@link #getApplicationLanguages()} to
+   *          specify the supported application languages.
    * @return List of the CodeTypes.
    */
   @GET

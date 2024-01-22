@@ -17,10 +17,17 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation to declare a field name for a Scout element. May be used if the element should be dynamically written to a
+ * field of a container object.
+ */
 @Inherited
 @Documented
 @Target({TYPE})
 @Retention(RUNTIME)
 public @interface FieldName {
+  /**
+   * @return The name of the field.
+   */
   String value();
 }
