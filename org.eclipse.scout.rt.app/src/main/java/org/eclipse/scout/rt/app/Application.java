@@ -10,7 +10,6 @@
 package org.eclipse.scout.rt.app;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -39,7 +38,6 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationCertificateAliasProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationConsoleInputHandlerEnabledProperty;
@@ -56,7 +54,6 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCoo
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
-import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationWebappDirectoryProperty;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -348,49 +345,27 @@ public class Application {
   }
 
   protected Handler createHandler() {
-    // In development mode, the use of a webapp folder including a web.xml is supported. If a webapp folder is detected, the following properties are ignored:
-    // - ScoutApplicationHttpSessionEnabledProperty
-    // - ScoutApplicationSessionTimeoutInMinutesProperty
-    // - ScoutApplicationSessionCookieConfigHttpOnlyProperty
-    //
-    // For production use, web.xml isn't supported.
-    File webappDirectory = CONFIG.getPropertyValue(ScoutApplicationWebappDirectoryProperty.class);
-    File webXmlFile = new File(webappDirectory, "WEB-INF/web.xml");
-    ServletContextHandler handler;
-    if (Platform.get().inDevelopmentMode() && webXmlFile.exists()) {
-      // use resource based web.xml mode
-      String resourceBase = webappDirectory.getAbsolutePath();
-      LOG.info("Creating servlet context handler for resource base '{}'", resourceBase);
+    boolean sessionEnabled = CONFIG.getPropertyValue(ScoutApplicationHttpSessionEnabledProperty.class);
+    LOG.info("Creating servlet context handler (non-resource-based) with {}", sessionEnabled ? "sessions" : "no sessions");
 
-      WebAppContext webAppContext = new DevelopmentWebAppContext(resourceBase, CONFIG.getPropertyValue(ScoutApplicationContextPathProperty.class));
-      webAppContext.setThrowUnavailableOnStartupException(true);
-      handler = webAppContext;
-    }
-    else {
-      // use non web.xml mode
-      boolean sessionEnabled = CONFIG.getPropertyValue(ScoutApplicationHttpSessionEnabledProperty.class);
-      LOG.info("Creating servlet context handler (non-resource-based) with {}", sessionEnabled ? "sessions" : "no sessions");
+    ServletContextHandler handler = new ServletContextHandler(sessionEnabled ? ServletContextHandler.SESSIONS : ServletContextHandler.NO_SESSIONS);
+    handler.addEventListener(new WebappEventListener());
 
-      handler = new ServletContextHandler(sessionEnabled ? ServletContextHandler.SESSIONS : ServletContextHandler.NO_SESSIONS);
-      handler.addEventListener(new WebappEventListener()); // not required for web.xml, because registered manually within
-      // if the web.xml mode is not supported anymore, check if the class WebappEventListener could be removed/handled differently
+    if (sessionEnabled) {
+      // See https://github.com/jetty/jetty.project/blob/jetty-11.0.18/jetty-webapp/src/main/java/org/eclipse/jetty/webapp/StandardDescriptorProcessor.java#L650
+      // for how session properties are applied from web.xml to Java classes.
+      int sessionTimeoutInSeconds = CONFIG.getPropertyValue(ScoutApplicationSessionTimeoutProperty.class);
+      boolean httpOnly = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigHttpOnlyProperty.class);
+      boolean secure = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSecureProperty.class);
+      SameSite sameSite = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSameSiteProperty.class);
 
-      if (sessionEnabled) {
-        // See https://github.com/jetty/jetty.project/blob/jetty-11.0.18/jetty-webapp/src/main/java/org/eclipse/jetty/webapp/StandardDescriptorProcessor.java#L650
-        // for how session properties are applied from web.xml to Java classes.
-        int sessionTimeoutInSeconds = CONFIG.getPropertyValue(ScoutApplicationSessionTimeoutProperty.class);
-        boolean httpOnly = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigHttpOnlyProperty.class);
-        boolean secure = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSecureProperty.class);
-        SameSite sameSite = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSameSiteProperty.class);
+      LOG.info("[Session config] timeout: {} s, HTTP only: {}, secure: {}, same site: {}", sessionTimeoutInSeconds, httpOnly, secure, sameSite.getAttributeValue());
 
-        LOG.info("[Session config] timeout: {} s, HTTP only: {}, secure: {}, same site: {}", sessionTimeoutInSeconds, httpOnly, secure, sameSite.getAttributeValue());
-
-        SessionHandler sessionHandler = handler.getSessionHandler();
-        sessionHandler.setMaxInactiveInterval(sessionTimeoutInSeconds);
-        sessionHandler.getSessionCookieConfig().setHttpOnly(httpOnly);
-        sessionHandler.getSessionCookieConfig().setSecure(secure);
-        sessionHandler.setSameSite(sameSite);
-      }
+      SessionHandler sessionHandler = handler.getSessionHandler();
+      sessionHandler.setMaxInactiveInterval(sessionTimeoutInSeconds);
+      sessionHandler.getSessionCookieConfig().setHttpOnly(httpOnly);
+      sessionHandler.getSessionCookieConfig().setSecure(secure);
+      sessionHandler.setSameSite(sameSite);
     }
 
     handler.setDisplayName(CONFIG.getPropertyValue(ApplicationNameProperty.class));
