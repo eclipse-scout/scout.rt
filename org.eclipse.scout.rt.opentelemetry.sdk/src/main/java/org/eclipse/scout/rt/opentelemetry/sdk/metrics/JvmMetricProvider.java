@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.instrumentation.runtimemetrics.java8.BufferPools;
 import io.opentelemetry.instrumentation.runtimemetrics.java8.Classes;
 import io.opentelemetry.instrumentation.runtimemetrics.java8.Cpu;
 import io.opentelemetry.instrumentation.runtimemetrics.java8.GarbageCollector;
@@ -41,7 +40,6 @@ public class JvmMetricProvider implements IMetricProvider {
   @Override
   public void register(OpenTelemetry openTelemetry) {
     // see https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/runtime-telemetry/runtime-telemetry-java8/library#usage
-    m_observables.addAll(BufferPools.registerObservers(openTelemetry));
     m_observables.addAll(Classes.registerObservers(openTelemetry));
     m_observables.addAll(Cpu.registerObservers(openTelemetry));
     m_observables.addAll(MemoryPools.registerObservers(openTelemetry));
