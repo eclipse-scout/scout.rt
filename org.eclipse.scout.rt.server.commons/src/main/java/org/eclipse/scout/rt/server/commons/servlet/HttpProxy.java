@@ -252,7 +252,8 @@ public class HttpProxy {
       pathInfo = pathInfo.substring(1);
     }
     uriBuilder.addPath(pathInfo);
-    uriBuilder.queryString(req.getQueryString());
+    // Decoding URL since req.getQueryString method doesn't decode it. The query string gets encoded again when creating the URI.
+    uriBuilder.queryString(IOUtility.urlDecode(req.getQueryString()));
     return uriBuilder.createURI();
   }
 
