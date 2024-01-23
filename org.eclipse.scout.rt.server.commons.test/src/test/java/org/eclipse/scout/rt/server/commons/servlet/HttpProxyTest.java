@@ -142,8 +142,7 @@ public class HttpProxyTest {
         "/lorem", null, options);
     testRewriteUrlInternal("http://internal.example.com:1234/api/lorem?ipsum",
         "/lorem", "ipsum", new HttpProxyRequestOptions());
-    testRewriteUrlInternal("http://internal.example.com:1234/api/lorem?foo=%25bar%25",
-        "/lorem", "foo=%bar%", new HttpProxyRequestOptions());
+    testRewriteUrlInternal("http://internal.example.com:1234/api/lorem?foo=%25bar%25+lorem+ipsum", "/lorem", "foo=%25bar%25+lorem+ipsum", new HttpProxyRequestOptions());
   }
 
   protected void testRewriteUrlInternal(String expectedResult, String pathInfo, String queryString, HttpProxyRequestOptions options) {
