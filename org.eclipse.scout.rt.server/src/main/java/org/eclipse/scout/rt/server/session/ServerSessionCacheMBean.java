@@ -11,16 +11,16 @@ package org.eclipse.scout.rt.server.session;
 
 import java.util.Map.Entry;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import javax.management.ObjectName;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.rt.platform.context.PlatformIdentifier;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
 import org.eclipse.scout.rt.server.IServerSession;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 @ApplicationScoped
 @CreateImmediately
@@ -37,7 +37,7 @@ public class ServerSessionCacheMBean implements IServerSessionCacheMBean {
   }
 
   protected ObjectName jmxObjectName() {
-    return MBeanUtility.toJmxName("org.eclipse.scout.rt.server", PlatformIdentifier.get(), ServerSessionCache.class.getSimpleName());
+    return MBeanUtility.toJmxName("org.eclipse.scout.rt.server", ServerSessionCache.class.getSimpleName());
   }
 
   @Override

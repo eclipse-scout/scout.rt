@@ -13,19 +13,16 @@ import java.lang.management.ManagementFactory;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
-import javax.management.MXBean;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.eclipse.scout.rt.platform.context.PlatformIdentifier;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Scout convention is to use the MBEAN java package base name as MBean domain, the {@link PlatformIdentifier} as
- * optional MBean type and the MBean main type as MBean name
+ * Scout convention is to use the MBEAN java package base name as MBean domain and the MBean main type as MBean name.
  *
  * @since 8.0
  */
@@ -46,8 +43,6 @@ public final class MBeanUtility {
   /**
    * @param domain
    *          Scout convention is to use the package base name
-   * @param type
-   *          Scout convention is to use {@link PlatformIdentifier}
    * @param name
    *          Scout convention is to use the MBean main type simple name
    */
@@ -65,9 +60,6 @@ public final class MBeanUtility {
     }
   }
 
-  /**
-   * For platform scoped {@link MXBean} consider using {@link PlatformIdentifier#get()} as the type of the MBean name.
-   */
   public static void register(ObjectName name, Object monitor) {
     try {
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();

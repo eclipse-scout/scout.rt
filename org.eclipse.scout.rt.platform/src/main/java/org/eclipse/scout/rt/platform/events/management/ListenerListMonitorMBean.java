@@ -15,17 +15,16 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-
 import javax.management.ObjectName;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.rt.platform.context.PlatformIdentifier;
 import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
 import org.eclipse.scout.rt.platform.events.ListenerListSnapshot;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 @ApplicationScoped
 @CreateImmediately
@@ -36,7 +35,7 @@ public class ListenerListMonitorMBean implements IListenerListMonitorMBean {
    */
 
   protected ObjectName jmxObjectName() {
-    return MBeanUtility.toJmxName("org.eclipse.scout.rt.platform", PlatformIdentifier.get(), "EventListeners");
+    return MBeanUtility.toJmxName("org.eclipse.scout.rt.platform", "EventListeners");
   }
 
   @PostConstruct
@@ -74,8 +73,8 @@ public class ListenerListMonitorMBean implements IListenerListMonitorMBean {
               listenerListCount.put(className, listenerListCount.getOrDefault(className, 0) + 1);
               Map<String, List<String>> mergedTypes = listenerListTypes.computeIfAbsent(className, className2 -> new TreeMap<>());
               types.forEach((type, listeners) -> listeners.forEach(listener -> mergedTypes
-                    .computeIfAbsent(type, type2 -> new ArrayList<>())
-                    .add(listener.getClass().getName())));
+                  .computeIfAbsent(type, type2 -> new ArrayList<>())
+                  .add(listener.getClass().getName())));
             });
     return listenerListTypes
         .entrySet()
