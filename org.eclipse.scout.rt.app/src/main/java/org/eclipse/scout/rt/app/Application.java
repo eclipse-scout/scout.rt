@@ -71,7 +71,6 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.commons.WebappEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,30 +96,6 @@ public class Application {
     INSTANCE.get().start();
   }
 
-  /**
-   * Entry point for a service wrapper which is starting the application.
-   * <p>
-   * <b>Important:</b> Do not change the signature of this method!
-   */
-  @SuppressWarnings("RedundantThrows")
-  public static void start(String[] args) throws Exception {
-    LOG.info("Starting platform");
-    IPlatform platform = Platform.get();
-    platform.awaitPlatformStarted();
-
-    LOG.info("Starting application");
-    INSTANCE.get().start();
-  }
-
-  /**
-   * Entry point for a service wrapper which is stopping the application.
-   * <p>
-   * <b>Important:</b> Do not change the signature of this method!
-   */
-  @SuppressWarnings("RedundantThrows")
-  public static void stop(String[] args) throws Exception {
-    INSTANCE.get().shutdown();
-  }
 
   protected void start() {
     try {
@@ -349,7 +324,6 @@ public class Application {
     LOG.info("Creating servlet context handler (non-resource-based) with {}", sessionEnabled ? "sessions" : "no sessions");
 
     ServletContextHandler handler = new ServletContextHandler(sessionEnabled ? ServletContextHandler.SESSIONS : ServletContextHandler.NO_SESSIONS);
-    handler.addEventListener(new WebappEventListener());
 
     if (sessionEnabled) {
       // See https://github.com/jetty/jetty.project/blob/jetty-11.0.18/jetty-webapp/src/main/java/org/eclipse/jetty/webapp/StandardDescriptorProcessor.java#L650
@@ -447,8 +421,8 @@ public class Application {
     if (server != null) {
       LOG.info("Shutting down application...");
       server.stop();
-      // stop platform if it is available and not yet stopped, should actually be stopped by org.eclipse.scout.rt.server.commons.WebappEventListener.contextDestroyed(ServletContextEvent)
-      // however if context has not been fully initialized (e.g. an error occurred during start, platform must still be stopped during shutdown)
+
+      // stop platform if it is available and not yet stopped (shouldn't be stopped yet)
       IPlatform platform = Platform.peek();
       if (platform != null && platform.getState() != State.PlatformStopped) {
         platform.stop();

@@ -20,20 +20,19 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-
 import javax.management.ObjectName;
-import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.rt.platform.context.PlatformIdentifier;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.servlet.http.HttpSession;
 
 @ApplicationScoped
 @CreateImmediately
@@ -49,7 +48,7 @@ public class SessionMonitorMBean implements ISessionMonitorMBean {
    */
 
   protected ObjectName jmxObjectName() {
-    return MBeanUtility.toJmxName("org.eclipse.scout.rt.ui.html", PlatformIdentifier.get(), "Sessions");
+    return MBeanUtility.toJmxName("org.eclipse.scout.rt.ui.html", "Sessions");
   }
 
   @PostConstruct

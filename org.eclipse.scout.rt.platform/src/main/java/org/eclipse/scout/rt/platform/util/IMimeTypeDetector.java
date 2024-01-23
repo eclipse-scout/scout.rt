@@ -39,11 +39,6 @@ import org.eclipse.scout.rt.platform.Order;
  * <li>{@link PrimaryMimeTypeDetector} with order 0 (first to be asked)</li>
  * <li>{@link JavaNioMimeTypeDetector} with {@link IOrdered#DEFAULT_ORDER} (last to be asked)</li>
  * </ul>
- * <p>
- * The scout server commons module provides another pre-defined {@link IMimeTypeDetector}
- * <ul>
- * <li>{@link ServletContextMimeTypeDetector} with order 10 (first to be asked)</li>
- * </ul>
  * Projects are free to replace these beans or add additional beans with other orders.
  *
  * @author BSI AG

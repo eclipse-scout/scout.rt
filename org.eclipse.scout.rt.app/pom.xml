@@ -26,10 +26,5 @@
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.jetty</artifactId>
     </dependency>
-    <dependency>
-      <!-- due to org.eclipse.scout.rt.server.commons.WebappEventListener -->
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
-    </dependency>
   </dependencies>
 </project>
