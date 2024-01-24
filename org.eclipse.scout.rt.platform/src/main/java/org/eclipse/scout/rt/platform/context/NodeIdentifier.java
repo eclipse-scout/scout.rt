@@ -9,14 +9,17 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
-import java.util.UUID;
-
-import jakarta.annotation.PostConstruct;
-
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
+import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.uuid.IUuidProvider;
+
+import jakarta.annotation.PostConstruct;
 
 /**
  * Provides the current node's identification.
@@ -54,20 +57,20 @@ public class NodeIdentifier {
       return nodeId;
     }
 
-    // Check for WebLogic name
-    nodeId = System.getProperty("weblogic.Name");
-    if (StringUtility.hasText(nodeId)) {
-      return nodeId;
-    }
-
-    // Check for JBoss node name
-    nodeId = System.getProperty("jboss.node.name");
-    if (StringUtility.hasText(nodeId)) {
-      return nodeId;
+    if (Platform.get().inDevelopmentMode()) {
+      return computeForDevelopmentMode();
     }
 
     // Generate random ID
-    return UUID.randomUUID().toString();
+    return BEANS.get(IUuidProvider.class).createUuid().toString();
+  }
+
+  protected String computeForDevelopmentMode() {
+    String hostname = BEANS.get(LocalHostAddressHelper.class).getHostName();
+
+    // In development mode there might be running multiple instances on different ports.
+    // Therefore, we use the Scout app port as well.
+    return StringUtility.join(":", hostname, ConfigUtility.getProperty("scout.app.port"));
   }
 
   public static class NodeIdProperty extends AbstractStringConfigProperty {
