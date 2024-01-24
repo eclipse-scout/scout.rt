@@ -66,8 +66,23 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     });
   }
 
+  /**
+   * Limits the data to 'maxRowCount' results, converts the data to LookupRows and filters
+   * the rows by their 'active' state. If a subclass overrides this method it can omit the
+   * super call, if it must avoid the maxRowCount limit and does its own filtering. In that
+   * case the subclass may choose to call <code>#_mapAndFilterData</code> and
+   * <code>#_limitMaxRows</code> when suitable.
+   */
   protected _lookupRowsByAll(): LookupRow<TKey>[] {
-    let datas = this.data.slice(0, this.maxRowCount);
+    let datas = this._limitMaxRows(this.data);
+    return this._mapAndFilterData(datas);
+  }
+
+  protected _limitMaxRows(array: any[]): any[] {
+    return arrays.ensure(array).slice(0, this.maxRowCount);
+  }
+
+  protected _mapAndFilterData(datas: any[]): LookupRow<TKey>[] {
     return datas
       .map(this._dataToLookupRow, this)
       .filter(this._filterActiveLookupRow, this);
@@ -125,9 +140,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   protected _lookupRowsByText(text: string): LookupRow<TKey>[] {
     let regex = this._createSearchPattern(text);
     let datas = this.data.filter(data => regex.test(data[1].toLowerCase()));
-    return datas
-      .map(this._dataToLookupRow, this)
-      .filter(this._filterActiveLookupRow, this);
+    return this._mapAndFilterData(datas);
   }
 
   _createSearchPattern(text: string): RegExp {
