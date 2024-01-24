@@ -77,7 +77,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    */
   private static final String EMPTY_UPLOAD_FILENAME = "*empty*";
 
-  private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
+  public static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
   public static final Set<String> DEFAULT_VALID_FILE_EXTENSIONS = Stream.of("avi", "bmp", "docx", "dotx", "gif", "html", "jpg", "jpeg", "log", "m2v", "mkv", "mov", "mp3", "mp4", "mpg", "m4p", "oga", "ogv", "pdf", "png", "potx", "ppsx",
       "pptx", "sldx", "svg", "thmx", "tif", "tiff", "txt", "vcard", "vcf", "vcs", "xlsx", "xltx").collect(Collectors.toSet());

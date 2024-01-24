@@ -11,18 +11,23 @@ package org.eclipse.scout.rt.ui.html.app;
 
 import java.util.List;
 
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletHolder.Registration;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckServlet;
 import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiServletMultipartConfigProperty;
 import org.eclipse.scout.rt.ui.html.UiServlet;
+import org.eclipse.scout.rt.ui.html.app.filter.UiServletMultipartConfigFilter;
+
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 /**
  * {@link IServletContributor} and {@link IServletFilterContributor} for UI server.
@@ -30,6 +35,25 @@ import org.eclipse.scout.rt.ui.html.UiServlet;
 public final class UiServletContributors {
 
   private UiServletContributors() {
+  }
+
+  /**
+   * First filter to be registered (low order on purpose); if the filter would be registered using
+   * {@link Registration#setMultipartConfig(MultipartConfigElement)} it would as well be registered before any filters
+   * are applied, see {@link ServletHolder#prepare(Request, ServletRequest, ServletResponse)}.
+   * <p>
+   * Early registration is also necessary as filter may already call {@link ServletRequest#getParameter(String)} which
+   * would evaluate the multipart config property in {@link Request#extractContentParameters()}.
+   *
+   * @see UiServletMultipartConfigFilter
+   */
+  @Order(100)
+  public static class UiServletMultipartConfigFilterContributor implements IServletFilterContributor {
+
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(UiServletMultipartConfigFilter.class, "/*", null);
+    }
   }
 
   @Order(1000)
@@ -94,8 +118,7 @@ public final class UiServletContributors {
 
     @Override
     public void contribute(ServletContextHandler handler) {
-      ServletHolder servletHolder = handler.addServlet(UiServlet.class, "/*");
-      servletHolder.getRegistration().setMultipartConfig(CONFIG.getPropertyValue(UiServletMultipartConfigProperty.class));
+      handler.addServlet(UiServlet.class, "/*");
     }
   }
 }
