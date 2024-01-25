@@ -66,7 +66,7 @@ public class UiNotificationRegistry {
    * The list will be cleaned up regularly by {@link #m_cleanupJob}.
    */
   private Map<String, List<UiNotificationMessageDo>> m_notifications = new HashMap<>();
-  private Map<String, FastListenerList<UiNotificationListener>> m_listeners = new HashMap<>();
+  private final Map<String, FastListenerList<UiNotificationListener>> m_listeners = new HashMap<>();
   private IFuture<Void> m_cleanupJob;
   private long m_cleanupJobInterval = CONFIG.getPropertyValue(RegistryCleanupJobIntervalProperty.class);
   private IUiNotificationClusterService m_clusterService;
@@ -353,18 +353,22 @@ public class UiNotificationRegistry {
   }
 
   public void addListener(String topic, UiNotificationListener listener) {
-    FastListenerList<UiNotificationListener> listeners = m_listeners.computeIfAbsent(topic, k -> new FastListenerList<>());
-    listeners.add(listener);
+    synchronized (m_listeners) {
+      FastListenerList<UiNotificationListener> listeners = m_listeners.computeIfAbsent(topic, k -> new FastListenerList<>());
+      listeners.add(listener);
+    }
   }
 
   public void removeListener(String topic, UiNotificationListener listener) {
-    FastListenerList<UiNotificationListener> listeners = m_listeners.get(topic);
-    if (listeners == null) {
-      return;
-    }
-    listeners.remove(listener);
-    if (listeners.isEmpty()) {
-      m_listeners.remove(topic);
+    synchronized (m_listeners) {
+      FastListenerList<UiNotificationListener> listeners = getListeners(topic);
+      if (listeners == null) {
+        return;
+      }
+      listeners.remove(listener);
+      if (listeners.isEmpty()) {
+        m_listeners.remove(topic);
+      }
     }
   }
 
@@ -391,7 +395,9 @@ public class UiNotificationRegistry {
   }
 
   protected final FastListenerList<UiNotificationListener> getListeners(String topic) {
-    return m_listeners.get(topic);
+    synchronized (m_listeners) {
+      return m_listeners.get(topic);
+    }
   }
 
   protected final Map<String, List<UiNotificationMessageDo>> getNotifications() {
