@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,10 +36,12 @@ export class CalendarListComponent {
 
   render($parent: JQuery) {
     let source = this.source;
+    let calendarDescriptor = source.parent.findCalendarForComponent(source);
     this.$container = $parent
       .appendDiv('calendar-component')
       .data('partDay', this.partDay)
       .addClass(source.item.cssClass)
+      .addClass(calendarDescriptor ? calendarDescriptor.cssClass : null)
       .toggleClass('comp-selected', source.selected)
       .on('mousedown', this._onMouseDown.bind(this, source))
       .on('contextmenu', source._onContextMenu.bind(source));
