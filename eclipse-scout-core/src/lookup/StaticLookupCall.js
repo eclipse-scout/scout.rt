@@ -61,8 +61,23 @@ export default class StaticLookupCall extends LookupCall {
     });
   }
 
+  /**
+   * Limits the data to 'maxRowCount' results, converts the data to LookupRows and filters
+   * the rows by their 'active' state. If a subclass overrides this method it can omit the
+   * super call, if it must avoid the maxRowCount limit and does its own filtering. In that
+   * case the subclass may choose to call <code>#_mapAndFilterData</code> and
+   * <code>#_limitMaxRows</code> when suitable.
+   */
   _lookupRowsByAll() {
-    let datas = this.data.slice(0, this.maxRowCount);
+    let datas = this._limitMaxRows(this.data);
+    return this._mapAndFilterData(datas);
+  }
+
+  _limitMaxRows(array) {
+    return arrays.ensure(array).slice(0, this.maxRowCount);
+  }
+
+  _mapAndFilterData(datas) {
     return datas
       .map(this._dataToLookupRow, this)
       .filter(this._filterActiveLookupRow, this);
@@ -122,9 +137,7 @@ export default class StaticLookupCall extends LookupCall {
   _lookupRowsByText(text) {
     let regex = this._createSearchPattern(text);
     let datas = this.data.filter(data => regex.test(data[1].toLowerCase()));
-    return datas
-      .map(this._dataToLookupRow, this)
-      .filter(this._filterActiveLookupRow, this);
+    return this._mapAndFilterData(datas);
   }
 
   _createSearchPattern(text) {
