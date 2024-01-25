@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   private long m_lastModified;
   private Object m_itemId;
   private String m_owner;
-  private long m_calendarId;
+  private String m_calendarId;
   private String m_subject;
   private String m_subjectLabel;
   private String m_subjectAppLink;
@@ -134,12 +134,12 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   }
 
   @Override
-  public long getCalendarId() {
+  public String getCalendarId() {
     return m_calendarId;
   }
 
   @Override
-  public void setCalendarId(long id) {
+  public void setCalendarId(String id) {
     m_calendarId = id;
   }
 

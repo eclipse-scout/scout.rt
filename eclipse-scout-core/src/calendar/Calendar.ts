@@ -883,7 +883,7 @@ export class Calendar extends Widget implements CalendarModel {
   /**
    * @param selectedComponent may be null when a day is selected
    */
-  protected _setSelection(selectedDate: Date, selectedCalendar: number | CalendarDescriptor | 'default', selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
+  protected _setSelection(selectedDate: Date, selectedCalendar: CalendarDescriptor | string, selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
     let changed = false;
     let dateChanged = dates.compareDays(this.selectedDate, selectedDate) !== 0;
 
@@ -906,10 +906,10 @@ export class Calendar extends Widget implements CalendarModel {
 
     // Set selected calendar
     let newSelectedCalendar = this.selectedCalendar;
-    if (numbers.isNumber(selectedCalendar)) {
-      newSelectedCalendar = this.calendars.find(c => c.calendarId === selectedCalendar);
-    } else if (selectedCalendar === 'default') {
+    if (selectedCalendar === 'default') {
       newSelectedCalendar = null;
+    } else if (typeof selectedCalendar === 'string' || selectedCalendar instanceof String) {
+      newSelectedCalendar = this.calendars.find(c => c.calendarId === selectedCalendar);
     } else {
       newSelectedCalendar = selectedCalendar as CalendarDescriptor;
     }
@@ -1508,7 +1508,7 @@ export class Calendar extends Widget implements CalendarModel {
   /* -- components, events-------------------------------------------- */
 
   /** @internal */
-  _selectedComponentChanged(component: CalendarComponent, calendarId: number, partDay: Date, updateScrollPosition: boolean) {
+  _selectedComponentChanged(component: CalendarComponent, calendarId: string, partDay: Date, updateScrollPosition: boolean) {
     this._setSelection(partDay, calendarId, component, updateScrollPosition, false);
   }
 
@@ -1551,11 +1551,11 @@ export class Calendar extends Widget implements CalendarModel {
   protected _onCalendarTreeNodeSelected(event: TreeNodesCheckedEvent) {
     let tupelArray = event.nodes
       .map(node => node as CalendarsPanelTreeNode)
-      .map(node => [node.calendarId, node.checked] as [number, boolean]);
+      .map(node => [node.calendarId, node.checked] as [string, boolean]);
     this._updateCalendarVisibility(tupelArray);
   }
 
-  protected _updateCalendarVisibility(updatedCalendars: [calendarId: number, visible: boolean][]) {
+  protected _updateCalendarVisibility(updatedCalendars: [calendarId: string, visible: boolean][]) {
     if (!this.initialized) {
       // Is called after init
       return;
@@ -1570,7 +1570,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.layoutSize(true);
   }
 
-  protected _updateCalendarVisibleProperty(calendarId: number, visible: boolean) {
+  protected _updateCalendarVisibleProperty(calendarId: string, visible: boolean) {
     if (!calendarId) {
       // No update
       return;
@@ -1781,8 +1781,8 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  protected _calculateStackKey(date: Date, calendarId?: number): string {
-    if (!this.isDay() || !calendarId || calendarId === 0) {
+  protected _calculateStackKey(date: Date, calendarId?: string): string {
+    if (!this.isDay() || !calendarId) {
       return 'default';
     }
     return date + '' + calendarId ? calendarId.toString() : 'default';

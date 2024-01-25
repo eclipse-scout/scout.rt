@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -469,7 +469,7 @@ export type CalendarItem = {
   itemId: any;
   owner: string;
   cssClass: string;
-  calendarId: number;
+  calendarId: string;
   subject: string;
   description: string;
   recurrencePattern: {

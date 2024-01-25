@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,8 @@ import {CalendarsPanelTreeNodeModel, InitModelOf, TreeNode} from '../index';
 export class CalendarsPanelTreeNode extends TreeNode implements CalendarsPanelTreeNodeModel {
   declare model: CalendarsPanelTreeNodeModel;
 
-  calendarId: number;
-  parentId: number;
+  calendarId: string;
+  parentId: string;
 
   constructor() {
     super();
