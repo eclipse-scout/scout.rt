@@ -33,15 +33,15 @@ describe('Calendar', () => {
       super._updateFullDayIndices(fullDayComponents);
     }
 
-    override _setSelection(selectedDate: Date, selectedCalendar: number | CalendarDescriptor | 'default', selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
+    override _setSelection(selectedDate: Date, selectedCalendar: CalendarDescriptor | string, selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
       super._setSelection(selectedDate, selectedCalendar, selectedComponent, updateScrollPosition, timeChanged);
     }
 
-    override _updateCalendarVisibility(updatedCalendars: [calendarId: number, visible: boolean][]) {
+    override _updateCalendarVisibility(updatedCalendars: [calendarId: string, visible: boolean][]) {
       super._updateCalendarVisibility(updatedCalendars);
     }
 
-    override _calculateStackKey(date: Date, calendarId?: number): string {
+    override _calculateStackKey(date: Date, calendarId?: string): string {
       return super._calculateStackKey(date, calendarId);
     }
 
@@ -524,7 +524,7 @@ describe('Calendar', () => {
     let day = dates.parseJsonDate(stringDay);
     let dateRangeNoon = {from: '2023-10-27 12:00:00.000', to: '2023-10-27 12:30:00.000'};
 
-    const createCalendarComponent = (calendar: Calendar, fromDate: string, toDate: string, calendarId?: string | number, fullDay?: boolean): CalendarComponent => {
+    const createCalendarComponent = (calendar: Calendar, fromDate: string, toDate: string, calendarId?: string, fullDay?: boolean): CalendarComponent => {
       let model = {
         parent: calendar,
         item: {
@@ -544,9 +544,9 @@ describe('Calendar', () => {
     };
 
     const createCalendarDescriptor = (name = 'Test calendar', visible = true, selectable = true): CalendarDescriptor => {
-      let calendarId = UuidPool.take(sandboxSession());
+      let calendarId = UuidPool.take(session);
       return {
-        calendarId: calendarId as unknown as number,
+        calendarId: calendarId,
         name: name,
         visible: visible,
         selectable: selectable
@@ -701,6 +701,76 @@ describe('Calendar', () => {
 
         // Assert
         expect(menuVisible).toBe(true);
+      });
+    });
+
+    it('should not be a problem to have an empty named calendar descriptor', () => {
+      // Arrange
+      let unnamedCalendar = createCalendarDescriptor(null);
+      let calendar = initCalendar(unnamedCalendar);
+      let component = createCalendarComponent(calendar, stringDay, stringDay, unnamedCalendar.calendarId);
+      calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+      // Act
+      let currentComponenteCalendarId = getCurrentCalendarIdFor(component);
+
+      // Assert
+      expect(currentComponenteCalendarId).toBe(unnamedCalendar.calendarId);
+    });
+
+    describe('range selection on multiple calendar', () => {
+      it('should apply selection on a selectable calendar', () => {
+        // Arrange
+        let selectableCalendar = createCalendarDescriptor('Selectable calendar', true, true);
+        let calendar = initCalendar(selectableCalendar);
+        calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+        // Act
+        calendar._setSelection(new Date(stringDay), selectableCalendar, null, false, false);
+
+        // Assert
+        expect(calendar.selectedCalendar).toBe(selectableCalendar);
+      });
+
+      it('should not apply selection on a non-selectable calendar', () => {
+        // Arrange
+        let unselectableCalendar = createCalendarDescriptor('Selectable calendar', true, false);
+        let calendar = initCalendar(unselectableCalendar);
+        calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+        // Act
+        calendar._setSelection(new Date(stringDay), unselectableCalendar, null, false, false);
+
+        // Assert
+        expect(calendar.selectedCalendar).toBe(null);
+      });
+
+      it('should preserve selected calendar when a non-selectable calendar is selected', () => {
+        // Arrange
+        let selectableCalendar = createCalendarDescriptor('Selectable calendar', true, true);
+        let unselectableCalendar = createCalendarDescriptor('Selectable calendar', true, false);
+        let calendar = initCalendar(selectableCalendar, unselectableCalendar);
+        calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+        // Act
+        calendar._setSelection(new Date(stringDay), selectableCalendar, null, false, false);
+        calendar._setSelection(new Date(stringDay), unselectableCalendar, null, false, false);
+
+        // Assert
+        expect(calendar.selectedCalendar).toBe(selectableCalendar);
+      });
+
+      it('should be able to handle calendarId when selection is set', () => {
+        // Arrange
+        let selectableCalendar = createCalendarDescriptor('Selectable calendar', true, true);
+        let calendar = initCalendar(selectableCalendar);
+        calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+        // Act
+        calendar._setSelection(new Date(stringDay), selectableCalendar.calendarId, null, false, false);
+
+        // Assert
+        expect(calendar.selectedCalendar).toBe(selectableCalendar);
       });
     });
   });

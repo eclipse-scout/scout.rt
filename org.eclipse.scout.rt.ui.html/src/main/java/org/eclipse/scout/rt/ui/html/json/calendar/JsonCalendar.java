@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -403,19 +403,19 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
   }
 
   protected void handleUiCalendarVisibilityChange(JsonEvent event) {
-    Pair<Long, Boolean> calendarVisibility = extractCalendarVisibility(event.getData());
+    Pair<String, Boolean> calendarVisibility = extractCalendarVisibility(event.getData());
     getModel().getUIFacade().setCalendarVisibilityFromUI(calendarVisibility.getLeft(), calendarVisibility.getRight());
     LOG.debug("calendarId={} visible={}", calendarVisibility.getLeft(), calendarVisibility.getRight());
   }
 
   protected void handleUiSelectedCalendarChange(JsonEvent event) {
-    Long calendarId = event.getData().optLong("calendarId");
+    String calendarId = event.getData().optString("calendarId");
     getModel().getUIFacade().setSelectedCalendarFromUI(calendarId);
     LOG.debug("calendarId={}", calendarId);
   }
 
-  protected Pair<Long, Boolean> extractCalendarVisibility(JSONObject data) {
-    Long calendarId = data.optLong("calendarId");
+  protected Pair<String, Boolean> extractCalendarVisibility(JSONObject data) {
+    String calendarId = data.optString("calendarId");
     Boolean visible = data.optBoolean("visible");
     return new ImmutablePair<>(calendarId, visible);
   }

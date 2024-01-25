@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -996,7 +996,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     }
 
     @Override
-    public void setCalendarVisibilityFromUI(Long calendarId, Boolean visible) {
+    public void setCalendarVisibilityFromUI(String calendarId, Boolean visible) {
       try {
         pushUIProcessor();
         ICalendarDescriptor cal = getCalendars().stream()
@@ -1015,11 +1015,11 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     }
 
     @Override
-    public void setSelectedCalendarFromUI(Long calendarId) {
+    public void setSelectedCalendarFromUI(String calendarId) {
       try {
         pushUIProcessor();
         ICalendarDescriptor selectedCalendar;
-        if (calendarId == null || calendarId == 0) {
+        if (StringUtility.isNullOrEmpty(calendarId)) {
           selectedCalendar = null;
         }
         else {

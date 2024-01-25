@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ public interface ICalendarDescriptor {
    * <br>
    * Required property, set via constructor
    */
-  Long getCalendarId();
+  String getCalendarId();
 
   /**
    * Name of the Calendar E.g. Jeremy White <br>
@@ -28,13 +28,15 @@ public interface ICalendarDescriptor {
    */
   String getName();
 
+  ICalendarDescriptor withName(String name);
+
   /**
    * Unique identifyer of the parent calendar. <br>
    * Do not set this, if ths is a calendar group or a top level calendar.
    */
-  Long getParentId();
+  String getParentId();
 
-  ICalendarDescriptor withParentId(Long parentId);
+  ICalendarDescriptor withParentId(String parentId);
 
   /**
    * Indicates if the calendar is displayed
