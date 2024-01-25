@@ -285,7 +285,8 @@ export class Calendar extends Widget implements CalendarModel {
           parentId: descriptor.parentId,
           text: descriptor.name,
           checked: descriptor.visible,
-          cssClass: descriptor.cssClass
+          cssClass: descriptor.cssClass,
+          expanded: true
         }), this.calendarsPanel.tree.nodes.find(node => node.calendarId === descriptor.parentId));
       });
   }
@@ -909,7 +910,7 @@ export class Calendar extends Widget implements CalendarModel {
     if (selectedCalendar === 'default') {
       newSelectedCalendar = null;
     } else if (typeof selectedCalendar === 'string' || selectedCalendar instanceof String) {
-      newSelectedCalendar = this.calendars.find(c => c.calendarId === selectedCalendar);
+      newSelectedCalendar = this._findCalendarForId(selectedCalendar as string);
     } else {
       newSelectedCalendar = selectedCalendar as CalendarDescriptor;
     }
@@ -1101,7 +1102,7 @@ export class Calendar extends Widget implements CalendarModel {
           if (id === 'default') {
             return this._defaultCalendarVisible();
           }
-          return this.calendars.find(cal => cal.calendarId === id).visible;
+          return this._findCalendarForId(id).visible;
         }).data('new-width', columnWidth);
     } else {
       // Set size 0 for all calendar columns
@@ -1183,7 +1184,11 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   findCalendarForComponent(component: CalendarComponent): CalendarDescriptor {
-    return this.calendars.find(cal => cal.calendarId === component.item.calendarId);
+    return this._findCalendarForId(component.item.calendarId);
+  }
+
+  protected _findCalendarForId(calendarId: string) {
+    return this.calendars.find(calendar => calendar.calendarId === calendarId);
   }
 
   protected _updateWeekdayNames() {
@@ -1575,7 +1580,7 @@ export class Calendar extends Widget implements CalendarModel {
       // No update
       return;
     }
-    let calendar = this.calendars.find(calendar => calendar.calendarId === calendarId);
+    let calendar = this._findCalendarForId(calendarId);
     if (!calendar || calendar.visible === visible) {
       // No update
       return;
@@ -2175,7 +2180,7 @@ export class Calendar extends Widget implements CalendarModel {
     let currentCalendarId = $(event.delegateTarget).data('calendarId');
     let selectable = currentCalendarId === 'default'
       ? true
-      : this.calendars.find(c => c.calendarId === currentCalendarId).selectable;
+      : this._findCalendarForId(currentCalendarId).selectable;
     if (!selectable) {
       return;
     }
