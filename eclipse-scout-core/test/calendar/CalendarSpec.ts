@@ -667,12 +667,17 @@ describe('Calendar', () => {
     });
 
     describe('calendars menu visible', () => {
+
+      const isCalendarsMenuVisible = (calendar: Calendar): boolean => {
+        return !calendar.$commands.children('.calendar-toggle-calendars').hasClass('hidden');
+      };
+
       it('should hide calendars menu when no calendar is set', () => {
         // Arrange
         let calendar = initCalendar();
 
         // Act
-        let menuVisible = !calendar.$commands.children('.calendar-toggle-calendars').hasClass('hidden');
+        let menuVisible = isCalendarsMenuVisible(calendar);
 
         // Assert
         expect(menuVisible).toBe(false);
@@ -684,7 +689,7 @@ describe('Calendar', () => {
         let calendar = initCalendar(calDesc);
 
         // Act
-        let menuVisible = !calendar.$commands.children('.calendar-toggle-calendars').hasClass('hidden');
+        let menuVisible = isCalendarsMenuVisible(calendar);
 
         // Assert
         expect(menuVisible).toBe(false);
@@ -697,10 +702,26 @@ describe('Calendar', () => {
         let calendar = initCalendar(businessCal, otherCal);
 
         // Act
-        let menuVisible = !calendar.$commands.children('.calendar-toggle-calendars').hasClass('hidden');
+        let menuVisible = isCalendarsMenuVisible(calendar);
 
         // Assert
         expect(menuVisible).toBe(true);
+      });
+
+      it('should make calendars menu visible when an additional calendar is added', () => {
+        // Arrange
+        let businessCal = createCalendarDescriptor('Business calendar');
+        let otherCal = createCalendarDescriptor('Other calendar');
+        let calendar = initCalendar(businessCal);
+
+        // Act
+        let menuVisibleFirst = isCalendarsMenuVisible(calendar);
+        calendar.setCalendars([...calendar.calendars, otherCal]);
+        let menuVisibleAfter = isCalendarsMenuVisible(calendar);
+
+        // Assert
+        expect(menuVisibleFirst).toBe(false);
+        expect(menuVisibleAfter).toBe(true);
       });
     });
 
