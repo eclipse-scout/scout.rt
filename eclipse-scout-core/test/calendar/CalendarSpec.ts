@@ -7,7 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponent, CalendarDescriptor, CalendarItem, DateRange, dates, scout, UuidPool} from '../../src/index';
+import {Calendar, CalendarComponent, CalendarDescriptor, CalendarItem, CalendarsPanelTreeNode, DateRange, dates, scout, UuidPool} from '../../src/index';
+import {JQueryTesting} from '../../src/testing/index';
 
 describe('Calendar', () => {
   let session: SandboxSession;
@@ -854,6 +855,100 @@ describe('Calendar', () => {
 
         // Assert
         expect(calendar.selectedCalendar).toBe(selectableCalendar);
+      });
+    });
+
+    describe('one calendar should always be selected', () => {
+
+      const clickTreeNodeForCalendarId = (calendar: Calendar, calendarId: string) => {
+        let tree = calendar.calendarSidebar.calendarsPanel.tree;
+        tree.visitNodes(node => {
+          if ((<CalendarsPanelTreeNode>node).calendarId === calendarId) {
+            JQueryTesting.triggerClick(node.$node);
+            return true;
+          }
+        });
+      };
+
+      it('should not be possible to uncheck the last checked calendar', () => {
+        // Arrange
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        let calendar2 = createCalendarDescriptor('Calendar 2');
+        let calendar = initCalendar(calendar1, calendar2);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+        clickTreeNodeForCalendarId(calendar, calendar2.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(false);
+        expect(calendar2.visible).toBe(true);
+      });
+
+      it('should not be possible to uncheck the calendar when calendars are in group', () => {
+        // Arrange
+        let parentCalendar = createCalendarDescriptor('Parent calendar');
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        calendar1.parentId = parentCalendar.calendarId;
+        let calendar2 = createCalendarDescriptor('Calendar 2');
+        calendar2.parentId = parentCalendar.calendarId;
+        let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+        clickTreeNodeForCalendarId(calendar, calendar2.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(false);
+        expect(calendar2.visible).toBe(true);
+      });
+
+      it('should not be possible to uncheck the calendar group when the group contains the remaining select calendars', () => {
+        // Arrange
+        let parentCalendar = createCalendarDescriptor('Parent calendar');
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        calendar1.parentId = parentCalendar.calendarId;
+        let calendar2 = createCalendarDescriptor('Calendar 2');
+        calendar2.parentId = parentCalendar.calendarId;
+        let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, parentCalendar.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(false);
+        expect(calendar2.visible).toBe(true);
+      });
+
+      it('should not hide a calendar when its double clicked', () => {
+        // Arrange
+        let parentCalendar = createCalendarDescriptor('Parent calendar');
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        calendar1.parentId = parentCalendar.calendarId;
+        let calendar2 = createCalendarDescriptor('Calendar 2');
+        calendar2.parentId = parentCalendar.calendarId;
+        let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, calendar2.calendarId);
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(true);
+        expect(calendar2.visible).toBe(false);
+      });
+
+      it('should not be possible to unselect the only calendar', () => {
+        // Arrange
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        let calendar = initCalendar(calendar1);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(true);
       });
     });
   });
