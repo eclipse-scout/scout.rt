@@ -42,4 +42,10 @@ public interface ICalendarUIFacade {
   void setCalendarVisibilityFromUI(String calendarId, Boolean visible);
 
   void setSelectedCalendarFromUI(String calendarId);
+
+  void setShowYearPanelFromUI(boolean show);
+
+  void setShowCalendarsPanelFromUI(boolean show);
+
+  void setShowListPanelFromUI(boolean show);
 }

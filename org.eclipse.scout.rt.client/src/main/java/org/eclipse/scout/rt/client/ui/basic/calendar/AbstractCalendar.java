@@ -175,6 +175,24 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(700)
+  protected boolean getConfiguredShowYearPanel() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(800)
+  protected boolean getConfiguredShowCalendarsPanel() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(900)
+  protected boolean getConfiguredShowListPanel() {
+    return false;
+  }
+
   private List<Class<? extends ICalendarItemProvider>> getConfiguredProducers() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<ICalendarItemProvider>> filtered = ConfigurationUtility.filterClasses(dca, ICalendarItemProvider.class);
@@ -234,6 +252,9 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     setShowDisplayModeSelection(getConfiguredShowDisplayModeSelection());
     setRangeSelectionAllowed(getConfiguredRangeSelectionAllowed());
     setCalendars(getConfiguredCalendars());
+    setShowYearPanel(getConfiguredShowYearPanel());
+    setShowCalendarsPanel(getConfiguredShowCalendarsPanel());
+    setShowListPanel(getShowListPanel());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -541,6 +562,37 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   @Override
   public ICalendarDescriptor getSelectedCalendar() {
     return propertySupport.getProperty(PROP_SELECTED_CALENDAR, ICalendarDescriptor.class);
+  }
+
+
+  @Override
+  public boolean getShowYearPanel() {
+    return propertySupport.getPropertyBool(PROP_SHOW_YEAR_PANEL);
+  }
+
+  @Override
+  public void setShowYearPanel(boolean showYearPanel) {
+    propertySupport.setPropertyBool(PROP_SHOW_YEAR_PANEL, showYearPanel);
+  }
+
+  @Override
+  public boolean getShowCalendarsPanel() {
+    return propertySupport.getPropertyBool(PROP_SHOW_CALENDARS_PANEL);
+  }
+
+  @Override
+  public void setShowCalendarsPanel(boolean showCalendarsPanel) {
+    propertySupport.setPropertyBool(PROP_SHOW_CALENDARS_PANEL, showCalendarsPanel);
+  }
+
+  @Override
+  public boolean getShowListPanel() {
+    return propertySupport.getPropertyBool(PROP_SHOW_LIST_PANEL);
+  }
+
+  @Override
+  public void setShowListPanel(boolean showListPanel) {
+    propertySupport.setPropertyBool(PROP_SHOW_LIST_PANEL, showListPanel);
   }
 
   @Override
@@ -1029,6 +1081,39 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
               .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar for id " + calendarId));
         }
         propertySupport.setProperty(PROP_SELECTED_CALENDAR, selectedCalendar);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setShowYearPanelFromUI(boolean show) {
+      try {
+        pushUIProcessor();
+        setShowYearPanel(show);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setShowCalendarsPanelFromUI(boolean show) {
+      try {
+        pushUIProcessor();
+        setShowCalendarsPanel(show);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setShowListPanelFromUI(boolean show) {
+      try {
+        pushUIProcessor();
+        setShowListPanel(show);
       }
       finally {
         popUIProcessor();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,11 @@ import {Calendar, CalendarComponentMoveEvent, CalendarVisibilityChangeEvent, dat
 
 export class CalendarAdapter extends ModelAdapter {
   declare widget: Calendar;
+
+  constructor() {
+    super();
+    this._addRemoteProperties(['showYearPanel', 'showCalendarsPanel', 'showListPanel']);
+  }
 
   /**
    * We must send the view-range to the client-model on the server. The view-range is determined by the UI.

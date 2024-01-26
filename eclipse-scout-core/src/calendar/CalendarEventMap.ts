@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,4 +34,7 @@ export interface CalendarEventMap extends WidgetEventMap {
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;
   'propertyChange:selectedDate': PropertyChangeEvent<Date>;
   'propertyChange:viewRange': PropertyChangeEvent<DateRange>;
+  'propertyChange:showYearPanel': PropertyChangeEvent<boolean>;
+  'propertyChange:showCalendarsPanel': PropertyChangeEvent<boolean>;
+  'propertyChange:showListPanel': PropertyChangeEvent<boolean>;
 }
