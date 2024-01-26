@@ -96,7 +96,6 @@ public class Application {
     INSTANCE.get().start();
   }
 
-
   protected void start() {
     try {
       startInternal();
@@ -310,10 +309,12 @@ public class Application {
   }
 
   /**
-   * Installs the default error handler. This default implementation does not send any stack traces to the client.
+   * Installs the default error handler. This default implementation doesn't show the servlet and doesn't send any stack
+   * traces to the client.
    */
   protected void installErrorHandler(Server server) {
     ErrorHandler handler = new ErrorHandler();
+    handler.setShowServlet(false);
     handler.setShowMessageInTitle(false);
     handler.setShowStacks(false);
     server.setErrorHandler(handler);
