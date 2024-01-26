@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/cli",
-  "version": "22.0.0-snapshot",
+  "version": "22.0.57",
   "description": "CLI for Eclipse Scout",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -54,7 +54,7 @@
     "karma-jasmine": "4.0.1",
     "karma-jasmine-ajax": "0.1.13",
     "@metahub/karma-jasmine-jquery": "4.0.1",
-    "@eclipse-scout/karma-jasmine-scout": ">=22.0.0-snapshot <22.0.0",
+    "@eclipse-scout/karma-jasmine-scout": "22.0.57",
     "karma-jasmine-html-reporter": "1.7.0",
     "karma-junit-reporter": "2.0.1",
     "karma-webpack": "5.0.0",
