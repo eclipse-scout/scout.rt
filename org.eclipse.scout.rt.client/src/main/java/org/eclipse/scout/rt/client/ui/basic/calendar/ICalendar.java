@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -93,6 +93,12 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
   String PROP_CONTEXT_MENU = "contextMenus";
 
   String PROP_MENU_INJECTION_TARGET = "menuInjectionTarget";
+
+  String PROP_SHOW_YEAR_PANEL = "showYearPanel";
+
+  String PROP_SHOW_CALENDARS_PANEL = "showYearPanel";
+
+  String PROP_SHOW_LIST_PANEL = "showYearPanel";
 
   String getTitle();
 
@@ -257,4 +263,16 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * and the new menu structure will be injected.
    */
   void setMenuInjectionTarget(IGroupBox target);
+
+  boolean getShowYearPanel();
+
+  void setShowYearPanel(boolean showYearPanel);
+
+  boolean getShowCalendarsPanel();
+
+  void setShowCalendarsPanel(boolean showCalendarsPanel);
+
+  boolean getShowListPanel();
+
+  void setShowListPanel(boolean showListPanel);
 }

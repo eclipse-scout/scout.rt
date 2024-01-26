@@ -239,6 +239,24 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
             .orElse(null);
       }
     });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_YEAR_PANEL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getShowYearPanel();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_CALENDARS_PANEL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getShowCalendarsPanel();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_LIST_PANEL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getShowListPanel();
+      }
+    });
   }
 
   @SuppressWarnings("unchecked")
@@ -258,6 +276,20 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       array.put(new JsonCalendarDescriptor(descriptor).toJson());
     }
     return array;
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (ICalendar.PROP_SHOW_YEAR_PANEL.equals(propertyName)) {
+      getModel().getUIFacade().setShowYearPanelFromUI(data.getBoolean(propertyName));
+    }
+    else if (ICalendar.PROP_SHOW_CALENDARS_PANEL.equals(propertyName)) {
+      getModel().getUIFacade().setShowCalendarsPanelFromUI(data.getBoolean(propertyName));
+    }
+    else if (ICalendar.PROP_SHOW_LIST_PANEL.equals(propertyName)) {
+      getModel().getUIFacade().setShowListPanelFromUI(data.getBoolean(propertyName));
+    }
+    super.handleUiPropertyChange(propertyName, data);
   }
 
   @Override

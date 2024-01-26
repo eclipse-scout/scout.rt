@@ -65,6 +65,68 @@ describe('Calendar', () => {
       expect(cal.viewRange).toBeDefined();
     });
 
+    describe('expands panels corretly', () => {
+
+      const getContainterWidth = (container: JQuery): number => {
+        return container.width();
+      };
+
+      it('should expand the year panel when showYearPanel is true', () => {
+        // Arrange
+        let model = {parent: session.desktop, showYearPanel: true};
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let yearPanelWidth = getContainterWidth(cal.calendarSidebar.yearPanel.$container);
+
+        // Assert
+        expect(yearPanelWidth).toBeGreaterThan(0);
+      });
+
+      it('should expand the calendars panel when showCalendarsPanel is true', () => {
+        // Arrange
+        let model = {parent: session.desktop, showCalendarsPanel: true};
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let calendarsPanelWidth = getContainterWidth(cal.calendarSidebar.calendarsPanel.$container);
+
+        // Assert
+        expect(calendarsPanelWidth).toBeGreaterThan(0);
+      });
+
+      it('should expand the list panel when showListPanel is true', () => {
+        // Arrange
+        let model = {parent: session.desktop, showListPanel: true};
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let listPanelWidth = getContainterWidth(cal.$listContainer);
+
+        // Assert
+        expect(listPanelWidth).toBeGreaterThan(0);
+      });
+
+      it('should expand nothing when no variable is set', () => {
+        // Arrange
+        let model = {parent: session.desktop};
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let yearPanelWidth = getContainterWidth(cal.calendarSidebar.yearPanel.$container);
+        let calendarsPanelWidth = getContainterWidth(cal.calendarSidebar.calendarsPanel.$container);
+        let listPanelWidth = getContainterWidth(cal.$listContainer);
+
+        // Assert
+        expect(yearPanelWidth).toBe(0);
+        expect(calendarsPanelWidth).toBe(0);
+        expect(listPanelWidth).toBe(0);
+      });
+    });
   });
 
   describe('dayPosition', () => {
