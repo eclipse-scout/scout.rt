@@ -1595,11 +1595,30 @@ export class Calendar extends Widget implements CalendarModel {
       // No update
       return;
     }
+    if (!this._hasOtherVisibleCalendars(calendar)) {
+      // Last visible calendar was unselected, selecting it again
+      let tree = this.calendarSidebar.calendarsPanel.tree;
+      tree.visitNodes(node => {
+        if ((<CalendarsPanelTreeNode>node).calendarId === calendar.calendarId) {
+          tree.checkNode(node, true, {triggerNodesChecked: false});
+          return true;
+        }
+      });
+      // Returning, because no event should be triggered -> nothing happened
+      return;
+    }
     calendar.visible = visible;
     this.trigger('calendarVisibilityChange', {
       calendarId: calendarId,
       visible: visible
     });
+  }
+
+  protected _hasOtherVisibleCalendars(calendar: CalendarDescriptor) {
+    return this.calendars
+      .filter(cal => cal.visible)
+      .filter(cal => cal !== calendar)
+      .length > 0;
   }
 
   /* -- components, arrangement------------------------------------ */
