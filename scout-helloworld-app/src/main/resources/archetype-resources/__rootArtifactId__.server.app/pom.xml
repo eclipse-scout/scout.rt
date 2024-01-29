@@ -19,10 +19,10 @@
       <artifactId>${rootArtifactId}.server</artifactId>
     </dependency>
 
-    <!-- Scout app (Jetty) -->
+    <!-- Scout server app (Jetty) -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.app</artifactId>
+      <artifactId>org.eclipse.scout.rt.server.app</artifactId>
     </dependency>
 
     <!-- Logging -->

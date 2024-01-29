@@ -322,7 +322,7 @@ public class Application {
 
   protected Handler createHandler() {
     boolean sessionEnabled = CONFIG.getPropertyValue(ScoutApplicationHttpSessionEnabledProperty.class);
-    LOG.info("Creating servlet context handler (non-resource-based) with {}", sessionEnabled ? "sessions" : "no sessions");
+    LOG.info("Creating servlet context handler with {}", sessionEnabled ? "sessions" : "no sessions");
 
     ServletContextHandler handler = new ServletContextHandler(sessionEnabled ? ServletContextHandler.SESSIONS : ServletContextHandler.NO_SESSIONS);
 

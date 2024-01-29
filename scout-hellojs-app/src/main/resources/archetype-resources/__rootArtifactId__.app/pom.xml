@@ -33,10 +33,10 @@
       </exclusions>
     </dependency>
 
-    <!-- Scout app (Jetty) -->
+    <!-- Scout UI app (Jetty) -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.app</artifactId>
+      <artifactId>org.eclipse.scout.rt.ui.html.app</artifactId>
     </dependency>
 
     <!-- Jackson -->

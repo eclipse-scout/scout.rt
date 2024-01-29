@@ -41,6 +41,7 @@
     <module>../org.eclipse.scout.rt.nls</module>
 
     <module>../org.eclipse.scout.rt.server</module>
+    <module>../org.eclipse.scout.rt.server.app</module>
     <module>../org.eclipse.scout.rt.server.test</module>
     <module>../org.eclipse.scout.rt.server.jaxws</module>
     <module>../org.eclipse.scout.rt.server.jaxws.test</module>
@@ -87,6 +88,7 @@
     <module>../org.eclipse.scout.rt.serverbridge</module>
 
     <module>../org.eclipse.scout.rt.ui.html</module>
+    <module>../org.eclipse.scout.rt.ui.html.app</module>
     <module>../org.eclipse.scout.rt.ui.html.test</module>
     <module>../org.eclipse.scout.rt.ui.html.selenium</module>
     <module>../org.eclipse.scout.rt.svg.ui.html</module>
@@ -408,6 +410,11 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.app</artifactId>
+        <version>24.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.test</artifactId>
         <version>24.1-SNAPSHOT</version>
       </dependency>
@@ -492,6 +499,11 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+        <version>24.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.ui.html.app</artifactId>
         <version>24.1-SNAPSHOT</version>
       </dependency>
       <dependency>

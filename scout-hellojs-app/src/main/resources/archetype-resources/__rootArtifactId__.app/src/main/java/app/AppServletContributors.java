@@ -9,13 +9,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.rest.RestApplication;
-import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextFilter;
-import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiServletMultipartConfigProperty;
-import org.eclipse.scout.rt.ui.html.UiServlet;
+import org.eclipse.scout.rt.ui.html.app.UiServletContributors.GzipFilterContributor;
+import org.eclipse.scout.rt.ui.html.app.UiServletContributors.UiServletContributor;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
@@ -30,28 +27,14 @@ public final class AppServletContributors {
   private AppServletContributors() {
   }
 
-  @Order(10)
-  public static class HttpSessionMutexFilterContributor implements IServletFilterContributor {
-
-    @Override
-    public void contribute(ServletContextHandler handler) {
-      handler.addEventListener(new HttpSessionMutex());
-    }
-  }
-
-  @Order(20)
-  public static class GzipFilterContributor implements IServletFilterContributor {
-
-    @Override
-    public void contribute(ServletContextHandler handler) {
-      handler.addFilter(GzipServletFilter.class, "/*", null);
-    }
-  }
+  // no auth filter on / for UiServlet required
 
   /**
    * Filters for API access.
+   * <p>
+   * After {@link GzipFilterContributor}.
    */
-  @Order(30)
+  @Order(4000)
   public static class RestAuthFilterContributor implements IServletFilterContributor {
 
     @Override
@@ -60,7 +43,7 @@ public final class AppServletContributors {
     }
   }
 
-  @Order(40)
+  @Order(5000)
   public static class ApiServerRunContextFilterContributor implements IServletFilterContributor {
 
     @Override
@@ -71,22 +54,11 @@ public final class AppServletContributors {
   }
 
   /**
-   * UI Servlet that provides resources (js, html, css, ...).
-   */
-  @Order(10)
-  public static class UiServletContributor implements IServletContributor {
-
-    @Override
-    public void contribute(ServletContextHandler handler) {
-      ServletHolder servletHolder = handler.addServlet(UiServlet.class, "/*");
-      servletHolder.getRegistration().setMultipartConfig(CONFIG.getPropertyValue(UiServletMultipartConfigProperty.class));
-    }
-  }
-
-  /**
    * JAX-RS Jersey Servlet.
+   * <p>
+   * After {@link UiServletContributor}.
    */
-  @Order(20)
+  @Order(3000)
   public static class ApiServletContributor implements IServletContributor {
 
     @Override
