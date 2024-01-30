@@ -15,7 +15,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -138,11 +137,17 @@ public class HttpProxyTest {
         "/my-api/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview", null, options);
     testRewriteUrlInternal("http://internal.example.com:1234/api",
         null, null, options);
+    testRewriteUrlInternal("http://internal.example.com:1234/api?foo",
+        null, "foo", options);
+    testRewriteUrlInternal("http://internal.example.com:1234/api/",
+        "/", null, options);
     testRewriteUrlInternal("http://internal.example.com:1234/api/lorem",
         "/lorem", null, options);
     testRewriteUrlInternal("http://internal.example.com:1234/api/lorem?ipsum",
         "/lorem", "ipsum", new HttpProxyRequestOptions());
     testRewriteUrlInternal("http://internal.example.com:1234/api/lorem?foo=%25bar%25+lorem+ipsum", "/lorem", "foo=%25bar%25+lorem+ipsum", new HttpProxyRequestOptions());
+    testRewriteUrlInternal("http://internal.example.com:1234/api/lorem%20ipsum/%C3%84hnliche%20Dateien.html",
+        "/lorem ipsum/Ähnliche Dateien.html", null, new HttpProxyRequestOptions());
   }
 
   protected void testRewriteUrlInternal(String expectedResult, String pathInfo, String queryString, HttpProxyRequestOptions options) {
@@ -153,8 +158,18 @@ public class HttpProxyTest {
     when(req.getPathInfo()).thenReturn(pathInfo);
     when(req.getQueryString()).thenReturn(queryString);
 
-    URI url = proxy.rewriteUrl(req, options);
-    assertEquals(expectedResult, url.toString());
+    String url = proxy.rewriteUrl(req, options);
+    assertEquals(expectedResult, url);
+  }
+
+  @Test
+  @NonParameterized
+  public void testWithRemoteBaseUrl() {
+    m_proxy.withRemoteBaseUrl("http://internal.example.com:1234/api");
+    assertEquals("http://internal.example.com:1234/api", m_proxy.getRemoteBaseUrl());
+
+    m_proxy.withRemoteBaseUrl("http://internal.example.com:1234/foo/");
+    assertEquals("http://internal.example.com:1234/foo", m_proxy.getRemoteBaseUrl());
   }
 
   @Test
@@ -416,7 +431,7 @@ public class HttpProxyTest {
   }
 
   @Test
-  public void testProxyRequest_Failure() throws IOException {
+  public void testProxyRequest_Failure() {
     HttpServletResponse resp = testProxyRequestInternal(new AbstractHandler() {
       @Override
       public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
