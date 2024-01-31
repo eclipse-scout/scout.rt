@@ -62,6 +62,10 @@ public class UiServletMultipartConfigFilter implements Filter {
 
   protected boolean isMultipartConfigRequired(HttpServletRequest request) {
     String pathInfo = request.getPathInfo();
+    if (pathInfo == null) {
+      return false;
+    }
+
     Matcher matcher = UploadRequestHandler.PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
     return matcher.matches();
   }
