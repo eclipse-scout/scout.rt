@@ -9,13 +9,13 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
+import jakarta.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.id.IId;
-
-import jakarta.annotation.Generated;
 
 @TypeName("scout.TestTypedUntypedInnerDataObjectIfc")
 public class TestTypedUntypedInnerDataObjectIfcDo extends DoEntity implements ITestTypedUntypedInnerDataObjectDo {

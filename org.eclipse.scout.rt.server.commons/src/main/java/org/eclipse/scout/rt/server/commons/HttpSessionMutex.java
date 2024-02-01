@@ -11,13 +11,13 @@ package org.eclipse.scout.rt.server.commons;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
+
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a mutex for {@link HttpSession}s to synchronize on.

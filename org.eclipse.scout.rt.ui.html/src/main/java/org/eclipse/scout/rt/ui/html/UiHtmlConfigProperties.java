@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.servlet.MultipartConfigElement;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
@@ -30,8 +32,6 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-
-import jakarta.servlet.MultipartConfigElement;
 
 /**
  * This class provides all properties configured in the config.properties file that affect the HTML UI module.

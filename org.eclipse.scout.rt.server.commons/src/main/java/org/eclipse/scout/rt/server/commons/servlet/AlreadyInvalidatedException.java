@@ -11,10 +11,10 @@ package org.eclipse.scout.rt.server.commons.servlet;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * Exception thrown by {@link AbstractHttpServlet} when trying to access {@link HttpServletRequest} or

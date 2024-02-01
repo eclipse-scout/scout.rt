@@ -20,6 +20,10 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http.HttpCookie.SameSite;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
@@ -73,10 +77,6 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @ApplicationScoped
 public class Application {

@@ -20,6 +20,11 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import org.eclipse.scout.rt.platform.holders.IntegerHolder;
 import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -27,11 +32,6 @@ import org.eclipse.scout.rt.server.commons.authentication.FormBasedAccessControl
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @RunWith(PlatformTestRunner.class)
 public class FormBasedAccessControllerTest {

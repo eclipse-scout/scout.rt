@@ -22,6 +22,10 @@ import java.util.stream.Collectors;
 
 import javax.management.ObjectName;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.servlet.http.HttpSession;
+
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.CreateImmediately;
@@ -29,10 +33,6 @@ import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.servlet.http.HttpSession;
 
 @ApplicationScoped
 @CreateImmediately

@@ -27,6 +27,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.apache.hc.core5.http.ConnectionClosedException;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpResponse;
@@ -66,11 +71,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
-
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @RunWith(ParameterizedPlatformTestRunner.class)
 public class HttpProxyTest {

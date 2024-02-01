@@ -11,6 +11,10 @@ package org.eclipse.scout.rt.ui.html.app;
 
 import java.util.List;
 
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -24,10 +28,6 @@ import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckServlet;
 import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.app.filter.UiServletMultipartConfigFilter;
-
-import jakarta.servlet.MultipartConfigElement;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 
 /**
  * {@link IServletContributor} and {@link IServletFilterContributor} for UI server.

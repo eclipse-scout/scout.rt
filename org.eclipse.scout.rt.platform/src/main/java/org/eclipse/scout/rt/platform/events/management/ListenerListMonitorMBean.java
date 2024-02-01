@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 
 import javax.management.ObjectName;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
 import org.eclipse.scout.rt.platform.events.ListenerListSnapshot;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 
 @ApplicationScoped
 @CreateImmediately

@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.ext.ContextResolver;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -34,9 +37,6 @@ import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.ext.ContextResolver;
 
 /**
  * Various test cases for {@link AbstractRestClientHelper}.

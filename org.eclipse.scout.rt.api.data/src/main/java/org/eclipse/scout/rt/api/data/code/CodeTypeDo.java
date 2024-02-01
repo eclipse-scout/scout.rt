@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import jakarta.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
-
-import jakarta.annotation.Generated;
 
 @TypeName("scout.CodeType")
 public class CodeTypeDo extends DoEntity {

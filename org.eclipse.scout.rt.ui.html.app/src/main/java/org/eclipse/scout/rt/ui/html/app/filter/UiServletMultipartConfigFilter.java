@@ -12,13 +12,6 @@ package org.eclipse.scout.rt.ui.html.app.filter;
 import java.io.IOException;
 import java.util.regex.Matcher;
 
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletHolder.Registration;
-import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiServletMultipartConfigProperty;
-import org.eclipse.scout.rt.ui.html.json.UploadRequestHandler;
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.MultipartConfigElement;
@@ -26,6 +19,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletHolder.Registration;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiServletMultipartConfigProperty;
+import org.eclipse.scout.rt.ui.html.json.UploadRequestHandler;
 
 /**
  * Filter class to add a multipart config for the {@link HttpServletRequest} if this filter determines it is necessary.

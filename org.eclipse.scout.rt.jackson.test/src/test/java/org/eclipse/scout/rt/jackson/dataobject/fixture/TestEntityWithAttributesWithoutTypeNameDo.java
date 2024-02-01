@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
-
-import jakarta.annotation.Generated;
 
 /**
  * Test {@link DoEntity} with attributes of DO type using no TypeName.

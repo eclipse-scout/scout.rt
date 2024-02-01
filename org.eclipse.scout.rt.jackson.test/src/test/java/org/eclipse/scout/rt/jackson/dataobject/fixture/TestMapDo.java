@@ -15,12 +15,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import jakarta.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
-
-import jakarta.annotation.Generated;
 
 @TypeName("TestMap")
 public class TestMapDo extends DoEntity {

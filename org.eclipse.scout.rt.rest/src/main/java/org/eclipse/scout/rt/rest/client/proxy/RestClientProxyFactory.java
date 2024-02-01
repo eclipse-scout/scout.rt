@@ -22,15 +22,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.util.FinalValue;
-import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.ForbiddenException;
@@ -53,6 +44,15 @@ import jakarta.ws.rs.client.RxInvoker;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.util.FinalValue;
+import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates proxy instances around REST client resources which provide the following features:

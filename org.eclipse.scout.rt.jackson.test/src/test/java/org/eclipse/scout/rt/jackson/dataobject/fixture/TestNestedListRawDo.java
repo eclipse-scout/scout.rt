@@ -13,14 +13,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
-
-import jakarta.annotation.Generated;
 
 @TypeName("TestNestedListRaw")
 public class TestNestedListRawDo extends DoEntity {

@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
+import jakarta.annotation.PostConstruct;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
@@ -18,8 +20,6 @@ import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.uuid.IUuidProvider;
-
-import jakarta.annotation.PostConstruct;
 
 /**
  * Provides the current node's identification.

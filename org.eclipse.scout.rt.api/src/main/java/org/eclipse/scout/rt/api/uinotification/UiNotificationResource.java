@@ -11,15 +11,6 @@ package org.eclipse.scout.rt.api.uinotification;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.api.data.uinotification.TopicDo;
-import org.eclipse.scout.rt.api.data.uinotification.UiNotificationRequest;
-import org.eclipse.scout.rt.api.data.uinotification.UiNotificationResponse;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.rest.IRestResource;
-import org.eclipse.scout.rt.security.IAccessControlService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -30,6 +21,15 @@ import jakarta.ws.rs.container.AsyncResponse;
 import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+
+import org.eclipse.scout.rt.api.data.uinotification.TopicDo;
+import org.eclipse.scout.rt.api.data.uinotification.UiNotificationRequest;
+import org.eclipse.scout.rt.api.data.uinotification.UiNotificationResponse;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.rest.IRestResource;
+import org.eclipse.scout.rt.security.IAccessControlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("ui-notifications")
 public class UiNotificationResource implements IRestResource {

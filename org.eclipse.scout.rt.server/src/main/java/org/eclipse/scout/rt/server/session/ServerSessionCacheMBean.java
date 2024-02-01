@@ -13,14 +13,14 @@ import java.util.Map.Entry;
 
 import javax.management.ObjectName;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
 import org.eclipse.scout.rt.server.IServerSession;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 
 @ApplicationScoped
 @CreateImmediately

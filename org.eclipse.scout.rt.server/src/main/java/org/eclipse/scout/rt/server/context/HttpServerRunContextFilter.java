@@ -11,12 +11,6 @@ package org.eclipse.scout.rt.server.context;
 
 import java.io.IOException;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.commons.context.HttpRunContextFilter;
-import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -25,6 +19,12 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.commons.context.HttpRunContextFilter;
+import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
 
 /**
  * A {@link Filter} that creates a {@link ServerRunContext}.

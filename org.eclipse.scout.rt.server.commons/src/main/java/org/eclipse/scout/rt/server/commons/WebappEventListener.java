@@ -9,12 +9,12 @@
  */
 package org.eclipse.scout.rt.server.commons;
 
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
-
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
 
 /**
  * Ensures that the platform is started, when the servlet context is ready. Likewise, the platform is stopped, when the

@@ -11,13 +11,13 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Map;
 
+import jakarta.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
-
-import jakarta.annotation.Generated;
 
 @TypeName("TestNestedRaw")
 public class TestNestedRawDo extends DoEntity {

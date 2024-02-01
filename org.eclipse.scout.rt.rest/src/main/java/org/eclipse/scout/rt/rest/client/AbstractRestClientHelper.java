@@ -16,6 +16,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ContextResolver;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
@@ -27,16 +37,6 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
 import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
-
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.ClientRequestFilter;
-import jakarta.ws.rs.client.Invocation;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Configuration;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.ContextResolver;
 
 /**
  * Abstract implementation of a REST client helper dealing with REST requests to a API server.

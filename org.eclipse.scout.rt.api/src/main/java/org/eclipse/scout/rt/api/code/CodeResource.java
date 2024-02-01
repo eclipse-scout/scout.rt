@@ -18,6 +18,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeContributor;
@@ -28,13 +35,6 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
 
 @Path("codes")
 public class CodeResource implements IRestResource {
