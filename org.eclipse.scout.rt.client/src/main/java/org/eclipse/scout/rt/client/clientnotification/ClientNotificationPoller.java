@@ -84,6 +84,7 @@ public class ClientNotificationPoller {
   }
 
   protected void startPoller() {
+    touch(); // reset timestamp of last poll request to eliminate timing issues (poller must run before liveness check)
     m_pollerFuture = Jobs.schedule(new P_NotificationPoller(this::touch), Jobs.newInput()
         .withRunContext(createRunContext())
         .withName(ClientNotificationPoller.class.getSimpleName()));
