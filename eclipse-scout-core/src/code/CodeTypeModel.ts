@@ -9,7 +9,7 @@
  */
 import {Code, CodeType, ModelOf, ObjectModel} from '../index';
 
-export interface CodeTypeModel<TCodeId, TCodeClass extends Code<TCodeId>, TCodeTypeId> extends ObjectModel<CodeType<TCodeId, TCodeClass, TCodeTypeId>, TCodeTypeId> {
+export interface CodeTypeModel<TCodeId, TCode extends Code<TCodeId>, TCodeTypeId> extends ObjectModel<CodeType<TCodeId, TCode, TCodeTypeId>, TCodeTypeId> {
   /**
    * If the Code is loaded from the Scout Java server and the application is running in dev mode, this property stores the Java Code class this code comes from.
    */
