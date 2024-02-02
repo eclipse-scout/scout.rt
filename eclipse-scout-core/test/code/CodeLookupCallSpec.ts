@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,13 +10,13 @@
 import {Code, CodeLookupCall, codes, CodeType, scout} from '../../src/index';
 
 describe('CodeLookupCall', () => {
-  let session: SandboxSession, codeType123: CodeType<string>;
+  let session: SandboxSession, codeType123: CodeType;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     codes.registry = new Map();
-    codeType123 = scout.create((CodeType<string>), {
+    codeType123 = scout.create(CodeType, {
       id: 'codeType.123',
       codes: [{
         id: 'code.1',

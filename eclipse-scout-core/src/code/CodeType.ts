@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,17 +9,17 @@
  */
 import {Code, codes, CodeTypeModel, FullModelOf, InitModelOf, Locale, ObjectOrModel, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
-export class CodeType<TCodeId> implements ObjectWithType {
+export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<TCodeId>, TCodeTypeId = string> implements ObjectWithType {
 
-  declare model: CodeTypeModel<TCodeId>;
+  declare model: CodeTypeModel<TCodeId, TCodeClass, TCodeTypeId>;
 
-  id: string;
+  id: TCodeTypeId;
   objectType: string;
   modelClass: string;
   iconId: string;
   hierarchical: boolean;
   maxLevel: number;
-  codeMap: Map<TCodeId, Code<TCodeId>>; // all codes recursively
+  codeMap: Map<TCodeId, TCodeClass>; // all codes recursively
 
   protected _textKey: string;
   protected _textKeyPlural: string;
@@ -46,7 +46,7 @@ export class CodeType<TCodeId> implements ObjectWithType {
       for (let i = 0; i < model.codes.length; i++) {
         let codeModel = model.codes[i];
         codeModel.codeType = this;
-        let code = Code.ensure(codeModel);
+        let code = Code.ensure(codeModel) as TCodeClass;
         if (code) {
           this._add(code);
         }
@@ -54,9 +54,9 @@ export class CodeType<TCodeId> implements ObjectWithType {
     }
   }
 
-  protected _add(code: Code<TCodeId>) {
+  protected _add(code: TCodeClass) {
     this.codeMap.set(code.id, code);
-    code.visitChildren(c => {
+    code.visitChildren((c: TCodeClass) => {
       this.codeMap.set(c.id, c);
     });
   }
@@ -99,13 +99,13 @@ export class CodeType<TCodeId> implements ObjectWithType {
    * @param rootOnly true if only the root Codes should be returned. The default value is false.
    * @return the root Codes of this CodeType if rootOnly is true and all Codes recursively otherwise.
    */
-  codes(rootOnly?: boolean): Code<TCodeId>[] {
+  codes(rootOnly?: boolean): TCodeClass[] {
     if (!rootOnly) {
       // all codes recursively
       return [...this.codeMap.values()];
     }
 
-    let rootCodes = [];
+    let rootCodes: TCodeClass[] = [];
     for (let code of this.codeMap.values()) {
       if (!code.parent) {
         rootCodes.push(code);
@@ -119,7 +119,7 @@ export class CodeType<TCodeId> implements ObjectWithType {
    * @param codeId The Code id to search
    * @return The Code with given id or null.
    */
-  get(codeId: TCodeId): Code<TCodeId> {
+  get(codeId: TCodeId): TCodeClass {
     return this.codeMap.get(codeId);
   }
 
@@ -130,7 +130,7 @@ export class CodeType<TCodeId> implements ObjectWithType {
    * To only abort the visiting of a subtree, the visitor can return SKIP_SUBTREE.
    * </p>
    */
-  visitChildren(visitor: TreeVisitor<Code<TCodeId>>): boolean | TreeVisitResult {
+  visitChildren(visitor: TreeVisitor<TCodeClass>): boolean | TreeVisitResult {
     let rootCodes = this.codes(true);
     for (let i = 0; i < rootCodes.length; i++) {
       let code = rootCodes[i];
@@ -147,7 +147,7 @@ export class CodeType<TCodeId> implements ObjectWithType {
     }
   }
 
-  static ensure<TCodeId>(codeType: ObjectOrModel<CodeType<TCodeId>>): CodeType<TCodeId> {
+  static ensure<TCodeClass extends Code<TCodeId>, TCodeId, TCodeTypeId>(codeType: ObjectOrModel<CodeType<TCodeId, TCodeClass, TCodeTypeId>>): CodeType<TCodeId, TCodeClass, TCodeTypeId> {
     if (!codeType) {
       return null;
     }
@@ -157,7 +157,7 @@ export class CodeType<TCodeId> implements ObjectWithType {
     if (!codeType.objectType) {
       codeType.objectType = CodeType;
     }
-    let codeTypeModel = codeType as FullModelOf<CodeType<TCodeId>>;
-    return scout.create(codeTypeModel) as CodeType<TCodeId>;
+    let codeTypeModel = codeType as FullModelOf<CodeType<TCodeId, TCodeClass, TCodeTypeId>>;
+    return scout.create(codeTypeModel) as CodeType<TCodeId, TCodeClass, TCodeTypeId>;
   }
 }

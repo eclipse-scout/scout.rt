@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,7 @@ export const codes = {
   /**
    * Map of Code id to Code instance. Do not access directly. Instead, use {@link codes.get}.
    */
-  registry: new Map<string /* CodeType.id */, CodeType<any>>,
+  registry: new Map<any, CodeType<any, any, any>>,
 
   /**
    * Initialize the code type map with the result of the given REST url.
@@ -47,7 +47,7 @@ export const codes = {
   /**
    * Adds all given CodeType models to the registry. The registry is not cleaned but existing entries with the same ids are overwritten.
    */
-  init(data?: ModelOf<CodeType<any>>[]) {
+  init(data?: ModelOf<CodeType<any, any, any>>[]) {
     codes.add(data);
   },
 
@@ -55,7 +55,7 @@ export const codes = {
    * Adds the given CodeType models to the registry. Existing entries with the same ids are overwritten.
    * @return The registered CodeType instances.
    */
-  add(codeTypes: ObjectOrModel<CodeType<any>> | ObjectOrModel<CodeType<any>>[]): CodeType<any>[] {
+  add(codeTypes: ObjectOrModel<CodeType<any, any, any>> | ObjectOrModel<CodeType<any, any, any>>[]): CodeType<any, any, any>[] {
     let registeredCodeTypes = [];
     arrays.ensure(codeTypes).forEach(codeTypeOrModel => {
       let codeType = CodeType.ensure(codeTypeOrModel);
@@ -72,7 +72,7 @@ export const codes = {
    *
    * @param codeTypes code types or code type ids to remove.
    */
-  remove(codeTypes: string | CodeType<any> | (string | CodeType<any>)[]) {
+  remove(codeTypes: string | CodeType<any, any, any> | (string | CodeType<any, any, any>)[]) {
     arrays.ensure(codeTypes)
       .map(codeTypeOrId => typeof codeTypeOrId === 'string' ? codeTypeOrId : codeTypeOrId.id)
       .forEach(id => codes.registry.delete(id));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,7 +29,7 @@ export class Code<TCodeId> implements ObjectWithType {
   sortCode: number;
   children: Code<TCodeId>[];
   parent?: Code<TCodeId>;
-  codeType: CodeType<TCodeId>;
+  codeType: CodeType<TCodeId, Code<TCodeId>, any>;
 
   protected _text: string; // e.g. "${textKey:key}"
 
@@ -87,7 +87,7 @@ export class Code<TCodeId> implements ObjectWithType {
     this._initCodeTypeField(this.codeType, model.fieldName);
   }
 
-  protected _initCodeTypeField(codeType: CodeType<TCodeId>, fieldName: string) {
+  protected _initCodeTypeField(codeType: CodeType<TCodeId, Code<TCodeId>, any>, fieldName: string) {
     if (!codeType || !fieldName) {
       return;
     }
