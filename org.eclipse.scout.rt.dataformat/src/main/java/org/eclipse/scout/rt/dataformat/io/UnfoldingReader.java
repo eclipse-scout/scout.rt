@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.QuotedPrintableCodec;
-import org.eclipse.scout.rt.dataformat.ical.ICalProperties;
 import org.eclipse.scout.rt.dataformat.ical.model.ICalVCardHelper;
 import org.eclipse.scout.rt.dataformat.ical.model.Property;
 import org.eclipse.scout.rt.dataformat.ical.model.PropertyParameter;
@@ -67,11 +66,13 @@ public class UnfoldingReader extends BufferedReader {
   }
 
   public Property readProperty() throws IOException {
-    String s = readLine();
-    while (s != null && s.isEmpty()) {
-      // skip empty lines
+    String s;
+    // Skip empty lines
+    do {
       s = readLine();
     }
+    while (s != null && !StringUtility.hasText(s));
+
     if (s == null) {
       // eof
       return null;
@@ -113,7 +114,7 @@ public class UnfoldingReader extends BufferedReader {
       }
       s = sb.toString();
       reset();
-      if (s == null || s.trim().isEmpty()) {
+      if (!StringUtility.hasText(s)) {
         // the file parsing will stop here
         return null;
       }
@@ -121,9 +122,9 @@ public class UnfoldingReader extends BufferedReader {
         // get the position of the colon in the unfolded content line
         indexOfColon = indexOfNonQuoted(s, ":");
         if (indexOfColon < 0) {
-          // unable to determine the property
-          // do not return null here - otherwise the file-parsing stops here
-          s = ICalProperties.PROP_UNKNOWN + ":" + s;
+          // unable to determine a folded property
+          // the file parsing will stop here
+          return null;
         }
       }
     }
@@ -263,27 +264,28 @@ public class UnfoldingReader extends BufferedReader {
         for (String v : values.toArray(new String[0])) {
           // the parameter values of the parameter "TYPE" are case-insensitive for all properties defined in RFC-2426
           v = v.toUpperCase();
-          //noinspection IfCanBeSwitch
-          if (VCardProperties.PARAM_VALUE_CAR.equals(v)) {
-            property.addParameters(VCardProperties.PARAM_CAR);
-          }
-          else if (VCardProperties.PARAM_VALUE_CELL.equals(v)) {
-            property.addParameters(VCardProperties.PARAM_CELL);
-          }
-          else if (VCardProperties.PARAM_VALUE_FAX.equals(v)) {
-            property.addParameters(VCardProperties.PARAM_FAX);
-          }
-          else if (VCardProperties.PARAM_VALUE_HOME.equals(v)) {
-            property.addParameters(VCardProperties.PARAM_HOME);
-          }
-          else if (VCardProperties.PARAM_VALUE_INTERNET.equals(v)) {
-            property.addParameters(VCardProperties.PARAM_INTERNET);
-          }
-          else if (VCardProperties.PARAM_VALUE_VOICE.equals(v)) {
-            property.addParameters(VCardProperties.PARAM_VOICE);
-          }
-          else if (VCardProperties.PARAM_VALUE_WORK.equals(v)) {
-            property.addParameters(VCardProperties.PARAM_WORK);
+          switch (v) {
+            case VCardProperties.PARAM_VALUE_CAR:
+              property.addParameters(VCardProperties.PARAM_CAR);
+              break;
+            case VCardProperties.PARAM_VALUE_CELL:
+              property.addParameters(VCardProperties.PARAM_CELL);
+              break;
+            case VCardProperties.PARAM_VALUE_FAX:
+              property.addParameters(VCardProperties.PARAM_FAX);
+              break;
+            case VCardProperties.PARAM_VALUE_HOME:
+              property.addParameters(VCardProperties.PARAM_HOME);
+              break;
+            case VCardProperties.PARAM_VALUE_INTERNET:
+              property.addParameters(VCardProperties.PARAM_INTERNET);
+              break;
+            case VCardProperties.PARAM_VALUE_VOICE:
+              property.addParameters(VCardProperties.PARAM_VOICE);
+              break;
+            case VCardProperties.PARAM_VALUE_WORK:
+              property.addParameters(VCardProperties.PARAM_WORK);
+              break;
           }
         }
         property.addParameters(new PropertyParameter(VCardProperties.PARAM_NAME_TYPE, values.isEmpty() ? null : values.toArray(new String[0])));
