@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.archetypes</groupId>
   <artifactId>scout-helloworld-app</artifactId>
-  <version>24.1-SNAPSHOT</version>
+  <version>24.2-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
 
   <name>Scout Hello World Sample Application</name>
@@ -28,7 +28,7 @@
   <url>https://eclipse.org/scout</url>
 
   <properties>
-    <org.eclipse.scout.rt_version>24.1-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>24.2-SNAPSHOT</org.eclipse.scout.rt_version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <eclipse_gerrit_username />
   </properties>
