@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, codes, CodeType} from '../../src/index';
+import {Code, codes, CodeType, CodeTypeModel} from '../../src/index';
 
 describe('CodeType', () => {
 
@@ -50,6 +50,33 @@ describe('CodeType', () => {
   });
 
   describe('init', () => {
+
+    it('throws if Code field is not initialized', () => {
+      let codeTypeModel: CodeTypeModel<number, Code<number>, number> = {
+        id: 33,
+        objectType: FixtureCodeType,
+        codes: [{
+          id: 44,
+          fieldName: 'codeMember44'
+        }, {
+          id: 45,
+          fieldName: 'codeMember45'
+        }]
+      };
+      expect(() => CodeType.ensure(codeTypeModel)).toThrow();
+    });
+
+    class FixtureCodeType extends CodeType<number, Code<number>, number> {
+      customMember: boolean;
+      codeMember44: Code<number>;
+      codeMember46: Code<number>; // name of member is wrong
+
+      protected override _getPublicNonCodeProperties(): Set<string> {
+        let result = super._getPublicNonCodeProperties();
+        result.add('customMember');
+        return result;
+      }
+    }
 
     it('creates codes and hierarchy', () => {
       let codeType = codes.get('codeType0');

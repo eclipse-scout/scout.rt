@@ -9,9 +9,9 @@
  */
 import {Code, codes, CodeTypeModel, FullModelOf, InitModelOf, Locale, ObjectOrModel, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
-export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<TCodeId>, TCodeTypeId = string> implements ObjectWithType {
+export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCodeId>, TCodeTypeId = string> implements ObjectWithType {
 
-  declare model: CodeTypeModel<TCodeId, TCodeClass, TCodeTypeId>;
+  declare model: CodeTypeModel<TCodeId, TCode, TCodeTypeId>;
 
   id: TCodeTypeId;
   objectType: string;
@@ -19,7 +19,7 @@ export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<
   iconId: string;
   hierarchical: boolean;
   maxLevel: number;
-  codeMap: Map<TCodeId, TCodeClass>; // all codes recursively
+  codeMap: Map<TCodeId, TCode>; // all codes recursively
 
   protected _textKey: string;
   protected _textKeyPlural: string;
@@ -46,17 +46,43 @@ export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<
       for (let i = 0; i < model.codes.length; i++) {
         let codeModel = model.codes[i];
         codeModel.codeType = this;
-        let code = Code.ensure(codeModel) as TCodeClass;
+        let code = Code.ensure(codeModel) as TCode;
         if (code) {
           this._add(code);
         }
       }
     }
+    this._validateCodeFields();
   }
 
-  protected _add(code: TCodeClass) {
+  /**
+   * Override this method and add additional properties which should not be validated to be present after CodeType init.
+   * @return A Set with all public properties (fields) of this CodeType which do _not_ point to a nested Code instance.
+   */
+  protected _getPublicNonCodeProperties(): Set<string> {
+    return new Set(['id', 'objectType', 'modelClass', 'iconId', 'hierarchical', 'maxLevel', 'codeMap']);
+  }
+
+  protected _validateCodeFields() {
+    let publicNonCodeProperties = this._getPublicNonCodeProperties();
+    Object.keys(this)
+      .filter(property => !property.startsWith('_'))
+      .filter(property => !publicNonCodeProperties.has(property))
+      .forEach(property => this._ensureCodeAvailable(property));
+  }
+
+  protected _ensureCodeAvailable(fieldName: string) {
+    let codeFieldValue = this[fieldName];
+    if (!codeFieldValue) {
+      throw new Error(`The field '${fieldName}' in CodeType with id '${this.id}' could not be initialized with a Code instance. ` +
+        `If this field should not hold a Code after CodeType init, override _getPublicNonCodeProperties and add '${fieldName}' to the resulting set. ` +
+        'If this field points to a Code, ensure the name of the field matches the \'fieldName\' property of the corresponding Code model.');
+    }
+  }
+
+  protected _add(code: TCode) {
     this.codeMap.set(code.id, code);
-    code.visitChildren((c: TCodeClass) => {
+    code.visitChildren((c: TCode) => {
       this.codeMap.set(c.id, c);
     });
   }
@@ -99,13 +125,13 @@ export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<
    * @param rootOnly true if only the root Codes should be returned. The default value is false.
    * @return the root Codes of this CodeType if rootOnly is true and all Codes recursively otherwise.
    */
-  codes(rootOnly?: boolean): TCodeClass[] {
+  codes(rootOnly?: boolean): TCode[] {
     if (!rootOnly) {
       // all codes recursively
       return [...this.codeMap.values()];
     }
 
-    let rootCodes: TCodeClass[] = [];
+    let rootCodes: TCode[] = [];
     for (let code of this.codeMap.values()) {
       if (!code.parent) {
         rootCodes.push(code);
@@ -119,7 +145,7 @@ export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<
    * @param codeId The Code id to search
    * @return The Code with given id or null.
    */
-  get(codeId: TCodeId): TCodeClass {
+  get(codeId: TCodeId): TCode {
     return this.codeMap.get(codeId);
   }
 
@@ -130,7 +156,7 @@ export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<
    * To only abort the visiting of a subtree, the visitor can return SKIP_SUBTREE.
    * </p>
    */
-  visitChildren(visitor: TreeVisitor<TCodeClass>): boolean | TreeVisitResult {
+  visitChildren(visitor: TreeVisitor<TCode>): boolean | TreeVisitResult {
     let rootCodes = this.codes(true);
     for (let i = 0; i < rootCodes.length; i++) {
       let code = rootCodes[i];
@@ -147,7 +173,7 @@ export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<
     }
   }
 
-  static ensure<TCodeClass extends Code<TCodeId>, TCodeId, TCodeTypeId>(codeType: ObjectOrModel<CodeType<TCodeId, TCodeClass, TCodeTypeId>>): CodeType<TCodeId, TCodeClass, TCodeTypeId> {
+  static ensure<TCode extends Code<TCodeId>, TCodeId, TCodeTypeId>(codeType: ObjectOrModel<CodeType<TCodeId, TCode, TCodeTypeId>>): CodeType<TCodeId, TCode, TCodeTypeId> {
     if (!codeType) {
       return null;
     }
@@ -157,7 +183,7 @@ export class CodeType<TCodeId = string, TCodeClass extends Code<TCodeId> = Code<
     if (!codeType.objectType) {
       codeType.objectType = CodeType;
     }
-    let codeTypeModel = codeType as FullModelOf<CodeType<TCodeId, TCodeClass, TCodeTypeId>>;
-    return scout.create(codeTypeModel) as CodeType<TCodeId, TCodeClass, TCodeTypeId>;
+    let codeTypeModel = codeType as FullModelOf<CodeType<TCodeId, TCode, TCodeTypeId>>;
+    return scout.create(codeTypeModel) as CodeType<TCodeId, TCode, TCodeTypeId>;
   }
 }
