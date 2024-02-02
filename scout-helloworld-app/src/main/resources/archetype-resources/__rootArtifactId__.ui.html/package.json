@@ -27,11 +27,11 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=22.0.0-snapshot <22.0.0",
+    "@eclipse-scout/cli": "22.0.58",
     "@eclipse-scout/releng": "^22.0.0"
   },
   "dependencies": {
-    "@eclipse-scout/core": ">=22.0.0-snapshot <22.0.0",
+    "@eclipse-scout/core": "22.0.58",
     "jquery": "3.6.0"
   }
 }
