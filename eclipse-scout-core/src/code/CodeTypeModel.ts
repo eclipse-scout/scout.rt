@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {Code, CodeType, ModelOf, ObjectModel} from '../index';
 
-export interface CodeTypeModel<TCodeId> extends ObjectModel<CodeType<TCodeId>> {
+export interface CodeTypeModel<TCodeId, TCodeClass extends Code<TCodeId>, TCodeTypeId> extends ObjectModel<CodeType<TCodeId, TCodeClass, TCodeTypeId>, TCodeTypeId> {
   /**
    * If the Code is loaded from the Scout Java server and the application is running in dev mode, this property stores the Java Code class this code comes from.
    */
