@@ -9,14 +9,24 @@
  */
 package org.eclipse.scout.rt.dataformat.io;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.io.IOException;
 import java.io.StringReader;
 
+import org.eclipse.scout.rt.dataformat.ical.model.Property;
 import org.junit.Test;
 
 public class UnfoldingReaderTest {
+
+  @Test
+  public void testSingleProperty() throws IOException {
+    testSingleProperty("lorem:ipsum", "LOREM", "ipsum");
+    testSingleProperty("\tloREM:ipsum", "\tLOREM", "ipsum");
+    testSingleProperty("\nLOREM:ipsum", "LOREM", "ipsum");
+    testSingleProperty("lorem:", "LOREM", "");
+    testSingleProperty(":", "", "");
+  }
 
   @Test
   public void testInvalidFormat() throws IOException {
@@ -31,6 +41,12 @@ public class UnfoldingReaderTest {
   protected void testInvalidFormat(String text) throws IOException {
     UnfoldingReader unfoldingReader = new UnfoldingReader(new StringReader(text), "utf-8");
     assertNull(unfoldingReader.readProperty());
+  }
 
+  protected void testSingleProperty(String text, String key, String value) throws IOException {
+    UnfoldingReader unfoldingReader = new UnfoldingReader(new StringReader(text), "utf-8");
+    Property property = unfoldingReader.readProperty();
+    assertEquals(key, property.getName());
+    assertEquals(value, property.getValue());
   }
 }
