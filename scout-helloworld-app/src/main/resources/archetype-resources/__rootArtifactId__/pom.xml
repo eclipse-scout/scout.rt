@@ -22,10 +22,9 @@
     <docker.app.image.registry>localhost:5000</docker.app.image.registry> <!-- set a desired registry before using profile exec.docker.image (e.g. registry.hub.docker.com/yourusername) -->
     <docker.app.image.tag>${versionWithoutSnapshot}-latest</docker.app.image.tag>
     <!-- java source image (pull) -->
-    <docker.java.image.registry>docker.io</docker.java.image.registry>
     <docker.java.image.name>eclipse-temurin</docker.java.image.name>
     <docker.java.image.tag>17-jdk-jammy</docker.java.image.tag>
-    <docker.java.image>${docker.java.image.registry}/${docker.java.image.name}:${docker.java.image.tag}</docker.java.image>
+    <docker.java.image>${docker.java.image.name}:${docker.java.image.tag}</docker.java.image>
   </properties>
 
   <modules>
