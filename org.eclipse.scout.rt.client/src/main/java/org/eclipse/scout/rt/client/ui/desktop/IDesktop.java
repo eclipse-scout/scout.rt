@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -190,12 +190,12 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   String DISPLAY_STYLE_COMPACT = "compact";
 
   /**
-   * Returns the first {@link Form} which is of the given type or a sub type of the given type.
+   * Returns the first {@link Form} which is of the given type or a subtype of the given type.
    */
   <T extends IForm> T findForm(Class<T> formType);
 
   /**
-   * Returns all registered Forms which are of the given type or a sub type of the given type.
+   * Returns all registered Forms which are of the given type or a subtype of the given type.
    */
   <T extends IForm> List<T> findForms(Class<T> formType);
 
@@ -218,12 +218,12 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   List<IForm> getSimilarForms(IForm form);
 
   /**
-   * fires a ensure visible event for every form in viewStack
+   * fires an ensure visible event for every form in viewStack
    */
   void ensureViewStackVisible();
 
   /**
-   * fires a activate form event
+   * fires an activate form event
    */
   void activateForm(IForm form);
 
@@ -431,7 +431,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   DesktopListeners desktopListeners();
 
   /**
-   * @param listener
    * @param eventTypes
    *          of {@link DesktopEvent} TYPE_*
    */
@@ -448,7 +447,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * <p>
    * Use {@link #addDesktopListener(DesktopListener, Integer...)} in all other cases
    *
-   * @param listener
    * @param eventTypes
    *          of {@link DesktopEvent} TYPE_*
    */
@@ -466,7 +464,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * Add Data Change Observer that is notified only if this desktop is in foreground (evaluated by the UI-layer, not
-   * controlled by the client model) and if {@link #isDataChanging()} returns {@code false}. Otherwise data change
+   * controlled by the client model) and if {@link #isDataChanging()} returns {@code false}. Otherwise, data change
    * notifications are deferred until the two conditions are met.
    */
   default void addDataChangeDesktopInForegroundListener(IDataChangeListener listener, Object... dataTypes) {
@@ -483,11 +481,14 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * These might include pages, forms, fields etc.<br>
    *
    * @param dataTypes
-   *          accepts vararg Objects that act as {@link DataChangeEvent#getDataType())} in implicitly created
+   *          accepts objects that act as {@link DataChangeEvent#getDataType()} in implicitly created
    *          {@link DataChangeEvent}s.
-   * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
-   *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
-   *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
+   * @see AbstractForm#execDataChanged(Object...)
+   * @see AbstractForm#execDataChanged(Object...)
+   * @see AbstractFormField#execDataChanged(Object...)
+   * @see AbstractFormField#execDataChanged(Object...)
+   * @see AbstractPage#execDataChanged(Object...)
+   * @see AbstractPage#execDataChanged(Object...)
    */
   void dataChanged(Object... dataTypes);
 
@@ -495,9 +496,12 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Call this method to refresh all listeners on that {@link DataChangeEvent#getDataType()}.<br>
    * These might include pages, forms, fields etc.<br>
    *
-   * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
-   *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
-   *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
+   * @see AbstractForm#execDataChanged(Object...)
+   * @see AbstractForm#execDataChanged(Object...)
+   * @see AbstractFormField#execDataChanged(Object...)
+   * @see AbstractFormField#execDataChanged(Object...)
+   * @see AbstractPage#execDataChanged(Object...)
+   * @see AbstractPage#execDataChanged(Object...)
    * @since 8.0
    */
   void fireDataChangeEvent(DataChangeEvent event);
@@ -515,8 +519,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Called after a page was loaded or reloaded.
    * <p>
    * Default minimizes page search form when data was found.
-   *
-   * @param page
    */
   void afterTablePageLoaded(IPageWithTable<?> page);
 
@@ -575,25 +577,25 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   void setTitle(String s);
 
   /**
-   * @return <code>true</code> if UI key strokes to select view tabs are enabled, <code>false</code> otherwise.
+   * @return <code>true</code> if UI keystrokes to select view tabs are enabled, <code>false</code> otherwise.
    */
   boolean isSelectViewTabsKeyStrokesEnabled();
 
   /**
    * @param selectViewTabsKeyStrokesEnabled
-   *          <code>true</code> to enable UI key strokes to select view tabs, <code>false</code> to disable them.
+   *          <code>true</code> to enable UI keystrokes to select view tabs, <code>false</code> to disable them.
    */
   void setSelectViewTabsKeyStrokesEnabled(boolean selectViewTabsKeyStrokesEnabled);
 
   /**
-   * @return optional modifier to use for UI key strokes to select view tabs (only relevant when
+   * @return optional modifier to use for UI keystrokes to select view tabs (only relevant when
    *         {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
    */
   String getSelectViewTabsKeyStrokeModifier();
 
   /**
    * @param selectViewTabsKeyStrokeModifier
-   *          optional modifier to use for UI key strokes to select view tabs (only relevant when
+   *          optional modifier to use for UI keystrokes to select view tabs (only relevant when
    *          {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
    */
   void setSelectViewTabsKeyStrokeModifier(String selectViewTabsKeyStrokeModifier);
@@ -618,8 +620,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * Removes a notification from the desktop.
-   *
-   * @param notification
    */
   void removeNotification(IDesktopNotification notification);
 
@@ -689,10 +689,10 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   /**
    * Activates a {@link Bookmark} on this desktop.
    * <p>
-   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and activated, afterwards every page from
+   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and activated. Afterward, every page from
    * the {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
    * <p>
-   * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
+   * Finally, the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
   void activateBookmark(Bookmark bm);
@@ -701,10 +701,10 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Activates a {@link Bookmark} on this desktop.
    * <p>
    * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and, if activateOutline is true, activated.
-   * Afterwards every page from the {@link Bookmark#getPath()} will be selected (respecting the
+   * Afterward, every page from the {@link Bookmark#getPath()} will be selected (respecting the
    * {@link AbstractPageState}).
    * <p>
-   * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
+   * Finally, the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
   void activateBookmark(Bookmark bm, boolean activateOutline);
@@ -802,7 +802,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * Adds an untyped add-on to the Desktop. Add-ons are required when you want to extend your Desktop with something
-   * that needs to add elements to the DOM of the user interface. Typically these DOM elements are not visible, so the
+   * that needs to add elements to the DOM of the user interface. Typically, these DOM elements are not visible, so the
    * add-ons are not meant for clickable UI-elements but rather for technical features, like interfaces built with
    * browser-technologies.
    * <p>
@@ -821,7 +821,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   /**
    * Returns true while outline is changing, which happens when <code>setOutline(IOutline)</code> is called.
    *
-   * @return whether or not outline is changing
+   * @return whether the outline is changing
    * @since 5.1.0
    */
   boolean isOutlineChanging();
@@ -922,7 +922,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   boolean isInBackground();
 
   /**
-   * @return the {@link IEventHistory} associated with this desktop (may be <code>null</code>).
+   * @return the {@link IEventHistory} associated with this desktop (might be <code>null</code>).
    *         <p>
    *         The default implementation is a {@link DefaultDesktopEventHistory} and created by
    *         {@link AbstractDesktop#createEventHistory()}

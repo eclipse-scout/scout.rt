@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.client.ui.desktop.internal;
 
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,8 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
@@ -80,6 +84,7 @@ public class VirtualDesktop implements IDesktop {
   private IDataChangeManager m_dataChangeDesktopInForegroundListeners;
   private WidgetListeners m_widgetListeners;
   private IDesktop m_realDesktop; // holds the "real" Desktop set to the ClientSession as soon as available.
+  private List<Pair<Object /* event */, Boolean /* is it coming from fireDataChangeEvent? Or dataChanged?*/>> m_bufferedDataChangeEvents;
 
   public VirtualDesktop() {
     m_listeners = new DesktopListeners();
@@ -87,6 +92,7 @@ public class VirtualDesktop implements IDesktop {
     m_dataChangeListeners = BEANS.get(IDataChangeManager.class);
     m_dataChangeDesktopInForegroundListeners = BEANS.get(IDataChangeManager.class);
     m_widgetListeners = new WidgetListeners();
+    m_bufferedDataChangeEvents = new ArrayList<>();
   }
 
   /**
@@ -139,6 +145,20 @@ public class VirtualDesktop implements IDesktop {
 
     // assign real desktop so that from now on calls to this virtual instance are delegated to the real one
     m_realDesktop = realDesktop;
+
+    // Replay the buffered dataChange events after the real desktop is set.
+    // This is required to ensure that a dataChangeListener, which accesses the Desktop again, already can see the real one (the one on which the events are fired).
+    for (Pair<Object, Boolean> pair : m_bufferedDataChangeEvents) {
+      boolean isFromFireDataChangeEvent = pair.getRight();
+      Object event = pair.getLeft();
+      if (isFromFireDataChangeEvent) {
+        m_realDesktop.fireDataChangeEvent((DataChangeEvent) event);
+      }
+      else {
+        m_realDesktop.dataChanged(event);
+      }
+    }
+    m_bufferedDataChangeEvents = null;
   }
 
   public Optional<IDesktop> getRealDesktop() {
@@ -366,22 +386,31 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void dataChanged(Object... dataTypes) {
-    forwardToRealDesktopOrThrow(d -> d.dataChanged(dataTypes));
+    if (dataTypes == null || dataTypes.length < 1) {
+      return;
+    }
+    forwardToRealDesktopOrElse(d -> d.dataChanged(dataTypes), () -> Arrays.stream(dataTypes)
+        .map(dataType -> new ImmutablePair<>(dataType, false))
+        .forEach(m_bufferedDataChangeEvents::add));
   }
 
   @Override
   public void fireDataChangeEvent(DataChangeEvent event) {
-    forwardToRealDesktopOrThrow(d -> d.fireDataChangeEvent(event));
+    if (event == null) {
+      return;
+    }
+    forwardToRealDesktopOrElse(d -> d.fireDataChangeEvent(event), () -> m_bufferedDataChangeEvents.add(new ImmutablePair<>(event, true)));
   }
 
   @Override
   public void setDataChanging(boolean b) {
-    forwardToRealDesktopOrThrow(d -> d.setDataChanging(b));
+    // the virtual desktop does never handle DataChangeEvents.
   }
 
   @Override
   public boolean isDataChanging() {
-    return getFromRealDesktopOrThrow(d -> d.isDataChanging());
+    // the virtual desktop does never handle DataChangeEvents.
+    return false;
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,8 @@ import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktopTest.VirtualDesktopForwardTestSession;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
+import org.eclipse.scout.rt.platform.util.ChangeStatus;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -92,6 +95,8 @@ public class VirtualDesktopTest {
         .widgetListeners()
         .list(WidgetEvent.TYPE_SCROLL_TO_TOP).stream()
         .filter(l -> l instanceof VirtualDesktopForwardTestWidgetListener).count());
+    assertEquals(List.of("virtualListener:event1", "realListener:event1", "virtualListener:event2", "realListener:event2", "virtualListener:event3", "realListener:event3", "virtualListener:event4", "realListener:event4"),
+        session.m_dataChangeEvents);
   }
 
   public static class VirtualDesktopForwardTestSession extends AbstractClientSession {
@@ -102,6 +107,7 @@ public class VirtualDesktopTest {
     private Throwable m_exFromAsyncAfterDesktopSet1;
     private Throwable m_exFromAsyncAfterDesktopSet2;
     private BasicPropertySupport m_realDesktopPropertySupport;
+    private List<String> m_dataChangeEvents = new ArrayList<>();
 
     public VirtualDesktopForwardTestSession() {
       super(true);
@@ -115,11 +121,25 @@ public class VirtualDesktopTest {
       if (t != null) {
         throw new ProcessingException("Error in execLoad", t);
       }
+      virtualDesktop.dataChanged("event1");
       ModelJobs.schedule(() -> {
         m_exFromAsyncInExecLoad = execWithCurrentDesktop(getDesktop(), virtualDesktop, true);
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+      virtualDesktop.addDataChangeListener(event -> m_dataChangeEvents.add("virtualListener:" + event.getDataType().toString()));
 
       IDesktop realDesktop = new AbstractDesktop() {
+        /**
+         * executed when the desktop is created (constructor)
+         */
+        @Override
+        protected void initConfigInternal() {
+          super.initConfigInternal();
+          addDataChangeListener(event -> m_dataChangeEvents.add("realListener:" + event.getDataType().toString()));
+        }
+
+        /**
+         * Executed when the desktop is initialized (init is call in AbstractClientSession.setDesktop)
+         */
         @Override
         protected void initInternal() {
           m_realDesktopPropertySupport = propertySupport;
@@ -129,11 +149,15 @@ public class VirtualDesktopTest {
           super.initInternal();
         }
       };
+
+      virtualDesktop.dataChanged("event2");
       ModelJobs.schedule(() -> {
         m_exFromAsyncInExecLoad = execWithCurrentDesktop(realDesktop, virtualDesktop, true);
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
+      virtualDesktop.fireDataChangeEvent(new DataChangeEvent("event3", ChangeStatus.UPDATED));
       setDesktop(realDesktop);
+      virtualDesktop.dataChanged("event4");
 
       ModelJobs.schedule(() -> {
         m_exFromAsyncAfterDesktopSet1 = execWithCurrentDesktop(realDesktop, virtualDesktop /* virtual because here the current thread-local is copied */, true);
