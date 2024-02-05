@@ -192,7 +192,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
           handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
         }
         else {
-          LOG.info("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
+          LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
           writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createEmptyResponse());
         }
         return;
@@ -217,7 +217,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   protected void handleEvents(HttpServletRequest req, HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     JSONObject jsonResp = uiSession.processJsonRequest(req, resp, jsonReq);
     if (jsonResp == null) {
-      LOG.info("Creating empty response [{}, #{}, #ACK {}]", "CER_HE", jsonReq.getSequenceNo(), jsonReq.getAckSequenceNo());
+      LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HE", jsonReq.getSequenceNo(), jsonReq.getAckSequenceNo());
       jsonResp = m_jsonRequestHelper.createEmptyResponse();
     }
     writeJsonResponse(resp, jsonResp);
@@ -371,7 +371,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     try {
       JSONObject response = uiSession.processSyncResponseQueueRequest(jsonReq);
       if (response == null) {
-        LOG.info("Creating empty response [{}, #{}, #ACK {}]", "CER_HSRQR", jsonReq.getSequenceNo(), jsonReq.getAckSequenceNo());
+        LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HSRQR", jsonReq.getSequenceNo(), jsonReq.getAckSequenceNo());
         response = m_jsonRequestHelper.createEmptyResponse();
       }
       writeJsonResponse(resp, response);

@@ -977,9 +977,7 @@ public class UiSession implements IUiSession {
       links.forEach(array::put);
       json.put("links", array);
     }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Uploaded " + links.size() + " resources. Returning links to resource=" + json);
-    }
+    LOG.debug("Uploaded {} resources. Returning links to resource={}", links.size(), json);
     return json;
   }
 
