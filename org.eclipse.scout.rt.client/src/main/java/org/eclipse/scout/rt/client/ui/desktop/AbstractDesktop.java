@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -271,7 +271,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
-   * @return an array of outline type tokens
+   * @return A list of outline classes.
    * @see IOutline
    */
   @ConfigProperty(ConfigProperty.OUTLINES)
@@ -1818,6 +1818,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public void dataChanged(Object... eventTypes) {
+    if (eventTypes == null) {
+      return;
+    }
     for (Object eventType : eventTypes) {
       //this code is only used to manage the ambiguity of untyped Object... varargs
       if (eventType instanceof DataChangeEvent) {
@@ -1832,6 +1835,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public void fireDataChangeEvent(DataChangeEvent event) {
+    if (event == null) {
+      return;
+    }
     m_dataChangeListeners.fireEvent(event);
     m_dataChangeDesktopInForegroundListeners.fireEvent(event);
   }
@@ -2114,7 +2120,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
           f.doClose();
         }
         catch (RuntimeException | PlatformError e) {
-          LOG.error("Exception while closing filechooser", e);
+          LOG.error("Exception while closing FileChooser", e);
         }
         finally {
           m_fileChooserStore.remove(f);
