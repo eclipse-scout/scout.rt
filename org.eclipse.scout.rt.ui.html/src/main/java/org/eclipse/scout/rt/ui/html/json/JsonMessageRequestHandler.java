@@ -187,8 +187,19 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
           handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
         }
         else {
-          LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
-          writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createEmptyResponse());
+          // If UiSession#waitForBackgroundJobs returned early because the request was already processed, the
+          // corresponding response has to be extracted and returned here. Otherwise, the client might never
+          // receive that response, which would lead to an inconsistent response queue. Normally, this is done
+          // in UiSession#processJsonRequest, but because we could not get the lock, we have to do it manually.
+          JSONObject response = uiSession.getAlreadyProcessedResponse(jsonRequest);
+          if (response != null) {
+            LOG.info("Request #{} was already processed. Sending back response from history.", jsonRequest.getSequenceNo());
+          }
+          else {
+            LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
+            response = m_jsonRequestHelper.createEmptyResponse();
+          }
+          writeJsonResponse(httpServletResponse, response);
         }
         return;
       }

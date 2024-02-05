@@ -122,6 +122,14 @@ public interface IUiSession {
   void confirmResponseProcessed(Long sequenceNo);
 
   /**
+   * If the given request has already been processed, the previous answer is returned. The check is based on the
+   * sequence number of the given request. If the request has no sequence number or no response exists in the response
+   * history for the sequence number, {@code null} is returned. This is the case when the request has actually never
+   * been processed before but also when the response has already been acknowledged by the UI.
+   */
+  JSONObject getAlreadyProcessedResponse(JsonRequest jsonRequest);
+
+  /**
    * Used to verify if the {@link Subject} we're running in should be replaced on the {@link IClientSession}.
    *
    * @param request
