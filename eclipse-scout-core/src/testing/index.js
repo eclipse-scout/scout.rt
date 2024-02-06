@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -23,6 +23,7 @@ export {default as TableSpecHelper} from './table/TableSpecHelper';
 export {default as FormSpecHelper} from './form/FormSpecHelper';
 export {default as CloneSpecHelper} from './form/fields/CloneSpecHelper';
 export {default as TestBeanField} from './form/fields/beanfield/TestBeanField';
+export {default as proposalFieldSpecHelper} from './form/fields/smartfield/proposalFieldSpecHelper';
 export {default as TabBoxSpecHelper} from './form/fields/tabbox/TabBoxSpecHelper';
 export {default as OutlineSpecHelper} from './desktop/outline/OutlineSpecHelper';
 export {default as DummyLookupCall} from './lookup/DummyLookupCall';
