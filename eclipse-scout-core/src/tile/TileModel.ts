@@ -47,4 +47,10 @@ export interface TileModel extends WidgetModel {
    * Default is false.
    */
   resizable?: boolean;
+  /**
+   * Specifies whether the tile can be selected for moving.
+   *
+   * Default is false.
+   */
+  movable?: boolean;
 }
