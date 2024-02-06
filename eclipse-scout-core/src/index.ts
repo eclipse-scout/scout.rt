@@ -894,6 +894,7 @@ export * from './tagbar/TagBarOverflowPopup';
 export * from './tagbar/TagBarOverflowPopupLayout';
 export * from './tile/Tile';
 export * from './tile/TileModel';
+export * from './tile/TileMoveHandler';
 export * from './tile/TileEventMap';
 export * from './tile/TileAdapter';
 export * from './tile/TileGrid';
