@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, Resizable, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
+import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, Resizable, scrollbars, SingleLayout, TileEventMap, TileModel, TileMoveHandler, Widget} from '../index';
 import $ from 'jquery';
 
 export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
@@ -27,6 +27,8 @@ export class Tile extends Widget implements TileModel {
   selectable: boolean;
   resizable: boolean;
   resizableProducer: () => Resizable;
+  movable: boolean;
+  movableProducer: () => TileMoveHandler;
   plainText: string;
 
   constructor() {
@@ -40,6 +42,7 @@ export class Tile extends Widget implements TileModel {
     this.selected = false;
     this.selectable = false;
     this.resizable = false;
+    this.movable = false;
     this.plainText = null;
     // Null to let TileGrid decide whether to enable animation
     this.animateRemoval = null;
@@ -76,7 +79,6 @@ export class Tile extends Widget implements TileModel {
     this._renderSelectable();
     this._renderSelected();
     this._renderDisplayStyle();
-    this._renderResizable();
   }
 
   protected override _postRender() {
@@ -171,7 +173,7 @@ export class Tile extends Widget implements TileModel {
 
   protected _renderResizable() {
     let resizableHandler: Resizable = this.$container.data('resizable');
-    if (this.resizable) {
+    if (this.resizable && this.enabledComputed) {
       if (resizableHandler) {
         return;
       }
@@ -191,6 +193,49 @@ export class Tile extends Widget implements TileModel {
       resizableHandler.destroy();
       this.$container.removeData('resizable');
     }
+  }
+
+  setMovableProducer(producer: () => TileMoveHandler) {
+    this.setProperty('movableProducer', producer);
+  }
+
+  protected _renderMovableProducer() {
+    this._removeMovable();
+    this._renderMovable();
+  }
+
+  setMovable(movable: boolean) {
+    this.setProperty('movable', movable);
+  }
+
+  protected _renderMovable() {
+    let movableHandler: TileMoveHandler = this.$container.data('movable');
+    if (this.movable && this.enabledComputed) {
+      if (movableHandler) {
+        return;
+      }
+      movableHandler = this.movableProducer && this.movableProducer();
+      if (!movableHandler) {
+        return;
+      }
+      this.$container.data('movable', movableHandler);
+    } else {
+      this._removeMovable();
+    }
+  }
+
+  protected _removeMovable() {
+    let movableHandler: TileMoveHandler = this.$container.data('movable');
+    if (movableHandler) {
+      movableHandler.destroy();
+      this.$container.removeData('movable');
+    }
+  }
+
+  protected override _renderEnabled() {
+    super._renderEnabled();
+    this._renderResizable();
+    this._renderMovable();
   }
 
   setFilterAccepted(filterAccepted: boolean) {

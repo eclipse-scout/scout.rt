@@ -10,8 +10,9 @@
 import {
   AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf,
   KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range,
-  Resizable, scout, ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridMoveSupport, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke,
-  TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileResizeHandler, TileTextFilter, UpdateFilteredElementsOptions,
+  Resizable, scout, ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke,
+  TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileMoveHandler, TileResizeHandler, TileTextFilter,
+  UpdateFilteredElementsOptions,
   VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
@@ -32,7 +33,6 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   animateTileInsertion: boolean;
   comparator: Comparator<TTile>;
   contextMenu: ContextMenuPopup;
-  draggable: boolean;
   empty: boolean;
   filters: Filter<TTile>[];
   filteredElementsDirty: boolean;
@@ -64,6 +64,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   defaultMenuTypes: string[];
   wrappable: boolean;
   resizableProducer: (tile: Tile) => Resizable;
+  movableProducer: (tile: Tile) => TileMoveHandler;
 
   $filterFieldContainer: JQuery;
   $fillBefore: JQuery;
@@ -75,7 +76,6 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   protected _filterMenusHandler: (menuItems: Menu[], destination: MenuDestinations) => Menu[];
   protected _renderViewPortAfterAttach: boolean;
   protected _scrollParentScrollHandler: (event: JQuery.ScrollEvent) => void;
-  protected _dragTileMouseDownHandler: (event: JQuery.MouseDownEvent) => void;
 
   // protected _resizeTileMouseDownHandler: (event: JQuery.MouseDownEvent) => void;
 
@@ -85,7 +85,6 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.animateTileInsertion = true;
     this.comparator = null;
     this.contextMenu = null;
-    this.draggable = false;
     this._doubleClickSupport = new DoubleClickSupport();
     this.empty = false;
     this.filters = [];
@@ -115,6 +114,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this.placeholderProducer = null;
     this.wrappable = true;
     this.resizableProducer = this._createResizableProducer();
+    this.movableProducer = this._createMovableProducer();
 
     this.$filterFieldContainer = null;
     this.textFilterEnabled = false;
@@ -127,7 +127,6 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this._filterMenusHandler = this._filterMenus.bind(this);
     this._renderViewPortAfterAttach = false;
     this._scrollParentScrollHandler = this._onScrollParentScroll.bind(this);
-    this._dragTileMouseDownHandler = this._onDragTileMouseDown.bind(this);
     // this._resizeTileMouseDownHandler = this._onResizeTileMouseDown.bind(this);
     this._addWidgetProperties(['tiles', 'selectedTiles', 'menus']);
     this._addPreserveOnPropertyChangeProperties(['selectedTiles']);
@@ -170,6 +169,17 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
 
   setResizableProducer(producer: (tile: Tile) => Resizable) {
     this.setProperty('resizableProducer', producer);
+  }
+
+  protected _createMovableProducer(): (tile: Tile) => TileMoveHandler {
+    return tile => scout.create(TileMoveHandler, {
+      tileGrid: this,
+      $container: tile.$container
+    });
+  }
+
+  setMovableProducer(producer: (tile: Tile) => TileMoveHandler) {
+    this.setProperty('movableProducer', producer);
   }
 
   protected _initVirtualScrolling() {
@@ -218,6 +228,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     tile.setSelectable(this.selectable);
     tile.setSelected(this.selectedTiles.indexOf(tile as TTile) >= 0);
     tile.setResizableProducer(() => this.resizableProducer(tile));
+    tile.setMovableProducer(() => this.movableProducer(tile));
 
     // Set proper state in case tile was used in another grid
     tile.setParent(this);
@@ -247,7 +258,6 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     this._renderSelectable();
     this._renderEmpty();
     this._renderTextFilterEnabled();
-    this._renderDraggable();
   }
 
   protected override _remove() {
@@ -1035,28 +1045,6 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   /** @see TileGridModel.wrappable */
   setWrappable(wrappable: boolean) {
     this.setProperty('wrappable', wrappable);
-  }
-
-  setDraggable(draggable: boolean) {
-    this.setProperty('draggable', draggable);
-  }
-
-  protected _renderDraggable() {
-    if (this.draggable) {
-      this.$container.on('mousedown touchstart', TILE_SELECTOR, this._dragTileMouseDownHandler);
-    } else {
-      this.$container.off('mousedown touchstart', TILE_SELECTOR, this._dragTileMouseDownHandler);
-    }
-  }
-
-  protected _onDragTileMouseDown(event: JQuery.MouseDownEvent) {
-    let $target = $(event.target);
-    if ($target.hasClass('resizable-handle')) {
-      return;
-    }
-    let tile = scout.widget($(event.currentTarget)) as Tile;
-    // Install move support for each drag operation so that a tile can be dragged even if another one is still finishing dragging
-    new TileGridMoveSupport(this).start(event, this.tiles, tile);
   }
 
   protected _onTileMouseDown(event: JQuery.MouseDownEvent): boolean {
