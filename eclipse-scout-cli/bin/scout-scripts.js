@@ -106,7 +106,7 @@ function runKarma(configFileName, headless, args) {
   }
 
   // load config
-  const karmaConfig = cfg.parseConfig(configFilePath, args);
+  const karmaConfig = cfg.parseConfig(configFilePath, args, {throwErrors: true});
   if (autoSetupHeadlessConfig) {
     // only executed if headless and no specific CI config file is found: use headless defaults
     karmaConfig.set({
