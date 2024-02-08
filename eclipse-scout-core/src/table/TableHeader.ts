@@ -126,7 +126,6 @@ export class TableHeader extends Widget implements TableHeaderModel {
 
     let $header = this.$filler.beforeDiv('table-header-item')
       .setEnabled(this.enabled) // enabledComputed not used on purpose
-      .data('widget', column)
       .data('column', column);
 
     aria.role($header, 'columnheader');
