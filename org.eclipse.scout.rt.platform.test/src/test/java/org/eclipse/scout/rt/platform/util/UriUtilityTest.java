@@ -109,4 +109,27 @@ public class UriUtilityTest {
     assertEquals(UriUtility.hashCode(a), UriUtility.hashCode(b));
   }
 
+  @Test
+  public void testToBaseUri() {
+    assertNull(UriUtility.toBaseUri(null));
+
+    assertEquals("https://localhost/", UriUtility.toBaseUri(UriUtility.toUri("https://localhost")));
+    assertEquals("http://localhost:8080/", UriUtility.toBaseUri(UriUtility.toUri("http://localhost:8080")));
+    assertEquals("http://localhost:8080/", UriUtility.toBaseUri(UriUtility.toUri("http://localhost:8080/?debug=true#base")));
+    assertEquals("https://my.app.example.com/", UriUtility.toBaseUri(UriUtility.toUri("https://my.app.example.com")));
+    assertEquals("https://example.com/", UriUtility.toBaseUri(UriUtility.toUri("https://example.com/my-app")));
+    assertEquals("https://example.com/my-app/", UriUtility.toBaseUri(UriUtility.toUri("https://example.com/my-app/")));
+    assertEquals("https://example.com/my-app/", UriUtility.toBaseUri(UriUtility.toUri("https://example.com/my-app/index.html")));
+    assertEquals("https://example.com/my-app/", UriUtility.toBaseUri(UriUtility.toUri("https://example.com/my-app/index.html#sec-login")));
+    assertEquals("https://example.com/my-app/", UriUtility.toBaseUri(UriUtility.toUri("https://example.com/my-app/search?type=0&q=a/b")));
+
+    assertEquals("/", UriUtility.toBaseUri(UriUtility.toUri("?type=0&q=a/b")));
+    assertEquals("/", UriUtility.toBaseUri(UriUtility.toUri("#")));
+    assertEquals("http/", UriUtility.toBaseUri(UriUtility.toUri("http")));
+    assertEquals("https://example.org/foo/", UriUtility.toBaseUri(UriUtility.toUri("https://example.org/foo//")));
+    assertEquals("https://example.org/foo/", UriUtility.toBaseUri(UriUtility.toUri("https://example.org/foo//bar")));
+    assertEquals("https://example.org/foo:/", UriUtility.toBaseUri(UriUtility.toUri("https://example.org/foo://bar")));
+    assertEquals("foo://bar://baz:/", UriUtility.toBaseUri(UriUtility.toUri("foo://bar://baz://")));
+    assertEquals("foo:bar/", UriUtility.toBaseUri(UriUtility.toUri("foo:bar?baz#qux")));
+  }
 }

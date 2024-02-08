@@ -305,4 +305,46 @@ public final class UriUtility {
   public static int hashCode(URL a) {
     return Objects.hashCode(a == null ? null : a.toString());
   }
+
+  /**
+   * Returns the "base URI" for the given URI. If the argument is {@code null}, {@code null} is returned.
+   * Otherwise, a string is returned that always ends with a {@code "/"} character. Filename, query parameters and
+   * fragment are automatically removed.
+   * <p>
+   * Examples:
+   * <ul>
+   * <li>http://localhost:8080 → http://localhost:8080/
+   * <li>https://www.example.org/public/my-app/index.html?debug=true → https://www.example.org/public/my-app/
+   * </ul>
+   */
+  @SuppressWarnings("JavadocLinkAsPlainText")
+  public static String toBaseUri(URI uri) {
+    if (uri == null) {
+      return null;
+    }
+
+    String baseUri = uri.toString();
+
+    // Remove query part
+    int index = baseUri.indexOf('?');
+    if (index != -1) {
+      baseUri = baseUri.substring(0, index);
+    }
+
+    // Remove fragment part
+    index = baseUri.indexOf('#');
+    if (index != -1) {
+      baseUri = baseUri.substring(0, index);
+    }
+
+    // Remove everything after the last slash (the file part), except if it is part of the scheme:// part
+    index = baseUri.lastIndexOf('/');
+    if (index != -1 && index != baseUri.indexOf("://") + 2) {
+      baseUri = baseUri.substring(0, index); // remove the last slash and everything after that
+      baseUri = baseUri.replaceAll("/+$", ""); // remove additional trailing slashes
+    }
+
+    // Add a single trailing slash again
+    return baseUri + "/";
+  }
 }
