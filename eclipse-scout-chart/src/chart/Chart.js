@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,7 +111,15 @@ export default class Chart extends Widget {
 
   _renderOnAttach() {
     super._renderOnAttach();
-    this._updateChartOptsWhileNotAttached.splice(0).forEach(opts => this.updateChart($.extend(true, {}, opts, {debounce: true})));
+    const updateChartOptsWhileNotAttached = this._updateChartOptsWhileNotAttached.splice(0);
+    if (!this.chartRenderer?.isDetachSupported()) {
+      // the chartRenderer does not support detach => recreate it
+      this._updateChartRenderer();
+      if (!updateChartOptsWhileNotAttached.length) {
+        updateChartOptsWhileNotAttached.push({requestAnimation: true});
+      }
+    }
+    updateChartOptsWhileNotAttached.forEach(opts => this.updateChart($.extend(true, {}, opts, {debounce: true})));
   }
 
   _remove() {
