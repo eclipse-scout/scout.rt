@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -443,6 +443,12 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
   override isDataUpdatable(): boolean {
     return true;
+  }
+
+  override isDetachSupported(): boolean {
+    // chart.js removes the animation-listeners onProgress and onComplete on detach and does not add them again on attach
+    // these listeners are needed for the datalabels => this renderer does not support detach
+    return false;
   }
 
   override refresh() {
