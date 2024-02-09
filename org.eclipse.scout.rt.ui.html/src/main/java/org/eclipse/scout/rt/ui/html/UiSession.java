@@ -723,6 +723,14 @@ public class UiSession implements IUiSession {
     return m_requestHistory.isRequestProcessed(requestSequenceNo);
   }
 
+  @Override
+  public JSONObject getAlreadyProcessedResponse(JsonRequest jsonRequest) {
+    if (isAlreadyProcessed(jsonRequest)) {
+      return m_responseHistory.getResponseForRequest(jsonRequest.getSequenceNo());
+    }
+    return null;
+  }
+
   /**
    * Verifies if an access controller has created a new {@link Subject} and replaces the current one on the
    * {@link IClientSession} with the new one. An {@link IAccessController} can request this by setting the
@@ -744,8 +752,8 @@ public class UiSession implements IUiSession {
 
   @Override
   public JSONObject processJsonRequest(final HttpServletRequest servletRequest, final HttpServletResponse servletResponse, final JsonRequest jsonRequest) {
-    if (isAlreadyProcessed(jsonRequest)) {
-      JSONObject response = m_responseHistory.getResponseForRequest(jsonRequest.getSequenceNo());
+    JSONObject response = getAlreadyProcessedResponse(jsonRequest);
+    if (response != null) {
       LOG.info("Request #{} was already processed. Sending back response from history.", jsonRequest.getSequenceNo());
       return response;
     }
