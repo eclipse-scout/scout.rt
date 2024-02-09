@@ -165,6 +165,12 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   // Placeholder string for an empty filename
   static EMPTY_UPLOAD_FILENAME = '*empty*';
 
+  /**
+   * Additional waiting time in seconds before a polling request is cancelled after it has exceeded
+   * the expected maximum duration ({@link SessionStartupResponse#startupData#pollingInterval}).
+   */
+  static POLLING_GRACE_PERIOD = 15;
+
   init(model: InitModelOf<this>) {
     let options = model || {} as InitModelOf<this>;
 
@@ -428,7 +434,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
 
     // Init request timeout for poller
-    this.requestTimeoutPoll = (data.startupData.pollingInterval + 15) * 1000;
+    this.requestTimeoutPoll = (data.startupData.pollingInterval + Session.POLLING_GRACE_PERIOD) * 1000;
 
     // Register UI session
     this.modelAdapterRegistry[this.uiSessionId] = this; // TODO [7.0] cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have root adapter as parent, see 406

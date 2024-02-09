@@ -27,9 +27,13 @@ export class ResponseQueue {
   }
 
   /**
-   * in milliseconds
+   * Timeout in milliseconds after which the response queue is processed even when a sequence number is still missing.
+   * This should prevent an infinitely blocked UI, but (optimistically) assumes that the missed response was not important.
+   *
+   * This value should be slightly larger than the {@link Session#POLLING_GRACE_PERIOD} to give the retry mechanism a
+   * chance to retrieve a missed response after a network interruption.
    */
-  static FORCE_TIMEOUT = 10 * 1000;
+  static FORCE_TIMEOUT = (Session.POLLING_GRACE_PERIOD + 5) * 1000;
 
   add(response?: RemoteResponse) {
     let sequenceNo = response && response['#'];
