@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, keys, scout} from '../../src/index';
+import {Action, keys, scout, Tooltip, tooltips} from '../../src/index';
 import {JQueryTesting} from '../../src/testing';
 
 describe('Action', () => {
@@ -138,6 +138,46 @@ describe('Action', () => {
       expect(selected).toBe(false);
     });
 
+  });
+
+  describe('tooltipText', () => {
+    beforeEach(() => {
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('is shown on mouseover after a short delay ', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        tooltipText: 'tooltip'
+      });
+      action.render();
+      JQueryTesting.triggerMouseEnter(action.$container);
+      expect(action.findChild(Tooltip)).toBeFalsy();
+
+      jasmine.clock().tick(tooltips.DEFAULT_TOOLTIP_DELAY - 100);
+      expect(action.findChild(Tooltip)).toBeFalsy();
+
+      jasmine.clock().tick(100);
+      expect(action.findChild(Tooltip).rendered).toBe(true);
+    });
+
+    it('is shown even if action is disabled', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        tooltipText: 'tooltip',
+        enabled: false
+      });
+      action.render();
+      JQueryTesting.triggerMouseEnter(action.$container);
+      expect(action.findChild(Tooltip)).toBeFalsy();
+
+      jasmine.clock().tick(tooltips.DEFAULT_TOOLTIP_DELAY);
+      expect(action.findChild(Tooltip).rendered).toBe(true);
+    });
   });
 
   describe('aria properties', () => {
