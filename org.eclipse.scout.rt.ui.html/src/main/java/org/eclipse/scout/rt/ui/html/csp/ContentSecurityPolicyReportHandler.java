@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.server.commons.servlet.ContentSecurityPolicy;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -31,10 +32,7 @@ import org.slf4j.LoggerFactory;
  * It is used to collect Content-Security-Policy violations.
  * <p>
  * If you get a violation for content you need, make sure all your content is provided from the same origin. If this is
- * not possible you can adjust the CSP rule to your own needs by replacing {@link HttpServletControl} and overriding
- * {@link HttpServletControl#getCspDirectives()}.
- * <p>
- * see {@link HttpServletControl}
+ * not possible you can change the rules by adjusting {@link ContentSecurityPolicy}.
  *
  * @since 5.2
  */
