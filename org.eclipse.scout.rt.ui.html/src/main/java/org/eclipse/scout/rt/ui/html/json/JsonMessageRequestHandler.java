@@ -185,15 +185,24 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       // Special case: Poll requests should only *try* to acquire the lock. If the lock is currently acquired
       // by some other thread, there is no reason to wait for it, because the other thread will already send
       // the entire JSON response to the UI. Waiting for too long here could cause the UI session to time out,
-      // because the poller-induced "heart beat" mechanism would stop. Therefore, if the lock cannot be acquired,
-      // an empty response is sent back to the UI.
+      // because the poller-induced "heart beat" mechanism would stop.
+      // If UiSession#waitForBackgroundJobs returned early because the request was already processed, we send back
+      // the corresponding response from the history. This would normally be done in UiSession#processJsonRequest,
+      // but without lock we have to do it manually. Otherwise, we send back an empty response.
       if (!uiSession.uiSessionLock().tryLock()) {
         if (uiSession.isDisposed()) {
           handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
         }
         else {
-          LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
-          writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createEmptyResponse());
+          JSONObject response = uiSession.getAlreadyProcessedResponse(jsonRequest);
+          if (response != null) {
+            LOG.info("Request #{} was already processed. Sending back response from history.", jsonRequest.getSequenceNo());
+          }
+          else {
+            LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
+            response = m_jsonRequestHelper.createEmptyResponse();
+          }
+          writeJsonResponse(httpServletResponse, response);
         }
         return;
       }

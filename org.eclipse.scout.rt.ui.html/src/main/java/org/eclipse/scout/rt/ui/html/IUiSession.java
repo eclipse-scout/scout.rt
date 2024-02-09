@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.Subject;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -120,6 +121,15 @@ public interface IUiSession {
    * a sequence number <code>&lt;= sequenceNo</code> are removed from the response history.
    */
   void confirmResponseProcessed(Long sequenceNo);
+
+  /**
+   * If the given request has already been processed, the previous response is returned <i>without processing the
+   * request again</i>. The check is based on the sequence number of the given request. If the request has no sequence
+   * number or no entry exists in the response history for the sequence number, {@code null} is returned. This is either
+   * the case if the request has never actually been processed before or when the receipt of the response has already
+   * been acknowledged by the UI.
+   */
+  JSONObject getAlreadyProcessedResponse(JsonRequest jsonRequest);
 
   /**
    * Used to verify if the {@link Subject} we're running in should be replaced on the {@link IClientSession}.

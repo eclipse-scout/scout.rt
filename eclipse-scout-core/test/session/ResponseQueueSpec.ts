@@ -138,10 +138,10 @@ describe('ResponseQueue', () => {
       expect(rq.nextExpectedSequenceNo).toBe(1);
       expect(rq.forceTimeoutId).not.toBe(null);
 
-      // wait 6s
-      jasmine.clock().tick(6000);
+      // wait 16s
+      jasmine.clock().tick(16000);
 
-      expect(rq.queue.length).toBe(0); // should have been forced after 10s
+      expect(rq.queue.length).toBe(0); // should have been forced after 20s
       expect(processJsonResponseInternalSpy.calls.count()).toBe(3);
       expect(rq.forceTimeoutId).toBe(null);
       expect(rq.nextExpectedSequenceNo).toBe(5);
