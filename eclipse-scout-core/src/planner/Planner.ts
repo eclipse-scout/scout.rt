@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -344,22 +344,25 @@ export class Planner extends Widget implements PlannerModel {
 
     this.startRow = selectedResource;
     this.lastRow = this.startRow;
-    this._select(true);
+    this._select();
 
     // add event handlers
-    this._resourceTitleMousemoveHandler = this._onResourceTitleMousemove.bind(this, event);
-    this._$body.document()
-      .on('mousemove', this._resourceTitleMousemoveHandler)
-      .one('mouseup', this._onDocumentMouseUp.bind(this));
+    this._removeMouseMoveHandlers();
+    if (this.multiSelect) {
+      this._resourceTitleMousemoveHandler = this._onResourceTitleMousemove.bind(this);
+      this._$body.document()
+        .on('mousemove', this._resourceTitleMousemoveHandler)
+        .one('mouseup', this._onDocumentMouseUp.bind(this));
+    }
   }
 
-  protected _onResourceTitleMousemove(mousedownEvent: JQuery.MouseDownEvent, event: JQuery.MouseMoveEvent<Document>) {
+  protected _onResourceTitleMousemove(event: JQuery.MouseMoveEvent<Document>) {
     let lastRow = this._findRow(event.pageY);
     if (lastRow) {
       this.lastRow = lastRow;
     }
 
-    this._select(true);
+    this._select();
   }
 
   protected _onResourceTitleContextMenu(event: JQuery.ContextMenuEvent) {
@@ -983,6 +986,7 @@ export class Planner extends Widget implements PlannerModel {
     }
 
     // add event handlers
+    this._removeMouseMoveHandlers();
     this._cellMousemoveHandler = this._onCellMousemove.bind(this, event);
     this._$body.document()
       .on('mousemove', this._cellMousemoveHandler)
@@ -999,7 +1003,7 @@ export class Planner extends Widget implements PlannerModel {
     this.lastRange = this.startRange;
 
     // draw
-    this._select(true);
+    this._select();
     this._rangeSelectionStarted = true;
   }
 
@@ -1038,7 +1042,7 @@ export class Planner extends Widget implements PlannerModel {
       this.lastRange = lastRange;
     }
 
-    this._select(true);
+    this._select();
   }
 
   protected _onResizeMouseDown(event: JQuery.MouseDownEvent): boolean {
@@ -1061,6 +1065,7 @@ export class Planner extends Widget implements PlannerModel {
 
     this._$body.addClass('col-resize');
 
+    this._removeMouseMoveHandlers();
     this._resizeMousemoveHandler = this._onResizeMousemove.bind(this);
     this._$body.document()
       .on('mousemove', this._resizeMousemoveHandler)
