@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {Dimension, fields, Form, NotificationBadgeStatus, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
+import {Dimension, fields, Form, NotificationBadgeStatus, NullWidget, ObjectFactory, PopupBlockerHandler, Rectangle, scout, Status, webstorage} from '../../src/index';
 
 describe('Form', () => {
   let session, helper, outlineHelper;
@@ -1063,6 +1063,36 @@ describe('Form', () => {
       expect(form.getNotificationBadgeText()).toBe('foo');
       form.setNotificationBadgeText(null);
       expect(form.getNotificationBadgeText()).toBeUndefined();
+    });
+  });
+
+  describe('form with displayHint = POPUP_WINDOW', () => {
+    class PreventOpenPopupBlockHandler extends PopupBlockerHandler {
+      openWindow(uri, windowName, windowSpecs, onWindowOpened) {
+        // Do nothing to not open the popup and also prevent logging a warning and opening of the desktop notification
+      }
+    }
+
+    beforeEach(() => {
+      ObjectFactory.get().register('PopupBlockerHandler', () => new PreventOpenPopupBlockHandler());
+    });
+
+    afterEach(() => {
+      ObjectFactory.get().unregister('PopupBlockerHandler');
+    });
+
+    it('can be closed without error even if open failed due to popup blocker', async () => {
+      let form = helper.createFormWithOneField({displayHint: Form.DisplayHint.POPUP_WINDOW});
+      await form.open();
+      form.close();
+      expect(form.destroyed).toBe(true);
+    });
+
+    it('can be hidden without error even if show failed due to popup blocker', () => {
+      let form = helper.createFormWithOneField({displayHint: Form.DisplayHint.POPUP_WINDOW});
+      form.show();
+      form.hide();
+      expect(form.rendered).toBe(false);
     });
   });
 });
