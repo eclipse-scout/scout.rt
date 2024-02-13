@@ -163,14 +163,13 @@ export default class DesktopFormController extends FormController {
    */
   _removePopupWindow(form) {
     let popupWindow = form.popupWindow;
-    if (!popupWindow) {
-      throw new Error('Form has no popupWindow reference');
+    if (popupWindow) {
+      delete form.popupWindow;
+      arrays.remove(this._popupWindows, popupWindow);
     }
-    delete form.popupWindow;
-    arrays.remove(this._popupWindows, popupWindow);
     if (form.rendered) {
       form.remove();
-      popupWindow.close();
+      popupWindow?.close();
     }
   }
 
