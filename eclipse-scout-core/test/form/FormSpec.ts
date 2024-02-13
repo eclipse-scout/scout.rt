@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
-  App, CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox,
-  Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
+  App, CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Popup, PopupBlockerHandler, Rectangle, ResetMenu,
+  SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -2178,6 +2178,36 @@ describe('Form', () => {
       expect(form.$container.attr('aria-label')).toBeTruthy();
       expect(form.$container).toHaveAttr('aria-label', 'testTitle testSubTitle');
       expect(form.$container.attr('aria-labelledby')).toBeFalsy();
+    });
+  });
+
+  describe('form with displayHint = POPUP_WINDOW', () => {
+    class PreventOpenPopupBlockHandler extends PopupBlockerHandler {
+      override openWindow(uri: string, windowName?: string, windowSpecs?: string, onWindowOpened?: (popup: Window) => void) {
+        // Do nothing to not open the popup and also prevent logging a warning and opening of the desktop notification
+      }
+    }
+
+    beforeEach(() => {
+      ObjectFactory.get().register(PopupBlockerHandler, () => new PreventOpenPopupBlockHandler());
+    });
+
+    afterEach(() => {
+      ObjectFactory.get().unregister(PopupBlockerHandler);
+    });
+
+    it('can be closed without error even if open failed due to popup blocker', async () => {
+      let form = scout.create(Form, {parent: session.desktop, displayHint: Form.DisplayHint.POPUP_WINDOW});
+      await form.open();
+      form.close();
+      expect(form.destroyed).toBe(true);
+    });
+
+    it('can be hidden without error even if show failed due to popup blocker', () => {
+      let form = scout.create(Form, {parent: session.desktop, displayHint: Form.DisplayHint.POPUP_WINDOW});
+      form.show();
+      form.hide();
+      expect(form.rendered).toBe(false);
     });
   });
 });
