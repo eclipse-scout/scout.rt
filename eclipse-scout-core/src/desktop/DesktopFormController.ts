@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -163,14 +163,13 @@ export class DesktopFormController extends FormController implements DesktopForm
 
   protected override _removePopupWindow(form: Form) {
     let popupWindow = form.popupWindow;
-    if (!popupWindow) {
-      throw new Error('Form has no popupWindow reference');
+    if (popupWindow) {
+      delete form.popupWindow;
+      arrays.remove(this.popupWindows, popupWindow);
     }
-    delete form.popupWindow;
-    arrays.remove(this.popupWindows, popupWindow);
     if (form.rendered) {
       form.remove();
-      popupWindow.close();
+      popupWindow?.close();
     }
   }
 
