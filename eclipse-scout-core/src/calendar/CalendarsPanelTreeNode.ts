@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CalendarsPanelTreeNodeModel, InitModelOf, TreeNode} from '../index';
+import {CalendarsPanelTreeNodeModel, TreeNode} from '../index';
 
 export class CalendarsPanelTreeNode extends TreeNode implements CalendarsPanelTreeNodeModel {
   declare model: CalendarsPanelTreeNodeModel;
@@ -20,11 +20,5 @@ export class CalendarsPanelTreeNode extends TreeNode implements CalendarsPanelTr
     super();
 
     this.calendarId = null;
-  }
-
-  override init(model: InitModelOf<this>) {
-    super.init(model);
-
-    this.leaf = !!this.parentId;
   }
 }
