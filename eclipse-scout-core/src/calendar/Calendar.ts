@@ -79,7 +79,6 @@ export class Calendar extends Widget implements CalendarModel {
   selectedRange: DateRange;
   needsScrollToStartHour: boolean;
   defaultMenuTypes: string[];
-  splitDay: boolean;
   showYearPanel: boolean;
   showListPanel: boolean;
   showCalendarsPanel: boolean;
@@ -133,7 +132,7 @@ export class Calendar extends Widget implements CalendarModel {
     super();
 
     this.monthViewNumberOfWeeks = 6;
-    this.numberOfHourDivisions = 4;
+    this.numberOfHourDivisions = 2;
     this.heightPerDivision = 30;
     this.startHour = 6;
     this.heightPerHour = this.numberOfHourDivisions * this.heightPerDivision;
@@ -155,7 +154,6 @@ export class Calendar extends Widget implements CalendarModel {
     this.calendarToggleListWidth = 270;
     this.calendarToggleYearWidth = 215;
     this.defaultMenuTypes = [Calendar.MenuType.EmptySpace];
-    this.splitDay = true;
 
     // main elements
     this.$container = null;
@@ -1093,7 +1091,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     // layout calendar columns
     let columnWidth = 0;
-    if (this.isDay() && this.splitDay) {
+    if (this.isDay()) {
       columnWidth = Math.round(contentW / (this._getCalendarsWithoutGroups().filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
     } else if (this.isWorkWeek()) {
       columnWidth = Math.round(contentW / this.workDayIndices.length);
