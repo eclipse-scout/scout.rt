@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderAutoAssignItemChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemMovedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsChain;
@@ -49,6 +50,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarDescriptor;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +131,12 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(25)
+  protected ICalendarDescriptor getConfiguredCalendarBelonging() {
+    return null;
+  }
+
   /**
    * Produce items in the time range [minDate,maxDate]<br>
    * The result is stored in the out parameter resutlHolder
@@ -173,6 +181,24 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   protected void execItemAction(ICalendarItem item) {
   }
 
+  /**
+   * When the items provided by this ItemProvider belong to a spesific calendar by using e.g.
+   * {@link #getConfiguredCalendarBelonging()}, the calendar items are automaticly assigned to the calendar. <br>
+   * Only items with no calendar id are automatically assigned.
+   *
+   * @param items
+   *     calendar item to be automatically assigned
+   */
+  @ConfigOperation
+  @Order(90)
+  protected void execAutoAssignCalendarItems(Set<ICalendarItem> items) {
+    for (ICalendarItem item : items) {
+      if (getCalendarBelonging() != null && item.getCalendarId() == null) {
+        item.setCalendarId(getCalendarBelonging().getCalendarId());
+      }
+    }
+  }
+
   protected final void interceptInitConfig() {
     m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
@@ -181,6 +207,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     m_contributionHolder = new ContributionComposite(this);
     setMoveItemEnabled(getConfiguredMoveItemEnabled());
     setRefreshIntervalMillis(getConfiguredRefreshIntervallMillis());
+    setCalendarBelonging(getConfiguredCalendarBelonging());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<>();
@@ -319,6 +346,16 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   @Override
+  public ICalendarDescriptor getCalendarBelonging() {
+    return propertySupport.getProperty(PROP_CALENDAR_BELONGING, ICalendarDescriptor.class);
+  }
+
+  @Override
+  public void setCalendarBelonging(ICalendarDescriptor belongingCalendar) {
+    propertySupport.setProperty(PROP_CALENDAR_BELONGING, belongingCalendar);
+  }
+
+  @Override
   public void onItemAction(ICalendarItem item) {
     interceptItemAction(item);
   }
@@ -393,6 +430,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         // call user code
         try {
           interceptLoadItemsInBackground(ClientSessionProvider.currentSession(), m_loadingMinDate, m_loadingMaxDate, m_result);
+          interceptAutoAssignCalendarItems(m_result);
         }
         catch (ThreadInterruptedError | FutureCancelledError e) { // NOSONAR
           // NOOP
@@ -448,6 +486,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       getOwner().execItemMoved(item, fromDate, toDate);
     }
 
+    @Override
+    public void execAutoAssignCalendarItems(CalendarItemProviderAutoAssignItemChain chain, Set<ICalendarItem> items) {
+      getOwner().execAutoAssignCalendarItems(items);
+    }
   }
 
   protected final void interceptLoadItems(Date minDate, Date maxDate, Set<ICalendarItem> result) {
@@ -472,6 +514,12 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
     CalendarItemProviderItemMovedChain chain = new CalendarItemProviderItemMovedChain(extensions);
     chain.execItemMoved(item, fromDate, toDate);
+  }
+
+  protected final void interceptAutoAssignCalendarItems(Set<ICalendarItem> item) {
+    List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
+    CalendarItemProviderAutoAssignItemChain chain = new CalendarItemProviderAutoAssignItemChain(extensions);
+    chain.execAutoAssignCalendarItems(item);
   }
 
 }
