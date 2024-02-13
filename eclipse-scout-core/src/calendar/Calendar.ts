@@ -282,7 +282,8 @@ export class Calendar extends Widget implements CalendarModel {
           text: descriptor.name,
           checked: descriptor.visible,
           cssClass: descriptor.cssClass,
-          expanded: true
+          expanded: true,
+          leaf: !this.calendars.find(node => node.parentId === descriptor.calendarId)
         }), this.calendarsPanel.tree.nodes.find(node => node.calendarId === descriptor.parentId));
       });
   }
