@@ -262,7 +262,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _updateCalendarNodes() {
-    this.calendarsPanel.tree.removeAllNodes();
+    this.calendarsPanel.tree.deleteAllChildNodes();
     // Ensure to add parent nodes first to the tree
     this.calendars.sort((cal1, cal2) => {
       if (cal1.parentId && cal2.parentId) {
@@ -1113,7 +1113,8 @@ export class Calendar extends Widget implements CalendarModel {
           if (id === 'default') {
             return this._defaultCalendarVisible();
           }
-          return this._findCalendarForId(id).visible;
+          let foundCalendar = this._findCalendarForId(id);
+          return foundCalendar ? foundCalendar.visible : false;
         }).data('new-width', columnWidth);
     } else {
       // Set size 0 for all calendar columns
