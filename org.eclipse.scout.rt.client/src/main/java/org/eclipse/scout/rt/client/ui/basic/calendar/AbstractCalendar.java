@@ -844,6 +844,18 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     }
   }
 
+  @Override
+  public void reloadCalendarItems(ICalendarDescriptor calendar) {
+    if (calendar == null) {
+      reloadCalendarItems();
+      return;
+    }
+    // Only reload necessary calendars
+    m_providers.stream()
+        .filter(provider -> provider.getCalendarBelonging() == null || calendar.equals(provider.getCalendarBelonging()))
+        .forEach(ICalendarItemProvider::reloadProvider);
+  }
+
   /*
    * Property Observer
    */
@@ -1058,7 +1070,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
         cal.withVisible(visible);
         // Trigger reload when new calendar is selected
         if (visible) {
-          reloadCalendarItems();
+          reloadCalendarItems(cal);
         }
       }
       finally {

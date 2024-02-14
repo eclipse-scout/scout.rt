@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,130 +8,81 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+#scout {
+  .calendar-color(@background-color, @border-color, @hover-background-color: @background-color, @hover-border-color, @selected-background-color, @selected-border-color: @hover-border-color, @check-box-color: empty) {
+    &.calendar-component {
+      background-color: @background-color;
+
+      & > .calendar-component-leftcolorborder {
+        background-color: @border-color;
+      }
+
+
+      &.hover {
+        background-color: @hover-background-color;
+
+        & > .calendar-component-leftcolorborder {
+          background-color: @hover-border-color;
+        }
+      }
+
+      &.comp-selected {
+        background-color: @selected-background-color;
+
+        & > .calendar-component-leftcolorborder {
+          background-color: @selected-border-color;
+        }
+      }
+    }
+
+    & > .tree-node-checkbox > .check-box.checked {
+      background-color: @check-box-color;
+      border-color: @check-box-color;
+    }
+  }
+}
+
+
 .calendar-color-red {
-
-  &.calendar-component {
-    background-color: @palette-red-0;
-
-    & > .calendar-component-leftcolorborder {
-      background-color: @palette-red-2;
-    }
-
-    &.hover {
-      background-color: @palette-red-1;
-
-      & > .calendar-component-leftcolorborder {
-        background-color: @palette-red-3;
-      }
-    }
-
-    &.comp-selected {
-      background-color: @palette-red-2;
-
-      & > .calendar-component-leftcolorborder {
-        background-color: @palette-red-3;
-      }
-    }
-  }
-
-  & > .tree-node-checkbox > .check-box.checked {
-    background-color: @palette-red-3;
-    border-color: @palette-red-3;
-  }
+  #scout.calendar-color(
+    @background-color: @palette-red-0,
+    @border-color: @palette-red-2,
+    @hover-background-color: @palette-red-1,
+    @hover-border-color: @palette-red-3,
+    @selected-background-color: @palette-red-2,
+    @check-box-color: @palette-red-3
+  );
 }
 
 .calendar-color-green {
-
-  &.calendar-component {
-    background-color: @palette-green-0;
-
-    & > .calendar-component-leftcolorborder {
-      background-color: @palette-green-2;
-    }
-
-    &.hover {
-      background-color: @palette-green-1;
-
-      & > .calendar-component-leftcolorborder {
-        background-color: @palette-green-3;
-      }
-    }
-
-    &.comp-selected {
-      background-color: @palette-green-2;
-
-      & > .calendar-component-leftcolorborder {
-        background-color: @palette-green-3;
-      }
-    }
-  }
-
-  & > .tree-node-checkbox > .check-box.checked {
-    background-color: @palette-green-3;
-    border-color: @palette-green-3;
-  }
+  #scout.calendar-color(
+    @background-color: @palette-green-0,
+    @border-color: @palette-green-2,
+    @hover-background-color: @palette-green-1,
+    @hover-border-color: @palette-green-3,
+    @selected-background-color: @palette-green-2,
+    @check-box-color: @palette-green-3
+  );
 }
 
 .calendar-color-orange {
-
-  &.calendar-component {
-    background-color: @palette-orange-0;
-
-    & > .calendar-component-leftcolorborder {
-      background-color: @palette-orange-2;
-    }
-
-    &.hover {
-      background-color: @palette-orange-1;
-
-      & > .calendar-component-leftcolorborder {
-        background-color: @palette-orange-3;
-      }
-    }
-
-    &.comp-selected {
-      background-color: @palette-orange-2;
-
-      & > .calendar-component-leftcolorborder {
-        background-color: @palette-orange-3;
-      }
-    }
-  }
-
-  & > .tree-node-checkbox > .check-box.checked {
-    background-color: @palette-orange-3;
-    border-color: @palette-orange-3;
-  }
+  #scout.calendar-color(
+    @background-color: @palette-orange-0,
+    @border-color: @palette-orange-2,
+    @hover-background-color: @palette-orange-1,
+    @hover-border-color: @palette-orange-3,
+    @selected-background-color: @palette-orange-2,
+    @check-box-color: @palette-orange-3
+  );
 }
 
 .calendar-color-blue {
-
-  &.calendar-component {
-    background-color: @palette-blue-0;
-
-    & > .calendar-component-leftcolorborder {
-      background-color: @palette-blue-2;
-    }
-
-    &.hover {
-      background-color: @palette-blue-1;
-
-      & > .calendar-component-leftcolorborder {
-        background-color: @palette-blue-3;
-      }
-    }
-
-    &.comp-selected {
-      background-color: @palette-blue-2;
-
-      & > .calendar-component-leftcolorborder {
-        background-color: @palette-blue-3;
-      }
-    }
-  }
-
-  & > .tree-node-checkbox > .check-box.checked {
-    background-color: @palette-blue-3;
-    border-color: @palette-blue-3;
-  }
+  #scout.calendar-color(
+    @background-color: @palette-blue-0,
+    @border-color: @palette-blue-2,
+    @hover-background-color: @palette-blue-1,
+    @hover-border-color: @palette-blue-3,
+    @selected-background-color: @palette-blue-2,
+    @check-box-color: @palette-blue-3
+  );
 }

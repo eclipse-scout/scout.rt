@@ -165,6 +165,8 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    */
   void reloadCalendarItems();
 
+  void reloadCalendarItems(ICalendarDescriptor calendar);
+
   /**
    * Model Observer
    */
