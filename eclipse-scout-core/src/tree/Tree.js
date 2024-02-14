@@ -1255,7 +1255,23 @@ export default class Tree extends Widget {
       text: this._nodeTooltipText.bind(this),
       arrowPosition: 50,
       arrowPositionUnit: '%',
-      nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
+      nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible(),
+      originProducer: $anchor => {
+        // Measure entire node
+        let origin = graphics.offsetBounds($anchor);
+
+        // Measure text (disable flex-grow to get only the necessary text width)
+        let $text = $anchor.children('.text');
+        let oldStyle = $text.attr('style');
+        $text.css('flex-grow', '0');
+        let textOffsetBounds = graphics.offsetBounds($text);
+        $text.attrOrRemove('style', oldStyle);
+
+        // Use text bounds for horizontal axis
+        origin.x = textOffsetBounds.x;
+        origin.width = Math.min(100, textOffsetBounds.width);
+        return origin;
+      }
     });
   }
 
