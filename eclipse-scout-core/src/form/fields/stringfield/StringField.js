@@ -309,6 +309,11 @@ export default class StringField extends BasicField {
    * @override
    */
   _renderDisplayText() {
+    if (this.multilineText && this.$disabledCopyOverlay) {
+      // Changing the value might change the visibility of the scrollbars -> overlay size needs to be adjusted
+      this.invalidateLayoutTree(false);
+    }
+
     if (this.inputObfuscated && this.focused) {
       // If a new display text is set (e.g. because value in model changed) and field is focused,
       // do not display new display text but clear content (as in _onFieldFocus).
