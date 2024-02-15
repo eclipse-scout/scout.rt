@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,5 +52,43 @@ describe('Rectangle', () => {
     expect(r1.intersects(r8)).toBe(true);
     expect(r1.intersects(r9)).toBe(false);
     expect(r1.intersects(r10)).toBe(false);
+  });
+
+  describe('intersect', () => {
+    it('computes the intersection between two rectangles', () => {
+      let rect = new Rectangle(2, 3, 10, 8);
+
+      // Second rectangle is as big as first
+      expect(rect.intersect(new Rectangle(rect))).toEqual(rect);
+
+      // Second rectangle completely covers first
+      expect(rect.intersect(new Rectangle(0, 1, 20, 30))).toEqual(rect);
+
+      // Second rectangle is completely inside first
+      expect(rect.intersect(new Rectangle(3, 4, 3, 2))).toEqual(new Rectangle(3, 4, 3, 2));
+
+      // Second rectangle starts inside and overlaps right and bottom
+      expect(rect.intersect(new Rectangle(4, 5, 20, 20))).toEqual(new Rectangle(4, 5, 8, 6));
+
+      // Second rectangle starts further left and top and ends inside first
+      expect(rect.intersect(new Rectangle(0, 1, 3, 4))).toEqual(new Rectangle(2, 3, 1, 2));
+
+      // Second rectangle starts further left and top and touches right border of first
+      expect(rect.intersect(new Rectangle(-4, -5, 17, 10))).toEqual(new Rectangle(2, 3, 10, 2));
+    });
+
+    it('returns an empty rectangle if the rectangles don\'t intersect', () => {
+      let rect = new Rectangle(2, 3, 10, 8);
+      // Second rectangle touches first on the bottom right edge
+      expect(rect.intersect(new Rectangle(12, 11, 5, 5))).toEqual(new Rectangle());
+
+      // Second rectangle touches first on the top left edge
+      expect(rect.intersect(new Rectangle(0, 0, 2, 8))).toEqual(new Rectangle());
+    });
+
+    it('returns an empty rectangle if the second rectangle is null or empty', () => {
+      expect(new Rectangle(2, 3, 10, 8).intersect(null)).toEqual(new Rectangle());
+      expect(new Rectangle().intersect(new Rectangle())).toEqual(new Rectangle());
+    });
   });
 });
