@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -77,6 +77,21 @@ export class Rectangle {
     return r.width > 0 && r.height > 0 && this.width > 0 && this.height > 0 &&
       r.x < this.right() && r.right() > this.x &&
       r.y < this.bottom() && r.bottom() > this.y;
+  }
+
+  /**
+   * Determines the intersection with the given rectangle.
+   *
+   * @returns the rectangle that represents the intersection, or an empty rectangle, if the rectangles don't intersect.
+   */
+  intersect(rect: Rectangle): Rectangle {
+    if (!this.intersects(rect)) {
+      return new Rectangle();
+    }
+    let newRect = new Rectangle(Math.max(this.x, rect.x), Math.max(this.y, rect.y));
+    newRect.width = Math.min(this.right(), rect.right()) - newRect.x;
+    newRect.height = Math.min(this.bottom(), rect.bottom()) - newRect.y;
+    return newRect;
   }
 
   /**

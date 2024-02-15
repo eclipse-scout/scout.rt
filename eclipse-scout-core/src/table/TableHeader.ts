@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, objects, PropertyChangeEvent, scout, scrollbars, SomeRequired, strings, styles,
-  Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
+  arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, objects, PropertyChangeEvent, Rectangle, scout, scrollbars, SomeRequired, strings,
+  styles, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -71,7 +71,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
 
     // Required to make "height: 100%" rule work. menuBarContainer and menuBar itself must have the same visibility.
-    // Otherwise they could cover the sorting/filter icons on the table-header of the column.
+    // Otherwise, they could cover the sorting/filter icons on the table-header of the column.
     this.$menuBarContainer = this.$container
       .appendDiv('menubar-container')
       .setVisible(this.menuBar.visible);
@@ -192,7 +192,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
       return;
     }
     if (!column.$header) {
-      // May be undefined if called when header item is not rendered yet (may caused by _adjustColumnMinWidth)
+      // May be undefined if called when header item is not rendered yet (e.g. coming from _adjustColumnMinWidth)
       return;
     }
 
@@ -278,6 +278,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
       text: this._headerItemTooltipText.bind(this),
       arrowPosition: 50,
       arrowPositionUnit: '%',
+      originProducer: this._headerItemTooltipOrigin.bind(this),
       nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible(),
       htmlEnabled: this._headerItemTooltipHtmlEnabled.bind(this)
     });
@@ -301,13 +302,35 @@ export class TableHeader extends Widget implements TableHeaderModel {
       return column.headerTooltipText;
     }
     let $text = $col.children('.table-header-item-text');
-    if ($text.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
+    if ($text.isContentTruncated() || !this._textInView($text)) {
+      // Show a tooltip if the content is truncated (text shows an ellipsis) or if the text is partially out of view because of the horizontal scroll position of the table
       let text = strings.plainText($text.html(), {trim: true});
       if (strings.hasText(text)) {
         return text;
       }
     }
     return null;
+  }
+
+  protected _textInView($text: JQuery): boolean {
+    let textBounds = graphics.offsetBounds($text);
+    let containerBounds = this._offsetBoundsWithoutMenuBar();
+    return textBounds.right() <= containerBounds.right() && textBounds.x >= containerBounds.x;
+  }
+
+  /**
+   * @returns the part of the header item that is visible in the current viewport of the table so the tooltip won't point to an invisible part of the header item
+   */
+  protected _headerItemTooltipOrigin($col: JQuery): Rectangle {
+    let headerItemBounds = graphics.offsetBounds($col);
+    let containerBounds = this._offsetBoundsWithoutMenuBar();
+    return containerBounds.intersect(headerItemBounds);
+  }
+
+  protected _offsetBoundsWithoutMenuBar(): Rectangle {
+    let containerBounds = graphics.offsetBounds(this.$container);
+    containerBounds.width -= graphics.size(this.$menuBarContainer).width;
+    return containerBounds;
   }
 
   protected _headerItemTooltipHtmlEnabled($col: JQuery): boolean {
@@ -838,7 +861,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
       return;
     }
     let column = event.filter.column;
-    // Check for column.$header because column may have been removed in the mean time due to a structure changed event -> don't try to render state
+    // Check for column.$header because column may have been removed in the meantime due to a structure changed event -> don't try to render state
     if (event.filter.filterType === ColumnUserFilter.TYPE && column.$header) {
       this._renderColumnState(column);
     }
