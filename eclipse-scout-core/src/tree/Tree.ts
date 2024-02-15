@@ -9,9 +9,9 @@
  */
 import {
   Action, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics,
-  HtmlComponent, InitModelOf, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, scout, scrollbars, ScrollDirection,
-  ScrollToOptions, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke,
-  TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
+  HtmlComponent, InitModelOf, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, Rectangle, scout, scrollbars, ScrollDirection,
+  ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke,
+  TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -1320,8 +1320,43 @@ export class Tree extends Widget implements TreeModel {
       text: this._nodeTooltipText.bind(this),
       arrowPosition: 50,
       arrowPositionUnit: '%',
-      nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
+      nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible(),
+      originProducer: this._treeNodeTooltipOrigin.bind(this)
     });
+  }
+
+  protected _treeNodeTooltipOrigin($node: JQuery): Rectangle {
+    // Measure entire node
+    let origin = graphics.offsetBounds($node);
+
+    // Measure content
+    let $text = $node.children('.text');
+    let textOffset = graphics.offset($text);
+    let textSize = graphics.prefSize($text);
+    if (strings.hasText($text.text())) {
+      // Text (with or without icon)
+      origin.x = textOffset.x;
+      origin.width = textSize.width;
+    } else {
+      let $icon = $node.children('.icon');
+      if ($icon.length) {
+        // Icon only
+        let iconOffset = graphics.offset($icon);
+        let iconSize = graphics.size($icon);
+        let iconInsets = graphics.insets($icon);
+        origin.x = iconOffset.x + iconInsets.left;
+        origin.width = iconSize.width - iconInsets.horizontal();
+      } else {
+        // Neither text nor icon
+        origin.x = textOffset.x;
+        origin.width = 10;
+      }
+    }
+
+    // Intersect with scroll parents
+    origin = scrollbars.intersectViewport(origin, $node.scrollParents());
+
+    return origin;
   }
 
   protected _uninstallNodeTooltipSupport() {
