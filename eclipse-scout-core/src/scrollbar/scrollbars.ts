@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Device, graphics, HtmlComponent, InitModelOf, Insets, objects, scout, Scrollbar, Session, SomeRequired, WidgetModel} from '../index';
+import {arrays, Device, graphics, HtmlComponent, InitModelOf, Insets, objects, Rectangle, scout, Scrollbar, Session, SomeRequired, WidgetModel} from '../index';
 import $ from 'jquery';
 
 export type ScrollDirection = 'x' | 'y' | 'both';
@@ -818,8 +818,10 @@ export const scrollbars = {
   },
 
   /**
+   * Computes whether the given location is in the viewport of the given $scrollables.
+   *
    * @param $scrollables one or more scrollables to check against
-   * @returns true if the location is visible in the current viewport of all the $scrollables, or if $scrollables is null
+   * @returns true if the location is visible in the current viewport of the $scrollables or if $scrollables is null.
    */
   isLocationInView(location: { x: number; y: number }, $scrollables: JQuery): boolean {
     if (!$scrollables || $scrollables.length === 0) {
@@ -829,6 +831,23 @@ export const scrollbars = {
       let scrollableOffsetBounds = graphics.offsetBounds($(scrollable));
       return scrollableOffsetBounds.contains(location.x, location.y);
     });
+  },
+
+  /**
+   * Clips the given bounds and removes the parts that are not in the current viewport of the given $scrollables.
+   *
+   * @param $scrollables one or more scrollables to check against
+   * @returns the intersection between the bounds and the viewports of the $scrollables.
+   *          If $scrollables is null or empty, the given bounds are returned without clipping.
+   */
+  intersectViewport(bounds: Rectangle, $scrollables: JQuery): Rectangle {
+    if (!$scrollables || $scrollables.length === 0) {
+      return bounds;
+    }
+    return $scrollables.toArray().reduce((prevBounds, scrollable) => {
+      let scrollableOffsetBounds = graphics.offsetBounds($(scrollable));
+      return prevBounds.intersect(scrollableOffsetBounds);
+    }, bounds);
   },
 
   /**
