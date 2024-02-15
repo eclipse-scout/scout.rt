@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.ui.html;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.List;
@@ -62,6 +64,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.server.commons.authentication.IAccessController;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
@@ -593,9 +596,14 @@ public class UiSession implements IUiSession {
     uninstallUiDataAvailableListener();
     signalPoller(); // Notify waiting requests - should not delay web-container shutdown
 
-    m_jsonAdapterRegistry.disposeAdapters();
-    m_httpContext.clear();
-    m_currentJsonResponse = null;
+    // The model may run tasks right now, that alter json adapters, and this may lead to an unreliable state of the JSON layer.
+    // Example: creating and initializing a new json adapter is NOT done atomically and disposing an adapter before it is initialized may lead to errors depending on thy type of json adapter.
+    // Therefore, run this in a model job to ensure a consistent state of the JSON layer before disposing it.
+    runInModelJob(() -> {
+      m_jsonAdapterRegistry.disposeAdapters();
+      m_httpContext.clear();
+      m_currentJsonResponse = null;
+    }, "Disposing Ui session", true);
 
     // Inform the desktop that the UI has been detached.
     // The model may trigger events during detaching the desktop, that need to be sent back to the browser if the ui session weren't disposed.
@@ -603,6 +611,60 @@ public class UiSession implements IUiSession {
     detachDesktop();
 
     m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
+  }
+
+  /**
+   * Run the given {@link Runnable} in a model job. If the current thread is the model thread or there is no active
+   * client session (see {@link #getClientSession()}) the {@link Runnable} is simply executed. If wait is set to
+   * <code>true</code>, the method waits for the model job to complete for 5 seconds. If it does not complete the
+   * {@link Runnable} is executed in the current thread.
+   * 
+   * @param runnable
+   *          {@link Runnable} to be executed.
+   * @param name
+   *          name of the model job that is triggered.
+   * @param wait
+   *          If {@code true}, method waits for the model job to complete.
+   */
+  protected void runInModelJob(Runnable runnable, String name, boolean wait) {
+    assertNotNull(runnable, "runnable is required");
+
+    // current thread is the model thread -> run
+    if (ModelJobs.isModelThread()) {
+      runnable.run();
+      return;
+    }
+
+    // current thread is NOT the model thread but there is no active client session -> run
+    final IClientSession clientSession = getClientSession();
+    if (clientSession == null || !clientSession.isActive() || clientSession.isStopping()) {
+      runnable.run();
+      return;
+    }
+
+    // current thread is NOT the model thread and the client session is active -> run in model job
+    final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
+    IFuture<Void> modelJob = ModelJobs.schedule(
+        runnable::run,
+        ModelJobs.newInput(clientRunContext)
+            .withName(name)
+            .withExceptionHandling(null, false)); // Propagate exception to caller
+
+    // no need to wait -> return
+    if (!wait) {
+      return;
+    }
+
+    try {
+      // wait for the model job to complete
+      modelJob.awaitDone(5, TimeUnit.SECONDS);
+    }
+    catch (TimedOutError | ThreadInterruptedError | FutureCancelledError e) {
+      LOG.warn("Unable to run task '{}' in model job -> run it in current thread.", name, e);
+      // the model job did not complete within wait time -> cancel it and run task in current thread
+      modelJob.cancel(true);
+      runnable.run();
+    }
   }
 
   protected void detachDesktop() {
@@ -620,18 +682,7 @@ public class UiSession implements IUiSession {
           }
         }
       };
-      // Current thread is the model thread if dispose is called by clientSession.stop(), otherwise (e.g. page reload) dispose is called from the UI thread
-      if (ModelJobs.isModelThread()) {
-        detachGui.run();
-      }
-      else {
-        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
-        ModelJobs.schedule(
-            detachGui::run,
-            ModelJobs.newInput(clientRunContext)
-                .withName("Detaching Gui")
-                .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
-      }
+      runInModelJob(detachGui, "Detaching Gui", false);
     }
   }
 
