@@ -142,8 +142,12 @@ export const graphics = {
 
   /**
    * Returns the preferred size of $elem.
-   * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
-   * because in this case the browser reserves the space the element would be using).
+   *
+   * Precondition: $elem and its parents must not be hidden ('display: none' - other styles like 'visibility: hidden'
+   * or 'opacity: 0' would be ok because in this case the browser reserves the space the element would be using).
+   *
+   * The `style` and `class` properties are temporarily altered to allow the element to assume its "natural size".
+   * A marker CSS class `measure` is added that can be used to reset element-specific CSS constraints (e.g. flexbox).
    *
    * @param $elem
    *          the jQuery element to measure
@@ -180,6 +184,7 @@ export const graphics = {
     }
 
     let oldStyle = $elem.attr('style');
+    let oldClass = $elem.attr('class');
     let oldScrollLeft = $elem.scrollLeft();
     let oldScrollTop = $elem.scrollTop();
 
@@ -208,6 +213,7 @@ export const graphics = {
     }
 
     // modify properties which prevent reading the preferred size
+    $elem.addClass('measure');
     $elem.css(cssProperties);
 
     // measure
@@ -220,6 +226,7 @@ export const graphics = {
 
     // reset the modified style attribute
     $elem.attrOrRemove('style', oldStyle);
+    $elem.attrOrRemove('class', oldClass);
     $elem.scrollLeft(oldScrollLeft);
     $elem.scrollTop(oldScrollTop);
 
