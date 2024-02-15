@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -940,6 +940,7 @@ export class Table extends Widget implements TableModel {
       htmlEnabled: this._isCellTooltipHtmlEnabled.bind(this),
       arrowPosition: 50,
       arrowPositionUnit: '%',
+      clipOrigin: true,
       nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
     });
   }
