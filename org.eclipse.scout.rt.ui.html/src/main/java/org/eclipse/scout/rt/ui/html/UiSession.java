@@ -145,6 +145,7 @@ public class UiSession implements IUiSession {
   private volatile JsonRequest m_currentJsonRequest;
   private volatile boolean m_processingJsonRequest;
   private volatile boolean m_attachedToDesktop;
+  private volatile boolean m_disposable = true;
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private volatile IRegistrationHandle m_uiDataAvailableListener;
@@ -573,10 +574,10 @@ public class UiSession implements IUiSession {
 
   @Override
   public void dispose() {
-    if (isProcessingJsonRequest()) {
+    if (!isDisposable()) {
       // If there is a request in progress just mark the session as being disposed.
       // The actual disposing happens before returning to the client, see processJsonRequest().
-      m_disposing = true;
+      setDisposingInternal(true);
       return;
     }
 
@@ -641,6 +642,14 @@ public class UiSession implements IUiSession {
 
   protected final void setDisposedInternal(boolean disposed) {
     m_disposed = disposed;
+  }
+
+  protected final boolean isDisposable() {
+    return m_disposable;
+  }
+
+  protected final void setDisposableInternal(boolean disposable) {
+    m_disposable = disposable;
   }
 
   protected final boolean isDisposing() {
@@ -755,6 +764,7 @@ public class UiSession implements IUiSession {
     m_httpContext.set(servletRequest, servletResponse);
     m_currentJsonRequest = jsonRequest;
     try {
+      setDisposableInternal(false);
       m_processingJsonRequest = true;
       try {
         // 1. Process the JSON request.
@@ -790,7 +800,8 @@ public class UiSession implements IUiSession {
       setRequestProcessed(jsonRequest);
       m_httpContext.clear();
       m_currentJsonRequest = null;
-      if (m_disposing) {
+      setDisposableInternal(true);
+      if (isDisposing()) {
         dispose();
       }
       if (LOG.isDebugEnabled()) {
@@ -894,6 +905,7 @@ public class UiSession implements IUiSession {
     final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
     m_httpContext.set(req, res);
     try {
+      setDisposableInternal(false);
       m_processingJsonRequest = true;
       try {
         // 1. Process the JSON request.
@@ -933,7 +945,8 @@ public class UiSession implements IUiSession {
     }
     finally {
       m_httpContext.clear();
-      if (m_disposing) {
+      setDisposableInternal(true);
+      if (isDisposing()) {
         dispose();
       }
     }
