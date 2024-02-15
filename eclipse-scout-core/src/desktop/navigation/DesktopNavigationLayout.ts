@@ -45,9 +45,7 @@ export class DesktopNavigationLayout extends AbstractLayout {
       if (viewButtonBoxWidth === 0 && outline && outline.$title) {
         // If there is no view button box, the outline title will be moved up.
         // If there is no outline title, the tool box will take the whole width (else case)
-        outline.$title.addClass('measure');
         let outlineTitleWidth = graphics.prefSize(outline.$title).width;
-        outline.$title.removeClass('measure');
         toolBoxSize = new Dimension(containerSize.width - outlineTitleWidth, 0) // height is set by css
           .subtract(toolBox.htmlComp.margins());
       } else {
