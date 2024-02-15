@@ -2323,6 +2323,16 @@ describe('Table', () => {
       verifyMouseMoveSelectionIsDisabled(model, table, true);
     });
 
+    it('can delete all rows during mouse down event', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      table.render();
+      table.on('rowsSelected', event => table.deleteAllRows());
+      expect(() => {
+        JQueryTesting.triggerMouseDown(table.rows[0].$row);
+      }).not.toThrow();
+    });
+
     function verifyMouseMoveSelectionIsDisabled(model, table, selectionMovable) {
       table.render();
 
