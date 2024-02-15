@@ -741,9 +741,12 @@ export class Table extends Widget implements TableModel {
       this._mouseDownColumn = null;
     });
     this.setContextColumn(this._columnAtX(event.pageX));
-    this.selectionHandler.onMouseDown(event);
-    let isRightClick = event.which === 3;
+    // The row referenced by this._$mouseDownRow might become invalid in the onMouseDown event (e.g. if the event removes all rows).
+    // Hence, we put the row aside before the event.
     let row = this._$mouseDownRow.data('row') as TableRow;
+    this.selectionHandler.onMouseDown(event);
+    this._$mouseDownRow = row.$row;
+    let isRightClick = event.which === 3;
 
     let $target = $(event.target);
     // handle expansion
