@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {graphics, NullWidget, scrollbars} from '../../src/index';
+import {graphics, NullWidget, Rectangle, scrollbars} from '../../src/index';
 
 describe('scrollbars', () => {
   let session: SandboxSession;
@@ -133,6 +133,61 @@ describe('scrollbars', () => {
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
+  });
+
+  describe('intersectViewport', () => {
+    let $scrollable: JQuery, $scrollable2: JQuery, $scrollables: JQuery, scrollableBounds: Rectangle, scrollableBounds2: Rectangle, $element: JQuery;
+
+    beforeEach(() => {
+      $scrollable = createScrollable();
+      scrollableBounds = graphics.offsetBounds($scrollable);
+      $scrollable2 = $scrollable.appendDiv()
+        .css('height', '30px')
+        .css('width', '100px')
+        .css('position', 'absolute');
+      scrollableBounds2 = graphics.offsetBounds($scrollable2);
+      $element = $('<div>')
+        .css('height', '10px')
+        .css('width', '10px')
+        .css('position', 'absolute')
+        .appendTo($('#sandbox'));
+      $scrollables = $();
+      $scrollables.push($scrollable, $scrollable2);
+    });
+
+    it('returns the intersection of the rectangle and all scrollables', () => {
+      // Inside both scrollables
+      $element
+        .cssLeft(scrollableBounds.x)
+        .cssTop(scrollableBounds.y);
+      let bounds = graphics.offsetBounds($element);
+      expect(scrollbars.intersectViewport(bounds, $scrollables)).toEqual(bounds);
+
+      // Outside first scrollable
+      $element
+        .cssLeft(scrollableBounds2.x)
+        .cssTop(scrollableBounds2.bottom());
+      bounds = graphics.offsetBounds($element);
+      expect(scrollbars.intersectViewport(bounds, $scrollables)).toEqual(new Rectangle());
+
+      // Overlapping into scrollable 2
+      $element
+        .cssLeft(scrollableBounds2.x)
+        .cssTop(scrollableBounds2.bottom() - 5);
+      bounds = graphics.offsetBounds($element);
+      expect(scrollbars.intersectViewport(bounds, $scrollables)).toEqual(new Rectangle(bounds.x, scrollableBounds2.bottom() - 5, bounds.width, bounds.height - 5));
+    });
+
+    it('returns the given rectangle if no scrollables are provided', () => {
+      // If no scrollables can be found, the rectangle is fully visible -> return the bounds as they are
+      // This behavior is consistent to isLocationInView which returns true in that case
+      $element
+        .cssLeft(scrollableBounds.x)
+        .cssTop(scrollableBounds.y);
+      let bounds = graphics.offsetBounds($element);
+      expect(scrollbars.intersectViewport(bounds, null)).toEqual(bounds);
+      expect(scrollbars.intersectViewport(bounds, $())).toEqual(bounds);
+    });
   });
 
   describe('render', () => {
