@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,7 @@ export class Tooltip extends Widget implements TooltipModel {
   severity: StatusSeverity;
   arrowPosition: number;
   arrowPositionUnit: string;
+  clipOrigin: boolean;
   windowPaddingX: number;
   windowPaddingY: number;
   origin: Rectangle;
@@ -55,6 +56,7 @@ export class Tooltip extends Widget implements TooltipModel {
     this.severity = Status.Severity.INFO;
     this.arrowPosition = 16;
     this.arrowPositionUnit = 'px';
+    this.clipOrigin = false;
     this.windowPaddingX = 10;
     this.windowPaddingY = 5;
     this.origin = null;
@@ -278,23 +280,25 @@ export class Tooltip extends Widget implements TooltipModel {
       // New text might be shorter or longer -> recompute position.
       // Resetting the current position first ensures that the position is computed the
       // same as if the tooltip was opened initially with the new text, even when the tooltip
-      // is at the right side of the screen. Otherwise, text wrapping might occur.
+      // is at the right of the screen. Otherwise, text wrapping might occur.
       this.$container.cssLeft('').cssTop('');
       this.position();
     }
   }
 
   position() {
-    let top, left, arrowSizeX, arrowSizeY, overlapX, overlapY, tooltipPosition, origin, offset,
-      tooltipWidth, tooltipHeight, arrowPosition, inView;
+    let $scrollParents = this.$anchor?.scrollParents();
+    let origin = this._getOrigin();
+    if ($scrollParents && this.clipOrigin) {
+      // Remove the parts from the origin that are not in the viewport
+      origin = scrollbars.intersectViewport(origin, $scrollParents);
+    }
+    let offset = this._getOffset(origin);
+    let tooltipPosition = origin.point().add(offset);
 
-    origin = this._getOrigin();
-    offset = this._getOffset(origin);
-    tooltipPosition = origin.point().add(offset);
-
-    if (this.$anchor) {
+    if ($scrollParents) {
       // Sticky tooltip must only be visible if the location where the tooltip points is in view (prevents that the tooltip points at an invisible anchor)
-      inView = scrollbars.isLocationInView(tooltipPosition, this.$anchor.scrollParent());
+      let inView = scrollbars.isLocationInView(tooltipPosition, $scrollParents);
       this.$container.setVisible(inView);
     }
 
@@ -305,14 +309,14 @@ export class Tooltip extends Widget implements TooltipModel {
       tooltipPosition.y -= parentOffset.top;
     }
 
-    arrowSizeX = 7;
-    arrowSizeY = 4;
+    let arrowSizeX = 7;
+    let arrowSizeY = 4;
 
-    tooltipHeight = this.$container.outerHeight();
-    tooltipWidth = this.$container.outerWidth();
+    let tooltipHeight = this.$container.outerHeight();
+    let tooltipWidth = this.$container.outerWidth();
 
     // Compute actual arrow position if position is provided in percentage
-    arrowPosition = this.arrowPosition;
+    let arrowPosition = this.arrowPosition;
     if (this.arrowPositionUnit === '%') {
       arrowPosition = tooltipWidth * this.arrowPosition / 100;
     }
@@ -320,10 +324,10 @@ export class Tooltip extends Widget implements TooltipModel {
       arrowPosition = tooltipWidth - arrowPosition;
     }
 
-    top = tooltipPosition.y - tooltipHeight - arrowSizeY;
-    left = tooltipPosition.x - arrowPosition;
-    overlapX = left + tooltipWidth + this.windowPaddingX - this.$parent.width();
-    overlapY = top - this.windowPaddingY;
+    let top = tooltipPosition.y - tooltipHeight - arrowSizeY;
+    let left = tooltipPosition.x - arrowPosition;
+    let overlapX = left + tooltipWidth + this.windowPaddingX - this.$parent.width();
+    let overlapY = top - this.windowPaddingY;
 
     // Move tooltip to the left until it gets fully visible
     if (overlapX > 0) {
@@ -345,7 +349,7 @@ export class Tooltip extends Widget implements TooltipModel {
       this.$arrow.addClass('arrow-bottom');
     }
 
-    // Make sure arrow is never positioned outside of the tooltip
+    // Make sure arrow is never positioned outside the tooltip
     arrowPosition = Math.min(arrowPosition, this.$container.outerWidth() - arrowSizeX);
     arrowPosition = Math.max(arrowPosition, arrowSizeX);
     this.$arrow.cssLeft(arrowPosition - this.$arrow.cssBorderLeftWidth());
@@ -358,7 +362,7 @@ export class Tooltip extends Widget implements TooltipModel {
       if (menu.popup) {
         menu.popup.position();
       }
-    }, this);
+    });
   }
 
   protected _getOrigin(): Rectangle {
@@ -413,7 +417,7 @@ export class Tooltip extends Widget implements TooltipModel {
     let $target = $(target),
       targetWidget = scout.widget($target);
 
-    // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
+    // Only remove the tooltip if the click is outside the container or the $anchor (= status icon)
     // Also ignore clicks if the tooltip is covert by a glasspane
     return !this.isOrHas(targetWidget) &&
       (this.$anchor && !this.$anchor.isOrHas($target[0])) &&
