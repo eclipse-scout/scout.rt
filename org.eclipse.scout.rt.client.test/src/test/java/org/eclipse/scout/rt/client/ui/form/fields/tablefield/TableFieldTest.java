@@ -11,6 +11,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -40,16 +44,15 @@ public class TableFieldTest {
    * Test method for {@link AbstractTableField#importFormFieldData(AbstractFormFieldData, boolean)} With and without
    * primary keys. Bug 414674
    */
-
   @Test
   public void testCreateTableField() {
     P_TableField tableField1 = createTableField(false);
-    assertEquals("prerequisite: tableField1.isPrimaryKey()", false, tableField1.getTable().getKeyColumn().isPrimaryKey());
-    assertEquals("prerequisite: tableField1.isDisplayable()", true, tableField1.getTable().getKeyColumn().isDisplayable());
+    assertFalse("prerequisite: tableField1.isPrimaryKey()", tableField1.getTable().getKeyColumn().isPrimaryKey());
+    assertTrue("prerequisite: tableField1.isDisplayable()", tableField1.getTable().getKeyColumn().isDisplayable());
 
     P_TableField tableField2 = createTableField(true);
-    assertEquals("prerequisite: tableField2.isPrimaryKey()", true, tableField2.getTable().getKeyColumn().isPrimaryKey());
-    assertEquals("prerequisite: tableField2.isDisplayable()", false, tableField2.getTable().getKeyColumn().isDisplayable());
+    assertTrue("prerequisite: tableField2.isPrimaryKey()", tableField2.getTable().getKeyColumn().isPrimaryKey());
+    assertFalse("prerequisite: tableField2.isDisplayable()", tableField2.getTable().getKeyColumn().isDisplayable());
   }
 
   /**
@@ -268,11 +271,11 @@ public class TableFieldTest {
 
   @Test
   public void testValueChangedTriggersWhileImportingFormFieldData() {
-    importFormFieldDataAndCheckExecContentChangedTriggerd(true);
-    importFormFieldDataAndCheckExecContentChangedTriggerd(false);
+    importFormFieldDataAndCheckExecContentChangedTriggered(true);
+    importFormFieldDataAndCheckExecContentChangedTriggered(false);
   }
 
-  private void importFormFieldDataAndCheckExecContentChangedTriggerd(boolean valueChangeTriggersEnabled) {
+  private void importFormFieldDataAndCheckExecContentChangedTriggered(boolean valueChangeTriggersEnabled) {
     P_TableField tableField = createTableField(false);
     P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, valueChangeTriggersEnabled);
@@ -346,7 +349,7 @@ public class TableFieldTest {
     tableField.setTable(tableField.new Table(), true);
     firstTable.setValueChangeTriggerEnabled(false);
 
-    // third call; should not affect firstField any more
+    // third call; should not affect firstField anymore
     tableField.setValueChangeTriggerEnabled(false);
     assertValueChangeTriggerEnabledFlag(tableField, false);
 
@@ -371,7 +374,7 @@ public class TableFieldTest {
     tableField.setValueChangeTriggerEnabled(true);
     assertValueChangeTriggerEnabledFlag(tableField, true);
 
-    // now exchange table with one that has it's trigger already disabled
+    // now exchange table with one that has its trigger already disabled
     org.eclipse.scout.rt.client.ui.form.fields.tablefield.TableFieldTest.P_TableField.Table newTable = tableField.new Table();
     newTable.setValueChangeTriggerEnabled(false);
     newTable.setValueChangeTriggerEnabled(false);
@@ -475,6 +478,107 @@ public class TableFieldTest {
     P_TableField tableField4 = createTableField(true);
     runImportFormFieldBeanDataWithAllRowStates(tableField4);
 
+  }
+
+  @Test
+  public void testCheckableColumn() {
+    P_CheckableTableField tableField = new P_CheckableTableField();
+    P_CheckableTableField.Table table = tableField.getTable();
+
+    ITableRow row1 = table.createRow();
+    table.getIntegerColumn().setValue(row1, 11);
+    table.getBooleanColumn().setValue(row1, true);
+    table.getStringColumn().setValue(row1, "One");
+    ITableRow row2 = table.createRow();
+    table.getIntegerColumn().setValue(row2, 22);
+    table.getStringColumn().setValue(row2, "Two");
+    ITableRow row3 = table.createRow();
+    table.getIntegerColumn().setValue(row3, 33);
+    table.getStringColumn().setValue(row3, "Three");
+    row3.setChecked(true);
+
+    table.addRows(List.of(row1, row2, row3));
+
+    // -----------------------
+
+    assertEquals(3, table.getRowCount());
+    row1 = table.getRow(0);
+    row2 = table.getRow(1);
+    row3 = table.getRow(2);
+
+    assertEquals(Integer.valueOf(11), table.getIntegerColumn().getValue(row1));
+    assertEquals(Boolean.TRUE, table.getBooleanColumn().getValue(row1));
+    assertEquals("One", table.getStringColumn().getValue(row1));
+    assertTrue(row1.isChecked());
+    assertEquals(Integer.valueOf(22), table.getIntegerColumn().getValue(row2));
+    assertEquals(Boolean.FALSE, table.getBooleanColumn().getValue(row2));
+    assertEquals("Two", table.getStringColumn().getValue(row2));
+    assertFalse(row2.isChecked());
+    assertEquals(Integer.valueOf(33), table.getIntegerColumn().getValue(row3));
+    assertEquals(Boolean.TRUE, table.getBooleanColumn().getValue(row3));
+    assertEquals("Three", table.getStringColumn().getValue(row3));
+    assertTrue(row3.isChecked());
+
+    // -----------------------
+
+    table.checkRow(row1, false); // change value via check row
+    table.getBooleanColumn().setValue(row2, Boolean.TRUE); // change value via column
+
+    String xml = tableField.storeToXmlString();
+    P_CheckableTableData fieldData = new P_CheckableTableData();
+    tableField.exportFormFieldData(fieldData);
+
+    // -----------------------
+
+    table.discardAllRows();
+    assertEquals(0, table.getRowCount());
+    tableField.loadFromXmlString(xml);
+
+    // -----------------------
+
+    assertEquals(3, table.getRowCount());
+    row1 = table.getRow(0);
+    row2 = table.getRow(1);
+    row3 = table.getRow(2);
+
+    assertEquals(Integer.valueOf(11), table.getIntegerColumn().getValue(row1));
+    assertEquals(Boolean.FALSE, table.getBooleanColumn().getValue(row1));
+    assertEquals("One", table.getStringColumn().getValue(row1));
+    assertFalse(row1.isChecked());
+    assertEquals(Integer.valueOf(22), table.getIntegerColumn().getValue(row2));
+    assertEquals(Boolean.TRUE, table.getBooleanColumn().getValue(row2));
+    assertEquals("Two", table.getStringColumn().getValue(row2));
+    assertTrue(row2.isChecked());
+    assertEquals(Integer.valueOf(33), table.getIntegerColumn().getValue(row3));
+    assertEquals(Boolean.TRUE, table.getBooleanColumn().getValue(row3));
+    assertEquals("Three", table.getStringColumn().getValue(row3));
+    assertTrue(row3.isChecked());
+
+    // -----------------------
+
+    table.discardAllRows();
+    assertEquals(0, table.getRowCount());
+    tableField.importFormFieldData(fieldData, false);
+
+    // -----------------------
+
+    assertEquals(3, table.getRowCount());
+    row1 = table.getRow(0);
+    row2 = table.getRow(1);
+    row3 = table.getRow(2);
+
+    assertEquals(Integer.valueOf(11), table.getIntegerColumn().getValue(row1));
+    assertEquals(Boolean.FALSE, table.getBooleanColumn().getValue(row1));
+    assertEquals("One", table.getStringColumn().getValue(row1));
+    assertFalse(row1.isChecked());
+    assertEquals(Integer.valueOf(22), table.getIntegerColumn().getValue(row2));
+    assertEquals(Boolean.TRUE, table.getBooleanColumn().getValue(row2));
+    assertEquals("Two", table.getStringColumn().getValue(row2));
+    assertTrue(row2.isChecked());
+    assertEquals(Integer.valueOf(33), table.getIntegerColumn().getValue(row3));
+    assertEquals(Boolean.TRUE, table.getBooleanColumn().getValue(row3));
+    assertEquals("Three", table.getStringColumn().getValue(row3));
+    assertTrue(row3.isChecked());
   }
 
   private void runImportFormFieldDataWithAllRowStates(P_TableField tableField) {
@@ -605,18 +709,18 @@ public class TableFieldTest {
 
   private static class P_TableField extends AbstractTableField<P_TableField.Table> {
 
-    private final boolean m_configuredDiplayable;
+    private final boolean m_configuredDisplayable;
     private final boolean m_configuredPrimaryKey;
     private boolean m_execContentChangedCalled;
 
     public P_TableField(boolean withPrimaryKey) {
       super(false);
       if (withPrimaryKey) {
-        m_configuredDiplayable = false;
+        m_configuredDisplayable = false;
         m_configuredPrimaryKey = true;
       }
       else {
-        m_configuredDiplayable = true;
+        m_configuredDisplayable = true;
         m_configuredPrimaryKey = false;
       }
       callInitializer();
@@ -646,7 +750,7 @@ public class TableFieldTest {
 
         @Override
         protected boolean getConfiguredDisplayable() {
-          return m_configuredDiplayable;
+          return m_configuredDisplayable;
         }
 
         @Override
@@ -743,6 +847,116 @@ public class TableFieldTest {
 
       public void setHidden(Boolean hidden) {
         m_hidden = hidden;
+      }
+    }
+  }
+
+  @FormData(value = P_CheckableTableData.class, sdkCommand = SdkCommand.USE)
+  private static class P_CheckableTableField extends AbstractTableField<P_CheckableTableField.Table> {
+
+    public class Table extends AbstractTable {
+
+      @Override
+      protected boolean getConfiguredCheckable() {
+        return true;
+      }
+
+      @Override
+      protected Class<? extends AbstractBooleanColumn> getConfiguredCheckableColumn() {
+        return BooleanColumn.class;
+      }
+
+      public IntegerColumn getIntegerColumn() {
+        return getColumnSet().getColumnByClass(IntegerColumn.class);
+      }
+
+      public BooleanColumn getBooleanColumn() {
+        return getColumnSet().getColumnByClass(BooleanColumn.class);
+      }
+
+      public StringColumn getStringColumn() {
+        return getColumnSet().getColumnByClass(StringColumn.class);
+      }
+
+      @Order(10)
+      public class IntegerColumn extends AbstractIntegerColumn {
+      }
+
+      @Order(20)
+      public class BooleanColumn extends AbstractBooleanColumn {
+      }
+
+      @Order(30)
+      public class StringColumn extends AbstractStringColumn {
+      }
+    }
+  }
+
+  private static class P_CheckableTableData extends AbstractTableFieldBeanData {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public P_CheckableTableRowData addRow() {
+      return (P_CheckableTableRowData) super.addRow();
+    }
+
+    @Override
+    public P_CheckableTableRowData addRow(int rowState) {
+      return (P_CheckableTableRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public P_CheckableTableRowData createRow() {
+      return new P_CheckableTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return P_CheckableTableRowData.class;
+    }
+
+    @Override
+    public P_CheckableTableRowData[] getRows() {
+      return (P_CheckableTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public P_CheckableTableRowData rowAt(int index) {
+      return (P_CheckableTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(P_CheckableTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class P_CheckableTableRowData extends AbstractTableRowData {
+      private static final long serialVersionUID = 1L;
+      private Integer m_integer;
+      private Boolean m_boolean;
+      private String m_string;
+
+      public Integer getInteger() {
+        return m_integer;
+      }
+
+      public void setInteger(Integer integer) {
+        m_integer = integer;
+      }
+
+      public Boolean getBoolean() {
+        return m_boolean;
+      }
+
+      public void setBoolean(Boolean aBoolean) {
+        m_boolean = aBoolean;
+      }
+
+      public String getString() {
+        return m_string;
+      }
+
+      public void setString(String string) {
+        m_string = string;
       }
     }
   }
