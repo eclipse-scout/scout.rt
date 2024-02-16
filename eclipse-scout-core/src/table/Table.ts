@@ -1967,16 +1967,23 @@ export class Table extends Widget implements TableModel {
     }
   }
 
+  /**
+   * @deprecated use {@link _removeAllRows} to only remove DOM elements, otherwise use {@link deleteAllRows}
+   */
   removeAllRows() {
+    this._removeAllRows();
+  }
+
+  protected _removeAllRows() {
     if (this._isDataRendered()) {
       this.$rows().each((i, elem) => {
-        let $row = $(elem),
-          row = $row.data('row') as TableRow;
+        let $row = $(elem);
         if ($row.hasClass('hiding')) {
           // Do not remove rows which are removed using an animation
           // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
           return;
         }
+        let row = $row.data('row') as TableRow;
         this._removeRow(row);
       });
     }
@@ -1989,7 +1996,7 @@ export class Table extends Widget implements TableModel {
    */
   protected _removeRows(rows?: TableRow | TableRow[]) {
     if (!rows) {
-      this.removeAllRows();
+      this._removeAllRows();
       return;
     }
 
