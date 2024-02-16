@@ -49,6 +49,11 @@ export class Table extends Widget implements TableModel {
   headerVisible: boolean;
   headerMenusEnabled: boolean;
   hasReloadHandler: boolean;
+  /**
+   * Defines whether hierarchical mode is active, meaning the table is grouping rows with the same {@link TableRow.parentRow} and allowing the user to expand and collapse these groups.
+   *
+   * The property returns true if there is at least one row with a parent row, false otherwise.
+   */
   hierarchical: boolean;
   hierarchicalStyle: TableHierarchicalStyle;
   keyStrokes: Action[];
@@ -3177,6 +3182,9 @@ export class Table extends Widget implements TableModel {
     this._sort();
   }
 
+  /**
+   * @deprecated use {@link hierarchical} instead
+   */
   isHierarchical(): boolean {
     return this.hierarchical;
   }
@@ -3582,8 +3590,8 @@ export class Table extends Widget implements TableModel {
   }
 
   /**
-   * Restores the selection by the given selectedKeys. Rows matching these given values (see {@link Table.getRowsByKey}) will be selected.
-   * If the table is {@link Table.hierarchical} all parent rows of selected rows will be expanded.
+   * Restores the selection by the given selectedKeys. Rows matching these given values (see {@link getRowsByKey}) will be selected.
+   * If the table is {@link hierarchical} all parent rows of selected rows will be expanded.
    *
    * @param selectedKeys array of key values (see {@link TableRow.getKeyValues}) of the rows to select.
    */
@@ -3648,7 +3656,7 @@ export class Table extends Widget implements TableModel {
   }
 
   /**
-   * @see Table.getRowsByKey
+   * @see getRowsByKey
    *
    * @param keys key values (see {@link TableRow.getKeyValues}).
    */
