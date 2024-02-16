@@ -730,7 +730,7 @@ export class Table extends Widget implements TableModel {
     }
   }
 
-  protected _onRowMouseDown(event: JQuery.MouseDownEvent): boolean {
+  protected _onRowMouseDown(event: JQuery.MouseDownEvent) {
     this._doubleClickSupport.mousedown(event);
     this._$mouseDownRow = $(event.currentTarget);
     this._mouseDownRowId = this._$mouseDownRow.data('row').id;
@@ -767,15 +767,15 @@ export class Table extends Widget implements TableModel {
       this.checkRow(row, !row.checked);
     }
     if (isRightClick) {
+      event.preventDefault();
       this.showContextMenu({
         pageX: event.pageX,
         pageY: event.pageY
       });
-      return false;
     }
 
     // set active descendant to the clicked row, so it is announced by screen readers.
-    // This should be done last so selection state/focus/etc is all set correctly before
+    // This should be done last so selection state/focus/etc. is all set correctly before
     // the change of active descendant triggers the screen readers announcement.
     aria.linkElementWithActiveDescendant(this.$container, row.$row);
   }
