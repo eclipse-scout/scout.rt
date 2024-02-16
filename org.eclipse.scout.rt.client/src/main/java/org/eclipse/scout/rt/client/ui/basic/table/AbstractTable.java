@@ -3135,7 +3135,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         InternalTableRow newIRow = newIRows.get(i);
         addInternalRow(newIRow);
         // copy check status of rows after adding them to the table since InternalTableRow maintains this on the table, not on the row
-        checkRow(newIRow, newRows.get(i).isChecked());
+        ITableRow newRow = newRows.get(i);
+        boolean checked = newRow.isChecked() || (getCheckableColumn() != null && BooleanUtility.nvl(getCheckableColumn().getValue(newRow)));
+        checkRow(newIRow, checked);
       }
 
       if (getColumnSet().getSortColumnCount() > 0) {
@@ -3269,7 +3271,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     });
 
     m_rootRows = Collections.synchronizedList(rootNodes);
-    boolean hierarchical = parentToChildren.size() > 0;
+    boolean hierarchical = !parentToChildren.isEmpty();
     setHierarchicalInternal(hierarchical);
     if (hierarchical) {
       CollectingVisitor<ITableRow> collector = new CollectingVisitor<>();
