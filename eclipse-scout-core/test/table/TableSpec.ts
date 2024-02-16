@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -3580,9 +3580,7 @@ describe('Table', () => {
       ];
       rows.forEach(row => row.cells.push(helper.createModelCell(row.id, row.id)));
       const rowModels = () => $.extend(true, [], rows); // copy models as table modifies the given array
-      const table = helper.createTable($.extend(helper.createModel(helper.createModelColumns(1), rowModels()), {
-        hierarchical: true
-      }));
+      const table = helper.createTable($.extend(helper.createModel(helper.createModelColumns(1), rowModels())));
       const load = () => table.replaceRows(rowModels());
       const findRow = (row: TableRowModel) => table.rows.find(r => r.id === row.id);
 

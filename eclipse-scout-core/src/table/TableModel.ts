@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -91,12 +91,6 @@ export interface TableModel extends WidgetModel {
    * Default is true.
    */
   headerMenusEnabled?: boolean;
-  /**
-   * Defines whether the table should group rows with the same {@link TableRow.parentRow} and allow the user to expand and collapse these groups.
-   *
-   * Default is false.
-   */
-  hierarchical?: boolean;
   hierarchicalStyle?: TableHierarchicalStyle;
   /**
    * Configures the keystrokes that should be registered in the current {@link keyStrokeContext}.
