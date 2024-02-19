@@ -33,11 +33,20 @@ public class BrowserFieldContentHttpResponseInterceptor implements IHttpResponse
 
   @Override
   public void intercept(HttpServletRequest req, HttpServletResponse resp) {
-    ContentSecurityPolicy csp = BEANS.get(ContentSecurityPolicy.class).appendScriptSrc("'unsafe-inline'");
+    String cspToken = getContentSecurityPolicy(req).toToken();
 
-    HttpClientInfo httpClientInfo = HttpClientInfo.get(req);
+    if (HttpClientInfo.get(req).isMshtml()) {
+      resp.setHeader(HttpServletControl.HTTP_HEADER_CSP_LEGACY, cspToken);
+    }
+    else {
+      resp.setHeader(HttpServletControl.HTTP_HEADER_CSP, cspToken);
+    }
+  }
+
+  protected ContentSecurityPolicy getContentSecurityPolicy(HttpServletRequest req) {
+    ContentSecurityPolicy csp = BEANS.get(ContentSecurityPolicy.class);
+
     String baseUri = UriUtility.toBaseUri(m_browserUri);
-
     if (baseUri != null) {
       // Normally, the csp report url is relative. Because documents inside the browser field are
       // loaded from a "/dynamic/..." URL, the relative url has to be converted to an absolute url.
@@ -45,18 +54,12 @@ public class BrowserFieldContentHttpResponseInterceptor implements IHttpResponse
 
       // Bug in Chrome: CSP 'self' is not interpreted correctly in sandboxed iframes, see https://bugs.chromium.org/p/chromium/issues/detail?id=443444
       // Workaround: Add resolved URI to image and style CSP directive to allow loading of images and styles from same origin as nested iframe in browser field
-      if (httpClientInfo.isWebkit()) {
+      if (HttpClientInfo.get(req).isWebkit()) {
         csp.appendImgSrc(baseUri);
         csp.appendStyleSrc(baseUri);
       }
     }
 
-    String cspToken = csp.toToken();
-    if (httpClientInfo.isMshtml()) {
-      resp.setHeader(HttpServletControl.HTTP_HEADER_CSP_LEGACY, cspToken);
-    }
-    else {
-      resp.setHeader(HttpServletControl.HTTP_HEADER_CSP, cspToken);
-    }
+    return csp;
   }
 }
