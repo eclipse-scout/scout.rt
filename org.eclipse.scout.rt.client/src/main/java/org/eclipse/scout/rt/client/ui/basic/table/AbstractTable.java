@@ -162,6 +162,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private final OptimisticLock m_initLock;
   private List<ITableRow> m_rows; // synchronized list
   private List<ITableRow> m_rootRows; // synchronized list
+  private Set<ITableRow> m_orphanRows; // synchronized set
   private final Object m_cachedRowsLock;
   private final Map<CompositeObject, ITableRow> m_rowsByKey;
   private final Map<CompositeObject, ITableRow> m_deletedRows;
@@ -216,6 +217,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<>(1));
     m_rootRows = Collections.synchronizedList(new ArrayList<>(1));
+    m_orphanRows = Collections.synchronizedSet(new HashSet<>(1));
     m_rowsByKey = Collections.synchronizedMap(new HashMap<>());
     m_deletedRows = new HashMap<>();
     m_rowFilters = new ArrayList<>(1);
@@ -231,6 +233,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         BEANS.get(ExceptionHandler.class).handle(ex);
       }
     }, TableEvent.TYPE_ROWS_SELECTED);
+    addRowFilter(row -> !m_orphanRows.contains(row));
     if (callInitializer) {
       callInitializer();
     }
@@ -3252,13 +3255,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   private void rebuildTreeStructureInternal() {
     List<ITableRow> rootNodes = new ArrayList<>();
+    Set<ITableRow> orphanRows = new HashSet<>();
     Map<ITableRow/*parent*/, List<ITableRow> /*child rows*/> parentToChildren = new HashMap<>();
     m_rows.forEach(row -> {
       List<Object> parentRowKeys = getParentRowKeys(row);
       if (parentRowKeys.stream().filter(Objects::nonNull).findAny().orElse(null) != null) {
         ITableRow parentRow = getRowByKey(parentRowKeys);
         if (parentRow == null) {
-          throw new IllegalArgumentException("Could not find the parent row of '" + row + "'. parent keys are defined.");
+          LOG.warn("Ignoring row with key {} because its parent key {} could not be found. {}", row.getKeyValues(), row.getParentKeyValues(), row);
+          row.setParentRowInternal(null);
+          rootNodes.add(row);
+          orphanRows.add(row);
+          return;
         }
         parentToChildren.computeIfAbsent(parentRow, children -> new ArrayList<>())
             .add(row);
@@ -3270,6 +3278,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     });
 
     m_rootRows = Collections.synchronizedList(rootNodes);
+    m_orphanRows = Collections.synchronizedSet(orphanRows);
     boolean hierarchical = !parentToChildren.isEmpty();
     setHierarchicalInternal(hierarchical);
     if (hierarchical) {
