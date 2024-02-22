@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DialogLayout, FormField, GroupBox, HorizontalGrid, scout, VerticalSmartGrid} from '../../../../src/index';
+import {DialogLayout, Dimension, FormField, GroupBox, HorizontalGrid, scout, VerticalSmartGrid} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('GroupBox', () => {
@@ -313,7 +313,7 @@ describe('GroupBox', () => {
     });
 
     it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', done => {
-      let $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
+      let $tmpStyle = $('<style>.dialog { position: absolute; }</style>')
         .appendTo($('head'));
 
       // stub function because when running in phantom js the window has an unpredictable size, it seems to get smaller when adding new specs...
@@ -340,6 +340,81 @@ describe('GroupBox', () => {
         })
         .catch(fail)
         .always(done);
+    });
+  });
+
+  describe('notification', () => {
+
+    it('validates the notification layout on size change', () => {
+      let groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+      groupBox.render();
+
+      groupBox.htmlComp.setSize(new Dimension(500, 300));
+      expect(groupBox.htmlComp.valid).toBe(true);
+      expect(groupBox.htmlComp.size()).toEqual(new Dimension(500, 300));
+      expect(groupBox.htmlBody.valid).toBe(true);
+      expect(groupBox.htmlBody.size()).toEqual(new Dimension(500, 300));
+
+      groupBox.setNotification(scout.create('Notification', {
+        parent: groupBox,
+        message: 'Lorem ipsum dolor sit amet, ipsum lorem dolor sit amet, sit lorem dolor ipsum amet, ipsum amet dolor sit lorem.'
+      }));
+      groupBox.revalidateLayout(); // trigger layout manually, because the group box is not inside a form
+
+      let bodySize1 = groupBox.htmlBody.size();
+      let notificationSize1 = groupBox.notification.htmlComp.size();
+      expect(groupBox.htmlComp.valid).toBe(true);
+      expect(groupBox.htmlComp.size()).toEqual(new Dimension(500, 300));
+      expect(groupBox.htmlBody.valid).toBe(true);
+      expect(bodySize1.width).toBe(500);
+      expect(bodySize1.height).toBeLessThan(300);
+      expect(groupBox.notification.htmlComp.valid).toBe(true);
+      expect(notificationSize1.width).toBe(500);
+      expect(notificationSize1.height).toBeLessThan(300);
+
+      groupBox.htmlComp.setSize(new Dimension(200, 300));
+
+      let bodySize2 = groupBox.htmlBody.size();
+      let notificationSize2 = groupBox.notification.htmlComp.size();
+      expect(groupBox.htmlComp.valid).toBe(true);
+      expect(groupBox.htmlComp.size()).toEqual(new Dimension(200, 300));
+      expect(groupBox.htmlBody.valid).toBe(true);
+      expect(bodySize2.width).toBe(200);
+      expect(bodySize2.height).toBeLessThan(300);
+      expect(bodySize2.height).toBeLessThan(bodySize1.height);
+      expect(groupBox.notification.htmlComp.valid).toBe(true);
+      expect(notificationSize2.width).toBe(200);
+      expect(notificationSize2.height).toBeLessThan(300);
+      expect(notificationSize2.height).toBeGreaterThan(notificationSize1.height);
+    });
+
+    it('adjusts notification height when computing preferred size', () => {
+      let groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+      groupBox.setNotification(scout.create('Notification', {
+        parent: groupBox,
+        message: 'Lorem ipsum dolor sit amet, ipsum lorem dolor sit amet, sit lorem dolor ipsum amet, ipsum amet dolor sit lorem.'
+      }));
+      groupBox.gridData.widthInPixel = 700;
+      groupBox.render();
+      groupBox.pack();
+
+      let size1 = groupBox.htmlComp.size();
+      let bodySize1 = groupBox.htmlBody.size();
+
+      groupBox.gridData.widthInPixel = 200;
+      groupBox.invalidateLayout();
+      groupBox.pack();
+
+      let size2 = groupBox.htmlComp.size();
+      let bodySize2 = groupBox.htmlBody.size();
+
+      expect(size1.width).toBe(700);
+      expect(size2.width).toBe(200);
+      expect(bodySize1.width).toBe(700);
+      expect(bodySize2.width).toBe(200);
+
+      expect(size2.height).toBeGreaterThan(size1.height);
+      expect(bodySize2.height).toBe(bodySize1.height);
     });
   });
 
@@ -487,16 +562,15 @@ describe('GroupBox', () => {
       expect(groupBox.controls[1]).toBe(sibling);
 
       // At the end
-      let newField3 = scout.create('StringField', {parent: groupBox});
+      let newField2 = scout.create('StringField', {parent: groupBox});
       sibling = groupBox.fields[2];
-      groupBox.insertFieldAfter(newField, sibling);
+      groupBox.insertFieldAfter(newField2, sibling);
       expect(groupBox.fields.length).toBe(4);
       expect(groupBox.controls.length).toBe(4);
-      expect(groupBox.fields[3]).toBe(newField);
-      expect(groupBox.controls[3]).toBe(newField);
+      expect(groupBox.fields[3]).toBe(newField2);
+      expect(groupBox.controls[3]).toBe(newField2);
       expect(groupBox.fields[2]).toBe(sibling);
       expect(groupBox.controls[2]).toBe(sibling);
     });
   });
-
 });
