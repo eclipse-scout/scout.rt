@@ -36,7 +36,9 @@
     #scout.menubar-background-color-inherit;
   }
 
-  &.collapsed > .menubar {
+  &.collapsed > .menubar,
+  &.collapsed > .notification,
+  &.collapsed > .group-box-body {
     display: none;
   }
 
@@ -185,10 +187,6 @@
   &.x-padding-invisible {
     padding-left: 0;
     padding-right: 0;
-  }
-
-  .collapsed > & {
-    display: none;
   }
 
   /* position scrollbar as right as possible to prevent overlapping field parts. */
