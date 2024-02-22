@@ -43,6 +43,7 @@ export default class Notification extends Widget {
     this.$content = this.$container.appendDiv('notification-content');
     this.$messageText = this.$content.appendDiv('notification-message');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.pixelBasedSizing = false;
   }
 
   _remove() {
