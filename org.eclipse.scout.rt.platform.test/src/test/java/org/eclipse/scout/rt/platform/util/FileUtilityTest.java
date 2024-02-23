@@ -38,6 +38,7 @@ public class FileUtilityTest {
   private static final String FILE_NAME = "fooBar.txt";
   private static final String FILE_NAME_MULTIPLE_DOTS = "foo.bar.txt";
   private static final String FILE_NAME_NO_EXT = "fooBar";
+  private static final String FILE_NAME_ONLY_DOT = "fooBar";
   private static final String PLATFORM_PATH = "org/eclipse/scout/rt/platform/";
 
   @Test
@@ -96,7 +97,9 @@ public class FileUtilityTest {
   public void testGetFileExtension_String() {
     assertEquals(TEXT_EXT, FileUtility.getFileExtension(FILE_NAME));
     assertEquals(TEXT_EXT, FileUtility.getFileExtension(FILE_NAME_MULTIPLE_DOTS));
+    assertNull(FileUtility.getFileExtension(FILE_NAME_ONLY_DOT));
     assertNull(FileUtility.getFileExtension(FILE_NAME_NO_EXT));
+    assertNull(FileUtility.getFileExtension(""));
     assertNull(FileUtility.getFileExtension((String) null));
   }
 
@@ -104,7 +107,9 @@ public class FileUtilityTest {
   public void testGetFileExtension_File() {
     assertEquals(TEXT_EXT, FileUtility.getFileExtension(new File(FILE_NAME)));
     assertEquals(TEXT_EXT, FileUtility.getFileExtension(new File(FILE_NAME_MULTIPLE_DOTS)));
+    assertNull(FileUtility.getFileExtension(new File(FILE_NAME_ONLY_DOT)));
     assertNull(FileUtility.getFileExtension(new File(FILE_NAME_NO_EXT)));
+    assertNull(FileUtility.getFileExtension(new File("")));
     assertNull(FileUtility.getFileExtension((File) null));
   }
 
@@ -319,4 +324,3 @@ public class FileUtilityTest {
     assertEquals("foo.bar", FileUtility.getFileName("\\folder\\subfolder\\foo.bar", true));
   }
 }
-
