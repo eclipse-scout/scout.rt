@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -620,13 +620,18 @@ describe('DateField', () => {
     });
 
     describe('DOWN', () => {
-
-      let model;
+      let model, origNewDateFunc: typeof dates.newDate;
 
       beforeEach(() => {
         model = createModel();
         model.value = '2014-10-01';
         model.displayText = '01.10.2014\n';
+        origNewDateFunc = dates.newDate;
+        dates.newDate = () => dates.create('2024-02-23 15:18:00.000');
+      });
+
+      afterEach(() => {
+        dates.newDate = origNewDateFunc;
       });
 
       it('opens the picker and selects the current date and time', () => {
@@ -637,15 +642,15 @@ describe('DateField', () => {
         dateField.render();
         JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
 
-        let expectedTime = dates.ceil(new Date(), dateField.timePickerResolution);
-        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
-        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
+        let expectedTime = dates.ceil(dates.newDate(), dateField.timePickerResolution);
+        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, dates.newDate())).toBe(true);
+        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(dates.newDate()));
         expect(dateField.$timeField.val()).toBe(dateField.isolatedTimeFormat.format(expectedTime));
         expect(dateField.displayText).toBe(dateField.formatValue(expectedTime) as string);
         expect(dateField.value).toBe(null); // value is still unchanged
 
         dateField.acceptInput();
-        expect(dates.isSameDay(dateField.value, new Date())).toBe(true);
+        expect(dates.isSameDay(dateField.value, dates.newDate())).toBe(true);
         expectTime(dateField.value, expectedTime.getHours(), expectedTime.getMinutes(), expectedTime.getSeconds());
       });
 
@@ -656,22 +661,22 @@ describe('DateField', () => {
         dateField.render();
         focusDate(dateField);
         JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
-        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
-        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
-        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
+        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, dates.newDate())).toBe(true);
+        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(dates.newDate()));
+        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(dates.newDate()));
         expect(dateField.value).toBe(null); // value is still unchanged
 
         // Clear date
         dateField.$dateField.val('');
         dateField.$dateField.trigger('input');
         expect(dateField.getDatePicker().selectedDate).toBe(null);
-        expect(dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
+        expect(dates.isSameDay(dateField.getDatePicker().preselectedDate, dates.newDate())).toBe(true);
 
         // Assert that current date is selected
         JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
-        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
-        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
-        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
+        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, dates.newDate())).toBe(true);
+        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(dates.newDate()));
+        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(dates.newDate()));
         expect(dateField.value).toBe(null); // value is still unchanged
       });
 
@@ -685,14 +690,14 @@ describe('DateField', () => {
         expect(dateField.errorStatus instanceof Status).toBe(true);
         JQueryTesting.triggerKeyDown(dateField.$dateField, keys.DOWN);
 
-        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
-        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
-        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
+        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, dates.newDate())).toBe(true);
+        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(dates.newDate()));
+        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(dates.newDate()));
         expect(dateField.value).toBe(null); // value is still unchanged
         expect(dateField.errorStatus).toBe(null);
 
         dateField.acceptInput();
-        expect(dates.isSameDay(dateField.value, new Date())).toBe(true);
+        expect(dates.isSameDay(dateField.value, dates.newDate())).toBe(true);
       });
 
       it('increases day by one', () => {
