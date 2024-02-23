@@ -94,7 +94,7 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
 
   String PROP_MENU_INJECTION_TARGET = "menuInjectionTarget";
 
-  String PROP_SHOW_YEAR_PANEL = "showYearPanel";
+  String PROP_SHOW_CALENDAR_SIDEBAR = "showCalendarSidebar";
 
   String PROP_SHOW_CALENDARS_PANEL = "showYearPanel";
 
@@ -266,9 +266,9 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    */
   void setMenuInjectionTarget(IGroupBox target);
 
-  boolean getShowYearPanel();
+  boolean getShowCalendarSidebar();
 
-  void setShowYearPanel(boolean showYearPanel);
+  void setShowCalendarSidebar(boolean showYearPanel);
 
   boolean getShowCalendarsPanel();
 

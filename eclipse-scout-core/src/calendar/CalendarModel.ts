@@ -32,9 +32,9 @@ export interface CalendarModel extends WidgetModel {
   menus?: ObjectOrChildModel<Menu>[];
   defaultMenuTypes?: string[];
   /**
-   * Indicates, if the year panel is shown
+   * Indicates, if the sidebar is shown
    */
-  showYearPanel?: boolean;
+  showCalendarSidebar?: boolean;
   /**
    * Indicates, if the calendars panel is shown.
    */

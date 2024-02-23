@@ -177,7 +177,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(700)
-  protected boolean getConfiguredShowYearPanel() {
+  protected boolean getConfiguredShowCalendarSidebar() {
     return false;
   }
 
@@ -252,7 +252,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     setShowDisplayModeSelection(getConfiguredShowDisplayModeSelection());
     setRangeSelectionAllowed(getConfiguredRangeSelectionAllowed());
     setCalendars(getConfiguredCalendars());
-    setShowYearPanel(getConfiguredShowYearPanel());
+    setShowCalendarSidebar(getConfiguredShowCalendarSidebar());
     setShowCalendarsPanel(getConfiguredShowCalendarsPanel());
     setShowListPanel(getShowListPanel());
 
@@ -566,13 +566,13 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
 
 
   @Override
-  public boolean getShowYearPanel() {
-    return propertySupport.getPropertyBool(PROP_SHOW_YEAR_PANEL);
+  public boolean getShowCalendarSidebar() {
+    return propertySupport.getPropertyBool(PROP_SHOW_CALENDAR_SIDEBAR);
   }
 
   @Override
-  public void setShowYearPanel(boolean showYearPanel) {
-    propertySupport.setPropertyBool(PROP_SHOW_YEAR_PANEL, showYearPanel);
+  public void setShowCalendarSidebar(boolean showYearPanel) {
+    propertySupport.setPropertyBool(PROP_SHOW_CALENDAR_SIDEBAR, showYearPanel);
   }
 
   @Override
@@ -1103,7 +1103,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     public void setShowYearPanelFromUI(boolean show) {
       try {
         pushUIProcessor();
-        setShowYearPanel(show);
+        setShowCalendarSidebar(show);
       }
       finally {
         popUIProcessor();

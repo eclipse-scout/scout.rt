@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,15 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CalendarSidebarLayout, CalendarsPanel, HtmlComponent, InitModelOf, scout, Splitter, Widget, YearPanel} from '../index';
+import {CalendarSidebarLayout, CalendarSidebarSplitter, CalendarsPanel, Event, HtmlComponent, InitModelOf, scout, SplitterPositionChangeEvent, Widget, YearPanel} from '../index';
 
 export class CalendarSidebar extends Widget {
   yearPanel: YearPanel;
-  splitter: Splitter;
+  splitter: CalendarSidebarSplitter;
   calendarsPanel: CalendarsPanel;
 
-  protected _showYearPanel: boolean;
-  protected _showCalendarsPanel: boolean;
+  calendarsPanelDisplayable: boolean;
+  animationEnabled: boolean;
 
   constructor() {
     super();
@@ -32,10 +32,10 @@ export class CalendarSidebar extends Widget {
     this.yearPanel = scout.create(YearPanel, {
       parent: this
     });
-    this.splitter = scout.create(Splitter, {
+    this.splitter = scout.create(CalendarSidebarSplitter, {
       parent: this,
       splitHorizontal: false,
-      cssClass: 'line'
+      collapsedLabel: this.session.text('ui.AvailableCalendars')
     });
     this.calendarsPanel = scout.create(CalendarsPanel, {
       parent: this,
@@ -43,7 +43,7 @@ export class CalendarSidebar extends Widget {
     });
 
     this.splitter.on('positionChange', this._onSplitterPositionChange.bind(this));
-
+    this.splitter.on('splitterClick', this._onSplitterClick.bind(this));
   }
 
   protected override _render() {
@@ -56,40 +56,24 @@ export class CalendarSidebar extends Widget {
     this.calendarsPanel.render();
   }
 
-  _onSplitterPositionChange(event) {
+  _onSplitterPositionChange(event: SplitterPositionChangeEvent) {
     this.invalidateLayoutTree(false);
   }
 
-  startShowYearPanel(show: boolean) {
-    if (show === this._showYearPanel) {
-      return;
-    }
-    this._showYearPanel = show;
-    this._layoutSizes(show, this._showCalendarsPanel, 100, 0);
+  protected _onSplitterClick(event: Event<CalendarSidebarSplitter>) {
+    this.setCalendarsPanelExpanded(this.splitter.collapsed, true);
   }
 
-  startShowCalendarsPanel(show: boolean) {
-    if (show === this._showCalendarsPanel) {
+  setCalendarsPanelExpanded(expanded: boolean, animate = false) {
+    if (!this.splitter.collapsed === expanded) {
       return;
     }
-    this._showCalendarsPanel = show;
-    this._layoutSizes(show, this._showYearPanel, 0, 100);
+    (this.htmlComp.layout as CalendarSidebarLayout).setNewSplitterPositionPercentage(expanded ? 62 : 100, animate);
+    this.invalidateLayoutTree(false);
   }
 
-  protected _layoutSizes(elmentVisible: boolean, otherElementVisible: boolean, fullExpandedPos: number, notExpandedPos: number) {
-    let layout = this.htmlComp.layout as CalendarSidebarLayout;
-    if (elmentVisible && !otherElementVisible) {
-      // Nothing is visible before, sidebar extends horizontally, no vertical animation
-      layout.setNewSplitterPositionPercentage(fullExpandedPos, false);
-    } else if (elmentVisible && otherElementVisible) {
-      // Other panel is already visible, animate beside it
-      layout.setNewSplitterPositionPercentage(50, true);
-    } else if (!elmentVisible && otherElementVisible) {
-      // Hide this panel with animation
-      layout.setNewSplitterPositionPercentage(notExpandedPos, true);
-    } else if (!elmentVisible && !otherElementVisible) {
-      // Nothing is expanded, sidebar will colapse, no vertical animation
-    }
+  setCalendarsPanelDisplayable(displayable: boolean) {
+    this.calendarsPanelDisplayable = displayable;
     this.invalidateLayoutTree(false);
   }
 }

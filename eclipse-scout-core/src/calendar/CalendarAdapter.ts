@@ -14,7 +14,7 @@ export class CalendarAdapter extends ModelAdapter {
 
   constructor() {
     super();
-    this._addRemoteProperties(['showYearPanel', 'showCalendarsPanel', 'showListPanel']);
+    this._addRemoteProperties(['showCalendarSidebar', 'showCalendarsPanel', 'showListPanel']);
   }
 
   /**
