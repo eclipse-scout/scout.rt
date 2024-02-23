@@ -171,17 +171,6 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testFileExtension() {
-    assertEquals("temp", IOUtility.getFileExtension("Test.temp"));
-    assertEquals("temp", IOUtility.getFileExtension("Test.xy.temp"));
-    assertEquals("temp", IOUtility.getFileExtension(".temp"));
-    assertEquals("", IOUtility.getFileExtension("Test."));
-    assertEquals("", IOUtility.getFileExtension("."));
-    assertNull(IOUtility.getFileExtension(""));
-    assertNull(IOUtility.getFileExtension(null));
-  }
-
-  @Test
   public void testDeleteDirectory() throws IOException {
     File tempFile = File.createTempFile("tempFile", "tmp");
     File tempDir = new File(tempFile.getParent(), "FileUtilityTestTempDir");

@@ -862,22 +862,6 @@ public final class IOUtility {
   }
 
   /**
-   * @return the extension of the file
-   */
-  public static String getFileExtension(String filename) {
-    if (filename == null) {
-      return null;
-    }
-    int i = filename.lastIndexOf('.');
-    if (i < 0) {
-      return null;
-    }
-    else {
-      return filename.substring(i + 1);
-    }
-  }
-
-  /**
    * @return the path of the file without its name
    */
   public static String getFilePath(String filepath) {
