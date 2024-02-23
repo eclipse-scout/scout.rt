@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -162,7 +162,7 @@ export class YearPanel extends Widget implements YearPanelModel {
     halfMonth = $month.outerHeight() / 2;
     halfYear = $year.outerHeight() / 2;
 
-    this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear);
+    this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear, () => scrollbars.update(this.$yearList));
   }
 
   protected _format(date: Date, pattern: string): string {

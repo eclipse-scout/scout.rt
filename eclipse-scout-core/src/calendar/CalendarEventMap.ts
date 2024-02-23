@@ -34,7 +34,7 @@ export interface CalendarEventMap extends WidgetEventMap {
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;
   'propertyChange:selectedDate': PropertyChangeEvent<Date>;
   'propertyChange:viewRange': PropertyChangeEvent<DateRange>;
-  'propertyChange:showYearPanel': PropertyChangeEvent<boolean>;
+  'propertyChange:showCalendarSidebar': PropertyChangeEvent<boolean>;
   'propertyChange:showCalendarsPanel': PropertyChangeEvent<boolean>;
   'propertyChange:showListPanel': PropertyChangeEvent<boolean>;
 }

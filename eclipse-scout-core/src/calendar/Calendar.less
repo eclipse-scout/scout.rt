@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -126,9 +126,8 @@
 }
 
 .calendar-mode,
-.calendar-toggle-year,
-.calendar-toggle-list,
-.calendar-toggle-calendars {
+.calendar-toggle-sidebar,
+.calendar-toggle-list {
   display: inline-block;
   vertical-align: middle;
   text-align: center;
@@ -174,9 +173,8 @@
   border-radius: @button-border-radius;
 }
 
-.calendar-toggle-year,
-.calendar-toggle-list,
-.calendar-toggle-calendars {
+.calendar-toggle-sidebar,
+.calendar-toggle-list {
   margin-left: 5px;
 
   &:hover::before {
@@ -184,16 +182,12 @@
   }
 }
 
-.calendar-toggle-year::before {
+.calendar-toggle-sidebar::before {
   .calendar-icon(@icon-calendar, 18px);
 }
 
 .calendar-toggle-list::before {
   .calendar-icon(@icon-list, 18px);
-}
-
-.calendar-toggle-calendars::before {
-  .calendar-icon(@icon-person-solid, 18px);
 }
 
 .calendar-component {

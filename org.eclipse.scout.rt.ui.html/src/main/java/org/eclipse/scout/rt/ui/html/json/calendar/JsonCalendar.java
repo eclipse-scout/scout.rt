@@ -239,10 +239,10 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
             .orElse(null);
       }
     });
-    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_YEAR_PANEL, model) {
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_CALENDAR_SIDEBAR, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().getShowYearPanel();
+        return getModel().getShowCalendarSidebar();
       }
     });
     putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_CALENDARS_PANEL, model) {
@@ -280,7 +280,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
 
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
-    if (ICalendar.PROP_SHOW_YEAR_PANEL.equals(propertyName)) {
+    if (ICalendar.PROP_SHOW_CALENDAR_SIDEBAR.equals(propertyName)) {
       getModel().getUIFacade().setShowYearPanelFromUI(data.getBoolean(propertyName));
     }
     else if (ICalendar.PROP_SHOW_CALENDARS_PANEL.equals(propertyName)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -625,6 +625,9 @@ export * from './calendar/CalendarsPanelTreeNode';
 export * from './calendar/CalendarsPanelTreeNodeModel';
 export * from './calendar/CalendarSidebar';
 export * from './calendar/CalendarSidebarLayout';
+export * from './calendar/CalendarSidebarSplitter';
+export * from './calendar/CalendarSidebarSplitterModel';
+export * from './calendar/CalendarSidebarSplitterEventMap';
 export * from './form/fields/fields';
 export * from './form/fields/AppLinkKeyStroke';
 export * from './form/fields/SelectAllTextInFieldKeyStroke';
