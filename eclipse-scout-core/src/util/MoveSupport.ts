@@ -69,12 +69,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     this._initMoveData(event, elements, draggedElement);
     $('iframe').addClass('dragging-in-progress');
 
-    // Prevent scrolling on touch devices (like "touch-action: none" but with better browser support).
-    // Theoretically, unwanted scrolling can be prevented by adding the CSS rule "touch-action: none"
-    // to the element. Unfortunately, not all devices support this (e.g. Apple Safari on iOS).
-    // Therefore, we always suppress the scrolling in JS. Because this also suppresses the 'click'
-    // event, click actions have to be triggered manually in the 'mouseup' handler.
-    event.preventDefault();
+    // TODO CGU on touch devices it must be possible to scroll but also to drag the element -> drag should start not when pointer is moved but when touch is pressed down for some time
 
     // Cancel moving when widget is removed
     let handler = () => this.cancel();
