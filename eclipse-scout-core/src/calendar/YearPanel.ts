@@ -44,7 +44,9 @@ export class YearPanel extends Widget implements YearPanelModel {
     this.removeContent();
     this._drawYear();
     this._installScrollbars({
-      axis: 'y'
+      axis: 'y',
+      nativeScrollbars: false,
+      hybridScrollbars: false
     });
     this.yearRendered = true;
     this._colorYear();
