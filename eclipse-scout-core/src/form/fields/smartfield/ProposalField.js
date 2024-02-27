@@ -170,6 +170,12 @@ export default class ProposalField extends SmartField {
   }
 
   _acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+    if (this.touchMode) {
+      $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) Always send acceptInput for touch field');
+      this._inputAccepted(true, !!selectedLookupRow);
+      return;
+    }
+
     // Do nothing when search text is equals to the text of the current lookup row
     if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
