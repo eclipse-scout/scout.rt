@@ -117,11 +117,9 @@ export class TileResizeHandler extends Resizable implements TileResizeHandlerMod
    * @returns the position of the cursor relative to the given container
    */
   protected _relativeCursorPos($container: JQuery, event: JQuery.MouseEventBase): Point {
+    let scrollPos = new Point($container[0].scrollLeft, $container[0].scrollTop);
     let offset = graphics.offset($container);
-    return new Point(
-      event.pageX - offset.x,
-      event.pageY - offset.y
-    );
+    return new Point(event.pageX, event.pageY).subtract(offset).add(scrollPos);
   }
 
   protected override _resizeEnd() {
