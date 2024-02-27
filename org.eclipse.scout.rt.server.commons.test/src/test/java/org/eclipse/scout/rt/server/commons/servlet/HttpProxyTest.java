@@ -158,6 +158,7 @@ public class HttpProxyTest {
     assertRewriteRequestHeaders(singletonMap("foo", "bar"), singletonMap("foo", "bar"));
 
     assertRewriteRequestHeaders(emptyMap(), singletonMap("Connection", "close"));
+    assertRewriteRequestHeaders(emptyMap(), singletonMap("Upgrade", "h2c"));
     assertRewriteRequestHeaders(emptyMap(), singletonMap("Keep-Alive", "true"));
     assertRewriteRequestHeaders(emptyMap(), singletonMap("Transfer-Encoding", "chunked"));
     assertRewriteRequestHeaders(emptyMap(), singletonMap("Proxy-Authorization", "Basic YWxhZGRpbjpvcGVuc2VzYW1l"));
