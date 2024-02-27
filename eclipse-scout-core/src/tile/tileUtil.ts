@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,8 @@ import {GridData, ObjectOrChildModel, Tile} from '..';
 export const tileUtil = {
   buildMatrix(tiles: Tile[], minWidth = 0, minHeight = 0): TileMatrix {
     let matrix: TileMatrix = [[]];
-    matrix.maxWidth = minWidth - 1;
-    matrix.maxHeight = minHeight - 1;
+    matrix.maxWidth = minWidth;
+    matrix.maxHeight = minHeight;
     for (let tile of tiles) {
       const gridData = tile.gridDataHints;
       for (let x = gridData.x; x < gridData.x + gridData.w; x++) {
