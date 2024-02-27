@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, EnumObject, graphics, InitModelOf, Insets, ObjectWithType, Rectangle, ResizableModel, scout, SomeRequired} from '../index';
+import {arrays, EnumObject, graphics, InitModelOf, Insets, ObjectWithType, Point, Rectangle, ResizableModel, scout, SomeRequired} from '../index';
 import $ from 'jquery';
 import MouseDownEvent = JQuery.MouseDownEvent;
 import MouseUpEvent = JQuery.MouseUpEvent;
@@ -215,14 +215,16 @@ export class Resizable implements ResizableModel, ObjectWithType {
   }
 
   protected _onMouseDown(event: MouseDownEvent) {
-    let $resizable = this.$container,
-      $myWindow = $resizable.window(),
-      $handle = $(event.target),
-      minWidth = $resizable.cssMinWidth(),
-      minHeight = $resizable.cssMinHeight(),
-      maxWidth = $resizable.cssMaxWidth(),
-      maxHeight = $resizable.cssMaxHeight(),
-      initialBounds = graphics.bounds($resizable, {exact: true});
+    let $resizable = this.$container;
+    let $myWindow = $resizable.window();
+    let $handle = $(event.target);
+    let minWidth = $resizable.cssMinWidth();
+    let minHeight = $resizable.cssMinHeight();
+    let maxWidth = $resizable.cssMaxWidth();
+    let maxHeight = $resizable.cssMaxHeight();
+    let initialBounds = graphics.bounds($resizable, {exact: true});
+    let $offsetParent = $resizable.offsetParent();
+    initialBounds = initialBounds.translate(new Point($offsetParent[0].scrollLeft, $offsetParent[0].scrollTop));
 
     this._context = {
       initialBounds: initialBounds,
