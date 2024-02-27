@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -232,12 +232,6 @@ export default class SmartField extends ValueField {
     this._flushLookupStatus();
     this._clearPendingLookup();
 
-    if (this.touchMode) {
-      $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) Always send acceptInput for touch field');
-      this._inputAccepted();
-      return;
-    }
-
     return this._acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
   }
 
@@ -287,6 +281,11 @@ export default class SmartField extends ValueField {
    * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
    */
   _acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+    if (this.touchMode) {
+      $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) Always send acceptInput for touch field');
+      this._inputAccepted();
+      return;
+    }
 
     let unchanged = false;
     if (this.removing) {
