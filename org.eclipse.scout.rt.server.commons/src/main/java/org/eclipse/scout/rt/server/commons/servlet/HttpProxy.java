@@ -81,6 +81,7 @@ public class HttpProxy {
     //  https://www.mnot.net/blog/2011/07/11/what_proxies_must_do
     Set<String> hopByHopRequestHeaders = CollectionUtility.hashSet(
         "Connection",
+        "Upgrade",
         "Keep-Alive",
         "Transfer-Encoding",
         "Proxy-Authorization",
