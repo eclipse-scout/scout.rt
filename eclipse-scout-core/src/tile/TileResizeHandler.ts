@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,11 +92,9 @@ export class TileResizeHandler extends Resizable implements TileResizableModel {
   }
 
   protected _relativeCursorPos($container: JQuery, event: JQuery.MouseEventBase): Point {
+    let scrollPos = new Point($container[0].scrollLeft, $container[0].scrollTop);
     let offset = graphics.offset($container);
-    return new Point(
-      event.pageX - offset.x,
-      event.pageY - offset.y
-    );
+    return new Point(event.pageX, event.pageY).subtract(offset).add(scrollPos);
   }
 
   protected override _resizeEnd() {
