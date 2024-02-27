@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -272,9 +272,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   protected void inactivateSession() {
     try {
-      BEANS
-          .optional(ILogoutService.class)
-          .ifPresent(ILogoutService::logout);
+      logoutSession();
     }
     finally {
       m_active = false;
@@ -283,6 +281,12 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
       m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
       LOG.info("Server session stopped [session={}, user={}]", this, getUserId());
     }
+  }
+
+  protected void logoutSession() {
+    BEANS
+        .optional(ILogoutService.class)
+        .ifPresent(ILogoutService::logout);
   }
 
   @Override
