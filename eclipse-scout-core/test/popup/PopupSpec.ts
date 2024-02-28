@@ -1395,5 +1395,21 @@ describe('Popup', () => {
       expect(popup.rendered).toBe(true);
     });
 
+    it('executes post validate functions on open', () => {
+      let scheduledValidateFunctionCalled = false;
+      session.layoutValidator.schedulePostValidateFunction(() => {
+        scheduledValidateFunctionCalled = true;
+      });
+      session.desktop.validateLayoutTree();
+      spyOn(session.desktop.htmlComp, 'validateLayout').and.callThrough();
+      let popup = scout.create(Popup, {
+        parent: session.desktop
+      });
+      popup.open();
+      expect(popup.rendered).toBe(true);
+      expect(popup.htmlComp.valid).toBe(true);
+      expect(scheduledValidateFunctionCalled).toBe(true);
+      expect(session.desktop.htmlComp.validateLayout).not.toHaveBeenCalled();
+    });
   });
 });
