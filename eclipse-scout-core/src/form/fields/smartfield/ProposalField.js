@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout, SmartField, strings} from '../../../index';
+import {objects, SmartField, strings} from '../../../index';
 import $ from 'jquery';
 
 export default class ProposalField extends SmartField {
@@ -69,7 +69,15 @@ export default class ProposalField extends SmartField {
   }
 
   _formatValue(value) {
-    return scout.nvl(value, '');
+    if (objects.isNullOrUndefined(value)) {
+      return '';
+    }
+
+    if (this.lookupRow) {
+      return this._formatLookupRow(this.lookupRow);
+    }
+
+    return value;
   }
 
   _validateValue(value) {
@@ -161,12 +169,11 @@ export default class ProposalField extends SmartField {
    */
   _copyValuesFromField(otherField) {
     if (this.lookupRow !== otherField.lookupRow) {
-      this.setLookupRow(otherField.lookupRow);
+      this._setLookupRow(otherField.lookupRow); // only set property lookup
     }
     this.setErrorStatus(otherField.errorStatus);
-    if (this.value !== otherField.value) {
-      this.setValue(otherField.value);
-    }
+    this.setDisplayText(otherField.displayText);
+    this.setValue(otherField.value);
   }
 
   _acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
@@ -176,8 +183,8 @@ export default class ProposalField extends SmartField {
       return;
     }
 
-    // Do nothing when search text is equals to the text of the current lookup row
-    if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
+    // Do nothing when search text did not change and is equals to the text of the current lookup row
+    if (!searchTextChanged && !selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
       this._inputAccepted(false);
       return;
