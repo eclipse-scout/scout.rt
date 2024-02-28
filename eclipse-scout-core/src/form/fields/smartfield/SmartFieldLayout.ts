@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,8 +33,8 @@ export class SmartFieldLayout extends FormFieldLayout {
     let popup = this._smartField.popup;
     if (popup && popup.rendered) {
       // Make sure the popup is correctly layouted and positioned
+      popup.revalidateLayoutTree(false);
       popup.position();
-      popup.validateLayout();
     }
   }
 }

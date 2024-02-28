@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2375,7 +2375,6 @@ describe('Desktop', () => {
     });
   });
 
-
   describe('views', () => {
     let formModel = {
       objectType: Form,
@@ -2498,7 +2497,6 @@ describe('Desktop', () => {
       desktop.views[0].close();
       expect(desktop.selectedViewTabs.size).toBe(0);
     });
-
 
     it('allows to select a specific outline based view on startup', () => {
       session = sandboxSession({
@@ -2703,6 +2701,16 @@ describe('Desktop', () => {
     });
 
     it('orders overlays relative to their context', () => {
+      // Add some CSS styles for "overlay" elements to prevent errors when running this test on a headless browser
+      // that only provides a small screen (e.g. 800x600). Without these styles, certain elements are automatically
+      // hidden because they are outside the viewport.
+      $('#sandbox').append($(`
+          <style>
+            .desktop { position: absolute; left: 0; top: 0; width: 200px; height: 200px; }
+            .form, .popup, .tooltip { position: absolute; min-width: 50px; min-height: 50px; max-width: 50px; max-height: 50px; }
+          </style>
+      `));
+
       let desktop = session.desktop;
       desktop.render(session.$entryPoint);
 

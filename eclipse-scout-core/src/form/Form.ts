@@ -449,7 +449,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Method may be implemented to load the data.
-   * By default, a resolved promise containing {@link this.data} is returned.
+   * By default, a resolved promise containing {@link data} is returned.
    */
   protected _load(): JQuery.Promise<any> {
     return $.resolvedPromise().then(() => {
@@ -499,14 +499,14 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * Imports the {@link this.data} to the form.
+   * Imports {@link data} to the form.
    */
   importData() {
     // NOP
   }
 
   /**
-   * Exports the form to {@link this.data}.
+   * Exports the form to {@link data}.
    */
   exportData(): any {
     return null;
@@ -1471,7 +1471,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     let layout = this.htmlComp.layout as DialogLayout,
       shrinkEnabled = layout.shrinkEnabled;
     layout.shrinkEnabled = true;
-    this.revalidateLayoutTree();
+    this.revalidateLayoutTree(false);
     this.position();
     layout.shrinkEnabled = shrinkEnabled;
   }
