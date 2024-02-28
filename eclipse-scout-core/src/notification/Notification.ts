@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -54,6 +54,7 @@ export class Notification extends Widget implements NotificationModel {
     this.$content = this.$container.appendDiv('notification-content');
     this.$messageText = this.$content.appendDiv('notification-message');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.pixelBasedSizing = false;
   }
 
   protected override _remove() {

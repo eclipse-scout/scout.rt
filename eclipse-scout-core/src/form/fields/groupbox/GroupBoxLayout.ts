@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,13 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, Dimension, EventHandler, FormField, graphics, GroupBox, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, MenuBarLayout, PropertyChangeEvent, ResponsiveManager, scrollbars} from '../../../index';
+import {AbstractLayout, Dimension, EventHandler, FormField, graphics, GroupBox, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, MenuBarLayout, PropertyChangeEvent, ResponsiveManager, scout, scrollbars} from '../../../index';
 import $ from 'jquery';
 
 export class GroupBoxLayout extends AbstractLayout {
   groupBox: GroupBox;
   protected _htmlPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, HtmlEnvironment>>;
-  protected _statusWidth: number;
+  protected _fieldStatusWidth: number;
 
   constructor(groupBox: GroupBox) {
     super();
@@ -29,7 +29,7 @@ export class GroupBoxLayout extends AbstractLayout {
   }
 
   protected _initDefaults() {
-    this._statusWidth = HtmlEnvironment.get().fieldStatusWidth;
+    this._fieldStatusWidth = HtmlEnvironment.get().fieldStatusWidth;
   }
 
   protected _onHtmlEnvironmentPropertyChange() {
@@ -55,11 +55,7 @@ export class GroupBoxLayout extends AbstractLayout {
       ResponsiveManager.get().handleResponsive(this.groupBox, containerSize.width);
     }
 
-    let $status = this._$status();
-    if ($status && $status.isVisible()) {
-      this._layoutStatus();
-      statusWidth = $status.outerWidth(true);
-    }
+    statusWidth = this._statusWidth();
 
     // Menu-bar
     if (htmlMenuBar) {
@@ -83,13 +79,21 @@ export class GroupBoxLayout extends AbstractLayout {
       setWidthForStatus($header);
     }
 
+    let notificationHeight = 0;
     if (this.groupBox.notification) {
       setWidthForStatus(this.groupBox.notification.$container, statusWidth);
+
+      let notificationPrefSize = this.groupBox.notification.htmlComp.prefSize({
+        widthHint: containerSize.width - statusWidth,
+        includeMargin: true
+      });
+      this.groupBox.notification.htmlComp.setSize(notificationPrefSize);
+      notificationHeight = notificationPrefSize.height;
     }
 
     let gbBodySize = containerSize.subtract(htmlGbBody.margins());
     gbBodySize.height -= this._headerHeight();
-    gbBodySize.height -= this._notificationHeight();
+    gbBodySize.height -= notificationHeight;
     gbBodySize.height -= menuBarHeight;
     $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
     htmlGbBody.setSize(gbBodySize);
@@ -205,7 +209,7 @@ export class GroupBoxLayout extends AbstractLayout {
       statusMargins = graphics.margins($status),
       statusPosition = this.groupBox.statusPosition;
 
-    $status.cssWidth(this._statusWidth);
+    $status.cssWidth(this._fieldStatusWidth);
     if (statusPosition === FormField.StatusPosition.DEFAULT) {
       top += $header.cssMarginTop();
     }
@@ -255,12 +259,19 @@ export class GroupBoxLayout extends AbstractLayout {
       if (htmlMenuBar && this.groupBox.menuBarPosition !== GroupBox.MenuBarPosition.TITLE) {
         prefSize.height += htmlMenuBar.prefSize(options).height;
       }
+
+      if (this.groupBox.notification) {
+        let notificationPrefSize = this.groupBox.notification.htmlComp.prefSize({
+          widthHint: scout.nvl(options.widthHint, prefSize.width) - this._statusWidth(),
+          includeMargin: true
+        });
+        prefSize.height += notificationPrefSize.height;
+      }
     } else {
       prefSize = new Dimension(0, 0);
     }
     prefSize = prefSize.add(htmlContainer.insets());
     prefSize.height += this._headerHeight();
-    prefSize.height += this._notificationHeight(options);
 
     // predefined height or width in pixel override other values
     if (widthInPixel) {
@@ -281,13 +292,14 @@ export class GroupBoxLayout extends AbstractLayout {
     return graphics.prefSize(this.groupBox.$header, true).height;
   }
 
-  protected _notificationHeight(options?: HtmlCompPrefSizeOptions): number {
-    options = options || {};
-    if (!this.groupBox.notification) {
-      return 0;
+  protected _statusWidth(): number {
+    let statusWidth = 0;
+    let $status = this._$status();
+    if ($status && $status.isVisible()) {
+      this._layoutStatus();
+      statusWidth = $status.outerWidth(true);
     }
-    options.includeMargin = true;
-    return this.groupBox.notification.htmlComp.prefSize(options).height;
+    return statusWidth;
   }
 
   /**
