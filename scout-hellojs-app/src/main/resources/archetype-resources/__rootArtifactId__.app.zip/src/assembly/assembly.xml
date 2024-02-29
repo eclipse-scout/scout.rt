@@ -11,9 +11,7 @@
     <dependencySet>
       <outputDirectory>/lib</outputDirectory>
       <unpack>false</unpack>
-      <excludes>
-        <exclude>${project.groupId}:${project.artifactId}</exclude>
-      </excludes>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
   </dependencySets>
 
