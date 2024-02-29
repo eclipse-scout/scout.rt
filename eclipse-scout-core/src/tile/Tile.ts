@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,8 @@ export class Tile extends Widget implements TileModel {
   movable: boolean;
   movableProducer: () => TileMoveHandler;
   plainText: string;
+  minWidth: number;
+  maxWidth: number;
 
   constructor() {
     super();
@@ -46,6 +48,8 @@ export class Tile extends Widget implements TileModel {
     this.plainText = null;
     // Null to let TileGrid decide whether to enable animation
     this.animateRemoval = null;
+    this.minWidth = null;
+    this.maxWidth = null;
     this._addPropertyDimensionAlias('visible', 'filterAccepted');
   }
 
@@ -79,6 +83,8 @@ export class Tile extends Widget implements TileModel {
     this._renderSelectable();
     this._renderSelected();
     this._renderDisplayStyle();
+    this._renderMinWidth();
+    this._renderMaxWidth();
   }
 
   protected override _postRender() {
@@ -301,4 +307,24 @@ export class Tile extends Widget implements TileModel {
   markAsActiveDescendantFor($container: JQuery) {
     aria.linkElementWithActiveDescendant($container, this.$container);
   }
+
+  setMinWidth(minWidth: number) {
+    this.setProperty('minWidth', minWidth);
+  }
+
+  protected _renderMinWidth() {
+    this.$container.css('min-width', this.minWidth);
+    this.invalidateLayoutTree();
+  }
+
+  setMaxWidth(maxWidth: number) {
+    this.setProperty('maxWidth', maxWidth);
+  }
+
+  protected _renderMaxWidth() {
+    this.$container.css('max-width', this.maxWidth);
+    this.invalidateLayoutTree();
+  }
+
+  // TODO CGU adjust LogicalGridLayout as well
 }
