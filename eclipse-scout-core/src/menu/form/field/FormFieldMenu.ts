@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CloneOptions, ColumnLayout, FormField, FormFieldMenuEventMap, FormFieldMenuModel, GridData, HtmlComponent, LogicalGridData, Menu, ObjectOrChildModel, SomeRequired} from '../../../index';
+import {CloneOptions, ColumnLayout, ColumnLayoutData, FormField, FormFieldMenuEventMap, FormFieldMenuModel, GridData, HtmlComponent, Menu, ObjectOrChildModel, SomeRequired} from '../../../index';
 
 export class FormFieldMenu extends Menu implements FormFieldMenuModel {
   declare model: FormFieldMenuModel;
@@ -57,9 +57,7 @@ export class FormFieldMenu extends Menu implements FormFieldMenuModel {
       this.field.gridData = GridData.createFromHints(this.field, 1);
 
       this.field.render(this.$container);
-      let layoutData = new LogicalGridData(this.field);
-      layoutData.validate();
-      this.field.setLayoutData(layoutData);
+      this.field.setLayoutData({widthHint: this.field.gridData.widthInPixel} as ColumnLayoutData);
       this.field.$container.addClass('content');
     }
   }
