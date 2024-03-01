@@ -93,7 +93,7 @@ export default class Chart extends Widget {
     this.htmlComp.setLayout(new ChartLayout(this));
 
     // !!! Do _not_ update the chart here, because usually the container size
-    // !!! is not correct anyways during the render phase. The ChartLayout
+    // !!! is not correct anyway during the render phase. The ChartLayout
     // !!! will eventually call updateChart() when the layout is validated.
   }
 
@@ -115,9 +115,8 @@ export default class Chart extends Widget {
     if (!this.chartRenderer?.isDetachSupported()) {
       // the chartRenderer does not support detach => recreate it
       this._updateChartRenderer();
-      if (!updateChartOptsWhileNotAttached.length) {
-        updateChartOptsWhileNotAttached.push({requestAnimation: true});
-      }
+      updateChartOptsWhileNotAttached.forEach(opts => delete opts.requestAnimation);
+      updateChartOptsWhileNotAttached.push({requestAnimation: false});
     }
     updateChartOptsWhileNotAttached.forEach(opts => this.updateChart($.extend(true, {}, opts, {debounce: true})));
   }
@@ -193,7 +192,7 @@ export default class Chart extends Widget {
       delete oldConfigWithNewData.data;
     }
 
-    // the label map is technically part of the config, but it is handled as data. Therefore it is excluded from this check.
+    // the label map is technically part of the config, but it is handled as data. Therefore, it is excluded from this check.
     let transferLabelMap = (source, target, identifier) => {
       if (!source || !target || !identifier) {
         return;

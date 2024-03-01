@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,6 +80,8 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     }
 
     // Final callback
+    // In the case of 3 circles, draw will be called async after render is completed. Therefore, the current animationDuration needs to be set again when _draw is finally called.
+    const animationDurationRender = this.animationDuration;
     let draw = function() {
       this.readyToDraw = true;
       if (!this.$svg.isAttached()) {
@@ -87,7 +89,10 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
         return;
       }
       this.readyToDraw = false;
+      const animationDuration = this.animationDuration;
+      this.setAnimationDuration(animationDurationRender);
       this._draw(true, true);
+      this.setAnimationDuration(animationDuration);
     }.bind(this);
 
     // save callback if user navigated away while calculating and _draw is not executed.

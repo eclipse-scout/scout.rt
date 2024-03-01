@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {arrays} from '@eclipse-scout/core';
+import {arrays, objects} from '@eclipse-scout/core';
 
 export default class AbstractChartRenderer {
 
@@ -84,14 +84,16 @@ export default class AbstractChartRenderer {
    *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
   render(requestAnimation) {
-    this.animationDuration = requestAnimation ? this.chart.config.options.animation.duration : 0;
     if (!this.validate() || !this.chart.rendered) {
       return;
     }
+    const configAnimationDuration = this.chart.config.options.animation.duration;
+    this.setAnimationDuration(requestAnimation ? configAnimationDuration : 0);
     this.rendering = true;
     this._render();
     this.rendering = false;
     this.rendered = true;
+    this.setAnimationDuration(configAnimationDuration);
   }
 
   _render() {
@@ -118,11 +120,13 @@ export default class AbstractChartRenderer {
       this.render(requestAnimation);
       return;
     }
-    this.animationDuration = requestAnimation ? this.chart.config.options.animation.duration : 0;
     if (!this.validate() || !this.isDataUpdatable()) {
       return;
     }
+    const configAnimationDuration = this.chart.config.options.animation.duration;
+    this.setAnimationDuration(requestAnimation ? configAnimationDuration : 0);
     this._updateData();
+    this.setAnimationDuration(configAnimationDuration);
   }
 
   _updateData() {
@@ -144,18 +148,39 @@ export default class AbstractChartRenderer {
     this.render(false);
   }
 
+  setAnimationDuration(animationDuration) {
+    if (objects.equals(this.animationDuration, animationDuration)) {
+      return;
+    }
+
+    this._setAnimationDuration(animationDuration);
+    if (this.rendered) {
+      this._renderAnimationDuration();
+    }
+  }
+
+  _setAnimationDuration(animationDuration) {
+    this.animationDuration = animationDuration;
+  }
+
+  _renderAnimationDuration() {
+    // nop
+  }
+
   /**
    * @param requestAnimation
    *          Whether animations should be used while removing the chart. Note that his
    *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
   remove(requestAnimation, afterRemoveFunc) {
-    this.animationDuration = requestAnimation && this.chart.config.options.animation.duration;
+    const configAnimationDuration = this.chart.config.options.animation.duration;
+    this.setAnimationDuration(requestAnimation && configAnimationDuration);
     if (this.animationDuration && this.rendered) {
       this._removeAnimated(afterRemoveFunc);
     } else {
       this._remove(afterRemoveFunc);
     }
+    this.setAnimationDuration(configAnimationDuration);
   }
 
   _remove(afterRemoveFunc) {
