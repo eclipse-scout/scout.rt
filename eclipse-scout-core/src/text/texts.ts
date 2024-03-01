@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -53,7 +53,7 @@ export const texts = {
   },
 
   /**
-   * Links the texts of the given languageTag to make parent lookup possible (e.g. look first in de-CH, then in de, then in default)
+   * Links the texts of the given languageTag to make parent lookup possible (e.g. look first in de-CH, then in de, then in default).
    */
   link(languageTag: string) {
     let tags = texts.createOrderedLanguageTags(languageTag);
@@ -63,13 +63,13 @@ export const texts = {
       if (!textMap) {
         // If there are no texts for the given tag, create an empty Texts object for linking purpose
         textMap = new TextMap();
-        texts.put(tag, textMap);
+        texts._put(tag, textMap);
       }
       if (child) {
         child.setParent(textMap);
       }
       child = textMap;
-    }, this);
+    });
   },
 
   /**
@@ -100,6 +100,8 @@ export const texts = {
 
   /**
    * Returns the (modifiable) TextMap for the given language tag.
+   * If no TextMap exists for the languageTag given, a new empty map is created.
+   * @return the TextMap for the given languageTag. Never returns null or undefined.
    */
   get(languageTag: string): TextMap {
     let textMap: TextMap = texts._get(languageTag);
@@ -123,8 +125,9 @@ export const texts = {
   /**
    * Registers the text map for the given locale.
    * If there already is a text map registered for that locale, it will be replaced, meaning existing texts for that locale are deleted.
+   * @internal
    */
-  put(languageTag: string, textMap: TextMap) {
+  _put(languageTag: string, textMap: TextMap) {
     texts.textsByLocale[languageTag] = textMap;
   },
 

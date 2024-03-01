@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -188,8 +188,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.userAgent = scout.nvl(options.userAgent, this.userAgent);
     this.suppressErrors = scout.nvl(options.suppressErrors, this.suppressErrors);
     if (options.locale) {
-      this.locale = Locale.ensure(options.locale);
-      this.textMap = texts.get(this.locale.languageTag);
+      this._setLocaleAndTexts(Locale.ensure(options.locale));
     }
     if (options.backgroundJobPollingEnabled === false) {
       this.backgroundJobPollingSupport.enabled = false;
@@ -444,10 +443,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       this._copyAdapterData(data.adapterData);
     }
 
-    this.locale = new Locale(data.startupData.locale);
-    this.textMap = texts.get(this.locale.languageTag);
-    this.textMap.addAll(data.startupData.textMap);
-    scout.setDocumentLocale(this.locale);
+    this._setLocaleAndTexts(Locale.ensure(data.startupData.locale));
 
     // Create the desktop
     // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
@@ -1441,29 +1437,31 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   }
 
   protected _onLocaleChanged(event: RemoteEvent & { locale?: LocaleModel; textMap?: Record<string, string> }) {
-    let locale = new Locale(event.locale);
+    let locale = Locale.ensure(event.locale);
     let textMap = new TextMap(event.textMap);
     this.switchLocale(locale, textMap);
   }
 
   /**
    * @param locale the new locale
-   * @param textMap the new textMap. If not defined, the corresponding textMap for the new locale is used.
+   * @param textMap the new textMap. If not defined, the existing textMap for the new locale is used.
    */
   switchLocale(locale: Locale, textMap?: TextMap) {
     scout.assertParameter('locale', locale, Locale);
-    this.locale = locale;
-    this.textMap = texts.get(locale.languageTag);
-    if (textMap) {
-      objects.copyOwnProperties(textMap, this.textMap);
-    }
-    // set document locale so screen readers read text correctly
-    scout.setDocumentLocale(locale);
+    this._setLocaleAndTexts(locale, textMap);
     // TODO [7.0] bsh: inform components to reformat display text? also check Collator in comparators.TEXT
 
     this.trigger('localeSwitch', {
       locale: this.locale
     });
+  }
+
+  _setLocaleAndTexts(locale: Locale, textMap?: TextMap) {
+    this.locale = locale;
+    this.textMap = texts.get(locale.languageTag);
+    this.textMap.addAll(textMap);
+    // set document locale so screen readers read text correctly
+    scout.setDocumentLocale(locale);
   }
 
   /** @internal */
