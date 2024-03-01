@@ -201,7 +201,7 @@
   }
 
   // Prevent empty div from collapsing (without &nbsp;)
-  &::after {
+  &:empty::after {
     content: '\200b'; // U+200B ZERO WIDTH SPACE
   }
 }
