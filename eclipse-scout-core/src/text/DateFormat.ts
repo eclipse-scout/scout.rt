@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -135,7 +135,7 @@ export class DateFormat {
           let startYear = (parseContext.startDate || new Date()).getFullYear();
           // Construct a new year using the startYear's century and the entered 'short year'
           let year = Number(
-            strings.padZeroLeft(startYear, 4).substr(0, 2) +
+            strings.padZeroLeft(startYear, 4).substring(0, 2) +
             strings.padZeroLeft(match, 2));
           // Ensure max. 50 years distance between 'startYear' and 'year'
           let distance = year - startYear;
@@ -639,7 +639,7 @@ export class DateFormat {
         },
         parseRegExp: /^([+|-]\d{4})(.*)$/,
         applyMatchFunction: (parseContext, match, acceptedTerm) => {
-          let offset = Number(match.substr(1, 2)) * 60 + Number(match.substr(3, 2));
+          let offset = Number(match.substring(1, 3)) * 60 + Number(match.substring(3, 5));
           if (match.charAt(0) === '-') {
             offset *= -1;
           }
@@ -733,7 +733,7 @@ export class DateFormat {
   protected _createConstantStringParseFunction(term: string): (parseContext: DateFormatParseContext) => boolean {
     return parseContext => {
       if (strings.startsWith(parseContext.inputString, term)) {
-        parseContext.inputString = parseContext.inputString.substr(term.length);
+        parseContext.inputString = parseContext.inputString.substring(term.length);
         parseContext.parsedPattern += term;
         return true;
       }
@@ -901,7 +901,7 @@ export class DateFormat {
     let validMonth = scout.nvl(dateInfo.month, startDate.getMonth());
     let validYear = scout.nvl(dateInfo.year, startDate.getFullYear());
     // When user entered the day but not (yet) the month, adjust month if possible to propose a valid date
-    if (dateInfo.day && !dateInfo.month) {
+    if (dateInfo.day && !numbers.isNumber(dateInfo.month)) {
       // If day "31" does not exist in the proposed month, use the next month
       if (dateInfo.day === 31) {
         let monthsWithThirtyOneDays = [0, 2, 4, 6, 7, 9, 11];
@@ -917,8 +917,8 @@ export class DateFormat {
     }
 
     // ensure valid day for selected month for dateInfo without day
-    if (!dateInfo.day && dateInfo.month) {
-      let lastOfMonth = dates.shift(new Date(validYear, dateInfo.month + 1, 1), 0, 0, -1);
+    if (!dateInfo.day && (numbers.isNumber(dateInfo.month) || dateInfo.year)) {
+      let lastOfMonth = dates.shift(new Date(validYear, validMonth + 1, 1), 0, 0, -1);
       validDay = Math.min(lastOfMonth.getDate(), startDate.getDate());
     }
 
@@ -1054,6 +1054,7 @@ export interface DateFormatOptions {
 
 export interface DateFormatMatchInfo {
   year?: string;
+  /** one-based (January = '1') */
   month?: string;
   week?: string;
   day?: string;
@@ -1068,6 +1069,7 @@ export interface DateFormatMatchInfo {
 
 export interface DateFormatDateInfo {
   year?: number;
+  /** zero-based (January = 0) */
   month?: number;
   day?: number;
   hours?: number;
