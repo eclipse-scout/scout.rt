@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -51,9 +51,14 @@ export class Locale implements LocaleModel {
     }
   }
 
+  /**
+   * Creates a new {@link Locale} based on given input. If no input is given, the default Locale is returned (en-US).
+   * @param locale The locale or null for the default locale.
+   * @returns the given Locale, a new Locale based on the model given or the default Locale if the input is null.
+   */
   static ensure(locale?: Locale | InitModelOf<Locale>): Locale {
     if (!locale) {
-      return locale as Locale;
+      return new Locale(Locale.DEFAULT);
     }
     if (locale instanceof Locale) {
       return locale;

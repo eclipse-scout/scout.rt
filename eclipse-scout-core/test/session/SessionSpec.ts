@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, UserAgent} from '../../src/index';
+import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
+import {LocaleSpecHelper} from '../../src/testing';
 
 /* global receiveResponseForAjaxCall */
 describe('Session', () => {
@@ -317,7 +318,7 @@ describe('Session', () => {
       // Send first request (other requests must not be sent yet)
       jasmine.clock().tick(0);
       let request = jasmine.Ajax.requests.at(0);
-      expect($.parseJSON(request.params)).toContainEvents([event0]);
+      expect(JSON.parse(request.params)).toContainEvents([event0]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(true);
@@ -325,7 +326,7 @@ describe('Session', () => {
       // Send second request
       receiveResponseForAjaxCall(request);
       request = jasmine.Ajax.requests.at(1);
-      expect($.parseJSON(request.params)).toContainEvents([event1, event2]);
+      expect(JSON.parse(request.params)).toContainEvents([event1, event2]);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(true);
@@ -333,7 +334,7 @@ describe('Session', () => {
       // Send last request
       receiveResponseForAjaxCall(request);
       request = jasmine.Ajax.requests.at(2);
-      expect($.parseJSON(request.params)).toContainEvents([event3, event4]);
+      expect(JSON.parse(request.params)).toContainEvents([event3, event4]);
       expect(jasmine.Ajax.requests.count()).toBe(3);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(false);
@@ -360,7 +361,7 @@ describe('Session', () => {
       // Send request
       jasmine.clock().tick(0);
       let request = jasmine.Ajax.requests.at(0);
-      expect($.parseJSON(request.params)).toContainEvents([event0, event1, event2]);
+      expect(JSON.parse(request.params)).toContainEvents([event0, event1, event2]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(false);
@@ -611,17 +612,27 @@ describe('Session', () => {
   // Tests whether delegation to TextMap works as expected
   describe('texts', () => {
 
-    let session;
+    let session: SandboxSession;
+    let oldTextsByLocale: TextMapType;
 
     beforeEach(() => {
+      oldTextsByLocale = texts.textsByLocale;
       session = createSession();
-      session.textMap = new TextMap({
+      let textMap = new TextMap({
         NoOptions: 'Keine Übereinstimmung',
         NumOptions: '{0} Optionen',
         Greeting: 'Hello {0}, my name is {2}, {1}.',
         Empty: '',
         Null: null
       });
+      texts._setTextsByLocale({
+        'de-CH': textMap
+      });
+      session.textMap = textMap;
+    });
+
+    afterEach(() => {
+      texts._setTextsByLocale(oldTextsByLocale);
     });
 
     it('check if correct text is returned', () => {
@@ -661,9 +672,24 @@ describe('Session', () => {
     });
 
     it('optText returns text if key found, with arguments', () => {
-      expect(session.optText('NumOptions', '#Default', 7)).toBe('7 Optionen');
+      expect(session.optText('NumOptions', '#Default', '7')).toBe('7 Optionen');
     });
 
-  });
+    it('switchLocale extends existing texts with new ones', () => {
+      let newLocale = new LocaleSpecHelper().createLocale('de-CH');
+      session.switchLocale(newLocale, new TextMap({
+        NumOptions: '{0} Optionen nach Switch', // overwrites an existing one
+        NewEntry: 'Neuer Eintrag nach Switch' // adds a new text
+      }));
 
+      // tests that overwritten texts use the new one
+      expect(session.optText('NumOptions', '#Default', '8')).toBe('8 Optionen nach Switch');
+
+      // tests that existing texts are preserved
+      expect(session.text('NoOptions')).toBe('Keine Übereinstimmung');
+
+      // tests that new texts are available
+      expect(session.optText('NewEntry')).toBe('Neuer Eintrag nach Switch');
+    });
+  });
 });

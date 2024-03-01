@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -176,7 +176,7 @@ window.createSimpleModel = <T>(objectType, session, id) => {
 window.mostRecentJsonRequest = () => {
   let req = jasmine.Ajax.requests.mostRecent();
   if (req) {
-    return $.parseJSON(req.params);
+    return JSON.parse(req.params);
   }
 };
 
