@@ -241,10 +241,10 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }
     let config = $.extend(true, {}, this.chart.config);
     this._adjustConfig(config);
-    this._renderChart(config, true);
+    this._renderChart(config);
   }
 
-  protected _renderChart(config: ChartConfig, animated: boolean) {
+  protected _renderChart(config: ChartConfig) {
     if (this.chartJs) {
       this.chartJs.destroy();
     }
@@ -253,11 +253,11 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         animation: {}
       }
     }, config);
-    config.options.animation.duration = animated ? this.animationDuration : 0;
+    config.options.animation.duration = this.animationDuration;
 
     this.chartJs = new ChartJs(this.$canvas[0].getContext('2d'), config as ChartConfiguration) as ChartJsChart;
     this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
-    this.chartJs.update();
+    this.refresh();
   }
 
   protected override _updateData() {
@@ -435,10 +435,10 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       (axis.ticks || {} as (LinearScaleOptions | RadialLinearScaleOptions)['ticks']).stepSize = undefined;
     });
 
-    this.chartJs.update();
+    this.refresh();
 
     this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
-    this.chartJs.update();
+    this.refresh();
   }
 
   override isDataUpdatable(): boolean {
@@ -459,9 +459,23 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }
   }
 
+  protected override _renderAnimationDuration() {
+    if (!this.chartJs) {
+      return;
+    }
+    $.extend(true, this.chartJs.config, {
+      options: {
+        animation: {
+          duration: this.animationDuration
+        }
+      }
+    });
+    this.refresh();
+  }
+
   protected override _renderCheckedItems() {
     if (this.chartJs && this._checkItems(this.chartJs.config)) {
-      this.chartJs.update();
+      this.refresh();
     }
   }
 
@@ -2247,7 +2261,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       }
     });
     if (update) {
-      this.chartJs.update();
+      this.refresh();
     }
   }
 
@@ -2295,7 +2309,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       datasetType = dataset ? dataset.type : null;
     if ((datasetType || type) === Chart.Type.LINE) {
       this._setHoverBackgroundColor(dataset);
-      this.chartJs.update();
+      this.refresh();
     }
     this._updateHoverStyle(index, true);
     this.chartJs.render();
@@ -2326,7 +2340,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       datasetType = dataset ? dataset.type : null;
     if ((datasetType || type) === Chart.Type.LINE) {
       this._restoreBackgroundColor(dataset);
-      this.chartJs.update();
+      this.refresh();
     }
     this._updateHoverStyle(index, false);
     this.chartJs.render();
