@@ -111,9 +111,8 @@ export class Chart extends Widget implements ChartModel {
     if (!this.chartRenderer?.isDetachSupported()) {
       // the chartRenderer does not support detach => recreate it
       this._updateChartRenderer();
-      if (!updateChartOptsWhileNotAttached.length) {
-        updateChartOptsWhileNotAttached.push({requestAnimation: true});
-      }
+      updateChartOptsWhileNotAttached.forEach(opts => delete opts.requestAnimation);
+      updateChartOptsWhileNotAttached.push({requestAnimation: false});
     }
     updateChartOptsWhileNotAttached.forEach(opts => this.updateChart($.extend(true, {}, opts, {debounce: true})));
   }

@@ -9,10 +9,12 @@
  */
 
 import {Chart} from '../index';
-import {arrays, Session} from '@eclipse-scout/core';
+import {arrays, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, Session} from '@eclipse-scout/core';
 import {UpdateChartOptions} from './Chart';
 
-export class AbstractChartRenderer {
+export class AbstractChartRenderer extends PropertyEventEmitter {
+  declare eventMap: AbstractChartRendererEventMap;
+
   chart: Chart;
   session: Session;
 
@@ -25,6 +27,7 @@ export class AbstractChartRenderer {
   firstOpaqueBackgroundColor: string;
 
   constructor(chart: Chart) {
+    super();
     this.chart = chart;
     this.session = chart.session;
     this.rendering = false;
@@ -87,14 +90,16 @@ export class AbstractChartRenderer {
    *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
   render(requestAnimation: boolean) {
-    this.animationDuration = requestAnimation ? this.chart.config.options.animation.duration : 0;
     if (!this.validate() || !this.chart.rendered) {
       return;
     }
+    const configAnimationDuration = this.chart.config.options.animation.duration;
+    this.setAnimationDuration(requestAnimation ? configAnimationDuration : 0);
     this.rendering = true;
     this._render();
     this.rendering = false;
     this.rendered = true;
+    this.setAnimationDuration(configAnimationDuration);
   }
 
   protected _render() {
@@ -121,11 +126,13 @@ export class AbstractChartRenderer {
       this.render(requestAnimation);
       return;
     }
-    this.animationDuration = requestAnimation ? this.chart.config.options.animation.duration : 0;
     if (!this.validate() || !this.isDataUpdatable()) {
       return;
     }
+    const configAnimationDuration = this.chart.config.options.animation.duration;
+    this.setAnimationDuration(requestAnimation ? configAnimationDuration : 0);
     this._updateData();
+    this.setAnimationDuration(configAnimationDuration);
   }
 
   protected _updateData() {
@@ -147,18 +154,37 @@ export class AbstractChartRenderer {
     this.render(false);
   }
 
+  setAnimationDuration(animationDuration: number) {
+    if (!this.setProperty('animationDuration', animationDuration)) {
+      return;
+    }
+    if (this.rendered) {
+      this._renderAnimationDuration();
+    }
+  }
+
+  protected _setAnimationDuration(animationDuration: number) {
+    this._setProperty('animationDuration', animationDuration);
+  }
+
+  protected _renderAnimationDuration() {
+    // nop
+  }
+
   /**
    * @param requestAnimation
    *          Whether animations should be used while removing the chart. Note that his
    *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
   remove(requestAnimation = false, afterRemoveFunc?: (chartAnimationStopping?: boolean) => void) {
-    this.animationDuration = requestAnimation && this.chart.config.options.animation.duration;
+    const configAnimationDuration = this.chart.config.options.animation.duration;
+    this.setAnimationDuration(requestAnimation && configAnimationDuration);
     if (this.animationDuration && this.rendered) {
       this._removeAnimated(afterRemoveFunc);
     } else {
       this._remove(afterRemoveFunc);
     }
+    this.setAnimationDuration(configAnimationDuration);
   }
 
   protected _remove(afterRemoveFunc: (chartAnimationStopping?: boolean) => void) {
@@ -177,4 +203,8 @@ export class AbstractChartRenderer {
   shouldAnimateRemoveOnUpdate(opts: UpdateChartOptions): boolean {
     return opts.requestAnimation;
   }
+}
+
+export interface AbstractChartRendererEventMap extends PropertyEventMap {
+  'propertyChange:animationDuration': PropertyChangeEvent<number>;
 }
