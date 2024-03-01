@@ -178,7 +178,11 @@
 
 .notification-message {
   padding-right: 12px;
-  min-height: 12px; // Prevent empty div from collapsing (without &nbsp;)
   #scout.user-select(text);
   #scout.overflow-ellipsis();
+
+  // Prevent empty div from collapsing (without &nbsp;)
+  &:empty::after {
+    content: '\200b'; // U+200B ZERO WIDTH SPACE
+  }
 }
