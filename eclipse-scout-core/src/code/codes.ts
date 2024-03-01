@@ -53,7 +53,7 @@ export const codes = {
 
   /**
    * Adds the given CodeType models to the registry. Existing entries with the same ids are overwritten.
-   * @return The registered CodeType instances.
+   * @returns The registered CodeType instances.
    */
   add(codeTypes: ObjectOrModel<CodeType<any, any, any>> | ObjectOrModel<CodeType<any, any, any>>[]): CodeType<any, any, any>[] {
     let registeredCodeTypes = [];
@@ -81,7 +81,7 @@ export const codes = {
   /**
    * Gets the CodeType with given id or Class.
    * @param codeTypeIdOrClassRef The CodeType id or Class
-   * @return The CodeType instance or undefined if not found.
+   * @returns The CodeType instance or undefined if not found.
    */
   get<T extends CodeType<any>>(codeTypeIdOrClassRef: string | (new() => T)): T {
     if (typeof codeTypeIdOrClassRef === 'string') {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -595,7 +595,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Default error handler for {@link _load}, {@link _save} and {@link _postLoad}. May be overridden by subclasses.
-   * @return A promise that resolves when the error is handled.
+   * @returns A promise that resolves when the error is handled.
    */
   protected _handleError(error: any): JQuery.Promise<void> {
     const errorHandler = App.get().errorHandler;
