@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -557,7 +557,7 @@ function getModuleName() {
  * Keep imports to the excludedFolder.
  * @param {string} newImport new name of the replaced import, typically the module name
  * @param {string} excludedFolder imports to that folder won't be replaced
- * @return a function that should be added to the webpack externals
+ * @returns a function that should be added to the webpack externals
  */
 function rewriteIndexImports(newImport, excludedFolder) {
   return ({context, request, contextInfo}, callback) => {

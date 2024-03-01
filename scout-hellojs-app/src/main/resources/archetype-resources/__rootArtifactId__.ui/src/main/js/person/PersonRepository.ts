@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 import {App, Person, PersonRestriction, Repository} from '../index';
 import {App as ScoutApp, scout} from '@eclipse-scout/core';
 
@@ -22,7 +31,7 @@ export class PersonRepository extends Repository {
   /**
    * Gets all persons.
    * @param restriction Restriction which persons to fetch
-   * @return The persons matching the restriction
+   * @returns The persons matching the restriction
    */
   list(restriction: PersonRestriction): JQuery.Promise<Person[]> {
     return this._list(restriction);

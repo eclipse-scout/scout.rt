@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -211,7 +211,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     // a listener on the desktop in their init phase, they access the desktop by calling 'this.session.desktop'
     // that's why we need this instance as early as possible. When that happens they access a desktop which is
     // not yet fully initialized. But anyway, it's already possible to attach a listener, for instance.
-    // Because of this line of code here, we don't have to set the variable in App.js, after the desktop has been
+    // Because of this line of code here, we don't have to set the variable in App.ts, after the desktop has been
     // created. Also note that Scout Java uses a different pattern to solve the same problem, there a VirtualDesktop
     // is used during initialization. When initialization is done, all registered listeners on the virtual desktop
     // are copied to the real desktop instance.
@@ -376,7 +376,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   }
 
   /**
-   * @return true if the desktop has a busy indicator active.
+   * @returns true if the desktop has a busy indicator active.
    */
   get busy(): boolean {
     return this.busySupport.isBusy();

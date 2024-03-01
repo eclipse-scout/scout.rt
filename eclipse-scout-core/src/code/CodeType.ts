@@ -57,7 +57,7 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
 
   /**
    * Override this method and add additional properties which should not be validated to be present after CodeType init.
-   * @return A Set with all public properties (fields) of this CodeType which do _not_ point to a nested Code instance.
+   * @returns A Set with all public properties (fields) of this CodeType which do _not_ point to a nested Code instance.
    */
   protected _getPublicNonCodeProperties(): Set<string> {
     return new Set(['id', 'objectType', 'modelClass', 'iconId', 'hierarchical', 'maxLevel', 'codeMap']);
@@ -123,7 +123,7 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
   /**
    * Gets the codes of this CodeType.
    * @param rootOnly true if only the root Codes should be returned. The default value is false.
-   * @return the root Codes of this CodeType if rootOnly is true and all Codes recursively otherwise.
+   * @returns the root Codes of this CodeType if rootOnly is true and all Codes recursively otherwise.
    */
   codes(rootOnly?: boolean): TCode[] {
     if (!rootOnly) {
@@ -143,7 +143,7 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
   /**
    * Gets the Code with given id. All codes recursively are searched.
    * @param codeId The Code id to search
-   * @return The Code with given id or null.
+   * @returns The Code with given id or null.
    */
   get(codeId: TCodeId): TCode {
     return this.codeMap.get(codeId);

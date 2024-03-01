@@ -101,7 +101,7 @@ export const texts = {
   /**
    * Returns the (modifiable) TextMap for the given language tag.
    * If no TextMap exists for the languageTag given, a new empty map is created.
-   * @return the TextMap for the given languageTag. Never returns null or undefined.
+   * @returns the TextMap for the given languageTag. Never returns null or undefined.
    */
   get(languageTag: string): TextMap {
     let textMap: TextMap = texts._get(languageTag);
