@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,7 @@ export class NotificationBadgeStatus extends Status {
   }
 
   /**
-   * @return {NotificationBadgeStatus} a clone of this Status instance.
+   * @returns {NotificationBadgeStatus} a clone of this Status instance.
    */
   override clone(): Status {
     let modelClone = $.extend({}, this);
