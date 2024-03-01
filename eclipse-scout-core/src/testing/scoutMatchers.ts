@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -79,7 +79,7 @@ export const jasmineScoutMatchers = {
       for (let i = 0; i < expected.length; i++) {
         // Prototype may be Event. If that's the case we need to convert, otherwise equals will fail
         if (Object.getPrototypeOf(expected[i]) !== Object.prototype) {
-          expected[i] = $.parseJSON(JSON.stringify(expected[i]));
+          expected[i] = JSON.parse(JSON.stringify(expected[i]));
         }
 
         result.pass = result.pass && util.contains(actualEvents, expected[i]);
@@ -113,7 +113,7 @@ export const jasmineScoutMatchers = {
       for (let i = 0; i < expected.length; i++) {
         // Prototype may be Event. If that's the case we need to convert, otherwise equals will fail
         if (Object.getPrototypeOf(expected[i]) !== Object.prototype) {
-          expected[i] = $.parseJSON(JSON.stringify(expected[i]));
+          expected[i] = JSON.parse(JSON.stringify(expected[i]));
         }
       }
 
