@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -118,9 +118,7 @@ describe('DateFormat', () => {
       pattern = 'yyyy-MM-ddTHH:mm:ss.SSSZ';
       dateFormat = new DateFormat(locale, pattern);
       expect(dateFormat.format(date)).toBe('2014-03-21T13:01:00.000' + timeZone);
-
     });
-
   });
 
   describe('parse', () => {
@@ -194,7 +192,6 @@ describe('DateFormat', () => {
       let refDate = dates.create('2017-01-01 12:00:05.123');
       refDate.setMinutes(refDate.getMinutes() - refDate.getTimezoneOffset() - 6 * 60);
       expect(dateFormat.parse('2017-01-01T12:00:05.123-0600').getTime()).toBe(refDate.getTime());
-
     });
   });
 
@@ -284,6 +281,15 @@ describe('DateFormat', () => {
 
         result = dateFormat.analyze('32', dates.create('2016-04-01'));
         expect(result.predictedDate).toBe(null);
+
+        result = dateFormat.analyze('2', dates.create('2024-02-29'));
+        expect(dateFormat.format(result.predictedDate)).toBe('02.02.2024');
+
+        result = dateFormat.analyze('3', dates.create('2024-02-29'));
+        expect(dateFormat.format(result.predictedDate)).toBe('03.02.2024');
+
+        result = dateFormat.analyze('30', dates.create('2024-02-29'));
+        expect(dateFormat.format(result.predictedDate)).toBe('30.03.2024');
       });
 
       it('proposes valid dates for pattern MM.yyyy', () => {
@@ -309,6 +315,32 @@ describe('DateFormat', () => {
 
         let result = dateFormat.analyze('2017', dates.create('2016-02-29'));
         expect(dateFormat.format(result.predictedDate)).toBe('2017');
+      });
+
+      it('proposes valid dates for pattern yyyy-MM', () => {
+        let pattern = 'yyyy-MM';
+        let dateFormat = new DateFormat(locale, pattern);
+
+        let result = dateFormat.analyze('17-2', dates.create('2017-03-31'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2017-02');
+
+        result = dateFormat.analyze('17-4', dates.create('2017-03-31'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2017-04');
+
+        result = dateFormat.analyze('17-5', dates.create('2017-03-31'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2017-05');
+
+        result = dateFormat.analyze('17-5', dates.create('2017-03-10'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2017-05');
+
+        result = dateFormat.analyze('2', dates.create('2024-02-29')); // feb-29 does not exist in 2002 -> should still predict february
+        expect(dateFormat.format(result.predictedDate)).toBe('2002-02');
+
+        result = dateFormat.analyze('24', dates.create('2024-02-29'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2024-02');
+
+        result = dateFormat.analyze('2-3', dates.create('2024-02-29'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2002-03');
       });
 
       it('proposes valid times', () => {
@@ -350,5 +382,4 @@ describe('DateFormat', () => {
       });
     });
   });
-
 });
