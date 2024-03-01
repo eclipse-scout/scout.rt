@@ -279,10 +279,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
      */
     let config = $.extend(true, {}, this.chart.config);
     this._adjustConfig(config);
-    this._renderChart(config, true);
+    this._renderChart(config);
   }
 
-  _renderChart(config, animated) {
+  _renderChart(config) {
     if (this.chartJs) {
       this.chartJs.destroy();
     }
@@ -291,7 +291,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         animation: {}
       }
     }, config);
-    config.options.animation.duration = animated ? this.animationDuration : 0;
+    config.options.animation.duration = this.animationDuration;
 
     /**
      * @type {Chart}
@@ -300,7 +300,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
      */
     this.chartJs = new ChartJs(this.$canvas[0].getContext('2d'), config);
     this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
-    this.chartJs.update();
+    this.refresh();
   }
 
   _updateData() {
@@ -315,7 +315,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     // Transfer property from source object to target object:
     // 1. If the property is not set on the target object, copy it from source.
-    // 2. If the property is not set on the source object, set it to undefined if setToUndefined = true. Otherwise empty the array if it is an array property or set it to undefined.
+    // 2. If the property is not set on the source object, set it to undefined if setToUndefined = true. Otherwise, empty the array if it is an array property or set it to undefined.
     // 3. If the property is not an array on the source or the target object, copy the property from the source to the target object.
     // 4. If the property is an array on both objects, do not update the array, but transfer the elements (update elements directly, use pop(), push() or splice() if one array is longer than the other).
     let transferProperty = (source, target, property, setToUndefined) => {
@@ -478,10 +478,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       (axis.ticks || {}).stepSize = undefined;
     });
 
-    this.chartJs.update();
+    this.refresh();
 
     this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
-    this.chartJs.update();
+    this.refresh();
   }
 
   isDataUpdatable() {
@@ -502,9 +502,23 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
   }
 
+  _renderAnimationDuration() {
+    if (!this.chartJs) {
+      return;
+    }
+    $.extend(true, this.chartJs.config, {
+      options: {
+        animation: {
+          duration: this.animationDuration
+        }
+      }
+    });
+    this.refresh();
+  }
+
   _renderCheckedItems() {
     if (this.chartJs && this._checkItems(this.chartJs.config)) {
-      this.chartJs.update();
+      this.refresh();
     }
   }
 
@@ -683,7 +697,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       borderWidthBackupIdentifier = hover ? 'hoverBorderWidthBackup' : 'borderWidthBackup',
       backgroundColorIdentifier = hover ? 'hoverBackgroundColor' : 'backgroundColor',
       borderColorIdentifier = hover ? 'hoverBorderColor' : 'borderColor';
-    // restore original state if there is an backup
+    // restore original state if there is a backup
     if (dataset[borderWidthBackupIdentifier]) {
       dataset[borderWidthIdentifier] = dataset[borderWidthBackupIdentifier];
       delete dataset[borderWidthBackupIdentifier];
@@ -2325,7 +2339,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }
     });
     if (update) {
-      this.chartJs.update();
+      this.refresh();
     }
   }
 
@@ -2373,7 +2387,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       datasetType = dataset ? dataset.type : null;
     if ((datasetType || type) === Chart.Type.LINE) {
       this._setHoverBackgroundColor(dataset);
-      this.chartJs.update();
+      this.refresh();
     }
     this._updateHoverStyle(index, true);
     this.chartJs.render();
@@ -2404,7 +2418,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       datasetType = dataset ? dataset.type : null;
     if ((datasetType || type) === Chart.Type.LINE) {
       this._restoreBackgroundColor(dataset);
-      this.chartJs.update();
+      this.refresh();
     }
     this._updateHoverStyle(index, false);
     this.chartJs.render();
@@ -2414,7 +2428,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   /**
    * Sets the hover background color as the datasets background color.
    * This little workaround is necessary for the line chart, which does not support a native hover effect.
-   * The previous background color will be backuped on the dataset property "backgroundColorBackup"
+   * The previous background color will be backed up on the dataset property "backgroundColorBackup"
    * and can be restored with {@link _restoreBackgroundColor}.
    * @param {Dataset} dataset
    */
