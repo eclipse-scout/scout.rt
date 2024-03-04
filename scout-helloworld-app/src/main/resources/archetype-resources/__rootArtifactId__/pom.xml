@@ -66,27 +66,31 @@
         </plugins>
       </build>
     </profile>
-  </profiles>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <!-- required for .app.image module to build and publish docker image -->
-          <groupId>com.google.cloud.tools</groupId>
-          <artifactId>jib-maven-plugin</artifactId>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>build</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+    <profile>
+      <!--  set property docker.app.image.registry before activating profile -->
+      <id>exec.docker.image</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <!-- phase binding required for .app.image module to build and publish docker image -->
+              <groupId>com.google.cloud.tools</groupId>
+              <artifactId>jib-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>build</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 
   <dependencyManagement>
     <dependencies>
