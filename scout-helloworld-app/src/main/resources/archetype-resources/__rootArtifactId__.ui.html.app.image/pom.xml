@@ -13,41 +13,35 @@
   <!-- Application leaf module with dependencies only relevant for docker image build including config.properties/logback.xml -->
   <artifactId>${rootArtifactId}.${artifactId}</artifactId>
 
-  <profiles>
-    <profile>
-      <!--  set property docker.app.image.registry before activating profile -->
-      <id>exec.docker.image</id>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.google.cloud.tools</groupId>
-            <artifactId>jib-maven-plugin</artifactId>
-            <configuration>
-              <to>
-                <image>${docker.app.image.registry}/${simpleArtifactName}-ui</image>
-                <tags>
-                  <tag>${docker.app.image.tag}</tag>
-                </tags>
-              </to>
-              <from>
-                <image>${docker.java.image}</image>
-              </from>
-              <container>
-                <mainClass>org.eclipse.scout.rt.app.Application</mainClass>
-                <ports>
-                  <port>8080</port>
-                </ports>
-                <environment>
-                  <scout_app_port>8080</scout_app_port>
-                </environment>
-              </container>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Google Jib goal 'build' is bound to phase 'package' via profile 'exec.docker.image' -->
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <configuration>
+          <to>
+            <image>${docker.app.image.registry}/${simpleArtifactName}-ui</image>
+            <tags>
+              <tag>${docker.app.image.tag}</tag>
+            </tags>
+          </to>
+          <from>
+            <image>${docker.java.image}</image>
+          </from>
+          <container>
+            <mainClass>org.eclipse.scout.rt.app.Application</mainClass>
+            <ports>
+              <port>8080</port>
+            </ports>
+            <environment>
+              <scout_app_port>8080</scout_app_port>
+            </environment>
+          </container>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <dependencies>
     <dependency>
