@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,15 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventHandler, EventListener, EventSupport, scout, UiNotificationDo, UiNotificationHandler, UiNotificationPoller} from '../index';
+import {Event, EventHandler, EventListener, EventSupport, scout, systems, UiNotificationDo, UiNotificationHandler, UiNotificationPoller} from '../index';
 
 export class UiNotificationSystem {
   poller: UiNotificationPoller;
-  url: string;
+  name: string;
   events: UiNotificationEventSupport;
 
-  constructor(url: string) {
-    this.url = url;
+  constructor(name: string) {
+    this.name = name;
     this.events = new UiNotificationEventSupport(this);
   }
 
@@ -81,8 +81,10 @@ export class UiNotificationSystem {
     let poller = this.poller;
     if (topics.length > 0 && !poller) {
       // First topic added -> create poller
+      let endpointUrl = systems.getOrCreate(this.name).getEndpointUrl('ui-notifications', 'ui-notifications');
       poller = scout.create(UiNotificationPoller, {
-        url: this.url
+        system: this,
+        url: endpointUrl
       });
       poller.on('notifications', event => this._dispatch(event.notifications));
       this.poller = poller;

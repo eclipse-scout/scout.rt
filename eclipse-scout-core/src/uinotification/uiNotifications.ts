@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {UiNotificationHandler, UiNotificationSystem} from '../index';
+import {System, systems, UiNotificationHandler, UiNotificationSystem} from '../index';
 
 export const uiNotifications = {
   systems: new Map<string, UiNotificationSystem>(),
@@ -22,7 +22,8 @@ export const uiNotifications = {
    *    Try to make the topic as specific as possible, e.g. by appending the id of an element to the topic name, instead of filtering the notifications in the UI.
    *    This reduces the overhead of sending unnecessary notifications to clients.
    * @param system The system that publishes the notification. If no system is provided, the `main` system is used, which points to `api/ui-notifications`.
-   *    To subscribe to another system, the system must be registered first using {@link registerSystem}.
+   *    To subscribe to a system with different url, the system must be registered first using {@link systems.getOrCreate} and then calling {@link System.setBaseUrl}
+   *    and/or {@link System.setEndpointUrl}.
    * @returns a promise that will be resolved as soon as the subscription was successful and notifications can be received.
    */
   subscribe(topic: string, handler: UiNotificationHandler, system?: string): JQuery.Promise<string> {
@@ -49,18 +50,6 @@ export const uiNotifications = {
   },
 
   /**
-   * Registers a new system that can publish ui notifications.
-   *
-   * To subscribe topics from that system, pass the name as parameter when calling {@link subscribe}.
-   */
-  registerSystem(name: string, url: string) {
-    if (uiNotifications.systems.has(name)) {
-      throw new Error(`System ${name} is already registered.`);
-    }
-    uiNotifications.systems.set(name, new UiNotificationSystem(url));
-  },
-
-  /**
    * Unregisters the system and closes the pending connection, if there is any.
    */
   unregisterSystem(name: string) {
@@ -81,13 +70,11 @@ export const uiNotifications = {
 };
 
 function getOrInitSystem(system?: string): UiNotificationSystem {
-  if (!system && !uiNotifications.systems.has('main')) {
-    uiNotifications.registerSystem('main', 'api/ui-notifications');
-  }
-
-  let systemObj = uiNotifications.systems.get(system || 'main');
+  system = system || System.MAIN_SYSTEM;
+  let systemObj = uiNotifications.systems.get(system);
   if (!systemObj) {
-    throw new Error(`Unknown system ${system}`);
+    systemObj = new UiNotificationSystem(system);
+    uiNotifications.systems.set(system, systemObj);
   }
   return systemObj;
 }

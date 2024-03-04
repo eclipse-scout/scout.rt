@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,8 +22,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.text.TEXTS;
@@ -55,9 +53,8 @@ public class HtmlDocumentParser {
   protected static final Pattern PATTERN_SCRIPTS_TAG = Pattern.compile("<scout:scripts\\s+entrypoint=\"(" + ENTRY_POINT_VALUE_REGEX + ")\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_STYLESHEETS_TAG = Pattern.compile("<scout:stylesheets\\s+entrypoint=\"(" + ENTRY_POINT_VALUE_REGEX + ")\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-  protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_UNKNOWN_TAG = Pattern.compile("<scout:(\"[^\"]*\"|[^>]*?)*>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-  protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
+  protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("(\\S+)=\"([^\"]*)\"");
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static final String SCRIPT_TAG_PREFIX = "<script src=\"";
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
@@ -84,7 +81,6 @@ public class HtmlDocumentParser {
   protected void replaceAllTags() {
     replaceIncludeTags();
     replaceBaseTags();
-    replaceVersionTags();
     replaceMessageTags();
     replaceStylesheetsTags();
     replaceStylesheetTags();
@@ -163,13 +159,6 @@ public class HtmlDocumentParser {
     }
     String baseTag = "<base href=\"" + basePath + "\">";
     m_workingContent = PATTERN_BASE_TAG.matcher(m_workingContent).replaceAll(baseTag);
-  }
-
-  protected void replaceVersionTags() {
-    // <scout:version />
-    String version = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
-    String versionTag = "<scout-version data-value=\"" + version + "\"></scout-version>";
-    m_workingContent = PATTERN_VERSION_TAG.matcher(m_workingContent).replaceAll(versionTag);
   }
 
   @SuppressWarnings("squid:S1149")
