@@ -29,6 +29,17 @@ describe('Rectangle', () => {
     expect(r5.equals(r6)).toBe(false);
   });
 
+  describe('union', () => {
+    let r1 = new Rectangle(0, 0, 675, 558);
+    let r2 = new Rectangle(687, 0, 674, 558);
+
+    it('produces same results as java.awt.Rectangle', () => {
+      let r = r1.union(r2);
+      let expected = new Rectangle(0, 0, 1361, 558);
+      expect(expected.equals(r)).toBe(true);
+    });
+  });
+
   it('intersects', () => {
     let r1 = new Rectangle(0, 0, 10, 5);
     let r2 = new Rectangle(0, 0, 20, -1);

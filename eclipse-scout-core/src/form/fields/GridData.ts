@@ -139,6 +139,8 @@ export class GridData {
    * Default is 0.
    */
   widthInPixel?: number;
+  minWidthInPixel?: number;
+  maxWidthInPixel?: number;
   /**
    * Configures the preferred height of the element in pixel.
    *
@@ -147,6 +149,8 @@ export class GridData {
    * Default is 0.
    */
   heightInPixel?: number;
+  minHeightInPixel?: number;
+  maxHeightInPixel?: number;
 
   constructor(model?: GridData) {
     model = model || {};
@@ -163,7 +167,11 @@ export class GridData {
     this.fillHorizontal = true;
     this.fillVertical = true;
     this.widthInPixel = 0;
+    this.minWidthInPixel = 0;
+    this.maxWidthInPixel = 10240;
     this.heightInPixel = 0;
+    this.minHeightInPixel = 0;
+    this.maxHeightInPixel = 10240;
 
     $.extend(this, model);
   }
