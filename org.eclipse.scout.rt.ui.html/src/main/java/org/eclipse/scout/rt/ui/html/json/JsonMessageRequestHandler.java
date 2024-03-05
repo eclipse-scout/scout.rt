@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -183,13 +183,8 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       // because the poller-induced "heart beat" mechanism would stop. Therefore, if the lock cannot be acquired,
       // an empty response is sent back to the UI.
       if (!uiSession.uiSessionLock().tryLock()) {
-        if (uiSession.isDisposed()) {
-          handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
-        }
-        else {
-          LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
-          writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createEmptyResponse());
-        }
+        LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
+        writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createEmptyResponse());
         return;
       }
     }
