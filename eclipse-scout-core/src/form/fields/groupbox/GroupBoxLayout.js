@@ -81,14 +81,12 @@ export default class GroupBoxLayout extends AbstractLayout {
 
     let notificationHeight = 0;
     if (this.groupBox.notification) {
-      setWidthForStatus(this.groupBox.notification.$container, statusWidth);
-
+      let notificationMargin = this.groupBox.notification.htmlComp.margins();
       let notificationPrefSize = this.groupBox.notification.htmlComp.prefSize({
-        widthHint: containerSize.width - statusWidth,
-        includeMargin: true
+        widthHint: containerSize.width - statusWidth
       });
       this.groupBox.notification.htmlComp.setSize(notificationPrefSize);
-      notificationHeight = notificationPrefSize.height;
+      notificationHeight = notificationPrefSize.height + notificationMargin.vertical();
     }
 
     gbBodySize = containerSize.subtract(htmlGbBody.margins());
