@@ -190,20 +190,15 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       // the corresponding response from the history. This would normally be done in UiSession#processJsonRequest,
       // but without lock we have to do it manually. Otherwise, we send back an empty response.
       if (!uiSession.uiSessionLock().tryLock()) {
-        if (uiSession.isDisposed()) {
-          handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
+        JSONObject response = uiSession.getAlreadyProcessedResponse(jsonRequest);
+        if (response != null) {
+          LOG.info("Request #{} was already processed. Sending back response from history.", jsonRequest.getSequenceNo());
         }
         else {
-          JSONObject response = uiSession.getAlreadyProcessedResponse(jsonRequest);
-          if (response != null) {
-            LOG.info("Request #{} was already processed. Sending back response from history.", jsonRequest.getSequenceNo());
-          }
-          else {
-            LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
-            response = m_jsonRequestHelper.createEmptyResponse();
-          }
-          writeJsonResponse(httpServletResponse, response);
+          LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HJR", jsonRequest.getSequenceNo(), jsonRequest.getAckSequenceNo());
+          response = m_jsonRequestHelper.createEmptyResponse();
         }
+        writeJsonResponse(httpServletResponse, response);
         return;
       }
     }
