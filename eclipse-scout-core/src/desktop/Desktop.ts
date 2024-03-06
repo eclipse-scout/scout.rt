@@ -1680,7 +1680,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
 
   protected _initTheme() {
     let theme = this.theme;
-    if (this.url.hasParameter('theme')) {
+    if (!this.modelAdapter && this.url.hasParameter('theme')) { // only needed for Scout JS (in Scout classic, the theme URL parameter is handled in UiSession#initUiTheme)
       theme = strings.nullIfEmpty(this.url.getParameter('theme') as string) || Desktop.DEFAULT_THEME;
     } else if (theme === null) {
       theme = this._activeTheme();
