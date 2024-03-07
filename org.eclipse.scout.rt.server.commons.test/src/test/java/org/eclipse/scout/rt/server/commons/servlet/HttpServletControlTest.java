@@ -33,23 +33,23 @@ public class HttpServletControlTest {
   @Test
   public void testSetResponseHeaders() {
     // GET request with CSP enabled  -> expect CSP headers, expect other headers
-    runTestSetResponseHeader(true, true, "GET", true, true, true, true);
-    runTestSetResponseHeader(false, true, "GET", true, true, true, true);
+    runTestSetResponseHeader(true, true, "GET", true, true, true);
+    runTestSetResponseHeader(false, true, "GET", true, true, true);
 
     // GET request with CSP disabled -> do not expect CSP headers, expect other headers
-    runTestSetResponseHeader(true, false, "GET", false, true, true, true);
-    runTestSetResponseHeader(false, false, "GET", false, true, true, true);
+    runTestSetResponseHeader(true, false, "GET", false, true, true);
+    runTestSetResponseHeader(false, false, "GET", false, true, true);
 
     // POST request with CSP enabled -> do not expect CSP headers, do not expect other headers
-    runTestSetResponseHeader(true, true, "POST", false, false, false, true);
-    runTestSetResponseHeader(false, true, "POST", false, false, false, true);
+    runTestSetResponseHeader(true, true, "POST", false, false, true);
+    runTestSetResponseHeader(false, true, "POST", false, false, true);
 
     // POST request with CSP disabled -> do not expect CSP headers, do not expect other headers
-    runTestSetResponseHeader(true, false, "POST", false, false, false, true);
-    runTestSetResponseHeader(false, false, "POST", false, false, false, true);
+    runTestSetResponseHeader(true, false, "POST", false, false, true);
+    runTestSetResponseHeader(false, false, "POST", false, false, true);
   }
 
-  protected void runTestSetResponseHeader(boolean mshtml, boolean cspEnabled, String method, boolean expectCspHeader, boolean expectFrameOptions, boolean expectXssProtection, boolean expectNoSniff) {
+  protected void runTestSetResponseHeader(boolean mshtml, boolean cspEnabled, String method, boolean expectCspHeader, boolean expectFrameOptions, boolean expectNoSniff) {
     CspEnabledProperty cspProperty = Mockito.mock(CspEnabledProperty.class);
     Mockito.when(cspProperty.getValue(ArgumentMatchers.any())).thenReturn(cspEnabled);
     IBean<?> bean = BeanTestingHelper.get().registerBean(new BeanMetaData(CspEnabledProperty.class, cspProperty));
@@ -77,8 +77,6 @@ public class HttpServletControlTest {
 
       Mockito.verify(resp, expectFrameOptions ? calledOnce : calledNever)
           .setHeader(HttpServletControl.HTTP_HEADER_X_FRAME_OPTIONS, HttpServletControl.SAMEORIGIN);
-      Mockito.verify(resp, expectXssProtection ? calledOnce : calledNever)
-          .setHeader(HttpServletControl.HTTP_HEADER_X_XSS_PROTECTION, HttpServletControl.XSS_MODE_BLOCK);
       Mockito.verify(resp, expectNoSniff ? calledOnce : calledNever)
           .setHeader(HttpServletControl.HTTP_HEADER_X_CONTENT_TYPE_OPTIONS, HttpServletControl.CONTENT_TYPE_OPTION_NO_SNIFF);
 
