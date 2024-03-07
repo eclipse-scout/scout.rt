@@ -41,9 +41,6 @@ public class HttpServletControl implements Serializable {
   public static final String HTTP_HEADER_X_FRAME_OPTIONS = "X-Frame-Options";
   public static final String SAMEORIGIN = "SAMEORIGIN";
 
-  public static final String HTTP_HEADER_X_XSS_PROTECTION = "X-XSS-Protection";
-  public static final String XSS_MODE_BLOCK = "1; mode=block";
-
   public static final String HTTP_HEADER_CSP = "Content-Security-Policy";
 
   /** Legacy header for content security policy used by Internet Explorer */
@@ -104,7 +101,6 @@ public class HttpServletControl implements Serializable {
       return;
     }
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
-    resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
 
     if (isCspEnabled(req)) {
       if (HttpClientInfo.get(req).isMshtml()) {
