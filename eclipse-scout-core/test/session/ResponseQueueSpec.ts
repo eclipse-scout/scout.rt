@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -65,11 +65,14 @@ describe('ResponseQueue', () => {
       rq.add({'#': 1, 'id': '1'});
       rq.add({'#': 2, 'id': '2'});
       rq.add({'#': 4, 'id': '4'});
+      expect(rq.queue.length).toBe(3);
       rq.add({'#': 8, 'combined': true, 'id': '8'});
-      rq.add({'#': 3, 'id': '3'});
-      rq.add({'#': 6, 'combined': true, 'id': '6'});
+      expect(rq.queue.length).toBe(1);
+      rq.add({'#': 3, 'id': '3'}); // should be ignored
+      expect(rq.queue.length).toBe(1);
+      rq.add({'#': 6, 'combined': true, 'id': '6'}); // should be ignored
+      expect(rq.queue.length).toBe(1);
       rq.add({'#': 9, 'id': '9'});
-
       expect(rq.queue.length).toBe(2);
       expect(rq.queue[0].id).toBe('8');
       expect(rq.queue[1].id).toBe('9');
@@ -77,8 +80,12 @@ describe('ResponseQueue', () => {
       // assume "processed" until combined message
       expect(rq.nextExpectedSequenceNo).toBe(8);
       expect(rq.lastProcessedSequenceNo).toBe(7);
-    });
 
+      // Combined messages can have the same sequence number as another message
+      rq.add({'#': 9, 'combined': true, 'id': '9c'});
+      expect(rq.queue.length).toBe(1);
+      expect(rq.queue[0].id).toBe('9c');
+    });
   });
 
   describe('process', () => {

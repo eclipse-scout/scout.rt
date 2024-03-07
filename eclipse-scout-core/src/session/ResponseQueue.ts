@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {RemoteRequest, RemoteResponse, Session} from '../index';
+import {objects, RemoteRequest, RemoteResponse, Session} from '../index';
 
 export class ResponseQueue {
   session: Session;
@@ -32,6 +32,11 @@ export class ResponseQueue {
   static FORCE_TIMEOUT = 10 * 1000;
 
   add(response?: RemoteResponse) {
+    // Ignore completely empty messages
+    if (objects.isEmpty(response)) {
+      return;
+    }
+
     let sequenceNo = response && response['#'];
 
     // Ignore responses that were already processed (duplicate detection)
@@ -39,10 +44,11 @@ export class ResponseQueue {
       return;
     }
 
-    // "Fast-forward" the expected sequence no. when a combined response is received
+    // "Fast-forward" the response queue when a combined response is received
     if (sequenceNo && response.combined) {
       this.lastProcessedSequenceNo = Math.max(sequenceNo - 1, this.lastProcessedSequenceNo);
       this.nextExpectedSequenceNo = Math.max(sequenceNo, this.nextExpectedSequenceNo);
+      this.queue = this.queue.filter(el => !el['#'] || el['#'] > sequenceNo); // remove obsolete messages
     }
 
     if (!sequenceNo || this.queue.length === 0) { // Handle messages without sequenceNo in the order they were received
@@ -58,10 +64,6 @@ export class ResponseQueue {
             // insert at position
             newQueue.push(response);
             responseToInsert = null;
-          }
-          if (el['#'] <= this.lastProcessedSequenceNo) {
-            // skip obsolete elements (may happen when a combined response is added to the queue)
-            continue;
           }
         }
         newQueue.push(el);
