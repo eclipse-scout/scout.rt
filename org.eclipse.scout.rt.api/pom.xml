@@ -31,6 +31,10 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.uinotification</artifactId>
     </dependency>
     <dependency>
