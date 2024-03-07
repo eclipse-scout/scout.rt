@@ -20,12 +20,12 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
-import org.eclipse.scout.rt.api.data.security.IToPermissionCollectionDoFunction;
 import org.eclipse.scout.rt.dataobject.mapping.ToDoFunctionHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.security.IPermissionCollection;
+import org.eclipse.scout.rt.security.mapping.IToPermissionCollectionDoFunction;
 
 @Path("permissions")
 public class PermissionResource implements IRestResource {

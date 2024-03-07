@@ -15,9 +15,6 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.security.IPermission;
-import org.eclipse.scout.rt.security.PermissionLevel;
 
 /**
  * This data object represents a Scout JS object model and supports subclassing.<br>
@@ -25,8 +22,6 @@ import org.eclipse.scout.rt.security.PermissionLevel;
  */
 @TypeName("scout.Permission")
 public class PermissionDo extends DoEntity {
-
-  protected static final String PERMISSION_OBJECT_TYPE = "Permission";
 
   /**
    * String used to identify the Scout JS object created by this object model.
@@ -41,20 +36,6 @@ public class PermissionDo extends DoEntity {
 
   public DoValue<Integer> level() {
     return doValue("level");
-  }
-
-  /* **************************************************************************
-   * CUSTOM CONVENIENCE TO DO FUNCTION
-   * *************************************************************************/
-
-  public static class ToPermissionDoFunction extends AbstractToPermissionDoFunction<IPermission, PermissionDo> {
-    @Override
-    public void apply(IPermission permission, PermissionDo permissionDo) {
-      permissionDo
-          .withObjectType(PERMISSION_OBJECT_TYPE)
-          .withName(permission.getName())
-          .withLevel(ObjectUtility.nvl(permission.getLevel(), PermissionLevel.UNDEFINED).getValue());
-    }
   }
 
   /* **************************************************************************
