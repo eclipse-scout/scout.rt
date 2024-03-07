@@ -443,7 +443,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       this._copyAdapterData(data.adapterData);
     }
 
-    this._setLocaleAndTexts(Locale.ensure(data.startupData.locale));
+    this._setLocaleAndTexts(Locale.ensure(data.startupData.locale), data.startupData.textMap);
 
     // Create the desktop
     // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
