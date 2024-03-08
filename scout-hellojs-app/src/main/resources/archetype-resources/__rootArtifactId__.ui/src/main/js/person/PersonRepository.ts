@@ -1,13 +1,14 @@
-import {App, Person, PersonRestriction, Repository} from '../index';
-import {scout} from '@eclipse-scout/core';
+import {Person, PersonRestriction, Repository} from '../index';
+import {scout, systems} from '@eclipse-scout/core';
 
 let repository: PersonRepository;
+
 export class PersonRepository extends Repository {
   constructor() {
     super();
 
     this.entityType = Person.ENTITY_TYPE;
-    this.targetUrl = `${App.get().apiUrl}persons/`;
+    this.targetUrl = systems.getOrCreate().getEndpointUrl('persons', 'persons')
   }
 
   /**

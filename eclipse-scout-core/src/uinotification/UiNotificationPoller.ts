@@ -55,7 +55,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     super._init(model);
     let timeoutPropertyKey: keyof MainConfigProperties = 'scout.uinotification.waitTimeout';
     let system = this.system.name as keyof ConfigProperties;
-    let backendTimeout = scout.nvl(config.get(timeoutPropertyKey, system), config.get(timeoutPropertyKey), UiNotificationPoller.DEFAULT_BACKEND_TIMEOUT);
+    let backendTimeout = scout.nvl(config.get(timeoutPropertyKey, system)?.value, config.get(timeoutPropertyKey)?.value, UiNotificationPoller.DEFAULT_BACKEND_TIMEOUT);
     this.requestTimeout = backendTimeout + UiNotificationPoller.BACKEND_TIMEOUT_OFFSET;
   }
 
@@ -122,6 +122,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
   }
 
   protected _poll() {
+    this._call?.abort(); // abort in case there is already a call running
     this._call = ajax.createCallJson({
       url: this.url,
       timeout: this.requestTimeout,

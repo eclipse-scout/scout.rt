@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,10 +19,11 @@ export abstract class Call implements CallModel, ObjectWithType {
   declare model: CallModel;
 
   objectType: string;
-  retryIntervals: number[];
   minCallDuration: number;
   callCounter: number;
+  retryIntervals: number[];
   maxRetries: number;
+  defaultRetryInterval: number;
   deferred: JQuery.Deferred<any>;
   aborted: boolean;
   initialized: boolean;
@@ -40,6 +41,7 @@ export abstract class Call implements CallModel, ObjectWithType {
     this.retryIntervals = [];
     this.maxRetries = null; // automatically set to the length of retryInternals in init(), unless specified explicitly
     this.minCallDuration = 500;
+    this.defaultRetryInterval = 300;
     /**
      * Counts how many times this call was actually performed (normally, only 1 try is expected)
      */
@@ -64,13 +66,8 @@ export abstract class Call implements CallModel, ObjectWithType {
   init(model: InitModelOf<this>) {
     $.extend(this, model);
 
-    // Ensure "retryIntervals" is a valid array
-    if (!objects.isNullOrUndefined(this.maxRetries)) {
-      this.retryIntervals = arrays.init(this.maxRetries, 0);
-    } else {
-      // Do not modify the passed value -> create a copy
-      this.retryIntervals = (this.retryIntervals ? this.retryIntervals.slice() : []);
-      // Remember initial number of retries (for logging)
+    this.retryIntervals = (this.retryIntervals ? this.retryIntervals.slice() : []); // Do not modify the passed value -> create a copy
+    if (objects.isNullOrUndefined(this.maxRetries)) {
       this.maxRetries = this.retryIntervals.length;
     }
 
@@ -218,19 +215,24 @@ export abstract class Call implements CallModel, ObjectWithType {
   }
 
   /**
-   * Checks if the call can be retried. If a number is returned, a retry is performed
-   * with a delay of the corresponding amount of milliseconds.
-   *
-   * All other values indicate that no retry must be performed. (It is recommended
-   * to return 'false' or 'null' in this case.)
-   *
-   * >>> This method MAY be overridden by a subclass. <<<
+   * Checks if the call can be retried. If a number is returned, a retry is performed with a delay of the corresponding amount of milliseconds.
+   * All other values indicate that no retry must be performed. (It is recommended to return 'false' or 'null' in this case.)
+   * This method MAY be overridden by a subclass.
    */
   protected _nextRetryImpl(...args: any[]): number | boolean {
-    if (this.retryIntervals.length) {
-      return this.retryIntervals.shift();
+    if (this.maxRetries >= 0 && this.callCounter > this.maxRetries) {
+      return false; // no more retries
     }
-    return false;
+    if (this.retryIntervals.length) {
+      // there are more intervals: consume the next
+      let nextRetryInterval = this.retryIntervals.shift();
+      this.defaultRetryInterval = nextRetryInterval; // keep the last interval for next retries (in case maxRetries > retryIntervals.length)
+      return nextRetryInterval;
+    }
+
+    // there should be more retries, but no intervals are available (anymore).
+    // use the default interval for all subsequent retries.
+    return this.defaultRetryInterval;
   }
 
   // ==================================================================================

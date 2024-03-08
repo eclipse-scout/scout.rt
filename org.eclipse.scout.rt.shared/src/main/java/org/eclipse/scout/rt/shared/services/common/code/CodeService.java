@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,14 +18,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.cache.AbstractCacheWrapper;
 import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
@@ -33,6 +36,8 @@ import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * Common logic for the {@link ICodeService} implementations. Uses {@link ICache} for caching.
@@ -46,6 +51,7 @@ public class CodeService implements ICodeService {
   public static final String CODE_SERVICE_CACHE_ID = CodeService.class.getName();
 
   private volatile ICache<CodeTypeCacheKey, ICodeType<?, ?>> m_cache;
+  private volatile IFastListenerList<Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>>> m_invalidationListeners;
 
   /**
    * Creates and initializes a new cache. Executed in {@link PostConstruct} to ensure that the cache created exactly
@@ -53,6 +59,7 @@ public class CodeService implements ICodeService {
    */
   @PostConstruct
   protected void initCache() {
+    m_invalidationListeners = new FastListenerList<>();
     m_cache = createCacheBuilder().build();
   }
 
@@ -67,8 +74,22 @@ public class CodeService implements ICodeService {
     return cacheBuilder.withCacheId(CODE_SERVICE_CACHE_ID).withValueResolver(createCacheValueResolver())
         .withShared(true)
         .withClusterEnabled(true)
+        .withAdditionalCustomWrapper(InvalidationListenerWrapper.class)
         .withTransactional(true)
         .withTransactionalFastForward(true);
+  }
+
+  protected static class InvalidationListenerWrapper extends AbstractCacheWrapper<CodeTypeCacheKey, ICodeType<?, ?>> {
+
+    public InvalidationListenerWrapper(ICache<CodeTypeCacheKey, ICodeType<?, ?>> delegate) {
+      super(delegate);
+    }
+
+    @Override
+    public void invalidate(ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> filter, boolean propagate) {
+      super.invalidate(filter, propagate);
+      BEANS.get(CodeService.class).getInvalidationListeners().forEach(l -> l.accept(filter));
+    }
   }
 
   protected ICacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>> createCacheValueResolver() {
@@ -96,6 +117,25 @@ public class CodeService implements ICodeService {
    */
   protected <T extends ICodeType<?, ?>> CodeTypeCacheKey createCacheKey(Class<T> type) {
     return BEANS.get(CodeTypeCacheUtility.class).createCacheKey(type);
+  }
+
+  @Override
+  public void addInvalidationListener(Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> listener) {
+    if (listener != null) {
+      m_invalidationListeners.add(listener);
+    }
+  }
+
+  @Override
+  public void removeInvalidationListener(Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> listener) {
+    if (listener != null) {
+      m_invalidationListeners.remove(listener);
+    }
+  }
+
+  @Override
+  public List<Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>>> getInvalidationListeners() {
+    return m_invalidationListeners.list();
   }
 
   @SuppressWarnings("unchecked")

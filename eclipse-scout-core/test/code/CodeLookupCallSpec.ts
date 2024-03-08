@@ -10,11 +10,12 @@
 import {Code, CodeLookupCall, codes, CodeType, scout} from '../../src/index';
 
 describe('CodeLookupCall', () => {
-  let session: SandboxSession, codeType123: CodeType;
+  let session: SandboxSession, codeType123: CodeType, origCodeTypeCache;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
+    origCodeTypeCache = codes.registry;
     codes.registry = new Map();
     codeType123 = scout.create(CodeType, {
       id: 'codeType.123',
@@ -37,6 +38,11 @@ describe('CodeLookupCall', () => {
         }]
       }]
     });
+  });
+
+  afterEach(() => {
+    // cleanup
+    codes.registry = origCodeTypeCache;
   });
 
   function createLookupCall<T>(codeType: CodeType<T>): CodeLookupCall<T> {

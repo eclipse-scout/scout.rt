@@ -71,6 +71,16 @@ export const uiNotifications = {
 
 function getOrInitSystem(system?: string): UiNotificationSystem {
   system = system || System.MAIN_SYSTEM;
+  if (system !== System.MAIN_SYSTEM && !systems.exists(system)) {
+    // The custom system is not known (yet). Therefore, no custom baseUrl is present. The system will use the default endpoint url.
+    // To prevent having multiple notification systems (and therefore pollers) for the same endpoint url, the system is reset to main if unknown.
+    //
+    // This ignores the case when the main system is registered to a non-default baseUrl. E.g. main system has '/api-main' and other system has '/api'.
+    // Then subscribing to other system would not be possible before actually registering it even if the url would not require a registration (because it is default).
+    // But as this case is rather uncommon and the '/api' url should be considered to be the main system instead, this case is ignored as there is an easy workaround:
+    // register the other system first with default base url.
+    system = System.MAIN_SYSTEM;
+  }
   let systemObj = uiNotifications.systems.get(system);
   if (!systemObj) {
     systemObj = new UiNotificationSystem(system);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,16 +7,19 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, codes, CodeType} from '../../src/index';
+import {Code, codes, CodeType, CodeTypeModel} from '../../src/index';
 
 describe('codes', () => {
 
   let CODE_TYPE = '12345';
   let CODE = 12346;
+  let origCodeTypeCache;
 
   // Some dummy data used to make the tests below work
   beforeEach(() => {
-    codes.init([{
+    origCodeTypeCache = codes.registry;
+    codes.registry = new Map();
+    codes.add([{
       id: '12345',
       objectType: CodeType,
       codes: [
@@ -33,11 +36,9 @@ describe('codes', () => {
     ]);
   });
 
-  it('can init without data', () => {
-    let emptyRegistry = new Map();
-    codes.registry = emptyRegistry;
-    codes.init();
-    expect(codes.registry).toBe(emptyRegistry);
+  afterEach(() => {
+    // cleanup
+    codes.registry = origCodeTypeCache;
   });
 
   it('finds a code type by ID', () => {
@@ -63,7 +64,7 @@ describe('codes', () => {
   describe('add', () => {
     it('adds a code type or an array of code types and removes it afterwards', () => {
       let origSize = codes.registry.size;
-      let codeType = {
+      let codeType: CodeTypeModel = {
         id: 'codeType.123',
         codes: [{
           id: 'code.123',

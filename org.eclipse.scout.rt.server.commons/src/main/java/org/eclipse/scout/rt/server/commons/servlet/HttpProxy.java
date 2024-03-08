@@ -14,6 +14,8 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -66,6 +68,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -654,7 +657,7 @@ public class HttpProxy {
         try {
           boolean alreadyCommitted = resp.isCommitted();
           if (!alreadyCommitted) {
-            resp.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            resp.setStatus(computeStatusCodeForFailure(ex));
           }
         }
         catch (AlreadyInvalidatedException e) {
@@ -669,5 +672,23 @@ public class HttpProxy {
         asyncContext.complete();
       }
     };
+  }
+
+  protected int computeStatusCodeForFailure(Exception e) {
+    // see org.apache.hc.client5.http.ConnectExceptionSupport for details which exceptions might throw
+    if (e instanceof ConnectException) {
+      // is thrown if the target system is unavailable (cannot be connected)
+      // includes e.g. org.apache.hc.client5.http.HttpHostConnectException
+      return HttpStatus.SC_SERVICE_UNAVAILABLE;
+    }
+    if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(e)) {
+      // on connection reset (e.g. if connection was successful but has been aborted).
+      return HttpStatus.SC_SERVICE_UNAVAILABLE;
+    }
+    if (e instanceof SocketTimeoutException) {
+      // includes e.g. org.apache.hc.client5.http.ConnectTimeoutException
+      return HttpStatus.SC_GATEWAY_TIMEOUT;
+    }
+    return HttpStatus.SC_INTERNAL_SERVER_ERROR;
   }
 }

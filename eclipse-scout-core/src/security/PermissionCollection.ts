@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, Permission, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout} from '../index';
+import {DoEntity, FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, Permission, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout} from '../index';
 
 export class PermissionCollection extends PropertyEventEmitter implements PermissionCollectionModel {
   declare self: PermissionCollection;
@@ -210,7 +210,7 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
   }
 }
 
-export interface PermissionCollectionModel extends ObjectModel<PermissionCollection> {
+export interface PermissionCollectionModel extends ObjectModel<PermissionCollection>, DoEntity {
   /**
    * {@link Permission}s grouped by `id`.
    */

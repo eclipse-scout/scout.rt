@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import java.util.WeakHashMap;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
 
 /**
- * High performance event listener list with support for frequent add/remove and weak listners.
+ * High performance event listener list with support for frequent add/remove and weak listeners.
  * <p>
  * The high performance is reached by setting removed and garbage collected weak listeners to null instead on completely
  * removing them. The rebuild of the internal listener list is done lazy when there are enough accumulated null values.
@@ -32,6 +32,11 @@ import org.eclipse.scout.rt.platform.util.WeakEventListener;
 public class UnsafeFastListenerList<LISTENER> implements IFastListenerList<LISTENER> {
   private final List<Object> m_refs = new ArrayList<>();
   private final Map<LISTENER, Integer> m_indexes = new WeakHashMap<>();
+
+  @Override
+  public int size() {
+    return m_indexes.size();
+  }
 
   @Override
   public boolean isEmpty() {
@@ -90,7 +95,7 @@ public class UnsafeFastListenerList<LISTENER> implements IFastListenerList<LISTE
   }
 
   /**
-   * Iterates all listeners in the order to be called listeners. Null values are skipped automatically.
+   * Iterates all listeners in the order to be called. Null values are skipped automatically.
    */
   @Override
   public List<LISTENER> list() {

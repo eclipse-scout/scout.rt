@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CodeModel, codes, CodeType, FullModelOf, InitModelOf, Locale, ModelOf, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
+import {CodeModel, CodeType, FullModelOf, InitModelOf, Locale, ModelOf, ObjectWithType, scout, texts, TreeVisitor, TreeVisitResult} from '../index';
 
 export class Code<TCodeId> implements ObjectWithType {
   declare model: CodeModel<TCodeId>;
@@ -69,7 +69,7 @@ export class Code<TCodeId> implements ObjectWithType {
       }
       let codeTypeId = scout.nvl(this.codeType?.id, '');
       let key = '__code.' + codeTypeId + '.' + this.id;
-      codes.registerTexts(key, model.texts);
+      texts.registerTexts(key, model.texts);
       this._text = texts.buildKey(key);
     }
 

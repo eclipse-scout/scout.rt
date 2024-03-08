@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,12 +40,14 @@ export interface RegisterNamespaceOptions {
 export class ObjectFactory {
   /** use {@link createUniqueId} to generate a new ID */
   uniqueIdSeqNo: number;
+  initialized: boolean;
 
   protected _registry: Map<ObjectType, ObjectCreator>;
   protected _objectTypeMap: Map<new() => object, string>;
 
   constructor() {
     this.uniqueIdSeqNo = 0;
+    this.initialized = false;
     this._registry = new Map();
     this._objectTypeMap = new Map();
   }
@@ -248,6 +250,7 @@ export class ObjectFactory {
     for (let [objectType, factory] of scout.objectFactories) {
       this.register(objectType, factory);
     }
+    this.initialized = true;
   }
 
   /**
@@ -277,6 +280,10 @@ export class ObjectFactory {
     for (let [name, object] of Object.entries(objects)) {
       if (name === 'default') {
         // Do not register module itself, only imported files
+        continue;
+      }
+      if (!object) {
+        // ignore elements which have no value (e.g. exported variables which are null)
         continue;
       }
       if (window[namespace][name] && !options.allowedReplacements.includes(name)) {

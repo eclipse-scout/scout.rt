@@ -24,6 +24,18 @@ describe('AccessControl', () => {
 
   class SpecAccessControl extends AccessControl {
     declare _permissionCollection: PermissionCollection;
+
+    override _sync() {
+      super._sync();
+    }
+
+    protected override _subscribeForNotifications() {
+      // nop
+    }
+
+    protected override _unsubscribeFromNotifications() {
+      // nop
+    }
   }
 
   describe('_sync', () => {
@@ -63,7 +75,7 @@ describe('AccessControl', () => {
     });
 
     it('keeps last collection if request fails', () => {
-      const accessControl = scout.create(SpecAccessControl, {permissionsUrl: 'permissions', interval: 1000});
+      const accessControl = scout.create(SpecAccessControl, {permissionsUrl: 'permissions'});
       expect(accessControl._permissionCollection).toBeNull();
 
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
@@ -94,6 +106,7 @@ describe('AccessControl', () => {
       accessControl.check(Permission.quick('other')).then(result => expect(result).toBeTrue());
       accessControl.check(Permission.quick('test')).then(result => expect(result).toBeFalse());
 
+      accessControl._sync();
       jasmine.clock().tick(1000);
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1), {
         status: 500
@@ -111,6 +124,7 @@ describe('AccessControl', () => {
       accessControl.check(Permission.quick('other')).then(result => expect(result).toBeTrue());
       accessControl.check(Permission.quick('test')).then(result => expect(result).toBeFalse());
 
+      accessControl._sync();
       jasmine.clock().tick(1000);
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(2), {
         status: 200,

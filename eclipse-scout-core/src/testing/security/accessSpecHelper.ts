@@ -59,6 +59,14 @@ class StaticAccessControl extends AccessControl {
     // nop
   }
 
+  protected override _subscribeForNotifications() {
+    // nop
+  }
+
+  protected override _unsubscribeFromNotifications() {
+    // nop
+  }
+
   override whenSync(): JQuery.Promise<void> {
     return $.resolvedPromise();
   }
