@@ -240,16 +240,24 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
         }
       }
     }
+    let maxSpan = 1;
     for (let i = 0; i < compCount; i++) {
       let cons = this.gridDatas[i];
       if (cons.gridw > 1) {
+        maxSpan = Math.max(cons.gridw, maxSpan);
         let hSpan = cons.gridw;
         let spanWidth = 0;
+        let spanMinWidth = 0;
+        let spanMaxWidth = 0;
         let distWidth;
+        let distMinWidth;
+        let distMaxWidth;
         // pref
         for (let j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
           if (!fixedWidths[j]) {
             spanWidth += prefWidths[j];
+            spanMinWidth += minWidths[j];
+            spanMaxWidth += maxWidths[j];
           }
         }
         let hGaps = (hSpan - 1) * this.hgap;
@@ -260,20 +268,16 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
         } else {
           distWidth = this.logicalWidthInPixel(cons) - spanWidth - hGaps;
         }
+        distMinWidth = cons.minWidth - spanMinWidth - hGaps;
+        distMaxWidth = cons.maxWidth - spanMaxWidth - hGaps;
         if (distWidth > 0) {
           let equalWidth = Math.floor((distWidth + spanWidth) / hSpan);
           let remainder = (distWidth + spanWidth) % hSpan;
-          let equalMinWidth = Math.floor((cons.minWidth - hGaps) / hSpan);
-          let remainderMinWidth = (cons.minWidth - hGaps) % hSpan;
-          let equalMaxWidth = Math.floor((cons.maxWidth - hGaps) / hSpan);
-          let remainderMaxWidth = (cons.maxWidth - hGaps) % hSpan;
           let last = -1;
           for (let j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
             last = j;
             if (!fixedWidths[j]) {
               prefWidths[j] = Math.max(equalWidth, prefWidths[j]);
-              minWidths[j] = Math.max(equalMinWidth, minWidths[j]);
-              maxWidths[j] = Math.min(equalMaxWidth, maxWidths[j]);
             }
             if (cons.weightx === 0) {
               fixedWidths[j] = true;
@@ -281,8 +285,27 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
           }
           if (last > -1) {
             prefWidths[last] += remainder;
+          }
+        }
+        if (distMinWidth > 0) {
+          let equalMinWidth = Math.floor((distMinWidth + spanMinWidth) / hSpan);
+          let remainderMinWidth = (distMinWidth + spanMinWidth) % hSpan;
+          let last = -1;
+          for (let j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
+            last = j;
+            if (!fixedWidths[j]) {
+              minWidths[j] = Math.max(equalMinWidth, minWidths[j]);
+            }
+          }
+          if (last > -1) {
             minWidths[last] += remainderMinWidth;
-            maxWidths[last] += remainderMaxWidth;
+          }
+          // The min widths have been distributed to hSpan columns.
+          // If a grid cell on a previous row spans more columns,
+          // the minWidth needs to be removed for the additional columns to not exceed the total minWidth specified by cons.minWidth
+          while (last < maxSpan - 1) {
+            last++;
+            minWidths[last] = 0;
           }
         }
       }
@@ -292,9 +315,11 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
     for (let i = 0; i < this.cols; i++) {
       this.width[i] = [];
       if (fixedWidths[i]) {
-        this.width[i][lc.MIN] = prefWidths[i];
+        let minWidth = Math.max(prefWidths[i], minWidths[i]);
+        let maxWidth = Math.min(Math.max(prefWidths[i], minWidth), maxWidths[i]);
+        this.width[i][lc.MIN] = minWidth;
         this.width[i][lc.PREF] = prefWidths[i];
-        this.width[i][lc.MAX] = prefWidths[i];
+        this.width[i][lc.MAX] = maxWidth;
       } else {
         this.width[i][lc.MIN] = minWidths[i];
         this.width[i][lc.PREF] = prefWidths[i];
@@ -464,6 +489,10 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
       for (c = 0; c < this.cols; c++) {
         this.cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
         x += w[c];
+        if (w[c + 1] === 0) {
+          // Do not add gap if column width is reduced to 0 to allow a cell to be reach its minWidth
+          continue;
+        }
         x += this.hgap;
       }
       y += h[r];
