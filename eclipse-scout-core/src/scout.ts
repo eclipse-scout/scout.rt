@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AdapterData, App, Device, Locale, locales, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, Session, strings, ValueField, Widget, widgets} from './index';
+import {AdapterData, App, Device, GroupBox, Locale, locales, LogicalGridLayout, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, Session, strings, ValueField, Widget, widgets} from './index';
 import $ from 'jquery';
 
 let $activeElements = null;
@@ -463,5 +463,25 @@ export const scout = {
       clone.cloneOf = template;
     }
     return clone;
+  },
+
+  /**
+   * Enables or disables the layout spy that visualizes the cell bounds of the logical grid for debugging purposes.
+   * The spy can be enabled on elements that belong to a widget using a {@link LogicalGridLayout}, e.g. {@link GroupBox}, {@link TileGrid}, etc.
+   */
+  setLogicalGridSpyEnabled(elem: HTMLElement, enabled: boolean) {
+    let layout;
+    let widget = scout.widget(elem);
+    if (widget instanceof GroupBox) {
+      layout = widget.htmlBody.layout;
+      widget.htmlBody.invalidateLayoutTree(false);
+    } else {
+      layout = widget.htmlComp.layout;
+      widget.htmlComp.invalidateLayoutTree(false);
+    }
+    if (!(layout instanceof LogicalGridLayout)) {
+      throw new Error('Layout needs to be a LogicalGridLayout');
+    }
+    layout.setSpyEnabled(enabled);
   }
 };

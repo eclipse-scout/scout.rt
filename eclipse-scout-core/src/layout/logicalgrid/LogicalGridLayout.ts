@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutInfo, ObjectOrModel, Rectangle, Widget} from '../../index';
+import {
+  AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutInfo, LogicalGridLayoutSpy, ObjectOrModel, Rectangle, Widget
+} from '../../index';
 import $ from 'jquery';
 
 /**
@@ -32,6 +34,8 @@ export class LogicalGridLayout extends AbstractLayout {
   columnWidth: number;
   rowHeight: number;
   minWidth: number;
+  spyEnabled: boolean;
+  protected _spy: LogicalGridLayoutSpy;
 
   constructor(widget: Widget, layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     super();
@@ -40,6 +44,7 @@ export class LogicalGridLayout extends AbstractLayout {
     this.valid = false;
     this.widget = widget;
     this.info = null;
+    this.spyEnabled = false;
 
     this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {});
     this.layoutConfig.applyToLayout(this);
@@ -55,9 +60,9 @@ export class LogicalGridLayout extends AbstractLayout {
       this.widget.validateLogicalGrid();
       // It is important that the logical grid and the layout use the same widgets. Otherwise, there may be widgets without a gridData which is required by the layout.
       // This can happen if the widgets are inserted and removed by an animation before the layout has been done. If the widget is removed using an animation it is not in the list of getGridWidgets() anymore but may still be in the DOM.
-      this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(function(widget) {
+      this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(widget => {
         if (!widget.rendered) {
-          // getGridWidgets may return non rendered widgets, but grid should be calculated nevertheless
+          // getGridWidgets may return non-rendered widgets, but grid should be calculated nevertheless
           return;
         }
         if (!widget.htmlComp) {
@@ -65,7 +70,7 @@ export class LogicalGridLayout extends AbstractLayout {
           return;
         }
         validateGridData.call(this, widget.htmlComp);
-      }, this);
+      });
     } else {
       $container.children().each((idx, elem) => {
         let $comp = $(elem);
@@ -127,6 +132,7 @@ export class LogicalGridLayout extends AbstractLayout {
     }
     $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
     let cellBounds = this._layoutCellBounds(containerSize, containerInsets);
+    this._spy?.drawCellBounds($container, cellBounds);
 
     // Set bounds of components
     let r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
@@ -217,5 +223,21 @@ export class LogicalGridLayout extends AbstractLayout {
     dim.width += insets.horizontal();
     dim.height += insets.vertical();
     return dim;
+  }
+
+  /**
+   * Enables or disables the layout spy that visualizes the cell bounds of the logical grid for debugging purposes.
+   */
+  setSpyEnabled(spyEnabled: boolean) {
+    if (this.spyEnabled === spyEnabled) {
+      return;
+    }
+    this.spyEnabled = spyEnabled;
+    if (!this.spyEnabled) {
+      this._spy?.dispose();
+      this._spy = null;
+    } else {
+      this._spy = new LogicalGridLayoutSpy();
+    }
   }
 }

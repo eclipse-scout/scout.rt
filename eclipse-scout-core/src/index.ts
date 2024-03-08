@@ -185,6 +185,7 @@ export * from './layout/logicalgrid/LogicalGrid';
 export * from './layout/logicalgrid/LogicalGridConfig';
 export * from './layout/logicalgrid/LogicalGridData';
 export * from './layout/logicalgrid/LogicalGridLayout';
+export * from './layout/logicalgrid/LogicalGridLayoutSpy';
 export * from './layout/logicalgrid/LogicalGridLayoutConfig';
 export * from './layout/logicalgrid/LogicalGridLayoutInfo';
 export * from './layout/logicalgrid/LogicalGridLayoutInfoModel';
