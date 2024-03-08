@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutConfigModel, LogicalGridLayoutInfo, ObjectOrModel, Rectangle, Widget
+  AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutConfigModel, LogicalGridLayoutInfo, LogicalGridLayoutSpy, ObjectOrModel,
+  Rectangle, Widget
 } from '../../index';
 import $ from 'jquery';
 
@@ -34,6 +35,8 @@ export class LogicalGridLayout extends AbstractLayout {
   columnWidth: number;
   rowHeight: number;
   minWidth: number;
+  spy: LogicalGridLayoutSpy;
+  spyEnabled: boolean;
 
   constructor(widget: Widget, layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     super();
@@ -42,6 +45,7 @@ export class LogicalGridLayout extends AbstractLayout {
     this.valid = false;
     this.widget = widget;
     this.info = null;
+    this.spyEnabled = false;
 
     this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {} as LogicalGridLayoutConfigModel);
     this.layoutConfig.applyToLayout(this);
@@ -57,9 +61,9 @@ export class LogicalGridLayout extends AbstractLayout {
       this.widget.validateLogicalGrid();
       // It is important that the logical grid and the layout use the same widgets. Otherwise, there may be widgets without a gridData which is required by the layout.
       // This can happen if the widgets are inserted and removed by an animation before the layout has been done. If the widget is removed using an animation it is not in the list of getGridWidgets() anymore but may still be in the DOM.
-      this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(function(widget) {
+      this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(widget => {
         if (!widget.rendered) {
-          // getGridWidgets may return non rendered widgets, but grid should be calculated nevertheless
+          // getGridWidgets may return non-rendered widgets, but grid should be calculated nevertheless
           return;
         }
         if (!widget.htmlComp) {
@@ -67,7 +71,7 @@ export class LogicalGridLayout extends AbstractLayout {
           return;
         }
         validateGridData.call(this, widget.htmlComp);
-      }, this);
+      });
     } else {
       $container.children().each((idx, elem) => {
         let $comp = $(elem);
@@ -129,6 +133,7 @@ export class LogicalGridLayout extends AbstractLayout {
     }
     $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
     let cellBounds = this._layoutCellBounds(containerSize, containerInsets);
+    this.spy?.drawCellBounds($container, cellBounds);
 
     // Set bounds of components
     let r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
@@ -219,5 +224,15 @@ export class LogicalGridLayout extends AbstractLayout {
     dim.width += insets.horizontal();
     dim.height += insets.vertical();
     return dim;
+  }
+
+  setSpyEnabled(spyEnabled: boolean) {
+    this.spyEnabled = spyEnabled;
+    if (!this.spyEnabled) {
+      this.spy?.dispose();
+      this.spy = null;
+    } else {
+      this.spy = new LogicalGridLayoutSpy();
+    }
   }
 }
