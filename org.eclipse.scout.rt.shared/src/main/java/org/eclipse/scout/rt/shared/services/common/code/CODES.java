@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,8 +28,9 @@ public final class CODES {
 
   /**
    * @param id
+   *          The CodeType id (see {@link ICodeType#getId()}).
    * @return Note that this method does not load code types, but only searches code types already loaded into the code
-   *         service using {@link #getAllCodeTypes(String)}, {@link #getCodeType(Class)} etc.
+   *         service using {@link #getAllCodeTypes(String)}, {@link #getCodeTypes(Class[])} etc.
    */
   public static <T> ICodeType<T, ?> findCodeTypeById(T id) {
     return BEANS.get(ICodeService.class).findCodeTypeById(id);

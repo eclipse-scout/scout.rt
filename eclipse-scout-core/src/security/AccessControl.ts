@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,8 @@
  */
 
 import {
-  ajax, AjaxError, ErrorHandler, Event, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout,
-  SomeRequired
+  ajax, AjaxCall, AjaxError, DoEntity, ErrorHandler, Event, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PropertyEventEmitter,
+  PropertyEventMap, scout, SomeRequired, UiNotificationEvent, uiNotifications
 } from '../index';
 import $ from 'jquery';
 
@@ -21,56 +21,71 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
   declare eventMap: AccessControlEventMap;
 
   permissionsUrl: string;
-  interval: number;
 
   protected _permissionCollection: PermissionCollection;
-  protected _retryIntervals: number[];
-  protected _syncTimeoutId: number;
+  protected _permissionUpdateEventHandler: EventHandler<UiNotificationEvent>;
+  protected _reloadTimeoutId;
+  protected _call: AjaxCall;
 
   constructor() {
     super();
     this.permissionsUrl = null;
-    this.interval = 1800000; // 30 * 60 * 1000 (30 minutes)
-
+    this._call = null;
+    this._reloadTimeoutId = -1;
     this._permissionCollection = null;
-    this._retryIntervals = [];
-    this._syncTimeoutId = null;
+    this._permissionUpdateEventHandler = this._onPermissionUpdateNotify.bind(this);
   }
 
   override init(model: InitModelOf<this>) {
     this.permissionsUrl = scout.assertParameter('permissionsUrl', model.permissionsUrl);
-    this._setInterval(scout.nvl(model.interval, this.interval));
-
     this.startSync();
   }
 
-  setInterval(interval: number) {
-    this.setProperty('interval', interval);
-  }
-
-  protected _setInterval(interval: number) {
-    const retryIntervals = [];
-    if (interval) {
-      let retryInterval = 1000;
-      while (retryInterval < interval) {
-        retryIntervals.push(retryInterval);
-        retryInterval = retryInterval * 2;
-      }
-    }
-    this._retryIntervals = retryIntervals;
-    this._setProperty('interval', interval);
-  }
-
   startSync() {
+    this._subscribeForNotifications();
     this._sync();
   }
 
   stopSync() {
-    clearTimeout(this._syncTimeoutId);
+    this._unsubscribeFromNotifications();
+  }
+
+  protected _subscribeForNotifications() {
+    uiNotifications.subscribe('permissionsUpdate', this._permissionUpdateEventHandler);
+  }
+
+  protected _unsubscribeFromNotifications() {
+    uiNotifications.unsubscribe('permissionsUpdate', this._permissionUpdateEventHandler);
+  }
+
+  protected _onPermissionUpdateNotify(event: UiNotificationEvent) {
+    let message = event.message as PermissionUpdateMessageDo;
+    let reloadDelayWindow = scout.nvl(message.reloadDelayWindow, 0);
+    let reloadDelay = this._computeReloadDelay(reloadDelayWindow);
+    $.log.info(`About to refresh permission cache with a delay of ${reloadDelay}ms.`);
+    if (this._reloadTimeoutId > 0) {
+      // cancel current update and schedule a new one to ensure the newest changes from the backend are fetched in case the fetch has already started.
+      clearTimeout(this._reloadTimeoutId);
+    }
+    this._reloadTimeoutId = setTimeout(() => {
+      this._reloadTimeoutId = -1;
+      this._sync();
+    }, reloadDelay);
+  }
+
+  protected _computeReloadDelay(reloadDelayWindow: number): number {
+    if (reloadDelayWindow < 3) {
+      // no delay if the window is very small (not necessary)
+      return 0;
+    }
+    return Math.ceil(Math.random() * 1000 * reloadDelayWindow); // randomly delay the reload (milliseconds)
   }
 
   protected _sync() {
     this._loadPermissionCollection()
+      .always(() => {
+        this._call = null; // call ended. Not necessary anymore
+      })
       .catch((error: AjaxError) => {
         // handle error and return null
         scout.create(ErrorHandler, {displayError: false}).handle(error);
@@ -83,8 +98,6 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
         model = model || this._permissionCollection || {type: PermissionCollectionType.NONE};
         // update permission collection
         this._permissionCollection = PermissionCollection.ensure(model);
-        // schedule next sync
-        this._syncTimeoutId = setTimeout(this._sync.bind(this), this.interval);
         if (sync) {
           // notify listeners
           this._onSyncSuccess();
@@ -93,7 +106,16 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
   }
 
   protected _loadPermissionCollection(): JQuery.Promise<PermissionCollectionModel, AjaxError> {
-    return ajax.getJson(this.permissionsUrl, {cache: true}, {retryIntervals: this._retryIntervals});
+    this._call?.abort(); // abort in case there is already a call running
+    this._call = ajax.createCallJson({
+      url: this.permissionsUrl,
+      type: 'GET',
+      cache: true
+    }, {
+      maxRetries: -1, // unlimited retries
+      retryIntervals: [300, 500, 1000, 5000]
+    });
+    return this._call.call();
   }
 
   /**
@@ -162,16 +184,13 @@ export interface AccessControlModel extends ObjectModel<AccessControl> {
    * URL pointing to a json resource that provides information about permissions (see {@link PermissionCollectionModel}).
    */
   permissionsUrl?: string;
-  /**
-   * Interval in which sync is performed (in milliseconds).
-   *
-   * Default is 1800000 (30 minutes).
-   */
-  interval?: number;
 }
 
 export interface AccessControlEventMap extends PropertyEventMap {
   'syncSuccess': Event<AccessControl>;
   'syncError': Event<AccessControl>;
-  'propertyChange:interval': PropertyChangeEvent<number>;
+}
+
+export interface PermissionUpdateMessageDo extends DoEntity {
+  reloadDelayWindow: number;
 }

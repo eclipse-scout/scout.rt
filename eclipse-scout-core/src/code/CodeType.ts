@@ -92,7 +92,7 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
       return;
     }
     let key = '__codeType.' + this.id + '.' + suffix;
-    codes.registerTexts(key, textMap);
+    codes._registerTexts(key, textMap);
     return texts.buildKey(key);
   }
 
@@ -174,7 +174,7 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
   }
 
   static ensure<TCode extends Code<TCodeId>, TCodeId, TCodeTypeId>(codeType: ObjectOrModel<CodeType<TCodeId, TCode, TCodeTypeId>>): CodeType<TCodeId, TCode, TCodeTypeId> {
-    if (!codeType) {
+    if (!codeType?.id) {
       return null;
     }
     if (codeType instanceof CodeType) {
@@ -184,6 +184,6 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
       codeType.objectType = CodeType;
     }
     let codeTypeModel = codeType as FullModelOf<CodeType<TCodeId, TCode, TCodeTypeId>>;
-    return scout.create(codeTypeModel) as CodeType<TCodeId, TCode, TCodeTypeId>;
+    return scout.create(codeTypeModel, {ensureUniqueId: false}) as CodeType<TCodeId, TCode, TCodeTypeId>;
   }
 }

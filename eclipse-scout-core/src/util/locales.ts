@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,11 +15,11 @@ export const locales = {
 
   bootstrap(url: string): JQuery.Promise<void> {
     let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
-    return promise.then(locales._preInit.bind(this, url));
+    return promise.then(locales._handleBootstrapResponse.bind(this, url));
   },
 
   /** @internal */
-  _preInit(url: string, data: any) {
+  _handleBootstrapResponse(url: string, data: any) {
     if (data && data.error) {
       // The result may contain a json error (e.g. session timeout) -> abort processing
       throw {

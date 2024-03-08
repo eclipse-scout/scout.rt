@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.security;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 import javax.security.auth.Subject;
 
@@ -48,4 +51,24 @@ public interface IAccessControlService extends IService {
    * Invalidates any cached {@link IPermissionCollection}s.
    */
   void clearCache();
+
+  /**
+   * Adds a new listener to be notified when access control cache entries are invalidated. The listener is fired after
+   * the entries have already been removed.
+   *
+   * @param listener
+   *     The listener to add. The {@link IAccessControlService} given to the listener is the service in which
+   *     entries have been invalidated.
+   */
+  void addInvalidationListener(Consumer<IAccessControlService> listener);
+
+  /**
+   * Removes the given listener.
+   */
+  void removeInvalidationListener(Consumer<IAccessControlService> listener);
+
+  /**
+   * @return All registered invalidation listeners.
+   */
+  List<Consumer<IAccessControlService>> getInvalidationListeners();
 }
