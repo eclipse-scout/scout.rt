@@ -116,6 +116,7 @@ describe('LogicalGridLayoutInfo', () => {
         expect(rows[1][0]).toEqual(new Rectangle(0, 35, 23, 30));
         expect(rows[1][1]).toEqual(new Rectangle(28, 35, 23, 30));
         expect(rows[1][2]).toEqual(new Rectangle(56, 35, 24, 30));
+        expect(rows[1][3]).toEqual(new Rectangle(80, 35, 0, 30));
 
         // w = 4 on first row, w = 3 on second -> should lead to same result
         gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 3, gridh: 1, weightx: 1, minWidth: 80});
@@ -128,6 +129,67 @@ describe('LogicalGridLayoutInfo', () => {
         expect(rows[1][0]).toEqual(new Rectangle(0, 35, 23, 30));
         expect(rows[1][1]).toEqual(new Rectangle(28, 35, 23, 30));
         expect(rows[1][2]).toEqual(new Rectangle(56, 35, 24, 30));
+        expect(rows[1][3]).toEqual(new Rectangle(80, 35, 0, 30));
+      });
+
+      it('scales cell not smaller than minWidth even if there is a spanned cell on another row', () => {
+        // w = 2 and w = 1 on first row, w = 3 on second
+        let gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 2, gridh: 1, weightx: 1, minWidth: 80});
+        let gd2 = new LogicalGridData({gridx: 2, gridy: 0, gridw: 1, gridh: 1, weightx: 1, minWidth: 80});
+        let gd3 = new LogicalGridData({gridx: 0, gridy: 1, gridw: 3, gridh: 1, weightx: 1, minWidth: 80});
+        let rows = newLogicalGridLayoutInfo([gd1, gd2, gd3]).layoutCellBounds(new Dimension(10, 10), parentInsets);
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 37, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(42, 0, 38, 30));
+        expect(rows[0][2]).toEqual(new Rectangle(85, 0, 80, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 37, 30));
+        expect(rows[1][1]).toEqual(new Rectangle(42, 35, 38, 30));
+        expect(rows[1][2]).toEqual(new Rectangle(85, 35, 80, 30));
+
+        // w = 3 on first row, w = 2 and w = 1 on second -> should lead to same result
+        gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 3, gridh: 1, weightx: 1, minWidth: 80});
+        gd2 = new LogicalGridData({gridx: 0, gridy: 1, gridw: 2, gridh: 1, weightx: 1, minWidth: 80});
+        gd3 = new LogicalGridData({gridx: 2, gridy: 1, gridw: 1, gridh: 1, weightx: 1, minWidth: 80});
+        rows = newLogicalGridLayoutInfo([gd1, gd2, gd3]).layoutCellBounds(new Dimension(10, 10), parentInsets);
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 37, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(42, 0, 38, 30));
+        expect(rows[0][2]).toEqual(new Rectangle(85, 0, 80, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 37, 30));
+        expect(rows[1][1]).toEqual(new Rectangle(42, 35, 38, 30));
+        expect(rows[1][2]).toEqual(new Rectangle(85, 35, 80, 30));
+      });
+
+      it('scales cell not smaller than minWidth with multiple spans on multiple rows', () => {
+        // w = 3 and w = 2 on first row, w = 5 on second
+        let gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 3, gridh: 1, weightx: 1, minWidth: 80});
+        let gd2 = new LogicalGridData({gridx: 3, gridy: 0, gridw: 2, gridh: 1, weightx: 1, minWidth: 80});
+        let gd3 = new LogicalGridData({gridx: 0, gridy: 1, gridw: 5, gridh: 1, weightx: 1, minWidth: 80});
+        let rows = newLogicalGridLayoutInfo([gd1, gd2, gd3]).layoutCellBounds(new Dimension(10, 10), parentInsets);
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 23, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(28, 0, 23, 30));
+        expect(rows[0][2]).toEqual(new Rectangle(56, 0, 24, 30));
+        expect(rows[0][3]).toEqual(new Rectangle(85, 0, 37, 30));
+        expect(rows[0][4]).toEqual(new Rectangle(127, 0, 38, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 23, 30));
+        expect(rows[1][1]).toEqual(new Rectangle(28, 35, 23, 30));
+        expect(rows[1][2]).toEqual(new Rectangle(56, 35, 24, 30));
+        expect(rows[1][3]).toEqual(new Rectangle(85, 35, 37, 30));
+        expect(rows[1][4]).toEqual(new Rectangle(127, 35, 38, 30));
+
+        // w = 5 on first row, w = 3 and w = 2 on second -> should lead to same result
+        gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 5, gridh: 1, weightx: 1, minWidth: 80});
+        gd2 = new LogicalGridData({gridx: 0, gridy: 1, gridw: 3, gridh: 1, weightx: 1, minWidth: 80});
+        gd3 = new LogicalGridData({gridx: 3, gridy: 1, gridw: 2, gridh: 1, weightx: 1, minWidth: 80});
+        rows = newLogicalGridLayoutInfo([gd1, gd2, gd3]).layoutCellBounds(new Dimension(10, 10), parentInsets);
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 23, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(28, 0, 23, 30));
+        expect(rows[0][2]).toEqual(new Rectangle(56, 0, 24, 30));
+        expect(rows[0][3]).toEqual(new Rectangle(85, 0, 37, 30));
+        expect(rows[0][4]).toEqual(new Rectangle(127, 0, 38, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 23, 30));
+        expect(rows[1][1]).toEqual(new Rectangle(28, 35, 23, 30));
+        expect(rows[1][2]).toEqual(new Rectangle(56, 35, 24, 30));
+        expect(rows[1][3]).toEqual(new Rectangle(85, 35, 37, 30));
+        expect(rows[1][4]).toEqual(new Rectangle(127, 35, 38, 30));
       });
     });
 
@@ -164,17 +226,17 @@ describe('LogicalGridLayoutInfo', () => {
         let gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 2, gridh: 1, weightx: 1, maxWidth: 80});
         let gd2 = new LogicalGridData({gridx: 0, gridy: 1, gridw: 1, gridh: 1, weightx: 1, maxWidth: 80});
         let rows = newLogicalGridLayoutInfo([gd1, gd2]).layoutCellBounds(parentSize, parentInsets);
-        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 80, 30));
-        expect(rows[0][1]).toEqual(new Rectangle(80, 0, 0, 30));
-        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 80, 30));
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 37, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(42, 0, 38, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 37, 30));
 
         // w = 1 on first row, w = 2 on second -> should lead to same result
         gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 1, gridh: 1, weightx: 1, maxWidth: 80});
         gd2 = new LogicalGridData({gridx: 0, gridy: 1, gridw: 2, gridh: 1, weightx: 1, maxWidth: 80});
         rows = newLogicalGridLayoutInfo([gd1, gd2]).layoutCellBounds(parentSize, parentInsets);
-        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 80, 30));
-        expect(rows[0][1]).toEqual(new Rectangle(80, 0, 0, 30));
-        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 80, 30));
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 37, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(42, 0, 38, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 37, 30));
       });
 
       it('distributes maxWidth to spanned cells with spans on every row', () => {
@@ -182,25 +244,27 @@ describe('LogicalGridLayoutInfo', () => {
         let gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 4, gridh: 1, weightx: 1, maxWidth: 80});
         let gd2 = new LogicalGridData({gridx: 0, gridy: 1, gridw: 3, gridh: 1, weightx: 1, maxWidth: 80});
         let rows = newLogicalGridLayoutInfo([gd1, gd2]).layoutCellBounds(parentSize, parentInsets);
-        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 23, 30));
-        expect(rows[0][1]).toEqual(new Rectangle(28, 0, 23, 30));
-        expect(rows[0][2]).toEqual(new Rectangle(56, 0, 24, 30));
-        expect(rows[0][3]).toEqual(new Rectangle(80, 0, 0, 30));
-        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 23, 30));
-        expect(rows[1][1]).toEqual(new Rectangle(28, 35, 23, 30));
-        expect(rows[1][2]).toEqual(new Rectangle(56, 35, 24, 30));
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 16, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(21, 0, 16, 30));
+        expect(rows[0][2]).toEqual(new Rectangle(42, 0, 17, 30));
+        expect(rows[0][3]).toEqual(new Rectangle(64, 0, 17, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 16, 30));
+        expect(rows[1][1]).toEqual(new Rectangle(21, 35, 16, 30));
+        expect(rows[1][2]).toEqual(new Rectangle(42, 35, 17, 30));
+        expect(rows[1][3]).toEqual(new Rectangle(64, 35, 17, 30));
 
         // w = 4 on first row, w = 3 on second -> should lead to same result
         gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 3, gridh: 1, weightx: 1, maxWidth: 80});
         gd2 = new LogicalGridData({gridx: 0, gridy: 1, gridw: 4, gridh: 1, weightx: 1, maxWidth: 80});
         rows = newLogicalGridLayoutInfo([gd1, gd2]).layoutCellBounds(parentSize, parentInsets);
-        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 23, 30));
-        expect(rows[0][1]).toEqual(new Rectangle(28, 0, 23, 30));
-        expect(rows[0][2]).toEqual(new Rectangle(56, 0, 24, 30));
-        expect(rows[0][3]).toEqual(new Rectangle(80, 0, 0, 30));
-        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 23, 30));
-        expect(rows[1][1]).toEqual(new Rectangle(28, 35, 23, 30));
-        expect(rows[1][2]).toEqual(new Rectangle(56, 35, 24, 30));
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 16, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(21, 0, 16, 30));
+        expect(rows[0][2]).toEqual(new Rectangle(42, 0, 16, 30));
+        expect(rows[0][3]).toEqual(new Rectangle(63, 0, 17, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 16, 30));
+        expect(rows[1][1]).toEqual(new Rectangle(21, 35, 16, 30));
+        expect(rows[1][2]).toEqual(new Rectangle(42, 35, 16, 30));
+        expect(rows[1][3]).toEqual(new Rectangle(63, 35, 17, 30));
       });
     });
 

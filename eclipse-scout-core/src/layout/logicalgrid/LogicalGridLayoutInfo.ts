@@ -214,12 +214,15 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
   protected _initializeColumns() {
     let compSize = this.compSize;
     let compCount = compSize.length;
-    let prefWidths = arrays.init(this.cols, 0);
     let minWidths = arrays.init(this.cols, 0);
+    let prefWidths = arrays.init(this.cols, 0);
     let maxWidths = arrays.init(this.cols, 10240);
     let fixedWidths = arrays.init(this.cols, false);
+    let usedCols = arrays.init(this.cols, false);
     for (let i = 0; i < compCount; i++) {
       let cons = this.gridDatas[i];
+      usedCols[cons.gridx] = true;
+
       if (cons.gridw === 1) {
         let prefw;
         if (cons.widthHint > 0) {
@@ -241,77 +244,55 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
       }
     }
     let maxSpan = 1;
+    const lc = LayoutConstants;
+    let emptyCols = usedCols.map(used => !used);
     for (let i = 0; i < compCount; i++) {
       let cons = this.gridDatas[i];
       if (cons.gridw > 1) {
         maxSpan = Math.max(cons.gridw, maxSpan);
         let hSpan = cons.gridw;
-        let spanWidth = 0;
-        let spanMinWidth = 0;
-        let spanMaxWidth = 0;
-        let distWidth;
-        let distMinWidth;
-        let distMaxWidth;
-        // pref
+        let spanWidth = [0, 0, 0];
+        let distWidth = [];
         for (let j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
           if (!fixedWidths[j]) {
-            spanWidth += prefWidths[j];
-            spanMinWidth += minWidths[j];
-            spanMaxWidth += maxWidths[j];
+            spanWidth[lc.MIN] += minWidths[j];
+            spanWidth[lc.PREF] += prefWidths[j];
+            spanWidth[lc.MAX] += maxWidths[j];
           }
         }
         let hGaps = (hSpan - 1) * this.hgap;
         if (cons.widthHint > 0) {
-          distWidth = cons.widthHint - spanWidth - hGaps;
+          distWidth[lc.PREF] = cons.widthHint - spanWidth[lc.PREF] - hGaps;
         } else if (cons.useUiWidth) {
-          distWidth = compSize[i].width - spanWidth - hGaps;
+          distWidth[lc.PREF] = compSize[i].width - spanWidth[lc.PREF] - hGaps;
         } else {
-          distWidth = this.logicalWidthInPixel(cons) - spanWidth - hGaps;
+          distWidth[lc.PREF] = this.logicalWidthInPixel(cons) - spanWidth[lc.PREF] - hGaps;
         }
-        distMinWidth = cons.minWidth - spanMinWidth - hGaps;
-        distMaxWidth = cons.maxWidth - spanMaxWidth - hGaps;
-        if (distWidth > 0) {
-          let equalWidth = Math.floor((distWidth + spanWidth) / hSpan);
-          let remainder = (distWidth + spanWidth) % hSpan;
-          let last = -1;
-          for (let j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
-            last = j;
-            if (!fixedWidths[j]) {
-              prefWidths[j] = Math.max(equalWidth, prefWidths[j]);
-            }
-            if (cons.weightx === 0) {
-              fixedWidths[j] = true;
-            }
-          }
-          if (last > -1) {
-            prefWidths[last] += remainder;
-          }
+        distWidth[lc.MIN] = cons.minWidth - spanWidth[lc.MIN] - hGaps;
+        distWidth[lc.MAX] = cons.maxWidth - spanWidth[lc.MAX] - hGaps;
+        if (distWidth[lc.PREF] > 0) {
+          this._distribute(distWidth[lc.PREF], spanWidth[lc.PREF], prefWidths, cons, fixedWidths, (equalWidth, width) => Math.max(equalWidth, width));
         }
-        if (distMinWidth > 0) {
-          let equalMinWidth = Math.floor((distMinWidth + spanMinWidth) / hSpan);
-          let remainderMinWidth = (distMinWidth + spanMinWidth) % hSpan;
-          let last = -1;
-          for (let j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
-            last = j;
-            if (!fixedWidths[j]) {
-              minWidths[j] = Math.max(equalMinWidth, minWidths[j]);
-            }
-          }
-          if (last > -1) {
-            minWidths[last] += remainderMinWidth;
-          }
-          // The min widths have been distributed to hSpan columns.
-          // If a grid cell on a previous row spans more columns,
-          // the minWidth needs to be removed for the additional columns to not exceed the total minWidth specified by cons.minWidth
-          while (last < maxSpan - 1) {
-            last++;
-            minWidths[last] = 0;
-          }
+        let usedSpans = usedCols.slice(cons.gridx, hSpan);
+        if (distWidth[lc.MIN] > 0) {
+          this._distribute(distWidth[lc.MIN], spanWidth[lc.MIN], minWidths, cons, fixedWidths, (equalWidth, width) => Math.max(equalWidth, width), usedSpans);
         }
+        this._distribute(distWidth[lc.MAX], spanWidth[lc.MAX], maxWidths, cons, fixedWidths, (equalWidth, width) => Math.min(equalWidth, width));
+
+        // TODO CGU don't distribute to columns without an element (cons.x = col, ignoring w) -> if done so, columns get too small because distwidth is without gaps
+        // TODO CGU maybe only w[c + 1] === 0 below only for last column in span? discuss with fsh
+
+        // The min widths have been distributed to hSpan columns.
+        // If a grid cell on a previous row spans more columns,
+        // the minWidth needs to be removed for the additional columns to not exceed the total minWidth specified by cons.minWidth
+        // let pos = cons.gridx + cons.gridw;
+        // while (pos < cons.gridx + maxSpan) {
+        //   minWidths[pos] = 0;
+        //   pos++;
+        // }
       }
     }
 
-    let lc = LayoutConstants;
     for (let i = 0; i < this.cols; i++) {
       this.width[i] = [];
       if (fixedWidths[i]) {
@@ -354,6 +335,26 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
       for (let i = 0; i < this.cols; i++) {
         this.weightX[i] = this.weightX[i] * f;
       }
+    }
+  }
+
+  protected _distribute<T>(distWidth: number, spanWidth: number, widths: number[], cons: LogicalGridData, fixedWidths: boolean[], calc: (equalWidth: number, width: number) => number, usedSpans?: boolean[]) {
+    let numEmptyCols = !usedSpans ? 0 : usedSpans.filter(used => !used).length;
+    let hSpan = cons.gridw - numEmptyCols;
+    let equalWidth = Math.floor((distWidth + spanWidth) / hSpan);
+    let remainder = (distWidth + spanWidth) % hSpan;
+    let last = -1;
+    for (let j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
+      last = j;
+      if (!fixedWidths[j] && (!usedSpans || usedSpans[j])) {
+        widths[j] = calc(equalWidth, widths[j]);
+      }
+      if (cons.weightx === 0) {
+        fixedWidths[j] = true;
+      }
+    }
+    if (last > -1) {
+      widths[last] += remainder;
     }
   }
 
