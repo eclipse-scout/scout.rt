@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, JsonValueMapper, Primitive, scout, strings} from '../index';
+import {arrays, JsonValueMapper, ObjectFactory, Primitive, scout, strings} from '../index';
 import $ from 'jquery';
 
 const CONST_REGEX = /\${const:([^}]*)}/;
@@ -43,6 +43,41 @@ export const objects = {
       }
     }
     return dest;
+  },
+
+  /**
+   * Creates a dynamic proxy which can be used e.g. to initialize a constant.
+   * The proxy wraps an instance created on first use using the given constructor function.
+   * All calls to the proxy are forwarded to this lazy instance.
+   * The instance can only be created after the {@link ObjectFactory} has been initialized.
+   * @param constr The constructor to lazily create the instance on first use.
+   * @returns A proxy that delegates calls to the lazy instance.
+   */
+  createSingletonProxy<T extends object>(constr: new() => T): T {
+    return new Proxy({/* target obj for the lazy instance */}, {
+      get(target: { instance?: T }, prop: string | symbol, proxy) {
+        if (!target.instance) {
+          if (prop === 'prototype') {
+            // variable has no prototype: directly return undefined so that no instance is created yet.
+            return undefined;
+          }
+          if (!ObjectFactory.get()?.initialized) {
+            // only allow singleton creation after ObjectFactory has been set up. Otherwise, the class cannot be customized/replaced.
+            throw Error('Singleton cannot be created yet as the ObjectFactory is not initialized.');
+          }
+          target.instance = scout.create(constr);
+        }
+        let requestedProperty = target.instance[prop];
+        if (typeof requestedProperty === 'function') {
+          return requestedProperty.bind(target.instance);
+        }
+        return Reflect.get(target.instance, prop, target.instance);
+      },
+
+      set(target: { instance?: T }, prop: string | symbol, value: any) {
+        return Reflect.set(target.instance, prop, value, target.instance);
+      }
+    }) as T;
   },
 
   /**

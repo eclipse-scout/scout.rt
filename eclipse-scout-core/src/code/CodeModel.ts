@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, CodeType, FullModelOf, ObjectModel} from '../index';
+import {Code, CodeType, InitModelOf, ObjectModel} from '../index';
 
 export interface CodeModel<TCodeId> extends ObjectModel<Code<TCodeId>, TCodeId> {
   /**
@@ -77,7 +77,7 @@ export interface CodeModel<TCodeId> extends ObjectModel<Code<TCodeId>, TCodeId> 
   /**
    * The child Codes of this code.
    */
-  children?: FullModelOf<Code<TCodeId>>[];
+  children?: InitModelOf<Code<TCodeId>>[];
   /**
    * The CodeType instance this Code belongs to.
    */

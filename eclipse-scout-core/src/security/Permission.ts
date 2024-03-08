@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnumObject, FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, scout, SomeRequired, strings} from '../index';
+import {DoEntity, EnumObject, FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, scout, SomeRequired, strings} from '../index';
 
 export class Permission implements PermissionModel {
   declare self: Permission;
@@ -95,7 +95,7 @@ export class Permission implements PermissionModel {
   }
 }
 
-export interface PermissionModel extends ObjectModel<Permission> {
+export interface PermissionModel extends ObjectModel<Permission>, DoEntity {
   /**
    * The name and identifier of the {@link Permission}.
    */

@@ -407,7 +407,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.persistent = data.startupData.persistent;
 
     // true if the UiServer runs in development mode (see Platform.get().inDevelopmentMode())
-    this.inDevelopmentMode = !!config.get('scout.devMode');
+    this.inDevelopmentMode = !!config.get('scout.devMode')?.value;
 
     // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
     this.clientSessionId = data.startupData.clientSessionId;
@@ -433,7 +433,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
 
     // Init request timeout for poller
-    this.requestTimeoutPoll = (config.get('scout.ui.backgroundPollingMaxWaitTime') + Session.POLLING_GRACE_PERIOD) * 1000;
+    this.requestTimeoutPoll = (scout.nvl(config.get('scout.ui.backgroundPollingMaxWaitTime')?.value, 60) + Session.POLLING_GRACE_PERIOD) * 1000;
 
     // Register UI session
     this.modelAdapterRegistry[this.uiSessionId] = this; // TODO [7.0] cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have root adapter as parent, see 406

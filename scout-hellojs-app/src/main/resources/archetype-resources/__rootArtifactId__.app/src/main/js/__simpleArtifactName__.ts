@@ -1,6 +1,7 @@
 import {App} from '@${simpleArtifactName}/ui';
-import {access} from '@eclipse-scout/core';
+import {access, System, systems} from '@eclipse-scout/core';
 
+systems.getOrCreate(System.MAIN_SYSTEM, '../api/');
 App.addBootstrapper(() => access.bootstrapSystem());
 
 new App().init({
@@ -8,4 +9,3 @@ new App().init({
     textsUrl: 'texts.json'
   }
 });
-

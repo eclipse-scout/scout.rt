@@ -59,9 +59,10 @@ public class UiNotificationRegistry {
   /**
    * Contains all notifications per topic including notifications that are created by other cluster nodes.
    * <p>
-   * The order is not relevant for the implementation, however, notifications created this registry are actually
-   * ordered by {@link UiNotificationDo#creationTime()} because only one notification can be inserted at a time, and it will be added to the end of the list.
-   * Notifications received from other cluster nodes are also added at the end of the list, but they may not arrive in the same order as inserted in the registry of the other cluster node.
+   * The order is not relevant for the implementation, however, notifications created this registry are actually ordered
+   * by {@link UiNotificationDo#creationTime()} because only one notification can be inserted at a time, and it will be
+   * added to the end of the list. Notifications received from other cluster nodes are also added at the end of the
+   * list, but they may not arrive in the same order as inserted in the registry of the other cluster node.
    * <p>
    * The list will be cleaned up regularly by {@link #m_cleanupJob}.
    */
@@ -87,12 +88,13 @@ public class UiNotificationRegistry {
   }
 
   /**
-   * Checks if there are notifications for the given topics since the {@link UiNotificationDo#creationTime()} of the {@link TopicDo#lastNotifications}, and if there are, completes the future immediately with these notifications.
-   * Otherwise, a listener is added to the registry which will be notified when new notifications are put into the registry.
-   * Once this happens, the future will be completed with the new notifications.
+   * Checks if there are notifications for the given topics since the {@link UiNotificationDo#creationTime()} of the
+   * {@link TopicDo#lastNotifications}, and if there are, completes the future immediately with these notifications.
+   * Otherwise, a listener is added to the registry which will be notified when new notifications are put into the
+   * registry. Once this happens, the future will be completed with the new notifications.
    *
-   * @return a future that will be completed when new a notification is put into the registry for the given topics.
-   * It will also complete with an empty list of notifications if the given timeout expires.
+   * @return a future that will be completed when new a notification is put into the registry for the given topics. It
+   *         will also complete with an empty list of notifications if the given timeout expires.
    */
   public CompletableFuture<List<UiNotificationDo>> getOrWait(List<TopicDo> topics, String user, long timeout) {
     List<UiNotificationDo> notifications = get(topics, user);
@@ -130,7 +132,8 @@ public class UiNotificationRegistry {
   }
 
   /**
-   * @return the notifications for the given topics since the {@link UiNotificationDo#creationTime()} of the {@link TopicDo#lastNotifications}.
+   * @return the notifications for the given topics since the {@link UiNotificationDo#creationTime()} of the
+   *         {@link TopicDo#lastNotifications}.
    */
   public List<UiNotificationDo> get(List<TopicDo> topics, String user) {
     List<UiNotificationDo> notifications = new ArrayList<>();
@@ -185,14 +188,14 @@ public class UiNotificationRegistry {
   /**
    * Creates a notification to mark the start of the subscription.
    * <p>
-   * This is necessary to ensure the client receives every notification from now on even if the connection
-   * temporarily drops before the first real notification can be sent.
-   * During that connection drop a notification could be added that needs to be sent as soon as the connection is reestablished again.
+   * This is necessary to ensure the client receives every notification from now on even if the connection temporarily
+   * drops before the first real notification can be sent. During that connection drop a notification could be added
+   * that needs to be sent as soon as the connection is reestablished again.
    * <p>
-   * The result can contain multiple notifications, one for each cluster node.
-   * So, if a cluster node created notifications for the topic, the last one for that node will be returned.
-   * If another node did not create any notifications for the topic, the result won't contain a notification for that node.
-   * The next request will then return all notifications for node 1 since the last known notification and all notifications for node 2.
+   * The result can contain multiple notifications, one for each cluster node. So, if a cluster node created
+   * notifications for the topic, the last one for that node will be returned. If another node did not create any
+   * notifications for the topic, the result won't contain a notification for that node. The next request will then
+   * return all notifications for node 1 since the last known notification and all notifications for node 2.
    */
   protected List<UiNotificationDo> createSubscriptionStartNotifications(String topic, Stream<UiNotificationDo> notificationStream) {
     Map<String, UiNotificationDo> lastNotificationByNode = notificationStream
@@ -252,14 +255,15 @@ public class UiNotificationRegistry {
    * Puts a message into the registry for a specific topic and user with custom options.
    *
    * @param topic
-   *     A notification must be assigned to a topic.
+   *          A notification must be assigned to a topic. Must not be {@code null}.
    * @param userId
-   *     If specified, only the user with this id will get the notification.
+   *          If specified, only the user with this id will get the notification. May be {@code null}.
    * @param message
-   *     The message part of the {@link UiNotificationDo}.
+   *          The message part of the {@link UiNotificationDo}. May be {@code null}.
+   * @param options
+   *          Optional {@link UiNotificationPutOptions}. May be {@code null}.
    */
   public void put(String topic, String userId, IDoEntity message, UiNotificationPutOptions options) {
-    Assertions.assertNotNull(message, "Message must not be null");
     Assertions.assertNotNull(topic, "Topic must not be null");
     if (options == null) {
       options = new UiNotificationPutOptions();
@@ -278,7 +282,8 @@ public class UiNotificationRegistry {
 
     if (ObjectUtility.nvl(options.getTransactional(), true)) {
       putTransactional(metaMessage);
-    } else {
+    }
+    else {
       putInternal(metaMessage);
     }
   }
@@ -370,6 +375,21 @@ public class UiNotificationRegistry {
         m_listeners.remove(topic);
       }
     }
+  }
+
+  /**
+   * Retrieves how many observers are listening for the given topic.
+   *
+   * @param topic
+   *          The topic for which the listener count should be returned.
+   * @return The number of listeners for the given topic.
+   */
+  public int getListenerCount(String topic) {
+    var listenerList = m_listeners.get(topic);
+    if (listenerList == null || listenerList.isEmpty()) {
+      return 0;
+    }
+    return listenerList.size();
   }
 
   public void addListeners(List<String> topics, UiNotificationListener listener) {
@@ -474,7 +494,8 @@ public class UiNotificationRegistry {
    * <p>
    * The property needs to be set before the cleanup job is scheduled, which is, before the first notification is put.
    *
-   * @param cleanupJobInterval The interval in seconds between job runs. 0 to disable the job.
+   * @param cleanupJobInterval
+   *          The interval in seconds between job runs. 0 to disable the job.
    */
   public void setCleanupJobInterval(long cleanupJobInterval) {
     m_cleanupJobInterval = cleanupJobInterval;
@@ -493,7 +514,8 @@ public class UiNotificationRegistry {
   }
 
   /**
-   * @return the hash of the current node id. Because it will be sent to the UI and may contain the name of the server, a hash is used instead of the plain node id.
+   * @return the hash of the current node id. Because it will be sent to the UI and may contain the name of the server,
+   *         a hash is used instead of the plain node id.
    */
   public String currentNodeId() {
     return Base64Utility.encode(SecurityUtility.hash(NodeId.current().toString().getBytes()));

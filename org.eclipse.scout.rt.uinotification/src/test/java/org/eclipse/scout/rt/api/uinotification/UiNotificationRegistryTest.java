@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,23 @@ public class UiNotificationRegistryTest {
     m_registry = new UiNotificationRegistry();
     m_registry.setCleanupJobInterval(0);
     m_registry.setIdGenerator(new TestIdGenerator());
+  }
+
+  @Test
+  public void testGetListenerCount() {
+    assertEquals(0, m_registry.getListenerCount("topic"));
+    m_registry.addListener("test", e -> {
+    });
+    assertEquals(0, m_registry.getListenerCount("topic"));
+    UiNotificationListener listener = e -> {
+    };
+    m_registry.addListener("topic", listener);
+    assertEquals(1, m_registry.getListenerCount("topic"));
+    m_registry.addListener("topic", e -> {
+    });
+    assertEquals(2, m_registry.getListenerCount("topic"));
+    m_registry.removeListener("topic", listener);
+    assertEquals(1, m_registry.getListenerCount("topic"));
   }
 
   @Test

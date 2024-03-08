@@ -7,9 +7,53 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, FormField, Menu, objects, scout, Widget} from '../../src/index';
+import {Action, arrays, FormField, Menu, ObjectFactory, objects, scout, Widget} from '../../src/index';
 
 describe('objects', () => {
+
+  describe('createSingletonProxy', () => {
+    let origInitialized: boolean;
+    beforeEach(() => {
+      origInitialized = ObjectFactory.get().initialized;
+    });
+
+    afterEach(() => {
+      ObjectFactory.get().initialized = origInitialized;
+    });
+
+    class ProxyTestClass {
+      prop: string;
+
+      constructor() {
+        this.prop = 'test';
+      }
+
+      testFunction(): string {
+        return this.prop;
+      }
+    }
+
+    it('', () => {
+      expect(ObjectFactory.get().initialized).toBeTrue();
+      let proxy = objects.createSingletonProxy(ProxyTestClass);
+      expect(proxy.prop).toBe('test');
+      expect(proxy.testFunction()).toBe('test');
+      expect(proxy['prototype']).toBeUndefined();
+      expect(proxy['notExisting']).toBeUndefined();
+      expect(proxy['prop']).toBe('test');
+    });
+    it('', () => {
+      ObjectFactory.get().initialized = false;
+      let proxy = objects.createSingletonProxy(ProxyTestClass);
+      expect(proxy['prototype']).toBeUndefined(); // prototype access does not create the lazy instance
+      expect(() => {
+        proxy.prop;
+      }).toThrow();
+      expect(() => {
+        proxy.testFunction();
+      }).toThrow();
+    });
+  });
 
   describe('copyProperties', () => {
 
@@ -581,11 +625,11 @@ describe('objects', () => {
       expect(objects.equals(null, null)).toBe(true);
       expect(objects.equals([], [])).toBe(true);
       expect(objects.equals([42], [42])).toBe(false);
-      let arr01: number[] & {equals?: (o: any) => boolean} = [1, 2, 3];
+      let arr01: number[] & { equals?: (o: any) => boolean } = [1, 2, 3];
       expect(objects.equals(arr01, arr01)).toBe(true);
       expect(objects.equals(arr01, [1, 2, 3])).toBe(false);
       arr01.equals = a => objects.isArray(a) && arrays.equalsIgnoreOrder(arr01, a);
-      const arr02: number[] & {equals?: (o: any) => boolean} = [2, 1, 3];
+      const arr02: number[] & { equals?: (o: any) => boolean } = [2, 1, 3];
       arr02.equals = a => objects.isArray(a) && arrays.equalsIgnoreOrder(arr02, a);
       expect(objects.equals(arr01, arr02)).toBe(true);
       let a = {};

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 import {arrays, Event, EventHandler, EventListener, objects, scout} from '../index';
 import $ from 'jquery';
 
-export type EventSubTypePredicate = (type, subType) => boolean;
+export type EventSubTypePredicate = (type: Event, subType: string) => boolean;
 
 export class EventSupport {
   protected _eventListeners: EventListener[];
@@ -98,7 +98,7 @@ export class EventSupport {
    * Adds an event handler using {@link one} and returns a promise.
    * The promise is resolved as soon as the event is triggered.
    */
-  when(type: string):JQuery.Promise<Event> {
+  when(type: string): JQuery.Promise<Event> {
     let deferred = $.Deferred();
     this.one(type, deferred.resolve.bind(deferred));
     return deferred.promise();
@@ -176,6 +176,9 @@ export class EventSupport {
     let parts = listenerType.split(':');
     let type = parts[0];
     let subType = parts[1];
+    if (type !== event.type) {
+      return false;
+    }
     let predicate = this._subTypePredicates[type];
     if (!predicate) {
       return;
@@ -185,7 +188,7 @@ export class EventSupport {
 
   /**
    *
-   * @param type the type which could contain a sub type
+   * @param type the type which could contain a subtype
    * @param predicate the predicate which will be tested when an event with the given type is triggered.
    */
   registerSubTypePredicate(type: string, predicate: EventSubTypePredicate) {

@@ -37,5 +37,13 @@ export const systems = {
     });
     systems._systemsMap.set(name, system);
     return system;
+  },
+
+  /**
+   * @param name The optional name of the system. If omitted, {@link System.MAIN_SYSTEM} is used.
+   * @returns true if a system with given name is already registered.
+   */
+  exists(name?: string): boolean {
+    return systems._systemsMap.has(name || System.MAIN_SYSTEM);
   }
 };
