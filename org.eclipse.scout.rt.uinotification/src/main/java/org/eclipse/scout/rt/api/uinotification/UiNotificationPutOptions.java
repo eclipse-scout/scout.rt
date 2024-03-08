@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,10 +11,12 @@ package org.eclipse.scout.rt.api.uinotification;
 
 public class UiNotificationPutOptions {
   private Boolean m_transactional;
-  private Long  m_timeout;
+  private Long m_timeout;
 
   /**
-   * @param timeout Time in milliseconds before the notification expires and can be removed from the registry by the cleanup job.
+   * @param timeout
+   *          Time in milliseconds before the notification expires and can be removed from the registry by the cleanup
+   *          job.
    */
   public UiNotificationPutOptions withTimeout(Long timeout) {
     m_timeout = timeout;

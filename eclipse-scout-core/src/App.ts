@@ -9,8 +9,8 @@
  */
 
 import {
-  access, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout,
-  Session, SessionModel, texts, webstorage, Widget
+  access, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, ErrorInfo, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory,
+  objects, scout, Session, SessionModel, texts, webstorage, Widget
 } from './index';
 import $ from 'jquery';
 
@@ -558,7 +558,7 @@ export class App extends EventEmitter {
     if (this.sessions.length === 0) {
       promises.push(this.errorHandler.handle(error, ...args)
         .then(errorInfo => {
-          this._appendStartupError($('body'), errorInfo.message);
+          this._appendStartupError($('body'), errorInfo);
         }));
     } else {
       // Session.js may already display a fatal message box
@@ -580,9 +580,13 @@ export class App extends EventEmitter {
     return $.promiseAll(promises).then(errorInfo => $.rejectedPromise(error, ...args));
   }
 
-  protected _appendStartupError($parent: JQuery, message: string) {
+  protected _appendStartupError($parent: JQuery, errorInfo: ErrorInfo) {
     let $error = $parent.appendDiv('startup-error');
     $error.appendDiv('startup-error-title').text('The application could not be started');
+    let message = errorInfo.message;
+    if (errorInfo?.httpStatus) {
+      message = this.errorHandler.getMessageBodyForHttpStatus(errorInfo?.httpStatus);
+    }
     if (message) {
       $error.appendDiv('startup-error-message').text(message);
     }

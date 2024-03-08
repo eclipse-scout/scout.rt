@@ -10,9 +10,12 @@
 import {Code, codes, CodeType, CodeTypeModel} from '../../src/index';
 
 describe('CodeType', () => {
+  let origCodeTypeCache;
 
   beforeEach(() => {
-    codes.init([{
+    origCodeTypeCache = codes.registry;
+    codes.registry = new Map();
+    codes.add([{
       objectType: CodeType,
       id: 'codeType0',
       codes: [{
@@ -47,6 +50,11 @@ describe('CodeType', () => {
         fieldName: 'iconId'
       }]
     }]);
+  });
+
+  afterEach(() => {
+    // cleanup
+    codes.registry = origCodeTypeCache;
   });
 
   describe('init', () => {

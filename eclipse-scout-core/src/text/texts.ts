@@ -14,6 +14,11 @@ export type TextMapType = Record<string, TextMap>;
 
 export const texts = {
 
+  /**
+   * This default language is used whenever a new text is registered.
+   */
+  defaultLanguage: 'en',
+
   TEXT_KEY_REGEX: /\${textKey:([^}]*)}/,
 
   textsByLocale: {} as TextMapType,
@@ -25,7 +30,7 @@ export const texts = {
     let promises = [];
     let urls = arrays.ensure(url);
     urls.forEach(url => promises.push(
-      $.ajaxJson(url).then(texts._preInit.bind(this, url)))
+      $.ajaxJson(url).then(texts._handleBootstrapResponse.bind(this, url)))
     );
     return $.promiseAll(promises);
   },
@@ -36,7 +41,7 @@ export const texts = {
   },
 
   /** @internal */
-  _preInit(url: string | string[], data: any) {
+  _handleBootstrapResponse(url: string | string[], data: any) {
     if (data && data.error) {
       // The result may contain a json error (e.g. session timeout) -> abort processing
       throw {
@@ -199,6 +204,27 @@ export const texts = {
     let text = texts.resolveText(value, session.locale.languageTag);
     if (text !== value) {
       object[textProperty] = text;
+    }
+  },
+
+  /**
+   * Registers a texts map for a text key.
+   * The texts for the default language specified by {@link texts.defaultLanguage} are registered as default texts.
+   *
+   * @param key the text key under which the given textsArg map will be registered.
+   * @param textsArg an object with the languageTag as key and the translated text as value
+   */
+  registerTexts(key: string, textsArg: Record<string, string>) {
+    // In case of changed defaultLanguage clear the 'default' entry
+    texts.get('default').remove(key);
+
+    for (let languageTag in textsArg) {
+      let text = textsArg[languageTag];
+      // Use defaultLanguage as default, if specified (maybe changed or set to null by the app).
+      if (languageTag && languageTag === texts.defaultLanguage) {
+        languageTag = 'default';
+      }
+      texts.get(languageTag).add(key, text);
     }
   }
 };

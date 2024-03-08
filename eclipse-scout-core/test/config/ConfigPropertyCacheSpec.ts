@@ -8,11 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {config, ConfigProperties, ConfigProperty} from '../../src/index';
+import {config, ConfigProperties, ConfigProperty, ConfigPropertyCache, System} from '../../src/index';
 
 describe('scout.config', () => {
 
   let origConfigMap: Map<string, Map<string, ConfigProperty<any>>>;
+
+  class TestingConfigPropertyCache extends ConfigPropertyCache {
+    override _handleBootstrapResponse(data?: ConfigProperty<any> | ConfigProperty<any>[], system?: string) {
+      super._handleBootstrapResponse(data, system);
+    }
+  }
 
   beforeEach(() => {
     origConfigMap = config.configMap;
@@ -22,16 +28,17 @@ describe('scout.config', () => {
     config.configMap = origConfigMap;
   });
 
-  describe('init', () => {
+  describe('_handleBootstrapResponse', () => {
     it('adds properties to the correct system', () => {
-      config.init([{
+      let configPropertyCache = config as TestingConfigPropertyCache;
+      configPropertyCache._handleBootstrapResponse([{
         key: 'scout.devMode',
         value: true
       }, {
         key: 'scout.ui.backgroundPollingMaxWaitTime',
         value: 2
       }]);
-      config.init([{
+      configPropertyCache._handleBootstrapResponse([{
         key: 'scout.devMode',
         value: false
       }, {
@@ -42,52 +49,48 @@ describe('scout.config', () => {
       let testSystem = 'test' as keyof ConfigProperties;
       expect(config.configMap.size).toBe(2);
       expect(config.configMap.get('main').size).toBe(2);
-      expect(config.get('scout.devMode')).toBe(true);
-      expect(config.get('scout.devMode', testSystem)).toBe(false);
-      expect(config.get('scout.ui.backgroundPollingMaxWaitTime')).toBe(2);
-      expect(config.get('scout.uinotification.waitTimeout')).toBeUndefined();
-      expect(config.get('scout.uinotification.waitTimeout', testSystem)).toBe(4);
+      expect(config.get('scout.devMode')?.value).toBeTrue();
+      expect(config.get('scout.devMode', testSystem)?.value).toBeFalse();
+      expect(config.get('scout.uinotification.waitTimeout')?.value).toBeUndefined();
+      expect(config.get('scout.uinotification.waitTimeout', testSystem)?.value).toBe(4);
     });
 
     it('skips properties without key', () => {
+      let configPropertyCache = config as TestingConfigPropertyCache;
       // @ts-expect-error
-      config.init([{key: null, value: true}, {value: 'test'}, [1], null, {key: 'scout.ui.backgroundPollingMaxWaitTime', value: 11}]);
+      configPropertyCache._handleBootstrapResponse([{key: null, value: true}, {value: 'test'}, [1], null, {key: 'scout.ui.backgroundPollingMaxWaitTime', value: 11}]);
       expect(config.configMap.size).toBe(1);
       expect(config.configMap.get('main').size).toBe(1);
-      expect(config.get('scout.ui.backgroundPollingMaxWaitTime')).toBe(11);
+      expect(config.get('scout.ui.backgroundPollingMaxWaitTime')?.value).toBe(11);
     });
 
-    it('ignores already existing properties', () => {
-      config.init([{
+    it('overwrites already existing properties', () => {
+      let configPropertyCache = config as TestingConfigPropertyCache;
+      configPropertyCache._handleBootstrapResponse([{
         key: 'scout.devMode',
         value: true
       }, {
         key: 'scout.ui.backgroundPollingMaxWaitTime',
         value: 2
       }]);
-      config.init([{
+      configPropertyCache._handleBootstrapResponse([{
         key: 'scout.devMode',
-        value: false // is skipped
+        value: false // overwrites
       }]);
       expect(config.configMap.size).toBe(1);
-      expect(config.configMap.get('main').size).toBe(2);
-      expect(config.get('scout.devMode')).toBe(true);
+      expect(config.configMap.get(System.MAIN_SYSTEM).size).toBe(2);
+      expect(config.get('scout.devMode')?.value).toBeFalse();
     });
   });
 
   describe('get', () => {
     it('returns the correct values', () => {
-      config.init([{
-        key: 'scout.devMode',
-        value: true
-      }, {
-        key: 'scout.ui.backgroundPollingMaxWaitTime',
-        value: 2
-      }]);
+      config.set('scout.devMode', true);
+      config.set('scout.ui.backgroundPollingMaxWaitTime', 2);
       expect(config.configMap.size).toBe(1);
       expect(config.configMap.get('main').size).toBe(2);
-      expect(config.get('scout.devMode')).toBe(true);
-      expect(config.get('scout.uinotification.waitTimeout')).toBeUndefined();
+      expect(config.get('scout.devMode')?.value).toBeTrue();
+      expect(config.get('scout.uinotification.waitTimeout')?.value).toBeUndefined();
       expect(config.get(null)).toBeUndefined();
       expect(config.get(undefined)).toBeUndefined();
     });
@@ -95,20 +98,17 @@ describe('scout.config', () => {
 
   describe('set', () => {
     it('writes the correct values', () => {
-      config.init([{
-        key: 'scout.devMode',
-        value: true
-      }]);
+      config.set('scout.devMode', true);
       let testSystem = 'test' as keyof ConfigProperties;
       config.set('scout.devMode', false); // overwrites
       config.set('scout.devMode', true, testSystem); // creates new property for test system
       config.set('scout.ui.backgroundPollingMaxWaitTime', 44); // creates new property
 
       expect(config.configMap.size).toBe(2);
-      expect(config.configMap.get('main').size).toBe(3);
-      expect(config.get('scout.devMode')).toBe(false);
-      expect(config.get('scout.devMode', testSystem)).toBe(true);
-      expect(config.get('scout.ui.backgroundPollingMaxWaitTime')).toBe(44);
+      expect(config.configMap.get('main').size).toBe(2);
+      expect(config.get('scout.devMode')?.value).toBeFalse();
+      expect(config.get('scout.devMode', testSystem)?.value).toBeTrue();
+      expect(config.get('scout.ui.backgroundPollingMaxWaitTime')?.value).toBe(44);
     });
   });
 });

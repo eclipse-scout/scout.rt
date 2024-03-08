@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -277,6 +277,10 @@ export class ObjectFactory {
     for (let [name, object] of Object.entries(objects)) {
       if (name === 'default') {
         // Do not register module itself, only imported files
+        continue;
+      }
+      if (!object) {
+        // ignore elements which have no value (e.g. variables like )
         continue;
       }
       if (window[namespace][name] && !options.allowedReplacements.includes(name)) {

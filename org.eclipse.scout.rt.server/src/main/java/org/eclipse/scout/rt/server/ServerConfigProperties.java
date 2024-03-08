@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.server;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.server.services.common.file.RemoteFileService;
@@ -68,6 +69,28 @@ public final class ServerConfigProperties {
     @Override
     public String description() {
       return String.format("Absolute path to the root directory of the '%s'. The default value is null.", RemoteFileService.class.getSimpleName());
+    }
+  }
+
+  public static class PermissionResourceThroughputProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public Integer getDefaultValue() {
+      return 30;
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.permissionResource.throughput";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies how many requests to the PermissionResource the server can handle per second.\n"
+          + "The value is used to spread a permission refresh on the browser to reduce server load.\n"
+          + "Use a high value for fast servers. Then the permission refresh on the browser will be very soon after permissions on the server have been reloaded, but load on the server is increased.\n"
+          + "Use smaller values to reduce server load but increase the delay between the reload on the server and the refresh on the browser.\n"
+          + "The default is 30 requests per second.";
     }
   }
 }

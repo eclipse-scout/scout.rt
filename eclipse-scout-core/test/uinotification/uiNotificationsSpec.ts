@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, dates, DoEntity, JsonObject, Session, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src';
+import {BackgroundJobPollingStatus, dates, DoEntity, JsonObject, Session, systems, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src';
 
 describe('uiNotifications', () => {
 
@@ -326,6 +326,7 @@ describe('uiNotifications', () => {
     });
 
     it('starts a poller per system', () => {
+      systems.getOrCreate('sys2');
       expect(pollers().size).toBe(0);
 
       uiNotifications.subscribe('aaa', () => undefined);

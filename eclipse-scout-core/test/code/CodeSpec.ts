@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, codes, Locale, texts} from '../../src/index';
+import {Code, Locale, texts} from '../../src/index';
 
 describe('Code', () => {
 
@@ -37,7 +37,7 @@ describe('Code', () => {
       expect(texts.get('en').get('__code..123xy')).toBe('Code 123xy in English');
     });
 
-    it('uses the language configured by codes.defaultLanguage as default', () => {
+    it('uses the language configured by texts.defaultLanguage as default', () => {
       let model = {
         id: '123xy',
         texts: {
@@ -48,7 +48,7 @@ describe('Code', () => {
 
       let code = new Code();
       code.init(model);
-      expect(codes.defaultLanguage).toBe('en');
+      expect(texts.defaultLanguage).toBe('en');
       // fr is not defined -> use English / defaultLanguage
       expect(texts.get('fr').get('__code..123xy')).toBe('Code 123xy in English');
     });

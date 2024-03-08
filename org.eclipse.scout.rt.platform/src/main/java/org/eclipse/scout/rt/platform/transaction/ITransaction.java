@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -100,7 +100,7 @@ public interface ITransaction extends ICancellable {
   Throwable[] getFailures();
 
   /**
-   * Associates this transaction with the given {@link Throwable}, which typically results in a later roll back of this
+   * Associates this transaction with the given {@link Throwable}, which typically results in a later rollback of this
    * transaction. This method has no effect if already registered.
    */
   void addFailure(Throwable t);
@@ -109,7 +109,7 @@ public interface ITransaction extends ICancellable {
    * Tries to temporarily commit the transaction on all transaction members by invoking
    * {@link ITransactionMember#commitPhase1()} on any member.
    *
-   * @return <code>true</code> without if the commit phase 1 was successful on all members.
+   * @return <code>true</code> if the commit phase 1 was successful on all members.
    * @throws FutureCancelledError
    *           if the transaction is cancelled.
    */
