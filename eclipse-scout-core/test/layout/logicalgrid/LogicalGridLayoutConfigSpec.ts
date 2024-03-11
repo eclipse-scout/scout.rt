@@ -11,6 +11,7 @@ import {HtmlEnvironment, InitModelOf, LogicalGridLayoutConfig, ObjectOrModel, sc
 
 describe('LogicalGridLayoutConfig', () => {
   let session: SandboxSession;
+  let htmlEnvBack: HtmlEnvironment;
 
   class LogicalGridWidget extends Widget {
     layoutConfig: LogicalGridLayoutConfig;
@@ -33,6 +34,18 @@ describe('LogicalGridLayoutConfig', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
+    htmlEnvBack = $.extend({}, HtmlEnvironment.get());
+  });
+
+  afterEach(() => {
+    // Reset to original values to not affect other specs because HtmlEnvironment is a singleton
+    $.extend(HtmlEnvironment.get(), {
+      formColumnWidth: htmlEnvBack.formColumnWidth,
+      formRowHeight: htmlEnvBack.formRowHeight,
+      formColumnGap: htmlEnvBack.formColumnGap,
+      formRowGap: htmlEnvBack.formRowGap,
+      smallColumnGap: htmlEnvBack.smallColumnGap
+    });
   });
 
   it('is initialized with defaults from html env', () => {
@@ -102,5 +115,17 @@ describe('LogicalGridLayoutConfig', () => {
     expect(widget.layoutConfig.rowHeight).toBe(887);
     expect(widget.layoutConfig.hgap).toBe(886);
     expect(widget.layoutConfig.vgap).toBe(885);
+  });
+
+  describe('prepareSmallHgapConfig', () => {
+    it('uses small hgap as default', () => {
+      let htmlEnv = HtmlEnvironment.get();
+      htmlEnv.smallColumnGap = 2;
+      let config = LogicalGridLayoutConfig.prepareSmallHgapConfig();
+      expect(config.columnWidth).toBe(HtmlEnvironment.get().formColumnWidth);
+      expect(config.rowHeight).toBe(HtmlEnvironment.get().formRowHeight);
+      expect(config.hgap).toBe(HtmlEnvironment.get().smallColumnGap);
+      expect(config.vgap).toBe(HtmlEnvironment.get().formRowGap);
+    });
   });
 });

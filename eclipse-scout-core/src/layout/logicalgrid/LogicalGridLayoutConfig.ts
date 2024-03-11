@@ -74,7 +74,7 @@ export class LogicalGridLayoutConfig implements LogicalGridLayoutConfigModel {
   }
 
   protected _init() {
-    $.extend(this, this._defaults, this._readDefaults(), this._options);
+    $.extend(this, this._readDefaults(), this._defaults, this._options);
   }
 
   protected _readDefaults(): InitModelOf<LogicalGridLayoutConfig> {
@@ -134,7 +134,7 @@ export class LogicalGridLayoutConfig implements LogicalGridLayoutConfigModel {
     });
   }
 
-  static prepareSmallHgapConfig(layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
+  static prepareSmallHgapConfig(layoutConfig?: ObjectOrModel<LogicalGridLayoutConfig>) {
     if (!layoutConfig) {
       layoutConfig = new LogicalGridLayoutConfig();
     }
