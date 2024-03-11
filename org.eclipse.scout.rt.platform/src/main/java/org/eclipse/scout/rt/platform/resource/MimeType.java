@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -53,12 +53,13 @@ public enum MimeType implements IMimeType {
   JFIF("image/jpeg", "jfif", IMimeMagic.JPEG_JPG),
   PJPEG("image/jpeg", "pjpeg", IMimeMagic.JPEG_JPG),
   PJP("image/jpeg", "pjp", IMimeMagic.JPEG_JPG),
-  JS("application/javascript", "js"),
+  JS("text/javascript", "js"),
   JSON("application/json", "json"),
   JSONML("application/jsonml+json", "jsonml"),
   LOG("text/x-log", "log"),
   M2V("video/mpeg", "m2v"),
   MIME("message/rfc822", "mime"),
+  MJS("text/javascript", "mjs"),
   MKV("video/x-matroska", "mkv"),
   MOV("video/quicktime", "mov"),
   MP3("audio/mpeg", "mp3", IMimeMagic.MP3),
