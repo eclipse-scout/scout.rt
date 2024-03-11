@@ -191,6 +191,32 @@ describe('LogicalGridLayoutInfo', () => {
         expect(rows[1][3]).toEqual(new Rectangle(85, 35, 37, 30));
         expect(rows[1][4]).toEqual(new Rectangle(127, 35, 38, 30));
       });
+
+      it('scales cell not smaller than minWidth even if on the left and right are used cells', () => {
+        // w = 1, w = 2 and w = 1 on first row
+        let gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 1, gridh: 1, weightx: 1, minWidth: 80});
+        let gd2 = new LogicalGridData({gridx: 1, gridy: 0, gridw: 2, gridh: 1, weightx: 1, minWidth: 80});
+        let gd3 = new LogicalGridData({gridx: 3, gridy: 0, gridw: 1, gridh: 1, weightx: 1, minWidth: 80});
+        let rows = newLogicalGridLayoutInfo([gd1, gd2, gd3]).layoutCellBounds(new Dimension(10, 10), parentInsets);
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 37, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(42, 0, 38, 30));
+        expect(rows[0][2]).toEqual(new Rectangle(85, 0, 80, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 37, 30));
+        expect(rows[1][1]).toEqual(new Rectangle(42, 35, 38, 30));
+        expect(rows[1][2]).toEqual(new Rectangle(85, 35, 80, 30));
+
+        // w = 2, w = 1 and w = 2 on first row
+        gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 2, gridh: 1, weightx: 1, minWidth: 80});
+        gd2 = new LogicalGridData({gridx: 1, gridy: 0, gridw: 1, gridh: 1, weightx: 1, minWidth: 80});
+        gd3 = new LogicalGridData({gridx: 3, gridy: 0, gridw: 2, gridh: 1, weightx: 1, minWidth: 80});
+        rows = newLogicalGridLayoutInfo([gd1, gd2, gd3]).layoutCellBounds(new Dimension(10, 10), parentInsets);
+        expect(rows[0][0]).toEqual(new Rectangle(0, 0, 37, 30));
+        expect(rows[0][1]).toEqual(new Rectangle(42, 0, 38, 30));
+        expect(rows[0][2]).toEqual(new Rectangle(85, 0, 80, 30));
+        expect(rows[1][0]).toEqual(new Rectangle(0, 35, 37, 30));
+        expect(rows[1][1]).toEqual(new Rectangle(42, 35, 38, 30));
+        expect(rows[1][2]).toEqual(new Rectangle(85, 35, 80, 30));
+      });
     });
 
     describe('maxWidth', () => {
