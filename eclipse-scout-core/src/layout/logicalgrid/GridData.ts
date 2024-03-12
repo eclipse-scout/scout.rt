@@ -26,7 +26,9 @@ export class GridData implements GridDataModel {
   fillHorizontal: boolean;
   fillVertical: boolean;
   widthInPixel: number;
+  maxWidthInPixel: number;
   heightInPixel: number;
+  maxHeightInPixel: number;
 
   constructor(model?: InitModelOf<GridData>) {
     model = model || {};
@@ -43,7 +45,9 @@ export class GridData implements GridDataModel {
     this.fillHorizontal = true;
     this.fillVertical = true;
     this.widthInPixel = 0;
+    this.maxWidthInPixel = 0;
     this.heightInPixel = 0;
+    this.maxHeightInPixel = 0;
 
     $.extend(this, model);
   }
