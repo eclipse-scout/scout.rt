@@ -268,10 +268,11 @@ export class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
         if (distWidth[lc.PREF] > 0) {
           this._distribute(distWidth[lc.PREF], spanWidth[lc.PREF], prefWidths, cons, fixedWidths, (equalWidth, width) => Math.max(equalWidth, width));
         }
-        distWidth[lc.MIN] = cons.minWidth - spanWidth[lc.MIN];
+        distWidth[lc.MIN] = cons.minWidth - spanWidth[lc.MIN] - hGaps;
         if (distWidth[lc.MIN] > 0) {
-          this._distribute(distWidth[lc.MIN], spanWidth[lc.MIN], minWidths, cons, fixedWidths, (equalWidth, width) => Math.max(equalWidth, width), usedCols);
+          this._distribute(distWidth[lc.MIN], spanWidth[lc.MIN], minWidths, cons, fixedWidths, (equalWidth, width) => Math.max(equalWidth, width));
         }
+        // TODO CGU this is not deterministic, the components need to be sorted first e.g. by minWidth and w, otherwise if a smaller component comes second, it will enlarge some columns but not shrink others which makes the first larger component too big
         distWidth[lc.MAX] = cons.maxWidth - spanWidth[lc.MAX] - hGaps;
         this._distribute(distWidth[lc.MAX], spanWidth[lc.MAX], maxWidths, cons, fixedWidths, (equalWidth, width) => Math.min(equalWidth, width));
       }
