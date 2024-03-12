@@ -61,7 +61,7 @@ export class LogicalGridLayout extends AbstractLayout {
       this.widget.validateLogicalGrid();
       // It is important that the logical grid and the layout use the same widgets. Otherwise, there may be widgets without a gridData which is required by the layout.
       // This can happen if the widgets are inserted and removed by an animation before the layout has been done. If the widget is removed using an animation it is not in the list of getGridWidgets() anymore but may still be in the DOM.
-      this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(function(widget) {
+      this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(widget => {
         if (!widget.rendered) {
           // getGridWidgets may return non-rendered widgets, but grid should be calculated nevertheless
           return;
@@ -71,7 +71,7 @@ export class LogicalGridLayout extends AbstractLayout {
           return;
         }
         validateGridData.call(this, widget.htmlComp);
-      }, this);
+      });
     } else {
       $container.children().each((idx, elem) => {
         let $comp = $(elem);
