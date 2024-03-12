@@ -139,6 +139,12 @@ export interface GridDataModel {
    */
   widthInPixel?: number;
   /**
+   * Configures the maximum width of the element in pixel.
+   *
+   * Default is 0 which means there is no maximum.
+   */
+  maxWidthInPixel?: number;
+  /**
    * Configures the preferred height of the element in pixel.
    *
    * If the value is <=0 the property has no effect.
@@ -146,4 +152,10 @@ export interface GridDataModel {
    * Default is 0.
    */
   heightInPixel?: number;
+  /**
+   * Configures the maximum height of the element in pixel.
+   *
+   * Default is 0 which means there is no maximum.
+   */
+  maxHeightInPixel?: number;
 }
