@@ -140,6 +140,12 @@ export class GridData {
    */
   widthInPixel?: number;
   /**
+   * Configures the maximal width of the element in pixel.
+   *
+   * Default is 10240 which means there is no maximum.
+   */
+  maxWidthInPixel?: number;
+  /**
    * Configures the preferred height of the element in pixel.
    *
    * If the value is <=0 the property has no effect.
@@ -147,6 +153,12 @@ export class GridData {
    * Default is 0.
    */
   heightInPixel?: number;
+  /**
+   * Configures the maximal height of the element in pixel.
+   *
+   * Default is 10240 which means there is no maximum.
+   */
+  maxHeightInPixel?: number;
 
   constructor(model?: GridData) {
     model = model || {};
@@ -163,7 +175,9 @@ export class GridData {
     this.fillHorizontal = true;
     this.fillVertical = true;
     this.widthInPixel = 0;
+    this.maxWidthInPixel = 10240;
     this.heightInPixel = 0;
+    this.maxHeightInPixel = 10240; // TODO CGU maybe set to -1 here and to max value only in logical grid?
 
     $.extend(this, model);
   }
