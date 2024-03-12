@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CompositeField, FormField, FormFieldLabelPosition, graphics, GridData, LayoutData, objects, Widget} from '../../index';
+import {CompositeField, FormField, FormFieldLabelPosition, graphics, GridData, LayoutData, Widget} from '../../index';
 
 export interface LogicalGridWidget extends Widget {
   _setGridData(gridData: GridData);
@@ -36,6 +36,7 @@ export class LogicalGridData implements LayoutData {
   gridx: number;
   gridy: number;
   heightHint: number;
+  maxHeight: number;
   horizontalAlignment: number;
   logicalRowHeightAddition: number;
   useUiHeight: boolean;
@@ -45,8 +46,9 @@ export class LogicalGridData implements LayoutData {
   weighty: number;
   widget: LogicalGridWidget;
   widthHint: number;
+  maxWidth: number;
 
-  constructor(vararg?: LogicalGridData | Widget) {
+  constructor(vararg?: Partial<LogicalGridData> | Widget) {
     this.gridx = 0;
     this.gridy = 0;
     this.gridw = 1;
@@ -56,20 +58,19 @@ export class LogicalGridData implements LayoutData {
     this.useUiWidth = false;
     this.useUiHeight = false;
     this.widthHint = 0;
+    this.maxWidth = 10240;
     this.heightHint = 0;
+    this.maxHeight = 10240;
     this.horizontalAlignment = -1;
     this.verticalAlignment = -1;
     this.fillHorizontal = true;
     this.fillVertical = true;
 
-    if (vararg instanceof LogicalGridData) {
-      // copy properties from LGD template
-      objects.copyProperties(vararg, this);
-    } else if (isLogicalGridWidget(vararg)) {
+    if (isLogicalGridWidget(vararg)) {
       // work with widget / validate
       this.widget = vararg;
     } else {
-      // NOP - default CTOR
+      $.extend(this, vararg);
     }
   }
 
@@ -101,7 +102,9 @@ export class LogicalGridData implements LayoutData {
     this.fillHorizontal = data.fillHorizontal;
     this.fillVertical = data.fillVertical;
     this.widthHint = data.widthInPixel;
+    this.maxWidth = data.maxWidthInPixel > 0 ? data.maxWidthInPixel : 10240;
     this.heightHint = data.heightInPixel;
+    this.maxHeight = data.maxHeightInPixel > 0 ? data.maxHeightInPixel : 10240;
 
     // when having the label on top, the row height has to be increased
     if (this.widget.labelVisible && this.widget.$label && this.widget.labelPosition === FormField.LabelPosition.TOP) {
