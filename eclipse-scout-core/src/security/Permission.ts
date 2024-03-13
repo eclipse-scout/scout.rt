@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,13 +13,13 @@ import {EnumObject, FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, scout,
 export class Permission implements PermissionModel {
   declare self: Permission;
   declare model: PermissionModel;
-  declare initModel: SomeRequired<this['model'], 'name'>;
+  declare initModel: SomeRequired<this['model'], 'id'>;
 
-  name: string;
+  id: string;
   level: PermissionLevel;
 
   constructor() {
-    this.name = null;
+    this.id = null;
     this.level = Permission.Level.UNDEFINED;
   }
 
@@ -31,7 +31,7 @@ export class Permission implements PermissionModel {
 
   init(model: InitModelOf<this>) {
     model = model || {} as InitModelOf<this>;
-    this.name = scout.assertParameter('name', strings.nullIfEmpty(model.name));
+    this.id = scout.assertParameter('id', strings.nullIfEmpty(model.id));
     this.level = scout.nvl(model.level, this.level);
   }
 
@@ -50,7 +50,7 @@ export class Permission implements PermissionModel {
   }
 
   matches(permission: Permission): boolean {
-    return permission instanceof Permission && this.name === permission.name;
+    return permission instanceof Permission && this.id === permission.id;
   }
 
   /**
@@ -68,13 +68,13 @@ export class Permission implements PermissionModel {
   }
 
   /**
-   * @returns a {@link Permission} with the given `name`.
+   * @returns a {@link Permission} with the given `id`.
    */
-  static quick(name: string): Permission {
-    if (!name) {
+  static quick(id: string): Permission {
+    if (!id) {
       return null;
     }
-    return Permission.ensure({name});
+    return Permission.ensure({id: id});
   }
 
   /**
@@ -97,9 +97,9 @@ export class Permission implements PermissionModel {
 
 export interface PermissionModel extends ObjectModel<Permission> {
   /**
-   * The name and identifier of the {@link Permission}.
+   * The identifier of the {@link Permission}.
    */
-  name?: string;
+  id?: string;
   /**
    * The level of the {@link Permission}.
    */

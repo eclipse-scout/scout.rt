@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,9 +17,9 @@ describe('access', () => {
     none: Permission;
 
   beforeAll(async () => {
-    same = Permission.ensure({objectType: SamePermission, name: 'same', level: Permission.Level.ALL});
+    same = Permission.ensure({objectType: SamePermission, id: 'same', level: Permission.Level.ALL});
     name = Permission.quick('name');
-    none = scout.create(Permission, {name: 'none', level: Permission.Level.NONE});
+    none = scout.create(Permission, {id: 'none', level: Permission.Level.NONE});
     await accessSpecHelper.install(accessSpecHelper.permissionCollectionModel(same, name, none));
   });
 
@@ -38,22 +38,22 @@ describe('access', () => {
     it('checks synchronously against granted permissions', () => {
       expect(access.quickCheck('same')).toBeFalse();
       expect(access.quickCheck(Permission.quick('same'))).toBeFalse();
-      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, name: 'same'}))).toBeFalse();
+      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, id: 'same'}))).toBeFalse();
       expect(access.quickCheck(same)).toBeTrue();
 
       expect(access.quickCheck('name')).toBeTrue();
       expect(access.quickCheck(Permission.quick('name'))).toBeTrue();
-      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, name: 'name'}))).toBeTrue();
+      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, id: 'name'}))).toBeTrue();
       expect(access.quickCheck(name)).toBeTrue();
 
       expect(access.quickCheck('none')).toBeFalse();
       expect(access.quickCheck(Permission.quick('none'))).toBeFalse();
-      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, name: 'none'}))).toBeFalse();
+      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, id: 'none'}))).toBeFalse();
       expect(access.quickCheck(none)).toBeFalse();
 
       expect(access.quickCheck('other')).toBeFalse();
       expect(access.quickCheck(Permission.quick('other'))).toBeFalse();
-      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, name: 'other'}))).toBeFalse();
+      expect(access.quickCheck(Permission.ensure({objectType: SamePermission, id: 'other'}))).toBeFalse();
     });
   });
 
@@ -62,22 +62,22 @@ describe('access', () => {
     it('checks asynchronously against granted permissions', async () => {
       expect(await access.check('same')).toBeFalse();
       expect(await access.check(Permission.quick('same'))).toBeFalse();
-      expect(await access.check(Permission.ensure({objectType: SamePermission, name: 'same'}))).toBeFalse();
+      expect(await access.check(Permission.ensure({objectType: SamePermission, id: 'same'}))).toBeFalse();
       expect(await access.check(same)).toBeTrue();
 
       expect(await access.check('name')).toBeTrue();
       expect(await access.check(Permission.quick('name'))).toBeTrue();
-      expect(await access.check(Permission.ensure({objectType: SamePermission, name: 'name'}))).toBeTrue();
+      expect(await access.check(Permission.ensure({objectType: SamePermission, id: 'name'}))).toBeTrue();
       expect(await access.check(name)).toBeTrue();
 
       expect(await access.check('none')).toBeFalse();
       expect(await access.check(Permission.quick('none'))).toBeFalse();
-      expect(await access.check(Permission.ensure({objectType: SamePermission, name: 'none'}))).toBeFalse();
+      expect(await access.check(Permission.ensure({objectType: SamePermission, id: 'none'}))).toBeFalse();
       expect(await access.check(none)).toBeFalse();
 
       expect(await access.check('other')).toBeFalse();
       expect(await access.check(Permission.quick('other'))).toBeFalse();
-      expect(await access.check(Permission.ensure({objectType: SamePermission, name: 'other'}))).toBeFalse();
+      expect(await access.check(Permission.ensure({objectType: SamePermission, id: 'other'}))).toBeFalse();
     });
   });
 

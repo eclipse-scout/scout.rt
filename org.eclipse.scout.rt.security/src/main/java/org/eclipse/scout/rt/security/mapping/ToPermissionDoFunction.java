@@ -22,7 +22,7 @@ public class ToPermissionDoFunction extends AbstractToPermissionDoFunction<IPerm
   public void apply(IPermission permission, PermissionDo permissionDo) {
     permissionDo
         .withObjectType(PERMISSION_OBJECT_TYPE)
-        .withName(permission.getName())
+        .withId(permission.getId())
         .withLevel(ObjectUtility.nvl(permission.getLevel(), PermissionLevel.UNDEFINED).getValue());
   }
 }

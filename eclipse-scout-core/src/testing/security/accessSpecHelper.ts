@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,7 +29,7 @@ export const accessSpecHelper = {
     arrays.ensure(permissions)
       .forEach(p => {
         p = Permission.ensure(p);
-        permissionMap.set(p.name, [...arrays.ensure(permissionMap.get(p.name)), p]);
+        permissionMap.set(p.id, [...arrays.ensure(permissionMap.get(p.id)), p]);
       });
 
     return {

@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.api.data.security.PermissionCollectionDo;
 import org.eclipse.scout.rt.api.data.security.PermissionCollectionType;
+import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.dataobject.mapping.ToDoFunctionHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.security.AbstractPermission;
@@ -40,11 +41,13 @@ public class ToPermissionCollectionDoFunctionTest {
     assertEquals(PermissionCollectionType.DEFAULT, permissionCollectionDo.getType());
     assertEquals(0, permissionCollectionDo.getPermissions().size());
 
-    permissionCollectionDo = toDoFunctionHelper.toDo(permissionCollection(permission("test1"), permission("test2")), IToPermissionCollectionDoFunction.class);
+    PermissionId test1PermissionId = PermissionId.of("test1");
+    PermissionId test2PermissionId = PermissionId.of("test2");
+    permissionCollectionDo = toDoFunctionHelper.toDo(permissionCollection(permission(test1PermissionId), permission(test2PermissionId)), IToPermissionCollectionDoFunction.class);
     assertNotNull(permissionCollectionDo);
     assertEquals("PermissionCollection", permissionCollectionDo.getObjectType());
     assertEquals(PermissionCollectionType.DEFAULT, permissionCollectionDo.getType());
-    assertEquals(Set.of("test1", "test2"), permissionCollectionDo.getPermissions().keySet());
+    assertEquals(Set.of(test1PermissionId, test2PermissionId), permissionCollectionDo.getPermissions().keySet());
 
     permissionCollectionDo = toDoFunctionHelper.toDo(BEANS.get(AllPermissionCollection.class), IToPermissionCollectionDoFunction.class);
     assertNotNull(permissionCollectionDo);
@@ -57,8 +60,8 @@ public class ToPermissionCollectionDoFunctionTest {
     assertEquals(PermissionCollectionType.NONE, permissionCollectionDo.getType());
   }
 
-  protected IPermission permission(String name) {
-    return new AbstractPermission(name) {
+  protected IPermission permission(PermissionId id) {
+    return new AbstractPermission(id) {
       private static final long serialVersionUID = 1L;
     };
   }

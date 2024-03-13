@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -168,7 +169,7 @@ public class AccessControlServiceTest {
     private static final long serialVersionUID = 1L;
 
     public SomePermission1() {
-      super("some.permission.1");
+      super(PermissionId.of("some.permission.1"));
     }
   }
 
