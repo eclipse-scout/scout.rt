@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,8 +30,8 @@ public class PermissionDo extends DoEntity {
     return doValue("objectType");
   }
 
-  public DoValue<String> name() {
-    return doValue("name");
+  public DoValue<PermissionId> id() {
+    return doValue("id");
   }
 
   public DoValue<Integer> level() {
@@ -60,14 +60,14 @@ public class PermissionDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public PermissionDo withName(String name) {
-    name().set(name);
+  public PermissionDo withId(PermissionId id) {
+    id().set(id);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getName() {
-    return name().get();
+  public PermissionId getId() {
+    return id().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

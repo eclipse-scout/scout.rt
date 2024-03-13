@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,16 +23,16 @@ describe('Permission', () => {
     it('asserts that name is set', () => {
       const permission = Permission.quick('some');
 
-      expect(permission.name).toBe('some');
+      expect(permission.id).toBe('some');
 
-      permission.init({name: 'other'});
-      expect(permission.name).toBe('other');
+      permission.init({id: 'other'});
+      expect(permission.id).toBe('other');
 
-      expect(() => permission.init(null)).toThrowError('Missing required parameter \'name\'');
-      expect(() => permission.init({} as any)).toThrowError('Missing required parameter \'name\'');
-      expect(() => permission.init({name: null})).toThrowError('Missing required parameter \'name\'');
-      expect(() => permission.init({name: ''})).toThrowError('Missing required parameter \'name\'');
-      expect(() => permission.init({test: 'some'} as any)).toThrowError('Missing required parameter \'name\'');
+      expect(() => permission.init(null)).toThrowError('Missing required parameter \'id\'');
+      expect(() => permission.init({} as any)).toThrowError('Missing required parameter \'id\'');
+      expect(() => permission.init({id: null})).toThrowError('Missing required parameter \'id\'');
+      expect(() => permission.init({id: ''})).toThrowError('Missing required parameter \'id\'');
+      expect(() => permission.init({test: 'some'} as any)).toThrowError('Missing required parameter \'id\'');
     });
   });
 
@@ -40,8 +40,8 @@ describe('Permission', () => {
 
     it('by name and class', () => {
       const some1 = Permission.quick('some');
-      const some2 = scout.create(Permission, {name: 'some'});
-      const someObj = {name: 'some'} as Permission;
+      const some2 = scout.create(Permission, {id: 'some'});
+      const someObj = {id: 'some'} as Permission;
       const other = Permission.quick('other');
 
       expect(some1.matches(some1)).toBeTrue();
@@ -105,7 +105,7 @@ describe('Permission', () => {
 
     it('evaluates permission', async () => {
       const some1 = Permission.quick('some');
-      const some2 = scout.create(SpecPermission, {name: 'some'});
+      const some2 = scout.create(SpecPermission, {id: 'some'});
 
       expect(some1.implies(some1, true)).toBeTrue();
       expect(some1.implies(some2, true)).toBeTrue();
@@ -147,15 +147,15 @@ describe('Permission', () => {
       expect(ensurePermission).toBeInstanceOf(Permission);
       expect(ensurePermission).not.toBeInstanceOf(SpecPermission);
 
-      const ensureModel = Permission.ensure({name: 'some'});
+      const ensureModel = Permission.ensure({id: 'some'});
       expect(ensureModel).not.toBe(some);
-      expect(ensureModel.name).toBe('some');
+      expect(ensureModel.id).toBe('some');
       expect(ensureModel).toBeInstanceOf(Permission);
       expect(ensureModel).not.toBeInstanceOf(SpecPermission);
 
-      const ensureSpecModel = Permission.ensure({objectType: SpecPermission, name: 'some'});
+      const ensureSpecModel = Permission.ensure({objectType: SpecPermission, id: 'some'});
       expect(ensureSpecModel).not.toBe(some);
-      expect(ensureSpecModel.name).toBe('some');
+      expect(ensureSpecModel.id).toBe('some');
       expect(ensureSpecModel).toBeInstanceOf(Permission);
       expect(ensureSpecModel).toBeInstanceOf(SpecPermission);
     });

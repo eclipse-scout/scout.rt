@@ -31,7 +31,7 @@ public class ToPermissionCollectionDoFunction extends AbstractToPermissionCollec
         .withPermissions(permissionCollection.stream()
             .map(permission -> toDoFunctionHelper.toDo(permission, IToPermissionDoFunction.class))
             .filter(Objects::nonNull)
-            .collect(Collectors.groupingBy(PermissionDo::getName, Collectors.toSet())))
+            .collect(Collectors.groupingBy(PermissionDo::getId, Collectors.toSet())))
         .withType(PermissionCollectionType.DEFAULT);
   }
 }

@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.platform.util.EnumerationUtility;
 
 /**
@@ -33,7 +34,7 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
   private static final long serialVersionUID = 1L;
 
   /** content is effective immutable and protected by {@link #isReadOnly()} */
-  private final Map<String, List<IPermission>> m_permissions;
+  private final Map<PermissionId, List<IPermission>> m_permissions;
   private final List<Permission> m_javaPermissions;
 
   public DefaultPermissionCollection() {
@@ -56,7 +57,7 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
   public void add(IPermission permission) {
     assertNotReadOnly();
     if (permission != null) {
-      m_permissions.computeIfAbsent(permission.getName(), k -> new ArrayList<>()).add(permission);
+      m_permissions.computeIfAbsent(permission.getId(), k -> new ArrayList<>()).add(permission);
     }
   }
 
@@ -90,7 +91,7 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
     if (permission == null) {
       return false;
     }
-    return m_permissions.getOrDefault(permission.getName(), Collections.emptyList()).stream().anyMatch(def -> def.implies(permission));
+    return m_permissions.getOrDefault(permission.getId(), Collections.emptyList()).stream().anyMatch(def -> def.implies(permission));
   }
 
   @Override
@@ -123,7 +124,7 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
     if (permission == null) {
       return Stream.empty();
     }
-    return m_permissions.getOrDefault(permission.getName(), Collections.emptyList()).stream()
+    return m_permissions.getOrDefault(permission.getId(), Collections.emptyList()).stream()
         .filter(def -> def.matches(permission));
   }
 

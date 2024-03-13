@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,20 +11,22 @@ package org.eclipse.scout.rt.security;
 
 import java.security.Permission;
 
+import org.eclipse.scout.rt.api.data.security.PermissionId;
+
 /**
  * Extension to {@link Permission}
  * <p>
  * Unlike other permissions, a permission implementing this interface can only be implied by another {@link IPermission}
- * <b>with the same name</b>.
+ * <b>with the same name (= the same id)</b>.
  *
  * @see Permission
  */
 public interface IPermission {
 
   /**
-   * @see Permission#getName()
+   * Typed wrapper for {@link Permission#getName()}
    */
-  String getName();
+  PermissionId getId();
 
   /**
    * {@link PermissionLevel} which was granted within an {@link IPermissionCollection}.
@@ -68,7 +70,7 @@ public interface IPermission {
   /**
    * Tests if this permission is responsible for granting given permission.
    * <p>
-   * If {@link #getName()} do not match, this method should return false.
+   * If {@link #getId()} do not match, this method should return false.
    *
    * @return true if this permission is responsible for granting given permission
    */

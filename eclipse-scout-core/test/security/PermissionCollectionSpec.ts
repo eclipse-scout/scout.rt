@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -78,8 +78,8 @@ describe('PermissionCollection', () => {
     it('resolves if first check is succeeds', () => {
       let evalDeferred1: JQuery.Deferred<boolean>;
       let evalDeferred2: JQuery.Deferred<boolean>;
-      const permission1 = scout.create(SpecPermission, {name: 'test'});
-      const permission2 = scout.create(SpecPermission, {name: 'test'});
+      const permission1 = scout.create(SpecPermission, {id: 'test'});
+      const permission2 = scout.create(SpecPermission, {id: 'test'});
       const collection = scout.create(PermissionCollection, accessSpecHelper.permissionCollectionModel(permission1, permission2));
 
       permission1._evalPermission = (permission: Permission) => {
@@ -144,11 +144,11 @@ describe('PermissionCollection', () => {
     it('gets the correct permission level if type is DEFAULT', () => {
       const collection = scout.create(PermissionCollection, {
         permissions: {
-          undef: [scout.create(Permission, {name: 'undef', level: Permission.Level.UNDEFINED})],
-          none: [scout.create(Permission, {name: 'none', level: Permission.Level.NONE})],
-          all: [scout.create(Permission, {name: 'all', level: Permission.Level.ALL})],
-          multiple: [scout.create(Permission, {name: 'multiple', level: Permission.Level.NONE}), scout.create(Permission, {name: 'multiple', level: Permission.Level.ALL})],
-          multipleSame: [scout.create(Permission, {name: 'multipleSame', level: Permission.Level.ALL}), scout.create(Permission, {name: 'multipleSame', level: Permission.Level.ALL})]
+          undef: [scout.create(Permission, {id: 'undef', level: Permission.Level.UNDEFINED})],
+          none: [scout.create(Permission, {id: 'none', level: Permission.Level.NONE})],
+          all: [scout.create(Permission, {id: 'all', level: Permission.Level.ALL})],
+          multiple: [scout.create(Permission, {id: 'multiple', level: Permission.Level.NONE}), scout.create(Permission, {id: 'multiple', level: Permission.Level.ALL})],
+          multipleSame: [scout.create(Permission, {id: 'multipleSame', level: Permission.Level.ALL}), scout.create(Permission, {id: 'multipleSame', level: Permission.Level.ALL})]
         }
       });
 
@@ -169,12 +169,12 @@ describe('PermissionCollection', () => {
 
       const permissionsObject = {
         array: [Permission.quick('array')],
-        arrayModel: [{name: 'arrayModel'}],
+        arrayModel: [{id: 'arrayModel'}],
         arrayEmpty: []
       };
       const permissionsMap = new Map(Object.entries({
         set: new Set([Permission.quick('set')]),
-        setModel: new Set([{name: 'setModel'}]),
+        setModel: new Set([{id: 'setModel'}]),
         setEmpty: new Set()
       }));
 

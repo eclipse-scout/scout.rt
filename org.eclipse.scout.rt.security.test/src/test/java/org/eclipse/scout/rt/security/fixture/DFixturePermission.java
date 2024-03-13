@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.security.fixture;
 
+import org.eclipse.scout.rt.api.data.security.PermissionId;
+
 public class DFixturePermission extends AbstractFixturePermission {
   private static final long serialVersionUID = 1L;
 
   public DFixturePermission() {
-    super("D");
+    super(PermissionId.of("D"));
   }
 }

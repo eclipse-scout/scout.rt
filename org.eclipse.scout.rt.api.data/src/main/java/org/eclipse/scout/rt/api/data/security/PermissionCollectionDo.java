@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,7 +37,7 @@ public class PermissionCollectionDo extends DoEntity {
     return doValue("type");
   }
 
-  public DoValue<Map<String, ? extends Collection<PermissionDo>>> permissions() {
+  public DoValue<Map<PermissionId, ? extends Collection<PermissionDo>>> permissions() {
     return doValue("permissions");
   }
 
@@ -74,13 +74,13 @@ public class PermissionCollectionDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public PermissionCollectionDo withPermissions(Map<String, ? extends Collection<PermissionDo>> permissions) {
+  public PermissionCollectionDo withPermissions(Map<PermissionId, ? extends Collection<PermissionDo>> permissions) {
     permissions().set(permissions);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Map<String, ? extends Collection<PermissionDo>> getPermissions() {
+  public Map<PermissionId, ? extends Collection<PermissionDo>> getPermissions() {
     return permissions().get();
   }
 }

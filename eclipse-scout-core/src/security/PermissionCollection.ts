@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -67,7 +67,7 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
     }
     switch (this.type) {
       case PermissionCollectionType.DEFAULT: {
-        const permissions = this.permissions.get(permission.name);
+        const permissions = this.permissions.get(permission.id);
         if (!permissions || !permissions.size) {
           return quick ? false : $.resolvedPromise(false);
         }
@@ -120,7 +120,7 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
     }
     switch (this.type) {
       case PermissionCollectionType.DEFAULT: {
-        const permissions = this.permissions.get(permission.name);
+        const permissions = this.permissions.get(permission.id);
         if (!permissions || !permissions.size) {
           return Permission.Level.NONE;
         }
@@ -168,7 +168,7 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
   /**
    * Ensures that the given `permissionModelMapModel` is of type {@link PermissionMap}.
    *
-   * @param permissionModelMapModel map/object of {@link Permission}s or their model grouped by `name`.
+   * @param permissionModelMapModel map/object of {@link Permission}s or their model grouped by `id`.
    */
   protected static _ensurePermissionMap(permissionModelMapModel: PermissionModelMapModel): PermissionMap {
     // permissionModelMapModel is a map or an object
@@ -212,7 +212,7 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
 
 export interface PermissionCollectionModel extends ObjectModel<PermissionCollection> {
   /**
-   * {@link Permission}s grouped by `name`.
+   * {@link Permission}s grouped by `id`.
    */
   permissions?: PermissionModelMapModel;
   /**

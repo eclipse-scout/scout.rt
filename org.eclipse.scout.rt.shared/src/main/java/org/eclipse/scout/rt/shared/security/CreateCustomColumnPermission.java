@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
+import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.security.AbstractPermission;
 
 public class CreateCustomColumnPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
+  public static final PermissionId ID = PermissionId.of("scout.custom.column.create");
 
   public CreateCustomColumnPermission() {
-    super("scout.custom.column.create");
+    super(ID);
   }
 }
