@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.security.mapping;
 import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.api.data.security.PermissionDo;
+import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.dataobject.mapping.ToDoFunctionHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.security.AbstractPermission;
@@ -35,11 +36,11 @@ public class ToPermissionDoFunctionTest {
     permissionDo = toDoFunctionHelper.toDo(permission("test"), IToPermissionDoFunction.class);
     assertNotNull(permissionDo);
     assertEquals("Permission", permissionDo.getObjectType());
-    assertEquals("test", permissionDo.getName());
+    assertEquals(PermissionId.of("test"), permissionDo.getName());
   }
 
   protected IPermission permission(String name) {
-    return new AbstractPermission(name) {
+    return new AbstractPermission(PermissionId.of(name)) {
       private static final long serialVersionUID = 1L;
     };
   }

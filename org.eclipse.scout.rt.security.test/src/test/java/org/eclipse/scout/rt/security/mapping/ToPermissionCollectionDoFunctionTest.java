@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.api.data.security.PermissionCollectionDo;
 import org.eclipse.scout.rt.api.data.security.PermissionCollectionType;
+import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.dataobject.mapping.ToDoFunctionHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.security.AbstractPermission;
@@ -44,7 +45,7 @@ public class ToPermissionCollectionDoFunctionTest {
     assertNotNull(permissionCollectionDo);
     assertEquals("PermissionCollection", permissionCollectionDo.getObjectType());
     assertEquals(PermissionCollectionType.DEFAULT, permissionCollectionDo.getType());
-    assertEquals(Set.of("test1", "test2"), permissionCollectionDo.getPermissions().keySet());
+    assertEquals(Set.of(PermissionId.of("test1"), PermissionId.of("test2")), permissionCollectionDo.getPermissions().keySet());
 
     permissionCollectionDo = toDoFunctionHelper.toDo(BEANS.get(AllPermissionCollection.class), IToPermissionCollectionDoFunction.class);
     assertNotNull(permissionCollectionDo);
@@ -58,7 +59,7 @@ public class ToPermissionCollectionDoFunctionTest {
   }
 
   protected IPermission permission(String name) {
-    return new AbstractPermission(name) {
+    return new AbstractPermission(PermissionId.of(name)) {
       private static final long serialVersionUID = 1L;
     };
   }

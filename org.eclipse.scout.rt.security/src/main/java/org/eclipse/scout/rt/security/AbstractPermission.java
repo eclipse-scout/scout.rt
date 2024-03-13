@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,11 @@
  */
 package org.eclipse.scout.rt.security;
 
+import static java.util.Optional.ofNullable;
+
 import java.security.Permission;
 
+import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 
@@ -23,12 +26,13 @@ public abstract class AbstractPermission extends Permission implements IPermissi
   private IPermissionCollection m_permissionCollection;
   private PermissionLevel m_level;
 
-  /**
-   * @param name
-   *          returned by {@link #getName()}
-   */
-  public AbstractPermission(String name) {
-    super(name);
+  public AbstractPermission(PermissionId id) {
+    super(ofNullable(id).map(PermissionId::unwrapAsString).orElse(null));
+  }
+
+  @Override
+  public PermissionId getId() {
+    return PermissionId.of(getName());
   }
 
   protected IPermissionCollection getPermissionCollection() {
@@ -53,7 +57,7 @@ public abstract class AbstractPermission extends Permission implements IPermissi
 
   @Override
   public boolean matches(IPermission p) {
-    return p != null && p.getClass() == getClass() && getName().equals(p.getName());
+    return p != null && p.getClass() == getClass() && getId().equals(p.getId());
   }
 
   @Override
