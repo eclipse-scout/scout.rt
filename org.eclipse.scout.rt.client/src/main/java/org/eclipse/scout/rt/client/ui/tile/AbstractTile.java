@@ -316,7 +316,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
         }
       };
     }
-    IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
+    IDesktop.CURRENT.get().dataChangeDesktopInForegroundListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
   @Override
