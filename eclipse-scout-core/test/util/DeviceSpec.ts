@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -54,12 +54,28 @@ describe('Device', () => {
   describe('isWindowsTabletMode', () => {
 
     it('returns true if system is windows and scrollbarWidth is 0', () => {
-      Device.get().scrollbarWidth = 0;
       Device.get().system = Device.System.WINDOWS;
       Device.get().systemVersion = 10.0;
-      expect(Device.get().isWindowsTabletMode()).toBe(true);
-    });
+      let origMatchMedia = window.matchMedia;
+      try {
+        // Patch native "matchMedia" function to simulate different device capabilities
+        let matches = false;
+        window.matchMedia = (mediaQuery: string) => {
+          return {
+            matches: matches
+          } as MediaQueryList;
+        };
+        expect(Device.get().isWindowsTabletMode()).toBe(false);
 
+        matches = true;
+        expect(Device.get().isWindowsTabletMode()).toBe(true);
+
+        Device.get().system = Device.System.UNKNOWN;
+        expect(Device.get().isWindowsTabletMode()).toBe(false);
+      } finally {
+        window.matchMedia = origMatchMedia;
+      }
+    });
   });
 
   describe('user agent parsing', () => {
