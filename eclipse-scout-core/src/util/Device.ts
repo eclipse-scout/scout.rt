@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -251,11 +251,15 @@ export class Device implements DeviceModel, ObjectWithType {
   }
 
   /**
-   * The best way we have to detect a Microsoft Surface Tablet in table mode is to check if
-   * the scrollbar width is 0 pixel. In desktop mode the scrollbar width is > 0 pixel.
+   * Checks if the device is running Windows 10 or later in "tablet mode". We assume that this is the case when the
+   * _primary_ input mechanism consists of a pointing device of limited accuracy, such as a finger on a touchscreen.
+   *
+   * In Windows 11, the "tablet mode" cannot be explicitly set by the user. Instead, it is automatically turned on
+   * when the keyboard is detached. When the device is docked, the touchscreen can still be used, but it is no longer
+   * the primary input mechanism.
    */
   isWindowsTabletMode(): boolean {
-    return Device.System.WINDOWS === this.system && this.systemVersion >= 10 && this.scrollbarWidth === 0;
+    return Device.System.WINDOWS === this.system && this.systemVersion >= 10 && window.matchMedia('(pointer: coarse)').matches;
   }
 
   /**
