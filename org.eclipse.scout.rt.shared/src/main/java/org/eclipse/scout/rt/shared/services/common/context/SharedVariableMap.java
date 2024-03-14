@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -61,16 +61,21 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
    */
   public void updateInternal(SharedVariableMap newMap) {
     if (newMap.getVersion() != getVersion()) {
+      var different = !m_variables.equals(newMap.m_variables);
       m_variables = CollectionUtility.copyMap(newMap.m_variables);
       m_version = newMap.getVersion();
+      if (different) {
+        mapChanged();
+      }
     }
   }
 
   /**
-   * @return the version seq of the map state. This version number is changed every time the variable map changes. Note
-   *         that even a different number means that the version changed, it must not be higher, just different.
+   * @return The version seq of the map state. This version number is changed every time the variable map changes.
    *         <p>
-   *         see https://bugs.eclipse.org/bugs/show_bug.cgi?id=358344
+   *         Note that even a different number means that the version changed, it must not be higher, just different.
+   *         <p>
+   *         See <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=358344">Bug 358344</a>.
    */
   public int getVersion() {
     return m_version;
