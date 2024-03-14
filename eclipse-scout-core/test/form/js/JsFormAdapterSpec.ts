@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -102,7 +102,7 @@ describe('JsFormAdapter', () => {
           clientSession: '7'
         },
         adapterData: {
-          7: {desktop: '13'} as unknown as AdapterData,
+          7: {desktop: '13', objectType: 'Session'} as AdapterData,
           13: $.extend({objectType: 'Desktop'}, displayHint === Form.DisplayHint.VIEW ? {views: ['42']} : {dialogs: ['42']}),
           42: $.extend(createAdapterData('42', 'jsformspec.JsForm'), {displayHint})
         }

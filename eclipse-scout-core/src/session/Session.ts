@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager, fonts, icons,
-  InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType,
-  Reconnector, RemoteEvent, ResponseQueue, scout, SessionEventMap, SessionModel, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget
+  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager, fonts, icons, InitModelOf,
+  JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType, Reconnector,
+  RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
@@ -42,6 +42,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   layoutValidator: LayoutValidator;
   focusManager: FocusManager;
   keyStrokeManager: KeyStrokeManager;
+  modelAdapter: SessionAdapter;
   /** assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern). */
   uiSessionId: string;
   clientSessionId: string;
@@ -49,6 +50,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   remoteUrl: string;
   unloadUrl: string;
   modelAdapterRegistry: Record<string, ModelAdapterLike>;
+  sharedVariableMap: Record<string, any>;
   ajaxCalls: AjaxCall[];
   asyncEvents: RemoteEvent[];
   currentEvent: RemoteEvent;
@@ -126,6 +128,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.reconnector = new Reconnector(this);
     this.processingEvents = false;
     this.adapterExportEnabled = false;
+    this.sharedVariableMap = {};
     this._adapterDataCache = {};
     this._deferred = null;
     this._fatalMessagesOnScreen = {};
@@ -220,6 +223,14 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     if (!this.suppressErrors) {
       throw new Error(message);
     }
+  }
+
+  /**
+   * @param name The name of the shared variable.
+   * @returns the value of the shared variable with given name.
+   */
+  getSharedVariable<TKey extends keyof SharedVariables & string>(name: TKey): SharedVariables[TKey] {
+    return this.sharedVariableMap[name];
   }
 
   unregisterModelAdapter(modelAdapter: ModelAdapter) {
@@ -445,10 +456,13 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
     this._setLocaleAndTexts(Locale.ensure(data.startupData.locale), data.startupData.textMap);
 
+    // create session adapter
+    let clientSessionModel = this._getAdapterData(data.startupData.clientSession);
+    this.modelAdapter = this.createModelAdapter(clientSessionModel) as SessionAdapter;
+    this.modelAdapter._initProperties(clientSessionModel);
+
     // Create the desktop
-    // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
-    let clientSessionData = this._getAdapterData(data.startupData.clientSession);
-    this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget) as Desktop;
+    this.desktop = this.getOrCreateWidget(clientSessionModel.desktop, this.rootAdapter.widget) as Desktop;
     App.get()._triggerDesktopReady(this.desktop);
 
     let renderDesktopImpl = function() {
@@ -637,7 +651,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
     // Ensure that certain request don't run forever. When a timeout occurs, the session
     // is put into offline mode. Note that normal requests should NOT be limited, because
-    // the server processing might take very long (e.g. long running database query).
+    // the server processing might take very long (e.g. long-running database query).
     ajaxOptions.timeout = 0; // "infinite"
     if (request.cancel) {
       ajaxOptions.timeout = this.requestTimeoutCancel;
@@ -739,7 +753,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
         // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
         // correctly, because the glasspane of the busy indicator is still visible.
         // The second check prevents flickering of the busy indicator if there is a scheduled request
-        // that will be sent immediately afterwards (see onAjaxAlways).
+        // that will be sent immediately afterward (see onAjaxAlways).
         if (busyHandling && !this.areBusyIndicatedEventsQueued()) {
           this._setBusy(false);
         }

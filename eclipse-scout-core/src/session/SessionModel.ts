@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -55,7 +55,7 @@ export interface SessionModel extends ObjectModel<Session> {
   suppressErrors?: boolean;
 
   /**
-   * Forces the focus manager to be active or not. If undefined, the value is auto detected by {@link Device}.
+   * Forces the focus manager to be active or not. If undefined, the value is auto-detected by {@link Device}.
    */
   focusManagerActive?: boolean;
 
@@ -68,4 +68,9 @@ export interface SessionModel extends ObjectModel<Session> {
    * Properties of this object are copied to all instances of {@link AjaxCall}.
    */
   ajaxCallOptions?: AjaxCallModel;
+
+  /**
+   * Map of shared variables coming from the backend client session. See IClientSession.java#getExposedSharedVariables.
+   */
+  sharedVariableMap?: Record<string, any>;
 }

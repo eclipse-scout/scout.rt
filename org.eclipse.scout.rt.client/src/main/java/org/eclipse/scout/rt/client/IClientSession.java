@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client;
 
 import java.net.URI;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 
@@ -25,6 +26,12 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public interface IClientSession extends ISession, IPropertyObserver {
 
   String PROP_LOCALE = "locale";
+
+  /**
+   * Property for the shared variables. Events are fired for this property when the {@link #getSharedVariableMap()} has
+   * changed.
+   */
+  String PROP_SHARED_VARIABLE_MAP = "sharedVariableMap";
 
   /**
    * @return the session's {@link Locale} or <code>null</code> if not set.
@@ -125,4 +132,10 @@ public interface IClientSession extends ISession, IPropertyObserver {
    * that only one model job is active at any given time for this session.
    */
   IExecutionSemaphore getModelJobSemaphore();
+
+  /**
+   * @return An unmodifiable {@link Set} with all property names of the {@link #getSharedVariableMap() shared variable
+   * map} that should be accessible in the browser. Never returns {@code null}.
+   */
+  Set<String> getExposedSharedVariables();
 }

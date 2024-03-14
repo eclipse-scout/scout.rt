@@ -150,6 +150,8 @@ export * from './security/PermissionCollection';
 export * from './session/Session';
 export * from './session/SessionModel';
 export * from './session/SessionEventMap';
+export * from './session/SessionAdapter';
+export * from './session/SharedVariables';
 export * from './session/BackgroundJobPollingStatus';
 export * from './session/BackgroundJobPollingSupport';
 export * from './session/BusyIndicator';

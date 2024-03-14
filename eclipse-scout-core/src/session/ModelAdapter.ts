@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, ChildModelOf, comparators, defaultValues, Event, EventEmitter, EventListener, FullModelOf, InitModelOf, ModelAdapterEventMap, ModelAdapterModel, objects, Predicate, PropertyChangeEvent, PropertyChangeEventFilter,
-  RemoteEvent, scout, Session, SomeRequired, strings, Widget, WidgetEventTypeFilter, WidgetModel
+  AdapterData, App, arrays, ChildModelOf, comparators, defaultValues, Event, EventEmitter, EventListener, FullModelOf, InitModelOf, ModelAdapterEventMap, ModelAdapterModel, ObjectModel, objects, Predicate, PropertyChangeEvent,
+  PropertyChangeEventFilter, RemoteEvent, scout, Session, SomeRequired, strings, Widget, WidgetEventTypeFilter
 } from '../index';
 import $ from 'jquery';
 
@@ -123,7 +123,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
   /**
    * Override this method to call _sync* methods of the ModelAdapter _before_ the widget is created.
    */
-  protected _initProperties(model: WidgetModel) {
+  protected _initProperties(model: ObjectModel) {
     // NOP
   }
 
@@ -374,9 +374,13 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
       if (this[syncFuncName]) {
         this[syncFuncName](value);
       } else {
-        this.widget.callSetter(propertyName, value);
+        this._writeProperty(propertyName, value);
       }
     });
+  }
+
+  protected _writeProperty(propertyName: string, value: any) {
+    this.widget.callSetter(propertyName, value);
   }
 
   /**
