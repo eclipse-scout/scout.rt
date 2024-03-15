@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -998,7 +998,16 @@ public class UiSession implements IUiSession {
 
   @Override
   public JSONObject processSyncResponseQueueRequest(JsonRequest jsonRequest) {
-    return m_responseHistory.toSyncResponse();
+    JSONObject response = m_responseHistory.toSyncResponse();
+    if (response == null) {
+      // Since we are not using m_currentJsonResponse we must subtract 1 from the current seqNo.
+      // By sending a sequenceNo, we can "fast-forward" the response queue in the client.
+      long responseSequenceNo = m_responseSequenceNo.get() - 1;
+      LOG.info("Response history is empty, sending empty response [#: {}]", responseSequenceNo);
+      response = new JSONObject();
+      response.put(JsonResponse.PROP_SEQUENCE_NO, responseSequenceNo);
+    }
+    return response;
   }
 
   @Override

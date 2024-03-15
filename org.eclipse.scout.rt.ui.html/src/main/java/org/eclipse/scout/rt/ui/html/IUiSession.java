@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -150,6 +150,13 @@ public interface IUiSession {
 
   void processCancelRequest();
 
+  /**
+   * Returns a combined response consisting of the entire response history, i.e. all responses that were not yet
+   * acknowledged by the UI. The sequence no. of the last entry in the history is used for the combined response.
+   * <p>
+   * The return value is never {@code null}. If the history is empty, an empty message is created instead. The response
+   * sequence no. is set to one less than the current sequence number (which will be used for the next "real" response).
+   */
   JSONObject processSyncResponseQueueRequest(JsonRequest jsonRequest);
 
   /**

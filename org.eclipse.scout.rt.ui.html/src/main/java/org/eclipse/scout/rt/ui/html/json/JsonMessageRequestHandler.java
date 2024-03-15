@@ -360,10 +360,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     uiSessionLock.lock();
     try {
       JSONObject response = uiSession.processSyncResponseQueueRequest(jsonReq);
-      if (response == null) {
-        LOG.debug("Creating empty response [{}, #{}, #ACK {}]", "CER_HSRQR", jsonReq.getSequenceNo(), jsonReq.getAckSequenceNo());
-        response = m_jsonRequestHelper.createEmptyResponse();
-      }
       writeJsonResponse(resp, response);
     }
     finally {
