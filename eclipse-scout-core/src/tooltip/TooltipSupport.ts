@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -89,6 +89,10 @@ export class TooltipSupport {
     this._destroyTooltip();
   }
 
+  get tooltip(): Tooltip {
+    return this._tooltip;
+  }
+
   protected _onMouseEnter(event: MouseEnterEvent) {
     let $comp = $(event.currentTarget);
 
@@ -134,21 +138,25 @@ export class TooltipSupport {
       return; // removed in the meantime (this method is called using setTimeout)
     }
     let text = this._text($comp);
-    if (!text) {
-      return; // treat undefined and no text as no tooltip
+    if (!text) { // treat undefined and no text as no tooltip
+      this._destroyTooltip();
+      return;
     }
 
+    let $anchor = this._options.$anchor || $comp;
     let htmlEnabled = this._htmlEnabled($comp);
 
     if (this._tooltip && this._tooltip.rendered) {
       // update existing tooltip
+      this._tooltip.set$Anchor($anchor);
+      this._tooltip.setHtmlEnabled(htmlEnabled);
       this._tooltip.setText(text);
       this._tooltip.setSeverity(this._options.severity);
       this._tooltip.setMenus(this._options.menus);
     } else {
       // create new tooltip
       let options = $.extend({}, this._options, {
-        $anchor: this._options.$anchor || $comp,
+        $anchor: $anchor,
         text: text,
         htmlEnabled: htmlEnabled
       });

@@ -213,10 +213,6 @@ export class Tooltip extends Widget implements TooltipModel {
     this.setProperty('text', text);
   }
 
-  setSeverity(severity: StatusSeverity) {
-    this.setProperty('severity', severity);
-  }
-
   protected _renderText() {
     let text = this.text || '';
     if (this.htmlEnabled) {
@@ -230,6 +226,18 @@ export class Tooltip extends Widget implements TooltipModel {
     if (!this.rendering) {
       this.position();
     }
+  }
+
+  setHtmlEnabled(htmlEnabled: boolean) {
+    this.setProperty('htmlEnabled', htmlEnabled);
+  }
+
+  protected _renderHtmlEnabled() {
+    this._renderText();
+  }
+
+  setSeverity(severity: StatusSeverity) {
+    this.setProperty('severity', severity);
   }
 
   protected _renderSeverity() {
@@ -284,6 +292,17 @@ export class Tooltip extends Widget implements TooltipModel {
       this.$container.cssLeft('').cssTop('');
       this.position();
     }
+  }
+
+  set$Anchor($anchor: JQuery) {
+    if ($anchor?.[0] === this.$anchor?.[0]) { // compare DOM elements
+      return;
+    }
+    this.setProperty('$anchor', $anchor);
+  }
+
+  protected _render$anchor() {
+    this.position();
   }
 
   position() {
