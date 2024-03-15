@@ -15,7 +15,7 @@ import {
   TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
   TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke,
   TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips,
-  UpdateFilteredElementsOptions, ValueField, Widget
+  TooltipSupport, UpdateFilteredElementsOptions, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -2051,6 +2051,10 @@ export class Table extends Widget implements TableModel {
       return;
     }
 
+    let tooltipSupport = this.$data.data('tooltipSupport') as TooltipSupport;
+    if ($row.isOrHas(tooltipSupport?.tooltip?.$anchor)) {
+      tooltipSupport.close();
+    }
     this._destroyTooltipsForRow(row);
     this._destroyCellEditorForRow(row);
 
@@ -3161,6 +3165,8 @@ export class Table extends Widget implements TableModel {
   }
 
   protected _renderUpdateRows(rows: TableRow[], oldRowsMap: Record<string, TableRow>) {
+    let tooltipSupport = this.$data.data('tooltipSupport') as TooltipSupport;
+
     // render row and replace div in DOM
     rows.forEach(row => {
       let oldRow = oldRowsMap[row.id];
@@ -3171,11 +3177,27 @@ export class Table extends Widget implements TableModel {
       }
       let $updatedRow = $(this._buildRowDiv(row));
       $updatedRow.copyCssClasses(oldRow.$row, Table.SELECTION_CLASSES + ' first last');
+
+      // Check if the cell tooltip is currently pointing to a cell in this row. If yes, update its $anchor to the corresponding cell
+      // in the new row. Otherwise, the tooltip position will be wrong, because the old anchor is no longer part of the DOM.
+      let $updatedTooltipCell: JQuery = null;
+      if (tooltipSupport?.tooltip) {
+        let $oldRowCells = oldRow.$row.children('.table-cell');
+        let oldTooltipCellIndex = $oldRowCells.index(tooltipSupport.tooltip.$anchor);
+        if (oldTooltipCellIndex !== -1) {
+          $updatedTooltipCell = $updatedRow.children('.table-cell').eq(oldTooltipCellIndex);
+        }
+      }
+
       oldRow.$row.replaceWith($updatedRow);
       Table.linkRowToDiv(row, $updatedRow);
       this._destroyTooltipsForRow(row);
       this._destroyCellEditorForRow(row);
       this._installRow(row);
+
+      if ($updatedTooltipCell?.length) {
+        tooltipSupport.update($updatedTooltipCell);
+      }
       if (oldRow.$row.hasClass('showing') && oldRow.$row.outerHeight() < row.$row.outerHeight() / 3) {
         // If the row was being shown by an animation, start the animation again for the new row, otherwise row would immediately appear without animation.
         // Do it only, if the current running time of the animation does not exceed 33% (this won't be correct if the height of the new and old rows differ).

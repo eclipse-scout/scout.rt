@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, JQueryTesting} from '../../src/testing/index';
-import {tooltips, ValueField} from '../../src/index';
+import {scout, Tooltip, tooltips, TooltipSupport, ValueField} from '../../src/index';
 
 describe('scout.tooltips', () => {
 
@@ -319,4 +319,94 @@ describe('scout.tooltips', () => {
     tooltips.uninstall($testElement);
   });
 
+  it('can update an already visible tooltip when the DOM element is replaced', () => {
+    let $container = session.$entryPoint.appendDiv('tooltip-test-container');
+    let $element1 = $container.appendDiv('tooltip-test')
+      .attr('id', 'el1')
+      .data('tooltipText', 'Text <b>1</b>')
+      .data('htmlEnabled', true);
+    let $element2 = $container.appendDiv('tooltip-test')
+      .attr('id', 'el2')
+      .data('tooltipText', 'Text < 2');
+
+    // Install tooltip support on container, address elements with 'selector' property
+    tooltips.install($container, {
+      parent: session.desktop,
+      selector: '.tooltip-test',
+      delay: 123
+    });
+    let support = $container.data('tooltipSupport') as TooltipSupport;
+    let $tooltip: JQuery;
+    let tooltip: Tooltip;
+
+    // -----------------
+
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(0);
+
+    JQueryTesting.triggerMouseEnter($element1);
+    jasmine.clock().tick(150);
+
+    // HTML content
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('Text 1');
+    expect($tooltip.children('.tooltip-content').html()).toBe('Text <b>1</b>');
+    tooltip = scout.widget($tooltip);
+    expect(tooltip.$anchor[0]).toBe($element1[0]);
+
+    // Remove tooltip text -> tooltip should be removed
+    $element1.data('tooltipText', '');
+    support.update($element1);
+
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(0);
+
+    JQueryTesting.triggerMouseLeave($element1);
+
+    // -----------------
+
+    JQueryTesting.triggerMouseEnter($element2);
+    jasmine.clock().tick(150);
+
+    // Plain text content
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('Text < 2');
+    expect($tooltip.children('.tooltip-content').html()).toBe('Text &lt; 2');
+    tooltip = scout.widget($tooltip);
+    expect(tooltip.$anchor[0]).toBe($element2[0]);
+
+    // Change 'htmlEnabled' property -> same tooltip should now support HTML content
+    $element2.data('tooltipText', '<b>Up</b>dated');
+    $element2.data('htmlEnabled', true);
+    support.update($element2);
+
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('Updated');
+    expect($tooltip.children('.tooltip-content').html()).toBe('<b>Up</b>dated');
+    expect(scout.widget($tooltip)).toBe(tooltip);
+    tooltip = scout.widget($tooltip);
+    expect(tooltip.$anchor[0]).toBe($element2[0]);
+
+    // -----------------
+
+    // Replace element2 with a new DIV -> Tooltip should be updated, including the $anchor
+    let $newElement2 = $container.makeDiv('tooltip-test')
+      .attr('id', 'el2_new')
+      .attr('data-tooltip-text', 'New');
+    $element2.replaceWith($newElement2);
+
+    JQueryTesting.triggerMouseEnter($newElement2);
+    jasmine.clock().tick(150);
+
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('New');
+    expect(scout.widget($tooltip)).toBe(tooltip);
+    tooltip = scout.widget($tooltip);
+    expect(tooltip.$anchor[0]).toBe($newElement2[0]);
+    expect(tooltip.$anchor[0]).not.toBe($element2[0]);
+  });
 });
