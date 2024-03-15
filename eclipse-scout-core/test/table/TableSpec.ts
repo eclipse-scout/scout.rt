@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BeanColumn, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, TableRowModel, Tooltip
+  BeanColumn, Cell, Column, ColumnModel, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, ObjectFactory, Point, Range, RemoteEvent, scout, scrollbars, Status, Table, TableField, TableRow, TableRowModel, Tooltip
 } from '../../src/index';
 import {JQueryTesting, LocaleSpecHelper, SpecTable, TableSpecHelper} from '../../src/testing/index';
 
@@ -364,6 +364,69 @@ describe('Table', () => {
       expect(table.rows[1].cells[0].text).toBe('newRow1Cell0');
       expect(table.rows[1].cells[1].text).toBe('newRow1Cell1');
     });
+
+    it('updates the cell tooltip', () => {
+      table.rows[0].cells[0].tooltipText = 'tooltipText0';
+      table.render();
+
+      let tooltipSupport = table.$data.data('tooltipSupport');
+      expect(tooltipSupport).toBeTruthy();
+      expect(tooltipSupport.tooltip).toBe(null);
+
+      JQueryTesting.triggerMouseEnter(table.rows[0].$row.find('.table-cell').eq(0));
+      jasmine.clock().tick(2000);
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('tooltipText0');
+      let tooltipPos = new Point(tooltipSupport.tooltip.$container.cssLeft(), tooltipSupport.tooltip.$container.cssTop());
+      let $anchor = tooltipSupport.tooltip.$anchor;
+
+      let row = {
+        id: table.rows[0].id,
+        cells: [
+          scout.create(Cell, {
+            text: 'newCellText0',
+            tooltipText: 'newTooltipText0'
+          }),
+          'newCellText1'
+        ]
+      };
+      table.updateRows([row]);
+
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('newTooltipText0');
+      let newTooltipPos = new Point(tooltipSupport.tooltip.$container.cssLeft(), tooltipSupport.tooltip.$container.cssTop());
+      expect(newTooltipPos).toEqual(tooltipPos);
+      let $newAnchor = tooltipSupport.tooltip.$anchor;
+      expect($newAnchor[0]).not.toBe($anchor[0]);
+
+      // --------
+
+      // Insert and update a second row --> should not affect the tooltip of the first row
+
+      table.insertRow({
+        id: '_secondRow',
+        cells: ['r1c0', 'r1c1']
+      });
+
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('newTooltipText0');
+      let newTooltipPos2 = new Point(tooltipSupport.tooltip.$container.cssLeft(), tooltipSupport.tooltip.$container.cssTop());
+      expect(newTooltipPos2).toEqual(tooltipPos);
+      let $newAnchor2 = tooltipSupport.tooltip.$anchor;
+      expect($newAnchor2[0]).toBe($newAnchor[0]);
+
+      table.updateRows([{
+        id: '_secondRow',
+        cells: ['new-r1c0', 'new-r1c1']
+      }]);
+
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('newTooltipText0');
+      let newTooltipPos3 = new Point(tooltipSupport.tooltip.$container.cssLeft(), tooltipSupport.tooltip.$container.cssTop());
+      expect(newTooltipPos3).toEqual(tooltipPos);
+      let $newAnchor3 = tooltipSupport.tooltip.$anchor;
+      expect($newAnchor3[0]).toBe($newAnchor[0]);
+    });
   });
 
   describe('deleteRows', () => {
@@ -441,6 +504,29 @@ describe('Table', () => {
       expect(table.rows.length).toBe(0);
       expect(table.$fillBefore.height()).toBe(0);
       expect(table.$fillAfter.height()).toBe(0);
+    });
+
+    it('updates the cell tooltip', () => {
+      table.rows[0].cells[0].tooltipText = 'My Tooltip';
+      table.render();
+
+      let tooltipSupport = table.$data.data('tooltipSupport');
+      expect(tooltipSupport).toBeTruthy();
+      expect(tooltipSupport.tooltip).toBe(null);
+
+      JQueryTesting.triggerMouseEnter(table.rows[0].$row.find('.table-cell').eq(0));
+      jasmine.clock().tick(2000);
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('My Tooltip');
+
+      // Delete second row --> should not affect the tooltip of the first row
+      table.deleteRows([table.rows[1]]);
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('My Tooltip');
+
+      // Delete first row --> should remove tooltip
+      table.deleteRows([table.rows[0]]);
+      expect(tooltipSupport.tooltip).toBeFalsy();
     });
   });
 
@@ -2452,6 +2538,46 @@ describe('Table', () => {
       expect(orderedRows).toEqual(uiOrderedRows);
     });
 
+    it('removes the cell tooltip', () => {
+      expect(table.rows.length).toBe(3);
+
+      table.rows[0].cells[0].tooltipText = 'My Tooltip';
+      table.render();
+
+      let tooltipSupport = table.$data.data('tooltipSupport');
+      expect(tooltipSupport).toBeTruthy();
+      expect(tooltipSupport.tooltip).toBe(null);
+
+      JQueryTesting.triggerMouseEnter(table.rows[0].$row.find('.table-cell').eq(0));
+      jasmine.clock().tick(2000);
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('My Tooltip');
+
+      // Set a new order -> rows are re-created and the tooltip is closed
+      let $firstRow = table.rows[0].$row;
+      table.updateRowOrder([table.rows[2], table.rows[1], table.rows[0]]);
+
+      expect(table.rows.length).toBe(3);
+      expect(table.rows[0].$row[0]).not.toBe($firstRow[0]);
+      expect(table.rows[2].$row[0]).not.toBe($firstRow[0]);
+      expect(tooltipSupport.tooltip).toBeFalsy();
+
+      // -----
+
+      JQueryTesting.triggerMouseEnter(table.rows[2].$row.find('.table-cell').eq(0));
+      jasmine.clock().tick(2000);
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('My Tooltip');
+
+      // Set the same order -> should still re-create the rows (because e.g. aggregated rows have changed) and therefore close the tooltip
+      $firstRow = table.rows[0].$row;
+      table.updateRowOrder([table.rows[0], table.rows[1], table.rows[2]]);
+
+      expect(table.rows.length).toBe(3);
+      expect(table.rows[0].$row[0]).not.toBe($firstRow[0]);
+      expect(table.rows[2].$row[0]).not.toBe($firstRow[0]);
+      expect(tooltipSupport.tooltip).toBeFalsy();
+    });
   });
 
   describe('initColumns', () => {
