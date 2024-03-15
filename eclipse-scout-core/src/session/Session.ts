@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1354,7 +1354,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }, requestData) as RemoteRequest;
 
     // Certain requests do not require a sequence number
-    if (!request.log && !request.syncResponseQueue) {
+    if (!request.log && !request.syncResponseQueue && !request.cancel) {
       request['#'] = this.requestSequenceNo++;
     }
     return request;
