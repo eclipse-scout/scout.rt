@@ -7,13 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.code;
+package org.eclipse.scout.rt.shared.services.common.code.mapping;
 
-import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
+import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.dataobject.mapping.IToDoFunction;
+import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 /**
- * {@link IToDoFunction} that converts an {@link ICodeType} to a {@link CodeTypeDo}.
+ * {@link IToDoFunction} that converts an {@link ICode} to a {@link CodeDo}.
  */
-public interface ICodeTypeToDoFunction extends IToDoFunction<ICodeType<?, ?>, CodeTypeDo> {
+public interface ICodeToDoFunction extends IToDoFunction<ICode<?>, CodeDo> {
 }

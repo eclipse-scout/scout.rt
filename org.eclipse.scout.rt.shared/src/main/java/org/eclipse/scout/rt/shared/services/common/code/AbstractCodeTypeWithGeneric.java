@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.shared.extension.services.common.code.CodeTypeWithGe
 import org.eclipse.scout.rt.shared.extension.services.common.code.CodeTypeWithGenericChains.CodeTypeWithGenericOverwriteCodeChain;
 import org.eclipse.scout.rt.shared.extension.services.common.code.ICodeTypeExtension;
 import org.eclipse.scout.rt.shared.extension.services.common.code.MoveCodesHandler;
+import org.eclipse.scout.rt.shared.services.common.code.mapping.ICodeTypeToDoFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

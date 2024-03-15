@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.code;
+package org.eclipse.scout.rt.shared.services.common.code.mapping;
 
 import static org.junit.Assert.*;
 
@@ -19,6 +19,9 @@ import org.eclipse.scout.rt.dataobject.mapping.ToDoFunctionHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
+import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.junit.Test;
 
 public class CodeTypeToDoFunctionTest {

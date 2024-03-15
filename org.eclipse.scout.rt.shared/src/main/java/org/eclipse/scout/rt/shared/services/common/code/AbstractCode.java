@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.extension.services.common.code.CodeChains.CodeCreateChildCodesChain;
 import org.eclipse.scout.rt.shared.extension.services.common.code.ICodeExtension;
+import org.eclipse.scout.rt.shared.services.common.code.mapping.ICodeToDoFunction;
 
 @ClassId("8a1ed7c8-14e0-42ba-a275-258a3c2c4a51")
 public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContributionOwner, IExtensibleObject {
@@ -303,7 +304,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   /**
    * Do only call this method during creation and setup of a code / code type.
    * <p>
-   * Never call it afterwards, this may lead to conflicting situations when {@link ICode}s are in use and references.
+   * Never call it afterward, this may lead to conflicting situations when {@link ICode}s are in use and references.
    */
   public void setActiveInternal(boolean b) {
     m_row.withActive(b);
@@ -317,7 +318,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   /**
    * Do only call this method during creation and setup of a code / code type.
    * <p>
-   * Never call it afterwards, this may lead to conflicting situations when {@link ICode}s are in use and references.
+   * Never call it afterward, this may lead to conflicting situations when {@link ICode}s are in use and references.
    */
   public void setEnabledInternal(boolean b) {
     m_row.withEnabled(b);

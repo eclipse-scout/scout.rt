@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.code;
+package org.eclipse.scout.rt.shared.services.common.code.mapping;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +30,8 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.services.common.code.ICode;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
 /**
  * Base implementation of {@link ICodeToDoFunction}. It transfers all attributes from {@link ICode} to the corresponding
