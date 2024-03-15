@@ -7,10 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.shared.services.common.code;
+package org.eclipse.scout.rt.shared.services.common.code.mapping;
 
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 /**
  * Default function that converts a {@link ICode} to a {@link CodeDo}.

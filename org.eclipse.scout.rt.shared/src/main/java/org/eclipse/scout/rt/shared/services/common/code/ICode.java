@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.services.common.code.mapping.ICodeToDoFunction;
 
 public interface ICode<T> extends ITypeWithClassId, IOrdered {
 
@@ -42,7 +43,7 @@ public interface ICode<T> extends ITypeWithClassId, IOrdered {
    * do not use this internal method unless the intention is in fact to change the structure of the possibly shared
    * {@link ICodeType}
    * <p>
-   * Add a new code as child of this code, owerwrite (drop) existing code
+   * Add a new code as child of this code, overwrite (drop) existing code
    *
    * @since 4.0
    * @param index
