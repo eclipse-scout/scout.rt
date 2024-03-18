@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -186,7 +186,8 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
   /**
    * This method loads the child nodes of this node and returns a jQuery.Promise to register callbacks
-   * when loading is done or has failed. This method should only be called when childrenLoaded is false.
+   * when loading is done or has failed. To skip loading the children when they are already loaded, use
+   * {@link #ensureLoadChildren} instead.
    *
    * @returns a Promise or null when TreeNode cannot load children (which is the case for all
    *     TreeNodes in the remote case). The default impl. returns an empty resolved promise.
@@ -215,7 +216,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     }
 
     this._loadChildrenPromise = promise;
-    promise.done(this._onLoadChildrenDone.bind(this));
+    promise.then(this._onLoadChildrenDone.bind(this));
     return promise; // we must always return a promise, never null - otherwise caller would throw an error
   }
 

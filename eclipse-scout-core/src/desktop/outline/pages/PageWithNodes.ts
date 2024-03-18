@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -86,7 +86,7 @@ export class PageWithNodes extends Page {
 
   override loadChildren(): JQuery.Promise<any> {
     this.childrenLoaded = false;
-    return this._createChildPages().done(childPages => {
+    return this._createChildPages().then(childPages => {
       this._rebuildDetailTable(childPages);
       this.getOutline().deleteNodes(arrays.diff(this.childNodes, childPages), this);
       this.getOutline().insertNodes(childPages, this);
@@ -95,7 +95,7 @@ export class PageWithNodes extends Page {
   }
 
   /**
-   * Override this method to create child pages for this page. The default impl. returns an empty array.
+   * Override this method to create child pages for this page. The default impl. returns the current `childNodes` list.
    */
   protected _createChildPages(): JQuery.Promise<Page[]> {
     return $.resolvedPromise(this.childNodes);
