@@ -659,6 +659,9 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   }
 
   setDetailFormVisibleByUi(node: Page, visible: boolean) {
+    if (node.detailFormVisibleByUi === visible) {
+      return; // nothing to do
+    }
     node.detailFormVisibleByUi = visible;
     this._triggerPageChanged(node);
   }

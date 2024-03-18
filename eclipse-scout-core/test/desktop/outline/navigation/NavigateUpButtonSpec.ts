@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -65,17 +65,25 @@ describe('NavigateUpButton', () => {
     expect(menu._isDetail()).toBe(false);
     node.detailForm = new Form();
 
+    // false when detailTableVisible is true, but detailTable has no rows
+    expect(menu._isDetail()).toBe(false);
+
     // false when detailTable is absent, even when if detailTableVisible=true
     delete node.detailTable;
     expect(menu._isDetail()).toBe(false);
     node.detailTable = new Table();
+
+    // false when detail form is currently visible, even when detail table is present and has rows
+    // @ts-expect-error
+    node.detailTable.rows.push([]);
+    expect(menu._isDetail()).toBe(false);
 
     // true when detailForm is hidden by UI
     node.detailFormVisibleByUi = false;
     expect(menu._isDetail()).toBe(true);
     node.detailFormVisibleByUi = true;
 
-    // false when property says to
+    // false when property says so
     node.detailFormVisible = false;
     expect(menu._isDetail()).toBe(false);
     node.detailFormVisible = true;
@@ -102,7 +110,6 @@ describe('NavigateUpButton', () => {
       outline.defaultDetailForm = undefined;
       expect(menu._buttonEnabled()).toBe(false);
     });
-
   });
 
   describe('_drill', () => {
@@ -135,6 +142,5 @@ describe('NavigateUpButton', () => {
       menu._drill();
       expect(outline.navigateToTop).toHaveBeenCalled();
     });
-
   });
 });

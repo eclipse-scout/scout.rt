@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,8 +27,7 @@ export class NavigateUpButton extends NavigateButton {
 
   protected _isDetail(): boolean {
     // Button is in "detail mode" if there are both detail form and detail table visible and detail form _is_ hidden.
-    return !!(this.node.detailFormVisible && this.node.detailForm &&
-      this.node.detailTableVisible && this.node.detailTable && !this.node.detailFormVisibleByUi);
+    return this._hasDetailForm() && this._hasDetailTable() && !this.node.detailFormVisibleByUi;
   }
 
   protected _toggleDetail(): boolean {
