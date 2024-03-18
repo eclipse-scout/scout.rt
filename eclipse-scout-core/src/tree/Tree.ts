@@ -2026,7 +2026,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       $element: node.$node,
       $scrollable: this.get$Scrollable(),
       isExpanded: element => element.expanded,
-      getChildren: parent => parent.childNodes,
+      getChildren: parent => parent.childNodes.filter(node => node.filterAccepted),
       nodePaddingLevel: this.nodePaddingLevel,
       defaultChildHeight: this.nodeHeight
     });
