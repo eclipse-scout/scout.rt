@@ -41,4 +41,5 @@ To get in touch with the Eclipse Scout community, please open a thread in the [E
 
 ## License
 
-[Eclipse Public License (EPL) v1.0](https://wiki.eclipse.org/Eclipse_Public_License)
+[Eclipse Public License 2.0](https://www.eclipse.org/legal/epl-2.0/)
+
