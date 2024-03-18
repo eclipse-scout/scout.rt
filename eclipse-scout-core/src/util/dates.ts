@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -330,7 +330,7 @@ export const dates = {
 
   /**
    * Converts the given date object to a JSON string. By default, the local time zone
-   * is used to built the result, time zone information itself is not part of the
+   * is used to build the result, time zone information itself is not part of the
    * result. If the argument 'utc' is set to true, the result is built using the
    * UTC values of the date. Such a result string is marked with a trailing 'Z' character.
    *
@@ -463,6 +463,43 @@ export const dates = {
   formatDateTime(date: Date, locale: Locale): string {
     let dateFormat = new DateFormat(locale, locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault);
     return dateFormat.format(date);
+  },
+
+  /**
+   * Returns a formatted date in the pattern `yyyy-MM-dd hh:mm:ss.SSS`.
+   * The locale is irrelevant, the time is always returned in 24h format.
+   *
+   * @param options A {@link DatesFormatTimestampOptions} object or a date.
+   */
+  formatTimestamp(options?: DatesFormatTimestampOptions | Date): string {
+    if (options instanceof Date) {
+      options = {date: options};
+    }
+    options = $.extend({
+      date: dates.newDate(),
+      withDate: true,
+      withTime: true,
+      includeMillis: true
+    }, options);
+
+    let datePart = '';
+    if (options.withDate) {
+      datePart = strings.join('-',
+        strings.padZeroLeft(options.date.getFullYear(), 4),
+        strings.padZeroLeft(options.date.getMonth() + 1, 2), // (month is 0-indexed)
+        strings.padZeroLeft(options.date.getDate(), 2)
+      );
+    }
+    let timePart = '';
+    if (options.withTime) {
+      timePart = strings.join(':',
+        strings.padZeroLeft(options.date.getHours(), 2),
+        strings.padZeroLeft(options.date.getMinutes(), 2),
+        strings.padZeroLeft(options.date.getSeconds(), 2)
+      ) + (options.includeMillis ? '.' + strings.padZeroLeft(options.date.getMilliseconds(), 3) : '');
+    }
+
+    return strings.join(' ', datePart, timePart);
   },
 
   compare(a: Date, b: Date): number {
@@ -606,3 +643,14 @@ export const dates = {
     };
   }
 };
+
+export interface DatesFormatTimestampOptions {
+  /** The default is the current date */
+  date?: Date;
+  /** The default is true */
+  withDate?: boolean;
+  /** The default is true */
+  withTime?: boolean;
+  /** The default is true. Only relevant when `withTime` is true. */
+  includeMillis?: boolean;
+}

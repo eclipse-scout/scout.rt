@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 import {objects, RoundingMode, strings} from '../index';
 
 export const numbers = {
+
   /**
    * Converts the given decimal number to base-62 (i.e. the same value, but represented by [a-zA-Z0-9] instead of only [0-9]).
    */
@@ -41,6 +42,16 @@ export const numbers = {
       result += alphabet[Math.floor(Math.random() * alphabet.length)];
     }
     return result;
+  },
+
+  /**
+   * Returns a random integer between 0 (inclusive) and the given `size` (exclusive).
+   *
+   * @param size The default size is {@link Number.MAX_SAFE_INTEGER}.
+   */
+  randomInt(size?: number): number {
+    size = size || Number.MAX_SAFE_INTEGER;
+    return Math.floor(Math.random() * size);
   },
 
   /** @internal */
