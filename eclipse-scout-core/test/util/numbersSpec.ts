@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -172,7 +172,6 @@ describe('scout.numbers', () => {
       expect(numbers.round(12.34500000000001, roundingMode, 2)).toBe(12.35);
       expect(numbers.round(12.34500000000000, roundingMode, 2)).toBe(12.34);
     });
-
   });
 
   describe('shiftDecimalPoint', () => {
@@ -231,7 +230,6 @@ describe('scout.numbers', () => {
       // eslint-disable-next-line
       expect(numbers.shiftDecimalPoint(2.0999999999999999, 1)).toBe(21);
     });
-
   });
 
   describe('randomId', () => {
@@ -244,7 +242,24 @@ describe('scout.numbers', () => {
       expect(numbers.randomId(27).length).toBe(27);
       expect(numbers.randomId()).not.toBe(numbers.randomId());
     });
+  });
 
+  describe('randomInt', () => {
+
+    it('can generate random integers', () => {
+      expect(typeof numbers.randomInt()).toBe('number');
+      expect(numbers.randomInt()).toBeGreaterThanOrEqual(0);
+      expect(numbers.randomInt(0)).toBeGreaterThanOrEqual(0);
+      expect(numbers.randomInt(1)).toBe(0);
+      expect(numbers.randomInt(-99)).toBeLessThanOrEqual(0);
+
+      for (let i = 0; i < 1000; i++) {
+        let r = numbers.randomInt(5);
+        expect(r).toBeGreaterThanOrEqual(0);
+        expect(r).toBeLessThan(5);
+        expect(numbers.isInteger(r)).toBe(true);
+      }
+    });
   });
 
   describe('correlationId', () => {
@@ -258,7 +273,6 @@ describe('scout.numbers', () => {
       expect(numbers.correlationId(27).length).toBe(27 + 5);
       expect(numbers.correlationId()).toMatch(/^([a-zA-Z]{2}[0-9]){3}[a-zA-Z]{2}\/4870$/);
     });
-
   });
 
   describe('isNumber', () => {

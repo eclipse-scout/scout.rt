@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,7 +52,6 @@ describe('scout.dates', () => {
         let date = dates.create('2016-02-29T00:00:00.000');
         expect(dates.shift(date, 1).toISOString()).toBe(dates.create('2017-02-28 00:00:00.000').toISOString());
       });
-
     });
 
     describe('shift month', () => {
@@ -128,7 +127,6 @@ describe('scout.dates', () => {
         expect(dates.shift(date, 0, 12).toISOString()).toBe(dates.create('2017-02-28 00:00:00.000').toISOString());
       });
     });
-
   });
 
   describe('shiftToNextDayOfType', () => {
@@ -206,7 +204,6 @@ describe('scout.dates', () => {
       date2 = new Date('2014-11-20T22:00:00.000-02:00');
       expect(dates.isSameDay(date, date2)).toBe(true);
     });
-
   });
 
   describe('compareMonths', () => {
@@ -255,7 +252,6 @@ describe('scout.dates', () => {
       date2 = dates.create('2015-12-21');
       expect(dates.compareMonths(date, date2)).toBe(-13);
     });
-
   });
 
   describe('compareDays', () => {
@@ -314,7 +310,6 @@ describe('scout.dates', () => {
       date2 = dates.create('2014-12-31');
       expect(dates.compareDays(date, date2)).toBe(1);
     });
-
   });
 
   describe('orderWeekdays', () => {
@@ -330,7 +325,6 @@ describe('scout.dates', () => {
       expect(check2.join('-')).toBe('Di-Mi-Do-Fr-Sa-So-Mo');
       expect(check3.join('-')).toBe('Mi-Do-Fr-Sa-So-Mo-Di');
     });
-
   });
 
   describe('toJsonDate / parseJsonDate', () => {
@@ -393,7 +387,6 @@ describe('scout.dates', () => {
       jsonDate = dates.toJsonDate(date, true);
       expect(jsonDate).toBe('+20222-11-21 00:00:00.000Z');
     });
-
   });
 
   describe('create', () => {
@@ -470,7 +463,6 @@ describe('scout.dates', () => {
       expect(dates.weekInYear(dates.create('2015-01-12'), 0)).toBe(2);
       expect(dates.weekInYear(dates.create('2015-01-26'), 0)).toBe(4);
     });
-
   });
 
   describe('format', () => {
@@ -502,7 +494,6 @@ describe('scout.dates', () => {
 
       expect(dates.format(dates.create('2014-11-21'), locale, 'yy')).toBe('14');
     });
-
   });
 
   describe('compare', () => {
@@ -557,7 +548,6 @@ describe('scout.dates', () => {
       date2 = dates.create('2015-03-01');
       expect(dates.compare(date, date2)).toBe(0);
     });
-
   });
 
   describe('equals', () => {
@@ -599,7 +589,6 @@ describe('scout.dates', () => {
       expect(dates.isLeapYear(2008)).toBe(true);
       expect(dates.isLeapYear(2100)).toBe(false);
     });
-
   });
 
   describe('combineDateTime', () => {
@@ -618,7 +607,5 @@ describe('scout.dates', () => {
       let date = dates.combineDateTime(dates.create('2017-12-10 05:15:50.999'));
       expect(date.toISOString()).toBe(dates.create('2017-12-10 00:00:00.000').toISOString());
     });
-
   });
-
 });
