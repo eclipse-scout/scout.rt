@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, GroupBox, MessageBox, ObjectFactory, objects, OutlineOverview, scout, Status, Table, TileOutlineOverview, Tree, TreeField} from '../../../src/index';
+import {Column, Form, GroupBox, MessageBox, ObjectFactory, ObjectOrModel, objects, OutlineOverview, Page, PageWithNodes, PageWithTable, scout, Status, Table, TableRow, TileOutlineOverview, Tree, TreeField} from '../../../src/index';
 import {FormSpecHelper, JQueryTesting, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '../../../src/testing/index';
 
 describe('Outline', () => {
@@ -642,6 +642,178 @@ describe('Outline', () => {
       expect(form.destroyed).toBe(true);
       expect(outline.defaultDetailForm).toBe(null);
       expect(outline.outlineOverview.rendered).toBe(true);
+    });
+  });
+
+  describe('drillDown', () => {
+
+    class SpecPageWithNodes extends PageWithNodes {
+
+      protected override _createChildPages(): JQuery.Promise<Page[]> {
+        let childPages = [
+          scout.create(SpecPageWithTable, {
+            parent: this.getOutline(),
+            text: 'Table Page',
+            detailTable: {
+              objectType: Table,
+              columns: [
+                {
+                  id: 'StringColumn',
+                  objectType: Column
+                }
+              ]
+            }
+          }),
+          scout.create(SpecPageWithNodes, {
+            parent: this.getOutline(),
+            text: 'Node Page'
+          })
+        ];
+        return $.resolvedPromise(childPages);
+      }
+    }
+
+    class SpecPageWithTable extends PageWithTable {
+
+      override createChildPage(row) {
+        return scout.create(SpecPageWithNodes, {
+          parent: this.getOutline()
+        });
+      }
+
+      protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+        let data = [
+          {string: 'string 1'},
+          {string: 'string 2'},
+          {string: 'string 3'}
+        ];
+        return $.resolvedPromise(data);
+      }
+
+      protected override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
+        return tableData.map(row => {
+          return {
+            data: row,
+            cells: [row.string]
+          };
+        });
+      }
+    }
+
+    it('selects the given page', () => {
+      let model = helper.createModelFixture(3, 2, false);
+      let outline = helper.createOutline(model);
+
+      expect(outline.selectedNode()).toBe(null);
+      expect(outline.nodes[0].expanded).toBe(false);
+      expect(outline.nodes[1].expanded).toBe(false);
+
+      // Supports null
+      outline.drillDown(null);
+      expect(outline.selectedNode()).toBe(null);
+      expect(outline.nodes[0].expanded).toBe(false);
+      expect(outline.nodes[1].expanded).toBe(false);
+
+      // Select first node, does not automatically expand children (because parent is not a table page)
+      outline.drillDown(outline.nodes[0]);
+      expect(outline.selectedNode()).toBe(outline.nodes[0]);
+      expect(outline.nodes[0].expanded).toBe(false);
+      expect(outline.nodes[1].expanded).toBe(false);
+      expect(outline.nodes[2].expanded).toBe(false);
+
+      // Select second node, and specify expansion explicitly
+      outline.drillDown(outline.nodes[1], true);
+      expect(outline.selectedNode()).toBe(outline.nodes[1]);
+      expect(outline.nodes[0].expanded).toBe(false);
+      expect(outline.nodes[1].expanded).toBe(true);
+      expect(outline.nodes[1].childNodes[0].expanded).toBe(false);
+      expect(outline.nodes[1].childNodes[1].expanded).toBe(false);
+      expect(outline.nodes[1].childNodes[2].expanded).toBe(false);
+      expect(outline.nodes[2].expanded).toBe(false);
+
+      // Select child page of third node, parent node should be expanded automatically
+      outline.drillDown(outline.nodes[2].childNodes[1]);
+      expect(outline.selectedNode()).toBe(outline.nodes[2].childNodes[1]);
+      expect(outline.nodes[0].expanded).toBe(false);
+      expect(outline.nodes[1].expanded).toBe(true);
+      expect(outline.nodes[1].childNodes[0].expanded).toBe(false);
+      expect(outline.nodes[1].childNodes[1].expanded).toBe(false);
+      expect(outline.nodes[1].childNodes[2].expanded).toBe(false);
+      expect(outline.nodes[2].expanded).toBe(true);
+      expect(outline.nodes[2].childNodes[0].expanded).toBe(false);
+      expect(outline.nodes[2].childNodes[1].expanded).toBe(false);
+      expect(outline.nodes[2].childNodes[2].expanded).toBe(false);
+    });
+
+    it('automatically expands the node when the parent page is a table page', async () => {
+      jasmine.clock().uninstall();
+
+      let model = helper.createModel([]);
+      let outline = helper.createOutline(model);
+
+      // NodePage [nodePage1]
+      // +- TablePage [tablePage1]
+      // |  +- NodePage [nodePage2]
+      // |  +- NodePage [nodePage3]
+      // |  |  (...)
+      // |  +- NodePage [nodePage4]
+      // |     +- TablePage [tablePage2]
+      // |     |  +- NodePage [nodePage6]
+      // |     |  +- NodePage [nodePage7]
+      // |     |  +- NodePage [nodePage8]
+      // |     +- NodePage [nodePage5]
+      // +- (...)
+
+      expect(outline.selectedNode()).toBe(null);
+
+      let nodePage1 = scout.create(SpecPageWithNodes, {
+        parent: outline
+      });
+      outline.insertNode(nodePage1);
+      await nodePage1.ensureLoadChildren();
+
+      outline.drillDown(nodePage1);
+      expect(outline.selectedNode()).toBe(nodePage1);
+      expect(nodePage1.expanded).toBe(false);
+
+      let tablePage1 = nodePage1.childNodes[0];
+      outline.drillDown(tablePage1, true);
+      expect(outline.selectedNode()).toBe(tablePage1);
+      expect(nodePage1.expanded).toBe(true);
+      expect(tablePage1.expanded).toBe(true);
+
+      await tablePage1.ensureLoadChildren();
+      expect(tablePage1.childNodes.length).toBe(3);
+      let nodePage2 = tablePage1.childNodes[0];
+      let nodePage3 = tablePage1.childNodes[1];
+      let nodePage4 = tablePage1.childNodes[2];
+
+      outline.drillDown(nodePage3);
+      expect(outline.selectedNode()).toBe(nodePage3);
+      expect(nodePage2.expanded).toBe(false);
+      expect(nodePage3.expanded).toBe(true); // <--
+      expect(nodePage4.expanded).toBe(false);
+
+      await nodePage4.ensureLoadChildren();
+      expect(nodePage4.childNodes.length).toBe(2);
+      let tablePage2 = nodePage4.childNodes[0];
+      let nodePage5 = nodePage4.childNodes[1];
+      outline.drillDown(tablePage2);
+      expect(outline.selectedNode()).toBe(tablePage2);
+      expect(tablePage2.expanded).toBe(false); // <--
+      expect(nodePage5.expanded).toBe(false);
+
+      await tablePage2.ensureLoadChildren();
+      expect(tablePage2.childNodes.length).toBe(3);
+      let nodePage6 = tablePage2.childNodes[0];
+      let nodePage7 = tablePage2.childNodes[1];
+      let nodePage8 = tablePage2.childNodes[2];
+
+      outline.drillDown(nodePage7, false); // <--
+      expect(outline.selectedNode()).toBe(nodePage7);
+      expect(nodePage6.expanded).toBe(false);
+      expect(nodePage7.expanded).toBe(false); // <--
+      expect(nodePage8.expanded).toBe(false);
     });
   });
 });
