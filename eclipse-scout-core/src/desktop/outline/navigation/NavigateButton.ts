@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -62,6 +62,9 @@ export abstract class NavigateButton extends Menu implements NavigateButtonModel
     this.altKeyStrokeContext.unregisterKeyStroke(this);
   }
 
+  /**
+   * Toggles the visibility of the detail form according to {@link _toggleDetail}. Called when the button is clicked and {@link _isDetail} is `true`.
+   */
   protected _setDetailVisible() {
     let detailVisible = this._toggleDetail();
     $.log.isDebugEnabled() && $.log.debug('show detail-' + (detailVisible ? 'form' : 'table'));
@@ -77,12 +80,26 @@ export abstract class NavigateButton extends Menu implements NavigateButtonModel
     }
   }
 
+  /**
+   * Returns `true` if the button is in "detail toggle mode", i .e. the page has both a detail form and a detail table and the button
+   * should toggle between these two detail views instead of changing the selected page. In other words, when this is `true`, clicking
+   * the button does not {@link _drill drill} up or down like normal, but only changes the displayed "detail content".
+   */
   protected abstract _isDetail(): boolean;
 
+  /**
+   * Sets the outline selection to the child or parent page. Called when the button is clicked and {@link _isDetail} is `false`.
+   */
   protected abstract _drill();
 
+  /**
+   * Specifies the new value of {@link Page#detailFormVisibleByUi} when toggling the detail content instead of changing the selected page.
+   */
   protected abstract _toggleDetail(): boolean;
 
+  /**
+   * Computes whether this button should be enabled in the current state of the application.
+   */
   protected abstract _buttonEnabled(): boolean;
 
   /**
