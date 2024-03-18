@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Tree, TreeNode} from '../index';
+import {Filter, Tree, TreeNode} from '../index';
 
 export type LazyNodeFilterTreeNode = TreeNode & { _lazyNodeFilterAccepted?: boolean };
 
-export class LazyNodeFilter {
+export class LazyNodeFilter implements Filter<LazyNodeFilterTreeNode> {
   tree: Tree;
 
   constructor(tree: Tree) {
