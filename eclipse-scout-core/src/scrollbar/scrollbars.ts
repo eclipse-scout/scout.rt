@@ -1029,7 +1029,7 @@ export const scrollbars = {
     let parentHeight = parent.element.height;
     let scrollTopPos = parent.$scrollable.scrollTop();
 
-    // vertical scrolling
+    // --- vertical scrolling ---
     if (!isParentExpanded) {
       // parent is not expanded, make sure that at least one node above the parent is visible
       if (parentPositionTop < parentHeight) {
@@ -1038,12 +1038,15 @@ export const scrollbars = {
           animate: true
         });
       }
-    } else if (isParentExpanded && children.length > 0) {
+    } else if (isParentExpanded) {
       // parent is expanded and has children, the best effort approach to show the expansion
       let fullDataHeight = parent.$scrollable.height();
 
       // get childRowCount considering already expanded rows
-      let childRowsHeight = scrollbars._getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded, parent.defaultChildHeight);
+      let childRowsHeight = 0;
+      if (children.length > 0) {
+        childRowsHeight = scrollbars._getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded, parent.defaultChildHeight);
+      }
 
       // + 1.5 since it's the parent's top position, and we want to scroll half a row further to show that there's something after the expansion
       let additionalHeight = childRowsHeight + (1.5 * parentHeight);
@@ -1059,8 +1062,9 @@ export const scrollbars = {
       }
     }
 
-    if (children.length > 0) {
-      // horizontal scrolling: at least 3 levels of hierarchy should be visible (only relevant for small fields)
+    // --- horizontal scrolling ---
+    if (children.length > 0 && !!scrollbars.scrollbar(parent.$scrollable, 'x')) {
+      // at least 3 levels of hierarchy should be visible (only relevant for small fields)
       let minLevelLeft = Math.max(parent.element.level - 3, 0) * parent.nodePaddingLevel;
       scrollbars.scrollLeft(parent.$scrollable, minLevelLeft, {
         animate: true,
