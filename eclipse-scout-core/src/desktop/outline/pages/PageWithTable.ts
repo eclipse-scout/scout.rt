@@ -136,10 +136,14 @@ export class PageWithTable extends Page implements PageWithTableModel {
     if (!this.detailTable) {
       return $.resolvedPromise();
     }
+
+    this.childrenLoaded = false;
     const deferred = $.Deferred();
     this.one('load error', e => deferred.resolve());
     this.detailTable.reload();
-    return deferred.promise();
+    return deferred.promise().then(() => {
+      this.childrenLoaded = true;
+    });
   }
 
   protected _createSearchFilter(): any {
@@ -261,7 +265,6 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   protected _onLoadTableDataAlways(restoreSelectionInfo?: RestoreSelectionInfo) {
     this._restoreSelection(restoreSelectionInfo);
-    this.childrenLoaded = true;
     this.detailTable.setLoading(false);
   }
 
