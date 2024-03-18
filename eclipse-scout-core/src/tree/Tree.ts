@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, aria, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics,
-  HtmlComponent, InitModelOf, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, Rectangle, scout, scrollbars, ScrollDirection,
-  ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCheckNodesResult, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke,
-  TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
+  Action, aria, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport,
+  FullModelOf, graphics, HtmlComponent, InitModelOf, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, Rectangle, scout,
+  scrollbars, ScrollDirection, ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCheckNodesResult, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel,
+  TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
 
-export class Tree extends Widget implements TreeModel {
+export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   declare model: TreeModel;
   declare eventMap: TreeEventMap;
   declare self: Tree;
