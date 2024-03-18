@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, MenuBar, Page, scout, Table, TableReloadEvent, TableRow, TableRowActionEvent} from '../../../index';
+import {arrays, Column, MenuBar, Page, scout, Table, TableReloadEvent, TableRow, TableRowActionEvent} from '../../../index';
 import $ from 'jquery';
 
 export class PageWithNodes extends Page {
@@ -85,9 +85,8 @@ export class PageWithNodes extends Page {
   override loadChildren(): JQuery.Promise<any> {
     return this._createChildPages().then(childPages => {
       this._rebuildDetailTable(childPages);
-      if (childPages.length > 0) {
-        this.getOutline().insertNodes(childPages, this);
-      }
+      this.getOutline().deleteNodes(arrays.diff(this.childNodes, childPages), this);
+      this.getOutline().insertNodes(childPages, this);
       this.childrenLoaded = true;
     });
   }
