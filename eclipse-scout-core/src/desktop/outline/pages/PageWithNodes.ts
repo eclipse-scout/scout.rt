@@ -49,6 +49,13 @@ export class PageWithNodes extends Page {
     table.insertRows(rows);
   }
 
+  /** @internal */
+  rebuildDetailTableInternal() {
+    if (this.childrenLoaded) {
+      this._rebuildDetailTable(this.childNodes);
+    }
+  }
+
   protected _unlinkAllTableRows(rows: TableRow[]) {
     rows.forEach(row => {
       if (row.page) {

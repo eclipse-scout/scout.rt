@@ -7,13 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, InitModelOf, Page, PageWithTable, Table, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsUpdatedEvent} from '../../index';
+import {Event, InitModelOf, Page, PageWithNodes, PageWithTable, Table, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsUpdatedEvent} from '../../index';
 
 export class OutlineMediator {
 
   init(model: InitModelOf<this>) {
     // NOP
   }
+
+  // ------------------------------
+  //   Table -> Tree
+  // ------------------------------
 
   protected _skipEvent(page: Page): boolean {
     return page === null || page.getOutline() === null || page.leaf;
@@ -71,6 +75,10 @@ export class OutlineMediator {
     page.getOutline().filter();
   }
 
+  // ------------------------------
+  //   Tree -> Table
+  // ------------------------------
+
   onPageSelected(selectedPage: Page) {
     if (!selectedPage || !selectedPage.parentNode) {
       return;
@@ -82,5 +90,14 @@ export class OutlineMediator {
       return;
     }
     table.selectRow(row);
+  }
+
+  onChildPagesChanged(page: Page) {
+    // This method is called by the outline when one of the child pages of the given page has been changed.
+    // If it is a node page, update the corresponding detail table. If it is a table page, we don't have to
+    // do anything, because table pages work in the opposite way (table -> tree, see methods above).
+    if (page instanceof PageWithNodes) {
+      page.rebuildDetailTableInternal();
+    }
   }
 }
