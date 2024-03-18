@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -431,35 +431,34 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     this.toggleCssClass('outline-content-has-dimmed-background', hasDimmedBackground);
   }
 
-  protected _computeDetailContentForPage(node: Page): Form | Table {
-    if (!node) {
-      throw new Error('called _showDetailContentForPage without node');
-    }
+  protected _computeOutlineContentForPage(page: Page): OutlineContent {
+    scout.assertParameter('page', page);
 
-    let content: Form | Table;
-    if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
-      content = node.detailForm;
+    let content: OutlineContent;
+    if (page.detailForm && page.detailFormVisible && page.detailFormVisibleByUi) {
+      content = page.detailForm;
       content.uiCssClass = 'detail-form';
-    } else if (node.detailTable && node.detailTableVisible) {
-      content = node.detailTable;
+    } else if (page.detailTable && page.detailTableVisible) {
+      content = page.detailTable;
       content.uiCssClass = 'detail-table perma-focus';
     }
 
     return content;
   }
 
+  protected _computeOutlineContent(): OutlineContent {
+    let selectedPage = this.outline.selectedNode(); // outline does not support multi selection
+    if (selectedPage) {
+      return this._computeOutlineContentForPage(selectedPage);
+    }
+    return this.outline.getRootContent();
+  }
+
   updateOutlineContent() {
     if (!this.outlineContentVisible || !this.outline) {
       return;
     }
-    let content: OutlineContent,
-      selectedPage = this.outline.selectedNode();
-    if (selectedPage) {
-      // Outline does not support multi selection
-      content = this._computeDetailContentForPage(selectedPage);
-    } else {
-      content = this.outline.getRootContent();
-    }
+    let content = this._computeOutlineContent();
     if (content) {
       if (content instanceof Table) {
         content.menuBar.addCssClass('main-menubar');
