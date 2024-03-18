@@ -81,7 +81,34 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     throw new UnsupportedOperationException();
   }
 
-  protected IBinaryResourceProvider getBinaryResourceProvider(IUiSession uiSession, String adapterId) {
+  /**
+   * Load a resource internally, without a request and without caching.
+   */
+  public static BinaryResource loadResource(String pathInfo, IUiSession uiSession) {
+    if (pathInfo == null || uiSession == null) {
+      return null;
+    }
+    DynamicResourceInfo info = DynamicResourceInfo.fromPath(
+        uiSessionId -> uiSession.getUiSessionId().equals(uiSessionId) ? uiSession : null,
+        uiSession::getJsonAdapter,
+        pathInfo);
+    if (info == null) {
+      return null;
+    }
+
+    IBinaryResourceProvider provider = getBinaryResourceProvider(uiSession, info.getJsonAdapterId());
+    if (provider == null) {
+      return null;
+    }
+
+    BinaryResourceHolder localResourceHolder = provider.provideBinaryResource(info.getFileName());
+    if (localResourceHolder == null) {
+      return null;
+    }
+    return localResourceHolder.get();
+  }
+
+  protected static IBinaryResourceProvider getBinaryResourceProvider(IUiSession uiSession, String adapterId) {
     IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(adapterId);
     if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
       return null;

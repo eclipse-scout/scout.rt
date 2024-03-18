@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -104,6 +106,31 @@ public class DynamicResourceInfo {
     }
 
     return new DynamicResourceInfo(uiSession, components.getAdapterId(), components.getFilename());
+  }
+
+  /**
+   * @param uiSessionResolver
+   *          non-null UI session ID -> {@link IUiSession} resolver
+   * @param jsonAdapterResolver
+   *          non-null json adapter ID -> {@link IJsonAdapter} resolver
+   * @param path
+   *          decoded path (non url-encoded)
+   */
+  public static DynamicResourceInfo fromPath(Function<String/*uiSessionId*/, IUiSession> uiSessionResolver, Function<String/*id*/, IJsonAdapter> jsonAdapterResolver, String path) {
+    DynamicResourcePathComponents parts = DynamicResourcePathComponents.fromPath(path);
+    if (parts == null) {
+      return null;
+    }
+    // resolve session id and adapter id
+    IUiSession uiSession = Optional.ofNullable(parts.getUiSessionId()).map(uiSessionResolver).orElse(null);
+    IJsonAdapter jsonAdapter = Optional.ofNullable(parts.getAdapterId()).map(jsonAdapterResolver).orElse(null);
+    if (uiSession == null || !uiSession.getUiSessionId().equals(parts.getUiSessionId())) {
+      return null;
+    }
+    if (jsonAdapter == null || !jsonAdapter.getId().equals(parts.getAdapterId())) {
+      return null;
+    }
+    return new DynamicResourceInfo(jsonAdapter, parts.getFilename());
   }
 
   protected static class DynamicResourcePathComponents {
