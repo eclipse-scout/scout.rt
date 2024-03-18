@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {EventHandler, icons, InitModelOf, NavigateButton, OutlinePageRowLinkEvent, Page, TableRowsSelectedEvent} from '../../../index';
-import $ from 'jquery';
 
 export class NavigateDownButton extends NavigateButton {
   protected _detailTableRowsSelectedHandler: EventHandler<TableRowsSelectedEvent>;
@@ -76,15 +75,14 @@ export class NavigateDownButton extends NavigateButton {
   protected _drill() {
     let drillNode: Page;
 
-    if (this.node.detailTable) {
-      let row = this.node.detailTable.selectedRow();
-      drillNode = this.node.pageForTableRow(row);
+    let selectedRow = this.node.detailTable?.selectedRow();
+    if (selectedRow) {
+      drillNode = this.node.pageForTableRow(selectedRow);
     } else {
       drillNode = this.node.childNodes[0];
     }
 
     if (drillNode) {
-      $.log.isDebugEnabled() && $.log.debug('drill down to node ' + drillNode);
       // Collapse other expanded child nodes
       let parentNode = drillNode.parentNode;
       if (parentNode) {
@@ -97,14 +95,7 @@ export class NavigateDownButton extends NavigateButton {
         });
       }
 
-      // Select the target node
-      this.outline.selectNodes(drillNode); // this also expands the parent node, if required
-
-      // If the parent node is a table page node, expand the drillNode
-      // --> Same logic as in OutlineMediator.mediateTableRowAction()
-      if (parentNode && parentNode.nodeType === Page.NodeType.TABLE) {
-        this.outline.expandNode(drillNode);
-      }
+      this.outline.drillDown(drillNode);
     }
   }
 
