@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, InitModelOf, Page, PageWithTable, Table, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsUpdatedEvent} from '../../index';
+import {Event, InitModelOf, Page, PageWithNodes, PageWithTable, Table, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsUpdatedEvent} from '../../index';
 
 export class OutlineMediator {
 
@@ -82,5 +82,14 @@ export class OutlineMediator {
       return;
     }
     table.selectRow(row);
+  }
+
+  onChildPagesChanged(pageWithNodes: PageWithNodes) {
+    if (this._skipEvent(pageWithNodes)) {
+      return;
+    }
+
+    // The subtree of the node page was changed -> update the corresponding detail table
+    pageWithNodes.rebuildDetailTableInternal();
   }
 }
