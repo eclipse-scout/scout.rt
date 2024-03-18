@@ -2850,7 +2850,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
           $element: rows[0].$row,
           $scrollable: this.get$Scrollable(),
           isExpanded: element => element.expanded,
-          getChildren: parent => parent.childRows,
+          getChildren: parent => parent.childRows.filter(row => row.filterAccepted),
           defaultChildHeight: this.rowHeight
         });
       }

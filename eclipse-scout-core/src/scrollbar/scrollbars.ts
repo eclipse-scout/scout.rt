@@ -174,6 +174,7 @@ export const scrollbars = {
       htmlContainer.scrollable = true;
     }
     $container.data('scrollable', true);
+    $container.data('scroll-axis', options.axis);
     let session = options.session || options.parent.session;
     scrollbars.pushScrollable(session, $container);
     if (options.scrollShadow) {
@@ -469,6 +470,10 @@ export const scrollbars = {
     return !!$scrollable.data('scrollbars');
   },
 
+  getScrollAxis($scrollable: JQuery): ScrollDirection {
+    return $scrollable.data('scroll-axis');
+  },
+
   /** @internal */
   _installJs($container: JQuery, options: SomeRequired<ScrollbarInstallOptions, 'parent'>) {
     $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + graphics.debugOutput($container));
@@ -519,6 +524,7 @@ export const scrollbars = {
     }
     scrollbars.removeScrollable(session, $container);
     $container.removeData('scrollable');
+    $container.removeData('scroll-axis');
     $container.css('overflow', '');
     $container.removeClass('hybrid-scrollable');
     $container.removeData('scrollbars');
@@ -1028,39 +1034,46 @@ export const scrollbars = {
     let parentPositionTop = parent.$element.position().top;
     let parentHeight = parent.element.height;
     let scrollTopPos = parent.$scrollable.scrollTop();
+    let scrollAxis = scrollbars.getScrollAxis(parent.$scrollable);
+    let verticalScrolling = scout.isOneOf(scrollAxis, 'y', 'both');
+    let horizontalScrolling = scout.isOneOf(scrollAxis, 'x', 'both');
 
-    // vertical scrolling
-    if (!isParentExpanded) {
-      // parent is not expanded, make sure that at least one node above the parent is visible
-      if (parentPositionTop < parentHeight) {
-        let minScrollTop = Math.max(scrollTopPos - (parentHeight - parentPositionTop), 0);
-        scrollbars.scrollTop(parent.$scrollable, minScrollTop, {
-          animate: true
-        });
-      }
-    } else if (isParentExpanded && children.length > 0) {
-      // parent is expanded and has children, the best effort approach to show the expansion
-      let fullDataHeight = parent.$scrollable.height();
+    if (verticalScrolling) {
+      if (isParentExpanded) {
+        // parent is expanded and has children, the best effort approach to show the expansion
+        let fullDataHeight = parent.$scrollable.height();
 
-      // get childRowCount considering already expanded rows
-      let childRowsHeight = scrollbars._getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded, parent.defaultChildHeight);
+        // get childRowCount considering already expanded rows
+        let childRowsHeight = 0;
+        if (children.length > 0) {
+          childRowsHeight = scrollbars._getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded, parent.defaultChildHeight);
+        }
 
-      // + 1.5 since it's the parent's top position, and we want to scroll half a row further to show that there's something after the expansion
-      let additionalHeight = childRowsHeight + (1.5 * parentHeight);
-      let scrollTo = parentPositionTop + additionalHeight;
-      // scroll as much as needed to show the expansion but make sure that the parent row (plus one more) is still visible
-      let newScrollTop = scrollTopPos + Math.min(scrollTo - fullDataHeight, parentPositionTop - parentHeight);
-      // only scroll down
-      if (newScrollTop > scrollTopPos) {
-        scrollbars.scrollTop(parent.$scrollable, newScrollTop, {
-          animate: true,
-          stop: false
-        });
+        // + 1.5 since it's the parent's top position, and we want to scroll half a row further to show that there's something after the expansion
+        let additionalHeight = childRowsHeight + (1.5 * parentHeight);
+        let scrollTo = parentPositionTop + additionalHeight;
+        // scroll as much as needed to show the expansion but make sure that the parent row (plus one more) is still visible
+        let newScrollTop = scrollTopPos + Math.min(scrollTo - fullDataHeight, parentPositionTop - parentHeight);
+        // only scroll down
+        if (newScrollTop > scrollTopPos) {
+          scrollbars.scrollTop(parent.$scrollable, newScrollTop, {
+            animate: true,
+            stop: false
+          });
+        }
+      } else {
+        // parent is not expanded, make sure that at least one node above the parent is visible
+        if (parentPositionTop < parentHeight) {
+          let minScrollTop = Math.max(scrollTopPos - (parentHeight - parentPositionTop), 0);
+          scrollbars.scrollTop(parent.$scrollable, minScrollTop, {
+            animate: true
+          });
+        }
       }
     }
 
-    if (children.length > 0) {
-      // horizontal scrolling: at least 3 levels of hierarchy should be visible (only relevant for small fields)
+    if (horizontalScrolling) {
+      // at least 3 levels of hierarchy should be visible (only relevant for small fields)
       let minLevelLeft = Math.max(parent.element.level - 3, 0) * parent.nodePaddingLevel;
       scrollbars.scrollLeft(parent.$scrollable, minLevelLeft, {
         animate: true,
