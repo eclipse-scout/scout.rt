@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -330,7 +330,7 @@ export const dates = {
 
   /**
    * Converts the given date object to a JSON string. By default, the local time zone
-   * is used to built the result, time zone information itself is not part of the
+   * is used to build the result, time zone information itself is not part of the
    * result. If the argument 'utc' is set to true, the result is built using the
    * UTC values of the date. Such a result string is marked with a trailing 'Z' character.
    *
