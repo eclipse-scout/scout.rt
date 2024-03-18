@@ -71,6 +71,21 @@ export abstract class NavigateButton extends Menu implements NavigateButtonModel
     this.outline.setDetailFormVisibleByUi(this.node, detailVisible);
   }
 
+  /**
+   * @returns `true` if the page has a detail form and the detail form is marked as visible.
+   */
+  protected _hasDetailForm(): boolean {
+    return this.node.detailFormVisible && !!this.node.detailForm;
+  }
+
+  /**
+   * @returns `true` if the page has a detail table and the detail table is marked as visible and the detail table contains
+   *          at least one row. The last requirement can be lifted by setting the optional parameter `requireRows` to false.
+   */
+  protected _hasDetailTable(requireRows = true): boolean {
+    return this.node.detailTableVisible && !!this.node.detailTable && (this.node.detailTable.rows.length > 0 || !requireRows);
+  }
+
   protected override _doAction() {
     super._doAction();
     if (this._isDetail()) {

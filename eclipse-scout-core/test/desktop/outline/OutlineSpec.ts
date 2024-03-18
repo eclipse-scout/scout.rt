@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -261,6 +261,7 @@ describe('Outline', () => {
 
     it('removes the listener from the detail tables on selection changes and destroy', () => {
       let outline = helper.createOutlineWithOneDetailTable();
+      outline.setNavigateButtonsVisible(false); // hide for this test, so their listeners won't interfere
       helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
       let node1 = outline.nodes[1];
@@ -270,15 +271,15 @@ describe('Outline', () => {
 
       outline.selectNodes(node0);
       let selectionListenerCount = eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount + 5); // destroy and propertyChange listener
+      expect(selectionListenerCount).toBe(initialListenerCount + 2); // destroy and propertyChange listener
 
       outline.selectNodes(node1);
       selectionListenerCount = eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount + 3); // listeners removed
+      expect(selectionListenerCount).toBe(initialListenerCount); // listeners removed
 
       outline.selectNodes(node0);
       selectionListenerCount = eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount + 5); // listeners attached again
+      expect(selectionListenerCount).toBe(initialListenerCount + 2); // listeners attached again
 
       outline.nodes[0].detailTable.destroy();
       expect(eventListeners.length).toBe(0); // every listener should be removed now
