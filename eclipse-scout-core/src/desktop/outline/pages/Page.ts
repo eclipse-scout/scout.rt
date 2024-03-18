@@ -557,10 +557,11 @@ export class Page extends TreeNode implements PageModel {
     if (!this.drillDownOnRowClick) {
       return;
     }
-    let row = event.row;
-    let drillNode = this.pageForTableRow(row);
-    this.getOutline().selectNode(drillNode);
-    this.detailTable.deselectRow(row);
+    if (this.leaf) {
+      return;
+    }
+    this.getOutline().drillDown(event.row.page);
+    event.source.deselectRow(event.row);
   }
 
   setPageChanging(changing: boolean) {

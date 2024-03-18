@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1218,5 +1218,24 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     }
 
     this._triggerPageChanged(page);
+  }
+
+  /**
+   * Selects the given page.
+   *
+   * @param drillNode The page to select. May be null, in which case nothing happens.
+   * @param expandDrillNode Whether to automatically expand the drill node after selecting it.
+   *        By default, this is `true` for node pages, `false` otherwise.
+   */
+  drillDown(drillNode: Page, expandDrillNode?: boolean) {
+    if (drillNode) {
+      // Select the target page (this also expands the parent node, if required)
+      this.selectNodes(drillNode);
+
+      // If the target node is a node page, expand it
+      if (scout.nvl(expandDrillNode, drillNode.nodeType === Page.NodeType.NODES)) {
+        this.expandNode(drillNode);
+      }
+    }
   }
 }

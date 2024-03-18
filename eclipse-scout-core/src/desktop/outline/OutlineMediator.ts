@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,7 @@ export class OutlineMediator {
     if (this._skipEvent(pageWithTable)) {
       return;
     }
+
     pageWithTable.getTree().insertNodes(childPages, pageWithTable);
   }
 
@@ -30,6 +31,7 @@ export class OutlineMediator {
     if (this._skipEvent(pageWithTable)) {
       return;
     }
+
     pageWithTable.getTree().deleteNodes(childPages, pageWithTable);
   }
 
@@ -43,18 +45,12 @@ export class OutlineMediator {
   }
 
   onTableRowAction(event: TableRowActionEvent, page: Page) {
-    let childPage = event.row.page;
-    if (!childPage) {
+    if (this._skipEvent(page)) {
       return;
     }
 
-    let outline = childPage.getOutline();
-    if (!outline) {
-      return;
-    }
-
-    outline.selectNode(childPage);
-    outline.setNodeExpanded(childPage, true);
+    let drillNode = event.row.page;
+    page.getOutline().drillDown(drillNode);
   }
 
   onTableRowOrderChanged(event: TableRowOrderChangedEvent, pageWithTable: PageWithTable) {
@@ -68,6 +64,10 @@ export class OutlineMediator {
   }
 
   onTableFilter(event: Event<Table>, page: Page) {
+    if (this._skipEvent(page)) {
+      return;
+    }
+
     page.getOutline().filter();
   }
 
