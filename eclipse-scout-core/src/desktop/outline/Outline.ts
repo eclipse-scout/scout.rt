@@ -11,8 +11,8 @@ import {
   arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget, GroupBox,
   GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton,
   ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel, PropertyChangeEvent,
-  scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke,
-  TreeNavigationUpKeyStroke, Widget
+  scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke,
+  TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesSelectedEvent, TreeNodesUpdatedEvent, Widget
 } from '../../index';
 
 export class Outline extends Tree implements DisplayParent, OutlineModel {
@@ -124,6 +124,8 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     super._init(model);
 
     this.mediator = this._createMediator();
+    this._installLocalTreeListener();
+
     this.formController = scout.create(FormController, {
       displayParent: this,
       session: this.session
@@ -159,12 +161,32 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
     this._nodesSelectedInternal(this.selectedNodes);
   }
 
-  /**
-   * This function returns the outline mediator instance. When we're in an online Scout application we must
-   * return a null instance here, because mediation is done server-side.
-   */
   protected _createMediator(): OutlineMediator {
     return scout.create(OutlineMediator);
+  }
+
+  protected _installLocalTreeListener() {
+    // Note: Although there is a Java outline mediator in Scout Classic, we always install the JS outline mediator.
+    // This enables hybrid outlines, i.e. Java outlines that contain both Java and JS pages.
+
+    // Mediate node selection
+    this.on('nodesSelected', (event: TreeNodesSelectedEvent) => {
+      this.mediator.onPageSelected(this.selectedNode());
+    });
+
+    // Mediate subtree changes
+    let handleSubTreeChanged = (nodes: TreeNode | TreeNode[]) => {
+      arrays.ensure(nodes).forEach(node => this.mediator.onChildPagesChanged(node as Page));
+    };
+    let getDistinctParentNodes = (nodes: TreeNode[]): TreeNode[] => {
+      let parentNodes = arrays.ensure(nodes).map(node => node.parentNode).filter(Boolean);
+      return [...new Set(parentNodes)];
+    };
+    this.on('nodesInserted', (event: TreeNodesInsertedEvent) => handleSubTreeChanged(event.parentNode));
+    this.on('nodesUpdated', (event: TreeNodesUpdatedEvent) => handleSubTreeChanged(getDistinctParentNodes(event.nodes)));
+    this.on('nodesDeleted', (event: TreeNodesDeletedEvent) => handleSubTreeChanged(event.parentNode || getDistinctParentNodes(event.nodes)));
+    this.on('allChildNodesDeleted', (event: TreeAllChildNodesDeletedEvent) => handleSubTreeChanged(event.parentNode));
+    this.on('childNodeOrderChanged', (event: TreeChildNodeOrderChangedEvent) => handleSubTreeChanged(event.parentNode));
   }
 
   override insertNode(node: ObjectOrModel<Page>, parentNode?: Page) {
@@ -455,7 +477,6 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
 
   protected override _setSelectedNodes(nodes: Page[], debounceSend?: boolean) {
     super._setSelectedNodes(nodes, debounceSend);
-    this.mediator.onPageSelected(this.selectedNode());
     // Needs to be done here so that tree.selectNodes() can restore scroll position correctly after the content has been updated
     this.updateDetailContent();
   }
@@ -659,6 +680,9 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
   }
 
   setDetailFormVisibleByUi(node: Page, visible: boolean) {
+    if (node.detailFormVisibleByUi === visible) {
+      return; // nothing to do
+    }
     node.detailFormVisibleByUi = visible;
     this._triggerPageChanged(node);
   }

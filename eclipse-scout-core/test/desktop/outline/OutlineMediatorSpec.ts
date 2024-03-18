@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, Outline, PageWithTable, scout, Table, TableModel, TableTextUserFilter} from '../../../src/index';
+import {Device, Outline, PageWithNodes, PageWithTable, scout, Table, TableModel, TableTextUserFilter} from '../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('OutlineMediator', () => {
@@ -121,7 +121,6 @@ describe('OutlineMediator', () => {
     expect(page.childNodes[1].filterAccepted).toBe(true); // filter is accepted for 'Bar'
   });
 
-
   it('onPageSelected', () => {
     const modelRows = [
       tableHelper.createModelRow('0', ['Foo']),
@@ -145,5 +144,85 @@ describe('OutlineMediator', () => {
 
     outline.selectNodes(null);
     expect(detailTable.selectedRows).toEqual([row0]);
+  });
+
+  it('onChildPagesChanged', () => {
+    let spy = spyOn(outline.mediator, 'onChildPagesChanged').and.callThrough();
+
+    const modelRows = [
+      tableHelper.createModelRow('0', ['Foo']),
+      tableHelper.createModelRow('1', ['Bar'])
+    ];
+    detailTable.insertRows(modelRows);
+    expect(spy).toHaveBeenCalledOnceWith(page);
+    spy.calls.reset();
+
+    let page1 = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Page 1'
+    });
+    outline.insertNode(page1);
+    expect(spy).not.toHaveBeenCalled();
+
+    let page2 = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Pag 2'
+    });
+    outline.insertNode(page2, page1);
+    expect(spy).toHaveBeenCalledOnceWith(page1);
+    spy.calls.reset();
+
+    page2.setText('Page 2');
+    outline.updateNode(page2);
+    expect(spy).toHaveBeenCalledOnceWith(page1);
+    spy.calls.reset();
+
+    let page3 = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Page 3'
+    });
+    let page4 = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Page 4'
+    });
+    outline.insertNodes([page3, page4], page2);
+    expect(spy).toHaveBeenCalledOnceWith(page2);
+    spy.calls.reset();
+
+    outline.deleteNode(page3);
+    expect(spy).toHaveBeenCalledOnceWith(page2);
+    spy.calls.reset();
+
+    outline.deleteNodes(page4);
+    expect(spy).toHaveBeenCalledOnceWith(page2);
+    spy.calls.reset();
+
+    let page5 = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Page 5'
+    });
+    let page6 = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Page 6'
+    });
+    let page7 = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Page 7'
+    });
+    let page8 = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Page 8'
+    });
+    outline.insertNodes([page5, page6], page2);
+    outline.insertNodes([page7, page8], page6);
+    spy.calls.reset();
+
+    outline.deleteAllChildNodes(page6);
+    expect(spy).toHaveBeenCalledOnceWith(page6);
+    spy.calls.reset();
+
+    outline.deleteNodes(page2);
+    expect(spy).toHaveBeenCalledOnceWith(page1);
+    spy.calls.reset();
   });
 });

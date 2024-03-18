@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,6 +28,10 @@ describe('NavigateDownButton', () => {
 
     override _drill() {
       super._drill();
+    }
+
+    override _getDrillNode(): Page {
+      return super._getDrillNode();
     }
   }
 
@@ -61,6 +65,11 @@ describe('NavigateDownButton', () => {
       session: session
     });
     node.detailTableVisible = true;
+    // false when detail table has no
+    expect(menu._isDetail()).toBe(false);
+    node.detailTable.insertRow({
+      cells: ['Test']
+    });
     expect(menu._isDetail()).toBe(true);
 
     // false when detailForm is absent, even when if detailFormVisible=true
@@ -115,11 +124,12 @@ describe('NavigateDownButton', () => {
       });
       expect(menu._buttonEnabled()).toBe(false);
 
-      node.detailTable.selectedRows = [{
+      node.detailTable.rows = [{
         id: '1',
         // @ts-expect-error
         page: {}
       }];
+      node.detailTable.selectedRows = [node.detailTable.rows[0]];
       expect(menu._buttonEnabled()).toBe(true);
     });
 
@@ -135,9 +145,10 @@ describe('NavigateDownButton', () => {
       expect(menu._buttonEnabled()).toBe(false);
 
       // @ts-expect-error
-      node.detailTable.selectedRows = [{
+      node.detailTable.rows = [{
         id: '1'
       }];
+      node.detailTable.selectedRows = [node.detailTable.rows[0]];
       expect(menu._buttonEnabled()).toBe(false);
 
       // @ts-expect-error
@@ -199,4 +210,54 @@ describe('NavigateDownButton', () => {
     expect(outline.selectNodes).toHaveBeenCalledWith(drillNode);
   });
 
+  describe('_getDrillNode', () => {
+
+    it('_getDrillNode returns the next child node', () => {
+      node.detailTable = scout.create(Table, {
+        parent: new NullWidget(),
+        session: session,
+        rows: [
+          {id: '1'},
+          {id: '2'},
+          {id: '3'}
+        ]
+      });
+      let childNode1 = scout.create(Page, {
+        parent: outline
+      });
+      let childNode2 = scout.create(Page, {
+        parent: outline
+      });
+      node.childNodes = [childNode1, childNode2];
+      let row1 = node.detailTable.rows[0];
+      let row2 = node.detailTable.rows[1];
+      let row3 = node.detailTable.rows[2];
+      childNode1.linkWithRow(row1);
+      childNode2.linkWithRow(row2);
+
+      expect(menu._getDrillNode()).toBe(null);
+
+      node.detailTable.selectRows(row1);
+      expect(menu._getDrillNode()).toBe(childNode1);
+
+      node.detailTable.selectRows(row2);
+      expect(menu._getDrillNode()).toBe(childNode2);
+
+      node.detailTable.selectRows(row3);
+      expect(menu._getDrillNode()).toBe(null);
+
+      // -----
+
+      node.leaf = true;
+      node.detailTable.selectRows(row1);
+      expect(menu._getDrillNode()).toBe(null);
+
+      // -----
+
+      node.leaf = false;
+      node.detailTableVisible = false;
+      node.detailTable.selectRows(null);
+      expect(menu._getDrillNode()).toBe(childNode1);
+    });
+  });
 });
