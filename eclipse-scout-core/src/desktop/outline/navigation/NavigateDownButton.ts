@@ -76,15 +76,17 @@ export class NavigateDownButton extends NavigateButton {
   protected _drill() {
     let drillNode: Page;
 
-    if (this.node.detailTable) {
-      let row = this.node.detailTable.selectedRow();
-      drillNode = this.node.pageForTableRow(row);
+    let selectedRow = this.node.detailTable?.selectedRow();
+    if (selectedRow) {
+      drillNode = this.node.pageForTableRow(selectedRow);
     } else {
       drillNode = this.node.childNodes[0];
     }
 
+    // Note: similar 'drill-down' logic exists at other places [#9xw34fQWo2]
     if (drillNode) {
       $.log.isDebugEnabled() && $.log.debug('drill down to node ' + drillNode);
+
       // Collapse other expanded child nodes
       let parentNode = drillNode.parentNode;
       if (parentNode) {
