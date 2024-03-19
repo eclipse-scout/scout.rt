@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -411,7 +411,7 @@ export const strings = {
     if (!measureText) {
       measureText = text => ({width: (text || '').length});
     }
-    text = text.trim();
+    text = strings.asString(text).trim();
     let textWidth = measureText(text).width;
     if (textWidth <= horizontalSpace) {
       return text;
