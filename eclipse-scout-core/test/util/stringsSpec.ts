@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -480,6 +480,10 @@ describe('strings', () => {
       expect(strings.truncateText(loremIpsum, 120, measureText)).toBe(loremIpsum);
       expect(strings.truncateText(loremIpsum, 100, measureText)).toBe('Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dol...');
       expect(strings.truncateText(loremIpsum, 0, measureText)).toBe(loremIpsum);
+    });
+
+    it('does not fail if a number is passed', () => {
+      expect(strings.truncateText(1234567 as any, 5)).toBe('12...');
     });
   });
 });
