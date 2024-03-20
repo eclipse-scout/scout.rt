@@ -61,13 +61,14 @@ export function copyText(options) {
 export function _copyText(options) {
   // Modern clipboard API
   // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
-  if (navigator.clipboard) {
-    return navigator.clipboard.writeText(options.text);
+  let win = options?.parent?.window(true) || window;
+  if (win.navigator.clipboard) {
+    return win.navigator.clipboard.writeText(options.text);
   }
 
   // Fallback for browsers that don't support the modern clipboard API (IE, Safari, Chrome < 66, Firefox < 63)
   // Create invisible textarea field and use document command "copy" to copy the text to the clipboard
-  let doc = (options.parent && options.parent.rendered ? options.parent.document(true) : document);
+  let doc = options?.parent?.document(true) || document;
   let f = doc.createElement('textarea');
   f.style.position = 'fixed';
   f.style.opacity = '0.0';
@@ -126,8 +127,7 @@ export function _failedStatus(session) {
  * has been copied to the clipboard successfully. By passing a different status, the
  * message can be changed.
  *
- * @param parent
- *          Widget that wants show the notification. Mandatory. Required for NLS texts.
+ * @param parent Widget that wants to show the notification. Mandatory. Required for NLS texts.
  */
 export function showNotification(parent, status) {
   scout.assertParameter('parent', parent);
