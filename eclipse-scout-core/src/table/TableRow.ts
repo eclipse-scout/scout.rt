@@ -39,6 +39,9 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
   aggregateRowBefore: AggregateTableRow;
   lookupRow: LookupRow<any>;
   $row: JQuery;
+  /**
+   * The child page that corresponds to this table row. Only set for rows in the `detailTable` of page, see {@link Page#linkWithRow}.
+   */
   page: Page;
   expandable: boolean;
 

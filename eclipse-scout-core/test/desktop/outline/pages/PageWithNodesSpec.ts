@@ -100,6 +100,40 @@ describe('PageWithNodes', () => {
     expect(page1.detailTable.selectedRows.length).toBe(0); // <--
   });
 
+  it('updates childrenLoaded flag', () => {
+    let page = scout.create(PageWithNodes, {
+      parent: outline,
+      text: 'Page 1',
+      reloadable: true,
+      childNodes: [
+        {
+          objectType: PageWithNodes,
+          text: 'Page 2'
+        },
+        {
+          objectType: PageWithNodes,
+          text: 'Page 3'
+        }
+      ]
+    });
+    outline.insertNode(page);
+    outline.selectNode(page);
+    jasmine.clock().tick(1);
+    let detailTable = page.detailTable;
+    expect(detailTable).toBeTruthy();
+
+    expect(page.childrenLoaded).toBe(true);
+    expect(detailTable.loading).toBe(false);
+
+    detailTable.reload();
+    expect(page.childrenLoaded).toBe(false);
+    expect(detailTable.loading).toBe(false); // currently not implemented for NodePages
+
+    jasmine.clock().tick(1);
+    expect(page.childrenLoaded).toBe(true);
+    expect(detailTable.loading).toBe(false);
+  });
+
   describe('reloadPage', () => {
 
     it('does not reload child pages if pages are static', () => {

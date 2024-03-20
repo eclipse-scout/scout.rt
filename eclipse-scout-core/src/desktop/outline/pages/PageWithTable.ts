@@ -85,8 +85,8 @@ export class PageWithTable extends Page implements PageWithTableModel {
       return;
     }
 
-    let rows = arrays.ensure(event.rows),
-      childPages = rows.map(row => this._createChildPageInternal(row));
+    let rows = arrays.ensure(event.rows);
+    let childPages = rows.map(row => this._createChildPageInternal(row)).filter(Boolean);
 
     this.getOutline().mediator.onTableRowsInserted(rows, childPages, this);
   }
@@ -108,11 +108,13 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   protected _createChildPageInternal(row: TableRow): Page {
     let childPage = this.createChildPage(row);
-    if (childPage === null && this.alwaysCreateChildPage) {
+    if (!childPage && this.alwaysCreateChildPage) {
       childPage = this.createDefaultChildPage(row);
     }
-    childPage.linkWithRow(row);
-    childPage = childPage.updatePageFromTableRow(row);
+    if (childPage) {
+      childPage.linkWithRow(row);
+      childPage = childPage.updatePageFromTableRow(row);
+    }
     return childPage;
   }
 

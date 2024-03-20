@@ -403,13 +403,16 @@ export class Page extends TreeNode implements PageModel {
   }
 
   /**
-   * @returns an array of pages linked with the given rows.
-   *   The order of the returned pages will be the same as the order of the rows.
+   * Returns an array of pages linked with the given rows. The order of the returned pages corresponds to the
+   * order of the rows. Rows that are not linked to a page are ignored.
    */
   pagesForTableRows(rows: TableRow[]): Page[] {
-    return rows.map(this.pageForTableRow);
+    return rows.map(row => row.page).filter(Boolean);
   }
 
+  /**
+   * @deprecated Use {@link TableRow#page} instead. Will be removed in 25.1
+   */
   pageForTableRow(row: TableRow): Page {
     if (!row.page) {
       throw new Error('Table-row is not linked to a page');
@@ -476,16 +479,20 @@ export class Page extends TreeNode implements PageModel {
   }
 
   /**
-   * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and returns the pages.
+   * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and
+   * returns the pages. Rows that are not linked to a page are ignored.
    *
    * @returns pages linked with the given rows.
    */
   updatePagesFromTableRows(rows: TableRow[]): Page[] {
-    return rows.map(row => row.page.updatePageFromTableRow(row));
+    return rows
+      .filter(row => !!row.page)
+      .map(row => row.page.updatePageFromTableRow(row));
   }
 
   /**
    * Updates relevant properties (text, enabled, htmlEnabled) from the page linked with the given row.
+   * Only call this method if {@link TableRow#page} is set!
    *
    * @returns page linked with the given row.
    */
@@ -493,7 +500,7 @@ export class Page extends TreeNode implements PageModel {
     let page = row.page;
     page.enabled = row.enabled;
     page.text = page.computeTextForRow(row);
-    if (row.cells.length >= 1) {
+    if (row.cells.length) {
       page.htmlEnabled = row.cells[0].htmlEnabled;
       page.cssClass = row.cells[0].cssClass;
     }
