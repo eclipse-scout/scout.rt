@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -283,6 +283,8 @@ export class OutlineAdapter extends TreeAdapter {
 
   protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<TreeNode> {
     const model = super._initNodeModel(nodeModel);
+    // This marker is only set for pages that represent a remote page on the UI server. It prevents menus from being inherited
+    // from the parent table page, because in the case of Java pages that is already done on the server.
     model.remote = true;
     return model;
   }

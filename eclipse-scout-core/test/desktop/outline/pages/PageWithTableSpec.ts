@@ -333,4 +333,39 @@ describe('PageWithTable', () => {
     expect(pageAbc.text).toBe('a d e');
     expect(page123.text).toBe('1 4 5');
   });
+
+  it('updates childrenLoaded flag', () => {
+    let page = scout.create(SpecPageWithTable, {
+      parent: outline,
+      detailTable: {
+        objectType: Table
+      }
+    });
+    outline.insertNode(page);
+    expect(page.childrenLoaded).toBe(false);
+
+    outline.selectNode(page);
+    jasmine.clock().tick(1);
+    let detailTable = page.detailTable;
+    expect(detailTable).toBeTruthy();
+
+    expect(page.childrenLoaded).toBe(true);
+    expect(detailTable.loading).toBe(false);
+
+    detailTable.reload();
+    expect(page.childrenLoaded).toBe(true); // same as before, because reloading the table does not call loadChildren()
+    expect(detailTable.loading).toBe(true);
+
+    jasmine.clock().tick(1);
+    expect(page.childrenLoaded).toBe(true);
+    expect(detailTable.loading).toBe(false);
+
+    page.reloadPage();
+    expect(page.childrenLoaded).toBe(false); // <--
+    expect(detailTable.loading).toBe(true);
+
+    jasmine.clock().tick(1);
+    expect(page.childrenLoaded).toBe(true);
+    expect(detailTable.loading).toBe(false);
+  });
 });
