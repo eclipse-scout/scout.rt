@@ -401,16 +401,23 @@ export class Page extends TreeNode implements PageModel {
   }
 
   /**
-   * @returns an array of pages linked with the given rows.
-   *   The order of the returned pages will be the same as the order of the rows.
+   * Returns an array of pages linked with the given rows. The order of the returned pages corresponds to the
+   * order of the rows. Rows that are not linked to a page are ignored.
    */
   pagesForTableRows(rows: TableRow[]): Page[] {
-    return rows.map(this.pageForTableRow);
+    return rows
+      .filter(row => !!row.page)
+      .map(row => this.pageForTableRow(row));
   }
 
+  /**
+   * Returns the page linked to the given row.
+   *
+   * Warning: an error will be thrown when the row is not linked to a page!
+   */
   pageForTableRow(row: TableRow): Page {
     if (!row.page) {
-      throw new Error('Table-row is not linked to a page');
+      throw new Error('Table row is not linked to a page');
     }
     return row.page;
   }
@@ -464,21 +471,26 @@ export class Page extends TreeNode implements PageModel {
   }
 
   /**
-   * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and returns the pages.
+   * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and
+   * returns the pages. Rows that are not linked to a page are ignored.
    *
    * @returns pages linked with the given rows.
    */
   updatePagesFromTableRows(rows: TableRow[]): Page[] {
-    return rows.map(row => row.page.updatePageFromTableRow(row));
+    return rows
+      .filter(row => !!row.page)
+      .map(row => this.updatePageFromTableRow(row));
   }
 
   /**
    * Updates relevant properties (text, enabled, htmlEnabled) from the page linked with the given row.
    *
+   * Warning: an error will be thrown when the row is not linked to a page!
+   *
    * @returns page linked with the given row.
    */
   updatePageFromTableRow(row: TableRow): Page {
-    let page = row.page;
+    let page = this.pageForTableRow(row);
     page.enabled = row.enabled;
     page.text = page.computeTextForRow(row);
     if (row.cells.length >= 1) {
