@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,17 +11,13 @@ package org.eclipse.scout.rt.shared.ui;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
+
 /**
  * Browser engine type
  *
  * @since 6.0.0
  */
 @FunctionalInterface
-public interface IUiEngineType extends Serializable {
-
-  /**
-   * @return unique id
-   */
-  String getIdentifier();
-
+public interface IUiEngineType extends Serializable, IEnum {
 }

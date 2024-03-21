@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -69,10 +69,10 @@ public class DefaultUserAgentParser implements IUserAgentParser {
       LOG.warn("Character which is used as delimiter has been found in uiDeviceId. Replaced with '_'. Old uiDeviceId: {}. New uiDeviceId: {}", userAgent.getUiDeviceId(), uiDeviceId);
     }
     return StringUtility.concatenateTokens(
-        userAgent.getUiLayer().getIdentifier(), DELIMITER,
-        userAgent.getUiDeviceType().getIdentifier(), DELIMITER,
-        userAgent.getUiEngineType().getIdentifier(), DELIMITER,
-        userAgent.getUiSystem().getIdentifier(), DELIMITER,
+        userAgent.getUiLayer().stringValue(), DELIMITER,
+        userAgent.getUiDeviceType().stringValue(), DELIMITER,
+        userAgent.getUiEngineType().stringValue(), DELIMITER,
+        userAgent.getUiSystem().stringValue(), DELIMITER,
         uiDeviceId);
   }
 

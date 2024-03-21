@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -109,11 +109,11 @@ public class ClientUIPreferences {
 
     String uiLayer = null;
     if (!UiLayer.UNKNOWN.equals(currentUserAgent.getUiLayer())) {
-      uiLayer = currentUserAgent.getUiLayer().getIdentifier();
+      uiLayer = currentUserAgent.getUiLayer().stringValue();
     }
     String uiDeviceType = null;
     if (!UiDeviceType.UNKNOWN.equals(currentUserAgent.getUiDeviceType())) {
-      uiDeviceType = currentUserAgent.getUiDeviceType().getIdentifier();
+      uiDeviceType = currentUserAgent.getUiDeviceType().stringValue();
     }
 
     return StringUtility.concatenateTokens(uiLayer, ".", uiDeviceType, ".");
