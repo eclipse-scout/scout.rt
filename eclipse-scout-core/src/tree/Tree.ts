@@ -444,6 +444,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     // render display style before viewport (not in renderProperties) to have a correct style from the beginning
     this._renderDisplayStyle();
     this._renderViewport();
+    this.revealSelection();
   }
 
   protected override _renderProperties() {
