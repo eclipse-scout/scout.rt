@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,11 +48,9 @@ export const router = {
       location = router.defaultLocation;
     }
 
-    let i, route: Route = null;
-    for (i = 0; i < router.routes.length; i++) {
-      route = router.routes[i];
+    for (let i = 0; i < router.routes.length; i++) {
+      let route = router.routes[i];
       if (route.matches(location)) {
-
         if (route === router.currentRoute && route.location === location) {
           $.log.isDebugEnabled() && $.log.debug('Route has not changed - do not activate route');
           return;
@@ -68,13 +66,14 @@ export const router = {
         router.currentRoute.activate(location);
 
         window.location.replace(location);
-        $.log.isInfoEnabled() && $.log.info('router: activated route for location=', location);
+        $.log.isInfoEnabled() && $.log.info('router: activated route for location ', location);
 
         router.events.trigger('routeChange', new RouteChangeEvent(route));
         return;
       }
     }
-    $.log.warn('router: no route registered for location=', location);
+
+    $.log.isInfoEnabled() && $.log.info('router: no route registered for location ' + location);
   },
 
   register(route: Route) {
