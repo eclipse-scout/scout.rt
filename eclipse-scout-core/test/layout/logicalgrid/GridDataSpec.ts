@@ -29,4 +29,17 @@ describe('GridData', () => {
       expect(gridData.equals(new GridData({x: 1, y: 10, w: 3, h: 5}))).toBe(false);
     });
   });
+
+  describe('clone', () => {
+    it('creates a copy of the existing grid data', () => {
+      let gridData = new GridData({x: 5, y: 10, w: 3, h: 5});
+      expect(gridData.clone()).not.toBe(gridData);
+      expect(gridData.clone().equals(new GridData({x: 5, y: 10, w: 3, h: 5}))).toBe(true);
+    });
+
+    it('enriches the clone with the passed model', () => {
+      let gridData = new GridData({x: 5, y: 10, w: 3, h: 5});
+      expect(gridData.clone({y: 20, w: 30}).equals(new GridData({x: 5, y: 20, w: 30, h: 5}))).toBe(true);
+    });
+  });
 });
