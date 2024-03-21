@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,10 +11,11 @@ package org.eclipse.scout.rt.shared.ui;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
+
 /**
  * @since 3.8.0
  */
 @FunctionalInterface
-public interface IUiDeviceType extends Serializable {
-  String getIdentifier();
+public interface IUiDeviceType extends Serializable, IEnum {
 }

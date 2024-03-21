@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,22 +9,23 @@
  */
 package org.eclipse.scout.rt.shared.ui;
 
+import org.eclipse.scout.rt.dataobject.enumeration.EnumName;
+
 /**
  * @since 3.8.0
  */
+@EnumName("scout.UiLayer")
 public enum UiLayer implements IUiLayer {
 
-  HTML(true),
-  UNKNOWN;
+  HTML("HTML", true),
+  UNKNOWN("UNKNOWN", false);
 
-  final boolean m_webUi;
+  private final boolean m_webUi;
+  private final String m_stringValue;
 
-  UiLayer(boolean webUi) {
+  UiLayer(String stringValue, boolean webUi) {
+    m_stringValue = stringValue;
     m_webUi = webUi;
-  }
-
-  UiLayer() {
-    this(false);
   }
 
   @Override
@@ -33,8 +34,8 @@ public enum UiLayer implements IUiLayer {
   }
 
   @Override
-  public String getIdentifier() {
-    return name();
+  public String stringValue() {
+    return m_stringValue;
   }
 
   public static IUiLayer createByIdentifier(String identifier) {
