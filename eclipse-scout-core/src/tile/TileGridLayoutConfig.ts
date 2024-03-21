@@ -68,8 +68,8 @@ export class TileGridLayoutConfig extends LogicalGridLayoutConfig implements Til
     }
   }
 
-  override clone(): TileGridLayoutConfig {
-    return new TileGridLayoutConfig(this._options, this._defaults);
+  override clone(options?: InitModelOf<TileGridLayoutConfig>): TileGridLayoutConfig {
+    return new TileGridLayoutConfig($.extend({}, this._options, options), this._defaults);
   }
 
   static override ensure(layoutConfig: ObjectOrModel<TileGridLayoutConfig>): TileGridLayoutConfig {
