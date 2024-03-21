@@ -75,7 +75,7 @@ export class GridData {
    *   with fixed height, no additional space is grabbed, because weightY will automatically be set to 0.
    * - If the weight of these 3 fields were set to 1, the fields would grow and shrink proportionally.
    * - If the weight of these 3 fields were set to 0.1, 0.1 and 1, the first two fields would adjust the size very
-   *   slowly and would mostly be a as big as one logical grid row (because gridH is set to 1), whereas the third field
+   *   slowly and would mostly be as big as one logical grid row (because gridH is set to 1), whereas the third field
    *   would adjust it's size very fast.
    *
    *   Default is -1.
@@ -116,7 +116,7 @@ export class GridData {
    *
    * - If the property is set to true, the element takes all the horizontal space and therefore is as width as the grid cell.
    * - If it's set to false, the width is computed based on the properties {@link useUiWidth and {@link widthInPixel}.
-   * - If non of these are set, a default value is used which typically is the width of a logical grid column.
+   * - If none of these are set, a default value is used which typically is the width of a logical grid column.
    *
    * Default is true.
    */
@@ -166,6 +166,13 @@ export class GridData {
     this.heightInPixel = 0;
 
     $.extend(this, model);
+  }
+
+  /**
+   * @returns a clone of this grid data enriched with the properties of the given model.
+   */
+  clone?(model?: GridData): GridData {
+    return new GridData($.extend({}, this, model));
   }
 
   equals?(other: GridData): boolean {
