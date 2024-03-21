@@ -1057,11 +1057,13 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
+      boxOptions.yesButtonAction = null; // NOP
       isFatalError = false; // unsafe upload allows the application to continue
     } else if (jsonError.code === Session.JsonResponseError.REJECTED_UPLOAD) {
       boxOptions.header = this.optText('ui.RejectedUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.RejectedUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
+      boxOptions.yesButtonAction = null; // NOP
       isFatalError = false; // rejected upload allows the application to continue
     }
     this.showFatalMessage(boxOptions, jsonError.code + '');
