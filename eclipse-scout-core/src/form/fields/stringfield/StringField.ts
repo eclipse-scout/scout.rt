@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,7 @@ import {
   StringFieldLayout, StringFieldModel, strings, texts
 } from '../../../index';
 
-export class StringField extends BasicField<string> {
+export class StringField extends BasicField<string> implements StringFieldModel {
   declare model: StringFieldModel;
   declare eventMap: StringFieldEventMap;
   declare self: StringField;
