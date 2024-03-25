@@ -21,10 +21,12 @@ import java.security.KeyStore;
 import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.http.HttpCookie.SameSite;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
@@ -333,14 +335,16 @@ public class Application {
       boolean httpOnly = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigHttpOnlyProperty.class);
       boolean secure = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSecureProperty.class);
       SameSite sameSite = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSameSiteProperty.class);
+      boolean partitioned = CONFIG.getPropertyValue(ScoutApplicationSessionCookieConfigSecureProperty.class);
 
-      LOG.info("[Session config] timeout: {} s, HTTP only: {}, secure: {}, same site: {}", sessionTimeoutInSeconds, httpOnly, secure, sameSite.getAttributeValue());
+      LOG.info("[Session config] timeout: {} s, HTTP only: {}, secure: {}, same site: {}, partitioned: {}", sessionTimeoutInSeconds, httpOnly, secure, sameSite.getAttributeValue(), partitioned);
 
       SessionHandler sessionHandler = handler.getSessionHandler();
+      SessionCookieConfig sessionCookieConfig = sessionHandler.getSessionCookieConfig();
       sessionHandler.setMaxInactiveInterval(sessionTimeoutInSeconds);
-      sessionHandler.getSessionCookieConfig().setHttpOnly(httpOnly);
-      sessionHandler.getSessionCookieConfig().setSecure(secure);
-      sessionHandler.setSameSite(sameSite);
+      sessionCookieConfig.setHttpOnly(httpOnly);
+      sessionCookieConfig.setSecure(secure);
+      sessionCookieConfig.setComment(HttpCookie.getCommentWithAttributes(sessionCookieConfig.getComment(), httpOnly, sameSite, partitioned));
     }
 
     handler.setDisplayName(CONFIG.getPropertyValue(ApplicationNameProperty.class));

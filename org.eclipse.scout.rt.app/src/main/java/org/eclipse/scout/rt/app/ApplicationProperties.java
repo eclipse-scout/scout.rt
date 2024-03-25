@@ -207,6 +207,24 @@ public final class ApplicationProperties {
     }
   }
 
+  public static class ScoutApplicationSessionCookieConfigPartitionedProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.sessionCookieConfigPartitioned";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the Partitioned attribute of the HTTP session cookie. Default value is '" + getDefaultValue() + "'.";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return false;
+    }
+  }
+
   public static class ScoutApplicationHttpRequestMaxHeaderSizeProperty extends AbstractIntegerConfigProperty {
 
     @Override
