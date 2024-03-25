@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Event, EventHandler, EventListener, EventMapOf, Form, HybridManagerEventMap, InitModelOf, ObjectOrChildModel, Session, UuidPool, Widget} from '../../index';
+import {Event, EventHandler, EventListener, EventMapOf, Form, HybridManagerEventMap, InitModelOf, ObjectOrChildModel, Session, UuidPool, Widget} from '../../index';
 
 export class HybridManager extends Widget {
   declare eventMap: HybridManagerEventMap;
@@ -51,23 +51,26 @@ export class HybridManager extends Widget {
   // widgets
 
   protected _setWidgets(widgets: Record<string, ObjectOrChildModel<Widget>>) {
-    const oldWidgets = $.extend(true, {}, this.widgets);
-    const oldWidgetIds = Object.keys(oldWidgets);
-
     widgets = this._ensureWidgets(widgets);
+
+    const removedWidgets: Record<string, Widget> = {};
+    for (const [id, widget] of Object.entries(this.widgets)) {
+      if (!widgets[id]) {
+        removedWidgets[id] = widget;
+      }
+    }
+    const addedWidgets: Record<string, Widget> = {};
+    for (const [id, widget] of Object.entries(widgets as Record<string, Widget>)) {
+      if (!this.widgets[id]) {
+        addedWidgets[id] = widget;
+      }
+    }
+    this._destroyOrUnlinkChildren(Object.values(removedWidgets));
 
     this._setProperty('widgets', widgets);
 
-    const widgetIdsAdded = [], widgetIdsRemoved = [...oldWidgetIds];
-
-    Object.keys(this.widgets).forEach(id => {
-      if (!arrays.remove(widgetIdsRemoved, id)) {
-        widgetIdsAdded.push(id);
-      }
-    });
-
-    widgetIdsAdded.forEach(id => this._triggerWidgetAdd(id, this.widgets[id]));
-    widgetIdsRemoved.forEach(id => this._triggerWidgetRemove(id, oldWidgets[id]));
+    Object.entries(addedWidgets).forEach(([id, widget]) => this._triggerWidgetAdd(id, widget));
+    Object.entries(removedWidgets).forEach(([id, widget]) => this._triggerWidgetRemove(id, widget));
   }
 
   protected _ensureWidgets(modelsOrWidgets: Record<string, ObjectOrChildModel<Widget>>): Record<string, Widget> {

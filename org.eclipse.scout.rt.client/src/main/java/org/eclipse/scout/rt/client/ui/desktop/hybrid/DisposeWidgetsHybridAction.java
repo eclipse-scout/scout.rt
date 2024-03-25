@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,7 @@ public class DisposeWidgetsHybridAction extends AbstractHybridAction<DisposeWidg
     for (String id : data.getIds()) {
       IWidget widget = hybridManager().getWidgetById(id);
       if (widget != null) {
-        hybridManager().disposeWidget(widget);
+        widget.dispose();
         LOG.debug("Disposed hybrid widget with id {}", id);
       }
     }
