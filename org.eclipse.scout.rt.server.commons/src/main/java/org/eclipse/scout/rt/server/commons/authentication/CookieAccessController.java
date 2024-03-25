@@ -183,6 +183,10 @@ public class CookieAccessController implements IAccessController {
     LOG.info("Store signed cookie '{}' for '{}'", m_cookieName, p.getName());
     Cookie myCookie = new Cookie(m_cookieName, signedValue);
     myCookie.setMaxAge((int) m_maxAge);
+    // FIXME aeg: just for testing
+    myCookie.setSecure(true);
+    myCookie.setHttpOnly(true);
+    myCookie.setComment("__SAME_SITE_NONE____PARTITIONED__");
     resp.addCookie(myCookie);
   }
 
