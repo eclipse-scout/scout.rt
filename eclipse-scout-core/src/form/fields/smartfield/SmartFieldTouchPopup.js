@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, TouchPopup} from '../../../index';
+import {objects, scout, TouchPopup} from '../../../index';
+import $ from 'jquery';
 
 /**
  * Info: this class must have the same interface as SmartFieldPopup. That's why there's some
@@ -18,12 +19,14 @@ export default class SmartFieldTouchPopup extends TouchPopup {
 
   constructor() {
     super();
+    this._initialFieldState = null;
   }
 
   _init(options) {
     options.withFocusContext = false;
     options.smartField = options.parent; // alias for parent (required by proposal chooser)
     super._init(options);
+    this._initialFieldState = this._getFieldState();
 
     this.setLookupResult(options.lookupResult);
     this.setStatus(options.status);
@@ -40,6 +43,11 @@ export default class SmartFieldTouchPopup extends TouchPopup {
     this._widget = this._createProposalChooser();
     this._widget.on('lookupRowSelected', this._triggerEvent.bind(this));
     this._widget.on('activeFilterSelected', this._triggerEvent.bind(this));
+  }
+
+  _getFieldState() {
+    const {value, displayText, errorStatus, lookupRow} = this._field;
+    return $.extend(true, {}, {value, displayText, errorStatus, lookupRow});
   }
 
   _createProposalChooser() {
@@ -107,6 +115,9 @@ export default class SmartFieldTouchPopup extends TouchPopup {
   }
 
   _beforeClosePopup(event) {
+    if (objects.equalsRecursive(this._initialFieldState, this._getFieldState())) {
+      return;
+    }
     this.smartField.acceptInputFromField(this._field);
   }
 }
