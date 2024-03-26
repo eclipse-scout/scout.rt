@@ -576,5 +576,87 @@ describe('ProposalField', () => {
         }
       });
     }
+
+    // select a value, then open and close the touch popup multiple times
+
+    it('write \'ok\' (touchMode: true, open and close multiple times)', async () =>
+      await testTouchProposalFieldOpenClose('ok'));
+
+    it('write \'warning\' (touchMode: true, open and close multiple times)', async () =>
+      await testTouchProposalFieldOpenClose('warning'));
+
+    it('write \'throw\' (touchMode: true, open and close multiple times)', async () =>
+      await testTouchProposalFieldOpenClose('throw'));
+
+    it('write \'no error\' (touchMode: true, open and close multiple times)', async () =>
+      await testTouchProposalFieldOpenClose('no error'));
+
+    it('lookup \'ok\' (touchMode: true, open and close multiple times)', async () =>
+      await testTouchProposalFieldOpenClose({text: 'ok', lookup: true}));
+
+    it('lookup \'warning\' (touchMode: true, open and close multiple times)', async () =>
+      await testTouchProposalFieldOpenClose({text: 'warning', lookup: true}));
+
+    it('lookup \'throw\' (touchMode: true, open and close multiple times)', async () =>
+      await testTouchProposalFieldOpenClose({text: 'throw', lookup: true}));
+
+    it('lookup \'no error\' (touchMode: true, open and close multiple times)', async () =>
+      await testTouchProposalFieldOpenClose({text: 'no error', lookup: true}));
+
+    async function testTouchProposalFieldOpenClose(inputOrText) {
+      const expectInput = (input) => {
+        const {text, lookup} = input;
+
+        // displayText always equals text
+        expect(field.displayText).toBe(text);
+
+        // value equals text iff there is no validation error (see validator)
+        if ('throw' === text) {
+          expect(field.value).not.toBe(text);
+        } else {
+          expect(field.value).toBe(text);
+        }
+
+        // correct errorStatus is set (see validator)
+        if ('ok' === text) {
+          expect(field.errorStatus).not.toBeNull();
+          expect(field.errorStatus.severity).toBe(Status.Severity.OK);
+          expect(field.errorStatus.message).toBe('This has severity OK.');
+        } else if ('warning' === text) {
+          expect(field.errorStatus).not.toBeNull();
+          expect(field.errorStatus.severity).toBe(Status.Severity.WARNING);
+          expect(field.errorStatus.message).toBe('This has severity WARNING.');
+        } else if ('throw' === text) {
+          expect(field.errorStatus).not.toBeNull();
+          expect(field.errorStatus.severity).toBe(Status.Severity.ERROR);
+          expect(field.errorStatus.message).toBe('This is an exception.');
+        } else {
+          expect(field.errorStatus).toBeNull();
+        }
+
+        // lookupRow is set and contains the correct values iff a lookupRow was selected
+        if (lookup) {
+          expect(field.lookupRow).not.toBeNull();
+          expect(field.lookupRow.text).toBe(text);
+          expect(field.lookupRow.key).toBe(text);
+        } else {
+          expect(field.lookupRow).toBeNull();
+        }
+      };
+
+      const input = proposalFieldSpecHelper.ensureInput(inputOrText);
+
+      await proposalFieldSpecHelper.testProposalFieldInputs(field, [input], true, {
+        afterInput: expectInput
+      });
+
+      let i = 0;
+      while (i < 5) {
+        const popup = await proposalFieldSpecHelper.openPopup(field);
+        popup.doneAction.doAction();
+        expectInput(input);
+        i++;
+      }
+    }
   });
 });
