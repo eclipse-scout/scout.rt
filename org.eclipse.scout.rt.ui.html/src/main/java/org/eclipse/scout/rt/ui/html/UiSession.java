@@ -418,7 +418,14 @@ public class UiSession implements IUiSession {
     // Ensure the model theme is valid, otherwise it could result in an endless reload loop
     String validTheme = UiThemeHelper.get().validateTheme(modelTheme);
     if (!ObjectUtility.equals(validTheme, modelTheme)) {
-      LOG.info("Model theme ({}) is not valid, switching to a valid one ({})", modelTheme, validTheme);
+      if (modelTheme == null) {
+        // Initial assignment
+        LOG.debug("No model theme set, using a default value ({})", validTheme);
+      }
+      else {
+        // Invalid theme
+        LOG.warn("Model theme ({}) is not valid, switching to a valid one ({})", modelTheme, validTheme);
+      }
       modelTheme = validTheme;
     }
 
