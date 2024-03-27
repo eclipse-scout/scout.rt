@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1329,16 +1329,28 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     return $element.entryPoint();
   }
 
+  /**
+   * Returns the `window` inside which this widget is currently rendered. If the widget is not rendered, `null` (or an empty jQuery
+   * collection, respectively) is returned.
+   *
+   * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+   */
   window<T extends boolean>(domElement?: T): T extends true ? Window : JQuery<Window> {
     let $el = this.$container || this.$parent;
     // @ts-expect-error $() is not of type JQuery<Document>
-    return $el ? $el.window(domElement) : domElement ? null : $();
+    return $el ? $el.window(domElement) : (domElement ? null : $());
   }
 
+  /**
+   * Returns the `document` inside which this widget is currently rendered. If the widget is not rendered, `null` (or an empty jQuery
+   * collection, respectively) is returned.
+   *
+   * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+   */
   document<T extends boolean>(domElement?: T): T extends true ? Document : JQuery<Document> {
     let $el = this.$container || this.$parent;
     // @ts-expect-error $() is not of type JQuery<Document>
-    return $el ? $el.document(domElement) : domElement ? null : $();
+    return $el ? $el.document(domElement) : (domElement ? null : $());
   }
 
   /**
