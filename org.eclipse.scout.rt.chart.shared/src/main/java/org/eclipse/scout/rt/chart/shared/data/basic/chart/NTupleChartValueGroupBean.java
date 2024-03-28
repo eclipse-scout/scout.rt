@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,12 +12,13 @@ package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StreamUtility;
 
 public class NTupleChartValueGroupBean extends AbstractChartValueGroupBean implements INTupleChartValueGroupBean {
   private static final long serialVersionUID = 1L;
@@ -57,16 +58,12 @@ public class NTupleChartValueGroupBean extends AbstractChartValueGroupBean imple
   }
 
   @Override
-  public void add(BigDecimal... tupleValues) {
-    if (m_n != tupleValues.length) {
+  public void add(List<BigDecimal> tupleValues) {
+    if (getN() != CollectionUtility.size(tupleValues)) {
       throw new IllegalArgumentException("The number of tuple values is unequal to the dimension.");
     }
 
-    Map<String, BigDecimal> tuple = new HashMap<>();
-    for (int i = 0; i < tupleValues.length; i++) {
-      tuple.put(m_identifiers.get(i), tupleValues[i]);
-    }
-
-    m_values.add(tuple);
+    m_values.add(IntStream.range(0, getN()).boxed()
+        .collect(StreamUtility.toMap(m_identifiers::get, tupleValues::get)));
   }
 }
