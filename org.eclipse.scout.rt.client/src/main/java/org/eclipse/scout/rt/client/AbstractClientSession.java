@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,21 +9,26 @@
  */
 package org.eclipse.scout.rt.client;
 
+import static java.util.Collections.*;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.AccessController;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
@@ -88,6 +93,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private volatile Subject m_subject;
 
   private final SharedVariableMap m_sharedVariableMap;
+  private Set<String> m_exposedSharedVariables;
 
   private IMemoryPolicy m_memoryPolicy;
   private final SessionData m_sessionData;
@@ -103,6 +109,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_subject = Subject.getSubject(AccessController.getContext());
     m_objectExtensions = new ObjectExtensions<>(this, true);
     m_sharedVariableMap = new SharedVariableMap();
+    m_exposedSharedVariables = null;
 
     m_sessionMetrics.sessionCreated(SESSION_TYPE);
     setLocale(NlsLocale.get());
@@ -130,10 +137,23 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
   }
 
-  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Override
+  public Set<String> getExposedSharedVariables() {
+    var exposedVariables = m_exposedSharedVariables;
+    if (exposedVariables == null) {
+      return emptySet();
+    }
+    return unmodifiableSet(exposedVariables);
+  }
+
+  /**
+   * @return A {@link Set} of shared variable names (see {@link #getSharedVariableMap()}) that should be sent to the
+   * browser. Default returns {@code null} (no properties are synced).
+   */
   @Order(100)
-  protected boolean getConfiguredSingleThreadSession() {
-    return false;
+  @ConfigProperty(ConfigProperty.OBJECT)
+  protected Set<String> getConfiguredExposedSharedVariables() {
+    return null;
   }
 
   @Override
@@ -221,12 +241,19 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void initConfig() {
     m_virtualDesktop = new VirtualDesktop();
     m_browserUri = resolveBrowserUri();
+    m_exposedSharedVariables = getConfiguredExposedSharedVariables();
 
     setMemoryPolicy(resolveMemoryPolicy());
+    m_sharedVariableMap.addPropertyChangeListener(e -> {
+      if ("values".equals(e.getPropertyName())) {
+        ModelJobs.schedule(() -> propertySupport.firePropertyChange(PROP_SHARED_VARIABLE_MAP, e.getOldValue(), e.getNewValue()),
+            ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+      }
+    });
   }
 
   /**
-   * Resolves the browser URI, or <code>null</code> if could not be resolved.
+   * Resolves the browser URI or {@code null} if it could not be resolved.
    * <p>
    * The default implementation looks in the current calling context for the URL. Typically, that URL is set only during
    * session initialization.

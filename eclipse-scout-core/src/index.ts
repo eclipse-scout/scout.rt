@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -147,6 +147,8 @@ export * from './security/PermissionCollection';
 export * from './session/Session';
 export * from './session/SessionModel';
 export * from './session/SessionEventMap';
+export * from './session/SessionAdapter';
+export * from './session/SharedVariables';
 export * from './session/BackgroundJobPollingStatus';
 export * from './session/BackgroundJobPollingSupport';
 export * from './session/BusyIndicator';
