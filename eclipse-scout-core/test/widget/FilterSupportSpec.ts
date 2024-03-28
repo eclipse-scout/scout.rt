@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ describe('FilterSupport', () => {
 
     elements: Element[];
     filters: Filter<Element>[];
-    filterSupport: FilterSupport<Element> & { _filterField: StringField };
+    filterSupport: FilterSupport<Element> & { _filterField: StringField; _updateFilterFieldBackgroundColor: () => void };
     textFilterEnabled: boolean;
     filteredElementsDirty: boolean;
 
@@ -385,6 +385,40 @@ describe('FilterSupport', () => {
         };
 
       testTextFilter(somePropertyFilterFunc, idIsPrimeFilterFunc);
+    });
+  });
+
+  describe('filter field', () => {
+
+    let $div1, $div2, $div3;
+
+    beforeEach(() => {
+      $div1 = session.$entryPoint.appendDiv().css('background-color', 'red');
+      $div2 = $div1.appendDiv();
+      $div3 = $div2.appendDiv().css('background-color', 'blue');
+    });
+
+    it('updates the background-color when filter field is rendered initially', () => {
+      let widget = createWidget({elements: createElements()});
+      let updateBgSpy = spyOn(widget.filterSupport, '_updateFilterFieldBackgroundColor').and.callThrough();
+      widget.setTextFilterEnabled(true); // <-- before widget.render()
+
+      expect(updateBgSpy).toHaveBeenCalledTimes(0);
+      widget.render($div3);
+      expect(updateBgSpy).toHaveBeenCalledTimes(1);
+      expect(widget.filterSupport._filterField.$container.css('--filter-field-background-color')).toBe($div3.css('background-color'));
+    });
+
+    it('updates the background-color when filter field is rendered later', () => {
+      let widget = createWidget({elements: createElements()});
+      let updateBgSpy = spyOn(widget.filterSupport, '_updateFilterFieldBackgroundColor').and.callThrough();
+
+      expect(updateBgSpy).toHaveBeenCalledTimes(0);
+      widget.render($div2);
+      expect(updateBgSpy).toHaveBeenCalledTimes(0);
+      widget.setTextFilterEnabled(true); // <-- after widget.render()
+      expect(updateBgSpy).toHaveBeenCalledTimes(1);
+      expect(widget.filterSupport._filterField.$container.css('--filter-field-background-color')).toBe($div1.css('background-color'));
     });
   });
 });
