@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,6 +32,7 @@ export interface ClipboardTextCopyOptions {
 }
 
 export const clipboard = {
+
   /**
    * Copies the given text to the clipboard. To make this work, the method must be called inside
    * a "user action" (i.e. mouse or keyboard event handler). For security reasons, the access to
@@ -62,8 +63,9 @@ export const clipboard = {
 
     // Modern clipboard API
     // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(options.text)
+    let win = options?.parent?.window(true) || window;
+    if (win.navigator.clipboard) {
+      win.navigator.clipboard.writeText(options.text)
         .then((...args) => deferred.resolve(...args))
         .catch((...args) => deferred.reject(...args));
       return deferred.promise();
@@ -71,7 +73,7 @@ export const clipboard = {
 
     // Fallback for browsers that don't support the modern clipboard API (IE, Safari, Chrome < 66, Firefox < 63)
     // Create invisible textarea field and use document command "copy" to copy the text to the clipboard
-    let doc = (options.parent && options.parent.rendered ? options.parent.document(true) : document);
+    let doc = options?.parent?.document(true) || document;
     let f = doc.createElement('textarea');
     f.style.position = 'fixed';
     f.style.opacity = '0.0';
@@ -132,8 +134,7 @@ export const clipboard = {
    * has been copied to the clipboard successfully. By passing a different status, the
    * message can be changed.
    *
-   * @param parent
-   *          Widget that wants show the notification. Mandatory. Required for NLS texts.
+   * @param parent Widget that wants to show the notification. Mandatory. Required for NLS texts.
    */
   showNotification(parent: Widget, status?: Status) {
     scout.assertParameter('parent', parent);
@@ -145,5 +146,4 @@ export const clipboard = {
     });
     notification.show();
   }
-
 };
