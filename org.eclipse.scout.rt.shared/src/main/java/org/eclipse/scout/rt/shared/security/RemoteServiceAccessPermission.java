@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.shared.security;
 
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.security.AbstractPermission;
 import org.eclipse.scout.rt.security.IPermission;
@@ -39,7 +40,7 @@ public class RemoteServiceAccessPermission extends AbstractPermission {
   }
 
   protected RemoteServiceAccessPermission(String serviceOperation) {
-    super("scout.remote.service.access");
+    super(PermissionId.of("scout.remote.service.access"));
     m_serviceOperation = serviceOperation;
   }
 
