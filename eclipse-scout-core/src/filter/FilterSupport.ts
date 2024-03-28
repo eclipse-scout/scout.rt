@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -119,7 +119,7 @@ export class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
     this._filterField.$field.attr('tabindex', -1);
 
     if (!this.widget.rendered) {
-      this.widget.session.layoutValidator.schedulePostValidateFunction(this._updateFilterFieldBackgroundColor.bind(this));
+      this.widget.one('render', event => this._updateFilterFieldBackgroundColor());
     } else {
       this._updateFilterFieldBackgroundColor();
     }
