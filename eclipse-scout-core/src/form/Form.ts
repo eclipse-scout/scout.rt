@@ -206,7 +206,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
       this.htmlComp.validateRoot = true;
       // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
       // E.g. clicking a checkbox label on another dialog executes mouse down handler of the checkbox which will focus the box. This only works if the focus context of the dialog is active.
-      this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
+      this.$container[0].addEventListener('mousedown', this._onDialogMouseDown, true);
     } else {
       if (this.isPopupWindow()) {
         this.$container.addClass('popup-window');
