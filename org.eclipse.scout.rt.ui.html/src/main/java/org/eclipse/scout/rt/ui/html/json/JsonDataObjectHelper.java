@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IIdEncryptionDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.json.JSONArray;
@@ -26,7 +27,7 @@ import org.json.JSONObject;
 @Bean
 public class JsonDataObjectHelper {
 
-  protected final IDataObjectMapper m_defaultDataObjectMapper = BEANS.get(IDataObjectMapper.class);
+  protected final IDataObjectMapper m_defaultDataObjectMapper = BEANS.get(IIdEncryptionDataObjectMapper.class);
   protected IDataObjectMapper m_dataObjectMapper = null;
 
   public IDataObjectMapper getDataObjectMapper() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,9 +18,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IUuId;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.QualifiedIIdParamConverter;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,9 +58,8 @@ public class IIdParamConverterProviderTest {
     assertNotNull(uuIdConverter);
     ParamConverter<IId> idConverter = m_provider.getConverter(IId.class, null, null);
     assertNotNull(idConverter);
-    assertSame(uuIdConverter, idConverter); // same application scoped bean is used for qualified converter
     //noinspection AssertBetweenInconvertibleTypes
-    assertSame(uuIdConverter, BEANS.get(QualifiedIIdParamConverter.class));
+    assertNotSame(uuIdConverter, idConverter);
   }
 
   @Test
