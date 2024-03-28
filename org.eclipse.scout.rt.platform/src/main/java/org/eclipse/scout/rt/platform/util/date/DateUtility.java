@@ -17,6 +17,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -93,6 +95,27 @@ public final class DateUtility {
   }
 
   /**
+   * format LocalDate with specific pattern as defined in {@link DateTimeFormatter}
+   */
+  public static String format(LocalDate d, String pattern) {
+    if (d == null || !StringUtility.hasText(pattern)) {
+      return "";
+    }
+    return format(d.atStartOfDay(), pattern);
+  }
+
+  /**
+   * format LocalDateTime with specific pattern as defined in {@link DateTimeFormatter}
+   */
+  public static String format(LocalDateTime d, String pattern) {
+    if (d == null || !StringUtility.hasText(pattern)) {
+      return "";
+    }
+    Locale loc = NlsLocale.get();
+    return DateTimeFormatter.ofPattern(pattern, loc).format(d);
+  }
+
+  /**
    * Creates a {@link SimpleDateFormat} to parse the first argument according to the provided pattern. Disables lenient
    * behavior of {@link SimpleDateFormat}.
    */
@@ -109,6 +132,38 @@ public final class DateUtility {
       return df.parse(s);
     }
     catch (ParseException e) {
+      throw new IllegalArgumentException("parse(\"" + s + "\",\"" + pattern + "\") failed", e);
+    }
+  }
+
+  /**
+   * Creates a {@link DateTimeFormatter} to parse the first argument according to the provided pattern.
+   */
+  public static LocalDate parseLocalDate(String s, String pattern) {
+    if (s == null) {
+      return null;
+    }
+    try {
+      Locale loc = NlsLocale.get();
+      return LocalDate.parse(s, DateTimeFormatter.ofPattern(pattern, loc));
+    }
+    catch (DateTimeParseException e) {
+      throw new IllegalArgumentException("parse(\"" + s + "\",\"" + pattern + "\") failed", e);
+    }
+  }
+
+  /**
+   * Creates a {@link DateTimeFormatter} to parse the first argument according to the provided pattern.
+   */
+  public static LocalDateTime parseLocalDateTime(String s, String pattern) {
+    if (s == null) {
+      return null;
+    }
+    try {
+      Locale loc = NlsLocale.get();
+      return LocalDateTime.parse(s, DateTimeFormatter.ofPattern(pattern, loc));
+    }
+    catch (DateTimeParseException e) {
       throw new IllegalArgumentException("parse(\"" + s + "\",\"" + pattern + "\") failed", e);
     }
   }
@@ -235,6 +290,13 @@ public final class DateUtility {
     return c.getTime();
   }
 
+  public static LocalDateTime truncDate(LocalDateTime d) {
+    if (d == null) {
+      return null;
+    }
+    return d.withNano(0).withSecond(0).withMinute(0).withHour(0);
+  }
+
   /**
    * truncate the date to hour
    *
@@ -250,6 +312,13 @@ public final class DateUtility {
     return c.getTime();
   }
 
+  public static LocalDateTime truncDateToHour(LocalDateTime d) {
+    if (d == null) {
+      return null;
+    }
+    return d.withNano(0).withSecond(0).withMinute(0);
+  }
+
   public static Date truncDateToMinute(Date d) {
     if (d == null) {
       return null;
@@ -261,6 +330,13 @@ public final class DateUtility {
     return c.getTime();
   }
 
+  public static LocalDateTime truncDateToMinute(LocalDateTime d) {
+    if (d == null) {
+      return null;
+    }
+    return d.withNano(0).withSecond(0);
+  }
+
   public static Date truncDateToSecond(Date d) {
     if (d == null) {
       return null;
@@ -269,6 +345,13 @@ public final class DateUtility {
     c.setTime(d);
     c.set(Calendar.MILLISECOND, 0);
     return c.getTime();
+  }
+
+  public static LocalDateTime truncDateToSecond(LocalDateTime d) {
+    if (d == null) {
+      return null;
+    }
+    return d.withNano(0);
   }
 
   /**

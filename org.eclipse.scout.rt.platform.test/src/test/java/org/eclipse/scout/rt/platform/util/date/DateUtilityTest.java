@@ -905,7 +905,7 @@ public class DateUtilityTest {
 
   @Test
   public void testTruncDateToHour() {
-    assertNull("Trunc <null> to hour", DateUtility.truncDateToHour(null));
+    assertNull("Trunc <null> to hour", DateUtility.truncDateToHour((Date) null));
     assertDateEquals("1970-01-01 00:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 00:01:00.000")));
     assertDateEquals("1970-01-01 00:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 00:59:00.000")));
     assertDateEquals("1970-01-01 10:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 10:43:00.000")));
@@ -915,6 +915,62 @@ public class DateUtilityTest {
     assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 00:00:00.000")));
     assertDateEquals("2015-01-01 18:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 18:17:25.831")));
     assertDateEquals("2015-01-01 23:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 23:59:59.999")));
+  }
+
+  @Test
+  public void testLocalDateTimeTruncDate() {
+    assertNull("Trunc <null>", DateUtility.truncDate((LocalDateTime) null));
+    assertLocalDateTimeEquals("1970-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("1970-01-01 00:01:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("1970-01-01 00:59:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("1970-01-01 10:43:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("1970-01-01 13:43:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("1970-01-01 23:00:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("1970-01-01 23:59:00.000")));
+    assertLocalDateTimeEquals("2015-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("2015-01-01 00:00:00.000")));
+    assertLocalDateTimeEquals("2015-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("2015-01-01 18:17:25.831")));
+    assertLocalDateTimeEquals("2015-01-01 00:00:00.000", DateUtility.truncDate(localDateTimeOf("2015-01-01 23:59:59.999")));
+  }
+
+  @Test
+  public void testLocalDateTimeTruncDateToHour() {
+    assertNull("Trunc <null> to hour", DateUtility.truncDateToHour((LocalDateTime) null));
+    assertLocalDateTimeEquals("1970-01-01 00:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("1970-01-01 00:01:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 00:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("1970-01-01 00:59:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 10:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("1970-01-01 10:43:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 13:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("1970-01-01 13:43:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 23:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("1970-01-01 23:00:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 23:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("1970-01-01 23:59:00.000")));
+    assertLocalDateTimeEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("2015-01-01 00:00:00.000")));
+    assertLocalDateTimeEquals("2015-01-01 18:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("2015-01-01 18:17:25.831")));
+    assertLocalDateTimeEquals("2015-01-01 23:00:00.000", DateUtility.truncDateToHour(localDateTimeOf("2015-01-01 23:59:59.999")));
+  }
+
+  @Test
+  public void testLocalDateTimeTruncDateToMinute() {
+    assertNull("Trunc <null> to hour", DateUtility.truncDateToMinute((LocalDateTime) null));
+    assertLocalDateTimeEquals("1970-01-01 00:01:00.000", DateUtility.truncDateToMinute(localDateTimeOf("1970-01-01 00:01:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 00:59:00.000", DateUtility.truncDateToMinute(localDateTimeOf("1970-01-01 00:59:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 10:43:00.000", DateUtility.truncDateToMinute(localDateTimeOf("1970-01-01 10:43:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 13:43:00.000", DateUtility.truncDateToMinute(localDateTimeOf("1970-01-01 13:43:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 23:00:00.000", DateUtility.truncDateToMinute(localDateTimeOf("1970-01-01 23:00:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 23:59:00.000", DateUtility.truncDateToMinute(localDateTimeOf("1970-01-01 23:59:00.000")));
+    assertLocalDateTimeEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToMinute(localDateTimeOf("2015-01-01 00:00:00.000")));
+    assertLocalDateTimeEquals("2015-01-01 18:17:00.000", DateUtility.truncDateToMinute(localDateTimeOf("2015-01-01 18:17:25.831")));
+    assertLocalDateTimeEquals("2015-01-01 23:59:00.000", DateUtility.truncDateToMinute(localDateTimeOf("2015-01-01 23:59:59.999")));
+  }
+
+  @Test
+  public void testLocalDateTimeTruncDateToSecond() {
+    assertNull("Trunc <null> to hour", DateUtility.truncDateToSecond((LocalDateTime) null));
+    assertLocalDateTimeEquals("1970-01-01 00:01:00.000", DateUtility.truncDateToSecond(localDateTimeOf("1970-01-01 00:01:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 00:59:00.000", DateUtility.truncDateToSecond(localDateTimeOf("1970-01-01 00:59:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 10:43:00.000", DateUtility.truncDateToSecond(localDateTimeOf("1970-01-01 10:43:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 13:43:00.000", DateUtility.truncDateToSecond(localDateTimeOf("1970-01-01 13:43:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 23:00:00.000", DateUtility.truncDateToSecond(localDateTimeOf("1970-01-01 23:00:00.000")));
+    assertLocalDateTimeEquals("1970-01-01 23:59:00.000", DateUtility.truncDateToSecond(localDateTimeOf("1970-01-01 23:59:00.000")));
+    assertLocalDateTimeEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToSecond(localDateTimeOf("2015-01-01 00:00:00.000")));
+    assertLocalDateTimeEquals("2015-01-01 18:17:25.000", DateUtility.truncDateToSecond(localDateTimeOf("2015-01-01 18:17:25.831")));
+    assertLocalDateTimeEquals("2015-01-01 23:59:59.000", DateUtility.truncDateToSecond(localDateTimeOf("2015-01-01 23:59:59.999")));
   }
 
   @Test
@@ -1063,6 +1119,14 @@ public class DateUtilityTest {
     assertEquals(message, expectedDate, stringOf(date));
   }
 
+  public static void assertLocalDateTimeEquals(String expectedDate, LocalDateTime date) {
+    assertLocalDateTimeEquals(null, expectedDate, date);
+  }
+
+  public static void assertLocalDateTimeEquals(String message, String expectedDate, LocalDateTime date) {
+    assertEquals(message, expectedDate, stringOf(date));
+  }
+
   public static void assertCalendarEquals(String expectedDate, Calendar cal) {
     assertDateEquals(expectedDate, DateUtility.convertCalendar(cal));
   }
@@ -1088,9 +1152,26 @@ public class DateUtilityTest {
   }
 
   /**
+   * Parses the given string into a {@link LocalDateTime}.
+   *
+   * @param dateString
+   *          staring representation using format yyyy-MM-dd HH:mm:ss.SSS
+   */
+  public static LocalDateTime localDateTimeOf(String dateString) {
+    return DateUtility.parseLocalDateTime(dateString, YEAR_DATE_TIME_PATTERN);
+  }
+
+  /**
    * Formats the given date using format yyyy-MM-dd_HH:mm:ss.SSS
    */
   public static String stringOf(Date date) {
+    return DateUtility.format(date, YEAR_DATE_TIME_PATTERN);
+  }
+
+  /**
+   * Formats the given date using format yyyy-MM-dd_HH:mm:ss.SSS
+   */
+  public static String stringOf(LocalDateTime date) {
     return DateUtility.format(date, YEAR_DATE_TIME_PATTERN);
   }
 }
