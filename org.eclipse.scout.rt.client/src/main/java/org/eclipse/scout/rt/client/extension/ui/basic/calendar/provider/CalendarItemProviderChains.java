@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,6 +92,23 @@ public final class CalendarItemProviderChains {
         @Override
         protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) {
           next.execItemMoved(CalendarItemProviderItemMovedChain.this, item, fromDate, toDate);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
+  public static class CalendarItemProviderAutoAssignItemChain extends AbstractCalendarItemProviderChain {
+
+    public CalendarItemProviderAutoAssignItemChain(List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions) {
+      super(extensions);
+    }
+
+    public void execAutoAssignCalendarItems(Set<ICalendarItem> items) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) {
+          next.execAutoAssignCalendarItems(CalendarItemProviderAutoAssignItemChain.this, items);
         }
       };
       callChain(methodInvocation);

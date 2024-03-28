@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CalendarComponent, CalendarDisplayMode, GroupBox, Menu, ObjectOrChildModel, WidgetModel} from '../index';
+import {CalendarComponent, CalendarDescriptor, CalendarDisplayMode, GroupBox, Menu, ObjectOrChildModel, WidgetModel} from '../index';
 
 export interface CalendarModel extends WidgetModel {
   monthViewNumberOfWeeks?: number;
@@ -22,6 +22,8 @@ export interface CalendarModel extends WidgetModel {
   selectedDate?: Date | string;
   showDisplayModeSelection?: boolean;
   rangeSelectionAllowed?: boolean;
+  calendars?: CalendarDescriptor[];
+  selectedCalendar?: CalendarDescriptor;
   title?: string;
   useOverflowCells?: boolean;
   calendarToggleListWidth?: number;
@@ -29,4 +31,16 @@ export interface CalendarModel extends WidgetModel {
   menuInjectionTarget?: GroupBox;
   menus?: ObjectOrChildModel<Menu>[];
   defaultMenuTypes?: string[];
+  /**
+   * Indicates, if the sidebar is shown
+   */
+  showCalendarSidebar?: boolean;
+  /**
+   * Indicates, if the calendars panel is shown.
+   */
+  showCalendarsPanel?: boolean;
+  /**
+   * Indicates, if the calendars panel is expanded
+   */
+  showListPanel?: boolean;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,4 +39,13 @@ public interface ICalendarUIFacade {
 
   void fireAppLinkActionFromUI(String ref);
 
+  void setCalendarVisibilityFromUI(String calendarId, Boolean visible);
+
+  void setSelectedCalendarFromUI(String calendarId);
+
+  void setShowYearPanelFromUI(boolean show);
+
+  void setShowCalendarsPanelFromUI(boolean show);
+
+  void setShowListPanelFromUI(boolean show);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -64,6 +65,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarDescriptor;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,6 +169,30 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(600)
+  protected List<ICalendarDescriptor> getConfiguredCalendars() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(700)
+  protected boolean getConfiguredShowCalendarSidebar() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(800)
+  protected boolean getConfiguredShowCalendarsPanel() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(900)
+  protected boolean getConfiguredShowListPanel() {
+    return false;
+  }
+
   private List<Class<? extends ICalendarItemProvider>> getConfiguredProducers() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<ICalendarItemProvider>> filtered = ConfigurationUtility.filterClasses(dca, ICalendarItemProvider.class);
@@ -225,6 +251,10 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     setUseOverflowCells(getConfiguredUseOverflowCells());
     setShowDisplayModeSelection(getConfiguredShowDisplayModeSelection());
     setRangeSelectionAllowed(getConfiguredRangeSelectionAllowed());
+    setCalendars(getConfiguredCalendars());
+    setShowCalendarSidebar(getConfiguredShowCalendarSidebar());
+    setShowCalendarsPanel(getConfiguredShowCalendarsPanel());
+    setShowListPanel(getShowListPanel());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -520,6 +550,52 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
+  public List<ICalendarDescriptor> getCalendars() {
+    return propertySupport.getPropertyList(PROP_CALENDARS);
+  }
+
+  @Override
+  public void setCalendars(List<ICalendarDescriptor> calendars) {
+    propertySupport.setPropertyList(PROP_CALENDARS, calendars);
+  }
+
+  @Override
+  public ICalendarDescriptor getSelectedCalendar() {
+    return propertySupport.getProperty(PROP_SELECTED_CALENDAR, ICalendarDescriptor.class);
+  }
+
+
+  @Override
+  public boolean getShowCalendarSidebar() {
+    return propertySupport.getPropertyBool(PROP_SHOW_CALENDAR_SIDEBAR);
+  }
+
+  @Override
+  public void setShowCalendarSidebar(boolean showYearPanel) {
+    propertySupport.setPropertyBool(PROP_SHOW_CALENDAR_SIDEBAR, showYearPanel);
+  }
+
+  @Override
+  public boolean getShowCalendarsPanel() {
+    return propertySupport.getPropertyBool(PROP_SHOW_CALENDARS_PANEL);
+  }
+
+  @Override
+  public void setShowCalendarsPanel(boolean showCalendarsPanel) {
+    propertySupport.setPropertyBool(PROP_SHOW_CALENDARS_PANEL, showCalendarsPanel);
+  }
+
+  @Override
+  public boolean getShowListPanel() {
+    return propertySupport.getPropertyBool(PROP_SHOW_LIST_PANEL);
+  }
+
+  @Override
+  public void setShowListPanel(boolean showListPanel) {
+    propertySupport.setPropertyBool(PROP_SHOW_LIST_PANEL, showListPanel);
+  }
+
+  @Override
   public Range<Date> getViewRange() {
     @SuppressWarnings("unchecked")
     Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_VIEW_RANGE);
@@ -768,6 +844,18 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     }
   }
 
+  @Override
+  public void reloadCalendarItems(ICalendarDescriptor calendar) {
+    if (calendar == null) {
+      reloadCalendarItems();
+      return;
+    }
+    // Only reload necessary calendars
+    m_providers.stream()
+        .filter(provider -> provider.getCalendarBelonging() == null || calendar.equals(provider.getCalendarBelonging()))
+        .forEach(ICalendarItemProvider::reloadProvider);
+  }
+
   /*
    * Property Observer
    */
@@ -969,6 +1057,79 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     @Override
     public void fireAppLinkActionFromUI(String ref) {
       doAppLinkAction(ref);
+    }
+
+    @Override
+    public void setCalendarVisibilityFromUI(String calendarId, Boolean visible) {
+      try {
+        pushUIProcessor();
+        ICalendarDescriptor cal = getCalendars().stream()
+            .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
+            .findAny()
+            .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar!"));
+        cal.withVisible(visible);
+        // Trigger reload when new calendar is selected
+        if (visible) {
+          reloadCalendarItems(cal);
+        }
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setSelectedCalendarFromUI(String calendarId) {
+      try {
+        pushUIProcessor();
+        ICalendarDescriptor selectedCalendar;
+        if (StringUtility.isNullOrEmpty(calendarId)) {
+          selectedCalendar = null;
+        }
+        else {
+          selectedCalendar = getCalendars().stream()
+              .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
+              .findAny()
+              .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar for id " + calendarId));
+        }
+        propertySupport.setProperty(PROP_SELECTED_CALENDAR, selectedCalendar);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setShowYearPanelFromUI(boolean show) {
+      try {
+        pushUIProcessor();
+        setShowCalendarSidebar(show);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setShowCalendarsPanelFromUI(boolean show) {
+      try {
+        pushUIProcessor();
+        setShowCalendarsPanel(show);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setShowListPanelFromUI(boolean show) {
+      try {
+        pushUIProcessor();
+        setShowListPanel(show);
+      }
+      finally {
+        popUIProcessor();
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -373,6 +373,7 @@ export * from './menu/menubar/MenuBarBox';
 export * from './menu/menubar/MenuBarBoxModel';
 export * from './menu/menubar/MenuBarBoxEventMap';
 export * from './menu/menubar/MenuBarBoxLayout';
+export * from './calendar/CalendarDescriptor';
 export * from './calendar/Calendar';
 export * from './calendar/CalendarEventMap';
 export * from './calendar/CalendarModel';
@@ -619,6 +620,14 @@ export * from './tree/keystrokes/CompactTreeUpKeyStroke';
 export * from './tree/keystrokes/CompactTreeDownKeyStroke';
 export * from './tree/keystrokes/CompactTreeLeftKeyStroke';
 export * from './tree/keystrokes/CompactTreeRightKeyStroke';
+export * from './calendar/CalendarsPanel';
+export * from './calendar/CalendarsPanelTreeNode';
+export * from './calendar/CalendarsPanelTreeNodeModel';
+export * from './calendar/CalendarSidebar';
+export * from './calendar/CalendarSidebarLayout';
+export * from './calendar/CalendarSidebarSplitter';
+export * from './calendar/CalendarSidebarSplitterModel';
+export * from './calendar/CalendarSidebarSplitterEventMap';
 export * from './form/fields/fields';
 export * from './form/fields/AppLinkKeyStroke';
 export * from './form/fields/SelectAllTextInFieldKeyStroke';

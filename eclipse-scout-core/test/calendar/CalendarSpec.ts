@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponent, DateRange, dates, scout} from '../../src/index';
+import {Calendar, CalendarComponent, CalendarDescriptor, CalendarItem, CalendarsPanelTreeNode, DateRange, dates, scout, UuidPool} from '../../src/index';
+import {JQueryTesting} from '../../src/testing/index';
 
 describe('Calendar', () => {
   let session: SandboxSession;
@@ -32,6 +33,30 @@ describe('Calendar', () => {
     override _updateFullDayIndices(fullDayComponents?: CalendarComponent[]) {
       super._updateFullDayIndices(fullDayComponents);
     }
+
+    override _setSelection(selectedDate: Date, selectedCalendar: CalendarDescriptor | string, selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
+      super._setSelection(selectedDate, selectedCalendar, selectedComponent, updateScrollPosition, timeChanged);
+    }
+
+    override _updateCalendarVisibility(updatedCalendars: [calendarId: string, visible: boolean][]) {
+      super._updateCalendarVisibility(updatedCalendars);
+    }
+
+    override _calculateStackKey(date: Date, calendarId?: string): string {
+      return super._calculateStackKey(date, calendarId);
+    }
+
+    override _onNextClick() {
+      super._onNextClick();
+    }
+
+    override _onPreviousClick() {
+      super._onPreviousClick();
+    }
+
+    override _arrange(components: CalendarComponent[], day: Date) {
+      super._arrange(components, day);
+    }
   }
 
   describe('init', () => {
@@ -41,6 +66,68 @@ describe('Calendar', () => {
       expect(cal.viewRange).toBeDefined();
     });
 
+    describe('expands panels corretly', () => {
+
+      const getContainterWidth = (container: JQuery): number => {
+        return container.width();
+      };
+
+      it('should expand the year panel when showYearPanel is true', () => {
+        // Arrange
+        let model = {parent: session.desktop, showYearPanel: true};
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let yearPanelWidth = getContainterWidth(cal.calendarSidebar.yearPanel.$container);
+
+        // Assert
+        expect(yearPanelWidth).toBeGreaterThan(0);
+      });
+
+      it('should expand the calendars panel when showCalendarsPanel is true', () => {
+        // Arrange
+        let model = {parent: session.desktop, showCalendarsPanel: true};
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let calendarsPanelWidth = getContainterWidth(cal.calendarSidebar.calendarsPanel.$container);
+
+        // Assert
+        expect(calendarsPanelWidth).toBeGreaterThan(0);
+      });
+
+      it('should expand the list panel when showListPanel is true', () => {
+        // Arrange
+        let model = {parent: session.desktop, showListPanel: true};
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let listPanelWidth = getContainterWidth(cal.$listContainer);
+
+        // Assert
+        expect(listPanelWidth).toBeGreaterThan(0);
+      });
+
+      it('should expand nothing when no variable is set', () => {
+        // Arrange
+        let model = {parent: session.desktop};
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let yearPanelWidth = getContainterWidth(cal.calendarSidebar.yearPanel.$container);
+        let calendarsPanelWidth = getContainterWidth(cal.calendarSidebar.calendarsPanel.$container);
+        let listPanelWidth = getContainterWidth(cal.$listContainer);
+
+        // Assert
+        expect(yearPanelWidth).toBe(0);
+        expect(calendarsPanelWidth).toBe(0);
+        expect(listPanelWidth).toBe(0);
+      });
+    });
   });
 
   describe('dayPosition', () => {
@@ -145,6 +232,11 @@ describe('Calendar', () => {
     });
 
     describe('arrangeComponents', () => {
+      let stackKey;
+
+      beforeAll(() => {
+        stackKey = cal._calculateStackKey(day);
+      });
 
       it('does nothing for no components', () => {
         let components = [];
@@ -156,8 +248,8 @@ describe('Calendar', () => {
         let components = [c1];
         cal._arrange(components, day);
         expect(components[0]).toEqual(c1);
-        expect(c1.stack[day + ''].x).toEqual(0);
-        expect(c1.stack[day + ''].w).toEqual(1);
+        expect(c1.stack[stackKey].x).toEqual(0);
+        expect(c1.stack[stackKey].w).toEqual(1);
       });
 
       it('arranges intersecting components', () => {
@@ -165,10 +257,10 @@ describe('Calendar', () => {
         cal._arrange(components, day);
         expect(components[0]).toEqual(c1);
         expect(components[1]).toEqual(c5);
-        expect(c1.stack[day + ''].x).toEqual(0);
-        expect(c1.stack[day + ''].w).toEqual(2);
-        expect(c5.stack[day + ''].x).toEqual(1);
-        expect(c5.stack[day + ''].w).toEqual(2);
+        expect(c1.stack[stackKey].x).toEqual(0);
+        expect(c1.stack[stackKey].w).toEqual(2);
+        expect(c5.stack[stackKey].x).toEqual(1);
+        expect(c5.stack[stackKey].w).toEqual(2);
       });
 
       it('arranges equal components', () => {
@@ -176,10 +268,10 @@ describe('Calendar', () => {
         cal._arrange(components, day);
         expect(components[0]).toEqual(c6);
         expect(components[1]).toEqual(c7);
-        expect(c6.stack[day + ''].x).toEqual(0);
-        expect(c6.stack[day + ''].w).toEqual(2);
-        expect(c7.stack[day + ''].x).toEqual(1);
-        expect(c7.stack[day + ''].w).toEqual(2);
+        expect(c6.stack[stackKey].x).toEqual(0);
+        expect(c6.stack[stackKey].w).toEqual(2);
+        expect(c7.stack[stackKey].x).toEqual(1);
+        expect(c7.stack[stackKey].w).toEqual(2);
       });
 
       it('arranges intersecting and non-intersecting components', () => {
@@ -191,19 +283,19 @@ describe('Calendar', () => {
         expect(components[3]).toEqual(c2);
         expect(components[4]).toEqual(c3);
         expect(components[5]).toEqual(c4);
-        expect(c1.stack[day + ''].w).toEqual(3);
-        expect(c2.stack[day + ''].w).toEqual(3);
-        expect(c3.stack[day + ''].w).toEqual(3);
-        expect(c4.stack[day + ''].w).toEqual(3);
-        expect(c5.stack[day + ''].w).toEqual(3);
-        expect(c6.stack[day + ''].w).toEqual(3);
+        expect(c1.stack[stackKey].w).toEqual(3);
+        expect(c2.stack[stackKey].w).toEqual(3);
+        expect(c3.stack[stackKey].w).toEqual(3);
+        expect(c4.stack[stackKey].w).toEqual(3);
+        expect(c5.stack[stackKey].w).toEqual(3);
+        expect(c6.stack[stackKey].w).toEqual(3);
 
-        expect(c6.stack[day + ''].x).toEqual(0);
-        expect(c1.stack[day + ''].x).toEqual(1);
-        expect(c5.stack[day + ''].x).toEqual(2);
-        expect(c2.stack[day + ''].x).toEqual(0);
-        expect(c3.stack[day + ''].x).toEqual(0);
-        expect(c4.stack[day + ''].x).toEqual(1);
+        expect(c6.stack[stackKey].x).toEqual(0);
+        expect(c1.stack[stackKey].x).toEqual(1);
+        expect(c5.stack[stackKey].x).toEqual(2);
+        expect(c2.stack[stackKey].x).toEqual(0);
+        expect(c3.stack[stackKey].x).toEqual(0);
+        expect(c4.stack[stackKey].x).toEqual(1);
       });
 
       it('reduces rows when arranging components', () => {
@@ -212,13 +304,13 @@ describe('Calendar', () => {
         expect(components[0]).toEqual(c6);
         expect(components[1]).toEqual(c1);
         expect(components[2]).toEqual(c3);
-        expect(c6.stack[day + ''].w).toEqual(2);
-        expect(c1.stack[day + ''].w).toEqual(2);
-        expect(c3.stack[day + ''].w).toEqual(1);
+        expect(c6.stack[stackKey].w).toEqual(2);
+        expect(c1.stack[stackKey].w).toEqual(2);
+        expect(c3.stack[stackKey].w).toEqual(1);
 
-        expect(c6.stack[day + ''].x).toEqual(0);
-        expect(c1.stack[day + ''].x).toEqual(1);
-        expect(c3.stack[day + ''].x).toEqual(0);
+        expect(c6.stack[stackKey].x).toEqual(0);
+        expect(c1.stack[stackKey].x).toEqual(1);
+        expect(c3.stack[stackKey].x).toEqual(0);
       });
 
       it('arranges intersecting components spanning more than one day', () => {
@@ -228,11 +320,11 @@ describe('Calendar', () => {
         cal._arrange(components, day1);
         expect(components[0]).toEqual(c8);
         expect(components[1]).toEqual(c3);
-        expect(c8.stack[day1 + ''].w).toEqual(2);
-        expect(c3.stack[day1 + ''].w).toEqual(2);
+        expect(c8.stack[stackKey].w).toEqual(2);
+        expect(c3.stack[stackKey].w).toEqual(2);
 
-        expect(c8.stack[day1 + ''].x).toEqual(0);
-        expect(c3.stack[day1 + ''].x).toEqual(1);
+        expect(c8.stack[stackKey].x).toEqual(0);
+        expect(c3.stack[stackKey].x).toEqual(1);
       });
 
     });
@@ -428,7 +520,7 @@ describe('Calendar', () => {
       // empty parent div
       let $div = $('<div></div>');
 
-      let cal = scout.create(Calendar, {
+      let cal = scout.create(SpecCalendar, {
         parent: session.desktop,
         selectedDate: '2016-01-01 12:00:00.000',
         displayMode: Calendar.DisplayMode.MONTH
@@ -460,7 +552,7 @@ describe('Calendar', () => {
       // empty parent div
       let $div = $('<div></div>');
 
-      let cal = scout.create(Calendar, {
+      let cal = scout.create(SpecCalendar, {
         parent: session.desktop,
         selectedDate: '2016-01-31 12:00:00.000',
         displayMode: Calendar.DisplayMode.MONTH
@@ -488,6 +580,376 @@ describe('Calendar', () => {
       // because the day was shifted to 29 while navigating over Feb. 2016
       expect(cal.selectedDate).toEqual(dates.parseJsonDate('2016-01-29 12:00:00.000'));
     });
+  });
 
+  describe('multiple calendars', () => {
+    let stringDay = '2023-10-27 00:00:00.000';
+    let day = dates.parseJsonDate(stringDay);
+    let dateRangeNoon = {from: '2023-10-27 12:00:00.000', to: '2023-10-27 12:30:00.000'};
+
+    const createCalendarComponent = (calendar: Calendar, fromDate: string, toDate: string, calendarId?: string, fullDay?: boolean): CalendarComponent => {
+      let model = {
+        parent: calendar,
+        item: {
+          calendarId: calendarId
+        } as unknown as CalendarItem,
+        fromDate: fromDate,
+        toDate: toDate,
+        coveredDaysRange: {
+          from: fromDate,
+          to: toDate
+        },
+        fullDay: fullDay
+      };
+      let comp = scout.create(CalendarComponent, model);
+      calendar.addComponents([comp]);
+      return comp;
+    };
+
+    const createCalendarDescriptor = (name = 'Test calendar', visible = true, selectable = true): CalendarDescriptor => {
+      let calendarId = UuidPool.take(session);
+      return {
+        calendarId: calendarId,
+        name: name,
+        visible: visible,
+        selectable: selectable
+      };
+    };
+
+    const getCurrentCalendarIdFor = (comp: CalendarComponent): string | number => {
+      return comp._$parts[0].parents('.calendar-column').data('calendarId');
+    };
+
+    const initCalendar = (...calendars: CalendarDescriptor[]): SpecCalendar => {
+      let calendar = scout.create(SpecCalendar, {
+        parent: session.desktop,
+        selectedDate: day,
+        calendars: calendars
+      });
+      calendar.render();
+      return calendar;
+    };
+
+    it('should render components without calendarId in default column in day view', () => {
+      // Arrange
+      let businessCalendar = createCalendarDescriptor();
+      let calendar = initCalendar(businessCalendar);
+      let comp = createCalendarComponent(calendar, dateRangeNoon.from, dateRangeNoon.to);
+      calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+      // Act
+      let calendarIdData = getCurrentCalendarIdFor(comp);
+
+      // Assert
+      expect(calendarIdData).toEqual('default');
+    });
+
+    it('should render components with calendarId in corresponding column in day view', () => {
+      // Arrange
+      let businessCalendar = createCalendarDescriptor('Business calendar');
+      let otherCalendar = createCalendarDescriptor('Other calendar', true, false);
+      let calendar = initCalendar(businessCalendar, otherCalendar);
+      let comp = createCalendarComponent(calendar, dateRangeNoon.from, dateRangeNoon.to, businessCalendar.calendarId);
+      calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+      // Act
+      let calendarIdData = getCurrentCalendarIdFor(comp);
+
+      // Assert
+      expect(calendarIdData).toEqual(businessCalendar.calendarId);
+    });
+
+    it('should move component from default to corresponding calendar column when displayMode is changed from week to day', () => {
+      // Arrange
+      let businessCalendar = createCalendarDescriptor('Business calendar');
+      let calendar = initCalendar(businessCalendar);
+      calendar.setDisplayMode(Calendar.DisplayMode.WORK_WEEK);
+      let comp = createCalendarComponent(calendar, dateRangeNoon.from, dateRangeNoon.to, businessCalendar.calendarId);
+
+      // Act
+      let calendarIdForWeek = getCurrentCalendarIdFor(comp);
+      calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+      let calendarIdForDay = getCurrentCalendarIdFor(comp);
+      calendar.setDisplayMode(Calendar.DisplayMode.MONTH);
+      let calendarIdForMonth = getCurrentCalendarIdFor(comp);
+
+      // Assert
+      expect(calendarIdForWeek).toBe('default');
+      expect(calendarIdForDay).toBe(businessCalendar.calendarId);
+      expect(calendarIdForMonth).toBe('default');
+    });
+
+    it('should hide components, when calendar is made invisible on week view', () => {
+      // Arrange
+      let businessCalendar = createCalendarDescriptor('Business calendar');
+      let otherCalendar = createCalendarDescriptor('Other calendar', true, false);
+      let calendar = initCalendar(businessCalendar, otherCalendar);
+      calendar.setDisplayMode(Calendar.DisplayMode.WEEK);
+      let businessComp = createCalendarComponent(calendar, dateRangeNoon.from, dateRangeNoon.to, businessCalendar.calendarId);
+      let externalComp = createCalendarComponent(calendar, dateRangeNoon.from, dateRangeNoon.to, otherCalendar.calendarId);
+
+      // Act
+      calendar._updateCalendarVisibility([[otherCalendar.calendarId, false]]);
+
+      // Assert
+      expect(businessComp.visible).toBe(true);
+      expect(externalComp.visible).toBe(false);
+    });
+
+    // No range selection on disabled column
+    it('should not apply a selection on calendars which are not selectable', () => {
+      // Arrange
+      let nonSelectableCalendar = createCalendarDescriptor('Non selectable calendar', true, false);
+      let calendar = initCalendar(nonSelectableCalendar);
+      calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+      // Act
+      calendar._setSelection(calendar.selectedDate, nonSelectableCalendar, null, false, false);
+
+      // Assert
+      expect(calendar.selectedCalendar).not.toBe(nonSelectableCalendar);
+    });
+
+    it('should correctly update full day indices on day', () => {
+      // Arrange
+      let businessCalendar = createCalendarDescriptor('Business calendar');
+      let externalCalendar = createCalendarDescriptor('External calendar', true, false);
+      let calendar = initCalendar(businessCalendar, externalCalendar);
+
+      let businessComp = createCalendarComponent(calendar, stringDay, stringDay, businessCalendar.calendarId, true);
+      let secondBusniessComp = createCalendarComponent(calendar, stringDay, stringDay, businessCalendar.calendarId, true);
+      let externalComp = createCalendarComponent(calendar, stringDay, stringDay, externalCalendar.calendarId, true);
+
+      // Act
+      calendar._updateFullDayIndices(calendar.components);
+
+      // Assert
+      expect(businessComp.fullDayIndex).toBe(0);
+      expect(secondBusniessComp.fullDayIndex).toBe(1);
+      expect(externalComp.fullDayIndex).toBe(0);
+    });
+
+    describe('calendars menu visible', () => {
+
+      const isCalendarsMenuVisible = (calendar: Calendar): boolean => {
+        return !calendar.$commands.children('.calendar-toggle-calendars').hasClass('hidden');
+      };
+
+      it('should hide calendars menu when no calendar is set', () => {
+        // Arrange
+        let calendar = initCalendar();
+
+        // Act
+        let menuVisible = isCalendarsMenuVisible(calendar);
+
+        // Assert
+        expect(menuVisible).toBe(false);
+      });
+
+      it('should hide calendars menu when only one calendar is set', () => {
+        // Arrange
+        let calDesc = createCalendarDescriptor('Calendar');
+        let calendar = initCalendar(calDesc);
+
+        // Act
+        let menuVisible = isCalendarsMenuVisible(calendar);
+
+        // Assert
+        expect(menuVisible).toBe(false);
+      });
+
+      it('should make calendars menu visible when more than one calendar is set', () => {
+        // Arrange
+        let businessCal = createCalendarDescriptor('Business calendar');
+        let otherCal = createCalendarDescriptor('Other calendar');
+        let calendar = initCalendar(businessCal, otherCal);
+
+        // Act
+        let menuVisible = isCalendarsMenuVisible(calendar);
+
+        // Assert
+        expect(menuVisible).toBe(true);
+      });
+
+      it('should make calendars menu visible when an additional calendar is added', () => {
+        // Arrange
+        let businessCal = createCalendarDescriptor('Business calendar');
+        let otherCal = createCalendarDescriptor('Other calendar');
+        let calendar = initCalendar(businessCal);
+
+        // Act
+        let menuVisibleFirst = isCalendarsMenuVisible(calendar);
+        calendar.setCalendars([...calendar.calendars, otherCal]);
+        let menuVisibleAfter = isCalendarsMenuVisible(calendar);
+
+        // Assert
+        expect(menuVisibleFirst).toBe(false);
+        expect(menuVisibleAfter).toBe(true);
+      });
+    });
+
+    it('should not be a problem to have an empty named calendar descriptor', () => {
+      // Arrange
+      let unnamedCalendar = createCalendarDescriptor(null);
+      let calendar = initCalendar(unnamedCalendar);
+      let component = createCalendarComponent(calendar, stringDay, stringDay, unnamedCalendar.calendarId);
+      calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+      // Act
+      let currentComponenteCalendarId = getCurrentCalendarIdFor(component);
+
+      // Assert
+      expect(currentComponenteCalendarId).toBe(unnamedCalendar.calendarId);
+    });
+
+    describe('range selection on multiple calendar', () => {
+      it('should apply selection on a selectable calendar', () => {
+        // Arrange
+        let selectableCalendar = createCalendarDescriptor('Selectable calendar', true, true);
+        let calendar = initCalendar(selectableCalendar);
+        calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+        // Act
+        calendar._setSelection(new Date(stringDay), selectableCalendar, null, false, false);
+
+        // Assert
+        expect(calendar.selectedCalendar).toBe(selectableCalendar);
+      });
+
+      it('should not apply selection on a non-selectable calendar', () => {
+        // Arrange
+        let unselectableCalendar = createCalendarDescriptor('Selectable calendar', true, false);
+        let calendar = initCalendar(unselectableCalendar);
+        calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+        // Act
+        calendar._setSelection(new Date(stringDay), unselectableCalendar, null, false, false);
+
+        // Assert
+        expect(calendar.selectedCalendar).toBe(null);
+      });
+
+      it('should preserve selected calendar when a non-selectable calendar is selected', () => {
+        // Arrange
+        let selectableCalendar = createCalendarDescriptor('Selectable calendar', true, true);
+        let unselectableCalendar = createCalendarDescriptor('Selectable calendar', true, false);
+        let calendar = initCalendar(selectableCalendar, unselectableCalendar);
+        calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+        // Act
+        calendar._setSelection(new Date(stringDay), selectableCalendar, null, false, false);
+        calendar._setSelection(new Date(stringDay), unselectableCalendar, null, false, false);
+
+        // Assert
+        expect(calendar.selectedCalendar).toBe(selectableCalendar);
+      });
+
+      it('should be able to handle calendarId when selection is set', () => {
+        // Arrange
+        let selectableCalendar = createCalendarDescriptor('Selectable calendar', true, true);
+        let calendar = initCalendar(selectableCalendar);
+        calendar.setDisplayMode(Calendar.DisplayMode.DAY);
+
+        // Act
+        calendar._setSelection(new Date(stringDay), selectableCalendar.calendarId, null, false, false);
+
+        // Assert
+        expect(calendar.selectedCalendar).toBe(selectableCalendar);
+      });
+    });
+
+    describe('one calendar should always be selected', () => {
+
+      const clickTreeNodeForCalendarId = (calendar: Calendar, calendarId: string) => {
+        let tree = calendar.calendarSidebar.calendarsPanel.tree;
+        tree.visitNodes(node => {
+          if ((<CalendarsPanelTreeNode>node).calendarId === calendarId) {
+            JQueryTesting.triggerClick(node.$node);
+            return true;
+          }
+        });
+      };
+
+      it('should not be possible to uncheck the last checked calendar', () => {
+        // Arrange
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        let calendar2 = createCalendarDescriptor('Calendar 2');
+        let calendar = initCalendar(calendar1, calendar2);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+        clickTreeNodeForCalendarId(calendar, calendar2.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(false);
+        expect(calendar2.visible).toBe(true);
+      });
+
+      it('should not be possible to uncheck the calendar when calendars are in group', () => {
+        // Arrange
+        let parentCalendar = createCalendarDescriptor('Parent calendar');
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        calendar1.parentId = parentCalendar.calendarId;
+        let calendar2 = createCalendarDescriptor('Calendar 2');
+        calendar2.parentId = parentCalendar.calendarId;
+        let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+        clickTreeNodeForCalendarId(calendar, calendar2.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(false);
+        expect(calendar2.visible).toBe(true);
+      });
+
+      it('should not be possible to uncheck the calendar group when the group contains the remaining select calendars', () => {
+        // Arrange
+        let parentCalendar = createCalendarDescriptor('Parent calendar');
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        calendar1.parentId = parentCalendar.calendarId;
+        let calendar2 = createCalendarDescriptor('Calendar 2');
+        calendar2.parentId = parentCalendar.calendarId;
+        let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, parentCalendar.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(false);
+        expect(calendar2.visible).toBe(true);
+      });
+
+      it('should not hide a calendar when its double clicked', () => {
+        // Arrange
+        let parentCalendar = createCalendarDescriptor('Parent calendar');
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        calendar1.parentId = parentCalendar.calendarId;
+        let calendar2 = createCalendarDescriptor('Calendar 2');
+        calendar2.parentId = parentCalendar.calendarId;
+        let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, calendar2.calendarId);
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(true);
+        expect(calendar2.visible).toBe(false);
+      });
+
+      it('should not be possible to unselect the only calendar', () => {
+        // Arrange
+        let calendar1 = createCalendarDescriptor('Calendar 1');
+        let calendar = initCalendar(calendar1);
+
+        // Act
+        clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
+
+        // Assert
+        expect(calendar1.visible).toBe(true);
+      });
+    });
   });
 });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,11 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarUIFacade;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.Range;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarDescriptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
@@ -56,6 +60,8 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
   private static final String EVENT_VIEW_RANGE_CHANGE = "viewRangeChange";
   private static final String EVENT_SELECTED_RANGE_CHANGE = "selectedRangeChange";
   private static final String EVENT_MODEL_CHANGE = "modelChange";
+  private static final String EVENT_CALENDAR_VISIBILITY_CHANGE = "calendarVisibilityChange";
+  private static final String EVENT_SELECTED_CALENDAR_CHANGE = "selectedCalendarChange";
 
   private CalendarListener m_calendarListener;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
@@ -141,6 +147,18 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
         return getModel().getTitle();
       }
     });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_CALENDARS, model) {
+      @Override
+      protected List<ICalendarDescriptor> modelValue() {
+        return getModel().getCalendars();
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return calendarDescriptorsToJsonArray(((List<ICalendarDescriptor>) value));
+      }
+    });
     putJsonProperty(new JsonProperty<>(ICalendar.PROP_VIEW_RANGE, model) {
       @Override
       protected Range<Date> modelValue() {
@@ -221,6 +239,24 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
             .orElse(null);
       }
     });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_CALENDAR_SIDEBAR, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getShowCalendarSidebar();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_CALENDARS_PANEL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getShowCalendarsPanel();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SHOW_LIST_PANEL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getShowListPanel();
+      }
+    });
   }
 
   @SuppressWarnings("unchecked")
@@ -229,6 +265,31 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       return null;
     }
     return (JsonCalendarComponent<C>) getUiSession().getJsonAdapter(adapterId);
+  }
+
+  protected JSONArray calendarDescriptorsToJsonArray(List<ICalendarDescriptor> descriptors) {
+    JSONArray array = new JSONArray();
+    if (!CollectionUtility.hasElements(descriptors)) {
+      return array;
+    }
+    for (ICalendarDescriptor descriptor : descriptors) {
+      array.put(new JsonCalendarDescriptor(descriptor).toJson());
+    }
+    return array;
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (ICalendar.PROP_SHOW_CALENDAR_SIDEBAR.equals(propertyName)) {
+      getModel().getUIFacade().setShowYearPanelFromUI(data.getBoolean(propertyName));
+    }
+    else if (ICalendar.PROP_SHOW_CALENDARS_PANEL.equals(propertyName)) {
+      getModel().getUIFacade().setShowCalendarsPanelFromUI(data.getBoolean(propertyName));
+    }
+    else if (ICalendar.PROP_SHOW_LIST_PANEL.equals(propertyName)) {
+      getModel().getUIFacade().setShowListPanelFromUI(data.getBoolean(propertyName));
+    }
+    super.handleUiPropertyChange(propertyName, data);
   }
 
   @Override
@@ -253,6 +314,12 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     }
     else if (EVENT_SELECTED_RANGE_CHANGE.equals(event.getType())) {
       handleUiSelectedRangeChange(event);
+    }
+    else if (EVENT_CALENDAR_VISIBILITY_CHANGE.equals(event.getType())) {
+      handleUiCalendarVisibilityChange(event);
+    }
+    else if (EVENT_SELECTED_CALENDAR_CHANGE.equals(event.getType())) {
+      handleUiSelectedCalendarChange(event);
     }
     else {
       super.handleUiEvent(event);
@@ -365,6 +432,24 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       return null;
     }
     return new JsonDate(data.optString(propertyName, null)).asJavaDate();
+  }
+
+  protected void handleUiCalendarVisibilityChange(JsonEvent event) {
+    Pair<String, Boolean> calendarVisibility = extractCalendarVisibility(event.getData());
+    getModel().getUIFacade().setCalendarVisibilityFromUI(calendarVisibility.getLeft(), calendarVisibility.getRight());
+    LOG.debug("calendarId={} visible={}", calendarVisibility.getLeft(), calendarVisibility.getRight());
+  }
+
+  protected void handleUiSelectedCalendarChange(JsonEvent event) {
+    String calendarId = event.getData().optString("calendarId");
+    getModel().getUIFacade().setSelectedCalendarFromUI(calendarId);
+    LOG.debug("calendarId={}", calendarId);
+  }
+
+  protected Pair<String, Boolean> extractCalendarVisibility(JSONObject data) {
+    String calendarId = data.optString("calendarId");
+    Boolean visible = data.optBoolean("visible");
+    return new ImmutablePair<>(calendarId, visible);
   }
 
   @Override

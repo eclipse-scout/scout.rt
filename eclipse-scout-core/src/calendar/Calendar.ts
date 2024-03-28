@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf,
-  JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, CalendarsPanel, CalendarsPanelTreeNode, comparators, ContextMenuPopup, DateRange,
+  dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JQueryWheelEvent, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings,
+  TreeNodesCheckedEvent, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -62,6 +63,8 @@ export class Calendar extends Widget implements CalendarModel {
   selectorEnd: Date;
   showDisplayModeSelection: boolean;
   rangeSelectionAllowed: boolean;
+  calendars: CalendarDescriptor[];
+  selectedCalendar: CalendarDescriptor;
   title: string;
   useOverflowCells: boolean;
   viewRange: DateRange;
@@ -70,10 +73,15 @@ export class Calendar extends Widget implements CalendarModel {
   menuInjectionTarget: GroupBox;
   modesMenu: CalendarModesMenu;
   menus: Menu[];
+  calendarSidebar: CalendarSidebar;
   yearPanel: YearPanel;
+  calendarsPanel: CalendarsPanel;
   selectedRange: DateRange;
   needsScrollToStartHour: boolean;
   defaultMenuTypes: string[];
+  showCalendarSidebar: boolean;
+  showCalendarsPanel: boolean;
+  showListPanel: boolean;
 
   $header: JQuery;
   $range: JQuery;
@@ -90,10 +98,6 @@ export class Calendar extends Widget implements CalendarModel {
   $title: JQuery;
   $select: JQuery;
   $window: JQuery<Window>;
-
-  /** additional modes; should be stored in model */
-  protected _showYearPanel: boolean;
-  protected _showListPanel: boolean;
 
   /**
    * The narrow view range is different from the regular view range.
@@ -142,6 +146,8 @@ export class Calendar extends Widget implements CalendarModel {
     this.selectedDate = new Date();
     this.showDisplayModeSelection = true;
     this.rangeSelectionAllowed = false;
+    this.calendars = [];
+    this.selectedCalendar = null;
     this.title = null;
     this.useOverflowCells = true;
     this.viewRange = null;
@@ -160,8 +166,9 @@ export class Calendar extends Widget implements CalendarModel {
     this.$list = null;
     this.$progress = null;
 
-    this._showYearPanel = false;
-    this._showListPanel = false;
+    this.showCalendarSidebar = false;
+    this.showListPanel = false;
+    this.showCalendarsPanel = false;
 
     this._exactRange = null;
 
@@ -231,9 +238,15 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
-    this.yearPanel = scout.create(YearPanel, {
+    this.calendarSidebar = scout.create(CalendarSidebar, {
       parent: this
+
     });
+    this.yearPanel = this.calendarSidebar.yearPanel;
+    this.calendarsPanel = this.calendarSidebar.calendarsPanel;
+
+    this.calendarsPanel.tree.on('nodesChecked', this._onCalendarTreeNodeSelected.bind(this));
+
     this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
     this.modesMenu = scout.create(CalendarModesMenu, {
       parent: this,
@@ -243,9 +256,41 @@ export class Calendar extends Widget implements CalendarModel {
     this._setSelectedDate(this.selectedDate);
     this._setDisplayMode(this.displayMode);
     this._setMenuInjectionTarget(this.menuInjectionTarget);
+    this._setCalendars(this.calendars);
     this._exactRange = this._calcExactRange();
     this.yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();
+  }
+
+  protected _updateCalendarNodes() {
+    this.calendarsPanel.tree.deleteAllChildNodes();
+    // Ensure to add parent nodes first to the tree
+    this.calendars.sort((cal1, cal2) => {
+      if (cal1.parentId && cal2.parentId) {
+        return 0;
+      } else if (cal1.parentId) {
+        return 1;
+      } else if (cal2.parentId) {
+        return -1;
+      }
+      return comparators.NUMERIC.compare(cal1.order, cal2.order);
+    })
+      .forEach(descriptor => {
+        this.calendarsPanel.tree.insertNode(scout.create(CalendarsPanelTreeNode, {
+          parent: this.calendarsPanel.tree,
+          calendarId: descriptor.calendarId,
+          parentId: descriptor.parentId,
+          text: descriptor.name,
+          checked: descriptor.visible,
+          cssClass: descriptor.cssClass,
+          expanded: true,
+          leaf: !this.calendars.find(node => node.parentId === descriptor.calendarId)
+        }), this.calendarsPanel.tree.nodes.find(node => node.calendarId === descriptor.parentId));
+      });
+  }
+
+  protected _updateCalendarsPanelDisplayable() {
+    this.calendarSidebar.setCalendarsPanelDisplayable(this.calendars.length > 1);
   }
 
   setSelectedDate(date: Date | string) {
@@ -286,7 +331,9 @@ export class Calendar extends Widget implements CalendarModel {
       }
     }
     this.selectedRange = null;
+    this.selectedCalendar = null;
     this.trigger('selectedRangeChange');
+    this.trigger('selectedCalendarChange', {calendarId: null});
   }
 
   protected _renderDisplayMode(oldDisplayMode?: CalendarDisplayMode) {
@@ -296,9 +343,9 @@ export class Calendar extends Widget implements CalendarModel {
     }
     this._updateModel(true);
 
+    this._renderComponents();
     // only render if components have another layout
     if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
-      this._renderComponents();
       this.needsScrollToStartHour = true;
     }
   }
@@ -373,6 +420,18 @@ export class Calendar extends Widget implements CalendarModel {
     return menuInjectionTarget.menus.filter(element => !injectedMenus.includes(element));
   }
 
+  setShowCalendarSidebar(showCalendarSidebar: boolean) {
+    this.setProperty('showCalendarSidebar', showCalendarSidebar);
+  }
+
+  setShowCalendarsPanel(showCalendarsPanel: boolean) {
+    this.setProperty('showCalendarsPanel', showCalendarsPanel);
+  }
+
+  setShowListPanel(showCalendarsPanel: boolean) {
+    this.setProperty('showListPanel', showCalendarsPanel);
+  }
+
   protected override _render() {
     this.$container = this.$parent.appendDiv('calendar');
 
@@ -386,7 +445,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.$header.toggleClass('mobile', isMobile);
     this.$headerRow1 = this.$header.appendDiv('calendar-header-row first');
     this.$headerRow2 = this.$header.appendDiv('calendar-header-row last');
-    this.yearPanel.render();
+    this.calendarSidebar.render();
 
     this.$grids = this.$container.appendDiv('calendar-grids');
     this.$topGrid = this.$grids.appendDiv('calendar-top-grid');
@@ -427,8 +486,11 @@ export class Calendar extends Widget implements CalendarModel {
       .attr('data-mode', Calendar.DisplayMode.MONTH)
       .on('click', this._onDisplayModeClick.bind(this));
     this.modesMenu.render(this.$commands);
-    this.$commands.appendDiv('calendar-toggle-year')
-      .on('click', this._onYearClick.bind(this));
+
+    // Top-right menus
+    this.$commands.appendDiv('calendar-toggle-sidebar')
+      .on('click', this._onCalendarSidebarClick.bind(this));
+    this._updateCalendarsPanelDisplayable();
     this.$commands.appendDiv('calendar-toggle-list')
       .on('click', this._onListClick.bind(this));
 
@@ -440,7 +502,6 @@ export class Calendar extends Widget implements CalendarModel {
         .data('day', dayTop);
     }
 
-    this.$topGrid.appendDiv('calendar-week-task').attr('data-axis-name', this.session.text('ui.CalendarDay'));
     let $weekTopGridDays = this.$topGrid.appendDiv('calendar-week-allday-container');
     $weekTopGridDays.appendDiv('calendar-week-name');
 
@@ -467,11 +528,8 @@ export class Calendar extends Widget implements CalendarModel {
       }
     }
 
-    // click event on all day and children elements
-    let mousedownCallbackWithTime = this._onDayMouseDown.bind(this, true);
-    this.$grid.find('.calendar-day').on('mousedown', mousedownCallbackWithTime);
-    let mousedownCallback = this._onDayMouseDown.bind(this, false);
-    this.$topGrid.find('.calendar-day').on('mousedown', mousedownCallback);
+    // Register zoom handler
+    this.$grid.on('wheel', this._onZoomCtrlScrollListener.bind(this));
 
     this.$window = this.$container.window();
     this.$container.on('mousedown touchstart', this._onMouseDown.bind(this));
@@ -481,10 +539,67 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected override _renderProperties() {
     super._renderProperties();
+    this._renderCalendars();
     this._renderComponents();
     this._renderSelectedComponent();
     this._renderLoadInProgress();
     this._renderDisplayMode();
+  }
+
+  setCalendars(calendars: CalendarDescriptor[]) {
+    this.setProperty('calendars', calendars);
+  }
+
+  protected _setCalendars(calendars: CalendarDescriptor[]) {
+    this._setProperty('calendars', calendars);
+    this._updateCalendarsPanelDisplayable();
+    this._updateCalendarNodes();
+  }
+
+  protected _renderCalendars() {
+    let $dayName = this.$topGrid.find('.calendar-week-header > .calendar-day-name');
+    let $fullDay = this.$topGrid.find('.calendar-week-allday-container > .calendar-day');
+    let $day = this.$grid.find('.calendar-week > .calendar-day');
+
+    // Remove old calendar columns
+    $dayName.find('.calendar-column').remove();
+    $fullDay.find('.calendar-column').remove();
+    $day.find('.calendar-column').remove();
+
+    // Add default calendar columns
+    $dayName.appendDiv('calendar-column')
+      .data('calendarId', 'default');
+    $fullDay.appendDiv('calendar-column')
+      .data('calendarId', 'default');
+    $day.appendDiv('calendar-column')
+      .data('calendarId', 'default');
+
+    // Add new calendar columns
+    this._getCalendarsWithoutGroups().forEach(calendar => {
+      $dayName.appendDiv('calendar-column')
+        .data('calendarId', calendar.calendarId)
+        .attr('data-calendar-name', calendar.name);
+      $fullDay.appendDiv('calendar-column')
+        .data('calendarId', calendar.calendarId);
+      $day.appendDiv('calendar-column')
+        .data('calendarId', calendar.calendarId);
+    });
+
+    // click event on all day and children elements
+    let mousedownCallbackWithTime = this._onDayColumnMouseDown.bind(this, true);
+    this.$grid.find('.calendar-column').on('mousedown', mousedownCallbackWithTime);
+    let mousedownCallback = this._onDayColumnMouseDown.bind(this, false);
+    this.$topGrid.find('.calendar-column').on('mousedown', mousedownCallback);
+
+    this._renderComponents();
+  }
+
+  setComponents(components: CalendarComponent[]) {
+    this.setProperty('components', components);
+  }
+
+  addComponents(components: CalendarComponent[]) {
+    this.setComponents([...this.components, ...components]);
   }
 
   protected _renderComponents() {
@@ -540,6 +655,10 @@ export class Calendar extends Widget implements CalendarModel {
     }
   }
 
+  protected _updateScrollShadow() {
+    scrollbars.updateScrollShadow(this.$grid);
+  }
+
   protected _scrollToSelectedComponent(animate: boolean) {
     if (this.selectedComponent && this.selectedComponent._$parts[0] && this.selectedComponent._$parts[0].parent() && this.selectedComponent._$parts[0].isVisible()) {
       scrollbars.scrollTo(this.selectedComponent._$parts[0].parent(), this.selectedComponent._$parts[0], {
@@ -569,13 +688,11 @@ export class Calendar extends Widget implements CalendarModel {
 
   /* -- basics, events -------------------------------------------- */
 
-  /** @internal */
-  _onPreviousClick() {
+  protected _onPreviousClick() {
     this._navigateDate(Calendar.Direction.BACKWARD);
   }
 
-  /** @internal */
-  _onNextClick() {
+  protected _onNextClick() {
     this._navigateDate(Calendar.Direction.FORWARD);
   }
 
@@ -689,34 +806,50 @@ export class Calendar extends Widget implements CalendarModel {
     this.setDisplayMode(displayMode);
   }
 
-  protected _onYearClick(event: JQuery.ClickEvent) {
-    this._showYearPanel = !this._showYearPanel;
+  protected _onCalendarSidebarClick(event: JQuery.ClickEvent) {
+    this.setShowCalendarSidebar(!this.showCalendarSidebar);
     this._updateScreen(true, true);
   }
 
   protected _onListClick(event: JQuery.ClickEvent) {
-    this._showListPanel = !this._showListPanel;
+    this.setShowListPanel(!this.showListPanel);
     this._updateScreen(false, true);
   }
 
-  protected _onDayMouseDown(withTime: boolean, event: JQuery.MouseDownEvent) {
-    let selectedDate = new Date($(event.delegateTarget).data('date')),
-      timeChanged = false;
-    if (withTime && (this.isDay() || this.isWeek() || this.isWorkWeek())) {
+  protected _onDayColumnMouseDown(withTime: boolean, event: JQuery.MouseDownEvent) {
+    let selectedDayColumn = $(event.delegateTarget),
+      selectedDate = new Date(selectedDayColumn.parent().data('date')),
+      timeChanged = false,
+      selectedCalendarId = selectedDayColumn.data('calendarId');
+
+    // Check if date is valid
+    if (!selectedDate.valueOf()) {
+      return;
+    }
+
+    let rangeSelectionPossible = withTime && (this.isDay() || this.isWeek() || this.isWorkWeek());
+    // Set seconds of date
+    if (rangeSelectionPossible) {
       let seconds = this._getSelectedSeconds(event);
       if (seconds < 60 * 60 * 24) {
         selectedDate.setSeconds(seconds);
         timeChanged = true;
       }
+    }
+
+    this._setSelection(selectedDate, selectedCalendarId, null, false, timeChanged);
+
+    if (rangeSelectionPossible) {
       this._startRangeSelection(event);
     }
-    this._setSelection(selectedDate, null, false, timeChanged);
   }
 
   protected _getSelectedDate(event: JQuery.MouseEventBase): Date {
     let date = null;
     if ($(event.target).hasClass('calendar-day')) {
       date = $(event.target).data('date');
+    } else if ($(event.target).hasClass('calendar-column')) {
+      date = $(event.target).parent().data('date');
     } else if ($(event.target).hasClass('calendar-component')
       || $(event.target).parents('.calendar-component').length > 0
       || $(event.target).hasClass('calendar-range-selector')) {
@@ -753,7 +886,7 @@ export class Calendar extends Widget implements CalendarModel {
   /**
    * @param selectedComponent may be null when a day is selected
    */
-  protected _setSelection(selectedDate: Date, selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
+  protected _setSelection(selectedDate: Date, selectedCalendar: CalendarDescriptor | string, selectedComponent: CalendarComponent, updateScrollPosition: boolean, timeChanged: boolean) {
     let changed = false;
     let dateChanged = dates.compareDays(this.selectedDate, selectedDate) !== 0;
 
@@ -772,6 +905,24 @@ export class Calendar extends Widget implements CalendarModel {
         });
       }
       this.selectedDate = selectedDate;
+    }
+
+    // Set selected calendar
+    let newSelectedCalendar = this.selectedCalendar;
+    if (selectedCalendar === 'default') {
+      newSelectedCalendar = null;
+    } else if (typeof selectedCalendar === 'string' || selectedCalendar instanceof String) {
+      newSelectedCalendar = this._findCalendarForId(selectedCalendar as string);
+    } else {
+      newSelectedCalendar = selectedCalendar as CalendarDescriptor;
+    }
+    let selectable = newSelectedCalendar ? newSelectedCalendar.selectable : true;
+    if (newSelectedCalendar !== this.selectedCalendar && selectable) {
+      changed = true;
+      this.selectedCalendar = newSelectedCalendar;
+      this.trigger('selectedCalendarChange', {
+        calendarId: newSelectedCalendar ? newSelectedCalendar.calendarId : null
+      });
     }
 
     // selected component / part (may be null)
@@ -796,7 +947,7 @@ export class Calendar extends Widget implements CalendarModel {
       }
     }
 
-    if (this._showYearPanel) {
+    if (this.showCalendarSidebar) {
       this.yearPanel.selectDate(this.selectedDate);
     }
   }
@@ -818,7 +969,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.layoutSize(animate);
     this.layoutAxis();
 
-    if (this._showYearPanel) {
+    if (this.showCalendarSidebar) {
       this.yearPanel.selectDate(this.selectedDate);
     }
 
@@ -845,19 +996,20 @@ export class Calendar extends Widget implements CalendarModel {
       gridPaddingX = this.$grid.innerWidth() - this.$grid.width(),
       gridW = containerW - gridPaddingX;
 
-    // show or hide year
-    $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
-    if (this._showYearPanel) {
-      this.yearPanel.$container.data('new-width', this.calendarToggleYearWidth);
+    // show or hide calendar sidebar
+    if (this.showCalendarSidebar) {
+      this.calendarSidebar.$container.data('new-width', this.calendarToggleYearWidth);
       gridW -= this.calendarToggleYearWidth;
       containerW -= this.calendarToggleYearWidth;
     } else {
-      this.yearPanel.$container.data('new-width', 0);
+      this.calendarSidebar.$container.data('new-width', 0);
     }
 
+    this.calendarSidebar.setCalendarsPanelExpanded(this.showCalendarsPanel);
+
     // show or hide work list
-    $('.calendar-toggle-list', this.$commands).select(this._showListPanel);
-    if (this._showListPanel) {
+    $('.calendar-toggle-list', this.$commands).select(this.showListPanel);
+    if (this.showListPanel) {
       this.$list.parent().data('new-width', this.calendarToggleListWidth);
       gridW -= this.calendarToggleListWidth;
       containerW -= this.calendarToggleListWidth;
@@ -926,6 +1078,42 @@ export class Calendar extends Widget implements CalendarModel {
       this.widthPerDivision = newWidthMonthOrWeek;
     }
 
+    // layout calendar columns
+    let columnWidth = 0;
+    if (this.isDay()) {
+      columnWidth = Math.round(contentW / (this._getCalendarsWithoutGroups().filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
+    } else if (this.isWorkWeek()) {
+      columnWidth = Math.round(contentW / this.workDayIndices.length);
+    } else {
+      columnWidth = Math.round(contentW / 7);
+    }
+
+    if (this.isDay()) {
+      // Set size to 0 for all
+      $('.calendar-column', this.$grids).data('new-width', 0);
+
+      // Resize visible columns of selected day
+      $('.calendar-day-name:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid)
+        .add($('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$grids))
+        .find('.calendar-column')
+        .filter((i, e) => {
+          let id = $(e).data('calendarId');
+          if (id === 'default') {
+            return this._defaultCalendarVisible();
+          }
+          let foundCalendar = this._findCalendarForId(id);
+          return foundCalendar ? foundCalendar.visible : false;
+        }).data('new-width', columnWidth);
+    } else {
+      // Set size 0 for all calendar columns
+      $('.calendar-column', this.$grids).data('new-width', 0);
+
+      // Full size for default column
+      $('.calendar-column', this.$grids)
+        .filter((i, e) => $(e).data('calendarId') === 'default')
+        .data('new-width', columnWidth);
+    }
+
     // layout components
     if (this.isMonth()) {
       $('.component-month', this.$grid).each(function() {
@@ -963,11 +1151,14 @@ export class Calendar extends Widget implements CalendarModel {
         }
         if (animate) {
           $e.animateAVCSD('height', h, () => {
-            if (h === 0) {
-              $e.addClass('hidden');
-            }
-            this._afterLayout($e, animate);
-          });
+              if (h === 0) {
+                $e.addClass('hidden');
+              }
+              this._afterLayout($e, animate);
+            },
+            () => {
+              this._afterLayout($e, animate);
+            });
         } else {
           $e.css('height', h);
           if (h === 0) {
@@ -980,8 +1171,24 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _afterLayout($parent: JQuery, animate: boolean) {
+    this.calendarSidebar.invalidateLayoutTree(false);
     this._updateScrollbars($parent, animate);
     this._updateWeekdayNames();
+  }
+
+  protected _defaultCalendarVisible(): boolean {
+    return this.components
+      .filter(comp => comp.coveredDaysRange.covers(this.selectedDate, true))
+      .filter(comp => !comp.item.calendarId)
+      .length > 0;
+  }
+
+  findCalendarForComponent(component: CalendarComponent): CalendarDescriptor {
+    return this._findCalendarForId(component.item.calendarId);
+  }
+
+  protected _findCalendarForId(calendarId: string) {
+    return this.calendars.find(calendar => calendar.calendarId === calendarId);
   }
 
   protected _updateWeekdayNames() {
@@ -1005,21 +1212,24 @@ export class Calendar extends Widget implements CalendarModel {
       weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
     }
 
-    $('.calendar-day-name', this.$topGrid).each(function(index: number) {
-      $(this).attr('data-day-name', weekdays[index]);
-    });
+    $('.calendar-day-name > .calendar-column', this.$topGrid)
+      .filter((i, element) => $(element).data('calendarId') === 'default')
+      .each((i, elm) => {
+        $(elm).attr('data-calendar-name', weekdays[i]);
+      });
   }
 
   protected _updateScrollbars($parent: JQuery, animate: boolean) {
-    let $scrollables = $('.calendar-scrollable-components', $parent);
+    let $scrollables = $('.calendar-scrollable-components > .calendar-column', $parent);
     $scrollables.each((i, elem) => {
       scrollbars.update($(elem), true);
     });
     this.updateScrollPosition(animate);
+    this._updateScrollShadow();
   }
 
   protected _uninstallComponentScrollbars($parent: JQuery) {
-    $parent.find('.calendar-scrollable-components').each((i, elem) => {
+    $parent.find('.calendar-scrollable-components > .calendar-column').each((i, elem) => {
       scrollbars.uninstall($(elem), this.session);
     });
   }
@@ -1047,7 +1257,7 @@ export class Calendar extends Widget implements CalendarModel {
     fullDayComponents.sort(this._sortFromTo);
 
     const {from, to} = this._exactRange;
-    const usedIndicesMap = new Map();
+    const usedIndicesMap = new Map<string, number[]>();
     let maxComponentsPerDay = 0;
 
     for (const component of fullDayComponents) {
@@ -1062,7 +1272,8 @@ export class Calendar extends Widget implements CalendarModel {
         date = from;
       }
 
-      let usedIndices = arrays.ensure(usedIndicesMap.get(date.valueOf()));
+      let key = this._calculateFullDayIndiciesKey(component, date);
+      let usedIndices = arrays.ensure(usedIndicesMap.get(key));
 
       // get the first unused index
       // create [0, 1, 2, ..., maxIndex, maxIndex + 1] remove the used indices
@@ -1077,10 +1288,11 @@ export class Calendar extends Widget implements CalendarModel {
       // none of these indices can be used already due to the order of the components
       while (date <= component.coveredDaysRange.to && date <= to) {
         usedIndices.push(index);
-        usedIndicesMap.set(date.valueOf(), usedIndices);
+        usedIndicesMap.set(key, usedIndices);
 
         date = dates.shift(date, 0, 0, 1);
-        usedIndices = arrays.ensure(usedIndicesMap.get(date.valueOf()));
+        key = this._calculateFullDayIndiciesKey(component, date);
+        usedIndices = arrays.ensure(usedIndicesMap.get(key));
       }
 
       maxComponentsPerDay = Math.max(index + 1, maxComponentsPerDay);
@@ -1089,8 +1301,12 @@ export class Calendar extends Widget implements CalendarModel {
     this.$grids.css('--full-day-components', maxComponentsPerDay);
   }
 
+  protected _calculateFullDayIndiciesKey(component: CalendarComponent, date: Date): string {
+    return this.getCalendarIdForComponent(component) + strings.asString(date.valueOf());
+  }
+
   layoutYearPanel() {
-    if (this._showYearPanel) {
+    if (this.showCalendarSidebar) {
       scrollbars.update(this.yearPanel.$yearList);
       this.yearPanel._scrollYear();
     }
@@ -1103,7 +1319,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     // set range text
     if (this.isDay()) {
-      text = this._format(exFrom, 'd. MMMM yyyy');
+      text = this._format(exFrom, 'EEEE, d. MMMM yyyy');
     } else if (this.isWorkWeek() || this.isWeek()) {
       let toText = this.session.text('ui.to');
       if (exFrom.getMonth() === exTo.getMonth()) {
@@ -1238,7 +1454,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _updateListPanel() {
-    if (this._showListPanel) {
+    if (this.showListPanel) {
       scrollbars.uninstall(this.$list, this.session);
 
       // remove old list-components
@@ -1297,8 +1513,8 @@ export class Calendar extends Widget implements CalendarModel {
   /* -- components, events-------------------------------------------- */
 
   /** @internal */
-  _selectedComponentChanged(component: CalendarComponent, partDay: Date, updateScrollPosition: boolean) {
-    this._setSelection(partDay, component, updateScrollPosition, false);
+  _selectedComponentChanged(component: CalendarComponent, calendarId: string, partDay: Date, updateScrollPosition: boolean) {
+    this._setSelection(partDay, calendarId, component, updateScrollPosition, false);
   }
 
   protected _onDayContextMenu(event: JQuery.ContextMenuEvent) {
@@ -1337,28 +1553,90 @@ export class Calendar extends Widget implements CalendarModel {
     this.session.onRequestsDone(func, event, allowedType);
   }
 
+  protected _onCalendarTreeNodeSelected(event: TreeNodesCheckedEvent) {
+    let tupelArray = event.nodes
+      .map(node => node as CalendarsPanelTreeNode)
+      .map(node => [node.calendarId, node.checked] as [string, boolean]);
+    this._updateCalendarVisibility(tupelArray);
+  }
+
+  protected _updateCalendarVisibility(updatedCalendars: [calendarId: string, visible: boolean][]) {
+    if (!this.initialized) {
+      // Is called after init
+      return;
+    }
+    updatedCalendars.forEach(tuple => {
+      this._updateCalendarVisibleProperty(tuple[0], tuple[1]);
+    });
+    if (!this.isDay()) {
+      // No re-rendering required when on day -> component is hidden by layouyt
+      this._renderComponents();
+    }
+    this.layoutSize(true);
+  }
+
+  protected _updateCalendarVisibleProperty(calendarId: string, visible: boolean) {
+    if (!calendarId) {
+      // No update
+      return;
+    }
+    let calendar = this._findCalendarForId(calendarId);
+    if (!calendar || calendar.visible === visible) {
+      // No update
+      return;
+    }
+    if (!this._hasOtherVisibleCalendars(calendar)) {
+      // Last visible calendar was unselected, selecting it again
+      let tree = this.calendarSidebar.calendarsPanel.tree;
+      tree.visitNodes(node => {
+        if ((<CalendarsPanelTreeNode>node).calendarId === calendar.calendarId) {
+          tree.checkNode(node, true, {triggerNodesChecked: false});
+          return true;
+        }
+      });
+      // Returning, because no event should be triggered -> nothing happened
+      return;
+    }
+    calendar.visible = visible;
+    this.trigger('calendarVisibilityChange', {
+      calendarId: calendarId,
+      visible: visible
+    });
+  }
+
+  protected _hasOtherVisibleCalendars(calendar: CalendarDescriptor) {
+    return this.calendars
+      .filter(cal => cal.visible)
+      .filter(cal => cal !== calendar)
+      .length > 0;
+  }
+
   /* -- components, arrangement------------------------------------ */
 
   protected _arrangeComponents() {
-    let k, j, $day, $allChildren, $children, $scrollableContainer, dayComponents, day;
+    let k: number, c: number, j: number,
+      $day: JQuery, $columns: JQuery, $defaultColumn: JQuery, $allChildren: JQuery,
+      $children: JQuery, $scrollableContainer: JQuery, dayComponents: CalendarComponent[],
+      day: Date;
 
     let $days = $('.calendar-day', this.$grid);
     // Main (Bottom) grid: Iterate over days
     for (k = 0; k < $days.length; k++) {
       $day = $days.eq(k);
-      $children = $day.children('.calendar-component:not(.component-task)');
-      $allChildren = $day.children('.calendar-component');
       day = $day.data('date');
+      $columns = $day.children('.calendar-column');
+      $allChildren = $day.find('.calendar-component');
+      $defaultColumn = $columns.filter((i, e) => $(e).data('calendarId') === 'default');
 
       // Remove old element containers
-      $scrollableContainer = $day.children('.calendar-scrollable-components');
+      $scrollableContainer = $defaultColumn.children('.calendar-scrollable-components');
       if ($scrollableContainer.length > 0) {
         scrollbars.uninstall($scrollableContainer, this.session);
         $scrollableContainer.remove();
       }
 
       if (this.isMonth() && $allChildren.length > 0) {
-        $scrollableContainer = $day.appendDiv('calendar-scrollable-components');
+        $scrollableContainer = $defaultColumn.appendDiv('calendar-scrollable-components');
 
         for (j = 0; j < $allChildren.length; j++) {
           let $child = $allChildren.eq(j);
@@ -1377,15 +1655,19 @@ export class Calendar extends Widget implements CalendarModel {
         });
       }
 
-      if (this.isMonth() && $children.length > 2) {
-        $day.addClass('many-items');
-      } else if (!this.isMonth() && $children.length > 1) {
-        // logical placement
-        dayComponents = this._getComponents($children);
-        this._arrange(dayComponents, day);
+      for (c = 0; c < $columns.length; c++) {
+        $children = $columns.eq(c).children('.calendar-component:not(.component-task)');
 
-        // screen placement
-        this._arrangeComponentSetPlacement($children, day);
+        if (this.isMonth() && $children.length > 2) {
+          $day.addClass('many-items');
+        } else if (!this.isMonth() && $children.length > 1) {
+          // logical placement
+          dayComponents = this._getComponents($children);
+          this._arrange(dayComponents, day);
+
+          // screen placement
+          this._arrangeComponentSetPlacement($children, day);
+        }
       }
     }
 
@@ -1401,19 +1683,20 @@ export class Calendar extends Widget implements CalendarModel {
         session: this.session,
         axis: 'y'
       });
-      this.$topGrid.find('.calendar-scrollable-components').each((i, elem) => {
-        let $topDay = $(elem);
-        if ($topDay.data('scrollable')) {
-          scrollbars.update($topDay);
-          return;
-        }
-        scrollbars.install($topDay, {
-          parent: this,
-          session: this.session,
-          axis: 'y',
-          scrollShadow: 'none'
+      this.$topGrid.find('.calendar-scrollable-components > .calendar-column')
+        .each((i, elem) => {
+          let $topDay = $(elem);
+          if ($topDay.data('scrollable')) {
+            scrollbars.update($topDay);
+            return;
+          }
+          scrollbars.install($topDay, {
+            parent: this,
+            session: this.session,
+            axis: 'y',
+            scrollShadow: 'none'
+          });
         });
-      });
     }
   }
 
@@ -1434,9 +1717,8 @@ export class Calendar extends Widget implements CalendarModel {
 
   /**
    * Arrange components (stack width, stack index) per day
-   * @internal
    */
-  _arrange(components: CalendarComponent[], day: Date) {
+  protected _arrange(components: CalendarComponent[], day: Date) {
     let columns: CalendarComponent[] = [],
       key = day + '';
 
@@ -1449,12 +1731,15 @@ export class Calendar extends Widget implements CalendarModel {
       if (!c.stack) {
         c.stack = {};
       }
-      c.stack[key] = {};
+      let calendarId = c.item ? c.item.calendarId : null;
+      c.stack[this._calculateStackKey(day, calendarId)] = {};
     }
 
     for (let i = 0; i < components.length; i++) {
       let c = components[i];
       let r = c.getPartDayPosition(day); // Range [from,to]
+      let calendarId = c.item ? c.item.calendarId : null;
+      key = this._calculateStackKey(day, calendarId);
 
       // reduce number of columns, if all components end before this one
       if (columns.length > 0 && this._allEndBefore(columns, r.from, day)) {
@@ -1505,18 +1790,26 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _arrangeComponentSetPlacement($children: JQuery, day: Date) {
-    let i, $child, stack;
+    let i, $child, component: CalendarComponent, stack;
 
     // loop and place based on data
     for (i = 0; i < $children.length; i++) {
       $child = $children.eq(i);
-      stack = $child.data('component').stack[day + ''];
+      component = $child.data('component');
+      stack = component.stack[this._calculateStackKey(day, component.item.calendarId)];
 
       // make last element smaller
       $child
         .css('width', 100 / stack.w + '%')
         .css('left', stack.x * 100 / stack.w + '%');
     }
+  }
+
+  protected _calculateStackKey(date: Date, calendarId?: string): string {
+    if (!this.isDay() || !calendarId) {
+      return 'default';
+    }
+    return date + '' + calendarId ? calendarId.toString() : 'default';
   }
 
   override get$Scrollable(): JQuery {
@@ -1787,6 +2080,10 @@ export class Calendar extends Widget implements CalendarModel {
     return null;
   }
 
+  protected _getCalendarsWithoutGroups(): CalendarDescriptor[] {
+    return this.calendars.filter(calendar => !this.calendars.find(cal => cal.parentId === calendar.calendarId));
+  }
+
   protected _newMoveData(event: JQuery.MouseDownEvent): CalendarMoveData {
     let moveData: CalendarMoveData = {};
     moveData.event = event;
@@ -1898,17 +2195,30 @@ export class Calendar extends Widget implements CalendarModel {
       return;
     }
 
+    // No range selection when calendar is not selectable
+    let currentCalendarId = $(event.delegateTarget).data('calendarId');
+    let selectable = currentCalendarId === 'default'
+      ? true
+      : this._findCalendarForId(currentCalendarId).selectable;
+    if (!selectable) {
+      return;
+    }
+
     // Ignore right mouse button clicks within current selection
-    let selectedDateTime = this._getSelectedDateTime(event);
+    let selectedDateTime = this._getSelectedDateTime(event),
+      newSelectedCalendarId = $(event.delegateTarget).data('calendarId'),
+      currentSelectedCalendarId = this.selectedCalendar ? this.selectedCalendar.calendarId : 'default';
+
     if (event.which === 3 &&
       this.selectedRange && selectedDateTime &&
       dates.compare(selectedDateTime, this.selectedRange.from) >= 0 &&
-      dates.compare(selectedDateTime, this.selectedRange.to) < 0) {
+      dates.compare(selectedDateTime, this.selectedRange.to) < 0 &&
+      currentSelectedCalendarId === newSelectedCalendarId) {
       return;
     }
 
     // Ignore clicks to calendar components, this should open the tooltip
-    if (!$(event.target).hasClass('calendar-range-selector') && !$(event.target).hasClass('calendar-day')) {
+    if (!$(event.target).hasClass('calendar-range-selector') && !$(event.target).hasClass('calendar-column')) {
       return;
     }
 
@@ -1943,6 +2253,17 @@ export class Calendar extends Widget implements CalendarModel {
       }
     });
     return $foundDay;
+  }
+
+  protected _findSelectedCalendarColumn(selectedDate: Date): JQuery {
+    let calendarId = this.selectedCalendar ? this.selectedCalendar.calendarId : 'default';
+    let $day = this._findDayInCalendar(selectedDate);
+    if (!$day) {
+      return null;
+    }
+    return $day
+      .find('.calendar-column')
+      .filter((i, e) => $(e).data('calendarId') === calendarId);
   }
 
   protected _setRangeSelection() {
@@ -1981,14 +2302,14 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _appendCalendarRangeSelection(date: Date, fromTime: Date, toTime: Date) {
-    let $parent = this._findDayInCalendar(date);
+    let $parent = this._findSelectedCalendarColumn(date);
     if (!$parent) {
       return;
     }
 
     // top and height
     let startPosition = fromTime ? this._dayPosition(this._getHours(fromTime), 0) : 0;
-    let endPosition = toTime ? this._dayPosition(this._getHours(toTime) + 0.5, 0) : 100;
+    let endPosition = toTime ? this._dayPosition(this._getHours(toTime) + (1 / this.numberOfHourDivisions), 0) : 100;
 
     $parent.appendDiv('calendar-range-selector')
       .css('top', startPosition + '%')
@@ -1996,8 +2317,8 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _getHours(date: Date): number {
-    // round to 0.5h
-    return Math.round((date.getHours() + date.getMinutes() / 60) * 2) / 2;
+    // round to number of hour devisions
+    return Math.round((date.getHours() + date.getMinutes() / 60) * this.numberOfHourDivisions) / this.numberOfHourDivisions;
   }
 
   protected _onMouseMoveRangeSelection(event: JQuery.MouseMoveEvent) {
@@ -2046,5 +2367,27 @@ export class Calendar extends Widget implements CalendarModel {
       this.selectedRange = null;
     }
     this.trigger('selectedRangeChange');
+  }
+
+  getCalendarIdForComponent(component: CalendarComponent): number | 'default' {
+    if (!component || !component.item) {
+      return 'default';
+    }
+    return scout.nvl(component.item.calendarId, 'default');
+  }
+
+  protected _onZoomCtrlScrollListener(event: JQueryWheelEvent) {
+    if (!event.ctrlKey) {
+      return;
+    }
+    event.preventDefault();
+    if (event.originalEvent.deltaY < 0) {
+      this.heightPerDivision += 2;
+    } else {
+      this.heightPerDivision -= 2;
+    }
+    this.heightPerHour = this.numberOfHourDivisions * this.heightPerDivision;
+    this.heightPerDay = 24 * this.heightPerHour;
+    this._updateScreen(false, false);
   }
 }

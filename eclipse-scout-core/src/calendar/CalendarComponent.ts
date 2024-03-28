@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,11 +83,24 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       return;
     }
 
+    // Calculate visible
+    let calendarDescriptor = this.parent.findCalendarForComponent(this);
+    if (calendarDescriptor) {
+      // components with no calendarId are alwas shown in the default column
+      this.setVisible(calendarDescriptor.visible);
+    }
+
+    if (!this.isVisible()) {
+      return;
+    }
+
     let loopDay = this._startLoopDay();
+    let item = this.item || {} as CalendarItem;
 
     let appointmentToDate: Date | string = dates.parseJsonDate(this.toDate);
     let appointmentFromDate = dates.parseJsonDate(this.fromDate);
     let coveredDaysRangeTo = this.coveredDaysRange.to;
+    let calendarCssClass = calendarDescriptor ? calendarDescriptor.cssClass : null;
 
     if (!this.fullDay) {
       let truncToDate = dates.trunc(appointmentToDate);
@@ -124,12 +137,21 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         // next day, partDay not found in grid
         continue;
       }
-      $part = $day.appendDiv('calendar-component');
+
+      // Find corresponding calendar
+      let $calendar = this._findCalendarColumnInDay($day, item.calendarId);
+      if (!$calendar) {
+        continue;
+      }
+      $part = $calendar.appendDiv('calendar-component');
 
       $part
-        .addClass(this.item.cssClass)
+        .addClass(item.cssClass)
+        .addClass(calendarCssClass)
         .data('component', this)
         .data('partDay', partDay)
+        .on('mouseenter', this._onMouseEnter.bind(this))
+        .on('mouseleave', this._onMouseLeave.bind(this))
         .on('mouseup', this._onMouseUp.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
       $part.appendDiv('calendar-component-leftcolorborder');
@@ -137,7 +159,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       if (this.item.subjectIconId) {
         $partContent.appendIcon(this.item.subjectIconId);
       }
-      $partContent.appendSpan('subject', this.item.subject);
+      $partContent.appendSpan('subject', item.subject);
 
       this._$parts.push($part);
 
@@ -197,6 +219,14 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       .filter(function(i, elem) {
         return dates.isSameDay($(this).data('date'), date);
       }).eq(0);
+  }
+
+  protected _findCalendarColumnInDay($day: JQuery, calendarId: string | number): JQuery {
+    if (!this.parent.isDay() || !calendarId) {
+      calendarId = 'default';
+    }
+    return $day.find('.calendar-column')
+      .filter((index: number, element: HTMLSelectElement) => $(element).data('calendarId').toString() === calendarId.toString());
   }
 
   protected _isTask(): boolean {
@@ -272,7 +302,15 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   }
 
   updateSelectedComponent($part: JQuery, updateScrollPosition: boolean) {
-    this.parent._selectedComponentChanged(this, $part.data('partDay') as Date, updateScrollPosition);
+    this.parent._selectedComponentChanged(this, this.item.calendarId, $part.data('partDay') as Date, updateScrollPosition);
+  }
+
+  protected _onMouseEnter(event: JQuery.MouseEnterEvent) {
+    this._$parts.forEach($part => $part.addClass('hover'));
+  }
+
+  protected _onMouseLeave(evenet: JQuery.MouseLeaveEvent) {
+    this._$parts.forEach($part => $part.removeClass('hover'));
   }
 
   protected _onMouseUp(event: JQuery.MouseUpEvent) {
@@ -431,6 +469,7 @@ export type CalendarItem = {
   itemId: any;
   owner: string;
   cssClass: string;
+  calendarId: string;
   subject: string;
   description: string;
   recurrencePattern: {

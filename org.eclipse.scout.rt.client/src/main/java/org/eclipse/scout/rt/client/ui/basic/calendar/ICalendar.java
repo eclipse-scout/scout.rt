@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvi
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarDescriptor;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
 public interface ICalendar extends IWidget, IContextMenuOwner {
@@ -41,6 +42,14 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * type boolean
    */
   String PROP_DISPLAY_CONDENSED = "displayCondensed";
+  /**
+   * type {@link List<ICalendarDescriptor>}
+   */
+  String PROP_CALENDARS = "calendars";
+  /**
+   * type {@link ICalendarDescriptor}
+   */
+  String PROP_SELECTED_CALENDAR = "selectedCalendar";
   /**
    * type String
    */
@@ -85,6 +94,12 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
 
   String PROP_MENU_INJECTION_TARGET = "menuInjectionTarget";
 
+  String PROP_SHOW_CALENDAR_SIDEBAR = "showCalendarSidebar";
+
+  String PROP_SHOW_CALENDARS_PANEL = "showYearPanel";
+
+  String PROP_SHOW_LIST_PANEL = "showYearPanel";
+
   String getTitle();
 
   void setTitle(String s);
@@ -96,6 +111,12 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
   boolean isDisplayCondensed();
 
   void setDisplayCondensed(boolean condensed);
+
+  List<ICalendarDescriptor> getCalendars();
+
+  void setCalendars(List<ICalendarDescriptor> calendars);
+
+  ICalendarDescriptor getSelectedCalendar();
 
   /**
    * @return a Date tupel [begin, end]
@@ -143,6 +164,8 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * reload all calendar items
    */
   void reloadCalendarItems();
+
+  void reloadCalendarItems(ICalendarDescriptor calendar);
 
   /**
    * Model Observer
@@ -242,4 +265,16 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * and the new menu structure will be injected.
    */
   void setMenuInjectionTarget(IGroupBox target);
+
+  boolean getShowCalendarSidebar();
+
+  void setShowCalendarSidebar(boolean showYearPanel);
+
+  boolean getShowCalendarsPanel();
+
+  void setShowCalendarsPanel(boolean showCalendarsPanel);
+
+  boolean getShowListPanel();
+
+  void setShowListPanel(boolean showListPanel);
 }
