@@ -285,7 +285,7 @@ export class Popup extends Widget implements PopupModel {
     if (this._openLater) {
       return;
     }
-    this.revalidateLayoutTree(false);
+    this.revalidateLayout();
     this.position();
   }
 
@@ -693,7 +693,7 @@ export class Popup extends Widget implements PopupModel {
     if (this.scrollType === 'position') {
       this.position();
     } else if (this.scrollType === 'layoutAndPosition') {
-      this.revalidateLayoutTree(false);
+      this.revalidateLayout();
       this.position();
     } else if (this.scrollType === 'remove') {
       this.close();
@@ -1033,7 +1033,7 @@ export class Popup extends Widget implements PopupModel {
     if (needsLayouting) {
       let currentAnimateResize = this.animateResize;
       this.animateResize = false;
-      this.revalidateLayoutTree(false);
+      this.revalidateLayout();
       this.animateResize = currentAnimateResize;
       if (this.withFocusContext) {
         this.session.focusManager.validateFocus();
@@ -1073,7 +1073,7 @@ export class Popup extends Widget implements PopupModel {
     this.setProperty('$anchor', $anchor);
     if (this.rendered) {
       this._attachAnchorHandlers();
-      this.revalidateLayoutTree(false);
+      this.revalidateLayout();
       if (!this.animateResize) { // PopupLayout will move it -> don't break move animation
         this.position();
       }
