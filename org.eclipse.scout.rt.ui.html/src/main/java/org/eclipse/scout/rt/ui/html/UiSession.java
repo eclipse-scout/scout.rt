@@ -46,7 +46,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -80,7 +79,6 @@ import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.BackgroundPollingIntervalProperty;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
@@ -502,11 +500,7 @@ public class UiSession implements IUiSession {
     final JSONObject startupData = m_currentJsonResponse.getStartupData();
     startupData.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
     startupData.put("clientSession", clientSessionAdapterId);
-    startupData.put("pollingInterval", CONFIG.getPropertyValue(BackgroundPollingIntervalProperty.class));
     startupData.put("persistent", isPersistent());
-    if (Platform.get().inDevelopmentMode()) {
-      startupData.put("inDevelopmentMode", true); // only send if required
-    }
     putLocaleData(startupData, BEANS.get(UiJobs.class).awaitAndGet(future));
   }
 
@@ -618,7 +612,7 @@ public class UiSession implements IUiSession {
    * client session (see {@link #getClientSession()}) the {@link Runnable} is simply executed. If wait is set to
    * <code>true</code>, the method waits for the model job to complete for 5 seconds. If it does not complete the
    * {@link Runnable} is executed in the current thread.
-   * 
+   *
    * @param runnable
    *          {@link Runnable} to be executed.
    * @param name

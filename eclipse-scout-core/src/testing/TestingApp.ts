@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, InitModelOf, RemoteApp, Session} from '../index';
+import {App, AppBootstrapOptions, Device, InitModelOf, RemoteApp, Session} from '../index';
 
 export class TestingApp extends RemoteApp {
 
@@ -23,6 +23,10 @@ export class TestingApp extends RemoteApp {
 
   override _createSession(options: InitModelOf<Session>): Session {
     return super._createSession(options);
+  }
+
+  protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
+    return [Device.get().bootstrap.bind(Device.get())];
   }
 
   static set(newApp: App) {

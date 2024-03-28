@@ -125,9 +125,9 @@ describe('uiNotifications', () => {
     });
 
     it('does not execute the handler if the notification is already known', async () => {
-      let receivedMsgs = [];
+      let receivedMessages = [];
       uiNotifications.subscribe('aaa', event => {
-        receivedMsgs.push(event.message);
+        receivedMessages.push(event.message);
       });
       let poller = pollers().get('main');
 
@@ -149,7 +149,7 @@ describe('uiNotifications', () => {
 
       await sleep(1);
       expect(poller.notifications.get('aaa').get('node1').length).toBe(1);
-      expect(receivedMsgs.length).toBe(1);
+      expect(receivedMessages.length).toBe(1);
 
       response = {
         notifications: [{
@@ -177,9 +177,9 @@ describe('uiNotifications', () => {
 
       await sleep(1);
       expect(poller.notifications.get('aaa').get('node1').length).toBe(2);
-      expect(receivedMsgs.length).toBe(2);
-      expect(receivedMsgs[0].id).toBe('1');
-      expect(receivedMsgs[1].id).toBe('2');
+      expect(receivedMessages.length).toBe(2);
+      expect(receivedMessages[0].id).toBe('1');
+      expect(receivedMessages[1].id).toBe('2');
     });
 
     it('does not execute the handlers for the start subscription notification', async () => {
@@ -214,9 +214,9 @@ describe('uiNotifications', () => {
     });
 
     it('can handle subscription and regular notifications in same response', async () => {
-      let receivedMsgs = [];
+      let receivedMessages = [];
       uiNotifications.subscribe('aaa', event => {
-        receivedMsgs.push(event.message);
+        receivedMessages.push(event.message);
       });
 
       let response: UiNotificationResponse = {
@@ -251,7 +251,7 @@ describe('uiNotifications', () => {
 
       await sleep(1);
 
-      expect(receivedMsgs).toEqual([{
+      expect(receivedMessages).toEqual([{
         a: '1'
       }, {
         a: '2'
@@ -334,7 +334,6 @@ describe('uiNotifications', () => {
       let poller = pollers().get('main');
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
-      uiNotifications.registerSystem('sys2', '/api2/ui-notifications');
       uiNotifications.subscribe('bbb', () => undefined, 'sys2');
       expect(pollers().size).toBe(2);
 
@@ -346,13 +345,9 @@ describe('uiNotifications', () => {
       expect(pollers().size).toBe(2); // Still 2
     });
 
-    it('throws an exception if a system is not registered', () => {
+    it('automatically registers system on subscribe', () => {
       expect(pollers().size).toBe(0);
-
-      expect(() => uiNotifications.subscribe('aaa', () => undefined, 'unknown_system')).toThrow();
-
-      uiNotifications.registerSystem('unknown_system', '/api/ui-notifications');
-      expect(() => uiNotifications.subscribe('aaa', () => undefined, 'unknown_system')).not.toThrow();
+      expect(() => uiNotifications.subscribe('aaa', () => undefined, 'unknown_system')).not.toBeFalsy();
     });
 
     it('sends the last received notifications per topic and node', async () => {
@@ -839,7 +834,6 @@ describe('uiNotifications', () => {
       let poller = pollers().get('main');
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
-      uiNotifications.registerSystem('sys2', '/api2/ui-notifications');
       uiNotifications.subscribe('bbb', () => undefined, 'sys2');
       let poller2 = pollers().get('sys2');
       expect(poller2.status).toBe(BackgroundJobPollingStatus.RUNNING);

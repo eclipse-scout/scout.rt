@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CodeType, ModelOf, ObjectOrModel, texts} from '../index';
+import {arrays, CodeType, ModelOf, ObjectOrModel, systems, texts} from '../index';
 import $ from 'jquery';
 
 export const codes = {
@@ -27,6 +27,14 @@ export const codes = {
   bootstrap(url: string): JQuery.Promise<any> {
     let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise({});
     return promise.then(codes._preInit.bind(this, url));
+  },
+
+  /**
+   * load codes from the main system
+   */
+  bootstrapSystem(): JQuery.Promise<void> {
+    const url = systems.getOrCreate().getEndpointUrl('codes', 'codes');
+    return codes.bootstrap(url);
   },
 
   /** @internal */
