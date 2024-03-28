@@ -906,8 +906,8 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       return strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex].z));
     } else if (config.type === Chart.Type.SCATTER) {
       return {
-        x: strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex].x)),
-        y: strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex].y))
+        x: strings.encode(this._formatXLabel(dataset.data[tooltipItem.dataIndex].x)),
+        y: strings.encode(this._formatYLabel(dataset.data[tooltipItem.dataIndex].y))
       };
     }
     return strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex]));
@@ -1622,7 +1622,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     if (config.type === Chart.Type.BUBBLE) {
       return this._formatLabel((value as BubbleDataPoint).z);
     } else if (config.type === Chart.Type.SCATTER) {
-      return strings.join(' / ', this._formatLabel((value as ScatterDataPoint).x), this._formatLabel((value as ScatterDataPoint).y));
+      return strings.join(' / ', this._formatXLabel((value as ScatterDataPoint).x), this._formatYLabel((value as ScatterDataPoint).y));
     }
     return this._formatLabel(value as number);
   }
