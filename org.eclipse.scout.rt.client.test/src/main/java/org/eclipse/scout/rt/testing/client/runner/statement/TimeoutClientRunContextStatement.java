@@ -1,27 +1,22 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2023 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.testing.client.runner.statement;
 
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
-import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.testing.platform.runner.statement.AbstractTimeoutRunContextStatement;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
-import org.junit.runners.model.TestTimedOutException;
 
 /**
  * Statement for executing tests with a timeout (i.e. the annotated test method is expected to complete within the
@@ -31,35 +26,14 @@ import org.junit.runners.model.TestTimedOutException;
  * @see Test#timeout()
  * @since 5.1
  */
-public class TimeoutClientRunContextStatement extends Statement {
-
-  protected final Statement m_next;
-  private final long m_timeoutMillis;
+public class TimeoutClientRunContextStatement extends AbstractTimeoutRunContextStatement {
 
   public TimeoutClientRunContextStatement(final Statement next, final long timeoutMillis) {
-    m_timeoutMillis = timeoutMillis;
-    m_next = Assertions.assertNotNull(next, "next statement must not be null");
+    super(next, timeoutMillis);
   }
 
   @Override
-  public void evaluate() throws Throwable {
-    final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
-
-    final IFuture<Void> future = ModelJobs.schedule(invoker, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Running test with support for JUnit timeout"));
-
-    try {
-      if (m_timeoutMillis <= 0) {
-        future.awaitDone();
-      }
-      else {
-        future.awaitDone(m_timeoutMillis, TimeUnit.MILLISECONDS);
-      }
-    }
-    catch (ThreadInterruptedError | TimedOutError e) { // NOSONAR
-      future.cancel(true);
-      throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS); // JUnit timeout exception
-    }
-
-    invoker.throwOnError();
+  protected IFuture<Void> createFuture(IRunnable runnable) {
+    return ModelJobs.schedule(runnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Running test with support for JUnit timeout"));
   }
 }
