@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.ComputeParentTablePageMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
@@ -27,8 +26,9 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends AbstractTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {
+public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends AbstractExtension<OWNER> implements IPageExtension<OWNER> {
 
   public AbstractPageExtension(OWNER owner) {
     super(owner);

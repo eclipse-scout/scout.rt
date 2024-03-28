@@ -16,17 +16,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDecorateCellChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeInitTreeNodeChain;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -37,16 +32,10 @@ import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
-import org.eclipse.scout.rt.shared.extension.AbstractExtension;
-import org.eclipse.scout.rt.shared.extension.ContributionComposite;
-import org.eclipse.scout.rt.shared.extension.IContributionOwner;
-import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
-import org.eclipse.scout.rt.shared.extension.IExtension;
-import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, IContributionOwner, IExtensibleObject {
+public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
 
   private static final String INITIALIZED = "INITIALIZED";
   private static final String DISPOSING = "DISPOSING";
@@ -72,13 +61,10 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private ITreeNode m_parentNode;
   private ITreeNode m_oldParentNode;
 
-  private final Object m_childNodeListLock;
-  private final Object m_filteredChildNodesLock;
   private final OptimisticLock m_childrenLoadedLock;
   private final Cell m_cell;
-
   private List<ITreeNode> m_childNodeList;
-  private volatile List<ITreeNode> m_filteredChildNodes;
+  private List<ITreeNode> m_filteredChildNodes;
   private int m_status;
   private List<IMenu> m_menus;
   private int m_childNodeIndex;
@@ -112,24 +98,16 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    */
   private byte m_flags;
 
-  protected IContributionOwner m_contributionHolder;
-
-  private final ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>> m_objectExtensions;
-
   public AbstractTreeNode() {
     this(true);
   }
 
   public AbstractTreeNode(boolean callInitializer) {
     setFilterAccepted(true);
-    m_childNodeListLock = new Object();
-    m_childNodeList = new ArrayList<>();
-    m_filteredChildNodesLock = new Object();
     m_childrenLoadedLock = new OptimisticLock();
     m_cell = new Cell(this);
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
-    m_objectExtensions = new ObjectExtensions<>(this, this instanceof AbstractPage<?>);
     if (callInitializer) {
       callInitializer();
     }
@@ -137,7 +115,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   protected void callInitializer() {
     if (!isInitialized()) {
-      interceptInitConfig();
       initTreeNode();
       m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
     }
@@ -145,26 +122,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   protected boolean isInitialized() {
     return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
-  }
-
-  @Override
-  public final List<Object> getAllContributions() {
-    return m_contributionHolder.getAllContributions();
-  }
-
-  @Override
-  public final <T> List<T> getContributionsByClass(Class<T> type) {
-    return m_contributionHolder.getContributionsByClass(type);
-  }
-
-  @Override
-  public final <T> T getContribution(Class<T> contribution) {
-    return m_contributionHolder.getContribution(contribution);
-  }
-
-  @Override
-  public final <T> T optContribution(Class<T> contribution) {
-    return m_contributionHolder.optContribution(contribution);
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -223,10 +180,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
-  protected final void interceptInitConfig() {
-    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
-  }
-
   protected void initConfig() {
     setLeafInternal(getConfiguredLeaf());
     setEnabled(getConfiguredEnabled(), IDimensions.ENABLED);
@@ -234,31 +187,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
     setExpandedLazyInternal(isLazyExpandingEnabled());
     setInitialExpanded(getConfiguredExpanded());
-    m_contributionHolder = new ContributionComposite(this);
     // menus are lazy
-  }
-
-  @Override
-  public final List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> getAllExtensions() {
-    return m_objectExtensions.getAllExtensions();
-  }
-
-  protected ITreeNodeExtension<? extends AbstractTreeNode> createLocalExtension() {
-    return new LocalTreeNodeExtension<>(this);
-  }
-
-  @Override
-  public <T extends IExtension<?>> T getExtension(Class<T> c) {
-    return m_objectExtensions.getExtension(c);
-  }
-
-  /**
-   * Executes the given runnable in the extension context, in which this tree node object was created.
-   *
-   * @see ObjectExtensions#runInExtensionContext(Runnable)
-   */
-  protected void runInExtensionContext(Runnable runnable) {
-    m_objectExtensions.runInExtensionContext(runnable);
   }
 
   /**
@@ -282,7 +211,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       for (ITreeNode childNode : getChildNodes()) {
         childNode.initTreeNode();
       }
-      interceptInitTreeNode();
+      execInitTreeNode();
     }
     finally {
       setInitializing(false);
@@ -388,9 +317,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public void resetFilterCache() {
-    synchronized (m_filteredChildNodesLock) {
-      m_filteredChildNodes = null;
-    }
+    m_filteredChildNodes = null;
   }
 
   @Override
@@ -415,12 +342,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public final void decorateCell() {
-    try {
-      interceptDecorateCell(m_cell);
-    }
-    catch (Exception t) {
-      LOG.error("node {} {}", getClass(), getCell().getText(), t);
-    }
+    execDecorateCell(m_cell);
   }
 
   @Override
@@ -700,8 +622,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   protected List<IMenu> lazyCreateAndInitializeMenus() {
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-
     OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
@@ -714,7 +634,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     catch (Exception e) {
       LOG.error("Error occurred while dynamically contributing menus.", e);
     }
-    menus.addAllOrdered(contributedMenus);
     new MoveActionNodesHandler<>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();
 
@@ -802,6 +721,9 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public int getChildNodeCount() {
+    if (m_childNodeList == null) {
+      return 0;
+    }
     return m_childNodeList.size();
   }
 
@@ -817,20 +739,15 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public List<ITreeNode> getFilteredChildNodes() {
-    if (m_filteredChildNodes == null) {
-      synchronized (m_filteredChildNodesLock) {
-        if (m_filteredChildNodes == null) {
-          synchronized (m_childNodeListLock) {
-            List<ITreeNode> list = new ArrayList<>(m_childNodeList.size());
-            for (ITreeNode node : m_childNodeList) {
-              if (node.isFilterAccepted()) {
-                list.add(node);
-              }
-            }
-            m_filteredChildNodes = list;
-          }
+    if (m_childNodeList != null && m_filteredChildNodes == null) {
+      ArrayList<ITreeNode> list = new ArrayList<>(m_childNodeList.size());
+      for (ITreeNode node : m_childNodeList) {
+        if (node.isFilterAccepted()) {
+          list.add(node);
         }
       }
+      list.trimToSize();
+      m_filteredChildNodes = list;
     }
     return CollectionUtility.arrayList(m_filteredChildNodes);
   }
@@ -848,34 +765,29 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public ITreeNode getChildNode(int childIndex) {
-    synchronized (m_childNodeListLock) {
-      if (childIndex >= 0 && childIndex < m_childNodeList.size()) {
-        return m_childNodeList.get(childIndex);
-      }
-      else {
-        return null;
-      }
+    if (m_childNodeList != null && childIndex >= 0 && childIndex < m_childNodeList.size()) {
+      return m_childNodeList.get(childIndex);
     }
+    return null;
   }
 
   @Override
   public List<ITreeNode> getChildNodes() {
-    synchronized (m_childNodeListLock) {
-      return CollectionUtility.arrayList(m_childNodeList);
-    }
+    return CollectionUtility.arrayList(m_childNodeList);
   }
 
   @Override
   public void collectChildNodes(Set<ITreeNode> collector, boolean recursive) {
-    synchronized (m_childNodeListLock) {
-      for (ITreeNode node : m_childNodeList) {
-        if (node == null) {
-          continue;
-        }
-        collector.add(node);
-        if (recursive) {
-          node.collectChildNodes(collector, recursive);
-        }
+    if (m_childNodeList == null) {
+      return;
+    }
+    for (ITreeNode node : m_childNodeList) {
+      if (node == null) {
+        continue;
+      }
+      collector.add(node);
+      if (recursive) {
+        node.collectChildNodes(collector, recursive);
       }
     }
   }
@@ -896,16 +808,14 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    * do not use this internal method
    */
   public final void setChildNodeOrderInternal(List<ITreeNode> nodes) {
-    synchronized (m_childNodeListLock) {
-      List<ITreeNode> newList = new ArrayList<>(m_childNodeList.size());
-      int index = 0;
-      for (ITreeNode n : nodes) {
-        n.setChildNodeIndexInternal(index);
-        newList.add(n);
-        index++;
-      }
-      m_childNodeList = newList;
+    List<ITreeNode> newList = new ArrayList<>(nodes.size());
+    int index = 0;
+    for (ITreeNode n : nodes) {
+      n.setChildNodeIndexInternal(index);
+      newList.add(n);
+      index++;
     }
+    m_childNodeList = newList;
     resetFilterCache();
   }
 
@@ -917,13 +827,14 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       node.setTreeInternal(m_tree, true);
       node.setParentNodeInternal(this);
     }
+    if (m_childNodeList == null) {
+      m_childNodeList = new ArrayList<>(startIndex + nodes.size());
+    }
 
-    synchronized (m_childNodeListLock) {
-      m_childNodeList.addAll(startIndex, nodes);
-      int endIndex = m_childNodeList.size() - 1;
-      for (int i = startIndex; i <= endIndex; i++) {
-        m_childNodeList.get(i).setChildNodeIndexInternal(i);
-      }
+    m_childNodeList.addAll(startIndex, nodes);
+    int endIndex = m_childNodeList.size() - 1;
+    for (int i = startIndex; i <= endIndex; i++) {
+      m_childNodeList.get(i).setChildNodeIndexInternal(i);
     }
     // traverse subtree for add / remove notify
     for (ITreeNode node : nodes) {
@@ -936,46 +847,27 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    * do not use this internal method
    */
   public final void removeChildNodesInternal(Collection<? extends ITreeNode> nodes, boolean includeSubtree, boolean disposeNodes) {
-    List<ITreeNode> removedNodes = new ArrayList<>();
-    synchronized (m_childNodeListLock) {
-      for (ITreeNode node : nodes) {
-        if (m_childNodeList.remove(node)) {
-          removedNodes.add(node);
-        }
-        node.setTreeInternal(null, true);
-        node.setParentNodeInternal(null);
-      }
-      int startIndex = 0;
-      int endIndex = m_childNodeList.size() - 1;
-      for (int i = startIndex; i <= endIndex; i++) {
-        m_childNodeList.get(i).setChildNodeIndexInternal(i);
-      }
+    if (m_childNodeList == null) {
+      return;
     }
+    List<ITreeNode> removedNodes = new ArrayList<>(nodes.size());
+    for (ITreeNode node : nodes) {
+      if (m_childNodeList.remove(node)) {
+        removedNodes.add(node);
+      }
+      node.setTreeInternal(null, true);
+      node.setParentNodeInternal(null);
+    }
+    int startIndex = 0;
+    int endIndex = m_childNodeList.size() - 1;
+    for (int i = startIndex; i <= endIndex; i++) {
+      m_childNodeList.get(i).setChildNodeIndexInternal(i);
+    }
+
     // inform nodes of remove
     for (ITreeNode removedNode : removedNodes) {
       postProcessRemoveRec(removedNode, getTree(), includeSubtree, disposeNodes);
     }
-    resetFilterCache();
-  }
-
-  /**
-   * do not use this internal method
-   */
-  public final void replaceChildNodeInternal(int index, ITreeNode newNode) {
-    ITreeNode oldNode;
-    synchronized (m_childNodeListLock) {
-      //remove old
-      oldNode = m_childNodeList.get(index);
-      oldNode.setTreeInternal(null, true);
-      oldNode.setParentNodeInternal(null);
-      //add new
-      m_childNodeList.set(index, newNode);
-      newNode.setTreeInternal(m_tree, true);
-      newNode.setParentNodeInternal(this);
-      m_childNodeList.get(index).setChildNodeIndexInternal(index);
-    }
-    postProcessRemoveRec(oldNode, m_tree, true, true);
-    postProcessAddRec(newNode, true);
     resetFilterCache();
   }
 
@@ -1077,11 +969,9 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     if (m_tree != null && isExpanded()) {
       m_tree.setNodeExpandedInternal(this, true, isLazyExpandingEnabled());
     }
-    if (includeSubtree) {
-      synchronized (m_childNodeListLock) {
-        for (ITreeNode aM_childNodeList : m_childNodeList) {
-          (aM_childNodeList).setTreeInternal(tree, includeSubtree);
-        }
+    if (includeSubtree && m_childNodeList != null) {
+      for (ITreeNode aM_childNodeList : m_childNodeList) {
+        (aM_childNodeList).setTreeInternal(tree, includeSubtree);
       }
     }
   }
@@ -1115,66 +1005,29 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     return value;
   }
 
-  /**
-   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
-   * any further chain elements.
-   */
-  protected static class LocalTreeNodeExtension<OWNER extends AbstractTreeNode> extends AbstractExtension<OWNER> implements ITreeNodeExtension<OWNER> {
-
-    public LocalTreeNodeExtension(OWNER owner) {
-      super(owner);
-    }
-
-    @Override
-    public void execDecorateCell(TreeNodeDecorateCellChain chain, Cell cell) {
-      getOwner().execDecorateCell(cell);
-    }
-
-    @Override
-    public void execInitTreeNode(TreeNodeInitTreeNodeChain chain) {
-      getOwner().execInitTreeNode();
-    }
-
-    @Override
-    public void execDispose(TreeNodeDisposeChain chain) {
-      getOwner().execDispose();
-    }
+  private void setDisposing(boolean disposing) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(DISPOSING, disposing, m_flags);
   }
 
-  protected final void interceptDecorateCell(Cell cell) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    TreeNodeDecorateCellChain chain = new TreeNodeDecorateCellChain(extensions);
-    chain.execDecorateCell(cell);
-  }
-
-  protected final void interceptInitTreeNode() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    TreeNodeInitTreeNodeChain chain = new TreeNodeInitTreeNodeChain(extensions);
-    chain.execInitTreeNode();
-  }
-
-  protected final void interceptDispose() {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    TreeNodeDisposeChain chain = new TreeNodeDisposeChain(extensions);
-    chain.execDispose();
+  @Override
+  public boolean isDisposing() {
+    return FLAGS_BIT_HELPER.isBitSet(DISPOSING, m_flags);
   }
 
   @Override
   public final void dispose() {
     setDisposing(true);
     try {
-      try {
-        disposeInternal();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing node.", e);
-      }
-      try {
-        interceptDispose();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing node.", e);
-      }
+      disposeInternal();
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Exception while disposing node.", e);
+    }
+    try {
+      execDispose();
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Exception while disposing node.", e);
     }
     finally {
       setDisposing(false);
@@ -1195,14 +1048,5 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
         m.dispose();
       }
     }
-  }
-
-  private void setDisposing(boolean disposing) {
-    m_flags = FLAGS_BIT_HELPER.changeBit(DISPOSING, disposing, m_flags);
-  }
-
-  @Override
-  public boolean isDisposing() {
-    return FLAGS_BIT_HELPER.isBitSet(DISPOSING, m_flags);
   }
 }

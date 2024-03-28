@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithNodesChains.PageWithNodesCreateChildPagesChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.MenuWrapper;
@@ -426,7 +425,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   protected final void interceptCreateChildPages(List<IPage<?>> pageList) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
     PageWithNodesCreateChildPagesChain chain = new PageWithNodesCreateChildPagesChain(extensions);
     chain.execCreateChildPages(pageList);
   }
@@ -447,5 +446,4 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   protected IPageWithNodesExtension<? extends AbstractPageWithNodes> createLocalExtension() {
     return new LocalPageWithNodesExtension<>(this);
   }
-
 }

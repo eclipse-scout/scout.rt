@@ -26,5 +26,4 @@ public class PageWithTableExtension extends AbstractPageWithTableExtension<ITabl
     super.execInitSearchForm(chain);
     BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().notifyPageSearchFormInit(getOwner());
   }
-
 }
