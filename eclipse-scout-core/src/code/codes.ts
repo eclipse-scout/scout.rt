@@ -7,48 +7,34 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CodeType, ModelOf, ObjectOrModel, texts} from '../index';
-import $ from 'jquery';
+import {CodeType, CodeTypeCache, ObjectOrModel, scout, systems, texts} from '../index';
+
+let codeTypeCache: CodeTypeCache = null;
 
 export const codes = {
+
   /**
-   * This default language is used whenever a code registers its texts in scout.texts.
+   * This default language is used whenever a code registers its texts in {@link texts}.
    */
   defaultLanguage: 'en',
 
   /**
-   * Map of Code id to Code instance. Do not access directly. Instead, use {@link codes.get}.
+   * load codes from the main system
    */
-  registry: new Map<any, CodeType<any, any, any>>,
+  bootstrapSystem(): JQuery.Promise<void> {
+    const url = systems.getOrCreate().getEndpointUrl('codes', 'codes');
+    return codes.bootstrap(url);
+  },
 
   /**
    * Initialize the code type map with the result of the given REST url.
    */
   bootstrap(url: string): JQuery.Promise<any> {
-    let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise({});
-    return promise.then(codes._preInit.bind(this, url));
-  },
-
-  /** @internal */
-  _preInit(url: string, data: any) {
-    if (!data) {
-      return;
+    if (!url) {
+      // no need to create the codetype cache
+      return $.resolvedPromise();
     }
-    if (data.error) {
-      // The result may contain a json error (e.g. session timeout) -> abort processing
-      throw {
-        error: data.error,
-        url: url
-      };
-    }
-    codes.init(data);
-  },
-
-  /**
-   * Adds all given CodeType models to the registry. The registry is not cleaned but existing entries with the same ids are overwritten.
-   */
-  init(data?: ModelOf<CodeType<any, any, any>>[]) {
-    codes.add(data);
+    return codes.getCodeTypeCache().bootstrap(url);
   },
 
   /**
@@ -56,15 +42,7 @@ export const codes = {
    * @returns The registered CodeType instances.
    */
   add(codeTypes: ObjectOrModel<CodeType<any, any, any>> | ObjectOrModel<CodeType<any, any, any>>[]): CodeType<any, any, any>[] {
-    let registeredCodeTypes = [];
-    arrays.ensure(codeTypes).forEach(codeTypeOrModel => {
-      let codeType = CodeType.ensure(codeTypeOrModel);
-      if (codeType && codeType.id) {
-        codes.registry.set(codeType.id, codeType);
-        registeredCodeTypes.push(codeType);
-      }
-    });
-    return registeredCodeTypes;
+    return codes.getCodeTypeCache().add(codeTypes);
   },
 
   /**
@@ -73,9 +51,7 @@ export const codes = {
    * @param codeTypes code types or code type ids to remove.
    */
   remove(codeTypes: string | CodeType<any, any, any> | (string | CodeType<any, any, any>)[]) {
-    arrays.ensure(codeTypes)
-      .map(codeTypeOrId => typeof codeTypeOrId === 'string' ? codeTypeOrId : codeTypeOrId.id)
-      .forEach(id => codes.registry.delete(id));
+    codes.getCodeTypeCache().remove(codeTypes);
   },
 
   /**
@@ -84,16 +60,17 @@ export const codes = {
    * @returns The CodeType instance or undefined if not found.
    */
   get<T extends CodeType<any>>(codeTypeIdOrClassRef: string | (new() => T)): T {
-    if (typeof codeTypeIdOrClassRef === 'string') {
-      return codes.registry.get(codeTypeIdOrClassRef) as T;
-    }
+    return codes.getCodeTypeCache().get(codeTypeIdOrClassRef);
+  },
 
-    for (let codeType of codes.registry.values()) {
-      if (codeType instanceof codeTypeIdOrClassRef) {
-        return codeType as T;
-      }
+  /**
+   * @returns the global {@link CodeTypeCache} instance. If required, a new one is created (on first use).
+   */
+  getCodeTypeCache(): CodeTypeCache {
+    if (!codeTypeCache) {
+      codeTypeCache = scout.create(CodeTypeCache);
     }
-    return undefined; // class not found
+    return codeTypeCache;
   },
 
   /**
@@ -102,8 +79,9 @@ export const codes = {
    *
    * @param key the text key under which the given textsArg map will be registered.
    * @param textsArg an object with the languageTag as key and the translated text as value
+   * @internal
    */
-  registerTexts(key: string, textsArg: Record<string, string>) {
+  _registerTexts(key: string, textsArg: Record<string, string>) {
     // In case of changed defaultLanguage clear the 'default' entry
     texts.get('default').remove(key);
 

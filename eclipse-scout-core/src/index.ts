@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -137,7 +137,12 @@ export * from './code/CodeModel';
 export * from './code/CodeType';
 export * from './code/CodeTypeModel';
 export * from './code/codes';
+export * from './code/CodeTypeCache';
+export * from './code/CodeTypeCacheEventMap';
 export * from './code/CodeLookupCall';
+export * from './config/config';
+export * from './config/ConfigPropertyCache';
+export * from './config/ConfigProperties';
 export * from './dataobject/DoEntity';
 export * from './dataobject/ValueDo';
 export * from './security/access';
@@ -1087,6 +1092,8 @@ export * from './form/fields/breadcrumbbarfield/BreadcrumbBarField';
 export * from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldModel';
 export * from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldEventMap';
 export * from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldAdapter';
+export * from './system/System';
+export * from './system/systems';
 export * from './uuidpool/UuidPool';
 export * from './uuidpool/UuidPoolAdapter';
 export * from './uuidpool/UuidPoolEventMap';

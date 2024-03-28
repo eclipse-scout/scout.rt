@@ -25,7 +25,7 @@ export const texts = {
     let promises = [];
     let urls = arrays.ensure(url);
     urls.forEach(url => promises.push(
-      $.ajaxJson(url).then(texts._preInit.bind(this, url)))
+      $.ajaxJson(url).then(texts._handleBootstrapResponse.bind(this, url)))
     );
     return $.promiseAll(promises);
   },
@@ -36,7 +36,7 @@ export const texts = {
   },
 
   /** @internal */
-  _preInit(url: string | string[], data: any) {
+  _handleBootstrapResponse(url: string | string[], data: any) {
     if (data && data.error) {
       // The result may contain a json error (e.g. session timeout) -> abort processing
       throw {

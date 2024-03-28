@@ -9,8 +9,8 @@
  */
 
 import {
-  access, AppEventMap, aria, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session,
-  SessionModel, texts, webstorage, Widget
+  access, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, ErrorInfo, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory,
+  objects, scout, Session, SessionModel, texts, webstorage, Widget
 } from './index';
 import $ from 'jquery';
 
@@ -61,6 +61,10 @@ export interface AppBootstrapOptions {
    * @see PermissionCollectionModel
    */
   permissionsUrl?: string;
+  /**
+   * URL pointing to a resource providing config properties that will be available through {@link config}.
+   */
+  configUrl?: string | string[];
   /**
    * Custom functions that needs to be executed while bootstrapping.
    * All custom and default bootrappers need to finish successfully before the app will proceed with the initialization.
@@ -186,8 +190,10 @@ export class App extends EventEmitter {
    */
   protected _bootstrap(options: AppBootstrapOptions): JQuery.Promise<any> {
     options = options || {};
+    options.bootstrappers = options.bootstrappers || [];
     this.bootstrappers = [
       ...this._defaultBootstrappers(options),
+      ...options.bootstrappers,
       ...this.bootstrappers,
       ...bootstrappers
     ].filter(bootstrapper => !!bootstrapper);
@@ -204,7 +210,8 @@ export class App extends EventEmitter {
       locales.bootstrap.bind(locales, options.localesUrl),
       texts.bootstrap.bind(texts, options.textsUrl),
       codes.bootstrap.bind(codes, options.codesUrl),
-      access.bootstrap.bind(access, options.permissionsUrl)
+      access.bootstrap.bind(access, options.permissionsUrl),
+      config.bootstrap.bind(config, options.configUrl)
     ];
   }
 
@@ -385,10 +392,7 @@ export class App extends EventEmitter {
   }
 
   protected _initVersion(options: AppModel) {
-    this.version = scout.nvl(
-      this.version,
-      options.version,
-      $('scout-version').data('value'));
+    this.version = scout.nvl(this.version, options.version, config.get('scout.application.version'));
   }
 
   protected _prepareDOM() {
@@ -551,7 +555,7 @@ export class App extends EventEmitter {
     if (this.sessions.length === 0) {
       promises.push(this.errorHandler.handle(error, ...args)
         .then(errorInfo => {
-          this._appendStartupError($('body'), errorInfo.message);
+          this._appendStartupError($('body'), errorInfo);
         }));
     } else {
       // Session.js may already display a fatal message box
@@ -573,9 +577,13 @@ export class App extends EventEmitter {
     return $.promiseAll(promises).then(errorInfo => $.rejectedPromise(error, ...args));
   }
 
-  protected _appendStartupError($parent: JQuery, message: string) {
+  protected _appendStartupError($parent: JQuery, errorInfo: ErrorInfo) {
     let $error = $parent.appendDiv('startup-error');
     $error.appendDiv('startup-error-title').text('The application could not be started');
+    let message = errorInfo.message;
+    if (errorInfo?.httpStatus) {
+      message = this.errorHandler.getMessageBodyForHttpStatus(errorInfo?.httpStatus);
+    }
     if (message) {
       $error.appendDiv('startup-error-message').text(message);
     }

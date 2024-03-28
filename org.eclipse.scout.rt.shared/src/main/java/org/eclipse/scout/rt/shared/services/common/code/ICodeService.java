@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.service.IService;
 
 public interface ICodeService extends IService {
@@ -59,6 +61,28 @@ public interface ICodeService extends IService {
    * Invalidates the given list of code types without reloading them immediately.
    */
   void invalidateCodeTypes(List<Class<? extends ICodeType<?, ?>>> types);
+
+  /**
+   * Adds a new listener to be notified when code cache entries are invalidated. The listener is fired after the entries
+   * have already been removed. To find invalidated CodeTypes apply the filter to all CodeTypes (using
+   * {@link CodeTypeCacheUtility#createCacheKey(Class)}). Please note that this will load the CodeType again which might
+   * not be desired after invalidation!
+   *
+   * @param listener
+   *          The listener to add. All entries in the cache which accept the given {@link ICacheEntryFilter} have been
+   *          invalidated.
+   */
+  void addInvalidationListener(Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> listener);
+
+  /**
+   * Removes the given listener.
+   */
+  void removeInvalidationListener(Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> listener);
+
+  /**
+   * @return All registered invalidation listeners.
+   */
+  List<Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>>> getInvalidationListeners();
 
   /**
    * @return all code type classes

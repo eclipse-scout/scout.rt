@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,21 +14,28 @@ import java.security.PermissionCollection;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.annotation.PostConstruct;
 import javax.security.auth.Subject;
 
+import jakarta.annotation.PostConstruct;
+
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.cache.AbstractCacheWrapper;
 import org.eclipse.scout.rt.platform.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.util.event.FastListenerList;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * Common logic for an {@link IAccessControlService} implementation. An Implementation has to override
@@ -49,9 +56,9 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 public abstract class AbstractAccessControlService<K> implements IAccessControlService {
   public static final String ACCESS_CONTROL_SERVICE_CACHE_ID = AbstractAccessControlService.class.getName();
 
-  // never null
   private volatile Pattern[] m_userIdSearchPatterns;
   private volatile ICache<K, IPermissionCollection> m_cache;
+  private volatile IFastListenerList<Consumer<IAccessControlService>> m_invalidationListeners;
 
   public AbstractAccessControlService() {
     m_userIdSearchPatterns = new Pattern[]{
@@ -65,6 +72,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
    */
   @PostConstruct
   protected void initCache() {
+    m_invalidationListeners = new FastListenerList<>();
     m_cache = createCacheBuilder().build();
   }
 
@@ -112,7 +120,41 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
         .withClusterEnabled(true)
         .withTransactional(true)
         .withTransactionalFastForward(true)
+        .withAdditionalCustomWrapper(InvalidationListenerWrapper.class)
         .withTimeToLive(1L, TimeUnit.HOURS, false);
+  }
+
+  protected static class InvalidationListenerWrapper extends AbstractCacheWrapper<Object, IPermissionCollection> {
+
+    public InvalidationListenerWrapper(ICache<Object, IPermissionCollection> delegate) {
+      super(delegate);
+    }
+
+    @Override
+    public void invalidate(ICacheEntryFilter<Object, IPermissionCollection> filter, boolean propagate) {
+      super.invalidate(filter, propagate);
+      var accessControlService = BEANS.get(IAccessControlService.class);
+      accessControlService.getInvalidationListeners().forEach(l -> l.accept(accessControlService));
+    }
+  }
+
+  @Override
+  public void addInvalidationListener(Consumer<IAccessControlService> listener) {
+    if (listener != null) {
+      m_invalidationListeners.add(listener);
+    }
+  }
+
+  @Override
+  public void removeInvalidationListener(Consumer<IAccessControlService> listener) {
+    if (listener != null) {
+      m_invalidationListeners.remove(listener);
+    }
+  }
+
+  @Override
+  public List<Consumer<IAccessControlService>> getInvalidationListeners() {
+    return m_invalidationListeners.list();
   }
 
   protected ICacheValueResolver<K, IPermissionCollection> createCacheValueResolver() {

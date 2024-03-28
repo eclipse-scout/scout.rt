@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, App, arrays, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status, StatusSeverity, strings
+  AjaxError, App, arrays, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status, StatusSeverity, strings, texts
 } from './index';
 import $ from 'jquery';
 import * as sourcemappedStacktrace from 'sourcemapped-stacktrace';
@@ -608,27 +608,34 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     if (errorInfo.message) {
       return errorInfo.message;
     }
-    return this._getMessageBodyForHttpStatus(session, errorInfo);
+    return this.getMessageBodyForHttpStatus(errorInfo?.httpStatus, session);
   }
 
-  protected _getMessageBodyForHttpStatus(session: Session, errorInfo: ErrorInfo): string {
+  /**
+   * Gets the default error message body for the given HTTP status error code.
+   * @param httpStatus The HTTP status error code. E.g. 503 (Service Unavailable)
+   * @param session An optional Session for a message in the language of the user. The default language is used if omitted.
+   * @returns The error message for the given error HTTP status.
+   */
+  getMessageBodyForHttpStatus(httpStatus: number, session?: Session): string {
     let body: string;
-    switch (errorInfo.httpStatus) {
+    let textMap = session ? session.textMap : texts.get('default');
+    switch (httpStatus) {
       case 404: // Not Found
-        body = session.optText('TheRequestedResourceCouldNotBeFound', 'The requested resource could not be found.');
+        body = textMap.optGet('TheRequestedResourceCouldNotBeFound', 'The requested resource could not be found.');
         break;
       case 502: // Bad Gateway
       case 503: // Service Unavailable
       case 504: // Gateway Timeout
-        body = session.optText('NetSystemsNotAvailable', 'The system is partially unavailable at the moment.')
+        body = textMap.optGet('NetSystemsNotAvailable', 'The system is partially unavailable at the moment.')
           + '\n\n'
-          + session.optText('PleaseTryAgainLater', 'Please try again later.');
+          + textMap.optGet('PleaseTryAgainLater', 'Please try again later.');
         break;
       case 403: // Forbidden
-        body = session.optText('YouAreNotAuthorizedToPerformThisAction', 'You are not authorized to perform this action.');
+        body = textMap.optGet('YouAreNotAuthorizedToPerformThisAction', 'You are not authorized to perform this action.');
         break;
       default:
-        body = session.optText('ui.UnexpectedProblem', 'Unexpected problem');
+        body = textMap.optGet('ui.UnexpectedProblem', 'Unexpected problem');
     }
     return body;
   }

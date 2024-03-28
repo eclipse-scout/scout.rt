@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,12 +20,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.text.ITextProviderService;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.shared.ui.webresource.AbstractWebResourceResolver;
@@ -90,13 +85,7 @@ public class HtmlDocumentParserTest {
   @Test
   public void testHtmlDocumentParser_01() throws IOException {
     HtmlDocumentParser parser = newParser(null);
-    IBean<TestApplicationVersionProperty> bean = BEANS.getBeanManager().registerBean(new BeanMetaData(TestApplicationVersionProperty.class).withReplace(true));
-    try {
-      testParser(parser, "test01_input.html", "test01_output.html");
-    }
-    finally {
-      BEANS.getBeanManager().unregisterBean(bean);
-    }
+    testParser(parser, "test01_input.html", "test01_output.html");
   }
 
   @Test
@@ -138,16 +127,6 @@ public class HtmlDocumentParserTest {
     @Override
     public Map<String, String> getTextMap(Locale locale) {
       return new HashMap<>();
-    }
-  }
-
-  @IgnoreBean
-  @Replace
-  public static class TestApplicationVersionProperty extends ApplicationVersionProperty {
-
-    @Override
-    public synchronized String getValue(String namespace) {
-      return "1.2.3.unit_test";
     }
   }
 }

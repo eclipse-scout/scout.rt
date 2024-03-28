@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,7 +24,7 @@ export class PropertyEventEmitter extends EventEmitter {
 
   constructor() {
     super();
-    this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => event.propertyName === propertyName);
+    this.events.registerSubTypePredicate('propertyChange', (event: PropertyChangeEvent, propertyName) => event.propertyName === propertyName);
     this.propertyDecorations = {
       computed: new Set<string>()
     };
@@ -319,7 +319,7 @@ export class PropertyEventEmitter extends EventEmitter {
    * If the value is a boolean, the default dimension is written. If it is an object, every dimension in the object is written.
    * If a dimension has an alias and the model contains a property with the name of the alias, that property has priority over the dimension passed as part of the dimensional object.
    *
-   * Afterwards, the multidimensional properties are replaced with the computed values.
+   * Afterward, the multidimensional properties are replaced with the computed values.
    */
   protected _initMultiDimensionalProperties(model: InitModelOf<this>) {
     for (const propertyName of this.multiDimensionalProperties) {

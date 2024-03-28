@@ -69,7 +69,7 @@ export class Code<TCodeId> implements ObjectWithType {
       }
       let codeTypeId = scout.nvl(this.codeType?.id, '');
       let key = '__code.' + codeTypeId + '.' + this.id;
-      codes.registerTexts(key, model.texts);
+      codes._registerTexts(key, model.texts);
       this._text = texts.buildKey(key);
     }
 

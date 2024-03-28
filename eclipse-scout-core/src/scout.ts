@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -220,7 +220,6 @@ export const scout = {
    * Currently, it does the following:
    * - Remove the <noscript> tag (obviously there is no need for it).
    * - Remove <scout-text> tags (they must have been processed before, see texts.readFromDOM())
-   * - Remove <scout-version> tag (it must have been processed before, see App._initVersion())
    * - Add a device / browser class to the body tag to allow for device specific CSS rules.
    * - Add browser locale to DOM so screen readers read text correctly (may get replaced if actual locale of user is loaded)
    * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
@@ -230,7 +229,6 @@ export const scout = {
     // Cleanup DOM
     $('noscript', targetDocument).remove();
     $('scout-text', targetDocument).remove();
-    $('scout-version', targetDocument).remove();
     $('body', targetDocument).addDeviceClass();
 
     // Set locale of the document so screen readers read text correctly
