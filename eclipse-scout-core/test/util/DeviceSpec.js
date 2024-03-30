@@ -54,12 +54,28 @@ describe('Device', () => {
   describe('isWindowsTabletMode', () => {
 
     it('returns true if system is windows and scrollbarWidth is 0', () => {
-      Device.get().scrollbarWidth = 0;
       Device.get().system = Device.System.WINDOWS;
       Device.get().systemVersion = 10.0;
-      expect(Device.get().isWindowsTabletMode()).toBe(true);
-    });
+      let origMatchMedia = window.matchMedia;
+      try {
+        // Patch native "matchMedia" function to simulate different device capabilities
+        let matches = false;
+        window.matchMedia = mediaQuery => {
+          return /** @type {MediaQueryList} */ {
+            matches: matches
+          };
+        };
+        expect(Device.get().isWindowsTabletMode()).toBe(false);
 
+        matches = true;
+        expect(Device.get().isWindowsTabletMode()).toBe(true);
+
+        Device.get().system = Device.System.UNKNOWN;
+        expect(Device.get().isWindowsTabletMode()).toBe(false);
+      } finally {
+        window.matchMedia = origMatchMedia;
+      }
+    });
   });
 
   describe('user agent parsing', () => {
