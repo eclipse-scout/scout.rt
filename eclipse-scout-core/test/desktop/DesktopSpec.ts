@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2375,7 +2375,6 @@ describe('Desktop', () => {
     });
   });
 
-
   describe('views', () => {
     let formModel = {
       objectType: Form,
@@ -2498,7 +2497,6 @@ describe('Desktop', () => {
       desktop.views[0].close();
       expect(desktop.selectedViewTabs.size).toBe(0);
     });
-
 
     it('allows to select a specific outline based view on startup', () => {
       session = sandboxSession({
