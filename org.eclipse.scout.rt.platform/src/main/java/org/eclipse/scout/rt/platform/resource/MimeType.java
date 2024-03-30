@@ -19,6 +19,10 @@ import java.util.Locale;
  * For file extension lookup based on mime type, the order of the mime types is relevant (first match returns).
  * <p>
  * This enum can be extended in {@link MimeTypes}
+ * <p>
+ * Some entries are based on the list provided by
+ * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">Common MIME
+ * types</a>.
  */
 public enum MimeType implements IMimeType {
   AA("audio/audible", "aa"),
@@ -26,7 +30,7 @@ public enum MimeType implements IMimeType {
   AMV("video/x-amv", "amv"),
   APPCACHE("text/cache-manifest", "appcache"),
   APPLICATION_OCTET_STREAM("application/octet-stream", "bin"),
-  AVI("video/avi", "avi"),
+  AVI("video/x-msvideo", "avi"),
   BMP("image/bmp", "bmp", IMimeMagic.BMP),
   CSS("text/css", "css"),
   CSV("text/csv", "csv"),
@@ -43,7 +47,7 @@ public enum MimeType implements IMimeType {
   GZ("application/gzip", "gz", IMimeMagic.GZ),
   HTML("text/html", "html"),
   HTM("text/html", "htm"),
-  ICO("image/x-icon", "ico", IMimeMagic.ICO),
+  ICO("image/x-icon", "ico", IMimeMagic.ICO), // image/vnd.microsoft.icon according to MDN common MIME types
   ICS("text/calendar", "ics"),
   IFB("text/calendar", "ifb"),
   JAR("application/java-archive", "jar", IMimeMagic.ZIP),
@@ -58,10 +62,13 @@ public enum MimeType implements IMimeType {
   JSONML("application/jsonml+json", "jsonml"),
   LOG("text/x-log", "log"),
   M2V("video/mpeg", "m2v"),
+  MID("audio/midi", "mid"),
+  MIDI("audio/midi", "midi"),
   MIME("message/rfc822", "mime"),
   MJS("text/javascript", "mjs"),
   MKV("video/x-matroska", "mkv"),
   MOV("video/quicktime", "mov"),
+  MPEG("video/mpeg", "mpeg"),
   MP3("audio/mpeg", "mp3", IMimeMagic.MP3),
   MP4("video/mp4", "mp4", IMimeMagic.MP4),
   MPG("video/mpeg", "mpg"),
@@ -88,20 +95,25 @@ public enum MimeType implements IMimeType {
   THMX("application/vnd.openxmlformats-officedocument.presentationml.presentation", "thmx", IMimeMagic.ZIP),
   TIF("image/tiff", "tif", IMimeMagic.TIF_TIFF),
   TIFF("image/tiff", "tiff", IMimeMagic.TIF_TIFF),
+  TTF("font/ttf", "ttf"),
   TXT("text/plain", "txt"),
   VCARD("text/vcard", "vcard"),
   VCF("text/x-vcard", "vcf"),
   VCS("text/x-vcalendar", "vcs"),
+  WAV("audio/wav", "wav"),
   WEBM("video/webm", "webm"),
-  WOFF("application/font-woff", "woff", IMimeMagic.WOFF),
+  WOFF("font/woff", "woff", IMimeMagic.WOFF),
+  WOFF2("font/woff2", "woff2"),
+  XHTML("application/xhtml+xml", "xhtml"),
   XLS("application/vnd.ms-excel", "xls", IMimeMagic.DOC_XLS_PPT),
   XLSB("application/vnd.ms-excel.sheet.binary.macroEnabled.12", "xlsb"),
   XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", IMimeMagic.DOCX_XLSX_PPTX),
   XLSM("application/vnd.ms-excel.sheet.macroEnabled.12", "xlsm", IMimeMagic.DOCX_XLSX_PPTX),
   XLTX("application/vnd.openxmlformats-officedocument.spreadsheetml.template", "xltx", IMimeMagic.DOCX_XLSX_PPTX),
-  XML("text/xml", "xml"),
+  XML("application/xml", "xml"),
   URI("text/x-uri", "url"),
-  ZIP("application/zip", "zip", IMimeMagic.ZIP);
+  ZIP("application/zip", "zip", IMimeMagic.ZIP),
+  _7Z("application/x-7z-compressed", "7z");
 
   private final String m_type;
   private final String m_fileExtension;
