@@ -13,8 +13,15 @@
   color: @tile-default-color;
   --tile-background-color: @tile-default-background-color;
   background-color: var(--tile-background-color);
-
   #scout.double-drop-shadow(@spread1: 1px, @color1: @dashboard-tile-border-color, @y2: 0px, @blur2: 0px);
+
+  // Adjust color of the resizable border, see Resizable.ts
+  // Always use inverted colors which are darker than regular color to make the resizable visible even if the dashboard contains mixed tiles (some inverted, some not)
+  --resizable-color: @dashboard-tile-default-inverted-selected-border-color;
+
+  &.color-alternative {
+    --resizable-color: @dashboard-tile-alternative-inverted-selected-border-color;
+  }
 
   &.inverted {
     --box-shadow-1-color: @tile-default-inverted-background-color;

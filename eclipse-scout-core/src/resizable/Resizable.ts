@@ -249,6 +249,7 @@ export class Resizable implements ResizableModel, ObjectWithType {
     if (this.useOverlay) {
       this.$resizingOverlay = $resizable.parent().appendDiv('resizing-overlay');
       this.$resizingOverlay.css('border-radius', $resizable.css('border-radius'));
+      this.$resizingOverlay.css('border-color', $resizable.css('--resizable-color'));
       graphics.setBounds(this.$resizingOverlay, initialBounds);
     }
 
