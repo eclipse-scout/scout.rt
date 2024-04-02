@@ -44,6 +44,8 @@ public interface IChartConfig extends Serializable {
 
   int DEFAULT_MAX_SEGMENTS_PIE = 5;
 
+  String LEGEND_LABELS_BOX_WIDTH = "options.plugins.legend.labels.boxWidth";
+
   String SPEEDO_CHART_GREEN_AREA_POSITION = "options.speedo.greenAreaPosition";
 
   String SALESFUNNEL_NORMALIZED = "options.salesfunnel.normalized";
