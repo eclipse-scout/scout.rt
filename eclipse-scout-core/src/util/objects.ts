@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,12 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, JsonValueMapper, Primitive, scout, strings} from '../index';
+import {arrays, JsonValueMapper, Primitive, scout} from '../index';
 import $ from 'jquery';
 
 const CONST_REGEX = /\${const:([^}]*)}/;
 
 export const objects = {
+
   /**
    * Uses Object.create(null) to create an object without a prototype. This is different to use the literal {} which links the object to Object.prototype.
    * <p>
@@ -526,143 +527,6 @@ export const objects = {
    */
   forEachArgument(args: IArguments, func: (value: any, index: number, args: any[]) => void) {
     return objects.argumentsToArray(args).forEach(func);
-  },
-
-  /**
-   * Development utility to check if overrides in JavaScript "classes" are correct.
-   *
-   * How to use:
-   *   1. Start application in development mode (non-minimized).
-   *   2. Open browser's development console
-   *   3. Type: checkFunctionOverrides().join('\n')
-   */
-  checkFunctionOverrides(): string[] {
-    let whitelist = [
-      'ModelAdapter.init',
-      'ModelAdapter._init',
-      'Calendar.init'
-    ];
-    let result1 = [
-      'Legend:',
-      '[!] Function includes super call, and parent function uses arguments',
-      ' ~  Function includes super call, but parent function does not use arguments',
-      '    Function does not include super call',
-      '',
-      'Wrong number of arguments:'
-    ];
-    let result2 = ['Different argument names:'];
-
-    for (let prop in scout) {
-      if (!scout.hasOwnProperty(prop)) {
-        continue;
-      }
-      let o = scout[prop];
-      // Only check functions that have a "parent"
-      if (typeof o === 'function' && o.parent) {
-        for (let name in o.prototype) {
-          if (!o.prototype.hasOwnProperty(name)) {
-            continue;
-          }
-          let fn = o.prototype[name];
-          // Ignore constructor, inherited properties and non-functions
-          if (name === 'constructor' || !o.prototype.hasOwnProperty(name) || typeof fn !== 'function') {
-            continue;
-          }
-          let args = getFunctionArguments(fn);
-          // Check all parents
-          let parent = o.parent;
-          while (parent) {
-            let parentFn = parent.prototype[name];
-            if (parent.prototype.hasOwnProperty(name) && typeof parentFn === 'function') {
-              let parentArgs = getFunctionArguments(parentFn);
-              // Check arguments (at least all the parent args must be present)
-              let mismatch = false;
-              for (let i = 0; i < parentArgs.length; i++) {
-                if (args.length < i || args[i] !== parentArgs[i]) {
-                  mismatch = true;
-                  break;
-                }
-              }
-              let fName = prop + '.' + name;
-              if (mismatch && whitelist.indexOf(fName) === -1) { // && args.length !== parentArgs.length) {
-                // Collect found mismatch
-                let result = fName + '(' + args.join(', ') + ') does not correctly override ' + getPrototypeOwner(parentFn) + '.' + name + '(' + parentArgs.join(', ') + ')';
-                let includesSuperCall = fn.toString().match(new RegExp('scout.' + strings.quote(prop) + '.parent.prototype.' + strings.quote(name) + '.call\\(')) !== null;
-                let parentFunctionUsesArguments = false;
-                if (includesSuperCall) {
-                  for (let j = 0; j < parentArgs.length; j++) {
-                    let m = parentFn.toString().match(new RegExp('[^.\\w]' + strings.quote(parentArgs[j]) + '[^\\w]', 'g'));
-                    if (m !== null && m.length > 1) {
-                      parentFunctionUsesArguments = true;
-                      break;
-                    }
-                  }
-                }
-                result = (includesSuperCall ? parentFunctionUsesArguments ? '[!]' : ' ~ ' : '   ') + ' ' + result;
-                if (args.length !== parentArgs.length) {
-                  result1.push(result);
-                } else {
-                  result2.push(result);
-                }
-              }
-            }
-            parent = parent.parent;
-          }
-        }
-      }
-    }
-
-    result1.push('');
-    return result1.concat(result2);
-
-    // ----- Helper functions -----
-
-    function getFunctionArguments(fn) {
-      let FN_COMMENTS = /\/\*.*?\*\/|\/\/.*$/mg; // removes comments in function declaration
-      let FN_ARGS = /^function[^(]*\((.*?)\)/m; // fetches all arguments in m[1]
-
-      if (typeof fn !== 'function') {
-        throw new Error('Argument is not a function: ' + fn);
-      }
-
-      let m = fn.toString().replace(FN_COMMENTS, '')
-        .match(FN_ARGS);
-      let args = [];
-      if (m !== null) {
-        m[1].split(',').forEach((arg, i) => {
-          arg = arg.trim();
-          if (arg.length > 0) {
-            args.push(arg);
-          }
-        });
-      }
-      return args;
-    }
-
-    function getPrototypeOwner(fx) {
-      for (let prop in scout) {
-        if (!scout.hasOwnProperty(prop)) {
-          continue;
-        }
-        let o = scout[prop];
-        if (typeof o === 'function') {
-          for (let name in o.prototype) {
-            if (!o.prototype.hasOwnProperty(name)) {
-              continue;
-            }
-            let fn = o.prototype[name];
-            // Ignore constructor, inherited properties and non-functions
-            if (name === 'constructor' || !o.prototype.hasOwnProperty(name) || typeof fn !== 'function') {
-              continue;
-            }
-            if (fn === fx) {
-              return prop;
-            }
-          }
-        }
-      }
-      return '';
-    }
   },
 
   /**
