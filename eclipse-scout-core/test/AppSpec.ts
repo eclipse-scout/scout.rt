@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, scout} from '../src/index';
+import {App, AppBootstrapOptions, Device, scout} from '../src/index';
 import {AppModel} from '../src/App';
 import {TestingApp} from '../src/testing';
 
@@ -29,9 +29,19 @@ describe('App', () => {
     $('.startup-error').remove();
   });
 
+  class SpecApp extends App {
+    override _load(options: AppModel): JQuery.Promise<any> {
+      return super._load(options);
+    }
+
+    protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
+      return [Device.get().bootstrap.bind(Device.get())];
+    }
+  }
+
   describe('initDone', () => {
     it('is executed after desktop is rendered', done => {
-      let app = new App();
+      let app = new SpecApp();
       app.init();
 
       let desktop;
@@ -46,12 +56,6 @@ describe('App', () => {
         .then(done)
         .catch(fail);
     });
-
-    class SpecApp extends App {
-      override _load(options: AppModel): JQuery.Promise<any> {
-        return super._load(options);
-      }
-    }
 
     it('waits for load to complete', done => {
       let app = new SpecApp();
@@ -98,7 +102,7 @@ describe('App', () => {
   describe('aria properties', () => {
 
     it('has lang attribute set', done => {
-      let app = new App();
+      let app = new SpecApp();
       app.init();
       app.when('init')
         .then(() => {

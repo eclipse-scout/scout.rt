@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -50,6 +50,9 @@ public class ResourceLoaders {
     }
     if (resourcePath.endsWith('/' + LegacyBrowserScriptLoader.LEGACY_BROWSERS_SCRIPT)) {
       return new LegacyBrowserScriptLoader();
+    }
+    if (resourcePath.endsWith('/' + ConfigPropertiesLoader.FILE_NAME)) {
+      return new ConfigPropertiesLoader();
     }
 
     UiThemeHelper uiThemeHelper = UiThemeHelper.get();

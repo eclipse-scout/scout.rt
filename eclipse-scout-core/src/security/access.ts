@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,13 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AccessControl, Permission, PermissionLevel, scout} from '../index';
+import {AccessControl, Permission, PermissionLevel, scout, systems} from '../index';
 import $ from 'jquery';
 
 let accessControl: AccessControl = null;
 
 export const access = {
 
+  /**
+   * Loads all permissions from the given url to a client cache.
+   * @param permissionsUrl The url to fetch the permissions from.
+   */
   bootstrap(permissionsUrl: string): JQuery.Promise<any> {
     if (!permissionsUrl) {
       return $.resolvedPromise();
@@ -22,6 +26,14 @@ export const access = {
       accessControl = scout.create(AccessControl, {permissionsUrl});
     }
     return accessControl.whenSync();
+  },
+
+  /**
+   * Loads permissions from the main system using the url configuration of that {@link System}.
+   */
+  bootstrapSystem(): JQuery.Promise<void> {
+    const url = systems.getOrCreate().getEndpointUrl('permissions', 'permissions');
+    return access.bootstrap(url);
   },
 
   tearDown() {
