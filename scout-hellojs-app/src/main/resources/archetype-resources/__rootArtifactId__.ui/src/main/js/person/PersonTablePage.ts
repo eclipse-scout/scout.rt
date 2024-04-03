@@ -45,7 +45,7 @@ export class PersonTablePage extends PageWithTable {
     let restriction = scout.create(PersonRestriction, searchFilter, {
       ensureUniqueId: false
     });
-    return PersonRepository.get().list(restriction);
+    return PersonRepository.get().list(this._withMaxRowCountContribution(restriction));
   }
 
   protected override _transformTableDataToTableRows(tableData: Person[]): ObjectOrModel<TableRowWithPerson>[] {

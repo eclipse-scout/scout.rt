@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ModelAdapter} from './ModelAdapter';
-import {SessionModel} from './SessionModel';
+import {ModelAdapter, SessionModel} from '../index';
 
 export class SessionAdapter extends ModelAdapter {
 

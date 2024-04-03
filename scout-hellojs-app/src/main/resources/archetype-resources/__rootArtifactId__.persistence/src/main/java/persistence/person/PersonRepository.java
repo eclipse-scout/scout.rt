@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.jooq.Condition;
 import org.jooq.Field;
 
 import ${package}.data.person.IPersonRepository;
@@ -40,22 +41,22 @@ public class PersonRepository extends AbstractRepository<Person, PersonRecord, P
   }
 
   @Override
-  public Stream<PersonDo> all() {
-    return getAll().map(this::recToDo);
-  }
-
-  @Override
-  public Stream<PersonDo> list(PersonRestrictionDo restrictions) {
+  public Stream<PersonDo> list(PersonRestrictionDo restrictions, int numberOfRows) {
     Person personTab = Person.PERSON.as("p");
+    Condition firstNameRestriction = StringUtility.hasText(restrictions.getFirstName())
+      ? personTab.FIRST_NAME.likeIgnoreCase('%' + restrictions.getFirstName() + '%')
+      : noCondition();
+    Condition lastNameRestriction = StringUtility.hasText(restrictions.getLastName())
+      ? personTab.LAST_NAME.likeIgnoreCase('%' + restrictions.getLastName() + '%')
+      : noCondition();
     return jooq()
-        .select()
-        .from(personTab)
-        .where(StringUtility.hasText(restrictions.getFirstName()) ? personTab.FIRST_NAME.likeIgnoreCase('%' + restrictions.getFirstName() + '%') : noCondition(),
-            StringUtility.hasText(restrictions.getLastName()) ? personTab.LAST_NAME.likeIgnoreCase('%' + restrictions.getLastName() + '%') : noCondition())
-        .limit(100)
-        .fetchStream()
-        .map(r -> r.into(personTab))
-        .map(this::recToDo);
+      .select()
+      .from(personTab)
+      .where(firstNameRestriction, lastNameRestriction)
+      .limit(numberOfRows)
+      .fetchStream()
+      .map(r -> r.into(personTab))
+      .map(this::recToDo);
   }
 
   @Override

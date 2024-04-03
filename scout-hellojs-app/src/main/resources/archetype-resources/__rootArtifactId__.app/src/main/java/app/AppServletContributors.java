@@ -54,9 +54,7 @@ public final class AppServletContributors {
   }
 
   /**
-   * JAX-RS Jersey Servlet.
-   * <p>
-   * After {@link UiServletContributor}.
+   * Register Jakarta RESTful Web Services Servlet from Jersey.
    */
   @Order(3000)
   public static class ApiServletContributor implements IServletContributor {

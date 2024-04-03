@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent, TableReloadEvent, TableRow, TableRowActionEvent,
-  TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  arrays, AutoLeafPageWithNodes, DoEntity, EventHandler, Form, FormTableControl, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent,
+  TableMaxResultsHelper, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -38,7 +38,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
     this._tableRowUpdateHandler = this._onTableRowsUpdated.bind(this);
     this._tableRowActionHandler = this._onTableRowAction.bind(this);
     this._tableRowOrderChangeHandler = this._onTableRowOrderChanged.bind(this);
-    this._tableDataLoadHandler = this.loadTableData.bind(this);
+    this._tableDataLoadHandler = (e: TableReloadEvent) => this.loadTableData(e?.reloadReason);
   }
 
   protected override _initDetailTable(table: Table) {
@@ -155,9 +155,29 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   /**
+   * Adds a {@link MaxRowCountContributionDo} to the given request.
+   * Typically, this method should be used before sending a request in {@link _loadTableData} to attach the row limit constraints (if existing).
+   * The contribution is only added if there is a row limit. Otherwise, the request remains untouched.
+   * @example
+   * protected override _loadTableData(searchFilter: MyRestrictionDo): JQuery.Promise<MyResponseDo> {
+   *   const request: MyRequestDo = {
+   *     id: '1',
+   *     ...
+   *     restriction: searchFilter
+   *   };
+   *   return ajax.postJson(url, this._withMaxRowCountContribution(request));
+   * }
+   * @param dataObject The {@link DoEntity} to which the contribution should be added.
+   * @returns the resulting request with the added contribution.
+   */
+  protected _withMaxRowCountContribution<T>(dataObject: T): T {
+    return scout.create(TableMaxResultsHelper).addMaxRowCountContribution(dataObject, this.detailTable);
+  }
+
+  /**
    * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
    */
-  loadTableData(): JQuery.Promise<any> {
+  loadTableData(reloadReason?: TableReloadReason): JQuery.Promise<any> {
     this.ensureDetailTable();
     this.detailTable.setLoading(true);
     const restoreSelectionInfo = this._getRestoreSelectionInfo();
@@ -235,8 +255,11 @@ export class PageWithTable extends Page implements PageWithTableModel {
   protected _onLoadTableDataDone(tableData: any, restoreSelectionInfo?: RestoreSelectionInfo) {
     let success = false;
     try {
-      const rows = this._transformTableDataToTableRows(tableData);
+      const rows = arrays.ensure(this._transformTableDataToTableRows(tableData));
+      const limitedResultInfoDo = this._getLimitedResultInfoDo(tableData);
+      this._readLimitedResultInfo(rows.length, limitedResultInfoDo); // apply properties from LimitedResultInfoDo to table (must be before replaceRows as this triggers the TableFooter update which already requires the new values).
       this.detailTable.replaceRows(rows);
+      this.detailTable.setLimitedResultTableStatus(!!limitedResultInfoDo?.limitedResult); // set table status after replaceRows as the new rows are required
       success = true;
     } finally {
       this._onLoadTableDataAlways(restoreSelectionInfo);
@@ -244,6 +267,23 @@ export class PageWithTable extends Page implements PageWithTableModel {
     if (success) {
       this.trigger('load');
     }
+  }
+
+  protected _readLimitedResultInfo(numRows: number, limitedResultInfoDo?: LimitedResultInfoContributionDo) {
+    if (!limitedResultInfoDo) {
+      return;
+    }
+    // update table properties. The footer is automatically updated after the new rows have been created
+    if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, limitedResultInfoDo.estimatedRowCount, limitedResultInfoDo.maxRowCount)) {
+      // only update if the next load would be a ReloadReason.OVERRIDE_ROW_LIMIT so that the new limit is used
+      this.detailTable.setMaxRowCount(limitedResultInfoDo.maxRowCount);
+    }
+    this.detailTable.setEstimatedRowCount(limitedResultInfoDo.estimatedRowCount);
+  }
+
+  protected _getLimitedResultInfoDo(tableData: any): LimitedResultInfoContributionDo {
+    return arrays.ensure(tableData?._contributions)
+      .find((contribution: DoEntity) => contribution._type === 'scout.LimitedResultInfoContribution') as LimitedResultInfoContributionDo;
   }
 
   protected _onLoadTableDataFail(error: any, restoreSelectionInfo?: RestoreSelectionInfo) {

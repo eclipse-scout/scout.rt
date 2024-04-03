@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   aria, Event, EventHandler, fields, FocusFilterFieldKeyStroke, graphics, HtmlComponent, InitModelOf, InputFieldKeyStrokeContext, MenuBarLayout, PropertyChangeEvent, scout, SomeRequired, Status, strings, Table, TableControl,
-  TableFilterAddedEvent, TableFilterRemovedEvent, TableFooterLayout, TableFooterModel, TableRowsInsertedEvent, TableRowsSelectedEvent, TableTextUserFilter, TableUserFilter, Tooltip, Widget
+  TableFilterAddedEvent, TableFilterRemovedEvent, TableFooterLayout, TableFooterModel, TableMaxResultsHelper, TableRowsInsertedEvent, TableRowsSelectedEvent, TableTextUserFilter, TableUserFilter, Tooltip, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -303,7 +303,7 @@ export class TableFooter extends Widget implements TableFooterModel {
         $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
       }
       if (this.table.hasReloadHandler) {
-        if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
+        if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows, maxRows)) {
           if (estRows < maxRows) {
             $infoButton = $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
           } else {
@@ -805,7 +805,7 @@ export class TableFooter extends Widget implements TableFooterModel {
       let numRows = this.table.rows.length;
       let estRows = this.table.estimatedRowCount;
       let maxRows = this.table.maxRowCount;
-      if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
+      if (scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(numRows, estRows, maxRows)) {
         this.table.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
       } else {
         this.table.reload();

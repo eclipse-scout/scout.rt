@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Column, NumberColumn, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
+import {arrays, Column, MaxRowCountContributionDo, NumberColumn, ObjectOrModel, Outline, Page, PageWithNodes, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('PageWithTable', () => {
@@ -21,6 +21,14 @@ describe('PageWithTable', () => {
   class SpecPageWithTable extends PageWithTable {
     override _createSearchFilter(): any {
       return super._createSearchFilter();
+    }
+
+    override _withMaxRowCountContribution(request: any): any {
+      return super._withMaxRowCountContribution(request);
+    }
+
+    override _transformTableDataToTableRows(tableData: any): ObjectOrModel<TableRow>[] {
+      return super._transformTableDataToTableRows(tableData);
     }
 
     override _loadTableData(searchFilter: any): JQuery.Promise<any> {
@@ -63,6 +71,39 @@ describe('PageWithTable', () => {
 
     expect(page.detailTable.hasReloadHandler).toBe(true);
     expect(counter).toBe(1);
+  });
+
+  it('row limits are exported', () => {
+    page.detailTable.setMaxRowCount(123);
+    let searchFilter = {
+      _contributions: {
+        _type: 'whatever'
+      }
+    };
+    let requestWithLimit = page._withMaxRowCountContribution(searchFilter);
+    expect(requestWithLimit._contributions.length).toBe(2);
+    let maxRowCountContributionDo: MaxRowCountContributionDo = requestWithLimit._contributions[1];
+    expect(maxRowCountContributionDo.hint).toBe(123);
+    expect(maxRowCountContributionDo._type).toBe('scout.MaxRowCountContribution');
+  });
+
+  it('row limits are imported', () => {
+    page._loadTableData = searchFilter => {
+      return $.resolvedPromise({
+        _contributions: [{
+          _type: 'scout.LimitedResultInfoContribution',
+          limitedResult: true,
+          maxRowCount: 456,
+          estimatedRowCount: 1111
+        }]
+      });
+    };
+    page._transformTableDataToTableRows = data => undefined;
+    page.detailTable.reload();
+    jasmine.clock().tick(10);
+    expect(page.detailTable.maxRowCount).toBe(456);
+    expect(page.detailTable.estimatedRowCount).toBe(1111);
+    expect(page.detailTable.tableStatus.message).toBe('[undefined text: MaxOutlineRowWarningWithEstimatedRowCount]');
   });
 
   it('should handle errors in _onLoadTableDataDone', () => {

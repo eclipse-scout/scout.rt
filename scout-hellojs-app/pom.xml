@@ -23,7 +23,7 @@
   <version>24.2-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
 
-  <name>ScoutJS Sample Application</name>
+  <name>Scout JS Sample Application</name>
   <description>Creates a Hello World sample application using Scout JS (UI written in JavaScript)</description>
   <url>https://eclipse.org/scout</url>
 

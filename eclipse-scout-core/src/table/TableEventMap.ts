@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AppLinkActionEvent, Cell, Column, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableCheckableStyle, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableRow, Tile,
-  TileTableHeaderBox, ValueField, WidgetEventMap
+  AppLinkActionEvent, Cell, Column, DropType, Event, FileDropEvent, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableCheckableStyle, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableReloadReason,
+  TableRow, Tile, TileTableHeaderBox, ValueField, WidgetEventMap
 } from '../index';
 
 export interface TableColumnBackgroundEffectChangedEvent<T = Table> extends Event<T> {
@@ -88,7 +88,7 @@ export interface TablePrepareCellEditEvent<TValue = any, T = Table> extends Even
 }
 
 export interface TableReloadEvent<T = Table> extends Event<T> {
-  reloadReason: string;
+  reloadReason: TableReloadReason;
 }
 
 export interface TableRowActionEvent<TValue = any, T = Table> extends Event<T> {
@@ -227,4 +227,6 @@ export interface TableEventMap extends WidgetEventMap {
   'propertyChange:truncatedCellTooltipEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:viewRangeSize': PropertyChangeEvent<number>;
   'propertyChange:virtual': PropertyChangeEvent<boolean>;
+  'propertyChange:maxRowCount': PropertyChangeEvent<number>;
+  'propertyChange:estimatedRowCount': PropertyChangeEvent<number>;
 }

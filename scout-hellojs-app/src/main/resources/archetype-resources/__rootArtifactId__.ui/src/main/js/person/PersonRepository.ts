@@ -8,7 +8,7 @@ export class PersonRepository extends Repository {
     super();
 
     this.entityType = Person.ENTITY_TYPE;
-    this.targetUrl = systems.getOrCreate().getEndpointUrl('persons', 'persons')
+    this.targetUrl = systems.getOrCreate().getEndpointUrl('persons', 'persons') + '/';
   }
 
   /**

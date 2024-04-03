@@ -13,9 +13,7 @@ public interface IPersonRepository {
 
   void store(String id, PersonDo person);
 
-  Stream<PersonDo> all();
-
-  Stream<PersonDo> list(PersonRestrictionDo restrictions);
+  Stream<PersonDo> list(PersonRestrictionDo restrictions, int numberOfRows);
 
   Optional<PersonDo> getById(String id);
 

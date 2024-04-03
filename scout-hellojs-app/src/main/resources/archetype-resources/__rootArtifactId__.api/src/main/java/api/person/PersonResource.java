@@ -13,8 +13,12 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+import org.eclipse.scout.rt.api.data.table.MaxResultsHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import ${package}.core.person.PersonService;
 import ${package}.data.person.PersonDo;
@@ -39,8 +43,12 @@ public class PersonResource implements IRestResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public PersonResponse list(PersonRestrictionDo restrictions) {
-    return BEANS.get(PersonResponse.class)
-        .withItems(BEANS.get(PersonService.class).list(restrictions));
+    MaxResultsHelper.ResultLimiter limiter = BEANS.get(MaxResultsHelper.class).limiter(restrictions);
+    List<PersonDo> persons = BEANS.get(PersonService.class)
+      .list(restrictions, limiter.getQueryLimit())
+      .collect(Collectors.toList());
+    PersonResponse response = BEANS.get(PersonResponse.class);
+    return response.withItems(limiter.limit(persons, response));
   }
 
   @PUT

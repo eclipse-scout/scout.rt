@@ -97,11 +97,13 @@ export abstract class Repository implements ObjectWithType {
       if (!response || !response.items) {
         return response;
       }
-      return response.items.map(item => {
-        return scout.create(item, {
-          ensureUniqueId: false
-        });
-      });
+      let result = response.items.map(item => scout.create(item, {
+        ensureUniqueId: false
+      }));
+      if (response._contributions) {
+        result._contributions = response._contributions;
+      }
+      return result;
     });
   }
 

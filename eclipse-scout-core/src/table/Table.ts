@@ -10,9 +10,9 @@
 import {
   AbstractTableAccessibilityRenderer, Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke,
   ContextMenuPopup, DefaultTableAccessibilityRenderer, Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult,
-  FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
-  NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles,
-  TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
+  FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder,
+  menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings,
+  styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
   TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke,
   TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips,
   TooltipSupport, UpdateFilteredElementsOptions, ValueField, Widget
@@ -1034,7 +1034,7 @@ export class Table extends Widget implements TableModel {
     return this._isAggregatedTooltip($cell);
   }
 
-  reload(reloadReason?: string) {
+  reload(reloadReason?: TableReloadReason) {
     if (!this.hasReloadHandler) {
       return;
     }
@@ -4554,7 +4554,7 @@ export class Table extends Widget implements TableModel {
     });
   }
 
-  protected _triggerReload(reloadReason?: string) {
+  protected _triggerReload(reloadReason?: TableReloadReason) {
     this.trigger('reload', {
       reloadReason: reloadReason
     });
@@ -4901,6 +4901,42 @@ export class Table extends Widget implements TableModel {
     this.setProperty('tableStatus', status);
   }
 
+  /**
+   * If the rows of this table are limited, the tableStatus is set to the corresponding message.
+   * {@link rows.length} and {@link estimatedRowCount} of this table are taken into account to create the status message.
+   * @param limitedResult Specifies if the rows of this table are limited.
+   */
+  setLimitedResultTableStatus(limitedResult: boolean) {
+    if (!limitedResult) {
+      if (this.tableStatus instanceof LimitedResultTableStatus) {
+        this.setTableStatus(null);
+      }
+      return;
+    }
+
+    const estimatedRowCount = this.estimatedRowCount;
+    const numRows = this.rows.length;
+    const decimalFormat = this.session.locale.decimalFormat;
+    const showingRowCountText = decimalFormat.format(numRows);
+    let message: string;
+    if (Device.get().type === Device.Type.MOBILE) {
+      if (estimatedRowCount > 0) {
+        const estimatedRowCountText = decimalFormat.format(estimatedRowCount);
+        message = this.session.text('MaxOutlineRowWarningMobileWithEstimatedRowCount', showingRowCountText, estimatedRowCountText);
+      } else {
+        message = this.session.text('MaxOutlineRowWarningMobile', showingRowCountText);
+      }
+    } else {
+      if (estimatedRowCount > 0) {
+        const estimatedRowCountText = decimalFormat.format(estimatedRowCount);
+        message = this.session.text('MaxOutlineRowWarningWithEstimatedRowCount', showingRowCountText, estimatedRowCountText);
+      } else {
+        message = this.session.text('MaxOutlineRowWarning', showingRowCountText);
+      }
+    }
+    this.setTableStatus(LimitedResultTableStatus.info(message));
+  }
+
   protected _setTableStatus(status: StatusOrModel) {
     status = Status.ensure(status);
     this._setProperty('tableStatus', status);
@@ -5234,6 +5270,16 @@ export class Table extends Widget implements TableModel {
   /** @see TableModel.dropType */
   setDropType(dropType: DropType) {
     this.setProperty('dropType', dropType);
+  }
+
+  /** @see TableModel.maxRowCount */
+  setMaxRowCount(maxRowCount: number) {
+    this.setProperty('maxRowCount', maxRowCount);
+  }
+
+  /** @see TableModel.estimatedRowCount */
+  setEstimatedRowCount(estimatedRowCount: number) {
+    this.setProperty('estimatedRowCount', estimatedRowCount);
   }
 
   protected _renderDropType() {

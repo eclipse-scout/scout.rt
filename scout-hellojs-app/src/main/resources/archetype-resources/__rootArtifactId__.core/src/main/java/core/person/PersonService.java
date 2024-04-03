@@ -40,9 +40,9 @@ public class PersonService implements IService {
     return BEANS.get(IPersonRepository.class).remove(id);
   }
 
-  public Stream<PersonDo> list(PersonRestrictionDo restrictions) {
+  public Stream<PersonDo> list(PersonRestrictionDo restrictions, int numberOfRows) {
     //TODO add validation and business logic here
-    return BEANS.get(IPersonRepository.class).list(restrictions);
+    return BEANS.get(IPersonRepository.class).list(restrictions, numberOfRows);
   }
 
   protected PersonDo assertPersonDo(PersonDo person) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -295,7 +295,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     String showingRowCountText = NumberFormat.getIntegerInstance(NlsLocale.get()).format(table.getRowCount());
     String estimatedRowCountText = NumberFormat.getIntegerInstance(NlsLocale.get()).format(estimatedRowCount);
     String message;
-    if (UserAgentUtility.isTouchDevice()) {
+    if (UserAgentUtility.isMobileDevice()) {
       if (estimatedRowCount > 0L) {
         message = TEXTS.get("MaxOutlineRowWarningMobileWithEstimatedRowCount", showingRowCountText, estimatedRowCountText);
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,10 @@
  */
 package org.eclipse.scout.rt.shared.data.page;
 
+import org.eclipse.scout.rt.api.data.table.LimitedResultInfoContributionDo;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
@@ -27,6 +30,21 @@ public abstract class AbstractTablePageData extends AbstractTableFieldBeanData {
   private boolean m_limitedResult;
   private long m_estimatedRowCount;
   private int m_maxRowCount;
+
+  /**
+   * Sets the maxRowCount, estimatedRowCount and limitedResult properties based on the
+   * {@link LimitedResultInfoContributionDo} attached to the given {@link IDoEntity}.
+   *
+   * @param entity
+   *     The entity to get the metadata from.
+   */
+  public void setLimitsFromDo(IDoEntity entity) {
+    LimitedResultInfoContributionDo.of(entity).ifPresent(limits -> {
+      setLimitedResult(limits.isLimitedResult());
+      setEstimatedRowCount(NumberUtility.nvl(limits.getEstimatedRowCount(), 0));
+      setMaxRowCount(NumberUtility.nvl(limits.getMaxRowCount(), 0));
+    });
+  }
 
   /**
    * Optional property may be used by the data provider to signal, that the data returned by this instance has been
