@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ajax, AjaxCall, AjaxError, arrays, BackgroundJobPollingStatus, dates, ErrorHandler, JsonErrorResponse, objects, PropertyEventEmitter, scout, Session, TopicDo, UiNotificationDo, UiNotificationPollerEventMap, UiNotificationResponse
+  ajax, AjaxCall, AjaxError, arrays, BackgroundJobPollingStatus, config, ConfigProperties, dates, ErrorHandler, InitModelOf, JsonErrorResponse, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo, UiNotificationDo,
+  UiNotificationPollerEventMap, UiNotificationResponse, UiNotificationSystem
 } from '../index';
 import $ from 'jquery';
 
@@ -26,6 +27,9 @@ export class UiNotificationPoller extends PropertyEventEmitter {
    */
   static HISTORY_COUNT = 10;
 
+  protected static DEFAULT_BACKEND_TIMEOUT = 60_000;
+  protected static BACKEND_TIMEOUT_OFFSET = 15_000;
+
   /**
    * Configures in milliseconds how long the connection is allowed to stay open before it will be aborted.
    * This is more like a last resort timeout, the server will release the connection earlier (see scout.uinotification.waitTimeout).
@@ -37,13 +41,22 @@ export class UiNotificationPoller extends PropertyEventEmitter {
    */
   notifications: Map<string, Map<string, UiNotificationDo[]>>;
   url: string;
+  system: UiNotificationSystem;
   protected _call: AjaxCall;
 
   constructor() {
     super();
-    this.requestTimeout = 75000;
+    this.requestTimeout = UiNotificationPoller.DEFAULT_BACKEND_TIMEOUT + UiNotificationPoller.BACKEND_TIMEOUT_OFFSET;
     this.status = BackgroundJobPollingStatus.STOPPED;
     this.notifications = new Map();
+  }
+
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
+    let timeoutPropertyKey: keyof MainConfigProperties = 'scout.uinotification.waitTimeout';
+    let system = this.system.name as keyof ConfigProperties;
+    let backendTimeout = scout.nvl(config.get(timeoutPropertyKey, system), config.get(timeoutPropertyKey), UiNotificationPoller.DEFAULT_BACKEND_TIMEOUT);
+    this.requestTimeout = backendTimeout + UiNotificationPoller.BACKEND_TIMEOUT_OFFSET;
   }
 
   setTopics(topics: string[]) {
