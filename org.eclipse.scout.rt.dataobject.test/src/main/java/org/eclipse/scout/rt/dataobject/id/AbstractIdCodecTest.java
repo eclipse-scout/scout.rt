@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureWrapperCompositeId;
+import org.eclipse.scout.rt.dataobject.migration.IIdTypeNameMigrationHandler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -378,6 +380,50 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromQualifiedLegacyId() {
+    FixtureNewId id1 = FixtureNewId.of("foo");
+    IId id2 = getCodec().fromQualified("scout.FixtureNewId:foo");
+    assertEquals(id1, id2);
+
+    IId id3 = getCodec().fromQualified("scout.FixtureNewLegacyId:foo");
+    assertEquals(id1, id3);
+
+    IId id4 = getCodec().fromQualified("scout.FixtureLegacyId:foo");
+    assertEquals(id1, id4);
+  }
+
+  @Test
+  public void testFromQualifiedLegacyId_multipleMappings() {
+    FixtureNewId id1 = FixtureNewId.of("foo");
+    IId id2 = getCodec().fromQualified("scout.FixtureNewId:foo");
+    assertEquals(id1, id2);
+
+    getCodec().registerLegacyIdTypeNameMapping("scout.FixtureLegacyIdA", "scout.FixtureLegacyIdB");
+    getCodec().registerLegacyIdTypeNameMapping("scout.FixtureLegacyIdB", "scout.FixtureLegacyIdC");
+    getCodec().registerLegacyIdTypeNameMapping("scout.FixtureLegacyIdC", "scout.FixtureLegacyIdD");
+    getCodec().registerLegacyIdTypeNameMapping("scout.FixtureLegacyIdD", "scout.FixtureNewId");
+
+    assertEquals(id1, getCodec().fromQualified("scout.FixtureLegacyIdA:foo"));
+    assertEquals(id1, getCodec().fromQualified("scout.FixtureLegacyIdB:foo"));
+    assertEquals(id1, getCodec().fromQualified("scout.FixtureLegacyIdC:foo"));
+    assertEquals(id1, getCodec().fromQualified("scout.FixtureLegacyIdD:foo"));
+    assertEquals(id1, getCodec().fromQualified("scout.FixtureNewId:foo"));
+  }
+
+  @Test
+  public void testFromQualifiedLegacyId_multipleMappingsCycle() {
+    FixtureNewId id1 = FixtureNewId.of("foo");
+    IId id2 = getCodec().fromQualified("scout.FixtureNewId:foo");
+    assertEquals(id1, id2);
+
+    getCodec().registerLegacyIdTypeNameMapping("scout.FixtureLegacyIdA", "scout.FixtureLegacyIdB");
+    getCodec().registerLegacyIdTypeNameMapping("scout.FixtureLegacyIdB", "scout.FixtureLegacyIdA");
+    assertThrows(PlatformException.class, () -> getCodec().fromQualified("scout.FixtureLegacyIdA:foo"));
+  }
+
+  // TODO PBZ Add more tests, add tests for register/unregister mappings
+
+  @Test
   public void testFromUnqualifiedRootId() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
     FixtureUuId id2 = getCodec().fromUnqualified(FixtureUuId.class, TEST_UUID.toString());
@@ -692,6 +738,36 @@ public abstract class AbstractIdCodecTest {
         return null;
       }
       return new FixtureCustomComparableRawDataId(date);
+    }
+  }
+
+  @IdTypeName("scout.FixtureNewId")
+  protected static final class FixtureNewId extends AbstractStringId {
+    private static final long serialVersionUID = 1L;
+
+    private FixtureNewId(String id) {
+      super(id);
+    }
+
+    public static FixtureNewId of(String id) {
+      if (StringUtility.isNullOrEmpty(id)) {
+        return null;
+      }
+      return new FixtureNewId(id);
+    }
+  }
+
+  public static class FixtureLegacyIdTypeNameMigrationHandler implements IIdTypeNameMigrationHandler {
+    @Override
+    public Map<String, String> getIdTypeNameTranslations() {
+      return Map.of("scout.FixtureLegacyId", "scout.FixtureNewLegacyId");
+    }
+  }
+
+  public static class FixtureNewLegacyIdTypeNameMigrationHandler implements IIdTypeNameMigrationHandler {
+    @Override
+    public Map<String, String> getIdTypeNameTranslations() {
+      return Map.of("scout.FixtureNewLegacyId", "scout.FixtureNewId");
     }
   }
 }

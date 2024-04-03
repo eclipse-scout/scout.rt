@@ -14,16 +14,21 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
 
+import org.eclipse.scout.rt.dataobject.migration.IIdTypeNameMigrationHandler;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -40,6 +45,8 @@ public class IdCodec {
   protected final Map<Class<?>, Function<String, Object>> m_rawTypeFromStringMapper = new HashMap<>();
   protected final Map<Class<?>, Function<Object, String>> m_rawTypeToStringMapper = new HashMap<>();
 
+  protected final Map<String, String> m_legacyIdTypeNameMappings = new HashMap<>();
+
   @PostConstruct
   protected void initialize() {
     // setup default type mappings between raw type <--> string
@@ -49,6 +56,15 @@ public class IdCodec {
     registerRawTypeMapper(Integer.class, Integer::parseInt, Object::toString);
     registerRawTypeMapper(Date.class, d -> new Date(Long.parseLong(d)), d -> String.valueOf(d.getTime()));
     registerRawTypeMapper(Locale.class, Locale::forLanguageTag, Locale::toLanguageTag);
+
+    // setup type name migrations for legacy id type names
+    initTypeNameMigrations();
+  }
+
+  protected void initTypeNameMigrations() {
+    BEANS.all(IIdTypeNameMigrationHandler.class).stream()
+        .flatMap(h -> h.getIdTypeNameTranslations().entrySet().stream())
+        .forEach(e -> m_legacyIdTypeNameMappings.put(e.getKey(), e.getValue()));
   }
 
   // ---------------- IId to String ----------------
@@ -172,6 +188,16 @@ public class IdCodec {
     m_rawTypeFromStringMapper.remove(rawType);
   }
 
+  // TODO PBZ Add Javadoc
+  public void registerLegacyIdTypeNameMapping(String legacyIdTypeName, String newIdTypeName) {
+    m_legacyIdTypeNameMappings.put(legacyIdTypeName, newIdTypeName);
+  }
+
+  // TODO PBZ Add Javadoc
+  public void unregisterLegacyIdTypeNameMapping(String legacyIdTypeName) {
+    m_legacyIdTypeNameMappings.remove(legacyIdTypeName);
+  }
+
   // ---------------- helper methods ----------------
 
   /**
@@ -205,6 +231,23 @@ public class IdCodec {
     }
     String typeName = tmp[0];
     Class<? extends IId> idClass = m_idInventory.get().getIdClass(typeName);
+
+    // (1) idClass not found, try to re-map legacy id type names
+    if (idClass == null) {
+      String newTypeName = typeName;
+      Set<String> remapping = new LinkedHashSet<>();
+      remapping.add(typeName);
+      // TODO PBZ Consider pre-calculate re-mappings A -> B -> C into A -> C and B -> C
+      while (m_legacyIdTypeNameMappings.containsKey(newTypeName)) {
+        newTypeName = m_legacyIdTypeNameMappings.get(newTypeName);
+        if (!remapping.add(newTypeName)) {
+          throw new PlatformException("Found remapping cycle for type name '{}', remapping {}", typeName, remapping);
+        }
+      }
+      idClass = m_idInventory.get().getIdClass(newTypeName);
+    }
+
+    // (2) check if mapping found
     if (idClass == null) {
       if (lenient) {
         return null;
