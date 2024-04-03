@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager, fonts, icons, InitModelOf,
-  JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType, Reconnector,
-  RemoteEvent, ResponseQueue, scout, SessionEventMap, SessionModel, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget
+  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager, fonts, icons,
+  InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType,
+  Reconnector, RemoteEvent, ResponseQueue, scout, SessionEventMap, SessionModel, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
@@ -167,7 +167,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
   /**
    * Additional waiting time in seconds before a polling request is cancelled after it has exceeded
-   * the expected maximum duration ({@link SessionStartupResponse#startupData#pollingInterval}).
+   * the expected maximum duration (see property 'scout.ui.backgroundPollingMaxWaitTime').
    */
   static POLLING_GRACE_PERIOD = 15;
 
@@ -407,7 +407,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.persistent = data.startupData.persistent;
 
     // true if the UiServer runs in development mode (see Platform.get().inDevelopmentMode())
-    this.inDevelopmentMode = !!data.startupData.inDevelopmentMode; // may be undefined
+    this.inDevelopmentMode = !!config.get('scout.devMode');
 
     // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
     this.clientSessionId = data.startupData.clientSessionId;
@@ -433,7 +433,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
 
     // Init request timeout for poller
-    this.requestTimeoutPoll = (data.startupData.pollingInterval + Session.POLLING_GRACE_PERIOD) * 1000;
+    this.requestTimeoutPoll = (config.get('scout.ui.backgroundPollingMaxWaitTime') + Session.POLLING_GRACE_PERIOD) * 1000;
 
     // Register UI session
     this.modelAdapterRegistry[this.uiSessionId] = this; // TODO [7.0] cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have root adapter as parent, see 406
@@ -1638,9 +1638,7 @@ export interface SessionStartupResponse extends RemoteResponse {
     clientSessionId?: string;
     clientSession?: string;
     reloadPage?: boolean;
-    pollingInterval?: number;
     persistent?: boolean;
-    inDevelopmentMode?: boolean;
     inspector?: boolean;
     locale?: LocaleModel;
     textMap?: TextMap;

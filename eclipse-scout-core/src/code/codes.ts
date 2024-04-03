@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CodeType, ModelOf, ObjectOrModel, texts} from '../index';
+import {arrays, CodeType, ModelOf, ObjectOrModel, systems, texts} from '../index';
 import $ from 'jquery';
 
 export const codes = {
@@ -22,11 +22,19 @@ export const codes = {
   registry: new Map<any, CodeType<any, any, any>>,
 
   /**
-   * Initialize the code type map with the result of the given REST url.
+   * Initializes the code type map with the result of the given REST url.
    */
   bootstrap(url: string): JQuery.Promise<any> {
     let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise({});
     return promise.then(codes._preInit.bind(this, url));
+  },
+
+  /**
+   * Loads code types from the main system using the url configuration of that {@link System}.
+   */
+  bootstrapSystem(): JQuery.Promise<void> {
+    const url = systems.getOrCreate().getEndpointUrl('codes', 'codes');
+    return codes.bootstrap(url);
   },
 
   /** @internal */

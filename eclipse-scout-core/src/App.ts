@@ -9,8 +9,8 @@
  */
 
 import {
-  access, AppEventMap, aria, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session,
-  SessionModel, texts, webstorage, Widget
+  access, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory, objects, scout,
+  Session, SessionModel, texts, webstorage, Widget
 } from './index';
 import $ from 'jquery';
 
@@ -61,6 +61,10 @@ export interface AppBootstrapOptions {
    * @see PermissionCollectionModel
    */
   permissionsUrl?: string;
+  /**
+   * URL pointing to a resource providing config properties that will be available through {@link config}.
+   */
+  configUrl?: string | string[];
   /**
    * Custom functions that needs to be executed while bootstrapping.
    * All custom and default bootrappers need to finish successfully before the app will proceed with the initialization.
@@ -186,8 +190,10 @@ export class App extends EventEmitter {
    */
   protected _bootstrap(options: AppBootstrapOptions): JQuery.Promise<any> {
     options = options || {};
+    options.bootstrappers = options.bootstrappers || [];
     this.bootstrappers = [
       ...this._defaultBootstrappers(options),
+      ...options.bootstrappers,
       ...this.bootstrappers,
       ...bootstrappers
     ].filter(bootstrapper => !!bootstrapper);
@@ -204,7 +210,8 @@ export class App extends EventEmitter {
       locales.bootstrap.bind(locales, options.localesUrl),
       texts.bootstrap.bind(texts, options.textsUrl),
       codes.bootstrap.bind(codes, options.codesUrl),
-      access.bootstrap.bind(access, options.permissionsUrl)
+      access.bootstrap.bind(access, options.permissionsUrl),
+      config.bootstrap.bind(config, options.configUrl)
     ];
   }
 

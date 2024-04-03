@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, AppBootstrapOptions, defaultValues, ErrorHandler, InitModelOf, Session, SessionModel} from './index';
+import {App, AppBootstrapOptions, config, defaultValues, ErrorHandler, InitModelOf, Session, SessionModel} from './index';
 import $ from 'jquery';
 
 export class RemoteApp extends App {
@@ -18,7 +18,18 @@ export class RemoteApp extends App {
   }
 
   protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
-    return super._defaultBootstrappers(options).concat(this._defaultValuesBootrapper());
+    return super._defaultBootstrappers(options).concat(
+      this._defaultValuesBootrapper(),
+      this._configPropertiesBootstrapper(options)
+    );
+  }
+
+  protected _configPropertiesBootstrapper(options: AppBootstrapOptions): () => JQuery.Promise<void> {
+    if (options.configUrl) {
+      return null; // custom URL has been provided. Boostrap using this URL already in queue.
+    }
+    // no custom URL available: use default bootstrap for main system.
+    return config.bootstrapSystem.bind(config);
   }
 
   protected _defaultValuesBootrapper(): () => JQuery.Promise<void> {
