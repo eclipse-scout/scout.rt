@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 /**
  * @since 8.0
  */
-public class JsonTileField<T extends ITileField<? extends ITile>> extends JsonFormField<T> implements IBinaryResourceConsumer {
+public class JsonTileField<T extends ITileField<? extends ITileGrid<? extends ITile>>> extends JsonFormField<T> implements IBinaryResourceConsumer {
 
   public JsonTileField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -42,19 +42,19 @@ public class JsonTileField<T extends ITileField<? extends ITile>> extends JsonFo
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<T>(ITileField.PROP_TILE_GRID, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<>(ITileField.PROP_TILE_GRID, model, getUiSession()) {
       @Override
       protected ITileGrid<?> modelValue() {
         return getModel().getTileGrid();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileField.PROP_DROP_TYPE, model) {
+    putJsonProperty(new JsonProperty<>(ITileField.PROP_DROP_TYPE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getDropType();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileField.PROP_DROP_MAXIMUM_SIZE, model) {
+    putJsonProperty(new JsonProperty<>(ITileField.PROP_DROP_MAXIMUM_SIZE, model) {
       @Override
       protected Long modelValue() {
         return getModel().getDropMaximumSize();
