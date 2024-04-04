@@ -14,6 +14,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 // TODO PBZ Add Javadoc, check naming, add example impl
+// rename to IIdTypeNameRenameMigrationHandler
 @ApplicationScoped
 public interface IIdTypeNameMigrationHandler {
 

@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureWrapperCompositeId;
 import org.eclipse.scout.rt.dataobject.migration.IIdTypeNameMigrationHandler;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -757,6 +758,8 @@ public abstract class AbstractIdCodecTest {
     }
   }
 
+  // FIXME PBZ: und registrieren
+  @IgnoreBean
   public static class FixtureLegacyIdTypeNameMigrationHandler implements IIdTypeNameMigrationHandler {
     @Override
     public Map<String, String> getIdTypeNameTranslations() {
@@ -764,6 +767,8 @@ public abstract class AbstractIdCodecTest {
     }
   }
 
+  // FIXME PBZ: und registrieren
+  @IgnoreBean
   public static class FixtureNewLegacyIdTypeNameMigrationHandler implements IIdTypeNameMigrationHandler {
     @Override
     public Map<String, String> getIdTypeNameTranslations() {

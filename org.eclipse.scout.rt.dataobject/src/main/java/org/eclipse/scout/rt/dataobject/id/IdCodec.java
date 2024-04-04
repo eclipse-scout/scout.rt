@@ -45,7 +45,7 @@ public class IdCodec {
   protected final Map<Class<?>, Function<String, Object>> m_rawTypeFromStringMapper = new HashMap<>();
   protected final Map<Class<?>, Function<Object, String>> m_rawTypeToStringMapper = new HashMap<>();
 
-  protected final Map<String, String> m_legacyIdTypeNameMappings = new HashMap<>();
+  protected final Map<String, String> m_legacyIdTypeNameMappings = new HashMap<>();  // idTypeRenameMapping  vs. idTypeNameRemapping
 
   @PostConstruct
   protected void initialize() {
@@ -62,6 +62,9 @@ public class IdCodec {
   }
 
   protected void initTypeNameMigrations() {
+
+    // neu berechnen A -> B -> C + cycle detection
+
     BEANS.all(IIdTypeNameMigrationHandler.class).stream()
         .flatMap(h -> h.getIdTypeNameTranslations().entrySet().stream())
         .forEach(e -> m_legacyIdTypeNameMappings.put(e.getKey(), e.getValue()));
@@ -188,12 +191,12 @@ public class IdCodec {
     m_rawTypeFromStringMapper.remove(rawType);
   }
 
-  // TODO PBZ Add Javadoc
+  // TODO PBZ Add Javadoc  -> entfernen, BSP mit bean-based reg/unreg
   public void registerLegacyIdTypeNameMapping(String legacyIdTypeName, String newIdTypeName) {
     m_legacyIdTypeNameMappings.put(legacyIdTypeName, newIdTypeName);
   }
 
-  // TODO PBZ Add Javadoc
+  // TODO PBZ Add Javadoc  -> entfernen, BSP mit bean-based reg/unreg
   public void unregisterLegacyIdTypeNameMapping(String legacyIdTypeName) {
     m_legacyIdTypeNameMappings.remove(legacyIdTypeName);
   }
@@ -237,6 +240,10 @@ public class IdCodec {
       String newTypeName = typeName;
       Set<String> remapping = new LinkedHashSet<>();
       remapping.add(typeName);
+      // FIXME PBZ check invocations of org.eclipse.scout.rt.dataobject.id.IdInventory.getIdClass + add javascript
+
+      // FIXME PBZ move to 24/2
+
       // TODO PBZ Consider pre-calculate re-mappings A -> B -> C into A -> C and B -> C
       while (m_legacyIdTypeNameMappings.containsKey(newTypeName)) {
         newTypeName = m_legacyIdTypeNameMappings.get(newTypeName);
