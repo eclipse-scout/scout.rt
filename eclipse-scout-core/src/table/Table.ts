@@ -13,9 +13,9 @@ import {
   FilterResult, FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus,
   NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles,
   TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
-  TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke,
-  TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips,
-  TooltipSupport, UpdateFilteredElementsOptions, ValueField, Widget
+  TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel,
+  TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile,
+  TileTableHeaderBox, tooltips, TooltipSupport, UpdateFilteredElementsOptions, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -128,6 +128,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   filteredElementsDirty: boolean;
   defaultMenuTypes: string[];
   accessibilityRenderer: AbstractTableAccessibilityRenderer;
+  tableOrganizer: TableOrganizer;
 
   $data: JQuery;
   $emptyData: JQuery;
@@ -241,6 +242,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.filteredElementsDirty = false;
     this.defaultMenuTypes = [Table.MenuType.EmptySpace];
     this.accessibilityRenderer = new DefaultTableAccessibilityRenderer();
+    this.tableOrganizer = null;
 
     this._doubleClickSupport = new DoubleClickSupport();
     this._permanentHeadSortColumns = [];
@@ -366,6 +368,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       property: 'groupingStyle',
       constType: Table.GroupingStyle
     }]);
+
+    this.tableOrganizer = this._createTableOrganizer();
     this._initColumns();
 
     this.rows.forEach((row, i) => {
@@ -455,6 +459,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
   protected override _destroy() {
     this._destroyColumns();
+    this._destroyTableOrganizer();
     super._destroy();
   }
 
@@ -952,6 +957,21 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       parent: this,
       table: this
     });
+  }
+
+  protected _createTableOrganizer(): TableOrganizer {
+    let organizer = scout.create(TableOrganizer, {
+      table: this
+    });
+    organizer.install();
+    return organizer;
+  }
+
+  protected _destroyTableOrganizer() {
+    if (this.tableOrganizer) {
+      this.tableOrganizer.uninstall();
+      this.tableOrganizer = null;
+    }
   }
 
   protected _installCellTooltipSupport() {
@@ -5829,6 +5849,32 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     arrays.ensure(rows || this.rows).forEach(row => {
       row.status = TableRow.Status.NON_CHANGED;
     });
+  }
+
+  isColumnAddable(insertAfterColumn?: Column): boolean {
+    if (this.tableOrganizer) {
+      return this.tableOrganizer.isColumnAddable(insertAfterColumn);
+    }
+    return this.columnAddable;
+  }
+
+  isColumnRemovable(column: Column): boolean {
+    if (this.tableOrganizer) {
+      return this.tableOrganizer.isColumnRemovable(column);
+    }
+    return column.removable;
+  }
+
+  isColumnModifiable(column: Column): boolean {
+    if (this.tableOrganizer) {
+      return this.tableOrganizer.isColumnModifiable(column);
+    }
+    return column.modifiable;
+  }
+
+  isCustomizable(): boolean {
+    // return !!this.tableCustomizer; FIXME bsh [js-table] Implement
+    return false;
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */

@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableRow, TableSelectionHandler,
-  TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
+  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableOrganizer, TableRow,
+  TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
 } from '../index';
 
 export interface TableModel extends WidgetModel {
@@ -268,4 +268,5 @@ export interface TableModel extends WidgetModel {
    */
   textFilterEnabled?: boolean;
   defaultMenuTypes?: string[];
+  tableOrganizer?: ObjectOrModel<TableOrganizer>;
 }

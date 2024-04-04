@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -720,6 +720,15 @@ export class TableAdapter extends ModelAdapter {
         return;
       }
       return this.createTilesOrig(rows);
+    }, true);
+
+    // not used in classic mode since table is organized on the server
+    objects.replacePrototypeFunction(Table, '_createTableOrganizer', function(this: Table & { _createTableOrganizerOrig }) {
+      if (this.modelAdapter) {
+        // nop in classic mode
+        return;
+      }
+      return this._createTableOrganizerOrig();
     }, true);
   }
 

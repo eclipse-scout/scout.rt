@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -492,6 +492,8 @@ export * from './table/TableHeaderMenuGroupEventMap';
 export * from './table/TableHeaderMenuButton';
 export * from './table/TableHeaderMenuButtonModel';
 export * from './table/TableLayout';
+export * from './table/TableOrganizer';
+export * from './table/TableOrganizerModel';
 export * from './table/TableSelectionHandler';
 export * from './table/TableTileGridMediator';
 export * from './table/TableTileGridMediatorModel';
@@ -505,6 +507,8 @@ export * from './table/TableRowTileMappingAdapter';
 export * from './table/TableTooltip';
 export * from './table/TableTooltipModel';
 export * from './table/TableUpdateBuffer';
+export * from './table/ShowInvisibleColumnsForm';
+export * from './table/ShowInvisibleColumnsFormModel';
 export * from './table/TileTableHeaderGroupByLookupCall';
 export * from './table/TileTableHeaderGroupByLookupCallModel';
 export * from './table/TileTableHeaderSortByLookupCall';

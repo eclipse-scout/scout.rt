@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -89,6 +89,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     this.focusableContainer = true;
 
     this.leftGroups = [];
+
     this.moveGroup = null;
     this.toBeginButton = null;
     this.forwardButton = null;
@@ -396,7 +397,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   }
 
   protected _isColumnActionsGroupVisible(): boolean {
-    return this.table.columnAddable || this.column.removable || this.column.modifiable;
+    return this.table.isColumnAddable(this.column) || this.table.isColumnRemovable(this.column) || this.table.isColumnModifiable(this.column);
   }
 
   protected _renderColumnActionsGroup(): TableHeaderMenuGroup {
@@ -412,7 +413,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       parent: this.columnActionsGroup,
       text: '${textKey:ui.addColumn}',
       cssClass: 'add-column',
-      visible: this.table.columnAddable
+      visible: this.table.isColumnAddable(this.column)
     });
     this.addColumnButton.on('action', onClick.bind(this, 'add'));
 
@@ -420,7 +421,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       parent: this.columnActionsGroup,
       text: '${textKey:ui.removeColumn}',
       cssClass: 'remove-column',
-      visible: this.column.removable
+      visible: this.table.isColumnRemovable(this.column)
     });
     this.removeColumnButton.on('action', onClick.bind(this, 'remove'));
 
@@ -428,7 +429,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
       parent: this.columnActionsGroup,
       text: '${textKey:ui.changeColumn}',
       cssClass: 'change-column',
-      visible: this.column.modifiable
+      visible: this.table.isColumnModifiable(this.column)
     });
     this.modifyColumnButton.on('action', onClick.bind(this, 'modify'));
 
