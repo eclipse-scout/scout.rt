@@ -150,6 +150,7 @@ export class Chart extends Widget implements ChartModel {
       type: Chart.Type.PIE,
       options: {
         autoColor: true,
+        colorMode: ChartColorMode.AUTO,
         colorScheme: colorSchemes.ColorSchemeId.DEFAULT,
         transparent: false,
         maxSegments: 5,
@@ -418,6 +419,7 @@ export type ChartConfig = Partial<Omit<ChartConfiguration, 'type'>> & {
   type: ChartType;
   options?: {
     autoColor?: boolean;
+    colorMode?: ChartColorMode;
     colorScheme?: ColorScheme | string;
     transparent?: boolean;
     maxSegments?: number;
@@ -471,6 +473,24 @@ export type ChartConfig = Partial<Omit<ChartConfiguration, 'type'>> & {
 export type ChartType = EnumObject<typeof Chart.Type>;
 export type ChartPosition = EnumObject<typeof Chart.Position>;
 export type NumberFormatter = (label: number | string, defaultFormatter: (label: number | string) => string) => string;
+
+/**
+ * Determines what parts of the chart data is colored with the same colors.
+ */
+export enum ChartColorMode {
+  /**
+   * Uses one of the other options depending on the chart type.
+   */
+  AUTO = 'auto',
+  /**
+   * Uses a different color for each dataset.
+   */
+  DATASET = 'dataset',
+  /**
+   * Uses a different color for each datapoint in a dataset but the n-th datapoint in each dataset will be colored using the same color.
+   */
+  DATA = 'data'
+}
 
 export type ClickObject = {
   datasetIndex: number;

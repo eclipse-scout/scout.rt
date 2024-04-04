@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractChartRenderer, Chart, chartJsDateAdapter} from '../index';
+import {AbstractChartRenderer, Chart, ChartColorMode, chartJsDateAdapter} from '../index';
 import {
   _adapters as chartJsAdapters, ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint,
   FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
@@ -1656,7 +1656,13 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       type = config.type,
       autoColor = config.options && config.options.autoColor,
       checkable = config.options && config.options.checkable,
-      multipleColorsPerDataset = autoColor && scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA),
+      colorMode = config.options && config.options.colorMode,
+      multipleColorsPerDataset = autoColor && (
+        colorMode === ChartColorMode.DATASET
+          ? false
+          : colorMode === ChartColorMode.DATA
+            ? true
+            : scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)),
       colors = {
         backgroundColors: [],
         borderColors: [],
