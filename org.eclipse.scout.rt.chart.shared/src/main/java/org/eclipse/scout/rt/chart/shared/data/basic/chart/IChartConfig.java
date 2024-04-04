@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -132,6 +132,12 @@ public interface IChartConfig extends Serializable {
   IChartConfig removeAutoColor();
 
   boolean isAutoColor();
+
+  IChartConfig withColorMode(ColorMode colorMode);
+
+  IChartConfig removeColorMode();
+
+  ColorMode getColorMode();
 
   IChartConfig withColorScheme(IColorScheme colorScheme);
 

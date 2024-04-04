@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,7 @@ public class ChartConfig implements IChartConfig {
   protected static final String OPTIONS = "options";
   protected static final String PLUGINS = combine(OPTIONS, "plugins");
   protected static final String AUTO_COLOR = combine(OPTIONS, "autoColor");
+  protected static final String COLOR_MODE = combine(OPTIONS, "colorMode");
   protected static final String COLOR_SCHEME = combine(OPTIONS, "colorScheme");
   protected static final String TRANSPARENT = combine(OPTIONS, "transparent");
   protected static final String MAX_SEGMENTS = combine(OPTIONS, "maxSegments");
@@ -435,6 +436,21 @@ public class ChartConfig implements IChartConfig {
   @Override
   public boolean isAutoColor() {
     return BooleanUtility.nvl((Boolean) getProperty(AUTO_COLOR));
+  }
+
+  @Override
+  public IChartConfig withColorMode(ColorMode colorMode) {
+    return withProperty(COLOR_MODE, colorMode != null ? colorMode.getValue() : null);
+  }
+
+  @Override
+  public IChartConfig removeColorMode() {
+    return removeProperty(COLOR_MODE);
+  }
+
+  @Override
+  public ColorMode getColorMode() {
+    return ColorMode.parse((String) getProperty(COLOR_MODE));
   }
 
   @Override
