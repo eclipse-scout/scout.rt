@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -291,12 +291,6 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this._flushLookupStatus();
     this._clearPendingLookup();
 
-    if (this.touchMode) {
-      $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) Always send acceptInput for touch field');
-      this._inputAccepted();
-      return;
-    }
-
     return this._acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
   }
 
@@ -346,6 +340,12 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
    * @param sync optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
    */
   protected _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<TValue>): JQuery.Promise<void> | void {
+    if (this.touchMode) {
+      $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) Always send acceptInput for touch field');
+      this._inputAccepted();
+      return;
+    }
+
     let unchanged = false;
     if (this.removing) {
       // Rare case: _acceptInput may be called when the field is being removed. In that case
