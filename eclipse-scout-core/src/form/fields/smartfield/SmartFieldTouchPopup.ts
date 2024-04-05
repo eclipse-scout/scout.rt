@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Event, InitModelOf, LookupRow, PropertyChangeEvent, ProposalChooser, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, scout, ScoutKeyboardEvent, SmartField, SmartFieldLookupResult,
-  SmartFieldTouchPopupEventMap, SmartFieldTouchPopupModel, StatusOrModel, TouchPopup
+  Event, InitModelOf, LookupRow, objects, PropertyChangeEvent, ProposalChooser, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, scout, ScoutKeyboardEvent, SmartField, SmartFieldLookupResult,
+  SmartFieldTouchPopupEventMap, SmartFieldTouchPopupModel, Status, StatusOrModel, TouchPopup
 } from '../../../index';
+import $ from 'jquery';
 
 /**
  * Info: this class must have the same interface as SmartFieldPopup. That's why there's some
@@ -27,10 +28,18 @@ export class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFie
   lookupResult: SmartFieldLookupResult<TValue>;
   smartField: SmartField<TValue>;
 
+  protected _initialFieldState: SmartFieldTouchPopupInitialFieldState<TValue>;
+
+  constructor() {
+    super();
+    this._initialFieldState = null;
+  }
+
   protected override _init(options: InitModelOf<this>) {
     options.withFocusContext = false;
     options.smartField = options.parent as SmartField<TValue>; // alias for parent (required by proposal chooser)
     super._init(options);
+    this._initialFieldState = this._getFieldState();
 
     this.setLookupResult(options.lookupResult);
     this.setStatus(options.status);
@@ -47,6 +56,11 @@ export class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFie
     this._widget = this._createProposalChooser();
     this._widget.on('lookupRowSelected', this._triggerEvent.bind(this));
     this._widget.on('activeFilterSelected', this._triggerEvent.bind(this));
+  }
+
+  protected _getFieldState(): SmartFieldTouchPopupInitialFieldState<TValue> {
+    const {value, displayText, errorStatus, lookupRow} = this._field;
+    return $.extend(true, {}, {value, displayText, errorStatus, lookupRow});
   }
 
   protected _createProposalChooser(): ProposalChooser<TValue, any, any> {
@@ -114,6 +128,16 @@ export class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFie
   }
 
   protected _beforeClosePopup(event: Event<SmartFieldTouchPopup<TValue>>) {
+    if (objects.equalsRecursive(this._initialFieldState, this._getFieldState())) {
+      return;
+    }
     this.smartField.acceptInputFromField(this._field);
   }
 }
+
+export type SmartFieldTouchPopupInitialFieldState<TValue> = {
+  value: TValue;
+  displayText: string;
+  errorStatus: Status;
+  lookupRow: LookupRow<TValue>;
+};
