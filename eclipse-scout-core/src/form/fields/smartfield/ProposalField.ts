@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, LookupRow, objects, ProposalFieldEventMap, ProposalFieldModel, scout, SmartField, SmartFieldLookupResult, strings} from '../../../index';
+import {aria, LookupRow, objects, ProposalFieldEventMap, ProposalFieldModel, SmartField, SmartFieldLookupResult, strings} from '../../../index';
 import $ from 'jquery';
 
 export class ProposalField extends SmartField<string> implements ProposalFieldModel {
@@ -79,7 +79,15 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
   }
 
   protected override _formatValue(value: string): string {
-    return scout.nvl(value, '');
+    if (objects.isNullOrUndefined(value)) {
+      return '';
+    }
+
+    if (this.lookupRow) {
+      return this._formatLookupRow(this.lookupRow);
+    }
+
+    return value;
   }
 
   protected override _validateValue(value: string): string {
@@ -162,12 +170,11 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
    */
   protected override _copyValuesFromField(otherField: ProposalField) {
     if (this.lookupRow !== otherField.lookupRow) {
-      this.setLookupRow(otherField.lookupRow);
+      this._setLookupRow(otherField.lookupRow); // only set property lookup
     }
     this.setErrorStatus(otherField.errorStatus);
-    if (this.value !== otherField.value) {
-      this.setValue(otherField.value);
-    }
+    this.setDisplayText(otherField.displayText);
+    this.setValue(otherField.value);
   }
 
   protected override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
@@ -177,8 +184,8 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
       return;
     }
 
-    // 1. Do nothing when search text is equals to the text of the current lookup row
-    if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
+    // 1. Do nothing when search text did not change and is equals to the text of the current lookup row
+    if (!searchTextChanged && !selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
       this._inputAccepted(false);
       return;

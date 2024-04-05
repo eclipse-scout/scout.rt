@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {LookupRow, ProposalChooser, ProposalField, SmartFieldPopup, SmartFieldTouchPopup} from '../../../../index';
+import {LookupRow, ProposalChooser, ProposalField, SmartFieldLookupResult, SmartFieldPopup, SmartFieldTouchPopup} from '../../../../index';
 import {JQueryTesting} from '../../../jquery-testing';
 
 export const proposalFieldSpecHelper = {
@@ -99,9 +99,23 @@ export type ProposalFieldSpecHelperCallbacks = {
 };
 
 export class SpecProposalField extends ProposalField {
+  declare _userWasTyping: boolean;
+
+  override _lookupByTextOrAllDone(result: SmartFieldLookupResult<string>) {
+    super._lookupByTextOrAllDone(result);
+  }
+
+  override _getLastSearchText(): string {
+    return super._getLastSearchText();
+  }
+
   override acceptInput(sync?: boolean): JQuery.Promise<void> | void {
     this._acceptInputEnabled = true; // accept all inputs, no need for a timeout
     return super.acceptInput(sync);
+  }
+
+  override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
+    return super._acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
   }
 }
 
