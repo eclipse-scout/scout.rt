@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupRow, ModelAdapterSendOptions, ProposalFieldAdapter, scout, SmartFieldAcceptInputEvent, StaticLookupCall, Status} from '../../../../src/index';
+import {LookupRow, ModelAdapterSendOptions, ProposalFieldAdapter, scout, SmartFieldAcceptInputEvent, SmartFieldTouchPopup, StaticLookupCall, Status} from '../../../../src/index';
 import {proposalFieldSpecHelper, ProposalFieldSpecHelperCallbacks, ProposalFieldSpecHelperInput, SpecProposalField} from '../../../../src/testing';
 
 describe('ProposalFieldAdapter', () => {
@@ -270,6 +270,81 @@ describe('ProposalFieldAdapter', () => {
         eventData = {...eventData, lookupRow};
       }
       expect(spy).toHaveBeenCalledWith('acceptInput', jasmine.objectContaining(eventData), jasmine.anything());
+    }
+
+    // select a value, then open and close the touch popup multiple times
+
+    it('write \'foo\' (touchMode: true, withErrorStatus: false, open and close multiple times)', async () => {
+      await testTouchProposalFieldOpenClose(
+        'foo',
+        false);
+    });
+
+    it('write \'foo\' (touchMode: true, withErrorStatus: true, open and close multiple times)', async () => {
+      await testTouchProposalFieldOpenClose(
+        'foo',
+        true);
+    });
+
+    it('write \'some\' (touchMode: true, withErrorStatus: false, open and close multiple times)', async () => {
+      await testTouchProposalFieldOpenClose(
+        'some',
+        false);
+    });
+
+    it('write \'some\' (touchMode: true, withErrorStatus: true, open and close multiple times)', async () => {
+      await testTouchProposalFieldOpenClose(
+        'some',
+        true);
+    });
+
+    it('lookup \'foo\' (touchMode: true, withErrorStatus: false, open and close multiple times)', async () => {
+      await testTouchProposalFieldOpenClose(
+        {text: 'foo', lookup: true},
+        false);
+    });
+
+    it('lookup \'foo\' (touchMode: true, withErrorStatus: true, open and close multiple times)', async () => {
+      await testTouchProposalFieldOpenClose(
+        {text: 'foo', lookup: true},
+        true);
+    });
+
+    async function testTouchProposalFieldOpenClose(inputOrText: ProposalFieldSpecHelperInput | string, withErrorStatus?: boolean) {
+      const expectInput = (input: ProposalFieldSpecHelperInput) => {
+        const {text} = input;
+        expect(field.value).toBe(text);
+        if (withErrorStatus) {
+          expect(field.errorStatus).not.toBeNull();
+        } else {
+          expect(field.errorStatus).toBeNull();
+        }
+      };
+      const callbacks = {
+        afterInput: (input: ProposalFieldSpecHelperInput) => {
+          if (withErrorStatus) {
+            field.setErrorStatus(Status.warning('I am a WARNING!'));
+          }
+          expectInput(input);
+        },
+        afterSelectLookupRow: (text: string, lookupRow: LookupRow<string>) => expectAcceptInputEvent(text, lookupRow),
+        afterAcceptCustomText: (text: string) => expectAcceptInputEvent(text)
+      };
+
+      const input = proposalFieldSpecHelper.ensureInput(inputOrText);
+
+      await proposalFieldSpecHelper.testProposalFieldInputs(field, [input], true, callbacks);
+
+      const callCount = spy.calls.count();
+
+      let i = 0;
+      while (i < 5) {
+        const popup = await proposalFieldSpecHelper.openPopup(field) as SmartFieldTouchPopup<string>;
+        popup.doneAction.doAction();
+        expectInput(input);
+        expect(spy).toHaveBeenCalledTimes(callCount);
+        i++;
+      }
     }
   });
 });
