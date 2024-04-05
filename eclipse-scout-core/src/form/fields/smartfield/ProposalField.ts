@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -160,6 +160,7 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     if (this.lookupRow !== otherField.lookupRow) {
       this.setLookupRow(otherField.lookupRow);
     }
+    this.setErrorStatus(otherField.errorStatus);
     if (this.value !== otherField.value) {
       this.setValue(otherField.value);
     }
