@@ -167,6 +167,12 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
   }
 
   protected override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
+    if (this.touchMode) {
+      $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) Always send acceptInput for touch field');
+      this._inputAccepted(true, !!selectedLookupRow);
+      return;
+    }
+
     // 1. Do nothing when search text is equals to the text of the current lookup row
     if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
