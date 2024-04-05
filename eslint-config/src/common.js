@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,7 +35,7 @@ module.exports = {
     'no-prototype-builtins': 'off',
     'no-return-assign': 'error',
     'eslint func-call-spacing': 'off',
-    'no-return-await': 'error',
+    'no-return-await': 'off',
     'no-self-compare': 'error',
     'no-label-var': 'error',
     'no-shadow': 'off',
