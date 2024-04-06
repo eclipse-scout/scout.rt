@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,11 @@ package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
 
+/**
+ * An action that can be called remotely by JavaScript code based on the configured {@link HybridActionType}.
+ *
+ * @see HybridManager
+ */
 @Bean
 public interface IHybridAction<DO_ENTITY extends IDoEntity> {
 

@@ -156,10 +156,10 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
   protected void handleUiHybridAction(JsonEvent event) {
     JSONObject eventData = event.getData();
     String id = eventData.getString("id");
-    String eventType = eventData.getString("eventType");
+    String actionType = eventData.getString("actionType");
     IDoEntity data = jsonDoHelper().jsonToDataObject(eventData.optJSONObject("data"), IDoEntity.class);
 
-    getModel().getUIFacade().handleHybridActionFromUI(id, eventType, data);
+    getModel().getUIFacade().handleHybridActionFromUI(id, actionType, data);
   }
 
   protected class P_HybridEventListener implements HybridEventListener {

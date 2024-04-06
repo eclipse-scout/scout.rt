@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -65,23 +65,35 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
     return HybridManager.get();
   }
 
+  /**
+   * @see HybridManager#addWidgets(Map)
+   */
   protected void addWidget(IWidget widget) {
     assertInitialized();
     hybridManager().addWidget(getId(), widget);
   }
 
-  protected void addWidgets(Map<String, IWidget> widgets) {
+  /**
+   * @see HybridManager#addWidgets(Map)
+   */
+  protected void addWidgets(Map<String, ? extends IWidget> widgets) {
     assertInitialized();
     hybridManager().addWidgets(Optional.ofNullable(widgets).orElse(Map.of())
         .entrySet().stream()
         .collect(Collectors.toMap(entry -> getId() + entry.getKey(), Entry::getValue)));
   }
 
+  /**
+   * @see HybridManager#removeWidgets(Collection)
+   */
   protected void removeWidget() {
     assertInitialized();
     hybridManager().removeWidgetById(getId());
   }
 
+  /**
+   * @see HybridManager#removeWidgets(Collection)
+   */
   protected void removeWidgetsById(Collection<String> ids) {
     assertInitialized();
     hybridManager().removeWidgetsById(Optional.ofNullable(ids).orElse(Collections.emptySet())
@@ -90,10 +102,16 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
         .collect(Collectors.toSet()));
   }
 
+  /**
+   * @see HybridManager#removeWidgets(Collection)
+   */
   protected void removeWidget(IWidget widget) {
     hybridManager().removeWidget(widget);
   }
 
+  /**
+   * @see HybridManager#removeWidgets(Collection)
+   */
   protected void removeWidgets(Collection<IWidget> widgets) {
     hybridManager().removeWidgets(widgets);
   }

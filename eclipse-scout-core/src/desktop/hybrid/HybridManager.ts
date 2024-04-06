@@ -9,6 +9,10 @@
  */
 import {Event, EventHandler, EventListener, EventMapOf, Form, HybridManagerEventMap, InitModelOf, ObjectOrChildModel, Session, UuidPool, Widget} from '../../index';
 
+/**
+ * A utility to invoke remote Java actions to simplify the interaction of Scout JS and Scout Classic code
+ * to facilitate the creation of hybrid applications.
+ */
 export class HybridManager extends Widget {
   declare eventMap: HybridManagerEventMap;
   declare self: HybridManager;
@@ -110,11 +114,11 @@ export class HybridManager extends Widget {
     }
   }
 
-  _onHybridWidgetEvent(widget: Widget, eventType: string, data: object) {
+  protected _onHybridWidgetEvent(widget: Widget, eventType: string, data: object) {
     widget.trigger(eventType, {data});
   }
 
-  _onHybridFormEvent(form: Form, eventType: string, data: object) {
+  protected _onHybridFormEvent(form: Form, eventType: string, data: object) {
     if (eventType === 'reset') {
       form.setData(data);
       form.trigger('reset');
@@ -135,30 +139,65 @@ export class HybridManager extends Widget {
   }
 
   /**
-   * @returns the id of the triggered hybrid action
+   * @deprecated use {@link callAction} instead.
    */
   triggerHybridAction(eventType: string, data?: object): string {
+    return this.callAction(eventType, data);
+  }
+
+  /**
+   * Calls the hybrid action that matches the given action type.
+   *
+   * @returns the id of the triggered hybrid action
+   * @see IHybridAction.java
+   */
+  callAction(actionType: string, data?: object): string {
     const id = this._createEventId();
-    this.trigger('hybridAction', {data: {id, eventType, data}});
+    this.trigger('hybridAction', {data: {id, actionType, data}});
     return id;
   }
 
+  /**
+   * @deprecated use {@link callActionAndWait} instead.
+   */
   async triggerHybridActionAndWait(eventType: string, data?: object): Promise<object> {
-    const id = this.triggerHybridAction(eventType, data);
-    const r = await this.when(`hybridActionEnd:${id}`);
-    return r.data;
+    return this.callActionAndWait(eventType, data);
   }
 
-  async openForm(modelVariant: string, data?: object): Promise<Form> {
-    const id = this.triggerHybridAction(`openForm:${modelVariant}`, data);
-    const r = await this.when(`widgetAdd:${id}`);
-    return r.widget as Form;
+  /**
+   * Calls the hybrid action that matches the given action type and returns a promise that will be resolved once the corresponding hybridActionEnd event arrives.
+   *
+   * @returns a promise that will be resolved once the corresponding hybridActionEnd event arrives.
+   * @see IHybridAction
+   * @see AbstractHybridAction.fireHybridActionEndEvent
+   */
+  callActionAndWait(actionType: string, data?: object): JQuery.Promise<object> {
+    const id = this.callAction(actionType, data);
+    return this.when(`hybridActionEnd:${id}`).then(event => event.data);
   }
 
-  async createForm(modelVariant: string, data?: object): Promise<Form> {
-    const id = this.triggerHybridAction(`createForm:${modelVariant}`, data);
-    const r = await this.when(`widgetAdd:${id}`);
-    return r.widget as Form;
+  /**
+   * Calls the form hybrid action with the action type `openForm:${modelVariant}` to create, start and show the requested form.
+   *
+   * @param modelVariant the suffix for the actionType so the correct hybrid action can be resolved
+   * @param data a data object that will be passed to the hybrid action
+   * @returns a promise that will be resolved once the form has been created
+   */
+  openForm(modelVariant: string, data?: object): JQuery.Promise<Form> {
+    const id = this.callAction(`openForm:${modelVariant}`, data);
+    return this.when(`widgetAdd:${id}`).then(event => event.widget as Form);
+  }
+
+  /**
+   * Calls the form hybrid action with the action type `createForm:${modelVariant}` to create and start the requested form without showing it.
+   *
+   * @param modelVariant the suffix for the actionType so the correct hybrid action can be resolved
+   * @param data a data object that will be passed to the hybrid action
+   * @returns a promise that will be resolved once the form has been created
+   */
+  createForm(modelVariant: string, data?: object): JQuery.Promise<Form> {
+    const id = this.callAction(`createForm:${modelVariant}`, data);
+    return this.when(`widgetAdd:${id}`).then(event => event.widget as Form);
   }
 
   // event support
