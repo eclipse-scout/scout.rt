@@ -9,10 +9,19 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Action to dispose widgets added to the hybrid manager from remote.
+ *
+ * @see HybridManager#addWidgets(Map)
+ * @see HybridManager#removeWidgets(Collection)
+ */
 @HybridActionType(DisposeWidgetsHybridAction.TYPE)
 public class DisposeWidgetsHybridAction extends AbstractHybridAction<DisposeWidgetsHybridActionDo> {
   protected static final String TYPE = "DisposeWidgets";

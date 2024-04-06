@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,10 +92,24 @@ public class HybridManager extends AbstractPropertyObserver {
     }
   }
 
+  /**
+   * @see #addWidgets(Map)
+   */
   public void addWidget(String id, IWidget widget) {
     addWidgets(singletonMap(id, widget));
   }
 
+  /**
+   * Adds widgets to the hybrid manager to make them available remotely. This will remotely trigger a `widgetAdd:${id}`
+   * event for each added widget.
+   * <p>
+   * <b>Important</b>: Added widgets need to be removed again when they are no longer needed, so they will be removed
+   * remotely as well. If a widget is disposed it will be removed automatically. Normally, a widget is disposed by its
+   * parent. If your widget doesn't have a parent, you need to call ({@link IWidget#dispose}) manually. You can also
+   * initiate the disposing remotely by using the {@link DisposeWidgetsHybridAction}.
+   *
+   * @see #removeWidgets(Collection)
+   */
   public void addWidgets(Map<String, IWidget> widgets) {
     Map<String, IWidget> result = new HashMap<>(getWidgets());
     widgets.forEach((id, widget) -> {
@@ -110,20 +124,35 @@ public class HybridManager extends AbstractPropertyObserver {
     setWidgetsInternal(result);
   }
 
+  /**
+   * @see #removeWidgets(Collection)
+   */
   public void removeWidgetById(String id) {
     removeWidgetsById(List.of(id));
   }
 
+  /**
+   * @see #removeWidgets(Collection)
+   */
   public void removeWidgetsById(Collection<String> ids) {
     Map<String, IWidget> result = new HashMap<>(getWidgets());
     ids.forEach(result::remove);
     setWidgetsInternal(result);
   }
 
+  /**
+   * @see #removeWidgets(Collection)
+   */
   public void removeWidget(IWidget widget) {
     removeWidgets(List.of(widget));
   }
 
+  /**
+   * Removes widgets from the hybrid manager to remove and destroy them remotely as well. This will remotely trigger a
+   * `widgetRemove:${id}` event for each removed widget.
+   *
+   * @see #addWidgets(Map)
+   */
   public void removeWidgets(Collection<IWidget> widgets) {
     setWidgetsInternal(getWidgets().entrySet().stream()
         .filter(entry -> !widgets.contains(entry.getValue()))
@@ -223,13 +252,13 @@ public class HybridManager extends AbstractPropertyObserver {
 
   // hybrid actions (js to java)
 
-  private void handleHybridAction(String id, String eventType, IDoEntity data) {
+  private void handleHybridAction(String id, String actionType, IDoEntity data) {
     if (m_hybridActionMap == null) {
       m_hybridActionMap = BEANS.getBeanManager().getBeans(IHybridAction.class).stream()
           .filter(bean -> bean.hasAnnotation(HybridActionType.class))
           .collect(Collectors.toMap(bean -> bean.getBeanAnnotation(HybridActionType.class).value(), IBean::getBeanClazz));
     }
-    Optional.ofNullable(m_hybridActionMap.get(eventType))
+    Optional.ofNullable(m_hybridActionMap.get(actionType))
         .map(BEANS::get)
         .ifPresent(hybridAction -> hybridAction.execute(id, data));
   }
@@ -245,12 +274,12 @@ public class HybridManager extends AbstractPropertyObserver {
   protected class P_UIFacade implements IHybridManagerUIFacade {
 
     @Override
-    public void handleHybridActionFromUI(String id, String eventType, IDoEntity data) {
-      handleHybridAction(id, eventType, data);
+    public void handleHybridActionFromUI(String id, String actionType, IDoEntity data) {
+      handleHybridAction(id, actionType, data);
     }
   }
 
-  public P_WidgetDisposeListener getWidgetDisposeListener() {
+  protected P_WidgetDisposeListener getWidgetDisposeListener() {
     return m_widgetDisposeListener;
   }
 

@@ -88,11 +88,11 @@ describe('HybridManager', () => {
     });
   });
 
-  describe('triggerActionAndWait', () => {
-    it('triggers a HybridAction and waits for its completion', done => {
+  describe('callActionAndWait', () => {
+    it('calls a HybridAction and waits for its completion', done => {
       const id = '42';
       UuidPool.get(session).uuids.push(id);
-      HybridManager.get(session).triggerHybridActionAndWait('Ping').then(() => done());
+      HybridManager.get(session).callActionAndWait('Ping').then(() => done());
       session._processSuccessResponse({
         events: [
           {
