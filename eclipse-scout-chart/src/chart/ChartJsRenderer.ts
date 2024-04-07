@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractChartRenderer, Chart, chartJsDateAdapter} from '../index';
+import {AbstractChartRenderer, CartesianChartScale, Chart, chartJsDateAdapter, RadialChartScale} from '../index';
 import {
   _adapters as chartJsAdapters, ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint,
   FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle,
@@ -2794,7 +2794,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     });
   }
 
-  protected _adjustAxisMaxMin(axis: LinearScaleOptions | RadialLinearScaleOptions, maxTicks: number, maxMinValue: Boundary) {
+  protected _adjustAxisMaxMin(axis: AxisWithMaxMin, maxTicks: number, maxMinValue: Boundary) {
     if (!axis) {
       return;
     }
@@ -2857,6 +2857,14 @@ export type DatasetColors = {
 
 export type Boundary = { maxValue: number; minValue: number };
 
+export type AxisWithMaxMin = (CartesianChartScale | RadialChartScale) & {
+  suggestedMax?: string | number;
+  suggestedMin?: string | number;
+  ticks?: (CartesianChartScale | RadialChartScale)['ticks'] & {
+    stepSize?: number;
+  };
+};
+
 // extend chart.js
 
 export type ChartJsChart = Omit<ChartJs, 'config'> & {
@@ -2873,10 +2881,10 @@ declare module 'chart.js' {
     datasetId?: string;
     yAxisID?: 'y' | 'yDiffType';
 
-    pointBackgroundColor?: Color;
-    pointHoverBackgroundColor?: Color;
-    pointRadius?: number;
-    legendColor?: Color;
+    pointBackgroundColor?: Scriptable<Color, ScriptableContext<TType>>;
+    pointHoverBackgroundColor?: Scriptable<Color, ScriptableContext<TType>>;
+    pointRadius?: Scriptable<number, ScriptableContext<TType>>;
+    legendColor?: Scriptable<Color, number>;
 
     checkedBackgroundColor?: Color;
     checkedHoverBackgroundColor?: Color;
