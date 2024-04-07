@@ -10,7 +10,7 @@
 import {AbstractChartRenderer, ChartEventMap, ChartJsRenderer, ChartLayout, ChartModel, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
 import {aria, arrays, ColorScheme, colorSchemes, EnumObject, HtmlComponent, InitModelOf, objects, Widget} from '@eclipse-scout/core';
 import {GreenAreaPosition} from './SpeedoChartRenderer';
-import {ChartConfiguration, LinearScaleOptions, RadialLinearScaleOptions} from 'chart.js';
+import {CategoryScaleOptions, ChartConfiguration, ChartOptions, LinearScaleOptions, LogarithmicScaleOptions, RadialLinearScaleOptions, ScaleType, TimeScaleOptions as ChartJsTimeScaleOptions} from 'chart.js';
 import $ from 'jquery';
 
 export class Chart extends Widget implements ChartModel {
@@ -414,60 +414,72 @@ export type ChartValueGroup = {
   cssClass?: string;
 };
 
-export type ChartConfig = Partial<Omit<ChartConfiguration, 'type'>> & {
+export type ChartConfig = Partial<Omit<ChartConfiguration, 'type' | 'options'>> & {
   type: ChartType;
-  options?: {
-    autoColor?: boolean;
-    colorScheme?: ColorScheme | string;
-    transparent?: boolean;
-    maxSegments?: number;
-    otherSegmentClickable?: boolean;
-    adjustGridMaxMin?: boolean;
-    clickable?: boolean;
-    checkable?: boolean;
-    scaleLabelByTypeMap?: Record<ChartType, Record<string, string>>;
-    numberFormatter?: NumberFormatter;
-    reformatLabels?: boolean;
-    handleResize?: boolean;
-    animation?: {
-      duration?: number;
-    };
-    scales?: {
-      x?: LinearScaleOptions & {
-        minSpaceBetweenTicks?: number;
-      };
-      y?: LinearScaleOptions & {
-        minSpaceBetweenTicks?: number;
-      };
-      yDiffType?: LinearScaleOptions;
-      r?: RadialLinearScaleOptions & {
-        minSpaceBetweenTicks?: number;
-      };
-    };
-    bubble?: {
-      sizeOfLargestBubble?: number;
-      minBubbleSize?: number;
-    };
-    fulfillment?: {
-      startValue?: number;
-    };
-    salesfunnel?: {
-      normalized?: boolean;
-      calcConversionRate?: boolean;
-    };
-    speedo?: {
-      greenAreaPosition?: GreenAreaPosition;
-    };
-    venn?: {
-      numberOfCircles?: 1 | 2 | 3;
-    };
-    plugins?: {
-      legend?: {
-        clickable?: boolean;
-      };
+  options?: ChartConfigOptions;
+};
+
+export type ChartConfigOptions = Omit<ChartOptions, 'scales'> & {
+  autoColor?: boolean;
+  colorScheme?: ColorScheme | string;
+  transparent?: boolean;
+  maxSegments?: number;
+  otherSegmentClickable?: boolean;
+  adjustGridMaxMin?: boolean;
+  clickable?: boolean;
+  checkable?: boolean;
+  scaleLabelByTypeMap?: Record<ChartType, Record<string, string>>;
+  numberFormatter?: NumberFormatter;
+  reformatLabels?: boolean;
+  handleResize?: boolean;
+  animation?: {
+    duration?: number;
+  };
+  scales?: {
+    x?: CartesianChartScale;
+    y?: CartesianChartScale;
+    yDiffType?: CartesianChartScale;
+    r?: RadialChartScale;
+  };
+  bubble?: {
+    sizeOfLargestBubble?: number;
+    minBubbleSize?: number;
+  };
+  fulfillment?: {
+    startValue?: number;
+  };
+  salesfunnel?: {
+    normalized?: boolean;
+    calcConversionRate?: boolean;
+  };
+  speedo?: {
+    greenAreaPosition?: GreenAreaPosition;
+  };
+  venn?: {
+    numberOfCircles?: 1 | 2 | 3;
+  };
+  plugins?: {
+    legend?: {
+      clickable?: boolean;
     };
   };
 };
+
+export type RadialChartScale = DeepPartial<RadialLinearScaleOptions> & {
+  type?: ScaleType;
+  minSpaceBetweenTicks?: number;
+};
+
+export type CartesianChartScale = DeepPartial<LinearScaleOptions | CategoryScaleOptions | TimeScaleOptions | LogarithmicScaleOptions> & {
+  type?: ScaleType;
+  minSpaceBetweenTicks?: number;
+};
+
+export type TimeScaleOptions = Omit<ChartJsTimeScaleOptions, 'min' | 'max'> & {
+  min?: string | number | Date | (() => string | number | Date);
+  max?: string | number | Date | (() => string | number | Date);
+};
+
 export type ChartType = EnumObject<typeof Chart.Type>;
 export type ChartPosition = EnumObject<typeof Chart.Position>;
 export type NumberFormatter = (label: number | string, defaultFormatter: (label: number | string) => string) => string;
@@ -498,3 +510,7 @@ export type UpdateChartOptions = {
   onlyRefresh?: boolean;
   enforceRerender?: boolean;
 };
+
+type DeepPartial<T> = T extends object ? {
+  [P in keyof T]?: DeepPartial<T[P]>;
+} : T;
