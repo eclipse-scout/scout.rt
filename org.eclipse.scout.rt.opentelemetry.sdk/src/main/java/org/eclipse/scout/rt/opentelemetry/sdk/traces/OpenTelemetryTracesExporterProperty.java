@@ -20,7 +20,8 @@ public class OpenTelemetryTracesExporterProperty extends AbstractStringConfigPro
 
   @Override
   public String description() {
-    return "Configures the default exporter for traces. Default is 'none', so no traces are exported. Set value to "
+    return "Configures the default exporter for traces. Default is 'none',"
+        + " so no traces are exported. Set value to "
         + "'otlp' to export using the OpenTelemetry protocol.";
   }
 

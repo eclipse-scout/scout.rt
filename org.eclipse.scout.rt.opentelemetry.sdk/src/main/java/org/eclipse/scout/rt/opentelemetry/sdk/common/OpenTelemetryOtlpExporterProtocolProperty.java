@@ -20,8 +20,9 @@ public class OpenTelemetryOtlpExporterProtocolProperty extends AbstractStringCon
 
   @Override
   public String description() {
-    return "Configures the protocol for exporting telemetry data with otlp. Possible values are "
-        + "'http/protobuf', 'http/json' or 'grpc'. Default is 'http/protobuf'";
+    return "Configures the protocol for exporting telemetry data with otlp."
+        + " Possible values are 'http/protobuf', 'http/json' or 'grpc'."
+        + " Default is 'http/protobuf'";
   }
 
   @Override

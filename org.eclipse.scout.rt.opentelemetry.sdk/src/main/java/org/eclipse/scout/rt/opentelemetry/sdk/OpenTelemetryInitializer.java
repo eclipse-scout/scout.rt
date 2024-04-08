@@ -112,13 +112,15 @@ public class OpenTelemetryInitializer implements IPlatformListener {
 
   protected Map<String, String> getDefaultProperties() {
     String tracesExporter = CONFIG.getPropertyValue(OpenTelemetryTracesExporterProperty.class);
-    String metricsExporter = CONFIG.getPropertyValue(OpenTelemetryDefaultExporterProperty.class);
+    String metricsExporter = CONFIG.getPropertyValue(OpenTelemetryMetricsExporterProperty.class);
     String otplExporterEndpoint = CONFIG.getPropertyValue(OpenTelemetryOtlpExporterEndpointProperty.class);
     String otlpExporterProtocol = CONFIG.getPropertyValue(OpenTelemetryOtlpExporterProtocolProperty.class);
+    String serviceName = CONFIG.getPropertyValue(ApplicationNameProperty.class);
+    String instanceIdProperty = "service.instance.id=" + NodeId.current().unwrapAsString();
 
     Map<String, String> defaultConfig = new HashMap<>();
-    defaultConfig.put("otel.service.name", CONFIG.getPropertyValue(ApplicationNameProperty.class));
-    defaultConfig.put("otel.resource.attributes", "service.instance.id=" + NodeId.current().unwrapAsString());
+    defaultConfig.put("otel.service.name", serviceName);
+    defaultConfig.put("otel.resource.attributes", instanceIdProperty);
 
     // OTLP Exporter
     defaultConfig.put("otel.expoter.otlp.endpoint", otplExporterEndpoint);
@@ -188,7 +190,7 @@ public class OpenTelemetryInitializer implements IPlatformListener {
     }
   }
 
-  public static class OpenTelemetryDefaultExporterProperty extends AbstractStringConfigProperty {
+  public static class OpenTelemetryMetricsExporterProperty extends AbstractStringConfigProperty {
 
     @Override
     public String getKey() {
