@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Proxy;
 import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -177,7 +178,7 @@ public abstract class AbstractJaxWsClientTest {
       fail("invocation is expected to be cancelled");
     }
     catch (WebServiceException e) {
-      if (!(e.getCause() instanceof SocketTimeoutException)) {
+      if (!isTimeoutCause(e)) {
         throw e;
       }
     }
@@ -289,7 +290,7 @@ public abstract class AbstractJaxWsClientTest {
       fail("invocation is expected to be cancelled");
     }
     catch (WebServiceException e) {
-      if (!(e.getCause() instanceof SocketTimeoutException)) {
+      if (!isTimeoutCause(e)) {
         throw e;
       }
     }
@@ -298,6 +299,10 @@ public abstract class AbstractJaxWsClientTest {
     // 3. invoke echo again, response code 200 expected
     port.echo(echoReq);
     assertHttpResponseCode(port, 200);
+  }
+
+  protected boolean isTimeoutCause(WebServiceException e) {
+    return e.getCause() instanceof SocketTimeoutException || e.getCause() instanceof HttpTimeoutException;
   }
 
   @Test
@@ -324,7 +329,7 @@ public abstract class AbstractJaxWsClientTest {
       fail("invocation is expected to be cancelled");
     }
     catch (WebServiceException e) {
-      if (!(e.getCause() instanceof SocketTimeoutException)) {
+      if (!isTimeoutCause(e)) {
         throw e;
       }
     }
@@ -439,7 +444,7 @@ public abstract class AbstractJaxWsClientTest {
       fail("invocation is expected to be cancelled");
     }
     catch (WebServiceException e) {
-      if (!(e.getCause() instanceof SocketTimeoutException)) {
+      if (!isTimeoutCause(e)) {
         throw e;
       }
     }
