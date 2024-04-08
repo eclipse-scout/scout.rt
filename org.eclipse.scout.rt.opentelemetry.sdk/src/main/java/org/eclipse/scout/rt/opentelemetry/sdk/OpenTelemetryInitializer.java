@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
+import org.eclipse.scout.rt.opentelemetry.sdk.common.OpenTelemetryOtlpExporterEndpointProperty;
+import org.eclipse.scout.rt.opentelemetry.sdk.common.OpenTelemetryOtlpExporterProtocolProperty;
+import org.eclipse.scout.rt.opentelemetry.sdk.traces.OpenTelemetryTracesExporterProperty;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
@@ -108,16 +111,29 @@ public class OpenTelemetryInitializer implements IPlatformListener {
   }
 
   protected Map<String, String> getDefaultProperties() {
-    String defaultExporter = CONFIG.getPropertyValue(OpenTelemetryDefaultExporterProperty.class);
-    Map<String, String> defaultConfig = new HashMap<>();
-    defaultConfig.put("otel.traces.exporter", "none");
-    defaultConfig.put("otel.logs.exporter", "none");
-    defaultConfig.put("otel.metrics.exporter", defaultExporter);
-    defaultConfig.put("otel.exporter.otlp.protocol", "http/protobuf");
-    defaultConfig.put("otel.metric.export.interval", "30000"); // 30s
+    String tracesExporter = CONFIG.getPropertyValue(OpenTelemetryTracesExporterProperty.class);
+    String metricsExporter = CONFIG.getPropertyValue(OpenTelemetryDefaultExporterProperty.class);
+    String otplExporterEndpoint = CONFIG.getPropertyValue(OpenTelemetryOtlpExporterEndpointProperty.class);
+    String otlpExporterProtocol = CONFIG.getPropertyValue(OpenTelemetryOtlpExporterProtocolProperty.class);
 
+    Map<String, String> defaultConfig = new HashMap<>();
     defaultConfig.put("otel.service.name", CONFIG.getPropertyValue(ApplicationNameProperty.class));
     defaultConfig.put("otel.resource.attributes", "service.instance.id=" + NodeId.current().unwrapAsString());
+
+    // OTLP Exporter
+    defaultConfig.put("otel.expoter.otlp.endpoint", otplExporterEndpoint);
+    defaultConfig.put("otel.exporter.otlp.protocol", otlpExporterProtocol);
+
+    // Traces
+    defaultConfig.put("otel.traces.exporter", tracesExporter);
+
+    // Metrics
+    defaultConfig.put("otel.metrics.exporter", metricsExporter);
+    defaultConfig.put("otel.metric.export.interval", "30000"); // 30s
+
+    // Logs
+    defaultConfig.put("otel.logs.exporter", "none");
+
     return defaultConfig;
   }
 
