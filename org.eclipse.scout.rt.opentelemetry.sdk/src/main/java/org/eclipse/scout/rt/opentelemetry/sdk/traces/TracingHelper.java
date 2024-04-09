@@ -38,18 +38,7 @@ public class TracingHelper implements ITracingHelper {
 
   @Override
   public void wrapInSpan(Tracer tracer, String spanName, Runnable runnable) {
-    Span span = tracer.spanBuilder(spanName).startSpan();
-    try (Scope ignored = span.makeCurrent()) {
-      runnable.run();
-    }
-    catch (Throwable t) {
-      span.setStatus(StatusCode.ERROR, t.getMessage());
-      span.recordException(t);
-      throw t;
-    }
-    finally {
-      span.end();
-    }
+    wrapInSpan(tracer, spanName, (span) -> runnable.run());
   }
 
   @Override
@@ -72,12 +61,12 @@ public class TracingHelper implements ITracingHelper {
   @SuppressWarnings("unchecked")
   public <T> void appendAttributes(Span span, T source) {
     BEANS.all(ISpanAttributeMapper.class).stream()
-        .filter(mapper -> getGenericClassType(mapper).equals(source.getClass()))
+        .filter(mapper -> getGenericClass(mapper).equals(source.getClass()))
         .forEach(mapper -> mapper.addAttribute(span, source));
   }
 
   @SuppressWarnings("unchecked")
-  private <T> Class<T> getGenericClassType(ISpanAttributeMapper<T> mapper) {
+  private <T> Class<T> getGenericClass(ISpanAttributeMapper<T> mapper) {
     Type interfaceClass = mapper.getClass().getGenericInterfaces()[0];
     return ((Class<T>) ((ParameterizedType) interfaceClass).getActualTypeArguments()[0]);
   }
