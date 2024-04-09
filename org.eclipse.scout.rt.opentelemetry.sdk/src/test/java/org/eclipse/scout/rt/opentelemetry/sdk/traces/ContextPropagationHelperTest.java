@@ -64,10 +64,10 @@ public class ContextPropagationHelperTest {
 
     // Act
     TextMapGetter<HttpServletRequest> getter = BEANS.get(IContextPropagationHelper.class).createServletRequestTextMapGetter();
-    Iterable<String> iterableHederKeys = getter.keys(mockRequest);
+    Iterable<String> iterableHeaderKeys = getter.keys(mockRequest);
 
     // Assert
-    assertTrue(iterableHederKeys.iterator().hasNext());
+    assertTrue(iterableHeaderKeys.iterator().hasNext());
     assertEquals(headerValue, getter.get(mockRequest, headerKey));
   }
 }
