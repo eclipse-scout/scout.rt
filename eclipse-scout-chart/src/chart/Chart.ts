@@ -12,7 +12,6 @@ import {arrays, ColorScheme, colorSchemes, EnumObject, HtmlComponent, InitModelO
 import {GreenAreaPosition} from './SpeedoChartRenderer';
 import {CategoryScaleOptions, ChartConfiguration, ChartOptions, LinearScaleOptions, LogarithmicScaleOptions, RadialLinearScaleOptions, ScaleType, TimeScaleOptions as ChartJsTimeScaleOptions} from 'chart.js';
 import $ from 'jquery';
-import type {DeepPartial} from 'chart.js/types/utils';
 
 export class Chart extends Widget implements ChartModel {
   declare model: ChartModel;
@@ -470,7 +469,7 @@ export type RadialChartScale = DeepPartial<RadialLinearScaleOptions> & {
   minSpaceBetweenTicks?: number;
 };
 
-export type CartesianChartScale = DeepPartial<(LinearScaleOptions | CategoryScaleOptions | TimeScaleOptions | LogarithmicScaleOptions)> & {
+export type CartesianChartScale = DeepPartial<LinearScaleOptions | CategoryScaleOptions | TimeScaleOptions | LogarithmicScaleOptions> & {
   type?: ScaleType;
   minSpaceBetweenTicks?: number;
 };
@@ -510,3 +509,7 @@ export type UpdateChartOptions = {
   onlyRefresh?: boolean;
   enforceRerender?: boolean;
 };
+
+type DeepPartial<T> = T extends object ? {
+  [P in keyof T]?: DeepPartial<T[P]>;
+} : T;
