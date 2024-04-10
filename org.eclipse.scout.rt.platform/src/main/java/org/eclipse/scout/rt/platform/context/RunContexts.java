@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,8 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+
+import io.opentelemetry.context.Context;
 
 /**
  * Factory methods to create a new {@link RunContext} objects to propagate context like {@link Subject} or
@@ -122,7 +124,8 @@ public final class RunContexts {
     public RunContext empty() {
       RunContext rc = newInstance()
           .withRunMonitor(BEANS.get(RunMonitor.class))
-          .withTransactionScope(TransactionScope.REQUIRED);
+          .withTransactionScope(TransactionScope.REQUIRED)
+          .withOpenTelemetryContext(Context.current());
       rc.fillEmpty();
       return rc;
     }
@@ -139,6 +142,7 @@ public final class RunContexts {
           .withRunMonitor(BEANS.get(RunMonitor.class))
           .withTransactionScope(TransactionScope.REQUIRED)
           .withNewTransactionSupplier(null)
+          .withOpenTelemetryContext(Context.current())
           .withoutTransactionMembers();
 
       // Register the run monitor for propagated cancellation.

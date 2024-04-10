@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,6 +48,9 @@ import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.MDC;
 
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+
 /**
  * A {@link RunContext} represents a "snapshot" of the current calling state and is always associated with a
  * {@link RunMonitor}.
@@ -73,6 +76,7 @@ public class RunContext implements IAdaptable {
   protected Subject m_subject;
   protected Locale m_locale;
   protected String m_correlationId;
+  protected Context m_openTelemetryContext;
   protected PropertyMap m_propertyMap = new PropertyMap();
 
   protected Map<ThreadLocal<?>, ThreadLocalProcessor<?>> m_threadLocalProcessors = new HashMap<>();
@@ -151,8 +155,9 @@ public class RunContext implements IAdaptable {
    *           if the callable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
   @SuppressWarnings("squid:S1181")
-  public <RESULT, EXCEPTION extends Throwable> RESULT call(final Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
+  public <RESULT, EXCEPTION extends Throwable> RESULT call(Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     final ThreadInterrupter threadInterrupter = new ThreadInterrupter(Thread.currentThread(), m_runMonitor);
+    callable = injectOpenTelemetryContext(callable);
     try {
       return this.<RESULT> createCallableChain().call(callable);
     }
@@ -162,6 +167,26 @@ public class RunContext implements IAdaptable {
     finally {
       threadInterrupter.destroy();
     }
+  }
+
+  /**
+   * When a OpenTelemetry context is set, modify the callable to run in the context.
+   *
+   * @param callable
+   *     original callable
+   * @param <RESULT>
+   *     result type of the callable
+   * @return the callable with the injected OpenTelemetry context
+   */
+  protected <RESULT> Callable<RESULT> injectOpenTelemetryContext(final Callable<RESULT> callable) {
+    if (getOpenTelemetryContext() == null) {
+      return callable;
+    }
+    return () -> {
+      try (Scope ignored = getOpenTelemetryContext().makeCurrent()) {
+        return callable.call();
+      }
+    };
   }
 
   /**
@@ -489,6 +514,15 @@ public class RunContext implements IAdaptable {
     return this;
   }
 
+  public RunContext withOpenTelemetryContext(final Context context) {
+    m_openTelemetryContext = context;
+    return this;
+  }
+
+  public Context getOpenTelemetryContext() {
+    return m_openTelemetryContext;
+  }
+
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -522,6 +556,7 @@ public class RunContext implements IAdaptable {
     m_locale = origin.m_locale;
     m_correlationId = origin.m_correlationId;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
+    m_openTelemetryContext = origin.m_openTelemetryContext;
     m_transactionScope = origin.m_transactionScope;
     m_transaction = origin.m_transaction;
     m_newTransactionSupplier = origin.m_newTransactionSupplier;
@@ -543,6 +578,7 @@ public class RunContext implements IAdaptable {
     m_locale = NlsLocale.CURRENT.get();
     m_correlationId = CorrelationId.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
+    m_openTelemetryContext = Context.current();
     m_transactionScope = currentRunContext.m_transactionScope;
     m_transaction = ITransaction.CURRENT.get();
     m_newTransactionSupplier = currentRunContext.m_newTransactionSupplier;
