@@ -12,10 +12,14 @@ package org.eclipse.scout.rt.opentelemetry.sdk.traces;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.opentelemetry.ISpanAttributeMapper;
 import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
+import org.eclipse.scout.rt.platform.opentelemetry.ThrowingConsumer;
+import org.eclipse.scout.rt.platform.opentelemetry.ThrowingFunction;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
@@ -37,15 +41,33 @@ public class TracingHelper implements ITracingHelper {
   }
 
   @Override
-  public void wrapInSpan(Tracer tracer, String spanName, Runnable runnable) {
-    wrapInSpan(tracer, spanName, (span) -> runnable.run());
+  public void wrapInSpan(Tracer tracer, String spanName, Consumer<Span> consumer) {
+    wrapInSpan(tracer, spanName, (ThrowingConsumer<Span>) span -> consumer.accept(span), BEANS.get(PlatformExceptionTranslator.class));
   }
 
   @Override
-  public void wrapInSpan(Tracer tracer, String spanName, Consumer<Span> consumer) {
+  public <T> T wrapInSpan(Tracer tracer, String spanName, Function<Span, T> function) {
+    return wrapInSpan(tracer, spanName, (ThrowingFunction<Span, T>) span -> function.apply(span), BEANS.get(PlatformExceptionTranslator.class));
+  }
+
+  @Override
+  public void wrapInSpan(Tracer tracer, String spanName, ThrowingConsumer<Span> consumer, PlatformExceptionTranslator exceptionTranslator) {
+    wrapInSpan(tracer, spanName, span -> {
+      consumer.accept(span);
+      return null;
+    }, exceptionTranslator);
+  }
+
+  @Override
+  public <T> T wrapInSpan(Tracer tracer, String spanName, ThrowingFunction<Span, T> function, PlatformExceptionTranslator exceptionTranslator) {
     Span span = tracer.spanBuilder(spanName).startSpan();
     try (Scope ignored = span.makeCurrent()) {
-      consumer.accept(span);
+      try {
+        return function.apply(span);
+      }
+      catch (Exception e) {
+        throw exceptionTranslator.translate(e);
+      }
     }
     catch (Throwable t) {
       span.setStatus(StatusCode.ERROR, t.getMessage());

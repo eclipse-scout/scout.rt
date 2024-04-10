@@ -10,8 +10,10 @@
 package org.eclipse.scout.rt.platform.opentelemetry;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.slf4j.Logger;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
@@ -65,22 +67,6 @@ public interface ITracingHelper {
   /**
    * Wraps the given code into a span.
    * <p>
-   * Creates a new span (unit of work) with the given name and from the provided tracer. The runnable code passed is
-   * being executed within the span.
-   * </p>
-   *
-   * @param tracer
-   *     instance of the tracer where the span is created from
-   * @param spanName
-   *     name of the span
-   * @param runnable
-   *     code to be executed within the span
-   */
-  void wrapInSpan(Tracer tracer, String spanName, Runnable runnable);
-
-  /**
-   * Wraps the given code into a span.
-   * <p>
    * Creates a new span (unit of work) with the given name and from the provided tracer. The code passed is being
    * executed within the span. The consumer accepts the span object. This gives the opportunity to add e.g. attributes
    * or events to the trace.
@@ -94,6 +80,12 @@ public interface ITracingHelper {
    *     code to be executed within the span, accepts the span object to add attributes or events
    */
   void wrapInSpan(Tracer tracer, String spanName, Consumer<Span> consumer);
+
+  <T> T wrapInSpan(Tracer tracer, String spanName, Function<Span, T> function);
+
+  void wrapInSpan(Tracer tracer, String spanName, ThrowingConsumer<Span> consumer, PlatformExceptionTranslator exceptionTranslator);
+
+  <T> T wrapInSpan(Tracer tracer, String spanName, ThrowingFunction<Span, T> function, PlatformExceptionTranslator exceptionTranslator);
 
   /**
    * Adds attributes to the span from a source object.

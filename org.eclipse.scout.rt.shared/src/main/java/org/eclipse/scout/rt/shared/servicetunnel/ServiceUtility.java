@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,10 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
 import org.eclipse.scout.rt.platform.util.Assertions;
+
+import io.opentelemetry.api.trace.Tracer;
 
 @ApplicationScoped
 public class ServiceUtility {
@@ -46,11 +49,16 @@ public class ServiceUtility {
     Assertions.assertNotNull(service, "service is null");
     Assertions.assertNotNull(operation, "operation is null");
 
-    try {
-      return operation.invoke(service, args != null ? args : new Object[0]);
-    }
-    catch (final Throwable t) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(t);
-    }
+    Tracer tracer = BEANS.get(ITracingHelper.class).createTracer(ServiceUtility.class);
+    return BEANS.get(ITracingHelper.class).wrapInSpan(tracer, service.getClass().getSimpleName(), span -> {
+      span.setAttribute("scout.server.service.name", service.getClass().getName());
+      span.setAttribute("scout.server.service.operation", operation.getName());
+      try {
+        return operation.invoke(service, args != null ? args : new Object[0]);
+      }
+      catch (final Throwable t) {
+        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(t);
+      }
+    });
   }
 }

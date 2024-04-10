@@ -45,20 +45,6 @@ public class TracingHelperTest {
   }
 
   @Test
-  public void testWrapRunnableInSpan() {
-    // Arrange
-    Tracer mockTracer = mock(Tracer.class);
-    mockSpan(mockTracer); // Also mocks the span builder
-    Runnable mockRunnable = mock(Runnable.class);
-
-    // Act
-    BEANS.get(ITracingHelper.class).wrapInSpan(mockTracer, "testName", mockRunnable);
-
-    // Assert
-    verify(mockRunnable).run();
-  }
-
-  @Test
   @SuppressWarnings("unchecked")
   public void testWrapConsumerInSpan() {
     // Arrange

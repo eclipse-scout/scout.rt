@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,9 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.slf4j.Logger;
@@ -33,7 +35,10 @@ public class JsonEventProcessor {
     Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread={}, request={}, response={}]",
         Thread.currentThread().getName(), request, response);
     for (final JsonEvent event : request.getEvents()) {
-      processEvent(event, response);
+      BEANS.get(ITracingHelper.class).wrapInSpan(BEANS.get(ITracingHelper.class).createTracer(JsonEventProcessor.class), "processJsonEvent", span -> {
+        BEANS.get(ITracingHelper.class).appendAttributes(span, event);
+        processEvent(event, response);
+      });
     }
   }
 
