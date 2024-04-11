@@ -124,8 +124,7 @@ public final class RunContexts {
     public RunContext empty() {
       RunContext rc = newInstance()
           .withRunMonitor(BEANS.get(RunMonitor.class))
-          .withTransactionScope(TransactionScope.REQUIRED)
-          .withOpenTelemetryContext(Context.current());
+          .withTransactionScope(TransactionScope.REQUIRED);
       rc.fillEmpty();
       return rc;
     }

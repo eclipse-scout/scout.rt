@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.slf4j.Logger;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
@@ -44,7 +43,7 @@ public interface ITracingHelper {
    * </p>
    *
    * @param instrumentationClass
-   *     class for which the {@link Tracer} should be created
+   *          class for which the {@link Tracer} should be created
    * @return the tracer instance
    */
   Tracer createTracer(Class<?> instrumentationClass);
@@ -57,9 +56,9 @@ public interface ITracingHelper {
    * </p>
    *
    * @param openTelemetry
-   *     custom {@link OpenTelemetry} instance to create the tracer from
+   *          custom {@link OpenTelemetry} instance to create the tracer from
    * @param instrumentationClass
-   *     class for which the {@link Tracer} should be created
+   *          class for which the {@link Tracer} should be created
    * @return the tracer instance
    */
   Tracer createTracer(OpenTelemetry openTelemetry, Class<?> instrumentationClass);
@@ -73,19 +72,70 @@ public interface ITracingHelper {
    * </p>
    *
    * @param tracer
-   *     instance of the tracer where the span is created from
+   *          instance of the tracer where the span is created from
    * @param spanName
-   *     name of the span
+   *          name of the span
    * @param consumer
-   *     code to be executed within the span, accepts the span object to add attributes or events
+   *          code to be executed within the span, accepts the span object to add attributes or events
    */
   void wrapInSpan(Tracer tracer, String spanName, Consumer<Span> consumer);
 
+  /**
+   * Wraps the given code into a span.
+   * <p>
+   * Creates a new span (unit of work) with the given name and from the provided tracer. The code passed is being
+   * executed within the span. The function applies the span object. This gives the opportunity to add e.g. attributes
+   * or events to the trace. The function returns a gereric return value.
+   * </p>
+   *
+   * @param tracer
+   *     instance of the tracer where the span is created from
+   * @param spanName
+   *     name of the span
+   * @param function
+   *     code to be executed within the span, applies the span object and returns a generic value
+   * @param <T>
+   *     type of the return value
+   * @return the result of the function
+   */
   <T> T wrapInSpan(Tracer tracer, String spanName, Function<Span, T> function);
 
-  void wrapInSpan(Tracer tracer, String spanName, ThrowingConsumer<Span> consumer, PlatformExceptionTranslator exceptionTranslator);
+  /**
+   * Wraps the given code into a span. An exception may be thrown.
+   * <p>
+   * Creates a new span (unit of work) with the given name and from the provided tracer. The code passed is being
+   * executed within the span. The consumer accepts the span object. This gives the opportunity to add e.g. attributes
+   * or events to the trace. The consumer may throw an exception.
+   * </p>
+   *
+   * @param tracer
+   *          instance of the tracer where the span is created from
+   * @param spanName
+   *          name of the span
+   * @param consumer
+   *          code to be executed within the span, accepts the span object to add attributes or events
+   */
+  void wrapInThrowingSpan(Tracer tracer, String spanName, IThrowingConsumer<Span> consumer) throws Exception;
 
-  <T> T wrapInSpan(Tracer tracer, String spanName, ThrowingFunction<Span, T> function, PlatformExceptionTranslator exceptionTranslator);
+  /**
+   * Wraps the given code into a span. An exception may be thrown.
+   * <p>
+   * Creates a new span (unit of work) with the given name and from the provided tracer. The code passed is being
+   * executed within the span. The function applies the span object. This gives the opportunity to add e.g. attributes
+   * or events to the trace. The function returns a gereric return value and may throw an exception.
+   * </p>
+   *
+   * @param tracer
+   *          instance of the tracer where the span is created from
+   * @param spanName
+   *          name of the span
+   * @param function
+   *          code to be executed within the span, applies the span object and returns a generic value
+   * @return the result of the function
+   * @param <T>
+   *          type of the return value
+   */
+  <T> T wrapInThrowingSpan(Tracer tracer, String spanName, IThrowingFunction<Span, T> function) throws Exception;
 
   /**
    * Adds attributes to the span from a source object.
@@ -96,9 +146,9 @@ public interface ITracingHelper {
    * </p>
    *
    * @param span
-   *     span where attributes should be added
+   *          span where attributes should be added
    * @param source
-   *     object from where the attributes are read
+   *          object from where the attributes are read
    */
   <T> void appendAttributes(Span span, T source);
 }

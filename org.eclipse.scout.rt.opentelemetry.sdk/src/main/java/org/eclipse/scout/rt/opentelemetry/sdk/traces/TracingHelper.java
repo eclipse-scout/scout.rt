@@ -15,11 +15,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.opentelemetry.ISpanAttributeMapper;
+import org.eclipse.scout.rt.platform.opentelemetry.IThrowingConsumer;
+import org.eclipse.scout.rt.platform.opentelemetry.IThrowingFunction;
 import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
-import org.eclipse.scout.rt.platform.opentelemetry.ThrowingConsumer;
-import org.eclipse.scout.rt.platform.opentelemetry.ThrowingFunction;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
@@ -42,32 +42,37 @@ public class TracingHelper implements ITracingHelper {
 
   @Override
   public void wrapInSpan(Tracer tracer, String spanName, Consumer<Span> consumer) {
-    wrapInSpan(tracer, spanName, (ThrowingConsumer<Span>) span -> consumer.accept(span), BEANS.get(PlatformExceptionTranslator.class));
+    try {
+      wrapInThrowingSpan(tracer, spanName, (IThrowingConsumer<Span>) span -> consumer.accept(span));
+    }
+    catch (Exception e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
   }
 
   @Override
   public <T> T wrapInSpan(Tracer tracer, String spanName, Function<Span, T> function) {
-    return wrapInSpan(tracer, spanName, (ThrowingFunction<Span, T>) span -> function.apply(span), BEANS.get(PlatformExceptionTranslator.class));
+    try {
+      return wrapInThrowingSpan(tracer, spanName, (IThrowingFunction<Span, T>) span -> function.apply(span));
+    }
+    catch (Exception e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
   }
 
   @Override
-  public void wrapInSpan(Tracer tracer, String spanName, ThrowingConsumer<Span> consumer, PlatformExceptionTranslator exceptionTranslator) {
-    wrapInSpan(tracer, spanName, span -> {
+  public void wrapInThrowingSpan(Tracer tracer, String spanName, IThrowingConsumer<Span> consumer) throws Exception {
+    wrapInThrowingSpan(tracer, spanName, span -> {
       consumer.accept(span);
       return null;
-    }, exceptionTranslator);
+    });
   }
 
   @Override
-  public <T> T wrapInSpan(Tracer tracer, String spanName, ThrowingFunction<Span, T> function, PlatformExceptionTranslator exceptionTranslator) {
+  public <T> T wrapInThrowingSpan(Tracer tracer, String spanName, IThrowingFunction<Span, T> function) throws Exception {
     Span span = tracer.spanBuilder(spanName).startSpan();
     try (Scope ignored = span.makeCurrent()) {
-      try {
-        return function.apply(span);
-      }
-      catch (Exception e) {
-        throw exceptionTranslator.translate(e);
-      }
+      return function.apply(span);
     }
     catch (Throwable t) {
       span.setStatus(StatusCode.ERROR, t.getMessage());

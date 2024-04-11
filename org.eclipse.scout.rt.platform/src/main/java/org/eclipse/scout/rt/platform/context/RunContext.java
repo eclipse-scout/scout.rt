@@ -76,8 +76,8 @@ public class RunContext implements IAdaptable {
   protected Subject m_subject;
   protected Locale m_locale;
   protected String m_correlationId;
-  protected Context m_openTelemetryContext;
   protected PropertyMap m_propertyMap = new PropertyMap();
+  protected Context m_openTelemetryContext;
 
   protected Map<ThreadLocal<?>, ThreadLocalProcessor<?>> m_threadLocalProcessors = new HashMap<>();
   protected Map<String, DiagnosticContextValueProcessor> m_diagnosticProcessors = new HashMap<>();
@@ -173,9 +173,9 @@ public class RunContext implements IAdaptable {
    * When a OpenTelemetry context is set, modify the callable to run in the context.
    *
    * @param callable
-   *     original callable
+   *          original callable
    * @param <RESULT>
-   *     result type of the callable
+   *          result type of the callable
    * @return the callable with the injected OpenTelemetry context
    */
   protected <RESULT> Callable<RESULT> injectOpenTelemetryContext(final Callable<RESULT> callable) {
@@ -514,11 +514,21 @@ public class RunContext implements IAdaptable {
     return this;
   }
 
+  /**
+   * Attaches a OpenTelemetry {@link Context} with the RunContext
+   *
+   * @param context
+   *     Context to be attached
+   * @return the RunContext with an OpenTelemetry Context
+   */
   public RunContext withOpenTelemetryContext(final Context context) {
     m_openTelemetryContext = context;
     return this;
   }
 
+  /**
+   * @return the OpenTelemetry context of the RunContext
+   */
   public Context getOpenTelemetryContext() {
     return m_openTelemetryContext;
   }

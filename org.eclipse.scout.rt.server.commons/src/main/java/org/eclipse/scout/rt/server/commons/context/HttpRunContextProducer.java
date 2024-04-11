@@ -84,6 +84,13 @@ public class HttpRunContextProducer {
     return getCorrelationIdProvider().newCorrelationId();
   }
 
+  /**
+   * Extracts the OpenTelemetry {@link Context} out of the incoming request
+   *
+   * @param request
+   *     incoming request
+   * @return the extracted context
+   */
   protected Context extractOpenTelemetryContext(HttpServletRequest request) {
     return GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator()
         .extract(Context.current(), request,
