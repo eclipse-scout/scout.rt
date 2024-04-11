@@ -147,6 +147,22 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testToQualifiedUnknownId() {
+    //noinspection deprecation
+    UnknownId id = UnknownId.of("unknown", "foo");
+    String qualifiedId = getCodec().toQualified(id);
+    assertEquals("unknown:foo", qualifiedId);
+  }
+
+  @Test
+  public void testToQualifiedUnknownId_Composite() {
+    //noinspection deprecation
+    UnknownId id = UnknownId.of("unknown", "foo;bar;baz");
+    String qualifiedId = getCodec().toQualified(id);
+    assertEquals("unknown:foo;bar;baz", qualifiedId);
+  }
+
+  @Test
   public void testToUnqualifiedRootId() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
     String ext1 = getCodec().toUnqualified(id1);
@@ -243,6 +259,22 @@ public abstract class AbstractIdCodecTest {
   public void testToUnqualifiedIdUnsupportedType() {
     // unsupported type to unwrap
     assertThrows(PlatformException.class, () -> getCodec().toUnqualified((IId) () -> null));
+  }
+
+  @Test
+  public void testToUnqualifiedUnknownId() {
+    //noinspection deprecation
+    UnknownId id = UnknownId.of("unknown", "foo");
+    String unqualifiedId = getCodec().toUnqualified(id);
+    assertEquals("foo", unqualifiedId);
+  }
+
+  @Test
+  public void testToUnqualifiedUnknownId_Composite() {
+    //noinspection deprecation
+    UnknownId id = UnknownId.of("unknown", "foo;bar;baz");
+    String unqualifiedId = getCodec().toUnqualified(id);
+    assertEquals("foo;bar;baz", unqualifiedId);
   }
 
   @Test
@@ -506,6 +538,16 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test(expected = PlatformException.class)
+  public void testFromQualified_InvalidFormat_noColon() {
+    getCodec().fromQualified("DoesNotExist");
+  }
+
+  @Test(expected = PlatformException.class)
+  public void testFromQualified_InvalidFormat_duplicateColon() {
+    getCodec().fromQualified("DoesNotExist:d:d");
+  }
+
+  @Test(expected = PlatformException.class)
   public void testFromQualified_UnsupportedWrappedType() {
     getCodec().fromQualified("DoesNotExist:" + TEST_UUID);
   }
@@ -520,13 +562,67 @@ public abstract class AbstractIdCodecTest {
   @Test
   public void testFromQualifiedLenient_UnknownType() {
     IId id = getCodec().fromQualifiedLenient("DoesNotExist:" + TEST_UUID);
-    assertNull(id);
+    assertTrue(id instanceof UnknownId);
+    UnknownId uid = (UnknownId) id;
+    assertEquals("DoesNotExist", uid.getIdTypeName());
+    assertEquals(TEST_UUID.toString(), uid.getId());
+    assertEquals(TEST_UUID.toString(), uid.unwrap());
+    //noinspection deprecation
+    assertEquals(UnknownId.of("DoesNotExist", TEST_UUID.toString()), id);
+  }
+
+  @Test
+  public void testFromQualifiedLenient_CompositeUnknownType() {
+    IId id = getCodec().fromQualifiedLenient("DoesNotExist:abc;123");
+    assertTrue(id instanceof UnknownId);
+    UnknownId uid = (UnknownId) id;
+    assertEquals("DoesNotExist", uid.getIdTypeName());
+    assertEquals("abc;123", uid.getId());
+    assertEquals("abc;123", uid.unwrap());
+    //noinspection deprecation
+    assertEquals(UnknownId.of("DoesNotExist", "abc;123"), id);
   }
 
   @Test
   public void testFromQualifiedLenient_WrongFormat() {
     IId id = getCodec().fromQualifiedLenient("Does:Not:Exist:" + TEST_UUID);
+    assertTrue(id instanceof UnknownId);
+    UnknownId uid = (UnknownId) id;
+    assertEquals("Does", uid.getIdTypeName());
+    assertEquals("Not:Exist:" + TEST_UUID, uid.getId());
+    assertEquals("Not:Exist:" + TEST_UUID, uid.unwrap());
+    //noinspection deprecation
+    assertEquals(UnknownId.of("Does", "Not:Exist:" + TEST_UUID), id);
+  }
+
+  @Test
+  public void testFromQualifiedLenient_NoIdTypeName() {
+    IId id = getCodec().fromQualifiedLenient("Foo" + TEST_UUID);
     assertNull(id);
+  }
+
+  @Test
+  public void testFromQualifiedLenient_CompositeWrongCardinalityToSmall() {
+    IId id = getCodec().fromQualifiedLenient("scout.FixtureCompositeId:" + TEST_UUID);
+    assertTrue(id instanceof UnknownId);
+    UnknownId uid = (UnknownId) id;
+    assertEquals("scout.FixtureCompositeId", uid.getIdTypeName());
+    assertEquals(TEST_UUID.toString(), uid.getId());
+    assertEquals(TEST_UUID.toString(), uid.unwrap());
+    //noinspection deprecation
+    assertEquals(UnknownId.of("scout.FixtureCompositeId", TEST_UUID.toString()), id);
+  }
+
+  @Test
+  public void testFromQualifiedLenient_CompositeWrongCardinalityToHigh() {
+    IId id = getCodec().fromQualifiedLenient("scout.FixtureCompositeId:" + "a;b;c");
+    assertTrue(id instanceof UnknownId);
+    UnknownId uid = (UnknownId) id;
+    assertEquals("scout.FixtureCompositeId", uid.getIdTypeName());
+    assertEquals("a;b;c", uid.getId());
+    assertEquals("a;b;c", uid.unwrap());
+    //noinspection deprecation
+    assertEquals(UnknownId.of("scout.FixtureCompositeId", "a;b;c"), id);
   }
 
   @Test

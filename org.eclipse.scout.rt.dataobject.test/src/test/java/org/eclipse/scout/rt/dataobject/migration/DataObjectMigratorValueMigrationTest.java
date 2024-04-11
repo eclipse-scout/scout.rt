@@ -21,18 +21,23 @@ import java.util.Map;
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.DoEntityHolder;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDataObjectVisitorExtension;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.id.UnknownId;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrator.DataObjectMigratorResult;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerGenderFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerGenderFixtureEnum;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.EntityWithIdFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoStructureMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoValueMigrationHandler_1;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureStringId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypesFixture;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureAlwaysAcceptDoValueMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDoValueMigrationHandler_3;
@@ -86,7 +91,8 @@ public class DataObjectMigratorValueMigrationTest {
             new RoomTypeFixtureDoValueMigrationHandler_2(),
             new CustomerGenderFixtureDoValueMigrationHandler_2(),
             new HouseTypeFixtureDoValueMigrationHandler_2(),
-            new HouseFixtureDoValueMigrationHandler_1()));
+            new HouseFixtureDoValueMigrationHandler_1(),
+            new OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler()));
 
     TEST_BEANS.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestDataObjectMigrationInventory.class, inventory).withReplace(true)));
 
@@ -558,5 +564,52 @@ public class DataObjectMigratorValueMigrationTest {
             RoomTypesFixture.ROOM));
 
     assertEqualsWithComparisonFailure(expected, result.getDataObject());
+  }
+
+  /**
+   * Testcase for IdTypeName renaming from 'charlieFixture.OldHouseTypeFixtureStringId' to
+   * 'charlieFixture.HouseTypeFixtureStringId'
+   * <p>
+   * Setup EntityWithIdFixtureDo using raw data object mapper.
+   */
+  @Test
+  public void testHouseTypeFixtureStringIdTypeNameRenameMigration_01() {
+    IDoEntity entity = (IDoEntity) BEANS.get(IDataObjectMapper.class).readValueRaw("{\"_type\" : \"EntityWithIdFixture\", \"id\" : \"charlieFixture.OldHouseTypeFixtureStringId:foo\"}");
+    DataObjectMigratorResult<EntityWithIdFixtureDo> result = s_migrator.migrateDataObject(s_migrationContext, entity, EntityWithIdFixtureDo.class);
+    assertTrue(result.isChanged());
+    assertTrue(result.getDataObject().getId() instanceof HouseTypeFixtureStringId);
+    assertEquals("foo", result.getDataObject().getId().unwrap());
+  }
+
+  /**
+   * Testcase for IdTypeName renaming from 'charlieFixture.OldHouseTypeFixtureStringId' to
+   * 'charlieFixture.HouseTypeFixtureStringId'
+   * <p>
+   * Setup EntityWithIdFixtureDo using lenient data object mapper.
+   */
+  @Test
+  public void testHouseTypeFixtureStringIdTypeNameRenameMigration_02() {
+    EntityWithIdFixtureDo entity = BEANS.get(ILenientDataObjectMapper.class).readValue("{\"_type\" : \"EntityWithIdFixture\", \"id\" : \"charlieFixture.OldHouseTypeFixtureStringId:foo\"}", EntityWithIdFixtureDo.class);
+    DataObjectMigratorResult<EntityWithIdFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, entity);
+    assertTrue(result.isChanged());
+    assertTrue(result.getDataObject().getId() instanceof HouseTypeFixtureStringId);
+    assertEquals("foo", result.getDataObject().getId().unwrap());
+  }
+
+  /**
+   * Testcase for IdTypeName renaming from 'charlieFixture.OldHouseTypeFixtureStringId' to
+   * 'charlieFixture.HouseTypeFixtureStringId'
+   * <p>
+   * Setup EntityWithIdFixtureDo using programmatic instance of UnknownId.
+   */
+  @Test
+  public void testHouseTypeFixtureStringIdTypeNameRenameMigration_03() {
+    EntityWithIdFixtureDo entity = BEANS.get(EntityWithIdFixtureDo.class);
+    //noinspection deprecation
+    entity.put("id", UnknownId.of("charlieFixture.OldHouseTypeFixtureStringId", "foo"));
+    DataObjectMigratorResult<EntityWithIdFixtureDo> result = s_migrator.applyValueMigration(s_migrationContext, entity);
+    assertTrue(result.isChanged());
+    assertTrue(result.getDataObject().getId() instanceof HouseTypeFixtureStringId);
+    assertEquals("foo", result.getDataObject().getId().unwrap());
   }
 }

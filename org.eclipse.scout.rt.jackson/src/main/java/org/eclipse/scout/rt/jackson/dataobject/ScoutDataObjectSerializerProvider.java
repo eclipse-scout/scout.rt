@@ -128,7 +128,7 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
         return new UnqualifiedIIdDeserializer(idClass);
       }
       else {
-        return new QualifiedIIdDeserializer(idClass);
+        return new QualifiedIIdDeserializer(moduleContext, idClass);
       }
     }
     else if (TypedId.class.isAssignableFrom(rawClass)) {

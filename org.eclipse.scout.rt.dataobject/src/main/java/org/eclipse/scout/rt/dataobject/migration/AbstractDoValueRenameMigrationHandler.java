@@ -18,15 +18,15 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  * Abstract implementation of a {@link IDoValueMigrationHandler} providing an implementation of {@link #valueClass()}
  * based on the class generic type and supporting {@link Class} of {@link ITypeVersion} instead of
  * {@link NamespaceVersion}.
- *
- * @see AbstractDoStructureRenameMigrationHandler for a handler allowing to rename and therefore change the type of the
- *      migrated value.
+ * <p>
+ * This re-name migration handler allows to rename the type name and therefore change the type of the migrated value
+ * from {@code T} to {@link Object}.
  */
-public abstract class AbstractDoValueMigrationHandler<T> implements IDoValueMigrationHandler<T> {
+public abstract class AbstractDoValueRenameMigrationHandler<T> implements IDoValueMigrationHandler<T> {
 
   private final NamespaceVersion m_typeVersion;
 
-  protected AbstractDoValueMigrationHandler() {
+  protected AbstractDoValueRenameMigrationHandler() {
     m_typeVersion = BEANS.get(typeVersionClass()).getVersion();
   }
 
@@ -40,15 +40,8 @@ public abstract class AbstractDoValueMigrationHandler<T> implements IDoValueMigr
   @Override
   public Class<T> valueClass() {
     // noinspection unchecked
-    return TypeCastUtility.getGenericsParameterClass(this.getClass(), AbstractDoValueMigrationHandler.class);
+    return TypeCastUtility.getGenericsParameterClass(this.getClass(), AbstractDoValueRenameMigrationHandler.class);
   }
-
-  /**
-   * Note: A default data object value migration is not allowed to change the type {@code T} of the value. Use
-   * {@link AbstractDoValueRenameMigrationHandler} to change the type of the migrated value.
-   */
-  @Override
-  public abstract T migrate(DataObjectMigrationContext ctx, T value);
 
   /**
    * The default implementation will accept when this value migration wasn't applied already. Own implementations might

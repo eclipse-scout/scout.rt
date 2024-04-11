@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.IUuId;
+import org.eclipse.scout.rt.dataobject.id.UnknownId;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithIIdDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
@@ -174,8 +175,18 @@ public class IIdSerializationTest {
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
 
     TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    //noinspection deprecation
+    assertEquals(UnknownId.of("scout.unknown","unknown"), marshalledLenient.getIid());
+  }
+
+  @Test
+  public void testDeserializeMissingQualifiedIdFormat() {
+    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iid\" : \"unknown\" }";
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
     assertThrows(ClassCastException.class, () -> marshalledLenient.getIid());
-    assertEquals("scout.unknown:unknown", marshalledLenient.getString("iid"));
+    assertEquals("unknown", marshalledLenient.getString("iid"));
   }
 
   @Test
