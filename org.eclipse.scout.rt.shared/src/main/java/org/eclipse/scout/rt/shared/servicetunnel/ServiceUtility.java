@@ -50,9 +50,13 @@ public class ServiceUtility {
     Assertions.assertNotNull(operation, "operation is null");
 
     Tracer tracer = BEANS.get(ITracingHelper.class).createTracer(ServiceUtility.class);
-    return BEANS.get(ITracingHelper.class).wrapInSpan(tracer, service.getClass().getSimpleName(), span -> {
+    String spanName = service.getClass().getSimpleName();
+
+    return BEANS.get(ITracingHelper.class).wrapInSpan(tracer, spanName, span -> {
       span.setAttribute("scout.server.service.name", service.getClass().getName());
       span.setAttribute("scout.server.service.operation", operation.getName());
+
+      // Invoke serivce
       try {
         return operation.invoke(service, args != null ? args : new Object[0]);
       }

@@ -18,6 +18,8 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.opentelemetry.api.trace.Tracer;
+
 /**
  * Processes JSON events from the UI in a Scout model job and waits for all model jobs of that session to complete.
  */
@@ -34,8 +36,10 @@ public class JsonEventProcessor {
   public void processEvents(final JsonRequest request, final JsonResponse response) {
     Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread={}, request={}, response={}]",
         Thread.currentThread().getName(), request, response);
+
+    Tracer tracer = BEANS.get(ITracingHelper.class).createTracer(JsonEventProcessor.class);
     for (final JsonEvent event : request.getEvents()) {
-      BEANS.get(ITracingHelper.class).wrapInSpan(BEANS.get(ITracingHelper.class).createTracer(JsonEventProcessor.class), "processJsonEvent", span -> {
+      BEANS.get(ITracingHelper.class).wrapInSpan(tracer, "processJsonEvent", span -> {
         BEANS.get(ITracingHelper.class).appendAttributes(span, event);
         processEvent(event, response);
       });

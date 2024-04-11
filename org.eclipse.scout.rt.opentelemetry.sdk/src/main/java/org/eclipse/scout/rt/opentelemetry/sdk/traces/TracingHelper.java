@@ -88,7 +88,7 @@ public class TracingHelper implements ITracingHelper {
   @SuppressWarnings("unchecked")
   public <T> void appendAttributes(Span span, T source) {
     BEANS.all(ISpanAttributeMapper.class).stream()
-        .filter(mapper -> getGenericClass(mapper).equals(source.getClass()))
+        .filter(mapper -> getGenericClass(mapper).isAssignableFrom(source.getClass()))
         .forEach(mapper -> mapper.addAttribute(span, source));
   }
 
