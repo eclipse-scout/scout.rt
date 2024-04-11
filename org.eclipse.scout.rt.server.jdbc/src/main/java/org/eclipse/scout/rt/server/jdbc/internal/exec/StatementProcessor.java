@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.holders.ITableBeanHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
-import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
 import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
@@ -68,8 +67,6 @@ import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentelemetry.api.trace.Tracer;
-
 @SuppressWarnings("squid:S1166")
 public class StatementProcessor implements IStatementProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(StatementProcessor.class);
@@ -99,8 +96,6 @@ public class StatementProcessor implements IStatementProcessor {
   private int m_currentOutputBatchIndex = -1;
   private String m_currentInputStm;
   private TreeMap<Integer/* jdbcBindIndex */, SqlBind> m_currentInputBindMap;
-  // OpenTelemetry
-  private Tracer m_tracer;
 
   public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases) {
     this(callerService, stm, bindBases, 0);
@@ -111,7 +106,6 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases, int maxRowCount, int maxFetchMemorySize) {
-    m_tracer = BEANS.get(ITracingHelper.class).createTracer(StatementProcessor.class);
     if (stm == null) {
       throw new ProcessingException("statement is null");
     }
@@ -266,52 +260,50 @@ public class StatementProcessor implements IStatementProcessor {
   @SuppressWarnings("resource")
   @Override
   public Object[][] processSelect(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
-    return BEANS.get(ITracingHelper.class).wrapInSpan(m_tracer, "processSelectStatement", span -> {
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      try {
-        ArrayList<Object[]> rows = new ArrayList<>();
-        while (hasNextInputBatch()) {
-          nextInputBatch();
-          prepareInputStatementAndBinds();
-          dump();
-          ps = cache.getPreparedStatement(conn, m_currentInputStm);
-          bindBatch(ps);
-          registerActiveStatement(ps);
-          try {
-            rs = ps.executeQuery();
-            for (Object[] row : processResultRows(rs, m_maxRowCount)) {
-              rows.add(row);
-              nextOutputBatch();
-              consumeSelectIntoRow(row);
-            }
-          }
-          finally {
-            unregisterActiveStatement(ps);
-            /*
-             * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
-             * yet because the monitor could do some post-fetching of the data.
-             * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
-             */
-            if (hasNextInputBatch()) {
-              releasePreparedStatementAndResultSet(ps, cache, rs);
-            }
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+      ArrayList<Object[]> rows = new ArrayList<>();
+      while (hasNextInputBatch()) {
+        nextInputBatch();
+        prepareInputStatementAndBinds();
+        dump();
+        ps = cache.getPreparedStatement(conn, m_currentInputStm);
+        bindBatch(ps);
+        registerActiveStatement(ps);
+        try {
+          rs = ps.executeQuery();
+          for (Object[] row : processResultRows(rs, m_maxRowCount)) {
+            rows.add(row);
+            nextOutputBatch();
+            consumeSelectIntoRow(row);
           }
         }
-        finishOutputBatch();
-        if (monitor != null) {
-          monitor.postFetchData(conn, ps, rs, rows);
+        finally {
+          unregisterActiveStatement(ps);
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the monitor could do some post-fetching of the data.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
+          }
         }
-        return rows.toArray(new Object[rows.size()][]);
       }
-      catch (SQLException | RuntimeException e) {
-        throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-            .withContextInfo("statement", createSqlDump(true, false));
+      finishOutputBatch();
+      if (monitor != null) {
+        monitor.postFetchData(conn, ps, rs, rows);
       }
-      finally {
-        releasePreparedStatementAndResultSet(ps, cache, rs);
-      }
-    });
+      return rows.toArray(new Object[rows.size()][]);
+    }
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
+    }
+    finally {
+      releasePreparedStatementAndResultSet(ps, cache, rs);
+    }
   }
 
   /*
@@ -324,109 +316,105 @@ public class StatementProcessor implements IStatementProcessor {
   @SuppressWarnings("resource")
   @Override
   public void processSelectInto(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
-    BEANS.get(ITracingHelper.class).wrapInSpan(m_tracer, "processSelectIntoStatement", span -> {
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      try {
-        while (hasNextInputBatch()) {
-          nextInputBatch();
-          prepareInputStatementAndBinds();
-          dump();
-          ps = cache.getPreparedStatement(conn, m_currentInputStm);
-          bindBatch(ps);
-          registerActiveStatement(ps);
-          try {
-            rs = ps.executeQuery();
-            for (Object[] row : processResultRows(rs, m_maxRowCount)) {
-              nextOutputBatch();
-              consumeSelectIntoRow(row);
-            }
-          }
-          finally {
-            unregisterActiveStatement(ps);
-            /*
-             * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
-             * yet because the monitor could do some post-fetching of the data.
-             * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
-             */
-            if (hasNextInputBatch()) {
-              releasePreparedStatementAndResultSet(ps, cache, rs);
-            }
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+      while (hasNextInputBatch()) {
+        nextInputBatch();
+        prepareInputStatementAndBinds();
+        dump();
+        ps = cache.getPreparedStatement(conn, m_currentInputStm);
+        bindBatch(ps);
+        registerActiveStatement(ps);
+        try {
+          rs = ps.executeQuery();
+          for (Object[] row : processResultRows(rs, m_maxRowCount)) {
+            nextOutputBatch();
+            consumeSelectIntoRow(row);
           }
         }
-        finishOutputBatch();
-        if (monitor != null) {
-          monitor.postFetchData(conn, ps, rs, null);
+        finally {
+          unregisterActiveStatement(ps);
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the monitor could do some post-fetching of the data.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
+          }
         }
       }
-      catch (SQLException | RuntimeException e) {
-        throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-            .withContextInfo("statement", createSqlDump(true, false));
+      finishOutputBatch();
+      if (monitor != null) {
+        monitor.postFetchData(conn, ps, rs, null);
       }
-      finally {
-        releasePreparedStatementAndResultSet(ps, cache, rs);
-      }
-    });
+    }
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
+    }
+    finally {
+      releasePreparedStatementAndResultSet(ps, cache, rs);
+    }
   }
 
   @SuppressWarnings({"resource", "squid:S2095"})
   @Override
   public void processSelectStreaming(Connection conn, IStatementCache cache, ISelectStreamHandler handler) {
-    BEANS.get(ITracingHelper.class).wrapInSpan(m_tracer, "processSelectStatementStreaming", span -> {
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      ISqlStyle sqlStyle = m_callerService.getSqlStyle();
-      try {
-        int rowCount = 0;
-        while (hasNextInputBatch()) {
-          nextInputBatch();
-          prepareInputStatementAndBinds();
-          dump();
-          ps = cache.getPreparedStatement(conn, m_currentInputStm);
-          bindBatch(ps);
-          registerActiveStatement(ps);
-          try {
-            rs = ps.executeQuery();
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    ISqlStyle sqlStyle = m_callerService.getSqlStyle();
+    try {
+      int rowCount = 0;
+      while (hasNextInputBatch()) {
+        nextInputBatch();
+        prepareInputStatementAndBinds();
+        dump();
+        ps = cache.getPreparedStatement(conn, m_currentInputStm);
+        bindBatch(ps);
+        registerActiveStatement(ps);
+        try {
+          rs = ps.executeQuery();
 
-            ResultSetMetaData meta = rs.getMetaData();
-            int colCount = meta.getColumnCount();
-            while (rs.next()) {
-              List<SqlBind> row = new ArrayList<>(colCount);
-              for (int i = 0; i < colCount; i++) {
-                int type = meta.getColumnType(i + 1);
-                Object value = sqlStyle.readBind(rs, meta, type, i + 1);
-                row.add(new SqlBind(type, value));
-              }
-              handler.handleRow(conn, ps, rs, rowCount, row);
-              rowCount++;
-              if (m_maxRowCount > 0 && rowCount >= m_maxRowCount) {
-                break;
-              }
+          ResultSetMetaData meta = rs.getMetaData();
+          int colCount = meta.getColumnCount();
+          while (rs.next()) {
+            List<SqlBind> row = new ArrayList<>(colCount);
+            for (int i = 0; i < colCount; i++) {
+              int type = meta.getColumnType(i + 1);
+              Object value = sqlStyle.readBind(rs, meta, type, i + 1);
+              row.add(new SqlBind(type, value));
             }
-          }
-          finally {
-            unregisterActiveStatement(ps);
-            /*
-             * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
-             * yet because the handler could do finishing work.
-             * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
-             */
-            if (hasNextInputBatch()) {
-              releasePreparedStatementAndResultSet(ps, cache, rs);
+            handler.handleRow(conn, ps, rs, rowCount, row);
+            rowCount++;
+            if (m_maxRowCount > 0 && rowCount >= m_maxRowCount) {
+              break;
             }
           }
         }
-        finishOutputBatch();
-        handler.finished(conn, ps, rs, rowCount);
+        finally {
+          unregisterActiveStatement(ps);
+          /*
+           * The PreparedStatement and the ResultSet of the last input batch are not allowed to be closed
+           * yet because the handler could do finishing work.
+           * Closing the last PreparedStatement and its ResultSet is done in the outer finally block.
+           */
+          if (hasNextInputBatch()) {
+            releasePreparedStatementAndResultSet(ps, cache, rs);
+          }
+        }
       }
-      catch (SQLException | RuntimeException e) {
-        throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-            .withContextInfo("statement", createSqlDump(true, false));
-      }
-      finally {
-        releasePreparedStatementAndResultSet(ps, cache, rs);
-      }
-    });
+      finishOutputBatch();
+      handler.finished(conn, ps, rs, rowCount);
+    }
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
+    }
+    finally {
+      releasePreparedStatementAndResultSet(ps, cache, rs);
+    }
   }
 
   /*
@@ -439,35 +427,33 @@ public class StatementProcessor implements IStatementProcessor {
   @SuppressWarnings("resource")
   @Override
   public int processModification(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
-    return BEANS.get(ITracingHelper.class).wrapInSpan(m_tracer, "processDatabaseModification", span -> {
-      PreparedStatement ps = null;
-      int rowCount = 0;
-      try {
-        while (hasNextInputBatch()) {
-          nextInputBatch();
-          prepareInputStatementAndBinds();
-          dump();
-          ps = cache.getPreparedStatement(conn, m_currentInputStm);
-          bindBatch(ps);
-          registerActiveStatement(ps);
-          try {
-            rowCount = rowCount + ps.executeUpdate();
-          }
-          finally {
-            unregisterActiveStatement(ps);
-            cache.releasePreparedStatement(ps);
-          }
+    PreparedStatement ps = null;
+    int rowCount = 0;
+    try {
+      while (hasNextInputBatch()) {
+        nextInputBatch();
+        prepareInputStatementAndBinds();
+        dump();
+        ps = cache.getPreparedStatement(conn, m_currentInputStm);
+        bindBatch(ps);
+        registerActiveStatement(ps);
+        try {
+          rowCount = rowCount + ps.executeUpdate();
         }
-        return rowCount;
+        finally {
+          unregisterActiveStatement(ps);
+          cache.releasePreparedStatement(ps);
+        }
       }
-      catch (SQLException | RuntimeException e) {
-        throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-            .withContextInfo("statement", createSqlDump(true, false));
-      }
-      finally {
-        cache.releasePreparedStatement(ps);
-      }
-    });
+      return rowCount;
+    }
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
+    }
+    finally {
+      cache.releasePreparedStatement(ps);
+    }
   }
 
   /*
@@ -480,38 +466,36 @@ public class StatementProcessor implements IStatementProcessor {
   @SuppressWarnings("resource")
   @Override
   public boolean processStoredProcedure(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
-    return BEANS.get(ITracingHelper.class).wrapInSpan(m_tracer, "processStoredProcedure", span -> {
-      CallableStatement cs = null;
-      boolean status = true;
-      try {
-        while (hasNextInputBatch()) {
-          nextInputBatch();
-          prepareInputStatementAndBinds();
-          dump();
-          cs = cache.getCallableStatement(conn, m_currentInputStm);
-          bindBatch(cs);
-          registerActiveStatement(cs);
-          try {
-            status = status && cs.execute();
-            nextOutputBatch();
-            consumeOutputRow(cs);
-          }
-          finally {
-            unregisterActiveStatement(cs);
-            cache.releaseCallableStatement(cs);
-          }
+    CallableStatement cs = null;
+    boolean status = true;
+    try {
+      while (hasNextInputBatch()) {
+        nextInputBatch();
+        prepareInputStatementAndBinds();
+        dump();
+        cs = cache.getCallableStatement(conn, m_currentInputStm);
+        bindBatch(cs);
+        registerActiveStatement(cs);
+        try {
+          status = status && cs.execute();
+          nextOutputBatch();
+          consumeOutputRow(cs);
         }
-        finishOutputBatch();
-        return status;
+        finally {
+          unregisterActiveStatement(cs);
+          cache.releaseCallableStatement(cs);
+        }
       }
-      catch (SQLException | RuntimeException e) {
-        throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-            .withContextInfo("statement", createSqlDump(true, false));
-      }
-      finally {
-        cache.releaseCallableStatement(cs);
-      }
-    });
+      finishOutputBatch();
+      return status;
+    }
+    catch (SQLException | RuntimeException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+          .withContextInfo("statement", createSqlDump(true, false));
+    }
+    finally {
+      cache.releaseCallableStatement(cs);
+    }
   }
 
   /*
