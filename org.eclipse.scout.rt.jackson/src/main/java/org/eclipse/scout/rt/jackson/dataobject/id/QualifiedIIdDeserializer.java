@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
+import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -32,9 +33,12 @@ public class QualifiedIIdDeserializer extends StdDeserializer<IId> {
   protected final LazyValue<IdCodec> m_idCodec = new LazyValue<>(IdCodec.class);
   protected final Class<? extends IId> m_idClass;
 
-  public QualifiedIIdDeserializer(Class<? extends IId> idClass) {
+  protected final ScoutDataObjectModuleContext m_moduleContext;
+
+  public QualifiedIIdDeserializer(ScoutDataObjectModuleContext context, Class<? extends IId> idClass) {
     super(idClass);
     m_idClass = idClass;
+    m_moduleContext = context;
   }
 
   @Override
@@ -42,6 +46,9 @@ public class QualifiedIIdDeserializer extends StdDeserializer<IId> {
     // check required to prevent returning an instance that isn't compatible with requested ID class
     String rawValue = p.getText();
     try {
+      if (m_moduleContext.isLenientMode()) {
+        return assertInstance(m_idCodec.get().fromQualifiedLenient(rawValue), m_idClass);
+      }
       return assertInstance(m_idCodec.get().fromQualified(rawValue), m_idClass);
     }
     catch (RuntimeException e) {

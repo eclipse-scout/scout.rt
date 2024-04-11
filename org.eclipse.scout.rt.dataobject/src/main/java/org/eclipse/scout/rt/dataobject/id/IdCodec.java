@@ -68,7 +68,12 @@ public class IdCodec {
     }
     String typeName = m_idInventory.get().getTypeName(id);
     if (StringUtility.isNullOrEmpty(typeName)) {
-      throw new PlatformException("Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass());
+      if (id instanceof UnknownId) {
+        typeName = ((UnknownId) id).getIdTypeName();
+      }
+      else {
+        throw new PlatformException("Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass());
+      }
     }
     return typeName + ":" + toUnqualified(id);
   }
@@ -99,6 +104,9 @@ public class IdCodec {
           .map(this::toUnqualified)
           .map(s -> s == null ? "" : s) // empty string if component is null just in case of composite id
           .collect(Collectors.joining(";"));
+    }
+    else if (id instanceof UnknownId) {
+      return ((UnknownId) id).getId();
     }
     return handleToUnqualifiedUnknownIdType(id);
   }
@@ -197,7 +205,10 @@ public class IdCodec {
     String[] tmp = qualifiedId.split(":", 2); // split into at most two parts
     if (tmp.length < 2) { // no ":" found
       if (lenient) {
+        //noinspection deprecation
         return null;
+        // FIXME PBZ: To Discuss during code review: retain this case as UnknownId
+        // e.g.  return UnknownId.of(null, qualifiedId);
       }
       else {
         throw new PlatformException("Qualified id '{}' format is invalid", qualifiedId);
@@ -207,13 +218,25 @@ public class IdCodec {
     Class<? extends IId> idClass = m_idInventory.get().getIdClass(typeName);
     if (idClass == null) {
       if (lenient) {
-        return null;
+        //noinspection deprecation
+        return UnknownId.of(typeName, tmp[1]);
       }
       else {
         throw new PlatformException("No class found for type name '{}'", typeName);
       }
     }
-    return fromUnqualified(idClass, tmp[1]);
+
+    try {
+      return fromUnqualified(idClass, tmp[1]);
+    }
+    catch (Exception e) {
+      // handle any deserialization issues in lenient mode by retaining the raw id as UnknownId instance
+      if (lenient) {
+        //noinspection deprecation
+        return UnknownId.of(typeName, tmp[1]);
+      }
+      throw e;
+    }
   }
 
   /**

@@ -20,6 +20,7 @@ public class DataObjectIdStructureTest extends AbstractIdStructureTest {
   @Parameters(name = "{0}")
   public static Iterable<?> parameters() {
     return streamIdClasses("org.eclipse.scout.rt.dataobject")
+        .filter(id -> !UnknownId.class.isAssignableFrom(id)) // UnknownId does not comply with IId structure
         .collect(Collectors.toList());
   }
 

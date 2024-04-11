@@ -52,21 +52,23 @@ public class DoValueMigrationDataObjectVisitor extends AbstractReplacingDataObje
     if (m_valueMigrationHandlers.isEmpty()) {
       return dataObject;
     }
-    return replaceOrVisit(dataObject);
+    //noinspection unchecked
+    return (T) replaceOrVisit(dataObject);
   }
 
   @Override
-  protected <T> T replaceOrVisit(T oldValue) {
+  @SuppressWarnings("unchecked")
+  protected Object replaceOrVisit(Object oldValue) {
     if (oldValue == null) {
       return null;
     }
     // apply all migration handlers in order
     // feed the migrated value to the next handler
-    T currentValue = oldValue;
+    Object currentValue = oldValue;
     for (IDoValueMigrationHandler<?> handler : m_valueMigrationHandlers) {
       if (handler.valueClass().isInstance(currentValue)) {
         // noinspection unchecked
-        T migratedValue = ((IDoValueMigrationHandler<T>) handler).migrate(m_ctx, currentValue);
+        Object migratedValue = ((IDoValueMigrationHandler<Object>) handler).migrate(m_ctx, currentValue);
         // handler must not change provided input value, but must return a fresh instance (clone or new instance)
         m_changed |= ObjectUtility.notEquals(currentValue, migratedValue);
         currentValue = migratedValue;
