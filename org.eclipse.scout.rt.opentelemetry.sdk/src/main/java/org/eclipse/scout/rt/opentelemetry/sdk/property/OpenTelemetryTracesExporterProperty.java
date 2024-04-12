@@ -7,26 +7,26 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.opentelemetry.sdk.common;
+package org.eclipse.scout.rt.opentelemetry.sdk.property;
 
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 
-public class OpenTelemetryOtlpExporterProtocolProperty extends AbstractStringConfigProperty {
+public class OpenTelemetryTracesExporterProperty extends AbstractStringConfigProperty {
 
   @Override
   public String getKey() {
-    return "scout.otel.exporter.otlp.protocol";
+    return "scout.otel.traces.exporter";
   }
 
   @Override
   public String description() {
-    return "Configures the protocol for exporting telemetry data with otlp."
-        + " Possible values are 'http/protobuf', 'http/json' or 'grpc'."
-        + " Default is 'http/protobuf'";
+    return "Configures the default exporter for traces. Default is 'none',"
+        + " so no traces are exported. Set value to "
+        + "'otlp' to export using the OpenTelemetry protocol.";
   }
 
   @Override
   public String getDefaultValue() {
-    return "http/protobuf";
+    return "none";
   }
 }

@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
-import org.eclipse.scout.rt.opentelemetry.sdk.common.OpenTelemetryOtlpExporterEndpointProperty;
-import org.eclipse.scout.rt.opentelemetry.sdk.common.OpenTelemetryOtlpExporterProtocolProperty;
-import org.eclipse.scout.rt.opentelemetry.sdk.traces.OpenTelemetryTracesExporterProperty;
+import org.eclipse.scout.rt.opentelemetry.sdk.property.OpenTelemetryOtlpExporterEndpointProperty;
+import org.eclipse.scout.rt.opentelemetry.sdk.property.OpenTelemetryOtlpExporterProtocolProperty;
+import org.eclipse.scout.rt.opentelemetry.sdk.property.OpenTelemetryTracesExporterProperty;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
