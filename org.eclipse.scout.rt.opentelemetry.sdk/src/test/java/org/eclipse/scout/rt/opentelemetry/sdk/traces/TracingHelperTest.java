@@ -13,9 +13,12 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.opentelemetry.ISpanAttributeMapper;
+import org.eclipse.scout.rt.platform.opentelemetry.IThrowingConsumer;
+import org.eclipse.scout.rt.platform.opentelemetry.IThrowingFunction;
 import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -29,6 +32,15 @@ import io.opentelemetry.api.trace.Tracer;
 
 @RunWith(PlatformTestRunner.class)
 public class TracingHelperTest {
+
+  @Test
+  public void testCreateGlobalOpenTelemetryTracerCreation() {
+    // Act
+    Tracer tracer = BEANS.get(ITracingHelper.class).createTracer(this.getClass());
+
+    // Assert
+    assertNotNull(tracer);
+  }
 
   @Test
   public void testCreateTracer() {
@@ -57,6 +69,57 @@ public class TracingHelperTest {
 
     // Assert
     verify(mockConsumer).accept(mockSpan);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testWrapFunctionInSpan() {
+    // Arrange
+    Tracer mockTracer = mock(Tracer.class);
+    Span mockSpan = mockSpan(mockTracer);
+    String functionReturnValue = "Sucess!";
+    Function<Span, String> mockFunction = mock(Function.class);
+    when(mockFunction.apply(any())).thenReturn(functionReturnValue);
+
+    // Act
+    String returnedValue = BEANS.get(ITracingHelper.class).wrapInSpan(mockTracer, "testName", mockFunction);
+
+    // Assert
+    assertEquals(functionReturnValue, returnedValue);
+    verify(mockFunction).apply(mockSpan);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testWrapThrowingConsumerInSpan() throws Exception {
+    // Arrange
+    Tracer mockTracer = mock(Tracer.class);
+    Span mockSpan = mockSpan(mockTracer);
+    IThrowingConsumer<Span> mockConsumer = mock(IThrowingConsumer.class);
+
+    // Act
+    BEANS.get(ITracingHelper.class).wrapInThrowingSpan(mockTracer, "testName", mockConsumer);
+
+    // Assert
+    verify(mockConsumer).accept(mockSpan);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testWrapThrowingFunctionInSpan() throws Exception {
+    // Arrange
+    Tracer mockTracer = mock(Tracer.class);
+    Span mockSpan = mockSpan(mockTracer);
+    String functionReturnValue = "Sucess!";
+    IThrowingFunction<Span, String> mockFunction = mock(IThrowingFunction.class);
+    when(mockFunction.apply(any())).thenReturn(functionReturnValue);
+
+    // Act
+    String returnedValue = BEANS.get(ITracingHelper.class).wrapInThrowingSpan(mockTracer, "testName", mockFunction);
+
+    // Assert
+    assertEquals(functionReturnValue, returnedValue);
+    verify(mockFunction).apply(mockSpan);
   }
 
   @Test
