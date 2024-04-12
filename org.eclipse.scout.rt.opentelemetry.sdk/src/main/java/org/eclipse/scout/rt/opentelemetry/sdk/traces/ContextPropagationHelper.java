@@ -32,21 +32,23 @@ public class ContextPropagationHelper implements IContextPropagationHelper {
 
   @Override
   public TextMapGetter<HttpServletRequest> createServletRequestTextMapGetter() {
-    return new TextMapGetter<>() {
-      @Override
-      public Iterable<String> keys(HttpServletRequest carrier) {
-        return () -> carrier.getHeaderNames().asIterator();
-      }
+    return new HttpServletRequestTextMapGetter();
+  }
 
-      @Nullable
-      @Override
-      public String get(@Nullable HttpServletRequest carrier, String key) {
-        String parameterValue = null;
-        if (carrier != null) {
-          parameterValue = carrier.getHeader(key);
-        }
-        return parameterValue;
+  private final class HttpServletRequestTextMapGetter implements TextMapGetter<HttpServletRequest> {
+    @Override
+    public Iterable<String> keys(HttpServletRequest carrier) {
+      return () -> carrier.getHeaderNames().asIterator();
+    }
+
+    @Nullable
+    @Override
+    public String get(@Nullable HttpServletRequest carrier, String key) {
+      String parameterValue = null;
+      if (carrier != null) {
+        parameterValue = carrier.getHeader(key);
       }
-    };
+      return parameterValue;
+    }
   }
 }

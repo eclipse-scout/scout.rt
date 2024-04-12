@@ -179,9 +179,14 @@ public class RunContext implements IAdaptable {
    * @return the callable with the injected OpenTelemetry context
    */
   protected <RESULT> Callable<RESULT> injectOpenTelemetryContext(final Callable<RESULT> callable) {
-    if (getOpenTelemetryContext() == null) {
-      return callable;
+    Callable<RESULT> result = callable;
+    if (getOpenTelemetryContext() != null) {
+      result = createOpenTelemetryContextCallable(callable);
     }
+    return result;
+  }
+
+  private <RESULT> Callable<RESULT> createOpenTelemetryContextCallable(Callable<RESULT> callable) {
     return () -> {
       try (Scope ignored = getOpenTelemetryContext().makeCurrent()) {
         return callable.call();

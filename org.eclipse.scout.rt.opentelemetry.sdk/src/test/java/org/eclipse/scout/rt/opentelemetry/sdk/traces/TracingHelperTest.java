@@ -123,11 +123,26 @@ public class TracingHelperTest {
   }
 
   @Test
-  public void testExceptionHandlingWhenWrappingInSpan() {
+  public void testExceptionHandlingWhenWrappingConsumerInSpan() {
     // Arrange
     Tracer mockTracer = mock(Tracer.class);
     Span mockSpan = mockSpan(mockTracer);
     Consumer<Span> mockConsumer = span -> {
+      throw new RuntimeException();
+    };
+
+    // Act / Assert
+    assertThrows(RuntimeException.class, () -> BEANS.get(ITracingHelper.class).wrapInSpan(mockTracer, "testName", mockConsumer));
+    verify(mockSpan).setStatus(eq(StatusCode.ERROR), any());
+    verify(mockSpan).recordException(any());
+  }
+
+  @Test
+  public void testExceptionHandlingWhenWrappingFunctionInSpan() {
+    // Arrange
+    Tracer mockTracer = mock(Tracer.class);
+    Span mockSpan = mockSpan(mockTracer);
+    Function<Span, Void> mockConsumer = span -> {
       throw new RuntimeException();
     };
 
