@@ -120,7 +120,7 @@
     <logback.version>1.2.13</logback.version>
     <jackson.bom.version>2.13.4.20221013</jackson.bom.version>
     <jackson.version>2.13.4</jackson.version>
-    <io.netty-version>4.1.104.Final</io.netty-version>
+    <io.netty-version>4.1.108.Final</io.netty-version>
     <apache.tika-version>2.4.0</apache.tika-version>
     <batik.version>1.17</batik.version>
     <activemq.version>5.18.3</activemq.version>
