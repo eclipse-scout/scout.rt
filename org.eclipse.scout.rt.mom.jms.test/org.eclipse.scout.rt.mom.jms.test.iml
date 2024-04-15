@@ -39,20 +39,20 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.activemq:artemis-jms-client:2.20.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.activemq:artemis-core-client:2.20.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jgroups:jgroups:3.6.13.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-unix-common:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-classes-epoll:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-kqueue:osx-x86_64:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-classes-kqueue:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec-http:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-buffer:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-resolver:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-handler:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-handler-proxy:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec-socks:4.1.100.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-common:4.1.100.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-unix-common:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-classes-epoll:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-kqueue:osx-x86_64:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-classes-kqueue:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec-http:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-buffer:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-resolver:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-handler:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-handler-proxy:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec-socks:4.1.108.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-common:4.1.108.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.activemq:artemis-commons:2.20.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-beanutils:commons-beanutils:1.9.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
