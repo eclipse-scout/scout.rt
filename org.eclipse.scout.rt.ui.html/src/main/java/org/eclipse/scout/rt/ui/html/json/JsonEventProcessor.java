@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,11 +10,15 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.opentelemetry.api.trace.Tracer;
 
 /**
  * Processes JSON events from the UI in a Scout model job and waits for all model jobs of that session to complete.
@@ -32,8 +36,13 @@ public class JsonEventProcessor {
   public void processEvents(final JsonRequest request, final JsonResponse response) {
     Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread={}, request={}, response={}]",
         Thread.currentThread().getName(), request, response);
+
+    Tracer tracer = BEANS.get(ITracingHelper.class).createTracer(JsonEventProcessor.class);
     for (final JsonEvent event : request.getEvents()) {
-      processEvent(event, response);
+      BEANS.get(ITracingHelper.class).wrapInSpan(tracer, "processJsonEvent", span -> {
+        BEANS.get(ITracingHelper.class).appendAttributes(span, event);
+        processEvent(event, response);
+      });
     }
   }
 

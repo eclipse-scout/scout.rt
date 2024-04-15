@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,6 +39,10 @@ import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
+
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.propagation.TextMapSetter;
 
 /**
  * Abstract tunnel used to invoke a service through HTTP.
@@ -129,8 +133,6 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   /**
    * @param httpRequest
    *          request object
-   * @param method
-   *          GET or POST override this method to add custom HTTP headers
    * @param call
    *          request information
    * @param callData
@@ -141,6 +143,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   protected void addCustomHeaders(HttpRequest httpRequest, ServiceTunnelRequest call, byte[] callData) throws IOException {
     addSignatureHeader(httpRequest, callData);
     addCorrelationId(httpRequest);
+    addOpenTelemetryContextHeader(httpRequest);
   }
 
   protected void addSignatureHeader(HttpRequest httpRequest, byte[] callData) throws IOException {
@@ -165,6 +168,16 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     }
   }
 
+  protected void addOpenTelemetryContextHeader(final HttpRequest httpRequest) {
+    TextMapSetter<HttpRequest> setter = (carrier, key, value) -> {
+      if (carrier != null) {
+        carrier.getHeaders().set(key, value);
+      }
+    };
+    GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator()
+        .inject(Context.current(), httpRequest, setter);
+  }
+
   /**
    * @return msgEncoder used to encode and decode a request / response to and from the binary stream. Default is the
    *         {@link BinaryServiceTunnelContentHandler} which handles binary messages
@@ -174,9 +187,9 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
-   * @param msgEncoder
-   *          that can encode and decode a request / response to and from the binary stream. Default is the
-   *          {@link BinaryServiceTunnelContentHandler} which handles binary messages
+   * @param e
+   *          content handler that can encode and decode a request / response to and from the binary stream. Default is
+   *          the {@link BinaryServiceTunnelContentHandler} which handles binary messages
    */
   public void setContentHandler(IServiceTunnelContentHandler e) {
     m_contentHandler = e;
