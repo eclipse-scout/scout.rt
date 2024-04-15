@@ -7,14 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Column, MenuBar, Page, scout, Table, TableRow, TableRowActionEvent} from '../../../index';
+import {arrays, Column, MenuBar, Page, scout, Table, TableReloadEvent, TableRow, TableRowActionEvent} from '../../../index';
 import $ from 'jquery';
 
 export class PageWithNodes extends Page {
 
+  declare reloadable: boolean;
+
   constructor() {
     super();
     this.nodeType = Page.NodeType.NODES;
+    this.reloadable = false;
   }
 
   protected override _createDetailTable(): Table {
@@ -27,15 +30,21 @@ export class PageWithNodes extends Page {
       id: 'PageWithNodesTable',
       autoResizeColumns: true,
       headerVisible: false,
+      hasReloadHandler: this.reloadable,
       columns: [nodeColumn]
     });
     table.menuBar.setPosition(MenuBar.Position.TOP);
     table.on('rowAction', this._onDetailTableRowAction.bind(this));
+    table.on('reload', this._onDetailTableReload.bind(this));
     return table;
   }
 
   protected _onDetailTableRowAction(event: TableRowActionEvent) {
     this.getOutline().mediator.onTableRowAction(event, this);
+  }
+
+  protected _onDetailTableReload(event: TableReloadEvent) {
+    this.reloadPage();
   }
 
   protected _rebuildDetailTable(childPages: Page[]) {
@@ -79,9 +88,8 @@ export class PageWithNodes extends Page {
     this.childrenLoaded = false;
     return this._createChildPages().done(childPages => {
       this._rebuildDetailTable(childPages);
-      if (childPages.length > 0) {
-        this.getOutline().insertNodes(childPages, this);
-      }
+      this.getOutline().deleteNodes(arrays.diff(this.childNodes, childPages), this);
+      this.getOutline().insertNodes(childPages, this);
       this.childrenLoaded = true;
     });
   }
