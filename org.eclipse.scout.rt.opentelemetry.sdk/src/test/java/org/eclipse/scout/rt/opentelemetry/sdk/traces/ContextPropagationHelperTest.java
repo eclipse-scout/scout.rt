@@ -33,6 +33,9 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import io.opentelemetry.context.propagation.TextMapGetter;
 import io.opentelemetry.context.propagation.TextMapSetter;
 
+/**
+ * Test class for {@link ContextPropagationHelper}
+ */
 @RunWith(PlatformTestRunner.class)
 public class ContextPropagationHelperTest {
 

@@ -30,6 +30,9 @@ import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 
+/**
+ * Test class for {@link TracingHelper}
+ */
 @RunWith(PlatformTestRunner.class)
 public class TracingHelperTest {
 
