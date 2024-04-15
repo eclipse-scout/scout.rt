@@ -102,7 +102,7 @@
     <logback.version>1.2.13</logback.version>
     <!-- careful: jackson breaks api with Double/BigDecimal from 2.11 to 2.12 -->
     <jackson.version>2.11.4</jackson.version>
-    <io.netty-version>4.1.100.Final</io.netty-version>
+    <io.netty-version>4.1.108.Final</io.netty-version>
     <batik.version>1.17</batik.version>
     <activemq.version>5.18.3</activemq.version>
     <artemis.version>2.20.0</artemis.version>
@@ -666,7 +666,7 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        <version>3.4.10</version>
+        <version>3.5.8</version>
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
@@ -677,7 +677,7 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http</artifactId>
-        <version>3.4.10</version>
+        <version>3.5.8</version>
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
@@ -688,7 +688,7 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        <version>3.4.10</version>
+        <version>3.5.8</version>
         <exclusions>
           <exclusion>
             <groupId>javax.servlet</groupId>
