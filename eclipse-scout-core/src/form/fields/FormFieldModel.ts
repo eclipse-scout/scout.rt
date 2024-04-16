@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, DropType, FormField, FormFieldLabelPosition, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor, GridData, Menu, ObjectOrChildModel, StatusMenuMapping, StatusOrModel, TooltipSupportOptions,
-  WidgetModel
+  Action, DropType, FormField, FormFieldLabelPosition, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor, GridData, Menu, ObjectOrChildModel, ObjectOrModel, StatusMenuMapping, StatusOrModel,
+  TooltipSupportOptions, WidgetModel
 } from '../../index';
 
 export interface FormFieldModel extends WidgetModel {
@@ -52,9 +52,9 @@ export interface FormFieldModel extends WidgetModel {
    * The {@link logicalGrid} uses these hints to calculate the effective {@link FormField.gridData}, most importantly {@link GridData.x} and {@link GridData.y}.
    *
    * @see {@link LogicalGridLayout} on how the layout works
-   * @see {@link GridData} for the configuration possibilities.
+   * @see {@link GridDataModel} for the configuration possibilities.
    */
-  gridDataHints?: GridData;
+  gridDataHints?: ObjectOrModel<GridData>;
   /**
    * Configures the keystrokes that should be registered in the current {@link keyStrokeContext}.
    *

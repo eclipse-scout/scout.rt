@@ -9,7 +9,7 @@
  */
 import {
   AbstractLayout, Action, aria, arrays, clipboard, CloneOptions, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
-  FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel, objects, Predicate,
+  FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel, ObjectOrModel, objects, Predicate,
   PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
@@ -842,11 +842,11 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /** @see FormFieldModel.gridDataHints */
-  setGridDataHints(gridData: GridData) {
+  setGridDataHints(gridData: ObjectOrModel<GridData>) {
     this.setProperty('gridDataHints', gridData);
   }
 
-  protected _setGridDataHints(gridData: GridData) {
+  protected _setGridDataHints(gridData: ObjectOrModel<GridData>) {
     this._setProperty('gridDataHints', GridData.ensure(gridData || new GridData()));
   }
 
@@ -855,7 +855,7 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   /** @internal */
-  _setGridData(gridData: GridData) {
+  _setGridData(gridData: ObjectOrModel<GridData>) {
     this._setProperty('gridData', GridData.ensure(gridData || new GridData()));
   }
 

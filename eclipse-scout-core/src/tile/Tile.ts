@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
+import {aria, ColorScheme, colorSchemes, EnumObject, GridData, HtmlComponent, InitModelOf, LoadingSupport, ObjectOrModel, scrollbars, SingleLayout, TileEventMap, TileModel, Widget} from '../index';
 import $ from 'jquery';
 
 export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
@@ -87,7 +87,7 @@ export class Tile extends Widget implements TileModel {
   }
 
   /** @see TileModel.gridDataHints */
-  setGridDataHints(gridData: GridData) {
+  setGridDataHints(gridData: ObjectOrModel<GridData>) {
     this.setProperty('gridDataHints', gridData);
     if (this.rendered) {
       // Do it here instead of _renderGridDataHints because grid does not need to be invalidated when rendering, only when hints change
@@ -96,12 +96,12 @@ export class Tile extends Widget implements TileModel {
     }
   }
 
-  protected _setGridDataHints(gridData: GridData) {
+  protected _setGridDataHints(gridData: ObjectOrModel<GridData>) {
     this._setProperty('gridDataHints', GridData.ensure(gridData || new GridData()));
   }
 
   /** @internal */
-  _setGridData(gridData: GridData) {
+  _setGridData(gridData: ObjectOrModel<GridData>) {
     this._setProperty('gridData', GridData.ensure(gridData || new GridData()));
   }
 
