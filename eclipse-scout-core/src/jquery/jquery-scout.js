@@ -779,12 +779,12 @@ $.fn.scrollParent = function() {
 };
 
 $.fn.scrollParents = function() {
-  let $scrollParents = $(),
-    $elem = this;
+  let $scrollParents = $();
+  let $elem = this;
 
   while ($elem.length > 0) {
     if ($elem.data('scrollable')) {
-      $scrollParents.push($elem);
+      $scrollParents.push($elem[0]);
     }
     $elem = $elem.parent();
   }
