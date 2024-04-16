@@ -178,6 +178,7 @@ export * from './layout/LayoutData';
 export * from './layout/LayoutConstants';
 export * from './layout/LayoutValidator';
 export * from './layout/logicalgrid/GridData';
+export * from './layout/logicalgrid/GridDataModel';
 export * from './layout/logicalgrid/LogicalGrid';
 export * from './layout/logicalgrid/LogicalGridConfig';
 export * from './layout/logicalgrid/LogicalGridData';

@@ -4701,9 +4701,9 @@ export class Table extends Widget implements TableModel {
   }
 
   protected _adaptTile(tile: Tile) {
-    tile.gridDataHints = {
+    tile.setGridDataHints({
       weightX: 0
-    };
+    });
   }
 
   createTileForRow(row: TableRow): Tile {
