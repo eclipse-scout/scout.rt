@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,6 @@ public final class OfficialVersion {
   private OfficialVersion() {
   }
 
-  public static final String COPYRIGHT_VERSION = "24.1";
+  public static final String COPYRIGHT_VERSION = "24.2";
   public static final String COPYRIGHT = "Scout " + COPYRIGHT_VERSION + ", &copy; BSI Business Systems Integration AG " + 2001 + "," + Calendar.getInstance().get(Calendar.YEAR) + " EPL";
 }
