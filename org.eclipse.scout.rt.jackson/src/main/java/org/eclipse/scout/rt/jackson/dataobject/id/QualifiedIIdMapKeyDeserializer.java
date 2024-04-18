@@ -40,14 +40,14 @@ public class QualifiedIIdMapKeyDeserializer extends KeyDeserializer {
 
   @Override
   public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-    // check required to prevent returning an instance that isn't compatible with requested ID class
     try {
+      if (m_moduleContext.isLenientMode()) {
+        return m_idCodec.get().fromQualifiedLenient(key);
+      }
+      // check required to prevent returning an instance that isn't compatible with requested ID class
       return assertInstance(m_idCodec.get().fromQualified(key), m_idClass);
     }
     catch (RuntimeException e) {
-      if (m_moduleContext.isLenientMode()) {
-        return key;
-      }
       throw InvalidFormatException.from(null, "Failed to deserialize qualified IId map key: " + e.getMessage(), key, m_idClass);
     }
   }

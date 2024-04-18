@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.dataobject.migration.fixture.house;
+package org.eclipse.scout.rt.dataobject.migration.fixture;
 
 import jakarta.annotation.Generated;
 

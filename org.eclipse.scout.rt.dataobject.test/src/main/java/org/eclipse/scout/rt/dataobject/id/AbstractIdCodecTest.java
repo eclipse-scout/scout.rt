@@ -155,11 +155,27 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testToQualifiedUnknownId_idTypeNameNull() {
+    //noinspection deprecation
+    UnknownId id = UnknownId.of(null, "foo");
+    String qualifiedId = getCodec().toQualified(id);
+    assertEquals("foo", qualifiedId);
+  }
+
+  @Test
   public void testToQualifiedUnknownId_Composite() {
     //noinspection deprecation
     UnknownId id = UnknownId.of("unknown", "foo;bar;baz");
     String qualifiedId = getCodec().toQualified(id);
     assertEquals("unknown:foo;bar;baz", qualifiedId);
+  }
+
+  @Test
+  public void testToQualifiedUnknownId_CompositeIdTypeNameNull() {
+    //noinspection deprecation
+    UnknownId id = UnknownId.of(null, "foo;bar;baz");
+    String qualifiedId = getCodec().toQualified(id);
+    assertEquals("foo;bar;baz", qualifiedId);
   }
 
   @Test
@@ -598,7 +614,13 @@ public abstract class AbstractIdCodecTest {
   @Test
   public void testFromQualifiedLenient_NoIdTypeName() {
     IId id = getCodec().fromQualifiedLenient("Foo" + TEST_UUID);
-    assertNull(id);
+    assertTrue(id instanceof UnknownId);
+    UnknownId uid = (UnknownId) id;
+    assertNull(uid.getIdTypeName());
+    assertEquals("Foo" + TEST_UUID, uid.getId());
+    assertEquals("Foo" + TEST_UUID, uid.unwrap());
+    //noinspection deprecation
+    assertEquals(UnknownId.of(null, "Foo" + TEST_UUID), id);
   }
 
   @Test

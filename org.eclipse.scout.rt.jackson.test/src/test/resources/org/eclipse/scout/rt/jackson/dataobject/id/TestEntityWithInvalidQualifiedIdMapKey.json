@@ -1,0 +1,6 @@
+{
+  "_type" : "scout.TestEntityWithIId",
+  "iUuIdMap" : {
+    "scout.unknown:unknown" : "value"
+  }
+}

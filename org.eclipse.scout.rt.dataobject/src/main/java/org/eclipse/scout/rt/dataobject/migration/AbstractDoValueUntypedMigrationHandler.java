@@ -19,14 +19,14 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
  * based on the class generic type and supporting {@link Class} of {@link ITypeVersion} instead of
  * {@link NamespaceVersion}.
  * <p>
- * This re-name migration handler allows to rename the type name and therefore change the type of the migrated value
+ * This rename migration handler allows to rename the type name and therefore change the type of the migrated value
  * from {@code T} to {@link Object}.
  */
-public abstract class AbstractDoValueRenameMigrationHandler<T> implements IDoValueMigrationHandler<T> {
+public abstract class AbstractDoValueUntypedMigrationHandler<T> implements IDoValueMigrationHandler<T> {
 
   private final NamespaceVersion m_typeVersion;
 
-  protected AbstractDoValueRenameMigrationHandler() {
+  protected AbstractDoValueUntypedMigrationHandler() {
     m_typeVersion = BEANS.get(typeVersionClass()).getVersion();
   }
 
@@ -40,7 +40,7 @@ public abstract class AbstractDoValueRenameMigrationHandler<T> implements IDoVal
   @Override
   public Class<T> valueClass() {
     // noinspection unchecked
-    return TypeCastUtility.getGenericsParameterClass(this.getClass(), AbstractDoValueRenameMigrationHandler.class);
+    return TypeCastUtility.getGenericsParameterClass(this.getClass(), AbstractDoValueUntypedMigrationHandler.class);
   }
 
   /**

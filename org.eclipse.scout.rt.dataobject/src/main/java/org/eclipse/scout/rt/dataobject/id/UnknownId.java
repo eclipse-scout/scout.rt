@@ -14,9 +14,10 @@ import java.util.Objects;
 import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
 
 /**
- * Marker class used as value holder class when deserializing IIds having an unknown {@link IdTypeName} using lenient
- * deserialization. This class is used by {@link IdCodec} during lenient deserialization to retain the deserialized raw
- * value before a later executed value migrations is able to change the value and instantiate the corresponding id class.
+ * Marker class used as value holder class when deserializing {@link IId}'s having an unknown {@link IdTypeName} using
+ * lenient deserialization. This class is used by {@link IdCodec} during lenient deserialization to retain the
+ * deserialized raw value before a later executed value migrations is able to change the value and instantiate the
+ * corresponding id class.
  *
  * @see IdCodec#fromQualifiedLenient(String)
  * @see ILenientDataObjectMapper

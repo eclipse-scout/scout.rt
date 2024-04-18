@@ -107,11 +107,11 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
  *   }
  * }
  * </pre>
- * <p>
+ *
  * <b>Example 3:</b> built-in id FooTypeId with IdTypeName 'FooTypeId' is renamed to BarTypeId with name 'BarTypeId'<br>
  *
  * <pre>
- * public class FooDoValueMigrationHandler extends AbstractDoValueRenameMigrationHandler<UnknownId> {
+ * public class FooDoValueMigrationHandler extends AbstractDoValueUntypedMigrationHandler<UnknownId> {
  *
  *   public static final DoValueMigrationId ID = DoValueMigrationId.of("3740d4ce-849b-449e-afb1-0986993c9423");
  *

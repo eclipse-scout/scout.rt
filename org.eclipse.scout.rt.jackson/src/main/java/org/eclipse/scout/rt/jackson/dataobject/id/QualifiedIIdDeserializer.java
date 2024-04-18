@@ -43,12 +43,12 @@ public class QualifiedIIdDeserializer extends StdDeserializer<IId> {
 
   @Override
   public IId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    // check required to prevent returning an instance that isn't compatible with requested ID class
     String rawValue = p.getText();
     try {
       if (m_moduleContext.isLenientMode()) {
-        return assertInstance(m_idCodec.get().fromQualifiedLenient(rawValue), m_idClass);
+        return m_idCodec.get().fromQualifiedLenient(rawValue);
       }
+      // check required to prevent returning an instance that isn't compatible with requested ID class
       return assertInstance(m_idCodec.get().fromQualified(rawValue), m_idClass);
     }
     catch (RuntimeException e) {
