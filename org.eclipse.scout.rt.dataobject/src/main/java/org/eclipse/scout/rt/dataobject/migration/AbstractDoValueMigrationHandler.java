@@ -10,52 +10,22 @@
 package org.eclipse.scout.rt.dataobject.migration;
 
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
  * Abstract implementation of a {@link IDoValueMigrationHandler} providing an implementation of {@link #valueClass()}
  * based on the class generic type and supporting {@link Class} of {@link ITypeVersion} instead of
  * {@link NamespaceVersion}.
  *
- * @see AbstractDoStructureRenameMigrationHandler for a handler allowing to rename and therefore change the type of the
+ * @see AbstractDoValueUntypedMigrationHandler for a handler allowing to rename and therefore change the type T of the
  *      migrated value.
  */
-public abstract class AbstractDoValueMigrationHandler<T> implements IDoValueMigrationHandler<T> {
-
-  private final NamespaceVersion m_typeVersion;
-
-  protected AbstractDoValueMigrationHandler() {
-    m_typeVersion = BEANS.get(typeVersionClass()).getVersion();
-  }
-
-  @Override
-  public NamespaceVersion typeVersion() {
-    return m_typeVersion;
-  }
-
-  public abstract Class<? extends ITypeVersion> typeVersionClass();
-
-  @Override
-  public Class<T> valueClass() {
-    // noinspection unchecked
-    return TypeCastUtility.getGenericsParameterClass(this.getClass(), AbstractDoValueMigrationHandler.class);
-  }
+public abstract class AbstractDoValueMigrationHandler<T> extends AbstractDoValueUntypedMigrationHandler<T> {
 
   /**
    * Note: A default data object value migration is not allowed to change the type {@code T} of the value. Use
-   * {@link AbstractDoValueRenameMigrationHandler} to change the type of the migrated value.
+   * {@link AbstractDoValueUntypedMigrationHandler} to change the type of the migrated value.
    */
   @Override
   public abstract T migrate(DataObjectMigrationContext ctx, T value);
-
-  /**
-   * The default implementation will accept when this value migration wasn't applied already. Own implementations might
-   * choose to always accept (despite being already applied) or to not accept in case some context data is missing.
-   */
-  @Override
-  public boolean accept(DataObjectMigrationContext ctx) {
-    return !ctx.getGlobal(DoValueMigrationIdsContextData.class).getAppliedValueMigrationIds().contains(id());
-  }
 }

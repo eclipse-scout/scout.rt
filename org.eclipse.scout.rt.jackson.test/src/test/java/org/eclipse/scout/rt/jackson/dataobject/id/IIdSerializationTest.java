@@ -170,49 +170,99 @@ public class IIdSerializationTest {
   }
 
   @Test
-  public void testDeserializeInvalidQualifiedId() {
-    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iid\" : \"scout.unknown:unknown\" }";
+  public void testDeserializeInvalidQualifiedId() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithInvalidQualifiedId.json"));
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
 
     TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
     //noinspection deprecation
-    assertEquals(UnknownId.of("scout.unknown","unknown"), marshalledLenient.getIid());
+    assertEquals(UnknownId.of("scout.unknown", "unknown"), marshalledLenient.getIid());
+    assertEquals("unknown", marshalledLenient.get("iid", UnknownId.class).unwrap());
+
+    // assert roundtrip back to JSON is equals
+    String serialized = m_dataObjectMapper.writeValue(marshalledLenient);
+    m_testHelper.assertJsonEquals(json, serialized);
   }
 
   @Test
-  public void testDeserializeMissingQualifiedIdFormat() {
-    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iid\" : \"unknown\" }";
+  public void testDeserializeInvalidQualifiedIUuid() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithInvalidQualifiedIUuId.json"));
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
 
     TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
-    assertThrows(ClassCastException.class, () -> marshalledLenient.getIid());
-    assertEquals("unknown", marshalledLenient.getString("iid"));
+    assertThrows(ClassCastException.class, () -> marshalledLenient.getIUuId());
+    //noinspection deprecation
+    assertEquals(UnknownId.of("scout.unknown", "unknown"), marshalledLenient.get("iUuId"));
+    assertEquals("unknown", marshalledLenient.get("iUuId", UnknownId.class).unwrap());
+
+    // assert roundtrip back to JSON is equals
+    String serialized = m_dataObjectMapper.writeValue(marshalledLenient);
+    m_testHelper.assertJsonEquals(json, serialized);
   }
 
   @Test
-  public void testDeserializeInvalidQualifiedIdMapKey() {
-    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iUuIdMap\" : { \"scout.unknown:unknown\" : \"value\" } }";
+  public void testDeserializeMissingQualifiedIdFormat() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithMissingQualifiedId.json"));
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    //noinspection deprecation
+    assertEquals(UnknownId.of(null, "unknown"), marshalledLenient.getIid());
+    assertEquals("unknown", marshalledLenient.get("iid", UnknownId.class).unwrap());
+
+    // assert roundtrip back to JSON is equals
+    String serialized = m_dataObjectMapper.writeValue(marshalledLenient);
+    m_testHelper.assertJsonEquals(json, serialized);
+  }
+
+  @Test
+  public void testDeserializeMissingQualifiedIUuIdFormat() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithMissingQualifiedIUuId.json"));
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
+
+    TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
+    assertThrows(ClassCastException.class, () -> marshalledLenient.getIUuId());
+    //noinspection deprecation
+    assertEquals(UnknownId.of(null, "unknown"),  marshalledLenient.get("iUuId"));
+    assertEquals("unknown", marshalledLenient.get("iUuId", UnknownId.class).unwrap());
+
+    // assert roundtrip back to JSON is equals
+    String serialized = m_dataObjectMapper.writeValue(marshalledLenient);
+    m_testHelper.assertJsonEquals(json, serialized);
+  }
+
+  @Test
+  public void testDeserializeInvalidQualifiedIdMapKey() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithInvalidQualifiedIdMapKey.json"));
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
 
     TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
     Map<IUuId, String> map = marshalledLenient.getIUuIdMap(); // accessing this way works due to missing checks for generics at runtime
     assertEquals(1, map.size());
-    //noinspection AssertBetweenInconvertibleTypes
-    assertEquals("scout.unknown:unknown", CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
+    //noinspection AssertBetweenInconvertibleTypes,deprecation
+    assertEquals(UnknownId.of("scout.unknown","unknown"), CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
     assertEquals("value", CollectionUtility.firstElement(map.values()));
+
+    // assert roundtrip back to JSON is equals
+    String serialized = m_dataObjectMapper.writeValue(marshalledLenient);
+    m_testHelper.assertJsonEquals(json, serialized);
   }
 
   @Test
-  public void testDeserializeInvalidQualifiedIdMapKeyWithValidDo() {
-    String json = "{\"_type\" : \"scout.TestEntityWithIId\", \"iUuIdDoMap\" : { \"scout.unknown:unknown\" : { \"_type\" : \"TestItem\", \"id\" : \"1\" } } }";
+  public void testDeserializeInvalidQualifiedIdMapKeyWithValidDo() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithInvalidQualifiedIdMapKeyWithValidDo.json"));
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithIIdDo.class));
 
     TestEntityWithIIdDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithIIdDo.class);
     Map<IUuId, TestItemDo> map = marshalledLenient.getIUuIdDoMap(); // accessing this way works due to missing checks for generics at runtime
     assertEquals(1, map.size());
-    //noinspection AssertBetweenInconvertibleTypes
-    assertEquals("scout.unknown:unknown", CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
+    //noinspection AssertBetweenInconvertibleTypes,deprecation
+    assertEquals(UnknownId.of("scout.unknown","unknown"), CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
     assertEquals(BEANS.get(TestItemDo.class).withId("1"), CollectionUtility.firstElement(map.values())); // typed
+
+    // assert roundtrip back to JSON is equals
+    String serialized = m_dataObjectMapper.writeValue(marshalledLenient);
+    m_testHelper.assertJsonEquals(json, serialized);
   }
 
   @Test

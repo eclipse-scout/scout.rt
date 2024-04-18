@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.dataobject.migration.fixture.house;
 
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.dataobject.id.UnknownId;
-import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueRenameMigrationHandler;
+import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueUntypedMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_1;
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureT
 /**
  * Migration handler migrating former OldHouseTypeFixtureStringId instances to {@link HouseTypeFixtureStringId}.
  */
-public class OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler extends AbstractDoValueRenameMigrationHandler<UnknownId> {
+public class OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler extends AbstractDoValueUntypedMigrationHandler<UnknownId> {
 
   public static final DoValueMigrationId ID = DoValueMigrationId.of("543df71a-e095-499c-a684-2d4e5604a391");
 
@@ -32,7 +32,6 @@ public class OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler extends A
   public Class<? extends ITypeVersion> typeVersionClass() {
     return CharlieFixture_1.class;
   }
-
 
   @Override
   public Object migrate(DataObjectMigrationContext ctx, UnknownId value) {

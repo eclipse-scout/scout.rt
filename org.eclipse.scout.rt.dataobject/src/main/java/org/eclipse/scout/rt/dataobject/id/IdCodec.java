@@ -34,6 +34,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 @ApplicationScoped
 public class IdCodec {
 
+  protected static final String ID_TYPENAME_DELIMITER = ":";
+
   protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
   protected final LazyValue<IdInventory> m_idInventory = new LazyValue<>(IdInventory.class);
 
@@ -69,13 +71,14 @@ public class IdCodec {
     String typeName = m_idInventory.get().getTypeName(id);
     if (StringUtility.isNullOrEmpty(typeName)) {
       if (id instanceof UnknownId) {
-        typeName = ((UnknownId) id).getIdTypeName();
+        // typeName of unknown id could be null, retain unknown id as-is for later migration
+        return StringUtility.join(ID_TYPENAME_DELIMITER, ((UnknownId) id).getIdTypeName(), toUnqualified(id));
       }
       else {
         throw new PlatformException("Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass());
       }
     }
-    return typeName + ":" + toUnqualified(id);
+    return typeName + ID_TYPENAME_DELIMITER + toUnqualified(id);
   }
 
   /**
@@ -202,13 +205,11 @@ public class IdCodec {
     if (StringUtility.isNullOrEmpty(qualifiedId)) {
       return null;
     }
-    String[] tmp = qualifiedId.split(":", 2); // split into at most two parts
+    String[] tmp = qualifiedId.split(ID_TYPENAME_DELIMITER, 2); // split into at most two parts
     if (tmp.length < 2) { // no ":" found
       if (lenient) {
         //noinspection deprecation
-        return null;
-        // FIXME PBZ: To Discuss during code review: retain this case as UnknownId
-        // e.g.  return UnknownId.of(null, qualifiedId);
+        return UnknownId.of(null, qualifiedId);
       }
       else {
         throw new PlatformException("Qualified id '{}' format is invalid", qualifiedId);
