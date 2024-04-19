@@ -14,12 +14,12 @@ import org.eclipse.scout.rt.dataobject.id.UnknownId;
 import org.eclipse.scout.rt.dataobject.migration.AbstractDoValueUntypedMigrationHandler;
 import org.eclipse.scout.rt.dataobject.migration.DataObjectMigrationContext;
 import org.eclipse.scout.rt.dataobject.migration.DoValueMigrationId;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_2;
 
 /**
  * Migration handler migrating former OldHouseTypeFixtureStringId instances to {@link HouseTypeFixtureStringId}.
  */
-public class OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler extends AbstractDoValueUntypedMigrationHandler<UnknownId> {
+public class OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2 extends AbstractDoValueUntypedMigrationHandler<UnknownId> {
 
   public static final DoValueMigrationId ID = DoValueMigrationId.of("543df71a-e095-499c-a684-2d4e5604a391");
 
@@ -30,7 +30,9 @@ public class OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler extends A
 
   @Override
   public Class<? extends ITypeVersion> typeVersionClass() {
-    return CharlieFixture_1.class;
+    // Type version DeltaFixture_2 is after CharlieFixture_2 and therefore HouseTypeFixtureDoValueMigrationHandler_2.
+    // But untyped value migrations will always be applied before regular value migrations, based on the primary sort order.
+    return DeltaFixture_2.class;
   }
 
   @Override

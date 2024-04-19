@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureRawOn
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureStructureMigrationTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureTypedOnlyStructureMigrationTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureDoValueMigrationHandler_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureFamilyFriendlyMigrationHandlerInvalidTypeVersionToUpdate_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStructureMigrationHandler_2;
@@ -103,7 +104,8 @@ public class DataObjectMigrationInventoryTest {
             // registration order here is relevant for test method testValueMigrationHandlersOrdered
             new RoomSizeFixtureDoValueMigrationHandler_2(),
             new RoomTypeFixtureDoValueMigrationHandler_2(),
-            new HouseTypeFixtureDoValueMigrationHandler_2()));
+            new HouseTypeFixtureDoValueMigrationHandler_2(),
+            new OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2()));
   }
 
   /**
@@ -140,7 +142,7 @@ public class DataObjectMigrationInventoryTest {
    * Validates internal structure of inventory ({@link DataObjectMigrationInventory#m_orderedVersions}.
    */
   @Test
-  public void testOrdered() {
+  public void testOrderedVersions() {
     assertEquals(
         Arrays.asList(
             AlfaFixture_1.VERSION, BravoFixture_1.VERSION, CharlieFixture_1.VERSION, DeltaFixture_1.VERSION,
@@ -317,7 +319,7 @@ public class DataObjectMigrationInventoryTest {
   }
 
   @Test
-  public void testGetMigrationHandlers() {
+  public void testGetStructureMigrationHandlers() {
     assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationHandlers(null));
     assertThrows(AssertionException.class, () -> s_inventory.getStructureMigrationHandlers(AlfaFixture_7.VERSION)); // no registered
 
@@ -362,19 +364,24 @@ public class DataObjectMigrationInventoryTest {
   public void testValueMigrationHandlersOrdered() {
     // all value migration handlers, ordered (see initialization of s_inventory)
     List<IDoValueMigrationHandler<?>> valueMigrationHandlers = s_inventory.getValueMigrationHandlers();
-    assertEquals(3, valueMigrationHandlers.size());
-    assertEquals(RoomTypeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(0).id());
+    assertEquals(4, valueMigrationHandlers.size());
+
+    // untyped value migration handler before regular migrations (because of primary sort order)
+    assertEquals(OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2.ID, valueMigrationHandlers.get(0).id());
+
+    // regular migration handlers
+    assertEquals(RoomTypeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(1).id());
     // HouseTypeFixtureDoValueMigrationHandler_2 after RoomTypeFixtureDoValueMigrationHandler_2 because of registration order (same type version)
-    assertEquals(HouseTypeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(1).id());
+    assertEquals(HouseTypeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(2).id());
     // RoomSizeFixtureDoValueMigrationHandler_2 after HouseTypeFixtureDoValueMigrationHandler_2 because of type version (registration order is overridden)
-    assertEquals(RoomSizeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(2).id());
+    assertEquals(RoomSizeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(3).id());
   }
 
   /**
    * Register two value migration handlers with identical ID -> exception expected
    */
   @Test
-  public void voidTestDuplicateValueMigrationIds() {
+  public void testDuplicateValueMigrationIds() {
     PlatformException exception = assertThrows(PlatformException.class, () -> new TestDataObjectMigrationInventory(
         Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace()),
         Arrays.asList(
