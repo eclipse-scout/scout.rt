@@ -22,6 +22,11 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
  */
 public abstract class AbstractDoValueMigrationHandler<T> extends AbstractDoValueUntypedMigrationHandler<T> {
 
+  @Override
+  public double primarySortOrder() {
+    return DEFAULT_PRIMARY_SORT_ORDER;
+  }
+
   /**
    * Note: A default data object value migration is not allowed to change the type {@code T} of the value. Use
    * {@link AbstractDoValueUntypedMigrationHandler} to change the type of the migrated value.

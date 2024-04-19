@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoVal
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureStringId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypesFixture;
-import org.eclipse.scout.rt.dataobject.migration.fixture.house.OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureAlwaysAcceptDoValueMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureDoValueMigrationHandler_3;
@@ -92,7 +92,7 @@ public class DataObjectMigratorValueMigrationTest {
             new CustomerGenderFixtureDoValueMigrationHandler_2(),
             new HouseTypeFixtureDoValueMigrationHandler_2(),
             new HouseFixtureDoValueMigrationHandler_1(),
-            new OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler()));
+            new OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2()));
 
     TEST_BEANS.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestDataObjectMigrationInventory.class, inventory).withReplace(true)));
 
@@ -611,5 +611,23 @@ public class DataObjectMigratorValueMigrationTest {
     assertTrue(result.isChanged());
     assertTrue(result.getDataObject().getId() instanceof HouseTypeFixtureStringId);
     assertEquals("foo", result.getDataObject().getId().unwrap());
+  }
+
+  /**
+   * Testcase for IdTypeName renaming from 'charlieFixture.OldHouseTypeFixtureStringId' to
+   * 'charlieFixture.HouseTypeFixtureStringId' followed by a typed value migration for HouseTypeFixtureStringId.
+   * <p>
+   * Setup EntityWithIdFixtureDo using raw data object mapper.
+   * <p>
+   * Sort order of value migration handlers is relevant: HouseTypeFixtureDoValueMigrationHandler_2 is applied
+   * <i>after</i> OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2, despite a lower type version.
+   */
+  @Test
+  public void testValueMigrationOrder() {
+    IDoEntity entity = (IDoEntity) BEANS.get(IDataObjectMapper.class).readValueRaw("{\"_type\" : \"EntityWithIdFixture\", \"id\" : \"charlieFixture.OldHouseTypeFixtureStringId:house\"}");
+    DataObjectMigratorResult<EntityWithIdFixtureDo> result = s_migrator.migrateDataObject(s_migrationContext, entity, EntityWithIdFixtureDo.class);
+    assertTrue(result.isChanged());
+    assertTrue(result.getDataObject().getId() instanceof HouseTypeFixtureStringId);
+    assertEquals(HouseTypesFixture.DETACHED_HOUSE, result.getDataObject().getId());
   }
 }

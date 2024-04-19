@@ -220,7 +220,9 @@ public class DataObjectMigrationInventory {
     allValueMigrationHandlers.forEach(handler -> validateValueMigrationHandler(handler, validatedValueMigrationHandlers));
     // Primary sort order by type version, secondary sort order provided by bean manager (order annotation and fully qualified class name).
     allValueMigrationHandlers.stream()
-        .sorted(Comparator.comparing(IDoValueMigrationHandler::typeVersion, m_comparator))
+        .sorted(Comparator
+            .comparingDouble((IDoValueMigrationHandler<?> handler) -> handler.primarySortOrder())
+            .thenComparing(IDoValueMigrationHandler::typeVersion, m_comparator))
         .forEach(handler -> m_valueMigrationHandlers.put(handler.id(), handler));
   }
 

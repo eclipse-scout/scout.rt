@@ -36,8 +36,9 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
  * constants from the current code base, i.e. they are never refactored, if the code base changes).
  * <p>
  * Value migration handlers are always applied <i>after</i> all {@link IDoStructureMigrationHandler} have been applied.
- * Value migrations are applied in a specific order, defined by the given {@link #typeVersion()}. Migration handlers
- * with the same type version are applied in the order provided by the bean manager.
+ * Value migrations are applied in a specific order, defined by the given {@link #primarySortOrder()} and
+ * {@link #typeVersion()}. Migration handlers with the same primary sort order and type version are applied in the order
+ * provided by the bean manager.
  * <p>
  * Value migration handlers <i>must be idempotent</i>, i.e. the result of a given migration must not change, even if the
  * migration is applied multiple times. In general, value migrations are applied <i>exactly once</i>, as the system
@@ -139,6 +140,20 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 public interface IDoValueMigrationHandler<T> {
 
   /**
+   * Primary sort order for untyped value migrations, used by {@link AbstractDoValueUntypedMigrationHandler}.
+   *
+   * @see #primarySortOrder()
+   */
+  double UNTYPED_PRIMARY_SORT_ORDER = 1000.0;
+
+  /**
+   * Default primary sort order used by {@link AbstractDoValueMigrationHandler}.
+   *
+   * @see #primarySortOrder()
+   */
+  double DEFAULT_PRIMARY_SORT_ORDER = 2000.0;
+
+  /**
    * Unique identifier for this value migration handler.
    */
   DoValueMigrationId id();
@@ -153,7 +168,18 @@ public interface IDoValueMigrationHandler<T> {
   Class<T> valueClass();
 
   /**
-   * Type version used for sorting.
+   * Primary sort order used for sorting. The primary sort order can be used to group different types of value migration
+   * handlers. Secondary sort order is by {@link #typeVersion()}.
+   * <p>
+   * Example: Untyped DO value migrations (see {@link AbstractDoValueUntypedMigrationHandler}) use
+   * {@link #UNTYPED_PRIMARY_SORT_ORDER} and are always applied before regular migration handlers
+   * ({@link AbstractDoValueMigrationHandler}) using {@link #DEFAULT_PRIMARY_SORT_ORDER}).
+   */
+  double primarySortOrder();
+
+  /**
+   * Type version used for sorting. Primary sort order is by {@link #primarySortOrder()}, secondary sort order is by
+   * type version.
    * <p>
    * The type version defined on a value migration is used to obtain a sort order over all value migrations, including
    * value migrations from other namespaces. Value migrations are always applied after all structure migrations have
