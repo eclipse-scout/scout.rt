@@ -1,0 +1,6 @@
+{
+  "_type" : "scout.TestEntityWithTypedId",
+  "iid" : "scout.unknown1:foo;8fa211b0-fd83-42cb-96c9-1942e274ce79",
+  "stringId" : "scout.unknown2:foo",
+  "uuId" : "scout.unknown3:8fa211b0-fd83-42cb-96c9-1942e274ce79"
+}

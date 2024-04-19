@@ -9,21 +9,26 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.net.URL;
 
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
+import org.eclipse.scout.rt.dataobject.id.UnknownId;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithTypedIdDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 public class TypedIdSerializationTest {
 
@@ -32,10 +37,12 @@ public class TypedIdSerializationTest {
 
   protected DataObjectSerializationTestHelper m_testHelper;
   protected IDataObjectMapper m_dataObjectMapper;
+  protected IDataObjectMapper m_lenientDataObjectMapper;
 
   @Before
   public void before() {
     m_dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
+    m_lenientDataObjectMapper = BEANS.get(ILenientDataObjectMapper.class);
     m_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
   }
 
@@ -66,6 +73,43 @@ public class TypedIdSerializationTest {
 
     TestEntityWithTypedIdDo marshalled = m_dataObjectMapper.readValue(expectedJson, TestEntityWithTypedIdDo.class);
     assertEquals(c, marshalled.getIid().getId());
+  }
+
+  @Test
+  public void testSerializeDeserialize_UnknownId() throws Exception {
+    String json = m_testHelper.readResourceAsString(toURL("TestEntityWithUnknownTypedIdDo.json"));
+    PlatformException e = assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithTypedIdDo.class));
+    assertTrue(e.getCause() instanceof InvalidFormatException);
+  }
+
+  @Test
+  public void testSerializeDeserializeLenient_UnknownId() throws Exception {
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithUnknownTypedIdDo.json"));
+    TestEntityWithTypedIdDo marshalled = m_lenientDataObjectMapper.readValue(expectedJson, TestEntityWithTypedIdDo.class);
+    //noinspection deprecation,AssertBetweenInconvertibleTypes
+    assertEquals(UnknownId.of("scout.unknown1", "foo;" + UU_ID.unwrapAsString()), marshalled.getIid().getId());
+    //noinspection deprecation,AssertBetweenInconvertibleTypes
+    assertEquals(UnknownId.of("scout.unknown2", "foo"), marshalled.getStringId().getId());
+    //noinspection deprecation,AssertBetweenInconvertibleTypes
+    assertEquals(UnknownId.of("scout.unknown3", UU_ID.unwrapAsString()), marshalled.getUuId().getId());
+
+    String json = m_dataObjectMapper.writeValue(marshalled);
+    m_testHelper.assertJsonEquals(expectedJson, json);
+  }
+
+  @Test
+  public void testSerializeDeserializeLenient_UnknownIdInvalidFormat() throws Exception {
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithUnknownTypedIdInvalidFormatDo.json"));
+    TestEntityWithTypedIdDo marshalled = m_lenientDataObjectMapper.readValue(expectedJson, TestEntityWithTypedIdDo.class);
+    //noinspection deprecation,AssertBetweenInconvertibleTypes
+    assertEquals(UnknownId.of(null, "foo;" + UU_ID.unwrapAsString()), marshalled.getIid().getId());
+    //noinspection deprecation,AssertBetweenInconvertibleTypes
+    assertEquals(UnknownId.of(null, "foo"), marshalled.getStringId().getId());
+    //noinspection deprecation,AssertBetweenInconvertibleTypes
+    assertEquals(UnknownId.of(null, UU_ID.unwrapAsString()), marshalled.getUuId().getId());
+
+    String json = m_dataObjectMapper.writeValue(marshalled);
+    m_testHelper.assertJsonEquals(expectedJson, json);
   }
 
   protected URL toURL(String resourceName) {
