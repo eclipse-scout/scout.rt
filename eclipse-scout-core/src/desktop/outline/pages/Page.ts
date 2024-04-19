@@ -137,9 +137,11 @@ export class Page extends TreeNode implements PageModel {
     super._destroy();
     if (this.detailTable) {
       this.detailTable.destroy();
+      this.detailTable = null;
     }
     if (this.detailForm) {
       this.detailForm.destroy();
+      this.detailForm = null;
     }
     this.trigger('destroy');
   }
@@ -433,6 +435,11 @@ export class Page extends TreeNode implements PageModel {
     }
     this.detailForm = form;
     if (form) {
+      form.one('destroy', () => {
+        if (this.detailForm === form) {
+          this.detailForm = null;
+        }
+      });
       this._initDetailForm(form);
     }
     this.triggerPropertyChange('detailForm', oldDetailForm, form);
@@ -457,6 +464,11 @@ export class Page extends TreeNode implements PageModel {
     }
     this.detailTable = table;
     if (table) {
+      table.one('destroy', () => {
+        if (this.detailTable === table) {
+          this.detailTable = null;
+        }
+      });
       this._initDetailTable(table);
     }
     this.triggerPropertyChange('detailTable', oldDetailTable, table);

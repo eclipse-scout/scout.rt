@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Form, GroupBox, Outline, Page, PageWithTable, scout, Table, Widget} from '../../../../src';
+import {arrays, Form, GroupBox, Outline, Page, PageWithNodes, PageWithTable, scout, Table, Widget} from '../../../../src';
 import {MenuSpecHelper, OutlineSpecHelper, TableSpecHelper} from '../../../../src/testing';
 import {ChildModelOf} from '../../../../src/scout';
 
@@ -73,6 +73,47 @@ describe('Page', () => {
     page.setDetailTable(newTable);
     expect(oldTable.destroyed).toBe(true);
     expect(newTable.destroyed).toBe(false);
+  });
+
+  it('detailTable and detailForm are destroyed when page is destroyed', () => {
+    session.desktop.setBenchVisible(true);
+    session.desktop.setOutline(outline);
+
+    let parentPage = scout.create(PageWithNodes, {
+      parent: outline,
+      childNodes: [
+        {
+          objectType: Page,
+          detailForm: {
+            objectType: Form,
+            rootGroupBox: {
+              objectType: GroupBox
+            }
+          },
+          detailFormVisible: true,
+          detailTable: {
+            objectType: Table
+          },
+          detailTableVisible: true
+        }
+      ]
+    });
+    outline.insertNode(parentPage);
+    outline.expandNode(parentPage);
+    let page = parentPage.childNodes[0];
+    outline.selectNode(page);
+
+    expect(page.detailTable).toBeInstanceOf(Table);
+    expect(page.detailForm).toBeInstanceOf(Widget);
+    let detailTable = page.detailTable;
+    let detailForm = page.detailForm;
+
+    outline.deleteNode(page);
+    expect(page.destroyed).toBe(true);
+    expect(detailForm.destroyed).toBe(true);
+    expect(detailTable.destroyed).toBe(true);
+    expect(page.detailForm).toBe(null);
+    expect(page.detailTable).toBe(null);
   });
 
   it('detailTable and detailForm are enhanced with parent table page menus', () => {
