@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -134,23 +135,23 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    */
   @Override
   public List<? extends ILookupRow<T>> getDataByText() {
-    List<ILookupRow<T>> list = new ArrayList<>();
+    Map<T, ILookupRow<T>> list = new HashMap<>();
     Pattern p = createSearchPattern(getText());
     List<? extends ILookupRow<T>> lookupRows = createLookupRowsFiltered();
     for (ILookupRow<T> row : lookupRows) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
-        list.add(row);
+        list.put(row.getKey(), row);
       }
     }
     if (isHierarchicalLookup()) {
       Map<T, Set<ILookupRow<T>>> nodeMap = createNodeMap(lookupRows);
       List<ILookupRow<T>> children = new ArrayList<>();
-      for (ILookupRow<T> res : list) {
+      for (ILookupRow<T> res : list.values()) {
         collectChildrenRec(nodeMap, res.getKey(), children);
       }
-      list.addAll(children);
+      list.putAll(children.stream().collect(Collectors.toMap(ILookupRow::getKey, Function.identity())));
     }
-    return list;
+    return new ArrayList<>(list.values());
   }
 
   /**
