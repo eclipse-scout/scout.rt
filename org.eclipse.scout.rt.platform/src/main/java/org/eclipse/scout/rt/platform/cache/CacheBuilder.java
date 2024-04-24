@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -35,6 +36,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   private final List<CustomWrapperInitializer> m_customWrappers;
 
   private String m_cacheId;
+  private Supplier<String> m_labelSupplier;
   private ICacheValueResolver<K, V> m_valueResolver;
   private boolean m_shared;
   private boolean m_remoteValueResolverEnabled;
@@ -121,7 +123,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   }
 
   protected ICache<K, V> createBasicCache(Map<K, V> cacheMap) {
-    return new BasicCache<>(getCacheId(), getValueResolver(), cacheMap);
+    return new BasicCache<>(getCacheId(), getLabelSupplier(), getValueResolver(), cacheMap);
   }
 
   protected ICache<K, V> addBeforeCustomWrappers(ICache<K, V> cache) {
@@ -163,6 +165,16 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   public String getCacheId() {
     return m_cacheId;
+  }
+
+  @Override
+  public ICacheBuilder<K, V> withLabelSupplier(Supplier<String> labelSupplier) {
+    m_labelSupplier = labelSupplier;
+    return this;
+  }
+
+  public Supplier<String> getLabelSupplier() {
+    return m_labelSupplier;
   }
 
   @Override

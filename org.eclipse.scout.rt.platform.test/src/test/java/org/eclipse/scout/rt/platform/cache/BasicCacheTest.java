@@ -65,6 +65,37 @@ public class BasicCacheTest {
   }
 
   @Test
+  public void testCacheIdLabel() {
+    //noinspection unchecked
+    ICache<Integer, String> cache = BEANS.get(ICacheBuilder.class)
+        .withCacheId("BasicCacheTestCacheId_testCacheIdLabel_1")
+        .withValueResolver(k -> "all")
+        .build();
+
+    assertEquals("BasicCacheTestCacheId_testCacheIdLabel_1", cache.getCacheId());
+    assertNull(cache.getLabel());
+
+    //noinspection unchecked
+    cache = BEANS.get(ICacheBuilder.class)
+        .withCacheId("BasicCacheTestCacheId_testCacheIdLabel_2")
+        .withValueResolver(k -> null)
+        .build();
+
+    assertEquals("BasicCacheTestCacheId_testCacheIdLabel_2", cache.getCacheId());
+    assertNull(cache.getLabel());
+
+    //noinspection unchecked
+    cache = BEANS.get(ICacheBuilder.class)
+        .withCacheId("BasicCacheTestCacheId_testCacheIdLabel_3")
+        .withLabelSupplier(() -> "label")
+        .withValueResolver(k -> "all")
+        .build();
+
+    assertEquals("BasicCacheTestCacheId_testCacheIdLabel_3", cache.getCacheId());
+    assertEquals("label", cache.getLabel());
+  }
+
+  @Test
   public void testCacheBasic() {
     ICache<Integer, String> cache = createCache("BasicCacheTestCacheId_testCacheBasic");
 
