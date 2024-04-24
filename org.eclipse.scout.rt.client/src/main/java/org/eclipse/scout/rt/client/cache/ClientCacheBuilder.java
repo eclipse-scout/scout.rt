@@ -32,7 +32,7 @@ public class ClientCacheBuilder<K, V> extends CacheBuilder<K, V> {
     if (isSharedAndRemoteAvailable() && isRemoteValueResolverEnabled()) {
       valueResolver = new RemoteCacheValueResolver<>(getCacheId());
     }
-    return new BasicCache<>(getCacheId(), valueResolver, cacheMap);
+    return new BasicCache<>(getCacheId(), getLabelSupplier(), valueResolver, cacheMap);
   }
 
   @Override
