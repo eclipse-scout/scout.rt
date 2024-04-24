@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.cache;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -52,6 +53,15 @@ public interface ICacheBuilder<K, V> {
    * @return this builder
    */
   ICacheBuilder<K, V> withCacheId(String cacheId);
+
+  /**
+   * Sets a label supplier.
+   *
+   * @param labelSupplier
+   *     Label supplier for label returned by {@link ICache#getLabel}.
+   * @return this builder
+   */
+  ICacheBuilder<K, V> withLabelSupplier(Supplier<String> labelSupplier);
 
   /**
    * true: if a cache with the same cacheId already exists it is overwritten
