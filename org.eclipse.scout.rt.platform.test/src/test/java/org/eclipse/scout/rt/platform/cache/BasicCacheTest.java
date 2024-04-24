@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicReference;
@@ -162,6 +163,61 @@ public class BasicCacheTest {
   public void testCacheExceptionDuringResolve() {
     ICache<Integer, String> cache = createCache("BasicCacheTestCacheId_testCacheExceptionDuringCreation");
     cache.get(1337);
+  }
+
+  /**
+   * Verifies that if {@link ICacheValueResolver#resolveAll(Set)} returns more entries than requested, all the returned
+   * entries are cached.
+   * <p>
+   * This behavior could be used to apply a lazy preloading of caches (under some additional circumstances).
+   */
+  @Test
+  public void testCacheGetAll() {
+    //noinspection unchecked
+    ICache<Integer, String> cache = BEANS.get(ICacheBuilder.class)
+        .withCacheId("BasicCacheTestCacheId#testCacheGetAll")
+        .withValueResolver(new ICacheValueResolver<Integer, String>() {
+          @Override
+          public String resolve(Integer key) {
+            return "value_" + key;
+          }
+
+          @Override
+          public Map<Integer, String> resolveAll(Set<Integer> keys) {
+            Map<Integer, String> map = new HashMap<>();
+            keys.forEach(key -> map.put(key, "value_" + key));
+            // fix entries to be returned
+            map.put(888, "value_888");
+            map.put(999, "value_999");
+            return map;
+          }
+        })
+        .withThreadSafe(false)
+        .withReplaceIfExists(true)
+        .build();
+
+    assertTrue(cache.getUnmodifiableMap().isEmpty());
+    assertEquals("value_1", cache.get(1));
+    assertEquals(Map.of(1, "value_1"), cache.getUnmodifiableMap());
+
+    // getAll returns all keys as resolved by ICacheValueResolver#resolveAll.
+    // This behavior might be changed in a future release (somewhat unexpected)
+    assertEquals(Map.of(
+        // requested
+        2, "value_2",
+        3, "value_3",
+        // additionally provided by value resolver
+        888, "value_888",
+        999, "value_999"), cache.getAll(Set.of(2, 3)));
+
+    // Cache contains all entries as resolved by ICacheValueResolver#resolve and #resolveAll (even if it returned more entries than requested)
+    // Intended behavior, might be used to pre-populate cache lazily.
+    assertEquals(Map.of(
+        1, "value_1",
+        2, "value_2",
+        3, "value_3",
+        888, "value_888",
+        999, "value_999"), cache.getUnmodifiableMap());
   }
 
   @Test
