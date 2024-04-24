@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.cache;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +29,9 @@ public interface ICacheValueResolver<K, V> {
   V resolve(K key);
 
   /**
+   * If the returned map contains additional keys not present in parameter <code>keys</code>, then all returned entries
+   * will be cached and all the entries will be returned by {@link ICache#getAll(Collection)}.
+   *
    * @param keys
    *          never null, empty or contains null elements
    * @return non null modifiable map
