@@ -48,6 +48,11 @@ public interface ICache<K, V> extends IAdaptable {
   String getCacheId();
 
   /**
+   * Cache label.
+   */
+  String getLabel();
+
+  /**
    * First, tries to lookup the value in the cache. In case of a cache miss, {@link ICacheValueResolver#resolve(Object)}
    * is called to fetch or recompute the value. The value is then stored in the local cache.
    *

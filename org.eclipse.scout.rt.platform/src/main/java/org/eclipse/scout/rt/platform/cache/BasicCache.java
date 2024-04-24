@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -37,13 +38,23 @@ import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 public class BasicCache<K, V> implements ICache<K, V> {
 
   protected final String m_cacheId;
+  protected final Supplier<String> m_labelSupplier;
   protected final ICacheValueResolver<K, V> m_resolver;
   protected final Map<K, V> m_cacheMap;
 
   protected final AbstractTransactionalMap<K, ?> m_transactionalMap; // is null if not transactional cache
 
+  /**
+   * @deprecated Use constructor including label supplier as second argument. Label supplier can be retrieved via
+   * {@link CacheBuilder#getLabelSupplier()}.
+   */
+  @Deprecated(forRemoval = true)
   public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap) {
-    this(cacheId, resolver, cacheMap, findTransactionalMap(cacheMap));
+    this(cacheId, null, resolver, cacheMap, findTransactionalMap(cacheMap));
+  }
+
+  public BasicCache(String cacheId, Supplier<String> labelSupplier, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap) {
+    this(cacheId, labelSupplier, resolver, cacheMap, findTransactionalMap(cacheMap));
   }
 
   @SuppressWarnings("unchecked")
@@ -58,8 +69,18 @@ public class BasicCache<K, V> implements ICache<K, V> {
     return null;
   }
 
+  /**
+   * @deprecated Use constructor including label supplier as second argument. Label supplier can be retrieved via
+   *             {@link CacheBuilder#getLabelSupplier()}.
+   */
+  @Deprecated(forRemoval = true)
   public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, AbstractTransactionalMap<K, ?> transactionalMap) {
+    this(cacheId, null, resolver, cacheMap, transactionalMap);
+  }
+
+  public BasicCache(String cacheId, Supplier<String> labelSupplier, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, AbstractTransactionalMap<K, ?> transactionalMap) {
     m_cacheId = Assertions.assertNotNullOrEmpty(cacheId);
+    m_labelSupplier = labelSupplier;
     m_resolver = Assertions.assertNotNull(resolver);
     m_cacheMap = Assertions.assertNotNull(cacheMap);
 
@@ -69,6 +90,11 @@ public class BasicCache<K, V> implements ICache<K, V> {
   @Override
   public String getCacheId() {
     return m_cacheId;
+  }
+
+  @Override
+  public String getLabel() {
+    return m_labelSupplier == null ? null : m_labelSupplier.get();
   }
 
   @Override

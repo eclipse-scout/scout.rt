@@ -34,6 +34,11 @@ public abstract class AbstractCacheWrapper<K, V> implements ICache<K, V> {
   }
 
   @Override
+  public String getLabel() {
+    return m_delegate.getLabel();
+  }
+
+  @Override
   public Map<K, V> getCacheMap() {
     return m_delegate.getCacheMap();
   }
