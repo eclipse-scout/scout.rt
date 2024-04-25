@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,10 +28,14 @@ import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.AndExpr;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.AndOp;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.Atom;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.BracketExpr;
+import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.CastExpr;
+import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.CastToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.CloseBracketToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.Comment;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.FunExpr;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.IToken;
+import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.IntervalExpr;
+import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.IntervalToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.ListExpr;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.ListSeparator;
 import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.MathExpr;
@@ -62,6 +66,7 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.TextToken;
  * Statement = SingleStatement (UnionToken SingleStatement)* (Unparsed)?
  * SingleStatement = Part+ {with first part being a statement root part such as SELECT, INSERT, WITH, ...}
  * Part = PartToken ListExpr
+ * PartToken = WITH|AS|SELECT|FROM|LEFT JOIN|OUTER JOIN|INNER JOIN|JOIN|ON|WHERE|GROUP BY|HAVING|ORDER BY|INSERT INTO|INSERT|INTO|CONNECT BY( NOCYCLE)?|START WITH|UPDATE|DELETE FROM|DELETE|SET|VALUES|CASE|ELSE|END|THEN|WHEN)
  * ListExpr = OrExpr (ListSeparator OrExpr)*
  * OrExpr = AndExpr (OrOp AndExpr)*
  * AndExpr = MathExpr (AndOp MathExpr)*
@@ -69,12 +74,16 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.TextToken;
  * _simpleExpr = UnaryPrefixExpr | MinusExpr | Atom
  * UnaryPrefixExpr = UnaryPrefix Atom
  * MinusExpr = BinaryOp['-'] Atom
- * Atom= (BracketExpr | Statement | OrExpr | FunExpr | Name | Text | BinaryOp['*']) (OuterJoinToken)? (Name[alias])?
+ * Atom= (BracketExpr | Statement | OrExpr | CastExpr | IntervalExpr | FunExpr | Name | Text | BinaryOp['*']) (OuterJoinToken)? (Name[alias])?
  * BracketExpr = OpenBracketToken (Statement | ListExpr) CloseBracketToken
+ * CastExpr = CastToken OpenBracketToken MathExpr 'AS' MathExpr CloseBracketToken
+ * IntervalExpr = IntervalToken Text
+ * IntervalToken = 'INTERVAL'
  * FunExpr = Name BracketExpr
  * Bind = ':' any until whitespace | '#' any '#' | '&' any '&'
  * Name = nameChar+
  * nameChar = {a-zA-Z0-9_$.@:?}
+ * Text = Apostroph any Apostroph
  * </code>
  * </pre>
  */
@@ -100,6 +109,8 @@ public class SqlParser {
   private static final Pattern OPEN_BRACKET_PAT = Pattern.compile("([(])");
   private static final Pattern CLOSE_BRACKET_PAT = Pattern.compile("([)])");
   private static final Pattern LIST_SEPARATOR_PAT = Pattern.compile("([,])");
+  private static final Pattern CAST_PAT = Pattern.compile("(CAST)");
+  private static final Pattern INTERVAL_PAT = Pattern.compile("(INTERVAL)");
 
   /**
    * avoid dead-lock
@@ -549,6 +560,80 @@ public class SqlParser {
     }
   }
 
+  private CastExpr parseCastExpr(List<IToken> list, ParseContext ctx) {
+    //'CAST' OpenBracketToken MathExpr 'AS' MathExpr CloseBracketToken
+    ParseStep lock = ctx.checkAndAdd("CastExpr", list);
+    if (lock == null) {
+      return null;
+    }
+    try {
+      IToken cast = null;
+      IToken open = null;
+      IToken stm = null;
+      IToken as = null;
+      IToken type = null;
+      IToken close = null;
+      Collection<IToken> backup = new ArrayList<>(list);
+      if ((cast = removeToken(list, CastToken.class, "CAST")) != null
+          && (open = removeToken(list, OpenBracketToken.class)) != null
+          && (stm = parseMathExpr(list, ctx)) != null
+          && (as = removeToken(list, PartToken.class, "AS")) != null // 'AS' is a PartToken
+          && (type = parseMathExpr(list, ctx)) != null
+          && (close = removeToken(list, CloseBracketToken.class)) != null) {
+        //ok
+      }
+      else {
+        //restore incomplete
+        list.clear();
+        list.addAll(backup);
+        return null;
+      }
+      CastExpr e = new CastExpr();
+      e.addChild(cast);
+      e.addChild(open);
+      e.addChild(stm);
+      e.addChild(as);
+      e.addChild(type);
+      e.addChild(close);
+      return e;
+    }
+    finally {
+      ctx.remove(lock);
+    }
+  }
+
+  private IntervalExpr parseIntervalExpr(List<IToken> list, ParseContext ctx) {
+    //IntervalToken Text
+    ParseStep lock = ctx.checkAndAdd("IntervalExpr", list);
+    if (lock == null) {
+      return null;
+    }
+    try {
+      IntervalToken i = null;
+      Text t = null;
+      if ((i = removeToken(list, IntervalToken.class)) != null && (t = removeToken(list, Text.class)) != null) {
+        //ok
+      }
+      else {
+        //restore incomplete
+        if (t != null) {
+          list.add(0, t);
+        }
+        if (i != null) {
+          list.add(0, i);
+        }
+        return null;
+      }
+      IntervalExpr e = new IntervalExpr();
+      e.addChild(i);
+      e.addChild(t);
+      return e;
+    }
+    finally {
+      ctx.remove(lock);
+    }
+  }
+
   private FunExpr parseFunExpr(List<IToken> list, ParseContext ctx) {
     //Name BracketExpr
     ParseStep lock = ctx.checkAndAdd("FunExpr", list);
@@ -627,6 +712,12 @@ public class SqlParser {
         //ok
       }
       else if ((t = parseOrExpr(list, ctx)) != null) {
+        //ok
+      }
+      else if ((t = parseCastExpr(list, ctx)) != null) {
+        //ok
+      }
+      else if ((t = parseIntervalExpr(list, ctx)) != null) {
         //ok
       }
       else if ((t = parseFunExpr(list, ctx)) != null) {
@@ -710,6 +801,8 @@ public class SqlParser {
     list = tokenizeRaw(list, MATH_OP_PAT1, MathOp.class, false);
     list = tokenizeRaw(list, MATH_OP_PAT2, MathOp.class, false);
     list = tokenizeRaw(list, UNARY_PREFIX_PAT, UnaryPrefix.class, false);
+    list = tokenizeRaw(list, CAST_PAT, CastToken.class, false);
+    list = tokenizeRaw(list, INTERVAL_PAT, IntervalToken.class, false);
     list = tokenizeRaw(list, NAME_PAT, Name.class, false);
     list = tokenizeRaw(list, OPEN_BRACKET_PAT, OpenBracketToken.class, false);
     list = tokenizeRaw(list, CLOSE_BRACKET_PAT, CloseBracketToken.class, false);

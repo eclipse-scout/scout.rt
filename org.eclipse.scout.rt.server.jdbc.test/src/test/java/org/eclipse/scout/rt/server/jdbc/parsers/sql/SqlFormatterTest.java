@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,6 +34,15 @@ public class SqlFormatterTest {
     check("select-case1.sql");
     check("select-case2.sql");
     check("select-case3.sql");
+  }
+
+  @Test
+  public void testSelectCast() throws Exception {
+    check("select-cast1.sql");
+    check("select-cast2.sql");
+    check("select-cast3.sql");
+    check("select-cast4.sql");
+    check("select-cast5.sql");
   }
 
   @Test
