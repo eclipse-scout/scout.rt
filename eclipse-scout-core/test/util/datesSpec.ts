@@ -10,7 +10,7 @@
 import {dates} from '../../src/index';
 import {LocaleSpecHelper} from '../../src/testing/index';
 
-describe('scout.dates', () => {
+describe('dates', () => {
 
   describe('shift', () => {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,6 @@
 import {LookupRow, QueryBy, RemoteEvent, scout, SmartField, SmartFieldPopup, Status} from '../../../../src/index';
 import {FormSpecHelper, JQueryTesting} from '../../../../src/testing/index';
 
-/* global linkWidgetAndAdapter */
 describe('SmartFieldRemote', () => {
 
   // This spec contains test that use the SmartFieldAdapter (= remote case)

@@ -10,7 +10,7 @@
 import {Call} from '../../src/index';
 import {InitModelOf, scout} from '../../src/scout';
 
-describe('scout.Call', () => {
+describe('Call', () => {
 
   beforeEach(() => {
     jasmine.clock().install();

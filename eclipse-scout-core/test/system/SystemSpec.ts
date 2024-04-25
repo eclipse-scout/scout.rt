@@ -9,7 +9,7 @@
  */
 import {System} from '../../src';
 
-describe('scout.System', () => {
+describe('System', () => {
   describe('init', () => {
     it('correctly initializes', () => {
       let system = new System();
