@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,9 +10,7 @@
 import {FocusManagerSpecHelper, FormSpecHelper} from '../../src/testing/index';
 import {FocusManager, FocusRule, focusUtils, GlassPane, scout} from '../../src/index';
 
-/* global FocusManagerSpecHelper */
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-describe('scout.FocusManager', () => {
+describe('FocusManager', () => {
   let session: SandboxSession, formHelper: FormSpecHelper, focusHelper: FocusManagerSpecHelper, focusManager: FocusManager;
 
   beforeEach(() => {

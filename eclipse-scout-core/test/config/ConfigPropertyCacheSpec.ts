@@ -10,7 +10,7 @@
 
 import {config, ConfigProperties, ConfigProperty, ConfigPropertyCache, System} from '../../src/index';
 
-describe('scout.config', () => {
+describe('config', () => {
 
   let origConfigMap: Map<string, Map<string, ConfigProperty<any>>>;
 

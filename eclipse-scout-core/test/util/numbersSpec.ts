@@ -9,7 +9,7 @@
  */
 import {numbers, RoundingMode} from '../../src/index';
 
-describe('scout.numbers', () => {
+describe('numbers', () => {
 
   /**
    * Test cases copied & extended from java.math.RoundingMode

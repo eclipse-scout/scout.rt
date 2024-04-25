@@ -10,7 +10,6 @@
 import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
 import {LocaleSpecHelper} from '../../src/testing';
 
-/* global receiveResponseForAjaxCall */
 describe('Session', () => {
 
   beforeEach(() => {

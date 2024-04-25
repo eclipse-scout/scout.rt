@@ -42,7 +42,7 @@ describe('Device', () => {
     return device;
   }
 
-  describe('scout.device', () => {
+  describe('device', () => {
 
     it('is initialized automatically', () => {
       expect(Device.get()).toBeDefined();

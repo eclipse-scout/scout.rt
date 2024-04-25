@@ -10,7 +10,7 @@
 import {FormSpecHelper, JQueryTesting} from '../../src/testing/index';
 import {scout, Tooltip, tooltips, TooltipSupport, ValueField} from '../../src/index';
 
-describe('scout.tooltips', () => {
+describe('tooltips', () => {
 
   let session: SandboxSession, helper: FormSpecHelper, formField: SpecValueField;
 
