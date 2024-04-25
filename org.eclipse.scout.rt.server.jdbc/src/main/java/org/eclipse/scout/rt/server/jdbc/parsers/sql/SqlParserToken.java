@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -123,6 +123,18 @@ final class SqlParserToken {
   }
 
   public static class PartToken extends AbstractToken {
+  }
+
+  public static class CastExpr extends AbstractToken {
+  }
+
+  public static class CastToken extends AbstractToken {
+  }
+
+  public static class IntervalToken extends AbstractToken {
+  }
+
+  public static class IntervalExpr extends AbstractToken {
   }
 
   public static class UnaryPrefix extends AbstractToken {

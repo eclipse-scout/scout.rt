@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,24 +37,6 @@ import org.eclipse.scout.rt.server.jdbc.parsers.sql.SqlParserToken.Unparsed;
 
 /**
  * see {@link SqlParser}
- *
- * <pre>
- * <code>
- * Statement = SingleStatement (UnionToken SingleStatement)* (Unparsed)?
- * SingleStatement = Part+
- * Part = PartToken ListExpr
- * ListExpr = OrExpr (ListSeparator OrExpr)*
- * OrExpr = AndExpr (BinaryOp['OR'] AndExpr)*
- * AndExpr = MathExpr (BinaryOp['AND'] MathExpr)*
- * MathExpr = _simpleExpr (BinaryOp _simpleExpr)*
- * _simpleExpr = UnaryPrefixExpr | MinusExpr | Atom
- * UnaryPrefixExpr = UnaryPrefix Atom
- * MinusExpr = BinaryOp['-'] Atom
- * Atom= (BracketExpr | Statement | OrExpr | FunExpr | Name | Text | BinaryOp['*']) (OuterJoinToken)? (Name["AS"])? (Name[alias])?
- * BracketExpr = OpenBracketToken (Statement | ListExpr) CloseBracketToken
- * FunExpr = Name BracketExpr
- * </code>
- * </pre>
  */
 public class SqlFormatter {
 
