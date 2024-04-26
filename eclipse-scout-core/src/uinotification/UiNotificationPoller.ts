@@ -109,6 +109,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
   }
 
   protected _poll() {
+    this._call?.abort(); // abort in case there is already a call running
     this._call = ajax.createCallJson({
       url: this.url,
       timeout: this.requestTimeout,
