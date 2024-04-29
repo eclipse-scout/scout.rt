@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -69,4 +69,10 @@ public interface CssClasses {
    * Add this to elements to make them only visible to screen readers
    */
   String SCREEN_READER_ONLY = "sr-only";
+
+  /**
+   * Class that can be added to a SplitBox to make the splitter invisible.
+   * This is useful if the splitter itself should be visualized in another way, e.g. by using one of the fields border.
+   */
+  String INVISIBLE_SPLITTER = "invisible-splitter";
 }
