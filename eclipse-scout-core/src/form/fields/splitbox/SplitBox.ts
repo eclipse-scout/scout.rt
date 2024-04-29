@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  CollapseHandle, CollapseHandleHorizontalAlignment, CompositeField, Dimension, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStroke, PropertyChangeEvent, scout, SplitBoxCollapseKeyStroke, SplitBoxEventMap,
-  SplitBoxFirstCollapseKeyStroke, SplitBoxLayout, SplitBoxModel, SplitBoxSecondCollapseKeyStroke
+  CollapseHandle, CollapseHandleHorizontalAlignment, CompositeField, Dimension, EnumObject, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStroke, PropertyChangeEvent, scout, SplitBoxCollapseKeyStroke,
+  SplitBoxEventMap, SplitBoxFirstCollapseKeyStroke, SplitBoxLayout, SplitBoxModel, SplitBoxSecondCollapseKeyStroke
 } from '../../../index';
 import $ from 'jquery';
 
@@ -29,7 +29,7 @@ export class SplitBox extends CompositeField {
   splitterEnabled: boolean;
   splitterPosition: number;
   minSplitterPosition: number;
-  splitterPositionType: string;
+  splitterPositionType: SplitBoxSplitterPositionType;
   fieldMinimized: boolean;
   minimizeEnabled: boolean;
   htmlSplitArea: HtmlComponent;
@@ -57,17 +57,28 @@ export class SplitBox extends CompositeField {
     this.splitterEnabled = true;
     this.splitterPosition = 0.5;
     this.minSplitterPosition = 0;
-    this.splitterPositionType = SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
+    this.splitterPositionType = SplitBox.SplitterPositionType.RELATIVE_FIRST;
     this.fieldMinimized = false;
     this.minimizeEnabled = true;
     this._$splitArea = null;
     this._$splitter = null;
   }
 
-  static SPLITTER_POSITION_TYPE_RELATIVE_FIRST = 'relativeFirst';
-  static SPLITTER_POSITION_TYPE_RELATIVE_SECOND = 'relativeSecond';
-  static SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = 'absoluteFirst';
-  static SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
+  static SplitterPositionType = {
+    RELATIVE_FIRST: 'relativeFirst',
+    RELATIVE_SECOND: 'relativeSecond',
+    ABSOLUTE_FIRST: 'absoluteFirst',
+    ABSOLUTE_SECOND: 'absoluteSecond'
+  } as const;
+
+  /** @deprecated use SplitBox.SplitterPositionType instead */
+  static SPLITTER_POSITION_TYPE_RELATIVE_FIRST = SplitBox.SplitterPositionType.RELATIVE_FIRST;
+  /** @deprecated use SplitBox.SplitterPositionType instead */
+  static SPLITTER_POSITION_TYPE_RELATIVE_SECOND = SplitBox.SplitterPositionType.RELATIVE_SECOND;
+  /** @deprecated use SplitBox.SplitterPositionType instead */
+  static SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = SplitBox.SplitterPositionType.ABSOLUTE_FIRST;
+  /** @deprecated use SplitBox.SplitterPositionType instead */
+  static SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = SplitBox.SplitterPositionType.ABSOLUTE_SECOND;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
@@ -192,19 +203,19 @@ export class SplitBox extends CompositeField {
           // Splitter width plus margin on right side, if temporary splitter position is x, the splitter div position is x-splitterOffset
           let splitterOffset = Math.floor((splitterSize.width + HtmlEnvironment.get().fieldMandatoryIndicatorWidth) / 2);
 
-          if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST) {
+          if (this.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_FIRST) {
             minSplitterPositionLeft = scout.nvl(this.minSplitterPosition, 0);
             // allow to move the splitter to right side, leaving minimal space for splitter div without right margin (=total splitter size minus offset)
             maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset;
-          } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+          } else if (this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST) {
             minSplitterPositionLeft = (splitAreaSize.width - splitterSize.width) * scout.nvl(this.minSplitterPosition, 0);
             // allow to move the splitter to right side, leaving minimal space for splitter div without right margin (=total splitter size minus offset)
             maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset;
-          } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+          } else if (this.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_SECOND) {
             minSplitterPositionLeft = 0;
             // allow to move the splitter to right side, leaving minimal space for splitter div without right margin, reserving space for minimum splitter size
             maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset - scout.nvl(this.minSplitterPosition, 0);
-          } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+          } else if (this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_SECOND) {
             minSplitterPositionLeft = 0;
             // allow to move the splitter to right side, leaving minimal space for splitter div without right margin, reserving space for minimum splitter size
             maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset - Math.floor(scout.nvl(this.minSplitterPosition, 0) * (splitAreaSize.width - splitterSize.width));
@@ -225,11 +236,11 @@ export class SplitBox extends CompositeField {
 
           // Normalize target position (available splitter area is (splitAreaSize.width - splitterSize.width))
           newSplitterPosition = (targetSplitterPositionLeft - tempSplitterOffsetX);
-          if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+          if (this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST) {
             newSplitterPosition = newSplitterPosition / (splitAreaSize.width - splitterSize.width);
-          } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+          } else if (this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_SECOND) {
             newSplitterPosition = 1 - (newSplitterPosition / (splitAreaSize.width - splitterSize.width));
-          } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+          } else if (this.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_SECOND) {
             newSplitterPosition = splitAreaSize.width - splitterSize.width - newSplitterPosition;
           }
         } else { // "--"
@@ -250,11 +261,11 @@ export class SplitBox extends CompositeField {
           $tempSplitter.cssTop(targetSplitterPositionTop - tempSplitterOffsetY);
           // Normalize target position
           newSplitterPosition = targetSplitterPositionTop - tempSplitterOffsetY;
-          if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+          if (this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST) {
             newSplitterPosition = newSplitterPosition / (splitAreaSize.height - splitterSize.height);
-          } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+          } else if (this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_SECOND) {
             newSplitterPosition = 1 - (newSplitterPosition / (splitAreaSize.height - splitterSize.height));
-          } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+          } else if (this.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_SECOND) {
             newSplitterPosition = splitAreaSize.height - newSplitterPosition - splitterSize.height;
           }
         }
@@ -349,8 +360,8 @@ export class SplitBox extends CompositeField {
       let newIsAbsolute = !newIsRelative;
       if (oldIsRelative && newIsAbsolute) {
         // From relative to absolute
-        if ((this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) ||
-          (this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)) {
+        if ((this._oldSplitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST && this.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_SECOND) ||
+          (this._oldSplitterPositionType === SplitBox.SplitterPositionType.RELATIVE_SECOND && this.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_FIRST)) {
           splitterPosition = totalSize - (totalSize * splitterPosition); // changed from first to second field or from second to first field, invert splitter position
         } else {
           splitterPosition = totalSize * splitterPosition;
@@ -361,8 +372,8 @@ export class SplitBox extends CompositeField {
         }
       } else if (oldIsAbsolute && newIsRelative) {
         // From absolute to relative
-        if ((this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) ||
-          (this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST)) {
+        if ((this._oldSplitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_FIRST && this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_SECOND) ||
+          (this._oldSplitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_SECOND && this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST)) {
           splitterPosition = (totalSize - splitterPosition) / totalSize; // changed from first to second field or from second to first field, invert splitter position
         } else {
           splitterPosition = splitterPosition / totalSize;
@@ -389,8 +400,8 @@ export class SplitBox extends CompositeField {
   }
 
   protected _isSplitterPositionTypeRelative(positionType: string): boolean {
-    return (positionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST)
-      || (positionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND);
+    return (positionType === SplitBox.SplitterPositionType.RELATIVE_FIRST)
+      || (positionType === SplitBox.SplitterPositionType.RELATIVE_SECOND);
   }
 
   protected _renderSplitterEnabled() {
@@ -472,7 +483,7 @@ export class SplitBox extends CompositeField {
       collapsed = this.fieldCollapsed,
       minimized = this.fieldMinimized,
       minimizable = this._isMinimizable(),
-      positionTypeFirstField = ((this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
+      positionTypeFirstField = ((this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST) || (this.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_FIRST)),
       positionNotAccordingCollapsibleField = (positionTypeFirstField && this.collapsibleField === this.secondField) || (!positionTypeFirstField && this.collapsibleField === this.firstField);
 
     if (positionTypeFirstField) {
@@ -695,7 +706,7 @@ export class SplitBox extends CompositeField {
     let collapsed = this.fieldCollapsed,
       minimized = this.fieldMinimized,
       minimizable = this._isMinimizable(),
-      positionTypeFirstField = ((this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
+      positionTypeFirstField = ((this.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST) || (this.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_FIRST)),
       increaseField = (!!event.left && !positionTypeFirstField) || (!!event.right && positionTypeFirstField);
 
     if ((positionTypeFirstField && this.collapsibleField === this.secondField) || (!positionTypeFirstField && this.collapsibleField === this.firstField)) {
@@ -767,3 +778,5 @@ export class SplitBox extends CompositeField {
     this.$container.toggleClass('single-field', hasOneField);
   }
 }
+
+export type SplitBoxSplitterPositionType = EnumObject<typeof SplitBox.SplitterPositionType>;

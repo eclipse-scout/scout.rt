@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -163,18 +163,18 @@ export class SplitBoxLayout extends AbstractLayout {
    */
   computeInnerFieldsDimensions(splitXAxis: boolean, firstFieldSize: Dimension, secondFieldSize: Dimension, splitterPosition: number) {
     if (splitXAxis) { // "|"
-      if (this.splitBox.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+      if (this.splitBox.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST) {
         // Relative first
         firstFieldSize.width = Math.floor(firstFieldSize.width * splitterPosition);
         secondFieldSize.width -= firstFieldSize.width;
-      } else if (this.splitBox.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+      } else if (this.splitBox.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_SECOND) {
         // Relative second
         secondFieldSize.width = Math.floor(secondFieldSize.width * splitterPosition);
         firstFieldSize.width -= secondFieldSize.width;
       } else {
         // Absolute
         splitterPosition = Math.min(splitterPosition, firstFieldSize.width);
-        if (this.splitBox.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+        if (this.splitBox.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_SECOND) {
           firstFieldSize.width = firstFieldSize.width - splitterPosition;
           secondFieldSize.width = splitterPosition;
         } else {
@@ -183,18 +183,18 @@ export class SplitBoxLayout extends AbstractLayout {
         }
       }
     } else { // "--"
-      if (this.splitBox.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+      if (this.splitBox.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_FIRST) {
         // Relative first
         firstFieldSize.height = Math.floor(firstFieldSize.height * splitterPosition);
         secondFieldSize.height -= firstFieldSize.height;
-      } else if (this.splitBox.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+      } else if (this.splitBox.splitterPositionType === SplitBox.SplitterPositionType.RELATIVE_SECOND) {
         // Relative second
         secondFieldSize.height = Math.floor(secondFieldSize.height * splitterPosition);
         firstFieldSize.height -= secondFieldSize.height;
       } else {
         // Absolute
         splitterPosition = Math.min(splitterPosition, firstFieldSize.height);
-        if (this.splitBox.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+        if (this.splitBox.splitterPositionType === SplitBox.SplitterPositionType.ABSOLUTE_SECOND) {
           firstFieldSize.height = firstFieldSize.height - splitterPosition;
           secondFieldSize.height = splitterPosition;
         } else {
