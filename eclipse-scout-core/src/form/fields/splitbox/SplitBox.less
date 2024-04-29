@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -91,6 +91,37 @@
   & > .collapse-handle.right-aligned {
     /* align with status icons */
     right: 3px;
+  }
+
+  // CSS Class 'invisible-splitter' can be added to make the splitter invisible but still draggable.
+  // This is useful if the splitter itself should be visualized in another way, e.g. by using one of the fields border.
+  &.invisible-splitter > .split-area {
+    & > .splitter {
+      opacity: 0;
+    }
+
+    & > .splitter.x-axis {
+      width: 16px;
+      margin-left: -8px;
+      padding-left: 0;
+      padding-right: 0;
+      opacity: 0;
+    }
+
+    & > .temp-splitter.x-axis {
+      margin-left: 8px;
+    }
+
+    & > .splitter.y-axis {
+      height: 16px;
+      margin-top: -8px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    & > .temp-splitter.y-axis {
+      margin-top: 8px;
+    }
   }
 }
 
