@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2024 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.util.UUID;
@@ -74,6 +74,7 @@ public class HealthCheckerTest {
   protected void awaitDone(IFuture future) {
     if (future != null) {
       future.awaitDoneAndGet();
+      future.awaitFinished(5, TimeUnit.SECONDS);
     }
   }
 
@@ -103,10 +104,10 @@ public class HealthCheckerTest {
     synchronized (sync) {
       checker.checkHealth(RunContexts.empty());
       sync.wait();
-      assertEquals("flag check 1", true, flag.get());
+      assertTrue("flag check 1", flag.get());
       sync.notify();
       sync.wait();
-      assertEquals("flag check 2", false, flag.get());
+      assertFalse("flag check 2", flag.get());
     }
   }
 
@@ -121,18 +122,18 @@ public class HealthCheckerTest {
     });
 
     // run without sleep
-    assertEquals("resultInitial", false, checker.checkHealth(RunContexts.empty()));
+    assertFalse("resultInitial", checker.checkHealth(RunContexts.empty()));
     awaitDone(checker.getFuture());
 
     // run with sleep
     sleep.set(true);
-    assertEquals("resultT", true, checker.checkHealth(RunContexts.empty()));
+    assertTrue("resultT", checker.checkHealth(RunContexts.empty()));
 
     // wait for timeout
     TimeUnit.SECONDS.sleep(2);
 
     // fails due to timeout
-    assertEquals("resultF", false, checker.checkHealth(RunContexts.empty()));
+    assertFalse("resultF", checker.checkHealth(RunContexts.empty()));
   }
 
   @Test
@@ -145,11 +146,11 @@ public class HealthCheckerTest {
     checker.checkHealth(RunContexts.empty());
     awaitDone(checker.getFuture());
     verify(test, times(1)).run();
-    assertEquals("result", true, checker.checkHealth(RunContexts.empty()));
+    assertTrue("result", checker.checkHealth(RunContexts.empty()));
 
     // spam checking
     for (int i = 0; i < 10; i++) {
-      assertEquals("resultX" + i, true, checker.checkHealth(RunContexts.empty()));
+      assertTrue("resultX" + i, checker.checkHealth(RunContexts.empty()));
     }
 
     // validate executions again
@@ -163,7 +164,7 @@ public class HealthCheckerTest {
     checker.checkHealth(RunContexts.empty());
     awaitDone(checker.getFuture());
     verify(test, times(2)).run();
-    assertEquals("resultZ", true, checker.checkHealth(RunContexts.empty()));
+    assertTrue("resultZ", checker.checkHealth(RunContexts.empty()));
   }
 
   @Test
@@ -175,13 +176,13 @@ public class HealthCheckerTest {
 
     // spam checking
     for (int i = 0; i < 10; i++) {
-      assertEquals("resultX" + i, false, checker.checkHealth(RunContexts.empty()));
+      assertFalse("resultX" + i, checker.checkHealth(RunContexts.empty()));
     }
 
     // validate
     awaitDone(checker.getFuture());
     verify(test, times(1)).run();
-    assertEquals("result", true, checker.checkHealth(RunContexts.empty()));
+    assertTrue("result", checker.checkHealth(RunContexts.empty()));
   }
 
   @Test(expected = ArrayIndexOutOfBoundsException.class)
@@ -209,18 +210,18 @@ public class HealthCheckerTest {
       awaitDone(checker.getFuture());
       throwException.set(true);
 
-      assertEquals("resultT:" + i, true, checker.checkHealth(RunContexts.empty()));
+      assertTrue("resultT:" + i, checker.checkHealth(RunContexts.empty()));
 
       // validate exception and flip switch back
       awaitDone(checker.getFuture());
       throwException.set(false);
 
-      assertEquals("resultF:" + i, false, checker.checkHealth(RunContexts.empty()));
+      assertFalse("resultF:" + i, checker.checkHealth(RunContexts.empty()));
     }
 
     // verify that the checker now stopped failing as there was no exception thrown
     awaitDone(checker.getFuture());
-    assertEquals("resultZ", true, checker.checkHealth(RunContexts.empty()));
+    assertTrue("resultZ", checker.checkHealth(RunContexts.empty()));
   }
 
 }
