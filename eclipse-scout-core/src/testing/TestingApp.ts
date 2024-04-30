@@ -11,7 +11,7 @@ import {App, AppBootstrapOptions, Device, InitModelOf, RemoteApp, Session} from 
 
 export class TestingApp extends RemoteApp {
 
-  protected override _defaultValuesBootrapper(): () => JQuery.Promise<void> {
+  protected override _defaultValuesBootstrapper(): () => JQuery.Promise<void> {
     // nop for testing
     return null;
   }
