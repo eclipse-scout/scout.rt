@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,6 +25,8 @@ import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformVersionProperty;
 import org.eclipse.scout.rt.platform.opentelemetry.IHistogramViewHintProvider;
 import org.eclipse.scout.rt.platform.opentelemetry.IMetricProvider;
 import org.slf4j.Logger;
@@ -117,8 +119,15 @@ public class OpenTelemetryInitializer implements IPlatformListener {
     defaultConfig.put("otel.metric.export.interval", "30000"); // 30s
 
     defaultConfig.put("otel.service.name", CONFIG.getPropertyValue(ApplicationNameProperty.class));
-    defaultConfig.put("otel.resource.attributes", "service.instance.id=" + NodeId.current().unwrapAsString());
+    defaultConfig.put("otel.resource.attributes", String.join(",",
+        toResourceAttribute("service.instance.id", NodeId.current().unwrapAsString()),
+        toResourceAttribute("scout.platform.version", CONFIG.getPropertyValue(PlatformVersionProperty.class)),
+        toResourceAttribute("scout.application.version", CONFIG.getPropertyValue(ApplicationVersionProperty.class))));
     return defaultConfig;
+  }
+
+  protected String toResourceAttribute(String key, String value) {
+    return key + "=" + value;
   }
 
   protected SdkMeterProviderBuilder customizeMeterProvider(SdkMeterProviderBuilder builder, ConfigProperties config) {
