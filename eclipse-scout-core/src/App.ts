@@ -67,7 +67,7 @@ export interface AppBootstrapOptions {
   configUrl?: string | string[];
   /**
    * Custom functions that needs to be executed while bootstrapping.
-   * All custom and default bootrappers need to finish successfully before the app will proceed with the initialization.
+   * All custom and default bootstrappers need to finish successfully before the app will proceed with the initialization.
    */
   bootstrappers?: (() => JQuery.Promise<void>)[];
 }
@@ -90,11 +90,11 @@ export class App extends EventEmitter {
    * Adds a function that needs to be executed while bootstrapping.
    * @see AppModel.bootstrappers
    */
-  static addBootstrapper(bootrapper: () => JQuery.Promise<void>) {
-    if (bootstrappers.indexOf(bootrapper) > -1) {
+  static addBootstrapper(bootstrapper: () => JQuery.Promise<void>) {
+    if (bootstrappers.indexOf(bootstrapper) > -1) {
       throw new Error('Bootstrapper is already registered.');
     }
-    bootstrappers.push(bootrapper);
+    bootstrappers.push(bootstrapper);
   }
 
   static get(): App {

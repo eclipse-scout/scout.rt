@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectFactory, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session, SessionStartupResponse, Widget, WidgetModel
+  AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectFactory, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
+  SessionStartupResponse, Widget, WidgetModel
 } from '../index';
-import {jasmineScoutMatchers, LocaleSpecHelper, TestingApp} from './index';
+import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, TestingApp} from './index';
 import 'jasmine-jquery';
 import $ from 'jquery';
 
@@ -261,14 +262,22 @@ export const JasmineScout = {
 
     context.keys().forEach(context);
   },
+
   startApp(App: new() => App) {
     // App initialization uses promises which are executed asynchronously
     // -> Use the clock to make sure all promise callbacks are executed before any test starts.
     jasmine.clock().install();
+    jasmine.Ajax.install();
 
     new App().init();
 
     jasmine.clock().tick(1000);
+
+    jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   }
 };
+
+JasmineScoutUtil.mockRestCall('api/permissions', {type: PermissionCollectionType.ALL});
+JasmineScoutUtil.mockRestCall('api/codes', {});
+JasmineScoutUtil.mockRestCall('api/parameters', []);

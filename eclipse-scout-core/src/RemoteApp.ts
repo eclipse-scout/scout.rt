@@ -19,7 +19,7 @@ export class RemoteApp extends App {
 
   protected override _defaultBootstrappers(options: AppBootstrapOptions): (() => JQuery.Promise<void>)[] {
     return super._defaultBootstrappers(options).concat(
-      this._defaultValuesBootrapper(),
+      this._defaultValuesBootstrapper(),
       this._configPropertiesBootstrapper(options)
     );
   }
@@ -32,7 +32,7 @@ export class RemoteApp extends App {
     return config.bootstrapSystem.bind(config);
   }
 
-  protected _defaultValuesBootrapper(): () => JQuery.Promise<void> {
+  protected _defaultValuesBootstrapper(): () => JQuery.Promise<void> {
     return defaultValues.bootstrap.bind(defaultValues);
   }
 

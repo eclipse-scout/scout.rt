@@ -14,8 +14,8 @@ import {ObjectFactory} from '../index';
 import * as self from './index';
 
 export * from './TestingApp';
-export * from './JasmineScout';
 export * from './JasmineScoutUtil';
+export * from './JasmineScout';
 export * from './text/LocaleSpecHelper';
 export * from './menu/MenuSpecHelper';
 export * from './security/accessSpecHelper';
