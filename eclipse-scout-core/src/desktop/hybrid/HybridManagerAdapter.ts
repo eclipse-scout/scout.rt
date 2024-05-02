@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, HybridActionEvent, HybridEvent, HybridManager, ModelAdapter, RemoteEvent} from '../../index';
+import {Event, HybridActionEvent, HybridManager, ModelAdapter, RemoteEvent} from '../../index';
 
 export class HybridManagerAdapter extends ModelAdapter {
   declare widget: HybridManager;
@@ -41,4 +41,10 @@ export class HybridManagerAdapter extends ModelAdapter {
   protected _onWidgetHybridAction(event: HybridActionEvent) {
     this._send('hybridAction', event.data);
   }
+}
+
+interface HybridEvent<TObject = object> extends RemoteEvent {
+  id: string;
+  eventType: string;
+  data: TObject;
 }

@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventHandler, EventListener, EventMapOf, Form, HybridManagerEventMap, InitModelOf, ObjectOrChildModel, Session, UuidPool, Widget} from '../../index';
+import {
+  Event, EventHandler, EventListener, EventMapOf, Form, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, Session, UuidPool, Widget
+} from '../../index';
 
 /**
  * A utility to invoke remote Java actions to simplify the interaction of Scout JS and Scout Classic code
@@ -87,11 +89,11 @@ export class HybridManager extends Widget {
   }
 
   protected _triggerWidgetAdd(id: string, widget: Widget) {
-    this.trigger(`widgetAdd:${id}`, {widget});
+    this.trigger(`widgetAdd:${id}`, {widget} as HybridManagerWidgetAddEvent);
   }
 
   protected _triggerWidgetRemove(id: string, widget: Widget) {
-    this.trigger(`widgetRemove:${id}`, {widget});
+    this.trigger(`widgetRemove:${id}`, {widget} as HybridManagerWidgetRemoveEvent);
   }
 
   // hybrid events (java to js)
@@ -153,7 +155,7 @@ export class HybridManager extends Widget {
    */
   callAction(actionType: string, data?: object): string {
     const id = this._createEventId();
-    this.trigger('hybridAction', {data: {id, actionType, data}});
+    this.trigger('hybridAction', {data: {id, actionType, data}} as HybridActionEvent);
     return id;
   }
 
