@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,18 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Event, HybridManager, PropertyChangeEvent, RemoteEvent, Widget, WidgetEventMap} from '../../index';
-
-export interface HybridEvent<TObject = object> extends RemoteEvent {
-  id: string;
-  eventType: string;
-  data: TObject;
-}
+import {Event, HybridManager, PropertyChangeEvent, Widget, WidgetEventMap} from '../../index';
 
 export interface HybridActionEvent<TObject = object, T = HybridManager> extends Event<T> {
   data: {
     id: string;
-    eventType: string;
+    actionType: string;
     data: TObject;
   };
 }
