@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, scout, strings} from '../index';
+import {arrays, DoEntity, HybridActionEvent, HybridManager, scout, Session, strings, Widget} from '../index';
 import $ from 'jquery';
 import 'jasmine-ajax';
 
@@ -101,11 +101,34 @@ export const JasmineScoutUtil = {
   },
 
   /**
-   * If a ajax call is not mocked, this fallback will be triggered to show information about which url is not mocked.
+   * If an ajax call is not mocked, this fallback will be triggered to show information about which url is not mocked.
    */
   captureNotMockedCalls() {
     jasmine.Ajax.stubRequest(/.*/).andCallFunction((request: JasmineAjaxRequest) => {
       fail('Ajax call not mocked for url: ' + request.url + ', method: ' + request.method);
+    });
+  },
+
+  /**
+   * Calls the given mock as soon as a hybrid action with the given actionType is called.
+   * The mock is called asynchronously using setTimeout to let the runtime code add any required event listeners first.
+   *
+   * The mock may return an object with [id, widget] if the action is supposed to create widgets.
+   * The format of the id depends on the method used to add widgets:
+   * - `AbstractHybridAction.addWidget(IWidget)` (e.g. `AbstractFormHybridAction`): `${widgetId}`
+   * - `AbstractHybridAction.addWidgets(Map<String, IWidget>)`: `${actionId}${widgetId}`
+   */
+  mockHybridAction<TData extends DoEntity>(session: Session, actionType: string, mock: (event: HybridActionEvent<TData>) => Record<string, Widget>) {
+    let hm = HybridManager.get(session);
+    hm.on('hybridAction', (event: HybridActionEvent<TData>) => {
+      if (event.data.actionType === actionType) {
+        setTimeout(() => {
+          let widgets = mock(event);
+          if (widgets) {
+            hm.setProperty('widgets', widgets);
+          }
+        });
+      }
     });
   }
 };
