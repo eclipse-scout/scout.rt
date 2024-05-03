@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,11 +15,13 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.CheckableStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -43,7 +45,6 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvisibleColumnsForm {
 
   private ITable m_table = null;
-
   private IColumn<?> m_insertAfterColumn = null;
 
   public ShowInvisibleColumnsForm(ITable table) {
@@ -68,17 +69,6 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
     return getFieldByClass(ColumnsTableField.class);
   }
 
-  /**
-   * Configures if for non-root entity selection, multiple attribute may be selected or not.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   *
-   * @return {@code true} if more then one attribute can be checked on a non-root entity, {@code false} otherwise.
-   */
-  protected boolean getConfiguredAllowMultiAttributeSelect() {
-    return true;
-  }
-
   protected int getConfiguredMainBoxGridColumnCount() {
     return 1;
   }
@@ -97,12 +87,6 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
       return getConfiguredMainBoxGridColumnCount();
     }
 
-    @Override
-    protected void execInitField() {
-      super.execInitField();
-      setStatusVisible(false);
-    }
-
     @Order(10)
     @ClassId("ee038f0e-bd8a-4ab5-9af6-fbb2e6a7ff00")
     public class GroupBox extends AbstractGroupBox {
@@ -110,19 +94,10 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
       @Order(10)
       @ClassId("9aa78206-cbf3-406f-a8c5-0783bfd1de9b")
       public class ColumnsTableField extends AbstractTableField<Table> {
+
         @Override
         protected int getConfiguredGridH() {
           return 6;
-        }
-
-        @Override
-        protected int getConfiguredGridW() {
-          return 1;
-        }
-
-        @Override
-        protected byte getConfiguredLabelPosition() {
-          return LABEL_POSITION_TOP;
         }
 
         @Override
@@ -175,8 +150,23 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
         public class Table extends AbstractTable {
 
           @Override
+          protected String getConfiguredCssClass() {
+            return "table-organizer-show-invisible-columns-form-table";
+          }
+
+          @Override
           protected boolean getConfiguredCheckable() {
             return true;
+          }
+
+          @Override
+          protected CheckableStyle getConfiguredCheckableStyle() {
+            return CheckableStyle.CHECKBOX_TABLE_ROW;
+          }
+
+          @Override
+          protected Class<? extends AbstractBooleanColumn> getConfiguredCheckableColumn() {
+            return CheckedColumn.class;
           }
 
           @Override
@@ -191,6 +181,10 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
 
           public KeyColumn getKeyColumn() {
             return getColumnSet().getColumnByClass(KeyColumn.class);
+          }
+
+          public CheckedColumn getCheckedColumn() {
+            return getColumnSet().getColumnByClass(CheckedColumn.class);
           }
 
           public TitleColumn getTitleColumn() {
@@ -213,6 +207,31 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
           }
 
           @Order(20)
+          @ClassId("09b5e0c7-f0e4-4e7f-bb83-6666aee6afcb")
+          public class CheckedColumn extends AbstractBooleanColumn {
+
+            @Override
+            protected int getConfiguredWidth() {
+              return 28; // reduce gap between checkbox and title (like ListBox)
+            }
+
+            @Override
+            protected int getConfiguredMinWidth() {
+              return 28;
+            }
+
+            @Override
+            protected boolean getConfiguredFixedWidth() {
+              return true;
+            }
+
+            @Override
+            protected boolean getConfiguredNodeColumnCandidate() {
+              return false;
+            }
+          }
+
+          @Order(30)
           @ClassId("fdef9323-d352-4802-9069-d6a3005a8f15")
           public class TitleColumn extends AbstractStringColumn {
 
@@ -220,11 +239,8 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
             protected int getConfiguredWidth() {
               return 200;
             }
-
           }
-
         }
-
       }
     }
 
@@ -237,7 +253,6 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
     @ClassId("f6b3f35e-f935-4cd3-94cf-a085ab5dd6b2")
     public class CancelButton extends AbstractCancelButton {
     }
-
   }
 
   public class ModifyHandler extends AbstractFormHandler {
@@ -299,7 +314,6 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
     protected void execLoad() {
       getColumnsTableField().reloadTableData();
     }
-
   }
 
   @Override
@@ -307,5 +321,4 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
     m_insertAfterColumn = insertAfterColumn;
     return this;
   }
-
 }

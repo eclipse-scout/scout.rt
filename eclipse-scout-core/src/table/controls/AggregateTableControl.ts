@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,13 @@ import $ from 'jquery';
 
 export class AggregateTableControl extends TableControl {
 
+  /**
+   * List of aggregated values per {@link Table#visibleColumns visible column}. If a column has no aggregated value,
+   * the corresponding entry is empty. This array needs to be updated whenever the list of visible columns changes.
+   *
+   * The additional "selection" property indicates whether the values are based on the current table selection (true)
+   * or all rows (false, default).
+   */
   aggregateRow: any[] & { selection?: boolean };
 
   protected _tableDataScrollHandler: () => void;

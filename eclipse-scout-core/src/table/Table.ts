@@ -10,12 +10,12 @@
 import {
   AbstractTableAccessibilityRenderer, Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke,
   ContextMenuPopup, DefaultTableAccessibilityRenderer, Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, Filterable, FilterOrFunction,
-  FilterResult, FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, KeyStrokeContext, LimitedResultTableStatus,LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus,
-  NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings,
-  styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
-  TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke,
-  TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips,
-  TooltipSupport, UpdateFilteredElementsOptions, ValueField, Widget
+  FilterResult, FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations,
+  MenuItemsOrder, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status,
+  StatusOrModel, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke,
+  TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow,
+  TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile,
+  TileTableHeaderBox, tooltips, TooltipSupport, UpdateFilteredElementsOptions, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -128,6 +128,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   filteredElementsDirty: boolean;
   defaultMenuTypes: string[];
   accessibilityRenderer: AbstractTableAccessibilityRenderer;
+  organizer: TableOrganizer;
 
   $data: JQuery;
   $emptyData: JQuery;
@@ -166,7 +167,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     super();
 
     this.autoResizeColumns = false;
-    this.columnAddable = false;
+    this.columnAddable = true;
     this.columnLayoutDirty = false;
     this.columns = [];
     this.contextColumn = null;
@@ -241,6 +242,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.filteredElementsDirty = false;
     this.defaultMenuTypes = [Table.MenuType.EmptySpace];
     this.accessibilityRenderer = new DefaultTableAccessibilityRenderer();
+    this.organizer = null;
 
     this._doubleClickSupport = new DoubleClickSupport();
     this._permanentHeadSortColumns = [];
@@ -366,6 +368,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       property: 'groupingStyle',
       constType: Table.GroupingStyle
     }]);
+
+    this._initOrganizer(model.organizer === undefined); // auto-create unless explicitly defined in the model
     this._initColumns();
 
     this.rows.forEach((row, i) => {
@@ -454,6 +458,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected override _destroy() {
+    this._destroyOrganizer();
     this._destroyColumns();
     super._destroy();
   }
@@ -906,6 +911,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     this.columnLayoutDirty = true;
     this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
+
+    // Rebuild aggregate rows. This computes missing aggregate values for previously hidden columns. It is also a convenient
+    // way to fix the column indices. The aggregate table control was already updated via 'columnStructureChanged' event.
+    this._group(false);
+
     if (this._isDataRendered()) {
       this._updateRowWidth();
       this.redraw();
@@ -952,6 +962,33 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       parent: this,
       table: this
     });
+  }
+
+  protected _initOrganizer(autoCreate = true) {
+    let organizer = this.organizer || (autoCreate ? this._createOrganizer() : null);
+    this._setOrganizer(organizer);
+  }
+
+  protected _createOrganizer(): TableOrganizer {
+    return scout.create(TableOrganizer);
+  }
+
+  protected _destroyOrganizer() {
+    this.setOrganizer(null);
+  }
+
+  setOrganizer(organizer: TableOrganizer) {
+    this.setProperty('organizer', organizer);
+  }
+
+  protected _setOrganizer(organizer: TableOrganizer) {
+    if (this.organizer) {
+      this.organizer.uninstall();
+    }
+    this._setProperty('organizer', organizer);
+    if (this.organizer) {
+      this.organizer.install(this);
+    }
   }
 
   protected _installCellTooltipSupport() {
@@ -2440,7 +2477,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * Executes the aggregate function with the given funcName for each visible column, but only if the Column
    * has that function, which is currently only the case for NumberColumns.
    *
-   * @param states is a reference to an Array containing the results for each column.
+   * @param states is a reference to an Array containing the results for each visible column
    * @param row (optional) if set, an additional cell-value parameter is passed to the aggregate function
    */
   _forEachVisibleColumn(funcName: string, states: object[], row?: TableRow) {
@@ -4433,8 +4470,8 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
 
     visibleColumns = this.visibleColumns();
     visibleNewPos = visibleColumns.indexOf(column); // we must re-evaluate visible columns
-    this._calculateTableNodeColumn();
 
+    this._calculateTableNodeColumn();
     this._triggerColumnMoved(column, visibleOldPos, visibleNewPos, dragged);
 
     // move aggregated rows
@@ -5877,6 +5914,32 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     });
   }
 
+  isColumnAddable(insertAfterColumn?: Column): boolean {
+    if (this.organizer) {
+      return this.organizer.isColumnAddable(insertAfterColumn);
+    }
+    return false;
+  }
+
+  isColumnRemovable(column: Column): boolean {
+    if (this.organizer) {
+      return this.organizer.isColumnRemovable(column);
+    }
+    return false;
+  }
+
+  isColumnModifiable(column: Column): boolean {
+    if (this.organizer) {
+      return this.organizer.isColumnModifiable(column);
+    }
+    return false;
+  }
+
+  isCustomizable(): boolean {
+    // TODO bsh [js-table] Delegate to this.customizer
+    return false;
+  }
+
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
   static parseHorizontalAlignment(alignment: Alignment): string {
@@ -5940,6 +6003,10 @@ export type TableRowCheckOptions = {
 
 export type AggregateTableRow = {
   id?: string;
+  /**
+   * List of aggregated values per {@link Table#visibleColumns visible column}. If a column has no aggregated value,
+   * the corresponding entry is empty. This array needs to be updated whenever the list of visible columns changes.
+   */
   contents: any[];
   prevRow: TableRow;
   nextRow: TableRow;
