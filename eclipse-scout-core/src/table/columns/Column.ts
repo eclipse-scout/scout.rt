@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -90,10 +90,10 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.autoOptimizeWidth = false;
     this.autoOptimizeWidthRequired = false;
     this.autoOptimizeMaxWidth = -1;
-    this.removable = false;
+    this.removable = true;
     this.cssClass = null;
     this.editable = false;
-    this.modifiable = false;
+    this.modifiable = true;
     this.fixedWidth = false;
     this.fixedPosition = false;
     this.grouped = false;
@@ -285,7 +285,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       let refRow = (this.table.groupingStyle === Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
       cell = this.createAggrGroupCell(refRow);
     } else {
-      let aggregateValue = aggregateRow.contents[this.table.columns.indexOf(this)];
+      let aggregateValue = aggregateRow.contents[this.table.visibleColumns().indexOf(this)];
       cell = this.createAggrValueCell(aggregateValue);
     }
     return this.buildCell(cell, {});

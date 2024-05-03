@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableRow, TableSelectionHandler,
-  TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
+  Action, Column, DropType, FilterOrFunction, Menu, ObjectOrChildModel, ObjectOrModel, StatusOrModel, TableCheckableStyle, TableCompactHandler, TableControl, TableGroupingStyle, TableHierarchicalStyle, TableOrganizer, TableRow,
+  TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile, TileTableHeaderBox, WidgetModel
 } from '../index';
 
 export interface TableModel extends WidgetModel {
@@ -27,6 +27,10 @@ export interface TableModel extends WidgetModel {
    * Default is false.
    */
   autoResizeColumns?: boolean;
+  /**
+   * Specifies whether columns can generally be added to the table. The effective value is determined by the
+   * {@link TableOrganizer table organizer}. The default value is true.
+   */
   columnAddable?: boolean;
   columns?: ObjectOrChildModel<Column<any>>[];
   /**
@@ -268,4 +272,9 @@ export interface TableModel extends WidgetModel {
    */
   textFilterEnabled?: boolean;
   defaultMenuTypes?: string[];
+  /**
+   * Allows adding, removing or modifying columns by listening for the table's `columnOrganizeAction` event. If the table is
+   * not to be organized, set this to `null`. By default, an instance of {@link TableOrganizer} is created automatically.
+   */
+  organizer?: TableOrganizer;
 }

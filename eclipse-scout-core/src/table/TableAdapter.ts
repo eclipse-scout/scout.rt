@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, RemoteEvent, scout, Table,
+  AdapterData, App, arrays, BooleanColumn, Cell, ChildModelOf, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, ObjectOrModel, objects, RemoteEvent, RemoteTableOrganizer, scout, Table,
   TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent, TableColumnResizedEvent, TableCompleteCellEditEvent,
   TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableModel, TablePrepareCellEditEvent, TableReloadEvent, TableRow, TableRowActionEvent, TableRowClickEvent, TableRowModel, TableRowsCheckedEvent,
   TableRowsExpandedEvent, TableRowsSelectedEvent, TableSortEvent, TableUserFilter, ValueField
@@ -29,6 +29,7 @@ export class TableAdapter extends ModelAdapter {
   protected override _initProperties(model: TableModel) {
     super._initProperties(model);
     model.compactHandler = null; // Disable Scout JS compact handling, will be done on the server
+    model.organizer = scout.create(RemoteTableOrganizer); // table is organized on the server in classic mode
   }
 
   /** @internal */
@@ -676,7 +677,7 @@ export class TableAdapter extends ModelAdapter {
     }, true);
 
     // _sortAfterUpdate
-    objects.replacePrototypeFunction(Table, '_sortAfterUpdate', function() {
+    objects.replacePrototypeFunction(Table, '_sortAfterUpdate', function(this: Table & { _sortAfterUpdateOrig }) {
       if (this.modelAdapter) {
         this._group();
       } else {
@@ -707,8 +708,7 @@ export class TableAdapter extends ModelAdapter {
     // no js default tileTableHeader in classic mode
     objects.replacePrototypeFunction(Table, '_createTileTableHeader', function(this: Table & { _createTileTableHeaderOrig }) {
       if (this.modelAdapter) {
-        // nop in classic mode
-        return;
+        return null;
       }
       return this._createTileTableHeaderOrig();
     }, true);
@@ -716,8 +716,7 @@ export class TableAdapter extends ModelAdapter {
     // not used in classic mode since tiles are created by the server
     objects.replacePrototypeFunction(Table, 'createTiles', function(this: Table & { createTilesOrig: typeof Table.prototype.createTiles }, rows: TableRow[]) {
       if (this.modelAdapter) {
-        // nop in classic mode
-        return;
+        return null;
       }
       return this.createTilesOrig(rows);
     }, true);

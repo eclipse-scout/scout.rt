@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Column, Device, NumberColumn, Range, Table} from '../../src/index';
+import {AggregateTableControl, arrays, Column, Device, NumberColumn, Range, scout, Table} from '../../src/index';
 import {SpecTable, SpecTableAdapter, TableModelWithCells, TableRowModelWithCells, TableSpecHelper} from '../../src/testing/index';
 
 describe('Table Grouping', () => {
@@ -34,11 +34,12 @@ describe('Table Grouping', () => {
   });
 
   function prepareTable(withAdapter?: boolean) {
-    columns = [helper.createModelColumn('col0'),
+    columns = [
+      helper.createModelColumn('col0'),
       helper.createModelColumn('col1'),
       helper.createModelColumn('col2'),
-      helper.createModelColumn('col3', 'NumberColumn'),
-      helper.createModelColumn('col4', 'NumberColumn')
+      helper.createModelColumn('col3', NumberColumn),
+      helper.createModelColumn('col4', NumberColumn)
     ];
     columns[0].index = 0;
     columns[1].index = 1;
@@ -170,6 +171,117 @@ describe('Table Grouping', () => {
     addGrouping(table, column0, false);
     expect(find$aggregateRows(table).length).toBe(2);
     expect(table._aggregateRows.length).toBe(2);
+  });
+
+  it('updates aggregate rows when column structure changes', () => {
+    if (!Device.get().supportsInternationalization()) {
+      return;
+    }
+    prepareTable();
+    let tableControl = scout.create(AggregateTableControl, {
+      parent: table,
+      table: table,
+      selected: true
+    });
+    table.setTableControls([tableControl]);
+    prepareContent();
+    render(table);
+
+    // 0: col0<String> | 1: col1<String> | 2: col2<String> | 3: col3<Number> | 4: col4<Number>
+    expect(table._aggregateRows.length).toBe(0);
+    expect(tableControl.aggregateRow.length).toBe(5);
+    expect(tableControl.aggregateRow[0]).toBeUndefined();
+    expect(tableControl.aggregateRow[1]).toBeUndefined();
+    expect(tableControl.aggregateRow[2]).toBeUndefined();
+    expect(tableControl.aggregateRow[3]).toBeDefined();
+    expect(tableControl.aggregateRow[4]).toBeDefined();
+
+    // Add grouping
+    addGrouping(table, column0, false);
+    // 0: col0<String> [G] | 1: col1<String> | 2: col2<String> | 3: col3<Number> | 4: col4<Number>
+    expect(table._aggregateRows.length).toBe(2);
+    expect(table._aggregateRows[0].contents.length).toBe(5);
+    expect(table._aggregateRows[0].contents[0]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[1]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[2]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[3]).toBeDefined();
+    expect(table._aggregateRows[0].contents[4]).toBeDefined();
+    expect(tableControl.aggregateRow.length).toBe(5);
+    expect(tableControl.aggregateRow[0]).toBeUndefined();
+    expect(tableControl.aggregateRow[1]).toBeUndefined();
+    expect(tableControl.aggregateRow[2]).toBeUndefined();
+    expect(tableControl.aggregateRow[3]).toBeDefined();
+    expect(tableControl.aggregateRow[4]).toBeDefined();
+
+    // Move last column between first and second column
+    table.moveColumn(table.columns[4], 4, 1);
+    // 0: col0<String> [G] | 1: col4<Number> | 2: col1<String> | 3: col2<String> | 4: col3<Number>
+    expect(table._aggregateRows.length).toBe(2);
+    expect(table._aggregateRows[0].contents.length).toBe(5);
+    expect(table._aggregateRows[0].contents[0]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[1]).toBeDefined();
+    expect(table._aggregateRows[0].contents[2]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[3]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[4]).toBeDefined();
+    expect(tableControl.aggregateRow.length).toBe(5);
+    expect(tableControl.aggregateRow[0]).toBeUndefined();
+    expect(tableControl.aggregateRow[1]).toBeDefined();
+    expect(tableControl.aggregateRow[2]).toBeUndefined();
+    expect(tableControl.aggregateRow[3]).toBeUndefined();
+    expect(tableControl.aggregateRow[4]).toBeDefined();
+
+    // Set the third column to displayable=false
+    table.columns[2].setDisplayable(false);
+    // 0: col0<String> [G] | 1: col4<Number> | 2: ( col1<String> ) | 3: col2<String> | 4: col3<Number>
+    expect(table._aggregateRows.length).toBe(2);
+    expect(table._aggregateRows[0].contents.length).toBe(4);
+    expect(table._aggregateRows[0].contents[0]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[1]).toBeDefined();
+    expect(table._aggregateRows[0].contents[2]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[3]).toBeDefined();
+    expect(tableControl.aggregateRow.length).toBe(4);
+    expect(tableControl.aggregateRow[0]).toBeUndefined();
+    expect(tableControl.aggregateRow[1]).toBeDefined();
+    expect(tableControl.aggregateRow[2]).toBeUndefined();
+    expect(tableControl.aggregateRow[3]).toBeDefined();
+
+    // Hide the second column
+    table.columns[1].setVisible(false);
+    // 0: col0<String> [G] | (1: col4<Number> ) | (2: col1<String> ) | 3: col2<String> | 4: col3<Number>
+    expect(table._aggregateRows.length).toBe(2);
+    expect(table._aggregateRows[0].contents.length).toBe(3);
+    expect(table._aggregateRows[0].contents[0]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[1]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[2]).toBeDefined();
+    expect(tableControl.aggregateRow.length).toBe(3);
+    expect(tableControl.aggregateRow[0]).toBeUndefined();
+    expect(tableControl.aggregateRow[1]).toBeUndefined();
+    expect(tableControl.aggregateRow[2]).toBeDefined();
+
+    // Show the previously hidden column as second-last column
+    table.organizer.showColumns([table.columns[1]], table.columns[3]);
+    // 0: col0<String> [G] | 1: col1<String> | 2: col2<String> | 3: col4<Number> | 4: col3<Number>
+    expect(table._aggregateRows.length).toBe(2);
+    expect(table._aggregateRows[0].contents.length).toBe(4);
+    expect(table._aggregateRows[0].contents[0]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[1]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[2]).toBeDefined();
+    expect(table._aggregateRows[0].contents[3]).toBeDefined();
+    expect(tableControl.aggregateRow.length).toBe(4);
+    expect(tableControl.aggregateRow[0]).toBeUndefined();
+    expect(tableControl.aggregateRow[1]).toBeUndefined();
+    expect(tableControl.aggregateRow[2]).toBeDefined();
+    expect(tableControl.aggregateRow[3]).toBeDefined();
+
+    // Table control is deselected when all aggregated columns are hidden
+    table.organizer.hideColumn(table.columns[3]);
+    table.organizer.hideColumn(table.columns[4]);
+    // 0: col0<String> [G] | (1: col1<String> ) | 2: col2<String> | (3: col4<Number> ) | ( 4: col3<Number> )
+    expect(table._aggregateRows.length).toBe(2);
+    expect(table._aggregateRows[0].contents.length).toBe(2);
+    expect(table._aggregateRows[0].contents[0]).toBeUndefined();
+    expect(table._aggregateRows[0].contents[1]).toBeUndefined();
+    expect(tableControl.selected).toBe(false);
   });
 
   it('considers groupingStyle -> aggregate rows must be rendered previous to the grouped rows', () => {

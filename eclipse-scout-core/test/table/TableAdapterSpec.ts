@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {defaultValues, RemoteEvent, RemoteResponse, Table, TableAdapter, TableRow, TableTextUserFilter} from '../../src/index';
+import {defaultValues, RemoteEvent, RemoteResponse, RemoteTableOrganizer, Table, TableAdapter, TableRow, TableTextUserFilter} from '../../src/index';
 import {LocaleSpecHelper, SpecTable, SpecTableAdapter, TableModelWithCells, TableSpecHelper} from '../../src/testing/index';
 
 describe('TableAdapter', () => {
@@ -77,7 +77,6 @@ describe('TableAdapter', () => {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
-
   });
 
   describe('checkRows', () => {
@@ -117,7 +116,6 @@ describe('TableAdapter', () => {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
-
   });
 
   describe('expandRows', () => {
@@ -174,7 +172,6 @@ describe('TableAdapter', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
       expect(table.rows[0].expanded).toBe(false);
     });
-
   });
 
   describe('onModelAction', () => {
@@ -254,7 +251,6 @@ describe('TableAdapter', () => {
         sendQueuedAjaxCalls();
         expect(jasmine.Ajax.requests.count()).toBe(0);
       });
-
     });
 
     describe('allRowsDeleted event', () => {
@@ -459,7 +455,6 @@ describe('TableAdapter', () => {
           expect(rowId).toBe(expectedRowId);
         });
       });
-
     });
 
     describe('rowsUpdated event', () => {
@@ -568,7 +563,6 @@ describe('TableAdapter', () => {
         session._processSuccessResponse(message);
         expect(table.updateColumnOrder).toHaveBeenCalledWith([column2, column0, column1]);
       });
-
     });
 
     describe('columnHeadersUpdated event', () => {
@@ -694,9 +688,7 @@ describe('TableAdapter', () => {
         expect(session.getModelAdapter(menu1.id)).toBeFalsy();
         expect(menu1Widget.destroyed).toBe(true);
       });
-
     });
-
   });
 
   describe('_sendFilter', () => {
@@ -713,7 +705,6 @@ describe('TableAdapter', () => {
       expect(session.asyncEvents[0].remove).toBe(true);
       expect(session.asyncEvents[1].remove).toBe(undefined);
     });
-
   });
 
   describe('_postCreateWidget', () => {
@@ -734,7 +725,33 @@ describe('TableAdapter', () => {
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
-
   });
 
+  describe('organizer', () => {
+
+    it('initializes the table with RemoteTableOrganizer', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop) as Table;
+
+      expect(table.organizer).toBeInstanceOf(RemoteTableOrganizer);
+
+      expect(table.isColumnAddable(table.columns[0])).toBe(true);
+      expect(table.isColumnRemovable(table.columns[0])).toBe(true);
+      expect(table.isColumnModifiable(table.columns[0])).toBe(true);
+
+      table.columnAddable = false;
+      expect(table.isColumnAddable(table.columns[0])).toBe(false);
+      table.columns[0].removable = false;
+      table.columns[0].modifiable = false;
+      expect(table.isColumnRemovable(table.columns[0])).toBe(false);
+      expect(table.isColumnModifiable(table.columns[0])).toBe(false);
+      expect(table.isColumnRemovable(table.columns[1])).toBe(true);
+      expect(table.isColumnModifiable(table.columns[1])).toBe(true);
+
+      table.columns.forEach(column => column.setVisible(false));
+      expect(table.isColumnRemovable(table.columns[1])).toBe(true);
+      expect(table.isColumnModifiable(table.columns[1])).toBe(true);
+    });
+  });
 });

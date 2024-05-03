@@ -54,6 +54,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ResetTableColumns",
         "SaveButton",
         "SearchButton",
+        "ShowColumns",
         "SmartFieldCannotComplete",
         "SmartFieldInactiveRow",
         "SmartFieldMoreThanXRows",
