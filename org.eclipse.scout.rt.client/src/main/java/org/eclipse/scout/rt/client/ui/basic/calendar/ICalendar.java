@@ -96,7 +96,7 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
 
   String PROP_SHOW_CALENDAR_SIDEBAR = "showCalendarSidebar";
 
-  String PROP_SHOW_CALENDARS_PANEL = "showYearPanel";
+  String PROP_SHOW_CALENDARS_PANEL = "showCalendarsPanel";
 
   String PROP_SHOW_LIST_PANEL = "showYearPanel";
 
