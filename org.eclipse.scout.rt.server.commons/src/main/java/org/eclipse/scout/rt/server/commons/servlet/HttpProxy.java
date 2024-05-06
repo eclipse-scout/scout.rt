@@ -286,7 +286,7 @@ public class HttpProxy {
     }
     for (Entry<String, String> header : customHeaders.entrySet()) {
       asyncRequestBuilder.addHeader(header.getKey(), header.getValue());
-      LOG.trace("Added custom request header: {}: {}", header.getValue(), header.getValue());
+      LOG.trace("Added custom request header: {}: {}", header.getKey(), header.getValue());
     }
   }
 
