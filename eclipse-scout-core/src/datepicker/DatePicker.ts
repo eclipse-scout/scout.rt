@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -589,7 +589,7 @@ export class DatePicker extends Widget implements DatePickerModel {
   protected _onMouseWheel(event: JQueryWheelEvent) {
     let originalEvent = event.originalEvent;
     let wheelData = originalEvent.deltaY | originalEvent.deltaX;
-    let diff = (wheelData >= 0 ? -1 : 1);
+    let diff = (wheelData < 0 ? -1 : 1);
     this.shiftViewDate(0, diff, 0);
     originalEvent.preventDefault();
   }
