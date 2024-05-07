@@ -80,6 +80,8 @@ export class FormFieldMenu extends Menu implements FormFieldMenuModel {
 
   protected override _renderOverflown() {
     super._renderOverflown();
-    this.field._hideStatusMessage();
+    if (this.field) {
+      this.field._hideStatusMessage();
+    }
   }
 }
