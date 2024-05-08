@@ -404,6 +404,16 @@ public class UiSession implements IUiSession {
     }
   }
 
+  protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, Map<String, String> sessionStartupParams) {
+    // Run in a model job, because the computed theme is written to the model ("theme" property on the desktop)
+    IFuture<Boolean> future = ModelJobs.schedule(
+        () -> initUiThemeInternal(req, resp, sessionStartupParams),
+        ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(m_clientSession, true))
+            .withName("Initializing UI theme")
+            .withExceptionHandling(null, false /* propagate */)); // exception handling done by caller
+    return BEANS.get(UiJobs.class).awaitAndGet(future);
+  }
+
   /**
    * Info: instead of reload the current page in the browser, we could build a servlet-filter which determines what
    * theme the user has _before_ the client-session is created. However, the 'reload' will only be performed in the case
@@ -412,32 +422,39 @@ public class UiSession implements IUiSession {
    * @return Whether the page must be reloaded by the browser (required when theme changes after client-session has been
    *         initialized)
    */
-  protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, Map<String, String> sessionStartupParams) {
+  protected boolean initUiThemeInternal(HttpServletRequest req, HttpServletResponse resp, Map<String, String> sessionStartupParams) {
+    ModelJobs.assertModelThread(); // because we change the model ("theme" property on the desktop)
     UiThemeHelper helper = UiThemeHelper.get();
+
     String modelTheme = m_clientSession.getDesktop().getTheme();
     String currentTheme = helper.getTheme(req);
 
-    // Ensure the model theme is valid, otherwise it could result in an endless reload loop
-    String validTheme = UiThemeHelper.get().validateTheme(modelTheme);
-    if (!ObjectUtility.equals(validTheme, modelTheme)) {
-      LOG.info("Model theme ({}) is not valid, switching to a valid one ({})", modelTheme, validTheme);
-      modelTheme = validTheme;
-    }
-
-    // If a theme is requested via URL this has priority before the theme from the session or the model
+    // If a theme is requested via URL, that has priority over the theme from the session or the model
     String requestedTheme = sessionStartupParams.get(URL_PARAM_THEME);
     if (requestedTheme != null) {
-      modelTheme = helper.validateTheme(requestedTheme);
+      modelTheme = requestedTheme;
     }
 
     if (modelTheme == null) {
-      modelTheme = ObjectUtility.nvl(currentTheme, helper.getConfiguredTheme());
-      m_clientSession.getDesktop().setTheme(currentTheme);
+      // "currentTheme" is valid by definition (see JavaDoc of UiThemeHelper#getTheme)
+      modelTheme = currentTheme;
+    }
+    else {
+      // Ensure the model theme is valid, otherwise it could result in an endless reload loop
+      String validTheme = helper.validateTheme(modelTheme);
+      if (!ObjectUtility.equals(validTheme, modelTheme)) {
+        LOG.warn("{} theme ({}) is not valid, switching to a valid one ({})", requestedTheme != null ? "Requested" : "Model", modelTheme, validTheme);
+        modelTheme = validTheme;
+      }
     }
 
-    boolean reloadPage = !modelTheme.equals(currentTheme);
+    // Write the valid theme to the client session, so the desktop logo can be adjusted (but this is not stored in the user settings)
+    m_clientSession.getDesktop().setTheme(modelTheme);
+    // Set as current theme for subsequent requests with the same UI session
     helper.storeTheme(resp, req.getSession(), modelTheme);
-    LOG.debug("UI theme model={} current={} reloadPage={}", modelTheme, currentTheme, reloadPage);
+
+    boolean reloadPage = !modelTheme.equals(currentTheme);
+    LOG.debug("UI theme requested={} current={} model={} reloadPage={}", requestedTheme, currentTheme, modelTheme, reloadPage);
     return reloadPage;
   }
 
