@@ -1682,7 +1682,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     let theme = this.theme;
     if (this.url.hasParameter('theme')) {
       theme = strings.nullIfEmpty(this.url.getParameter('theme') as string) || Desktop.DEFAULT_THEME;
-    } else if (theme === null) {
+    } else if (!theme) {
       theme = this._activeTheme();
     }
     this.setTheme(theme);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Desktop, DesktopCancelFormsEvent, DesktopFormActivateEvent, DesktopHistoryState, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, Outline,
-  RemoteEvent, Widget
+  App, Desktop, DesktopCancelFormsEvent, DesktopFormActivateEvent, DesktopHistoryState, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, objects,
+  Outline, RemoteEvent, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -255,4 +255,26 @@ export class DesktopAdapter extends ModelAdapter {
       super.onModelAction(event);
     }
   }
+
+  /**
+   * Static method to modify the prototype of Desktop.
+   */
+  static modifyDesktopPrototype() {
+    if (!App.get().remote) {
+      return;
+    }
+
+    objects.replacePrototypeFunction(Desktop, '_initTheme', DesktopAdapter._initTheme, true);
+  }
+
+  static _initTheme(this: Desktop & { _initThemeOrig; _activeTheme }) {
+    if (this.modelAdapter) {
+      // Write the active theme (defined by the UI server) to the desktop widget
+      this.setTheme(this._activeTheme());
+    } else {
+      this._initThemeOrig();
+    }
+  }
 }
+
+App.addListener('bootstrap', DesktopAdapter.modifyDesktopPrototype);
