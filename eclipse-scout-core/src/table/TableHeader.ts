@@ -144,6 +144,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
         .on('mousedown', this._onHeaderItemMouseDown.bind(this));
     }
 
+    $header.attrOrRemove('data-uuid', column.uuid);
     if (this.session.inspector) {
       inspector.applyInfo(column, $header);
     }

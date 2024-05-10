@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, ObjectOrChildModel, ObjectOrModel, Outline, Page, Table, TreeNodeModel} from '../../../index';
+import {Form, ObjectOrChildModel, ObjectOrModel, ObjectWithUuidModel, Outline, Page, Table, TreeNode, TreeNodeModel} from '../../../index';
 
-export interface PageModel extends TreeNodeModel {
+export interface PageModel extends TreeNodeModel, ObjectWithUuidModel<TreeNode> {
   parent?: Outline;
   childNodes?: ObjectOrModel<Page>[];
   compactRoot?: boolean;

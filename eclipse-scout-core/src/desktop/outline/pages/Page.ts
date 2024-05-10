@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ButtonTile, ChildModelOf, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus, ObjectOrChildModel, Outline, PageEventMap,
-  PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  ButtonTile, ChildModelOf, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus, ObjectOrChildModel, ObjectWithUuid,
+  Outline,
+  PageEventMap, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -20,7 +21,7 @@ import $ from 'jquery';
  * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
  * Implementations of these classes contain code which loads table data or child nodes.
  */
-export class Page extends TreeNode implements PageModel {
+export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   declare model: PageModel;
   declare eventMap: PageEventMap;
   declare self: Page;
@@ -28,6 +29,7 @@ export class Page extends TreeNode implements PageModel {
   declare childNodes: Page[];
   declare parentNode: Page;
 
+  uuid: string;
   /**
    * This property is set by the server, see: JsonOutline#putNodeType.
    */
@@ -66,6 +68,7 @@ export class Page extends TreeNode implements PageModel {
   constructor() {
     super();
 
+    this.uuid = null;
     this.nodeType = null;
     this.compactRoot = false;
     this.detailTable = null;
@@ -375,6 +378,7 @@ export class Page extends TreeNode implements PageModel {
     if (!this.$node) {
       return;
     }
+    this.$node.attrOrRemove('data-uuid', this.uuid);
     if (this.session.inspector) {
       inspector.applyInfo(this, this.$node);
     }

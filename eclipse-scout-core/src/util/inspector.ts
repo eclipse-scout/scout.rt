@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,6 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+import {strings} from './strings';
+
 export const inspector = {
   /**
    * Adds inspector info (e.g. classId) from the given 'model' to the DOM. The target element
@@ -21,7 +23,8 @@ export const inspector = {
     if (!$container) {
       return;
     }
-    $container.toggleAttr('data-id', !!model.id, model.id);
+    let id = strings.startsWith(model.id, 'ui') ? null : model.id; // FIXME bsh [js-bookmark] improve this
+    $container.toggleAttr('data-id', !!id, id);
     $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
     $container.toggleAttr('data-classid', !!model.classId, model.classId);
   }

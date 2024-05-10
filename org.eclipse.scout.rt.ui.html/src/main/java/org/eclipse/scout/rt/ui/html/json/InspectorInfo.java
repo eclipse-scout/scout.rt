@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
@@ -25,7 +26,10 @@ public class InspectorInfo {
     if (model != null && UrlHints.isInspectorHint(uiSession.currentHttpRequest())) {
       json.put("modelClass", model.getClass().getName());
       if (model instanceof ITypeWithClassId) {
-        json.put("classId", ((ITypeWithClassId) model).classId());
+        String classId = ((ITypeWithClassId) model).classId();
+        if (ObjectUtility.notEquals(json.get("uuid"), classId)) { // FIXME bsh [js-bookmark] improve this
+          json.put("classId", classId);
+        }
       }
     }
   }

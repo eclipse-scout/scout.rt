@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -196,6 +196,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       json.put(PROP_SHOW_TILE_OVERVIEW, page.isShowTileOverview());
       json.put(PROP_COMPACT_ROOT, page.isCompactRoot());
     }
+    json.put("uuid", page.classId()); // FIXME bsh [js-bookmark] where to get uuid?
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, page);
     JsonObjectUtility.filterDefaultValues(json, "Page");
     return json;
