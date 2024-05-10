@@ -9,12 +9,12 @@
  */
 import {
   Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, Predicate, PropertyDecoration, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session,
-  SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions,
+  ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
-export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
+export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType, ObjectWithUuid {
   declare model: WidgetModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
   declare eventMap: WidgetEventMap;
@@ -78,6 +78,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   scrollTop: number;
   session: Session;
   trackFocus: boolean;
+  uuid: string;
   visible: boolean;
   modelAdapter: ModelAdapter;
   $container: JQuery;
@@ -102,6 +103,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     super();
 
     this.id = null;
+    this.uuid = null;
     this.objectType = null;
     this.session = null;
 
@@ -649,6 +651,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   protected _renderInspectorInfo() {
+    if (this.$container) {
+      this.$container.attrOrRemove('data-uuid', this.uuid);
+    }
     if (!this.session.inspector) {
       return;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -112,6 +112,7 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
       this._updateStepClasses(step);
 
       // Inspector info
+      $step.attrOrRemove('data-uuid', step.uuid);
       if (this.session.inspector) {
         inspector.applyInfo(step, $step);
         $step.attr('data-step-index', step.index);
@@ -310,6 +311,7 @@ export interface WizardStep {
   finished?: boolean;
   modelClass?: string;
   classId?: string;
+  uuid?: string;
 
   $step?: JQuery;
 }

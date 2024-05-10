@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -103,6 +103,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put("headerTooltipText", getColumn().getHeaderCell().getTooltipText());
     json.put("headerTooltipHtmlEnabled", getColumn().getHeaderCell().isTooltipHtmlEnabled());
     json.put("headerIconId", BinaryResourceUrlUtility.createIconUrl(getColumn().getHeaderCell().getIconId()));
+    json.put("uuid", getColumn().classId()); // FIXME bsh [js-bookmark] where to get uuid?
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, getColumn());
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, getColumn().isInitialAlwaysIncludeSortAtBegin());

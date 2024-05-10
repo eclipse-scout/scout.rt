@@ -45,9 +45,20 @@ export interface ObjectWithType {
   objectType: string;
 }
 
+export interface ObjectWithUuid {
+  /**
+   * Unique identifier for this element.
+   */
+  uuid: string;
+}
+
 export interface ObjectModel<TObject = object, TId = string> {
   objectType?: ObjectType<TObject>;
   id?: TId;
+}
+
+export interface ObjectWithUuidModel<TObject = object, TId = string> extends ObjectModel<TObject, TId> {
+  uuid?: string;
 }
 
 export interface ReloadPageOptions {

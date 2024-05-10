@@ -9,11 +9,11 @@
  */
 import {
   AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf, objects,
-  ObjectWithType, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, ValueField, widgets
+  ObjectWithType, ObjectWithUuid, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, ValueField, widgets
 } from '../../index';
 import $ from 'jquery';
 
-export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType {
+export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType, ObjectWithUuid {
   declare model: ColumnModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'session'>;
   declare eventMap: ColumnEventMap;
@@ -21,6 +21,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   objectType: string;
   id: string;
+  uuid: string;
   autoOptimizeWidth: boolean;
   /** true if content of the column changed and width has to be optimized */
   autoOptimizeWidthRequired: boolean;
@@ -87,6 +88,8 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   constructor() {
     super();
+    this.id = null;
+    this.uuid = null;
     this.autoOptimizeWidth = false;
     this.autoOptimizeWidthRequired = false;
     this.autoOptimizeMaxWidth = -1;
