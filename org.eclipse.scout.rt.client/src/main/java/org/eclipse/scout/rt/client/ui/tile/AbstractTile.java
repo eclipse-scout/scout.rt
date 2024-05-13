@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.ui.tile;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -34,8 +36,8 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.data.colorscheme.ColorScheme;
@@ -57,6 +59,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   private IDataChangeListener m_internalDataChangeListener;
   private boolean m_filterAccepted = true;
   private volatile boolean m_loaded = false;
+  private IFuture<Void> m_loadJobFuture;
 
   public AbstractTile() {
     this(true);
@@ -114,6 +117,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Override
   protected final void disposeInternal() {
     disposeTileInternal();
+    cancelLoading();
     interceptDisposeTile();
     super.disposeInternal();
   }
@@ -307,6 +311,10 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     m_loaded = loaded;
   }
 
+  protected IFuture<Void> getLoadJobFuture() {
+    return m_loadJobFuture;
+  }
+
   @Override
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
@@ -383,6 +391,32 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     catch (Exception e) {
       handleLoadDataException(e);
     }
+  }
+
+  @Override
+  public void cancelLoading() {
+    if (getLoadJobFuture() != null) {
+      getLoadJobFuture().cancel(true);
+    }
+  }
+
+  @Override
+  public void reloadData() {
+    if (!isLoading()) {
+      loadData();
+      return;
+    }
+    cancelLoading();
+    addPropertyChangeListener(ITile.PROP_LOADING, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (!isLoading()) {
+          removePropertyChangeListener(this);
+          // Call reload (not load) in case another job has been started in the meantime and needs to be canceled first
+          reloadData();
+        }
+      }
+    });
   }
 
   protected void beforeLoadData() {
@@ -465,16 +499,18 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
       try {
         ITileGrid tileGridParent = getParentOfType(ITileGrid.class);
         IForm formParent = getParentOfType(IForm.class);
-        BEANS.get(TileDataLoadManager.class).schedule(() -> {
+        m_loadJobFuture = BEANS.get(TileDataLoadManager.class).schedule(() -> {
           try {
             final DATA data = doLoadData();
             BEANS.get(TileDataLoadManager.class).runInModelJob(() -> {
+              m_loadJobFuture = null;
               setLoading(false);
               updateModelData(data);
             });
           }
           catch (final Throwable e) { // Catch Throwable so we can handle all AbstractInterruptionError accordingly
             BEANS.get(TileDataLoadManager.class).runInModelJob(() -> {
+              m_loadJobFuture = null; // Needs to be done before setLoading(false) because setLoading(false) may re-schedule another load job, see reloadData()
               setLoading(false);
               handleLoadDataException(e);
             });

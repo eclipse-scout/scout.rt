@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.tile.AbstractTile.ITileDataLoader;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
@@ -56,7 +57,20 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
 
   void ensureDataLoaded();
 
+  /**
+   * Loads the data using {@link ITileDataLoader}. Does nothing if the data is already being loaded.
+   */
   void loadData();
+
+  /**
+   * Calls {@link #cancelLoading()} and {@link #loadData()}.
+   */
+  void reloadData();
+
+  /**
+   * Cancels data loading if loading is in progress.
+   */
+  void cancelLoading();
 
   @Override
   void setLoading(boolean loading);
