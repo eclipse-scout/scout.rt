@@ -564,6 +564,14 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     return propertySupport.getProperty(PROP_SELECTED_CALENDAR, ICalendarDescriptor.class);
   }
 
+  @Override
+  public void setCalendarVisibility(String calendarId, boolean visible) {
+    ICalendarDescriptor cal = getCalendars().stream()
+        .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
+        .findAny()
+        .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar!"));
+    cal.withVisible(visible);
+  }
 
   @Override
   public boolean getShowCalendarSidebar() {
@@ -845,14 +853,14 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
-  public void reloadCalendarItems(ICalendarDescriptor calendar) {
-    if (calendar == null) {
+  public void reloadCalendarItems(String calendarId) {
+    if (calendarId == null) {
       reloadCalendarItems();
       return;
     }
     // Only reload necessary calendars
     m_providers.stream()
-        .filter(provider -> provider.getCalendarBelonging() == null || calendar.equals(provider.getCalendarBelonging()))
+        .filter(provider -> provider.getCalendarBelonging() == null || calendarId.equals(provider.getCalendarBelonging().getCalendarId()))
         .forEach(ICalendarItemProvider::reloadProvider);
   }
 
@@ -1063,14 +1071,11 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     public void setCalendarVisibilityFromUI(String calendarId, Boolean visible) {
       try {
         pushUIProcessor();
-        ICalendarDescriptor cal = getCalendars().stream()
-            .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
-            .findAny()
-            .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar!"));
-        cal.withVisible(visible);
+        setCalendarVisibility(calendarId, visible);
+
         // Trigger reload when new calendar is selected
         if (visible) {
-          reloadCalendarItems(cal);
+          reloadCalendarItems(calendarId);
         }
       }
       finally {

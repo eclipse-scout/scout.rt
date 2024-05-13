@@ -1585,7 +1585,7 @@ export class Calendar extends Widget implements CalendarModel {
       // No update
       return;
     }
-    if (!this._hasOtherVisibleCalendars(calendar)) {
+    if (!this._hasOtherVisibleCalendars(calendar) && !visible) {
       // Last visible calendar was unselected, selecting it again
       let tree = this.calendarSidebar.calendarsPanel.tree;
       tree.visitNodes(node => {

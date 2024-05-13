@@ -118,6 +118,8 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
 
   ICalendarDescriptor getSelectedCalendar();
 
+  void setCalendarVisibility(String calendarId, boolean visible);
+
   /**
    * @return a Date tupel [begin, end]
    */
@@ -165,7 +167,7 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    */
   void reloadCalendarItems();
 
-  void reloadCalendarItems(ICalendarDescriptor calendar);
+  void reloadCalendarItems(String calendarId);
 
   /**
    * Model Observer
