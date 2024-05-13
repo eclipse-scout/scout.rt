@@ -724,11 +724,11 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     IForm formParent = getParentOfType(IForm.class);
     return Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent()
-            .withProperty(PROP_RUN_CONTEXT_TILE_LOAD_CANCELLABLE, tile)
+            .withProperty(RUN_CONTEXT_TILE_LOAD_CANCELLABLE, tile)
             .withForm(formParent != null ? formParent : IForm.CURRENT.get()))
-        .withName(PROP_ASYNC_LOAD_JOBNAME_PREFIX)
-        .withExecutionHint(PROP_ASYNC_LOAD_IDENTIFIER_PREFIX + getAsyncLoadIdentifier())
-        .withExecutionHint(PROP_WINDOW_IDENTIFIER_PREFIX + getWindowIdentifier());
+        .withName(ASYNC_LOAD_JOBNAME_PREFIX)
+        .withExecutionHint(ASYNC_LOAD_IDENTIFIER_PREFIX + getAsyncLoadIdentifier())
+        .withExecutionHint(WINDOW_IDENTIFIER_PREFIX + getWindowIdentifier());
   }
 
   @Override

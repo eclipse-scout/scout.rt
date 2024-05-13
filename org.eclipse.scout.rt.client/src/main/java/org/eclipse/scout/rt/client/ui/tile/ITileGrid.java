@@ -43,10 +43,26 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
   String PROP_TEXT_FILTER_ENABLED = "textFilterEnabled";
   String PROP_WRAPPABLE = "wrappable";
 
-  String PROP_ASYNC_LOAD_JOBNAME_PREFIX = "tileAsyncDataLoadJob";
-  String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
-  String PROP_WINDOW_IDENTIFIER_PREFIX = "tileDataLoadWindowsIdentifier";
-  String PROP_RUN_CONTEXT_TILE_LOAD_CANCELLABLE = "tileDataLoadWindowsIdentifier";
+  String ASYNC_LOAD_JOBNAME_PREFIX = "tileAsyncDataLoadJob";
+  String ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
+  String WINDOW_IDENTIFIER_PREFIX = "tileDataLoadWindowsIdentifier";
+  String RUN_CONTEXT_TILE_LOAD_CANCELLABLE = "tileDataLoadCancellable";
+
+  /**
+   * @deprecated use {@link #ASYNC_LOAD_JOBNAME_PREFIX}
+   */
+  @Deprecated
+  String PROP_ASYNC_LOAD_JOBNAME_PREFIX = ASYNC_LOAD_JOBNAME_PREFIX;
+  /**
+   * @deprecated use {@link #ASYNC_LOAD_IDENTIFIER_PREFIX}
+   */
+  @Deprecated
+  String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = ASYNC_LOAD_IDENTIFIER_PREFIX;
+  /**
+   * @deprecated use {@link #WINDOW_IDENTIFIER_PREFIX}
+   */
+  @Deprecated
+  String PROP_WINDOW_IDENTIFIER_PREFIX = WINDOW_IDENTIFIER_PREFIX;
 
   String LOGICAL_GRID_HORIZONTAL = "HorizontalGrid";
   String LOGICAL_GRID_VERTICAL_SMART = "VerticalSmartGrid";
