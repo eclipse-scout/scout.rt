@@ -9,7 +9,7 @@
  */
 import {
   arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, CalendarsPanel, CalendarsPanelTreeNode, comparators, ContextMenuPopup, DateRange,
-  dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JQueryWheelEvent, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings,
+  dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings,
   TreeNodesCheckedEvent, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
@@ -527,9 +527,6 @@ export class Calendar extends Widget implements CalendarModel {
         }
       }
     }
-
-    // Register zoom handler
-    this.$grid.on('wheel', this._onZoomCtrlScrollListener.bind(this));
 
     this.$window = this.$container.window();
     this.$container.on('mousedown touchstart', this._onMouseDown.bind(this));
@@ -2374,20 +2371,5 @@ export class Calendar extends Widget implements CalendarModel {
       return 'default';
     }
     return scout.nvl(component.item.calendarId, 'default');
-  }
-
-  protected _onZoomCtrlScrollListener(event: JQueryWheelEvent) {
-    if (!event.ctrlKey) {
-      return;
-    }
-    event.preventDefault();
-    if (event.originalEvent.deltaY < 0) {
-      this.heightPerDivision += 2;
-    } else {
-      this.heightPerDivision -= 2;
-    }
-    this.heightPerHour = this.numberOfHourDivisions * this.heightPerDivision;
-    this.heightPerDay = 24 * this.heightPerHour;
-    this._updateScreen(false, false);
   }
 }
