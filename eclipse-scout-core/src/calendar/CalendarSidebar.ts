@@ -65,9 +65,10 @@ export class CalendarSidebar extends Widget {
   }
 
   setCalendarsPanelExpanded(expanded: boolean, animate = false) {
-    if (!this.splitter.collapsed === expanded) {
+    if (this.splitter.collapsed !== undefined && !this.splitter.collapsed === expanded) {
       return;
     }
+    // 62 is the golden ratio
     (this.htmlComp.layout as CalendarSidebarLayout).setNewSplitterPositionPercentage(expanded ? 62 : 100, animate);
     this.invalidateLayoutTree(false);
   }

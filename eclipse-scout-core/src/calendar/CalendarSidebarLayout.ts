@@ -80,29 +80,6 @@ export class CalendarSidebarLayout extends AbstractLayout {
     this.calendarSidebar.yearPanel._scrollYear();
   }
 
-  setNewSplitterPosition(pos: number, animate?: boolean) {
-    this._newSplitterPosition = pos;
-    this._animateNewSplitterPosition = animate;
-  }
-
-  setNewSplitterPositionPercentage(pos: number, animate?: boolean) {
-    this._newRelativeSplitterPosition = pos;
-    this._animateNewSplitterPosition = animate;
-  }
-
-  protected _setSplitterPosition(pos: number, animate?: boolean) {
-    if (!animate) {
-      this.splitter.setPosition(pos);
-    } else {
-      let opts: JQuery.EffectsOptions<HTMLElement> = {
-        progress: () => {
-          this.splitter.setPosition(this.splitter.$container.cssTop());
-        }
-      };
-      this.splitter.$container.animate({top: pos}, opts);
-    }
-  }
-
   protected _validateSplitterPosition(htmlComp: HtmlComponent, splitter: Splitter, availableSize: Dimension) {
     // Window has been resized -> preserve relative splitter position
     if (availableSize.height !== this._availableHeight) {
@@ -129,6 +106,19 @@ export class CalendarSidebarLayout extends AbstractLayout {
     this._relativeSplitterPosition = splitter.position / availableSize.height;
   }
 
+  protected _setSplitterPosition(pos: number, animate?: boolean) {
+    if (!animate) {
+      this.splitter.setPosition(pos);
+    } else {
+      let opts: JQuery.EffectsOptions<HTMLElement> = {
+        progress: () => {
+          this.splitter.setPosition(this.splitter.$container.cssTop());
+        }
+      };
+      this.splitter.$container.animate({top: pos}, opts);
+    }
+  }
+
   /**
    * Updates splitter position without triggerig re-layouting
    */
@@ -139,5 +129,15 @@ export class CalendarSidebarLayout extends AbstractLayout {
     } finally {
       htmlComp.suppressInvalidate = false;
     }
+  }
+
+  setNewSplitterPosition(pos: number, animate?: boolean) {
+    this._newSplitterPosition = pos;
+    this._animateNewSplitterPosition = animate;
+  }
+
+  setNewSplitterPositionPercentage(pos: number, animate?: boolean) {
+    this._newRelativeSplitterPosition = pos;
+    this._animateNewSplitterPosition = animate;
   }
 }
