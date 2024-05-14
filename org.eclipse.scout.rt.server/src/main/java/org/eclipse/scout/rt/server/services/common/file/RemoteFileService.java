@@ -21,7 +21,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -34,6 +36,12 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 public class RemoteFileService implements IRemoteFileService {
+
+  private static final String LOCALE_DELIMITER = "_";
+  private static final Pattern PATTERN_LOCALE_DELIMITER = Pattern.compile(LOCALE_DELIMITER);
+  private static final int LOCALE_TEXT_MAX_LENGTH = 64;
+  private static final Pattern LOCALE_SECURITY_PATTERN = Pattern.compile("[-a-z0-9_#]+", Pattern.CASE_INSENSITIVE);
+
   private String m_rootPath;
 
   public RemoteFileService() {
@@ -224,9 +232,7 @@ public class RemoteFileService implements IRemoteFileService {
     }
   }
 
-  private static final Pattern LOCALE_SECURITY_PATTERN = Pattern.compile("[a-z]+([_][a-z0-9]+)?([_][a-z0-9_]+)?", Pattern.CASE_INSENSITIVE);
-
-  private File getFileInternal(RemoteFile spec) {
+  protected File getFileInternal(RemoteFile spec) {
     File root = new File(getRootPath());
     File folder = null;
     if (spec.getDirectory() == null || spec.getDirectory().isEmpty()) {
@@ -256,43 +262,55 @@ public class RemoteFileService implements IRemoteFileService {
     if (canonicalSimpleName == null || !canonicalSimpleName.equals(spec.getName().startsWith("/") ? spec.getName().substring(1) : spec.getName())) {
       throw new SecurityException("invalid or unaccessible path");
     }
-    //
-    String filename = canonicalSimpleName;
-    if (spec.getLocale() != null && filename.lastIndexOf('.') != -1) {
-      //check locale string for hacking patterns (only allow
-      String localeText = spec.getLocale().toString().replaceAll("__", "_");
-      if (!LOCALE_SECURITY_PATTERN.matcher(localeText).matches()) {
-        throw new SecurityException("invalid or unaccessible path");
-      }
-      String[] checkedLocaleParts = localeText.split("_", 3);
-      String prefix = filename.substring(0, filename.lastIndexOf('.'));
-      String suffix = filename.substring(filename.lastIndexOf('.'));
-      for (int i = checkedLocaleParts.length - 1; i >= 0; i--) {
-        if (prefix.toLowerCase().endsWith(checkedLocaleParts[i].toLowerCase())) {
-          prefix = prefix.substring(0, prefix.length() - checkedLocaleParts[i].length());
-          if (prefix.endsWith("_")) {
-            prefix = prefix.substring(0, prefix.length() - 1);
-          }
-        }
-      }
-      if (!prefix.endsWith("_")) {
-        prefix = prefix + "_";
-      }
-      filename = prefix + localeText + suffix;
-      File test = new File(canonicalFolder, filename);
-      while (!test.exists()) {
-        if (localeText.indexOf('_') == -1) {
-          filename = canonicalSimpleName;
-          break;
-        }
-        localeText = localeText.substring(0, localeText.lastIndexOf('_'));
-        filename = prefix + localeText + suffix;
-        test = new File(canonicalFolder, filename);
-      }
-    }
-
+    String filename = tryAddLocaleToFileName(canonicalSimpleName, spec.getLocale(), canonicalFolder, file -> file.exists());
     File file = new File(canonicalFolder, filename);
     return file;
+  }
+
+  protected String tryAddLocaleToFileName(String filename, Locale locale, String canonicalFolder, Predicate<File> fileExistsPredicate) {
+    int suffixSeparatorIndex = filename.lastIndexOf('.');
+    if (locale == null || suffixSeparatorIndex == -1) {
+      return filename;
+    }
+    String localeText = locale.toString().replaceAll(LOCALE_DELIMITER + LOCALE_DELIMITER, LOCALE_DELIMITER);
+    if (localeText.length() > LOCALE_TEXT_MAX_LENGTH) {
+      return filename;
+    }
+    // make sure only valid locale characters are accepted.
+    if (!LOCALE_SECURITY_PATTERN.matcher(localeText).matches()) {
+      throw new SecurityException("invalid or inaccessible path");
+    }
+
+    String[] checkedLocaleParts = PATTERN_LOCALE_DELIMITER.splitAsStream(localeText)
+        .limit(3)
+        .map(s -> s.toLowerCase(Locale.ROOT))
+        .map(s -> LOCALE_DELIMITER + s)
+        .toArray(String[]::new);
+    String prefix = filename.substring(0, suffixSeparatorIndex);
+    String suffix = filename.substring(suffixSeparatorIndex);
+    // Remove locale parts from the filename if and only if they are an exact match.
+    for (int i = checkedLocaleParts.length - 1; i >= 0; i--) {
+      if (prefix.toLowerCase(Locale.ROOT).endsWith(checkedLocaleParts[i])) {
+        prefix = prefix.substring(0, prefix.length() - checkedLocaleParts[i].length());
+      }
+    }
+    if (!prefix.endsWith(LOCALE_DELIMITER)) {
+      prefix = prefix + LOCALE_DELIMITER;
+    }
+    // Check if a file containing the given locale name or parts of it exists.
+    // Otherwise, return the original filename
+    String extendedFilename = prefix + localeText + suffix;
+    File test = new File(canonicalFolder, extendedFilename);
+    while (!fileExistsPredicate.test(test)) {
+      if (localeText.indexOf(LOCALE_DELIMITER) == -1) {
+        extendedFilename = filename;
+        break;
+      }
+      localeText = localeText.substring(0, localeText.lastIndexOf(LOCALE_DELIMITER));
+      extendedFilename = prefix + localeText + suffix;
+      test = new File(canonicalFolder, filename);
+    }
+    return extendedFilename;
   }
 
   @Override
