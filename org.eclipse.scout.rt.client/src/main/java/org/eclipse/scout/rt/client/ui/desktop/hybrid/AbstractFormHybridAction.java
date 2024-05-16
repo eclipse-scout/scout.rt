@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,17 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 
+/**
+ * An action to remotely create, start and show a form.
+ * <p>
+ * A subclass has to create the form using {@link #createForm(IDoEntity)} and add a {@link HybridActionType} annotation
+ * with a value that either starts with {@link #CREATE_FORM_PREFIX} or {@link #OPEN_FORM_PREFIX}. If
+ * {@link #OPEN_FORM_PREFIX} is used, the form will not only be started but also shown (added to the desktop).
+ * <p>
+ * When the form is saved, reset or closed, an event is sent to the remote client to inform about the operation. The
+ * save event will also contain the data returned by {@link #exportResult(IForm)}. Implement this method or
+ * {@link #exportResult(IForm, IDoEntity)} to provide the data that should be returned in this case.
+ */
 public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY extends IDoEntity> extends AbstractHybridAction<DO_ENTITY> {
 
   private static final String OPEN_FORM = "openForm";
@@ -47,14 +58,12 @@ public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY ext
   protected void addFormListeners(FORM form) {
     form.addFormListener(e -> {
       if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
-        DO_ENTITY result = createEmptyResult();
-        exportResult(form, result);
+        DO_ENTITY result = exportResultInternal(form);
         fireHybridWidgetEvent("save", result);
       }
       else if (FormEvent.TYPE_RESET_COMPLETE == e.getType()) {
-        DO_ENTITY result = createEmptyResult();
-        exportResult(form, result);
-        fireHybridWidgetEvent("reset");
+        DO_ENTITY result = exportResultInternal(form);
+        fireHybridWidgetEvent("reset", result);
       }
       else if (FormEvent.TYPE_CLOSED == e.getType()) {
         fireHybridWidgetEvent("close");
@@ -72,6 +81,20 @@ public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY ext
       return (DO_ENTITY) BEANS.get(DoEntity.class);
     }
     return BEANS.get(getDoEntityClass());
+  }
+
+  protected DO_ENTITY exportResultInternal(FORM form) {
+    DO_ENTITY result = exportResult(form);
+    if (result == null) {
+      result = createEmptyResult();
+    }
+    return result;
+  }
+
+  protected DO_ENTITY exportResult(FORM form) {
+    DO_ENTITY result = createEmptyResult();
+    exportResult(form, result);
+    return result;
   }
 
   protected void exportResult(FORM form, DO_ENTITY result) {
