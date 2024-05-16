@@ -237,7 +237,8 @@ export class Calendar extends Widget implements CalendarModel {
   protected _createDefaultCalendar(): CalendarDescriptor {
     return {
       calendarId: UuidPool.ZERO_UUID,
-      selectable: true
+      selectable: true,
+      visible: true
     };
   }
 
@@ -917,7 +918,7 @@ export class Calendar extends Widget implements CalendarModel {
     let newSelectedCalendar = this.selectedCalendar;
     if (typeof selectedCalendar === 'string' || selectedCalendar instanceof String) {
       newSelectedCalendar = this._findCalendarForId(selectedCalendar as string);
-    } else {
+    } else if (selectedCalendar) {
       newSelectedCalendar = selectedCalendar as CalendarDescriptor;
     }
     if (newSelectedCalendar !== this.selectedCalendar && newSelectedCalendar.selectable) {

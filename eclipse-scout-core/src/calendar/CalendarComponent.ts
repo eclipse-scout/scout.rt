@@ -90,7 +90,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       this.setVisible(calendarDescriptor.visible);
     }
 
-    if (!this.isVisible()) {
+    if (!this.visible) {
       return;
     }
 
