@@ -641,7 +641,7 @@ describe('Calendar', () => {
       let calendarIdData = getCurrentCalendarIdFor(comp);
 
       // Assert
-      expect(calendarIdData).toEqual('default');
+      expect(calendarIdData).toEqual(calendar.defaultCalendar.calendarId);
     });
 
     it('should render components with calendarId in corresponding column in day view', () => {
@@ -674,9 +674,9 @@ describe('Calendar', () => {
       let calendarIdForMonth = getCurrentCalendarIdFor(comp);
 
       // Assert
-      expect(calendarIdForWeek).toBe('default');
+      expect(calendarIdForWeek).toBe(calendar.defaultCalendar.calendarId);
       expect(calendarIdForDay).toBe(businessCalendar.calendarId);
-      expect(calendarIdForMonth).toBe('default');
+      expect(calendarIdForMonth).toBe(calendar.defaultCalendar.calendarId);
     });
 
     it('should hide components, when calendar is made invisible on week view', () => {
