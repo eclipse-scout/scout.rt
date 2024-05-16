@@ -72,30 +72,77 @@ describe('Calendar', () => {
         return container.width();
       };
 
-      it('should expand the year panel when showYearPanel is true', () => {
+      const getContainterHeight = (container: JQuery): number => {
+        return container.height();
+      };
+
+      it('should expand the calendar sidebar when showCalendarSidebar is true', () => {
         // Arrange
-        let model = {parent: session.desktop, showYearPanel: true};
+        let model = {parent: session.desktop, showCalendarSidebar: true};
         let cal = scout.create(Calendar, model);
 
         // Act
         cal.render();
-        let yearPanelWidth = getContainterWidth(cal.calendarSidebar.yearPanel.$container);
+        let calendarSidebarWidth = getContainterWidth(cal.calendarSidebar.$container);
+        let yearPanelWidth = getContainterWidth(cal.calendarSidebar.$container);
 
         // Assert
+        expect(calendarSidebarWidth).toBeGreaterThan(0);
         expect(yearPanelWidth).toBeGreaterThan(0);
       });
 
-      it('should expand the calendars panel when showCalendarsPanel is true', () => {
+      it('should not expand the calendar sidebar when showCalendarSidebar is false', () => {
         // Arrange
-        let model = {parent: session.desktop, showCalendarsPanel: true};
+        let model = {parent: session.desktop, showCalendarSidebar: false};
         let cal = scout.create(Calendar, model);
 
         // Act
         cal.render();
-        let calendarsPanelWidth = getContainterWidth(cal.calendarSidebar.calendarsPanel.$container);
+        let calendarSidebarWidth = getContainterWidth(cal.calendarSidebar.$container);
 
         // Assert
-        expect(calendarsPanelWidth).toBeGreaterThan(0);
+        expect(calendarSidebarWidth).toBe(0);
+      });
+
+      it('should expand the calendar sidebar and the calendars panel', () => {
+        // Arrange
+        let model = {
+          parent: session.desktop,
+          showCalendarSidebar: true,
+          showCalendarsPanel: true,
+          calendars: [{calendarId: 'a'}, {calendarId: 'b'}]
+        };
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        cal.calendarSidebar.revalidateLayout();
+        let calendarSidebarWidth = getContainterWidth(cal.calendarSidebar.$container);
+        let calendarsPanelHeight = getContainterHeight(cal.calendarSidebar.calendarsPanel.$container);
+
+        // Assert
+        expect(calendarSidebarWidth).toBeGreaterThan(0);
+        expect(calendarsPanelHeight).toBeGreaterThan(40);
+      });
+
+      it('should not expand the calendars panel', () => {
+        // Arrange
+        let model = {
+          parent: session.desktop,
+          showCalendarSidebar: true,
+          showCalendarsPanel: false,
+          calendars: [{calendarId: 'a'}, {calendarId: 'b'}]
+        };
+        let cal = scout.create(Calendar, model);
+
+        // Act
+        cal.render();
+        let calendarSidebarWidth = getContainterWidth(cal.calendarSidebar.$container);
+        let calendarsPanelHeight = getContainterHeight(cal.calendarSidebar.calendarsPanel.$container);
+
+        // Assert
+        expect(calendarSidebarWidth).toBeGreaterThan(0);
+        expect(calendarsPanelHeight).toBeLessThan(40);
       });
 
       it('should expand the list panel when showListPanel is true', () => {
@@ -729,10 +776,10 @@ describe('Calendar', () => {
       expect(externalComp.fullDayIndex).toBe(0);
     });
 
-    describe('calendars menu visible', () => {
+    describe('multiple calendar selection visible', () => {
 
-      const isCalendarsMenuVisible = (calendar: Calendar): boolean => {
-        return !calendar.$commands.children('.calendar-toggle-calendars').hasClass('hidden');
+      const isCalendarsSelectionVisible = (calendar: Calendar): boolean => {
+        return calendar.calendarSidebar.calendarsPanel.$container.height() > 40;
       };
 
       it('should hide calendars menu when no calendar is set', () => {
@@ -740,7 +787,7 @@ describe('Calendar', () => {
         let calendar = initCalendar();
 
         // Act
-        let menuVisible = isCalendarsMenuVisible(calendar);
+        let menuVisible = isCalendarsSelectionVisible(calendar);
 
         // Assert
         expect(menuVisible).toBe(false);
@@ -752,7 +799,7 @@ describe('Calendar', () => {
         let calendar = initCalendar(calDesc);
 
         // Act
-        let menuVisible = isCalendarsMenuVisible(calendar);
+        let menuVisible = isCalendarsSelectionVisible(calendar);
 
         // Assert
         expect(menuVisible).toBe(false);
@@ -765,7 +812,7 @@ describe('Calendar', () => {
         let calendar = initCalendar(businessCal, otherCal);
 
         // Act
-        let menuVisible = isCalendarsMenuVisible(calendar);
+        let menuVisible = isCalendarsSelectionVisible(calendar);
 
         // Assert
         expect(menuVisible).toBe(true);
@@ -778,9 +825,9 @@ describe('Calendar', () => {
         let calendar = initCalendar(businessCal);
 
         // Act
-        let menuVisibleFirst = isCalendarsMenuVisible(calendar);
+        let menuVisibleFirst = isCalendarsSelectionVisible(calendar);
         calendar.setCalendars([...calendar.calendars, otherCal]);
-        let menuVisibleAfter = isCalendarsMenuVisible(calendar);
+        let menuVisibleAfter = isCalendarsSelectionVisible(calendar);
 
         // Assert
         expect(menuVisibleFirst).toBe(false);
