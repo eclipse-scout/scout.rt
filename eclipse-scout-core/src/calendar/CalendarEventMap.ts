@@ -19,7 +19,7 @@ export interface CalendarVisibilityChangeEvent<C extends Calendar = Calendar> ex
 }
 
 export interface SelectedCalendarChangeEvent<C extends Calendar = Calendar> extends Event<C> {
-  calendarId: number;
+  calendarId: string;
 }
 
 export interface CalendarEventMap extends WidgetEventMap {

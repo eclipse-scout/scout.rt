@@ -221,12 +221,12 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       }).eq(0);
   }
 
-  protected _findCalendarColumnInDay($day: JQuery, calendarId: string | number): JQuery {
+  protected _findCalendarColumnInDay($day: JQuery, calendarId: string): JQuery {
     if (!this.parent.isDay() || !calendarId) {
-      calendarId = 'default';
+      calendarId = this.parent.defaultCalendar.calendarId;
     }
     return $day.find('.calendar-column')
-      .filter((index: number, element: HTMLSelectElement) => $(element).data('calendarId').toString() === calendarId.toString());
+      .filter((index: number, element: HTMLSelectElement) => $(element).data('calendarId') === calendarId);
   }
 
   protected _isTask(): boolean {

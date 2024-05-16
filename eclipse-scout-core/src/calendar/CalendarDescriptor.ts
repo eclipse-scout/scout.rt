@@ -11,8 +11,8 @@ export interface CalendarDescriptor {
   calendarId: string;
   name?: string;
   parentId?: string;
-  visible: boolean;
-  selectable: boolean;
+  visible?: boolean;
+  selectable?: boolean;
   cssClass?: string;
   order?: number;
 }

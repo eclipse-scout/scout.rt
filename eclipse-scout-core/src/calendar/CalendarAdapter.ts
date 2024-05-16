@@ -106,8 +106,15 @@ export class CalendarAdapter extends ModelAdapter {
   }
 
   protected _sendSelectedCalendarChange(event: SelectedCalendarChangeEvent) {
+    let selectedCalendarId = event.calendarId;
+
+    // Do not send the default calendar to java, because it's not known there
+    if (event.calendarId === this.widget.defaultCalendar.calendarId) {
+      selectedCalendarId = null;
+    }
+
     this._send('selectedCalendarChange', {
-      calendarId: event.calendarId
+      calendarId: selectedCalendarId
     });
   }
 }
