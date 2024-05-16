@@ -176,7 +176,7 @@ public class JsonHybridManagerTest {
     form.getDummyField().setValue(null);
 
     form.doReset();
-    verify(jsonHybridManager).handleModelHybridEvent(eq(HybridEvent.createHybridWidgetEvent(getHybridManager(), id, "reset")));
+    verify(jsonHybridManager).handleModelHybridEvent(eq(HybridEvent.createHybridWidgetEvent(getHybridManager(), id, "reset", dummyDo)));
 
     form.doOk();
     verify(jsonHybridManager, never()).handleModelHybridEvent(eq(HybridEvent.createHybridWidgetEvent(getHybridManager(), id, "save", dummyDo)));
