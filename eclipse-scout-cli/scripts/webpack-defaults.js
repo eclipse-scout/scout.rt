@@ -560,16 +560,28 @@ function getModuleName() {
  * @returns a function that should be added to the webpack externals
  */
 function rewriteIndexImports(newImport, excludedFolder) {
+  // If an import ends by one of these names, it is considered an index import.
+  let indexImports = ['index', 'main/js'];
+
   return ({context, request, contextInfo}, callback) => {
-    // Externalize every import to the main index and replace it with @bsi-scout/datamodel
-    // Keep imports to the testing index
-    if (/\/index$/.test(request) && !path.resolve(context, request).includes(excludedFolder)) {
+    // Externalize every import to the main index and replace it with newImport
+    // Keep imports pointing to excludedFolder
+    if (isIndexImport(request) && !path.resolve(context, request).includes(excludedFolder)) {
       return callback(null, newImport);
     }
 
     // Continue without externalizing the import
     callback();
   };
+
+  function isIndexImport(path) {
+    for (let imp of indexImports) {
+      if (path.endsWith(imp)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 function computeTypeCheck(typeCheck, devMode, watchMode) {
