@@ -11,7 +11,7 @@ package org.eclipse.scout.rt.dataobject.id;
 
 import static org.eclipse.scout.rt.platform.security.SecurityUtility.createMac;
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
-import static org.eclipse.scout.rt.platform.util.Base64Utility.encode;
+import static org.eclipse.scout.rt.platform.util.Base64Utility.encodeUrlSafe;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashSet;
 import static org.eclipse.scout.rt.platform.util.ObjectUtility.isOneOf;
 import static org.eclipse.scout.rt.platform.util.StringUtility.isNullOrEmpty;
@@ -196,11 +196,11 @@ public class IdCodec {
    *
    * @return an url safe signature
    */
-  protected String createSignature(String unqualifiedId) {
+  public String createSignature(String unqualifiedId) {
     if (isNullOrEmpty(unqualifiedId)) {
       return "";
     }
-    return encode(createMac(getIdSignaturePassword(), unqualifiedId.getBytes(StandardCharsets.UTF_8)));
+    return encodeUrlSafe(createMac(getIdSignaturePassword(), unqualifiedId.getBytes(StandardCharsets.UTF_8)));
   }
 
   /**
@@ -364,7 +364,7 @@ public class IdCodec {
    * </ul>
    * This will split the signed unqualifiedId into the id and its signature and assert the signature's validity.
    */
-  protected String removeSignature(Class<? extends IId> idClass, String unqualifiedId, Set<IIdCodecFlag> flags) {
+  public String removeSignature(Class<? extends IId> idClass, String unqualifiedId, Set<IIdCodecFlag> flags) {
     String[] unqualifiedIdSignatureParts = splitToSignatureParts(unqualifiedId);
     assertSignature(idClass, unqualifiedIdSignatureParts, flags);
     return unqualifiedIdSignatureParts[0];

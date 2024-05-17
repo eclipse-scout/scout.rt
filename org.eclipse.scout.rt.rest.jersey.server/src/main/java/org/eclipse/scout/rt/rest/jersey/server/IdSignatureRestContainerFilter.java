@@ -50,7 +50,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
  * Filter that adds an object mapper supporting signature creation for serialization/deserialization of request and
  * response. In addition, the {@link AbstractIdCodecParamConverter}s provided by {@link IIdParamConverterProvider} are
  * will also use signatures. This feature can be enabled depending on the context e.g. headers of the request. By
- * default, it is always active.
+ * default, it checks the {@link IdSignatureRestContainerFilter#ID_SIGNATURE_HTTP_HEADER}.
  */
 public class IdSignatureRestContainerFilter implements IRestContainerRequestFilter, IRestContainerResponseFilter {
   public static final String ID_SIGNATURE_HTTP_HEADER = "X-ScoutIdSignature";
@@ -92,7 +92,7 @@ public class IdSignatureRestContainerFilter implements IRestContainerRequestFilt
 
   /**
    * Check the {@link ContainerRequestContext} and {@link ContainerResponseContext} if signature creation needs to be
-   * enabled. Default implementation returns {@code false}.
+   * enabled.
    */
   protected boolean enableSignature(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     return enableSignature(requestContext) || enableSignature(responseContext);

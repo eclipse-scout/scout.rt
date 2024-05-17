@@ -40,7 +40,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public class IdSignatureRestContainerFilterTest {
+public class IdSignatureRestFilterTest {
 
   protected static IBean<?> s_bean;
 
@@ -70,36 +70,57 @@ public class IdSignatureRestContainerFilterTest {
 
   @Test
   public void testSigned() {
+    var singleIdDo = BEANS.get(SingleIdDo.class)
+        .withId(FixtureIntegerId.of(42));
     var request = BEANS.get(SerializationRequest.class)
-        .withBody(BEANS.get(SingleIdDo.class)
-            .withId(FixtureIntegerId.of(42)));
+        .withBody(singleIdDo);
 
     // ids need to be signed, but are not signed -> exception
     assertThrows(VetoException.class, () -> request()
         .header(IdSignatureRestContainerFilter.ID_SIGNATURE_HTTP_HEADER, Boolean.TRUE.toString())
         .post(Entity.json(BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(request)), SerializationResponse.class));
 
-    assertEquals("{\"id\":\"scout.FixtureIntegerId:42\"}",
+    assertEquals(
+        BEANS.get(SerializationResponse.class)
+            .withOriginal(singleIdDo)
+            .withSerialized("{\"_type\":\"scout.SingleId\",\"id\":\"scout.FixtureIntegerId:42\"}"),
         request()
             .header(IdSignatureRestContainerFilter.ID_SIGNATURE_HTTP_HEADER, Boolean.TRUE.toString())
-            .post(Entity.json(BEANS.get(IIdSignatureDataObjectMapper.class).writeValue(request)), SerializationResponse.class)
-            .getSerialized());
+            .post(Entity.json(BEANS.get(IIdSignatureDataObjectMapper.class).writeValue(request)), SerializationResponse.class));
+
+    assertEquals(
+        BEANS.get(SerializationResponse.class)
+            .withOriginal(singleIdDo)
+            .withSerialized("{\"_type\":\"scout.SingleId\",\"id\":\"scout.FixtureIntegerId:42\"}"),
+        request()
+            .header(IdSignatureRestContainerFilter.ID_SIGNATURE_HTTP_HEADER, Boolean.TRUE.toString())
+            .post(Entity.json(request), SerializationResponse.class));
   }
 
   @Test
   public void testUnsigned() {
+    var singleIdDo = BEANS.get(SingleIdDo.class)
+        .withId(FixtureIntegerId.of(42));
     var request = BEANS.get(SerializationRequest.class)
-        .withBody(BEANS.get(SingleIdDo.class)
-            .withId(FixtureIntegerId.of(42)));
+        .withBody(singleIdDo);
 
-    assertEquals("{\"id\":\"scout.FixtureIntegerId:42\"}",
+    assertEquals(
+        BEANS.get(SerializationResponse.class)
+            .withOriginal(singleIdDo)
+            .withSerialized("{\"_type\":\"scout.SingleId\",\"id\":\"scout.FixtureIntegerId:42\"}"),
         request()
-            .post(Entity.json(BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(request)), SerializationResponse.class)
-            .getSerialized());
+            .post(Entity.json(BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(request)), SerializationResponse.class));
 
     // ids need to be not signed, but are signed -> exception
     assertThrows(VetoException.class, () -> request()
         .post(Entity.json(BEANS.get(IIdSignatureDataObjectMapper.class).writeValue(request)), SerializationResponse.class));
+
+    assertEquals(
+        BEANS.get(SerializationResponse.class)
+            .withOriginal(singleIdDo)
+            .withSerialized("{\"_type\":\"scout.SingleId\",\"id\":\"scout.FixtureIntegerId:42\"}"),
+        request()
+            .post(Entity.json(request), SerializationResponse.class));
   }
 
   protected static class P_IdCodec extends IdCodec {

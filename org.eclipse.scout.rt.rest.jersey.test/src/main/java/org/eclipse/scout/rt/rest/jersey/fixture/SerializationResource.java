@@ -25,6 +25,7 @@ public class SerializationResource implements IRestResource {
   @Consumes(MediaType.APPLICATION_JSON)
   public SerializationResponse serialize(SerializationRequest request) {
     return BEANS.get(SerializationResponse.class)
-        .withSerialized(BEANS.get(IDataObjectMapper.class).writeValue(request.body()));
+        .withOriginal(request.getBody())
+        .withSerialized(BEANS.get(IDataObjectMapper.class).writeValue(request.getBody()));
   }
 }

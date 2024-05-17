@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,7 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientResponseFilter;
 import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Configuration;
@@ -120,6 +121,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   protected void initClientBuilder(ClientBuilder clientBuilder) {
     registerContextResolvers(clientBuilder);
     registerRequestFilters(clientBuilder);
+    registerResponseFilters(clientBuilder);
     configureClientBuilder(clientBuilder);
   }
 
@@ -156,6 +158,12 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
     }
   }
 
+  protected void registerResponseFilters(ClientBuilder clientBuilder) {
+    for (ClientResponseFilter filter : getResponseFiltersToRegister()) {
+      clientBuilder.register(filter);
+    }
+  }
+
   protected void configureClientBuilder(ClientBuilder clientBuilder) {
     for (IGlobalRestClientConfigurator configurator : getClientConfigurators()) {
       configurator.configure(clientBuilder);
@@ -176,6 +184,14 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    */
   protected List<ClientRequestFilter> getRequestFiltersToRegister() {
     return new ArrayList<>(BEANS.all(IGlobalRestRequestFilter.class));
+  }
+
+  /**
+   * @return list of response filters for this REST client helper. Result is modifiable and never <code>null</code>. Can
+   * be overridden by subclasses. The default returns all {@link IGlobalRestResponseFilter} beans.
+   */
+  protected List<ClientResponseFilter> getResponseFiltersToRegister() {
+    return new ArrayList<>(BEANS.all(IGlobalRestResponseFilter.class));
   }
 
   /**

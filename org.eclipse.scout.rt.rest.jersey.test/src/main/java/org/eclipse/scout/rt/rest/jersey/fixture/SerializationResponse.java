@@ -13,10 +13,15 @@ import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("scout.SerializationResponse")
 public class SerializationResponse extends DoEntity {
+
+  public DoValue<IDoEntity> original() {
+    return doValue("original");
+  }
 
   public DoValue<String> serialized() {
     return doValue("serialized");
@@ -25,6 +30,17 @@ public class SerializationResponse extends DoEntity {
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public SerializationResponse withOriginal(IDoEntity original) {
+    original().set(original);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IDoEntity getOriginal() {
+    return original().get();
+  }
 
   @Generated("DoConvenienceMethodsGenerator")
   public SerializationResponse withSerialized(String serialized) {
