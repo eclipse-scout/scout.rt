@@ -8,15 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {CalendarSidebarLayout, CalendarSidebarSplitter, CalendarsPanel, Event, HtmlComponent, InitModelOf, scout, SplitterPositionChangeEvent, Widget, YearPanel} from '../index';
+import {CalendarSidebarLayout, CalendarSidebarModel, CalendarSidebarSplitter, CalendarsPanel, Event, HtmlComponent, InitModelOf, scout, SplitterPositionChangeEvent, Widget, YearPanel} from '../index';
 
-export class CalendarSidebar extends Widget {
+export class CalendarSidebar extends Widget implements CalendarSidebarModel {
+  declare model: CalendarSidebarModel;
+
   yearPanel: YearPanel;
   splitter: CalendarSidebarSplitter;
   calendarsPanel: CalendarsPanel;
 
   calendarsPanelDisplayable: boolean;
-  animationEnabled: boolean;
+  /**
+   * Indicates, if the layout process is animated or not
+   */
+  protected _animationEnabled: boolean;
 
   constructor() {
     super();
@@ -24,6 +29,8 @@ export class CalendarSidebar extends Widget {
     this.yearPanel = null;
     this.splitter = null;
     this.calendarsPanel = null;
+    this.calendarsPanelDisplayable = false;
+    this._animationEnabled = false;
   }
 
   override init(model: InitModelOf<this>) {
@@ -56,7 +63,7 @@ export class CalendarSidebar extends Widget {
     this.calendarsPanel.render();
   }
 
-  _onSplitterPositionChange(event: SplitterPositionChangeEvent) {
+  protected _onSplitterPositionChange(event: SplitterPositionChangeEvent) {
     this.invalidateLayoutTree(false);
   }
 
@@ -74,7 +81,11 @@ export class CalendarSidebar extends Widget {
   }
 
   setCalendarsPanelDisplayable(displayable: boolean) {
-    this.calendarsPanelDisplayable = displayable;
+    this.setProperty('calendarsPanelDisplayable', displayable);
+  }
+
+  protected _setCalendarsPanelDisplayable(displayable: boolean) {
+    this._setProperty('calendarsPanelDisplayable', displayable);
     this.invalidateLayoutTree(false);
   }
 }

@@ -625,6 +625,7 @@ export * from './calendar/CalendarsPanelTreeNode';
 export * from './calendar/CalendarsPanelTreeNodeModel';
 export * from './calendar/CalendarSidebar';
 export * from './calendar/CalendarSidebarLayout';
+export * from './calendar/CalendarSidebarModel';
 export * from './calendar/CalendarSidebarSplitter';
 export * from './calendar/CalendarSidebarSplitterModel';
 export * from './calendar/CalendarSidebarSplitterEventMap';
