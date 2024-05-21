@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Accordion, arrays, Comparator, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, InitModelOf, KeyStrokeContext, ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, scout,
-  TextFilter, Tile, TileAccordionEventMap, TileAccordionLayout, TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
+  Accordion, arrays, Comparator, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, InitModelOf, KeyStrokeContext, ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, Rectangle,
+  scout, TextFilter, Tile, TileAccordionEventMap, TileAccordionLayout, TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
 } from '../../index';
 
 export class TileAccordion<TTile extends Tile = Tile> extends Accordion implements TileAccordionModel {
@@ -453,7 +453,7 @@ export class TileAccordion<TTile extends Tile = Tile> extends Accordion implemen
   findVisibleTileIndexAt(x: number, y: number, startIndex?: number, reverse?: boolean): number {
     startIndex = scout.nvl(startIndex, 0);
     return arrays.findIndexFrom(this.getVisibleTiles(), startIndex, (tile, i) => {
-      return this.getVisibleGridX(tile) === x && this.getVisibleGridY(tile) === y;
+      return new Rectangle(this.getVisibleGridX(tile), this.getVisibleGridY(tile), tile.gridData.w, tile.gridData.h).contains(x, y);
     }, reverse);
   }
 

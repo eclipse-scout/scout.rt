@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,6 +31,7 @@ export class TileGridSelectRightKeyStroke extends TileGridSelectKeyStroke {
   }
 
   protected override _computeNewSelection(extend?: boolean): TileGridSelectionInstruction {
-    return this.getSelectionHandler().computeSelectionX(1, extend);
+    let focusedTile = this.getSelectionHandler().computeFocusedTile();
+    return this.getSelectionHandler().computeSelectionX(focusedTile ? focusedTile.gridData.w : 1, extend);
   }
 }

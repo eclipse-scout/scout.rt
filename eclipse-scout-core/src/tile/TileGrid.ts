@@ -1266,7 +1266,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   findTileIndexAt(x: number, y: number, startIndex?: number, reverse?: boolean): number {
     startIndex = scout.nvl(startIndex, 0);
     return arrays.findIndexFrom(this._filteredTiles, startIndex, (tile, i) => {
-      return tile.gridData.x === x && tile.gridData.y === y;
+      return tile.gridData.toRectangle().contains(x, y);
     }, reverse);
   }
 

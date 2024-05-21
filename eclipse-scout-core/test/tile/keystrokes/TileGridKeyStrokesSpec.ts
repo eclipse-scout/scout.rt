@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -101,6 +101,56 @@ describe('TileGridKeyStrokes', () => {
 
       JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
       expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+    });
+
+    it('selects the next tile even if the focused tile has w > 1', () => {
+      let tileGrid = createTileGrid(4, {
+        selectable: true
+      });
+      let tiles = tileGrid.tiles;
+      tiles[0].setGridDataHints(tiles[0].gridDataHints.clone({w: 2}));
+      tiles[1].setGridDataHints(tiles[1].gridDataHints.clone({w: 2}));
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.selectTile(tiles[1]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+    });
+
+    it('selects the next tile even if the next tile has h > 1', () => {
+      let tileGrid = createTileGrid(6, {
+        selectable: true,
+        gridColumnCount: 3
+      });
+      let tiles = tileGrid.tiles;
+      tiles[1].setGridDataHints(tiles[1].gridDataHints.clone({h: 2}));
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.selectTile(tiles[0]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+
+      // Same result if first tile on second row is selected
+      tileGrid.selectTile(tiles[3]);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.RIGHT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[2]]);
       JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.RIGHT);
     });
 
@@ -278,6 +328,56 @@ describe('TileGridKeyStrokes', () => {
       JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
     });
 
+    it('selects the previous tile even if focused tile has w > 1', () => {
+      let tileGrid = createTileGrid(4, {
+        selectable: true
+      });
+      let tiles = tileGrid.tiles;
+      tiles[0].setGridDataHints(tiles[0].gridDataHints.clone({w: 2}));
+      tiles[1].setGridDataHints(tiles[1].gridDataHints.clone({w: 2}));
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.selectTile(tiles[2]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+    });
+
+    it('selects the previous tile even if the previous tile has h > 1', () => {
+      let tileGrid = createTileGrid(6, {
+        selectable: true,
+        gridColumnCount: 3
+      });
+      let tiles = tileGrid.tiles;
+      tiles[1].setGridDataHints(tiles[1].gridDataHints.clone({h: 2}));
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.selectTile(tiles[2]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+
+      // Same result if last tile on second row is selected
+      tileGrid.selectTile(tiles[4]);
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.LEFT);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.LEFT);
+    });
+
     it('selects the last tile if no tile is selected yet', () => {
       let tileGrid = createTileGrid(4, {
         selectable: true
@@ -442,6 +542,27 @@ describe('TileGridKeyStrokes', () => {
         gridColumnCount: 3
       });
       let tiles = tileGrid.tiles;
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.selectTile(tiles[0]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.DOWN);
+      expect(tileGrid.selectedTiles).toEqual([tiles[6]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.DOWN);
+    });
+
+    it('selects the tile below even if the focused tile has h > 1', () => {
+      let tileGrid = createTileGrid(8, {
+        selectable: true,
+        gridColumnCount: 2
+      });
+      let tiles = tileGrid.tiles;
+      tiles[0].setGridDataHints(tiles[0].gridDataHints.clone({h: 2}));
+      tiles[3].setGridDataHints(tiles[3].gridDataHints.clone({h: 2}));
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
@@ -645,6 +766,27 @@ describe('TileGridKeyStrokes', () => {
 
       JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
       expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
+    });
+
+    it('selects the tile above even if the focused tile has h > 1', () => {
+      let tileGrid = createTileGrid(8, {
+        selectable: true,
+        gridColumnCount: 2
+      });
+      let tiles = tileGrid.tiles;
+      tiles[0].setGridDataHints(tiles[0].gridDataHints.clone({h: 2}));
+      tiles[3].setGridDataHints(tiles[3].gridDataHints.clone({h: 2}));
+      tileGrid.render();
+      tileGrid.validateLayout();
+      tileGrid.selectTile(tiles[6]);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      expect(tileGrid.selectedTiles).toEqual([tiles[3]]);
+      JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
+
+      JQueryTesting.triggerKeyDownCapture(tileGrid.$container, keys.UP);
+      expect(tileGrid.selectedTiles).toEqual([tiles[0]]);
       JQueryTesting.triggerKeyUpCapture(tileGrid.$container, keys.UP);
     });
 

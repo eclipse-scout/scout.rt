@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,10 +29,10 @@ export class TileGridSelectionHandler {
 
     let $tile = $(event.currentTarget);
     let tile = $tile.data('widget');
-
     if (tile instanceof PlaceholderTile) {
       return;
     }
+
     if (tile.selected && event.which === 3) {
       // Do not toggle if context menus should be shown and tile already is selected
       return;
@@ -161,6 +161,29 @@ export class TileGridSelectionHandler {
   }
 
   /**
+   * @returns the focused tile if there is one.
+   *          Otherwise, returns the last tile of the selection if diff is > 0 and the first tile if diff is <= 0.
+   *          If there is no focused tile and no selection, null is returned.
+   */
+  computeFocusedTile(diff = 1): Tile {
+    // Focused tile may be null if tile has been deleted or if the user has not made a selection before
+    let focusedTile = this.getFocusedTile();
+    if (focusedTile) {
+      return focusedTile;
+    }
+    let selectedTiles = this.getSelectedTiles();
+    if (selectedTiles.length === 0) {
+      return null;
+    }
+    if (diff > 0) {
+      // Navigate down/right
+      return arrays.last(selectedTiles);
+    }
+    // Navigate up/left
+    return arrays.first(selectedTiles);
+  }
+
+  /**
    * Only sets the focus if event does not prevent the default and the tile does not have the class 'unfocusable'.
    */
   protected _checkAndSetFocusedTile(event: JQuery.MouseDownEvent, tile: Tile) {
@@ -205,41 +228,47 @@ export class TileGridSelectionHandler {
   }
 
   computeSelectionX(xDiff: number, extend: boolean): TileGridSelectionInstruction {
-    let tiles = this.getVisibleTiles();
-    let focusedTile = null;
-    let focusedTileIndex = -1;
-    let result = this._computeFocusedTile(xDiff);
-    if (result.selectedTiles !== null) {
+    let result = this._computeFocusedTileOrSelection(xDiff);
+    if (result.selectedTiles) {
       // New selection could be determined already -> return it;
       return result;
     }
-    focusedTile = result.focusedTile;
-    focusedTileIndex = tiles.indexOf(focusedTile);
-    return this.computeSelectionBetween(focusedTileIndex, focusedTileIndex + xDiff, extend);
+
+    let focusedTile = result.focusedTile;
+    let tiles = this.getVisibleTiles();
+    let focusedTileIndex = tiles.indexOf(focusedTile);
+    let focusedTileRow = this.getVisibleGridY(focusedTile);
+    let focusedTileColumn = this.getVisibleGridX(focusedTile);
+    // Look for the tile in the next or previous column (depending on xDiff) in the same row.
+    // We cannot just take the next tile in the tiles array because tiles may span multiple rows (h > 1), so the tile next to the focused tile is not necessarily the next tile in the array.
+    let newFocusedTileIndex = this.findVisibleTileIndexAt(focusedTileColumn + xDiff, focusedTileRow, xDiff > 0 ? 0 : focusedTileIndex, xDiff < 0);
+    if (newFocusedTileIndex < 0) {
+      // newFocusedTileIndex may be -1 if focusedTile is in the last column and xDiff > 0 or in the first column and xDiff < 0
+      // In that case, just take the next tile
+      newFocusedTileIndex = focusedTileIndex + (xDiff > 0 ? 1 : -1);
+    }
+    return this.computeSelectionBetween(focusedTileIndex, newFocusedTileIndex, extend);
   }
 
   computeSelectionY(yDiff: number, extend: boolean): TileGridSelectionInstruction {
-    let tiles = this.getVisibleTiles();
-    let focusedTile = null;
-    let focusedTileRow = -1;
-    let focusedTileColumn = -1;
-    let focusedTileIndex = -1;
-    let rowCount = this.getVisibleGridRowCount();
-    let result = this._computeFocusedTile(yDiff);
-    if (result.selectedTiles !== null) {
+    let result = this._computeFocusedTileOrSelection(yDiff);
+    if (result.selectedTiles) {
       // New selection could be determined already -> return it;
       return result;
     }
-    focusedTile = result.focusedTile;
-    focusedTileIndex = tiles.indexOf(focusedTile);
-    focusedTileRow = this.getVisibleGridY(focusedTile);
-    focusedTileColumn = this.getVisibleGridX(focusedTile);
+
+    let rowCount = this.getVisibleGridRowCount();
+    let focusedTile = result.focusedTile;
+    let focusedTileRow = this.getVisibleGridY(focusedTile);
+    let focusedTileColumn = this.getVisibleGridX(focusedTile);
     if (yDiff > 0 && focusedTileRow === rowCount - 1 ||
       yDiff < 0 && focusedTileRow === 0) {
       // Do nothing if focused tile is in the last row (navigate down) or first row (navigate up)
       return;
     }
 
+    let tiles = this.getVisibleTiles();
+    let focusedTileIndex = tiles.indexOf(focusedTile);
     let newFocusedTileIndex = this.findVisibleTileIndexAt(focusedTileColumn, focusedTileRow + yDiff, focusedTileIndex, yDiff < 0);
     if (newFocusedTileIndex < 0) {
       let tileGrid = this.getTileGridByRow(focusedTileRow + yDiff);
@@ -253,58 +282,52 @@ export class TileGridSelectionHandler {
 
   computeSelectionToFirst(extend: boolean): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
-    let focusedTile = this.getFocusedTile();
-    let focusedTileIndex = -1;
     let selectedTiles = this.getSelectedTiles();
     if (selectedTiles.length === 0) {
       // Select first tile if no tiles are selected
-      focusedTile = arrays.first(tiles);
+      let focusedTile = arrays.first(tiles);
       return {
         selectedTiles: [focusedTile],
         focusedTile: focusedTile
       };
     }
 
-    // Focused tile may be null if tile has been deleted or if the user has not made a selection before
-    if (!focusedTile) {
-      focusedTile = arrays.last(selectedTiles);
-    }
-    focusedTileIndex = tiles.indexOf(focusedTile);
+    let focusedTileIndex = tiles.indexOf(this.computeFocusedTile());
     return this.computeSelectionBetween(focusedTileIndex, 0, extend);
   }
 
   computeSelectionToLast(extend: boolean): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
-    let focusedTile = this.getFocusedTile();
-    let focusedTileIndex = -1;
     let selectedTiles = this.getSelectedTiles();
     if (selectedTiles.length === 0) {
       // Select last tile if no tiles are selected
-      focusedTile = arrays.last(tiles);
+      let focusedTile = arrays.last(tiles);
       return {
         selectedTiles: [focusedTile],
         focusedTile: focusedTile
       };
     }
-
-    // Focused tile may be null if tile has been deleted or if the user has not made a selection before
-    if (!focusedTile) {
-      focusedTile = arrays.last(selectedTiles);
-    }
-    focusedTileIndex = tiles.indexOf(focusedTile);
+    let focusedTileIndex = tiles.indexOf(this.computeFocusedTile());
     return this.computeSelectionBetween(focusedTileIndex, tiles.length - 1, extend);
   }
 
-  protected _computeFocusedTile(diff: number): TileGridSelectionInstruction {
+  /**
+   * If no tiles are selected, an object is returned containing the tile that should be focused and selected.
+   * This is the first tile if diff is > 0 and the last tile otherwise.
+   *
+   * If there are tiles selected but there is no focused tile, an object is returned containing the tile to be focused.
+   * This is the last tile if diff is > 0 and the first tile otherwise.
+   */
+  protected _computeFocusedTileOrSelection(diff: number): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
     let selectedTiles = this.getSelectedTiles();
-    let focusedTile = this.getFocusedTile();
     if (selectedTiles.length === 0) {
+      let focusedTile;
       if (diff > 0) {
         // Select first tile if no tiles are selected (navigate down/right)
         focusedTile = arrays.first(tiles);
       } else {
-        // Select first tile if no tiles are selected (navigate up/left)
+        // Select last tile if no tiles are selected (navigate up/left)
         focusedTile = arrays.last(tiles);
       }
       return {
@@ -313,27 +336,15 @@ export class TileGridSelectionHandler {
       };
     }
 
-    // Focused tile may be null if tile has been deleted or if the user has not made a selection before
-    if (!focusedTile) {
-      if (diff > 0) {
-        // Navigate down/right
-        focusedTile = arrays.last(selectedTiles);
-      } else {
-        // Navigate up/left
-        focusedTile = arrays.first(selectedTiles);
-      }
-    }
     return {
-      focusedTile: focusedTile,
+      focusedTile: this.computeFocusedTile(diff),
       selectedTiles: null
     };
   }
 
   computeSelectionBetween(focusedTileIndex: number, newFocusedTileIndex: number, extend: boolean): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
-    let selectedTiles = this.getSelectedTiles();
     let newFocusedTile = tiles[newFocusedTileIndex];
-
     if (focusedTileIndex < 0 || focusedTileIndex > tiles.length - 1 ||
       newFocusedTileIndex < 0 || newFocusedTileIndex > tiles.length - 1 ||
       focusedTileIndex === newFocusedTileIndex) {
@@ -350,6 +361,7 @@ export class TileGridSelectionHandler {
     }
 
     // Adjust existing selection
+    let selectedTiles = this.getSelectedTiles();
     let newSelectedTiles = [];
     if (!newFocusedTile.selected) {
       // Add all tiles between focused tile and newly focused tile to selection
@@ -361,7 +373,6 @@ export class TileGridSelectionHandler {
         newFocusedTile = this._findLastSelectedTileBefore(tiles, newFocusedTileIndex);
       }
     } else {
-      // TODO CGU what is Bug #172929 about? Do we need to consider this as well?
       if (newFocusedTileIndex > focusedTileIndex) {
         // Remove all tiles between focused tile and newly focused tile from selection if newly focused tile already is selected
         newSelectedTiles = selectedTiles.slice();
