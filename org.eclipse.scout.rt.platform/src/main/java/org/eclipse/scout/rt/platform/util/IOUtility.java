@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -321,6 +321,7 @@ public final class IOUtility {
    *
    * @return A collection of binary resources contained in the ZIP archive
    * @param zipArchive
+   *          binary data
    * @param charset
    *          the charset to use for the unzipping
    * @param filterPattern
@@ -543,19 +544,21 @@ public final class IOUtility {
   }
 
   /**
-   * creates a temporary directory with a random name and the given suffix
+   * Creates a temporary directory with a random name and the given suffix. The new directory is empty and exists. It is
+   * marked as {@link File#deleteOnExit()}.
+   *
+   * @return the new temporary directory
    */
-  @SuppressWarnings("ResultOfMethodCallIgnored")
   public static File createTempDirectory(String dirSuffix) {
     try {
       if (dirSuffix != null) {
         dirSuffix = dirSuffix.replaceAll("[:*?\"<>|]*", "");
       }
-      File tmp = File.createTempFile("dir", dirSuffix);
-      tmp.delete();
-      tmp.mkdirs();
-      tmp.deleteOnExit();
-      return tmp;
+      File tempDirectory = File.createTempFile("dir", dirSuffix);
+      assertTrue(tempDirectory.delete()); // File.createTempFile creates a new file which will be deleted here
+      assertTrue(tempDirectory.mkdirs()); // the newly created file reference is now used as a directory and the directory is created here
+      tempDirectory.deleteOnExit();
+      return tempDirectory;
     }
     catch (IOException e) {
       throw new ProcessingException("dir: " + dirSuffix, e);
@@ -913,14 +916,8 @@ public final class IOUtility {
       return "";
     }
 
-    try {
-      s = URLEncoder.encode(s, StandardCharsets.UTF_8.name());
-      s = StringUtility.replace(s, "+", "%20");
-    }
-    catch (UnsupportedEncodingException e) {
-      LOG.error("Unsupported encoding", e);
-    }
-    return s;
+    s = URLEncoder.encode(s, StandardCharsets.UTF_8);
+    return StringUtility.replace(s, "+", "%20");
   }
 
   /**
@@ -941,13 +938,7 @@ public final class IOUtility {
       return "";
     }
 
-    try {
-      s = URLDecoder.decode(s, StandardCharsets.UTF_8.name());
-    }
-    catch (UnsupportedEncodingException e) {
-      LOG.error("Unsupported encoding", e);
-    }
-    return s;
+    return URLDecoder.decode(s, StandardCharsets.UTF_8);
   }
 
   /**
