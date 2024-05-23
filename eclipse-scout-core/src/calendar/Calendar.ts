@@ -8,36 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, CalendarComponent, CalendarDescriptor, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarSidebar, CalendarsPanel, CalendarsPanelTreeNode, comparators, ContextMenuPopup, DateRange,
-  dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings,
-  TreeNodesCheckedEvent, UuidPool, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  arrays, CalendarComponent, CalendarDescriptor, CalendarDirection, CalendarDisplayMode, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarMoveData, CalendarSidebar, CalendarsPanel,
+  CalendarsPanelTreeNode, comparators, ContextMenuPopup, DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent,
+  RoundingMode, scout, scrollbars, strings, TreeNodesCheckedEvent, UuidPool, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
-
-export type CalendarDisplayMode = EnumObject<typeof Calendar.DisplayMode>;
-export type CalendarMenuType = EnumObject<typeof Calendar.MenuType>;
-export type CalendarDirection = EnumObject<typeof Calendar.Direction>;
-export type CalendarMoveData = {
-  event?: JQuery.MouseEventBase;
-  cancel?: () => void;
-  cancelled?: boolean;
-  unitX?: number;
-  unitY?: number;
-  logicalX?: number;
-  logicalY?: number;
-  mode?: string;
-  moving?: boolean;
-  component?: CalendarComponent;
-  containerOffset?: JQuery.Coordinates;
-  containerScrollPosition?: Point;
-  distance?: Point;
-  startCursorPosition?: Point;
-  currentCursorPosition?: Point;
-  viewportScroller?: ViewportScroller;
-  rafId?: number;
-  onMove?: (event: JQuery.MouseMoveEvent) => void;
-  onUp?: (event: JQuery.MouseUpEvent) => void;
-};
 
 export class Calendar extends Widget implements CalendarModel {
   declare model: CalendarModel;

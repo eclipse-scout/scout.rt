@@ -629,6 +629,7 @@ export * from './calendar/CalendarSidebarModel';
 export * from './calendar/CalendarSidebarSplitter';
 export * from './calendar/CalendarSidebarSplitterModel';
 export * from './calendar/CalendarSidebarSplitterEventMap';
+export * from './calendar/CalendarTypes';
 export * from './form/fields/fields';
 export * from './form/fields/AppLinkKeyStroke';
 export * from './form/fields/SelectAllTextInFieldKeyStroke';
