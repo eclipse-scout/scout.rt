@@ -19,7 +19,6 @@ export class CalendarSidebarLayout extends AbstractLayout {
    * arbitrary number to show at least one month of the year panel
    */
   minSplitterPosition: number;
-  collapsedLabelHeight: number;
 
   protected _relativeSplitterPosition: number;
   protected _availableHeight: number;
@@ -32,7 +31,6 @@ export class CalendarSidebarLayout extends AbstractLayout {
 
     this.calendarSidebar = widget;
     this.minSplitterPosition = 200;
-    this.collapsedLabelHeight = 40;
     this.yearPanel = this.calendarSidebar.yearPanel;
     this.splitter = this.calendarSidebar.splitter;
     this.calendarsPanel = this.calendarSidebar.calendarsPanel;
@@ -67,7 +65,7 @@ export class CalendarSidebarLayout extends AbstractLayout {
 
     // Calculate new heigths for ui elements
     let yearPanelHeight = this.splitter.position - 8; // Margin
-    let calendarsPanelMargin = (this.splitter.collapsed ? this.collapsedLabelHeight : 20);
+    let calendarsPanelMargin = (this.splitter.collapsed ? this._calculateColapsedLableHeight() : 20);
     let calendarsPanelHeight = availableSize.height - yearPanelHeight - calendarsPanelMargin;
 
     // Makes splitter invisible when calendars panel is not displayable
@@ -87,7 +85,7 @@ export class CalendarSidebarLayout extends AbstractLayout {
     }
 
     // Validate min and max splitter position
-    let maxSplitterPosition = availableSize.height - this.collapsedLabelHeight;
+    let maxSplitterPosition = availableSize.height - this._calculateColapsedLableHeight();
     if (!this.calendarSidebar.calendarsPanelDisplayable) {
       this._silentUpdateSpliterPosition(htmlComp, splitter, Math.max(availableSize.height, 0));
     } else if (splitter.position < this.minSplitterPosition) {
@@ -103,7 +101,7 @@ export class CalendarSidebarLayout extends AbstractLayout {
 
     // Update cached values
     this._availableHeight = availableSize.height;
-    this._relativeSplitterPosition = splitter.position / availableSize.height;
+    this._relativeSplitterPosition = splitter.position / maxSplitterPosition;
   }
 
   protected _setSplitterPosition(pos: number, animate?: boolean) {
@@ -129,6 +127,15 @@ export class CalendarSidebarLayout extends AbstractLayout {
     } finally {
       htmlComp.suppressInvalidate = false;
     }
+  }
+
+  protected _calculateColapsedLableHeight(): number {
+    if (!this.splitter.rendered) {
+      return 40; // arbitrary number
+    }
+    let labelHeight = this.splitter.$collapsedLabel.height();
+    let splitterHeight = this.splitter.$splitterBox.height();
+    return labelHeight + splitterHeight + 5; // margin
   }
 
   setNewSplitterPosition(pos: number, animate?: boolean) {
