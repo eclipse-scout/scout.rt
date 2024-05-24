@@ -908,7 +908,7 @@ describe('Calendar', () => {
     describe('one calendar should always be selected', () => {
 
       const clickTreeNodeForCalendarId = (calendar: Calendar, calendarId: string) => {
-        let tree = calendar.calendarSidebar.calendarsPanel.tree;
+        let tree = calendar.calendarSidebar.calendarsPanel.treeBox.tree;
         tree.visitNodes(node => {
           if ((<CalendarsPanelTreeNode>node).calendarId === calendarId) {
             JQueryTesting.triggerClick(node.$node);

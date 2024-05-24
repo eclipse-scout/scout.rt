@@ -24,13 +24,16 @@
   }
 
   & > .calendars-panel-container {
-    padding-right: 25px;
 
-    & > .tree > .tree-data > .tree-node.selected {
-      background-color: transparent;
+    & > .form-field > .field > .tree {
+      border: none; // remove border
 
-      &::after {
-        border-color: transparent;
+      & > .tree-data > .tree-node.selected {
+        background-color: transparent;
+
+        &::after {
+          border-color: transparent;
+        }
       }
     }
   }

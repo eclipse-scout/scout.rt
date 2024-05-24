@@ -7,36 +7,69 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CalendarsPanelTreeNode, HtmlComponent, InitModelOf, ObjectOrModel, scout, Tree, Widget} from '../index';
+import {arrays, CalendarsPanelLookupCall, CalendarsPanelTreeNode, HtmlComponent, InitModelOf, LookupRow, ObjectOrModel, scout, SingleLayout, Tree, TreeBox, TreeBoxTreeNode, TreeNodesCheckedEvent, Widget} from '../index';
 
 export class CalendarsPanel extends Widget {
-  tree: CalendarsPanelTree;
+  treeBox: CalendarsPanelTreeBox;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
-    this.tree = scout.create(CalendarsPanelTree, {
+
+    this.treeBox = scout.create(CalendarsPanelTreeBox, {
       parent: this,
-      checkable: true,
-      textFilterEnabled: false
+      lookupCall: CalendarsPanelLookupCall,
+      labelVisible: false,
+      statusVisible: false,
+      tree: {
+        objectType: CalendarsPanelTree,
+        checkable: true,
+        textFilterEnabled: false,
+        _scrollDirections: 'y',
+        autoCheckChildren: true
+      }
     });
   }
 
   protected override _render() {
     this.$container = this.$parent.appendDiv('calendars-panel-container');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
-    this.tree.render();
+    this.htmlComp.setLayout(new SingleLayout());
+    this.treeBox.render();
+  }
+}
+
+class CalendarsPanelTreeBox extends TreeBox<string> {
+  declare tree: CalendarsPanelTree;
+  declare lookupCall: CalendarsPanelLookupCall;
+
+  protected override _render() {
+    super._render();
+    this.removeMandatoryIndicator();
+  }
+
+  protected override _renderFocused() {
+    // NOP
+  }
+
+  protected override _createNode(lookupRow: LookupRow<string>): TreeBoxTreeNode<string> {
+    let node = super._createNode(lookupRow);
+    node.expanded = true;
+    return node;
+  }
+
+  protected override _onTreeNodesChecked(event: TreeNodesCheckedEvent) {
+    // Make impossible to uncheck all nodes
+    if (arrays.hasElements(this.tree.checkedNodes)) {
+      super._onTreeNodesChecked(event);
+    } else {
+      // Reapply the value to the tree
+      this._syncValueToTree(this.value);
+    }
   }
 }
 
 class CalendarsPanelTree extends Tree {
   declare nodes: CalendarsPanelTreeNode[];
-
-  constructor() {
-    super();
-
-    this._scrollDirections = 'y';
-    this.autoCheckChildren = true;
-  }
 
   override insertNode(node: ObjectOrModel<CalendarsPanelTreeNode>, parentNode?: CalendarsPanelTreeNode, index?: number) {
     super.insertNode(node, parentNode, index);

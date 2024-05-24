@@ -9,8 +9,8 @@
  */
 import {
   arrays, CalendarComponent, CalendarDescriptor, CalendarDirection, CalendarDisplayMode, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarMoveData, CalendarSidebar, CalendarsPanel,
-  CalendarsPanelTreeNode, comparators, ContextMenuPopup, DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent,
-  RoundingMode, scout, scrollbars, strings, TreeNodesCheckedEvent, UuidPool, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  ContextMenuPopup, DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings,
+  UuidPool, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -230,8 +230,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.yearPanel = this.calendarSidebar.yearPanel;
     this.calendarsPanel = this.calendarSidebar.calendarsPanel;
 
-    this.calendarsPanel.tree.on('nodesChecked', this._onCalendarTreeNodeSelected.bind(this));
-
+    this.calendarsPanel.treeBox.on('propertyChange:value', this._onCalendarTreeBoxValueChanged.bind(this));
     this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
     this.modesMenu = scout.create(CalendarModesMenu, {
       parent: this,
@@ -245,33 +244,6 @@ export class Calendar extends Widget implements CalendarModel {
     this._exactRange = this._calcExactRange();
     this.yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();
-  }
-
-  protected _updateCalendarNodes() {
-    this.calendarsPanel.tree.deleteAllChildNodes();
-    // Ensure to add parent nodes first to the tree
-    this.calendars.sort((cal1, cal2) => {
-      if (cal1.parentId && cal2.parentId) {
-        return 0;
-      } else if (cal1.parentId) {
-        return 1;
-      } else if (cal2.parentId) {
-        return -1;
-      }
-      return comparators.NUMERIC.compare(cal1.order, cal2.order);
-    })
-      .forEach(descriptor => {
-        this.calendarsPanel.tree.insertNode(scout.create(CalendarsPanelTreeNode, {
-          parent: this.calendarsPanel.tree,
-          calendarId: descriptor.calendarId,
-          parentId: descriptor.parentId,
-          text: descriptor.name,
-          checked: descriptor.visible,
-          cssClass: descriptor.cssClass,
-          expanded: true,
-          leaf: !this.calendars.find(node => node.parentId === descriptor.calendarId)
-        }), this.calendarsPanel.tree.nodes.find(node => node.calendarId === descriptor.parentId));
-      });
   }
 
   protected _updateCalendarsPanelDisplayable() {
@@ -535,7 +507,7 @@ export class Calendar extends Widget implements CalendarModel {
   protected _setCalendars(calendars: CalendarDescriptor[]) {
     this._setProperty('calendars', calendars);
     this._updateCalendarsPanelDisplayable();
-    this._updateCalendarNodes();
+    this._updateCalendarsPanel();
   }
 
   protected _renderCalendars() {
@@ -574,6 +546,15 @@ export class Calendar extends Widget implements CalendarModel {
     this.$topGrid.find('.calendar-column').on('mousedown', mousedownCallback);
 
     this._renderComponents();
+  }
+
+  protected _updateCalendarsPanel() {
+    this.calendarsPanel.treeBox.lookupCall.setCalendars(this.calendars);
+    this.calendarsPanel.treeBox.refreshLookup();
+    let value = this.calendars
+      .filter(calendar => calendar.visible)
+      .map(calendar => calendar.calendarId);
+    this.calendarsPanel.treeBox.setValue(value);
   }
 
   setComponents(components: CalendarComponent[]) {
@@ -1541,11 +1522,12 @@ export class Calendar extends Widget implements CalendarModel {
     this.session.onRequestsDone(func, event, allowedType);
   }
 
-  protected _onCalendarTreeNodeSelected(event: TreeNodesCheckedEvent) {
-    let tupelArray = event.nodes
-      .map(node => node as CalendarsPanelTreeNode)
-      .map(node => [node.calendarId, node.checked] as [string, boolean]);
-    this._updateCalendarVisibility(tupelArray);
+  protected _onCalendarTreeBoxValueChanged(event: PropertyChangeEvent<string[]>) {
+    let checkedNodes = event.newValue;
+    let calendarCheckedTuples = this.calendars
+      .map(cal => cal.calendarId)
+      .map(calId => [calId, checkedNodes.includes(calId)] as [string, boolean]);
+    this._updateCalendarVisibility(calendarCheckedTuples);
   }
 
   protected _updateCalendarVisibility(updatedCalendars: [calendarId: string, visible: boolean][]) {
@@ -1573,30 +1555,11 @@ export class Calendar extends Widget implements CalendarModel {
       // No update
       return;
     }
-    if (!this._hasOtherVisibleCalendars(calendar) && !visible) {
-      // Last visible calendar was unselected, selecting it again
-      let tree = this.calendarSidebar.calendarsPanel.tree;
-      tree.visitNodes(node => {
-        if ((<CalendarsPanelTreeNode>node).calendarId === calendar.calendarId) {
-          tree.checkNode(node, true, {triggerNodesChecked: false});
-          return true;
-        }
-      });
-      // Returning, because no event should be triggered -> nothing happened
-      return;
-    }
     calendar.visible = visible;
     this.trigger('calendarVisibilityChange', {
       calendarId: calendarId,
       visible: visible
     });
-  }
-
-  protected _hasOtherVisibleCalendars(calendar: CalendarDescriptor) {
-    return this.calendars
-      .filter(cal => cal.visible)
-      .filter(cal => cal !== calendar)
-      .length > 0;
   }
 
   /* -- components, arrangement------------------------------------ */
