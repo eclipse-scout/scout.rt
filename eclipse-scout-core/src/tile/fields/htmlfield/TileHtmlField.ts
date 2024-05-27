@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,7 @@ export class TileHtmlField extends HtmlField {
 
   protected override _render() {
     super._render();
-    this.$container.addClass('scrollbar-y-outside');
+    this.$container.addClass('scrollbar-y-outside tile-html-field');
   }
 
   protected override _installScrollbars(options: ScrollbarInstallOptions) {
