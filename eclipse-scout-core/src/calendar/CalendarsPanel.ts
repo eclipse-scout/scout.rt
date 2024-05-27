@@ -61,7 +61,7 @@ class CalendarsPanelTreeBox extends TreeBox<string> {
     // Make impossible to uncheck all nodes
     if (arrays.hasElements(this.tree.checkedNodes)) {
       super._onTreeNodesChecked(event);
-    } else {
+    } else if (!this._populating) {
       // Reapply the value to the tree
       this._syncValueToTree(this.value);
     }

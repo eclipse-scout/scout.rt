@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponent, CalendarDescriptor, CalendarItem, CalendarsPanelTreeNode, DateRange, dates, scout, UuidPool} from '../../src/index';
+import {Calendar, CalendarComponent, CalendarDescriptor, CalendarItem, DateRange, dates, scout, TreeBoxTreeNode, UuidPool} from '../../src/index';
 import {JQueryTesting} from '../../src/testing/index';
 
 describe('Calendar', () => {
@@ -810,6 +810,7 @@ describe('Calendar', () => {
         let businessCal = createCalendarDescriptor('Business calendar');
         let otherCal = createCalendarDescriptor('Other calendar');
         let calendar = initCalendar(businessCal, otherCal);
+        jasmine.clock().tick(500); // await the lookup
 
         // Act
         let menuVisible = isCalendarsSelectionVisible(calendar);
@@ -823,10 +824,12 @@ describe('Calendar', () => {
         let businessCal = createCalendarDescriptor('Business calendar');
         let otherCal = createCalendarDescriptor('Other calendar');
         let calendar = initCalendar(businessCal);
+        jasmine.clock().tick(500); // await the lookup
 
         // Act
         let menuVisibleFirst = isCalendarsSelectionVisible(calendar);
         calendar.setCalendars([...calendar.calendars, otherCal]);
+        jasmine.clock().tick(500); // await the lookup
         let menuVisibleAfter = isCalendarsSelectionVisible(calendar);
 
         // Assert
@@ -910,7 +913,7 @@ describe('Calendar', () => {
       const clickTreeNodeForCalendarId = (calendar: Calendar, calendarId: string) => {
         let tree = calendar.calendarSidebar.calendarsPanel.treeBox.tree;
         tree.visitNodes(node => {
-          if ((<CalendarsPanelTreeNode>node).calendarId === calendarId) {
+          if ((<TreeBoxTreeNode<string>>node).lookupRow.key === calendarId) {
             JQueryTesting.triggerClick(node.$node);
             return true;
           }
@@ -922,6 +925,7 @@ describe('Calendar', () => {
         let calendar1 = createCalendarDescriptor('Calendar 1');
         let calendar2 = createCalendarDescriptor('Calendar 2');
         let calendar = initCalendar(calendar1, calendar2);
+        jasmine.clock().tick(500); // await the lookup
 
         // Act
         clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
@@ -940,6 +944,7 @@ describe('Calendar', () => {
         let calendar2 = createCalendarDescriptor('Calendar 2');
         calendar2.parentId = parentCalendar.calendarId;
         let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+        jasmine.clock().tick(500); // await the lookup
 
         // Act
         clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
@@ -950,7 +955,7 @@ describe('Calendar', () => {
         expect(calendar2.visible).toBe(true);
       });
 
-      it('should not be possible to uncheck the calendar group when the group contains the remaining select calendars', () => {
+      it('should not be possible to uncheck the calendar group when the group consists of the last selected calendars', () => {
         // Arrange
         let parentCalendar = createCalendarDescriptor('Parent calendar');
         let calendar1 = createCalendarDescriptor('Calendar 1');
@@ -958,12 +963,13 @@ describe('Calendar', () => {
         let calendar2 = createCalendarDescriptor('Calendar 2');
         calendar2.parentId = parentCalendar.calendarId;
         let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+        jasmine.clock().tick(500); // await the lookup
 
         // Act
         clickTreeNodeForCalendarId(calendar, parentCalendar.calendarId);
 
         // Assert
-        expect(calendar1.visible).toBe(false);
+        expect(calendar1.visible).toBe(true);
         expect(calendar2.visible).toBe(true);
       });
 
@@ -975,6 +981,7 @@ describe('Calendar', () => {
         let calendar2 = createCalendarDescriptor('Calendar 2');
         calendar2.parentId = parentCalendar.calendarId;
         let calendar = initCalendar(parentCalendar, calendar1, calendar2);
+        jasmine.clock().tick(500); // await the lookup
 
         // Act
         clickTreeNodeForCalendarId(calendar, calendar2.calendarId);
@@ -990,6 +997,7 @@ describe('Calendar', () => {
         // Arrange
         let calendar1 = createCalendarDescriptor('Calendar 1');
         let calendar = initCalendar(calendar1);
+        jasmine.clock().tick(500); // await the lookup
 
         // Act
         clickTreeNodeForCalendarId(calendar, calendar1.calendarId);
