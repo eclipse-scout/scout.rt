@@ -508,6 +508,7 @@ export class Calendar extends Widget implements CalendarModel {
     this._setProperty('calendars', calendars);
     this._updateCalendarsPanelDisplayable();
     this._updateCalendarsPanel();
+    this._validateSelectedCalendar();
   }
 
   protected _renderCalendars() {
@@ -555,6 +556,12 @@ export class Calendar extends Widget implements CalendarModel {
       .filter(calendar => calendar.visible)
       .map(calendar => calendar.calendarId);
     this.calendarsPanel.treeBox.setValue(value);
+  }
+
+  protected _validateSelectedCalendar() {
+    if (!arrays.contains(this.calendars, this.selectedCalendar)) {
+      this.selectedCalendar = this.defaultCalendar;
+    }
   }
 
   setComponents(components: CalendarComponent[]) {
@@ -873,7 +880,7 @@ export class Calendar extends Widget implements CalendarModel {
     // Set selected calendar
     let newSelectedCalendar = this.selectedCalendar;
     if (typeof selectedCalendar === 'string' || selectedCalendar instanceof String) {
-      newSelectedCalendar = this._findCalendarForId(selectedCalendar as string);
+      newSelectedCalendar = this.findCalendarForId(selectedCalendar as string);
     } else if (selectedCalendar) {
       newSelectedCalendar = selectedCalendar as CalendarDescriptor;
     }
@@ -1061,7 +1068,7 @@ export class Calendar extends Widget implements CalendarModel {
           if (id === this.defaultCalendar.calendarId) {
             return this._defaultCalendarVisible();
           }
-          let foundCalendar = this._findCalendarForId(id);
+          let foundCalendar = this.findCalendarForId(id);
           return foundCalendar ? foundCalendar.visible : false;
         }).data('new-width', columnWidth);
     } else {
@@ -1139,19 +1146,26 @@ export class Calendar extends Widget implements CalendarModel {
   protected _defaultCalendarVisible(): boolean {
     return this.components
       .filter(comp => comp.coveredDaysRange.covers(this.selectedDate, true))
-      .filter(comp => !comp.item.calendarId)
+      .filter(comp => (!comp.item.calendarId) || (this.findCalendarForId(comp.item.calendarId) === this.defaultCalendar))
       .length > 0;
   }
 
   findCalendarForComponent(component: CalendarComponent): CalendarDescriptor {
-    return this._findCalendarForId(component.item.calendarId);
+    return this.findCalendarForId(component.item.calendarId);
   }
 
-  protected _findCalendarForId(calendarId: string): CalendarDescriptor {
+  findCalendarForId(calendarId: string): CalendarDescriptor {
     if (!calendarId || calendarId === this.defaultCalendar.calendarId) {
       return this.defaultCalendar;
     }
-    return this.calendars.find(calendar => calendar.calendarId === calendarId);
+    let calendar = this.calendars.find(calendar => calendar.calendarId === calendarId);
+
+    // No calendar found for this id
+    if (!calendar) {
+      return this.defaultCalendar;
+    }
+
+    return calendar;
   }
 
   protected _updateWeekdayNames() {
@@ -1550,7 +1564,7 @@ export class Calendar extends Widget implements CalendarModel {
       // No update
       return;
     }
-    let calendar = this._findCalendarForId(calendarId);
+    let calendar = this.findCalendarForId(calendarId);
     if (!calendar || calendar.visible === visible) {
       // No update
       return;
@@ -1761,7 +1775,8 @@ export class Calendar extends Widget implements CalendarModel {
 
     // Separate layouting of components by calendarId when on day
     if (this.isDay() && calendarId) {
-      stackKey = calendarId;
+      // Validate calendarId
+      stackKey = this.findCalendarForId(calendarId).calendarId;
     }
 
     return stackKey;
@@ -2152,7 +2167,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     // No range selection when calendar is not selectable
     let currentCalendarId = $(event.delegateTarget).data('calendarId');
-    let selectable = this._findCalendarForId(currentCalendarId).selectable;
+    let selectable = this.findCalendarForId(currentCalendarId).selectable;
     if (!selectable) {
       return;
     }

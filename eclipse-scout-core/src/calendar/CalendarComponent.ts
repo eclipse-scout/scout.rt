@@ -222,11 +222,15 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   }
 
   protected _findCalendarColumnInDay($day: JQuery, calendarId: string): JQuery {
-    if (!this.parent.isDay() || !calendarId) {
+    if (!this.parent.isDay()) {
       calendarId = this.parent.defaultCalendar.calendarId;
     }
+
+    // Validate calendarId
+    calendarId = this.parent.findCalendarForId(calendarId).calendarId;
+
     return $day.find('.calendar-column')
-      .filter((index: number, element: HTMLSelectElement) => $(element).data('calendarId') === calendarId);
+      .filter((index, element) => $(element).data('calendarId') === calendarId);
   }
 
   protected _isTask(): boolean {
