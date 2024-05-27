@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,11 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 export interface LocaleModel {
+  /**
+   * IETF BCP 47 language tag, e.g. `"en-US"` or `"de-CH"`.
+   * @see https://en.wikipedia.org/wiki/IETF_language_tag
+   */
   languageTag?: string;
   decimalFormatPatternDefault?: string;
   dateFormatPatternDefault?: string;
   timeFormatPatternDefault?: string;
+  /**
+   * A formatted display text for the language part of the {@link languageTag}. This value is optional.
+   */
   displayLanguage?: string;
+  /**
+   * A formatted display text for the country part of the {@link languageTag}. This value is optional.
+   */
   displayCountry?: string;
   decimalFormatSymbols?: DecimalFormatSymbols;
   dateFormatSymbols?: DateFormatSymbols;

@@ -13,7 +13,15 @@ export class Locale implements LocaleModel {
   declare model: LocaleModel;
 
   languageTag: string;
+  /**
+   * The language part of the {@link languageTag}, e.g. `"en"` or `"de"`.
+   * This value is automatically derived from the language tag when constructing a Locale instance.
+   */
   language: string;
+  /**
+   * The country part of the {@link languageTag}, e.g. `"US"` or `"CH"`.
+   * This value is automatically derived from the language tag when constructing a Locale instance.
+   */
   country: string;
   displayLanguage: string;
   displayCountry: string;
