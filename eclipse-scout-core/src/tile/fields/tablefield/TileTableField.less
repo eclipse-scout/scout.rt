@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -97,7 +97,7 @@
     & > .table-data {
       & + .scroll-shadow {
         .scroll-shadow.gradient();
-        --scroll-shadow-color: @tile-default-background-color;
+        --scroll-shadow-color: var(--tile-background-color);
       }
 
       & > .table-row {
@@ -155,10 +155,6 @@
           }
         }
       }
-
-      & + .scroll-shadow {
-        --scroll-shadow-color: @tile-default-inverted-background-color;
-      }
     }
 
     & > .menubar {
@@ -209,10 +205,6 @@
             color: @tile-alternative-inverted-color;
           }
         }
-      }
-
-      & + .scroll-shadow {
-        --scroll-shadow-color: @tile-alternative-inverted-background-color;
       }
     }
 
