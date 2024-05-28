@@ -65,7 +65,7 @@ export class CalendarSidebarLayout extends AbstractLayout {
 
     // Calculate new heigths for ui elements
     let yearPanelHeight = this.splitter.position - 8; // Margin
-    let calendarsPanelMargin = (this.splitter.collapsed ? this._calculateColapsedLableHeight() : 20);
+    let calendarsPanelMargin = (this.splitter.collapsed ? this._calculateColapsedLableHeight() : 0) + 20;
     let calendarsPanelHeight = availableSize.height - yearPanelHeight - calendarsPanelMargin;
 
     // Makes splitter invisible when calendars panel is not displayable
@@ -133,9 +133,9 @@ export class CalendarSidebarLayout extends AbstractLayout {
     if (!this.splitter.rendered) {
       return 40; // arbitrary number
     }
-    let labelHeight = this.splitter.$collapsedLabel.height();
-    let splitterHeight = this.splitter.$splitterBox.height();
-    return labelHeight + splitterHeight + 5; // margin
+    let labelHeight = this.splitter.$collapsedLabel.outerHeight();
+    let splitterHeight = this.splitter.$splitterBox.outerHeight();
+    return labelHeight + splitterHeight;
   }
 
   setNewSplitterPosition(pos: number, animate?: boolean) {
