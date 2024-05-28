@@ -45,6 +45,11 @@
 
   & > .form-field {
     padding: 16px @tile-field-padding @tile-field-padding;
+    border-radius: inherit;
+
+    & > .field {
+      border-radius: inherit;
+    }
 
     &.label-hidden {
       padding-top: @tile-field-padding;
@@ -181,6 +186,10 @@
     & > .loading-indicator {
       #scout.loading-indicator();
     }
+  }
+
+  &.disabled:not(.read-only) {
+    --tile-background-color: @tile-default-border-color;
   }
 
   &.inverted {
