@@ -252,8 +252,8 @@ public class AsyncObservableLongMeasurementTest {
         .andMatchExecutionHint(AbstractAsyncObservableMeasurement.ASYNC_JOB_EXECUTION_HINT);
   }
 
-  private void awaitNextAsyncObservationInterval(long asyncObservationIntervalInMs) throws InterruptedException {
-    Thread.sleep(asyncObservationIntervalInMs + 50);
+  private void awaitNextAsyncObservationInterval(long asyncObservationIntervalMillis) throws InterruptedException {
+    Thread.sleep(asyncObservationIntervalMillis + 50);
   }
 
   private void assertAsyncJobTrigger(Callable<?> callable, int expectedTriggerCount) throws Exception {

@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,25 +56,32 @@ public abstract class AbstractAsyncObservableMeasurement<M extends ObservableMea
   static final String ASYNC_JOB_NAME_PATTERN = "[otel] Async measurement: {}";
   static final LazyValue<IExecutionSemaphore> ASYNC_JOB_EXECUTION_SEMAPHORE = new LazyValue<>(() -> Jobs.newExecutionSemaphore(CONFIG.getPropertyValue(ConcurrentAsyncObservableJobProperty.class)));
   static final String ASYNC_JOB_EXECUTION_HINT = AbstractAsyncObservableMeasurement.class.getSimpleName() + "$ASYNC_JOB";
+  private static final long ASYNC_JOB_MIN_EXECUTION_EXPIRATION_TIME_MILLIS = TimeUnit.SECONDS.toMillis(10);
 
   private final String m_name;
   private final Callable<V> m_callable;
   private final Supplier<RunContext> m_runContextSupplier;
-  private final long m_asyncObservationIntervalInMs;
+  private final long m_asyncObservationIntervalMillis;
 
+  // In OpenTelemetry the metric collections across all readers are sequential. Therefore, no specific concurrency handling
+  // is required.
+  // see io.opentelemetry.sdk.metrics.internal.state.MeterSharedState.collectAll(RegisteredReader, MeterProviderSharedState, long)
   private volatile V m_asyncMeasurementValue;
   private final AtomicReference<IFuture<V>> m_asyncJobRef = new AtomicReference<>();
-  private long m_asyncJobLastTriggerTimestamp;
+  private volatile long m_asyncJobLastTriggerTimestamp;
 
   protected AbstractAsyncObservableMeasurement(String name, Callable<V> callable, Supplier<RunContext> runContextSupplier) {
     this(name, callable, runContextSupplier, TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(AsyncObservationIntervalProperty.class)));
   }
 
-  protected AbstractAsyncObservableMeasurement(String name, Callable<V> callable, Supplier<RunContext> runContextSupplier, long asyncObservationIntervalInMs) {
+  protected AbstractAsyncObservableMeasurement(String name, Callable<V> callable, Supplier<RunContext> runContextSupplier, long asyncObservationIntervalMillis) {
+    Assertions.assertNotNull(name);
+    Assertions.assertNotNull(callable);
+    Assertions.assertNotNull(runContextSupplier);
     m_name = name;
     m_callable = callable;
     m_runContextSupplier = runContextSupplier;
-    m_asyncObservationIntervalInMs = asyncObservationIntervalInMs;
+    m_asyncObservationIntervalMillis = asyncObservationIntervalMillis;
   }
 
   @Override
@@ -97,14 +105,14 @@ public abstract class AbstractAsyncObservableMeasurement<M extends ObservableMea
   }
 
   boolean requiresAsyncMeasurement() {
-    if (System.currentTimeMillis() - m_asyncJobLastTriggerTimestamp < m_asyncObservationIntervalInMs) {
+    if (System.currentTimeMillis() - m_asyncJobLastTriggerTimestamp < m_asyncObservationIntervalMillis) {
       return false;
     }
 
     IFuture<V> asyncJobRef = m_asyncJobRef.get();
     if (asyncJobRef != null) {
       // async measurement job is running longer than one "interval" --> cancel and re-trigger the async measurement job
-      LOG.warn("Cancel async measurement job '{}' which is running for more than {}s", m_name, TimeUnit.MILLISECONDS.toSeconds(m_asyncObservationIntervalInMs));
+      LOG.warn("Canceling async measurement job '{}' that is running longer than {}s", m_name, TimeUnit.MILLISECONDS.toSeconds(m_asyncObservationIntervalMillis));
       asyncJobRef.cancel(true);
     }
     return true;
@@ -119,7 +127,7 @@ public abstract class AbstractAsyncObservableMeasurement<M extends ObservableMea
             .withRunContext(m_runContextSupplier.get())
             .withExecutionSemaphore(ASYNC_JOB_EXECUTION_SEMAPHORE.get())
             .withExceptionHandling(BEANS.get(ExceptionHandler.class), true)
-            .withExpirationTime(m_asyncObservationIntervalInMs, TimeUnit.SECONDS)); // prevent execution after waiting for execution during at least one whole async job interval
+            .withExpirationTime(Math.max(m_asyncObservationIntervalMillis, ASYNC_JOB_MIN_EXECUTION_EXPIRATION_TIME_MILLIS), TimeUnit.MILLISECONDS)); // prevent execution after waiting for execution during at least one complete async job interval
     if (m_asyncJobRef.compareAndSet(null, future)) {
       LOG.debug("Scheduled async measurement job '{}'", m_name);
     }
