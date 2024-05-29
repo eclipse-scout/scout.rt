@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel} from '../../../index';
+import {
+  aria, Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, ObjectWithUuidModel, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel
+} from '../../../index';
 import $ from 'jquery';
 
 export class WizardProgressField extends FormField implements WizardProgressFieldModel {
@@ -112,9 +114,8 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
       this._updateStepClasses(step);
 
       // Inspector info
-      $step.attrOrRemove('data-uuid', step.uuid);
+      inspector.applyInfo(step, $step, this.session);
       if (this.session.inspector) {
-        inspector.applyInfo(step, $step);
         $step.attr('data-step-index', step.index);
       }
 
@@ -299,7 +300,7 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
   }
 }
 
-export interface WizardStep {
+export interface WizardStep extends ObjectWithUuidModel<WizardStep> {
   index?: number;
   title?: string;
   subTitle?: string;
@@ -311,7 +312,6 @@ export interface WizardStep {
   finished?: boolean;
   modelClass?: string;
   classId?: string;
-  uuid?: string;
 
   $step?: JQuery;
 }

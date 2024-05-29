@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.client.ui.InspectorObjectIdProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
@@ -34,6 +35,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   private boolean m_disposed;
   private final AtomicBoolean m_disposing = new AtomicBoolean();
   private final IJsonAdapter<?> m_parent;
+  protected static final LazyValue<InspectorObjectIdProvider> INSPECTOR_ID_PROVIDER = new LazyValue<>(InspectorObjectIdProvider.class);
 
   public AbstractJsonAdapter(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     if (model == null) {
@@ -143,17 +145,15 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JSONObject json = new JSONObject();
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
-    if (getModel() instanceof ITypeWithClassId) {
-      json.put("uuid", ((ITypeWithClassId) getModel()).classId()); // FIXME bsh [js-bookmark] where to get uuid?
-    }
-    BEANS.get(InspectorInfo.class).put(getUiSession(), json, getModel());
+    T model = getModel();
+    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), json, model, m -> INSPECTOR_ID_PROVIDER.get().getId(m));
 
     // Mark the global adapters so the UI may use the root adapter as owner
     if (getParent() == getUiSession().getRootJsonAdapter()) {
       putProperty(json, "global", true);
     }
     // The owner is not relevant for the UI, it always uses its creator as owner, or the root adapter if global is true
-    // But other clients (like JMEter) may need this information to easier link the individual adapters
+    // But other clients (like JMeter) may need this information to easier link the individual adapters
     if (UrlHints.isInspectorHint(getUiSession().currentHttpRequest())) {
       putProperty(json, "owner", getParent().getId());
     }
@@ -296,7 +296,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   /**
    * A global adapter is registered under the root json adapter and may be used by other adapters.
    * <p>
-   * Rule: Always create a global adapter if the model is able to dispose itself (Form, MessageBox, etc). In every other
+   * Rule: Always create a global adapter if the model is able to dispose itself (Form, MessageBox, etc.). In every other
    * case you have to be very careful. If you dispose a global adapter it may influence others which are using it.
    * <p>
    * Global adapters (like every other) get disposed on session disposal.

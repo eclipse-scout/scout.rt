@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ButtonTile, ChildModelOf, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus, ObjectOrChildModel, ObjectWithUuid,
-  Outline,
-  PageEventMap, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  BookmarkAdapter, ButtonTile, ChildModelOf, DefaultBookmarkAdapter, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus,
+  ObjectOrChildModel, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithUuid, Outline, PageEventMap, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm,
+  TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -21,7 +21,7 @@ import $ from 'jquery';
  * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
  * Implementations of these classes contain code which loads table data or child nodes.
  */
-export class Page extends TreeNode implements PageModel, ObjectWithUuid {
+export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectWithBookmarkAdapter {
   declare model: PageModel;
   declare eventMap: PageEventMap;
   declare self: Page;
@@ -58,9 +58,14 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   events: EventSupport;
   pageChanging: number;
 
+  // Inspector infos (are only available for remote pages)
+  modelClass: string;
+  classId: string;
+
   protected _tableFilterHandler: EventHandler<Event<Table>>;
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
   protected _detailTableModel: ChildModelOf<Table>;
+  protected _bookmarkAdapter: BookmarkAdapter;
   /** @internal */
   _detailFormModel: ChildModelOf<Form>;
   protected _menuOwnerMenusChangeHandler: (event: Event<MenuOwner>) => void;
@@ -77,7 +82,8 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     this.detailFormVisible = true;
     this.detailFormVisibleByUi = true;
     this.navigateButtonsVisible = true;
-
+    this.modelClass = null;
+    this.classId = null;
     this.tableStatusVisible = true;
     this.drillDownOnRowClick = false;
     this.overviewIconId = null;
@@ -90,6 +96,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
     this._detailFormModel = null;
+    this._bookmarkAdapter = null;
     this._menuOwnerMenusChangeHandler = this._onMenuOwnerMenusChange.bind(this);
   }
 
@@ -117,6 +124,18 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     } finally {
       this.setPageChanging(false);
     }
+  }
+
+  uuidPath(useFallback?: boolean): string {
+    return scout.create(ObjectUuidProvider, {object: this}).uuidPath(useFallback);
+  }
+
+  getBookmarkAdapter(): BookmarkAdapter {
+    if (!this._bookmarkAdapter) {
+      // no path, just the id of this Page. See AbstractPage#classId().
+      this._bookmarkAdapter = new DefaultBookmarkAdapter(this, false);
+    }
+    return this._bookmarkAdapter;
   }
 
   protected static _removePropertyIfLazyLoading(object: PageModel, name: string): any {
@@ -378,10 +397,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
     if (!this.$node) {
       return;
     }
-    this.$node.attrOrRemove('data-uuid', this.uuid);
-    if (this.session.inspector) {
-      inspector.applyInfo(this, this.$node);
-    }
+    inspector.applyInfo(this, this.$node);
     this.$node.toggleClass('compact-root', this.compactRoot);
     this.$node.toggleClass('has-tile-overview', this.showTileOverview ||
       (this.compactRoot && this.getOutline().detailContent instanceof TileOutlineOverview));

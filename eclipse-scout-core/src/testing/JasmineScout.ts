@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectFactory, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
+  AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectUuidProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
   SessionStartupResponse, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, TestingApp} from './index';
@@ -163,7 +163,7 @@ window.removePopups = (session, cssClass) => {
 
 window.createSimpleModel = <T>(objectType, session, id) => {
   if (id === undefined) {
-    id = ObjectFactory.get().createUniqueId();
+    id = ObjectUuidProvider.createUiId();
   }
   let parent = session.desktop;
   return {

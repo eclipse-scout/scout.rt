@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, objects, strings, widgets} from './index';
+import {Device, objects, ObjectUuidProvider, strings} from './index';
 
 /**
  * Determines whether a labelledby id is inserted at the front or the back of current aria-labelledby value.
@@ -140,14 +140,14 @@ export const aria = {
    *
    * For insert position see {@param position}, insert position has no effect if the labelledby property is replaced.
    */
-  _linkElementWithTargetElement($elem: JQuery<Element>, $targetElement: JQuery<Element>, ariaAttribute: string, idPrefix: string, position = AriaLabelledByInsertPosition.FRONT, replace = false) {
-    if (!$elem || !$targetElement || strings.empty(ariaAttribute) || strings.empty(idPrefix)) {
+  _linkElementWithTargetElement($elem: JQuery<Element>, $targetElement: JQuery<Element>, ariaAttribute: string, position = AriaLabelledByInsertPosition.FRONT, replace = false) {
+    if (!$elem || !$targetElement || strings.empty(ariaAttribute)) {
       return;
     }
     let targetId = $targetElement.attr('id') as string;
     if (!targetId) {
       // Create an id if the element does not have one yet
-      targetId = widgets.createUniqueId(idPrefix);
+      targetId = ObjectUuidProvider.createUiId();
       $targetElement.attr('id', targetId);
     }
     if (!replace) {
@@ -176,7 +176,7 @@ export const aria = {
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby">ARIA: aria-labelledby</a>
    */
   linkElementWithLabel($elem: JQuery<Element>, $label: JQuery<Element>, position = AriaLabelledByInsertPosition.FRONT, replace = false) {
-    aria._linkElementWithTargetElement($elem, $label, 'aria-labelledby', 'lbl', position, replace);
+    aria._linkElementWithTargetElement($elem, $label, 'aria-labelledby', position, replace);
   },
 
   /**
@@ -187,7 +187,7 @@ export const aria = {
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-describedby">ARIA: aria-describedby</a>
    */
   linkElementWithDescription($elem: JQuery<Element>, $description: JQuery<Element>, position = AriaLabelledByInsertPosition.FRONT, replace = false) {
-    aria._linkElementWithTargetElement($elem, $description, 'aria-describedby', 'desc', position, replace);
+    aria._linkElementWithTargetElement($elem, $description, 'aria-describedby', position, replace);
   },
 
   /**
@@ -301,7 +301,7 @@ export const aria = {
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-controls">ARIA: aria-controls</a>
    */
   linkElementWithControls($elem: JQuery<Element>, $controls: JQuery<Element>, position = AriaLabelledByInsertPosition.FRONT, replace = false) {
-    aria._linkElementWithTargetElement($elem, $controls, 'aria-controls', 'ctrl', position, replace);
+    aria._linkElementWithTargetElement($elem, $controls, 'aria-controls', position, replace);
   },
 
   removeControls($elem: JQuery<Element>) {
@@ -321,7 +321,7 @@ export const aria = {
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-activedescendant">ARIA: aria-activedescendant</a>
    */
   linkElementWithActiveDescendant($elem: JQuery<Element>, $activeDescendant: JQuery<Element>) {
-    aria._linkElementWithTargetElement($elem, $activeDescendant, 'aria-activedescendant', 'ades', AriaLabelledByInsertPosition.FRONT, true);
+    aria._linkElementWithTargetElement($elem, $activeDescendant, 'aria-activedescendant', AriaLabelledByInsertPosition.FRONT, true);
   },
 
   removeActiveDescendant($elem: JQuery<Element>) {

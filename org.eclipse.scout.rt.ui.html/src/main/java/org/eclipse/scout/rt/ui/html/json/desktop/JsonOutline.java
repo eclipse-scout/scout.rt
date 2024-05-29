@@ -196,8 +196,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       json.put(PROP_SHOW_TILE_OVERVIEW, page.isShowTileOverview());
       json.put(PROP_COMPACT_ROOT, page.isCompactRoot());
     }
-    json.put("uuid", page.classId()); // FIXME bsh [js-bookmark] where to get uuid?
-    BEANS.get(InspectorInfo.class).put(getUiSession(), json, page);
+    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), json, page, p -> INSPECTOR_ID_PROVIDER.get().getIdForPage(p));
     JsonObjectUtility.filterDefaultValues(json, "Page");
     return json;
   }

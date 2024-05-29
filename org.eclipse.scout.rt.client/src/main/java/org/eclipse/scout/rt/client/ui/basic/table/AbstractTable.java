@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -268,7 +268,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
     ITypeWithClassId container = getContainer();
-    if (container instanceof ITypeWithClassId) {
+    if (container != null) {
       return simpleClassId + ID_CONCAT_SYMBOL + container.classId();
     }
     return simpleClassId;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,10 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Widget} from '../index';
+import {arrays, ObjectUuidProvider, Widget} from '../index';
 import $ from 'jquery';
-
-let uniqueIdSeqNo = 0;
 
 export const widgets = {
   /**
@@ -30,16 +28,10 @@ export const widgets = {
   },
 
   /**
-   * Creates a "unique" id which may be used in the id attribute of an HTML element.
-   * <p>
-   * It actually just increases a sequence number prefixed by 'sc' or the given prefix.
-   * 'sc' (short for Scout) is added to reduce the possibility of a duplication
-   * if scout widgets are embedded into a foreign website which already uses numbers in its id attributes.
-   * So it is not unique but should be good enough when you know what you are doing.
+   * @deprecated Use {@link ObjectUuidProvider.createUiId} instead.
    */
-  createUniqueId(prefix: string): string {
-    prefix = prefix || 'sc';
-    return prefix + uniqueIdSeqNo++;
+  createUniqueId(prefix?: string): string {
+    return ObjectUuidProvider.createUiId();
   },
 
   /**
@@ -79,7 +71,7 @@ export const widgets = {
   },
 
   /**
-   * Resets a property that has been preserved on the preserver by {@link preserveAndSetProperty} using the given setter. Sets the preserved property to null afterwards.
+   * Resets a property that has been preserved on the preserver by {@link preserveAndSetProperty} using the given setter. Sets the preserved property to null afterward.
    * @param setter
    * @param preserver
    * @param preserverName

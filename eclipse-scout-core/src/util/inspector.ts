@@ -7,15 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {strings} from './strings';
+import {Session} from '../index';
 
 export const inspector = {
   /**
    * Adds inspector info (e.g. classId) from the given 'model' to the DOM. The target element
    * is either the given '$container' or model.$container. Nothing happens if model or target
-   * element is undefined.
+   * element is undefined or the inspector is disabled in the session.
    */
-  applyInfo(model: { $container?: JQuery; id?: string; modelClass?: string; classId?: string }, $container?: JQuery) {
+  applyInfo(model: InspectorModel, $container?: JQuery, session?: Session) {
     if (!model) {
       return;
     }
@@ -23,9 +23,27 @@ export const inspector = {
     if (!$container) {
       return;
     }
-    let id = strings.startsWith(model.id, 'ui') ? null : model.id; // FIXME bsh [js-bookmark] improve this
-    $container.toggleAttr('data-id', !!id, id);
+    session = session || model.session;
+    if (!session?.inspector) {
+      return;
+    }
+
+    let uuid = model.uuid;
+    if (!uuid) {
+      uuid = model.classId;
+    }
     $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
-    $container.toggleAttr('data-classid', !!model.classId, model.classId);
+    $container.toggleAttr('data-uuid', !!uuid, uuid);
+    $container.toggleAttr('data-id', !!model.id, model.id);
   }
 };
+
+export interface InspectorModel {
+  session?: Session;
+  $container?: JQuery;
+
+  id?: string;
+  modelClass?: string;
+  uuid?: string;
+  classId?: string;
+}

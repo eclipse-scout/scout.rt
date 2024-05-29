@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,25 +39,25 @@ public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJson
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(IWidget.PROP_CSS_CLASS, model) {
+    putJsonProperty(new JsonProperty<>(IWidget.PROP_CSS_CLASS, model) {
       @Override
       protected String modelValue() {
         return getModel().getCssClass();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IWidget.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<>(IWidget.PROP_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IWidget.PROP_INHERIT_ACCESSIBILITY, model) {
+    putJsonProperty(new JsonProperty<>(IWidget.PROP_INHERIT_ACCESSIBILITY, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isInheritAccessibility();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IWidget.PROP_LOADING, model) {
+    putJsonProperty(new JsonProperty<>(IWidget.PROP_LOADING, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isLoading();
