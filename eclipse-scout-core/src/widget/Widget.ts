@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext, LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions,
-  ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  Action, arrays, BookmarkAdapter, DefaultBookmarkAdapter, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector,
+  KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, ObjectOrChildModel, objects, ObjectType, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration,
+  PropertyEventEmitter, scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToOptions, Session, SomeRequired, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
-export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType, ObjectWithUuid {
+export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType, ObjectWithUuid, ObjectWithBookmarkAdapter {
   declare model: WidgetModel;
   declare initModel: SomeRequired<this['model'], 'parent'>;
   declare eventMap: WidgetEventMap;
@@ -61,8 +61,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   loading: boolean;
   loadingSupport: LoadingSupport;
   logicalGrid: LogicalGrid;
-  modelClass: string;
-  classId: string;
   objectType: string;
   owner: Widget;
   parent: Widget;
@@ -84,6 +82,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   $container: JQuery;
   $parent: JQuery;
 
+  // Inspector infos (are only available for remote widgets)
+  modelClass: string;
+  classId: string;
+
   /**
    * The 'rendered' flag is set the true when initial rendering of the widget is completed.
    *
@@ -98,6 +100,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   protected _postRenderActions: (() => void)[];
   protected _scrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _storedFocusedWidget: Widget;
+  protected _bookmarkAdapter: BookmarkAdapter;
 
   constructor() {
     super();
@@ -106,11 +109,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.uuid = null;
     this.objectType = null;
     this.session = null;
-
-    // Inspector infos (are only available for remote widgets)
     this.modelClass = null;
     this.classId = null;
-
     this.owner = null;
     this.parent = null;
     this.children = [];
@@ -149,6 +149,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this._parentDestroyHandler = this._onParentDestroy.bind(this);
     this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
     this._scrollHandler = this._onScroll.bind(this);
+    this._bookmarkAdapter = null;
     this.loadingSupport = this._createLoadingSupport();
     this.keyStrokeContext = this._createKeyStrokeContext();
     this.logicalGrid = null;
@@ -186,6 +187,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   override init(model: InitModelOf<this>) {
     let staticModel = this._jsonModel();
     if (staticModel) {
+      model.id = this._chooseId(model.id, staticModel.id);
       model = $.extend({}, staticModel, model);
     }
     model = model || {} as InitModelOf<this>;
@@ -198,12 +200,43 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
+   * Decides which id should be used in case this widget has one from the static and the dynamic model.
+   *
+   * It uses the static model in case it contains a custom id and the dynamic model only has a UI id from the sequence. Typically custom ids are more stable than the ids from the UI sequence which may be different every time.
+   * Otherwise, it uses the id from the dynamic model.
+   */
+  protected _chooseId(modelId: string, staticModelId: string): string {
+    if (!modelId) {
+      return staticModelId;
+    }
+    if (!staticModelId) {
+      return modelId;
+    }
+    if (ObjectUuidProvider.isUiId(modelId) && !ObjectUuidProvider.isUiId(staticModelId)) {
+      // prefer stable Id from static model if model Id is generated.
+      return staticModelId;
+    }
+    return modelId;
+  }
+
+  /**
    * Default implementation simply returns the unmodified model. A Subclass
    * may override this method to alter the JSON model before the widgets
    * are created out of the widgetProperties in the model.
    */
   protected _prepareModel(model: InitModelOf<this>): InitModelOf<this> {
     return model;
+  }
+
+  uuidPath(useFallback?: boolean): string {
+    return scout.create(ObjectUuidProvider, {object: this}).uuidPath(useFallback);
+  }
+
+  getBookmarkAdapter(): BookmarkAdapter {
+    if (!this._bookmarkAdapter) {
+      this._bookmarkAdapter = new DefaultBookmarkAdapter(this);
+    }
+    return this._bookmarkAdapter;
   }
 
   /**
@@ -651,12 +684,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   protected _renderInspectorInfo() {
-    if (this.$container) {
-      this.$container.attrOrRemove('data-uuid', this.uuid);
-    }
-    if (!this.session.inspector) {
-      return;
-    }
     inspector.applyInfo(this);
   }
 

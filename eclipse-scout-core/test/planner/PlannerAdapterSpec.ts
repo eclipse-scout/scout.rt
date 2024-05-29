@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {defaultValues, FullModelOf, ObjectFactory, Planner, PlannerAdapter, PlannerResourceModel} from '../../src/index';
+import {defaultValues, FullModelOf, ObjectUuidProvider, Planner, PlannerAdapter, PlannerResourceModel} from '../../src/index';
 
 describe('PlannerAdapter', () => {
   let session: SandboxSession;
@@ -55,18 +55,18 @@ describe('PlannerAdapter', () => {
 
   function createResource(text?: string): PlannerResourceModel {
     return {
-      id: ObjectFactory.get().createUniqueId(),
+      id: ObjectUuidProvider.createUiId(),
       resourceCell: {
         text: text
       },
       activities: [{
         beginTime: '2015-04-01 01:23:45.678Z',
         endTime: '2015-04-31 01:23:45.678Z',
-        id: ObjectFactory.get().createUniqueId()
+        id: ObjectUuidProvider.createUiId()
       }, {
         beginTime: '2016-02-29 01:23:45.678Z',
         endTime: '2400-02-29 01:23:45.678Z',
-        id: ObjectFactory.get().createUniqueId()
+        id: ObjectUuidProvider.createUiId()
       }]
     };
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -44,7 +44,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
   @Override
   protected void initJsonProperties(WIZARD_PROGRESS_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<WIZARD_PROGRESS_FIELD>(IWizardProgressField.PROP_STEPS, model) {
+    putJsonProperty(new JsonProperty<>(IWizardProgressField.PROP_STEPS, model) {
       @Override
       protected List<IWizardStep<? extends IForm>> modelValue() {
         return getModel().getSteps();
@@ -65,7 +65,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
         return jsonSteps;
       }
     });
-    putJsonProperty(new JsonProperty<WIZARD_PROGRESS_FIELD>(IWizardProgressField.PROP_ACTIVE_STEP, model) {
+    putJsonProperty(new JsonProperty<>(IWizardProgressField.PROP_ACTIVE_STEP, model) {
       @Override
       protected IWizardStep<? extends IForm> modelValue() {
         return getModel().getActiveStep();
@@ -96,7 +96,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
     jsonStep.put("actionEnabled", wizardStep.isActionEnabled());
     jsonStep.put("cssClass", wizardStep.getCssClass());
     jsonStep.put("finished", wizardStep.isFinished());
-    BEANS.get(InspectorInfo.class).put(getUiSession(), jsonStep, wizardStep);
+    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), jsonStep, wizardStep, s -> INSPECTOR_ID_PROVIDER.get().getIdForWizardStep(s));
     return jsonStep;
   }
 

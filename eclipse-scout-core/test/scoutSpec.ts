@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Menu, NullWidget, NumberField, ObjectFactory, objects, scout, Session, Status, StringField, Tooltip, ValueField, Widget} from '../src/index';
-import {FormSpecHelper} from '../src/testing';
+import {Menu, NullWidget, NumberField, objects, ObjectUuidProvider, scout, Session, Status, StringField, Tooltip, ValueField, Widget} from '../src/index';
+import {FormSpecHelper, TestingObjectUuidProvider} from '../src/testing';
 
 describe('main', () => {
   let session: SandboxSession;
@@ -388,13 +388,13 @@ describe('main', () => {
     describe('local object', () => {
 
       it('sets property \'id\' correctly when no ID is provided', () => {
-        let expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
+        let expectedSeqNo = TestingObjectUuidProvider.getUniqueIdSeqNo() + 1,
           menu = scout.create(Menu, {
             parent: new NullWidget(),
             session: session
           });
-        expect(menu.id).toBe('ui' + expectedSeqNo.toString());
-        expect(ObjectFactory.get().uniqueIdSeqNo).toBe(expectedSeqNo);
+        expect(menu.id).toBe(ObjectUuidProvider.UI_ID_PREFIX + expectedSeqNo.toString());
+        expect(TestingObjectUuidProvider.getUniqueIdSeqNo()).toBe(expectedSeqNo);
       });
 
       it('session must be set, but adapter should not be registered', () => {

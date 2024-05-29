@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AdapterData, App, Device, GroupBox, Locale, locales, LogicalGridLayout, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, Session, strings, ValueField, Widget, widgets} from './index';
+import {AdapterData, App, Device, GroupBox, Locale, locales, LogicalGridLayout, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, ObjectUuidProvider, Session, strings, ValueField, Widget, widgets} from './index';
 import $ from 'jquery';
 
 let $activeElements = null;
@@ -45,11 +45,23 @@ export interface ObjectWithType {
   objectType: string;
 }
 
+/**
+ * Represents an object having an uuid.
+ */
 export interface ObjectWithUuid {
   /**
-   * Unique identifier for this element.
+   * The identifier property of the object. This property alone may not be unique within a widget tree (e.g. if template widgets are used).
+   * To get a more unique id use {@link uuidPath} instead.
    */
   uuid: string;
+
+  /**
+   * Computes a string consisting of the id of this object and its parent objects (if existing) to get a unique identifier within an object tree.
+   *
+   * Note: The returned id may not be unique within the application! E.g. if the same form is opened twice, its children will share the same ids.
+   * @param useFallback Optional boolean specifying if a fallback identifier may be used or created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
+   */
+  uuidPath(useFallback?: boolean): string;
 }
 
 export interface ObjectModel<TObject = object, TId = string> {
@@ -58,6 +70,9 @@ export interface ObjectModel<TObject = object, TId = string> {
 }
 
 export interface ObjectWithUuidModel<TObject = object, TId = string> extends ObjectModel<TObject, TId> {
+  /**
+   * A unique identifier for the object. Typically, a new random UUID can be used.
+   */
   uuid?: string;
 }
 
@@ -468,7 +483,7 @@ export const scout = {
       }
     }
     if (scout.nvl(createUniqueId, true)) {
-      clone.id = ObjectFactory.get().createUniqueId();
+      clone.id = ObjectUuidProvider.createUiId();
     }
     if (clone.cloneOf === undefined) {
       clone.cloneOf = template;

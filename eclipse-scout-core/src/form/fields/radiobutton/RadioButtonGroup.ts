@@ -9,8 +9,8 @@
  */
 import {
   aria, arrays, CloneOptions, FormField, HorizontalGrid, HtmlComponent, InitModelOf, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, LookupCall, LookupCallOrModel, LookupResult, LookupRow,
-  ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout,
-  Status, ValueField
+  ObjectOrChildModel, ObjectOrModel, objects, ObjectUuidProvider, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel,
+  RadioButtonGroupRightOrDownKeyStroke, scout, Status, ValueField
 } from '../../../index';
 import $ from 'jquery';
 
@@ -534,3 +534,5 @@ export class RadioButtonGroup<TValue> extends ValueField<TValue> implements Radi
     return clone;
   }
 }
+
+ObjectUuidProvider.UuidPathSkipWidgets.add(RadioButtonGroup);

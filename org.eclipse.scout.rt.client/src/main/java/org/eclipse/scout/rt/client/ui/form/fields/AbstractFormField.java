@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1194,7 +1194,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Computes a unique class id.
    * <p>
    * If the class is annotated with {@link ClassId}, the annotation value is used. If the field is defined in a template
-   * (outside of its form class), the ids of the enclosing fields are appended, if necessary, to make the id unique.
+   * (outside its form class), the ids of the enclosing fields are appended, if necessary, to make the id unique.
    * <p>
    * If the class is not annotated with {@link ClassId}, a unique id is computed using the simple class name.
    * <p>

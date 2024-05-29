@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.ui.html.json.table;
 
+import org.eclipse.scout.rt.client.ui.InspectorObjectIdProvider;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
@@ -33,6 +35,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   private JsonTable<?> m_jsonTable;
   private int m_indexOffset;
 
+  protected static final LazyValue<InspectorObjectIdProvider> INSPECTOR_ID_PROVIDER = new LazyValue<>(InspectorObjectIdProvider.class);
   private static final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
   private static final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
 
@@ -68,50 +71,50 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     JSONObject json = new JSONObject();
     json.put("id", getId());
     json.put("objectType", getObjectTypeVariant());
-    json.put("index", getColumn().getColumnIndex() - m_indexOffset);
-    json.put("text", getColumn().getHeaderCell().getText());
-    json.put(IColumn.PROP_WIDTH, getColumn().getWidth());
-    json.put(IColumn.PROP_MIN_WIDTH, getColumn().getMinWidth());
-    json.put(IColumn.PROP_AUTO_OPTIMIZE_MAX_WIDTH, getColumn().getAutoOptimizeMaxWidth());
-    if (getColumn().getInitialWidth() != getColumn().getWidth()) {
-      json.put("initialWidth", getColumn().getInitialWidth());
+    T column = getColumn();
+    json.put("index", column.getColumnIndex() - m_indexOffset);
+    json.put("text", column.getHeaderCell().getText());
+    json.put(IColumn.PROP_WIDTH, column.getWidth());
+    json.put(IColumn.PROP_MIN_WIDTH, column.getMinWidth());
+    json.put(IColumn.PROP_AUTO_OPTIMIZE_MAX_WIDTH, column.getAutoOptimizeMaxWidth());
+    if (column.getInitialWidth() != column.getWidth()) {
+      json.put("initialWidth", column.getInitialWidth());
     }
-    json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, getColumn().getHorizontalAlignment());
-    if (getColumn().isSortActive()) {
+    json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, column.getHorizontalAlignment());
+    if (column.isSortActive()) {
       json.put("sortActive", true);
-      json.put("sortAscending", getColumn().isSortAscending());
-      json.put("sortIndex", getColumn().getSortIndex());
-      json.put("grouped", getColumn().isGroupingActive());
+      json.put("sortAscending", column.isSortAscending());
+      json.put("sortIndex", column.getSortIndex());
+      json.put("grouped", column.isGroupingActive());
     }
-    if (getColumn().getTable().getCheckableColumn() == getColumn()) {
+    if (column.getTable().getCheckableColumn() == column) {
       json.put("checkable", true);
     }
-    json.put(IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
-    json.put(IColumn.PROP_FIXED_POSITION, getColumn().isFixedPosition());
-    json.put(IColumn.PROP_AUTO_OPTIMIZE_WIDTH, getColumn().isAutoOptimizeWidth());
-    json.put(IColumn.PROP_EDITABLE, getColumn().isEditable());
-    json.put("mandatory", getColumn().isMandatory());
-    json.put("textWrap", getColumn().isTextWrap());
-    json.put(IColumn.PROP_HTML_ENABLED, getColumn().isHtmlEnabled());
-    json.put(IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
-    json.put("headerCssClass", getColumn().getHeaderCell().getCssClass());
-    json.put("headerHtmlEnabled", getColumn().getHeaderCell().isHtmlEnabled());
-    json.put("headerMenuEnabled", getColumn().getHeaderCell().isMenuEnabled());
-    json.put("headerBackgroundColor", getColumn().getHeaderCell().getBackgroundColor());
-    json.put("headerForegroundColor", getColumn().getHeaderCell().getForegroundColor());
-    json.put("headerFont", getColumn().getHeaderCell().getFont() != null ? getColumn().getHeaderCell().getFont().toPattern() : null);
-    json.put("headerTooltipText", getColumn().getHeaderCell().getTooltipText());
-    json.put("headerTooltipHtmlEnabled", getColumn().getHeaderCell().isTooltipHtmlEnabled());
-    json.put("headerIconId", BinaryResourceUrlUtility.createIconUrl(getColumn().getHeaderCell().getIconId()));
-    json.put("uuid", getColumn().classId()); // FIXME bsh [js-bookmark] where to get uuid?
-    BEANS.get(InspectorInfo.class).put(getUiSession(), json, getColumn());
-    json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
-    json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, getColumn().isInitialAlwaysIncludeSortAtBegin());
-    json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END, getColumn().isInitialAlwaysIncludeSortAtEnd());
-    json.put(PROP_REMOVABLE, getColumn().isRemovable());
-    json.put(PROP_MODIFIABLE, getColumn().isModifiable());
-    json.put(IColumn.PROP_NODE_COLUMN_CANDIDATE, getColumn().isNodeColumnCandidate());
-    json.put(PROP_COMPACTED, getColumn().isCompacted());
+    json.put(IColumn.PROP_FIXED_WIDTH, column.isFixedWidth());
+    json.put(IColumn.PROP_FIXED_POSITION, column.isFixedPosition());
+    json.put(IColumn.PROP_AUTO_OPTIMIZE_WIDTH, column.isAutoOptimizeWidth());
+    json.put(IColumn.PROP_EDITABLE, column.isEditable());
+    json.put("mandatory", column.isMandatory());
+    json.put("textWrap", column.isTextWrap());
+    json.put(IColumn.PROP_HTML_ENABLED, column.isHtmlEnabled());
+    json.put(IColumn.PROP_CSS_CLASS, column.getCssClass());
+    json.put("headerCssClass", column.getHeaderCell().getCssClass());
+    json.put("headerHtmlEnabled", column.getHeaderCell().isHtmlEnabled());
+    json.put("headerMenuEnabled", column.getHeaderCell().isMenuEnabled());
+    json.put("headerBackgroundColor", column.getHeaderCell().getBackgroundColor());
+    json.put("headerForegroundColor", column.getHeaderCell().getForegroundColor());
+    json.put("headerFont", column.getHeaderCell().getFont() != null ? column.getHeaderCell().getFont().toPattern() : null);
+    json.put("headerTooltipText", column.getHeaderCell().getTooltipText());
+    json.put("headerTooltipHtmlEnabled", column.getHeaderCell().isTooltipHtmlEnabled());
+    json.put("headerIconId", BinaryResourceUrlUtility.createIconUrl(column.getHeaderCell().getIconId()));
+    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), json, column, c -> INSPECTOR_ID_PROVIDER.get().getIdForColumn(c));
+    json.put(IColumn.PROP_UI_SORT_POSSIBLE, column.isUiSortPossible());
+    json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, column.isInitialAlwaysIncludeSortAtBegin());
+    json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END, column.isInitialAlwaysIncludeSortAtEnd());
+    json.put(PROP_REMOVABLE, column.isRemovable());
+    json.put(PROP_MODIFIABLE, column.isModifiable());
+    json.put(IColumn.PROP_NODE_COLUMN_CANDIDATE, column.isNodeColumnCandidate());
+    json.put(PROP_COMPACTED, column.isCompacted());
 
     return json;
   }

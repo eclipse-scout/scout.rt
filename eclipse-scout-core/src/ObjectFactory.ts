@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FullModelOf, InitModelOf, ModelOf, ObjectModel, objects, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
+import {FullModelOf, InitModelOf, ModelOf, ObjectModel, objects, ObjectUuidProvider, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
 import $ from 'jquery';
 
 export type ObjectCreator = (model?: any) => object;
@@ -38,15 +38,12 @@ export interface RegisterNamespaceOptions {
  * @singleton
  */
 export class ObjectFactory {
-  /** use {@link createUniqueId} to generate a new ID */
-  uniqueIdSeqNo: number;
   initialized: boolean;
 
   protected _registry: Map<ObjectType, ObjectCreator>;
   protected _objectTypeMap: Map<new() => object, string>;
 
   constructor() {
-    this.uniqueIdSeqNo = 0;
     this.initialized = false;
     this._registry = new Map();
     this._objectTypeMap = new Map();
@@ -168,7 +165,7 @@ export class ObjectFactory {
     if (objects.isFunction(scoutObject.init)) {
       if (model) {
         if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
-          model.id = this.createUniqueId();
+          model.id = ObjectUuidProvider.createUiId();
         }
         model.objectType = this.getObjectType(objectType);
       }
@@ -177,7 +174,7 @@ export class ObjectFactory {
     }
 
     if (scoutObject.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
-      scoutObject.id = this.createUniqueId();
+      scoutObject.id = ObjectUuidProvider.createUiId();
     }
     if (scoutObject.objectType === undefined) {
       scoutObject.objectType = this.getObjectType(objectType);
@@ -187,12 +184,10 @@ export class ObjectFactory {
   }
 
   /**
-   * Returns a new unique ID to be used for Widgets/Adapters created by the UI
-   * without a model delivered by the server-side client.
-   * @returns ID with prefix 'ui'
+   * @deprecated Use {@link ObjectUuidProvider.createUiId} instead.
    */
   createUniqueId(): string {
-    return 'ui' + (++this.uniqueIdSeqNo).toString();
+    return ObjectUuidProvider.createUiId();
   }
 
   resolveTypedObjectType(objectType: ObjectType): ObjectType {

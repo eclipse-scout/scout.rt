@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  CollapseHandle, CollapseHandleHorizontalAlignment, CompositeField, Dimension, EnumObject, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStroke, PropertyChangeEvent, scout, SplitBoxCollapseKeyStroke,
-  SplitBoxEventMap, SplitBoxFirstCollapseKeyStroke, SplitBoxLayout, SplitBoxModel, SplitBoxSecondCollapseKeyStroke
+  CollapseHandle, CollapseHandleHorizontalAlignment, CompositeField, Dimension, EnumObject, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStroke, ObjectUuidProvider, PropertyChangeEvent, scout,
+  SplitBoxCollapseKeyStroke, SplitBoxEventMap, SplitBoxFirstCollapseKeyStroke, SplitBoxLayout, SplitBoxModel, SplitBoxSecondCollapseKeyStroke
 } from '../../../index';
 import $ from 'jquery';
 
@@ -780,3 +780,5 @@ export class SplitBox extends CompositeField {
 }
 
 export type SplitBoxSplitterPositionType = EnumObject<typeof SplitBox.SplitterPositionType>;
+
+ObjectUuidProvider.UuidPathSkipWidgets.add(SplitBox);

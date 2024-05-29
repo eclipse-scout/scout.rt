@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, objects, PropertyChangeEvent, Rectangle, scout, scrollbars, SomeRequired,
-  strings, styles, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget, widgets
+  aria, arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, InitModelOf, inspector, MenuBar, MenuDestinations, objects, ObjectUuidProvider, PropertyChangeEvent, Rectangle, scout,
+  scrollbars, SomeRequired, strings, styles, Table, TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableHeaderEventMap, TableHeaderMenu, TableHeaderModel, tooltips, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -135,7 +135,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
     $header.cssMinWidth(columnWidth).cssMaxWidth(columnWidth);
 
     // add label id to header item text, so table cells can reference it for screen readers
-    this.headerLabelId = widgets.createUniqueId('lbl');
+    this.headerLabelId = ObjectUuidProvider.createUiId();
     $header.appendSpan('table-header-item-text').attr('id', this.headerLabelId);
 
     if (this.enabled) { // enabledComputed not used on purpose
@@ -144,10 +144,7 @@ export class TableHeader extends Widget implements TableHeaderModel {
         .on('mousedown', this._onHeaderItemMouseDown.bind(this));
     }
 
-    $header.attrOrRemove('data-uuid', column.uuid);
-    if (this.session.inspector) {
-      inspector.applyInfo(column, $header);
-    }
+    inspector.applyInfo(column, $header);
 
     if (isFirstColumn) {
       $header.addClass('first');
