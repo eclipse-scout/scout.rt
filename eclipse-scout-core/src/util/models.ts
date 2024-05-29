@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -113,6 +113,7 @@ export const models = {
    *
    * [appendTo]
    * Adding or overriding a property:
+   * ```
    *   {
    *     "id": "..."
    *     "type": "extension"
@@ -128,9 +129,11 @@ export const models = {
    *       }
    *     ]
    *   }
+   * ```
    *
    * [insert]
    * Adding new object to the tree:
+   * ```
    *   {
    *     "id": "..."
    *     "type": "extension"
@@ -139,28 +142,31 @@ export const models = {
    *         "operation": "insert",
    *         "target": {
    *           "id": "someObjectID",
-   *           "property": "collectionOfsomeObject",
+   *           "property": "collectionOfSomeObject",
    *           "before": "somObjectIDInPropertyArray"    // (alternative "index": 0)
    *         },
    *         "extension": {
    *            "id": "newObjectID",
-   *            "propertyx": "someThing",
-   *            "collectiony": [...]
+   *            "propertyX": "someThing",
+   *            "collectionY": [...]
    *         }
    *       }
    *     ]
    *   }
+   * ```
    *
    * To extend the root object directly, "target.root: true" can be used instead of "target.id".
    *
    * To group inserted elements positions with its target use:
+   * ```
    *   "target": {
    *     "id": "someObjectID",
-   *     "property": "collectionOfsomeObject",
+   *     "property": "collectionOfSomeObject",
    *     "before": "somObjectIDInPropertyArray",
    *     "groupWithTarget": true
    *   }
-   * This will group the properties together. future extensions which use "before": "somObjectIDInPropertyArray"
+   * ```
+   * This will group the properties together. Future extensions which use "before": "somObjectIDInPropertyArray"
    * will insert new elements before the grouped items. (Works the same with "after".)
    *
    * The extension property can be an object or an array of objects.
