@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -181,14 +181,19 @@ export class Scrollbar extends Widget implements ScrollbarModel {
       return;
     }
     let margin = this.$container['cssMargin' + this.axis.toUpperCase()]();
+    let border = this.$parent['cssBorderWidth' + this.axis.toUpperCase()]();
     let scrollPos = this.$parent[this._scrollDir]();
     let scrollLeft = this.$parent.scrollLeft();
     let scrollTop = this.$parent.scrollTop();
 
     this.reset();
 
-    this._offsetSize = this.$parent[0]['offset' + this._dim];
-    this._scrollSize = this.$parent[0]['scroll' + this._dim];
+    // parent dimensions
+    // The browser reports these including the border width, but because child elements are always
+    // positioned inside the border box, we have to subtract it manually. Otherwise, the scrollbar
+    // will be positioned too far down/right and will be cut off at the end.
+    this._offsetSize = this.$parent[0]['offset' + this._dim] - border;
+    this._scrollSize = this.$parent[0]['scroll' + this._dim] - border;
 
     // calc size and range of thumb
     let thumbSize = Math.max(this._offsetSize * this._offsetSize / this._scrollSize - margin, 25);
