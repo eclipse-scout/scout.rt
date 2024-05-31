@@ -1334,10 +1334,6 @@ export class Planner extends Widget implements PlannerModel {
     this._updateMenuBar();
   }
 
-  protected _removeMenus() {
-    // menubar takes care of removal
-  }
-
   protected _updateMenuBar() {
     let menuItems = this._filterMenus([Planner.MenuType.EmptySpace, Planner.MenuType.Resource, Planner.MenuType.Activity, Planner.MenuType.Range], false, true);
     this.menuBar.setMenuItems(menuItems);
