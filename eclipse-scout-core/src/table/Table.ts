@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractTableAccessibilityRenderer, Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke,
-  ContextMenuPopup, DefaultTableAccessibilityRenderer, Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, Filterable, FilterOrFunction,
-  FilterResult, FilterSupport, FullModelOf, graphics, HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations,
-  MenuItemsOrder, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status,
-  StatusOrModel, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke,
-  TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow,
-  TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile,
+  AbstractTableAccessibilityRenderer, Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BookmarkTableRowIdentifierBooleanComponentDo, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierLongComponentDo,
+  BookmarkTableRowIdentifierStringComponentDo, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DefaultTableAccessibilityRenderer, Desktop,
+  DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics,
+  HierarchicalTableAccessibilityRenderer, HtmlComponent, IconColumn, InitModelOf, Insets, KeyStrokeContext, LimitedResultTableStatus, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
+  NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, ScrollToOptions, Status, StatusOrModel, strings, styles,
+  TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke,
+  TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow, TableRowModel,
+  TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile,
   TileTableHeaderBox, tooltips, TooltipSupport, UpdateFilteredElementsOptions, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
@@ -404,6 +405,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       tableRow = this._createRow(row);
     }
     this.rowsMap[tableRow.id] = tableRow;
+    this._initBookmarkIdentifier(tableRow);
     this.trigger('rowInit', {
       row: tableRow
     });
@@ -415,6 +417,27 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     model.objectType = scout.nvl(model.objectType, TableRow);
     model.parent = this;
     return scout.create(model);
+  }
+
+  protected _initBookmarkIdentifier(tableRow: TableRow) {
+    if (tableRow.bookmarkIdentifier) {
+      return; // already set
+    }
+    // FIXME bsh [js-bookmark] Somehow create a JS version of BookmarkTableRowIdentifierDoFactory
+    let keyComponents = tableRow.getKeyValues().map(key => {
+      // FIXME bsh [js-bookmark] How to check for entity key types?
+      if (typeof key === 'string') {
+        return scout.create(BookmarkTableRowIdentifierStringComponentDo, {key});
+      }
+      if (typeof key === 'number') {
+        return scout.create(BookmarkTableRowIdentifierLongComponentDo, {key});
+      }
+      if (typeof key === 'boolean') {
+        return scout.create(BookmarkTableRowIdentifierBooleanComponentDo, {key});
+      }
+      return null; // FIXME bsh [js-bookmark] Handle this case
+    });
+    tableRow.bookmarkIdentifier = scout.create(BookmarkTableRowIdentifierDo, {keyComponents});
   }
 
   protected _initColumns() {
