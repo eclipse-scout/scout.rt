@@ -10,7 +10,7 @@
  */
 import {AbstractChartRenderer, Chart, chartJsDateAdapter} from '../index';
 import ChartJs from 'chart.js/auto';
-import {_adapters as chartJsAdapters} from 'chart.js';
+import {_adapters as chartJsAdapters, CategoryScale} from 'chart.js';
 import {arrays, colorSchemes, Event, graphics, numbers, objects, Point, scout, strings, styles, tooltips} from '@eclipse-scout/core';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import $ from 'jquery';
@@ -155,9 +155,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.colorSchemeCssClass = '';
     this.minRadialChartDatalabelSpace = 25;
 
-    this._labelFormatter = this._formatLabel.bind(this);
-    this._xLabelFormatter = this._formatXLabel.bind(this);
-    this._yLabelFormatter = this._formatYLabel.bind(this);
+    this._labelFormatter = this._createLabelFormatter(this._formatLabel);
+    this._xLabelFormatter = this._createLabelFormatter(this._formatXLabel);
+    this._yLabelFormatter = this._createLabelFormatter(this._formatYLabel);
 
     this._xAxisFitter = this._fitXAxis.bind(this);
     this._yAxisFitter = this._fitYAxis.bind(this);
@@ -1254,6 +1254,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           callback: this._labelFormatter
         },
         pointLabels: {
+          callback: this._labelFormatter,
           font: {
             size: ChartJs.defaults.font.size
           }
@@ -1485,22 +1486,44 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }, plugins.datalabels);
   }
 
-  _formatLabel(label) {
+  _getNumberFormatter() {
+    return this.chartJs?.config?.options?.numberFormatter;
+  }
+
+  /**
+   * Creates an unbound function that calls the given formatter on this {@link ChartJsRenderer}. The context of this
+   * unbound function is passed to the formatter as argument.
+   */
+  _createLabelFormatter(formatter) {
+    const renderer = this;
+    return function(label) {
+      return formatter.call(renderer, label, this);
+    };
+  }
+
+  _formatLabel(label, scale) {
+    label = this._formatCategory(label, scale);
     return this._formatLabelMap(label, null, this._getNumberFormatter());
   }
 
-  _getNumberFormatter() {
-    if (this.chartJs && this.chartJs.config && this.chartJs.config.options) {
-      return this.chartJs.config.options.numberFormatter;
-    }
-  }
-
-  _formatXLabel(label) {
+  _formatXLabel(label, scale) {
+    label = this._formatCategory(label, scale);
     return this._formatLabelMap(label, this._getXLabelMap(), this._getNumberFormatter());
   }
 
-  _formatYLabel(label) {
+  _formatYLabel(label, scale) {
+    label = this._formatCategory(label, scale);
     return this._formatLabelMap(label, this._getYLabelMap(), this._getNumberFormatter());
+  }
+
+  /**
+   * Uses the given scale to format the given label iff it is a {@link CategoryScale}.
+   */
+  _formatCategory(label, scale) {
+    if (scale instanceof CategoryScale && numbers.isNumber(label)) {
+      return scale.getLabelForValue(label);
+    }
+    return label;
   }
 
   _getXLabelMap() {
