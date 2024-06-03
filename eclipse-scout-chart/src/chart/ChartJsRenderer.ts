@@ -7,17 +7,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractChartRenderer, CartesianChartScale, Chart, chartJsDateAdapter, RadialChartScale} from '../index';
+import {AbstractChartRenderer, CartesianChartScale, Chart, ChartAxis, ChartConfig, ChartData, chartJsDateAdapter, ChartType, ClickObject, NumberFormatter, RadialChartScale} from '../index';
 import {
-  _adapters as chartJsAdapters, ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color, DefaultDataPoint,
-  FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem, TooltipLabelStyle,
-  TooltipModel, TooltipOptions
+  _adapters as chartJsAdapters, ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, CategoryScale, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color,
+  DefaultDataPoint, FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, PointOptions, PointProps, RadialLinearScaleOptions, Scale, ScatterDataPoint, TooltipCallbacks, TooltipItem,
+  TooltipLabelStyle, TooltipModel, TooltipOptions
 } from 'chart.js';
 import 'chart.js/auto'; // Import from auto to register charts
 import {arrays, colorSchemes, graphics, numbers, objects, Point, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
 import ChartDataLabels, {Context} from 'chartjs-plugin-datalabels';
 import $ from 'jquery';
-import {ChartAxis, ChartConfig, ChartData, ChartType, ClickObject, NumberFormatter} from './Chart';
 
 ChartJs.register(ChartDataLabels);
 
@@ -124,9 +123,9 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     this.colorSchemeCssClass = '';
     this.minRadialChartDatalabelSpace = 25;
 
-    this._labelFormatter = this._formatLabel.bind(this);
-    this._xLabelFormatter = this._formatXLabel.bind(this);
-    this._yLabelFormatter = this._formatYLabel.bind(this);
+    this._labelFormatter = this._createLabelFormatter(this._formatLabel);
+    this._xLabelFormatter = this._createLabelFormatter(this._formatXLabel);
+    this._yLabelFormatter = this._createLabelFormatter(this._formatYLabel);
 
     this._xAxisFitter = this._fitXAxis.bind(this);
     this._yAxisFitter = this._fitYAxis.bind(this);
@@ -1189,6 +1188,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
           callback: this._labelFormatter
         },
         pointLabels: {
+          callback: this._labelFormatter,
           font: {
             size: ChartJs.defaults.font.size
           }
@@ -1419,22 +1419,44 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }, plugins.datalabels);
   }
 
-  protected _formatLabel(label: number | string): string {
+  protected _getNumberFormatter(): NumberFormatter {
+    return this.chartJs?.config?.options?.numberFormatter;
+  }
+
+  /**
+   * Creates an unbound function that calls the given formatter on this {@link ChartJsRenderer}. The context of this
+   * unbound function is passed to the formatter as argument.
+   */
+  protected _createLabelFormatter(formatter: LabelFormatter): LabelFormatter {
+    const renderer = this;
+    return function(label) {
+      return formatter.call(renderer, label, this);
+    };
+  }
+
+  protected _formatLabel(label: number | string, scale?: Scale): string {
+    label = this._formatCategory(label, scale);
     return this._formatLabelMap(label, null, this._getNumberFormatter());
   }
 
-  protected _getNumberFormatter(): NumberFormatter {
-    if (this.chartJs && this.chartJs.config && this.chartJs.config.options) {
-      return this.chartJs.config.options.numberFormatter;
-    }
-  }
-
-  protected _formatXLabel(label: number | string): string {
+  protected _formatXLabel(label: number | string, scale?: Scale): string {
+    label = this._formatCategory(label, scale);
     return this._formatLabelMap(label, this._getXLabelMap(), this._getNumberFormatter());
   }
 
-  protected _formatYLabel(label: number | string): string {
+  protected _formatYLabel(label: number | string, scale?: Scale): string {
+    label = this._formatCategory(label, scale);
     return this._formatLabelMap(label, this._getYLabelMap(), this._getNumberFormatter());
+  }
+
+  /**
+   * Uses the given scale to format the given label iff it is a {@link CategoryScale}.
+   */
+  protected _formatCategory(label: number | string, scale?: Scale): number | string {
+    if (scale instanceof CategoryScale && numbers.isNumber(label)) {
+      return scale.getLabelForValue(label);
+    }
+    return label;
   }
 
   protected _getXLabelMap(): Record<number | string, string> {
@@ -2826,7 +2848,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
   }
 }
 
-export type LabelFormatter = (label: number | string) => string;
+export type LabelFormatter = (label: number | string, scale?: Scale) => string;
 export type AxisFitter = (axis: Scale<CartesianScaleOptions>) => void;
 export type DatalabelsDisplayHandler = (context: Context) => boolean;
 export type DatalabelsFormatter = (value: number | ScatterDataPoint | BubbleDataPoint, context: Context) => string;
