@@ -11,32 +11,48 @@
 package org.eclipse.scout.rt.platform.opentelemetry;
 
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.ObservableDoubleMeasurement;
 
-public final class AsyncObservableDoubleMeasurement extends AbstractAsyncObservableMeasurement<ObservableDoubleMeasurement, Double> {
+/**
+ * {@link ObservableDoubleMeasurement} to support "long-running" observable measurements that are independent of
+ * OpenTelemetry's metrics export interval.
+ *
+ * @see PeriodicAsyncMeasurement
+ */
+public final class AsyncObservableDoubleMeasurement implements Consumer<ObservableDoubleMeasurement>, AutoCloseable {
 
-  public static AsyncObservableDoubleMeasurement create(String name, Callable<Double> callable, Supplier<RunContext> runContextSupplier) {
-    return new AsyncObservableDoubleMeasurement(name, callable, runContextSupplier);
+  public static AsyncObservableDoubleMeasurement create(String name, Callable<Double> callable, Supplier<RunContext> runContextSupplier, Supplier<Boolean> leaderElectionSupplier) {
+    return create(name, callable, runContextSupplier, leaderElectionSupplier, Attributes.empty());
   }
 
-  static AsyncObservableDoubleMeasurement create(String name, Callable<Double> callable, Supplier<RunContext> runContextSupplier, long asyncObservationIntervalInMs) {
-    return new AsyncObservableDoubleMeasurement(name, callable, runContextSupplier, asyncObservationIntervalInMs);
+  public static AsyncObservableDoubleMeasurement create(String name, Callable<Double> callable, Supplier<RunContext> runContextSupplier, Supplier<Boolean> leaderElectionSupplier, Attributes attributes) {
+    return new AsyncObservableDoubleMeasurement(name, callable, runContextSupplier, leaderElectionSupplier, attributes);
   }
 
-  private AsyncObservableDoubleMeasurement(String name, Callable<Double> callable, Supplier<RunContext> runContextSupplier) {
-    super(name, callable, runContextSupplier);
-  }
+  private final Attributes m_attributes;
+  private final PeriodicAsyncMeasurement<Double> m_periodicAsyncMeasurement;
 
-  private AsyncObservableDoubleMeasurement(String name, Callable<Double> callable, Supplier<RunContext> runContextSupplier, long asyncObservationIntervalInNs) {
-    super(name, callable, runContextSupplier, asyncObservationIntervalInNs);
+  private AsyncObservableDoubleMeasurement(String name, Callable<Double> callable, Supplier<RunContext> runContextSupplier, Supplier<Boolean> leaderElectionSupplier, Attributes attributes) {
+    m_attributes = attributes;
+    m_periodicAsyncMeasurement = new PeriodicAsyncMeasurement<>(name, callable, runContextSupplier, leaderElectionSupplier);
   }
 
   @Override
-  protected void record(ObservableDoubleMeasurement measurement, Double asyncMeasurementValue) {
-    measurement.record(asyncMeasurementValue);
+  public void accept(ObservableDoubleMeasurement measurement) {
+    Double value = m_periodicAsyncMeasurement.getAndNext();
+    if (value != null) {
+      measurement.record(value, m_attributes);
+    }
+  }
+
+  @Override
+  public void close() throws Exception {
+    m_periodicAsyncMeasurement.close();
   }
 }
