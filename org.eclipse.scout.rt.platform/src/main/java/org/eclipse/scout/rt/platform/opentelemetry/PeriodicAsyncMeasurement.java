@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.opentelemetry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -30,72 +29,73 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.opentelemetry.api.metrics.ObservableMeasurement;
-
 /**
- * {@link ObservableMeasurement} to support "long-running" observable measurements that are independent of
- * OpenTelemetry's metrics export interval. "long-running" means measurements that are based on values accessing other
- * (external) systems, e.g. database queries, and can therefore take longer than few milliseconds. To avoid a
- * time-consuming metrics export process, the measurement is done asynchronously.<br/>
+ * Helper to support "long-running" observable measurements that are independent of OpenTelemetry's metrics export
+ * interval. "long-running" means measurements that are based on values accessing other (external) systems, e.g.
+ * database queries, and can therefore take longer than few milliseconds. To avoid a time-consuming metrics export
+ * process, the measurement is done asynchronously.<br/>
  * <b>Important:</b> Prefer to use in-memory metrics instead of this type of metrics if possible.
  * <p>
  * The observation is executed asynchronously with a predefined minimum interval (see
  * {@link AsyncObservationIntervalProperty}). The schedule of this async job is controlled during the execution of the
  * metrics export. As soon as the last job trigger is outside the specified interval, the job is re-triggered during the
- * metrics export (see {@link #accept(ObservableMeasurement)}).
+ * metrics export (see {@link #getAndNext()}).
  * </p>
  * <p>
  * {@link ConcurrentAsyncObservableJobProperty} is used to prevent too many parallel "long-running" observable
  * measurements, which could cause resource starvation (mainly with database connections).
  * </p>
  */
-public abstract class AbstractAsyncObservableMeasurement<M extends ObservableMeasurement, V> implements Consumer<M> {
+public class PeriodicAsyncMeasurement<V> implements AutoCloseable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractAsyncObservableMeasurement.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PeriodicAsyncMeasurement.class);
 
   static final String ASYNC_JOB_NAME_PATTERN = "[otel] Async measurement: {}";
   static final LazyValue<IExecutionSemaphore> ASYNC_JOB_EXECUTION_SEMAPHORE = new LazyValue<>(() -> Jobs.newExecutionSemaphore(CONFIG.getPropertyValue(ConcurrentAsyncObservableJobProperty.class)));
-  static final String ASYNC_JOB_EXECUTION_HINT = AbstractAsyncObservableMeasurement.class.getSimpleName() + "$ASYNC_JOB";
+  static final String ASYNC_JOB_EXECUTION_HINT = PeriodicAsyncMeasurement.class.getSimpleName() + "$ASYNC_JOB";
   private static final long ASYNC_JOB_MIN_EXECUTION_EXPIRATION_TIME_MILLIS = TimeUnit.SECONDS.toMillis(10);
 
   private final String m_name;
   private final Callable<V> m_callable;
   private final Supplier<RunContext> m_runContextSupplier;
+  private final Supplier<Boolean> m_activeOnThisNodeSupplier;
   private final long m_asyncObservationIntervalMillis;
 
   // In OpenTelemetry the metric collections across all readers are sequential. Therefore, no specific concurrency handling
   // is required.
-  // see io.opentelemetry.sdk.metrics.internal.state.MeterSharedState.collectAll(RegisteredReader, MeterProviderSharedState, long)
+  // see https://opentelemetry.io/docs/specs/otel/metrics/sdk/#exportbatch
+  // and io.opentelemetry.sdk.metrics.internal.state.MeterSharedState.collectAll(RegisteredReader, MeterProviderSharedState, long)
   private volatile V m_asyncMeasurementValue;
   private final AtomicReference<IFuture<V>> m_asyncJobRef = new AtomicReference<>();
   private volatile long m_asyncJobLastTriggerTimestamp;
 
-  protected AbstractAsyncObservableMeasurement(String name, Callable<V> callable, Supplier<RunContext> runContextSupplier) {
-    this(name, callable, runContextSupplier, TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(AsyncObservationIntervalProperty.class)));
+  public PeriodicAsyncMeasurement(String name, Callable<V> callable, Supplier<RunContext> runContextSupplier, Supplier<Boolean> activeOnThisNodeSupplier) {
+    this(name, callable, runContextSupplier, activeOnThisNodeSupplier, TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(AsyncObservationIntervalProperty.class)));
   }
 
-  protected AbstractAsyncObservableMeasurement(String name, Callable<V> callable, Supplier<RunContext> runContextSupplier, long asyncObservationIntervalMillis) {
+  public PeriodicAsyncMeasurement(String name, Callable<V> callable, Supplier<RunContext> runContextSupplier, Supplier<Boolean> activeOnThisNodeSupplier, long asyncObservationIntervalMillis) {
     Assertions.assertNotNull(name);
     Assertions.assertNotNull(callable);
     Assertions.assertNotNull(runContextSupplier);
     m_name = name;
     m_callable = callable;
     m_runContextSupplier = runContextSupplier;
+    m_activeOnThisNodeSupplier = activeOnThisNodeSupplier;
     m_asyncObservationIntervalMillis = asyncObservationIntervalMillis;
   }
 
-  @Override
-  public void accept(M measurement) {
+  /**
+   * @return <code>null</code> or the currently available measurement and trigger the next async measurement if required
+   *         (see interval).
+   */
+  public V getAndNext() {
     if (requiresAsyncMeasurement()) {
       triggerAsyncMeasurement();
     }
-    if (m_asyncMeasurementValue != null) {
-      record(measurement, m_asyncMeasurementValue);
-    }
+    return m_asyncMeasurementValue;
   }
 
-  protected abstract void record(M measurement, V asyncMeasurementValue);
-
+  @Override
   public void close() {
     IFuture<V> asyncJobRef = m_asyncJobRef.get();
     if (asyncJobRef == null) {
@@ -105,6 +105,10 @@ public abstract class AbstractAsyncObservableMeasurement<M extends ObservableMea
   }
 
   boolean requiresAsyncMeasurement() {
+    if (!isActiveOnThisNode()) {
+      return false;
+    }
+
     if (System.currentTimeMillis() - m_asyncJobLastTriggerTimestamp < m_asyncObservationIntervalMillis) {
       return false;
     }
@@ -116,6 +120,10 @@ public abstract class AbstractAsyncObservableMeasurement<M extends ObservableMea
       asyncJobRef.cancel(true);
     }
     return true;
+  }
+
+  protected boolean isActiveOnThisNode() {
+    return m_activeOnThisNodeSupplier.get();
   }
 
   void triggerAsyncMeasurement() {

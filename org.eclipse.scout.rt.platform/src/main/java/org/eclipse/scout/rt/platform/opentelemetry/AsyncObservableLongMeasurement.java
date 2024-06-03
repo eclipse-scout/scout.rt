@@ -11,32 +11,48 @@
 package org.eclipse.scout.rt.platform.opentelemetry;
 
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.ObservableLongMeasurement;
 
-public final class AsyncObservableLongMeasurement extends AbstractAsyncObservableMeasurement<ObservableLongMeasurement, Long> {
+/**
+ * {@link ObservableLongMeasurement} to support "long-running" observable measurements that are independent of
+ * OpenTelemetry's metrics export interval.
+ *
+ * @see PeriodicAsyncMeasurement
+ */
+public final class AsyncObservableLongMeasurement implements Consumer<ObservableLongMeasurement>, AutoCloseable {
 
-  public static AsyncObservableLongMeasurement create(String name, Callable<Long> callable, Supplier<RunContext> runContextSupplier) {
-    return new AsyncObservableLongMeasurement(name, callable, runContextSupplier);
+  public static AsyncObservableLongMeasurement create(String name, Callable<Long> callable, Supplier<RunContext> runContextSupplier, Supplier<Boolean> leaderElectionSupplier) {
+    return create(name, callable, runContextSupplier, leaderElectionSupplier, Attributes.empty());
   }
 
-  static AsyncObservableLongMeasurement create(String name, Callable<Long> callable, Supplier<RunContext> runContextSupplier, long asyncObservationIntervalInMs) {
-    return new AsyncObservableLongMeasurement(name, callable, runContextSupplier, asyncObservationIntervalInMs);
+  public static AsyncObservableLongMeasurement create(String name, Callable<Long> callable, Supplier<RunContext> runContextSupplier, Supplier<Boolean> leaderElectionSupplier, Attributes attributes) {
+    return new AsyncObservableLongMeasurement(name, callable, runContextSupplier, leaderElectionSupplier, attributes);
   }
 
-  private AsyncObservableLongMeasurement(String name, Callable<Long> callable, Supplier<RunContext> runContextSupplier) {
-    super(name, callable, runContextSupplier);
-  }
+  private final Attributes m_attributes;
+  private final PeriodicAsyncMeasurement<Long> m_periodicAsyncMeasurement;
 
-  private AsyncObservableLongMeasurement(String name, Callable<Long> callable, Supplier<RunContext> runContextSupplier, long asyncObservationIntervalInNs) {
-    super(name, callable, runContextSupplier, asyncObservationIntervalInNs);
+  private AsyncObservableLongMeasurement(String name, Callable<Long> callable, Supplier<RunContext> runContextSupplier, Supplier<Boolean> leaderElectionSupplier, Attributes attributes) {
+    m_attributes = attributes;
+    m_periodicAsyncMeasurement = new PeriodicAsyncMeasurement<>(name, callable, runContextSupplier, leaderElectionSupplier);
   }
 
   @Override
-  protected void record(ObservableLongMeasurement measurement, Long asyncMeasurementValue) {
-    measurement.record(asyncMeasurementValue);
+  public void accept(ObservableLongMeasurement measurement) {
+    Long value = m_periodicAsyncMeasurement.getAndNext();
+    if (value != null) {
+      measurement.record(value, m_attributes);
+    }
+  }
+
+  @Override
+  public void close() throws Exception {
+    m_periodicAsyncMeasurement.close();
   }
 }
