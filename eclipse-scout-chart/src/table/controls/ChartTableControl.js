@@ -749,7 +749,9 @@ export default class ChartTableControl extends TableControl {
         let label,
           keyX = xAxis[x];
         if (xAxis.column instanceof NumberColumn) {
-          label = keyX;
+          // the axis will format numbers as two digit decimals and null/undefined as the text '-empty-' or something similar
+          // only pass null/undefined to the axis as we want to leave the number format to the chart but need the '-empty-' string
+          label = objects.isNullOrUndefined(keyX) ? xAxis.format(keyX) : keyX;
         } else {
           label = this._handleIconLabel(xAxis.format(keyX), xAxis, iconClasses);
         }
