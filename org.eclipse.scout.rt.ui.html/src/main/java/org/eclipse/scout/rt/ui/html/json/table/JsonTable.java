@@ -139,6 +139,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   public static final String PROP_SELECTED_ROWS = "selectedRows";
   public static final String PROP_FILTERS = "filters";
   public static final String PROP_HAS_RELOAD_HANDLER = "hasReloadHandler";
+  public static final String PROP_USER_PREFERENCE_CONTEXT = "userPreferenceContext";
 
   private TableListener m_tableListener;
   private final Map<String, ITableRow> m_tableRows;
@@ -574,6 +575,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       json.put(PROP_FILTERS, filtersToJson(getModel().getUserFilterManager().getFilters()));
     }
     json.put(PROP_HAS_RELOAD_HANDLER, getModel().getReloadHandler() != null);
+    json.put(PROP_USER_PREFERENCE_CONTEXT, getModel().getUserPreferenceContext());
     return json;
   }
 
