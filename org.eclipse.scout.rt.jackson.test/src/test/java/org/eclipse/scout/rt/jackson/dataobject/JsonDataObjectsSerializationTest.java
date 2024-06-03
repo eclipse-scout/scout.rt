@@ -2200,7 +2200,7 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testInvalidAttributeJsonMappingExceptionMessage() {
     JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
-    assertTrue(exception.getMessage().startsWith("Failed to deserialize attribute 'value' of entity org.eclipse.scout.rt.dataobject.value.IntegerValueDo, value was abc"));
+    assertTrue(exception.getMessage().startsWith("Failed to deserialize attribute 'value' of entity org.eclipse.scout.rt.dataobject.value.IntegerValueDo, value was abc, message=Cannot deserialize value of type `java.lang.Integer` from String \"abc\": not a valid `java.lang.Integer` value"));
   }
 
   // ------------------------------------ performance tests ------------------------------------

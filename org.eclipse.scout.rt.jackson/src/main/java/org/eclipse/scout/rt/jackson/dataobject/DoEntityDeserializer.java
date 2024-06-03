@@ -186,14 +186,14 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     }
     catch (InvalidFormatException e) {
       // capture exception containing the deserialized value to throw a specific exception message with attribute name and entity class
-      String msg = MessageFormatter.arrayFormat("Failed to deserialize attribute '{}' of entity {}, value was {}", new Object[]{attributeName, handledType().getName(), e.getValue()}).getMessage();
+      String msg = MessageFormatter.arrayFormat("Failed to deserialize attribute '{}' of entity {}, value was {}, message={}", new Object[]{attributeName, handledType().getName(), e.getValue(), e.getMessage()}).getMessage();
       InvalidFormatException ife = InvalidFormatException.from(p, msg, e.getValue(), e.getTargetType());
       ife.addSuppressed(e);
       throw ife;
     }
     catch (IOException e) {
       // capture generic exception to add at least the attribute name and entity class to the exception message
-      String msg = MessageFormatter.format("Failed to deserialize attribute '{}' of entity {}", attributeName, handledType().getName()).getMessage();
+      String msg = MessageFormatter.arrayFormat("Failed to deserialize attribute '{}' of entity {}, message={}", new Object[]{attributeName, handledType().getName(), e.getMessage()}).getMessage();
       throw JsonMappingException.from(p, msg, e);
     }
   }
