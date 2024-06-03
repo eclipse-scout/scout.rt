@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Form, ObjectOrChildModel, ObjectOrModel, ObjectWithUuidModel, Outline, Page, Table, TreeNode, TreeNodeModel} from '../../../index';
+import {Form, ObjectOrChildModel, ObjectOrModel, ObjectWithUuidModel, Outline, Page, PageParamDo, Table, TreeNode, TreeNodeModel} from '../../../index';
 
 export interface PageModel extends TreeNodeModel, ObjectWithUuidModel<TreeNode> {
+  pageParam?: PageParamDo;
   parent?: Outline;
   childNodes?: ObjectOrModel<Page>[];
   compactRoot?: boolean;

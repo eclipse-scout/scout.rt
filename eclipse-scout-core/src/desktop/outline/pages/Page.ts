@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BookmarkAdapter, ButtonTile, ChildModelOf, DefaultBookmarkAdapter, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu, MenuBar, menus,
-  ObjectOrChildModel, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithUuid, Outline, PageEventMap, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm,
-  TreeNode, Widget
+  BookmarkAdapter, bookmarks, ButtonTile, ChildModelOf, DefaultBookmarkAdapter, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu,
+  MenuBar, menus, ObjectOrChildModel, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent,
+  TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -30,6 +30,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   declare parentNode: Page;
 
   uuid: string;
+  _pageParamInternal: PageParamDo;
   /**
    * This property is set by the server, see: JsonOutline#putNodeType.
    */
@@ -74,6 +75,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     super();
 
     this.uuid = null;
+    this._pageParamInternal = undefined;
     this.nodeType = null;
     this.compactRoot = false;
     this.detailTable = null;
@@ -547,6 +549,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
    *     to our outline instance and adds optional other properties. Typically, you'll pass an
    *     object (entity-key or arbitrary data) to a child page.
    */
+  // FIXME bsh [js-bookmark] Rename (or even remove) this method! Conflict with "pageParam" property. Why does this even exist?
   protected _pageParam<T extends object>(paramProperties?: T): T & { parent: Outline } {
     let param = {
       parent: this.getOutline()
@@ -589,6 +592,29 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     }
     this.getOutline().drillDown(event.row.page);
     event.source.deselectRow(event.row);
+  }
+
+  matchesPageParam(pageParam: PageParamDo): boolean {
+    return bookmarks.pageParamsMatch(this.pageParam, pageParam);
+  }
+
+  get pageParam(): PageParamDo {
+    if (this._pageParamInternal === undefined) {
+      return this._computePageParam();
+    }
+    return this._pageParamInternal;
+  }
+
+  set pageParam(pageParam: PageParamDo) {
+    this._pageParamInternal = pageParam;
+  }
+
+  protected _computePageParam(): PageParamDo {
+    let pageId = this.getBookmarkAdapter().buildId();
+    if (pageId) {
+      return scout.create(PageIdDummyPageParamDo, {pageId});
+    }
+    return null;
   }
 
   setPageChanging(changing: boolean) {
@@ -640,3 +666,10 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
 
 export type NodeType = EnumObject<typeof Page.NodeType>;
 export type MenuOwner = Widget & { menus: Menu[]; setMenus: (menus: ObjectOrChildModel<Menu>[]) => void };
+
+/**
+ * Base interface for all page param types.
+ */
+export interface PageParamDo extends DoEntity {
+  [x: string]: any; // FIXME bsh [js-bookmark] Why is this necessary??? WidgetsOutlineModel has errors otherwise
+}
