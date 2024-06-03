@@ -197,6 +197,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       json.put(PROP_COMPACT_ROOT, page.isCompactRoot());
     }
     BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), json, page, p -> INSPECTOR_ID_PROVIDER.get().getIdForPage(p));
+    BEANS.all(IPageToJsonContributor.class).forEach(c -> c.contribute(json, page));
     JsonObjectUtility.filterDefaultValues(json, "Page");
     return json;
   }
