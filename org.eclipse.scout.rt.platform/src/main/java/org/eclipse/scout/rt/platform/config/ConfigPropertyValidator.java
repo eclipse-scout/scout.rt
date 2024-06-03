@@ -33,6 +33,7 @@ public class ConfigPropertyValidator implements IConfigurationValidator {
   @PostConstruct
   public void init() {
     m_specialValidKeys.add(PropertiesHelper.IMPORT_KEY);// 'import' key should be accepted although there is no IConfigProperty class for this key.
+    m_specialValidKeys.add(PropertiesHelper.IMPORTENV_KEY);
   }
 
   protected Map<String, IConfigProperty<?>> getAllConfigProperties() {

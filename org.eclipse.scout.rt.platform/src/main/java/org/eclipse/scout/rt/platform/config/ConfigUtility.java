@@ -67,7 +67,8 @@ public final class ConfigUtility {
    * values are not checked in any {@link IConfigurationValidator}.
    * <p>
    * A variable file is passed to the java process using the system property
-   * <code>-Dscout.env=file:/path/to/my/launch.properties</code>
+   * <code>-Dscout.env=file:/path/to/my/launch.properties</code>. Alternatively such a file may be imported using the
+   * special key <code>importenv</code>.
    * <p>
    * Example content of such a launch.properties assuming it is placed in the root of the eclipse workspace resp. the
    * root of the IntelliJ project folder.

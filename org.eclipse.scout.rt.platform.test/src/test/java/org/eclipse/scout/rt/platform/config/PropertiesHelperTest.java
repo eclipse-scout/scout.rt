@@ -41,6 +41,8 @@ public class PropertiesHelperTest {
   private static final String PLACEHOLDER_IMPORT_PROPS = "classpath:org/eclipse/scout/rt/platform/config/placeholder-imp.properties";
   private static final String LIST_PROPS = "classpath:org/eclipse/scout/rt/platform/config/list-test.properties";
   private static final String DOTPROPERTY_PROPS = "classpath:org/eclipse/scout/rt/platform/config/dotproperty-test.properties";
+  private static final String ENV_FILE_PROPS = "classpath:org/eclipse/scout/rt/platform/config/envfile-test.properties";
+  private static final String IMPORTENV_PROPS = "classpath:org/eclipse/scout/rt/platform/config/importenv-test.properties";
 
   private static final String USER_HOME_KEY = "user.home";
   private static final String USER_HOME_VALUE = System.getProperty("user.home");
@@ -510,6 +512,18 @@ public class PropertiesHelperTest {
     finally {
       System.clearProperty("import");
     }
+  }
+
+  @Test
+  public void testEnvFile(){
+    PropertiesHelper h = new PropertiesHelper(new ConfigPropertyProvider(HELPER_CONFIG_PROPS), new ConfigPropertyProvider(ENV_FILE_PROPS));
+    assertEquals("atestValueb", h.getProperty("keyWithPlaceholderFromImport"));
+  }
+
+  @Test
+  public void testImportEnv() {
+    PropertiesHelper h = new PropertiesHelper(new ConfigPropertyProvider(HELPER_CONFIG_PROPS), new ConfigPropertyProvider(IMPORTENV_PROPS));
+    assertEquals("atestValueb", h.getProperty("keyWithPlaceholderFromImport"));
   }
 
   @Test

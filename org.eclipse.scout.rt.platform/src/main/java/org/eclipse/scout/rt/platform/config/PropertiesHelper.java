@@ -92,7 +92,8 @@ import org.slf4j.LoggerFactory;
  * file. Thus its values are not checked in any {@link IConfigurationValidator}.
  * <p>
  * A variable file is passed to the java process with the system property
- * <code>-Dscout.env=file:/path/to/my/launch.properties</code>
+ * <code>-Dscout.env=file:/path/to/my/launch.properties</code>. Alternatively such a file may be imported using the
+ * special key <code>importenv</code>.
  */
 public class PropertiesHelper {
 
@@ -107,7 +108,9 @@ public class PropertiesHelper {
   public static final char COLLECTION_DELIMITER_END = ']';
   public static final String CLASSPATH_PREFIX = CLASSPATH_PROTOCOL_NAME + PROTOCOL_DELIMITER;
   public static final String IMPORT_KEY = "import";
-  private static final Pattern IMPORT_PATTERN = Pattern.compile("^import(\\[[^\\]]*\\])?$");
+  public static final String IMPORTENV_KEY = "importenv";
+  private static final Pattern IMPORT_PATTERN = Pattern.compile("^import(env)?(\\[[^\\]]*\\])?$");
+  private static final Pattern IMPORT_POSIX_PATTERN = Pattern.compile("^import(env)?(\\_|\\.)(.*)$");
 
   /**
    * The variable ${CURRENT_DIR} can be used in a property file defined with -Dscout.env=file:/path/to/file to access
@@ -191,6 +194,7 @@ public class PropertiesHelper {
     if (propertyProvider == null) {
       return false;
     }
+    m_parsedFiles.add(propertyProvider.getPropertiesIdentifier());
     List<Entry<String, String>> properties = propertyProvider.readProperties();
     if (properties == null) {
       return false;
@@ -237,10 +241,12 @@ public class PropertiesHelper {
   }
 
   private String normalizeImportKey(String key) {
-    Pattern p = Pattern.compile("^" + IMPORT_KEY + "(\\_|\\.)(.*)$");
-    Matcher m = p.matcher(key);
+    Matcher m = IMPORT_POSIX_PATTERN.matcher(key);
     if (m.find()) {
-      return IMPORT_KEY + "[" + m.group(2) + "]";
+      if (StringUtility.hasText(m.group(1))) {
+        return IMPORTENV_KEY + "[" + m.group(3) + "]";
+      }
+      return IMPORT_KEY + "[" + m.group(3) + "]";
     }
     else {
       return key;
@@ -997,9 +1003,10 @@ public class PropertiesHelper {
    * This method receives a JSON string and is expected to return a Map holding the JSON's attribute names as keys and
    * their respective values in their string representation. In addition, <code>null</code> values in the JSON object
    * must be preserved as Java <code>null</code> values. Values which are JSON objects or arrays must be preserved in
-   * their string representation even though they may be reformatted (e.g. spaces removed as they will still be parsed).<br>
-   * Consumers of this method should catch {@link RuntimeException} in order to handle errors that occur while parsing the
-   * provided String as a JSON object.<br>
+   * their string representation even though they may be reformatted (e.g. spaces removed as they will still be
+   * parsed).<br>
+   * Consumers of this method should catch {@link RuntimeException} in order to handle errors that occur while parsing
+   * the provided String as a JSON object.<br>
    * Although {@link PropertiesHelper} will never call this method with a <code>null</code> or empty string argument,
    * implementers are still expected to handle these cases as follows:
    * <ul>
@@ -1041,10 +1048,10 @@ public class PropertiesHelper {
    * </pre>
    *
    * @param propertyValue
-   *     The JSON string to parse into a {@link Map}. May be <code>null</code> or an empty string.
+   *          The JSON string to parse into a {@link Map}. May be <code>null</code> or an empty string.
    * @throws RuntimeException
-   *     Thrown in case of errors that occur while parsing the provided string as a JSON object (or anything
-   *     else).
+   *           Thrown in case of errors that occur while parsing the provided string as a JSON object (or anything
+   *           else).
    */
   protected Map<String, String> parseJson(String propertyValue) {
     if (propertyValue == null) {
@@ -1160,13 +1167,18 @@ public class PropertiesHelper {
   }
 
   protected String resolveImports(String key, String value) {
-    if (IMPORT_PATTERN.matcher(key).find()) {
+    Matcher m = IMPORT_PATTERN.matcher(key);
+    if (m.find()) {
       // in case of an import evaluate system and environment write now to not import wrong properties
-
       value = resolve(resolveSystemProperty(key, value), PLACEHOLDER_PATTERN);
       IPropertyProvider propertyProvider = getPropertyProvider(value);
       if (!m_parsedFiles.contains(propertyProvider.getPropertiesIdentifier())) {
-        parse(propertyProvider);
+        if (StringUtility.hasText(m.group(1))) {
+          parseEnvFile(propertyProvider);
+        }
+        else {
+          parse(propertyProvider);
+        }
       }
       else {
         LOG.warn("Import of '{}' skipped because already imported: {}.", value, m_parsedFiles);
@@ -1179,7 +1191,7 @@ public class PropertiesHelper {
   protected String resolveSystemProperty(String key, String defaultValue) {
     Function<Object, String> keyNormalizer = o -> {
       String k = o.toString().toLowerCase();
-      if (k.startsWith(IMPORT_KEY)) {
+      if (k.startsWith(IMPORT_KEY) || k.startsWith(IMPORTENV_KEY)) {
         k = normalizeImportKey(k);
       }
       return k;
