@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import $ from 'jquery';
-import {AggregateTableRow, Cell, EnumObject, FilterElement, InitModelOf, LookupRow, ObjectWithType, Page, SomeRequired, Table, TableRowModel} from '../index';
+import {AggregateTableRow, BookmarkTableRowIdentifierDo, Cell, EnumObject, FilterElement, InitModelOf, LookupRow, ObjectWithType, Page, SomeRequired, Table, TableRowModel} from '../index';
 
 export type TableRowStatus = EnumObject<typeof TableRow.Status>;
 
@@ -44,6 +44,7 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
    */
   page: Page;
   expandable: boolean;
+  bookmarkIdentifier: BookmarkTableRowIdentifierDo;
 
   constructor() {
     this.$row = null;
@@ -63,6 +64,7 @@ export class TableRow implements TableRowModel, ObjectWithType, FilterElement {
     this.expanded = false;
     this.status = TableRow.Status.NON_CHANGED;
     this.hierarchyLevel = 0;
+    this.bookmarkIdentifier = null;
   }
 
   static Status = {
