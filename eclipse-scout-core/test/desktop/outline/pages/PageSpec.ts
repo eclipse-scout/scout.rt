@@ -231,6 +231,50 @@ describe('Page', () => {
     });
   });
 
+  describe('uuid', () => {
+
+    it('uuidPath for remote page includes parent', () => {
+      outline.classId = 'outline-class-id'; // outline contains only own classId without any parents (see AbstractOutline.classId)
+      const page = scout.create(Page, {
+        parent: outline,
+        classId: 'page-class-id' // page contains only own classId without any parents (see AbstractPage.classId)
+      });
+      expect(page.uuidPath()).toBe('page-class-id|outline-class-id');
+      expect(outline.uuidPath()).toBe('outline-class-id');
+    });
+
+    it('uuidPath for local page includes parent', () => {
+      outline.uuid = 'outline-uuid'; // outline contains only own uuid without any parents
+      const page = scout.create(Page, {
+        parent: outline,
+        uuid: 'page-uuid' // page contains only own uuid without any parents
+      });
+      expect(page.uuidPath()).toBe('page-uuid|outline-uuid');
+      expect(outline.uuidPath()).toBe('outline-uuid');
+    });
+
+    it('BookmarkAdapter.buildId returns id without parent for local and remote case', () => {
+      outline.classId = 'outline-class-id';
+      const remotePage = scout.create(Page, {
+        parent: outline,
+        classId: 'page-class-id'
+      });
+
+      expect(remotePage.getBookmarkAdapter().buildId()).toBe('page-class-id');
+      expect(outline.getBookmarkAdapter().buildId()).toBe('outline-class-id');
+
+      outline.classId = null;
+      outline.uuid = 'outline-uuid';
+      const localPage = scout.create(Page, {
+        parent: outline,
+        uuid: 'page-uuid'
+      });
+
+      expect(localPage.getBookmarkAdapter().buildId()).toBe('page-uuid');
+      expect(outline.getBookmarkAdapter().buildId()).toBe('outline-uuid');
+    });
+  });
+
   function createAndInsertPage(detailTable: ChildModelOf<Table>, detailForm: ChildModelOf<Form>, parentPage?: Page): PageWithLazyCreationCounter {
     const page = createPage(detailTable, detailForm);
     insertPage(page, parentPage);

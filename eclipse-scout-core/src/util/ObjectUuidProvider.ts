@@ -62,12 +62,18 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
    * If the object is a remote (Scout Classic) object, the classId path has already been computed on the backend and is directly returned without consulting the parent.
    *
    * @param useFallback Optional boolean specifying if a fallback identifier may be used or created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
+   * @param appendParent Optional boolean to control if the path should include the {@link uuidPath} of the parent.
+   * By default, the parent is not included if a classId is present as they typically already include its parents.
+   * Otherwise, the parent is included by default.
    * @returns the uuid path starting with this object's uuid or null if no path can be created.
    */
-  uuidPath(useFallback?: boolean) {
-    const {uuid, isFromClassId} = this._uuid(useFallback);
-    if (isFromClassId || !uuid || !this.parent) {
-      // Remote ClassId always already includes the path if required. No need to build any path again.
+  uuidPath(useFallback?: boolean, appendParent?: boolean) {
+    const uuid = this.uuid(useFallback);
+    if (!uuid || !this.parent) {
+      return uuid;
+    }
+    const skipParent = !scout.nvl(appendParent, !this.object.classId); // by default stop on classIds as they typically include its parents already
+    if (skipParent) {
       return uuid;
     }
     const parent = this._findUuidPathParent();
@@ -102,30 +108,26 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
    * @returns the uuid for the object or null.
    */
   uuid(includeFallback?: boolean): string {
-    return this._uuid(includeFallback).uuid;
-  }
-
-  protected _uuid(includeFallback?: boolean): { uuid: string; isFromClassId: boolean } {
     // Scout Classic ID
     if (this.object.classId) {
-      return {uuid: this.object.classId, isFromClassId: true};
+      return this.object.classId;
     }
 
     // Scout JS ID
     if (this.object.uuid) {
-      return {uuid: this.object.uuid, isFromClassId: false};
+      return this.object.uuid;
     }
 
     // Fallback
     if (!scout.nvl(includeFallback, true) || ObjectUuidProvider.isUiId(this.object.id)) {
-      return {uuid: null, isFromClassId: false};
+      return null; // no fallback
     }
     const objectType = this.object.objectType || ObjectFactory.get().getObjectType(this.object.constructor as new() => object);
     let fallbackId = strings.join(ObjectUuidProvider.UUID_FALLBACK_DELIMITER, this.object.id, objectType);
     if (strings.empty(fallbackId)) {
-      fallbackId = null; // don't return empty strings
+      return null; // don't return empty strings
     }
-    return {uuid: fallbackId, isFromClassId: false};
+    return fallbackId;
   }
 
   /**

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Session} from '../index';
+import {ObjectWithUuid, Session} from '../index';
 
 export const inspector = {
   /**
@@ -28,9 +28,11 @@ export const inspector = {
       return;
     }
 
-    let uuid = model.uuid;
-    if (!uuid) {
-      uuid = model.classId;
+    let uuid: string = null;
+    if (model.uuidPath) {
+      uuid = model.uuidPath(false);
+    } else {
+      uuid = model.classId ? model.classId : model.uuid;
     }
     $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
     $container.toggleAttr('data-uuid', !!uuid, uuid);
@@ -38,12 +40,11 @@ export const inspector = {
   }
 };
 
-export interface InspectorModel {
+export interface InspectorModel extends Partial<ObjectWithUuid> {
   session?: Session;
   $container?: JQuery;
 
   id?: string;
   modelClass?: string;
-  uuid?: string;
   classId?: string;
 }

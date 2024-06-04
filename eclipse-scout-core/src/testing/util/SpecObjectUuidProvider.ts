@@ -9,7 +9,7 @@
  */
 import {ObjectUuidProvider} from '../../index';
 
-export class TestingObjectUuidProvider extends ObjectUuidProvider {
+export class SpecObjectUuidProvider extends ObjectUuidProvider {
   static getUniqueIdSeqNo(): number {
     return ObjectUuidProvider._uniqueIdSeqNo;
   }

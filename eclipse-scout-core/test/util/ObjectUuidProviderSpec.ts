@@ -9,15 +9,15 @@
  */
 
 import {Form, GroupBox, InitModelOf, ObjectUuidProvider, ObjectUuidSource, scout, Widget, WidgetModel} from '../../src';
-import {TestingObjectUuidProvider} from '../../src/testing';
+import {SpecObjectUuidProvider} from '../../src/testing';
 
 describe('ObjectUuidProvider', () => {
 
   describe('createUiId', () => {
     it('has correct prefix and increases with each call', () => {
-      const nextIdSeqNo = TestingObjectUuidProvider.getUniqueIdSeqNo() + 1;
+      const nextIdSeqNo = SpecObjectUuidProvider.getUniqueIdSeqNo() + 1;
       expect(ObjectUuidProvider.createUiId()).toBe(ObjectUuidProvider.UI_ID_PREFIX + nextIdSeqNo);
-      expect(TestingObjectUuidProvider.getUniqueIdSeqNo()).toBe(nextIdSeqNo);
+      expect(SpecObjectUuidProvider.getUniqueIdSeqNo()).toBe(nextIdSeqNo);
     });
   });
 
@@ -196,14 +196,21 @@ describe('ObjectUuidProvider', () => {
       assertUuidPath(object, '4|3|2@Widget');
     });
 
-    it('stops on classId', () => {
+    it('stops on classId by default', () => {
       const root = scout.create(Widget, {parent: session.desktop, id: '2' /* ignored because child uses classId which stops the parent visit */});
       const group = scout.create(Widget, {parent: root, classId: '3'});
       const object = {
-        uuid: '4',
+        classId: '4',
         parent: group
       };
-      assertUuidPath(object, '4|3');
+      assertUuidPath(object, '4');
+      assertUuidPath(object, '4|3', true, true /* enforce to use parent even if a classId is present */);
+    });
+
+    it('skips parent if requested', () => {
+      const root = scout.create(Widget, {parent: session.desktop, uuid: '2' /* skipped by request */});
+      const group = scout.create(Widget, {parent: root, uuid: '3'});
+      assertUuidPath(group, '3', false, false);
     });
 
     it('ignores parent if classId from remote is used', () => {
@@ -218,10 +225,10 @@ describe('ObjectUuidProvider', () => {
       assertUuidPath(remoteElement, '3');
     });
 
-    function assertUuidPath(object: ObjectUuidSource, expectedUuidPath: string, useFallback?: boolean) {
+    function assertUuidPath(object: ObjectUuidSource, expectedUuidPath: string, useFallback?: boolean, appendParent?: boolean) {
       const uuidProvider = new ObjectUuidProvider();
       uuidProvider.init({object});
-      expect(uuidProvider.uuidPath(useFallback)).toBe(expectedUuidPath);
+      expect(uuidProvider.uuidPath(useFallback, appendParent)).toBe(expectedUuidPath);
     }
   });
 });
