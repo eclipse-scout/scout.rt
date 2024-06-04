@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FullModelOf, InitModelOf, ModelOf, ObjectModel, objects, ObjectUuidProvider, scout, TableRow, TreeNode, TypeDescriptor, TypeDescriptorOptions, Widget} from './index';
+import {FullModelOf, InitModelOf, ModelAdapter, ModelOf, ObjectModel, objects, ObjectUuidProvider, scout, TableRow, TreeNode, TypeDescriptor, TypeDescriptorOptions, Widget} from './index';
 import $ from 'jquery';
 
 export type ObjectCreator = (model?: any) => object;
@@ -163,7 +163,7 @@ export class ObjectFactory {
     // Create object
     let scoutObject = this._createObjectByType(objectType, options);
     // FIXME bsh [js-bookmark] How can be determine whether an ID should be generated? Is this even needed for widgets' (TreeNodes and TableRows seem to need it because of Maps in Tree/Table, but this could probably changed to ES6-Maps)
-    let ensureUniqueId = scout.nvl(options.ensureUniqueId, scoutObject instanceof Widget || scoutObject instanceof TreeNode || scoutObject instanceof TableRow);
+    let ensureUniqueId = scout.nvl(options.ensureUniqueId, scoutObject instanceof Widget || scoutObject instanceof TreeNode || scoutObject instanceof TableRow || scoutObject instanceof ModelAdapter);
 
     // Initialize object
     if (objects.isFunction(scoutObject.init)) {
