@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -746,6 +746,7 @@ describe('Widget', () => {
           this.enabled = false;
         }
       }
+
       let widget = scout.create(SubWidget, {
         parent: parent
       });
@@ -2231,6 +2232,48 @@ describe('Widget', () => {
       parentWidget2.setVisible(false);
       parentWidget3.setVisible(false);
       expect(testWidget.isEveryParentVisible()).toBe(false);
+    });
+  });
+
+  describe('uuid', () => {
+    it('uuidPath for remote widget includes parent', () => {
+      // remote widgets contain their parent classIds already (see AbstractWidget.classId, AbstractTable.classId, AbstractFormField.classId).
+      const w4 = createRemoteWidgetTree();
+      expect(w4.parent.uuidPath()).toBe('w3-class-id_w2-class-id_w1-class-id_root-class-id');
+      expect(w4.uuidPath()).toBe('w4-class-id_w3-class-id_w2-class-id_w1-class-id_root-class-id');
+    });
+
+    function createRemoteWidgetTree(): Widget {
+      const root = scout.create(Widget, {parent: session.root, classId: 'root-class-id'});
+      const w1 = scout.create(Widget, {parent: root, classId: 'w1-class-id_root-class-id'});
+      const w2 = scout.create(Widget, {parent: w1, classId: 'w2-class-id_w1-class-id_root-class-id'});
+      const w3 = scout.create(Widget, {parent: w2, classId: 'w3-class-id_w2-class-id_w1-class-id_root-class-id'});
+      return scout.create(Widget, {parent: w3, classId: 'w4-class-id_w3-class-id_w2-class-id_w1-class-id_root-class-id'});
+    }
+
+    it('uuidPath for local widget includes parent', () => {
+      // local widgets do not contain their parent classIds already.
+      const w4 = createLocalWidgetTree();
+      expect(w4.parent.uuidPath()).toBe('w3-uuid|w2-uuid|w1-class-id_root-class-id');
+      expect(w4.uuidPath()).toBe('w4-uuid|w3-uuid|w2-uuid|w1-class-id_root-class-id');
+    });
+
+    function createLocalWidgetTree(): Widget {
+      const root = scout.create(Widget, {parent: session.root, classId: 'root-class-id'});
+      const w1 = scout.create(Widget, {parent: root, classId: 'w1-class-id_root-class-id'});
+      const w2 = scout.create(Widget, {parent: w1, uuid: 'w2-uuid'});
+      const w3 = scout.create(Widget, {parent: w2, uuid: 'w3-uuid'});
+      return scout.create(Widget, {parent: w3, uuid: 'w4-uuid'});
+    }
+
+    it('BookmarkAdapter.buildId returns id with parents for local and remote case', () => {
+      const remote = createRemoteWidgetTree();
+      expect(remote.parent.getBookmarkAdapter().buildId()).toBe('w3-class-id_w2-class-id_w1-class-id_root-class-id');
+      expect(remote.getBookmarkAdapter().buildId()).toBe('w4-class-id_w3-class-id_w2-class-id_w1-class-id_root-class-id');
+
+      const local = createLocalWidgetTree();
+      expect(local.parent.getBookmarkAdapter().buildId()).toBe('w3-uuid|w2-uuid|w1-class-id_root-class-id');
+      expect(local.getBookmarkAdapter().buildId()).toBe('w4-uuid|w3-uuid|w2-uuid|w1-class-id_root-class-id');
     });
   });
 });

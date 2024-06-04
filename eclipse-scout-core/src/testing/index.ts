@@ -37,7 +37,7 @@ export * from './lookup/ColumnDescriptorDummyLookupCall';
 export * from './lookup/LanguageDummyLookupCall';
 export * from './focus/FocusManagerSpecHelper';
 export * from './form/fields/groupbox/GroupBoxSpecHelper';
-export * from './util/TestingObjectUuidProvider';
+export * from './util/SpecObjectUuidProvider';
 export * from './jquery-testing';
 export * from './form/SpecForm';
 export * from './form/SpecLifecycle';

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Menu, NullWidget, NumberField, objects, ObjectUuidProvider, scout, Session, Status, StringField, Tooltip, ValueField, Widget} from '../src/index';
-import {FormSpecHelper, TestingObjectUuidProvider} from '../src/testing';
+import {FormSpecHelper, SpecObjectUuidProvider} from '../src/testing';
 
 describe('main', () => {
   let session: SandboxSession;
@@ -388,13 +388,13 @@ describe('main', () => {
     describe('local object', () => {
 
       it('sets property \'id\' correctly when no ID is provided', () => {
-        let expectedSeqNo = TestingObjectUuidProvider.getUniqueIdSeqNo() + 1,
+        let expectedSeqNo = SpecObjectUuidProvider.getUniqueIdSeqNo() + 1,
           menu = scout.create(Menu, {
             parent: new NullWidget(),
             session: session
           });
         expect(menu.id).toBe(ObjectUuidProvider.UI_ID_PREFIX + expectedSeqNo.toString());
-        expect(TestingObjectUuidProvider.getUniqueIdSeqNo()).toBe(expectedSeqNo);
+        expect(SpecObjectUuidProvider.getUniqueIdSeqNo()).toBe(expectedSeqNo);
       });
 
       it('session must be set, but adapter should not be registered', () => {
