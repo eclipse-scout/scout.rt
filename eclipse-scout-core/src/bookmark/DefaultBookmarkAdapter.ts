@@ -22,9 +22,20 @@ export class DefaultBookmarkAdapter implements BookmarkAdapter {
   }
 
   buildId(): string {
-    if (this.useUuidPath) {
-      return this.owner.uuidPath(this.useFallback);
-    }
-    return scout.create(ObjectUuidProvider, {object: this.owner}).uuid(this.useFallback);
+    return this.useUuidPath ? this._buildUuidPath() : this._buildUuid();
+  }
+
+  /**
+   * @returns Uuid path
+   */
+  protected _buildUuidPath(): string {
+    return this.owner.uuidPath(this.useFallback);
+  }
+
+  /**
+   * @returns Uuid without path
+   */
+  protected _buildUuid(): string {
+    return ObjectUuidProvider.get().uuid(this.owner, this.useFallback);
   }
 }

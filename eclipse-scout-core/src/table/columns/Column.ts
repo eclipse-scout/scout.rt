@@ -190,8 +190,11 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   uuidPath(useFallback?: boolean): string {
-    const objectUuidProvider = scout.create(ObjectUuidProvider, {object: this, parent: this.table});
-    return objectUuidProvider.uuidPath(useFallback, true /* append the uuid of the table even when having a classId as the classId does not include its parent (see InspectorObjectIdProvider.getIdForColumn) */);
+    return ObjectUuidProvider.get().uuidPath(this, {
+      parent: this.table,
+      appendParent: true, // append the uuid of the table even when having a classId as the classId does not include its parent yet (see InspectorObjectIdProvider.getIdForColumn)
+      useFallback
+    });
   }
 
   getBookmarkAdapter(): BookmarkAdapter {

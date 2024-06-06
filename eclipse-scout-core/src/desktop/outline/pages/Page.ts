@@ -129,8 +129,10 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   uuidPath(useFallback?: boolean): string {
-    let objectUuidProvider = scout.create(ObjectUuidProvider, {object: this});
-    return objectUuidProvider.uuidPath(useFallback, true /* append the uuid of the parent outline even when having a classId as the classId does not include its parent yet (see AbstractPage.classId) */);
+    return ObjectUuidProvider.get().uuidPath(this, {
+      appendParent: true, // append the uuid of the parent outline even when having a classId as the classId does not include its parent yet (see AbstractPage.classId)
+      useFallback
+    });
   }
 
   getBookmarkAdapter(): BookmarkAdapter {
