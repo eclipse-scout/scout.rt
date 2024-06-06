@@ -229,7 +229,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   uuidPath(useFallback?: boolean): string {
-    return scout.create(ObjectUuidProvider, {object: this}).uuidPath(useFallback);
+    return ObjectUuidProvider.get().uuidPath(this, {useFallback});
   }
 
   getBookmarkAdapter(): BookmarkAdapter {

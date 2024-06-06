@@ -125,9 +125,7 @@ describe('ObjectUuidProvider', () => {
     });
 
     function assertUuid(object: ObjectUuidSource, expectedUuid: string, useFallback?: boolean) {
-      const uuidProvider = new ObjectUuidProvider();
-      uuidProvider.init({object});
-      expect(uuidProvider.uuid(useFallback)).toBe(expectedUuid);
+      expect(ObjectUuidProvider.get().uuid(object, useFallback)).toBe(expectedUuid);
     }
   });
 
@@ -226,9 +224,7 @@ describe('ObjectUuidProvider', () => {
     });
 
     function assertUuidPath(object: ObjectUuidSource, expectedUuidPath: string, useFallback?: boolean, appendParent?: boolean) {
-      const uuidProvider = new ObjectUuidProvider();
-      uuidProvider.init({object});
-      expect(uuidProvider.uuidPath(useFallback, appendParent)).toBe(expectedUuidPath);
+      expect(ObjectUuidProvider.get().uuidPath(object, {useFallback, appendParent})).toBe(expectedUuidPath);
     }
   });
 });

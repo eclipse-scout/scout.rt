@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Desktop, InitModelOf, NullWidget, ObjectFactory, ObjectModel, ObjectWithType, ObjectWithUuid, scout, SomeRequired, strings, Widget} from '../index';
+import {Desktop, NullWidget, ObjectFactory, ObjectModel, ObjectWithType, ObjectWithUuid, scout, SomeRequired, strings, Widget} from '../index';
 
 /**
  * Helper class to extract IDs of objects and to compute uuidPaths.
@@ -21,9 +21,8 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
 
   objectType: string;
   id: string;
-  object: ObjectUuidSource;
-  parent: Widget;
 
+  static INSTANCE: ObjectUuidProvider = null;
   /**
    * Prefix for all UI generated IDs.
    */
@@ -47,84 +46,84 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
   constructor() {
     this.objectType = null;
     this.id = null;
-    this.object = null;
-    this.parent = null;
-  }
-
-  init(model: InitModelOf<this>) {
-    this.object = scout.assertParameter('object', model.object);
-    this.parent = model.parent || this.object.parent;
   }
 
   /**
-   * Computes a path starting with the {@link uuid} of this object. If a parent is available, its {@link uuidPath} is appended (recursively).
+   * Computes a path starting with the {@link uuid} of this object. If a parent is available, its {@link uuidPath} is appended to the right (recursively).
    * {@link UUID_PATH_DELIMITER} is used as delimiter between the segments.
-   * If the object is a remote (Scout Classic) object, the classId path has already been computed on the backend and is directly returned without consulting the parent.
+   * By default, if the object is a remote (Scout Classic) object having a classId, its value is directly returned without consulting the parent has classIds typically already include its parents.
    *
-   * @param useFallback Optional boolean specifying if a fallback identifier may be used or created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
-   * @param appendParent Optional boolean to control if the path should include the {@link uuidPath} of the parent.
-   * By default, the parent is not included if a classId is present as they typically already include its parents.
-   * Otherwise, the parent is included by default.
+   * @param object The object for which the uuidPath should be computed.
+   * @param options Optional {@link UuidPathOptions} controlling the computation of the path.
+   *
    * @returns the uuid path starting with this object's uuid or null if no path can be created.
    */
-  uuidPath(useFallback?: boolean, appendParent?: boolean) {
-    const uuid = this.uuid(useFallback);
-    if (!uuid || !this.parent) {
+  uuidPath(object: ObjectUuidSource, options?: UuidPathOptions) {
+    const uuid = this.uuid(object, options?.useFallback);
+    if (!uuid) {
+      return null;
+    }
+    let parent = options?.parent || object.parent;
+    if (!parent) {
       return uuid;
     }
-    const skipParent = !scout.nvl(appendParent, !this.object.classId); // by default stop on classIds as they typically include its parents already
+    const skipParent = !scout.nvl(options?.appendParent, !object.classId); // by default stop on classIds as they typically include its parents already
     if (skipParent) {
       return uuid;
     }
-    const parent = this._findUuidPathParent();
-    return strings.join(ObjectUuidProvider.UUID_PATH_DELIMITER, uuid, parent?.uuidPath(useFallback));
+    parent = this._findUuidPathParent(parent);
+    return strings.join(ObjectUuidProvider.UUID_PATH_DELIMITER, uuid, parent?.uuidPath(options?.useFallback));
   }
 
-  protected _findUuidPathParent(): Widget {
-    if (!this.parent) {
+  protected _findUuidPathParent(parent: Widget): Widget {
+    if (!parent) {
       return null;
     }
-    if (this._isPathRelevantParent(this.parent)) {
-      return this.parent;
+    if (this._isPathRelevantParent(parent)) {
+      return parent;
     }
-    return this.parent.findParent(p => this._isPathRelevantParent(p));
+    return parent.findParent(p => this._isPathRelevantParent(p));
   }
 
-  protected _isPathRelevantParent(w: Widget): boolean {
-    if (ObjectUuidProvider.isUuidPathSkipWidget(w) || w instanceof Desktop || w instanceof NullWidget) {
-      return false; // always uninteresting parents, event if they have an ID.
+  protected _isPathRelevantParent(parent: Widget): boolean {
+    if (ObjectUuidProvider.isUuidPathSkipWidget(parent) || parent instanceof Desktop || parent instanceof NullWidget) {
+      return false; // always uninteresting parents, event if they have a stable ID.
     }
-    if (w.uuid || w.classId) {
+    if (parent.uuid || parent.classId) {
       return true; // accept element if it has a stable id
     }
     // only relevant for fallback case: don't use UI generated Ids.
-    return w.id && !ObjectUuidProvider.isUiId(w.id);
+    return parent.id && !ObjectUuidProvider.isUiId(parent.id);
   }
 
   /**
-   * Computes an uuid for the object. The result may be a 'classId' for remote objects (Scout Classic) or an 'uuid' for Scout JS elements (if available).
+   * Computes an uuid for the given object. The result may be a 'classId' for remote objects (Scout Classic) or an 'uuid' for Scout JS elements (if available).
    * If the fallback is enabled, an id might be created using the 'id' property and 'objectType' property.
-   * @param includeFallback Optional boolean specifying if a fallback identifier may be used or created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
+   * @param includeFallback Optional boolean specifying if a fallback identifier may be created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
    * @returns the uuid for the object or null.
    */
-  uuid(includeFallback?: boolean): string {
+  uuid(object: ObjectUuidSource, includeFallback?: boolean): string {
+    if (!object) {
+      return null;
+    }
+
     // Scout Classic ID
-    if (this.object.classId) {
-      return this.object.classId;
+    if (object.classId) {
+      return object.classId;
     }
 
     // Scout JS ID
-    if (this.object.uuid) {
-      return this.object.uuid;
+    if (object.uuid) {
+      return object.uuid;
     }
 
     // Fallback
-    if (!scout.nvl(includeFallback, true) || ObjectUuidProvider.isUiId(this.object.id)) {
+    if (!scout.nvl(includeFallback, true) || ObjectUuidProvider.isUiId(object.id)) {
       return null; // no fallback
     }
-    const objectType = this.object.objectType || ObjectFactory.get().getObjectType(this.object.constructor as new() => object);
-    let fallbackId = strings.join(ObjectUuidProvider.UUID_FALLBACK_DELIMITER, this.object.id, objectType);
-    if (strings.empty(fallbackId)) {
+    const objectType = object.objectType || ObjectFactory.get().getObjectType(object.constructor as new() => object);
+    let fallbackId = strings.join(ObjectUuidProvider.UUID_FALLBACK_DELIMITER, object.id, objectType);
+    if (!fallbackId) {
       return null; // don't return empty strings
     }
     return fallbackId;
@@ -151,8 +150,37 @@ export class ObjectUuidProvider implements ObjectUuidProviderModel, ObjectWithTy
    * @returns id with prefix {@link ObjectUuidProvider.UI_ID_PREFIX}.
    */
   static createUiId(): string {
+    // FIXME mvi [js-bookmark] Find better name than UI ID. Sounds too similar to UUID. Also adapt prefix?
     return ObjectUuidProvider.UI_ID_PREFIX + (++this._uniqueIdSeqNo).toString();
   }
+
+  /**
+   * @returns The shared singleton {@link ObjectUuidProvider} instance.
+   */
+  static get(): ObjectUuidProvider {
+    if (!ObjectUuidProvider.INSTANCE) {
+      ObjectUuidProvider.INSTANCE = scout.create(ObjectUuidProvider);
+    }
+    return ObjectUuidProvider.INSTANCE;
+  }
+}
+
+export interface UuidPathOptions {
+  /**
+   * Optional boolean specifying if a fallback identifier may be created in case an object has no specific identifier set. The fallback may be less stable. Default is true.
+   */
+  useFallback?: boolean;
+
+  /**
+   * Optional boolean to control if the path should include the {@link uuidPath} of the parent.
+   * By default, the parent is included unless the object has a classId set as classIds typically already include its parents (computed by the Java server).
+   */
+  appendParent?: boolean;
+
+  /**
+   * Optional {@link Widget} to use as parent of the object given. By the default 'object.parent' is used.
+   */
+  parent?: Widget;
 }
 
 /**
