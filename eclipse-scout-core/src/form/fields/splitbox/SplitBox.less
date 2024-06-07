@@ -17,8 +17,11 @@
 
     & > .first-field,
     & > .second-field {
-      overflow: hidden;
       position: absolute;
+      #scout.overflow-clip();
+      // Ensure focus border of elements inside the field is always visible
+      // Use @split-box-y-splitter-padding instead of (@focus-box-shadow-size to remove whitespace between splitter and field completely, at least for y splitter
+      overflow-clip-margin: @split-box-y-splitter-padding;
 
       &.collapsed {
         display: none;
