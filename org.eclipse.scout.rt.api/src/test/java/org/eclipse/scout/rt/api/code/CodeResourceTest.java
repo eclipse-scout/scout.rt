@@ -56,9 +56,13 @@ public class CodeResourceTest {
         .withId("1")
         .withText("en", "t1-updated")
         .withTextPlural("de", "p1-de")
+        .withTextPlural("en-US", "p1")
+        .withTextPlural("en-UK", "p1-uk")
         .withCodes(BEANS.get(CodeDo.class)
             .withId("1.1")
-            .withText("de", "t1.1-de"),
+                .withText("de", "t1.1-de")
+                .withText("en-US", "t1.1-us")
+                .withText("en-UK", "t1.1"),
             BEANS.get(CodeDo.class)
                 .withId("1.2")
                 .withText("en", "t1.2-updated"));
@@ -70,9 +74,9 @@ public class CodeResourceTest {
     Map<String, String> texts = merged.getTexts();
     assertEquals(Map.of("en", "t1-updated"), texts);
     Map<String, String> textsPlural = merged.getTextsPlural();
-    assertEquals(Map.of("en", "p1", "de", "p1-de"), textsPlural);
+    assertEquals(Map.of("en", "p1", "de", "p1-de", "en-UK", "p1-uk"), textsPlural);
     Map<String, String> code1Texts = merged.getCodes().get(0).getTexts();
-    assertEquals(Map.of("en", "t1.1", "de", "t1.1-de"), code1Texts);
+    assertEquals(Map.of("en", "t1.1", "de", "t1.1-de", "en-US", "t1.1-us"), code1Texts);
     Map<String, String> code2Texts = merged.getCodes().get(1).getTexts();
     assertEquals(Map.of("en", "t1.2-updated"), code2Texts);
   }
