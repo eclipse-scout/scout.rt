@@ -7,11 +7,29 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, DoEntity, ObjectFactory, objects, ObjectType, ObjectWithType, PageParamDo} from '../index';
+import {App, DoEntity, ObjectFactory, objects, ObjectType, ObjectWithType, PageParamDo, scout} from '../index';
 
 export abstract class AbstractDoEntity implements ObjectWithType, DoEntity {
-  _type?: string; // FIXME bsh Better solution?
+  declare model: Partial<this>;
+  declare _type?: string;
+
   objectType: string;
+
+  init(model: any) {
+    Object.keys(model).forEach(key => {
+      this[key] = this._revive(model[key]);
+    });
+  }
+
+  protected _revive(value: any): any {
+    if (objects.isPlainObject(value) && value.objectType) {
+      return scout.create(value);
+    }
+    if (objects.isArray(value)) {
+      return value.map(v => this._revive(v));
+    }
+    return value;
+  }
 }
 
 export class BookmarkDo extends AbstractDoEntity {
@@ -19,11 +37,6 @@ export class BookmarkDo extends AbstractDoEntity {
   titles: Record<string, string>;
   description: string;
   definition: IBookmarkDefinitionDo;
-
-  constructor(model: Partial<BookmarkDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 // --------------------------------------------------
@@ -37,20 +50,10 @@ export class OutlineBookmarkDefinitionDo extends AbstractDoEntity implements IBo
   outlineId: string;
   /** Path from the outline's root to the {@link bookmarkedPage} */
   pagePath: IBookmarkPageDo[];
-
-  constructor(model: Partial<OutlineBookmarkDefinitionDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class PageBookmarkDefinitionDo extends AbstractDoEntity implements IBookmarkDefinitionDo {
   bookmarkedPage: IBookmarkPageDo;
-
-  constructor(model: Partial<PageBookmarkDefinitionDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 // --------------------------------------------------
@@ -63,11 +66,6 @@ export interface IBookmarkPageDo {
 export class NodeBookmarkPageDo extends AbstractDoEntity implements IBookmarkPageDo {
   pageParam: PageParamDo;
   displayText: string;
-
-  constructor(model: Partial<NodeBookmarkPageDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class TableBookmarkPageDo extends AbstractDoEntity implements IBookmarkPageDo {
@@ -75,26 +73,17 @@ export class TableBookmarkPageDo extends AbstractDoEntity implements IBookmarkPa
   displayText: string;
   expandedChildRow: BookmarkTableRowIdentifierDo;
   selectedChildRows: BookmarkTableRowIdentifierDo[];
+  // FIXME bsh [js-bookmark] Add missing properties
   // tablePreferences: TableClientUiPreferencesDo;
   // searchFilterComplete: boolean;
   // searchData: ISearchDo;
   // chartTableControlConfig: ChartTableControlConfigDo;
-
-  constructor(model: Partial<TableBookmarkPageDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 // --------------------------------------------------
 
 export class BookmarkTableRowIdentifierDo extends AbstractDoEntity {
   keyComponents: IBookmarkTableRowIdentifierComponentDo[];
-
-  constructor(model: Partial<BookmarkTableRowIdentifierDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export interface IBookmarkTableRowIdentifierComponentDo {
@@ -105,85 +94,47 @@ export interface IBookmarkTableRowIdentifierComponentDo {
  */
 export class BookmarkTableRowIdentifierObjectComponentDo extends AbstractDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: any;
-
-  constructor(model: Partial<BookmarkTableRowIdentifierObjectComponentDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class BookmarkTableRowIdentifierEntityKeyComponentDo extends AbstractDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: string;
-
-  constructor(model: Partial<BookmarkTableRowIdentifierEntityKeyComponentDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class BookmarkTableRowIdentifierDateComponentDo extends AbstractDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: string;
-
-  constructor(model: Partial<BookmarkTableRowIdentifierDateComponentDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class BookmarkTableRowIdentifierBooleanComponentDo extends AbstractDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: boolean;
-
-  constructor(model: Partial<BookmarkTableRowIdentifierBooleanComponentDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class BookmarkTableRowIdentifierIntegerComponentDo extends AbstractDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: number;
-
-  constructor(model: Partial<BookmarkTableRowIdentifierIntegerComponentDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class BookmarkTableRowIdentifierTypedIdComponentDo extends AbstractDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: string;
-
-  constructor(model: Partial<BookmarkTableRowIdentifierTypedIdComponentDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class BookmarkTableRowIdentifierStringComponentDo extends AbstractDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: string;
-
-  constructor(model: Partial<BookmarkTableRowIdentifierStringComponentDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export class BookmarkTableRowIdentifierLongComponentDo extends AbstractDoEntity implements IBookmarkTableRowIdentifierComponentDo {
   key: number;
-
-  constructor(model: Partial<BookmarkTableRowIdentifierLongComponentDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 // --------------------------------------------------
 
 export class PageIdDummyPageParamDo extends AbstractDoEntity implements PageParamDo {
   pageId: string;
+}
 
-  constructor(model: Partial<PageIdDummyPageParamDo>) {
-    super();
-    Object.assign(this, model);
-  }
+// --------------------------------------------------
+
+export class ActivateBookmarkResultDo extends AbstractDoEntity {
+  remainingPagePath: IBookmarkPageDo[];
+  parentBookmarkPage: IBookmarkPageDo;
 }
 
 // --------------------------------------------------
@@ -292,6 +243,25 @@ export const bookmarks = {
         json._type = ObjectTypeToJsonTypeMapper.toJsonType(value.objectType);
         delete json.objectType;
         return json;
+      }
+      return value;
+    };
+
+    return JSON.parse(JSON.stringify(object, replacer));
+  },
+
+  toObjectModel(object: any): any {
+    const replacer = (key, value) => {
+      if (objects.isPlainObject(value) && value._type) {
+        let model = Object.assign({}, value); // shallow copy to keep original object intact
+        let objectType = ObjectTypeToJsonTypeMapper.optObjectType(value._type);
+        if (!objectType) {
+          return value;
+        }
+        model.objectType = objectType;
+        delete model._type;
+        delete model._typeVersion;
+        return model;
       }
       return value;
     };

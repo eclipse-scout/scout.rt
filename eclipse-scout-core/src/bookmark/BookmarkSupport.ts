@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectTypeToJsonTypeMapper, ObjectWithType, Outline,
-  OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectTypeToJsonTypeMapper,
+  ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -142,7 +142,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       let pathEntry = this._pageToBookmark(parentPage, currentPage);
       if (!pathEntry) {
         // non-bookmarkable page, discard entire path
-        pagePath = [];
+        pagePath = null;
         break;
       }
       pagePath.unshift(pathEntry);
@@ -150,7 +150,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
 
     let bookmarkDefinition = null;
-    if (pagePath.length) {
+    if (pagePath) {
       bookmarkDefinition = scout.create(OutlineBookmarkDefinitionDo, {
         outlineId: outlineId,
         bookmarkedPage: bookmarkedPage,
@@ -210,56 +210,81 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
     let bookmarkDefinition = bookmark.definition;
 
-    // Resolve outline
-    let outline = this.desktop.getOutlines().find(outline => {
-      let outlineId = outline.getBookmarkAdapter()?.buildId();
-      return outlineId === bookmarkDefinition.outlineId;
-    });
-    if (!outline || !outline.visible) {
-      // throw new VetoException(TEXTS.get("BookmarkActivationFailedOutlineNotAvailable", outline == null ? TEXTS.get("Unknown") : outline.getTitle())); FIXME bsh [js-bookmark] NLS
-      MessageBoxes.openOk(this.desktop, 'Outline not found', Status.Severity.ERROR);
-      return;
-    }
-
-    // Build page path
-    let pagePath = [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage];
-
-    // Activate outline
-    this.desktop.setOutline(outline);
-
     this.setLoading(true);
     return $.resolvedPromise()
-      .then(() => this._loadNextPageInPath(pagePath, outline, null))
-      .then(page => {
-        if (!page) {
-          MessageBoxes.openOk(this.desktop, 'There has been an error while loading the favorite.', Status.Severity.ERROR); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolvingFailed')
+      .then(() => {
+        let hybridManager = HybridManager.get(this.session);
+        if (hybridManager) {
+          let jsonBookmarkDefinition = bookmarks.toTypedJson(bookmarkDefinition);
+          let hybridActionData = {
+            bookmarkDefinition: jsonBookmarkDefinition
+          };
+          return hybridManager.callActionAndWait('ActivateBookmark', hybridActionData).then((result: ActivateBookmarkResultDo) => {
+            return scout.create(ActivateBookmarkResultDo, bookmarks.toObjectModel(result));
+          });
+        }
+        scout.create(ActivateBookmarkResultDo, {
+          remainingPagePath: [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage],
+          parentBookmarkPage: null
+        });
+      })
+      .then((result: ActivateBookmarkResultDo) => {
+        if (arrays.empty(result?.remainingPagePath)) {
+          return; // done, we are already on the correct page
+        }
+
+        // Check if we are already on the correct outline
+        let outline = this.desktop.outline;
+        if (outline?.getBookmarkAdapter()?.buildId() !== bookmarkDefinition.outlineId) {
+          outline = this.desktop.getOutlines().find(outline => {
+            let outlineId = outline.getBookmarkAdapter()?.buildId();
+            return outlineId === bookmarkDefinition.outlineId;
+          });
+        }
+        if (!outline || !outline.visible) {
+          // throw new VetoException(TEXTS.get("BookmarkActivationFailedOutlineNotAvailable", outline == null ? TEXTS.get("Unknown") : outline.getTitle())); FIXME bsh [js-bookmark] NLS
+          MessageBoxes.openOk(this.desktop, 'Outline not found', Status.Severity.ERROR);
           return;
         }
-        let pathFullyRestored = arrays.empty(pagePath);
+        this.desktop.setOutline(outline);
 
-        // FIXME bsh [js-bookmark] This block should not be necessary, but the tree is broken :( #378077
-        {
-          let expandNode = page;
-          if (!pathFullyRestored || page.nodeType === Page.NodeType.TABLE) {
-            // don't expand target node
-            expandNode = page.parentNode;
-          }
-          while (expandNode) {
-            outline.expandNode(expandNode, {renderAnimated: false});
-            expandNode = expandNode.parentNode;
-          }
-        }
+        let pagePath = result.remainingPagePath.slice(); // create copy because arrays is altered
+        let parent = outline.selectedNode() || outline;
+        let parentRowBookmarkIdentifier = result.parentBookmarkPage instanceof TableBookmarkPageDo ? result.parentBookmarkPage.expandedChildRow : null;
+        return this._loadNextPageInPath(pagePath, parent, parentRowBookmarkIdentifier)
+          .then(page => {
+            if (!page) {
+              console.log('Page not found', result, pagePath);
+              MessageBoxes.openOk(this.desktop, 'There has been an error while loading the favorite.', Status.Severity.ERROR); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolvingFailed')
+              return;
+            }
+            let pathFullyRestored = arrays.empty(pagePath);
 
-        outline.deselectAll(); // reselection triggers owner changes of menu in case we come here by execDataChanged FIXME bsh [js-bookmark] is this necessary in js?
-        outline.selectNode(page);
-        outline.revealSelection();
+            // FIXME bsh [js-bookmark] This block should not be necessary, but the tree is broken :( #378077
+            {
+              let expandNode = page;
+              if (!pathFullyRestored || page.nodeType === Page.NodeType.TABLE) {
+                // don't expand target node
+                expandNode = page.parentNode;
+              }
+              while (expandNode) {
+                outline.expandNode(expandNode, {renderAnimated: false});
+                expandNode = expandNode.parentNode;
+              }
+            }
 
-        if (!pathFullyRestored) {
-          page.detailTable?.setTableStatus(Status.error('Loading the favorite has been canceled because the entry cannot be found in this view.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolutionCanceled')
-        }
+            outline.deselectAll(); // reselection triggers owner changes of menu in case we come here by execDataChanged FIXME bsh [js-bookmark] is this necessary in js?
+            outline.selectNode(page);
+            outline.revealSelection();
+
+            if (!pathFullyRestored) {
+              page.detailTable?.setTableStatus(Status.error('Loading the favorite has been canceled because the entry cannot be found in this view.')); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolutionCanceled')
+            }
+          });
       })
       .catch(err => {
         // FIXME bsh [js-bookmark] Error handling
+        App.get().errorHandler.handle(err);
         MessageBoxes.openOk(this.desktop, 'There has been an error while loading the favorite.', Status.Severity.ERROR); // FIXME bsh [js-bookmark] NLS: this.session.text('BookmarkResolvingFailed')
       })
       .then(() => {
