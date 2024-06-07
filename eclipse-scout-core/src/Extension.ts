@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {scout} from './index';
+import {arrays, ObjectType, scout} from './index';
 
 /**
  * This class is used to extend an existing Scout object. In order to use the extension feature
@@ -52,10 +52,10 @@ export class Extension<E> {
   /**
    * Calls {@link scout.create} for each extension class in the given extensions array.
    *
-   * @param extensions an array of strings containing extension class names
+   * @param extensions a single objectType or an array of objectTypes
    */
-  static install(extensions: string[]) {
-    extensions.forEach(ext => {
+  static install(extensions: string | ObjectType | (string | ObjectType)[]) {
+    arrays.ensure(extensions).forEach(ext => {
       scout.create(ext);
     });
   }

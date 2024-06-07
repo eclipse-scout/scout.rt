@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,6 +28,11 @@ export interface AppSessionReadyEvent<T = App> extends Event<T> {
 export interface AppEventMap extends EventMap {
   'prepare': AppInitEvent;
   'init': AppInitEvent;
+  /**
+   * This event is triggered after the {@link App} has installed its {@link Extension}s (see {@link App#_installExtensions}).
+   * It can be used to install additional {@link Extension}s (see {@link Extension#install}), but be aware that there is no control over the order these {@link Extension}s are installed.
+   */
+  'installExtensions': Event<App>;
   'bootstrap': AppBootstrapEvent;
   'desktopReady': AppDesktopReadyEvent;
   'sessionReady': AppSessionReadyEvent;
