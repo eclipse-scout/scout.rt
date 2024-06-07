@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,7 +38,7 @@ export class FormTableControl extends TableControl implements FormTableControlMo
 
     // Tab box gets a special style if it is the first field in the root group box
     let rootGroupBox = this.form.rootGroupBox;
-    if (rootGroupBox.controls[0] instanceof TabBox) {
+    if (rootGroupBox && rootGroupBox.controls[0] instanceof TabBox) {
       rootGroupBox.controls[0].$container.addClass('in-table-control');
     }
 
@@ -85,11 +85,12 @@ export class FormTableControl extends TableControl implements FormTableControlMo
   }
 
   protected _adaptForm(form: Form) {
-    form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
+    form.setShowOnOpen(false);
     form.setDisplayHint(Form.DisplayHint.VIEW);
     form.setModal(false);
-    form.setAskIfNeedSave(false);
     form.setClosable(false);
+    form.setAskIfNeedSave(false);
+    form.rootGroupBox?.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
   }
 
   override onControlContainerOpened() {
