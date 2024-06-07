@@ -220,7 +220,10 @@ public class PeriodicAsyncMeasurementTest {
 
     final long asyncObservationInterval = 100;
     Callable<Long> callable = mockCallable();
-    Mockito.when(callable.call()).thenReturn(111L);
+    Mockito.when(callable.call()).then(invocation -> {
+      Thread.sleep(3); // simulate "db access"
+      return 111L;
+    });
     AtomicBoolean activeOnThisNode = new AtomicBoolean(false);
     try (PeriodicAsyncMeasurement<Long> asyncMeasurement = new PeriodicAsyncMeasurement<>("testActiveOnThisNode", callable, () -> RunContexts.empty(), () -> activeOnThisNode.get(), asyncObservationInterval)) {
 
@@ -238,7 +241,6 @@ public class PeriodicAsyncMeasurementTest {
       assertNull(asyncMeasurement.getAndNext());
       assertAsyncJobTrigger(callable, 0);
 
-      Thread.sleep(20);
       activeOnThisNode.set(Boolean.TRUE);
 
       // forth observation --> no measurement, but trigger async job
