@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,11 +17,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType3;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType4;
@@ -41,8 +45,7 @@ public class CodeServiceTest {
   private static final Long ZYX_ID = 550L;
 
   /**
-   * Test method for
-   * {@link CodeService#getAllCodeTypeClasses()} .
+   * Test method for {@link CodeService#getAllCodeTypeClasses()} .
    */
   @Test
   public void testGetAllCodeTypeClasses() {
@@ -59,8 +62,7 @@ public class CodeServiceTest {
   }
 
   /**
-   * Test method for
-   * {@link CodeService#getAllCodeTypes()} .
+   * Test method for {@link CodeService#getAllCodeTypes()} .
    */
   @Test
   public void testGetAllCodeTypesString() {
@@ -135,7 +137,6 @@ public class CodeServiceTest {
 
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeType(Class)}.
-   *
    */
   @Test
   public void testReloadCodeType() {
@@ -157,7 +158,6 @@ public class CodeServiceTest {
 
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeTypes(List)}.
-   *
    */
   @Test
   public void testReloadCodeTypes() {
@@ -186,7 +186,6 @@ public class CodeServiceTest {
 
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#findCodeTypeById(Object)} .
-   *
    */
   @Test
   public void testFindCodeTypeById() {
@@ -236,6 +235,37 @@ public class CodeServiceTest {
     MatcherAssert.assertThat(codeTypes.get(TestCodeType4.class), instanceOf(TestCodeType4.class));
   }
 
+  @Test
+  public void testResolveCodeForDifferentLocales() {
+    var cacheValueResolver = ((P_TestCodeService) newCodeServiceInstance()).createCacheValueResolver();
+
+    RunContexts.copyCurrent()
+        .withLocale(Locale.ENGLISH)
+        .run(() -> {
+          assertEquals(Map.of("day", "Day", "month", "Month"), getCodeIdTextMap(cacheValueResolver.resolve(new CodeTypeCacheKey(Locale.ENGLISH, ZyxCodeType.class))));
+          assertEquals(Map.of("day", "Tag", "month", "Monat"), getCodeIdTextMap(cacheValueResolver.resolve(new CodeTypeCacheKey(Locale.GERMAN, ZyxCodeType.class))));
+        });
+
+    RunContexts.copyCurrent()
+        .withLocale(Locale.GERMAN)
+        .run(() -> {
+          assertEquals(Map.of("day", "Day", "month", "Month"), getCodeIdTextMap(cacheValueResolver.resolve(new CodeTypeCacheKey(Locale.ENGLISH, ZyxCodeType.class))));
+          assertEquals(Map.of("day", "Tag", "month", "Monat"), getCodeIdTextMap(cacheValueResolver.resolve(new CodeTypeCacheKey(Locale.GERMAN, ZyxCodeType.class))));
+        });
+
+    RunContexts.copyCurrent()
+        .withLocale(Locale.FRENCH)
+        .run(() -> {
+          assertEquals(Map.of("day", "Day", "month", "Month"), getCodeIdTextMap(cacheValueResolver.resolve(new CodeTypeCacheKey(Locale.ENGLISH, ZyxCodeType.class))));
+          assertEquals(Map.of("day", "Tag", "month", "Monat"), getCodeIdTextMap(cacheValueResolver.resolve(new CodeTypeCacheKey(Locale.GERMAN, ZyxCodeType.class))));
+        });
+  }
+
+  protected <T> Map<T, String> getCodeIdTextMap(ICodeType<?, T> codeType) {
+    return codeType.getCodes().stream()
+        .collect(Collectors.toMap(ICode::getId, ICode::getText));
+  }
+
   protected ICodeService newCodeServiceInstance() {
     ICodeService service = new P_TestCodeService();
     BeanInstanceUtil.initializeBeanInstance(service);
@@ -272,7 +302,6 @@ public class CodeServiceTest {
     public Long getId() {
       return ABC_ID;
     }
-
   }
 
   public static class ZyxCodeType extends AbstractCodeType<Long, String> {
@@ -284,6 +313,34 @@ public class CodeServiceTest {
       return ZYX_ID;
     }
 
-  }
+    public static class DayCode extends AbstractCode<String> {
+      private static final long serialVersionUID = 1L;
+      public static final String ID = "day";
 
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Day");
+      }
+
+      @Override
+      public String getId() {
+        return ID;
+      }
+    }
+
+    public static class MonthCode extends AbstractCode<String> {
+      private static final long serialVersionUID = 1L;
+      public static final String ID = "month";
+
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Month");
+      }
+
+      @Override
+      public String getId() {
+        return ID;
+      }
+    }
+  }
 }
