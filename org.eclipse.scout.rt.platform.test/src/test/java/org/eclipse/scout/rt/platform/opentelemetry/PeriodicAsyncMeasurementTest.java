@@ -238,6 +238,7 @@ public class PeriodicAsyncMeasurementTest {
       assertNull(asyncMeasurement.getAndNext());
       assertAsyncJobTrigger(callable, 0);
 
+      Thread.sleep(20);
       activeOnThisNode.set(Boolean.TRUE);
 
       // forth observation --> no measurement, but trigger async job
