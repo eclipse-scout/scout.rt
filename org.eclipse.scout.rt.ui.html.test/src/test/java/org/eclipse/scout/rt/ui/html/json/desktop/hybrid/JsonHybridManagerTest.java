@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.desktop.hybrid.DummyForm;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridEvent;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridManager;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDataObjectHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
+import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.After;
@@ -124,6 +126,64 @@ public class JsonHybridManagerTest {
     String id = createId();
     jsonHybridManager.handleUiEvent(createHybridActionJsonEvent(jsonHybridManager, id, "Ping"));
     verify(jsonHybridManager).handleModelHybridEvent(eq(HybridEvent.createHybridActionEndEvent(getHybridManager(), id)));
+  }
+
+  @Test
+  public void testEventTypes() {
+    JsonHybridManager<HybridManager> jsonHybridManager = createJsonHybridManager();
+    jsonHybridManager.toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------
+    // Generic event
+
+    String id1 = createId();
+
+    getHybridManager().fireHybridEvent(id1, "foo");
+
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
+    JsonEvent event = m_uiSession.currentJsonResponse().getEventList().get(0);
+    assertEquals("hybridEvent", event.getType());
+    assertEquals(id1, event.getData().optString("id"));
+    assertEquals("foo", event.getData().optString("eventType"));
+    assertNull(event.getData().opt("data"));
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------
+    // actionEnd event
+
+    String id2 = createId();
+    IDoEntity data = BEANS.get(DoEntityBuilder.class).put("a", 123).put("b", "456").build();
+    JSONObject dataJson = new JSONObject();
+    dataJson.put("a", 123);
+    dataJson.put("b", "456");
+    registerJsonDo(dataJson, data);
+
+    getHybridManager().fireHybridActionEndEvent(id2, data);
+
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
+    event = m_uiSession.currentJsonResponse().getEventList().get(0);
+    assertEquals("hybridEvent", event.getType());
+    assertEquals(id2, event.getData().optString("id"));
+    assertEquals("hybridActionEnd", event.getData().optString("eventType"));
+    assertEquals(dataJson, event.getData().opt("data"));
+    JsonTestUtility.endRequest(m_uiSession);
+    unregisterJsonDo(dataJson);
+
+    // ----------
+    // Widget event
+
+    String id3 = createId();
+
+    getHybridManager().fireHybridWidgetEvent(id3, "bar");
+
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
+    event = m_uiSession.currentJsonResponse().getEventList().get(0);
+    assertEquals("hybridWidgetEvent", event.getType());
+    assertEquals(id3, event.getData().optString("id"));
+    assertEquals("bar", event.getData().optString("eventType"));
+    assertNull(event.getData().opt("data"));
+    JsonTestUtility.endRequest(m_uiSession);
   }
 
   @Test
