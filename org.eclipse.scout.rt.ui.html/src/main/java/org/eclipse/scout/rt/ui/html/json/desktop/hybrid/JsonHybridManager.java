@@ -114,6 +114,7 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     switch (event.getType()) {
       case HybridEvent.TYPE_EVENT:
         addActionEvent("hybridEvent", createJsonHybridEvent(event));
+        break;
       case HybridEvent.TYPE_WIDGET_EVENT:
         addActionEvent("hybridWidgetEvent", createJsonHybridEvent(event));
         break;
