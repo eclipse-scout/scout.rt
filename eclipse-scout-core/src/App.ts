@@ -298,6 +298,7 @@ export class App extends EventEmitter {
     this._installSyntheticActiveStateHandler();
     this._ajaxSetup();
     this._installExtensions();
+    this._triggerInstallExtensions();
     return this._load(options)
       .then(this._loadSessions.bind(this, options.session));
   }
@@ -601,5 +602,12 @@ export class App extends EventEmitter {
    */
   protected _installExtensions() {
     // NOP
+  }
+
+  /**
+   * @see AppEventMap#installExtensions
+   */
+  protected _triggerInstallExtensions() {
+    this.trigger('installExtensions');
   }
 }
