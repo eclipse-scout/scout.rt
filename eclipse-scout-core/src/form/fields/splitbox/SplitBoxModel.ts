@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormField, FormFieldModel, ObjectOrChildModel} from '../../../index';
+import {FormField, FormFieldModel, ObjectOrChildModel, SplitBoxSplitterPositionType} from '../../../index';
 
 export interface SplitBoxModel extends FormFieldModel {
   firstField?: ObjectOrChildModel<FormField>;
@@ -22,7 +22,7 @@ export interface SplitBoxModel extends FormFieldModel {
   splitterEnabled?: boolean;
   splitterPosition?: number;
   minSplitterPosition?: number;
-  splitterPositionType?: string;
+  splitterPositionType?: SplitBoxSplitterPositionType;
   fieldMinimized?: boolean;
   minimizeEnabled?: boolean;
 }
