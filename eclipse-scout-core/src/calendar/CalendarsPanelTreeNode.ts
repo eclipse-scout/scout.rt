@@ -20,5 +20,6 @@ export class CalendarsPanelTreeNode extends TreeNode implements CalendarsPanelTr
     super();
 
     this.calendarId = null;
+    this.parentId = null;
   }
 }

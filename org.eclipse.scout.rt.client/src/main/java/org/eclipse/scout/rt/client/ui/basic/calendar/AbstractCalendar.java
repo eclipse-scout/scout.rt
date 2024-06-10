@@ -251,7 +251,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     setUseOverflowCells(getConfiguredUseOverflowCells());
     setShowDisplayModeSelection(getConfiguredShowDisplayModeSelection());
     setRangeSelectionAllowed(getConfiguredRangeSelectionAllowed());
-    setCalendars(getConfiguredCalendars());
+    setCalendarDescriptors(getConfiguredCalendars());
     setShowCalendarSidebar(getConfiguredShowCalendarSidebar());
     setShowCalendarsPanel(getConfiguredShowCalendarsPanel());
     setShowListPanel(getShowListPanel());
@@ -550,23 +550,23 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
-  public List<ICalendarDescriptor> getCalendars() {
-    return propertySupport.getPropertyList(PROP_CALENDARS);
+  public List<ICalendarDescriptor> getCalendarDescriptors() {
+    return propertySupport.getPropertyList(PROP_CALENDAR_DESCRIPTORS);
   }
 
   @Override
-  public void setCalendars(List<ICalendarDescriptor> calendars) {
-    propertySupport.setPropertyList(PROP_CALENDARS, calendars);
+  public void setCalendarDescriptors(List<ICalendarDescriptor> calendars) {
+    propertySupport.setPropertyList(PROP_CALENDAR_DESCRIPTORS, calendars);
   }
 
   @Override
-  public ICalendarDescriptor getSelectedCalendar() {
-    return propertySupport.getProperty(PROP_SELECTED_CALENDAR, ICalendarDescriptor.class);
+  public ICalendarDescriptor getSelectedCalendarDescriptor() {
+    return propertySupport.getProperty(PROP_SELECTED_CALENDAR_DESCRIPTOR, ICalendarDescriptor.class);
   }
 
   @Override
   public void setCalendarVisibility(String calendarId, boolean visible) {
-    ICalendarDescriptor cal = getCalendars().stream()
+    ICalendarDescriptor cal = getCalendarDescriptors().stream()
         .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
         .findAny()
         .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar!"));
@@ -860,7 +860,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     }
     // Only reload necessary calendars
     m_providers.stream()
-        .filter(provider -> provider.getCalendarBelonging() == null || calendarId.equals(provider.getCalendarBelonging().getCalendarId()))
+        .filter(provider -> provider.getAssociatedCalendarDescriptor() == null || calendarId.equals(provider.getAssociatedCalendarDescriptor().getCalendarId()))
         .forEach(ICalendarItemProvider::reloadProvider);
   }
 
@@ -1084,7 +1084,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     }
 
     @Override
-    public void setSelectedCalendarFromUI(String calendarId) {
+    public void setSelectedCalendarDescriptorFromUI(String calendarId) {
       try {
         pushUIProcessor();
         ICalendarDescriptor selectedCalendar;
@@ -1092,12 +1092,12 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
           selectedCalendar = null;
         }
         else {
-          selectedCalendar = getCalendars().stream()
+          selectedCalendar = getCalendarDescriptors().stream()
               .filter(desc -> Objects.equals(desc.getCalendarId(), calendarId))
               .findAny()
               .orElseThrow(() -> new ProcessingException("Unable to find corresponding calendar for id " + calendarId));
         }
-        propertySupport.setProperty(PROP_SELECTED_CALENDAR, selectedCalendar);
+        propertySupport.setProperty(PROP_SELECTED_CALENDAR_DESCRIPTOR, selectedCalendar);
       }
       finally {
         popUIProcessor();

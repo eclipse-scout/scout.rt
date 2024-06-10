@@ -24,9 +24,8 @@ export interface CalendarSidebarModel extends WidgetModel {
    */
   calendarsPanel?: CalendarsPanel;
   /**
-   * Defines, whenether the calendar panel is displayable.
-   * The calendar panel is e.g. not visible When only one calendar
-   * is on the calendar widget.
+   * Defines, whether the calendars panel is displayable.
+   * For example, the calendars panel is not visible when the calendar widget has only one calendar descriptor.
    */
   calendarsPanelDisplayable?: boolean;
 }

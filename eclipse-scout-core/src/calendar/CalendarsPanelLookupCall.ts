@@ -10,20 +10,20 @@
 import {CalendarDescriptor, LookupRow, StaticLookupCall} from '../index';
 
 export class CalendarsPanelLookupCall extends StaticLookupCall<string> {
-  calendars: CalendarDescriptor[];
+  calendarDescriptors: CalendarDescriptor[];
 
   constructor() {
     super();
-    this.calendars = [];
+    this.calendarDescriptors = [];
   }
 
-  setCalendars(calendars: CalendarDescriptor[]) {
-    this.calendars = calendars;
+  setCalendarDescriptors(calendars: CalendarDescriptor[]) {
+    this.calendarDescriptors = calendars;
     this.refreshData();
   }
 
   protected override _data(): any[] {
-    return this.calendars.map(calendar =>
+    return this.calendarDescriptors.map(calendar =>
       [calendar.calendarId, calendar.name, calendar.parentId, calendar.cssClass]
     );
   }

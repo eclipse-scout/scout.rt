@@ -57,7 +57,6 @@ export class CalendarSidebar extends Widget implements CalendarSidebarModel {
     this.$container = this.$parent.appendDiv('calendar-sidebar');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new CalendarSidebarLayout(this));
-    this.htmlComp.invalidateLayoutTree(false);
     this.yearPanel.render();
     this.splitter.render();
     this.calendarsPanel.render();
@@ -72,7 +71,7 @@ export class CalendarSidebar extends Widget implements CalendarSidebarModel {
   }
 
   setCalendarsPanelExpanded(expanded: boolean, animate = false) {
-    if (this.splitter.collapsed !== undefined && !this.splitter.collapsed === expanded) {
+    if (this.splitter.collapsed !== undefined && this.splitter.collapsed !== expanded) {
       return;
     }
     // 62 is the golden ratio

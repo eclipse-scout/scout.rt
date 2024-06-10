@@ -133,7 +133,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
 
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(25)
-  protected ICalendarDescriptor getConfiguredCalendarBelonging() {
+  protected ICalendarDescriptor getConfiguredAssociatedCalendarDescriptor() {
     return null;
   }
 
@@ -182,8 +182,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   /**
-   * When the items provided by this ItemProvider belong to a spesific calendar by using e.g.
-   * {@link #getConfiguredCalendarBelonging()}, the calendar items are automaticly assigned to the calendar. <br>
+   * When the items provided by this ItemProvider are asscosiated with a spesific calendar by using e.g.
+   * {@link #getConfiguredAssociatedCalendarDescriptor()}, the calendar items are automaticly assigned to the calendar. <br>
    * Only items with no calendar id are automatically assigned.
    *
    * @param items
@@ -193,8 +193,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   @Order(90)
   protected void execAutoAssignCalendarItems(Set<ICalendarItem> items) {
     for (ICalendarItem item : items) {
-      if (getCalendarBelonging() != null && item.getCalendarId() == null) {
-        item.setCalendarId(getCalendarBelonging().getCalendarId());
+      if (getAssociatedCalendarDescriptor() != null && item.getCalendarId() == null) {
+        item.setCalendarId(getAssociatedCalendarDescriptor().getCalendarId());
       }
     }
   }
@@ -207,7 +207,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     m_contributionHolder = new ContributionComposite(this);
     setMoveItemEnabled(getConfiguredMoveItemEnabled());
     setRefreshIntervalMillis(getConfiguredRefreshIntervallMillis());
-    setCalendarBelonging(getConfiguredCalendarBelonging());
+    setAssociatedCalendarDescriptor(getConfiguredAssociatedCalendarDescriptor());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<>();
@@ -346,13 +346,13 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   @Override
-  public ICalendarDescriptor getCalendarBelonging() {
-    return propertySupport.getProperty(PROP_CALENDAR_BELONGING, ICalendarDescriptor.class);
+  public ICalendarDescriptor getAssociatedCalendarDescriptor() {
+    return propertySupport.getProperty(PROP_ASSOCIATED_CALENDAR_DESCRIPTOR, ICalendarDescriptor.class);
   }
 
   @Override
-  public void setCalendarBelonging(ICalendarDescriptor belongingCalendar) {
-    propertySupport.setProperty(PROP_CALENDAR_BELONGING, belongingCalendar);
+  public void setAssociatedCalendarDescriptor(ICalendarDescriptor associatedCalendar) {
+    propertySupport.setProperty(PROP_ASSOCIATED_CALENDAR_DESCRIPTOR, associatedCalendar);
   }
 
   @Override

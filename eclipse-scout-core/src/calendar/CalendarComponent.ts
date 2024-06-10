@@ -156,7 +156,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         .on('contextmenu', this._onContextMenu.bind(this));
       $part.appendDiv('calendar-component-leftcolorborder');
       let $partContent = $part.appendDiv('content');
-      if (this.item.subjectIconId) {
+      if (item.subjectIconId) {
         $partContent.appendIcon(this.item.subjectIconId);
       }
       $partContent.appendSpan('subject', item.subject);
@@ -223,7 +223,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
 
   protected _findCalendarColumnInDay($day: JQuery, calendarId: string): JQuery {
     if (!this.parent.isDay()) {
-      calendarId = this.parent.defaultCalendar.calendarId;
+      calendarId = this.parent.defaultCalendarDescriptor.calendarId;
     }
 
     // Validate calendarId

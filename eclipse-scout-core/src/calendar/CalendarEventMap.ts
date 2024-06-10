@@ -18,7 +18,7 @@ export interface CalendarVisibilityChangeEvent<C extends Calendar = Calendar> ex
   visible: boolean;
 }
 
-export interface SelectedCalendarChangeEvent<C extends Calendar = Calendar> extends Event<C> {
+export interface SelectedCalendarDescriptorChangeEvent<C extends Calendar = Calendar> extends Event<C> {
   calendarId: string;
 }
 
@@ -28,7 +28,7 @@ export interface CalendarEventMap extends WidgetEventMap {
   'selectionChange': Event<Calendar>;
   'selectedRangeChange': Event<Calendar>;
   'calendarVisibilityChange': CalendarVisibilityChangeEvent;
-  'selectedCalendarChange': SelectedCalendarChangeEvent;
+  'selectedCalendarDescriptorChange': SelectedCalendarDescriptorChangeEvent;
   'propertyChange:displayMode': PropertyChangeEvent<CalendarDisplayMode>;
   'propertyChange:menuInjectionTarget': PropertyChangeEvent<GroupBox>;
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;

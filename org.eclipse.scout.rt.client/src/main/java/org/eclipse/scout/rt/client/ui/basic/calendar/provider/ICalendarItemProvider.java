@@ -39,7 +39,7 @@ public interface ICalendarItemProvider extends IPropertyObserver {
   /**
    * type ICalendarDescriptor
    */
-  String PROP_CALENDAR_BELONGING = "calendarBelonging";
+  String PROP_ASSOCIATED_CALENDAR_DESCRIPTOR = "associatedCalendarDescriptor";
 
   void disposeProvider();
 
@@ -55,9 +55,9 @@ public interface ICalendarItemProvider extends IPropertyObserver {
 
   void setRefreshIntervalMillis(long millis);
 
-  ICalendarDescriptor getCalendarBelonging();
+  ICalendarDescriptor getAssociatedCalendarDescriptor();
 
-  void setCalendarBelonging(ICalendarDescriptor belongingCalendar);
+  void setAssociatedCalendarDescriptor(ICalendarDescriptor belongingCalendar);
 
   /**
    * @return the current set of items in the requested range

@@ -38,9 +38,9 @@ export class Calendar extends Widget implements CalendarModel {
   selectorEnd: Date;
   showDisplayModeSelection: boolean;
   rangeSelectionAllowed: boolean;
-  defaultCalendar: CalendarDescriptor;
-  calendars: CalendarDescriptor[];
-  selectedCalendar: CalendarDescriptor;
+  defaultCalendarDescriptor: CalendarDescriptor;
+  calendarDescriptors: CalendarDescriptor[];
+  selectedCalendarDescriptor: CalendarDescriptor;
   title: string;
   useOverflowCells: boolean;
   viewRange: DateRange;
@@ -122,9 +122,9 @@ export class Calendar extends Widget implements CalendarModel {
     this.selectedDate = new Date();
     this.showDisplayModeSelection = true;
     this.rangeSelectionAllowed = false;
-    this.defaultCalendar = this._createDefaultCalendar();
-    this.calendars = [];
-    this.selectedCalendar = this.defaultCalendar;
+    this.defaultCalendarDescriptor = this._createDefaultCalendarDescriptor();
+    this.calendarDescriptors = [];
+    this.selectedCalendarDescriptor = this.defaultCalendarDescriptor;
     this.title = null;
     this.useOverflowCells = true;
     this.viewRange = null;
@@ -209,16 +209,12 @@ export class Calendar extends Widget implements CalendarModel {
     return new KeyStrokeContext();
   }
 
-  protected _createDefaultCalendar(): CalendarDescriptor {
+  protected _createDefaultCalendarDescriptor(): CalendarDescriptor {
     return {
       calendarId: UuidPool.ZERO_UUID,
       selectable: true,
       visible: true
     };
-  }
-
-  override init(model: InitModelOf<this>) {
-    super.init(model);
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -230,7 +226,7 @@ export class Calendar extends Widget implements CalendarModel {
     this.yearPanel = this.calendarSidebar.yearPanel;
     this.calendarsPanel = this.calendarSidebar.calendarsPanel;
 
-    this.calendarsPanel.treeBox.on('propertyChange:value', this._onCalendarTreeBoxValueChanged.bind(this));
+    this.calendarsPanel.treeBox.on('propertyChange:value', this._onCalendarVisibilityChanged.bind(this));
     this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
     this.modesMenu = scout.create(CalendarModesMenu, {
       parent: this,
@@ -240,14 +236,14 @@ export class Calendar extends Widget implements CalendarModel {
     this._setSelectedDate(this.selectedDate);
     this._setDisplayMode(this.displayMode);
     this._setMenuInjectionTarget(this.menuInjectionTarget);
-    this._setCalendars(this.calendars);
+    this._setCalendarDescriptors(this.calendarDescriptors);
     this._exactRange = this._calcExactRange();
     this.yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();
   }
 
   protected _updateCalendarsPanelDisplayable() {
-    this.calendarSidebar.setCalendarsPanelDisplayable(this.calendars.length > 1);
+    this.calendarSidebar.setCalendarsPanelDisplayable(this.calendarDescriptors.length > 1);
   }
 
   setSelectedDate(date: Date | string) {
@@ -288,9 +284,9 @@ export class Calendar extends Widget implements CalendarModel {
       }
     }
     this.selectedRange = null;
-    this.selectedCalendar = null;
+    this.selectedCalendarDescriptor = this.defaultCalendarDescriptor;
     this.trigger('selectedRangeChange');
-    this.trigger('selectedCalendarChange', {calendarId: null});
+    this.trigger('selectedCalendarDescriptorChange', {calendarId: null});
   }
 
   protected _renderDisplayMode(oldDisplayMode?: CalendarDisplayMode) {
@@ -300,9 +296,10 @@ export class Calendar extends Widget implements CalendarModel {
     }
     this._updateModel(true);
 
-    this._renderComponents();
     // only render if components have another layout
-    if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
+    let renderRequired = arrays.containsAny([this.displayMode, oldDisplayMode], [Calendar.DisplayMode.DAY, Calendar.DisplayMode.MONTH]);
+    if (renderRequired) {
+      this._renderComponents();
       this.needsScrollToStartHour = true;
     }
   }
@@ -385,8 +382,8 @@ export class Calendar extends Widget implements CalendarModel {
     this.setProperty('showCalendarsPanel', showCalendarsPanel);
   }
 
-  setShowListPanel(showCalendarsPanel: boolean) {
-    this.setProperty('showListPanel', showCalendarsPanel);
+  setShowListPanel(showListPanel: boolean) {
+    this.setProperty('showListPanel', showListPanel);
   }
 
   protected override _render() {
@@ -493,25 +490,25 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected override _renderProperties() {
     super._renderProperties();
-    this._renderCalendars();
+    this._renderCalendarDescriptors();
     this._renderComponents();
     this._renderSelectedComponent();
     this._renderLoadInProgress();
     this._renderDisplayMode();
   }
 
-  setCalendars(calendars: CalendarDescriptor[]) {
-    this.setProperty('calendars', calendars);
+  setCalendarDescriptors(calendars: CalendarDescriptor[]) {
+    this.setProperty('calendarDescriptors', calendars);
   }
 
-  protected _setCalendars(calendars: CalendarDescriptor[]) {
-    this._setProperty('calendars', calendars);
+  protected _setCalendarDescriptors(calendars: CalendarDescriptor[]) {
+    this._setProperty('calendarDescriptors', calendars);
     this._updateCalendarsPanelDisplayable();
     this._updateCalendarsPanel();
-    this._validateSelectedCalendar();
+    this._validateSelectedCalendarDescriptor();
   }
 
-  protected _renderCalendars() {
+  protected _renderCalendarDescriptors() {
     let $dayName = this.$topGrid.find('.calendar-week-header > .calendar-day-name');
     let $fullDay = this.$topGrid.find('.calendar-week-allday-container > .calendar-day');
     let $day = this.$grid.find('.calendar-week > .calendar-day');
@@ -523,14 +520,14 @@ export class Calendar extends Widget implements CalendarModel {
 
     // Add default calendar columns
     $dayName.appendDiv('calendar-column')
-      .data('calendarId', this.defaultCalendar.calendarId);
+      .data('calendarId', this.defaultCalendarDescriptor.calendarId);
     $fullDay.appendDiv('calendar-column')
-      .data('calendarId', this.defaultCalendar.calendarId);
+      .data('calendarId', this.defaultCalendarDescriptor.calendarId);
     $day.appendDiv('calendar-column')
-      .data('calendarId', this.defaultCalendar.calendarId);
+      .data('calendarId', this.defaultCalendarDescriptor.calendarId);
 
     // Add new calendar columns
-    this._getCalendarsWithoutGroups().forEach(calendar => {
+    this._getLeafCalendarDescriptors().forEach(calendar => {
       $dayName.appendDiv('calendar-column')
         .data('calendarId', calendar.calendarId)
         .attr('data-calendar-name', calendar.name);
@@ -546,21 +543,24 @@ export class Calendar extends Widget implements CalendarModel {
     let mousedownCallback = this._onDayColumnMouseDown.bind(this, false);
     this.$topGrid.find('.calendar-column').on('mousedown', mousedownCallback);
 
-    this._renderComponents();
+    // Only requred when rendering is triggered by setter
+    if (!this.rendering) {
+      this._renderComponents();
+    }
   }
 
   protected _updateCalendarsPanel() {
-    this.calendarsPanel.treeBox.lookupCall.setCalendars(this.calendars);
+    this.calendarsPanel.treeBox.lookupCall.setCalendarDescriptors(this.calendarDescriptors);
     this.calendarsPanel.treeBox.refreshLookup();
-    let value = this.calendars
+    let value = this.calendarDescriptors
       .filter(calendar => calendar.visible)
       .map(calendar => calendar.calendarId);
     this.calendarsPanel.treeBox.setValue(value);
   }
 
-  protected _validateSelectedCalendar() {
-    if (!arrays.contains(this.calendars, this.selectedCalendar)) {
-      this.selectedCalendar = this.defaultCalendar;
+  protected _validateSelectedCalendarDescriptor() {
+    if (!arrays.contains(this.calendarDescriptors, this.selectedCalendarDescriptor)) {
+      this.selectedCalendarDescriptor = this.defaultCalendarDescriptor;
     }
   }
 
@@ -878,16 +878,16 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // Set selected calendar
-    let newSelectedCalendar = this.selectedCalendar;
+    let newSelectedCalendar = this.selectedCalendarDescriptor;
     if (typeof selectedCalendar === 'string' || selectedCalendar instanceof String) {
       newSelectedCalendar = this.findCalendarForId(selectedCalendar as string);
     } else if (selectedCalendar) {
       newSelectedCalendar = selectedCalendar as CalendarDescriptor;
     }
-    if (newSelectedCalendar !== this.selectedCalendar && newSelectedCalendar.selectable) {
+    if (newSelectedCalendar !== this.selectedCalendarDescriptor && newSelectedCalendar.selectable) {
       changed = true;
-      this.selectedCalendar = newSelectedCalendar;
-      this.trigger('selectedCalendarChange', {
+      this.selectedCalendarDescriptor = newSelectedCalendar;
+      this.trigger('selectedCalendarDescriptorChange', {
         calendarId: newSelectedCalendar.calendarId
       });
     }
@@ -1048,7 +1048,7 @@ export class Calendar extends Widget implements CalendarModel {
     // layout calendar columns
     let columnWidth = 0;
     if (this.isDay()) {
-      columnWidth = Math.round(contentW / (this._getCalendarsWithoutGroups().filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
+      columnWidth = Math.round(contentW / (this._getLeafCalendarDescriptors().filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
     } else if (this.isWorkWeek()) {
       columnWidth = Math.round(contentW / this.workDayIndices.length);
     } else {
@@ -1065,7 +1065,7 @@ export class Calendar extends Widget implements CalendarModel {
         .find('.calendar-column')
         .filter((i, e) => {
           let id = $(e).data('calendarId');
-          if (id === this.defaultCalendar.calendarId) {
+          if (id === this.defaultCalendarDescriptor.calendarId) {
             return this._defaultCalendarVisible();
           }
           let foundCalendar = this.findCalendarForId(id);
@@ -1077,7 +1077,7 @@ export class Calendar extends Widget implements CalendarModel {
 
       // Full size for default column
       $('.calendar-column', this.$grids)
-        .filter((i, e) => $(e).data('calendarId') === this.defaultCalendar.calendarId)
+        .filter((i, e) => $(e).data('calendarId') === this.defaultCalendarDescriptor.calendarId)
         .data('new-width', columnWidth);
     }
 
@@ -1146,7 +1146,7 @@ export class Calendar extends Widget implements CalendarModel {
   protected _defaultCalendarVisible(): boolean {
     return this.components
       .filter(comp => comp.coveredDaysRange.covers(this.selectedDate, true))
-      .filter(comp => (!comp.item.calendarId) || (this.findCalendarForId(comp.item.calendarId) === this.defaultCalendar))
+      .filter(comp => (!comp.item.calendarId) || (this.findCalendarForId(comp.item.calendarId) === this.defaultCalendarDescriptor))
       .length > 0;
   }
 
@@ -1155,14 +1155,14 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   findCalendarForId(calendarId: string): CalendarDescriptor {
-    if (!calendarId || calendarId === this.defaultCalendar.calendarId) {
-      return this.defaultCalendar;
+    if (!calendarId || calendarId === this.defaultCalendarDescriptor.calendarId) {
+      return this.defaultCalendarDescriptor;
     }
-    let calendar = this.calendars.find(calendar => calendar.calendarId === calendarId);
+    let calendar = this.calendarDescriptors.find(calendar => calendar.calendarId === calendarId);
 
     // No calendar found for this id
     if (!calendar) {
-      return this.defaultCalendar;
+      return this.defaultCalendarDescriptor;
     }
 
     return calendar;
@@ -1190,7 +1190,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     $('.calendar-day-name > .calendar-column', this.$topGrid)
-      .filter((i, element) => $(element).data('calendarId') === this.defaultCalendar.calendarId)
+      .filter((i, element) => $(element).data('calendarId') === this.defaultCalendarDescriptor.calendarId)
       .each((i, elm) => {
         $(elm).attr('data-calendar-name', weekdays[i]);
       });
@@ -1249,8 +1249,8 @@ export class Calendar extends Widget implements CalendarModel {
         date = from;
       }
 
-      let key = this._calculateFullDayIndiciesKey(component, date);
-      let usedIndices = arrays.ensure(usedIndicesMap.get(key));
+      let fullDayIndexKey = this._calculateFullDayIndexKey(component, date);
+      let usedIndices = arrays.ensure(usedIndicesMap.get(fullDayIndexKey));
 
       // get the first unused index
       // create [0, 1, 2, ..., maxIndex, maxIndex + 1] remove the used indices
@@ -1265,11 +1265,11 @@ export class Calendar extends Widget implements CalendarModel {
       // none of these indices can be used already due to the order of the components
       while (date <= component.coveredDaysRange.to && date <= to) {
         usedIndices.push(index);
-        usedIndicesMap.set(key, usedIndices);
+        usedIndicesMap.set(fullDayIndexKey, usedIndices);
 
         date = dates.shift(date, 0, 0, 1);
-        key = this._calculateFullDayIndiciesKey(component, date);
-        usedIndices = arrays.ensure(usedIndicesMap.get(key));
+        fullDayIndexKey = this._calculateFullDayIndexKey(component, date);
+        usedIndices = arrays.ensure(usedIndicesMap.get(fullDayIndexKey));
       }
 
       maxComponentsPerDay = Math.max(index + 1, maxComponentsPerDay);
@@ -1278,8 +1278,8 @@ export class Calendar extends Widget implements CalendarModel {
     this.$grids.css('--full-day-components', maxComponentsPerDay);
   }
 
-  protected _calculateFullDayIndiciesKey(component: CalendarComponent, date: Date): string {
-    let calendarId = this.defaultCalendar.calendarId;
+  protected _calculateFullDayIndexKey(component: CalendarComponent, date: Date): string {
+    let calendarId = this.defaultCalendarDescriptor.calendarId;
 
     if (component && component.item && component.item.calendarId) {
       calendarId = component.item.calendarId;
@@ -1536,9 +1536,9 @@ export class Calendar extends Widget implements CalendarModel {
     this.session.onRequestsDone(func, event, allowedType);
   }
 
-  protected _onCalendarTreeBoxValueChanged(event: PropertyChangeEvent<string[]>) {
+  protected _onCalendarVisibilityChanged(event: PropertyChangeEvent<string[]>) {
     let checkedNodes = event.newValue;
-    let calendarCheckedTuples = this.calendars
+    let calendarCheckedTuples = this.calendarDescriptors
       .map(cal => cal.calendarId)
       .map(calId => [calId, checkedNodes.includes(calId)] as [string, boolean]);
     this._updateCalendarVisibility(calendarCheckedTuples);
@@ -1591,7 +1591,7 @@ export class Calendar extends Widget implements CalendarModel {
       day = $day.data('date');
       $columns = $day.children('.calendar-column');
       $allChildren = $day.find('.calendar-component');
-      $defaultColumn = $columns.filter((i, e) => $(e).data('calendarId') === this.defaultCalendar.calendarId);
+      $defaultColumn = $columns.filter((i, e) => $(e).data('calendarId') === this.defaultCalendarDescriptor.calendarId);
 
       // Remove old element containers
       $scrollableContainer = $defaultColumn.children('.calendar-scrollable-components');
@@ -1771,7 +1771,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _calculateStackKey(date: Date, calendarId?: string): string {
-    let stackKey = this.defaultCalendar.calendarId;
+    let stackKey = this.defaultCalendarDescriptor.calendarId;
 
     // Separate layouting of components by calendarId when on day
     if (this.isDay() && calendarId) {
@@ -2050,8 +2050,10 @@ export class Calendar extends Widget implements CalendarModel {
     return null;
   }
 
-  protected _getCalendarsWithoutGroups(): CalendarDescriptor[] {
-    return this.calendars.filter(calendar => !this.calendars.find(cal => cal.parentId === calendar.calendarId));
+  protected _getLeafCalendarDescriptors(): CalendarDescriptor[] {
+    return this.calendarDescriptors
+      .filter(calendar => !this.calendarDescriptors
+        .find(cal => cal.parentId === calendar.calendarId));
   }
 
   protected _newMoveData(event: JQuery.MouseDownEvent): CalendarMoveData {
@@ -2180,7 +2182,7 @@ export class Calendar extends Widget implements CalendarModel {
       this.selectedRange && selectedDateTime &&
       dates.compare(selectedDateTime, this.selectedRange.from) >= 0 &&
       dates.compare(selectedDateTime, this.selectedRange.to) < 0 &&
-      this.selectedCalendar.calendarId === newSelectedCalendarId) {
+      this.selectedCalendarDescriptor.calendarId === newSelectedCalendarId) {
       return;
     }
 
@@ -2224,12 +2226,12 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _findSelectedCalendarColumn(selectedDate: Date): JQuery {
     let $day = this._findDayInCalendar(selectedDate);
-    if (!$day) {
+    if (!$day || !this.selectedCalendarDescriptor) {
       return null;
     }
     return $day
       .find('.calendar-column')
-      .filter((i, e) => $(e).data('calendarId') === this.selectedCalendar.calendarId);
+      .filter((i, e) => $(e).data('calendarId') === this.selectedCalendarDescriptor.calendarId);
   }
 
   protected _setRangeSelection() {

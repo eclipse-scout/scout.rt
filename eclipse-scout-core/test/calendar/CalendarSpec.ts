@@ -68,11 +68,11 @@ describe('Calendar', () => {
 
     describe('expands panels corretly', () => {
 
-      const getContainterWidth = (container: JQuery): number => {
+      const getContainerWidth = (container: JQuery): number => {
         return container.width();
       };
 
-      const getContainterHeight = (container: JQuery): number => {
+      const getContainerHeight = (container: JQuery): number => {
         return container.height();
       };
 
@@ -83,8 +83,8 @@ describe('Calendar', () => {
 
         // Act
         cal.render();
-        let calendarSidebarWidth = getContainterWidth(cal.calendarSidebar.$container);
-        let yearPanelWidth = getContainterWidth(cal.calendarSidebar.$container);
+        let calendarSidebarWidth = getContainerWidth(cal.calendarSidebar.$container);
+        let yearPanelWidth = getContainerWidth(cal.calendarSidebar.$container);
 
         // Assert
         expect(calendarSidebarWidth).toBeGreaterThan(0);
@@ -98,7 +98,7 @@ describe('Calendar', () => {
 
         // Act
         cal.render();
-        let calendarSidebarWidth = getContainterWidth(cal.calendarSidebar.$container);
+        let calendarSidebarWidth = getContainerWidth(cal.calendarSidebar.$container);
 
         // Assert
         expect(calendarSidebarWidth).toBe(0);
@@ -117,8 +117,8 @@ describe('Calendar', () => {
         // Act
         cal.render();
         cal.calendarSidebar.revalidateLayout();
-        let calendarSidebarWidth = getContainterWidth(cal.calendarSidebar.$container);
-        let calendarsPanelHeight = getContainterHeight(cal.calendarSidebar.calendarsPanel.$container);
+        let calendarSidebarWidth = getContainerWidth(cal.calendarSidebar.$container);
+        let calendarsPanelHeight = getContainerHeight(cal.calendarSidebar.calendarsPanel.$container);
 
         // Assert
         expect(calendarSidebarWidth).toBeGreaterThan(0);
@@ -137,8 +137,8 @@ describe('Calendar', () => {
 
         // Act
         cal.render();
-        let calendarSidebarWidth = getContainterWidth(cal.calendarSidebar.$container);
-        let calendarsPanelHeight = getContainterHeight(cal.calendarSidebar.calendarsPanel.$container);
+        let calendarSidebarWidth = getContainerWidth(cal.calendarSidebar.$container);
+        let calendarsPanelHeight = getContainerHeight(cal.calendarSidebar.calendarsPanel.$container);
 
         // Assert
         expect(calendarSidebarWidth).toBeGreaterThan(0);
@@ -152,7 +152,7 @@ describe('Calendar', () => {
 
         // Act
         cal.render();
-        let listPanelWidth = getContainterWidth(cal.$listContainer);
+        let listPanelWidth = getContainerWidth(cal.$listContainer);
 
         // Assert
         expect(listPanelWidth).toBeGreaterThan(0);
@@ -165,9 +165,9 @@ describe('Calendar', () => {
 
         // Act
         cal.render();
-        let yearPanelWidth = getContainterWidth(cal.calendarSidebar.yearPanel.$container);
-        let calendarsPanelWidth = getContainterWidth(cal.calendarSidebar.calendarsPanel.$container);
-        let listPanelWidth = getContainterWidth(cal.$listContainer);
+        let yearPanelWidth = getContainerWidth(cal.calendarSidebar.yearPanel.$container);
+        let calendarsPanelWidth = getContainerWidth(cal.calendarSidebar.calendarsPanel.$container);
+        let listPanelWidth = getContainerWidth(cal.$listContainer);
 
         // Assert
         expect(yearPanelWidth).toBe(0);
@@ -688,7 +688,7 @@ describe('Calendar', () => {
       let calendarIdData = getCurrentCalendarIdFor(comp);
 
       // Assert
-      expect(calendarIdData).toEqual(calendar.defaultCalendar.calendarId);
+      expect(calendarIdData).toEqual(calendar.defaultCalendarDescriptor.calendarId);
     });
 
     it('should render components with calendarId in corresponding column in day view', () => {
@@ -721,9 +721,9 @@ describe('Calendar', () => {
       let calendarIdForMonth = getCurrentCalendarIdFor(comp);
 
       // Assert
-      expect(calendarIdForWeek).toBe(calendar.defaultCalendar.calendarId);
+      expect(calendarIdForWeek).toBe(calendar.defaultCalendarDescriptor.calendarId);
       expect(calendarIdForDay).toBe(businessCalendar.calendarId);
-      expect(calendarIdForMonth).toBe(calendar.defaultCalendar.calendarId);
+      expect(calendarIdForMonth).toBe(calendar.defaultCalendarDescriptor.calendarId);
     });
 
     it('should hide components, when calendar is made invisible on week view', () => {
@@ -754,7 +754,7 @@ describe('Calendar', () => {
       calendar._setSelection(calendar.selectedDate, nonSelectableCalendar, null, false, false);
 
       // Assert
-      expect(calendar.selectedCalendar).not.toBe(nonSelectableCalendar);
+      expect(calendar.selectedCalendarDescriptor).not.toBe(nonSelectableCalendar);
     });
 
     it('should correctly update full day indices on day', () => {
@@ -828,7 +828,7 @@ describe('Calendar', () => {
 
         // Act
         let menuVisibleFirst = isCalendarsSelectionVisible(calendar);
-        calendar.setCalendars([...calendar.calendars, otherCal]);
+        calendar.setCalendarDescriptors([...calendar.calendarDescriptors, otherCal]);
         jasmine.clock().tick(500); // await the lookup
         let menuVisibleAfter = isCalendarsSelectionVisible(calendar);
 
@@ -863,7 +863,7 @@ describe('Calendar', () => {
         calendar._setSelection(new Date(stringDay), selectableCalendar, null, false, false);
 
         // Assert
-        expect(calendar.selectedCalendar).toBe(selectableCalendar);
+        expect(calendar.selectedCalendarDescriptor).toBe(selectableCalendar);
       });
 
       it('should not apply selection on a non-selectable calendar', () => {
@@ -876,7 +876,7 @@ describe('Calendar', () => {
         calendar._setSelection(new Date(stringDay), unselectableCalendar, null, false, false);
 
         // Assert
-        expect(calendar.selectedCalendar).toBe(null);
+        expect(calendar.selectedCalendarDescriptor).toBe(null);
       });
 
       it('should preserve selected calendar when a non-selectable calendar is selected', () => {
@@ -891,7 +891,7 @@ describe('Calendar', () => {
         calendar._setSelection(new Date(stringDay), unselectableCalendar, null, false, false);
 
         // Assert
-        expect(calendar.selectedCalendar).toBe(selectableCalendar);
+        expect(calendar.selectedCalendarDescriptor).toBe(selectableCalendar);
       });
 
       it('should be able to handle calendarId when selection is set', () => {
@@ -904,7 +904,7 @@ describe('Calendar', () => {
         calendar._setSelection(new Date(stringDay), selectableCalendar.calendarId, null, false, false);
 
         // Assert
-        expect(calendar.selectedCalendar).toBe(selectableCalendar);
+        expect(calendar.selectedCalendarDescriptor).toBe(selectableCalendar);
       });
     });
 

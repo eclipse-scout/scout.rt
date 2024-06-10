@@ -45,11 +45,11 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
   /**
    * type {@link List<ICalendarDescriptor>}
    */
-  String PROP_CALENDARS = "calendars";
+  String PROP_CALENDAR_DESCRIPTORS = "calendarDescriptors";
   /**
    * type {@link ICalendarDescriptor}
    */
-  String PROP_SELECTED_CALENDAR = "selectedCalendar";
+  String PROP_SELECTED_CALENDAR_DESCRIPTOR = "selectedCalendarDescriptor";
   /**
    * type String
    */
@@ -112,11 +112,11 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
 
   void setDisplayCondensed(boolean condensed);
 
-  List<ICalendarDescriptor> getCalendars();
+  List<ICalendarDescriptor> getCalendarDescriptors();
 
-  void setCalendars(List<ICalendarDescriptor> calendars);
+  void setCalendarDescriptors(List<ICalendarDescriptor> calendars);
 
-  ICalendarDescriptor getSelectedCalendar();
+  ICalendarDescriptor getSelectedCalendarDescriptor();
 
   void setCalendarVisibility(String calendarId, boolean visible);
 

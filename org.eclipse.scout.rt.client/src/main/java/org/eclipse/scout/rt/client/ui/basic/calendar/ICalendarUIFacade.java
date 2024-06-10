@@ -41,7 +41,7 @@ public interface ICalendarUIFacade {
 
   void setCalendarVisibilityFromUI(String calendarId, Boolean visible);
 
-  void setSelectedCalendarFromUI(String calendarId);
+  void setSelectedCalendarDescriptorFromUI(String calendarId);
 
   void setShowYearPanelFromUI(boolean show);
 

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Calendar, CalendarComponentMoveEvent, CalendarVisibilityChangeEvent, dates, Event, JsonDateRange, ModelAdapter, SelectedCalendarChangeEvent} from '../index';
+import {Calendar, CalendarComponentMoveEvent, CalendarVisibilityChangeEvent, dates, Event, JsonDateRange, ModelAdapter, SelectedCalendarDescriptorChangeEvent} from '../index';
 
 export class CalendarAdapter extends ModelAdapter {
   declare widget: Calendar;
@@ -40,7 +40,7 @@ export class CalendarAdapter extends ModelAdapter {
     } else if (event.type === 'calendarVisibilityChange') {
       this._sendCalendarVisibilityChange(event as CalendarVisibilityChangeEvent);
     } else if (event.type === 'selectedCalendarChange') {
-      this._sendSelectedCalendarChange(event as SelectedCalendarChangeEvent);
+      this._sendSelectedCalendarChange(event as SelectedCalendarDescriptorChangeEvent);
     } else {
       super._onWidgetEvent(event);
     }
@@ -105,11 +105,11 @@ export class CalendarAdapter extends ModelAdapter {
     });
   }
 
-  protected _sendSelectedCalendarChange(event: SelectedCalendarChangeEvent) {
+  protected _sendSelectedCalendarChange(event: SelectedCalendarDescriptorChangeEvent) {
     let selectedCalendarId = event.calendarId;
 
     // Do not send the default calendar to java, because it's not known there
-    if (event.calendarId === this.widget.defaultCalendar.calendarId) {
+    if (event.calendarId === this.widget.defaultCalendarDescriptor.calendarId) {
       selectedCalendarId = null;
     }
 

@@ -23,21 +23,13 @@ export class CalendarSidebarSplitter extends Splitter implements CalendarSidebar
   $collapseBorderLeft: JQuery;
   $collapseBorderRight: JQuery;
 
-  protected _spliterMoveStartPosition: number;
+  protected _splitterMoveStartPosition: number;
 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.on('moveStart', this._onSplitterMoveStart.bind(this));
     this.on('moveEnd', this._onSplitterMoveEnd.bind(this));
-  }
-
-  setCollapsed(collapsed: boolean) {
-    this.setProperty('collapsed', collapsed);
-  }
-
-  setCollapsedLabel(label: string) {
-    this.setProperty('collapsedLabel', label);
   }
 
   protected override _render() {
@@ -58,8 +50,16 @@ export class CalendarSidebarSplitter extends Splitter implements CalendarSidebar
     this._renderCollapsedLabel();
   }
 
+  setCollapsed(collapsed: boolean) {
+    this.setProperty('collapsed', collapsed);
+  }
+
   protected _renderCollapsed() {
     this.$container.toggleClass('collapsed', this.collapsed);
+  }
+
+  setCollapsedLabel(label: string) {
+    this.setProperty('collapsedLabel', label);
   }
 
   protected _renderCollapsedLabel() {
@@ -67,20 +67,20 @@ export class CalendarSidebarSplitter extends Splitter implements CalendarSidebar
   }
 
   protected _onSplitterMoveStart(event: SplitterMoveStartEvent) {
-    this._spliterMoveStartPosition = event.position;
+    this._splitterMoveStartPosition = event.position;
   }
 
   protected _onSplitterMoveEnd(event: SplitterMoveEndEvent) {
     // No previous location available
-    if (!this._spliterMoveStartPosition) {
+    if (!this._splitterMoveStartPosition) {
       return;
     }
 
     let endPos = event.position;
     // When the difference is not too big, trigger a click event
-    if (Math.abs(this._spliterMoveStartPosition - endPos) < 2) {
+    if (Math.abs(this._splitterMoveStartPosition - endPos) < 2) {
       this.trigger('splitterClick');
     }
-    this._spliterMoveStartPosition = null;
+    this._splitterMoveStartPosition = null;
   }
 }

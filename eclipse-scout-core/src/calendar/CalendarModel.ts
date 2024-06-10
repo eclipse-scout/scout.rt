@@ -22,8 +22,14 @@ export interface CalendarModel extends WidgetModel {
   selectedDate?: Date | string;
   showDisplayModeSelection?: boolean;
   rangeSelectionAllowed?: boolean;
-  calendars?: CalendarDescriptor[];
-  selectedCalendar?: CalendarDescriptor;
+  /**
+   * This property enables support for multiple calendars on the calendar widget
+   */
+  calendarDescriptors?: CalendarDescriptor[];
+  /**
+   * Indicates which CalendarDescriptor is currently selected
+   */
+  selectedCalendarDescriptor?: CalendarDescriptor;
   title?: string;
   useOverflowCells?: boolean;
   calendarToggleListWidth?: number;
@@ -36,11 +42,11 @@ export interface CalendarModel extends WidgetModel {
    */
   showCalendarSidebar?: boolean;
   /**
-   * Indicates, if the calendars panel is shown.
+   * Indicates, if the calendars panel is shown
    */
   showCalendarsPanel?: boolean;
   /**
-   * Indicates, if the calendars panel is expanded
+   * Indicates, if the list panel is expanded
    */
   showListPanel?: boolean;
 }
