@@ -264,3 +264,4 @@ export class DesktopAdapter extends ModelAdapter {
 }
 
 App.addListener('bootstrap', DesktopAdapter.modifyDesktopPrototype);
+

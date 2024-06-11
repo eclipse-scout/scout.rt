@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionContextElement;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridEvent;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridEventListener;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridManager;

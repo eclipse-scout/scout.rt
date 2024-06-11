@@ -457,6 +457,8 @@
       "expandedLazy": false,
       "lazyExpandingEnabled": false,
       "leaf": false,
+      "htmlEnabled": false,
+      "initialExpanded": false,
       "childNodes": [],
       "filterAccepted": true
     },

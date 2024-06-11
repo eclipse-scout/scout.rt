@@ -92,14 +92,19 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   }
 
   init(model: InitModelOf<this>) {
-    let staticModel = this._jsonModel();
-    if (staticModel) {
-      model = $.extend({}, staticModel, model);
-    }
+    this.loadFromModel(model);
     this._init(model);
     if (model.initialExpanded === undefined) {
       this.initialExpanded = this.expanded;
     }
+  }
+
+  loadFromModel(model: InitModelOf<this>) {
+    let staticModel = this._jsonModel();
+    if (staticModel) {
+      model = $.extend({}, staticModel, model);
+    }
+    $.extend(this, model);
   }
 
   destroy() {
@@ -125,8 +130,6 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
   protected _init(model: InitModelOf<this>) {
     scout.assertParameter('parent', model.parent, Tree);
     this.session = model.session || model.parent.session;
-
-    $.extend(this, model);
 
     texts.resolveTextProperty(this, 'text');
     icons.resolveIconProperty(this, 'iconId');

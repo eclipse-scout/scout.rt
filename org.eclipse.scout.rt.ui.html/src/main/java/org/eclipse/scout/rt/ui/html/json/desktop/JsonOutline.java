@@ -179,6 +179,17 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   @Override
+  protected void putCellProperties(JSONObject json, ITreeNode node) {
+    if (node instanceof IJsPage) {
+      // Send text because it might come from a summary column from a parent PageWithTable
+      json.put("text", node.getCell().getText());
+    }
+    else {
+      super.putCellProperties(json, node);
+    }
+  }
+
+  @Override
   protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes, Set<ITreeNode> acceptedNodes) {
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
