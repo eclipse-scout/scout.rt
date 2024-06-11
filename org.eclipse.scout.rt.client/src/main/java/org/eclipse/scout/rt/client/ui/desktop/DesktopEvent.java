@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,7 +29,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   /**
    * Event type that indicates that the active outline changes.
    *
-   * @see IDesktop#setOutline(IOutline)
+   * @see IDesktop#setOutline(Class)
    */
   public static final int TYPE_OUTLINE_CHANGED = 200;
 
@@ -70,11 +70,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    * Event type to trigger a GUI reload.
    */
   public static final int TYPE_RELOAD_GUI = 1060;
-
-  /**
-   * Event type to request the desktop's geographic position..
-   */
-  public static final int TYPE_REQUEST_GEOLOCATION = 110;
 
   private final int m_type;
   private IOutline m_outline;

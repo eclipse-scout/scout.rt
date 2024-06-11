@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDes
 import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopTest.P_CheckSaveTestForm.MainBox.MessageField;
+import org.eclipse.scout.rt.client.ui.desktop.hybrid.BrowserCallbacks;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -71,7 +72,7 @@ public class AbstractDesktopTest {
 
   private void prepareMockDesktopWithOutline() {
     ITreeNode node = Mockito.mock(ITreeNode.class);
-    Mockito.when(node.getChildNodes()).thenReturn(Collections.<ITreeNode> emptyList());
+    Mockito.when(node.getChildNodes()).thenReturn(Collections.emptyList());
 
     m_outline = Mockito.mock(IOutline.class);
     Mockito.when(m_outline.getActivePage()).thenReturn(null);
@@ -533,9 +534,10 @@ public class AbstractDesktopTest {
   @Test
   public void testGeolocation() throws InterruptedException, ExecutionException {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
-    Future<Coordinates> coordinatesFurure = desktop.requestGeolocation();
-    desktop.getUIFacade().fireGeolocationDetermined("1.0", "2.0");
-    Coordinates coordinates = coordinatesFurure.get();
+    Future<Coordinates> coordinatesFuture = desktop.requestGeolocation();
+    GeoLocationResponseDo browserResponse = BEANS.get(GeoLocationResponseDo.class).withLatitude("1.0").withLongitude("2.0");
+    BrowserCallbacks.get().getUIFacade().fireCallbackDone("requestGeolocation", browserResponse);
+    Coordinates coordinates = coordinatesFuture.get();
     assertEquals("1.0", coordinates.getLatitude());
     assertEquals("2.0", coordinates.getLongitude());
   }
@@ -543,10 +545,10 @@ public class AbstractDesktopTest {
   @Test(expected = ProcessingException.class)
   public void testGeolocationFailure() throws Throwable {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
-    Future<Coordinates> coordinatesFurure = desktop.requestGeolocation();
-    desktop.getUIFacade().fireGeolocationFailed("-1", "test failure");
+    Future<Coordinates> coordinatesFuture = desktop.requestGeolocation();
+    BrowserCallbacks.get().getUIFacade().fireCallbackFailed("requestGeolocation", "test failure", "-1");
     try {
-      coordinatesFurure.get();
+      coordinatesFuture.get();
     }
     catch (ExecutionException e) {
       throw e.getCause();

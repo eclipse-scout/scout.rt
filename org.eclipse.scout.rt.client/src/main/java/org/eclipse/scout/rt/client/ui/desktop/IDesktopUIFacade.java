@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -56,6 +56,11 @@ public interface IDesktopUIFacade {
    */
   void fireGuiDetached();
 
+  /**
+   * UI Desktop has been initialized as well and is ready to handle events.
+   */
+  void readyFromUI();
+
   void activateForm(IForm form);
 
   /**
@@ -77,10 +82,6 @@ public interface IDesktopUIFacade {
   void setGeoLocationServiceAvailableFromUI(boolean available);
 
   void initStartupRequestParamsFromUI();
-
-  void fireGeolocationDetermined(String latitude, String longitude);
-
-  void fireGeolocationFailed(String errorCode, String errorMessage);
 
   void fireLogoAction();
 

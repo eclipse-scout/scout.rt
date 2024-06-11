@@ -35,6 +35,10 @@ export class DesktopAdapter extends ModelAdapter {
     });
   }
 
+  protected _onWidgetRender(event: Event<Desktop>) {
+    this._send('desktopReady');
+  }
+
   protected _onWidgetFormActivate(event: DesktopFormActivateEvent) {
     if (event.form && !event.form.modelAdapter) {
       return; // Ignore ScoutJS forms
@@ -85,6 +89,8 @@ export class DesktopAdapter extends ModelAdapter {
       this._logoAction(event);
     } else if (event.type === 'cancelForms') {
       this._onWidgetCancelAllForms(event as DesktopCancelFormsEvent);
+    } else if (event.type === 'render') {
+      this._onWidgetRender(event);
     } else {
       super._onWidgetEvent(event);
     }
@@ -206,24 +212,6 @@ export class DesktopAdapter extends ModelAdapter {
     this.widget.bringOutlineToFront();
   }
 
-  protected _onRequestGeolocation(event: RemoteEvent) {
-    if (navigator.geolocation) {
-      let success = function(position: GeolocationPosition) {
-        this._send('geolocationDetermined', {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        });
-      }.bind(this);
-      let error = function(error: GeolocationPositionError) {
-        this._send('geolocationDetermined', {
-          errorCode: error.code,
-          errorMessage: error.message
-        });
-      }.bind(this);
-      navigator.geolocation.getCurrentPosition(success, error);
-    }
-  }
-
   override onModelAction(event: RemoteEvent) {
     if (event.type === 'formShow') {
       this._onFormShow(event);
@@ -249,8 +237,6 @@ export class DesktopAdapter extends ModelAdapter {
       this._onAddNotification(event);
     } else if (event.type === 'removeNotification') {
       this._onRemoveNotification(event);
-    } else if (event.type === 'requestGeolocation') {
-      this._onRequestGeolocation(event);
     } else {
       super.onModelAction(event);
     }
@@ -278,3 +264,4 @@ export class DesktopAdapter extends ModelAdapter {
 }
 
 App.addListener('bootstrap', DesktopAdapter.modifyDesktopPrototype);
+

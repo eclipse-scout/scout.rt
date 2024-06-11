@@ -16,6 +16,7 @@
     "noEmit": true,
     // For jquery imports, see https://www.typescriptlang.org/tsconfig#allowSyntheticDefaultImports
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "lib": [
       "dom",
       "ES2019"

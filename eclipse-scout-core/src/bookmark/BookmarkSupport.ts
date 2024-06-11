@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectTypeToJsonTypeMapper,
-  ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType,
+  Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -45,7 +45,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   protected _getBookmarkStore(): BookmarkDo[] {
     const reviver = (key, value) => {
       if (objects.isPlainObject(value) && value._type) {
-        let objectType = ObjectTypeToJsonTypeMapper.optObjectType(value._type);
+        let objectType = DoRegistry.get().toConstructor(value._type);
         if (objectType) {
           let model = Object.assign({}, value); // shallow copy to keep original object intact
           delete model._type;
@@ -68,7 +68,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     const replacer = (key, value) => {
       if (objects.isPlainObject(value) && value.objectType) {
         let json = Object.assign({}, value); // shallow copy to keep original object intact
-        json._type = ObjectTypeToJsonTypeMapper.toJsonType(value.objectType);
+        json._type = DoRegistry.get().toJsonType(value.objectType);
         delete json.objectType;
         return json;
       }
@@ -376,17 +376,14 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   createPageForBookmark(outline: Outline, bookmark: BookmarkDo): Page {
     // FIXME bsh [js-bookmark] Implement (BookmarkTablePage.execCreateChildPage, BookmarkClientDomain.createPageForBookmark)
 
-    // FIXME bsh [js-bookmark] Delegate to some kind of factory
-    let pageParam = bookmark?.definition?.bookmarkedPage?.pageParam;
-    if (pageParam instanceof PageIdDummyPageParamDo) {
-      switch (pageParam.pageId) {
-        case 'eead3ddc-1827-4cf3-9e53-076c9270635d':
-          return scout.create('jswidgets.SamplePageWithNodes', {
-            parent: outline
-          });
-      }
+    const pageParam = bookmark?.definition?.bookmarkedPage?.pageParam;
+    const pageObjectType = PageResolver.get().findObjectTypeForPageParam(pageParam);
+    if (pageObjectType) {
+      return scout.create(pageObjectType, {
+        parent: outline,
+        pageParam
+      });
     }
-
     return null;
   }
 

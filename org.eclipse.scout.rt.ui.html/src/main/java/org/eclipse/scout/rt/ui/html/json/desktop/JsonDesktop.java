@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -58,11 +58,11 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
   private static final String EVENT_HISTORY_ENTRY_ACTIVATE = "historyEntryActivate";
-  private static final String EVENT_GEOLOCATION_DETERMINED = "geolocationDetermined";
   private static final String EVENT_ADD_NOTIFICATION = "addNotification";
   private static final String EVENT_REMOVE_NOTIFICATION = "removeNotification";
   private static final String EVENT_OPEN_URI = "openUri";
   private static final String EVENT_FORM_ACTIVATE = "formActivate";
+  private static final String EVENT_DESKTOP_READY = "desktopReady";
   private static final String EVENT_LOGO_ACTION = "logoAction";
   private static final String EVENT_CANCEL_FORMS = "cancelForms";
 
@@ -118,18 +118,22 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     else if (EVENT_HISTORY_ENTRY_ACTIVATE.equals(event.getType())) {
       handleUiHistoryEntryActivate(event);
     }
-    else if (EVENT_GEOLOCATION_DETERMINED.equals(event.getType())) {
-      handleUiGeolocationDetermined(event);
-    }
     else if (EVENT_LOGO_ACTION.equals(event.getType())) {
       handleUiLogoAction(event);
     }
     else if (EVENT_CANCEL_FORMS.equals(event.getType())) {
       handleCancelAllForms(event);
     }
+    else if (EVENT_DESKTOP_READY.equals(event.getType())) {
+      handleUiDesktopReady(event);
+    }
     else {
       super.handleUiEvent(event);
     }
+  }
+
+  protected void handleUiDesktopReady(JsonEvent event) {
+    getModel().getUIFacade().readyFromUI();
   }
 
   protected void handleUiHistoryEntryActivate(JsonEvent event) {
@@ -208,26 +212,6 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     getModel().cancelForms(formSet);
   }
 
-  protected void handleUiGeolocationDetermined(JsonEvent event) {
-    JSONObject data = event.getData();
-    String errorCode = data.optString("errorCode");
-    String errorMessage = data.optString("errorMessage");
-    if (StringUtility.hasText(errorCode)) {
-      getModel().getUIFacade().fireGeolocationFailed(errorCode, errorMessage);
-      return;
-    }
-
-    String latitude = data.optString("latitude");
-    String longitude = data.optString("longitude");
-    // some browsers do not provide an errorCode but still deliver no location data
-    if (!StringUtility.hasText(latitude) || !StringUtility.hasText(longitude)) {
-      getModel().getUIFacade().fireGeolocationFailed(errorCode, errorMessage);
-      return;
-    }
-
-    getModel().getUIFacade().fireGeolocationDetermined(latitude, longitude);
-  }
-
   protected void handleUiLogoAction(JsonEvent event) {
     getModel().getUIFacade().fireLogoAction();
   }
@@ -240,7 +224,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     }
     IJsonAdapter<?> jsonAdapter = getUiSession().getJsonAdapter(formId);
     if (jsonAdapter == null) {
-      //should not occur, but if it occurs its not fatal because on next dialog/view/outline opening this is repaired
+      //should not occur, but if it occurs it's not fatal because on next dialog/view/outline opening this is repaired
       LOG.info("handleUIFormActivated is looking for form which exists no more. ID: {}", formId);
       return;
     }
@@ -250,10 +234,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   }
 
   protected DesktopEventFilterCondition addDesktopEventFilterCondition(int tableEventType) {
-    DesktopEventFilterCondition conditon = new DesktopEventFilterCondition(tableEventType);
-    conditon.setCheckDisplayParents(true);
-    m_desktopEventFilter.addCondition(conditon);
-    return conditon;
+    DesktopEventFilterCondition condition = new DesktopEventFilterCondition(tableEventType);
+    condition.setCheckDisplayParents(true);
+    m_desktopEventFilter.addCondition(condition);
+    return condition;
   }
 
   @Override
@@ -298,31 +282,31 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   @Override
   protected void initJsonProperties(DESKTOP model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_TITLE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_TITLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getTitle();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_SELECT_VIEW_TABS_KEY_STROKES_ENABLED, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_SELECT_VIEW_TABS_KEY_STROKES_ENABLED, model) {
       @Override
       protected Object modelValue() {
         return getModel().isSelectViewTabsKeyStrokesEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_SELECT_VIEW_TABS_KEY_STROKE_MODIFIER, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_SELECT_VIEW_TABS_KEY_STROKE_MODIFIER, model) {
       @Override
       protected Object modelValue() {
         return getModel().getSelectViewTabsKeyStrokeModifier();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_CACHE_SPLITTER_POSITION, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_CACHE_SPLITTER_POSITION, model) {
       @Override
       protected Object modelValue() {
         return getModel().isCacheSplitterPosition();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_BROWSER_HISTORY_ENTRY, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_BROWSER_HISTORY_ENTRY, model) {
       @Override
       protected BrowserHistoryEntry modelValue() {
         return getModel().getBrowserHistoryEntry();
@@ -333,7 +317,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
         return JsonBrowserHistoryEntry.toJson((BrowserHistoryEntry) value);
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_LOGO_ID, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_LOGO_ID, model) {
       @Override
       protected Object modelValue() {
         return getModel().getLogoId();
@@ -349,43 +333,43 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
         return "logoUrl";
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_NAVIGATION_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_NAVIGATION_VISIBLE, model) {
       @Override
       protected Object modelValue() {
         return getModel().isNavigationVisible();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_NAVIGATION_HANDLE_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_NAVIGATION_HANDLE_VISIBLE, model) {
       @Override
       protected Object modelValue() {
         return getModel().isNavigationHandleVisible();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_BENCH_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_BENCH_VISIBLE, model) {
       @Override
       protected Object modelValue() {
         return getModel().isBenchVisible();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_HEADER_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_HEADER_VISIBLE, model) {
       @Override
       protected Object modelValue() {
         return getModel().isHeaderVisible();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isGeolocationServiceAvailable();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_LOGO_ACTION_ENABLED, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_LOGO_ACTION_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isLogoActionEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(PROP_BENCH_LAYOUT_DATA, model) {
+    putJsonProperty(new JsonProperty<>(PROP_BENCH_LAYOUT_DATA, model) {
       @Override
       protected BenchLayoutData modelValue() {
         return getModel().getBenchLayoutData();
@@ -397,19 +381,19 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       }
 
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_DISPLAY_STYLE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_DISPLAY_STYLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getDisplayStyle();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_DENSE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_DENSE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isDense();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_TRACK_FOCUS, model) {
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_TRACK_FOCUS, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isTrackFocus();
@@ -488,19 +472,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       case DesktopEvent.TYPE_NOTIFICATION_REMOVED:
         handleModelNotificationRemoved(event);
         break;
-      case DesktopEvent.TYPE_REQUEST_GEOLOCATION:
-        handleRequestGeolocation(event);
-        break;
       case DesktopEvent.TYPE_RELOAD_GUI:
         handleModelReloadGui();
         break;
       default:
         // NOP
     }
-  }
-
-  protected void handleRequestGeolocation(DesktopEvent event) {
-    addActionEvent("requestGeolocation");
   }
 
   protected void handleModelNotificationAdded(DesktopEvent event) {
@@ -556,8 +533,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
    * semicolons as path parameters.
    *
    * For further information see:
-   * - https://serverfault.com/questions/874726/apache-decoding-semicolon-mod-proxy
-   * - https://security.stackexchange.com/questions/251723/semicolons-relation-with-reverse-proxy
+   * - <a href="https://serverfault.com/questions/874726/apache-decoding-semicolon-mod-proxy">ServerFault</a>
+   * - <a href=
+   "https://security.stackexchange.com/questions/251723/semicolons-relation-with-reverse-proxy">StackExchange</a>
    * </pre>
    */
   protected String cleanFilename(String fileName) {

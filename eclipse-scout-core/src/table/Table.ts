@@ -4968,9 +4968,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    */
   setLimitedResultTableStatus(limitedResult: boolean) {
     if (!limitedResult) {
-      if (this.tableStatus instanceof LimitedResultTableStatus) {
-        this.setTableStatus(null);
-      }
+      this.setTableStatus(null);
       return;
     }
 

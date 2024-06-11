@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BookmarkAdapter, bookmarks, ButtonTile, ChildModelOf, DefaultBookmarkAdapter, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons, InitModelOf, inspector, Menu,
-  MenuBar, menus, ObjectOrChildModel, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings, Table, TableRow, TableRowClickEvent,
-  TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  BaseDoEntity, BookmarkAdapter, bookmarks, ButtonTile, ChildModelOf, Constructor, DefaultBookmarkAdapter, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons,
+  InitModelOf, inspector, Menu, MenuBar, menus, ObjectFactory, ObjectOrChildModel, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings,
+  Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -30,7 +30,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   declare parentNode: Page;
 
   uuid: string;
-  _pageParamInternal: PageParamDo;
+  pageParamType: Constructor<PageParamDo>; // written using @pageParam decorator (see below)
   /**
    * This property is set by the server, see: JsonOutline#putNodeType.
    */
@@ -67,6 +67,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
   protected _detailTableModel: ChildModelOf<Table>;
   protected _bookmarkAdapter: BookmarkAdapter;
+  protected _pageParamInternal: PageParamDo;
   /** @internal */
   _detailFormModel: ChildModelOf<Form>;
   protected _menuOwnerMenusChangeHandler: (event: Event<MenuOwner>) => void;
@@ -94,6 +95,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     this.events = new EventSupport();
     this.events.registerSubTypePredicate('propertyChange', (event: PropertyChangeEvent, propertyName) => event.propertyName === propertyName);
     this.pageChanging = 0;
+    this.pageParamType = null;
     this._tableFilterHandler = this._onTableFilter.bind(this);
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
@@ -162,11 +164,11 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   protected override _destroy() {
     this.trigger('destroying');
     super._destroy();
-    if (this.detailTable) {
+    if (this.detailTable?.destroy) {
       this.detailTable.destroy();
       this.detailTable = null;
     }
-    if (this.detailForm) {
+    if (this.detailForm?.destroy) {
       this.detailForm.destroy();
       this.detailForm = null;
     }
@@ -603,16 +605,30 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
 
   get pageParam(): PageParamDo {
     if (this._pageParamInternal === undefined) {
-      return this._computePageParam();
+      if (this.pageParamType === null) {
+        // TODO mvi [js-bookmark] DummyPageParam is only used in bookmarks. Should not be here in Page, but in BookmarkAdapter instead?
+        this.pageParam = this._computeDummyPageParam();
+      } else {
+        this.pageParam = null; // no param set
+      }
     }
     return this._pageParamInternal;
   }
 
   set pageParam(pageParam: PageParamDo) {
-    this._pageParamInternal = pageParam;
+    if (pageParam instanceof BaseDoEntity || pageParam === null) {
+      this._pageParamInternal = pageParam;
+    } else {
+      let pageParamModel = bookmarks.toObjectModel(pageParam) as BaseDoEntity;
+      if (this.pageParamType && pageParamModel.objectType === 'BaseDoEntity') {
+        // if _type is missing or cannot be resolved: use decorated PageParam type to create expected instance
+        pageParamModel.objectType = ObjectFactory.get().getObjectType(this.pageParamType);
+      }
+      this._pageParamInternal = scout.create(pageParamModel);
+    }
   }
 
-  protected _computePageParam(): PageParamDo {
+  protected _computeDummyPageParam(): PageParamDo {
     let pageId = this.getBookmarkAdapter().buildId();
     if (pageId) {
       return scout.create(PageIdDummyPageParamDo, {pageId});
@@ -675,4 +691,13 @@ export type MenuOwner = Widget & { menus: Menu[]; setMenus: (menus: ObjectOrChil
  */
 export interface PageParamDo extends DoEntity {
   [x: string]: any; // FIXME bsh [js-bookmark] Why is this necessary??? WidgetsOutlineModel has errors otherwise
+}
+
+export function pageParam<DO extends PageParamDo>(pareParamDo: Constructor<DO>) {
+  return <T extends Constructor>(BaseClass: T) => class extends BaseClass {
+    constructor(...args: any[]) {
+      super(...args);
+      Reflect.set(this, 'pageParamType', pareParamDo);
+    }
+  };
 }

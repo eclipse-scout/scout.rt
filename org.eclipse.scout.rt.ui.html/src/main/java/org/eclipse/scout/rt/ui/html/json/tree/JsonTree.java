@@ -644,7 +644,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       JSONObject jsonNode = new JSONObject();
       putProperty(jsonNode, "id", nodeId);
       // Only send _some_ of the properties. Everything else (e.g. "checked", "expanded") will be handled with separate events.
-      // --> See also: Tree.js/_onNodesUpdated()
+      // --> See also: Tree.ts/_applyUpdatedNodeProperties()
       putProperty(jsonNode, "leaf", node.isLeaf());
       putProperty(jsonNode, "enabled", node.isEnabled());
       putProperty(jsonNode, "lazyExpandingEnabled", node.isLazyExpandingEnabled());
@@ -754,7 +754,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, nodeId);
-    putCellProperties(jsonEvent, modelNode.getCell());
+    putCellProperties(jsonEvent, modelNode);
     addActionEvent(EVENT_NODE_CHANGED, jsonEvent);
   }
 
@@ -906,8 +906,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     return rootNode.getChildNodes();
   }
 
-  protected void putCellProperties(JSONObject json, ICell cell) {
+  protected void putCellProperties(JSONObject json, ITreeNode node) {
     // We deliberately don't use JsonCell here, because most properties are not supported in a tree anyway
+    ICell cell = node.getCell();
     json.put("text", cell.getText());
     json.put("iconId", BinaryResourceUrlUtility.createIconUrl(cell.getIconId()));
     json.put("cssClass", (cell.getCssClass()));
@@ -952,7 +953,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(node.getCell().getIconId()));
     putProperty(json, "initialExpanded", node.isInitialExpanded());
     putChildNodeIndex(json, node, childIndexes);
-    putCellProperties(json, node.getCell());
+    putCellProperties(json, node);
     JSONArray jsonChildNodes = new JSONArray();
     if (node.getChildNodeCount() > 0) {
       for (ITreeNode childNode : node.getChildNodes()) {

@@ -91,6 +91,12 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    */
   String PROP_KEY_STROKES = "keyStrokes";
   /**
+   * Specifies that the Desktop has been completely initialized and started in Java and the Browser has completed the
+   * Desktop too. {@link Boolean}
+   */
+  String PROP_READY = "ready";
+  /**
+   * Specifies that the Desktop has been completely initialized and started in Java. It is not ready yet in the Browser!
    * {@link Boolean}
    */
   String PROP_OPENED = "opened";
@@ -245,9 +251,14 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   boolean isShowing(IForm form);
 
   /**
-   * @return true after desktop was opened and setup in any UI.
+   * @return true after desktop was opened and setup in Java.
    */
   boolean isOpened();
+
+  /**
+   * @return true if the desktop was initialized and opened in Java and the UI.
+   */
+  boolean isReady();
 
   /**
    * Returns all Forms which are attached to the given {@link IDisplayParent}. The forms returned are ordered as

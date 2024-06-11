@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FullModelOf, InitModelOf, ModelAdapter, ModelOf, ObjectModel, objects, ObjectUuidProvider, scout, TableRow, TreeNode, TypeDescriptor, TypeDescriptorOptions, Widget} from './index';
+import {AbstractConstructor, Constructor, FullModelOf, InitModelOf, ModelAdapter, ModelOf, ObjectModel, objects, ObjectUuidProvider, scout, TableRow, TreeNode, TypeDescriptor, TypeDescriptorOptions, Widget} from './index';
 import $ from 'jquery';
 
 export type ObjectCreator = (model?: any) => object;
@@ -41,7 +41,7 @@ export class ObjectFactory {
   initialized: boolean;
 
   protected _registry: Map<ObjectType, ObjectCreator>;
-  protected _objectTypeMap: Map<new() => object, string>;
+  protected _objectTypeMap: Map<Constructor, string>;
 
   constructor() {
     this.initialized = false;
@@ -238,6 +238,19 @@ export class ObjectFactory {
       return Class;
     }
     return this._objectTypeMap.get(Class);
+  }
+
+  getClassesInstanceOf<T extends object>(baseClass: Constructor<T> | AbstractConstructor<T>): Constructor<T>[] {
+    const result: Constructor<T>[] = [];
+    if (!baseClass) {
+      return result;
+    }
+    for (let obj of this._objectTypeMap.keys()) {
+      if (baseClass.isPrototypeOf(obj)) {
+        result.push(obj as Constructor<T>);
+      }
+    }
+    return result;
   }
 
   /**
