@@ -16,6 +16,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   declare model: BookmarkSupportModel;
   declare initModel: SomeRequired<this['model'], 'desktop'>;
 
+  static ERROR_MISSING_OUTLINE = 'missing-outline';
+  static ERROR_MISSING_PAGE_PARAM = 'missing-page-param';
+  static ERROR_PAGE_NOT_BOOKMARKABLE = 'page-not-bookmarkable';
+  static ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER = 'page-not-bookmarkable';
   static ERROR_OUTLINE_NOT_FOUND = 'outline-not-found';
   static ERROR_PAGE_NOT_FOUND = 'page-not-found';
 
@@ -124,77 +128,95 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
   // --------------------------------------
 
-  createBookmark(): BookmarkDo {
-    let outlineId = this.desktop.outline?.getBookmarkAdapter()?.buildId();
+  createBookmark(): JQuery.Promise<BookmarkDo> {
+    let outlineId = this.desktop.outline?.getBookmarkAdapter().buildId();
     if (!outlineId) {
-      return null;
+      // throw new VetoException(TEXTS.get("CannotCreateBookmarkAtThisLocation"));
+      return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_OUTLINE);
     }
 
     let selectedPage = this.desktop.outline.selectedNode();
-    let bookmarkedPage = this._pageToBookmark(selectedPage);
-    if (!bookmarkedPage) {
-      // FIXME bsh [js-bookmark] How to handle errors? VetoException? Special return object?
-      MessageBoxes.openOk(this.desktop, 'Page cannot be bookmarked (missing pageParam)', Status.Severity.ERROR);
-      return null;
-    }
+    return this._pageToBookmark(selectedPage)
+      .then(bookmarkedPage => this._createBookmark(outlineId, selectedPage, bookmarkedPage));
+  }
 
-    let pagePath = [];
-    let currentPage = selectedPage;
-    while (currentPage.parentNode) {
+  protected _createBookmark(outlineId: string, page: Page, bookmarkedPage: IBookmarkPageDo): JQuery.Promise<BookmarkDo> {
+    // Recursive function that returns the pagePath from the root to the given page  (as a promise)
+    let buildPagePath = (currentPage: Page, pagePath: IBookmarkPageDo[] = []): JQuery.Promise<IBookmarkPageDo[]> => {
       let parentPage = currentPage.parentNode;
-      let pathEntry = this._pageToBookmark(parentPage, currentPage);
-      if (!pathEntry) {
-        // non-bookmarkable page, discard entire path
-        pagePath = null;
-        break;
+      if (!parentPage) {
+        return $.resolvedPromise(pagePath); // done
       }
-      pagePath.unshift(pathEntry);
-      currentPage = parentPage;
-    }
-
-    let bookmarkDefinition = null;
-    if (pagePath) {
-      bookmarkDefinition = scout.create(OutlineBookmarkDefinitionDo, {
-        outlineId: outlineId,
-        bookmarkedPage: bookmarkedPage,
-        pagePath: pagePath
+      return this._pageToBookmark(parentPage, currentPage).then(pathEntry => {
+        if (!pathEntry) {
+          // non-bookmarkable page, discard entire path
+          return $.resolvedPromise(null);
+        }
+        return buildPagePath(parentPage, [pathEntry, ...pagePath]);
       });
-    } else {
-      bookmarkDefinition = scout.create(PageBookmarkDefinitionDo, {
-        bookmarkedPage: bookmarkedPage
-      });
-    }
+    };
 
-    return scout.create(BookmarkDo, {
-      definition: bookmarkDefinition
+    return buildPagePath(page).then(pagePath => {
+      let bookmarkDefinition = null;
+      if (pagePath) {
+        bookmarkDefinition = scout.create(OutlineBookmarkDefinitionDo, {
+          outlineId: outlineId,
+          bookmarkedPage: bookmarkedPage,
+          pagePath: pagePath
+        });
+      } else {
+        bookmarkDefinition = scout.create(PageBookmarkDefinitionDo, {
+          bookmarkedPage: bookmarkedPage
+        });
+      }
+      return scout.create(BookmarkDo, {
+        definition: bookmarkDefinition
+      });
     });
   }
 
-  protected _pageToBookmark(page: Page, childPage?: Page): IBookmarkPageDo {
-    let bookmarkedPage: IBookmarkPageDo = null;
-    if (page && page.pageParam) { // FIXME bsh [js-bookmark] Check bookmarkable
-      if (page.nodeType === Page.NodeType.NODES) {
-        bookmarkedPage = scout.create(NodeBookmarkPageDo, {
-          pageParam: page.pageParam,
-          displayText: page.text
-        });
-      } else if (page.nodeType === Page.NodeType.TABLE) {
-        // FIXME bsh [js-bookmark] Handle case where bookmarkIdentifier is not present -> throw new VetoException(TEXTS.get("CannotCreateBookmarkAtThisLocation"))
-        if (childPage && !childPage.row?.bookmarkIdentifier) {
-          return null; // child row not identifiable
-        }
-        let expandedChildRowIdentifier = childPage?.row?.bookmarkIdentifier;
-        // FIXME bsh [js-bookmark] Only export when requested, see BookmarkDoBuilder#createTableRowSelections
-        let selectedChildRowIdentifiers = page.detailTable.selectedRows.map(row => row.bookmarkIdentifier).filter(Boolean);
-        bookmarkedPage = scout.create(TableBookmarkPageDo, {
-          pageParam: page.pageParam,
-          displayText: page.text,
-          expandedChildRow: expandedChildRowIdentifier,
-          selectedChildRows: selectedChildRowIdentifiers
-        });
-      }
+  protected _pageToBookmark(page: Page, childPage?: Page): JQuery.Promise<IBookmarkPageDo> {
+    if (!page) { // } || !page['bookmarkable']) { // FIXME bsh [js-bookmark] Add 'bookmarkable' flag
+      return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE);
     }
-    return bookmarkedPage;
+    if (!page.pageParam) {
+      return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_PAGE_PARAM);
+    }
+
+    if (page.nodeType === Page.NodeType.NODES) {
+      let bookmarkedPage = scout.create(NodeBookmarkPageDo, {
+        pageParam: page.pageParam,
+        displayText: page.text // FIXME bsh [js-bookmark] Delegate to bookmark adapter
+      });
+      return $.resolvedPromise(bookmarkedPage);
+    }
+
+    if (page.nodeType === Page.NodeType.TABLE) {
+      // FIXME bsh [js-bookmark] Handle case where bookmarkIdentifier is not present -> throw new VetoException(TEXTS.get("CannotCreateBookmarkAtThisLocation"))
+      if (childPage && !childPage.row?.bookmarkIdentifier) { // child row not identifiable
+        return $.rejectedPromise(BookmarkSupport.ERROR_MISSING_ROW_BOOKMARK_IDENTIFIER);
+      }
+
+      let expandedChildRowIdentifier = childPage?.row?.bookmarkIdentifier;
+      // FIXME bsh [js-bookmark] Only export when requested, see BookmarkDoBuilder#createTableRowSelections
+      let selectedChildRowIdentifiers = page.detailTable.selectedRows.map(row => row.bookmarkIdentifier).filter(Boolean);
+      return $.resolvedPromise()
+        .then(() => {
+          // FIXME bsh [js-bookmark] load search filter
+          return null;
+        })
+        .then(searchFilter => {
+          let bookmarkedPage = scout.create(TableBookmarkPageDo, {
+            pageParam: page.pageParam,
+            displayText: page.text, // FIXME bsh [js-bookmark] Delegate to bookmark adapter
+            expandedChildRow: expandedChildRowIdentifier,
+            selectedChildRows: selectedChildRowIdentifiers
+          });
+          return $.resolvedPromise(bookmarkedPage);
+        });
+    }
+
+    return $.rejectedPromise(BookmarkSupport.ERROR_PAGE_NOT_BOOKMARKABLE);
   }
 
   // --------------------------------------
@@ -266,9 +288,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   protected _openBookmarkLocal(bookmarkDefinition: OutlineBookmarkDefinitionDo, result: ActivateBookmarkResultDo): JQuery.Promise<void> {
     // Check if we are already on the correct outline
     let outline = this.desktop.outline;
-    if (outline?.getBookmarkAdapter()?.buildId() !== bookmarkDefinition.outlineId) {
+    if (!outline || outline.getBookmarkAdapter().buildId() !== bookmarkDefinition.outlineId) {
       outline = this.desktop.getOutlines().find(outline => {
-        let outlineId = outline.getBookmarkAdapter()?.buildId();
+        let outlineId = outline.getBookmarkAdapter().buildId();
         return outlineId === bookmarkDefinition.outlineId;
       });
     }
