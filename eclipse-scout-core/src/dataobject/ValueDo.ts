@@ -19,6 +19,7 @@ import {DoEntity} from './../index';
  *
  * @see "org.eclipse.scout.rt.dataobject.value.IValueDo"
  */
+// FIXME mvi [js-bookmark]: should this extend BaseDoEntity? Also migrate JsPageUiHandler
 export interface ValueDo<T> extends DoEntity {
   value: T;
 }

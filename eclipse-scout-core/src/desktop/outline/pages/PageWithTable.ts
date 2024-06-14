@@ -148,16 +148,66 @@ export class PageWithTable extends Page implements PageWithTableModel {
     });
   }
 
+  // FIXME bsh [js-bookmark] Cleanup
   protected _createSearchFilter(): any {
-    // Cast could be wrong as any table control is in the list.
-    // But as the FormTableControl does not add new public items except the form and the presence of that is form is ensured in the find() method, it may be fine.
-    let controls = this.detailTable.tableControls as FormTableControl[];
+    return this.getSearchFilter();
+    // // Cast could be wrong as any table control is in the list.
+    // // But as the FormTableControl does not add new public items except the form and the presence of that is form is ensured in the find() method, it may be fine.
+    // let controls = this.detailTable.tableControls as FormTableControl[];
+    //
+    // let firstFormTableControl = arrays.find(controls, tableControl => tableControl.form instanceof Form);
+    // if (firstFormTableControl) {
+    //   return firstFormTableControl.form.exportData();
+    // }
+    // return null;
+  }
 
-    let firstFormTableControl = arrays.find(controls, tableControl => tableControl.form instanceof Form);
-    if (firstFormTableControl) {
-      return firstFormTableControl.form.exportData();
+  /**
+   * Returns the search form for this page, or `null` if no search form is present.
+   */
+  getSearchForm(): Form {
+    // TODO bsh [js-bookmark] Add dedicated SearchTableControl class to find the correct table control more reliably
+    let tableControl = this.detailTable.findTableControl(FormTableControl, tableControl => !!tableControl.form);
+    return tableControl ? tableControl.form : null;
+  }
+
+  /**
+   * Returns the exported data of the {@link #getSearchForm search form}, or `undefined` if no search form is present.
+   */
+  getSearchFilter(): any {
+    return this.getSearchForm()?.exportData();
+  }
+
+  /**
+   * Imports the given data into the {@link #getSearchForm search form}. If no search form is present, nothing happens.
+   *
+   * @param markAsSaved
+   *        If this optional parameter is set to `true`, the form state after the import is marked as the saved state,
+   *        i.e. pressing the reset button will revert the form to the new state. Otherwise, the saved state will not be
+   *        altered and pressing the reset button will revert the form to whatever was previously the saved state.
+   */
+  setSearchFilter(searchFilter: any, markAsSaved?: boolean) {
+    let searchForm = this.getSearchForm();
+    if (!searchForm) {
+      return;
     }
-    return null;
+    let oldData = searchForm.data;
+    searchForm.setData(searchFilter);
+    searchForm.importData();
+    if (markAsSaved) {
+      searchForm.markAsSaved();
+    } else {
+      // Because resetting the form not only resets every field but also loads the form again (see Lifecycle#reset),
+      // to 'data' attribute has to be reverted back to the previous value.
+      searchForm.setData(oldData);
+    }
+  }
+
+  /**
+   * Resets the {@link #getSearchForm search form} to its saved state. If no search form is present, nothing happens.
+   */
+  resetSearchFilter() {
+    this.getSearchForm()?.reset();
   }
 
   /**
@@ -238,12 +288,12 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   /**
    * Override this method to load table data (rows to be added to table).
+   *
    * This is an asynchronous operation working with a Promise. If table data load is successful,
-   * <code>_onLoadTableDataDone(data)</code> will be called. If a failure occurs while loading table
-   * data, <code>_onLoadTableDataFail(data)</code> will be called.
-   * <p>
-   * If you want to return static data, you can return a resolvedPromise:
-   * <code>return $.resolvedPromise([{...},{...}]);</code>
+   * {@link _onLoadTableDataDone} will be called. If a failure occurs while loading table data,
+   * {@link _onLoadTableDataFail} will be called.
+   *
+   * To return static data, use a resolved promise: `return $.resolvedPromise({...});`
    *
    * @param searchFilter The search filter as exported by the search form or null.
    */
@@ -253,9 +303,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   /**
    * This method is called when table data load is successful. It should transform the table data
-   * object to table rows.
+   * object to table rows and add them to the table.
    *
-   * @param tableData data loaded by <code>_loadTableData</code>
+   * @param tableData data loaded by {@link _loadTableData}
+   * @param restoreSelectionInfo information needed to restore the selection after table data was loaded
    */
   protected _onLoadTableDataDone(tableData: any, restoreSelectionInfo?: RestoreSelectionInfo) {
     let success = false;
