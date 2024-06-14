@@ -39,6 +39,12 @@ export class HybridManagerAdapter extends ModelAdapter {
   }
 
   protected _onWidgetHybridAction(event: HybridActionEvent) {
+    // FIXME bsh [js-bookmark] Hacky-hacky -> find a general solution!
+    if (event.data.data && event.data.data['_page']) {
+      let page = event.data.data['_page'];
+      let outline = page.getOutline();
+      event.data.data['_page'] = outline.modelAdapter.id + '/' + page.id;
+    }
     this._send('hybridAction', event.data);
   }
 }

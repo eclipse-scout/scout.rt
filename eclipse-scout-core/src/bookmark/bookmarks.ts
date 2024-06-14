@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, DoRegistry, objects, PageParamDo, scout, typeName} from '../index';
+import {BaseDoEntity, DoEntity, DoRegistry, objects, PageParamDo, scout, typeName} from '../index';
 
 @typeName('crm.Bookmark')
 export class BookmarkDo extends BaseDoEntity {
@@ -55,11 +55,10 @@ export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo
   displayText: string;
   expandedChildRow: BookmarkTableRowIdentifierDo;
   selectedChildRows: BookmarkTableRowIdentifierDo[];
-  // FIXME bsh [js-bookmark] Add missing properties
-  // tablePreferences: TableClientUiPreferencesDo;
-  // searchFilterComplete: boolean;
-  // searchData: ISearchDo;
-  // chartTableControlConfig: ChartTableControlConfigDo;
+  tablePreferences: DoEntity; // FIXME bsh [js-bookmark] TableClientUiPreferencesDo;
+  searchFilterComplete: boolean; // FIXME bsh [js-bookmark] always true?
+  searchData: DoEntity; // FIXME bsh [js-bookmark] ISearchDo;
+  chartTableControlConfig: DoEntity; // FIXME bsh [js-bookmark] ChartTableControlConfigDo;
 }
 
 // --------------------------------------------------

@@ -9,7 +9,7 @@
  */
 import {
   ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType,
-  Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -202,15 +202,23 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       let selectedChildRowIdentifiers = page.detailTable.selectedRows.map(row => row.bookmarkIdentifier).filter(Boolean);
       return $.resolvedPromise()
         .then(() => {
-          // FIXME bsh [js-bookmark] load search filter
-          return null;
+          // Local
+          if (page instanceof PageWithTable) {
+            return page.getSearchFilter();
+          }
+          // Remote
+          return HybridManager.get(this.session).callActionAndWait('ExportSearchData', {
+            _page: page
+          });
         })
         .then(searchFilter => {
           let bookmarkedPage = scout.create(TableBookmarkPageDo, {
             pageParam: page.pageParam,
             displayText: page.text, // FIXME bsh [js-bookmark] Delegate to bookmark adapter
             expandedChildRow: expandedChildRowIdentifier,
-            selectedChildRows: selectedChildRowIdentifiers
+            selectedChildRows: selectedChildRowIdentifiers,
+            searchFilterComplete: true,
+            searchData: searchFilter
           });
           return $.resolvedPromise(bookmarkedPage);
         });

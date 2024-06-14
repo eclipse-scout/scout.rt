@@ -148,16 +148,32 @@ export class PageWithTable extends Page implements PageWithTableModel {
     });
   }
 
+  // FIXME bsh [js-bookmark] Cleanup
   protected _createSearchFilter(): any {
-    // Cast could be wrong as any table control is in the list.
-    // But as the FormTableControl does not add new public items except the form and the presence of that is form is ensured in the find() method, it may be fine.
-    let controls = this.detailTable.tableControls as FormTableControl[];
+    return this.getSearchFilter();
+    // // Cast could be wrong as any table control is in the list.
+    // // But as the FormTableControl does not add new public items except the form and the presence of that is form is ensured in the find() method, it may be fine.
+    // let controls = this.detailTable.tableControls as FormTableControl[];
+    //
+    // let firstFormTableControl = arrays.find(controls, tableControl => tableControl.form instanceof Form);
+    // if (firstFormTableControl) {
+    //   return firstFormTableControl.form.exportData();
+    // }
+    // return null;
+  }
 
-    let firstFormTableControl = arrays.find(controls, tableControl => tableControl.form instanceof Form);
-    if (firstFormTableControl) {
-      return firstFormTableControl.form.exportData();
-    }
-    return null;
+  getSearchForm(): Form {
+    let tableControl = this.detailTable.findTableControl(FormTableControl, tableControl => !!tableControl.form);
+    return tableControl ? tableControl.form : null;
+  }
+
+  getSearchFilter(): any {
+    return this.getSearchForm()?.exportData();
+  }
+
+  setSearchFilter(searchFilter: any) {
+    this.getSearchForm()?.setData(searchFilter);
+    this.getSearchForm()?.importData();
   }
 
   /**
@@ -239,12 +255,12 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   /**
    * Override this method to load table data (rows to be added to table).
+   *
    * This is an asynchronous operation working with a Promise. If table data load is successful,
-   * <code>_onLoadTableDataDone(data)</code> will be called. If a failure occurs while loading table
-   * data, <code>_onLoadTableDataFail(data)</code> will be called.
-   * <p>
-   * If you want to return static data, you can return a resolvedPromise:
-   * <code>return $.resolvedPromise([{...},{...}]);</code>
+   * {@link _onLoadTableDataDone} will be called. If a failure occurs while loading table data,
+   * {@link _onLoadTableDataFail} will be called.
+   *
+   * To return static data, use a resolved promise: `return $.resolvedPromise({...});`
    *
    * @param searchFilter The search filter as exported by the search form or null.
    */
@@ -254,9 +270,10 @@ export class PageWithTable extends Page implements PageWithTableModel {
 
   /**
    * This method is called when table data load is successful. It should transform the table data
-   * object to table rows.
+   * object to table rows and add them to the table.
    *
-   * @param tableData data loaded by <code>_loadTableData</code>
+   * @param tableData data loaded by {@link _loadTableData}
+   * @param restoreSelectionInfo information needed to restore the selection after table data was loaded
    */
   protected _onLoadTableDataDone(tableData: any, restoreSelectionInfo?: RestoreSelectionInfo) {
     let success = false;
