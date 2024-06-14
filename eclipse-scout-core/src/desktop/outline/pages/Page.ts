@@ -609,7 +609,9 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     if (pageParam instanceof BaseDoEntity || !pageParam) {
       this._pageParamInternal = pageParam;
     } else {
-      this._pageParamInternal = dataObjects.deserialize(pageParam, this.pageParamType || BaseDoEntity);
+      // Explicitly define type, because TS seems to sometimes infer it wrongly (type instead of constructor)
+      let objectType: Constructor<DoEntity> = this.pageParamType || BaseDoEntity;
+      this._pageParamInternal = dataObjects.deserialize(pageParam, objectType);
     }
   }
 

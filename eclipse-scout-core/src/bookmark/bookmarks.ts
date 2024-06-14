@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, DoEntity, DoRegistry, objects, PageParamDo, typeName} from '../index';
+import {BaseDoEntity, dataObjects, DoEntity, DoRegistry, objects, PageParamDo, typeName} from '../index';
 
 @typeName('crm.Bookmark')
 export class BookmarkDo extends BaseDoEntity {
@@ -123,6 +123,7 @@ export class PageIdDummyPageParamDo extends BaseDoEntity implements PageParamDo 
 
 // --------------------------------------------------
 
+@typeName('suite.ActivateBookmarkResult')
 export class ActivateBookmarkResultDo extends BaseDoEntity {
   targetBookmarkPage: IBookmarkPageDo;
   remainingPagePath: IBookmarkPageDo[];
@@ -152,7 +153,10 @@ export const bookmarks = {
 
   // FIXME bsh [js-bookmark] move compare logic to dataObjects.ts
   stringifyNormalized(object: any): string {
-    return JSON.stringify(object, (key, value) => {
+    // Get rid of _typeVersion
+    // FIXME bsh [js-bookmark] There must be a better way!?
+    let normalizedObject = dataObjects.deserialize(dataObjects.serialize(object));
+    return JSON.stringify(normalizedObject, (key, value) => {
       if (objects.isPojo(value)) {
         if (value.objectType) {
           let json = Object.assign({}, value); // shallow copy to keep original object intact

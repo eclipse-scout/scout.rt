@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, dataObjects, Desktop, DoRegistry, HybridManager,
-  IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session,
-  SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage, HybridActionContextElements, HybridActionContextElement, HybridManagerActionEndEventResult
+  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, dataObjects, Desktop, HybridActionContextElement, HybridActionContextElements, HybridManager,
+  HybridManagerActionEndEventResult, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session,
+  SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -51,18 +51,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   // --------------------------------------
 
   protected _getBookmarkStore(): BookmarkDo[] {
-    const reviver = (key, value) => {
-      if (objects.isPojo(value) && value._type) {
-        let model = Object.assign({}, value); // shallow copy to keep original object intact
-        model.objectType = DoRegistry.get().toObjectType(value._type) || 'BaseDoEntity';
-        // Note: keep _type for later conversion to json again. This is important for types that are only known in Java.
-        delete model._typeVersion; // always ignore type version
-        return scout.create(model);
-      }
-      return value;
-    };
-
-    return JSON.parse(webstorage.getItemFromLocalStorage('jswidgets:bookmarks'), reviver);
+    let raw = webstorage.getItemFromLocalStorage('jswidgets:bookmarks');
+    return dataObjects.parse(raw, Array<BookmarkDo>);
   }
 
   protected _setBookmarkStore(bookmarkStore: BookmarkDo[]) {
@@ -266,7 +256,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
 
     if (hybridManager) {
       // Scout Classic: send the bookmark to the UI server first, let the client model resolve as much of the bookmark
-      // as it can, then resolved the remaining path in the UI
+      // as it can, then resolve the remaining path in the UI
       let jsonBookmarkDefinition = dataObjects.serialize(bookmarkDefinition);
       let hybridActionData = {
         bookmarkDefinition: jsonBookmarkDefinition
@@ -274,7 +264,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       return hybridManager.callActionAndWaitWithContext('ActivateBookmark', hybridActionData)
         .then((result: HybridManagerActionEndEventResult) => {
           let targetPage = result.contextElements.getSingle('targetPage').optElement(Page);
-          let data = scout.create(ActivateBookmarkResultDo, dataObjects.deserialize(result.data));
+          let data = dataObjects.deserialize(result.data, ActivateBookmarkResultDo);
           return {
             targetPage: targetPage,
             targetBookmarkPage: data.targetBookmarkPage,

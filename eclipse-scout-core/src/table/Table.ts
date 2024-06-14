@@ -970,7 +970,16 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   hasAggregateTableControl(): boolean {
-    return this.tableControls.some(control => control instanceof AggregateTableControl);
+    return !!this.findTableControl(AggregateTableControl);
+  }
+
+  findTableControl<T extends TableControl>(type: new () => T, predicate?: (tableControl: T) => boolean): T {
+    for (let tableControl of this.tableControls) {
+      if (tableControl instanceof type && (!predicate || predicate(tableControl))) {
+        return tableControl;
+      }
+    }
+    return null;
   }
 
   protected _createHeader(): TableHeader {
