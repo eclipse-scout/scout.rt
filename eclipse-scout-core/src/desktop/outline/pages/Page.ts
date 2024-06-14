@@ -30,7 +30,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   declare parentNode: Page;
 
   uuid: string;
-  pageParamType: Constructor<PageParamDo>; // written using @pageParam decorator (see below)
+  pageParamType: Constructor<BaseDoEntity>; // written using @pageParam decorator (see below)
   /**
    * This property is set by the server, see: JsonOutline#putNodeType.
    */
@@ -613,7 +613,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     if (pageParam instanceof BaseDoEntity || !pageParam) {
       this._pageParamInternal = pageParam;
     } else {
-      this._pageParamInternal = dataObjects.deserialize(pageParam, this.pageParamType || BaseDoEntity);
+      this._pageParamInternal = dataObjects.deserialize(pageParam, this.pageParamType);
     }
   }
 
@@ -677,12 +677,14 @@ export type MenuOwner = Widget & { menus: Menu[]; setMenus: (menus: ObjectOrChil
 
 /**
  * Base interface for all page param types.
+ * FIXME bsh [js-bookmark]: PageParamDo should be a class?
  */
 export interface PageParamDo extends DoEntity {
   [x: string]: any; // FIXME bsh [js-bookmark] Why is this necessary??? WidgetsOutlineModel has errors otherwise
 }
 
-export function pageParam<DO extends PageParamDo>(pareParamDo: Constructor<DO>) {
+// FIXME bsh [js-bookmark]: 'DO' should extend PageParamDo as soon as it is a class
+export function pageParam<DO extends BaseDoEntity>(pareParamDo: Constructor<DO>) {
   return <T extends Constructor>(BaseClass: T) => class extends BaseClass {
     constructor(...args: any[]) {
       super(...args);
