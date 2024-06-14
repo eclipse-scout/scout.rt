@@ -7,16 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Desktop, PageParamDo, PageResolver, UiCallbackHandler, ValueDo} from '../index';
+import {BaseDoEntity, Desktop, PageParamDo, PageResolver, scout, UiCallbackHandler} from '../index';
 import $ from 'jquery';
 
 export class JsPageUiHandler implements UiCallbackHandler {
-  handle(callbackId: string, owner: Desktop, request: PageParamDo): JQuery.Promise<ValueDo<string>> {
+  handle(callbackId: string, owner: Desktop, request: PageParamDo): JQuery.Promise<BaseDoEntity> {
     const objectType = PageResolver.get().findObjectTypeForPageParam(request);
-    const result: ValueDo<string> = {
-      _type: 'scout.StringValue',
-      value: objectType
-    };
+    const model = {_type: 'scout.StringValue', value: objectType};
+    const result = scout.create(BaseDoEntity, model);
     return $.resolvedPromise(result);
   }
 }

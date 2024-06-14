@@ -43,11 +43,12 @@ export class HybridManagerAdapter extends ModelAdapter {
 
   protected _onWidgetHybridAction(event: HybridActionEvent) {
     let dataobject = dataObjects.serialize(event.data.data);
+    let contextElements = this._contextElementsToJson(event.data.contextElements);
     this._send('hybridAction', {
       actionType: event.data.actionType, // add as first property (devtools sometimes show properties in that order)
       id: event.data.id,
       data: dataobject,
-      contextElements: this._contextElementsToJson(event.data.contextElements) || undefined
+      contextElements: contextElements || undefined
     });
   }
 

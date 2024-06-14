@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, DoEntity, DoRegistry, objects, PageParamDo, typeName} from '../index';
+import {BaseDoEntity, dataObjects, DoEntity, objects, PageParamDo, typeName} from '../index';
 
 @typeName('crm.Bookmark')
 export class BookmarkDo extends BaseDoEntity {
@@ -123,6 +123,7 @@ export class PageIdDummyPageParamDo extends BaseDoEntity implements PageParamDo 
 
 // --------------------------------------------------
 
+@typeName('suite.ActivateBookmarkResult')
 export class ActivateBookmarkResultDo extends BaseDoEntity {
   targetBookmarkPage: IBookmarkPageDo;
   remainingPagePath: IBookmarkPageDo[];
@@ -152,20 +153,13 @@ export const bookmarks = {
 
   // FIXME bsh [js-bookmark] move compare logic to dataObjects.ts
   stringifyNormalized(object: any): string {
-    return JSON.stringify(object, (key, value) => {
+    // Get rid of _typeVersion and objectType and sort attributes
+    // FIXME bsh [js-bookmark] There must be a better way!?
+    let json = dataObjects.serialize(object);
+    return JSON.stringify(json, (key, value) => {
       if (objects.isPojo(value)) {
-        if (value.objectType) {
-          let json = Object.assign({}, value); // shallow copy to keep original object intact
-          json._type = DoRegistry.get().toJsonType(value.objectType);
-          delete json.objectType;
-          value = json;
-        } else if (value._type) {
-          let json = Object.assign({}, value); // shallow copy to keep original object intact
-          delete json._typeVersion; // always ignore type version
-          delete json._contributions; // always ignore contributions
-          value = json;
-        }
         return Object.keys(value)
+          .filter(key => key !== '_typeVersion')
           .sort()
           .reduce((acc, cur) => {
             acc[cur] = value[cur];
