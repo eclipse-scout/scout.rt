@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkResultDo, App, arrays, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType,
-  Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  ActivateBookmarkResultDo, App, arrays, BaseDoEntity, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects,
+  ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -52,13 +52,11 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   protected _getBookmarkStore(): BookmarkDo[] {
     const reviver = (key, value) => {
       if (objects.isPlainObject(value) && value._type) {
-        let objectType = DoRegistry.get().toConstructor(value._type);
-        if (objectType) {
-          let model = Object.assign({}, value); // shallow copy to keep original object intact
-          delete model._type;
-          delete model._typeVersion; // always ignore type version
-          return scout.create(objectType, model);
-        }
+        let model = Object.assign({}, value); // shallow copy to keep original object intact
+        model.objectType = DoRegistry.get().toObjectType(value._type) || 'BaseDoEntity';
+        // Note: keep _type for later conversion to json again. This is important for types that are only known in Java.
+        delete model._typeVersion; // always ignore type version
+        return scout.create(model);
       }
       return value;
     };
@@ -72,17 +70,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       return;
     }
 
-    const replacer = (key, value) => {
-      if (objects.isPlainObject(value) && value.objectType) {
-        let json = Object.assign({}, value); // shallow copy to keep original object intact
-        json._type = DoRegistry.get().toJsonType(value.objectType);
-        delete json.objectType;
-        return json;
-      }
-      return value;
-    };
-
-    webstorage.setItemToLocalStorage('jswidgets:bookmarks', JSON.stringify(bookmarkStore, replacer));
+    let jsonBookmarkStore = bookmarks.toTypedJson(bookmarkStore);
+    webstorage.setItemToLocalStorage('jswidgets:bookmarks', JSON.stringify(jsonBookmarkStore));
   }
 
   // FIXME bsh [js-bookmark] Remove and replace with actual implementation
@@ -212,6 +201,12 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
           });
         })
         .then(searchFilter => {
+          if (searchFilter && !(searchFilter instanceof BaseDoEntity) && !searchFilter._type) {
+            searchFilter = bookmarks.toTypedJson(searchFilter);
+            if (!searchFilter._type) {
+              throw new Error('Missing _type for search filter');
+            }
+          }
           let bookmarkedPage = scout.create(TableBookmarkPageDo, {
             pageParam: page.pageParam,
             displayText: page.text, // FIXME bsh [js-bookmark] Delegate to bookmark adapter
