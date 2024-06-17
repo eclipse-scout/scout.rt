@@ -160,6 +160,7 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     JSONObject eventData = event.getData();
     String id = eventData.getString("id");
     String actionType = eventData.getString("actionType");
+    // FIXME bsh [js-bookmark] How to handle deserialization errors and still return an 'actionEnd' event?
     IDoEntity data = jsonDoHelper().jsonToDataObject(eventData.optJSONObject("data"), IDoEntity.class);
     // FIXME bsh [js-bookmark] Hacky-hacky -> find a general solution!
     if (data.has("_page")) {
