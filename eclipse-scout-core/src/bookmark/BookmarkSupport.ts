@@ -345,7 +345,15 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
           page.detailTable.selectRows(selectedRows);
         }
 
-        return page.ensureLoadChildren()
+        if (page instanceof PageWithTable) {
+          if (pageDefinition instanceof TableBookmarkPageDo) {
+            page.setSearchFilter(pageDefinition.searchData);
+          } else {
+            page.resetSearchFilter();
+          }
+        }
+
+        return page.loadChildren()
           .then(() => this._resolveNextPageInPath(pagePath, page, expandedChildRow));
       });
   }
@@ -369,8 +377,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
               return normalizedRowIdentifier === normalizedParentRowIdentifier;
             });
             if (row) {
-              return parent.ensureLoadChildren()
-                .then(() => row?.page);
+              return row.page;
             }
             return null; // not found
           }
