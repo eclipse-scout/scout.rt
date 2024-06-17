@@ -616,13 +616,16 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
   }
 
   set pageParam(pageParam: PageParamDo) {
-    if (pageParam instanceof BaseDoEntity || pageParam === null) {
+    if (pageParam instanceof BaseDoEntity || !pageParam) {
       this._pageParamInternal = pageParam;
     } else {
-      let pageParamModel = bookmarks.toObjectModel(pageParam) as BaseDoEntity;
-      if (this.pageParamType && pageParamModel.objectType === 'BaseDoEntity') {
-        // if _type is missing or cannot be resolved: use decorated PageParam type to create expected instance
+      let pageParamModel = bookmarks.toObjectModel(pageParam);
+      if ((!pageParamModel.objectType || pageParamModel.objectType === 'BaseDoEntity') && this.pageParamType) {
+        // Reconstruct objectType from @pageParam decoration
         pageParamModel.objectType = ObjectFactory.get().getObjectType(this.pageParamType);
+        if (!pageParamModel.objectType) {
+          throw new Error(`Unknown object type for @pageParam type "${this.pageParamType}"`);
+        }
       }
       this._pageParamInternal = scout.create(pageParamModel);
     }
