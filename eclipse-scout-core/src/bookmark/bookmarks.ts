@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, DoEntity, DoRegistry, objects, PageParamDo, scout, typeName} from '../index';
+import {BaseDoEntity, DoEntity, DoRegistry, objects, PageParamDo, typeName} from '../index';
 
 @typeName('crm.Bookmark')
 export class BookmarkDo extends BaseDoEntity {
@@ -180,7 +180,10 @@ export const bookmarks = {
     const replacer = (key, value) => {
       if (objects.isPlainObject(value) && value.objectType) {
         let json = Object.assign({}, value); // shallow copy to keep original object intact
-        json._type = DoRegistry.get().toJsonType(value.objectType);
+        json._type = json._type || DoRegistry.get().toJsonType(value.objectType);
+        if (!json._type) {
+          throw new Error(`Unknown JSON type for object type "${value.objectType}" (missing @typeName?)`);
+        }
         delete json.objectType;
         return json;
       }
@@ -194,9 +197,9 @@ export const bookmarks = {
     const replacer = (key, value) => {
       if (objects.isPlainObject(value) && value._type) {
         let model = Object.assign({}, value); // shallow copy to keep original object intact
-        model.objectType = model.objectType || scout.nvl(DoRegistry.get().toObjectType(value._type), 'BaseDoEntity');
-        delete model._type;
-        delete model._typeVersion;
+        model.objectType = model.objectType || DoRegistry.get().toObjectType(value._type) || 'BaseDoEntity';
+        // Note: keep _type for later conversion to json again. This is important for types that are only known in Java.
+        delete model._typeVersion; // always ignore type version
         return model;
       }
       return value;
