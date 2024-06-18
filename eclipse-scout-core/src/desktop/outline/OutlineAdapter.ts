@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel
+  App, ChildModelOf, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel, UuidPool
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -60,9 +60,17 @@ export class OutlineAdapter extends TreeAdapter {
     }
   }
 
+  protected _onSearchFilterForPageResponse(event: RemoteEvent) {
+    let eventId = event.eventId;
+    let searchData = event.searchData;
+    this.trigger('searchFilterForPageResponse:' + eventId, {searchData});
+  }
+
   override onModelAction(event: RemoteEvent) {
     if (event.type === 'pageChanged') {
       this._onPageChanged(event);
+    } else if (event.type === 'searchFilterForPageResponse') {
+      this._onSearchFilterForPageResponse(event);
     } else {
       super.onModelAction(event);
     }
@@ -173,6 +181,7 @@ export class OutlineAdapter extends TreeAdapter {
     objects.replacePrototypeFunction(Outline, 'updateDetailMenus', OutlineAdapter.updateDetailMenusRemote, true);
     objects.replacePrototypeFunction(Outline, '_initTreeNodeInternal', OutlineAdapter._initTreeNodeInternalRemote, true);
     objects.replacePrototypeFunction(Outline, '_createTreeNode', OutlineAdapter._createTreeNodeRemote, true);
+    objects.replacePrototypeFunction(Outline, Outline.prototype.getSearchFilterForPage, OutlineAdapter.getSearchFilterForPageRemote, true);
     objects.replacePrototypeFunction(Page, '_updateParentTablePageMenusForDetailForm', OutlineAdapter._updateParentTablePageMenusForDetailForm, true);
     objects.replacePrototypeFunction(Page, '_updateParentTablePageMenusForDetailTable', OutlineAdapter._updateParentTablePageMenusForDetailTable, true);
     objects.replacePrototypeFunction(Page, 'linkWithRow', OutlineAdapter.linkWithRow, true);
@@ -235,7 +244,7 @@ export class OutlineAdapter extends TreeAdapter {
   /**
    * Replaced to make sure page is correctly initialized (linked with row).
    * This cannot be done using pageInit event because the page needs to be initialized during the outline initialization
-   * and the event listener can only be attached afterwards.
+   * and the event listener can only be attached afterward.
    */
   protected static _initTreeNodeInternalRemote(this: Outline & { modelAdapter: OutlineAdapter; _initTreeNodeInternalOrig }, page: Page, parentNode: Page) {
     this._initTreeNodeInternalOrig(page, parentNode);
@@ -280,6 +289,19 @@ export class OutlineAdapter extends TreeAdapter {
     }
 
     return this._createTreeNodeOrig(nodeModel);
+  }
+
+  protected static getSearchFilterForPageRemote(this: Outline & { modelAdapter: OutlineAdapter; getSearchFilterForPageOrig: typeof Outline.prototype.getSearchFilterForPage }, page: Page & { remote?: true }) {
+    if (this.modelAdapter && page && page.remote) {
+      let eventId = UuidPool.take(this.session);
+      this.modelAdapter._send('searchFilterForPageRequest', {
+        eventId: eventId,
+        pageId: page.id
+      });
+      return this.modelAdapter.when('searchFilterForPageResponse:' + eventId)
+        .then((event: any) => event.searchData); // FIXME bsh [js-bookmark] Event Map
+    }
+    return this.getSearchFilterForPageOrig(page);
   }
 
   protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<TreeNode> {

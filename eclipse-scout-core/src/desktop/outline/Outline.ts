@@ -11,7 +11,7 @@ import {
   arrays, BookmarkAdapter, CompositeField, DefaultBookmarkAdapter, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController,
   FullModelOf, GlassPaneTarget, GroupBox, GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton,
   NavigateDownButton, NavigateUpButton, ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page,
-  PageLayout, PageModel, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent,
+  PageLayout, PageModel, PageWithTable, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent,
   TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesSelectedEvent,
   TreeNodesUpdatedEvent, Widget
 } from '../../index';
@@ -1270,5 +1270,13 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
         this.expandNode(drillNode);
       }
     }
+  }
+
+  getSearchFilterForPage(page: Page): JQuery.Promise<any> {
+    let searchFilter = null;
+    if (page instanceof PageWithTable) {
+      searchFilter = page.getSearchFilter();
+    }
+    return $.resolvedPromise(searchFilter);
   }
 }
