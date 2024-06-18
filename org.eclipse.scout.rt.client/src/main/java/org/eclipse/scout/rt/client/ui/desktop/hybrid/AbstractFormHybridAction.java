@@ -45,8 +45,8 @@ public abstract class AbstractFormHybridAction<FORM extends IForm, DO_ENTITY ext
     FORM form = createForm(data);
     prepareForm(form);
     addFormListeners(form);
-    addWidget(form);
     startForm(form);
+    addWidget(form);
   }
 
   protected abstract FORM createForm(DO_ENTITY data);
