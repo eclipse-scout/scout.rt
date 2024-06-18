@@ -24,13 +24,16 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.js.IJsPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonDataObjectHelper;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
@@ -52,6 +55,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   private static final String PROP_OVERVIEW_ICON_ID = "overviewIconId";
   private static final String PROP_SHOW_TILE_OVERVIEW = "showTileOverview";
   private static final String PROP_COMPACT_ROOT = "compactRoot";
+
+  public static final String EVENT_SEARCH_FILTER_FOR_PAGE_REQUEST = "searchFilterForPageRequest";
+  public static final String EVENT_SEARCH_FILTER_FOR_PAGE_RESPONSE = "searchFilterForPageResponse";
 
   private final IDesktop m_desktop;
   private final LazyValue<JsonDataObjectHelper> m_jsonDoHelper = new LazyValue<>(() -> BEANS.get(JsonDataObjectHelper.class)); // cached instance
@@ -331,5 +337,35 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
    */
   protected boolean hasDetailForm(IPage<?> page) {
     return (page.getDetailForm() != null && !page.getDetailForm().isFormClosed());
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_SEARCH_FILTER_FOR_PAGE_REQUEST.equals(event.getType())) {
+      handleUiSearchFilterForPageRequest(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiSearchFilterForPageRequest(JsonEvent event) {
+    String eventId = event.getData().getString("eventId");
+    String pageId = event.getData().getString("pageId");
+
+    IDoEntity searchData = null;
+    ITreeNode node = optTreeNodeForNodeId(pageId);
+    if (node instanceof IPageWithTable) {
+      IPageWithTable page = (IPageWithTable) node;
+      SearchFilter searchFilter = page.getSearchFilter();
+      if (searchFilter != null) {
+        searchData = searchFilter.getData();
+      }
+    }
+
+    JSONObject response = new JSONObject();
+    response.put("eventId", eventId);
+    response.put("searchData", jsonDoHelper().dataObjectToJson(searchData));
+    addActionEvent(EVENT_SEARCH_FILTER_FOR_PAGE_RESPONSE, response);
   }
 }

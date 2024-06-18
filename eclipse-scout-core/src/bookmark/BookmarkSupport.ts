@@ -191,14 +191,17 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       let selectedChildRowIdentifiers = page.detailTable.selectedRows.map(row => row.bookmarkIdentifier).filter(Boolean);
       return $.resolvedPromise()
         .then(() => {
+          let outline = page.getOutline();
+          return outline.getSearchFilterForPage(page);
+
           // Local
-          if (page instanceof PageWithTable) {
-            return page.getSearchFilter();
-          }
-          // Remote
-          return HybridManager.get(this.session).callActionAndWait('ExportSearchData', {
-            _page: page
-          });
+          // if (page instanceof PageWithTable) {
+          //   return page.getSearchFilter();
+          // }
+          // // Remote
+          // return HybridManager.get(this.session).callActionAndWait('ExportSearchData', {
+          //   _page: page
+          // });
         })
         .then(searchFilter => {
           if (searchFilter && !(searchFilter instanceof BaseDoEntity) && !searchFilter._type) {
@@ -282,8 +285,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     // Scout JS: resolve everything in the UI, i.e. the entire path is remaining
     return $.resolvedPromise().then(() => {
       return scout.create(ActivateBookmarkResultDo, {
-        remainingPagePath: [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage],
-        parentBookmarkPage: null
+        targetBookmarkPage: null,
+        remainingPagePath: [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage]
       });
     });
   }
@@ -302,10 +305,13 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     }
     this.desktop.setOutline(outline);
 
-    let pagePath = result.remainingPagePath.slice(); // create copy because arrays is altered
-    // FIXME bsh [js-bookmark] Find a better solution to transfer the parent from the UI server to here!
-    let parent = (result.parentBookmarkPage && outline.selectedNode()) || outline;
-    let parentRowBookmarkIdentifier = result.parentBookmarkPage instanceof TableBookmarkPageDo ? result.parentBookmarkPage.expandedChildRow : null;
+    // // FIXME bsh [js-bookmark] Find a better solution to transfer the parent from the UI server to here!
+    // let pagePath = result.remainingPagePath.slice(); // create copy because arrays is altered
+    // let parent = (result.targetBookmarkPage && outline.selectedNode()) || outline;
+    // let parentRowBookmarkIdentifier = result.targetBookmarkPage instanceof TableBookmarkPageDo ? result.targetBookmarkPage.expandedChildRow : null;
+    let pagePath = [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage];
+    let parent = outline;
+    let parentRowBookmarkIdentifier = null;
     return this._resolveNextPageInPath(pagePath, parent, parentRowBookmarkIdentifier)
       .then(page => {
         if (!page) {
@@ -326,7 +332,10 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     return this._resolvePage(pageDefinition, parent, parentRowBookmarkIdentifier)
       .then((page: Page) => {
         if (!page) {
-          return parentPage; // not found -> return last known page
+          // Unable to find a page that matches the requested page definition. Put it back to the page path (so later
+          // code will know that not the entire path was successfully consumed) and return the last known page.
+          pagePath.unshift(pageDefinition); // put it back
+          return parentPage;
         }
 
         page.activate();
