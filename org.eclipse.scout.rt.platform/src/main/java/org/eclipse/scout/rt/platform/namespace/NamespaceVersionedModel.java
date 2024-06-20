@@ -593,12 +593,10 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   protected static class P_ItemDependencyIterator<T extends INamespaceVersioned> implements Iterator<T> {
 
     private final Map<T, Set<T>> m_dependencyMap;
-    private final Map<T, Set<T>> m_initDependencyMap;
     private T m_next;
 
     public P_ItemDependencyIterator(Map<T, Set<T>> dependencyMap) {
       m_dependencyMap = dependencyMap;
-      m_initDependencyMap = new HashMap<>(dependencyMap);
       advance();
     }
 
@@ -618,7 +616,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
         }
       }
       if (!m_dependencyMap.isEmpty()) {
-        fail("Unable to resolve all dependencies - cycle in dependencies? {}", dependencyModelToString(m_initDependencyMap));
+        fail("Unable to resolve all dependencies - cycle in the already reduced dependencies? {}", dependencyModelToString(m_dependencyMap));
       }
       return null;
     }
