@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,13 +29,19 @@ export class TileButton extends Button {
 
     this.addContainer(this.$parent, 'tile-button');
     this.addField($button);
+    this.addStatus();
 
     // Disable inner form field layout, because the tile button should always occupy
     // the entire container area.
     this.htmlComp.setLayout(new NullLayout());
 
     this.$container
-      .on('click', this._onClick.bind(this))
+      .on('click', (event: JQuery.ClickEvent) => {
+        if (this.fieldStatus.$container.isOrHas(event.target)) {
+          return;
+        }
+        this._onClick(event);
+      })
       .unfocusable();
   }
 
@@ -69,7 +75,7 @@ export class TileButton extends Button {
 
   /** @internal */
   override _renderTooltipText() {
-    // Because tile buttons don't have a visible status, display the tooltip text as normal "hover" tooltip
+    // Because tile buttons normally don't have a visible status, display the tooltip text as normal "hover" tooltip
     if (strings.hasText(this.tooltipText)) {
       tooltips.install(this.$container, {
         parent: this,
