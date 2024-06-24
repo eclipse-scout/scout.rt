@@ -32,6 +32,8 @@ public class PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3 extends Abs
 
   @Override
   public Class<? extends ITypeVersion> toTypeVersionClass() {
+    // The target type version must be in the same namespace to trigger the migration handler correctly.
+    // The namespace is then migrated as part of the handler execution.
     return BravoFixture_3.class;
   }
 
