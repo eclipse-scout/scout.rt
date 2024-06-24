@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Device, EnumObject, HtmlComponent, KeyStrokeContext, objects, scout, strings, SwitchEventMap, SwitchModel, SwitchNavigationKeyStroke, SwitchToggleKeyStroke, tooltips, Widget} from '../index';
+import {Device, EnumObject, HtmlComponent, InitModelOf, KeyStrokeContext, objects, scout, strings, SwitchEventMap, SwitchModel, SwitchNavigationKeyStroke, SwitchToggleKeyStroke, tooltips, Widget} from '../index';
 
 export class Switch extends Widget implements SwitchModel {
   declare model: SwitchModel;
@@ -45,6 +45,11 @@ export class Switch extends Widget implements SwitchModel {
 
     this.$label = null;
     this.$button = null;
+  }
+
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
+    this.resolveTextKeys(['label', 'tooltipText']);
   }
 
   protected override _render() {
