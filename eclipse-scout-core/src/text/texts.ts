@@ -19,7 +19,7 @@ export const texts = {
    */
   defaultLanguage: 'en',
 
-  TEXT_KEY_REGEX: /\${textKey:([^}]*)}/,
+  TEXT_KEY_REGEX: /^\${textKey:([^}]+)}$/,
 
   textsByLocale: {} as TextMapType,
 
@@ -53,8 +53,10 @@ export const texts = {
   },
 
   init(model: Record<string, Record<string, string>>) {
-    Object.keys(model)
-      .forEach(languageTag => texts.get(languageTag).addAll(model[languageTag]), this);
+    Object.keys(model).forEach(languageTag => {
+      let textMap = model[languageTag];
+      texts.get(languageTag).addAll(textMap);
+    });
   },
 
   /**
@@ -79,18 +81,16 @@ export const texts = {
 
   /**
    * Creates an array containing all relevant tags.
-   * <p>
-   * Examples:<br>
+   *
+   * Examples:
    * - 'de-CH' generates the array: ['de-CH', 'de', 'default']
    * - 'de' generates the array: ['de', 'default']
    * - 'default' generates the array: ['default']
    */
   createOrderedLanguageTags(languageTag: string): string[] {
-    let tags = [],
-      i = languageTag.lastIndexOf('-');
+    let tags = [languageTag];
 
-    tags.push(languageTag);
-
+    let i = languageTag.lastIndexOf('-');
     while (i >= 0) {
       languageTag = languageTag.substring(0, i);
       tags.push(languageTag);
@@ -109,7 +109,7 @@ export const texts = {
    * @returns the TextMap for the given languageTag. Never returns null or undefined.
    */
   get(languageTag: string): TextMap {
-    let textMap: TextMap = texts._get(languageTag);
+    let textMap = texts._get(languageTag);
     if (textMap) {
       return textMap;
     }
@@ -139,7 +139,7 @@ export const texts = {
   /**
    * Extracts NLS texts from the DOM tree. Texts are expected in the following format:
    *
-   *   <scout-text data-key="..." data-value="..." />
+   *   `<scout-text data-key="..." data-value="..." />`
    *
    * This method returns a map with all found texts. It must be called before scout.prepareDOM()
    * is called, as that method removes all <scout-text> tags.
@@ -157,28 +157,35 @@ export const texts = {
   },
 
   /**
-   * Converts a key to the form '${textKey:AKey}'.
-   * @param key to convert (e.g. 'AKey')
-   * @returns text containing the text key like '${textKey:AKey}'.
+   * Returns the given text key in the form `'${textKey:AKey}'`.
+   *
+   * @param key the text key to convert (e.g. `'AKey'`)
+   * @returns the given text key in the form `'${textKey:AKey}'`
    */
   buildKey(key: string): string {
     return '${textKey:' + key + '}';
   },
 
   /**
-   * @param value text which contains a text key like '${textKey:AKey}'.
-   * @returns the resolved key or the unchanged value if the text key could not be extracted.
+   * Returns the text key (e.g. `'AKey'`) if the given text has the form `'${textKey:AKey}'`. Otherwise,
+   * the input is returned unchanged.
+   *
+   * @param value either an arbitrary text or a special string of the form `'${textKey:AKey}'`
+   * @returns the resolved text key or the unchanged value if the text key could not be extracted.
    */
   resolveKey(value: string): string {
-    let result = texts.TEXT_KEY_REGEX.exec(value);
-    if (result && result.length === 2) {
-      return result[1];
+    let match = texts.TEXT_KEY_REGEX.exec(value);
+    if (match) {
+      return match[1];
     }
     return value;
   },
 
   /**
-   * @param value text which contains a text key like '${textKey:AKey}'.
+   * If the given text has the form `'${textKey:AKey}'`, the key is extracted and the text for this
+   * key in the given languages is resolved and returned. Otherwise, the input is returned unchanged.
+   *
+   * @param value either an arbitrary text or a special string of the form `'${textKey:AKey}'`
    * @param languageTag the languageTag to use for the text lookup with the resolved key.
    * @returns the resolved text in the given language or the unchanged text if the text key could not be extracted.
    */
@@ -191,11 +198,12 @@ export const texts = {
   },
 
   /**
-   * Utility function to easily replace an object property which contains a text key like '${textKey:AKey}'.
+   * Converts the value of the specified property from the form `'${textKey:...}'` into a resolved text.
+   * The value remains unchanged if it does not match the {@linkplain texts#resolveText supported format}.
    *
-   * @param object object having a text property which contains a text-key
-   * @param [textProperty] name of the property where a text-key should be replaced by a text. By default, 'text' is used as property name.
-   * @param [session] can be undefined when given 'object' has a session property, otherwise mandatory
+   * @param object non-null object having a text property which may contain a text key (must not be null)
+   * @param textProperty name of the property on the given object which may contain a text key. By default, 'text' is used as property name.
+   * @param session session defining the locale to be used when resolving a text. Can be undefined when given 'object' has a session property, otherwise mandatory.
    */
   resolveTextProperty(object: any, textProperty?: string, session?: Session) {
     textProperty = textProperty || 'text';

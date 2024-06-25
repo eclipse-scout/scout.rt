@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -51,4 +51,54 @@ describe('icons', () => {
     expect(icon.appendCssClass('font-icon')).toBe('font-icon font-widgetIcons');
   });
 
+  it('resolves iconId', () => {
+    expect(icons.resolveIconId('${iconId:ANGLE_UP}')).toBe(icons.ANGLE_UP);
+    expect(icons.resolveIconId('${iconId:_DOES_NOT_EXIST_}')).toBe(undefined);
+    expect(icons.resolveIconId('foo ${iconId:ANGLE_UP}')).toBe('foo ${iconId:ANGLE_UP}');
+    expect(icons.resolveIconId('bar')).toBe('bar');
+    expect(icons.resolveIconId(icons.INFO)).toBe(icons.INFO);
+
+    window['testIconsSpec'] = {icons: {FOO: 'bar'}}; // dummy namespace
+    expect(icons.resolveIconId('${iconId:testIconsSpec.FOO}')).toBe('bar');
+    delete window['testIconsSpec'];
+  });
+
+  it('resolves iconId property', () => {
+    let obj = {
+      iconId: '${iconId:ANGLE_UP}',
+      name: 'xyz',
+      foo: '${iconId:ANGLE_UP}',
+      bar: icons.ANGLE_UP
+    };
+
+    icons.resolveIconProperty(obj);
+    expect(obj.iconId).toBe(icons.ANGLE_UP);
+    expect(obj.name).toBe('xyz');
+    expect(obj.foo).toBe('${iconId:ANGLE_UP}');
+    expect(obj.bar).toBe(icons.ANGLE_UP);
+
+    icons.resolveIconProperty(obj, 'name');
+    expect(obj.iconId).toBe(icons.ANGLE_UP);
+    expect(obj.name).toBe('xyz');
+    expect(obj.foo).toBe('${iconId:ANGLE_UP}');
+    expect(obj.bar).toBe(icons.ANGLE_UP);
+
+    icons.resolveIconProperty(obj, 'foo');
+    expect(obj.iconId).toBe(icons.ANGLE_UP);
+    expect(obj.name).toBe('xyz');
+    expect(obj.foo).toBe(icons.ANGLE_UP);
+    expect(obj.bar).toBe(icons.ANGLE_UP);
+
+    icons.resolveIconProperty(obj, 'bar');
+    expect(obj.iconId).toBe(icons.ANGLE_UP);
+    expect(obj.name).toBe('xyz');
+    expect(obj.foo).toBe(icons.ANGLE_UP);
+    expect(obj.bar).toBe(icons.ANGLE_UP);
+
+    icons.resolveIconProperty(obj, 'doesNotExist');
+    expect(obj.iconId).toBe(icons.ANGLE_UP);
+    expect(obj.name).toBe('xyz');
+    expect(obj.foo).toBe(icons.ANGLE_UP);
+    expect(obj.bar).toBe(icons.ANGLE_UP);
+  });
 });
