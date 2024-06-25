@@ -66,7 +66,7 @@ describe('Calendar', () => {
       expect(cal.viewRange).toBeDefined();
     });
 
-    describe('expands panels corretly', () => {
+    describe('expansion of panels', () => {
 
       const getContainerWidth = (container: JQuery): number => {
         return container.width();
@@ -743,7 +743,6 @@ describe('Calendar', () => {
       expect(externalComp.visible).toBe(false);
     });
 
-    // No range selection on disabled column
     it('should not apply a selection on calendars which are not selectable', () => {
       // Arrange
       let nonSelectableCalendar = createCalendarDescriptor('Non selectable calendar', true, false);
@@ -908,7 +907,7 @@ describe('Calendar', () => {
       });
     });
 
-    describe('one calendar should always be selected', () => {
+    describe('uncheck nodes in calendars tree box', () => {
 
       const clickTreeNodeForCalendarId = (calendar: Calendar, calendarId: string) => {
         let tree = calendar.calendarSidebar.calendarsPanel.treeBox.tree;

@@ -79,13 +79,14 @@ export class CalendarSidebarLayout extends AbstractLayout {
   }
 
   protected _validateSplitterPosition(htmlComp: HtmlComponent, splitter: Splitter, availableSize: Dimension) {
+    let maxSplitterPosition = availableSize.height - this._calculateCollapsedLabelHeight();
+
     // Window has been resized -> preserve relative splitter position
     if (availableSize.height !== this._availableHeight) {
-      this._silentUpdateSpliterPosition(htmlComp, splitter, availableSize.height * this._relativeSplitterPosition);
+      this._silentUpdateSpliterPosition(htmlComp, splitter, this._relativeSplitterPosition * maxSplitterPosition);
     }
 
     // Validate min and max splitter position
-    let maxSplitterPosition = availableSize.height - this._calculateCollapsedLabelHeight();
     if (!this.calendarSidebar.calendarsPanelDisplayable) {
       this._silentUpdateSpliterPosition(htmlComp, splitter, Math.max(availableSize.height, 0));
     } else if (splitter.position < this.minSplitterPosition) {
