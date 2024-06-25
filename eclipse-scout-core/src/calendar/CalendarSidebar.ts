@@ -42,7 +42,7 @@ export class CalendarSidebar extends Widget implements CalendarSidebarModel {
     this.splitter = scout.create(CalendarSidebarSplitter, {
       parent: this,
       splitHorizontal: false,
-      collapsedLabel: this.session.text('ui.AvailableCalendars')
+      collapsedLabel: this.session.text('ui.CalendarSelection')
     });
     this.calendarsPanel = scout.create(CalendarsPanel, {
       parent: this,
