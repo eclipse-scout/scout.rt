@@ -879,7 +879,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     // Set selected calendar
     let newSelectedCalendar = this.selectedCalendarDescriptor;
-    if (typeof selectedCalendar === 'string' || selectedCalendar instanceof String) {
+    if (objects.isString(selectedCalendar)) {
       newSelectedCalendar = this.findCalendarForId(selectedCalendar as string);
     } else if (selectedCalendar) {
       newSelectedCalendar = selectedCalendar as CalendarDescriptor;
@@ -1511,7 +1511,7 @@ export class Calendar extends Widget implements CalendarModel {
     event.stopPropagation();
 
     let func = function func(event: JQuery.ContextMenuEvent, allowedType: string) {
-      if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+      if (!this.rendered || !this.attached || !this._calculateContextMenuVisible(event)) { // check needed because function is called asynchronously
         return;
       }
       let filteredMenus = menus.filter(this.menus, [allowedType], {
@@ -1535,6 +1535,17 @@ export class Calendar extends Widget implements CalendarModel {
     }.bind(this);
 
     this.session.onRequestsDone(func, event, allowedType);
+  }
+
+  protected _calculateContextMenuVisible(event: JQuery.ContextMenuEvent): boolean {
+    let $target = $(event.currentTarget);
+    let calendarId = this.defaultCalendarDescriptor.calendarId;
+    if ($target.hasClass('calendar-component') && this.selectedComponent.item) {
+      calendarId = this.selectedComponent.item.calendarId;
+    } else {
+      calendarId = $(event.target).closest('.calendar-column').data('calendarId');
+    }
+    return this.findCalendarForId(calendarId).selectable;
   }
 
   protected _onCalendarVisibilityChanged(event: PropertyChangeEvent<string[]>) {
