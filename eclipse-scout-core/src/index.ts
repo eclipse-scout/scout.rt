@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-
+import 'reflect-metadata/lite';
 import {ObjectFactory} from './ObjectFactory';
 
 export * from './scout';
@@ -147,6 +147,7 @@ export * from './config/ConfigProperties';
 export * from './config/ConfigPropertyCache';
 export * from './dataobject/DoEntity';
 export * from './dataobject/dataObjects';
+export * from './dataobject/DataObjectSerializer';
 export * from './dataobject/ValueDo';
 export * from './dataobject/DoRegistry';
 export * from './security/access';

@@ -8,9 +8,28 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {arrays, DoEntity, objects, scout} from '..';
+import {arrays, DataObjectSerializer, DoEntity, objects, scout} from '..';
 
 export const dataObjects = {
+
+  equals(a: DoEntity, b: DoEntity): boolean {
+    // FIXME mvi [js-bookmark] implement
+    return false;
+  },
+
+  stringify(dataobject: DoEntity): string {
+    if (!dataobject) {
+      return null;
+    }
+    const serializer = scout.create(DataObjectSerializer);
+    return JSON.stringify(dataobject, (key, value) => serializer.serialize(key, value));
+  },
+
+  parse(string): DoEntity {
+    // FIXME mvi [js-bookmark] implement
+    return null;
+  },
+
   /**
    * @returns the DO entity contribution for the given contribution class or type.
    */

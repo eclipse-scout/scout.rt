@@ -49,6 +49,11 @@ export class NodeBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo 
   displayText: string;
 }
 
+@typeName('crm.BookmarkTableRowIdentifier')
+export class BookmarkTableRowIdentifierDo extends BaseDoEntity {
+  keyComponents: IBookmarkTableRowIdentifierComponentDo[];
+}
+
 @typeName('crm.TableBookmarkPage')
 export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo {
   pageParam: PageParamDo;
@@ -59,13 +64,6 @@ export class TableBookmarkPageDo extends BaseDoEntity implements IBookmarkPageDo
   searchFilterComplete: boolean; // FIXME bsh [js-bookmark] always true?
   searchData: DoEntity; // FIXME bsh [js-bookmark] ISearchDo;
   chartTableControlConfig: DoEntity; // FIXME bsh [js-bookmark] ChartTableControlConfigDo;
-}
-
-// --------------------------------------------------
-
-@typeName('crm.BookmarkTableRowIdentifier')
-export class BookmarkTableRowIdentifierDo extends BaseDoEntity {
-  keyComponents: IBookmarkTableRowIdentifierComponentDo[];
 }
 
 export interface IBookmarkTableRowIdentifierComponentDo {
@@ -152,7 +150,7 @@ export const bookmarks = {
     return normalizedJson1 === normalizedJson2;
   },
 
-  // FIXME bsh [js-bookmark] move to objects.ts
+  // FIXME bsh [js-bookmark] move compare logic to dataobjects.ts
   stringifyNormalized(object: any): string {
     return JSON.stringify(object, (key, value) => {
       if (objects.isPlainObject(value)) {
