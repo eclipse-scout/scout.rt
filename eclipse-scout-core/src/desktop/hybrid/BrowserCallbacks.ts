@@ -44,11 +44,6 @@ export class BrowserCallbacks extends Widget {
 export class BrowserCallbackErrorDo extends BaseDoEntity {
   message: string;
   code: string;
-
-  constructor(model: Partial<BrowserCallbackErrorDo>) {
-    super();
-    Object.assign(this, model);
-  }
 }
 
 export interface BrowserCallbackHandler {

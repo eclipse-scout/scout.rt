@@ -39,11 +39,6 @@ export class GeoLocationBrowserHandler implements BrowserCallbackHandler {
 
 @typeName('scout.GeoLocationResponse')
 export class GeoLocationResponseDo extends BaseDoEntity {
-  constructor(model: Partial<GeoLocationResponseDo>) {
-    super();
-    Object.assign(this, model);
-  }
-
   latitude?: string;
   longitude?: string;
 }

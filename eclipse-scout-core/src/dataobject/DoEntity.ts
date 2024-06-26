@@ -43,7 +43,6 @@ export class BaseDoEntity implements ObjectWithType, DoEntity {
   }
 }
 
-// FIXME mvi [js-bookmark] Do we really want to always add _type to instances? Or only when serializing? Or should DOs only be used to send to the Backend? Then it should be fine?
 export function typeName(typeName: string) {
   return <T extends Constructor>(BaseClass: T) => class extends BaseClass {
     constructor(...args: any[]) {

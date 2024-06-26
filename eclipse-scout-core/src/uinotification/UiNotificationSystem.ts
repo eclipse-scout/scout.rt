@@ -112,7 +112,7 @@ export class UiNotificationSystem {
   }
 }
 
-class UiNotificationEventSupport extends EventSupport {
+export class UiNotificationEventSupport extends EventSupport {
   system: UiNotificationSystem;
 
   constructor(system: UiNotificationSystem) {
