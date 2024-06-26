@@ -1473,24 +1473,25 @@ export class Calendar extends Widget implements CalendarModel {
     // set title
     this.$listTitle.text(this._format(this.selectedDate, 'd. MMMM yyyy'));
 
-    // find components to display on the list panel
-    this.components.forEach(component => {
-      if (belongsToSelectedDate.call(this, component)) {
-        components.push(component);
-      }
-    });
+    // filter components to display on the list panel
+    this.components
+      .filter(comp => this._filterCurrentDate(comp))
+      .filter(comp => this._filterVisibleComponents(comp))
+      .forEach(comp => {
+        listComponent = new CalendarListComponent(this.selectedDate, comp);
+        listComponent.render(this.$list);
+        this._listComponents.push(listComponent);
+      });
+  }
 
-    function belongsToSelectedDate(component: CalendarComponent): boolean {
-      let selectedDate = dates.trunc(this.selectedDate);
-      return dates.compare(selectedDate, component.coveredDaysRange.from) >= 0 &&
-        dates.compare(selectedDate, component.coveredDaysRange.to) <= 0;
-    }
+  protected _filterCurrentDate(component: CalendarComponent): boolean {
+    let selectedDate = dates.trunc(this.selectedDate);
+    return dates.compare(selectedDate, component.coveredDaysRange.from) >= 0 &&
+      dates.compare(selectedDate, component.coveredDaysRange.to) <= 0;
+  }
 
-    components.forEach(component => {
-      listComponent = new CalendarListComponent(this.selectedDate, component);
-      listComponent.render(this.$list);
-      this._listComponents.push(listComponent);
-    });
+  protected _filterVisibleComponents(component: CalendarComponent) {
+    return this.findCalendarForComponent(component).visible;
   }
 
   /* -- components, events-------------------------------------------- */
