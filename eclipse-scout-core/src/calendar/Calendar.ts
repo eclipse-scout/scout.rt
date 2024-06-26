@@ -1469,8 +1469,6 @@ export class Calendar extends Widget implements CalendarModel {
    * Renders the panel on the left, showing all components of the selected date.
    */
   protected _renderListPanel() {
-    let listComponent: CalendarListComponent, components: CalendarComponent[] = [];
-
     // set title
     this.$listTitle.text(this._format(this.selectedDate, 'd. MMMM yyyy'));
 
@@ -1479,7 +1477,7 @@ export class Calendar extends Widget implements CalendarModel {
       .filter(comp => this._filterCurrentDate(comp))
       .filter(comp => this._filterVisibleComponents(comp))
       .forEach(comp => {
-        listComponent = new CalendarListComponent(this.selectedDate, comp);
+        let listComponent = new CalendarListComponent(this.selectedDate, comp);
         listComponent.render(this.$list);
         this._listComponents.push(listComponent);
       });
