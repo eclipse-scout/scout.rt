@@ -790,7 +790,8 @@ export class Calendar extends Widget implements CalendarModel {
     let selectedDayColumn = $(event.delegateTarget),
       selectedDate = new Date(selectedDayColumn.parent().data('date')),
       timeChanged = false,
-      selectedCalendarId = selectedDayColumn.data('calendarId');
+      selectedCalendarId = selectedDayColumn.data('calendarId'),
+      selectedCalendarChanged = selectedCalendarId !== this.selectedCalendarDescriptor.calendarId;
 
     // Check if date is valid
     if (!selectedDate.valueOf()) {
@@ -810,7 +811,7 @@ export class Calendar extends Widget implements CalendarModel {
     this._setSelection(selectedDate, selectedCalendarId, null, false, timeChanged);
 
     if (rangeSelectionPossible) {
-      this._startRangeSelection(event);
+      this._startRangeSelection(event, selectedCalendarChanged);
     }
   }
 
@@ -2174,7 +2175,7 @@ export class Calendar extends Widget implements CalendarModel {
     return s1.localeCompare(s2);
   }
 
-  protected _startRangeSelection(event: JQuery.MouseDownEvent) {
+  protected _startRangeSelection(event: JQuery.MouseDownEvent, selectedCalendarChanged: boolean) {
     if (!this.rangeSelectionAllowed || this._rangeSelectionStarted || Device.get().type === Device.Type.MOBILE) {
       return;
     }
@@ -2187,14 +2188,12 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // Ignore right mouse button clicks within current selection
-    let selectedDateTime = this._getSelectedDateTime(event),
-      newSelectedCalendarId = $(event.delegateTarget).data('calendarId');
-
+    let selectedDateTime = this._getSelectedDateTime(event);
     if (event.which === 3 &&
       this.selectedRange && selectedDateTime &&
       dates.compare(selectedDateTime, this.selectedRange.from) >= 0 &&
       dates.compare(selectedDateTime, this.selectedRange.to) < 0 &&
-      this.selectedCalendarDescriptor.calendarId === newSelectedCalendarId) {
+      !selectedCalendarChanged) {
       return;
     }
 
