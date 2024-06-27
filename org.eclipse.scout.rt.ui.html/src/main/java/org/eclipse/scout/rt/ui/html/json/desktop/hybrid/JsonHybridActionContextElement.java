@@ -7,10 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.client.ui.desktop.hybrid;
+package org.eclipse.scout.rt.ui.html.json.desktop.hybrid;
 
-import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 
-public interface IHybridManagerUIFacade {
-  void handleHybridActionFromUI(String id, String actionType, IDoEntity data, HybridActionContextElement contextElement);
+public class JsonHybridActionContextElement implements IJsonObject {
+
+
+  @Override
+  public Object toJson() {
+    return null;
+  }
 }

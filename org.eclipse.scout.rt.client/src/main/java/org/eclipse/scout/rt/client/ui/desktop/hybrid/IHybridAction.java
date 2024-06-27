@@ -24,15 +24,15 @@ public interface IHybridAction<DO_ENTITY extends IDoEntity> {
 
   Class<DO_ENTITY> getDoEntityClass();
 
-  void init(String id);
+  void init(String id, HybridActionContextElement contextElement);
 
   void execute(DO_ENTITY data);
 
-  default void execute(String id, IDoEntity data) {
-    init(id);
+  default void execute(String id, IDoEntity data, HybridActionContextElement contextElement) {
     if (data != null && !getDoEntityClass().isInstance(data)) {
       throw new IllegalArgumentException("data must be of type '" + getDoEntityClass() + "' but is '" + data.getClass() + "'.");
     }
+    init(id, contextElement);
     execute(getDoEntityClass().cast(data));
   }
 }

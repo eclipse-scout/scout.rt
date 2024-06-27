@@ -27,6 +27,7 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
 
   private final Class<DO_ENTITY> m_doEntityClass;
   private String m_id;
+  private HybridActionContextElement m_contextElement;
   private boolean m_initialized;
 
   public AbstractHybridAction() {
@@ -44,13 +45,18 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
   }
 
   @Override
-  public void init(String id) {
+  public void init(String id, HybridActionContextElement contextElement) {
     m_id = id;
+    m_contextElement = contextElement;
     m_initialized = true;
   }
 
   protected String getId() {
     return m_id;
+  }
+
+  protected HybridActionContextElement getContextElement() {
+    return m_contextElement;
   }
 
   protected boolean isInitialized() {

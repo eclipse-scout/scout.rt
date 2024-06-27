@@ -13,12 +13,16 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionContextElement;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridEvent;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridEventListener;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -26,6 +30,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonDataObjectHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
@@ -163,10 +168,11 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     String actionType = eventData.getString("actionType");
     // FIXME bsh [js-bookmark] How to handle deserialization errors and still return an 'actionEnd' event?
     IDoEntity data = jsonDoHelper().jsonToDataObject(eventData.optJSONObject("data"), IDoEntity.class);
+    HybridActionContextElement contextElement = toContextElement(eventData.optJSONObject("contextElement"));
 
     LOG.debug("Handling hybrid action '{}' for id '{}'", actionType, id);
     try {
-      getModel().getUIFacade().handleHybridActionFromUI(id, actionType, data);
+      getModel().getUIFacade().handleHybridActionFromUI(id, actionType, data, contextElement);
     }
     catch (Exception e) {
       // Exceptions are handled differently depending on their type (e.g. VetoExceptions are displayed to the user).
@@ -174,6 +180,30 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
       LOG.info("Handling hybrid action '{}' for id '{}' failed", actionType, id);
       throw e;
     }
+  }
+
+  protected HybridActionContextElement toContextElement(JSONObject jsonContextElement) {
+    if (jsonContextElement == null) {
+      return null;
+    }
+    String widgetAdapterId = jsonContextElement.getString("widget");
+    IJsonAdapter<?> widgetAdapter = getUiSession().getJsonAdapter(widgetAdapterId);
+    IWidget widget = Assertions.assertInstance(widgetAdapter.getModel(), IWidget.class);
+    Object element = resolveContextElement(widgetAdapter, jsonContextElement.opt("element"));
+    return HybridActionContextElement.of(widget, element);
+  }
+
+  protected Object resolveContextElement(IJsonAdapter<?> widgetAdapter, Object jsonElement) {
+    if (jsonElement == null) {
+      return null;
+    }
+    for (IHybridActionContextElementResolver resolver : BEANS.all(IHybridActionContextElementResolver.class)) {
+      Object resolvedElement = resolver.resolveElement(widgetAdapter, jsonElement);
+      if (resolvedElement != null) {
+        return resolvedElement;
+      }
+    }
+    throw new ProcessingException("Unknown context element [adapter={}, element={}]", widgetAdapter, jsonElement);
   }
 
   protected class P_HybridEventListener implements HybridEventListener {

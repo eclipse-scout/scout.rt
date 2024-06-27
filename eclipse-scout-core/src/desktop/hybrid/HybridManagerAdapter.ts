@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, HybridActionEvent, HybridManager, ModelAdapter, RemoteEvent} from '../../index';
+import {Event, HybridActionContextElement, HybridActionContextElementDissolver, HybridActionEvent, HybridManager, ModelAdapter, RemoteEvent} from '../../index';
 
 export class HybridManagerAdapter extends ModelAdapter {
   declare widget: HybridManager;
@@ -39,13 +39,23 @@ export class HybridManagerAdapter extends ModelAdapter {
   }
 
   protected _onWidgetHybridAction(event: HybridActionEvent) {
-    // FIXME bsh [js-bookmark] Hacky-hacky -> find a general solution!
-    if (event.data.data && event.data.data['_page']) {
-      let page = event.data.data['_page'];
-      let outline = page.getOutline();
-      event.data.data['_page'] = outline.modelAdapter.id + '/' + page.id;
+    this._send('hybridAction', {
+      id: event.data.id,
+      actionType: event.data.actionType,
+      contextElement: this._contextElementToJson(event.data?.contextElement),
+      data: event.data.data
+    });
+  }
+
+  protected _contextElementToJson(contextElement: HybridActionContextElement): object {
+    if (!contextElement) {
+      return undefined;
     }
-    this._send('hybridAction', event.data);
+    let dissolved = HybridActionContextElementDissolver.dissolve(contextElement);
+    if (!dissolved) {
+      throw new Error('Unable to convert context element to JSON');
+    }
+    return dissolved;
   }
 }
 
