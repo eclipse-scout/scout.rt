@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Event, EventHandler, EventListener, EventMapOf, Form, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, Session, UuidPool, Widget
+  Event, EventHandler, EventListener, EventMapOf, Form, HybridActionContextElement, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, Session, UuidPool,
+  Widget
 } from '../../index';
 
 /**
@@ -153,9 +154,9 @@ export class HybridManager extends Widget {
    * @returns the id of the triggered hybrid action
    * @see IHybridAction.java
    */
-  callAction(actionType: string, data?: object): string {
+  callAction(actionType: string, data?: object, contextElement?: HybridActionContextElement): string {
     const id = this._createEventId();
-    this.trigger('hybridAction', {data: {id, actionType, data}} as HybridActionEvent);
+    this.trigger('hybridAction', {data: {id, actionType, contextElement, data}} as HybridActionEvent);
     return id;
   }
 
@@ -173,8 +174,8 @@ export class HybridManager extends Widget {
    * @see IHybridAction
    * @see AbstractHybridAction.fireHybridActionEndEvent
    */
-  callActionAndWait(actionType: string, data?: object): JQuery.Promise<object> {
-    const id = this.callAction(actionType, data);
+  callActionAndWait(actionType: string, data?: object, contextElement?: HybridActionContextElement): JQuery.Promise<object> {
+    const id = this.callAction(actionType, data, contextElement);
     return this.when(`hybridActionEnd:${id}`).then(event => event.data);
   }
 

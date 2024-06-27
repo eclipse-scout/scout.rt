@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.AbstractHybridAction;
+import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionContextElement;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridActionType;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 
@@ -22,12 +23,10 @@ public class ExportSearchDataHybridAction extends AbstractHybridAction<IDoEntity
   public void execute(IDoEntity data) {
     IDoEntity searchData = null;
 
-    if (data.has("_page")) {
-      IPage<?> page = data.get("_page", IPage.class);
-      if (page instanceof IPageWithTable) {
-        IPageWithTable tablePage = (IPageWithTable) page;
-        searchData = tablePage.getSearchFilter().getData();
-      }
+    HybridActionContextElement contextElement = getContextElement();
+    if (contextElement != null && contextElement.getElement() instanceof IPageWithTable) {
+      IPageWithTable tablePage = (IPageWithTable) contextElement.getElement();
+      searchData = tablePage.getSearchFilter().getData();
     }
 
     fireHybridActionEndEvent(searchData);

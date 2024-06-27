@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkResultDo, App, arrays, BaseDoEntity, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects,
-  ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  ActivateBookmarkResultDo, App, arrays, BaseDoEntity, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridActionContextElement, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes,
+  NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -191,17 +191,16 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       let selectedChildRowIdentifiers = page.detailTable.selectedRows.map(row => row.bookmarkIdentifier).filter(Boolean);
       return $.resolvedPromise()
         .then(() => {
-          let outline = page.getOutline();
-          return outline.getSearchFilterForPage(page);
+          // let outline = page.getOutline();
+          // return outline.getSearchFilterForPage(page);
 
           // Local
-          // if (page instanceof PageWithTable) {
-          //   return page.getSearchFilter();
-          // }
-          // // Remote
-          // return HybridManager.get(this.session).callActionAndWait('ExportSearchData', {
-          //   _page: page
-          // });
+          if (page instanceof PageWithTable) {
+            return page.getSearchFilter();
+          }
+          // Remote
+          return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined,
+            HybridActionContextElement.of(page.getOutline(), page));
         })
         .then(searchFilter => {
           if (searchFilter && !(searchFilter instanceof BaseDoEntity) && !searchFilter._type) {

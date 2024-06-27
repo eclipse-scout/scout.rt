@@ -252,7 +252,7 @@ public class HybridManager extends AbstractPropertyObserver {
 
   // hybrid actions (js to java)
 
-  private void handleHybridAction(String id, String actionType, IDoEntity data) {
+  private void handleHybridAction(String id, String actionType, IDoEntity data, HybridActionContextElement contextElement) {
     if (m_hybridActionMap == null) {
       m_hybridActionMap = BEANS.getBeanManager().getBeans(IHybridAction.class).stream()
           .filter(bean -> bean.hasAnnotation(HybridActionType.class))
@@ -260,7 +260,7 @@ public class HybridManager extends AbstractPropertyObserver {
     }
     Optional.ofNullable(m_hybridActionMap.get(actionType))
         .map(BEANS::get)
-        .ifPresent(hybridAction -> hybridAction.execute(id, data));
+        .ifPresent(hybridAction -> hybridAction.execute(id, data, contextElement));
   }
 
   public IHybridManagerUIFacade getUIFacade() {
@@ -274,8 +274,8 @@ public class HybridManager extends AbstractPropertyObserver {
   protected class P_UIFacade implements IHybridManagerUIFacade {
 
     @Override
-    public void handleHybridActionFromUI(String id, String actionType, IDoEntity data) {
-      handleHybridAction(id, actionType, data);
+    public void handleHybridActionFromUI(String id, String actionType, IDoEntity data, HybridActionContextElement contextElement) {
+      handleHybridAction(id, actionType, data, contextElement);
     }
   }
 
