@@ -15,5 +15,13 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 @ApplicationScoped
 public interface IHybridActionContextElementResolver {
 
+  /**
+   * Convert the given "json representation" of an element (e.g. a string id) to the corresponding model element.
+   */
   Object resolveElement(IJsonAdapter<?> adapter, Object element);
+
+  /**
+   * Converts the given model element to a "json representation" (e.g. a string id).
+   */
+  Object dissolveElement(IJsonAdapter<?> adapter, Object element);
 }

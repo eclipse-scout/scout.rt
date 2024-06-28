@@ -149,7 +149,8 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     return new JSONObject()
         .put("id", event.getId())
         .put("eventType", event.getEventType())
-        .put("data", jsonDoHelper().dataObjectToJson(event.getData()));
+        .put("data", jsonDoHelper().dataObjectToJson(event.getData()))
+        .putOpt("contextElement", contextElementToJson(event.getContextElement()));
   }
 
   @Override
@@ -168,7 +169,7 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     String actionType = eventData.getString("actionType");
     // FIXME bsh [js-bookmark] How to handle deserialization errors and still return an 'actionEnd' event?
     IDoEntity data = jsonDoHelper().jsonToDataObject(eventData.optJSONObject("data"), IDoEntity.class);
-    HybridActionContextElement contextElement = toContextElement(eventData.optJSONObject("contextElement"));
+    HybridActionContextElement contextElement = jsonToContextElement(eventData.optJSONObject("contextElement"));
 
     LOG.debug("Handling hybrid action '{}' for id '{}'", actionType, id);
     try {
@@ -182,7 +183,34 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     }
   }
 
-  protected HybridActionContextElement toContextElement(JSONObject jsonContextElement) {
+
+  protected JSONObject contextElementToJson(HybridActionContextElement contextElement) {
+    if (contextElement == null) {
+      return null;
+    }
+    IJsonAdapter<?> adapter = findAdapter(contextElement.getWidget());
+    Object element = dissolveContextElement(adapter, contextElement.getElement());
+
+    JSONObject json = new JSONObject();
+    json.put("widget", adapter.getId());
+    json.putOpt("element", element);
+    return json;
+  }
+
+  protected Object dissolveContextElement(IJsonAdapter<?> widgetAdapter, Object element) {
+    if (element == null) {
+      return null;
+    }
+    for (IHybridActionContextElementResolver resolver : BEANS.all(IHybridActionContextElementResolver.class)) {
+      Object dissolvedElement = resolver.dissolveElement(widgetAdapter, element);
+      if (dissolvedElement != null) {
+        return dissolvedElement;
+      }
+    }
+    throw new ProcessingException("Cannot convert context element to JSON [adapter={}, element={}]", widgetAdapter, element);
+  }
+
+  protected HybridActionContextElement jsonToContextElement(JSONObject jsonContextElement) {
     if (jsonContextElement == null) {
       return null;
     }
@@ -204,6 +232,15 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
       }
     }
     throw new ProcessingException("Unknown context element [adapter={}, element={}]", widgetAdapter, jsonElement);
+  }
+
+  protected IJsonAdapter<?> findAdapter(IWidget widget) {
+    IJsonAdapter<?> rootAdapter = getUiSession().getRootJsonAdapter();
+    IJsonAdapter<?> adapter = JsonAdapterUtility.findChildAdapter(rootAdapter, widget);
+    if (adapter == null) {
+      throw new IllegalStateException("Adapter not found " + widget);
+    }
+    return adapter;
   }
 
   protected class P_HybridEventListener implements HybridEventListener {

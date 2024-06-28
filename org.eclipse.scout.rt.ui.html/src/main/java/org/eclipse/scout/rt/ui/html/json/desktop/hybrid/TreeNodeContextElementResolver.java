@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.desktop.hybrid;
 
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
@@ -18,6 +19,16 @@ public class TreeNodeContextElementResolver implements IHybridActionContextEleme
   public Object resolveElement(IJsonAdapter<?> adapter, Object element) {
     if (adapter instanceof JsonTree && element instanceof String) {
       return ((JsonTree) adapter).getTreeNodeForNodeId((String) element);
+    }
+    return null;
+  }
+
+  @Override
+  public Object dissolveElement(IJsonAdapter<?> adapter, Object element) {
+    if (adapter instanceof JsonTree && element instanceof ITreeNode) {
+      JsonTree treeAdapter = (JsonTree) adapter;
+      treeAdapter.processBufferedEvents();
+      return treeAdapter.getNodeId((ITreeNode) element);
     }
     return null;
   }
