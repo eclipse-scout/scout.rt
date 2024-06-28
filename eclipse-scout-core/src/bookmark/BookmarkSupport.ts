@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkResultDo, App, arrays, BaseDoEntity, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridActionContextElement, HybridManager, IBookmarkPageDo, InitModelOf, MessageBoxes,
-  NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
+  ActivateBookmarkResultDo, App, arrays, BaseDoEntity, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridActionContextElement, HybridManager, HybridManagerActionEndEventResult,
+  IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status,
+  TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -265,7 +266,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       });
   }
 
-  protected _openBookmarkRemote(bookmarkDefinition: OutlineBookmarkDefinitionDo): JQuery.Promise<ActivateBookmarkResultDo> {
+  protected _openBookmarkRemote(bookmarkDefinition: OutlineBookmarkDefinitionDo): JQuery.Promise<ActivateBookmarkResult> {
     let hybridManager = HybridManager.get(this.session);
 
     if (hybridManager) {
@@ -275,22 +276,29 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       let hybridActionData = {
         bookmarkDefinition: jsonBookmarkDefinition
       };
-      return hybridManager.callActionAndWait('ActivateBookmark', hybridActionData)
-        .then((result: ActivateBookmarkResultDo) => {
-          return scout.create(ActivateBookmarkResultDo, bookmarks.toObjectModel(result));
+      return hybridManager.callActionAndWaitWithContext('ActivateBookmark', hybridActionData)
+        .then((result: HybridManagerActionEndEventResult) => {
+          let targetPage = (result.contextElement?.element instanceof Page ? result.contextElement.element : null);
+          let data = scout.create(ActivateBookmarkResultDo, bookmarks.toObjectModel(result.data));
+          return {
+            targetPage: targetPage,
+            targetBookmarkPage: data.targetBookmarkPage,
+            remainingPagePath: data.remainingPagePath
+          } as ActivateBookmarkResult;
         });
     }
 
     // Scout JS: resolve everything in the UI, i.e. the entire path is remaining
     return $.resolvedPromise().then(() => {
-      return scout.create(ActivateBookmarkResultDo, {
+      return {
+        targetPage: null,
         targetBookmarkPage: null,
         remainingPagePath: [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage]
-      });
+      };
     });
   }
 
-  protected _openBookmarkLocal(bookmarkDefinition: OutlineBookmarkDefinitionDo, result: ActivateBookmarkResultDo): JQuery.Promise<void> {
+  protected _openBookmarkLocal(bookmarkDefinition: OutlineBookmarkDefinitionDo, result: ActivateBookmarkResult): JQuery.Promise<void> {
     // Check if we are already on the correct outline
     let outline = this.desktop.outline;
     if (!outline || outline.getBookmarkAdapter().buildId() !== bookmarkDefinition.outlineId) {
@@ -305,12 +313,12 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     this.desktop.setOutline(outline);
 
     // // FIXME bsh [js-bookmark] Find a better solution to transfer the parent from the UI server to here!
-    // let pagePath = result.remainingPagePath.slice(); // create copy because arrays is altered
-    // let parent = (result.targetBookmarkPage && outline.selectedNode()) || outline;
-    // let parentRowBookmarkIdentifier = result.targetBookmarkPage instanceof TableBookmarkPageDo ? result.targetBookmarkPage.expandedChildRow : null;
-    let pagePath = [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage];
-    let parent = outline;
-    let parentRowBookmarkIdentifier = null;
+    let pagePath = result.remainingPagePath.slice(); // create copy because arrays is altered
+    let parent = result.targetPage || outline;
+    let parentRowBookmarkIdentifier = result.targetBookmarkPage instanceof TableBookmarkPageDo ? result.targetBookmarkPage.expandedChildRow : null;
+    // let pagePath = [...bookmarkDefinition.pagePath, bookmarkDefinition.bookmarkedPage];
+    // let parent = outline;
+    // let parentRowBookmarkIdentifier = null;
     return this._resolveNextPageInPath(pagePath, parent, parentRowBookmarkIdentifier)
       .then(page => {
         if (!page) {
@@ -459,3 +467,8 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
   }
 }
 
+export interface ActivateBookmarkResult {
+  targetPage: Page;
+  targetBookmarkPage: IBookmarkPageDo;
+  remainingPagePath: IBookmarkPageDo[];
+}

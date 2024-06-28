@@ -21,6 +21,7 @@ export interface HybridActionEvent<TObject = object, T = HybridManager> extends 
 
 export interface HybridActionEndEvent<TObject = object, T = HybridManager> extends Event<T> {
   data: TObject;
+  contextElement: HybridActionContextElement;
 }
 
 export interface HybridManagerWidgetAddEvent<TWidget = Widget, T = HybridManager> extends Event<T> {

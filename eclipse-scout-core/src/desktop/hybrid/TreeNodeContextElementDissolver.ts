@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {HybridActionContextElement, HybridActionContextElementDissolver, Tree, TreeAdapter, TreeNode} from '../../index';
+import {HybridActionContextElement, HybridActionContextElementDissolver, JsonHybridActionContextElement, ModelAdapter, scout, Tree, TreeAdapter, TreeNode} from '../../index';
 
 export class TreeNodeContextElementDissolver extends HybridActionContextElementDissolver {
 
-  dissolve(contextElement: HybridActionContextElement): object {
+  dissolve(contextElement: HybridActionContextElement): JsonHybridActionContextElement {
     if (contextElement.widget instanceof Tree && contextElement.widget.modelAdapter instanceof TreeAdapter) {
       let widgetAdapterId = contextElement.widget.modelAdapter.id;
       let elementId = undefined;
@@ -22,6 +22,18 @@ export class TreeNodeContextElementDissolver extends HybridActionContextElementD
         widget: widgetAdapterId,
         element: elementId
       };
+    }
+    return null;
+  }
+
+  override resolve(adapter: ModelAdapter, element: any): HybridActionContextElement {
+    if (adapter instanceof TreeAdapter) {
+      let tree = adapter.widget;
+      let treeNode = tree.nodesMap[element];
+      return scout.create(HybridActionContextElement, {
+        widget: tree,
+        element: treeNode
+      });
     }
     return null;
   }

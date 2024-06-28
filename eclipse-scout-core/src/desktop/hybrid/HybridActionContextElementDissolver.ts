@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {HybridActionContextElement} from './HybridActionContextElement';
+import {HybridActionContextElement, JsonHybridActionContextElement} from './HybridActionContextElement';
 import {arrays} from '../../util/arrays';
 import {Constructor, scout} from '../../scout';
+import {ModelAdapter} from '../../session/ModelAdapter';
 
 export abstract class HybridActionContextElementDissolver {
 
@@ -34,7 +35,7 @@ export abstract class HybridActionContextElementDissolver {
     });
   }
 
-  static dissolve(contextElement: HybridActionContextElement): object {
+  static dissolve(contextElement: HybridActionContextElement): JsonHybridActionContextElement {
     let dissolvers = HybridActionContextElementDissolver.all();
     for (let i = 0; i < dissolvers.length; i++) {
       let dissolved = dissolvers[i].dissolve(contextElement);
@@ -45,7 +46,20 @@ export abstract class HybridActionContextElementDissolver {
     return null;
   }
 
-  abstract dissolve(contextElement: HybridActionContextElement): object;
+  static resolve(adapter: ModelAdapter, element: any): HybridActionContextElement {
+    let dissolvers = HybridActionContextElementDissolver.all();
+    for (let i = 0; i < dissolvers.length; i++) {
+      let resolved = dissolvers[i].resolve(adapter, element);
+      if (resolved) {
+        return resolved;
+      }
+    }
+    return null;
+  }
+
+  abstract dissolve(contextElement: HybridActionContextElement): JsonHybridActionContextElement;
+
+  abstract resolve(adapter: ModelAdapter, element: any): HybridActionContextElement;
 }
 
 export interface HybridActionContextElementDissolverRegistration {

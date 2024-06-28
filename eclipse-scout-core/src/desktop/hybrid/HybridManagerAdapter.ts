@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, HybridActionContextElement, HybridActionContextElementDissolver, HybridActionEvent, HybridManager, ModelAdapter, RemoteEvent} from '../../index';
+import {Event, HybridActionContextElement, HybridActionContextElementDissolver, HybridActionEvent, HybridManager, JsonHybridActionContextElement, ModelAdapter, RemoteEvent} from '../../index';
 
 export class HybridManagerAdapter extends ModelAdapter {
   declare widget: HybridManager;
@@ -23,7 +23,8 @@ export class HybridManagerAdapter extends ModelAdapter {
   }
 
   protected _onHybridEvent(event: HybridEvent) {
-    this.widget.onHybridEvent(event.id, event.eventType, event.data);
+    let contextElement = this._jsonToContextElement(event.contextElement);
+    this.widget.onHybridEvent(event.id, event.eventType, event.data, contextElement);
   }
 
   protected _onHybridWidgetEvent(event: HybridEvent) {
@@ -42,14 +43,29 @@ export class HybridManagerAdapter extends ModelAdapter {
     this._send('hybridAction', {
       id: event.data.id,
       actionType: event.data.actionType,
-      contextElement: this._contextElementToJson(event.data?.contextElement),
+      contextElement: this._contextElementToJson(event.data.contextElement) || undefined,
       data: event.data.data
     });
   }
 
+  protected _jsonToContextElement(jsonContextElement: JsonHybridActionContextElement): HybridActionContextElement {
+    if (!jsonContextElement) {
+      return null;
+    }
+    let adapter = this.session.getModelAdapter(jsonContextElement.widget);
+    if (!(adapter instanceof ModelAdapter)) {
+      throw new Error(`No adapter found for '${jsonContextElement.widget}'`);
+    }
+    let resolved = HybridActionContextElementDissolver.resolve(adapter, jsonContextElement.element);
+    if (!resolved) {
+      throw new Error('Unable to convert JSON to context element');
+    }
+    return resolved;
+  }
+
   protected _contextElementToJson(contextElement: HybridActionContextElement): object {
     if (!contextElement) {
-      return undefined;
+      return null;
     }
     let dissolved = HybridActionContextElementDissolver.dissolve(contextElement);
     if (!dissolved) {
@@ -63,4 +79,5 @@ interface HybridEvent<TObject = object> extends RemoteEvent {
   id: string;
   eventType: string;
   data: TObject;
+  contextElement: JsonHybridActionContextElement;
 }

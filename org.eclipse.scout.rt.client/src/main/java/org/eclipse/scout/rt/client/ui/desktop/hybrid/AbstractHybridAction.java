@@ -128,8 +128,12 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
   }
 
   protected void fireHybridEvent(String eventType, IDoEntity data) {
+    fireHybridEvent(eventType, data, null);
+  }
+
+  protected void fireHybridEvent(String eventType, IDoEntity data, HybridActionContextElement contextElement) {
     assertInitialized();
-    hybridManager().fireHybridEvent(getId(), eventType, data);
+    hybridManager().fireHybridEvent(getId(), eventType, data, contextElement);
   }
 
   protected void fireHybridActionEndEvent() {
@@ -138,8 +142,12 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
   }
 
   protected void fireHybridActionEndEvent(IDoEntity data) {
+    fireHybridActionEndEvent(data, null);
+  }
+
+  protected void fireHybridActionEndEvent(IDoEntity data, HybridActionContextElement contextElement) {
     assertInitialized();
-    hybridManager().fireHybridActionEndEvent(getId(), data);
+    hybridManager().fireHybridActionEndEvent(getId(), data, contextElement);
   }
 
   protected void fireHybridWidgetEvent(String eventType) {

@@ -1533,7 +1533,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       return;
     }
     if (node.expanded || node.expandedLazy) {
-      this._addChildrenToFlatList(node, null, true, null, true /* required so that double-clicking a table-page-row expands the clicked child row */);
+      this._addChildrenToFlatList(node, null, false, null, true /* required so that double-clicking a table-page-row expands the clicked child row */);
     } else {
       this._removeChildrenFromFlatList(node, false);
     }

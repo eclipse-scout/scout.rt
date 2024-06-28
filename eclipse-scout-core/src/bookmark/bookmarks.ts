@@ -124,7 +124,6 @@ export class PageIdDummyPageParamDo extends BaseDoEntity implements PageParamDo 
 // --------------------------------------------------
 
 export class ActivateBookmarkResultDo extends BaseDoEntity {
-  // FIXME bsh [js-bookmark] How to do this? bookmarkPage: Page;
   targetBookmarkPage: IBookmarkPageDo;
   remainingPagePath: IBookmarkPageDo[];
 }

@@ -100,8 +100,11 @@ export class HybridManager extends Widget {
   // hybrid events (java to js)
 
   /** @internal */
-  onHybridEvent(id: string, eventType: string, data: object) {
-    this.trigger(`${eventType}:${id}`, {data});
+  onHybridEvent(id: string, eventType: string, data: object, contextElement: HybridActionContextElement) {
+    this.trigger(`${eventType}:${id}`, {
+      data,
+      contextElement
+    });
   }
 
   /** @internal */
@@ -175,8 +178,17 @@ export class HybridManager extends Widget {
    * @see AbstractHybridAction.fireHybridActionEndEvent
    */
   callActionAndWait(actionType: string, data?: object, contextElement?: HybridActionContextElement): JQuery.Promise<object> {
+    return this.callActionAndWaitWithContext(actionType, data, contextElement).then(result => result.data);
+  }
+
+  callActionAndWaitWithContext(actionType: string, data?: object, contextElement?: HybridActionContextElement): JQuery.Promise<HybridManagerActionEndEventResult> {
     const id = this.callAction(actionType, data, contextElement);
-    return this.when(`hybridActionEnd:${id}`).then(event => event.data);
+    return this.when(`hybridActionEnd:${id}`).then(event => {
+      return {
+        data: event.data,
+        contextElement: event.contextElement
+      };
+    });
   }
 
   /**
@@ -220,4 +232,9 @@ export class HybridManager extends Widget {
   override when<K extends string & keyof EventMapOf<this['self']>>(type: K | `${K}:${string}`): JQuery.Promise<EventMapOf<this>[K] & Event<this>> {
     return super.when(type as K);
   }
+}
+
+export interface HybridManagerActionEndEventResult {
+  data: object;
+  contextElement: HybridActionContextElement;
 }

@@ -219,19 +219,19 @@ public class HybridManager extends AbstractPropertyObserver {
   }
 
   public void fireHybridEvent(String id, String eventType) {
-    fireHybridEvent(id, eventType, null);
+    fireHybridEvent(id, eventType, null, null);
   }
 
-  public void fireHybridEvent(String id, String eventType, IDoEntity data) {
-    fireHybridEvent(HybridEvent.createHybridEvent(this, id, eventType, data));
+  public void fireHybridEvent(String id, String eventType, IDoEntity data, HybridActionContextElement contextElement) {
+    fireHybridEvent(HybridEvent.createHybridEvent(this, id, eventType, data, contextElement));
   }
 
   public void fireHybridActionEndEvent(String id) {
-    fireHybridActionEndEvent(id, null);
+    fireHybridActionEndEvent(id, null, null);
   }
 
-  public void fireHybridActionEndEvent(String id, IDoEntity data) {
-    fireHybridEvent(HybridEvent.createHybridActionEndEvent(this, id, data));
+  public void fireHybridActionEndEvent(String id, IDoEntity data, HybridActionContextElement contextElement) {
+    fireHybridEvent(HybridEvent.createHybridActionEndEvent(this, id, data, contextElement));
   }
 
   public void fireHybridWidgetEvent(String id, String eventType) {
