@@ -13,10 +13,6 @@
     display: flex;
     min-width: 206px;
 
-    &:not(.disabled) {
-      cursor: pointer;
-    }
-
     & > .group-collapse-border {
       flex-grow: 1;
       margin-top: 8px;
@@ -29,6 +25,10 @@
     & > .group-collapse-icon {
       transition: transform 0s;
       margin: 0;
+
+      &:not(.disabled) {
+        cursor: pointer;
+      }
 
       &::before {
         content: @icon-angle-down;
