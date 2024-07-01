@@ -9,13 +9,15 @@
  */
 package org.eclipse.scout.rt.rest.jersey.server;
 
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.*;
 import static org.junit.Assert.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
-import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.dataobject.IIdSignatureDataObjectMapper;
@@ -26,6 +28,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.fixture.SerializationRequest;
@@ -34,7 +37,6 @@ import org.eclipse.scout.rt.rest.jersey.fixture.SingleIdDo;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +45,6 @@ import org.junit.runner.RunWith;
 public class IdSignatureRestFilterTest {
 
   protected static IBean<?> s_bean;
-
-  private WebTarget m_target;
 
   @BeforeClass
   public static void beforeClass() {
@@ -57,13 +57,14 @@ public class IdSignatureRestFilterTest {
     BeanTestingHelper.get().unregisterBean(s_bean);
   }
 
-  @Before
-  public void before() {
-    m_target = BEANS.get(JerseyTestRestClientHelper.class).target("api/serialization");
-  }
-
-  protected Builder request() {
-    return m_target
+  protected Builder request(ClientRequestFilter... filters) {
+    return new JerseyTestRestClientHelper() {
+      @Override
+      protected List<ClientRequestFilter> getRequestFiltersToRegister() {
+        return combine(super.getRequestFiltersToRegister(), arrayList(filters));
+      }
+    }
+        .target("api/serialization")
         .request()
         .accept(MediaType.APPLICATION_JSON);
   }
@@ -78,6 +79,34 @@ public class IdSignatureRestFilterTest {
     // ids need to be signed, but are not signed -> exception
     assertThrows(VetoException.class, () -> request()
         .header(IdSignatureRestContainerFilter.ID_SIGNATURE_HTTP_HEADER, Boolean.TRUE.toString())
+        .post(Entity.json(BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(request)), SerializationResponse.class));
+
+    assertEquals(
+        BEANS.get(SerializationResponse.class)
+            .withOriginal(singleIdDo)
+            .withSerialized("{\"_type\":\"scout.SingleId\",\"id\":\"scout.FixtureIntegerId:42\"}"),
+        request()
+            .header(IdSignatureRestContainerFilter.ID_SIGNATURE_HTTP_HEADER, Boolean.TRUE.toString())
+            .post(Entity.json(BEANS.get(IIdSignatureDataObjectMapper.class).writeValue(request)), SerializationResponse.class));
+
+    assertEquals(
+        BEANS.get(SerializationResponse.class)
+            .withOriginal(singleIdDo)
+            .withSerialized("{\"_type\":\"scout.SingleId\",\"id\":\"scout.FixtureIntegerId:42\"}"),
+        request()
+            .header(IdSignatureRestContainerFilter.ID_SIGNATURE_HTTP_HEADER, Boolean.TRUE.toString())
+            .post(Entity.json(request), SerializationResponse.class));
+  }
+
+  @Test
+  public void testSignedWithFilter() {
+    var singleIdDo = BEANS.get(SingleIdDo.class)
+        .withId(FixtureIntegerId.of(42));
+    var request = BEANS.get(SerializationRequest.class)
+        .withBody(singleIdDo);
+
+    // ids need to be signed, but are not signed -> exception
+    assertThrows(VetoException.class, () -> request(BEANS.get(IdSignatureClientRequestFilter.class))
         .post(Entity.json(BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(request)), SerializationResponse.class));
 
     assertEquals(
