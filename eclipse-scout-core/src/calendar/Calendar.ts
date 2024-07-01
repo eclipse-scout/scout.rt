@@ -92,6 +92,11 @@ export class Calendar extends Widget implements CalendarModel {
   protected _menuInjectionTargetMenusChangedHandler: EventHandler<PropertyChangeEvent<Menu[], GroupBox>>;
 
   /**
+   * Calendar descriptors, which have do not have a parent
+   */
+  protected _leafCalendarDescriptors: CalendarDescriptor[];
+
+  /**
    * Temporary data structure to store data while mouse actions are handled
    * @internal
    */
@@ -503,6 +508,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _setCalendarDescriptors(calendars: CalendarDescriptor[]) {
     this._setProperty('calendarDescriptors', calendars);
+    this._updateLeafCalendarDescriptors();
     this._updateCalendarsPanelDisplayable();
     this._updateCalendarsPanel();
     this._validateSelectedCalendarDescriptor();
@@ -527,7 +533,7 @@ export class Calendar extends Widget implements CalendarModel {
       .data('calendarId', this.defaultCalendarDescriptor.calendarId);
 
     // Add new calendar columns
-    this._getLeafCalendarDescriptors().forEach(calendar => {
+    this._leafCalendarDescriptors.forEach(calendar => {
       $dayName.appendDiv('calendar-column')
         .data('calendarId', calendar.calendarId)
         .attr('data-calendar-name', calendar.name);
@@ -1061,7 +1067,7 @@ export class Calendar extends Widget implements CalendarModel {
     // layout calendar columns
     let columnWidth = 0;
     if (this.isDay()) {
-      columnWidth = Math.round(contentW / (this._getLeafCalendarDescriptors().filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
+      columnWidth = Math.round(contentW / (this._leafCalendarDescriptors.filter(c => c.visible).length + (this._defaultCalendarVisible() ? 1 : 0)));
     } else if (this.isWorkWeek()) {
       columnWidth = Math.round(contentW / this.workDayIndices.length);
     } else {
@@ -1164,6 +1170,11 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   findCalendarForComponent(component: CalendarComponent): CalendarDescriptor {
+    // Only render components in leaf calendars
+    let leafCalendar = this._leafCalendarDescriptors.find(desc => desc.calendarId === component.item.calendarId);
+    if (!leafCalendar) {
+      return this.defaultCalendarDescriptor;
+    }
     return this.findCalendarForId(component.item.calendarId);
   }
 
@@ -2073,8 +2084,8 @@ export class Calendar extends Widget implements CalendarModel {
     return null;
   }
 
-  protected _getLeafCalendarDescriptors(): CalendarDescriptor[] {
-    return this.calendarDescriptors
+  protected _updateLeafCalendarDescriptors(): void {
+    this._leafCalendarDescriptors = this.calendarDescriptors
       .filter(calendar => !this.calendarDescriptors
         .find(cal => cal.parentId === calendar.calendarId));
   }
