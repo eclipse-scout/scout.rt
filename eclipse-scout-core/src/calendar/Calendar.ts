@@ -568,6 +568,18 @@ export class Calendar extends Widget implements CalendarModel {
     this.setProperty('components', components);
   }
 
+  protected _setComponents(components: CalendarComponent[]) {
+    if (this.isDay()) {
+      let defaultCalendarVisible = this._defaultCalendarVisible();
+      this._setProperty('components', components);
+      if (this._defaultCalendarVisible() !== defaultCalendarVisible) {
+        this.layoutSize(true);
+      }
+    } else {
+      this._setProperty('components', components);
+    }
+  }
+
   addComponents(components: CalendarComponent[]) {
     this.setComponents([...this.components, ...components]);
   }
