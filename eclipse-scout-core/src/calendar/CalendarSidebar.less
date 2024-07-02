@@ -31,10 +31,16 @@
       & > .tree-data > .tree-node.selected {
         background-color: transparent;
 
-        &::after {
-          border-color: transparent;
+        &:after {
+          border: none transparent;
         }
       }
+    }
+
+    // remove border
+    & > .lookup-box > .field > .structure.tree.no-nodes-selected:focus {
+      border: none;
+      box-shadow: none;
     }
   }
 
