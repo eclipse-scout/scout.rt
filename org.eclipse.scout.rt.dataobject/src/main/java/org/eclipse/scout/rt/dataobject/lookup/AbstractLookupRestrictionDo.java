@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.dataobject.DoValue;
  * Abstract base class for lookup call restrictions
  *
  * @param <ID>
- *          Lookup row id type
+ *     Lookup row id type
  */
 public abstract class AbstractLookupRestrictionDo<ID> extends DoEntity {
 

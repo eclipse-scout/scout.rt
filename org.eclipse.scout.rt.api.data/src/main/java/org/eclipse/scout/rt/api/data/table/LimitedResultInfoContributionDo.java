@@ -70,9 +70,9 @@ public class LimitedResultInfoContributionDo extends DoEntity implements IDoEnti
    * {@link LimitedResultInfoContributionDo} is attached having {@link #isLimitedResult()} set to {@code true}.
    *
    * @param entity
-   *          The {@link IDoEntity} to check or {@code null}.
+   *     The {@link IDoEntity} to check or {@code null}.
    * @return {@code true} if the entity contains a {@link LimitedResultInfoContributionDo} having
-   *         {@link LimitedResultInfoContributionDo#isLimitedResult()} set to true.
+   * {@link LimitedResultInfoContributionDo#isLimitedResult()} set to true.
    */
   public static boolean isLimited(IDoEntity entity) {
     return of(entity)

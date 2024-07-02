@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
+import jakarta.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
@@ -19,4 +21,30 @@ public abstract class AbstractTestTypedUntypedInnerDo extends DoEntity {
   public abstract DoValue<FixtureStringId> stringId();
 
   public abstract DoValue<IId> iId();
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractTestTypedUntypedInnerDo withStringId(FixtureStringId stringId) {
+    stringId().set(stringId);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureStringId getStringId() {
+    return stringId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractTestTypedUntypedInnerDo withIId(IId iId) {
+    iId().set(iId);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IId getIId() {
+    return iId().get();
+  }
 }

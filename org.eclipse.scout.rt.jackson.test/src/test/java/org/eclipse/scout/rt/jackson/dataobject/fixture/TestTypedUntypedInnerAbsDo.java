@@ -41,12 +41,14 @@ public class TestTypedUntypedInnerAbsDo extends AbstractTestTypedUntypedInnerDo 
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public TestTypedUntypedInnerAbsDo withStringId(FixtureStringId stringId) {
     stringId().set(stringId);
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public TestTypedUntypedInnerAbsDo withIId(IId iId) {
     iId().set(iId);
