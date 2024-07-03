@@ -198,7 +198,7 @@ public class HybridManager extends AbstractPropertyObserver {
   }
 
   protected Map<String, IWidget> getWidgetsInternal() {
-    //noinspection unchecked
+    // noinspection unchecked
     return (Map<String, IWidget>) propertySupport.getProperty(PROP_WIDGETS, Map.class);
   }
 

@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 
 @HybridActionType(OpenDummyFormHybridAction.TYPE)
 public class OpenDummyFormHybridAction extends AbstractFormHybridAction<DummyForm, DummyDo> {
+
   protected static final String TYPE = OPEN_FORM_PREFIX + "Dummy";
 
   @Override

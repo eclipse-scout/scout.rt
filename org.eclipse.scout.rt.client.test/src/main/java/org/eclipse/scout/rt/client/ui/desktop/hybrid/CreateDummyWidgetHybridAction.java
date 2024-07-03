@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 
 @HybridActionType(CreateDummyWidgetHybridAction.TYPE)
 public class CreateDummyWidgetHybridAction extends AbstractHybridAction<DoEntity> {
+
   protected static final String TYPE = "createWidget:Dummy";
 
   @Override

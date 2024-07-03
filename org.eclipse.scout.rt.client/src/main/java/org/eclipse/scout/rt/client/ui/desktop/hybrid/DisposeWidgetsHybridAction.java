@@ -24,8 +24,9 @@ import org.slf4j.LoggerFactory;
  */
 @HybridActionType(DisposeWidgetsHybridAction.TYPE)
 public class DisposeWidgetsHybridAction extends AbstractHybridAction<DisposeWidgetsHybridActionDo> {
-  protected static final String TYPE = "DisposeWidgets";
   private static final Logger LOG = LoggerFactory.getLogger(DisposeWidgetsHybridAction.class);
+
+  protected static final String TYPE = "DisposeWidgets";
 
   @Override
   public void execute(DisposeWidgetsHybridActionDo data) {
