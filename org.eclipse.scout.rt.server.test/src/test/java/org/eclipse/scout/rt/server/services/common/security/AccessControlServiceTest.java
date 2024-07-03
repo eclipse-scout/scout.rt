@@ -100,7 +100,9 @@ public class AccessControlServiceTest {
   }
 
   private void commit() {
-    ITransaction.CURRENT.get().commitPhase2();
+    ITransaction transaction = ITransaction.CURRENT.get();
+    transaction.commitPhase2();
+    transaction.release();
   }
 
   private void assertSingleNotification() {

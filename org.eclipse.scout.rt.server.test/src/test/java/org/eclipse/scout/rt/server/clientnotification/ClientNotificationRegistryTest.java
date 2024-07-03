@@ -268,8 +268,10 @@ public class ClientNotificationRegistryTest {
   }
 
   private void commit() {
-    ITransaction.CURRENT.get().commitPhase1();
-    ITransaction.CURRENT.get().commitPhase2();
+    ITransaction transaction = ITransaction.CURRENT.get();
+    transaction.commitPhase1();
+    transaction.commitPhase2();
+    transaction.release();
   }
 
   private List<ClientNotificationMessage> consumeNoWait(ClientNotificationRegistry reg, NodeId nodeId) {
