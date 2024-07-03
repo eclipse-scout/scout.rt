@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -268,8 +268,10 @@ public class ClientNotificationRegistryTest {
   }
 
   private void commit() {
-    ITransaction.CURRENT.get().commitPhase1();
-    ITransaction.CURRENT.get().commitPhase2();
+    ITransaction transaction = ITransaction.CURRENT.get();
+    transaction.commitPhase1();
+    transaction.commitPhase2();
+    transaction.release();
   }
 
   private List<ClientNotificationMessage> consumeNoWait(ClientNotificationRegistry reg, NodeId nodeId) {
