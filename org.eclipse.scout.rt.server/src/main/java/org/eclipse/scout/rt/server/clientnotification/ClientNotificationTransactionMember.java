@@ -34,6 +34,8 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
   private final ClientNotificationCoalescer m_coalescer;
   private final ClientNotificationRegistry m_notificationRegistry;
 
+  private List<ClientNotificationMessage> m_notificationsToPublish;
+
   public ClientNotificationTransactionMember(ClientNotificationRegistry reg) {
     super(TRANSACTION_MEMBER_ID);
     m_notificationRegistry = reg;
@@ -71,7 +73,9 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
       m_notificationRegistry.publish(notifications, Assertions.assertNotNull(IClientNodeId.CURRENT.get(), "Missing 'client node id' on current calling context"));
     }
     else {
-      m_notificationRegistry.publish(notifications);
+      // if we cannot 'piggy-back' the notifications to the current request (e.g. for rest-calls), we hold the notifications back until the transaction is released
+      // to ensure the notifications are sent after all transaction-members are committed.
+      m_notificationsToPublish = notifications;
     }
 
   }
@@ -88,4 +92,11 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
     return false;
   }
 
+  @Override
+  public void release() {
+    if (m_notificationsToPublish != null) {
+      m_notificationRegistry.publish(m_notificationsToPublish);
+      m_notificationsToPublish = null;
+    }
+  }
 }
