@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 
+import java.util.Map;
+
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -24,15 +26,15 @@ public interface IHybridAction<DO_ENTITY extends IDoEntity> {
 
   Class<DO_ENTITY> getDoEntityClass();
 
-  void init(String id, HybridActionContextElement contextElement);
+  void init(String id, Map<String, HybridActionContextElement> contextElements);
 
   void execute(DO_ENTITY data);
 
-  default void execute(String id, IDoEntity data, HybridActionContextElement contextElement) {
+  default void execute(String id, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
     if (data != null && !getDoEntityClass().isInstance(data)) {
       throw new IllegalArgumentException("data must be of type '" + getDoEntityClass() + "' but is '" + data.getClass() + "'.");
     }
-    init(id, contextElement);
+    init(id, contextElements);
     execute(getDoEntityClass().cast(data));
   }
 }

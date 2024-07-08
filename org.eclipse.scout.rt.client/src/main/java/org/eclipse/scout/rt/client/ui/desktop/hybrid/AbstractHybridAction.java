@@ -27,7 +27,7 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
 
   private final Class<DO_ENTITY> m_doEntityClass;
   private String m_id;
-  private HybridActionContextElement m_contextElement;
+  private Map<String, HybridActionContextElement> m_contextElements;
   private boolean m_initialized;
 
   public AbstractHybridAction() {
@@ -45,9 +45,9 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
   }
 
   @Override
-  public void init(String id, HybridActionContextElement contextElement) {
+  public void init(String id, Map<String, HybridActionContextElement> contextElements) {
     m_id = id;
-    m_contextElement = contextElement;
+    m_contextElements = contextElements;
     m_initialized = true;
   }
 
@@ -55,8 +55,15 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
     return m_id;
   }
 
-  protected HybridActionContextElement getContextElement() {
-    return m_contextElement;
+  protected Map<String, HybridActionContextElement> getContextElements() {
+    return m_contextElements;
+  }
+
+  protected HybridActionContextElement getContextElement(String key) {
+    if (m_contextElements == null) {
+      return null;
+    }
+    return m_contextElements.get(key);
   }
 
   protected boolean isInitialized() {
@@ -131,9 +138,9 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
     fireHybridEvent(eventType, data, null);
   }
 
-  protected void fireHybridEvent(String eventType, IDoEntity data, HybridActionContextElement contextElement) {
+  protected void fireHybridEvent(String eventType, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
     assertInitialized();
-    hybridManager().fireHybridEvent(getId(), eventType, data, contextElement);
+    hybridManager().fireHybridEvent(getId(), eventType, data, contextElements);
   }
 
   protected void fireHybridActionEndEvent() {
@@ -145,9 +152,9 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
     fireHybridActionEndEvent(data, null);
   }
 
-  protected void fireHybridActionEndEvent(IDoEntity data, HybridActionContextElement contextElement) {
+  protected void fireHybridActionEndEvent(IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
     assertInitialized();
-    hybridManager().fireHybridActionEndEvent(getId(), data, contextElement);
+    hybridManager().fireHybridActionEndEvent(getId(), data, contextElements);
   }
 
   protected void fireHybridWidgetEvent(String eventType) {

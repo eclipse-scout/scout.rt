@@ -222,16 +222,16 @@ public class HybridManager extends AbstractPropertyObserver {
     fireHybridEvent(id, eventType, null, null);
   }
 
-  public void fireHybridEvent(String id, String eventType, IDoEntity data, HybridActionContextElement contextElement) {
-    fireHybridEvent(HybridEvent.createHybridEvent(this, id, eventType, data, contextElement));
+  public void fireHybridEvent(String id, String eventType, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
+    fireHybridEvent(HybridEvent.createHybridEvent(this, id, eventType, data, contextElements));
   }
 
   public void fireHybridActionEndEvent(String id) {
     fireHybridActionEndEvent(id, null, null);
   }
 
-  public void fireHybridActionEndEvent(String id, IDoEntity data, HybridActionContextElement contextElement) {
-    fireHybridEvent(HybridEvent.createHybridActionEndEvent(this, id, data, contextElement));
+  public void fireHybridActionEndEvent(String id, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
+    fireHybridEvent(HybridEvent.createHybridActionEndEvent(this, id, data, contextElements));
   }
 
   public void fireHybridWidgetEvent(String id, String eventType) {
@@ -252,7 +252,7 @@ public class HybridManager extends AbstractPropertyObserver {
 
   // hybrid actions (js to java)
 
-  private void handleHybridAction(String id, String actionType, IDoEntity data, HybridActionContextElement contextElement) {
+  private void handleHybridAction(String id, String actionType, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
     if (m_hybridActionMap == null) {
       m_hybridActionMap = BEANS.getBeanManager().getBeans(IHybridAction.class).stream()
           .filter(bean -> bean.hasAnnotation(HybridActionType.class))
@@ -260,7 +260,8 @@ public class HybridManager extends AbstractPropertyObserver {
     }
     Optional.ofNullable(m_hybridActionMap.get(actionType))
         .map(BEANS::get)
-        .ifPresent(hybridAction -> hybridAction.execute(id, data, contextElement));
+        .map(hybridAction -> (IHybridAction<?>) hybridAction) // FIXME bsh [js-bookmark] Why is this needed?
+        .ifPresent(hybridAction -> hybridAction.execute(id, data, contextElements));
   }
 
   public IHybridManagerUIFacade getUIFacade() {
@@ -274,8 +275,8 @@ public class HybridManager extends AbstractPropertyObserver {
   protected class P_UIFacade implements IHybridManagerUIFacade {
 
     @Override
-    public void handleHybridActionFromUI(String id, String actionType, IDoEntity data, HybridActionContextElement contextElement) {
-      handleHybridAction(id, actionType, data, contextElement);
+    public void handleHybridActionFromUI(String id, String actionType, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
+      handleHybridAction(id, actionType, data, contextElements);
     }
   }
 

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.desktop.hybrid;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -146,7 +147,7 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
         .put("id", event.getId())
         .put("eventType", event.getEventType())
         .put("data", jsonDoHelper().dataObjectToJson(event.getData()))
-        .putOpt("contextElement", contextElementToJson(event.getContextElement()));
+        .putOpt("contextElements", contextElementsToJson(event.getContextElements()));
   }
 
   @Override
@@ -165,18 +166,26 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     String actionType = eventData.getString("actionType");
     // FIXME bsh [js-bookmark] How to handle deserialization errors and still return an 'actionEnd' event?
     IDoEntity data = jsonDoHelper().jsonToDataObject(eventData.optJSONObject("data"), IDoEntity.class);
-    HybridActionContextElement contextElement = jsonToContextElement(eventData.optJSONObject("contextElement"));
+    Map<String, HybridActionContextElement> contextElements = jsonToContextElements(eventData.optJSONObject("contextElements"));
 
-    getModel().getUIFacade().handleHybridActionFromUI(id, actionType, data, contextElement);
+    getModel().getUIFacade().handleHybridActionFromUI(id, actionType, data, contextElements);
   }
 
+  protected JSONObject contextElementsToJson(Map<String, HybridActionContextElement> contextElements) {
+    if (contextElements == null || contextElements.isEmpty()) {
+      return null;
+    }
+    JSONObject json = new JSONObject();
+    contextElements.forEach((key, contextElement) -> json.putOpt(key, contextElementToJson(contextElement)));
+    return json;
+  }
 
   protected JSONObject contextElementToJson(HybridActionContextElement contextElement) {
     if (contextElement == null) {
       return null;
     }
     IJsonAdapter<?> adapter = findAdapter(contextElement.getWidget());
-    Object element = dissolveContextElement(adapter, contextElement.getElement());
+    Object element = contextElementToJson(adapter, contextElement.getElement());
 
     JSONObject json = new JSONObject();
     json.put("widget", adapter.getId());
@@ -184,27 +193,43 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     return json;
   }
 
-  protected Object dissolveContextElement(IJsonAdapter<?> widgetAdapter, Object element) {
+  protected Object contextElementToJson(IJsonAdapter<?> widgetAdapter, Object element) {
     if (element == null) {
       return null;
     }
-    for (IHybridActionContextElementResolver resolver : BEANS.all(IHybridActionContextElementResolver.class)) {
-      Object dissolvedElement = resolver.dissolveElement(widgetAdapter, element);
-      if (dissolvedElement != null) {
-        return dissolvedElement;
+    for (IHybridActionContextElementConverter<?, ?, ?> converter : BEANS.all(IHybridActionContextElementConverter.class)) {
+      Object jsonElement = converter.tryConvertToJson(widgetAdapter, element);
+      if (jsonElement != null) {
+        return jsonElement;
       }
     }
-    throw new ProcessingException("Cannot convert context element to JSON [adapter={}, element={}]", widgetAdapter, element);
+    throw new ProcessingException("Unable to convert context element to JSON [adapter={}, element={}]", widgetAdapter, element);
+  }
+
+  protected Map<String, HybridActionContextElement> jsonToContextElements(JSONObject jsonContextElements) {
+    if (jsonContextElements == null) {
+      return null;
+    }
+    Map<String, HybridActionContextElement> contextElements = new LinkedHashMap<>();
+    jsonContextElements.keys().forEachRemaining(key -> {
+      HybridActionContextElement contextElement = jsonToContextElement(jsonContextElements.optJSONObject(key));
+      contextElements.put(key, contextElement);
+    });
+    return contextElements;
   }
 
   protected HybridActionContextElement jsonToContextElement(JSONObject jsonContextElement) {
     if (jsonContextElement == null) {
       return null;
     }
+
     String widgetAdapterId = jsonContextElement.getString("widget");
     IJsonAdapter<?> widgetAdapter = getUiSession().getJsonAdapter(widgetAdapterId);
     IWidget widget = Assertions.assertInstance(widgetAdapter.getModel(), IWidget.class);
-    Object element = resolveContextElement(widgetAdapter, jsonContextElement.opt("element"));
+
+    Object jsonElement = jsonContextElement.opt("element");
+    Object element = resolveContextElement(widgetAdapter, jsonElement);
+
     return HybridActionContextElement.of(widget, element);
   }
 
@@ -212,13 +237,13 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     if (jsonElement == null) {
       return null;
     }
-    for (IHybridActionContextElementResolver resolver : BEANS.all(IHybridActionContextElementResolver.class)) {
-      Object resolvedElement = resolver.resolveElement(widgetAdapter, jsonElement);
-      if (resolvedElement != null) {
-        return resolvedElement;
+    for (IHybridActionContextElementConverter<?, ?, ?> converter : BEANS.all(IHybridActionContextElementConverter.class)) {
+      Object modelElement = converter.tryConvertFromJson(widgetAdapter, jsonElement);
+      if (modelElement != null) {
+        return modelElement;
       }
     }
-    throw new ProcessingException("Unknown context element [adapter={}, element={}]", widgetAdapter, jsonElement);
+    throw new ProcessingException("Unable to convert context element from JSON [adapter={}, jsonElement={}]", widgetAdapter, jsonElement);
   }
 
   protected IJsonAdapter<?> findAdapter(IWidget widget) {

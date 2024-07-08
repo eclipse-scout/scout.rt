@@ -23,7 +23,7 @@ public class ExportSearchDataHybridAction extends AbstractHybridAction<IDoEntity
   public void execute(IDoEntity data) {
     IDoEntity searchData = null;
 
-    HybridActionContextElement contextElement = getContextElement();
+    HybridActionContextElement contextElement = getContextElement("page");
     if (contextElement != null && contextElement.getElement() instanceof IPageWithTable) {
       IPageWithTable tablePage = (IPageWithTable) contextElement.getElement();
       searchData = tablePage.getSearchFilter().getData();

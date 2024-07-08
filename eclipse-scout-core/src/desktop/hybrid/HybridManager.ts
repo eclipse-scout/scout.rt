@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Event, EventHandler, EventListener, EventMapOf, Form, HybridActionContextElement, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, Session, UuidPool,
-  Widget
+  Constructor, Event, EventHandler, EventListener, EventMapOf, Form, HybridActionContextElement, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, scout,
+  Session, UuidPool, Widget
 } from '../../index';
 
 /**
@@ -46,6 +46,20 @@ export class HybridManager extends Widget {
     const deferred = $.Deferred();
     session.desktop.one('init', e => deferred.resolve(findHybridManager()));
     return deferred.promise();
+  }
+
+  static getContextWidget<W extends Widget>(contextElements: Record<string, HybridActionContextElement>, key: string, widgetType?: Constructor<W>): W {
+    if (contextElements?.[key]?.widget) {
+      return scout.assertInstance(contextElements[key].widget, widgetType);
+    }
+    return null;
+  }
+
+  static getContextElement<E>(contextElements: Record<string, HybridActionContextElement>, key: string, elementType?: Constructor<E>): E {
+    if (contextElements?.[key]?.element) {
+      return scout.assertInstance(contextElements[key].element, elementType);
+    }
+    return null;
   }
 
   // init
@@ -100,10 +114,10 @@ export class HybridManager extends Widget {
   // hybrid events (java to js)
 
   /** @internal */
-  onHybridEvent(id: string, eventType: string, data: object, contextElement: HybridActionContextElement) {
+  onHybridEvent(id: string, eventType: string, data: object, contextElements: Record<string, HybridActionContextElement>) {
     this.trigger(`${eventType}:${id}`, {
       data,
-      contextElement
+      contextElements
     });
   }
 
@@ -157,9 +171,9 @@ export class HybridManager extends Widget {
    * @returns the id of the triggered hybrid action
    * @see IHybridAction.java
    */
-  callAction(actionType: string, data?: object, contextElement?: HybridActionContextElement): string {
+  callAction(actionType: string, data?: object, contextElements?: Record<string, HybridActionContextElement>): string {
     const id = this._createEventId();
-    this.trigger('hybridAction', {data: {id, actionType, contextElement, data}} as HybridActionEvent);
+    this.trigger('hybridAction', {data: {id, actionType, contextElements, data}} as HybridActionEvent);
     return id;
   }
 
@@ -177,16 +191,16 @@ export class HybridManager extends Widget {
    * @see IHybridAction
    * @see AbstractHybridAction.fireHybridActionEndEvent
    */
-  callActionAndWait(actionType: string, data?: object, contextElement?: HybridActionContextElement): JQuery.Promise<object> {
-    return this.callActionAndWaitWithContext(actionType, data, contextElement).then(result => result.data);
+  callActionAndWait(actionType: string, data?: object, contextElements?: Record<string, HybridActionContextElement>): JQuery.Promise<object> {
+    return this.callActionAndWaitWithContext(actionType, data, contextElements).then(result => result.data);
   }
 
-  callActionAndWaitWithContext(actionType: string, data?: object, contextElement?: HybridActionContextElement): JQuery.Promise<HybridManagerActionEndEventResult> {
-    const id = this.callAction(actionType, data, contextElement);
+  callActionAndWaitWithContext(actionType: string, data?: object, contextElements?: Record<string, HybridActionContextElement>): JQuery.Promise<HybridManagerActionEndEventResult> {
+    const id = this.callAction(actionType, data, contextElements);
     return this.when(`hybridActionEnd:${id}`).then(event => {
       return {
         data: event.data,
-        contextElement: event.contextElement
+        contextElements: event.contextElements
       };
     });
   }
@@ -236,5 +250,5 @@ export class HybridManager extends Widget {
 
 export interface HybridManagerActionEndEventResult {
   data: object;
-  contextElement: HybridActionContextElement;
+  contextElements: Record<string, HybridActionContextElement>;
 }

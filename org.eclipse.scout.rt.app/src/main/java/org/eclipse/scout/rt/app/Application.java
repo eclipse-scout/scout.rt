@@ -146,6 +146,12 @@ public class Application {
       sb.append("  ").append(protocol).append("://").append(ip).append(":").append(port).append(contextPath).append('\n');
     }
     sb.append("---------------------------------------------------------------------\n");
+    try {
+      sb.append("PID: ").append(ProcessHandle.current().pid()).append("\n");
+    }
+    catch (Exception e) {
+      // PID not supported
+    }
 
     if (CONFIG.getPropertyValue(ScoutApplicationConsoleInputHandlerEnabledProperty.class)) {
       sb.append("To shut the server down, type \"shutdown\" or \"s\" in the console.\n");

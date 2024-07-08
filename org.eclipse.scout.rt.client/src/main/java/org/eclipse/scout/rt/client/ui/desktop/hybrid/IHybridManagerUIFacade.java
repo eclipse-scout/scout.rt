@@ -9,8 +9,10 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 
+import java.util.Map;
+
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 public interface IHybridManagerUIFacade {
-  void handleHybridActionFromUI(String id, String actionType, IDoEntity data, HybridActionContextElement contextElement);
+  void handleHybridActionFromUI(String id, String actionType, IDoEntity data, Map<String, HybridActionContextElement> contextElements);
 }

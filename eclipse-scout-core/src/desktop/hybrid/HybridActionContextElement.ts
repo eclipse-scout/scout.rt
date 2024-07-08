@@ -41,6 +41,8 @@ export interface HybridActionContextElementModel extends ObjectModel {
 }
 
 export interface JsonHybridActionContextElement {
-  widget: string; // adapterId
-  element: any;
+  /** adapter id */
+  widget: string;
+  /** widget-specific element representation */
+  element?: any;
 }
