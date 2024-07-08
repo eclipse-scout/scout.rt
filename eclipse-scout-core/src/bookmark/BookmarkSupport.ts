@@ -200,8 +200,9 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
             return page.getSearchFilter();
           }
           // Remote
-          return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined,
-            HybridActionContextElement.of(page.getOutline(), page));
+          return HybridManager.get(this.session).callActionAndWait('ExportSearchData', undefined, {
+            page: HybridActionContextElement.of(page.getOutline(), page)
+          });
         })
         .then(searchFilter => {
           if (searchFilter && !(searchFilter instanceof BaseDoEntity) && !searchFilter._type) {
@@ -278,7 +279,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       };
       return hybridManager.callActionAndWaitWithContext('ActivateBookmark', hybridActionData)
         .then((result: HybridManagerActionEndEventResult) => {
-          let targetPage = (result.contextElement?.element instanceof Page ? result.contextElement.element : null);
+          let targetPage = HybridManager.getContextElement(result.contextElements, 'targetPage', Page);
           let data = scout.create(ActivateBookmarkResultDo, bookmarks.toObjectModel(result.data));
           return {
             targetPage: targetPage,

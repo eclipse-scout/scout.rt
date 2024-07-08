@@ -14,14 +14,14 @@ export interface HybridActionEvent<TObject = object, T = HybridManager> extends 
   data: {
     id: string;
     actionType: string;
-    contextElement: HybridActionContextElement;
+    contextElements: Record<string, HybridActionContextElement>;
     data: TObject;
   };
 }
 
 export interface HybridActionEndEvent<TObject = object, T = HybridManager> extends Event<T> {
   data: TObject;
-  contextElement: HybridActionContextElement;
+  contextElements: Record<string, HybridActionContextElement>;
 }
 
 export interface HybridManagerWidgetAddEvent<TWidget = Widget, T = HybridManager> extends Event<T> {
