@@ -177,6 +177,10 @@ export const bookmarks = {
   },
 
   toTypedJson(object: any): any {
+    if (objects.isNullOrUndefinedOrEmpty(object)) {
+      return object;
+    }
+
     const replacer = (key, value) => {
       if (objects.isPlainObject(value) && value.objectType) {
         let json = Object.assign({}, value); // shallow copy to keep original object intact
@@ -194,6 +198,10 @@ export const bookmarks = {
   },
 
   toObjectModel(object: any): any {
+    if (objects.isNullOrUndefinedOrEmpty(object)) {
+      return object;
+    }
+
     const replacer = (key, value) => {
       if (objects.isPlainObject(value) && value._type) {
         let model = Object.assign({}, value); // shallow copy to keep original object intact
