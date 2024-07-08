@@ -27,9 +27,11 @@ export class BaseDoEntity implements ObjectWithType, DoEntity {
   objectType: string;
 
   init(model: any) {
-    Object.keys(model).forEach(key => {
-      this[key] = this._revive(model[key]);
-    });
+    if (objects.isPlainObject(model)) {
+      Object.keys(model).forEach(key => {
+        this[key] = this._revive(model[key]);
+      });
+    }
   }
 
   protected _revive(value: any): any {
