@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
@@ -22,6 +24,13 @@ import io.opentelemetry.api.trace.Tracer;
 
 @ApplicationScoped
 public class ServiceUtility {
+
+  private Tracer m_tracer;
+
+  @PostConstruct
+  public void init() {
+    m_tracer = BEANS.get(ITracingHelper.class).createTracer(ServiceUtility.class);
+  }
 
   /**
    * @return the reflective service operation that can be called using {@link #invoke(Object, Method, Object[])}
@@ -49,10 +58,9 @@ public class ServiceUtility {
     Assertions.assertNotNull(service, "service is null");
     Assertions.assertNotNull(operation, "operation is null");
 
-    Tracer tracer = BEANS.get(ITracingHelper.class).createTracer(ServiceUtility.class);
-    String spanName = service.getClass().getSimpleName();
+    String spanName = String.join("#", service.getClass().getSimpleName(), operation.getName());
 
-    return BEANS.get(ITracingHelper.class).wrapInSpan(tracer, spanName, span -> {
+    return BEANS.get(ITracingHelper.class).wrapInSpan(m_tracer, spanName, span -> {
       span.setAttribute("scout.server.service.name", service.getClass().getName());
       span.setAttribute("scout.server.service.operation", operation.getName());
 
