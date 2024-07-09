@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  fields, keys, LookupResult, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, StaticLookupCall, Status,
-  strings, ValidationFailedStatus
+  fields, keys, LookupResult, LookupRow, PrepopulatedLookupCall, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, StaticLookupCall, Status, strings,
+  ValidationFailedStatus
 } from '../../../../src/index';
 import {ColumnDescriptorDummyLookupCall, DelayedStaticLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting, MicrotaskStaticLookupCall} from '../../../../src/testing/index';
 import {LookupCall} from '../../../../src/lookup/LookupCall';
@@ -509,7 +509,7 @@ describe('SmartField', () => {
     });
 
     // test for ticket #228288
-    it('must add CSS class from selected lookup-row to field', () => {
+    it('adds CSS class from selected lookup-row to field', () => {
       let field = createFieldWithLookupCall();
       expect(strings.hasText(field.cssClass)).toBe(false);
       field.setValue(1);
@@ -520,6 +520,36 @@ describe('SmartField', () => {
       expect(strings.hasText(field.cssClass)).toBe(false);
     });
 
+    it('does not trigger unnecessary property change event for cssClass when lookup-row is selected', () => {
+      let eventCount = 0;
+      let field = scout.create(SmartField, {
+        parent: session.desktop,
+        lookupCall: {
+          objectType: PrepopulatedLookupCall,
+          lookupRows: [{
+            objectType: LookupRow,
+            key: 1,
+            text: 'hi'
+          }, {
+            objectType: LookupRow,
+            key: 2,
+            text: 'hello',
+            cssClass: 'cls'
+          }]
+        }
+      });
+      field.on('propertyChange:cssClass', () => eventCount++);
+      expect(field.cssClass).toBe(null);
+      field.setValue(1);
+      jasmine.clock().tick(500);
+      expect(field.cssClass).toBe(null);
+      expect(eventCount).toBe(0);
+
+      field.setValue(2);
+      jasmine.clock().tick(500);
+      expect(field.cssClass).toBe('cls');
+      expect(eventCount).toBe(1);
+    });
   });
 
   describe('lookupCall', () => {
