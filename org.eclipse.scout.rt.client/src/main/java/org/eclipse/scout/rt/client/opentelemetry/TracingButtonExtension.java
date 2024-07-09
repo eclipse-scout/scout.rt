@@ -26,11 +26,12 @@ public class TracingButtonExtension extends AbstractButtonExtension<AbstractButt
     m_tracer = BEANS.get(ITracingHelper.class).createTracer(TracingButtonExtension.class);
   }
 
+
   @Override
   public void execClickAction(ButtonClickActionChain chain) {
     String name = getOwner().getClass().getSimpleName() + "#execClickAction";
     BEANS.get(ITracingHelper.class).wrapInSpan(m_tracer, name, span -> {
-      span.setAttribute("scout.client.action.class", getOwner().getClass().getName());
+      span.setAttribute("scout.client.button.class", getOwner().getClass().getName());
       span.setAttribute("scout.client.button.text", getOwner().getLabel());
       super.execClickAction(chain);
     });
