@@ -1523,14 +1523,14 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
   protected _setLookupRow(lookupRow: LookupRow<TValue>) {
     // remove css classes from old lookup-row
-    if (this.lookupRow) {
+    if (this.lookupRow?.cssClass) {
       this.removeCssClass(this.lookupRow.cssClass);
     }
 
     this._setProperty('lookupRow', lookupRow);
 
     // add css classes from new lookup-row
-    if (lookupRow) {
+    if (lookupRow?.cssClass) {
       this.addCssClass(lookupRow.cssClass);
     }
   }
