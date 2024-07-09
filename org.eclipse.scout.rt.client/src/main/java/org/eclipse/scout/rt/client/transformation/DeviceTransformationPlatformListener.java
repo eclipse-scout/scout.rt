@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.client.transformation;
 
+import org.eclipse.scout.rt.client.opentelemetry.TracingActionExtension;
+import org.eclipse.scout.rt.client.opentelemetry.TracingButtonExtension;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -26,6 +28,10 @@ public class DeviceTransformationPlatformListener implements IPlatformListener {
       BEANS.get(IExtensionRegistry.class).register(PageWithTableExtension.class);
       BEANS.get(IExtensionRegistry.class).register(FormExtension.class);
       BEANS.get(IExtensionRegistry.class).register(FormFieldExtension.class);
+
+      // Observability
+      BEANS.get(IExtensionRegistry.class).register(TracingActionExtension.class);
+      BEANS.get(IExtensionRegistry.class).register(TracingButtonExtension.class);
     }
   }
 
