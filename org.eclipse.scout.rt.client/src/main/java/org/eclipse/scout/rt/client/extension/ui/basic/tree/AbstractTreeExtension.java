@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeHyperl
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeInitTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesSelectedChain;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -66,6 +67,11 @@ public abstract class AbstractTreeExtension<OWNER extends AbstractTree> extends 
   @Override
   public void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton) {
     chain.execNodeClick(node, mouseButton);
+  }
+
+  @Override
+  public void execNodesChecked(TreeNodesCheckedChain chain, List<ITreeNode> nodes) {
+    chain.execNodesChecked(nodes);
   }
 
   @Override

@@ -11,6 +11,12 @@ package org.eclipse.scout.rt.client.transformation;
 
 import org.eclipse.scout.rt.client.opentelemetry.TracingActionExtension;
 import org.eclipse.scout.rt.client.opentelemetry.TracingButtonExtension;
+import org.eclipse.scout.rt.client.opentelemetry.TracingCalendarItemProviderExtension;
+import org.eclipse.scout.rt.client.opentelemetry.TracingFormHandlerExtension;
+import org.eclipse.scout.rt.client.opentelemetry.TracingPageWithTableExtension;
+import org.eclipse.scout.rt.client.opentelemetry.TracingTableExtension;
+import org.eclipse.scout.rt.client.opentelemetry.TracingTreeExtension;
+import org.eclipse.scout.rt.client.opentelemetry.TracingWizardExtension;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -32,6 +38,12 @@ public class DeviceTransformationPlatformListener implements IPlatformListener {
       // Observability
       BEANS.get(IExtensionRegistry.class).register(TracingActionExtension.class);
       BEANS.get(IExtensionRegistry.class).register(TracingButtonExtension.class);
+      BEANS.get(IExtensionRegistry.class).register(TracingCalendarItemProviderExtension.class);
+      BEANS.get(IExtensionRegistry.class).register(TracingFormHandlerExtension.class);
+      BEANS.get(IExtensionRegistry.class).register(TracingPageWithTableExtension.class);
+      BEANS.get(IExtensionRegistry.class).register(TracingTableExtension.class);
+      BEANS.get(IExtensionRegistry.class).register(TracingTreeExtension.class);
+      BEANS.get(IExtensionRegistry.class).register(TracingWizardExtension.class);
     }
   }
 

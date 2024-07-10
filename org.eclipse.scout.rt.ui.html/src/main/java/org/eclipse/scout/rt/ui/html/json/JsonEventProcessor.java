@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,19 +29,23 @@ public class JsonEventProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(JsonEventProcessor.class);
 
   private final IUiSession m_uiSession;
+  private final Tracer m_tracer;
 
   public JsonEventProcessor(IUiSession uiSession) {
     m_uiSession = uiSession;
+    m_tracer = BEANS.get(ITracingHelper.class).createTracer(JsonEventProcessor.class);
   }
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
     Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread={}, request={}, response={}]",
         Thread.currentThread().getName(), request, response);
 
-    Tracer tracer = BEANS.get(ITracingHelper.class).createTracer(JsonEventProcessor.class);
     for (final JsonEvent event : request.getEvents()) {
-      BEANS.get(ITracingHelper.class).wrapInSpan(tracer, "processJsonEvent", span -> {
-        BEANS.get(ITracingHelper.class).appendAttributes(span, event);
+      String spanName = "process" + StringUtility.uppercaseFirst(event.getType()) + "Event";
+      BEANS.get(ITracingHelper.class).wrapInSpan(m_tracer, spanName, span -> {
+        span.setAttribute("scout.client.json.event.type", event.getType());
+        span.setAttribute("scout.client.json.event.target", event.getTarget());
+        span.setAttribute("scout.client.json.event", event.toJson().toString());
         processEvent(event, response);
       });
     }
