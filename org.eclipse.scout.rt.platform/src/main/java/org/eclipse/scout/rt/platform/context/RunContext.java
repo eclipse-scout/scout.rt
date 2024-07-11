@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryContextProcessor;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
@@ -49,7 +50,6 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.MDC;
 
 import io.opentelemetry.context.Context;
-import io.opentelemetry.context.Scope;
 
 /**
  * A {@link RunContext} represents a "snapshot" of the current calling state and is always associated with a
@@ -155,9 +155,8 @@ public class RunContext implements IAdaptable {
    *           if the callable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
   @SuppressWarnings("squid:S1181")
-  public <RESULT, EXCEPTION extends Throwable> RESULT call(Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
+  public <RESULT, EXCEPTION extends Throwable> RESULT call(final Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     final ThreadInterrupter threadInterrupter = new ThreadInterrupter(Thread.currentThread(), m_runMonitor);
-    callable = injectOpenTelemetryContext(callable);
     try {
       return this.<RESULT> createCallableChain().call(callable);
     }
@@ -167,31 +166,6 @@ public class RunContext implements IAdaptable {
     finally {
       threadInterrupter.destroy();
     }
-  }
-
-  /**
-   * When a OpenTelemetry context is set, modify the callable to run in the context.
-   *
-   * @param callable
-   *          original callable
-   * @param <RESULT>
-   *          result type of the callable
-   * @return the callable with the injected OpenTelemetry context
-   */
-  protected <RESULT> Callable<RESULT> injectOpenTelemetryContext(final Callable<RESULT> callable) {
-    Callable<RESULT> result = callable;
-    if (getOpenTelemetryContext() != null) {
-      result = createOpenTelemetryContextCallable(callable);
-    }
-    return result;
-  }
-
-  private <RESULT> Callable<RESULT> createOpenTelemetryContextCallable(Callable<RESULT> callable) {
-    return () -> {
-      try (Scope ignored = getOpenTelemetryContext().makeCurrent()) {
-        return callable.call();
-      }
-    };
   }
 
   /**
@@ -222,6 +196,7 @@ public class RunContext implements IAdaptable {
         .add(new DiagnosticContextValueProcessor(BEANS.get(CorrelationIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
         .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap))
+        .add(new OpenTelemetryContextProcessor<>(m_openTelemetryContext))
         .addAll(m_threadLocalProcessors.values())
         .addAll(contributions.asList())
         .addAll(m_diagnosticProcessors.values())
