@@ -117,16 +117,19 @@ export class Code<TCodeId> implements ObjectWithType {
 
   /**
    * Visits all children of this Code recursively without visiting this Code itself.
+   *
+   * By default, only active child codes are visited. To visit inactive child codes as well, set the `activeOnly` argument to false.
    */
-  visitChildren(visitor: TreeVisitor<Code<TCodeId>>): boolean | TreeVisitResult {
-    for (let i = 0; i < this.children.length; i++) {
-      let child = this.children[i];
+  visitChildren(visitor: TreeVisitor<Code<TCodeId>>, activeOnly = true): boolean | TreeVisitResult {
+    let children = activeOnly ? this.children.filter(child => child.active) : this.children;
+    for (let i = 0; i < children.length; i++) {
+      let child = children[i];
       let visitResult = visitor(child);
       if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
       }
       if (visitResult !== TreeVisitResult.SKIP_SUBTREE) {
-        visitResult = child.visitChildren(visitor);
+        visitResult = child.visitChildren(visitor, activeOnly);
         if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
           return TreeVisitResult.TERMINATE;
         }

@@ -84,7 +84,7 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
     this.codeMap.set(code.id, code);
     code.visitChildren((c: TCode) => {
       this.codeMap.set(c.id, c);
-    });
+    }, false);
   }
 
   protected _registerTexts(suffix: string, textMap: Record<string, string>): string {
@@ -125,19 +125,25 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
    * @param rootOnly true if only the root Codes should be returned. The default value is false.
    * @returns the root Codes of this CodeType if rootOnly is true and all Codes recursively otherwise.
    */
-  codes(rootOnly?: boolean): TCode[] {
-    if (!rootOnly) {
-      // all codes recursively
-      return [...this.codeMap.values()];
+  codes(): TCode[];
+  /** @deprecated use {@link CodeTypeCodesOptions} instead */
+  codes(rootOnly?: boolean): TCode[];
+  codes(options: CodeTypeCodesOptions): TCode[];
+  codes(options: boolean | CodeTypeCodesOptions = {}): TCode[] {
+    if (typeof options === 'boolean') { // legacy support
+      options = {
+        rootOnly: options
+      };
     }
 
-    let rootCodes: TCode[] = [];
-    for (let code of this.codeMap.values()) {
-      if (!code.parent) {
-        rootCodes.push(code);
-      }
+    let codes = [...this.codeMap.values()];
+    if (options.rootOnly) {
+      codes = codes.filter(code => !code.parent);
     }
-    return rootCodes;
+    if (scout.nvl(options.activeOnly, true)) {
+      codes = codes.filter(code => code.active);
+    }
+    return codes;
   }
 
   /**
@@ -151,13 +157,14 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
 
   /**
    * Visits all codes and their children recursively.
-   * <p>
-   * In order to abort visiting, the visitor can return true or TreeVisitResult.TERMINATE.
-   * To only abort the visiting of a subtree, the visitor can return SKIP_SUBTREE.
-   * </p>
+   *
+   * By default, only active codes are visited. To visit inactive codes as well, set the `activeOnly` argument to false.
+   *
+   * In order to abort visiting, the visitor can return true or {@link TreeVisitResult.TERMINATE}.
+   * To only abort the visiting of a subtree, the visitor can return {@link TreeVisitResult.SKIP_SUBTREE}.
    */
-  visitChildren(visitor: TreeVisitor<TCode>): boolean | TreeVisitResult {
-    let rootCodes = this.codes(true);
+  visitChildren(visitor: TreeVisitor<TCode>, activeOnly = true): boolean | TreeVisitResult {
+    let rootCodes = this.codes({rootOnly: true, activeOnly: activeOnly});
     for (let i = 0; i < rootCodes.length; i++) {
       let code = rootCodes[i];
       let visitResult = visitor(code);
@@ -165,7 +172,7 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
         return TreeVisitResult.TERMINATE;
       }
       if (visitResult !== TreeVisitResult.SKIP_SUBTREE) {
-        visitResult = code.visitChildren(visitor);
+        visitResult = code.visitChildren(visitor, activeOnly);
         if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
           return TreeVisitResult.TERMINATE;
         }
@@ -187,3 +194,8 @@ export class CodeType<TCodeId = string, TCode extends Code<TCodeId> = Code<TCode
     return scout.create(codeTypeModel, {ensureUniqueId: false}) as CodeType<TCodeId, TCode, TCodeTypeId>;
   }
 }
+
+export type CodeTypeCodesOptions = {
+  rootOnly?: boolean;
+  activeOnly?: boolean;
+};

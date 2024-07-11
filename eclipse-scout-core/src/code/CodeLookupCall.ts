@@ -52,7 +52,7 @@ export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
       if (!predicate || predicate(lookupRow)) {
         lookupRows.push(lookupRow);
       }
-    });
+    }, false);
     return lookupRows;
   }
 

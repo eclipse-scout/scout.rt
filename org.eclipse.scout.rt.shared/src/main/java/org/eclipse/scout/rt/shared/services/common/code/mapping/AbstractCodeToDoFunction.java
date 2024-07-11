@@ -127,7 +127,7 @@ public abstract class AbstractCodeToDoFunction<EXPLICIT_SOURCE extends ICode<?>,
   }
 
   protected List<? extends ICode<?>> getChildCodesToConvert(EXPLICIT_SOURCE code) {
-    return code.getChildCodes();
+    return code.getChildCodes(false);
   }
 
   /**

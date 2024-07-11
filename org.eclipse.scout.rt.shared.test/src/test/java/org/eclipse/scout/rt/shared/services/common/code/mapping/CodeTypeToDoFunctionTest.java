@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.junit.Test;
 
 public class CodeTypeToDoFunctionTest {
+
   @Test
   public void testConvert() {
     assertNull(convert(null));
@@ -38,15 +39,17 @@ public class CodeTypeToDoFunctionTest {
     assertTrue(codeTypeDo.isHierarchical());
     assertEquals("text", codeTypeDo.getTexts().get(NlsLocale.get().toLanguageTag()));
     assertEquals("TestFixture", codeTypeDo.getObjectType());
-    assertEquals(1, codeTypeDo.codes().size());
-    assertCodeDo(codeTypeDo.codes().get(0));
+    assertEquals(3, codeTypeDo.codes().size());
+    assertCodeDo10(codeTypeDo.codes().get(0));
+    assertCodeDo20(codeTypeDo.codes().get(1));
+    assertCodeDo30(codeTypeDo.codes().get(2));
   }
 
   protected CodeTypeDo convert(ICodeType<?, ?> codeType) {
     return BEANS.get(ToDoFunctionHelper.class).toDo(codeType, ICodeTypeToDoFunction.class);
   }
 
-  protected void assertCodeDo(CodeDo codeDo) {
+  protected void assertCodeDo10(CodeDo codeDo) {
     assertEquals("10", codeDo.getId());
     assertTrue(codeDo.getActive());
     assertFalse(codeDo.isEnabled());
@@ -63,6 +66,32 @@ public class CodeTypeToDoFunctionTest {
     assertEquals("testObjectType", codeDo.getObjectType());
     assertEquals(0, codeDo.getSortCode().intValue());
     assertEquals(1, codeDo.children().size());
+  }
+
+  protected void assertCodeDo20(CodeDo codeDo) {
+    assertEquals("20", codeDo.getId());
+    assertTrue(codeDo.getActive());
+    assertEquals(1, codeDo.children().size());
+    assertCodeDo201(codeDo.children().get(0));
+  }
+
+  protected void assertCodeDo201(CodeDo codeDo) {
+    assertEquals("201", codeDo.getId());
+    assertFalse(codeDo.getActive());
+    assertEquals(0, codeDo.children().size());
+  }
+
+  protected void assertCodeDo30(CodeDo codeDo) {
+    assertEquals("30", codeDo.getId());
+    assertFalse(codeDo.getActive());
+    assertEquals(1, codeDo.children().size());
+    assertCodeDo301(codeDo.children().get(0));
+  }
+
+  protected void assertCodeDo301(CodeDo codeDo) {
+    assertEquals("301", codeDo.getId());
+    assertFalse(codeDo.getActive()); // Automatically set to false by AbstractCodeTypeWithGeneric#loadCodes
+    assertEquals(0, codeDo.children().size());
   }
 
   @ObjectType("TestFixture")
@@ -170,7 +199,7 @@ public class CodeTypeToDoFunctionTest {
       @Order(1000)
       public static class ConvertTestChildCode extends AbstractCode<Long> {
         private static final long serialVersionUID = 1L;
-        public static final long ID = 1000L;
+        public static final long ID = 101L;
 
         @Override
         public Long getId() {
@@ -186,6 +215,60 @@ public class CodeTypeToDoFunctionTest {
       @Override
       public Long getId() {
         return null;
+      }
+    }
+
+    @Order(3000)
+    public static class ConvertTestCodeWithChildCodes extends AbstractCode<Long> {
+      private static final long serialVersionUID = 1L;
+      public static final long ID = 20L;
+
+      @Override
+      public Long getId() {
+        return ID;
+      }
+
+      @Order(1000)
+      public static class InactiveConvertTestCode extends AbstractCode<Long> {
+        private static final long serialVersionUID = 1L;
+        public static final long ID = 201L;
+
+        @Override
+        public Long getId() {
+          return ID;
+        }
+
+        @Override
+        protected boolean getConfiguredActive() {
+          return false;
+        }
+      }
+    }
+
+    @Order(4000)
+    public static class InactiveConvertTestCodeWithChildCodes extends AbstractCode<Long> {
+      private static final long serialVersionUID = 1L;
+      public static final long ID = 30L;
+
+      @Override
+      public Long getId() {
+        return ID;
+      }
+
+      @Override
+      protected boolean getConfiguredActive() {
+        return false;
+      }
+
+      @Order(1000)
+      public static class ConvertTestChildCode extends AbstractCode<Long> {
+        private static final long serialVersionUID = 1L;
+        public static final long ID = 301L;
+
+        @Override
+        public Long getId() {
+          return ID;
+        }
       }
     }
   }
