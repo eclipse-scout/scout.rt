@@ -9,14 +9,11 @@
  */
 package org.eclipse.scout.rt.opentelemetry.sdk.traces;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
-import org.eclipse.scout.rt.platform.opentelemetry.ISpanAttributeMapper;
 import org.eclipse.scout.rt.platform.opentelemetry.IThrowingConsumer;
 import org.eclipse.scout.rt.platform.opentelemetry.IThrowingFunction;
 import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
@@ -82,19 +79,5 @@ public class TracingHelper implements ITracingHelper {
     finally {
       span.end();
     }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> void appendAttributes(Span span, T source) {
-    BEANS.all(ISpanAttributeMapper.class).stream()
-        .filter(mapper -> getGenericClass(mapper).isAssignableFrom(source.getClass()))
-        .forEach(mapper -> mapper.addAttribute(span, source));
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> Class<T> getGenericClass(ISpanAttributeMapper<T> mapper) {
-    Type interfaceClass = mapper.getClass().getGenericInterfaces()[0];
-    return ((Class<T>) ((ParameterizedType) interfaceClass).getActualTypeArguments()[0]);
   }
 }

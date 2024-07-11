@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.opentelemetry.ISpanAttributeMapper;
 import org.eclipse.scout.rt.platform.opentelemetry.IThrowingConsumer;
 import org.eclipse.scout.rt.platform.opentelemetry.IThrowingFunction;
 import org.eclipse.scout.rt.platform.opentelemetry.ITracingHelper;
@@ -155,21 +154,6 @@ public class TracingHelperTest {
     verify(mockSpan).recordException(any());
   }
 
-  @Test
-  public void appendAttributes() {
-    // Arrange
-    String sourceObject = "Lorem Ipsum";
-    Span mockSpan = mock(Span.class);
-    BEANS.getBeanManager().registerClass(TestSpanAttributeMapper.class);
-
-    // Act
-    BEANS.get(ITracingHelper.class).appendAttributes(mockSpan, sourceObject);
-
-    // Assert
-    verify(mockSpan).setAttribute("string.legth", sourceObject.length());
-    verify(mockSpan).setAttribute("object.hash_code", sourceObject.hashCode());
-  }
-
   private Span mockSpan(Tracer mockTracer) {
     Span mockSpan = mock(Span.class);
     SpanBuilder mockSpanBuilder = mock(SpanBuilder.class);
@@ -178,11 +162,4 @@ public class TracingHelperTest {
     return mockSpan;
   }
 
-  public static class TestSpanAttributeMapper implements ISpanAttributeMapper<String> {
-    @Override
-    public void addAttribute(Span span, String source) {
-      span.setAttribute("string.legth", source.length());
-      span.setAttribute("object.hash_code", source.hashCode());
-    }
-  }
 }

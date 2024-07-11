@@ -154,8 +154,9 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
     BEANS.get(ITracingHelper.class).wrapInThrowingSpan(tracer, "handleJsonRequest", span -> {
       // Add attributes
-      BEANS.get(ITracingHelper.class).appendAttributes(span, jsonRequest);
-      BEANS.get(ITracingHelper.class).appendAttributes(span, req);
+      span.setAttribute("scout.client.json.request", jsonRequest.toString());
+      span.setAttribute("http.request.method", req.getMethod());
+      span.setAttribute("url.full", req.getRequestURI());
 
       // Execute request
       handleJsonRequestAsync(uiSession, jsonRequest, req, res);

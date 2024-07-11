@@ -136,19 +136,4 @@ public interface ITracingHelper {
    *          type of the return value
    */
   <T> T wrapInThrowingSpan(Tracer tracer, String spanName, IThrowingFunction<Span, T> function) throws Exception;
-
-  /**
-   * Adds attributes to the span from a source object.
-   * <p>
-   * This method provides a way to add metadata from a source object to the span, considering the correct semantic
-   * conventions from OpenTelemetry. The implementation checks whether the object is an instance of a known object and
-   * adds for tracing relevant data to the span.
-   * </p>
-   *
-   * @param span
-   *          span where attributes should be added
-   * @param source
-   *          object from where the attributes are read
-   */
-  <T> void appendAttributes(Span span, T source);
 }
