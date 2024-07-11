@@ -12,6 +12,14 @@ package org.eclipse.scout.rt.api.uinotification;
 public class UiNotificationPutOptions {
   private Boolean m_transactional;
   private Long m_timeout;
+  private Boolean m_publishOverCluster;
+
+  public UiNotificationPutOptions copy() {
+    return new UiNotificationPutOptions()
+        .withTransactional(getTransactional())
+        .withTimeout(getTimeout())
+        .withPublishOverCluster(getPublishOverCluster());
+  }
 
   /**
    * @param timeout
@@ -27,6 +35,11 @@ public class UiNotificationPutOptions {
     return m_timeout;
   }
 
+  /**
+   * @param transactional
+   *          Whether the notification should be put into the registry only if the current transaction is committed
+   *          successfully or not. Default is {@code true}.
+   */
   public UiNotificationPutOptions withTransactional(Boolean transactional) {
     m_transactional = transactional;
     return this;
@@ -36,7 +49,34 @@ public class UiNotificationPutOptions {
     return m_transactional;
   }
 
+  /**
+   * @param publishOverCluster
+   *          Whether the notification is published to all other cluster nodes or not. Default is {@code true}.
+   */
+  public UiNotificationPutOptions withPublishOverCluster(Boolean publishOverCluster) {
+    m_publishOverCluster = publishOverCluster;
+    return this;
+  }
+
+  public Boolean getPublishOverCluster() {
+    return m_publishOverCluster;
+  }
+
+  /*
+   * factory methods
+   */
+
+  /**
+   * Creates an {@link UiNotificationPutOptions} instance with {@code transactional = false}.
+   */
   public static UiNotificationPutOptions noTransaction() {
     return new UiNotificationPutOptions().withTransactional(false);
+  }
+
+  /**
+   * Creates an {@link UiNotificationPutOptions} instance with {@code publishOverCluster = false}.
+   */
+  public static UiNotificationPutOptions noClusterSync() {
+    return new UiNotificationPutOptions().withPublishOverCluster(false);
   }
 }
