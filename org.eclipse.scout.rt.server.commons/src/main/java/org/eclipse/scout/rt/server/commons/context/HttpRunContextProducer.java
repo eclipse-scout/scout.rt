@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.commons.opentelemetry.IContextPropagationHelper;
+import org.eclipse.scout.rt.server.commons.opentelemetry.HttpServletRequestTextMapGetter;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
 
@@ -93,8 +93,7 @@ public class HttpRunContextProducer {
    */
   protected Context extractOpenTelemetryContext(HttpServletRequest request) {
     return GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator()
-        .extract(Context.current(), request,
-            BEANS.get(IContextPropagationHelper.class).createServletRequestTextMapGetter());
+        .extract(Context.current(), request, BEANS.get(HttpServletRequestTextMapGetter.class));
   }
 
   protected ServletDiagnosticsProviderFactory createServletDiagnosticsProviderFactory() {

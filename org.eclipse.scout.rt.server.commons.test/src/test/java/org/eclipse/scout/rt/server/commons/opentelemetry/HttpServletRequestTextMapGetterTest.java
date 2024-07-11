@@ -7,12 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.opentelemetry.sdk.traces;
+package org.eclipse.scout.rt.server.commons.opentelemetry;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -20,40 +19,17 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.commons.opentelemetry.IContextPropagationHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.javanet.NetHttpTransport;
-
 import io.opentelemetry.context.propagation.TextMapGetter;
-import io.opentelemetry.context.propagation.TextMapSetter;
 
 /**
- * Test class for {@link ContextPropagationHelper}
+ * Test class for {@link HttpServletRequestTextMapGetter}
  */
 @RunWith(PlatformTestRunner.class)
-public class ContextPropagationHelperTest {
-
-  @Test
-  public void testCreateHttpRequestTextMapSetter() throws IOException {
-    // Arrange
-    HttpRequestFactory requestFactory = new NetHttpTransport().createRequestFactory();
-    HttpRequest request = requestFactory.buildGetRequest(new GenericUrl("http://example.com"));
-    String key = "testKey";
-    String value = "testValue";
-
-    // Act
-    TextMapSetter<HttpRequest> mapSetter = BEANS.get(IContextPropagationHelper.class).createHttpRequestTextMapSetter();
-    mapSetter.set(request, key, value);
-
-    // Assert
-    assertEquals(value, request.getHeaders().get(key));
-  }
+public class HttpServletRequestTextMapGetterTest {
 
   @Test
   public void testCreateServletRequestTextMapGetter() {
@@ -66,7 +42,7 @@ public class ContextPropagationHelperTest {
     when(mockRequest.getHeader(headerKey)).thenReturn(headerValue);
 
     // Act
-    TextMapGetter<HttpServletRequest> getter = BEANS.get(IContextPropagationHelper.class).createServletRequestTextMapGetter();
+    TextMapGetter<HttpServletRequest> getter = BEANS.get(HttpServletRequestTextMapGetter.class);
     Iterable<String> iterableHeaderKeys = getter.keys(mockRequest);
 
     // Assert
