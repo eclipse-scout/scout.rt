@@ -13,9 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.id.NodeId;
-import org.eclipse.scout.rt.opentelemetry.sdk.property.OpenTelemetryOtlpExporterEndpointProperty;
-import org.eclipse.scout.rt.opentelemetry.sdk.property.OpenTelemetryOtlpExporterProtocolProperty;
-import org.eclipse.scout.rt.opentelemetry.sdk.property.OpenTelemetryTracesExporterProperty;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
@@ -111,10 +108,7 @@ public class OpenTelemetryInitializer implements IPlatformListener {
   }
 
   protected Map<String, String> getDefaultProperties() {
-    String tracesExporter = CONFIG.getPropertyValue(OpenTelemetryTracesExporterProperty.class);
-    String metricsExporter = CONFIG.getPropertyValue(OpenTelemetryMetricsExporterProperty.class);
-    String otplExporterEndpoint = CONFIG.getPropertyValue(OpenTelemetryOtlpExporterEndpointProperty.class);
-    String otlpExporterProtocol = CONFIG.getPropertyValue(OpenTelemetryOtlpExporterProtocolProperty.class);
+    String defaultExporter = CONFIG.getPropertyValue(OpenTelemetryDefaultExporterProperty.class);
     String serviceName = CONFIG.getPropertyValue(ApplicationNameProperty.class);
     String instanceIdProperty = "service.instance.id=" + NodeId.current().unwrapAsString();
 
@@ -122,15 +116,11 @@ public class OpenTelemetryInitializer implements IPlatformListener {
     defaultConfig.put("otel.service.name", serviceName);
     defaultConfig.put("otel.resource.attributes", instanceIdProperty);
 
-    // OTLP Exporter
-    defaultConfig.put("otel.expoter.otlp.endpoint", otplExporterEndpoint);
-    defaultConfig.put("otel.exporter.otlp.protocol", otlpExporterProtocol);
-
     // Traces
-    defaultConfig.put("otel.traces.exporter", tracesExporter);
+    defaultConfig.put("otel.traces.exporter", "none");
 
     // Metrics
-    defaultConfig.put("otel.metrics.exporter", metricsExporter);
+    defaultConfig.put("otel.metrics.exporter", defaultExporter);
     defaultConfig.put("otel.metric.export.interval", "30000"); // 30s
 
     // Logs
@@ -190,7 +180,7 @@ public class OpenTelemetryInitializer implements IPlatformListener {
     }
   }
 
-  public static class OpenTelemetryMetricsExporterProperty extends AbstractStringConfigProperty {
+  public static class OpenTelemetryDefaultExporterProperty extends AbstractStringConfigProperty {
 
     @Override
     public String getKey() {
