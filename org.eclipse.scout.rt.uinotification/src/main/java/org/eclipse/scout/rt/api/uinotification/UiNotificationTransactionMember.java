@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,12 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.Pair;
 
 public class UiNotificationTransactionMember extends AbstractTransactionMember {
 
   public static final String TRANSACTION_MEMBER_ID = "uiNotification.transactionMemberId";
 
-  private final List<UiNotificationMessageDo> m_messages = new ArrayList<>();
+  private final List<Pair<UiNotificationMessageDo, UiNotificationPutOptions>> m_messages = new ArrayList<>();
   private final UiNotificationRegistry m_registry;
 
   public UiNotificationTransactionMember(UiNotificationRegistry registry) {
@@ -41,14 +43,14 @@ public class UiNotificationTransactionMember extends AbstractTransactionMember {
     return !m_messages.isEmpty();
   }
 
-  public void addNotification(UiNotificationMessageDo message) {
-    m_messages.add(message);
+  public void addNotification(UiNotificationMessageDo message, UiNotificationPutOptions options) {
+    m_messages.add(ImmutablePair.of(message, options));
   }
 
   @Override
   public void commitPhase2() {
-    for (UiNotificationMessageDo message : m_messages) {
-      m_registry.putInternal(message);
+    for (Pair<UiNotificationMessageDo, UiNotificationPutOptions> message : m_messages) {
+      m_registry.putInternal(message.getLeft(), message.getRight());
     }
     m_messages.clear();
   }

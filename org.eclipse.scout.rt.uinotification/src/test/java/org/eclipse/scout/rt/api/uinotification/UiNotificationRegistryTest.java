@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.api.uinotification;
 import static org.eclipse.scout.rt.api.uinotification.UiNotificationPutOptions.noTransaction;
 import static org.eclipse.scout.rt.api.uinotification.UiNotificationRegistry.SUBSCRIPTION_START_ID;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,10 +31,13 @@ import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -503,6 +508,35 @@ public class UiNotificationRegistryTest {
 
     // Somehow transaction is not closed when a new test runs -> remove member manually to not influence other tests
     ITransaction.CURRENT.get().unregisterMember(UiNotificationTransactionMember.TRANSACTION_MEMBER_ID);
+  }
+
+  @Test
+  public void testPublishOverCluster() {
+    var clusterService = mock(IUiNotificationClusterService.class);
+    List<IBean<?>> beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(IUiNotificationClusterService.class).withInitialInstance(clusterService));
+    try {
+      // create new registry, because cluster service is registered in its constructor
+      var registry = new UiNotificationRegistry();
+      registry.setCleanupJobInterval(0);
+      registry.setIdGenerator(new TestIdGenerator());
+
+      verify(clusterService, times(0)).publish(any());
+
+      registry.put("topic", createMessage(), UiNotificationPutOptions.noTransaction());
+      verify(clusterService, times(1)).publish(any());
+
+      registry.put("topic", createMessage(), UiNotificationPutOptions.noTransaction().withPublishOverCluster(true));
+      verify(clusterService, times(2)).publish(any());
+
+      registry.put("topic", createMessage(), UiNotificationPutOptions.noTransaction().withPublishOverCluster(false));
+      verify(clusterService, times(2)).publish(any());
+
+      registry.put("topic", createMessage(), UiNotificationPutOptions.noClusterSync().withTransactional(false));
+      verify(clusterService, times(2)).publish(any());
+    }
+    finally {
+      BeanTestingHelper.get().unregisterBeans(beans);
+    }
   }
 
   protected IDoEntity createMessage(String value) {

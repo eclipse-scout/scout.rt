@@ -280,27 +280,33 @@ public class UiNotificationRegistry {
         .withUser(userId)
         .withTimeout(ObjectUtility.nvl(options.getTimeout(), CONFIG.getPropertyValue(UiNotificationExpirationTimeProperty.class)));
 
+    options = options.copy().withTimeout(0L);
+
     if (ObjectUtility.nvl(options.getTransactional(), true)) {
-      putTransactional(metaMessage);
+      putTransactional(metaMessage, options);
     }
     else {
-      putInternal(metaMessage);
+      putInternal(metaMessage, options);
     }
   }
 
-  protected void putTransactional(UiNotificationMessageDo message) {
+  protected void putTransactional(UiNotificationMessageDo message, UiNotificationPutOptions options) {
     ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional ui notification {}", message);
+    if (options == null) {
+      options = new UiNotificationPutOptions();
+    }
+    options = options.copy().withTransactional(false);
     try {
       UiNotificationTransactionMember txMember = (UiNotificationTransactionMember) transaction.getMember(UiNotificationTransactionMember.TRANSACTION_MEMBER_ID);
       if (txMember == null) {
         txMember = new UiNotificationTransactionMember(this);
         transaction.registerMember(txMember);
       }
-      txMember.addNotification(message);
+      txMember.addNotification(message, options);
     }
     catch (RuntimeException e) {
       LOG.warn("Could not register transaction member. The notification will be processed immediately", e);
-      putInternal(message);
+      putInternal(message, options);
     }
   }
 
@@ -315,14 +321,10 @@ public class UiNotificationRegistry {
   public void handleClusterNotification(UiNotificationMessageDo message) {
     UiNotificationDo notification = message.getNotification();
     LOG.info("Received ui notification with id {} from cluster node {} for topic {} and user {}.", notification.getId(), notification.getNodeId(), notification.getTopic(), message.getUser());
-    putInternal(message, false);
+    putInternal(message, UiNotificationPutOptions.noClusterSync());
   }
 
-  protected void putInternal(UiNotificationMessageDo message) {
-    putInternal(message, true);
-  }
-
-  protected void putInternal(UiNotificationMessageDo message, boolean publishOverCluster) {
+  protected void putInternal(UiNotificationMessageDo message, UiNotificationPutOptions options) {
     UiNotificationDo notification = message.getNotification();
     String topic = notification.getTopic();
     m_lock.writeLock().lock();
@@ -339,7 +341,7 @@ public class UiNotificationRegistry {
     finally {
       m_lock.writeLock().unlock();
     }
-    if (publishOverCluster) {
+    if (options == null || ObjectUtility.nvl(options.getPublishOverCluster(), true)) {
       publishOverCluster(message);
     }
   }
