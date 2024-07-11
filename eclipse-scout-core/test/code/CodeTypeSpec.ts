@@ -28,6 +28,10 @@ describe('CodeType', () => {
           id: 'code02',
           objectType: Code,
           children: [{
+            id: 'code020',
+            objectType: Code,
+            active: false
+          }, {
             id: 'code021',
             objectType: Code
           }]
@@ -47,7 +51,11 @@ describe('CodeType', () => {
         enabled: false,
         partitionId: 4,
         sortCode: 3,
-        fieldName: 'iconId'
+        fieldName: 'iconId',
+        children: [{
+          id: 'code20',
+          objectType: Code
+        }]
       }]
     }]);
   });
@@ -89,6 +97,7 @@ describe('CodeType', () => {
     it('creates codes and hierarchy', () => {
       let codeType = codes.get('codeType0');
       expect(codeType.codes().length).toBe(7);
+      expect(codeType.codes({activeOnly: false}).length).toBe(9);
       expect(codeType.id).toBe('codeType0'); // fieldName of code1 must not override an already existing CodeType property value
       expect(codeType.maxLevel).toBe(2147483647); // default from Scout Classic
       expect(codeType.hierarchical).toBeFalse();
@@ -109,14 +118,20 @@ describe('CodeType', () => {
       expect(code01.codeType).toBe(codeType);
 
       let code02 = codeType.get('code02');
-      expect(code02.children.length).toBe(1);
+      expect(code02.children.length).toBe(2);
       expect(code0.children[1]).toBe(code02);
       expect(code02.parent).toBe(code0);
       expect(code02.codeType).toBe(codeType);
 
+      let code020 = codeType.get('code020');
+      expect(code020.children.length).toBe(0);
+      expect(code02.children[0]).toBe(code020);
+      expect(code020.parent).toBe(code02);
+      expect(code020.codeType).toBe(codeType);
+
       let code021 = codeType.get('code021');
       expect(code021.children.length).toBe(0);
-      expect(code02.children[0]).toBe(code021);
+      expect(code02.children[1]).toBe(code021);
       expect(code021.parent).toBe(code02);
       expect(code021.codeType).toBe(codeType);
 
@@ -133,17 +148,23 @@ describe('CodeType', () => {
 
       let code2 = codeType.get('code2');
       expect(code2.parent).toBe(undefined);
-      expect(code2.children.length).toBe(0);
+      expect(code2.children.length).toBe(1);
       expect(code2.codeType).toBe(codeType);
       expect(code2.active).toBeFalse();
       expect(code2.enabled).toBeFalse();
       expect(code2.partitionId).toBe(4);
       expect(code2.sortCode).toBe(3);
       expect(codeType.iconId as any).toBe(code2); // fieldName is used and written, as this field exists and is falsy.
+
+      let code20 = codeType.get('code20');
+      expect(code20.children.length).toBe(0);
+      expect(code2.children[0]).toBe(code20);
+      expect(code20.parent).toBe(code2);
     });
   });
 
   describe('get', () => {
+
     it('returns code with codeId', () => {
       let codeType = codes.get('codeType0');
       let code = codeType.get('code11');
@@ -156,20 +177,101 @@ describe('CodeType', () => {
   });
 
   describe('codes', () => {
-    it('returns all codes', () => {
+
+    it('returns all active codes', () => {
       let codeType = codes.get('codeType0');
       let codeArr = codeType.codes();
       expect(codeArr.length).toBe(7);
+      let codeArr2 = codeType.codes({activeOnly: true});
+      expect(codeArr2.length).toBe(7);
     });
 
-    it('returns root codes', () => {
+    it('returns all codes when activeOnly=false', () => {
       let codeType = codes.get('codeType0');
-      let codeArr = codeType.codes(true);
+      let codeArr = codeType.codes({activeOnly: false});
+      expect(codeArr.length).toBe(9);
+    });
+
+    it('returns active root codes when rootOnly=true', () => {
+      let codeType = codes.get('codeType0');
+      let codeArr = codeType.codes({rootOnly: true});
+      expect(codeArr.length).toBe(2);
+      expect(codeArr[0]).toBe(codeType.get('code0'));
+      expect(codeArr[1]).toBe(codeType.get('code1'));
+    });
+
+    it('returns all root codes when rootOnly=true and activeOnly=false', () => {
+      let codeType = codes.get('codeType0');
+      let codeArr = codeType.codes({rootOnly: true, activeOnly: false});
       expect(codeArr.length).toBe(3);
       expect(codeArr[0]).toBe(codeType.get('code0'));
       expect(codeArr[1]).toBe(codeType.get('code1'));
       expect(codeArr[2]).toBe(codeType.get('code2'));
     });
+
+    describe('legacy signature', () => {
+
+      it('returns active root codes when rootOnly=true', () => {
+        let codeType = codes.get('codeType0');
+        let codeArr = codeType.codes(true);
+        expect(codeArr.length).toBe(2);
+        expect(codeArr[0]).toBe(codeType.get('code0'));
+        expect(codeArr[1]).toBe(codeType.get('code1'));
+      });
+
+      it('returns all active codes when rootOnly=false', () => {
+        let codeType = codes.get('codeType0');
+        let codeArr = codeType.codes(false);
+        expect(codeArr.length).toBe(7);
+      });
+    });
   });
 
+  describe('visitChildren', () => {
+
+    it('visits active codes recursively', () => {
+      let visitedCodes = [];
+      let codeType = codes.get('codeType0');
+      codeType.visitChildren(code => {
+        visitedCodes.push(code);
+      });
+
+      let visitedCodes2 = [];
+      codeType.visitChildren(code => {
+        visitedCodes2.push(code);
+      }, true);
+
+      let expectedCodes = [
+        codeType.get('code0'),
+        codeType.get('code01'),
+        codeType.get('code02'),
+        codeType.get('code021'),
+        codeType.get('code1'),
+        codeType.get('code11')
+      ];
+      expect(visitedCodes).toEqual(expectedCodes);
+      expect(visitedCodes2).toEqual(expectedCodes);
+    });
+
+    it('visits all codes recursively when activeOnly=false', () => {
+      let visitedCodes = [];
+      let codeType = codes.get('codeType0');
+      codeType.visitChildren(code => {
+        visitedCodes.push(code);
+      }, false);
+
+      let expectedCodes = [
+        codeType.get('code0'),
+        codeType.get('code01'),
+        codeType.get('code02'),
+        codeType.get('code020'),
+        codeType.get('code021'),
+        codeType.get('code1'),
+        codeType.get('code11'),
+        codeType.get('code2'),
+        codeType.get('code20')
+      ];
+      expect(visitedCodes).toEqual(expectedCodes);
+    });
+  });
 });

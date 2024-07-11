@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  *
  * @see CodeLookupCallTest
  */
+@IgnoreBean // constructor with arguments
 public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_TYPE> implements Serializable {
   private static final long serialVersionUID = 0L;
 

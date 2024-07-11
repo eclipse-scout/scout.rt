@@ -74,7 +74,7 @@ public abstract class AbstractCodeTypeToDoFunction<EXPLICIT_SOURCE extends ICode
   }
 
   protected List<? extends ICode<?>> getCodesToConvert(EXPLICIT_SOURCE codeType) {
-    return codeType.getCodes();
+    return codeType.getCodes(false);
   }
 
   /**
