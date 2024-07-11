@@ -24,11 +24,16 @@ public class OpenTelemetryContextProcessor<RESULT> implements ICallableIntercept
 
   @Override
   public RESULT intercept(Chain<RESULT> chain) throws Exception {
-    return m_openTelemetryContext.wrap(() -> chain.continueChain()).call();
+    if (m_openTelemetryContext != null) {
+      return m_openTelemetryContext.wrap(() -> chain.continueChain()).call();
+    }
+    else {
+      return chain.continueChain();
+    }
   }
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return m_openTelemetryContext != null;
   }
 }
