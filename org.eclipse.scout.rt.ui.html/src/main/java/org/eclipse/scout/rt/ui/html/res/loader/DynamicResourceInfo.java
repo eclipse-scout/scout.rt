@@ -66,7 +66,7 @@ public class DynamicResourceInfo {
   }
 
   /**
-   * @param jsonAdapter
+   * @param jsonAdapter adapter matching the path
    * @param path
    *          decoded path (non url-encoded)
    */
@@ -81,6 +81,27 @@ public class DynamicResourceInfo {
       return null;
     }
     if (!jsonAdapter.getId().equals(parts.getAdapterId())) {
+      return null;
+    }
+    return new DynamicResourceInfo(jsonAdapter, parts.getFilename());
+  }
+
+  /**
+   * @param uiSession session matching the path
+   * @param path
+   *          decoded path (non url-encoded)
+   */
+  public static DynamicResourceInfo fromPath(IUiSession uiSession, String path) {
+    DynamicResourcePathComponents parts = DynamicResourcePathComponents.fromPath(path);
+    if (parts == null) {
+      return null;
+    }
+    // compare the session id to the passed in session to ensure that the resource path matches
+    if (!uiSession.getUiSessionId().equals(parts.getUiSessionId())) {
+      return null;
+    }
+    IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(parts.getAdapterId());
+    if (jsonAdapter == null) {
       return null;
     }
     return new DynamicResourceInfo(jsonAdapter, parts.getFilename());
