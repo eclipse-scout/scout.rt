@@ -21,8 +21,6 @@ import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
-import io.opentelemetry.context.Context;
-
 /**
  * Factory methods to create a new {@link RunContext} objects to propagate context like {@link Subject} or
  * {@link Locale}, and to demarcate the transaction boundary.
@@ -141,7 +139,6 @@ public final class RunContexts {
           .withRunMonitor(BEANS.get(RunMonitor.class))
           .withTransactionScope(TransactionScope.REQUIRED)
           .withNewTransactionSupplier(null)
-          .withOpenTelemetryContext(Context.current())
           .withoutTransactionMembers();
 
       // Register the run monitor for propagated cancellation.
