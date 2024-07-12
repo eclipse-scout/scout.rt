@@ -101,7 +101,7 @@ export class Switch extends Widget implements SwitchModel {
   }
 
   protected _renderActivated() {
-    this.$button.toggleClass('activated', this.activated);
+    this.$button.toggleClass('activated', !!this.activated);
   }
 
   setLabel(label: string) {
@@ -176,7 +176,7 @@ export class Switch extends Widget implements SwitchModel {
   protected _renderTabbable() {
     let tabbable = this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch();
     this.$container.setTabbable(tabbable);
-    this.$container.toggleClass('unfocusable', tabbable);
+    this.$container.toggleClass('unfocusable', !!tabbable);
   }
 
   protected _onSwitchMouseDown(event: JQuery.MouseDownEvent) {
