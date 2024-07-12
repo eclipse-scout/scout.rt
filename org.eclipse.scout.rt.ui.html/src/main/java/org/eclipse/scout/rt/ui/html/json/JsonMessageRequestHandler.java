@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
@@ -154,6 +155,8 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
     BEANS.get(ITracingHelper.class).wrapInThrowingSpan(tracer, "handleJsonRequest", span -> {
       // Add attributes
+      span.setAttribute("scout.corelation.id", CorrelationId.CURRENT.get());
+      span.setAttribute("scout.client.session.id", uiSession.getClientSessionId());
       span.setAttribute("scout.client.json.request", jsonRequest.toString());
       span.setAttribute("http.request.method", req.getMethod());
       span.setAttribute("url.full", req.getRequestURI());
