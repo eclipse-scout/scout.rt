@@ -51,4 +51,14 @@ describe('Switch', () => {
       expect(switch_.activated).toBe(true);
     });
   });
+
+  it('renders activated = null as not activated', () => {
+    let switch_ = scout.create(Switch, {
+      parent: session.desktop
+    });
+    switch_.render();
+    switch_.setActivated(false);
+    switch_.setActivated(null);
+    expect(switch_.$button).not.toHaveClass('activated');
+  });
 });
