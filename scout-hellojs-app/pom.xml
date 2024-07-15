@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.archetypes</groupId>
   <artifactId>scout-hellojs-app</artifactId>
-  <version>24.1-SNAPSHOT</version>
+  <version>24.1.17</version>
   <packaging>maven-archetype</packaging>
 
   <name>ScoutJS Sample Application</name>
