@@ -257,7 +257,7 @@ public class HttpProxy {
     return asyncRequestBuilder;
   }
 
-  protected void writeRequestHeaders(HttpServletRequest req, AbstractRequestBuilder asyncRequestBuilder) {
+  protected void writeRequestHeaders(HttpServletRequest req, AbstractRequestBuilder requestBuilder) {
     Enumeration<String> headerNames = req.getHeaderNames();
     final Set<String> hopByHopHeaderNames = getConnectionHeaderValues(req);
     while (headerNames.hasMoreElements()) {
@@ -271,7 +271,7 @@ public class HttpProxy {
         value = filter.filter(name, value);
       }
       if (value != null) {
-        asyncRequestBuilder.addHeader(name, value);
+        requestBuilder.addHeader(name, value);
         LOG.trace("Added request header: {}: {}", name, value);
       }
       else {
@@ -280,13 +280,25 @@ public class HttpProxy {
     }
   }
 
-  protected void writeCustomRequestHeaders(AsyncRequestBuilder asyncRequestBuilder, Map<String, String> customHeaders) {
+  protected void writeCustomRequestHeaders(AbstractRequestBuilder requestBuilder, Map<String, String> customHeaders) {
     if (customHeaders == null) {
       return;
     }
     for (Entry<String, String> header : customHeaders.entrySet()) {
-      asyncRequestBuilder.addHeader(header.getKey(), header.getValue());
-      LOG.trace("Added custom request header: {}: {}", header.getKey(), header.getValue());
+      String name = header.getKey();
+      if (name == null) {
+        continue;
+      }
+      String value = header.getValue();
+      Header existingHeader = requestBuilder.getFirstHeader(name);
+      requestBuilder.removeHeaders(name); // remove all existing headers with the same name
+      if (value != null) {
+        requestBuilder.addHeader(name, value);
+        LOG.trace("Added custom request header: {}: {}", name, value);
+      }
+      else if (existingHeader != null) {
+        LOG.trace("Removed custom request header: {} (original value: {})", name, existingHeader.getValue());
+      }
     }
   }
 
