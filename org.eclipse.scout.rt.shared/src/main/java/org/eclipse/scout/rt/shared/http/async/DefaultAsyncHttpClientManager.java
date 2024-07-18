@@ -10,8 +10,10 @@
 package org.eclipse.scout.rt.shared.http.async;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
@@ -59,7 +61,6 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
   protected void interceptCreateClient(HttpAsyncClientBuilder builder) {
     // see very similar code in org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory.newHttpTransport(IHttpTransportManager), unfortunately there is no common interface
     installConfigurableProxySelector(builder);
-    installMultiSessionCookieStore(builder);
 
     setConnectionKeepAliveAndRetrySettings(builder);
 
@@ -71,9 +72,9 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
     builder.setRoutePlanner(new SystemDefaultRoutePlanner(BEANS.get(ConfigurableProxySelector.class)));
   }
 
-  protected void installMultiSessionCookieStore(HttpAsyncClientBuilder builder) {
-    // see very similar code in org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory.installMultiSessionCookieStore(HttpClientBuilder), unfortunately there is no common interface
-    builder.setDefaultCookieStore(BEANS.get(ApacheMultiSessionCookieStore.class));
+  @Override
+  protected BiConsumer<HttpAsyncClientBuilder, CookieStore> getInstallCookieStoreBiConsumer() {
+    return (builder, cookieStore) -> builder.setDefaultCookieStore(cookieStore);
   }
 
   protected void setConnectionKeepAliveAndRetrySettings(HttpAsyncClientBuilder builder) {
