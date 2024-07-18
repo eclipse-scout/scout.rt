@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -21,14 +21,25 @@ public class HttpProxyRequestOptions {
   private IRewriteRule m_rewriteRule;
 
   public HttpProxyRequestOptions() {
-    m_customRequestHeaders = new HashMap<>();
+    m_customRequestHeaders = new LinkedHashMap<>(); // use sorted map to make result deterministic
   }
 
+  /**
+   * @param name
+   *     Name of the custom HTTP header (case-insensitive) that should be applied to the proxied HTTP request.
+   *     Existing headers with the same name are replaced by this value.
+   * @param value
+   *     The value of the custom HTTP header. If {@code null}, the header is removed from the proxied request.
+   */
   public HttpProxyRequestOptions withCustomRequestHeader(String name, String value) {
     m_customRequestHeaders.put(name, value);
     return this;
   }
 
+  /**
+   * Returns a list of HTTP headers to be added to the proxied HTTP request. Existing headers with the same name are
+   * removed. New headers are only added if the value is not {@code null}.
+   */
   public Map<String, String> getCustomRequestHeaders() {
     return m_customRequestHeaders;
   }
