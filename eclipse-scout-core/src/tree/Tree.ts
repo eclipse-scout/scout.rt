@@ -1333,7 +1333,7 @@ export class Tree extends Widget implements TreeModel {
     if (node.tooltipText) {
       return node.tooltipText;
     }
-    if (this._isTruncatedNodeTooltipEnabled() && $node.isContentTruncated()) {
+    if (this._isTruncatedNodeTooltipEnabled() && node.$text.isContentTruncated()) {
       return node.$text.text();
     }
   }
