@@ -111,7 +111,7 @@ public class HttpProxyTest {
     m_server = new Server();
     m_handlerCollection = new HandlerCollection(true);
     m_server.setHandler(m_handlerCollection);
-    @SuppressWarnings("ressource")
+    @SuppressWarnings("resource")
     ServerConnector connector = m_httpProxyTestParameter.getServerConnectorFunction().apply(m_server);
     m_server.setConnectors(new Connector[]{connector});
     m_server.start();
@@ -304,7 +304,6 @@ public class HttpProxyTest {
   @Test
   @NonParameterized
   public void testFilterHopByHopResponseHeaders() {
-    final String acceptEncodingHeaderName = "accept-encoding";
     assertRewriteResponseHeaders(emptyMap(), emptyMap());
     assertRewriteResponseHeaders(singletonMap("foo", "bar"), singletonMap("foo", "bar"));
 
@@ -315,8 +314,8 @@ public class HttpProxyTest {
     assertRewriteResponseHeaders(emptyMap(), singletonMap("Trailer", "Expires"));
 
     assertRewriteResponseHeaders(
-        singletonMap(acceptEncodingHeaderName, "deflate"),
-        hashMap(new ImmutablePair<>("Transfer-Encoding", "chunked"), new ImmutablePair<>(acceptEncodingHeaderName, "deflate")));
+        singletonMap("accept-encoding", "deflate"),
+        hashMap(new ImmutablePair<>("Transfer-Encoding", "chunked"), new ImmutablePair<>("accept-encoding", "deflate")));
 
     assertRewriteResponseHeaders(
         singletonMap("foobar", "bar"),
@@ -338,6 +337,38 @@ public class HttpProxyTest {
     assertEquals(expectedHeaders, collectedHeaders);
     verify(res, atLeast(0)).setHeader(anyString(), anyString());
     verifyNoMoreInteractions(res);
+  }
+
+  @Test
+  @NonParameterized
+  public void testWriteCustomRequestHeaders() {
+    BasicRequestBuilder httpReq = BasicRequestBuilder.get()
+        .setHeaders(
+            new BasicHeader("Foo", "123"),
+            new BasicHeader("Bar", "xyz"),
+            new BasicHeader("x-foobar", "test"),
+            new BasicHeader("Bar", "zyz"), // duplicate!
+            new BasicHeader("Baz", "H0"));
+
+    HttpProxyRequestOptions requestOptions = new HttpProxyRequestOptions()
+        .withCustomRequestHeader(null, null) // invalid name, should be ignored
+        .withCustomRequestHeader("myHeader", "H1") // new header
+        .withCustomRequestHeader("FOO", "H2") // overwrite single header (case-insensitive)
+        .withCustomRequestHeader("bar", "H3") // overwrite multi-header (case-insensitive)
+        .withCustomRequestHeader("X-FooBar", null) // remove existing header (case-insensitive)
+        .withCustomRequestHeader("X-BarFoo", null); // remove non-existing header
+
+    BEANS.get(HttpProxy.class).writeCustomRequestHeaders(httpReq, requestOptions.getCustomRequestHeaders());
+
+    var expectedHeaders = List.of(
+        new ImmutablePair<>("Baz", "H0"),
+        new ImmutablePair<>("myHeader", "H1"),
+        new ImmutablePair<>("FOO", "H2"),
+        new ImmutablePair<>("bar", "H3"));
+    var actualHeaders = Arrays.stream(ObjectUtility.nvlOpt(httpReq.getHeaders(), () -> new Header[0]))
+        .map(header -> new ImmutablePair<>(header.getName(), header.getValue()))
+        .collect(Collectors.toList());
+    assertEquals(expectedHeaders, actualHeaders);
   }
 
   @Test
