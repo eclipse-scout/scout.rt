@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -29,10 +30,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,6 +46,9 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.hc.client5.http.ContextBuilder;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.concurrent.FutureCallback;
@@ -65,6 +70,7 @@ import org.apache.hc.core5.http.support.AbstractRequestBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -72,8 +78,10 @@ import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyConfigProperties.HttpProxyAsyncHttpClientManagerConfigProperty;
 import org.eclipse.scout.rt.server.commons.servlet.HttpProxyConfigProperties.HttpProxyAsyncTimeoutConfigProperty;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.http.async.AbstractAsyncHttpClientManager;
 import org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager;
 import org.slf4j.Logger;
@@ -91,13 +99,15 @@ public class HttpProxy {
   private String m_remoteBaseUrl;
   private final List<IHttpHeaderFilter> m_requestHeaderFilters;
   private final List<IHttpHeaderFilter> m_responseHeaderFilters;
+  private final CookieStore m_defaultCookieStore;
   private Executor m_blockingOperationExecutor;
-  private Supplier<HttpClientContext> m_httpClientContextSupplier;
+  private Function<ContextBuilder, HttpClientContext> m_httpClientContextInterceptor;
 
   public HttpProxy() {
     m_httpClientManager = BEANS.get(CONFIG.getPropertyValue(HttpProxyAsyncHttpClientManagerConfigProperty.class));
     m_requestHeaderFilters = new ArrayList<>();
     m_responseHeaderFilters = new ArrayList<>();
+    m_defaultCookieStore = initializeDefaultCookieStore();
   }
 
   @PostConstruct
@@ -140,6 +150,27 @@ public class HttpProxy {
     m_responseHeaderFilters.add(new HttpHeaderNameFilter(null));
 
     m_blockingOperationExecutor = createBlockingOperationExecutor();
+  }
+
+  /**
+   * Return the (already initialized) {@link #m_defaultCookieStore}; may be null.
+   */
+  public CookieStore getDefaultCookieStore() {
+    return m_defaultCookieStore;
+  }
+
+  /**
+   * Create the cookie store instance used just for this {@link HttpProxy} instance.
+   */
+  protected CookieStore initializeDefaultCookieStore() {
+    return m_httpClientManager.getCookieStore();
+  }
+
+  /**
+   * @see SpecificSessionCookieStore
+   */
+  protected CookieStore createSpecificSessionCookieStore(ISession session) {
+    return new SpecificSessionCookieStore(session);
   }
 
   protected ExecutorService createBlockingOperationExecutor() {
@@ -234,8 +265,28 @@ public class HttpProxy {
   }
 
   protected HttpContext createHttpContext() {
-    Supplier<HttpClientContext> httpClientContextSupplier = getHttpClientContextSupplier();
-    return httpClientContextSupplier != null ? httpClientContextSupplier.get() : HttpClientContext.create();
+    ContextBuilder contextBuilder = ContextBuilder.create();
+
+    // cookie store
+    ISession currentSession = ISession.CURRENT.get();
+    CookieStore defaultCookieStore = getDefaultCookieStore();
+    if (defaultCookieStore != null) {
+      if (currentSession != null) {
+        contextBuilder.useCookieStore(createSpecificSessionCookieStore(currentSession));
+      }
+      else {
+        contextBuilder.useCookieStore(defaultCookieStore);
+      }
+    }
+
+    // apply additional settings using interceptor
+    Function<ContextBuilder, HttpClientContext> httpClientContextInterceptor = getHttpClientContextInterceptor();
+    if (httpClientContextInterceptor != null) {
+      return httpClientContextInterceptor.apply(contextBuilder);
+    }
+
+    // create context
+    return contextBuilder.build();
   }
 
   /**
@@ -527,15 +578,17 @@ public class HttpProxy {
     return m_blockingOperationExecutor;
   }
 
-  public Supplier<HttpClientContext> getHttpClientContextSupplier() {
-    return m_httpClientContextSupplier;
+  public Function<ContextBuilder, HttpClientContext> getHttpClientContextInterceptor() {
+    return m_httpClientContextInterceptor;
   }
 
   /**
-   * Create a supplier for {@link HttpClientContext} which is called upon each request.
+   * Create a supplier for {@link HttpClientContext} which is called upon each request. The function will be called with
+   * a pre-filled {@link ContextBuilder} and returns a {@link HttpClientContext} (maybe using
+   * {@link ContextBuilder#build()} or even a different one).
    */
-  public HttpProxy withHttpClientContextSupplier(Supplier<HttpClientContext> httpClientContextSupplier) {
-    m_httpClientContextSupplier = httpClientContextSupplier;
+  public HttpProxy withHttpClientContextSupplier(Function<ContextBuilder, HttpClientContext> httpClientContextSupplier) {
+    m_httpClientContextInterceptor = httpClientContextSupplier;
     return this;
   }
 
@@ -702,5 +755,47 @@ public class HttpProxy {
       return HttpStatus.SC_GATEWAY_TIMEOUT;
     }
     return HttpStatus.SC_INTERNAL_SERVER_ERROR;
+  }
+
+  /**
+   * Cookie store which uses {@link #getDefaultCookieStore()} with all operations run for the specified {@link ISession}.
+   * May be used if async threads access the cookie store where {@link ISession#CURRENT} is not set correctly.
+   */
+  private class SpecificSessionCookieStore implements CookieStore {
+
+    private ISession m_session;
+
+    public SpecificSessionCookieStore(ISession session) {
+      m_session = session;
+    }
+
+    @Override
+    public void addCookie(Cookie cookie) {
+      runWithSession(() -> getDefaultCookieStore().addCookie(cookie));
+    }
+
+    @Override
+    public List<Cookie> getCookies() {
+      return callWithSession(getDefaultCookieStore()::getCookies);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean clearExpired(Date date) {
+      return callWithSession(() -> getDefaultCookieStore().clearExpired(date));
+    }
+
+    @Override
+    public void clear() {
+      runWithSession(getDefaultCookieStore()::clear);
+    }
+
+    private void runWithSession(IRunnable runnable) {
+      RunContexts.copyCurrent(true).withThreadLocal(ISession.CURRENT, m_session).run(runnable);
+    }
+
+    private <R> R callWithSession(Callable<R> callable) {
+      return RunContexts.copyCurrent(true).withThreadLocal(ISession.CURRENT, m_session).call(callable);
+    }
   }
 }

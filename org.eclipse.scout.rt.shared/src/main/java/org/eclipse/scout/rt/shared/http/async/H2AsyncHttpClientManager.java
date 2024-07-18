@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,9 @@
  */
 package org.eclipse.scout.rt.shared.http.async;
 
+import java.util.function.BiConsumer;
+
+import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.H2AsyncClientBuilder;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
@@ -36,6 +39,11 @@ public class H2AsyncHttpClientManager extends AbstractAsyncHttpClientManager<H2A
   @Override
   protected void interceptCreateClient(H2AsyncClientBuilder builder) {
     builder.useSystemProperties();
+  }
+
+  @Override
+  protected BiConsumer<H2AsyncClientBuilder, CookieStore> getInstallCookieStoreBiConsumer() {
+    return (builder, cookieStore) -> builder.setDefaultCookieStore(cookieStore);
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,9 @@
 package org.eclipse.scout.rt.shared.http.async;
 
 import java.io.IOException;
+import java.util.function.BiConsumer;
 
+import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -18,6 +20,8 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.shared.http.ApacheMultiSessionCookieStore;
 
 /**
  * <p>
@@ -48,9 +52,37 @@ public abstract class AbstractAsyncHttpClientManager<BUILDER> implements IPlatfo
    */
   protected volatile CloseableHttpAsyncClient m_client;
 
+  /**
+   *
+   */
+  protected LazyValue<ApacheMultiSessionCookieStore> m_cookieStore = new LazyValue<>(ApacheMultiSessionCookieStore.class);
+
   public CloseableHttpAsyncClient getClient() {
     init();
     return m_client;
+  }
+
+  public ApacheMultiSessionCookieStore getCookieStore() {
+    return m_cookieStore.get();
+  }
+
+  /**
+   * Return a function to be called to install a {@link CookieStore}; return null if not supported/no store should be
+   * installed.
+   */
+  protected abstract BiConsumer<BUILDER, CookieStore> getInstallCookieStoreBiConsumer();
+
+  protected void installMultiSessionCookieStore(BUILDER builder) {
+    BiConsumer<BUILDER, CookieStore> installCookieStoreBiConsumer = getInstallCookieStoreBiConsumer();
+    if (installCookieStoreBiConsumer == null) {
+      return;
+    }
+
+    ApacheMultiSessionCookieStore cookieStore = getCookieStore();
+    if (cookieStore == null) {
+      return;
+    }
+    installCookieStoreBiConsumer.accept(builder, cookieStore);
   }
 
   /**
@@ -72,6 +104,7 @@ public abstract class AbstractAsyncHttpClientManager<BUILDER> implements IPlatfo
     }
 
     BUILDER builder = createBuilder();
+    installMultiSessionCookieStore(builder);
     interceptCreateClient(builder);
 
     m_client = createClient(builder);
