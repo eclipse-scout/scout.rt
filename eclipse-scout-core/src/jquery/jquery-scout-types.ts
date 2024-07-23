@@ -617,14 +617,20 @@ declare global {
     isAttached(): boolean;
 
     /**
+     * @param includePseudoScrollParents
+     *          Whether pseudo scrollable elements should be considered or not.
+     *          A pseudo scrollable element is an element that is not scrollable in the sense of e.g. scrollbars but implemented its own scroll-behaviour (e.g. like the carousel that moves a large filmstrip behind a smaller window).
      * @returns the current element if it is scrollable, otherwise the first parent that is scrollable.
      */
-    scrollParent(): JQuery;
+    scrollParent(includePseudoScrollParents?: boolean): JQuery;
 
     /**
+     * @param includePseudoScrollParents
+     *          Whether pseudo scrollable elements should be considered or not.
+     *          A pseudo scrollable element is an element that is not scrollable in the sense of e.g. scrollbars but implemented its own scroll-behaviour (e.g. like the carousel that moves a large filmstrip behind a smaller window).
      * @returns every parent that is scrollable
      */
-    scrollParents(): JQuery;
+    scrollParents(includePseudoScrollParents?: boolean): JQuery;
 
     /**
      * Similar to {@link JQuery.closest} but with a predicate function and the ability to stop at a given element.

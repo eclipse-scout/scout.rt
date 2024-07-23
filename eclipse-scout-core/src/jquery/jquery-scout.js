@@ -767,10 +767,10 @@ $.fn.isAttached = function() {
   return $.contains(this.document(true).documentElement, this[0]);
 };
 
-$.fn.scrollParent = function() {
+$.fn.scrollParent = function(includePseudoScrollParents) {
   let $elem = this;
   while ($elem.length > 0) {
-    if ($elem.data('scrollable')) {
+    if ($elem.data('scrollable') || (includePseudoScrollParents && $elem.data('pseudo-scrollable'))) {
       return $elem;
     }
     $elem = $elem.parent();
@@ -778,12 +778,12 @@ $.fn.scrollParent = function() {
   return $();
 };
 
-$.fn.scrollParents = function() {
+$.fn.scrollParents = function(includePseudoScrollParents) {
   let $scrollParents = $();
   let $elem = this;
 
   while ($elem.length > 0) {
-    if ($elem.data('scrollable')) {
+    if ($elem.data('scrollable') || (includePseudoScrollParents && $elem.data('pseudo-scrollable'))) {
       $scrollParents.push($elem[0]);
     }
     $elem = $elem.parent();

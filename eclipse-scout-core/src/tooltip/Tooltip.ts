@@ -306,7 +306,7 @@ export class Tooltip extends Widget implements TooltipModel {
   }
 
   position() {
-    let $scrollParents = this.$anchor?.scrollParents();
+    let $scrollParents = this.$anchor?.scrollParents(true);
     let origin = this._getOrigin();
     if ($scrollParents && this.clipOrigin) {
       // Remove the parts from the origin that are not in the viewport

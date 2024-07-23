@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -518,4 +518,61 @@ describe('jquery-scout', () => {
 
   });
 
+  describe('scrollParent/scrollParents', () => {
+    let $e1, $e2_pseudoScrollParent, $e3_scrollParent, $e4, $e5_scrollParent, $e6_pseudoScrollParent, $e7;
+
+    beforeEach(() => {
+      $e1 = $e.appendDiv('$e1');
+      $e2_pseudoScrollParent = $e1.appendDiv('$e2_pseudoScrollParent').data('pseudo-scrollable', true);
+      $e3_scrollParent = $e2_pseudoScrollParent.appendDiv('$e3_scrollParent').data('scrollable', true);
+      $e4 = $e3_scrollParent.appendDiv('$e4');
+      $e5_scrollParent = $e4.appendDiv('$e5_scrollParent').data('scrollable', true);
+      $e6_pseudoScrollParent = $e5_scrollParent.appendDiv('$e6_pseudoScrollParent').data('pseudo-scrollable', true);
+      $e7 = $e6_pseudoScrollParent.appendDiv('$e7');
+    });
+
+    it('returns first scroll parent', () => {
+      expect($e.scrollParent()[0]).toBeUndefined();
+      expect($e1.scrollParent()[0]).toBeUndefined();
+      expect($e2_pseudoScrollParent.scrollParent()[0]).toBeUndefined();
+      expect($e3_scrollParent.scrollParent()[0]).toBe($e3_scrollParent[0]);
+      expect($e4.scrollParent()[0]).toBe($e3_scrollParent[0]);
+      expect($e5_scrollParent.scrollParent()[0]).toBe($e5_scrollParent[0]);
+      expect($e6_pseudoScrollParent.scrollParent()[0]).toBe($e5_scrollParent[0]);
+      expect($e7.scrollParent()[0]).toBe($e5_scrollParent[0]);
+    });
+
+    it('returns first scroll parent or pseudo scroll parent', () => {
+      expect($e.scrollParent(true)[0]).toBeUndefined();
+      expect($e1.scrollParent(true)[0]).toBeUndefined();
+      expect($e2_pseudoScrollParent.scrollParent(true)[0]).toBe($e2_pseudoScrollParent[0]);
+      expect($e3_scrollParent.scrollParent(true)[0]).toBe($e3_scrollParent[0]);
+      expect($e4.scrollParent(true)[0]).toBe($e3_scrollParent[0]);
+      expect($e5_scrollParent.scrollParent(true)[0]).toBe($e5_scrollParent[0]);
+      expect($e6_pseudoScrollParent.scrollParent(true)[0]).toBe($e6_pseudoScrollParent[0]);
+      expect($e7.scrollParent(true)[0]).toBe($e6_pseudoScrollParent[0]);
+    });
+
+    it('returns all scroll parents', () => {
+      expect($e.scrollParents().toArray()).toEqual([]);
+      expect($e1.scrollParents().toArray()).toEqual([]);
+      expect($e2_pseudoScrollParent.scrollParents().toArray()).toEqual([]);
+      expect($e3_scrollParent.scrollParents().toArray()).toEqual([$e3_scrollParent[0]]);
+      expect($e4.scrollParents().toArray()).toEqual([$e3_scrollParent[0]]);
+      expect($e5_scrollParent.scrollParents().toArray()).toEqual([$e5_scrollParent[0], $e3_scrollParent[0]]);
+      expect($e6_pseudoScrollParent.scrollParents().toArray()).toEqual([$e5_scrollParent[0], $e3_scrollParent[0]]);
+      expect($e7.scrollParents().toArray()).toEqual([$e5_scrollParent[0], $e3_scrollParent[0]]);
+    });
+
+    it('returns all scroll parents or pseudo scroll parents', () => {
+      expect($e.scrollParents(true).toArray()).toEqual([]);
+      expect($e1.scrollParents(true).toArray()).toEqual([]);
+      expect($e2_pseudoScrollParent.scrollParents(true).toArray()).toEqual([$e2_pseudoScrollParent[0]]);
+      expect($e3_scrollParent.scrollParents(true).toArray()).toEqual([$e3_scrollParent[0], $e2_pseudoScrollParent[0]]);
+      expect($e4.scrollParents(true).toArray()).toEqual([$e3_scrollParent[0], $e2_pseudoScrollParent[0]]);
+      expect($e5_scrollParent.scrollParents(true).toArray()).toEqual([$e5_scrollParent[0], $e3_scrollParent[0], $e2_pseudoScrollParent[0]]);
+      expect($e6_pseudoScrollParent.scrollParents(true).toArray()).toEqual([$e6_pseudoScrollParent[0], $e5_scrollParent[0], $e3_scrollParent[0], $e2_pseudoScrollParent[0]]);
+      expect($e7.scrollParents(true).toArray()).toEqual([$e6_pseudoScrollParent[0], $e5_scrollParent[0], $e3_scrollParent[0], $e2_pseudoScrollParent[0]]);
+    });
+  });
 });

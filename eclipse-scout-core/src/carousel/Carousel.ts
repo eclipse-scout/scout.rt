@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,13 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CarouselLayout, CarouselModel, events, GridData, HtmlComponent, InitModelOf, ObjectOrChildModel, SingleLayout, Widget} from '../index';
+import {arrays, CarouselEventMap, CarouselLayout, CarouselModel, Device, events, GridData, HtmlComponent, InitModelOf, ObjectOrChildModel, SingleLayout, Widget} from '../index';
 
 export class Carousel extends Widget implements CarouselModel {
   declare model: CarouselModel;
+  declare self: Carousel;
+  declare eventMap: CarouselEventMap;
 
   statusEnabled: boolean;
-  statusItemHtml: string;
   gridData: GridData;
   moveThreshold: number;
   widgets: Widget[];
@@ -36,7 +37,6 @@ export class Carousel extends Widget implements CarouselModel {
   constructor() {
     super();
     this.statusEnabled = true;
-    this.statusItemHtml = '&bull;';
     this.currentItem = 0;
     this.moveThreshold = 0.25;
     this.widgets = [];
@@ -58,7 +58,9 @@ export class Carousel extends Widget implements CarouselModel {
 
   protected override _render() {
     // add container
-    this.$container = this.$parent.appendDiv('carousel');
+    this.$container = this.$parent.appendDiv('carousel')
+      // Tooltips on elements in the filmstrip will check all pseudo scroll parents (i.e. elements marked with 'pseudo-scrollable') if the anchor is visible.
+      .data('pseudo-scrollable', true);
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new CarouselLayout(this));
@@ -102,6 +104,7 @@ export class Carousel extends Widget implements CarouselModel {
       this.$carouselStatus = this.$container.appendDiv('carousel-status');
       this.htmlCompStatus = HtmlComponent.install(this.$carouselStatus, this.session);
     }
+    this.$carouselStatus.toggleClass('touch', Device.get().supportsOnlyTouch());
   }
 
   protected _removeStatus() {
@@ -117,10 +120,13 @@ export class Carousel extends Widget implements CarouselModel {
     }
     this.$carouselStatusItems = [];
     this.$carouselStatus.empty();
-    this.$carouselItems.forEach(() => {
+    const touch = Device.get().supportsOnlyTouch();
+    this.$carouselItems.forEach(($item, index) => {
       let $statusItem = this.$carouselStatus.appendDiv('status-item');
-      $statusItem.html(this.statusItemHtml);
       this.$carouselStatusItems.push($statusItem);
+      if (!touch) {
+        $statusItem.on('mousedown', () => this.setCurrentItem(index));
+      }
     });
   }
 
@@ -138,6 +144,7 @@ export class Carousel extends Widget implements CarouselModel {
     this.$carouselFilmstrip.css({
       transform: 'translateX(' + this.positionX + 'px)'
     });
+    this.$carouselFilmstrip.one('transitionend', () => this.session.desktop.repositionTooltips());
   }
 
   setCurrentItem(currentItem: number) {
@@ -145,7 +152,7 @@ export class Carousel extends Widget implements CarouselModel {
   }
 
   protected _renderCurrentItem() {
-    this._renderItemsInternal(undefined, false);
+    this._renderItemsInternal(this.currentItem, false);
     this._renderCurrentStatusItem();
     this.invalidateLayoutTree();
   }
