@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,17 +22,45 @@
 }
 
 .carousel-status {
-  font-size: 14pt;
-  font-weight: bold;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   & > .status-item {
-    color: @carousel-status-item-color;
-    display: inline;
-    margin-right: 6px;
+    --carousel-status-item-size: 8px;
+
+    --carousel-status-item-margin-top: 3px;
+    --carousel-status-item-margin-right: 0;
+    --carousel-status-item-margin-bottom: 0;
+    --carousel-status-item-margin-left: 0;
+
+    --carousel-status-item-padding-y: 3px;
+    --carousel-status-item-padding-x: 3px;
+
+    margin: var(--carousel-status-item-margin-top) var(--carousel-status-item-margin-right) var(--carousel-status-item-margin-bottom) var(--carousel-status-item-margin-left);
+    padding: var(--carousel-status-item-padding-y) var(--carousel-status-item-padding-x);
+
+    cursor: pointer;
+
+    &::before {
+      content: '';
+      display: block;
+      height: var(--carousel-status-item-size);
+      width: var(--carousel-status-item-size);
+      border-radius: 50%;
+      background-color: @carousel-status-item-color;
+    }
+
+    &.current-item {
+      cursor: default;
+
+      &::before {
+        background-color: @carousel-current-item-color;
+      }
+    }
   }
 
-  & > .current-item {
-    color: @carousel-current-item-color;
+  &.touch > .status-item {
+    --carousel-status-item-size: 6px;
   }
 }
