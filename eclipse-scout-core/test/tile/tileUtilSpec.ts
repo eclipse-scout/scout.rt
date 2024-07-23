@@ -124,8 +124,21 @@ describe('tileUtil', () => {
       expect(matrix.width).toBe(0);
       expect(matrix.height).toBe(0);
 
-      // One tile
+      // Only tiles with x or y = -1
       let tiles = createTiles([
+        {x: -1, y: 0, w: 2, h: 3},
+        {x: 0, y: -1, w: 2, h: 3}
+      ]);
+      tiles[0].gridData.x = -1;
+      tiles[1].gridData.y = -1;
+      matrix = tileUtil.buildMatrix(tiles);
+      expect(matrix.x).toBe(0);
+      expect(matrix.y).toBe(0);
+      expect(matrix.width).toBe(0);
+      expect(matrix.height).toBe(0);
+
+      // One tile
+      tiles = createTiles([
         {x: 0, y: 0, w: 2, h: 3}
       ]);
       matrix = tileUtil.buildMatrix(tiles);
