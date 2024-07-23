@@ -21,16 +21,14 @@ export const tileUtil = {
    * It uses gridDataHints if x/y are set explicitly. Otherwise, gridData is used.
    * Tiles with no gridData set or whose gridData.x or y is < 0 are ignored.
    *
-   * @param minWidth the {@link TileMatrix.width} will have at least this value
-   * @param minHeight the {@link TileMatrix.height} will have at least this value
    * @returns a two-dimensional array where the first dimension is the x-axis and the second the y-axis.
    */
-  buildMatrix(tiles: Tile[], minWidth = 0, minHeight = 0): TileMatrix {
+  buildMatrix(tiles: Tile[]): TileMatrix {
     let matrix: TileMatrix = $.extend([], {
-      x: tiles.length > 0 ? Number.MAX_SAFE_INTEGER : 0,
-      y: tiles.length > 0 ? Number.MAX_SAFE_INTEGER : 0,
-      width: minWidth,
-      height: minHeight
+      x: Number.MAX_SAFE_INTEGER,
+      y: Number.MAX_SAFE_INTEGER,
+      width: 0,
+      height: 0
     });
     for (let tile of tiles) {
       // If tiles use explicit x/y values work with hints because they are always set. GridData will only be set after layouting.
@@ -47,13 +45,19 @@ export const tileUtil = {
       for (let x = gridData.x; x < gridData.x + gridData.w; x++) {
         if (!matrix[x]) {
           matrix[x] = [];
-          matrix.width = Math.max(matrix.width, minWidth, matrix.length - matrix.x);
+          matrix.width = Math.max(matrix.width, matrix.length - matrix.x);
         }
         for (let y = gridData.y; y < gridData.y + gridData.h; y++) {
           matrix[x][y] = tile;
-          matrix.height = Math.max(matrix.height, minHeight, matrix[x].length - matrix.y);
+          matrix.height = Math.max(matrix.height, matrix[x].length - matrix.y);
         }
       }
+    }
+    if (matrix.x === Number.MAX_SAFE_INTEGER) {
+      matrix.x = 0;
+    }
+    if (matrix.y === Number.MAX_SAFE_INTEGER) {
+      matrix.y = 0;
     }
     return matrix;
   },
