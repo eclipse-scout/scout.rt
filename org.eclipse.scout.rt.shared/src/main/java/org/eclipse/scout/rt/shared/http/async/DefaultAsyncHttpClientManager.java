@@ -99,7 +99,8 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
     final boolean retryOnNoHttpResponseException = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty.class);
     final boolean retryOnSocketExceptionByConnectionReset = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty.class);
     if (retryOnNoHttpResponseException || retryOnSocketExceptionByConnectionReset) {
-      builder.setRetryStrategy(new CustomHttpRequestRetryStrategy(1, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset));
+      CustomHttpRequestRetryStrategy retryStrategy = new CustomHttpRequestRetryStrategy(1, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset);
+      retryStrategy.enable(builder);
     }
     else {
       builder.setRetryStrategy(new DefaultHttpRequestRetryStrategy());

@@ -21,10 +21,19 @@ import java.util.Set;
 
 import javax.net.ssl.SSLException;
 
+import org.apache.hc.client5.http.HttpRequestRetryStrategy;
+import org.apache.hc.client5.http.classic.ExecChain;
+import org.apache.hc.client5.http.classic.ExecChain.Scope;
+import org.apache.hc.client5.http.classic.ExecChainHandler;
+import org.apache.hc.client5.http.impl.ChainElement;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.concurrent.CancellableDependency;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ConnectionClosedException;
+import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.NoHttpResponseException;
@@ -41,6 +50,8 @@ import org.slf4j.LoggerFactory;
  */
 public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrategy {
   private static final Logger LOG = LoggerFactory.getLogger(CustomHttpRequestRetryStrategy.class);
+
+  public static final String RETRY_ENABLER_EXEC_CHAIN_NAME = OneTimeRetryPrepareExecChainHandler.class.getSimpleName();
 
   private final Set<Class<? extends IOException>> m_nonRetriableClasses;
   private final boolean m_retryOnNoHttpResponseException;
@@ -64,14 +75,33 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
   }
 
   protected CustomHttpRequestRetryStrategy(final int maxRetries,
-                                           final Collection<Class<? extends IOException>> clazzes,
-                                           final boolean retryOnNoHttpResponseException,
-                                           final boolean retryOnSocketExceptionByConnectionReset, List<Integer> codes) {
+      final Collection<Class<? extends IOException>> clazzes,
+      final boolean retryOnNoHttpResponseException,
+      final boolean retryOnSocketExceptionByConnectionReset, List<Integer> codes) {
     super(maxRetries, TimeValue.ofSeconds(1L), clazzes, codes);
     m_nonRetriableClasses = new HashSet<>(clazzes);
     m_retryOnNoHttpResponseException = retryOnNoHttpResponseException;
     m_retryOnSocketExceptionByConnectionReset = retryOnSocketExceptionByConnectionReset;
     m_maxRetries = maxRetries;
+  }
+
+  /**
+   * Register this {@link HttpRequestRetryStrategy} for this builder. For async-clients no
+   * {@link OneTimeRepeatableRequestEntityProxy} will be installed (= no one-time retry for stale-socket channels).
+   */
+  public void enable(HttpAsyncClientBuilder builder) {
+    // no AsyncExecChainHandler implementation for OneTimeRetryPrepareExec (and corresponding proxy installed there)
+    builder.setRetryStrategy(this);
+  }
+
+  /**
+   * Register this {@link HttpRequestRetryStrategy} for this builder. Also {@link OneTimeRepeatableRequestEntityProxy}
+   * will be used for certain stale-socket channel errors, see {@link #detectStaleSocketChannel(IOException)}
+   * (regardless of repeatability of the actual entity).
+   */
+  public void enable(HttpClientBuilder builder) {
+    builder.addExecInterceptorAfter(ChainElement.RETRY.name(), RETRY_ENABLER_EXEC_CHAIN_NAME, new OneTimeRetryPrepareExecChainHandler());
+    builder.setRetryStrategy(this);
   }
 
   @Override
@@ -90,7 +120,8 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
     }
     if (this.m_nonRetriableClasses.contains(exception.getClass())) {
       return false;
-    } else {
+    }
+    else {
       for (final Class<? extends IOException> rejectException : this.m_nonRetriableClasses) {
         if (rejectException.isInstance(exception)) {
           return false;
@@ -102,7 +133,7 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
     }
 
     // Retry if the request is considered idempotent or for stale socket channel (assumption)
-    return handleAsIdempotent(request) || detectStaleSocketChannel(exception, context);
+    return handleAsIdempotent(request) || detectStaleSocketChannel(exception);
   }
 
   /**
@@ -110,9 +141,8 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
    * <p>
    * http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659
    */
-  protected boolean detectStaleSocketChannel(IOException exception, HttpContext context) {
-    boolean retry;
-    if (m_retryOnNoHttpResponseException && exception instanceof NoHttpResponseException) {
+  public boolean detectStaleSocketChannel(IOException exception) {
+    if (checkRetryNoHttpResponseException(exception)) {
       String message = "detected a 'NoHttpResponseException', assuming a stale socket channel; retry non-idempotent request";
       if (Thread.currentThread().isInterrupted()) {
         LOG.debug(message);
@@ -120,9 +150,9 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
       else {
         LOG.warn(message);
       }
-      retry = true;
+      return true;
     }
-    else if (m_retryOnSocketExceptionByConnectionReset && exception instanceof java.net.SocketException && "Connection reset".equals(exception.getMessage())) {
+    else if (checkRetrySocketException(exception)) {
       String message = "detected a 'SocketException: Connection reset', assuming a stale socket channel; retry non-idempotent request";
       if (Thread.currentThread().isInterrupted()) {
         LOG.debug(message);
@@ -130,16 +160,37 @@ public class CustomHttpRequestRetryStrategy extends DefaultHttpRequestRetryStrat
       else {
         LOG.warn(message);
       }
-      retry = true;
-    }
-    else {
-      retry = false;
+      return true;
     }
 
-    if (retry) {
-      HttpRequest request = HttpClientContext.adapt(context).getRequest();
-      OneTimeRepeatableRequestEntityProxy.installRetry(request);
+    return false;
+  }
+
+  protected boolean checkRetryNoHttpResponseException(IOException exception) {
+    return m_retryOnNoHttpResponseException && exception instanceof NoHttpResponseException;
+  }
+
+  protected boolean checkRetrySocketException(IOException exception) {
+    return m_retryOnSocketExceptionByConnectionReset && exception instanceof java.net.SocketException && "Connection reset".equals(exception.getMessage());
+  }
+
+  public class OneTimeRetryPrepareExecChainHandler implements ExecChainHandler {
+
+    @Override
+    public ClassicHttpResponse execute(ClassicHttpRequest request, Scope scope, ExecChain chain) throws IOException, HttpException {
+      try {
+        return chain.proceed(request, scope);
+      }
+      catch (IOException e) {
+        if (CustomHttpRequestRetryStrategy.this.checkRetryNoHttpResponseException(e) || CustomHttpRequestRetryStrategy.this.checkRetrySocketException(e)) {
+          LOG.debug("Installing {} to support retry of non-idempotent request", OneTimeRepeatableRequestEntityProxy.class, e);
+
+          // installing a proxy to ensure isRepeatable = true at least once (keep pre-24.1 behavior)
+          // even though it is not even guaranteed that original request is really repeatable
+          OneTimeRepeatableRequestEntityProxy.installRetry(request);
+        }
+        throw e;
+      }
     }
-    return retry;
   }
 }
