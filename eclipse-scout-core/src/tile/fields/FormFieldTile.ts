@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,12 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, BrowserField, Device, EnumObject, FormField, FormFieldLayout, PropertyChangeEvent, Tile, Widget, WidgetTile} from '../../index';
+import {aria, BrowserField, Device, EnumObject, FormField, FormFieldLayout, PropertyChangeEvent, Tile, Widget, WidgetTile, WidgetTileEventMap} from '../../index';
 
 export type FormFieldTileDisplayStyle = EnumObject<typeof FormFieldTile.DisplayStyle>;
 
 export class FormFieldTile extends WidgetTile {
   declare displayStyle: FormFieldTileDisplayStyle;
+  declare eventMap: FormFieldTileEventMap;
+  declare self: FormFieldTile;
   declare tileWidget: FormField;
 
   constructor() {
@@ -94,4 +96,8 @@ export class FormFieldTile extends WidgetTile {
       aria.linkElementWithActiveDescendant(this.$container, this.tileWidget?.$field);
     }
   }
+}
+
+export interface FormFieldTileEventMap extends WidgetTileEventMap {
+  'propertyChange:tileWidget': PropertyChangeEvent<FormField, FormFieldTile>;
 }
