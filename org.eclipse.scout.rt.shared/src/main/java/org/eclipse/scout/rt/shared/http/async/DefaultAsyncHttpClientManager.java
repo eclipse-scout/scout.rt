@@ -23,10 +23,15 @@ import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
+import org.apache.hc.core5.util.TimeValue;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.http.ApacheMultiSessionCookieStore;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportConnectionTimeToLiveProperty;
+import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportEvictExpiredConnectionsProperty;
+import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportEvictIdleConnectionsTimeoutProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportKeepAliveProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsTotalProperty;
@@ -63,6 +68,7 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
     installConfigurableProxySelector(builder);
 
     setConnectionKeepAliveAndRetrySettings(builder);
+    setConnectionEvictionSettings(builder);
 
     builder.setConnectionManager(createConnectionManager());
   }
@@ -82,6 +88,21 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
     addConnectionKeepAliveSettings(builder);
     addRetrySettings(builder);
     addRedirectSettings(builder);
+  }
+
+  protected void setConnectionEvictionSettings(HttpAsyncClientBuilder builder) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory.setConnectionEvictionSettings(HttpClientBuilder), unfortunately there is no common interface
+
+    // evict idle connections
+    int evictIdleConnectionsTimeout = NumberUtility.nvl(CONFIG.getPropertyValue(ApacheHttpTransportEvictIdleConnectionsTimeoutProperty.class), 0);
+    if (evictIdleConnectionsTimeout > 0) {
+      builder.evictIdleConnections(TimeValue.of(evictIdleConnectionsTimeout, TimeUnit.SECONDS));
+    }
+
+    // evict expired connections
+    if (BooleanUtility.nvl(CONFIG.getPropertyValue(ApacheHttpTransportEvictExpiredConnectionsProperty.class))) {
+      builder.evictExpiredConnections();
+    }
   }
 
   protected void addConnectionKeepAliveSettings(HttpAsyncClientBuilder builder) {

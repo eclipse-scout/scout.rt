@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,10 +10,12 @@
 package org.eclipse.scout.rt.shared.http;
 
 import java.net.SocketException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.hc.core5.http.NoHttpResponseException;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 
 public final class HttpConfigurationProperties {
 
@@ -151,6 +153,56 @@ public final class HttpConfigurationProperties {
     @Override
     public String getKey() {
       return "scout.http.retryOnSocketExceptionByConnectionReset";
+    }
+  }
+
+  /**
+   * Enable automatic eviction of idle connections with the specified number in seconds (use zero to disable).
+   *
+   * @since 24.1
+   */
+  public static class ApacheHttpTransportEvictIdleConnectionsTimeoutProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public Integer getDefaultValue() {
+      return (int) TimeUnit.MINUTES.toSeconds(1L);
+    }
+
+    @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
+    public String description() {
+      return "Enable eviction of idle connections with the specified number in seconds (use zero to disable).\n"
+          + "The default value is 1 minute";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.http.evictIdleConnectionsTimeout";
+    }
+  }
+
+  /**
+   * Enable automatic eviction of expired connections (default: true).
+   *
+   * @since 24.1
+   */
+  public static class ApacheHttpTransportEvictExpiredConnectionsProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public Boolean getDefaultValue() {
+      return true;
+    }
+
+    @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
+    public String description() {
+      return "Enable eviction of expired connections.\n"
+          + "The default value is enabled (= true)";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.http.evictExpiredConnections";
     }
   }
 }
