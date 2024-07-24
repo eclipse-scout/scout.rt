@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Proxy;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.hc.core5.http.NoHttpResponseException;
+import org.apache.hc.core5.http.io.HttpClientConnection;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
@@ -142,6 +144,66 @@ public class HttpRetryTest {
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 11, bytes.length);//text + CR + LF
     assertEquals(Arrays.asList("01"), servletGetLog);
+  }
+
+  /**
+   * Expect retry on apache level
+   */
+  @Test
+  public void testPostWithUnsupportedRetryAndFailureWhileRetrievingResponse() throws IOException {
+    //emulate a header write error
+    AtomicInteger count = new AtomicInteger(1);
+    m_client.withExecuteInterceptor(
+        (request, conn, informationCallback, context, superCall) -> {
+          if (count.getAndIncrement() < 2) {
+            HttpClientConnection originalConnection = conn;
+            conn = (HttpClientConnection) Proxy.newProxyInstance(
+                HttpClientConnection.class.getClassLoader(),
+                new Class[]{HttpClientConnection.class},
+                (proxy, method, args) -> {
+                  if ("receiveResponseHeader".equals(method.getName())) {
+                    throw new NoHttpResponseException("foo");
+                  }
+                  return method.invoke(originalConnection, args);
+                });
+          }
+          return superCall.execute(request, conn, informationCallback, context, null);
+        });
+
+    HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
+    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
+      @Override
+      public void writeTo(OutputStream out) throws IOException {
+        out.write("bar".getBytes());
+      }
+
+      @Override
+      public boolean retrySupported() {
+        return false;
+      }
+
+      @Override
+      public String getType() {
+        return "text/plain;charset=UTF-8";
+      }
+
+      @Override
+      public long getLength() {
+        return 3;
+      }
+    });
+    req.getHeaders().set(CORRELATION_ID, "02");
+    HttpResponse resp = req.execute();
+    byte[] bytes;
+    try (InputStream in = resp.getContent()) {
+      bytes = IOUtility.readBytes(in);
+    }
+    String text = new String(bytes, StandardCharsets.UTF_8).trim();
+    assertEquals(text, "Post bar");
+    assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
+    assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
+    assertEquals(Arrays.asList("02", "02"), servletPostLog);
+    assertNull(servletPostError);
   }
 
   /**
