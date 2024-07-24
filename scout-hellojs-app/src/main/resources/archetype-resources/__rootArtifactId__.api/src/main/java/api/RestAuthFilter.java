@@ -13,7 +13,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.authentication.AnonymousAccessController;
 
@@ -26,12 +25,13 @@ public class RestAuthFilter implements Filter {
 
   @Override
   public void init(FilterConfig filterConfig) {
-    m_anonymousAccessController = BEANS.get(AnonymousAccessController.class).init();
+    m_anonymousAccessController = BEANS.get(AnonymousAccessController.class)
+      .init(new AnonymousAccessController.AnonymousAuthConfig()
+        .withPutPrincipalOnSession(false));
   }
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     final HttpServletRequest req = (HttpServletRequest) request;
     final HttpServletResponse resp = (HttpServletResponse) response;
 
