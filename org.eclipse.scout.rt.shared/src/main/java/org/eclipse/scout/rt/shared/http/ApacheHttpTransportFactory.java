@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,10 +25,15 @@ import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.client5.http.ssl.HttpsSupport;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.util.TimeValue;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportConnectionTimeToLiveProperty;
+import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportEvictExpiredConnectionsProperty;
+import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportEvictIdleConnectionsTimeoutProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportKeepAliveProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsTotalProperty;
@@ -54,6 +59,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     installMultiSessionCookieStore(builder);
 
     setConnectionKeepAliveAndRetrySettings(builder);
+    setConnectionEvictionSettings(builder);
 
     HttpClientConnectionManager cm = createHttpClientConnectionManager(manager);
     if (cm != null) {
@@ -71,6 +77,21 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     addConnectionKeepAliveSettings(builder);
     addRetrySettings(builder);
     addRedirectSettings(builder);
+  }
+
+  protected void setConnectionEvictionSettings(HttpClientBuilder builder) {
+    // see very similar code in org.eclipse.scout.rt.shared.http.async.DefaultAsyncHttpClientManager.setConnectionEvictionSettings(HttpAsyncClientBuilder), unfortunately there is no common interface
+
+    // evict idle connections
+    int evictIdleConnectionsTimeout = NumberUtility.nvl(CONFIG.getPropertyValue(ApacheHttpTransportEvictIdleConnectionsTimeoutProperty.class), 0);
+    if (evictIdleConnectionsTimeout > 0) {
+      builder.evictIdleConnections(TimeValue.of(evictIdleConnectionsTimeout, TimeUnit.SECONDS));
+    }
+
+    // evict expired connections
+    if (BooleanUtility.nvl(CONFIG.getPropertyValue(ApacheHttpTransportEvictExpiredConnectionsProperty.class))) {
+      builder.evictExpiredConnections();
+    }
   }
 
   protected void addConnectionKeepAliveSettings(HttpClientBuilder builder) {
