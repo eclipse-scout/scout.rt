@@ -102,7 +102,7 @@ if (args.printEventMaps) {
 if (migrateConfig.plugins.length === 0) {
   console.warn('No tasks executed, please consult README.md');
 } else {
-  migrate({rootDir, tsConfigDir, config: migrateConfig, sources}).then(exitCode => process.exit(exitCode));
+  migrate({rootDir, tsConfigDir, config: migrateConfig, sources}).then(({exitCode}) => process.exit(exitCode));
 }
 
 function configTypeScript() {
