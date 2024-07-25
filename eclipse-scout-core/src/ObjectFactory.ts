@@ -193,11 +193,11 @@ export class ObjectFactory {
     return ObjectUuidProvider.createUiId();
   }
 
-  resolveTypedObjectType(objectType: ObjectType): ObjectType {
+  resolveTypedObjectType<T>(objectType: ObjectType<T>): ObjectType<T> {
     if (typeof objectType !== 'string') {
       return objectType;
     }
-    let Class = TypeDescriptor.resolveType(objectType);
+    let Class = TypeDescriptor.resolveType(objectType) as Constructor<T>;
     if (Class) {
       return Class;
     }

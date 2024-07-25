@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-
-import {arrays, DataObjectSerializer, DoEntity, objects, scout} from '..';
+import {DoDeserializer, DoEntity, DoSerializer, ObjectType, scout} from '../index';
 
 export const dataObjects = {
 
@@ -17,17 +16,20 @@ export const dataObjects = {
     return false;
   },
 
-  stringify(dataobject: DoEntity): string {
+  stringify(dataobject: any): string {
     if (!dataobject) {
       return null;
     }
-    const serializer = scout.create(DataObjectSerializer);
+    const serializer = scout.create(DoSerializer);
     return JSON.stringify(dataobject, (key, value) => serializer.serialize(key, value));
   },
 
-  parse(string): DoEntity {
-    // FIXME mvi [js-bookmark] implement
-    return null;
+  parse<T extends DoEntity>(json: string, objectType?: ObjectType<T>): T {
+    if (!json) {
+      return null;
+    }
+    const deserializer = scout.create(DoDeserializer);
+    return deserializer.parse(json, objectType);
   },
 
   /**

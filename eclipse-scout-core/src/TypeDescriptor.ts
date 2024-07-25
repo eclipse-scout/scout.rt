@@ -81,9 +81,15 @@ export class TypeDescriptor {
     return this.error('Could not find "' + this.className + '" in namespace "' + this.namespaces.join('.') + '"');
   }
 
-  static resolveType(typeDescriptor: string, options?: TypeDescriptorOptions): new() => object {
+  static resolveType<T>(typeDescriptor: string | Constructor<T>, options?: TypeDescriptorOptions): Constructor<T> {
+    if (!typeDescriptor) {
+      return null;
+    }
+    if (typeof typeDescriptor === 'function') {
+      return typeDescriptor as Constructor<T>;
+    }
     let info = TypeDescriptor.parse(typeDescriptor);
-    return info.resolve(options);
+    return info.resolve(options) as Constructor<T>;
   }
 
   static parse(typeDescriptor: string): TypeDescriptor {

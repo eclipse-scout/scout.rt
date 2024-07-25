@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, BaseDoEntity, Constructor, ObjectFactory, scout} from '../index';
+import {App, BaseDoEntity, Constructor, ObjectFactory, scout, strings} from '../index';
 
 export class DoRegistry {
 
@@ -17,18 +17,53 @@ export class DoRegistry {
   protected _objectTypeByJsonType = new Map<string, string>();
 
   init() {
-    ObjectFactory.get().getClassesInstanceOf(BaseDoEntity).forEach(DoConstructor => {
-      const instance = new DoConstructor();
-      const _type = instance._type;
-      if (_type) {
-        this._constructorByJsonType.set(_type, DoConstructor);
-        const objectType = ObjectFactory.get().getObjectType(DoConstructor);
-        if (objectType) {
-          this._jsonTypeByDataObject.set(objectType, _type);
-          this._objectTypeByJsonType.set(_type, objectType);
-        }
+    ObjectFactory.get()
+      .getClassesInstanceOf(BaseDoEntity)
+      .forEach(doClass => this.add(doClass));
+  }
+
+  add(DoClass: Constructor<BaseDoEntity>, jsonType?: string) {
+    if (!DoClass) {
+      return;
+    }
+    jsonType = jsonType || this._readJsonType(DoClass);
+    if (!jsonType) {
+      return;
+    }
+
+    this._constructorByJsonType.set(jsonType, DoClass);
+    const objectType = ObjectFactory.get().getObjectType(DoClass);
+    if (objectType) {
+      this._jsonTypeByDataObject.set(objectType, jsonType);
+      this._objectTypeByJsonType.set(jsonType, objectType);
+    }
+  }
+
+  removeByClass(DoClass: Constructor<BaseDoEntity>) {
+    if (!DoClass) {
+      return;
+    }
+    for (let [key, value] of this._constructorByJsonType) {
+      if (value === DoClass) {
+        this.removeByJsonType(key);
       }
-    });
+    }
+  }
+
+  removeByJsonType(jsonType: string) {
+    if (!jsonType) {
+      return;
+    }
+    this._constructorByJsonType.delete(jsonType);
+    const objectType = this._objectTypeByJsonType.get(jsonType);
+    if (objectType) {
+      this._jsonTypeByDataObject.delete(objectType);
+    }
+    this._objectTypeByJsonType.delete(jsonType);
+  }
+
+  protected _readJsonType(DoClass: Constructor<BaseDoEntity>): string {
+    return new DoClass()._type;
   }
 
   allDataObjects(): IterableIterator<Constructor<BaseDoEntity>> {
@@ -40,6 +75,7 @@ export class DoRegistry {
   }
 
   toJsonType(objectType: string): string {
+    objectType = strings.removePrefix(objectType, 'scout.'); // scout elements are in the map without namespace.
     return this._jsonTypeByDataObject.get(objectType);
   }
 

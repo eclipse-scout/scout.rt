@@ -10,8 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const scoutBuildConstants = require('./constants');
-// FIXME mvi [js-bookmark] enable transformer when fully tested
-// const transformers = require('./transformers');
+const transformers = require('./transformers');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
@@ -84,9 +83,8 @@ module.exports = (env, args) => {
     compilerOptions: {
       noEmit: false,
       ...args.tsOptions?.compilerOptions
-    }/* ,
-    // FIXME mvi [js-bookmark] enable transformer when fully tested
-    getCustomTransformers: program => ({before: [ctx => transformers.dataObjectTransformer(program, ctx)]})*/
+    },
+    getCustomTransformers: program => ({before: [ctx => transformers.dataObjectTransformer(program, ctx)]})
   };
 
   const config = {
