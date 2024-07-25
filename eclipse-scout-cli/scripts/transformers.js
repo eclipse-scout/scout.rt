@@ -83,19 +83,34 @@ class DataObjectTransformer {
 
   _createMetaDataAnnotationsFor(node) {
     const metaDataAnnotations = [];
-    let type = node.type;
-    if (ts.isArrayTypeNode(type)) {
-      let dimension = 1;
-      type = type.elementType;
-      while (ts.isArrayTypeNode(type)) {
-        dimension++;
-        type = type.elementType;
-      }
-      const arrayMetaAnnotation = this._createMetaDataAnnotation('a', ts.factory.createNumericLiteral(dimension));
-      metaDataAnnotations.push(arrayMetaAnnotation);
-    }
+    let {type} = this._parseLeafType(node.type);
+    // FIXME mvi [js-bookmark] is array dimension required?
+    // if (dimension > 0) {
+    //   const arrayMetaAnnotation = this._createMetaDataAnnotation('a', ts.factory.createNumericLiteral(dimension));
+    //   metaDataAnnotations.push(arrayMetaAnnotation);
+    // }
+    // FIXME mvi [js-bookmark] only add types which are actually used at RT? e.g. skip Number, Boolean, String or Array, etc?
     metaDataAnnotations.push(this._createMetaDataAnnotation('t', this._createTypeNode(type)));
     return metaDataAnnotations;
+  }
+
+  _parseLeafType(type) {
+    let dimension = 0;
+    let abort = false;
+    while (!abort) {
+      if (ts.isArrayTypeNode(type)) {
+        // Obj[]
+        dimension++;
+        type = type.elementType;
+      } else if (ts.isTypeReferenceNode(type) && type.typeName?.escapedText === 'Array' && type.typeArguments.length) {
+        // Array<Obj>
+        dimension++;
+        type = type.typeArguments[0];
+      } else {
+        abort = true;
+      }
+    }
+    return {type: type, dimension};
   }
 
   _createTypeNode(node) {
@@ -111,7 +126,9 @@ class DataObjectTransformer {
       // primitive boolean
       return ts.factory.createIdentifier('Boolean');
     }
-    // FIXME mvi [js-bookmark] handle Record and Partial?
+    // bigint is not yet supported as it is only part of ES2020 while Scout still supports ES2019
+
+    // FIXME mvi [js-bookmark] handle Record and Partial and other types?
     if (ts.isTypeReferenceNode(node)) {
       const name = node.typeName.escapedText;
       if (global[name]) {
@@ -126,7 +143,7 @@ class DataObjectTransformer {
   _createMetaDataAnnotation(key/* string */, valueNode) {
     const reflect = ts.factory.createIdentifier('Reflect');
     const reflectMetaData = ts.factory.createPropertyAccessExpression(reflect, ts.factory.createIdentifier('metadata'));
-    const keyNode = ts.factory.createStringLiteral('scout.meta.' + key);
+    const keyNode = ts.factory.createStringLiteral('scout.m.' + key);
     const call = ts.factory.createCallExpression(reflectMetaData, undefined, [keyNode, valueNode]);
     return ts.factory.createDecorator(call);
   }
@@ -136,14 +153,7 @@ class DataObjectTransformer {
     if (!propertyName || propertyName.startsWith('_') || propertyName.startsWith('$') || CONSTANT_PATTERN.test(propertyName)) {
       return true;
     }
-    if (!node.modifiers) {
-      return false;
-    }
-    const isStaticOrProtected = node.modifiers.some(n => n.kind === ts.SyntaxKind.StaticKeyword || n.kind === ts.SyntaxKind.ProtectedKeyword);
-    if (isStaticOrProtected) {
-      return true;
-    }
-    return node.modifiers.some(n => ts.isDecorator(n) && n.expression?.escapedText === 'dataObjectAttribute');
+    return !!node.modifiers?.some(n => n.kind === ts.SyntaxKind.StaticKeyword || n.kind === ts.SyntaxKind.ProtectedKeyword);
   }
 
   _visitChildren(node) {

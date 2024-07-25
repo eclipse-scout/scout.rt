@@ -7,20 +7,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, Constructor, dates, DoRegistry, ObjectFactory, objects, TypeDescriptor} from '../index';
+import {BaseDoEntity, Constructor, dates, DoDeserializer, DoRegistry, ObjectFactory, objects, TypeDescriptor} from '../index';
 
-export class DataObjectSerializer {
+export class DoSerializer {
   serialize(key: string, value: any): any {
-    if (!objects.isPlainObject(value)) {
-      return value;
+    if (objects.isPlainObject(value)) {
+      return this._handleObjectValue(value);
     }
-    return this._handleObjectValue(value);
+    return value;
   }
 
   protected _handleObjectValue(value: any): any {
     const target = Object.assign({}, value); // shallow copy to keep original object intact
     const objectType = this._detectObjectType(value);
-    this._setJsonType(target, objectType);
+    this._setJsonTypeTo(target, objectType);
     delete target.objectType; // Scout JS internal property
 
     if (objectType) {
@@ -34,20 +34,13 @@ export class DataObjectSerializer {
     return target;
   }
 
-  protected _detectObjectType(obj): Constructor {
+  protected _detectObjectType(obj: any): Constructor {
     if (obj instanceof BaseDoEntity) {
       return obj.constructor as Constructor;
     }
-    const objectType = obj.objectType;
-    if (typeof objectType === 'function') {
-      return objectType;
-    }
-    if (typeof objectType === 'string') {
-      const typeDescriptor = TypeDescriptor.parse(objectType);
-      const result = typeDescriptor.resolve({variantLenient: true});
-      if (result) {
-        return result;
-      }
+    const constructor = TypeDescriptor.resolveType(obj.objectType, {variantLenient: true}) as Constructor;
+    if (constructor) {
+      return constructor;
     }
     if (typeof obj._type === 'string') {
       return DoRegistry.get().toConstructor(obj._type);
@@ -56,11 +49,6 @@ export class DataObjectSerializer {
   }
 
   protected _convertValue(proto: object, target: object, key: string, value: any): any {
-    // const propertyDataType = Reflect.getMetadata('scout.meta.t', proto, key);
-    // const arrayDim = Reflect.getMetadata('scout.meta.a', proto, key);
-    // if (typeof arrayDim === 'number' && arrayDim > 0) {
-    //   console.log('array of dimension' + arrayDim);
-    // }
     if (Array.isArray(value)) {
       return value.map(e => this._convertValue(proto, target, key, e));
     }
@@ -79,14 +67,16 @@ export class DataObjectSerializer {
     if (target._type) {
       return; // already present
     }
-    const objectType = Reflect.getMetadata('scout.meta.t', proto, key);
+    const objectType = Reflect.getMetadata(DoDeserializer.META_DATA_KEY, proto, key) as string;
     const jsonType = DoRegistry.get().toJsonType(objectType);
     if (jsonType) {
       target._type = jsonType;
+    } else if (objectType) {
+      target.objectType = objectType;
     }
   }
 
-  protected _setJsonType(obj: any, constructor: Constructor) {
+  protected _setJsonTypeTo(obj: any, constructor: Constructor) {
     if (obj._type) {
       return; // already present
     }
