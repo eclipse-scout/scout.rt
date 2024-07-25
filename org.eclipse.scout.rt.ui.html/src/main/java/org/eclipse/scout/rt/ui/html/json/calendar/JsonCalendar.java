@@ -21,8 +21,6 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarUIFacade;
-import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
@@ -32,6 +30,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonDataObjectHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -65,6 +64,8 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
   private static final String EVENT_RESOURCE_VISIBILITY_CHANGE = "resourceVisibilityChange";
   private static final String EVENT_SELECTED_RESOURCE_CHANGE = "selectedResourceChange";
 
+  private final JsonDataObjectHelper m_jsonDoHelper = BEANS.get(JsonDataObjectHelper.class); // cached instance
+
   private CalendarListener m_calendarListener;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
@@ -75,6 +76,10 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
   @Override
   public String getObjectType() {
     return "Calendar";
+  }
+
+  protected JsonDataObjectHelper jsonDoHelper() {
+    return m_jsonDoHelper;
   }
 
   @Override
@@ -158,7 +163,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       @SuppressWarnings("unchecked")
       @Override
       public Object prepareValueForToJson(Object value) {
-        return resourcesToJsonArray(((List<IDoEntity>) value));
+        return resourcesToJson(((List<CalendarResourceDo>) value));
       }
     });
     putJsonProperty(new JsonProperty<>(ICalendar.PROP_VIEW_RANGE, model) {
@@ -269,9 +274,8 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     return (JsonCalendarComponent<C>) getUiSession().getJsonAdapter(adapterId);
   }
 
-  protected JSONArray resourcesToJsonArray(List<IDoEntity> resources) {
-    String str = BEANS.get(IDataObjectMapper.class).writeValue(resources);
-    return new JSONArray(str);
+  protected JSONArray resourcesToJson(List<CalendarResourceDo> resources) {
+    return jsonDoHelper().dataObjectsToJson(resources);
   }
 
   @Override
