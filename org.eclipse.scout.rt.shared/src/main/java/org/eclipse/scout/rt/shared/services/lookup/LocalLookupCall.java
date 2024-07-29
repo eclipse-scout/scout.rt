@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,7 +136,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
    */
   @Override
   public List<? extends ILookupRow<T>> getDataByText() {
-    Map<T, ILookupRow<T>> list = new HashMap<>();
+    Map<T, ILookupRow<T>> list = new LinkedHashMap<>();
     Pattern p = createSearchPattern(getText());
     List<? extends ILookupRow<T>> lookupRows = createLookupRowsFiltered();
     for (ILookupRow<T> row : lookupRows) {
