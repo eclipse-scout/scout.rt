@@ -9,38 +9,31 @@
  */
 
 const ts = require('typescript');
+const ModuleDetector = require('./ModuleDetector');
 const CONSTANT_PATTERN = new RegExp('^[A-Z_0-9]+$');
-
-function dataObjectTransformer(program, context) {
-  const transformer = new DataObjectTransformer(program, context);
-  return node => ts.visitNode(node, node => transformer.visit(node));
-}
 
 /**
  * See https://github.com/itsdouges/typescript-transformer-handbook
  */
-class DataObjectTransformer {
+module.exports = class DataObjectTransformer {
 
-  constructor(program, context) {
+  constructor(program, context, namespaceResolver) {
     this.program = program;
     this.context = context;
-    this._namespace = null;
+    this.moduleDetector = null; // created on first use
+    this.namespaceResolver = namespaceResolver;
   }
 
-  visit(node) {
+  transform(node) {
     if (ts.isSourceFile(node)) {
-      return this._visitChildren(node); // step into top level source files
+      const transformedFile = this._visitChildren(node); // step into top level source files
+      this.moduleDetector = null; // forget cached types for this file
+      return transformedFile;
     }
     if (ts.isClassDeclaration(node)) {
       const typeNameDecorator = node.modifiers?.find(m => ts.isDecorator(m) && m.expression?.expression?.escapedText === 'typeName');
       if (typeNameDecorator) {
-        this._namespace = this._parseNamespace(typeNameDecorator);
-        if (this._namespace) {
-          const modifiedSubTree = this._visitChildren(node); // step into DO with typeName annotation and namespace
-          this._namespace = null; // reset for next class declaration in same file
-          return modifiedSubTree;
-        }
-        return node; // no need to step into
+        return this._visitChildren(node); // step into DO with typeName annotation
       }
       return node; // no need to step into
     }
@@ -51,7 +44,7 @@ class DataObjectTransformer {
       return node; // no need to step into
     }
 
-    if (ts.isPropertyDeclaration(node) && this._namespace /* only if inside a DO with namespace */ && !this._isSkipProperty(node)) {
+    if (ts.isPropertyDeclaration(node) && !this._isSkipProperty(node)) {
       const newModifiers = [
         ...(node.modifiers || []), // existing
         ...this._createMetaDataAnnotationsFor(node) // newly added
@@ -59,26 +52,6 @@ class DataObjectTransformer {
       return ts.factory.replaceDecoratorsAndModifiers(node, newModifiers);
     }
     return node; // no need to step into
-  }
-
-  _parseNamespace(typeNameDecorator) {
-    // FIXME mvi [js-bookmark] assumes the namespace of the dataobject typeName is the same as the namespace of the Scout JS module! Is this true?
-    // FIXME mvi [js-bookmark] otherwise parse from:
-    //  - for contributions: webpack config.output.library or webpack.config.file (ContributionBuildConfig)
-    //  - normal module: the 'index' file (search for ObjectFactory.get().registerNamespace)
-    const decoratorArgs = typeNameDecorator.expression?.arguments;
-    if (!decoratorArgs?.length) {
-      return null;
-    }
-    const typeName = decoratorArgs[0].text;
-    if (!typeName) {
-      return null;
-    }
-    const firstDotPos = typeName.indexOf('.');
-    if (firstDotPos < 1) {
-      return null;
-    }
-    return typeName.substring(0, firstDotPos);
   }
 
   _createMetaDataAnnotationsFor(node) {
@@ -134,10 +107,19 @@ class DataObjectTransformer {
       if (global[name]) {
         return ts.factory.createIdentifier(name); // e.g. Date, Number, String, Boolean
       }
-      const qualifiedName = this._namespace === 'scout' ? name : this._namespace + '.' + name;
-      return ts.factory.createStringLiteral(qualifiedName);
+      const namespace = this._detectNamespaceFor(node);
+      const qualifiedName = (!namespace || namespace === 'scout') ? name : namespace + '.' + name;
+      return ts.factory.createStringLiteral(qualifiedName); // use objectType as string because e.g. of TS interfaces (which do not exist at RT) and so that overwrites in ObjectFactory are taken into account.
     }
-    return ts.factory.createIdentifier('Object'); // e.g. any, void
+    return ts.factory.createIdentifier('Object'); // e.g. any, void, unknown
+  }
+
+  _detectNamespaceFor(typeNode) {
+    if (!this.moduleDetector) {
+      this.moduleDetector = new ModuleDetector(typeNode);
+    }
+    const moduleName = this.moduleDetector.detectModuleOf(typeNode);
+    return this.namespaceResolver.resolveNamespace(moduleName, this.moduleDetector.sourceFile.fileName);
   }
 
   _createMetaDataAnnotation(key/* string */, valueNode) {
@@ -157,10 +139,6 @@ class DataObjectTransformer {
   }
 
   _visitChildren(node) {
-    return ts.visitEachChild(node, n => this.visit(n), this.context);
+    return ts.visitEachChild(node, n => this.transform(n), this.context);
   }
-}
-
-module.exports = {
-  dataObjectTransformer
 };
