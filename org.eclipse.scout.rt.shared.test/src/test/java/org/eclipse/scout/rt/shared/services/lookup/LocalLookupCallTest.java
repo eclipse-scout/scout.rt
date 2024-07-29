@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -131,6 +131,17 @@ public class LocalLookupCallTest {
   }
 
   @Test
+  public void testGetDataByTexOrder() {
+    P_LocalLookupCall lc = new P_LocalLookupCall();
+    lc.setWildcard("*");
+    lc.setText("*");
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByText();
+    assertEquals("lorem", rows.get(0).getText());
+    assertEquals("ipsum", rows.get(1).getText());
+    assertEquals("dolor", rows.get(2).getText());
+  }
+
+  @Test
   public void testGetDataByKey() {
     runGetDataByKey(0, null);
     runGetDataByKey(1, ROW10_KEY);
@@ -155,7 +166,6 @@ public class LocalLookupCallTest {
     runGetDataByRec(1, ROW30_KEY);
     runGetDataByRec(0, ROW11_KEY);
     runGetDataByRec(0, 799999);
-
   }
 
   @Test
