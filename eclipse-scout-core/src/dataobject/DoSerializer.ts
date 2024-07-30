@@ -11,6 +11,9 @@ import {BaseDoEntity, Constructor, dates, DoDeserializer, DoRegistry, ObjectFact
 
 export class DoSerializer {
   serialize(key: string, value: any): any {
+    if (Array.isArray(value)) {
+      return value.map(e => this.serialize('', e));
+    }
     if (objects.isPlainObject(value)) {
       return this._handleObjectValue(value);
     }

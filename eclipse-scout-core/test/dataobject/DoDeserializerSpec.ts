@@ -108,7 +108,7 @@ describe('DoDeserializer', () => {
       "nestedNestedDate": "2024-07-25 09:41:10.708Z"
     }
     `;
-    const resultFromStringObjectType = new DoDeserializer().parse(withStringObjectType) as Fixture03Do;
+    const resultFromStringObjectType = dataobjects.parse(withStringObjectType) as Fixture03Do;
     expect(resultFromStringObjectType).toBeInstanceOf(Fixture03Do);
     expect(resultFromStringObjectType.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-25 09:41:10.708Z'));
 
@@ -122,7 +122,7 @@ describe('DoDeserializer', () => {
   });
 
   it('Uses BaseDoEntity if no type information is available', () => {
-    const result = new DoDeserializer().parse('{"num":1234}') as any;
+    const result = dataobjects.parse('{"num":1234}') as any;
     expect(result).toBeInstanceOf(BaseDoEntity);
     expect(result.num).toBe(1234);
   });
@@ -140,6 +140,32 @@ describe('DoDeserializer', () => {
     const fromString = dataobjects.parse(json, 'scout.Fixture03Do') as Fixture03Do;
     expect(fromString).toBeInstanceOf(Fixture03Do);// _type from string is ignored and given type should be used.
     expect(fromString.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-25 07:41:10.708Z'));
+  });
+
+  it('can deserialize arrays', () => {
+    const json = `[{
+      "_type": "scout.Fixture03",
+      "nestedNestedDate": "2024-07-31 07:52:39.708Z"
+    }, {
+      "_type": "scout.Fixture03",
+      "nestedNestedDate": "2024-07-31 07:54:39.708Z"
+    }]
+    `;
+    const arr = dataobjects.parse(json) as Fixture03Do[];
+    expect(Array.isArray(arr)).toBeTrue();
+    expect(arr.length).toBe(2);
+
+    const first = arr[0];
+    expect(first).toBeInstanceOf(Fixture03Do);
+    expect(first._type).toBe('scout.Fixture03');
+    expect(first.objectType).toBe('Fixture03Do');
+    expect(first.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-31 07:52:39.708Z'));
+
+    const second = arr[1];
+    expect(second).toBeInstanceOf(Fixture03Do);
+    expect(second._type).toBe('scout.Fixture03');
+    expect(second.objectType).toBe('Fixture03Do');
+    expect(second.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-31 07:54:39.708Z'));
   });
 });
 

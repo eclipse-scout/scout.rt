@@ -13,8 +13,10 @@ export class DoDeserializer {
 
   static META_DATA_KEY = 'scout.m.t';
 
-  parse<T>(json: string, objectType?: ObjectType<T>): T {
-    const value = JSON.parse(json); // don't use reviver here as it works bottom-up. But here top-down is required.
+  deserialize<T>(value: any, objectType?: ObjectType<T>): T {
+    if (Array.isArray(value)) {
+      return value.map(e => this.deserialize(e, objectType)) as T;
+    }
     if (objects.isPlainObject(value)) {
       return this.reviveObject(value, objectType);
     }
