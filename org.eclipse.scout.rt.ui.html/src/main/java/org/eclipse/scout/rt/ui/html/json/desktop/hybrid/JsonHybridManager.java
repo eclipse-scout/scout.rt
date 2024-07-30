@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
@@ -29,9 +30,11 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonHybridManager<T extends HybridManager> extends AbstractJsonPropertyObserver<T> {
-
+  private static final Logger LOG = LoggerFactory.getLogger(JsonHybridManager.class);
   private HybridEventListener m_listener;
 
   private final LazyValue<JsonDataObjectHelper> m_jsonDoHelper = new LazyValue<>(JsonDataObjectHelper.class); // cached instance
@@ -160,7 +163,13 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
     String actionType = eventData.getString("actionType");
     IDoEntity data = jsonDoHelper().jsonToDataObject(eventData.optJSONObject("data"), IDoEntity.class);
 
-    getModel().getUIFacade().handleHybridActionFromUI(id, actionType, data);
+    LOG.debug("Handling hybrid action '{}' for id '{}'", actionType, id);
+    try {
+      getModel().getUIFacade().handleHybridActionFromUI(id, actionType, data);
+    }
+    catch (Exception e) {
+      throw new UiException("Handling hybrid action '" + actionType + "' failed", e);
+    }
   }
 
   protected class P_HybridEventListener implements HybridEventListener {
