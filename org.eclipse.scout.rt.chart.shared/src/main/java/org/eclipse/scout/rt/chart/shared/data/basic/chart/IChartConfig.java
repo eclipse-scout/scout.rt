@@ -215,6 +215,12 @@ public interface IChartConfig extends Serializable {
 
   IChartConfig withLegendPositionRight();
 
+  IChartConfig withLegendPointsVisible(boolean legendPointsVisible);
+
+  IChartConfig removeLegendPointsVisible();
+
+  boolean isLegendPointsVisible();
+
   IChartConfig withLineTension(BigDecimal tension);
 
   IChartConfig removeLineTension();
