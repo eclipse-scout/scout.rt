@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ActivateBookmarkResultDo, App, arrays, BaseDoEntity, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, Desktop, DoRegistry, HybridActionContextElement, HybridManager, HybridManagerActionEndEventResult,
-  IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session, SomeRequired, Status,
-  TableBookmarkPageDo, UuidPool, webstorage
+  ActivateBookmarkResultDo, App, arrays, BaseDoEntity, BookmarkDo, bookmarks, BookmarkSupportModel, BookmarkTableRowIdentifierDo, dataobjects, Desktop, DoRegistry, HybridActionContextElement, HybridManager,
+  HybridManagerActionEndEventResult, IBookmarkPageDo, InitModelOf, MessageBoxes, NodeBookmarkPageDo, objects, ObjectWithType, Outline, OutlineBookmarkDefinitionDo, Page, PageBookmarkDefinitionDo, PageResolver, PageWithTable, scout, Session,
+  SomeRequired, Status, TableBookmarkPageDo, UuidPool, webstorage
 } from '../index';
 
 export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
@@ -71,8 +71,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
       return;
     }
 
-    let jsonBookmarkStore = bookmarks.toTypedJson(bookmarkStore);
-    webstorage.setItemToLocalStorage('jswidgets:bookmarks', JSON.stringify(jsonBookmarkStore));
+    webstorage.setItemToLocalStorage('jswidgets:bookmarks', dataobjects.stringify(bookmarkStore));
   }
 
   // FIXME bsh [js-bookmark] Remove and replace with actual implementation
@@ -205,12 +204,6 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
           });
         })
         .then(searchFilter => {
-          if (searchFilter && !(searchFilter instanceof BaseDoEntity) && !searchFilter._type) {
-            searchFilter = bookmarks.toTypedJson(searchFilter);
-            if (!searchFilter._type) {
-              throw new Error('Missing _type for search filter');
-            }
-          }
           let bookmarkedPage = scout.create(TableBookmarkPageDo, {
             pageParam: page.pageParam,
             displayText: page.text, // FIXME bsh [js-bookmark] Delegate to bookmark adapter
@@ -273,14 +266,14 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
     if (hybridManager) {
       // Scout Classic: send the bookmark to the UI server first, let the client model resolve as much of the bookmark
       // as it can, then resolved the remaining path in the UI
-      let jsonBookmarkDefinition = bookmarks.toTypedJson(bookmarkDefinition);
+      let jsonBookmarkDefinition = dataobjects.serialize(bookmarkDefinition);
       let hybridActionData = {
         bookmarkDefinition: jsonBookmarkDefinition
       };
       return hybridManager.callActionAndWaitWithContext('ActivateBookmark', hybridActionData)
         .then((result: HybridManagerActionEndEventResult) => {
           let targetPage = HybridManager.getContextElement(result.contextElements, 'targetPage', Page);
-          let data = scout.create(ActivateBookmarkResultDo, bookmarks.toObjectModel(result.data));
+          let data = scout.create(ActivateBookmarkResultDo, dataobjects.deserialize(result.data));
           return {
             targetPage: targetPage,
             targetBookmarkPage: data.targetBookmarkPage,

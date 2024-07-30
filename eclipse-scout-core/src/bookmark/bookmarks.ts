@@ -174,45 +174,5 @@ export const bookmarks = {
       }
       return value;
     });
-  },
-
-  toTypedJson(object: any): any {
-    if (objects.isNullOrUndefinedOrEmpty(object)) {
-      return object;
-    }
-
-    const replacer = (key, value) => {
-      if (objects.isPlainObject(value) && value.objectType) {
-        let json = Object.assign({}, value); // shallow copy to keep original object intact
-        json._type = json._type || DoRegistry.get().toJsonType(value.objectType);
-        if (!json._type) {
-          throw new Error(`Unknown JSON type for object type "${value.objectType}" (missing @typeName?)`);
-        }
-        delete json.objectType;
-        return json;
-      }
-      return value;
-    };
-
-    return JSON.parse(JSON.stringify(object, replacer));
-  },
-
-  toObjectModel(object: any): any {
-    if (objects.isNullOrUndefinedOrEmpty(object)) {
-      return object;
-    }
-
-    const replacer = (key, value) => {
-      if (objects.isPlainObject(value) && value._type) {
-        let model = Object.assign({}, value); // shallow copy to keep original object intact
-        model.objectType = model.objectType || DoRegistry.get().toObjectType(value._type) || 'BaseDoEntity';
-        // Note: keep _type for later conversion to json again. This is important for types that are only known in Java.
-        delete model._typeVersion; // always ignore type version
-        return model;
-      }
-      return value;
-    };
-
-    return JSON.parse(JSON.stringify(object, replacer));
   }
 } as const;

@@ -23,11 +23,27 @@ export const dataobjects = {
     return JSON.stringify(dataobject, (key, value) => serializer.serialize(key, value));
   },
 
+  serialize(dataobject: any): any {
+    if (!dataobject) {
+      return null;
+    }
+    return scout.create(DoSerializer).serialize('', dataobject);
+  },
+
   parse<T extends DoEntity>(json: string, objectType?: ObjectType<T>): T {
     if (!json) {
       return null;
     }
+    const value = JSON.parse(json); // don't use reviver here as it works bottom-up. But here top-down is required.
     const deserializer = scout.create(DoDeserializer);
-    return deserializer.parse(json, objectType);
+    return deserializer.deserialize(value, objectType);
+  },
+
+  deserialize<T extends DoEntity>(obj: any, objectType?: ObjectType<T>): T {
+    if (!obj) {
+      return null;
+    }
+    const deserializer = scout.create(DoDeserializer);
+    return deserializer.deserialize(obj, objectType);
   }
 };

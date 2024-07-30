@@ -33,6 +33,20 @@ describe('DoSerializer', () => {
     doRegistry.removeByClass(Fixture03Do);
   });
 
+  it('can serialize arrays', () => {
+    const serialized = dataobjects.serialize([_createFixture03Do('2024-07-30 07:51:39.708Z'), _createFixture03Do('2024-07-30 08:51:39.708Z')]);
+    expect(Array.isArray(serialized)).toBeTrue();
+    expect(serialized.length).toBe(2);
+    expect(serialized[0]).toEqual({
+      _type: 'scout.Fixture03',
+      nestedNestedDate: '2024-07-30 07:51:39.708Z'
+    });
+    expect(serialized[1]).toEqual({
+      _type: 'scout.Fixture03',
+      nestedNestedDate: '2024-07-30 08:51:39.708Z'
+    });
+  });
+
   it('can serialize based on instance type', () => {
     const fixture01 = _createFixture01Do([
       _createFixture02Do('2024-07-05 13:51:39.708Z', _createFixture03Do('2024-07-05 12:51:39.708Z'), _createFixture03Do('2024-07-05 11:51:39.708Z')),

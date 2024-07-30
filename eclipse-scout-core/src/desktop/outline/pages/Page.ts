@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BaseDoEntity, BookmarkAdapter, bookmarks, ButtonTile, ChildModelOf, Constructor, DefaultBookmarkAdapter, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent, icons,
-  InitModelOf, inspector, Menu, MenuBar, menus, ObjectFactory, ObjectOrChildModel, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout, strings,
-  Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  BaseDoEntity, BookmarkAdapter, bookmarks, ButtonTile, ChildModelOf, Constructor, dataobjects, DefaultBookmarkAdapter, DoEntity, EnumObject, Event, EventHandler, EventListener, EventMapOf, EventModel, EventSupport, Form, HtmlComponent,
+  icons, InitModelOf, inspector, Menu, MenuBar, menus, ObjectFactory, ObjectOrChildModel, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithUuid, Outline, PageEventMap, PageIdDummyPageParamDo, PageModel, PropertyChangeEvent, scout,
+  strings, Table, TableRow, TableRowClickEvent, TileOutlineOverview, TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 
@@ -619,7 +619,7 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid, ObjectW
     if (pageParam instanceof BaseDoEntity || !pageParam) {
       this._pageParamInternal = pageParam;
     } else {
-      let pageParamModel = bookmarks.toObjectModel(pageParam);
+      let pageParamModel = dataobjects.deserialize(pageParam, BaseDoEntity);
       if ((!pageParamModel.objectType || pageParamModel.objectType === 'BaseDoEntity') && this.pageParamType) {
         // Reconstruct objectType from @pageParam decoration
         pageParamModel.objectType = ObjectFactory.get().getObjectType(this.pageParamType);
