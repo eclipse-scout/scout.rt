@@ -61,6 +61,7 @@ public class ChartConfig implements IChartConfig {
   protected static final String LEGEND_DISPLAY = combine(LEGEND, "display");
   protected static final String LEGEND_CLICKABLE = combine(LEGEND, "clickable");
   protected static final String LEGEND_POSITION = combine(LEGEND, "position");
+  protected static final String LEGEND_POINTS_VISIBLE = combine(LEGEND, "pointsVisible");
   protected static final String ELEMENTS = combine(OPTIONS, "elements");
   protected static final String LINE = combine(ELEMENTS, "line");
   protected static final String LINE_TENSION = combine(LINE, "tension");
@@ -640,6 +641,21 @@ public class ChartConfig implements IChartConfig {
   @Override
   public IChartConfig withLegendPositionRight() {
     return withLegendPosition(RIGHT);
+  }
+
+  @Override
+  public IChartConfig withLegendPointsVisible(boolean legendPointsVisible) {
+    return withProperty(LEGEND_POINTS_VISIBLE, legendPointsVisible);
+  }
+
+  @Override
+  public IChartConfig removeLegendPointsVisible() {
+    return removeProperty(LEGEND_POINTS_VISIBLE);
+  }
+
+  @Override
+  public boolean isLegendPointsVisible() {
+    return BooleanUtility.nvl((Boolean) getProperty(LEGEND_POINTS_VISIBLE));
   }
 
   @Override

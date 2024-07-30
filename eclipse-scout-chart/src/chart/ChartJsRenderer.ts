@@ -540,6 +540,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       this._computeDatasets(this.chart.data, config);
     }
     this._adjustData(config);
+    this._adjustLegend(config);
     this._adjustTooltip(config);
     this._adjustGrid(config);
     this._adjustPlugins(config);
@@ -758,6 +759,26 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       this.onlyIntegers = config.data.datasets.every(dataset => dataset.data.every((data: ScatterDataPoint | BubbleDataPoint) => numbers.isInteger(data.x) && numbers.isInteger(data.y)));
     } else {
       this.onlyIntegers = config.data.datasets.every(dataset => dataset.data.every(data => numbers.isInteger(data)));
+    }
+  }
+
+  protected _adjustLegend(config: ChartConfig) {
+    if (!config || !config.type || !config.options) {
+      return;
+    }
+
+    config.options = $.extend(true, {}, config.options, {
+      plugins: {
+        legend: {
+          labels: {
+            generateLabels: this._legendLabelGenerator
+          }
+        }
+      }
+    });
+
+    if (!config.options.plugins.legend.pointsVisible) {
+      config.options.plugins.legend.labels.boxWidth = 0;
     }
   }
 
@@ -2039,8 +2060,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       plugins: {
         legend: {
           labels: {
-            color: this._computeLabelColor(config.type),
-            generateLabels: this._legendLabelGenerator
+            color: this._computeLabelColor(config.type)
           }
         }
       }
@@ -2085,7 +2105,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         legendColor, borderColor, backgroundColor;
       if (dataset && scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
         legendColor = arrays.ensure(dataset.legendColor)[0];
-        borderColor = this._adjustColorOpacity(dataset.borderColor as string, 1);
+        borderColor = this._adjustColorOpacity(arrays.ensure(dataset.borderColor as string | string[])[0], 1);
       } else if (data.datasets.length && scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
         dataset = data.datasets[0];
         legendColor = Array.isArray(dataset.legendColor) ? dataset.legendColor[idx] : dataset.legendColor;

@@ -170,7 +170,8 @@ export class Chart extends Widget implements ChartModel {
           legend: {
             display: true,
             clickable: false,
-            position: Chart.Position.RIGHT
+            position: Chart.Position.RIGHT,
+            pointsVisible: true
           }
         }
       }
@@ -463,6 +464,7 @@ export type ChartConfigOptions = Omit<ChartOptions, 'scales'> & {
   plugins?: {
     legend?: {
       clickable?: boolean;
+      pointsVisible?: boolean;
     };
   };
 };
