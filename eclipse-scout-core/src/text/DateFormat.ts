@@ -17,16 +17,6 @@ import {DateFormatPatternDefinition, DateFormatPatternType, DateFormatSymbols, d
  * (see SimpleDateFormat) with the most commonly used patterns is supported.
  *
  * This object only operates on the local time zone.
- * <p>
- * locale.dateFormatSymbols contains:
- * <ul>
- * <li>weekdays start with Sunday (starts at 0 and not 1 as it does in java)</li>
- * <li>weekdaysShort start with Sunday (starts at 0 and not 1 as it does in java)</li>
- * <li>months start with January</li>
- * <li>monthsShort start with January<7li>
- * <li>am</li>
- * <li>pm</li>
- *</ul>
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
@@ -102,8 +92,8 @@ export class DateFormat {
         dateFormat: this,
         formatFunction: (formatContext, acceptedTerm) => {
           let year = formatContext.inputDate.getFullYear();
-          let numDigits = Math.max(4, year.toString().length); // min. digits = 4
-          return strings.padZeroLeft(formatContext.inputDate.getFullYear(), numDigits).slice(-numDigits);
+          let length = Math.max(4, year.toString().length); // min. digits = 4
+          return strings.padZeroLeft(year, length).slice(-length);
         },
         parseRegExp: /^(\d{4})(.*)$/,
         applyMatchFunction: (parseContext, match, acceptedTerm) => {
@@ -157,14 +147,13 @@ export class DateFormat {
           return this.dateFormat.symbols.months[formatContext.inputDate.getMonth()];
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          let i, symbol, re, m;
-          for (i = 0; i < this.dateFormat.symbols.months.length; i++) {
-            symbol = this.dateFormat.symbols.months[i];
+          for (let i = 0; i < this.dateFormat.symbols.months.length; i++) {
+            let symbol = this.dateFormat.symbols.months[i];
             if (!symbol) {
               continue; // Ignore empty symbols (otherwise, pattern would match everything)
             }
-            re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
-            m = re.exec(parseContext.inputString);
+            let re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
+            let m = re.exec(parseContext.inputString);
             if (m) { // match found
               parseContext.dateInfo.month = i;
               parseContext.matchInfo.month = m[1];
@@ -174,10 +163,10 @@ export class DateFormat {
           }
           // No match found so far. In analyze mode, check prefixes.
           if (parseContext.analyze) {
-            for (i = 0; i < this.dateFormat.symbols.months.length; i++) {
-              symbol = this.dateFormat.symbols.months[i];
-              re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
-              m = re.exec(symbol);
+            for (let i = 0; i < this.dateFormat.symbols.months.length; i++) {
+              let symbol = this.dateFormat.symbols.months[i];
+              let re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+              let m = re.exec(symbol);
               if (m) { // match found
                 parseContext.dateInfo.month = i;
                 parseContext.matchInfo.month = symbol;
@@ -197,14 +186,13 @@ export class DateFormat {
           return this.dateFormat.symbols.monthsShort[formatContext.inputDate.getMonth()];
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          let i, symbol, re, m;
-          for (i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
-            symbol = this.dateFormat.symbols.monthsShort[i];
+          for (let i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
+            let symbol = this.dateFormat.symbols.monthsShort[i];
             if (!symbol) {
               continue; // Ignore empty symbols (otherwise, pattern would match everything)
             }
-            re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
-            m = re.exec(parseContext.inputString);
+            let re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
+            let m = re.exec(parseContext.inputString);
             if (m) { // match found
               parseContext.dateInfo.month = i;
               parseContext.matchInfo.month = m[1];
@@ -214,10 +202,10 @@ export class DateFormat {
           }
           // No match found so far. In analyze mode, check prefixes.
           if (parseContext.analyze) {
-            for (i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
-              symbol = this.dateFormat.symbols.monthsShort[i];
-              re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
-              m = re.exec(symbol);
+            for (let i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
+              let symbol = this.dateFormat.symbols.monthsShort[i];
+              let re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+              let m = re.exec(symbol);
               if (m) { // match found
                 parseContext.dateInfo.month = i;
                 parseContext.matchInfo.month = symbol;
@@ -348,16 +336,15 @@ export class DateFormat {
           return this.dateFormat.symbols.weekdays[formatContext.inputDate.getDay()];
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          let i, symbol, re, m;
-          for (i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
-            symbol = this.dateFormat.symbols.weekdays[i];
+          for (let i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
+            let symbol = this.dateFormat.symbols.weekdays[i];
             if (!symbol) {
               continue; // Ignore empty symbols (otherwise, pattern would match everything)
             }
-            re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
-            m = re.exec(parseContext.inputString);
+            let re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
+            let m = re.exec(parseContext.inputString);
             if (m) { // match found
-              parseContext.matchInfo.weekday = m[1];
+              parseContext.matchInfo.weekday = Number(m[1]);
               parseContext.hints.weekday = i;
               parseContext.inputString = m[2];
               return m[1];
@@ -365,10 +352,10 @@ export class DateFormat {
           }
           // No match found so far. In analyze mode, check prefixes.
           if (parseContext.analyze) {
-            for (i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
-              symbol = this.dateFormat.symbols.weekdays[i];
-              re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
-              m = re.exec(symbol);
+            for (let i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
+              let symbol = this.dateFormat.symbols.weekdays[i];
+              let re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+              let m = re.exec(symbol);
               if (m) { // match found
                 parseContext.matchInfo.weekday = symbol;
                 parseContext.hints.weekday = i;
@@ -388,16 +375,15 @@ export class DateFormat {
           return this.dateFormat.symbols.weekdaysShort[formatContext.inputDate.getDay()];
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          let i, symbol, re, m;
-          for (i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
-            symbol = this.dateFormat.symbols.weekdaysShort[i];
+          for (let i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
+            let symbol = this.dateFormat.symbols.weekdaysShort[i];
             if (!symbol) {
               continue; // Ignore empty symbols (otherwise, pattern would match everything)
             }
-            re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
-            m = re.exec(parseContext.inputString);
+            let re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
+            let m = re.exec(parseContext.inputString);
             if (m) { // match found
-              parseContext.matchInfo.weekday = m[1];
+              parseContext.matchInfo.weekday = Number(m[1]);
               parseContext.hints.weekday = i;
               parseContext.inputString = m[2];
               return m[1];
@@ -405,10 +391,10 @@ export class DateFormat {
           }
           // No match found so far. In analyze mode, check prefixes.
           if (parseContext.analyze) {
-            for (i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
-              symbol = this.dateFormat.symbols.weekdaysShort[i];
-              re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
-              m = re.exec(symbol);
+            for (let i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
+              let symbol = this.dateFormat.symbols.weekdaysShort[i];
+              let re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+              let m = re.exec(symbol);
               if (m) { // match found
                 parseContext.matchInfo.weekday = symbol;
                 parseContext.hints.weekday = i;
@@ -666,18 +652,17 @@ export class DateFormat {
   }
 
   protected _compile() {
-    let i, j, patternDefinitions, patternDefinition, re: RegExp, m, term, termAccepted, analyseFunctions;
-
     // Build format, parse and analyze functions for all terms in the DateFormat's pattern.
     // A term is a continuous sequence of the same character.
-    re = /(.)\1*/g;
+    let re = /(.)\1*/g;
+    let m: RegExpExecArray;
     while ((m = re.exec(this.pattern))) {
-      term = m[0];
+      let term = m[0];
       this._terms.push(term);
 
-      termAccepted = false;
-      for (i = 0; i < this._patternDefinitions.length; i++) {
-        patternDefinition = this._patternDefinitions[i];
+      let termAccepted = false;
+      for (let i = 0; i < this._patternDefinitions.length; i++) {
+        let patternDefinition = this._patternDefinitions[i];
         let acceptedTerm = patternDefinition.accept(term);
         if (acceptedTerm) {
           // 1. Create and install format function
@@ -687,11 +672,11 @@ export class DateFormat {
           this._parseFunctions.push(patternDefinition.createParseFunction(acceptedTerm));
 
           // 3. Create and install analyze functions
-          analyseFunctions = [patternDefinition.createParseFunction(acceptedTerm)];
+          let analyseFunctions = [patternDefinition.createParseFunction(acceptedTerm)];
           if (this.lenient) {
             // In lenient mode, add all other parse functions of the same type
-            patternDefinitions = this._patternLibrary[patternDefinition.type];
-            for (j = 0; j < patternDefinitions.length; j++) {
+            let patternDefinitions = this._patternLibrary[patternDefinition.type];
+            for (let j = 0; j < patternDefinitions.length; j++) {
               if (patternDefinitions[j] !== patternDefinition) {
                 analyseFunctions.push(patternDefinitions[j].createParseFunction(acceptedTerm));
               }
@@ -840,7 +825,7 @@ export class DateFormat {
 
   /**
    * Parses the given text with the current date format. If the text does not match exactly
-   * with the pattern, "null" is returned. Otherwise, the parsed date is returned.
+   * with the pattern, `null` is returned. Otherwise, the parsed date is returned.
    *
    * The argument 'startDate' is optional. It may set the date where parsed information should
    * be applied to (e.g. relevant for 2-digit years).
