@@ -35,16 +35,53 @@ export interface DecimalFormatSymbols {
 }
 
 export interface DateFormatSymbols {
+  /**
+   * Specifies which day of the week is considered to be the start of the week.
+   *
+   * - 0 = Sunday
+   * - 1 = Monday
+   * - 2 = Tuesday
+   * - etc.
+   */
   firstDayOfWeek?: number;
+
+  /**
+   * The localized names of the months ("January", "February" etc.), starting with January.
+   */
   months: string[];
+  /**
+   * The localized short names of the months ("Jan", "Feb" etc.), starting with January.
+   */
   monthsShort: string[];
 
+  /**
+   * The localized names the days of the week ("Monday", "Tuesday" etc.), starting with Sunday.
+   * Note that the list starts at index 0, not at 1 like in Java!
+   */
   weekdays: string[];
+  /**
+   * The same list as {@link weekdays}, but ordered so that it starts with the first day of the week according to {@link firstDayOfWeek}.
+   * @see dates#orderWeekdays
+   */
   weekdaysOrdered?: string[];
 
+  /**
+   * The localized short names the days of the week ("Mon", "Tue" etc.), starting with Sunday.
+   * Note that the list starts at index 0, not at 1 like in Java!
+   */
   weekdaysShort: string[];
+  /**
+   * The same list as {@link weekdaysShort}, but ordered so that it starts with the first day of the week according to {@link firstDayOfWeek}.
+   * @see dates#orderWeekdays
+   */
   weekdaysShortOrdered?: string[];
 
+  /**
+   * The text to indicate times before noon, e.g. "AM"
+   */
   am: string;
+  /**
+   * The text to indicate times after noon, e.g. "PM"
+   */
   pm: string;
 }
