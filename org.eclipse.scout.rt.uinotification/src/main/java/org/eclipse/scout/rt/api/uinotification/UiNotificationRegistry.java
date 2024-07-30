@@ -97,9 +97,10 @@ public class UiNotificationRegistry {
    *         will also complete with an empty list of notifications if the given timeout expires.
    */
   public CompletableFuture<List<UiNotificationDo>> getOrWait(List<TopicDo> topics, String user, long timeout) {
+    List<String> topicNames = topics.stream().map(topic -> topic.getName()).collect(Collectors.toList());
     List<UiNotificationDo> notifications = get(topics, user);
     if (!notifications.isEmpty() || timeout <= 0) {
-      LOG.info("Returning {} notifications for topics {} and user {} without waiting.", notifications.size(), topics, user);
+      LOG.info("Returning {} notifications for topics {} and user {} without waiting.", notifications.size(), topicNames, user);
       return CompletableFuture.completedFuture(notifications);
     }
 
@@ -107,14 +108,13 @@ public class UiNotificationRegistry {
     final UiNotificationListener listener = event -> {
       List<UiNotificationDo> newNotifications = get(topics, user);
       if (!newNotifications.isEmpty()) {
-        LOG.info("New notifications received for topics {} and user {}.", topics, user);
+        LOG.info("New notifications received for topics {} and user {}.", topicNames, user);
         future.complete(newNotifications);
       }
     };
-    List<String> topicNames = topics.stream().map(topic -> topic.getName()).collect(Collectors.toList());
     addListeners(topicNames, listener);
 
-    LOG.debug("Waiting for new notifications for topics {} and user {}.", topics, user);
+    LOG.debug("Waiting for new notifications for topics {} and user {}.", topicNames, user);
 
     return future.thenApply(uiNotificationDos -> {
       removeListeners(topicNames, user, listener);
@@ -333,7 +333,12 @@ public class UiNotificationRegistry {
 
       List<UiNotificationMessageDo> uiNotifications = getNotifications().computeIfAbsent(topic, key -> new ArrayList<>());
       uiNotifications.add(message);
-      LOG.info("Added new ui notification {} for topic {}. New size: {}", notification, topic, uiNotifications.size());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Added new ui notification {} for topic {}. New size: {}", notification, topic, uiNotifications.size());
+      }
+      else {
+        LOG.info("Added new ui notification with id {} for topic {}. New size: {}", notification.getId(), topic, uiNotifications.size());
+      }
 
       triggerEvent(topic, notification);
       startCleanupJob(); // inside lock to ensure cleanup job will be started only once
