@@ -106,32 +106,36 @@ export class DateFormat {
         terms: ['yyy', 'yy', 'y'],
         dateFormat: this,
         formatFunction: (formatContext, acceptedTerm) => {
-          let year = String(formatContext.inputDate.getFullYear());
-          let length = (formatContext.exactLength ? acceptedTerm.length : 2);
-          if (length === 1) {
-            // Return max. 2 digits, no leading zero
-            return year.slice(-length);
+          let year = formatContext.inputDate.getFullYear();
+          if (formatContext.analyzeInfo?.matchInfo?.year) {
+            let length = formatContext.analyzeInfo.matchInfo.year.length;
+            return strings.padZeroLeft(year, length).slice(-length);
           }
-          // Return max. 2 digits with zero padding
-          return strings.padZeroLeft(year, length).slice(-length);
+          // "For formatting, if the number of pattern letters is 2, the year is truncated to 2 digits"
+          if (acceptedTerm.length === 2) {
+            let length = acceptedTerm.length;
+            return strings.padZeroLeft(year, length).slice(-length);
+          }
+          // "For formatting, the number of pattern letters is the minimum number of digits, and shorter numbers are zero-padded to this amount."
+          return strings.padZeroLeft(year, acceptedTerm.length);
         },
-        parseRegExp: /^(\d{1,3})(.*)$/,
+        parseRegExp: /^(\d{1,4})(.*)$/,
         applyMatchFunction: (parseContext, match, acceptedTerm) => {
-          if (match.length === 3) {
+          // "For parsing, if the number of pattern letters is more than 2, the year is interpreted literally, regardless of the number of digits."
+          if (match.length > 2) {
             parseContext.dateInfo.year = Number(match);
             parseContext.matchInfo.year = match;
             return;
           }
+
+          // "For parsing with the abbreviated year pattern (y or yy), DateFormat must interpret the abbreviated year relative to some century.
+          // It does this by adjusting dates to be within 80 years before and 20 years after the 'startYear'."
           let startYear = (parseContext.startDate || new Date()).getFullYear();
-          // Construct a new year using the startYear's century and the entered 'short year'
-          let year = Number(
-            strings.padZeroLeft(startYear, 4).substring(0, 2) +
-            strings.padZeroLeft(match, 2));
-          // Ensure max. 50 years distance between 'startYear' and 'year'
+          let year = Number(strings.padZeroLeft(startYear, 4).substring(0, 2) + strings.padZeroLeft(match, 2));
           let distance = year - startYear;
-          if (distance <= -50) {
+          if (distance <= -80) {
             year += 100;
-          } else if (distance > 50) {
+          } else if (distance > 20) {
             year -= 100;
           }
           parseContext.dateInfo.year = year;
@@ -730,20 +734,13 @@ export class DateFormat {
   /**
    * Formats the given date according to the date pattern. If the date is missing, the
    * empty string is returned.
-   *
-   * @param exactLength
-   *          May be set to true to force the patterns to use the exact length. For example,
-   *          the year pattern 'yyy' would normally format the year using 2 digits. If
-   *          the parameter is true, 3 are used. This is mainly useful, when an "analyzed"
-   *          date should be formatted again using the "parsedPattern".
    */
-  format(date: Date, exactLength?: boolean): string {
+  format(date: Date, options: DateFormatFormatOptions = {}): string {
     if (!date) {
       return '';
     }
 
-    let formatContext = this._createFormatContext(date);
-    formatContext.exactLength = scout.nvl(exactLength, false);
+    let formatContext = this._createFormatContext(date, options.analyzeInfo);
     // Apply all formatter functions for this DateFormat to the pattern to replace the
     // different terms with the corresponding value from the given date.
     for (let i = 0; i < this._formatFunctions.length; i++) {
@@ -979,11 +976,11 @@ export class DateFormat {
    * passed through the various formatting functions. As the formatting progresses, the format context object
    * is updated accordingly. At the end of the process, the object contains the result.
    */
-  protected _createFormatContext(inputDate: Date): DateFormatContext {
+  protected _createFormatContext(inputDate: Date, analyzeInfo: DateFormatAnalyzeInfo): DateFormatContext {
     return {
       inputDate: inputDate,
-      formattedString: '',
-      exactLength: false
+      analyzeInfo: analyzeInfo,
+      formattedString: ''
     };
   }
 
@@ -1037,6 +1034,16 @@ export interface DateFormatOptions {
   lenient?: boolean;
 }
 
+export interface DateFormatFormatOptions {
+  /**
+   * The result of a previously analyzed user input when formatting it again. It helps the internal format functions
+   * to adjust the length of an accepted term to match to the corresponding user input.
+   *
+   * Normally, it is not necessary to set this value.
+   */
+  analyzeInfo?: DateFormatAnalyzeInfo;
+}
+
 export interface DateFormatMatchInfo {
   year?: string;
   /** one-based (January = '1') */
@@ -1087,6 +1094,11 @@ export interface DateFormatParseContext {
    * An object that contains further recognized date parts that are not needed to define the exact time.
    */
   hints: DateFormatHints;
+
+  /**
+   * The pattern that was used to parse the input string. It contains only the part of the date format pattern that matches the input string.
+   * Example: dateFormat="dd.MM.yyyy", inputString="14.2." --> parsedPattern="dd.M."
+   */
   parsedPattern: string;
 
   /**
@@ -1121,16 +1133,16 @@ export interface DateFormatContext {
   inputDate: Date;
 
   /**
-   * The result of the formatting. The string is initially empty. During the format process, the formatted parts will be appended to the string until the final string is complete.
+   * The result of a previously analyzed user input when formatting it again. It can be used by the internal format functions
+   * to adjust the length of an accepted term to match to the corresponding user input.
    */
-  formattedString: string;
+  analyzeInfo: DateFormatAnalyzeInfo;
 
   /**
-   * Flag to force the format functions to use the exact length of the accepted term. The default is false, which will use the canonical length.
-   * For example, the year pattern 'yyy' will format the year using 2 digits by default. If the parameter is true, 3 are used.
-   * This is mainly useful, when an "analyzed" date should be formatted again using the "parsedPattern".
+   * The result of the formatting. The string is initially empty. During the format process, the formatted parts will be appended
+   * to the string until the final string is complete.
    */
-  exactLength: boolean;
+  formattedString: string;
 }
 
 export interface DateFormatAnalyzeInfo {

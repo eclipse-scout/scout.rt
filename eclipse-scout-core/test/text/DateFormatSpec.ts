@@ -31,16 +31,23 @@ describe('DateFormat', () => {
       let dateFormat = new DateFormat(locale, pattern);
 
       expect(dateFormat.format(dates.create('2014-03-21'))).toBe('21.03.14');
+      expect(dateFormat.format(dates.create('0897-01-15'))).toBe('15.01.97');
 
       pattern = 'dd.MM.yyyy';
       dateFormat = new DateFormat(locale, pattern);
       expect(dateFormat.format(dates.create('2014-03-21'))).toBe('21.03.2014');
       expect(dateFormat.format(dates.create('20144-03-21'))).toBe('21.03.20144');
+      expect(dateFormat.format(dates.create('0897-01-15'))).toBe('15.01.0897');
 
       pattern = 'd.M.y';
       dateFormat = new DateFormat(locale, pattern);
-      expect(dateFormat.format(dates.create('2014-03-21'))).toBe('21.3.14');
-      expect(dateFormat.format(dates.create('2004-03-01'))).toBe('1.3.04');
+      expect(dateFormat.format(dates.create('2014-03-21'))).toBe('21.3.2014');
+      expect(dateFormat.format(dates.create('2004-03-01'))).toBe('1.3.2004');
+      expect(dateFormat.format(dates.create('0897-01-15'))).toBe('15.1.897');
+
+      pattern = 'dd.MM.y';
+      dateFormat = new DateFormat(locale, pattern);
+      expect(dateFormat.format(dates.create('0897-01-15'))).toBe('15.01.897');
 
       pattern = 'dd.MM.yy HH:mm';
       dateFormat = new DateFormat(locale, pattern);
@@ -128,10 +135,12 @@ describe('DateFormat', () => {
       let dateFormat = new DateFormat(locale, pattern);
 
       expect(dateFormat.parse('21.03.14').getTime()).toBe(dates.create('2014-03-21').getTime());
+      expect(dateFormat.parse('21.03.1914').getTime()).toBe(dates.create('1914-03-21').getTime());
 
       pattern = 'dd.MM.yyyy';
       dateFormat = new DateFormat(locale, pattern);
       expect(dateFormat.parse('21.03.2014').getTime()).toBe(dates.create('2014-03-21').getTime());
+      expect(dateFormat.parse('21.03.14')).toBe(null); // pattern does not match
 
       pattern = 'd.M.y';
       dateFormat = new DateFormat(locale, pattern);
@@ -196,7 +205,9 @@ describe('DateFormat', () => {
   });
 
   describe('analyze', () => {
+
     describe('analyzes the text and returns an object with months, years and days', () => {
+
       it('considers pattern dd.MM.yyyy', () => {
         let pattern = 'dd.MM.yyyy';
         let dateFormat = new DateFormat(locale, pattern);
@@ -212,6 +223,20 @@ describe('DateFormat', () => {
         expect(result.matchInfo.month).toBe('8');
         expect(result.matchInfo.year).toBe('2014');
         expect(result.parsedPattern).toBe('dd.M.yyyy');
+
+        result = dateFormat.analyze('21.08.2014');
+        expect(result.matchInfo.day).toBe('21');
+        expect(result.matchInfo.month).toBe('08');
+        expect(result.dateInfo.month).toBe(7);
+        expect(result.matchInfo.year).toBe('2014');
+        expect(result.parsedPattern).toBe('dd.MM.yyyy');
+
+        result = dateFormat.analyze('21.8.14');
+        expect(result.matchInfo.day).toBe('21');
+        expect(result.matchInfo.month).toBe('8');
+        expect(result.matchInfo.year).toBe('14');
+        expect(result.dateInfo.year).toBe(2014);
+        expect(result.parsedPattern).toBe('dd.M.yy');
       });
 
       it('considers pattern yyyy-MM-dd', () => {
@@ -379,6 +404,276 @@ describe('DateFormat', () => {
 
         result = dateFormat.analyze('11:59 a', dates.create('2016-02-01'));
         expect(dateFormat.format(result.predictedDate)).toBe('11:59 AM');
+      });
+    });
+
+    describe('formats predicted date differently', () => {
+
+      it('considers pattern dd.MM.yyyy', () => {
+        let pattern = 'dd.MM.yyyy';
+        let dateFormat = new DateFormat(locale, pattern);
+
+        let analyzeInfo = dateFormat.analyze('1.1.', dates.create('2014-12-30'));
+        expect(analyzeInfo.matchInfo.day).toBe('1');
+        expect(analyzeInfo.matchInfo.month).toBe('1');
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('d.M.yyyy');
+        expect(analyzeInfo.dateInfo.day).toBe(1);
+        expect(analyzeInfo.dateInfo.month).toBe(0);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-01-01'));
+
+        let predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('1.1.2014');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('1.1.2014');
+
+        analyzeInfo = dateFormat.analyze('16', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('16');
+        expect(analyzeInfo.matchInfo.month).toBe(undefined);
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('dd.MM.yyyy');
+        expect(analyzeInfo.dateInfo.day).toBe(16);
+        expect(analyzeInfo.dateInfo.month).toBe(undefined);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-06-16'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('16.06.2014');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('16.06.2014');
+
+        analyzeInfo = dateFormat.analyze('5.', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe(undefined);
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('d.MM.yyyy');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(undefined);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-06-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.06.2014');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.06.2014');
+
+        analyzeInfo = dateFormat.analyze('5.5.5', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('5');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.y');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(2005);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2005-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.2005');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.5');
+
+        analyzeInfo = dateFormat.analyze('5.5.51', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('51');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.yy');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(1951);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('1951-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.51');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.51');
+
+        analyzeInfo = dateFormat.analyze('5.5.2051', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('2051');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.yyyy');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(2051);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2051-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.2051');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.2051');
+      });
+
+      it('considers pattern dd.MM.yy', () => {
+        let pattern = 'dd.MM.yy';
+        let dateFormat = new DateFormat(locale, pattern);
+
+        let analyzeInfo = dateFormat.analyze('1.1.', dates.create('2014-12-30'));
+        expect(analyzeInfo.matchInfo.day).toBe('1');
+        expect(analyzeInfo.matchInfo.month).toBe('1');
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('d.M.yy');
+        expect(analyzeInfo.dateInfo.day).toBe(1);
+        expect(analyzeInfo.dateInfo.month).toBe(0);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-01-01'));
+
+        let predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('1.1.14');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('1.1.14');
+
+        analyzeInfo = dateFormat.analyze('16', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('16');
+        expect(analyzeInfo.matchInfo.month).toBe(undefined);
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('dd.MM.yy');
+        expect(analyzeInfo.dateInfo.day).toBe(16);
+        expect(analyzeInfo.dateInfo.month).toBe(undefined);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-06-16'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('16.06.14');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('16.06.14');
+
+        analyzeInfo = dateFormat.analyze('5.', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe(undefined);
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('d.MM.yy');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(undefined);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-06-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.06.14');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.06.14');
+
+        analyzeInfo = dateFormat.analyze('5.5.5', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('5');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.y');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(2005);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2005-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.2005');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.5');
+
+        analyzeInfo = dateFormat.analyze('5.5.51', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('51');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.yy');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(1951);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('1951-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.51');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.51');
+
+        analyzeInfo = dateFormat.analyze('5.5.2051', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('2051');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.yyy');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(2051);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2051-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.2051');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.2051');
+      });
+
+      it('considers pattern dd.MM.y', () => {
+        let pattern = 'dd.MM.y';
+        let dateFormat = new DateFormat(locale, pattern);
+
+        let analyzeInfo = dateFormat.analyze('1.1.', dates.create('2014-12-30'));
+        expect(analyzeInfo.matchInfo.day).toBe('1');
+        expect(analyzeInfo.matchInfo.month).toBe('1');
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('d.M.y');
+        expect(analyzeInfo.dateInfo.day).toBe(1);
+        expect(analyzeInfo.dateInfo.month).toBe(0);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-01-01'));
+
+        let predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('1.1.2014');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('1.1.2014');
+
+        analyzeInfo = dateFormat.analyze('16', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('16');
+        expect(analyzeInfo.matchInfo.month).toBe(undefined);
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('dd.MM.y');
+        expect(analyzeInfo.dateInfo.day).toBe(16);
+        expect(analyzeInfo.dateInfo.month).toBe(undefined);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-06-16'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('16.06.2014');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('16.06.2014');
+
+        analyzeInfo = dateFormat.analyze('5.', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe(undefined);
+        expect(analyzeInfo.matchInfo.year).toBe(undefined);
+        expect(analyzeInfo.parsedPattern).toBe('d.MM.y');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(undefined);
+        expect(analyzeInfo.dateInfo.year).toBe(undefined);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2014-06-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.06.2014');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.06.2014');
+
+        analyzeInfo = dateFormat.analyze('5.5.5', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('5');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.y');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(2005);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2005-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.2005');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.5');
+
+        analyzeInfo = dateFormat.analyze('5.5.51', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('51');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.yy');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(1951);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('1951-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.51');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.51');
+
+        analyzeInfo = dateFormat.analyze('5.5.2051', dates.create('2014-06-20'));
+        expect(analyzeInfo.matchInfo.day).toBe('5');
+        expect(analyzeInfo.matchInfo.month).toBe('5');
+        expect(analyzeInfo.matchInfo.year).toBe('2051');
+        expect(analyzeInfo.parsedPattern).toBe('d.M.yyy');
+        expect(analyzeInfo.dateInfo.day).toBe(5);
+        expect(analyzeInfo.dateInfo.month).toBe(4);
+        expect(analyzeInfo.dateInfo.year).toBe(2051);
+        expect(analyzeInfo.predictedDate).toEqual(dates.create('2051-05-05'));
+
+        predictionFormat = new DateFormat(locale, analyzeInfo.parsedPattern);
+        expect(predictionFormat.format(analyzeInfo.predictedDate)).toBe('5.5.2051');
+        expect(predictionFormat.format(analyzeInfo.predictedDate, {analyzeInfo})).toBe('5.5.2051');
       });
     });
   });
