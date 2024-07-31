@@ -183,9 +183,6 @@ public class BeanManagerImplementor implements IBeanManager {
           h.removeBean(bean);
         }
       }
-      if (bean instanceof BeanImplementor) {
-        ((BeanImplementor) bean).dispose();
-      }
     }
     finally {
       m_lock.writeLock().unlock();
