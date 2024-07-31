@@ -14,7 +14,7 @@ import java.io.Serializable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -35,23 +35,17 @@ public class NotificationHandlerRegistryTest {
   //notification handler for all INotificationGroup
   @BeanMock
   private GroupNotificationHandler m_groupNotificationHanlder;
+  private IBean<Object> m_registryBean;
 
   @Before
   public void before() {
     // ensure bean hander cache of notification dispatcher gets refreshed
-    ensureHandlerRegistryRefreshed();
+    m_registryBean = BeanTestingHelper.get().registerBean(new BeanMetaData(NotificationHandlerRegistry.class));
   }
 
   @After
   public void after() {
-    ensureHandlerRegistryRefreshed();
-  }
-
-  private void ensureHandlerRegistryRefreshed() {
-    IBeanManager beanManager = BEANS.getBeanManager();
-    IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);
-    beanManager.unregisterBean(bean);
-    beanManager.registerBean(new BeanMetaData(bean));
+    BeanTestingHelper.get().unregisterBean(m_registryBean);
   }
 
   /**
@@ -91,7 +85,7 @@ public class NotificationHandlerRegistryTest {
     }
   }
 
-  public static interface INotificationGroup extends Serializable {
+  public interface INotificationGroup extends Serializable {
 
   }
 
