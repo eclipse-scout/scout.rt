@@ -23,8 +23,8 @@ public class BeanImplementor<T> implements IBean<T> {
   private final Class<? extends T> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
   private final T m_initialInstance;
+  private final IBeanInstanceProducer<T> m_producer;
   private boolean m_instanceAvailable;
-  private IBeanInstanceProducer<T> m_producer;
 
   /**
    * Creates a {@link BeanImplementor} with the default producer.
@@ -54,6 +54,9 @@ public class BeanImplementor<T> implements IBean<T> {
     }
     else if (!m_beanClazz.isInterface()) {
       m_producer = beanInstanceProducer;
+    }
+    else {
+      m_producer = null;
     }
   }
 
@@ -104,10 +107,6 @@ public class BeanImplementor<T> implements IBean<T> {
   @Override
   public IBeanInstanceProducer<T> getBeanInstanceProducer() {
     return m_producer;
-  }
-
-  protected void dispose() {
-    m_producer = null;
   }
 
   @Override
