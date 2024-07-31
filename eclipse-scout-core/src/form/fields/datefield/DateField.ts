@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1525,13 +1525,18 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
 
     let predictedDate = analyzeInfo.predictedDate;
     let predictionFormat = new DateFormat(this.isolatedDateFormat.locale, analyzeInfo.parsedPattern);
-    let predictedDateFormatted = predictionFormat.format(predictedDate, true);
+    let predictedDateFormatted = predictionFormat.format(predictedDate, {analyzeInfo});
 
     // If predicted date format starts with validatedText, ensure that the capitalization matches.
     // Example: input = 'frid', predicted = 'Friday, 1.10.2014' --> return 'friday, 1.10.2014')
     m = predictedDateFormatted.match(new RegExp('^' + strings.quote(inputText) + '(.*)$', 'i'));
     if (m) {
       predictedDateFormatted = inputText + m[1];
+    }
+
+    // Don't show the formatted prediction if it does not match the user input (would not look good)
+    if (!predictedDateFormatted.startsWith(inputText)) {
+      predictedDateFormatted = inputText;
     }
 
     this._setDateValid(true);
@@ -1564,13 +1569,18 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
 
     let predictedDate = analyzeInfo.predictedDate;
     let predictionFormat = new DateFormat(this.isolatedTimeFormat.locale, analyzeInfo.parsedPattern);
-    let predictedTimeFormatted = predictionFormat.format(predictedDate, true);
+    let predictedTimeFormatted = predictionFormat.format(predictedDate, {analyzeInfo});
 
     // If predicted date format starts with validatedText, ensure that the capitalization matches.
     // Example: input = 'frid', predicted = 'Friday, 1.10.2014' --> return 'friday, 1.10.2014')
     let m = predictedTimeFormatted.match(new RegExp('^' + strings.quote(inputText) + '(.*)$', 'i'));
     if (m) {
       predictedTimeFormatted = inputText + m[1];
+    }
+
+    // Don't show the formatted prediction if it does not match the user input (would not look good)
+    if (!predictedTimeFormatted.startsWith(inputText)) {
+      predictedTimeFormatted = inputText;
     }
 
     this._setTimeValid(true);
