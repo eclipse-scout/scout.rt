@@ -34,6 +34,18 @@ export class FormFieldTile extends WidgetTile {
     this._renderCompact();
   }
 
+  protected override _renderLoading() {
+    // Setting the loading flag to false will show content of the tile immediately and the layout will be validated.
+    // However, if the tile is currently being animated, the layout validation will wait until the animation has
+    // finished (see HtmlComponent#_checkValidationPossible). To prevent showing non-layouted elements, we therefore
+    // also have to postpone the removal of the 'loading' class.
+    if (!this.loading && this.$container.hasAnimationClass()) {
+      this.$container.oneAnimationEnd(() => this.rendered && this._renderLoading());
+    } else {
+      super._renderLoading();
+    }
+  }
+
   protected override _setTileWidget(tileWidget: Widget) {
     super._setTileWidget(tileWidget);
     this._setDisplayStyle(this.displayStyle);
