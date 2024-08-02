@@ -116,7 +116,7 @@ describe('DoDeserializer', () => {
       objectType: Fixture03Do,
       nestedNestedDate: '2024-07-25 08:41:10.708Z'
     };
-    const resultFromConstructorObjectType = new DoDeserializer().reviveObject(withConstructorObjectType) as Fixture03Do;
+    const resultFromConstructorObjectType = new DoDeserializer().deserialize(withConstructorObjectType) as Fixture03Do;
     expect(resultFromConstructorObjectType).toBeInstanceOf(Fixture03Do);
     expect(resultFromConstructorObjectType.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-25 08:41:10.708Z'));
   });
@@ -127,19 +127,14 @@ describe('DoDeserializer', () => {
     expect(result.num).toBe(1234);
   });
 
-  it('uses objectType given for instance creation', () => {
+  it('throws if expected and given type differ', () => {
     const json = `{
       "_type": "scout.Fixture01",
       "nestedNestedDate": "2024-07-25 07:41:10.708Z"
     }
     `;
-    const fromConstructor = dataobjects.parse(json, Fixture03Do);
-    expect(fromConstructor).toBeInstanceOf(Fixture03Do);// _type from string is ignored and given type should be used.
-    expect(fromConstructor.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-25 07:41:10.708Z'));
-
-    const fromString = dataobjects.parse(json, 'scout.Fixture03Do') as Fixture03Do;
-    expect(fromString).toBeInstanceOf(Fixture03Do);// _type from string is ignored and given type should be used.
-    expect(fromString.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-25 07:41:10.708Z'));
+    expect(() => dataobjects.parse(json, Fixture03Do)).toThrow();
+    expect(() => dataobjects.parse(json, 'scout.Fixture03Do')).toThrow();
   });
 
   it('can deserialize arrays', () => {
