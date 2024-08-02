@@ -7,61 +7,64 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, Constructor, dates, DoRegistry, objects, ObjectType, scout, TypeDescriptor} from '../index';
+import {BaseDoEntity, Constructor, dataobjects, DoRegistry, ObjectFactory, objects, ObjectType, scout, TypeDescriptor} from '../index';
 
 export class DoDeserializer {
 
-  static META_DATA_KEY = 'scout.m.t';
+  static TYPE_META_DATA_KEY = 'scout.m.t';
 
-  deserialize<T>(value: any, objectType?: ObjectType<T>): T {
+  deserialize<T extends object>(value: any, objectType?: ObjectType<T>): T {
     if (Array.isArray(value)) {
       return value.map(e => this.deserialize(e, objectType)) as T;
     }
     if (objects.isPlainObject(value)) {
-      return this.reviveObject(value, objectType);
+      return this._deserializeObject(value, objectType);
     }
     return value;
   }
 
-  reviveObject<T>(rawObj: Record<string, any>, objectType?: ObjectType<T>): T {
-    let Class: Constructor<T> = this._tryResolveToConstructor(objectType); // convert string to constructor if possible as the datatype metadata would be on the constructor
-    if (!Class) {
-      Class = this._detectClassFor(rawObj) as Constructor<T>;
+  protected _deserializeObject<T extends object>(rawObj: Record<string, any>, objectType?: ObjectType<T>): T {
+    const detectedClass = this._detectClassFor(rawObj) as Constructor<T>;
+    let constructor = DoDeserializer.resolveToConstructor(objectType) as Constructor<T>; // convert string to constructor if possible as the datatype metadata would be on the constructor
+    if (constructor) {
+      DoDeserializer.assertSame(detectedClass, constructor);
+    } else if (detectedClass) {
+      constructor = detectedClass;
+    } else {
+      constructor = BaseDoEntity as Constructor<T>;
     }
 
-    const resultObj = scout.create(Class, null /* must always be possible to create a DO without model */, {ensureUniqueId: false});
-    if (BaseDoEntity === Class && rawObj._type) {
+    const resultObj = scout.create(constructor, null /* must always be possible to create a DO without model */, {ensureUniqueId: false});
+    if (BaseDoEntity === constructor && rawObj._type) {
       resultObj['_type'] = rawObj._type; // keep _type for BaseDoEntity. This is required for DOs which only exist on the backend.
     }
-    delete rawObj._type;
-    delete rawObj.objectType;
-    // keep _typeVersion in case the DO is sent to the backend again
 
-    const proto = Object.getPrototypeOf(Class).prototype;
-    Object.keys(rawObj).forEach(key => {
-      resultObj[key] = this._convertValue(proto, rawObj, key, rawObj[key]);
-    });
+    const proto = Object.getPrototypeOf(constructor).prototype;
+    Object.keys(rawObj)
+      .filter(key => key !== '_type' && key !== 'objectType') // Ignore _type and objectType from source object as these attributes are already correctly set here. Keep _typeVersion in case the DO is sent to the backend again.
+      .forEach(key => {
+        resultObj[key] = this._convertValue(proto, rawObj, key, rawObj[key]);
+      });
     return resultObj;
   }
 
   protected _convertValue(proto: object, rawObj: object, key: string, value: any): any {
-    if (objects.isNullOrUndefined(value) || !proto) {
+    const objectType = DoDeserializer.getTypeMetaData(proto, key);
+    const deserializer = dataobjects.jsonDeSerializers.find(d => d.canDeserialize(value, objectType));
+    if (deserializer) {
+      // use custom serializer
+      return deserializer.deserialize(value, objectType);
+    }
+    if (objects.isNullOrUndefined(value)) {
       return value; // no value to convert or no data-type info available
     }
     if (Array.isArray(value)) {
       return value.map(e => this._convertValue(proto, rawObj, key, e));
     }
-
-    const objectType = Reflect.getMetadata(DoDeserializer.META_DATA_KEY, proto, key) as ObjectType;
-    if (Date === objectType && typeof value === 'string') {
-      // Dates are serialized as strings. Convert here.
-      return dates.parseJsonDate(value);
-    }
     if (objects.isPlainObject(value)) {
       // nested object
-      return this.reviveObject(value, this._tryResolveToConstructor(objectType));
+      return this._deserializeObject(value, objectType);
     }
-    // FIXME mvi [js-bookmark] allow custom (de)serializers here (e.g. for IDs). See IDataObjectSerializerProvider.java and DataObjectSerializers.java
     return value;
   }
 
@@ -73,10 +76,27 @@ export class DoDeserializer {
         return result;
       }
     }
-    return this._tryResolveToConstructor(obj.objectType) || BaseDoEntity;
+    return DoDeserializer.resolveToConstructor(obj.objectType);
   }
 
-  protected _tryResolveToConstructor<T>(objectType: ObjectType<T>): Constructor<T> {
+  static getTypeMetaData(objectPrototype: any, fieldName: string): Constructor {
+    if (!objectPrototype || !fieldName) {
+      return null;
+    }
+    const objectType = Reflect.getMetadata(DoDeserializer.TYPE_META_DATA_KEY, objectPrototype, fieldName) as ObjectType; // could be a Constructor or string
+    return DoDeserializer.resolveToConstructor(objectType);
+  }
+
+  static resolveToConstructor<T>(objectType: ObjectType<T>): Constructor<T> {
     return TypeDescriptor.resolveType(objectType, {variantLenient: true});
+  }
+
+  static assertSame(detectedFromValue: Constructor, passedFromMeta: Constructor) {
+    if (detectedFromValue && passedFromMeta && detectedFromValue !== passedFromMeta) {
+      const objectFactory = ObjectFactory.get();
+      const inObject = objectFactory.getObjectType(detectedFromValue) || detectedFromValue;
+      const inMeta = objectFactory.getObjectType(passedFromMeta) || passedFromMeta;
+      throw new Error(`Incompatible types: object contains '${inObject}' but '${inMeta}' was expected.`);
+    }
   }
 }

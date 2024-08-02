@@ -7,36 +7,38 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoDeserializer, DoEntity, DoSerializer, ObjectType, scout} from '../index';
+import {DoDateSerializer, DoDeserializer, DoEntity, DoSerializer, JsonDeSerializer, ObjectType, scout} from '../index';
 
 export const dataobjects = {
+
+  jsonDeSerializers: [new DoDateSerializer()] as JsonDeSerializer<any>[],
+
   equals(a: DoEntity, b: DoEntity): boolean {
     // FIXME mvi [js-bookmark] implement
     return false;
   },
 
   stringify(dataobject: any): string {
-    if (!dataobject) {
+    const serialized = dataobjects.serialize(dataobject);
+    if (!serialized) {
       return null;
     }
-    const serializer = scout.create(DoSerializer);
-    return JSON.stringify(dataobject, (key, value) => serializer.serialize(key, value));
+    return JSON.stringify(serialized);
   },
 
   serialize(dataobject: any): any {
     if (!dataobject) {
       return null;
     }
-    return scout.create(DoSerializer).serialize('', dataobject);
+    return scout.create(DoSerializer).serialize(dataobject);
   },
 
   parse<T extends DoEntity>(json: string, objectType?: ObjectType<T>): T {
     if (!json) {
       return null;
     }
-    const value = JSON.parse(json); // don't use reviver here as it works bottom-up. But here top-down is required.
-    const deserializer = scout.create(DoDeserializer);
-    return deserializer.deserialize(value, objectType);
+    const value = JSON.parse(json);
+    return dataobjects.deserialize(value, objectType);
   },
 
   deserialize<T extends DoEntity>(obj: any, objectType?: ObjectType<T>): T {
@@ -47,3 +49,4 @@ export const dataobjects = {
     return deserializer.deserialize(obj, objectType);
   }
 };
+

@@ -7,33 +7,36 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, Constructor, dates, DoDeserializer, DoRegistry, ObjectFactory, objects, TypeDescriptor} from '../index';
+import {BaseDoEntity, Constructor, dataobjects, DoDeserializer, DoRegistry, ObjectFactory, objects} from '../index';
 
 export class DoSerializer {
-  serialize(key: string, value: any): any {
+  serialize(value: any): any {
     if (Array.isArray(value)) {
-      return value.map(e => this.serialize('', e));
+      return value.map(e => this.serialize(e));
     }
     if (objects.isPlainObject(value)) {
-      return this._handleObjectValue(value);
+      return this._serializeObject(value);
     }
     return value;
   }
 
-  protected _handleObjectValue(value: any): any {
+  protected _serializeObject(value: any, objectType?: Constructor): any {
+    const detectedObjectType = this._detectObjectType(value);
+    if (objectType) {
+      // a type is given from data value and from metadata of the parent object: validate they are the same
+      DoDeserializer.assertSame(detectedObjectType, objectType);
+    } else {
+      objectType = detectedObjectType;
+    }
+
     const target = Object.assign({}, value); // shallow copy to keep original object intact
-    const objectType = this._detectObjectType(value);
     this._setJsonTypeTo(target, objectType);
     delete target.objectType; // Scout JS internal property
 
-    if (objectType) {
-      const proto = Object.getPrototypeOf(objectType).prototype;
-      Object.keys(target)
-        .filter(key => !objects.isNullOrUndefined(target[key])) // properties not specified (no need to convert anything)
-        .forEach(key => {
-          target[key] = this._convertValue(proto, target, key, target[key]);
-        });
-    }
+    const proto = objectType ? Object.getPrototypeOf(objectType).prototype : null;
+    Object.keys(target).forEach(key => {
+      target[key] = this._convertValue(proto, target, key, target[key]);
+    });
     return target;
   }
 
@@ -41,7 +44,7 @@ export class DoSerializer {
     if (obj instanceof BaseDoEntity) {
       return obj.constructor as Constructor;
     }
-    const constructor = TypeDescriptor.resolveType(obj.objectType, {variantLenient: true}) as Constructor;
+    const constructor = DoDeserializer.resolveToConstructor(obj.objectType) as Constructor;
     if (constructor) {
       return constructor;
     }
@@ -52,31 +55,23 @@ export class DoSerializer {
   }
 
   protected _convertValue(proto: object, target: object, key: string, value: any): any {
+    const objectType = DoDeserializer.getTypeMetaData(proto, key);
+    const serializer = dataobjects.jsonDeSerializers.find(s => s.canSerialize(value, objectType));
+    if (serializer) {
+      // use custom serializer
+      return serializer.serialize(value, objectType);
+    }
+    if (objects.isNullOrUndefined(value)) {
+      return value;
+    }
     if (Array.isArray(value)) {
       return value.map(e => this._convertValue(proto, target, key, e));
     }
-    if (value instanceof Date) {
-      // JS Date must be converted to a string as expected by the Scout backends
-      return dates.toJsonDate(value, true);
-    }
     if (objects.isPlainObject(value)) {
-      // set _type of child object based on meta-data of this field
-      this._setJsonTypeByMetaData(proto, key, value);
+      // nested object
+      return this._serializeObject(value, objectType);
     }
     return value;
-  }
-
-  protected _setJsonTypeByMetaData(proto: object, key: string, target: any) {
-    if (target._type) {
-      return; // already present
-    }
-    const objectType = Reflect.getMetadata(DoDeserializer.META_DATA_KEY, proto, key) as string;
-    const jsonType = DoRegistry.get().toJsonType(objectType);
-    if (jsonType) {
-      target._type = jsonType;
-    } else if (objectType) {
-      target.objectType = objectType;
-    }
   }
 
   protected _setJsonTypeTo(obj: any, constructor: Constructor) {
@@ -84,7 +79,7 @@ export class DoSerializer {
       return; // already present
     }
     const objectFactory = ObjectFactory.get();
-    const objectType = objectFactory.getObjectType(obj.objectType) || objectFactory.getObjectType(constructor);
+    const objectType = objectFactory.getObjectType(constructor) || objectFactory.getObjectType(obj.objectType);
     if (objectType) {
       const jsonType = DoRegistry.get().toJsonType(objectType);
       if (jsonType) {

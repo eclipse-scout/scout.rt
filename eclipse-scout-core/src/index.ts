@@ -146,6 +146,7 @@ export * from './code/CodeLookupCall';
 export * from './config/ConfigProperties';
 export * from './config/ConfigPropertyCache';
 export * from './dataobject/DoEntity';
+export * from './dataobject/DataObjectSerializers';
 export * from './dataobject/dataobjects';
 export * from './dataobject/DoDeserializer';
 export * from './dataobject/DoSerializer';
