@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.notification;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
@@ -51,7 +50,7 @@ public class NotificationHandlerRegistryTest {
     IBeanManager beanManager = BEANS.getBeanManager();
     IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);
     beanManager.unregisterBean(bean);
-    beanManager.registerBean(new BeanMetaData(bean));
+    beanManager.registerClass(NotificationHandlerRegistry.class);
   }
 
   /**

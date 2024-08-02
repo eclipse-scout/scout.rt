@@ -62,7 +62,7 @@ public class NotificationDispatcherTest {
     IBeanManager beanManager = BEANS.getBeanManager();
     IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);
     beanManager.unregisterBean(bean);
-    beanManager.registerBean(new BeanMetaData(bean));
+    beanManager.registerClass(NotificationHandlerRegistry.class);
   }
 
   @After
@@ -72,7 +72,7 @@ public class NotificationDispatcherTest {
     IBeanManager beanManager = BEANS.getBeanManager();
     IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);
     beanManager.unregisterBean(bean);
-    beanManager.registerBean(new BeanMetaData(bean));
+    beanManager.registerClass(NotificationHandlerRegistry.class);
   }
 
   @Test
