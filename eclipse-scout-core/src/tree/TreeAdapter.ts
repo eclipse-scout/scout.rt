@@ -281,6 +281,7 @@ export class TreeAdapter extends ModelAdapter {
   protected _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<TreeNode> {
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, this._getDefaultNodeObjectType());
+    nodeModel.remote = true; // mark nodes that have a server representation (useful to skip JS logic that is already done on the server)
     defaultValues.applyTo(nodeModel);
     return nodeModel as ChildModelOf<TreeNode>;
   }
@@ -308,6 +309,14 @@ export class TreeAdapter extends ModelAdapter {
     return this._createTreeNodeOrig(nodeModel);
   }
 
+  protected static resolveTextKeysRemote(this: TreeNode & { remote: boolean; resolveTextKeysOrig }, properties: string[]) {
+    if (this.remote) {
+      // Never resolve '${textKey:...}' references in texts from the server
+      return;
+    }
+    return this.resolveTextKeysOrig(properties);
+  }
+
   /**
    * Static method to modify the prototype of Tree.
    */
@@ -318,6 +327,8 @@ export class TreeAdapter extends ModelAdapter {
 
     objects.replacePrototypeFunction(Tree, '_createTreeNode', TreeAdapter._createTreeNodeRemote, true);
     objects.replacePrototypeFunction(Tree, '_updateMarkChildrenChecked', TreeAdapter._updateMarkChildrenCheckedRemote, true);
+
+    objects.replacePrototypeFunction(TreeNode, 'resolveTextKeys', TreeAdapter.resolveTextKeysRemote, true);
   }
 }
 

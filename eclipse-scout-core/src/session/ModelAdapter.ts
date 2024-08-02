@@ -492,6 +492,15 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
       // Local case (default)
       return this._createChildOrig(model);
     }, true); // <-- true = keep original function
+
+    // resolveTextKeys
+    objects.replacePrototypeFunction(Widget, 'resolveTextKeys', function(this: Widget & { resolveTextKeysOrig }, properties: string[]) {
+      if (this.modelAdapter) {
+        // Never resolve '${textKey:...}' references in texts from the server
+        return;
+      }
+      return this.resolveTextKeysOrig(properties);
+    }, true);
   }
 }
 

@@ -7,9 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {
-  App, ChildModelOf, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNode, TreeNodeModel
-} from '../../index';
+import {App, EventHandler, Form, objects, Outline, Page, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, Tree, TreeAdapter, TreeNodeModel} from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
   declare widget: Outline;
@@ -173,6 +171,7 @@ export class OutlineAdapter extends TreeAdapter {
     objects.replacePrototypeFunction(Outline, 'updateDetailMenus', OutlineAdapter.updateDetailMenusRemote, true);
     objects.replacePrototypeFunction(Outline, '_initTreeNodeInternal', OutlineAdapter._initTreeNodeInternalRemote, true);
     objects.replacePrototypeFunction(Outline, '_createTreeNode', OutlineAdapter._createTreeNodeRemote, true);
+
     objects.replacePrototypeFunction(Page, '_updateParentTablePageMenusForDetailForm', OutlineAdapter._updateParentTablePageMenusForDetailForm, true);
     objects.replacePrototypeFunction(Page, '_updateParentTablePageMenusForDetailTable', OutlineAdapter._updateParentTablePageMenusForDetailTable, true);
     objects.replacePrototypeFunction(Page, 'linkWithRow', OutlineAdapter.linkWithRow, true);
@@ -279,14 +278,6 @@ export class OutlineAdapter extends TreeAdapter {
     }
 
     return this._createTreeNodeOrig(nodeModel);
-  }
-
-  protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<TreeNode> {
-    const model = super._initNodeModel(nodeModel);
-    // This marker is only set for pages that represent a remote page on the UI server. It prevents menus from being inherited
-    // from the parent table page, because in the case of Java pages that is already done on the server.
-    model.remote = true;
-    return model;
   }
 
   protected static _updateParentTablePageMenusForDetailForm(this: Page & { _updateParentTablePageMenusForDetailFormOrig; remote?: true }) {

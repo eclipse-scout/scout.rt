@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, HtmlComponent, Icon, InitModelOf, NotificationEventMap, NotificationModel, scout, Status, StatusOrModel, strings, texts, Widget} from '../index';
+import {aria, HtmlComponent, Icon, icons, InitModelOf, NotificationEventMap, NotificationModel, scout, Status, StatusOrModel, strings, texts, Widget} from '../index';
 import $ from 'jquery';
 
 export class Notification extends Widget implements NotificationModel {
@@ -45,8 +45,21 @@ export class Notification extends Widget implements NotificationModel {
         iconId: scout.nvl(model.iconId, this.status.iconId)
       });
     }
-    texts.resolveTextProperty(this.status, 'message', this.session);
+    this.resolveStatusTextKeys(['message']);
+    this.resolveStatusIconIds(['iconId']);
     this._setStatus(this.status);
+  }
+
+  resolveStatusTextKeys(properties: string[]) {
+    properties.forEach(property => {
+      texts.resolveTextProperty(this.status, property, this.session);
+    });
+  }
+
+  resolveStatusIconIds(properties: string[]) {
+    properties.forEach(property => {
+      icons.resolveIconProperty(this.status, property);
+    });
   }
 
   protected override _render() {

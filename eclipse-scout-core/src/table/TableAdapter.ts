@@ -737,6 +737,15 @@ export class TableAdapter extends ModelAdapter {
       this.initOrig(model);
     }, true);
 
+    // init
+    objects.replacePrototypeFunction(Column, 'resolveTextKeys', function(this: Column & { resolveTextKeysOrig }, properties: string[]) {
+      if (this.table?.modelAdapter) { // table may be null when columns are constructed manually in JS, e.g. in TableProposalChooser
+        // Never resolve '${textKey:...}' references in texts from the server
+        return;
+      }
+      this.resolveTextKeysOrig(properties);
+    }, true);
+
     // _ensureCell
     objects.replacePrototypeFunction(Column, '_ensureCell', function(this: Column & { _ensureCellOrig; _ensureValue }, vararg: any) {
       if (this.table.modelAdapter) {

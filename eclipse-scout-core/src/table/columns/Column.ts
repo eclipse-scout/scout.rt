@@ -156,9 +156,9 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
       this.initialWidth = scout.nvl(this.width, 0);
     }
 
-    texts.resolveTextProperty(this, 'text');
-    texts.resolveTextProperty(this, 'headerTooltipText');
-    icons.resolveIconProperty(this, 'headerIconId');
+    this.resolveTextKeys(['text', 'headerTooltipText']);
+    this.resolveIconIds(['headerIconId']);
+
     this._setTable(this.table);
     this._setAutoOptimizeWidth(this.autoOptimizeWidth);
     // no need to call setEditable here. cell propagation is done in _initCell
@@ -185,6 +185,18 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     if (this.table) {
       this.table.on('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
     }
+  }
+
+  resolveTextKeys(properties: string[]) {
+    properties.forEach(property => {
+      texts.resolveTextProperty(this, property);
+    });
+  }
+
+  resolveIconIds(properties: string[]) {
+    properties.forEach(property => {
+      icons.resolveIconProperty(this, property);
+    });
   }
 
   /**

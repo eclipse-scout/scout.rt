@@ -128,13 +128,25 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
 
     $.extend(this, model);
 
-    texts.resolveTextProperty(this, 'text');
-    icons.resolveIconProperty(this, 'iconId');
+    this.resolveTextKeys(['text']);
+    this.resolveIconIds(['iconId']);
 
     // make sure all child nodes are TreeNodes too
     if (this.hasChildNodes()) {
       this.getTree().ensureTreeNodes(this.childNodes, this);
     }
+  }
+
+  resolveTextKeys(properties: string[]) {
+    properties.forEach(property => {
+      texts.resolveTextProperty(this, property);
+    });
+  }
+
+  resolveIconIds(properties: string[]) {
+    properties.forEach(property => {
+      icons.resolveIconProperty(this, property);
+    });
   }
 
   protected _jsonModel(): Record<string, any> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkActionEvent, Event, ModelAdapter, Notification} from '../index';
+import {App, AppLinkActionEvent, Event, ModelAdapter, Notification, objects} from '../index';
 
 export class NotificationAdapter extends ModelAdapter {
 
@@ -30,4 +30,24 @@ export class NotificationAdapter extends ModelAdapter {
       super._onWidgetEvent(event);
     }
   }
+
+  /**
+   * Static method to modify the prototype of Widget.
+   */
+  static modifyNotificationPrototype(event: Event) {
+    if (!App.get().remote) {
+      return;
+    }
+
+    // resolveTextKeys
+    objects.replacePrototypeFunction(Notification, 'resolveStatusTextKeys', function(this: Notification & { resolveStatusTextKeysOrig }, properties: string[]) {
+      if (this.modelAdapter) {
+        // Never resolve '${textKey:...}' references in texts from the server
+        return;
+      }
+      return this.resolveStatusTextKeysOrig(properties);
+    }, true);
+  }
 }
+
+App.addListener('bootstrap', NotificationAdapter.modifyNotificationPrototype);
