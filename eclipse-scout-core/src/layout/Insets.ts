@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,14 +17,14 @@ export class Insets {
   /**
    * If no parameters are passed, all members are initialized with 0.
    */
-  constructor(leftOrInsets?: number | Insets, right?: number, bottom?: number, left?: number) {
-    if (leftOrInsets instanceof Insets) {
-      this.top = leftOrInsets.top;
-      this.right = leftOrInsets.right;
-      this.bottom = leftOrInsets.bottom;
-      this.left = leftOrInsets.left;
+  constructor(topOrInsets?: number | Insets, right?: number, bottom?: number, left?: number) {
+    if (topOrInsets instanceof Insets) {
+      this.top = topOrInsets.top;
+      this.right = topOrInsets.right;
+      this.bottom = topOrInsets.bottom;
+      this.left = topOrInsets.left;
     } else {
-      this.top = leftOrInsets || 0;
+      this.top = topOrInsets || 0;
       this.right = right || 0;
       this.bottom = bottom || 0;
       this.left = left || 0;
