@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, FilterOrFunction, Group, InitModelOf, ObjectOrChildModel, ObjectOrModel, objects, PropertyChangeEvent, scout, ScrollToOptions, Table, TableAllRowsDeletedEvent,
+  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, Group, InitModelOf, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, scout, ScrollToOptions, Table, TableAllRowsDeletedEvent,
   TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableRow, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent, TableRowTileMapping, TableTileGridMediatorEventMap,
-  TableTileGridMediatorModel, Tile, TileAccordion, TileActionEvent, TileClickEvent, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
+  TableTileGridMediatorModel, TableUserFilter, Tile, TileAccordion, TileActionEvent, TileClickEvent, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -46,6 +46,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
 
   protected _isUpdatingTiles: boolean;
   protected _tableHierarchyFilter: TileTableHierarchyFilter;
+  protected _tileFilters: MediatedTableTileFilter[];
   protected _destroyHandler: () => void;
   protected _tileAccordionPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, TileAccordion>>;
   protected _tileAccordionActionHandler: EventHandler<TileActionEvent<TileAccordion>>;
@@ -68,9 +69,20 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     this.tileAccordion = null;
     this.tiles = [];
     this.tileMappings = [];
+
     this.tilesMap = {};
     this.groupForTileMap = {};
     this.tableState = {};
+    this.exclusiveExpand = false;
+    this.gridColumnCount = null;
+    this.tileGridLayoutConfig = null;
+    this.withPlaceholders = null;
+
+    this._isUpdatingTiles = false;
+    this._tableHierarchyFilter = null;
+    this._tileFilters = [];
+
+    this._destroyHandler = this._uninstallListeners.bind(this);
     this._tileAccordionPropertyChangeHandler = this._onTileAccordionPropertyChange.bind(this);
     this._tileAccordionActionHandler = this._onTileAccordionAction.bind(this);
     this._tileAccordionClickHandler = this._onTileAccordionClick.bind(this);
@@ -84,11 +96,6 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     this._tableAllRowsDeletedHandler = this._onTableAllRowsDeleted.bind(this);
     this._tableRowOrderChangedHandler = this._onTableRowOrderChangedHandler.bind(this);
     this._tablePropertyChangeHandler = this._onTablePropertyChange.bind(this);
-    this._destroyHandler = this._uninstallListeners.bind(this);
-    this.exclusiveExpand = false;
-    this.gridColumnCount = null;
-    this.tileGridLayoutConfig = null;
-    this.withPlaceholders = null;
 
     this._addWidgetProperties(['tileAccordion', 'tiles', 'tileMappings']);
   }
@@ -543,15 +550,16 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     this._addFilter(event.filter);
   }
 
-  protected _onTableFilterRemoved(event: TableFilterRemovedEvent & { filter: TableFilterWithTileFilter }) {
+  protected _onTableFilterRemoved(event: TableFilterRemovedEvent) {
     if (!this.table.tileMode) {
       return;
     }
-    this.tileAccordion.removeFilter(event.filter.tileFilter);
+    this._removeFilterByPredicate(f => f.tableFilter === event.filter);
   }
 
-  protected _addFilter(tableFilter: TableFilterWithTileFilter) {
+  protected _addFilter(tableFilter: Filter<TableRow>) {
     let tileFilter = {
+      tableFilter: tableFilter,
       table: this.table,
       accept: (tile: Tile) => {
         let rowForTile = this.table.rowsMap[tile.rowId];
@@ -561,11 +569,23 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
         return false;
       }
     };
-    if (tableFilter.tileFilter) {
-      this.tileAccordion.removeFilter(tableFilter.tileFilter, false);
+
+    this._removeFilterByPredicate(f => f.tableFilter === tableFilter, false);
+    if (tableFilter instanceof TableUserFilter) {
+      let key = tableFilter.createKey();
+      this._removeFilterByPredicate(f => f.tableFilter instanceof TableUserFilter && objects.equals(f.tableFilter.createKey(), key), false);
     }
-    tableFilter.tileFilter = tileFilter;
+
+    this._tileFilters.push(tileFilter);
     this.tileAccordion.addFilter(tileFilter);
+  }
+
+  protected _removeFilterByPredicate(predicate: Predicate<MediatedTableTileFilter>, applyFilter = true) {
+    let filter = this._tileFilters.find(predicate);
+    if (filter) {
+      this.tileAccordion.removeFilter(filter, applyFilter);
+      arrays.remove(this._tileFilters, filter);
+    }
   }
 
   protected _onTableFilter(event: Event<Table>) {
@@ -677,4 +697,4 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   }
 }
 
-export type TableFilterWithTileFilter = Filter<TableRow> & { tileFilter?: FilterOrFunction<Tile> | FilterOrFunction<Tile>[] };
+export type MediatedTableTileFilter = Filter<Tile> & { tableFilter: Filter<TableRow> };
