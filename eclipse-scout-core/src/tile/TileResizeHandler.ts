@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, graphics, GridData, InitModelOf, LogicalGridLayout, Point, Predicate, Rectangle, Resizable, ResizableModel, scout, Tile, TileGrid, tileUtil} from '..';
+import {arrays, graphics, GridData, InitModelOf, Insets, LogicalGridLayout, Point, Predicate, Rectangle, Resizable, ResizableModel, scout, Tile, TileGrid, tileUtil} from '..';
 
 export class TileResizeHandler extends Resizable implements TileResizeHandlerModel {
   declare model: TileResizeHandlerModel;
@@ -103,10 +103,21 @@ export class TileResizeHandler extends Resizable implements TileResizeHandlerMod
    */
   protected _findCell(position: Point): Rectangle {
     let layoutInfo = this.layout.info;
+    let halfHgap = layoutInfo.hgap / 2;
+    let halfVgap = layoutInfo.vgap / 2;
     for (let row = 0; row < layoutInfo.rows; row++) {
       for (let col = 0; col < layoutInfo.cols; col++) {
-        if (layoutInfo.cellBounds[row][col].contains(position)) {
-          return layoutInfo.cellBounds[row][col].clone();
+        // Enlarge the cell bounds by half of the gaps size to make resizing more reactive
+        // -> This makes the whole area inside the grid reactive not only the cells
+        // Example: if the user resizes a cell that spans two columns and moves the cursor to the bottom between two other cells,
+        // it should resize to one of the two cells instead of doing nothing
+        let topGap = row > 0 ? halfVgap : 0; // Don't add top gap for first row
+        let bottomGap = row < layoutInfo.rows - 1 ? halfVgap : 0; // Don't add bottom gap for last row
+        let leftGap = col > 0 ? halfHgap : 0; // Don't add left gap for first col
+        let rightGap = col < layoutInfo.cols - 1 ? halfHgap : 0; // Don't add right gap for last col
+        let cellBounds = layoutInfo.cellBounds[row][col];
+        if (cellBounds.add(new Insets(topGap, rightGap, bottomGap, leftGap)).contains(position)) {
+          return cellBounds.clone();
         }
       }
     }

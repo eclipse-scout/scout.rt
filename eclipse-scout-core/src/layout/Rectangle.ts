@@ -118,6 +118,17 @@ export class Rectangle {
   }
 
   /**
+   * Adds the given insets to the rectangle.
+   */
+  add(insets: Insets): Rectangle {
+    return new Rectangle(
+      this.x - insets.left,
+      this.y - insets.top,
+      this.width + insets.horizontal(),
+      this.height + insets.vertical());
+  }
+
+  /**
    * Moves the rectangle the given distance.
    *
    * @param dxOrPoint the distance to move the rectangle along the x-axis, or a point object containing the diff on the x and y-axis.
