@@ -52,6 +52,9 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     this._releasingScrollHandler = this._onReleasingScroll.bind(this);
   }
 
+  /**
+   * @return `true` if the dragging was started successfully, falsy otherwise.
+   */
   start(event: JQuery.MouseDownEvent, elements: TElem[], draggedElement: TElem): boolean {
     if (this._moveData) {
       // Do nothing, when dragging is already in progress. This can happen when the user leaves
@@ -63,7 +66,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
       // If MoveSupport is created again for an already dragged element, do nothing. This makes sure the placeholder element cannot be dragged if clone is released and drag started right again
       return;
     }
-    if (!event || !elements || !elements.length || !draggedElement || !draggedElement.$container) {
+    if (!event || !elements || !draggedElement || !elements.includes(draggedElement) || !draggedElement.$container) {
       return;
     }
 
