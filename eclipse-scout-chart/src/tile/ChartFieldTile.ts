@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormFieldTile, PropertyChangeEvent} from '@eclipse-scout/core';
+import {ColorScheme, FormFieldTile, PropertyChangeEvent} from '@eclipse-scout/core';
 import {Chart, ChartField, ChartFieldTileModel} from '../index';
 import {ChartConfig} from '../chart/Chart';
 
@@ -22,8 +22,8 @@ export class ChartFieldTile extends FormFieldTile implements ChartFieldTileModel
     this._chartConfigChangeHandler = this._onChartConfigChange.bind(this);
   }
 
-  protected override _renderColorScheme() {
-    super._renderColorScheme();
+  protected override _setColorScheme(colorScheme: ColorScheme | string) {
+    super._setColorScheme(colorScheme);
     this._updateChartColorScheme();
   }
 
@@ -46,6 +46,7 @@ export class ChartFieldTile extends FormFieldTile implements ChartFieldTileModel
       this.tileWidget.chart.off('propertyChange:config', this._chartConfigChangeHandler);
     }
     super._setTileWidget(tileWidget);
+    this._updateChartColorScheme();
     this.tileWidget.chart.on('propertyChange:config', this._chartConfigChangeHandler);
   }
 }
