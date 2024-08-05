@@ -96,6 +96,8 @@ export class TileGridMoveSupport extends MoveSupport<Tile> {
 
   protected override _restoreStyles() {
     super._restoreStyles();
+    this._moveData.tileBelowCursor?.$container?.removeClass('dragover');
+
     let $draggedElement = this._moveData.$draggedElement;
     $draggedElement.addClass('drag-done');
     setTimeout(() => {
