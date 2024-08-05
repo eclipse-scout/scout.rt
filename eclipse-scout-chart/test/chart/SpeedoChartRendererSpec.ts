@@ -7,28 +7,29 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-/* global sandboxSession, createSimpleModel*/
-
-import {Chart, SpeedoChartRenderer} from '../../src/index';
+import {AbstractSvgChartRenderer, Chart, SpeedoChartRenderer} from '../../src/index';
 import {scout} from '@eclipse-scout/core';
 import {LocaleSpecHelper} from '@eclipse-scout/core/testing';
 
 describe('SpeedoChartRenderer', () => {
-  let locale, helper, session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new LocaleSpecHelper();
-    locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
+
+  class SpecSpeedoChartRenderer extends SpeedoChartRenderer {
+
+    override _formatValue(value: number): string {
+      return super._formatValue(value);
+    }
+  }
 
   describe('_formatValue', () => {
     it('should display compact labels for large values', () => {
-      let speedo = new SpeedoChartRenderer({});
-      speedo.session = {
-        locale: locale
-      };
+      let speedo = new SpecSpeedoChartRenderer(scout.create(Chart, {parent: session.desktop}));
       expect(speedo._formatValue(1)).toBe('1');
       expect(speedo._formatValue(999)).toBe('999');
       expect(speedo._formatValue(1000)).toBe('1\'000');
@@ -48,7 +49,6 @@ describe('SpeedoChartRenderer', () => {
         data: {
           axes: [],
           chartValueGroups: [{
-            clickable: true,
             colorHexValue: '#ffee00',
             groupName: 'Group0',
             values: [
@@ -58,7 +58,6 @@ describe('SpeedoChartRenderer', () => {
         },
         config: {
           type: Chart.Type.SPEEDO,
-          clickable: true,
           options: {
             autoColor: true,
             clickable: true,
@@ -96,7 +95,7 @@ describe('SpeedoChartRenderer', () => {
 
   describe('calculations', () => {
     it('rounded segments are always in the correct part', () => {
-      let speedo = new SpeedoChartRenderer({});
+      let speedo = new SpeedoChartRenderer(scout.create(Chart, {parent: session.desktop}));
 
       speedo.parts = SpeedoChartRenderer.NUM_PARTS_GREEN_EDGE;
       speedo.numSegmentsPerPart = 8;
@@ -149,7 +148,6 @@ describe('SpeedoChartRenderer', () => {
         data: {
           axes: [],
           chartValueGroups: [{
-            clickable: true,
             colorHexValue: '#ffee00',
             groupName: 'Group0',
             values: [
@@ -159,7 +157,6 @@ describe('SpeedoChartRenderer', () => {
         },
         config: {
           type: Chart.Type.SPEEDO,
-          clickable: true,
           options: {
             autoColor: true,
             clickable: true,
@@ -180,7 +177,7 @@ describe('SpeedoChartRenderer', () => {
       });
       chart.render();
       chart.chartRenderer.refresh();
-      expect(chart.chartRenderer.$svg.attr('aria-description')).toBeTruthy();
+      expect((chart.chartRenderer as AbstractSvgChartRenderer).$svg.attr('aria-description')).toBeTruthy();
     });
   });
 });
