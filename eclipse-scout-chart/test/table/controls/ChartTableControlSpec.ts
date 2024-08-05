@@ -9,10 +9,10 @@
  */
 import {ChartTableControl} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/core/testing';
+import {Event, InitModelOf, Table, TableControl} from '@eclipse-scout/core';
 
-/* global sandboxSession, createSimpleModel*/
 describe('ChartTableControl', () => {
-  let $sandbox, session, chartTableControl, helper, $div;
+  let $sandbox: JQuery, session: SandboxSession, helper: TableSpecHelper, $div: JQuery;
 
   beforeEach(() => {
     $div = $('<div></div>');
@@ -27,7 +27,7 @@ describe('ChartTableControl', () => {
     jasmine.clock().uninstall();
   });
 
-  function createModelFromTable(table) {
+  function createModelFromTable(table: Table): InitModelOf<ChartTableControl> {
     let model = createSimpleModel('ChartTableControl', session);
     let defaults = {
       enabled: true,
@@ -40,62 +40,78 @@ describe('ChartTableControl', () => {
     return model;
   }
 
-  function createModel(rows, columns) {
+  function createModel(rows: number, columns: number): InitModelOf<ChartTableControl> {
     let tableModel = helper.createModelFixture(rows, columns);
     let table = helper.createTable(tableModel);
 
     return createModelFromTable(table);
   }
 
-  function createChartTableControl(model) {
-    chartTableControl = new ChartTableControl();
+  function createChartTableControl(model: InitModelOf<ChartTableControl>): SpecChartTableControl {
+    const chartTableControl = new SpecChartTableControl();
     chartTableControl.init(model);
     chartTableControl.table._setTableControls([chartTableControl]);
     return chartTableControl;
   }
 
+  class SpecChartTableControl extends ChartTableControl {
+    declare table: SpecTable;
+    declare _tableUpdatedHandler: (e: Event<Table>) => void;
+
+    override _renderContent($parent: JQuery) {
+      super._renderContent($parent);
+    }
+  }
+
+  class SpecTable extends Table {
+
+    override _setTableControls(controls: TableControl[]) {
+      super._setTableControls(controls);
+    }
+  }
+
   describe('renderDefaultChart', () => {
 
     it('does not draw a chart, if there are multiple columns in the table before all are removed', () => {
-      chartTableControl = createChartTableControl(createModel(2, 2));
+      const chartTableControl = createChartTableControl(createModel(2, 2));
       chartTableControl.table.render();
-      expectEmptyChart(false);
+      expectEmptyChart(chartTableControl, false);
       chartTableControl.table.columns = [];
-      chartTableControl._tableUpdatedHandler();
-      jasmine.clock().tick();
-      expectEmptyChart(true);
+      chartTableControl._tableUpdatedHandler(null);
+      jasmine.clock().tick(0);
+      expectEmptyChart(chartTableControl, true);
     });
 
     it('does not draw a chart, if there are no columns', () => {
-      chartTableControl = createChartTableControl(createModel(0, 0));
+      const chartTableControl = createChartTableControl(createModel(0, 0));
       chartTableControl.table.render();
-      expectEmptyChart(true);
+      expectEmptyChart(chartTableControl, true);
     });
 
     it('draws a chart for a single column', () => {
-      chartTableControl = createChartTableControl(createModel(1, 1));
+      const chartTableControl = createChartTableControl(createModel(1, 1));
       chartTableControl.table.render();
-      expectEmptyChart(false);
+      expectEmptyChart(chartTableControl, false);
     });
 
     it('draws a chart for multiple columns', () => {
-      chartTableControl = createChartTableControl(createModel(2, 2));
+      const chartTableControl = createChartTableControl(createModel(2, 2));
       chartTableControl.table.render();
-      expectEmptyChart(false);
+      expectEmptyChart(chartTableControl, false);
     });
 
     it('draws a chart with date grouping for a date column', () => {
       let columns = helper.createModelColumns(1, 'DateColumn');
-      let c0 = helper.createModelCell(0, new Date());
+      let c0 = helper.createModelCell('0', new Date());
       let rows = [helper.createModelRow(null, [c0])];
       let model = helper.createModel(columns, rows);
       let table = helper.createTable(model);
-      chartTableControl = createChartTableControl(createModelFromTable(table));
+      const chartTableControl = createChartTableControl(createModelFromTable(table));
       chartTableControl._renderContent($div);
 
       expect(chartTableControl.chartGroup1.id).toBe(columns[0].id); // first column selected
       expect(chartTableControl.chartGroup1.modifier).toBe(256); // with date modifier
-      expectEmptyChart(false);
+      expectEmptyChart(chartTableControl, false);
     });
 
     it('renders header texts that contain HTML as plain text', () => {
@@ -103,31 +119,28 @@ describe('ChartTableControl', () => {
       let firstCol = model.table.columns[0];
       firstCol.headerHtmlEnabled = true;
       firstCol.text = '<b>Plain</b><br>Text';
-      chartTableControl = createChartTableControl(model);
+      const chartTableControl = createChartTableControl(model);
       chartTableControl._renderContent($sandbox);
       let $result = $sandbox.find('.select-axis.selected');
       expect($result.length).toBe(2);
       expect($result.get(0).innerHTML).toBe('Plain Text');
     });
-
   });
 
   describe('renderAfterColumnUpdate', () => {
 
     it('does not draw a chart, if columns are updated, but rows are not updated yet', () => {
-      chartTableControl = createChartTableControl(createModel(2, 1));
+      const chartTableControl = createChartTableControl(createModel(2, 1));
       // remove first column
       chartTableControl.table.columns.shift();
       // rows are not yet updated
       chartTableControl._renderContent($div);
-      expectEmptyChart(true);
+      expectEmptyChart(chartTableControl, true);
     });
-
   });
 
-  function expectEmptyChart(empty) {
+  function expectEmptyChart(chartTableControl: ChartTableControl, empty: boolean) {
     expect(chartTableControl.chart).toBeDefined();
     expect(((((chartTableControl.chart.config.data || {}).datasets || [])[0] || {}).data || []).length === 0).toBe(empty);
   }
-
 });

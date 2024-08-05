@@ -7,11 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Chart, FulfillmentChartRenderer} from '../../src/index';
+import {AbstractSvgChartRenderer, Chart, FulfillmentChartRenderer} from '../../src/index';
 import {scout} from '@eclipse-scout/core';
 
 describe('FulfillmentChartRendererSpec', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -25,19 +25,26 @@ describe('FulfillmentChartRendererSpec', () => {
     };
 
     it('without start value property', () => {
-      let fulfillment = new FulfillmentChartRenderer({});
+      let fulfillment = new FulfillmentChartRenderer(scout.create(Chart, {parent: session.desktop}));
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(true);
 
-      fulfillment = new FulfillmentChartRenderer({
-        config: 'notEmpty'
-      });
-      expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(true);
-
-      fulfillment = new FulfillmentChartRenderer({
+      fulfillment = new FulfillmentChartRenderer(scout.create(Chart, {
+        parent: session.desktop,
         config: {
-          fulfillment: 'notEmpty'
+          type: Chart.Type.FULFILLMENT
         }
-      });
+      }));
+      expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(true);
+
+      fulfillment = new FulfillmentChartRenderer(scout.create(Chart, {
+        parent: session.desktop,
+        config: {
+          type: Chart.Type.FULFILLMENT,
+          options: {
+            fulfillment: {}
+          }
+        }
+      }));
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(true);
 
       opts.requestAnimation = false;
@@ -57,16 +64,18 @@ describe('FulfillmentChartRendererSpec', () => {
         chartValueGroups: [actualChartValue, totalChartValue]
       };
       let config = {
+        type: Chart.Type.FULFILLMENT,
         options: {
           fulfillment: {
             startValue: 2
           }
         }
       };
-      let chart = {
-        data: data,
-        config: config
-      };
+      let chart = scout.create(Chart, {
+        parent: session.desktop,
+        data,
+        config
+      });
 
       let fulfillment = new FulfillmentChartRenderer(chart);
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(false);
@@ -100,7 +109,7 @@ describe('FulfillmentChartRendererSpec', () => {
       });
       chart.render();
       chart.chartRenderer.refresh();
-      expect(chart.chartRenderer.$svg.attr('aria-description')).toBeTruthy();
+      expect((chart.chartRenderer as AbstractSvgChartRenderer).$svg.attr('aria-description')).toBeTruthy();
     });
   });
 });

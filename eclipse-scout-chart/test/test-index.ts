@@ -9,5 +9,6 @@
  */
 import {JasmineScout} from '@eclipse-scout/core/testing';
 
-let context = require.context('./', true, /[sS]pec\.js$/);
+// @ts-expect-error
+let context = require.context('./', true, /[sS]pec\.[t|j]s$/);
 JasmineScout.runTestSuite(context);
