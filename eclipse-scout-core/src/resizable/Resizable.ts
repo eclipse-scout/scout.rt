@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, EnumObject, graphics, InitModelOf, Insets, ObjectWithType, Point, Rectangle, ResizableModel, scout, SomeRequired} from '../index';
+import {arrays, EnumObject, graphics, InitModelOf, Insets, keys, ObjectWithType, Point, Rectangle, ResizableModel, scout, SomeRequired} from '../index';
 import $ from 'jquery';
 import MouseDownEvent = JQuery.MouseDownEvent;
 import MouseUpEvent = JQuery.MouseUpEvent;
@@ -40,12 +40,14 @@ export class Resizable implements ResizableModel, ObjectWithType {
   protected _mouseDownHandler: (event: MouseDownEvent) => void;
   protected _mouseUpHandler: (event: MouseUpEvent) => void;
   protected _mouseMoveHandler: (event: MouseMoveEvent) => void;
+  protected _keyDownHandler: (event: KeyboardEvent) => void;
   protected _resizeHandler: (newBounds: Rectangle) => void;
 
   constructor() {
     this._mouseDownHandler = this._onMouseDown.bind(this);
     this._mouseUpHandler = this._onMouseUp.bind(this);
     this._mouseMoveHandler = this._onMouseMove.bind(this);
+    this._keyDownHandler = this._onKeyDown.bind(this);
     this._resizeHandler = this._resize.bind(this);
   }
 
@@ -188,13 +190,40 @@ export class Resizable implements ResizableModel, ObjectWithType {
       .on('mouseup', this._mouseUpHandler)
       .on('mousemove', this._mouseMoveHandler)
       .body().addClass(`${this._context.edge}-resize`);
+    this.$window[0].removeEventListener('keydown', this._keyDownHandler, true);
+    this.$window[0].addEventListener('keydown', this._keyDownHandler, true);
     $('iframe').addClass('dragging-in-progress');
   }
 
   protected _onMouseUp(event: MouseUpEvent) {
+    this.finish();
+  }
+
+  /**
+   * Finishes the resizing by cleaning up all temporary states and triggering the `resizeEnd` event with the initial and new bounds.
+   */
+  finish() {
     this._cleanup();
     this._resizeEnd();
     this._context = null;
+  }
+
+  /**
+   * Cancels the resizing if it is in progress.
+   */
+  cancel() {
+    if (!this._context) {
+      return;
+    }
+    this._context.currentBounds = this._context.initialBounds;
+    this.finish();
+  }
+
+  protected _onKeyDown(event: KeyboardEvent) {
+    if (event.which === keys.ESC) {
+      this.cancel();
+      event.stopPropagation();
+    }
   }
 
   protected _cleanup() {
@@ -206,6 +235,7 @@ export class Resizable implements ResizableModel, ObjectWithType {
     this.$window
       .off('mouseup', this._mouseUpHandler)
       .off('mousemove', this._mouseMoveHandler);
+    this.$window[0].removeEventListener('keydown', this._keyDownHandler, true);
     if (this._context) {
       this.$window.body().removeClass(`${this._context.edge}-resize`);
     }

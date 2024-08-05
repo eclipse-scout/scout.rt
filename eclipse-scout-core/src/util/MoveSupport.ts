@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventEmitter, EventMap, events, graphics, Insets, Point, Rectangle, Session, Widget} from '../index';
+import {Event, EventEmitter, EventMap, events, graphics, Insets, keys, Point, Rectangle, Session, Widget} from '../index';
 import $ from 'jquery';
 
 export class MoveSupport<TElem extends Widget> extends EventEmitter {
@@ -32,6 +32,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
   protected _animationDurationFactor: number;
   protected _mouseMoveHandler: (event: JQuery.MouseMoveEvent) => void;
   protected _mouseUpHandler: (event: JQuery.MouseUpEvent) => void;
+  protected _keyDownHandler: (event: KeyboardEvent) => void;
   protected _releasingScrollHandler: (event: JQuery.ScrollEvent) => void;
 
   /**
@@ -49,6 +50,7 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
 
     this._mouseMoveHandler = this._onMouseMove.bind(this);
     this._mouseUpHandler = this._onMouseUp.bind(this);
+    this._keyDownHandler = this._onKeyDown.bind(this);
     this._releasingScrollHandler = this._onReleasingScroll.bind(this);
   }
 
@@ -120,6 +122,8 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
       .off('mouseup touchend touchcancel', this._mouseUpHandler)
       .on('mousemove touchmove', this._mouseMoveHandler)
       .on('mouseup touchend touchcancel', this._mouseUpHandler);
+    this._moveData.$window[0].removeEventListener('keydown', this._keyDownHandler, true);
+    this._moveData.$window[0].addEventListener('keydown', this._keyDownHandler, true);
   }
 
   protected _createElementInfos(elements: TElem[], draggedElement: TElem): DraggableElementInfo<TElem>[] {
@@ -309,10 +313,18 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
       });
   }
 
+  protected _onKeyDown(event: KeyboardEvent) {
+    if (event.which === keys.ESC) {
+      this.cancel();
+      event.stopPropagation();
+    }
+  }
+
   protected _cleanup() {
     this._moveData.$window
       .off('mousemove touchmove', this._mouseMoveHandler)
       .off('mouseup touchend touchcancel', this._mouseUpHandler);
+    this._moveData.$window[0].removeEventListener('keydown', this._keyDownHandler, true);
     $('iframe').removeClass('dragging-in-progress');
   }
 
