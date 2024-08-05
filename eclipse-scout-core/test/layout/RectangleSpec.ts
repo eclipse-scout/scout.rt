@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Point, Rectangle} from '../../src/index';
+import {Insets, Point, Rectangle} from '../../src/index';
 
 describe('Rectangle', () => {
 
@@ -116,6 +116,21 @@ describe('Rectangle', () => {
       let rect = new Rectangle(10, 20, 10, 5);
       expect(rect.moveTo(30, 40)).toEqual(new Rectangle(30, 40, 10, 5));
       expect(rect.moveTo(new Point(100, 200))).toEqual(new Rectangle(100, 200, 10, 5));
+    });
+  });
+
+  describe('add', () => {
+    it('adds the insets to the rectangle', () => {
+      let rect = new Rectangle(10, 20, 10, 5);
+      expect(rect.add(new Insets(1, 2, 3, 4))).toEqual(new Rectangle(6, 19, 16, 9));
+
+      rect = new Rectangle(10, 20, 10, 5);
+      rect = new Rectangle(10, 20, 10, 5);
+      expect(rect.add(new Insets(0, 0, 0, 0))).toEqual(new Rectangle(10, 20, 10, 5));
+
+      rect = new Rectangle(10, 20, 10, 5);
+      rect = new Rectangle(10, 20, 10, 5);
+      expect(rect.add(new Insets(-1, -2, -3, -4))).toEqual(new Rectangle(14, 21, 4, 1));
     });
   });
 });
