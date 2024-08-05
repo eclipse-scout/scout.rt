@@ -264,13 +264,8 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     // would be a form that is opened from within the popup. To identify these kind of elements, we additionally
     // check the widget hierarchy.
     let target = widgets.get($target);
-    while (target) {
-      if (target === this.cell.field) {
-        return false; // event target belongs to the cell editor popup -> don't close the popup
-      }
-      // Follow 'owner' hierarchy instead of 'parent' hierarchy because the parent of a form is automatically
-      // overwritten with the display parent (see Form#_setDisplayParent).
-      target = target.owner;
+    if (this.cell.field.isOrHas(target)) {
+      return false; // event target belongs to the cell editor popup -> don't close the popup
     }
 
     return true;

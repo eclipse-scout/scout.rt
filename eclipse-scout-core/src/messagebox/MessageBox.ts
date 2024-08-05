@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -312,7 +312,10 @@ export class MessageBox extends Widget implements MessageBoxModel {
 
   protected _setDisplayParent(displayParent: DisplayParent) {
     this._setProperty('displayParent', displayParent);
-    if (displayParent) {
+
+    // Overwrite the parent with the displayParent, unless the displayParent is a descendant of the parent.
+    // This is necessary to automatically remove this element when the display parent is removed.
+    if (displayParent && !displayParent.isOrHas(this.parent)) {
       this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
     }
   }

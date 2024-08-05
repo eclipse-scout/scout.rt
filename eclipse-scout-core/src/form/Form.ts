@@ -1454,7 +1454,9 @@ export class Form extends Widget implements FormModel, DisplayParent {
     }
     this._setProperty('displayParent', displayParent);
 
-    if (displayParent) {
+    // Overwrite the parent with the displayParent, unless the displayParent is a descendant of the parent.
+    // This is necessary to automatically remove this element when the display parent is removed.
+    if (displayParent && !displayParent.isOrHas(this.parent)) {
       this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
     }
   }
