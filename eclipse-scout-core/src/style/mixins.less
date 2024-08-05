@@ -633,4 +633,14 @@
       }
     }
   }
+
+  /**
+   * Adds a rule for a css class with the name @{edge}-resize that defines the cursor with the same name, e.g. resize-w.
+   */
+  .resize-cursor(@edge) {
+    .@{edge}-resize,
+    .@{edge}-resize * { /* NOSONAR (universal selector is okay here) */
+      cursor: ~'@{edge}-resize !important'; /* NOSONAR !important is necessary to override any defined cursor on underlying components */
+    }
+  }
 }
