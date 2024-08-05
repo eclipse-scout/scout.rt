@@ -14,8 +14,8 @@ export class TileResizeHandler extends Resizable implements TileResizeHandlerMod
   tileGrid: TileGrid;
   ignorer: (tile: Tile) => boolean;
 
-  constructor(model: InitModelOf<TileResizeHandler>) {
-    super(model);
+  override init(model: InitModelOf<TileResizeHandler>) {
+    super.init(model);
     this.tileGrid = model.tileGrid;
     this.ignorer = model.ignorer;
   }

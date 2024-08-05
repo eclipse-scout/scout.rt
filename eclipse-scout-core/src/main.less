@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -326,18 +326,16 @@ button {
 
 /* cursor handling */
 
-/* The following classes are added dynamically while dragging. !important is necessary to override */
-/* any cursor an underlying component defines while moving the mouse. */
-
-.col-resize,
-.col-resize * { /* NOSONAR (universal selector is okay here) */
-  cursor: col-resize !important; /* NOSONAR (!important is okay here) */
-}
-
-.row-resize,
-.row-resize * { /* NOSONAR (universal selector is okay here) */
-  cursor: row-resize !important; /* NOSONAR (!important is okay here) */
-}
+#scout.resize-cursor(col);
+#scout.resize-cursor(row);
+#scout.resize-cursor(n);
+#scout.resize-cursor(ne);
+#scout.resize-cursor(e);
+#scout.resize-cursor(se);
+#scout.resize-cursor(s);
+#scout.resize-cursor(sw);
+#scout.resize-cursor(w);
+#scout.resize-cursor(nw);
 
 /* Used to temporarily disable pointer events on iframes while dragging elements */
 .dragging-in-progress {
