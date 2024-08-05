@@ -83,7 +83,7 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
       appendResult = scout.nvl(result.appendResult, false);
 
     if (appendResult) {
-      treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
+      treeNodesFlat = this._lookupRowsToFlatList(lookupRows);
       treeNodes = this._flatListToSubTree(treeNodesFlat);
       if (treeNodes.length) {
         let parentNode = null;
@@ -103,7 +103,7 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
       }
     } else {
       this.content.deleteAllChildNodes();
-      treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
+      treeNodesFlat = this._lookupRowsToFlatList(lookupRows);
       treeNodes = this._flatListToSubTree(treeNodesFlat);
       if (result.byText) {
         this._expandAllParentNodes(treeNodesFlat);
@@ -213,6 +213,18 @@ export class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, P
       }
     }, this.content.nodes);
     return leafs;
+  }
+
+  /**
+   * This function creates a list of flat tree nodes from a list of lookup rows.
+   * Nodes with duplicate ids are filtered, only the first node with the same id is kept.
+   */
+  protected _lookupRowsToFlatList(lookupRows: LookupRow<TValue>[]): ProposalTreeNode<TValue>[] {
+    let nodeIds = new Set();
+    return lookupRows.map(this._createTreeNode.bind(this))
+      .filter(node => {
+        return nodeIds.has(node.id) ? false : nodeIds.add(node.id);
+      });
   }
 
   /**
