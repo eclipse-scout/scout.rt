@@ -20,14 +20,26 @@
     "chart"
   ],
   "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/d.ts/src/index.d.ts",
+        "import": "./dist/eclipse-scout-chart.esm.js"
+      },
+      "./src/*": "./src/*"
+    },
     "main": "./dist/eclipse-scout-chart.esm.js",
     "module": "./dist/eclipse-scout-chart.esm.js",
     "types": "./dist/d.ts/index.d.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./src/*": "./src/*"
   },
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "files": [
     "dist",
+    "!dist/d.ts/test",
     "src"
   ],
   "scripts": {
