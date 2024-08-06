@@ -1108,7 +1108,9 @@ declare global {
 
     /**
      * Makes the current element resizable, which means DIVs for resize-handling are added to the DOM
-     * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
+     * in the E, SE and S of the element.
+     *
+     * @see Resizable
      */
     resizable(model?: ResizableModel): this;
 
