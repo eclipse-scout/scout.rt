@@ -308,7 +308,7 @@ public class RemoteFileService implements IRemoteFileService {
       }
       localeText = localeText.substring(0, localeText.lastIndexOf(LOCALE_DELIMITER));
       extendedFilename = prefix + localeText + suffix;
-      test = new File(canonicalFolder, filename);
+      test = new File(canonicalFolder, extendedFilename);
     }
     return extendedFilename;
   }
