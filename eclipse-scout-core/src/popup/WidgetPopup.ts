@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -156,11 +156,11 @@ export class WidgetPopup<TContent extends Widget = Widget> extends Popup impleme
     if (this.resizable) {
       this.$container
         .resizable({modes: this._determineResizeModes(), $container: this.$container, boundaries: this._calculateResizeBoundaries()})
-        .on('resize', this._resizeHandler);
+        .on('resizeStep', this._resizeHandler);
     } else {
       this.$container
         .unresizable()
-        .off('resize', this._resizeHandler);
+        .off('resizeStep', this._resizeHandler);
       this.invalidateLayoutTree(); // Resize popup to preferred size
     }
   }
