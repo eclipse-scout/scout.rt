@@ -14,7 +14,10 @@ import MouseUpEvent = JQuery.MouseUpEvent;
 import MouseMoveEvent = JQuery.MouseMoveEvent;
 
 /**
- * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given model.$container. This is primarily used for (modal) dialogs.
+ * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given model.$container.
+ * The following events are triggered on the DOM element:
+ * - resizeStep: triggered during resizing.
+ * - resizeEnd: triggered when resizing ends.
  */
 export class Resizable implements ResizableModel, ObjectWithType {
   declare model: ResizableModel;
@@ -281,7 +284,9 @@ export class Resizable implements ResizableModel, ObjectWithType {
     } else {
       graphics.setBounds(this.$container, newBounds);
     }
-    this.$container.trigger('resize', {
+    // 'resize' would be a better name, but it is a native event triggered by the browser when the window is resized
+    // To not accidentally trigger event handlers listening for window resizes, another name is used.
+    this.$container.trigger('resizeStep', {
       newBounds: newBounds,
       initialBounds: this._context.initialBounds
     });

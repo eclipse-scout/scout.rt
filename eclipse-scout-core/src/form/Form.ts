@@ -929,11 +929,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
     if (this.resizable && this.isDialog() && !this.maximized) {
       this.$container
         .resizable()
-        .on('resize', this._resizeHandler);
+        .on('resizeStep', this._resizeHandler);
     } else {
       this.$container
         .unresizable()
-        .off('resize', this._resizeHandler);
+        .off('resizeStep', this._resizeHandler);
     }
   }
 
