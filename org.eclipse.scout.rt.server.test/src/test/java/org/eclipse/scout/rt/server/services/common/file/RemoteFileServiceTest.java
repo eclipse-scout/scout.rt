@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.rt.server.services.common.file;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
 
 public class RemoteFileServiceTest {
@@ -84,6 +86,20 @@ public class RemoteFileServiceTest {
   protected void checkAddLocaleToFileName(String initialName, String expectedFileNameAfterTest, Locale locale, Integer fileExistsAtLevel) {
     AtomicInteger fileLocaleLevel = new AtomicInteger(0);
     String fileNameAfterExtend = service.tryAddLocaleToFileName(initialName, locale, "test/", file -> fileLocaleLevel.getAndIncrement() == fileExistsAtLevel);
+    Assertions.assertEquals(fileNameAfterExtend, expectedFileNameAfterTest);
+  }
+
+  @Test
+  public void testFallbackFilenameWhenTemplateMissing() {
+    checkAddLocaleToFileName("Example.txt", "Example.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example_de.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example.txt", "Example_de.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example_de.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example_de.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example_de_CH.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example.txt", "Example_de_CH.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example_de_CH.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example_de_CH.txt"));
+  }
+
+  protected void checkAddLocaleToFileName(String initialName, String expectedFileNameAfterTest, Locale locale, List<String> existingFilenames) {
+    String fileNameAfterExtend = service.tryAddLocaleToFileName(initialName, locale, "test/", file -> existingFilenames.contains(file.getName()));
     Assertions.assertEquals(fileNameAfterExtend, expectedFileNameAfterTest);
   }
 
