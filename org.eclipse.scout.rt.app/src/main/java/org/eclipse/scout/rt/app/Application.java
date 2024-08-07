@@ -88,12 +88,16 @@ public class Application {
   protected final AtomicReference<Server> m_server = new AtomicReference<>();
 
   public static void main(String[] args) {
+    long t0 = System.nanoTime();
     LOG.info("Starting platform");
     IPlatform platform = Platform.get();
     platform.awaitPlatformStarted();
+    LOG.info("Platform start took {} ms", StringUtility.formatNanos(System.nanoTime() - t0));
 
     LOG.info("Starting application");
+    long t1 = System.nanoTime();
     INSTANCE.get().start();
+    LOG.info("Application start took {} ms, total startup (platform/application) took {} ms", StringUtility.formatNanos(System.nanoTime() - t1), StringUtility.formatNanos(System.nanoTime() - t0));
   }
 
   protected void start() {
