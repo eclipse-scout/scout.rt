@@ -8,6 +8,6 @@
     "eslint": "8.10.0",
     "@babel/eslint-parser": "7.16.5",
     "@babel/eslint-plugin": "7.16.5",
-    "@eclipse-scout/eslint-config": ">=22.0.0-snapshot <22.0.0"
+    "@eclipse-scout/eslint-config": "22.0.62"
   }
 }

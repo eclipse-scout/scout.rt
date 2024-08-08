@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/chart",
-  "version": "22.0.0-snapshot",
+  "version": "22.0.62",
   "description": "Eclipse Scout chart",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -39,13 +39,13 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=22.0.0-snapshot <22.0.0",
+    "@eclipse-scout/cli": "22.0.62",
     "@eclipse-scout/releng": "^22.0.0",
     "jasmine-core": "3.10.1",
     "karma": "6.3.20"
   },
   "dependencies": {
-    "@eclipse-scout/core": ">=22.0.0-snapshot <22.0.0",
+    "@eclipse-scout/core": "22.0.62",
     "jquery": "3.6.0",
     "chart.js": "3.7.0",
     "chartjs-plugin-datalabels": "2.0.0"
