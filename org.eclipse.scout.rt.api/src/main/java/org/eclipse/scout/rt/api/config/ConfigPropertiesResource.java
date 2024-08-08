@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package og.eclipse.scout.rt.api.config;
+package org.eclipse.scout.rt.api.config;
 
 import java.util.Collection;
 import java.util.HashSet;
