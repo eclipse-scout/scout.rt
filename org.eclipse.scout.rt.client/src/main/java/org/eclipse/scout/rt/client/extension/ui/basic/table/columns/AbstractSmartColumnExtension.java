@@ -23,6 +23,6 @@ public abstract class AbstractSmartColumnExtension<VALUE, OWNER extends Abstract
 
   @Override
   public void execPrepareLookup(SmartColumnPrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call, ITableRow row) {
+    chain.execPrepareLookup(call, row);
   }
-
 }
