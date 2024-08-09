@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AggregateTableControl, arrays, objects, scout, Widget} from '../index';
+import {AggregateTableControl, arrays, objects, scout, TableUserFilter, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -54,6 +54,8 @@ export default class TableTileGridMediator extends Widget {
     this.gridColumnCount = null;
     this.tileGridLayoutConfig = null;
     this.withPlaceholders = null;
+
+    this._tileFilters = [];
 
     this._addWidgetProperties(['tileAccordion', 'tiles', 'tileMappings']);
   }
@@ -530,13 +532,13 @@ export default class TableTileGridMediator extends Widget {
     if (!this.table.tileMode) {
       return;
     }
-
-    this.tileAccordion.removeFilter(event.filter.tileFilter);
+    this._removeFilterByPredicate(f => f.tableFilter === event.filter);
   }
 
   _addFilter(tableFilter) {
     let tileFilter = {
       table: this.table,
+      tableFilter: tableFilter,
       accept: function(tile) {
         let rowForTile = this.table.rowsMap[tile.rowId];
         if (rowForTile) {
@@ -545,11 +547,23 @@ export default class TableTileGridMediator extends Widget {
         return false;
       }
     };
-    if (tableFilter.tileFilter) {
-      this.tileAccordion.removeFilter(tableFilter.tileFilter, false);
+
+    this._removeFilterByPredicate(f => f.tableFilter === tableFilter, false);
+    if (tableFilter instanceof TableUserFilter) {
+      let key = tableFilter.createKey();
+      this._removeFilterByPredicate(f => f.tableFilter instanceof TableUserFilter && objects.equals(f.tableFilter.createKey(), key), false);
     }
-    tableFilter.tileFilter = tileFilter;
+
+    this._tileFilters.push(tileFilter);
     this.tileAccordion.addFilter(tileFilter);
+  }
+
+  _removeFilterByPredicate(predicate, applyFilter = true) {
+    let filter = this._tileFilters.find(predicate);
+    if (filter) {
+      this.tileAccordion.removeFilter(filter, applyFilter);
+      arrays.remove(this._tileFilters, filter);
+    }
   }
 
   _onTableFilter(event) {
