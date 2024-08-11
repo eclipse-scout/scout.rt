@@ -71,7 +71,10 @@ export class MoveSupport<TElem extends Widget> extends EventEmitter {
     if (!event || !elements || !draggedElement || !elements.includes(draggedElement) || !draggedElement.$container) {
       return;
     }
-
+    if (event.which !== 1) {
+      // Only accept left mouse button clicks (right one is reserved for context menu)
+      return;
+    }
     events.fixTouchEvent(event);
 
     this._initMoveData(event, elements, draggedElement);
