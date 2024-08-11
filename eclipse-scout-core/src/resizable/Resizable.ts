@@ -148,6 +148,11 @@ export class Resizable implements ResizableModel, ObjectWithType {
   }
 
   protected _onMouseDown(event: MouseDownEvent) {
+    if (event.which !== 1 || this._context) {
+      // Only accept left mouse button clicks (right one is reserved for context menu)
+      // Also ensure resizing cannot be started twice (e.g. by pressing alt-tab, releasing the mouse button and pressing it again on the resizable)
+      return;
+    }
     let $resizable = this.$container;
     let $myWindow = $resizable.window();
     let $handle = $(event.target);
