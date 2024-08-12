@@ -28,12 +28,12 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=23.2.0-snapshot <23.2.0",
-    "@eclipse-scout/tsconfig": ">=23.2.0-snapshot <23.2.0",
+    "@eclipse-scout/cli": "23.2.26-alpha.0",
+    "@eclipse-scout/tsconfig": "23.2.26-alpha.0",
     "@eclipse-scout/releng": "^22.0.0"
   },
   "dependencies": {
-    "@eclipse-scout/core": ">=23.2.0-snapshot <23.2.0",
+    "@eclipse-scout/core": "23.2.26-alpha.0",
     "@${simpleArtifactName}/ui": "${version}"
   }
 }

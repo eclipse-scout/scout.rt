@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/migrate",
-  "version": "23.2.0-snapshot",
+  "version": "23.2.26-alpha.0",
   "description": "TypeScript migration module",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -46,6 +46,6 @@
     "jest": "29.5.0",
     "@babel/preset-env": "7.21.4",
     "@babel/core": "7.21.4",
-    "@eclipse-scout/tsconfig": ">=23.2.0-snapshot <23.2.0"
+    "@eclipse-scout/tsconfig": "23.2.26-alpha.0"
   }
 }
