@@ -16,6 +16,6 @@ public final class OfficialVersion {
   private OfficialVersion() {
   }
 
-  public static final String COPYRIGHT_VERSION = "24.2";
+  public static final String COPYRIGHT_VERSION = "25.1";
   public static final String COPYRIGHT = "Scout " + COPYRIGHT_VERSION + ", &copy; BSI Business Systems Integration AG " + 2001 + "," + Calendar.getInstance().get(Calendar.YEAR) + " EPL";
 }

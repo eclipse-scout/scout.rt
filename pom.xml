@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt.root</artifactId>
-  <version>24.2-SNAPSHOT</version>
+  <version>25.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
