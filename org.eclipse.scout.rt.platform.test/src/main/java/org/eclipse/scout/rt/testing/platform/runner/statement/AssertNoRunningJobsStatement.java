@@ -10,15 +10,16 @@
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import static org.junit.Assert.fail;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -28,16 +29,19 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Statement to assert no running jobs after test execution to prevent job interferences among test classes using a
- * shared platform.
+ * shared platform. Jobs marked with {@link JobInput#EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB} are ignored.
  *
  * @since 5.2
  */
 public class AssertNoRunningJobsStatement extends Statement {
-
-  private static final long AWAIT_DONE_TIMEOUT_MILLIS = TimeUnit.MINUTES.toMillis(1);
+  private static final Logger LOG = LoggerFactory.getLogger(AssertNoRunningJobsStatement.class);
+  private static final long AWAIT_DONE_TIMEOUT_NANOS = TimeUnit.MINUTES.toNanos(1);
+  private static final long REPORT_THRESHOLD_NANOS = TimeUnit.MILLISECONDS.toNanos(500);
 
   private final Statement m_next;
   private final String m_context;
@@ -65,22 +69,24 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     final Set<IFuture<?>> scheduledFutures = jobListener.getScheduledFutures();
     if (!scheduledFutures.isEmpty()) {
-      assertNoRunningJobs(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(scheduledFutures)
-          .toFilter());
+      assertNoRunningJobs(scheduledFutures);
     }
   }
 
   /**
    * Asserts that all jobs accepted by the given filter are in 'done' state.
    */
-  private void assertNoRunningJobs(final Predicate<IFuture<?>> jobFilter) {
+  private void assertNoRunningJobs(final Set<IFuture<?>> futures) {
     try {
+      //noinspection ResultOfMethodCallIgnored
       Thread.interrupted(); // clear the thread's interrupted status, in case the JUnit test interrupted the executing thread.
-      Jobs.getJobManager().awaitDone(jobFilter, AWAIT_DONE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+      removeAndAwaitDone(futures);
     }
     catch (final TimedOutError e) { // NOSONAR
-      final List<String> runningJobs = findJobNames(jobFilter);
+      final List<String> runningJobs = futures.stream()
+          .filter(f -> !f.isDone()) // because of the TimedOutError there could still be done jobs in the list
+          .map(f -> f.getJobInput().getName())
+          .collect(Collectors.toList());
       if (!runningJobs.isEmpty()) {
         fail(String.format("Test failed because some jobs did not complete yet. [context=%s, jobs=%s]", m_context, runningJobs));
       }
@@ -88,14 +94,31 @@ public class AssertNoRunningJobsStatement extends Statement {
   }
 
   /**
-   * Finds running job names which comply with the given filter.
+   * Waits until the given futures are done and removes them.
    */
-  private List<String> findJobNames(final Predicate<IFuture<?>> filter) {
-    final List<String> jobs = new ArrayList<>();
-    for (final IFuture<?> future : Jobs.getJobManager().getFutures(filter)) {
-      jobs.add(future.getJobInput().getName());
+  private void removeAndAwaitDone(Set<IFuture<?>> futures) {
+    // implementation note: we do not use IJobManager.awaitDone because we want to report jobs running longer than REPORT_THRESHOLD_NANOS.
+    long nanosWaited = 0;
+    boolean reported = false;
+    while (nanosWaited < AWAIT_DONE_TIMEOUT_NANOS) {
+      // remove all done jobs
+      futures.removeIf(IFuture::isDone);
+      if (futures.isEmpty()) {
+        return;
+      }
+
+      final IFuture<?> next = futures.iterator().next();
+      final long startNanos = System.nanoTime();
+      next.awaitDone(AWAIT_DONE_TIMEOUT_NANOS - nanosWaited, TimeUnit.NANOSECONDS);
+      nanosWaited += System.nanoTime() - startNanos;
+
+      if (!reported && nanosWaited > REPORT_THRESHOLD_NANOS) {
+        LOG.warn("The job '{}' did not complete within {}ms [took {}ms].\n"
+            + "Hint: in case of deferred background operations that do not impact the test execution, consider using JobInput.EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB",
+            next.getJobInput().getName(), TimeUnit.NANOSECONDS.toMillis(REPORT_THRESHOLD_NANOS), TimeUnit.NANOSECONDS.toMillis(nanosWaited));
+        reported = true;
+      }
     }
-    return jobs;
   }
 
   /**
@@ -123,13 +146,18 @@ public class AssertNoRunningJobsStatement extends Statement {
     @Override
     public void changed(final JobEvent event) {
       if (isScheduledByInitialThread() || isScheduledByInitialJob() || isScheduledByDescendantJob()) {
+        final IFuture<?> future = event.getData().getFuture();
+        // ignore specifically jobs marked jobs
+        if (future.containsExecutionHint(JobInput.EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB)) {
+          return;
+        }
         m_scheduledFutures.put(event.getData().getFuture(), PRESENT);
       }
     }
 
     /**
-     * @return Returns <code>true</code> if the the initial statement was not executed by a job and the current thread
-     *         is the initial thread.
+     * @return Returns <code>true</code> if the initial statement was not executed by a job and the current thread is
+     *         the initial thread.
      */
     private boolean isScheduledByInitialThread() {
       return m_initialThread != null && m_initialThread == Thread.currentThread();
