@@ -152,7 +152,7 @@ public class UiNotificationRegistry {
    * this time frame to delay requests back to the server to flatten the peak load.
    *
    * @param topic
-   *     The topic for which the delay should be computed.
+   *          The topic for which the delay should be computed.
    * @return The delay window (maximum time) in seconds. Is in the range [0, 60].
    */
   public long computeNotificationHandlerDelayWindow(String topic) {
@@ -303,13 +303,13 @@ public class UiNotificationRegistry {
    * Puts a message into the registry of all users except the ones provided.
    *
    * @param topic
-   *     A notification must be assigned to a topic. Must not be {@code null}.
+   *          A notification must be assigned to a topic. Must not be {@code null}.
    * @param excludedUserIds
-   *     {@link Collection} of userIds which should NOT receive the message.
+   *          {@link Collection} of userIds which should NOT receive the message.
    * @param message
-   *     The message part of the {@link UiNotificationDo}. May be {@code null}.
+   *          The message part of the {@link UiNotificationDo}. May be {@code null}.
    * @param options
-   *     Optional {@link UiNotificationPutOptions}. May be {@code null}.
+   *          Optional {@link UiNotificationPutOptions}. May be {@code null}.
    */
   public void putExcept(String topic, Collection<String> excludedUserIds, IDoEntity message, UiNotificationPutOptions options) {
     if (CollectionUtility.isEmpty(excludedUserIds)) {
@@ -414,8 +414,8 @@ public class UiNotificationRegistry {
     }
     // Ensure creation time is unique per node
     notification.withCreationTime(new Date());
-    if (notification.getCreationTime().equals(m_lastCreationTime)) {
-      notification.withCreationTime(DateUtility.addMilliseconds(notification.getCreationTime(), 1));
+    if (m_lastCreationTime != null && notification.getCreationTime().getTime() <= m_lastCreationTime.getTime()) {
+      notification.withCreationTime(DateUtility.addMilliseconds(m_lastCreationTime, 1));
     }
     m_lastCreationTime = notification.getCreationTime();
   }
