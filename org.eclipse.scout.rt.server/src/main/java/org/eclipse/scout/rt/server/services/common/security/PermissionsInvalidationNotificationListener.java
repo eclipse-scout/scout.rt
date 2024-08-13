@@ -21,12 +21,10 @@ import org.eclipse.scout.rt.api.uinotification.UiNotificationRegistry;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.security.IAccessControlService;
-import org.eclipse.scout.rt.server.ServerConfigProperties.PermissionResourceThroughputProperty;
 
 /**
  * Listens for permission cache invalidation and notifies the UI to update its cache.
@@ -48,7 +46,7 @@ public class PermissionsInvalidationNotificationListener implements Consumer<IAc
 
   @Override
   public void accept(IAccessControlService source) {
-    var transaction = ITransaction.CURRENT.get();
+    ITransaction transaction = ITransaction.CURRENT.get();
     if (transaction == null) {
       return;
     }
@@ -80,20 +78,10 @@ public class PermissionsInvalidationNotificationListener implements Consumer<IAc
 
     @Override
     public void commitPhase2() {
-      var uiNotificationRegistry = BEANS.get(UiNotificationRegistry.class);
-      int listenerCount = uiNotificationRegistry.getListenerCount(TOPIC);
-      if (listenerCount < 1) {
-        return; // prevent unnecessary notify if no one is interested
-      }
-      var reloadThroughputPerSecond = Math.max(CONFIG.getPropertyValue(PermissionResourceThroughputProperty.class), 1); // must be > 0
-      var reloadDelayWindow = computeReloadDelayWindow(listenerCount, reloadThroughputPerSecond);
-      var updateDo = BEANS.get(PermissionUpdateMessageDo.class).withReloadDelayWindow(reloadDelayWindow);
+      UiNotificationRegistry uiNotificationRegistry = BEANS.get(UiNotificationRegistry.class);
+      long reloadDelayWindow = uiNotificationRegistry.computeNotificationHandlerDelayWindow(TOPIC);
+      PermissionUpdateMessageDo updateDo = BEANS.get(PermissionUpdateMessageDo.class).withReloadDelayWindow(reloadDelayWindow);
       uiNotificationRegistry.put(TOPIC, updateDo, noTransaction());
-    }
-
-    protected long computeReloadDelayWindow(int numListeners, int reloadThroughputPerSecond) {
-      var delayWindow = (numListeners + reloadThroughputPerSecond - 1) / reloadThroughputPerSecond; // = ceil(numListeners/reloadThroughputPerSecond)
-      return Math.max(Math.min(delayWindow, 60), 0); // max 1min delay window
     }
   }
 }

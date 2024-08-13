@@ -19,8 +19,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
@@ -28,6 +29,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
+import org.eclipse.scout.rt.api.data.code.CodeTypeRequest;
 import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeContributor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -53,19 +55,24 @@ public class CodeResource implements IRestResource {
    *          specify the supported application languages.
    * @return List of the CodeTypes.
    */
-  @GET
+  @PUT
+  @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public Collection<CodeTypeDo> list(@QueryParam("allLanguages") @DefaultValue("true") boolean allLanguages) {
-    Map<String, CodeTypeDo> codeTypeDos = getCodeTypesById();
+  public Collection<CodeTypeDo> list(@QueryParam("allLanguages") @DefaultValue("true") boolean allLanguages, CodeTypeRequest request) {
+    Set<String> ids = request == null ? null : request.getCodeTypeIds();
+    Map<String, CodeTypeDo> codeTypeDos = getCodeTypesById(ids);
     if (allLanguages) {
-      loadOtherTextsFor(codeTypeDos);
+      loadOtherTextsFor(codeTypeDos, ids);
     }
     return codeTypeDos.values();
   }
 
-  protected Map<String, CodeTypeDo> getCodeTypesById() {
+  protected Map<String, CodeTypeDo> getCodeTypesById(Set<String> ids) {
     Set<CodeTypeDo> codeTypes = new HashSet<>();
     BEANS.all(IApiExposedCodeTypeContributor.class).forEach(contributor -> contributor.contribute(codeTypes));
+    if (CollectionUtility.hasElements(ids)) {
+      codeTypes.removeIf(codeType -> !ids.contains(codeType.getId()));
+    }
     return convertToMap(codeTypes);
   }
 
@@ -90,7 +97,7 @@ public class CodeResource implements IRestResource {
     }
   }
 
-  protected void loadOtherTextsFor(Map<String, CodeTypeDo> codeTypeMap) {
+  protected void loadOtherTextsFor(Map<String, CodeTypeDo> codeTypeMap, Set<String> ids) {
     Set<Locale> otherAppLanguages = new HashSet<>(getApplicationLanguages());
     otherAppLanguages.remove(NlsLocale.get()); // remove current running locale (is already part of the result)
     if (otherAppLanguages.isEmpty()) {
@@ -102,7 +109,7 @@ public class CodeResource implements IRestResource {
         .sorted(Comparator.comparing(Locale::toLanguageTag))
         .forEachOrdered(otherLanguage -> RunContexts.copyCurrent()
             .withLocale(otherLanguage)
-            .call(this::getCodeTypesById).values()
+            .call(() -> getCodeTypesById(ids)).values()
             .forEach(otherCodeTypeDo -> mergeCodeTypeTexts(otherCodeTypeDo, codeTypeMap)));
   }
 

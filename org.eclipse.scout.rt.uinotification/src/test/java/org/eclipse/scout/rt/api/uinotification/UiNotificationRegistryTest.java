@@ -72,6 +72,35 @@ public class UiNotificationRegistryTest {
   }
 
   @Test
+  public void testComputeNotificationHandlerMaxDelay() {
+    // test lower bounds
+    assertEquals(0, m_registry.computeNotificationHandlerMaxDelay(0, 30));
+
+    assertEquals(4, m_registry.computeNotificationHandlerMaxDelay(100, 30));
+    assertEquals(20, m_registry.computeNotificationHandlerMaxDelay(100, 5));
+
+    // test upper bounds
+    assertEquals(60, m_registry.computeNotificationHandlerMaxDelay(1000, 5));
+  }
+
+  @Test
+  public void testIsNotificationRelevantForUser() {
+    UiNotificationMessageDo withUser = BEANS.get(UiNotificationMessageDo.class).withUser("usr");
+    assertTrue(m_registry.isNotificationRelevantForUser(withUser, "usr"));
+    assertFalse(m_registry.isNotificationRelevantForUser(withUser, "other"));
+
+    UiNotificationMessageDo exceptUser = BEANS.get(UiNotificationMessageDo.class).withExcludedUserIds("ex1", "ex2");
+    assertTrue(m_registry.isNotificationRelevantForUser(exceptUser, "usr"));
+    assertTrue(m_registry.isNotificationRelevantForUser(exceptUser, "other"));
+    assertFalse(m_registry.isNotificationRelevantForUser(exceptUser, "ex1"));
+    assertFalse(m_registry.isNotificationRelevantForUser(exceptUser, "ex2"));
+
+    UiNotificationMessageDo noFilter = BEANS.get(UiNotificationMessageDo.class);
+    assertTrue(m_registry.isNotificationRelevantForUser(noFilter, "usr"));
+    assertTrue(m_registry.isNotificationRelevantForUser(noFilter, "other"));
+  }
+
+  @Test
   public void testGet() {
     m_registry.put("topic", createMessage(), noTransaction());
     UiNotificationDo notification = getNewestNotification("topic");

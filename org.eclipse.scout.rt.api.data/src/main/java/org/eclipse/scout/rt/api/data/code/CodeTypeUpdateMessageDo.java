@@ -16,6 +16,7 @@ import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("scout.CodeTypeUpdateMessage")
@@ -23,6 +24,14 @@ public class CodeTypeUpdateMessageDo extends DoEntity {
 
   public DoList<CodeTypeDo> codeTypes() {
     return doList("codeTypes");
+  }
+
+  public DoList<String> codeTypeIds() {
+    return doList("codeTypeIds");
+  }
+
+  public DoValue<Long> reloadDelayWindow() {
+    return doValue("reloadDelayWindow");
   }
 
   /* **************************************************************************
@@ -44,5 +53,33 @@ public class CodeTypeUpdateMessageDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public List<CodeTypeDo> getCodeTypes() {
     return codeTypes().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public CodeTypeUpdateMessageDo withCodeTypeIds(Collection<? extends String> codeTypeIds) {
+    codeTypeIds().updateAll(codeTypeIds);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public CodeTypeUpdateMessageDo withCodeTypeIds(String... codeTypeIds) {
+    codeTypeIds().updateAll(codeTypeIds);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<String> getCodeTypeIds() {
+    return codeTypeIds().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public CodeTypeUpdateMessageDo withReloadDelayWindow(Long reloadDelayWindow) {
+    reloadDelayWindow().set(reloadDelayWindow);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Long getReloadDelayWindow() {
+    return reloadDelayWindow().get();
   }
 }

@@ -10,11 +10,13 @@
 package org.eclipse.scout.rt.api.uinotification;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -26,6 +28,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.api.data.uinotification.TopicDo;
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationDo;
+import org.eclipse.scout.rt.api.uinotification.UiNotificationConfigProperties.NotificationHandlerThroughputProperty;
 import org.eclipse.scout.rt.api.uinotification.UiNotificationConfigProperties.RegistryCleanupJobIntervalProperty;
 import org.eclipse.scout.rt.api.uinotification.UiNotificationConfigProperties.UiNotificationExpirationTimeProperty;
 import org.eclipse.scout.rt.api.uinotification.UiNotificationConfigProperties.UiNotificationWaitTimeoutProperty;
@@ -42,6 +45,7 @@ import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
@@ -143,17 +147,30 @@ public class UiNotificationRegistry {
     return notifications;
   }
 
+  /**
+   * Computes the time window (maximum delay) for notification handlers of the given topic. Such handlers should use
+   * this time frame to delay requests back to the server to flatten the peak load.
+   *
+   * @param topic
+   *     The topic for which the delay should be computed.
+   * @return The delay window (maximum time) in seconds. Is in the range [0, 60].
+   */
+  public long computeNotificationHandlerDelayWindow(String topic) {
+    int listenerCount = getListenerCount(topic);
+    int reloadThroughputPerSecond = Math.max(CONFIG.getPropertyValue(NotificationHandlerThroughputProperty.class), 1); // must be > 0
+    return computeNotificationHandlerMaxDelay(listenerCount, reloadThroughputPerSecond);
+  }
+
+  protected long computeNotificationHandlerMaxDelay(int numListeners, int reloadThroughputPerSecond) {
+    var delayWindow = (numListeners + reloadThroughputPerSecond - 1) / reloadThroughputPerSecond; // = ceil(numListeners/reloadThroughputPerSecond)
+    return Math.max(Math.min(delayWindow, 60), 0); // max 1min delay window
+  }
+
   protected List<UiNotificationDo> get(String topic, String user, final List<UiNotificationDo> lastKnownNotifications) {
     m_lock.readLock().lock();
     try {
       Stream<UiNotificationDo> notificationStream = getNotifications().getOrDefault(topic, new ArrayList<>()).stream()
-          .filter(elem -> {
-            // If element contains a user it must match the given user
-            if (elem.getUser() != null) {
-              return elem.getUser().equals(user);
-            }
-            return true;
-          })
+          .filter(elem -> isNotificationRelevantForUser(elem, user))
           .map(elem -> elem.getNotification());
 
       // Return notifications that just act as subscription start markers
@@ -183,6 +200,21 @@ public class UiNotificationRegistry {
     finally {
       m_lock.readLock().unlock();
     }
+  }
+
+  protected boolean isNotificationRelevantForUser(UiNotificationMessageDo notification, String requestingUser) {
+    String notificationUser = notification.getUser();
+    if (notificationUser != null) {
+      // If notification contains a user it must match the given user
+      return notificationUser.equals(requestingUser);
+    }
+    Set<String> excludedUserIds = notification.getExcludedUserIds();
+    if (CollectionUtility.isEmpty(excludedUserIds)) {
+      return true;
+    }
+
+    // if notification has excluded users: the current user must not be part of it
+    return !excludedUserIds.contains(requestingUser);
   }
 
   /**
@@ -264,6 +296,29 @@ public class UiNotificationRegistry {
    *          Optional {@link UiNotificationPutOptions}. May be {@code null}.
    */
   public void put(String topic, String userId, IDoEntity message, UiNotificationPutOptions options) {
+    putMessage(topic, userId, null, message, options);
+  }
+
+  /**
+   * Puts a message into the registry of all users except the ones provided.
+   *
+   * @param topic
+   *     A notification must be assigned to a topic. Must not be {@code null}.
+   * @param excludedUserIds
+   *     {@link Collection} of userIds which should NOT receive the message.
+   * @param message
+   *     The message part of the {@link UiNotificationDo}. May be {@code null}.
+   * @param options
+   *     Optional {@link UiNotificationPutOptions}. May be {@code null}.
+   */
+  public void putExcept(String topic, Collection<String> excludedUserIds, IDoEntity message, UiNotificationPutOptions options) {
+    if (CollectionUtility.isEmpty(excludedUserIds)) {
+      excludedUserIds = null;
+    }
+    putMessage(topic, null, excludedUserIds, message, options);
+  }
+
+  protected void putMessage(String topic, String userId, Collection<String> excludedUserIds, IDoEntity message, UiNotificationPutOptions options) {
     Assertions.assertNotNull(topic, "Topic must not be null");
     if (options == null) {
       options = new UiNotificationPutOptions();
@@ -278,6 +333,7 @@ public class UiNotificationRegistry {
     UiNotificationMessageDo metaMessage = BEANS.get(UiNotificationMessageDo.class)
         .withNotification(notification)
         .withUser(userId)
+        .withExcludedUserIds(excludedUserIds)
         .withTimeout(ObjectUtility.nvl(options.getTimeout(), CONFIG.getPropertyValue(UiNotificationExpirationTimeProperty.class)));
 
     options = options.copy().withTimeout(0L);
@@ -386,12 +442,18 @@ public class UiNotificationRegistry {
 
   /**
    * Retrieves how many observers are listening for the given topic.
+   * <p>
+   * Note: a listener is not the same as a subscriber, so it must not be used to check whether a notification should be
+   * put into the registry. A listener count of 0 does not mean that nobody is currently interested in that topic. A
+   * listener is added temporarily during a poll request and removed when the request returns. So, if every poll request
+   * is returning, the listener count may be 0, but the clients may still be interested and immediately start new poll
+   * requests again.
    *
    * @param topic
    *          The topic for which the listener count should be returned.
    * @return The number of listeners for the given topic.
    */
-  public int getListenerCount(String topic) {
+  protected int getListenerCount(String topic) {
     var listenerList = m_listeners.get(topic);
     if (listenerList == null || listenerList.isEmpty()) {
       return 0;

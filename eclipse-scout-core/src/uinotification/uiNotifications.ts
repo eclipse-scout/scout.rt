@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {System, systems, UiNotificationHandler, UiNotificationSystem} from '../index';
+import {scout, System, systems, UiNotificationHandler, UiNotificationSystem} from '../index';
 
 export const uiNotifications = {
   systems: new Map<string, UiNotificationSystem>(),
@@ -59,6 +59,20 @@ export const uiNotifications = {
     }
     system.destroy();
     uiNotifications.systems.delete(name);
+  },
+
+  /**
+   * Computes a reload delay for the current client which lies within the given time window.
+   * @param reloadDelayWindow The time window in which the random delay must be (maximum) in seconds.
+   * @returns The delay in milliseconds.
+   */
+  computeReloadDelay(reloadDelayWindow: number): number {
+    reloadDelayWindow = scout.nvl(reloadDelayWindow, 0);
+    if (reloadDelayWindow < 3) {
+      // no delay if the window is very small (not necessary)
+      return 0;
+    }
+    return Math.ceil(Math.random() * 1000 * reloadDelayWindow); // randomly delay the reload within the necessary time window (milliseconds)
   },
 
   tearDown() {

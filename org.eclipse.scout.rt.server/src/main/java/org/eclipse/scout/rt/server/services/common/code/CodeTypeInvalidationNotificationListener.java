@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.server.services.common.code;
 
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.rt.api.uinotification.UiNotificationPutOptions.noTransaction;
 
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.code.CodeService;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheKey;
@@ -60,11 +62,11 @@ public class CodeTypeInvalidationNotificationListener implements Consumer<ICache
 
   @Override
   public void accept(ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> filter) {
-    var transaction = ITransaction.CURRENT.get();
+    ITransaction transaction = ITransaction.CURRENT.get();
     if (transaction == null) {
       return;
     }
-    var member = transaction.registerMemberIfAbsentAndNotCancelled(CodeTypeUiNotificationTransactionMember.TRANSACTION_MEMBER_ID, this::createTransactionMember);
+    CodeTypeUiNotificationTransactionMember member = transaction.registerMemberIfAbsentAndNotCancelled(CodeTypeUiNotificationTransactionMember.TRANSACTION_MEMBER_ID, this::createTransactionMember);
     if (member == null) {
       return; // transaction has been cancelled
     }
@@ -119,22 +121,15 @@ public class CodeTypeInvalidationNotificationListener implements Consumer<ICache
     }
 
     public void notifyInvalidatedCodeTypes() {
-      if (!isListenerAvailable()) {
-        return; // prevent eager load of all CodeTypes directly after invalidate if no one is interested
-      }
-      var exposedCodeTypeIds = getExposedCodeTypeIds(); // only notify for CodeTypes which are exposed!
-      var codeTypeCacheUtility = BEANS.get(CodeTypeCacheUtility.class);
-      var updatedAndExposedCodeTypes = BEANS.all(ICodeType.class).stream()
+      Set<String> exposedCodeTypeIds = getExposedCodeTypeIds(); // only notify for CodeTypes which are exposed!
+      CodeTypeCacheUtility codeTypeCacheUtility = BEANS.get(CodeTypeCacheUtility.class);
+      List<CodeTypeDo> updatedAndExposedCodeTypes = BEANS.all(ICodeType.class).stream()
           .filter(codeType -> needsNotify(codeTypeCacheUtility.createCacheKey(codeType.getClass()), codeType))
           .map(ICodeType::toDo)
           .filter(Objects::nonNull)
           .filter(codeTypeDo -> exposedCodeTypeIds.contains(codeTypeDo.getId()))
           .collect(Collectors.toList());
       notifyExposedCodeTypeUpdate(updatedAndExposedCodeTypes);
-    }
-
-    public boolean isListenerAvailable() {
-      return BEANS.get(UiNotificationRegistry.class).getListenerCount(TOPIC) > 0;
     }
 
     public boolean needsNotify(CodeTypeCacheKey cacheKey, ICodeType<?, ?> codeType) {
@@ -145,8 +140,26 @@ public class CodeTypeInvalidationNotificationListener implements Consumer<ICache
       if (codeTypes.isEmpty()) {
         return;
       }
-      var message = BEANS.get(CodeTypeUpdateMessageDo.class).withCodeTypes(codeTypes);
-      BEANS.get(UiNotificationRegistry.class).put(TOPIC, message, noTransaction());
+
+      UiNotificationRegistry uiNotificationRegistry = BEANS.get(UiNotificationRegistry.class);
+      String currentUserId = getUserId();
+
+      // send message to current user directly including the new code types
+      // this is required so that the caches are update to date very soon after the user applied the change
+      CodeTypeUpdateMessageDo messageWithNewCodeTypes = BEANS.get(CodeTypeUpdateMessageDo.class).withCodeTypes(codeTypes);
+      uiNotificationRegistry.put(TOPIC, currentUserId, messageWithNewCodeTypes, noTransaction());
+
+      // send updated codeType ids to other users so that they can reload them
+      Set<String> idsToUpdate = codeTypes.stream().map(CodeTypeDo::getId).collect(toSet());
+      long reloadDelayWindow = uiNotificationRegistry.computeNotificationHandlerDelayWindow(TOPIC);
+      CodeTypeUpdateMessageDo messageWithCodeTypeIdsToUpdate = BEANS.get(CodeTypeUpdateMessageDo.class)
+          .withCodeTypeIds(idsToUpdate)
+          .withReloadDelayWindow(reloadDelayWindow);
+      uiNotificationRegistry.putExcept(TOPIC, singleton(currentUserId), messageWithCodeTypeIdsToUpdate, noTransaction());
+    }
+
+    protected String getUserId() {
+      return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
     }
 
     public Set<String> getExposedCodeTypeIds() {
