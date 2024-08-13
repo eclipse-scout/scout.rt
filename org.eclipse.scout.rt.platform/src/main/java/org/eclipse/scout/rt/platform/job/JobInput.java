@@ -34,6 +34,13 @@ import org.slf4j.helpers.MessageFormatter;
 @Bean
 public class JobInput {
 
+  /**
+   * Execution hint used to advise Scout testing not to wait for marked jobs to complete before continuing with the test
+   * execution. Use this hint very moderately ond only if it is not possible to either suppress or wait for the async
+   * operation. See AssertNoRunningJobsStatement.
+   */
+  public static final String EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB = "scout.testing.doNotWaitForThisJob";
+
   public static final long EXPIRE_NEVER = 0;
 
   protected String m_name;
