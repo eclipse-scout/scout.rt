@@ -37,7 +37,6 @@
     --box-shadow-2-blur: @drop-shadow-blur;
     --box-shadow-2-alpha: @dashboard-tile-drop-shadow-light-alpha;
 
-    &.disabled,
     &.inverted {
       --box-shadow-2-alpha: @dashboard-tile-drop-shadow-dark-alpha;
     }
@@ -178,17 +177,11 @@
     }
   }
 
-  &.disabled:not(.read-only) {
-    --tile-background-color: @tile-default-border-color;
-  }
-
   &.inverted {
     --tile-background-color: @tile-default-inverted-background-color;
     color: @tile-default-inverted-color;
 
     &.disabled:not(.read-only) {
-      --tile-background-color: @tile-default-border-color;
-
       & ::-moz-selection {
         #scout.text-selection();
       }
@@ -282,10 +275,6 @@
     --tile-background-color: @tile-alternative-background-color;
     color: @tile-alternative-color;
 
-    &.disabled:not(.read-only) {
-      --tile-background-color: @tile-default-border-color;
-    }
-
     & > .form-field {
       & > label {
         color: @tile-alternative-label-color;
@@ -309,10 +298,6 @@
   &.inverted.color-alternative {
     --tile-background-color: @tile-alternative-inverted-background-color;
     color: @tile-alternative-inverted-color;
-
-    &.disabled:not(.read-only) {
-      --tile-background-color: @tile-default-border-color;
-    }
 
     & ::-moz-selection {
       #scout.text-selection();
@@ -354,11 +339,11 @@
   }
 
   &.selected:not(.dragged):not(.resizing) {
-    --box-shadow-1-spread: 2px;
+    --box-shadow-1-spread: @dashboard-tile-selected-border-width;
     --box-shadow-1-color: @dashboard-tile-default-selected-border-color;
 
     &.inverted {
-      --box-shadow-1-spread: 3px;
+      --box-shadow-1-spread: @dashboard-tile-inverted-selected-border-width;
       --box-shadow-1-color: @dashboard-tile-default-inverted-selected-border-color;
     }
 
