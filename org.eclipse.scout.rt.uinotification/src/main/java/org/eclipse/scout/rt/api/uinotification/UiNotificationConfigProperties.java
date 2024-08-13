@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.api.data.ApiExposed;
 import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 
 public final class UiNotificationConfigProperties {
 
@@ -76,6 +77,28 @@ public final class UiNotificationConfigProperties {
     @Override
     public Long getDefaultValue() {
       return TimeUnit.MINUTES.toMillis(7);
+    }
+  }
+
+  public static class NotificationHandlerThroughputProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public Integer getDefaultValue() {
+      return 30;
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.uinotification.handler.throughput";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies how many requests of browser side UI notification handlers can be processed per second.\n"
+          + "The value is used to delay requests from the UI notification handlers to the server.\n"
+          + "Use a high value for fast servers. Then the refresh on the browser will be very soon, but peak load on the server is increased.\n"
+          + "Use smaller values to reduce server load but increase the delay between the reload on the server and the refresh on the browser.\n"
+          + "The default is 30 requests per second.";
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,11 +10,14 @@
 package org.eclipse.scout.rt.api.uinotification;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Set;
 
 import jakarta.annotation.Generated;
 
 import org.eclipse.scout.rt.api.data.uinotification.UiNotificationDo;
 import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
@@ -32,6 +35,10 @@ public class UiNotificationMessageDo extends DoEntity implements Serializable {
 
   public DoValue<Long> timeout() {
     return doValue("timeout");
+  }
+
+  public DoSet<String> excludedUserIds() {
+    return doSet("excludedUserIds");
   }
 
   /* **************************************************************************
@@ -69,5 +76,22 @@ public class UiNotificationMessageDo extends DoEntity implements Serializable {
   @Generated("DoConvenienceMethodsGenerator")
   public Long getTimeout() {
     return timeout().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public UiNotificationMessageDo withExcludedUserIds(Collection<? extends String> excludedUserIds) {
+    excludedUserIds().updateAll(excludedUserIds);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public UiNotificationMessageDo withExcludedUserIds(String... excludedUserIds) {
+    excludedUserIds().updateAll(excludedUserIds);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Set<String> getExcludedUserIds() {
+    return excludedUserIds().get();
   }
 }

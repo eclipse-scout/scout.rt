@@ -84,7 +84,7 @@ declare global {
      * otherwise true.
      *
      * @param fx the function to wrap
-     * @param options an optional options object. Short-hand version: If a number is passed instead
+     * @param options an optional options object. Shorthand version: If a number is passed instead
      *          of an object, the value is automatically converted to the option 'delay'.
      */
     debounce(fx: (...args: any[]) => void, options?: DebounceOptions | number): ((...args: any[]) => void) & { cancel(): boolean };
@@ -106,7 +106,7 @@ declare global {
     /**
      * CSP-safe method to dynamically load and execute a script from server.
      *
-     * A new <script> tag is added to the document's head element. The methods returns
+     * A new <script> tag is added to the document's head element. The method returns
      * a promise which can be used to execute code after the loading has been completed.
      * A jQuery object referring to the new script tag is passed to the promise's
      * callback functions.
@@ -119,7 +119,7 @@ declare global {
     /**
      * CSP-safe method to dynamically load a style sheet from server.
      *
-     * A new <link> tag is added to the document's head element. The methods returns
+     * A new <link> tag is added to the document's head element. The method returns
      * a promise which can be used to execute code after the loading has been completed.
      * A jQuery object referring to the new link tag is passed to the promise's
      * callback functions.
@@ -135,7 +135,7 @@ declare global {
      * A new <style> tag is added to the document's head element. The methods returns
      * a jQuery object referring to the new style tag.
      *
-     *   $styleTag = $.injectStyle('p { text-color: orange; }');
+     * @example $styleTag = $.injectStyle('p { text-color: orange; }');
      *
      */
     injectStyle(data: string, options?: InjectOptions): JQuery.Promise<JQuery>;
@@ -293,7 +293,7 @@ declare global {
   interface JQuery<TElement = HTMLElement> extends Array<TElement | JQuery> {
     /**
      * @param $element returns the given element if the current jquery object does not contain any elements.
-     * Otherwise returns the current jquery object.
+     * Otherwise, returns the current jquery object.
      */
     nvl($element: JQuery): JQuery;
 
@@ -524,7 +524,7 @@ declare global {
      *           - a function to be called when the app link has been clicked
      *           - or an object with a method named _onAppLinkAction (e.g. an instance of
      *             BeanField)
-     *          If func is not set, the _onAppLinkAction of the inner most widget relative to
+     *          If func is not set, the _onAppLinkAction of the innermost widget relative to
      *          this element (if any) will be called when the app link has been clicked.
      */
     appLink(appLinkBean: AppLinkBeanArgument, func?: AppLinkFuncArgument<TElement>): this;
@@ -1168,7 +1168,7 @@ declare global {
     contentOrNbsp(htmlEnabled: boolean, content: string, emptyCssClass?: string): this;
 
     /**
-     * Like {@link JQuery.toggleClass}, this toggles a HTML attribute on a set of jquery elements.
+     * Like {@link JQuery.toggleClass}, this toggles an HTML attribute on a set of jquery elements.
      *
      * @param attr Name of the attribute to toggle.
      * @param state

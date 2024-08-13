@@ -7,7 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CodeType, CodeTypeCacheEventMap, CodeTypeChangeEvent, CodeTypeRemoveEvent, DoEntity, EventEmitter, ObjectModel, ObjectOrModel, objects, systems, UiNotificationEvent, uiNotifications} from '../index';
+import {ajax, arrays, CodeType, CodeTypeCacheEventMap, CodeTypeChangeEvent, CodeTypeRemoveEvent, DoEntity, EventEmitter, ObjectModel, ObjectOrModel, objects, systems, UiNotificationEvent, uiNotifications} from '../index';
+import $ from 'jquery';
 
 /**
  * Cache for CodeTypes grouped by CodeType id.
@@ -21,12 +22,22 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
    * Map of CodeType id to CodeType instance. Do not access directly. Instead, use {@link get}.
    */
   registry: Map<any /* CodeType id */, CodeType<any, any, any>>;
+  /**
+   * URL to get CodeType data from
+   */
+  url: string;
+
+  protected _reloadTimeoutId: number;
+  protected _idsToUpdate: string[];
 
   constructor() {
     super();
     this.events.registerSubTypePredicate('codeTypeChange', (event: CodeTypeChangeEvent, codeTypeId) => event.codeType.id === codeTypeId); // only works if the CodeTypeId can be converted to a string
     this.events.registerSubTypePredicate('codeTypeRemove', (event: CodeTypeRemoveEvent, codeTypeId) => event.id === codeTypeId); // only works if the CodeTypeId can be converted to a string
     this.registry = new Map();
+    this._reloadTimeoutId = -1;
+    this._idsToUpdate = [];
+    this.url = null;
   }
 
   /**
@@ -40,35 +51,72 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
   /**
    * Initializes the code type map with the result of the given REST url.
    */
-  bootstrap(url: string): JQuery.Promise<any> {
+  bootstrap(url: string): JQuery.Promise<void> {
     if (!url) {
       return $.resolvedPromise();
     }
+    this.url = url;
     uiNotifications.subscribe('codeTypeUpdate', event => this._onCodeTypeUpdateNotify(event));
-    return $.ajaxJson(url).then(this._handleBootstrapResponse.bind(this, url));
+    return this.loadCodeTypes().then(codes => undefined);
   }
 
-  protected _handleBootstrapResponse(url: string, data: any) {
+  /**
+   * Loads the CodeTypes from the backend. The URL provided in {@link bootstrap} is used.
+   * @param codeTypeIds Optional list of {@link CodeType.id} to load. If not specified, all are loaded.
+   * @returns The newly loaded {@link CodeType} instances.
+   */
+  loadCodeTypes(codeTypeIds?: string[]): JQuery.Promise<CodeType<any, any, any>[]> {
+    if (!this.url) {
+      return $.resolvedPromise([]);
+    }
+    const request: CodeTypeRequest = codeTypeIds?.length ? {
+      _type: 'scout.CodeTypeRequest',
+      codeTypeIds
+    } : null;
+    return ajax.putJson(this.url, request).then(this._handleCodesResponse.bind(this));
+  }
+
+  protected _handleCodesResponse(data: any): CodeType<any, any, any>[] {
     if (!data) {
-      return;
+      return [];
     }
     if (data.error) {
       // The result may contain a json error (e.g. session timeout) -> abort processing
       throw {
         error: data.error,
-        url: url
+        url: this.url
       };
     }
-    this.add(data);
+    return this.add(data);
   }
 
   protected _onCodeTypeUpdateNotify(event: UiNotificationEvent) {
     let message = event.message as CodeTypeUpdateMessageDo;
     let codeTypes = message.codeTypes;
-    if (!codeTypes?.length) {
-      return; // nothing to update
+    if (codeTypes?.length) {
+      // notification message directly contained the new CodeTypes: add them to the cache
+      this.add(codeTypes).forEach(codeType => $.log.info(`CodeType with id '${codeType.id}' updated.`));
+    } else if (message.codeTypeIds?.length) {
+      // no codeTypes received: get the changed CodeTypes in a new request
+      const reloadDelay = uiNotifications.computeReloadDelay(message.reloadDelayWindow);
+      this._scheduleCodeTypeUpdate(message.codeTypeIds, reloadDelay);
     }
-    this.add(codeTypes).forEach(codeType => $.log.info(`CodeType with id '${codeType.id}' updated.`));
+  }
+
+  protected _scheduleCodeTypeUpdate(idsToUpdate: string[], delay: number) {
+    this._idsToUpdate = [...new Set([...this._idsToUpdate, ...idsToUpdate])]; // merge existing and new arrays removing duplicates
+    if (this._reloadTimeoutId > 0) {
+      // cancel current update and schedule a new one to ensure the newest changes from the backend are fetched in case the fetch has already started.
+      clearTimeout(this._reloadTimeoutId);
+    }
+    $.log.info(`About to refresh CodeTypes with ids '${this._idsToUpdate}' after ${delay}ms.`);
+    this._reloadTimeoutId = setTimeout(() => {
+      this._reloadTimeoutId = -1;
+      const ids = this._idsToUpdate;
+      this._idsToUpdate = [];
+      this.loadCodeTypes(ids)
+        .then(codeTypes => codeTypes.forEach(codeType => $.log.info(`CodeType with id '${codeType.id}' updated.`)));
+    }, delay);
   }
 
   protected _triggerCodeTypeChange(codeType: CodeType<any, any, any>) {
@@ -128,7 +176,13 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
 }
 
 export interface CodeTypeUpdateMessageDo extends DoEntity {
-  codeTypes: ObjectOrModel<CodeType<any, any, any>>[];
+  codeTypes?: ObjectOrModel<CodeType<any, any, any>>[];
+  codeTypeIds?: string[];
+  reloadDelayWindow?: number;
+}
+
+export interface CodeTypeRequest extends DoEntity {
+  codeTypeIds?: string[];
 }
 
 export const codes: CodeTypeCache = objects.createSingletonProxy(CodeTypeCache);

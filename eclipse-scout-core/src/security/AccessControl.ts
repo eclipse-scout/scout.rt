@@ -24,7 +24,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
 
   protected _permissionCollection: PermissionCollection;
   protected _permissionUpdateEventHandler: EventHandler<UiNotificationEvent>;
-  protected _reloadTimeoutId;
+  protected _reloadTimeoutId: number;
   protected _call: AjaxCall;
 
   constructor() {
@@ -59,9 +59,8 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
   }
 
   protected _onPermissionUpdateNotify(event: UiNotificationEvent) {
-    let message = event.message as PermissionUpdateMessageDo;
-    let reloadDelayWindow = scout.nvl(message.reloadDelayWindow, 0);
-    let reloadDelay = this._computeReloadDelay(reloadDelayWindow);
+    const message = event.message as PermissionUpdateMessageDo;
+    const reloadDelay = uiNotifications.computeReloadDelay(message.reloadDelayWindow);
     $.log.info(`About to refresh permission cache with a delay of ${reloadDelay}ms.`);
     if (this._reloadTimeoutId > 0) {
       // cancel current update and schedule a new one to ensure the newest changes from the backend are fetched in case the fetch has already started.
@@ -71,14 +70,6 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
       this._reloadTimeoutId = -1;
       this._sync();
     }, reloadDelay);
-  }
-
-  protected _computeReloadDelay(reloadDelayWindow: number): number {
-    if (reloadDelayWindow < 3) {
-      // no delay if the window is very small (not necessary)
-      return 0;
-    }
-    return Math.ceil(Math.random() * 1000 * reloadDelayWindow); // randomly delay the reload (milliseconds)
   }
 
   protected _sync() {
