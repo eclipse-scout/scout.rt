@@ -482,9 +482,12 @@ public class UiNotificationRegistryTest {
 
     m_registry.put("topic", null, createMessage(), new UiNotificationPutOptions().withTimeout(TimeUnit.MILLISECONDS.toMillis(500)).withTransactional(false));
     m_registry.put("topic", null, createMessage(), new UiNotificationPutOptions().withTimeout(TimeUnit.MILLISECONDS.toMillis(50)).withTransactional(false));
-    assertEquals(2, m_registry.getNotifications().get("topic").size());
+    m_registry.put("topic", null, createMessage(), new UiNotificationPutOptions().withTimeout(TimeUnit.MILLISECONDS.toMillis(50)).withTransactional(false));
+    m_registry.put("topic", null, createMessage(), new UiNotificationPutOptions().withTimeout(TimeUnit.MILLISECONDS.toMillis(50)).withTransactional(false));
+    m_registry.put("topic", null, createMessage(), new UiNotificationPutOptions().withTimeout(TimeUnit.MILLISECONDS.toMillis(50)).withTransactional(false));
+    assertEquals(5, m_registry.getNotifications().get("topic").size());
 
-    Thread.sleep(51);
+    Thread.sleep(60);
     m_registry.cleanup();
     assertEquals(1, m_registry.getNotifications().get("topic").size());
 
