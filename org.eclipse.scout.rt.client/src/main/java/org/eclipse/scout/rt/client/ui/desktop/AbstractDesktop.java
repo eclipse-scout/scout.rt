@@ -95,6 +95,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -1621,6 +1622,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       fireNotification(DesktopEvent.TYPE_NOTIFICATION_ADDED, notification);
       if (notification.getDuration() > 0) {
         ModelJobs.schedule(() -> removeNotification(notification), ModelJobs.newInput(ClientRunContexts.copyCurrent())
+            .withExecutionHint(JobInput.EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB)
             .withExecutionTrigger(Jobs.newExecutionTrigger()
                 .withStartIn(notification.getDuration(), TimeUnit.MILLISECONDS)));
       }
