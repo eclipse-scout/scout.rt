@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ajax, arrays, CodeType, CodeTypeCacheEventMap, CodeTypeChangeEvent, CodeTypeRemoveEvent, DoEntity, EventEmitter, ObjectModel, ObjectOrModel, objects, systems, UiNotificationEvent, uiNotifications} from '../index';
+import {ajax, AjaxCall, arrays, CodeType, CodeTypeCacheEventMap, CodeTypeChangeEvent, CodeTypeRemoveEvent, DoEntity, EventEmitter, ObjectModel, ObjectOrModel, objects, systems, UiNotificationEvent, uiNotifications} from '../index';
 import $ from 'jquery';
 
 /**
@@ -27,6 +27,7 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
    */
   url: string;
 
+  protected _call: AjaxCall;
   protected _reloadTimeoutId: number;
   protected _idsToUpdate: string[];
 
@@ -73,7 +74,20 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
       _type: 'scout.CodeTypeRequest',
       codeTypeIds
     } : null;
-    return ajax.putJson(this.url, request).then(this._handleCodesResponse.bind(this));
+    this._call?.abort(); // abort in case there is already a call running
+    this._call = ajax.createCallJson({
+      url: this.url,
+      type: 'PUT',
+      data: JSON.stringify(request)
+    }, {
+      maxRetries: -1, // unlimited retries, ensure the cache will be updated eventually in case of network errors
+      retryIntervals: [300, 500, 1000, 5000]
+    });
+    return this._call.call()
+      .always(() => {
+        this._call = null; // call ended. Not necessary anymore
+      })
+      .then(this._handleCodesResponse.bind(this));
   }
 
   protected _handleCodesResponse(data: any): CodeType<any, any, any>[] {
