@@ -203,6 +203,7 @@ public class NamespaceVersionedModelTest {
         item("bravo-6", dep("alfa-4")))); // dependency cycle
     assertThrows(AssertionException.class, () -> createInventory(
         item("alfa-4", dep("charlie-8")),
+        item("foxtrot-1"),
         item("charlie-8", dep("bravo-6")),
         item("bravo-6", dep("alfa-4")))); // dependency cycle
     assertThrows(AssertionException.class, () -> createInventory(

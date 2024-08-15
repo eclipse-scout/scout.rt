@@ -616,7 +616,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
         }
       }
       if (!m_dependencyMap.isEmpty()) {
-        fail("Unable to resolve all dependencies - cycle in dependencies? {}", dependencyModelToString(m_dependencyMap));
+        fail("Unable to resolve all dependencies - cycle in the already reduced dependencies? {}", dependencyModelToString(m_dependencyMap));
       }
       return null;
     }
