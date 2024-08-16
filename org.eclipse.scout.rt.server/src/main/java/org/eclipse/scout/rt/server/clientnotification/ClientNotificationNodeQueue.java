@@ -100,7 +100,6 @@ public class ClientNotificationNodeQueue {
       }
     }
     if (!droppedNotifications.isEmpty()) {
-      if (LOG.isWarnEnabled()) {
         Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
             .map(m -> m.getNotification().getClass().getSimpleName() + " -> " + m.getAddress().prettyPrint())
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
@@ -109,16 +108,16 @@ public class ClientNotificationNodeQueue {
             .map(e -> e.getKey() + " (" + e.getValue() + "x)")
             .collect(Collectors.joining(", ", "[", "]"));
 
-        LOG.warn("Notification queue capacity reached. Added {}, removed oldest {} notification messages. [clientNodeId={}, lastConsumeAccess={}, newNotifications={}, droppedNotifications={}]",
-            notifications.size(), droppedNotifications.size(), getNodeId(), getLastConsumeAccessFormatted(), infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()));
-      }
+      LOG.error("Notification queue capacity reached. Added {}, removed oldest {} notification messages. [clientNodeId={}, lastConsumeAccess={}, newNotifications={}, droppedNotifications={}]",
+          notifications.size(), droppedNotifications.size(), getNodeId(), getLastConsumeAccessFormatted(), infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()));
+
       if (LOG.isDebugEnabled()) {
-        Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
+        Function<Stream<? extends ClientNotificationMessage>, String> detailInfoExtractor = s -> s
             .map(m -> m.toString())
             .collect(Collectors.joining("\n    ", "\n    ", ""));
 
         LOG.debug("Notification queue capacity reached. Details:\n  newNotifications={}\n  droppedNotifications={}",
-            infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()),
+            detailInfoExtractor.apply(notifications.stream()), detailInfoExtractor.apply(droppedNotifications.stream()),
             new Exception("stacktrace for further analysis"));
       }
     }
