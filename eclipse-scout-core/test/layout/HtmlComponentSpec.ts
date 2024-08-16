@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -202,7 +202,7 @@ describe('HtmlComponent', () => {
       expect(htmlChild.$comp.parents).not.toHaveBeenCalled();
     });
 
-    it('does not layout components with an animating parent', () => {
+    it('does not layout components with an animating parent (CSS)', () => {
       $comp.addClass('animate-test');
       spyOn(htmlChild.layout, 'layout').and.callThrough();
       htmlChild.validateLayout();
@@ -214,7 +214,7 @@ describe('HtmlComponent', () => {
       expect(htmlChild.layout.layout).toHaveBeenCalled();
     });
 
-    it('does not layout animated components', () => {
+    it('does not layout animated components (CSS)', () => {
       $comp.addClass('animate-test');
       spyOn(htmlComp.layout, 'layout').and.callThrough();
       htmlComp.validateLayout();
@@ -226,6 +226,37 @@ describe('HtmlComponent', () => {
       expect(htmlComp.layout.layout).toHaveBeenCalled();
     });
 
+    it('does not layout components with an animating parent (JS)', () => {
+      let deferred = $.Deferred();
+      let promise = deferred.promise();
+      $comp.data('animate-promise', promise);
+      // use always(), so it will be executed immediately when the promise is resolved (otherwise, we might get an endless loop)
+      promise.always(() => $comp.removeData('animate-promise'));
+
+      spyOn(htmlChild.layout, 'layout').and.callThrough();
+      htmlChild.validateLayout();
+      expect(htmlChild.layout.layout).not.toHaveBeenCalled();
+
+      // Simulate end of animation
+      deferred.resolve();
+      expect(htmlChild.layout.layout).toHaveBeenCalled();
+    });
+
+    it('does not layout animated components (JS)', () => {
+      let deferred = $.Deferred();
+      let promise = deferred.promise();
+      $comp.data('animate-promise', promise);
+      // use always(), so it will be executed immediately when the promise is resolved (otherwise, we might get an endless loop)
+      promise.always(() => $comp.removeData('animate-promise'));
+
+      spyOn(htmlComp.layout, 'layout').and.callThrough();
+      htmlComp.validateLayout();
+      expect(htmlComp.layout.layout).not.toHaveBeenCalled();
+
+      // Simulate end of animation
+      deferred.resolve();
+      expect(htmlComp.layout.layout).toHaveBeenCalled();
+    });
   });
 
   describe('prefSize', () => {
