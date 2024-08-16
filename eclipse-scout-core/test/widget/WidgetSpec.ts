@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, ObjectFactory, scout, StringField, TableRow, TreeVisitResult, Widget} from '../../src/index';
+import {EventListener, EventSupport, Form, GlassPane, GroupBox, HtmlComponent, Menu, NullWidget, ObjectFactory, scout, StringField, TableRow, TreeVisitResult, Widget} from '../../src/index';
 import {InitModelOf} from '../../src/scout';
 
 describe('Widget', () => {
@@ -1933,6 +1933,39 @@ describe('Widget', () => {
       widget.render(session.$entryPoint);
       widget.validateLayoutTree(); // <-- this triggers the focus to be set
       expect(document.activeElement).toBe(widget.$container[0]);
+    });
+  });
+
+  describe('isFocusable', () => {
+
+    it('returns true if the element is focusable', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+      widget.$container.setTabbable(true);
+      expect(widget.isFocusable()).toBe(true);
+      expect(widget.isFocusable(false)).toBe(true);
+
+      widget.$container.setTabbableOrFocusable(false);
+      expect(widget.isFocusable()).toBe(false); // Not tabbable, only focusable
+      expect(widget.isFocusable(false)).toBe(true);
+
+      widget.$container.setTabbable(false);
+      expect(widget.isFocusable()).toBe(false);
+      expect(widget.isFocusable(false)).toBe(false);
+    });
+
+    it('returns false if the element is covered by a glasspane', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+      widget.$container.setTabbable(true);
+      let glassPane = scout.create(GlassPane, {parent: session.desktop});
+      glassPane.render(widget.$container);
+      expect(widget.isFocusable()).toBe(false);
+      expect(widget.isFocusable(false)).toBe(false);
     });
   });
 

@@ -2199,6 +2199,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (!$elem.is(':focusable')) {
       return false;
     }
+    if (this.session.focusManager.isElementCovertByGlassPane($elem)) {
+      return false;
+    }
     if (scout.nvl(checkTabbable, true)) {
       return $elem.is(':tabbable');
     }
