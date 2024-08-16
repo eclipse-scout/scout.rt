@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ export class FileChooserController {
    */
   unregisterAndRemove(fileChooser: FileChooser) {
     if (fileChooser) {
-      arrays.remove(this.displayParent.fileChoosers, fileChooser);
+      this._unregister(fileChooser);
       this._remove(fileChooser);
     }
   }
@@ -67,8 +67,8 @@ export class FileChooserController {
     if (fileChooser.rendered) {
       return;
     }
-    if (register && !arrays.contains(this.displayParent.fileChoosers, fileChooser)) {
-      this.displayParent.fileChoosers.push(fileChooser);
+    if (register) {
+      this._register(fileChooser);
     }
 
     // Use parent's function or (if not implemented) our own.
@@ -125,5 +125,21 @@ export class FileChooserController {
 
   acceptView(view: FileChooser): boolean {
     return this.displayParent.rendered;
+  }
+
+  protected _register(fileChooser: FileChooser) {
+    if (this.displayParent.fileChoosers.includes(fileChooser)) {
+      return;
+    }
+    let fileChoosers = [...this.displayParent.fileChoosers, fileChooser];
+    this.displayParent._setProperty('fileChoosers', fileChoosers);
+  }
+
+  protected _unregister(fileChooser: FileChooser) {
+    let fileChoosers = this.displayParent.fileChoosers.filter(box => box !== fileChooser);
+    if (arrays.equals(this.displayParent.fileChoosers, fileChoosers)) {
+      return;
+    }
+    this.displayParent._setProperty('fileChoosers', fileChoosers);
   }
 }
