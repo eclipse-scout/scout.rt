@@ -11,7 +11,7 @@ import {arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Ins
 import $ from 'jquery';
 
 export class TileGridLayout extends LogicalGridLayout {
-  declare widget: TileGrid<Tile>;
+  declare widget: TileGrid;
   containerPos: Point;
   containerScrollTop: number;
   maxWidth: number;
@@ -147,7 +147,7 @@ export class TileGridLayout extends LogicalGridLayout {
     return super._layoutCellBounds(containerSize, containerInsets);
   }
 
-  protected _animateTiles(): JQuery.Promise<void>[] {
+  protected _animateTiles(): JQuery.Promise<JQuery>[] {
     let htmlComp = this.widget.htmlComp;
     let $container = htmlComp.$comp;
 
@@ -182,7 +182,7 @@ export class TileGridLayout extends LogicalGridLayout {
     return promises;
   }
 
-  protected _animateTile(tile: Tile): void | JQuery.Promise<void> {
+  protected _animateTile(tile: Tile): void | JQuery.Promise<JQuery> {
     // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
     // It may also happen that while the animation of a tile is in progress, the layout is triggered again but the tile should not be animated anymore
     // (e.g. if it is not in the viewport anymore). In that case the animation must be stopped otherwise it may be placed at a wrong position
@@ -229,7 +229,14 @@ export class TileGridLayout extends LogicalGridLayout {
     }
 
     // Start animation
-    return this._animateTileBounds(tile, fromBounds, bounds);
+    let promise = this._animateTileBounds(tile, fromBounds, bounds);
+
+    // Postpone layouting of the tile content until animation is complete (prevents measuring the wrong size)
+    tile.$container.data('animate-promise', promise);
+    // Note: the always() callback is executed synchronously after the animation is done, regardless of whether it has been completed or aborted
+    promise.always(() => tile.$container?.removeData('animate-promise'));
+
+    return promise;
   }
 
   protected _inViewport(bounds: Rectangle): boolean {
@@ -245,7 +252,7 @@ export class TileGridLayout extends LogicalGridLayout {
     this.widget.trigger('layoutAnimationDone');
   }
 
-  protected _animateTileBounds(tile: Tile, fromBounds: Rectangle, bounds: Rectangle): JQuery.Promise<void> {
+  protected _animateTileBounds(tile: Tile, fromBounds: Rectangle, bounds: Rectangle): JQuery.Promise<JQuery> {
     // jQuery's animate() function sets "overflow: hidden" during the animation. After the animation, the
     // original value is restored. (Search for "opts.overflow" in the jQuery source code, and see
     // https://stackoverflow.com/a/5696656/7188380 for details why this is required.)
@@ -263,34 +270,23 @@ export class TileGridLayout extends LogicalGridLayout {
       elem.style.overflowY = oldOverflowStyles[2];
     };
 
-    let promises = [];
-    tile.$container
-      .cssLeftAnimated(fromBounds.x, bounds.x, {
-        start: promise => {
-          promises.push(promise);
-        },
-        queue: false
-      })
-      .cssTopAnimated(fromBounds.y, bounds.y, {
-        start: promise => {
-          promises.push(promise);
-        },
-        queue: false
-      })
-      .cssWidthAnimated(fromBounds.width, bounds.width, {
-        start: promise => {
-          promises.push(promise);
-        },
-        queue: false
-      })
-      .cssHeightAnimated(fromBounds.height, bounds.height, {
-        start: promise => {
-          promises.push(promise);
-        },
-        queue: false
-      });
+    let fromValues = {
+      left: fromBounds.x,
+      top: fromBounds.y,
+      width: fromBounds.width,
+      height: fromBounds.height
+    };
+    let toValues = {
+      left: bounds.x,
+      top: bounds.y,
+      width: bounds.width,
+      height: bounds.height
+    };
+    let promise = tile.$container.cssAnimated(fromValues, toValues).promise();
+    // Note: the always() callback is executed synchronously after the animation is done, regardless of whether it has been completed or aborted
+    promise.always(restoreOverflowStyle);
 
-    return $.promiseAll(promises).then(restoreOverflowStyle);
+    return promise;
   }
 
   protected _updateScrollbar() {
