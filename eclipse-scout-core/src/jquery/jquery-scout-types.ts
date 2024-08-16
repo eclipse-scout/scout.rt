@@ -685,32 +685,32 @@ declare global {
     /**
      * Animates from old to new width. The default duration is set to 300ms.
      */
-    cssWidthAnimated(oldWidth: number, newWidth: number, options: JQuery.EffectsOptions<TElement>);
+    cssWidthAnimated(oldWidth: number, newWidth: number, options?: JQuery.EffectsOptions<TElement>);
 
     /**
      * Animates from old to new height. The default duration is set to 300ms.
      */
-    cssHeightAnimated(oldHeight: number, newHeight: number, options: JQuery.EffectsOptions<TElement>);
+    cssHeightAnimated(oldHeight: number, newHeight: number, options?: JQuery.EffectsOptions<TElement>);
 
     /**
      * Animates the left property from old to new left. The default duration is set to 300ms.
      */
-    cssLeftAnimated(from: number, to: number, options: JQuery.EffectsOptions<TElement>): this;
+    cssLeftAnimated(from: number, to: number, options?: JQuery.EffectsOptions<TElement>): this;
 
     /**
      * Animates the top property from old to new top. The default duration is set to 300ms.
      */
-    cssTopAnimated(from: number, to: number, options: JQuery.EffectsOptions<TElement>): this;
+    cssTopAnimated(from: number, to: number, options?: JQuery.EffectsOptions<TElement>): this;
 
     /**
      * Animates the given properties from old to new. The default duration is set to 300ms.
      */
-    cssAnimated<T extends JQuery.PlainObject<string | number>>(fromValues: T, toValues: T, options: JQuery.EffectsOptions<TElement>): this;
+    cssAnimated<T extends JQuery.PlainObject<string | number>>(fromValues: T, toValues: T, options?: JQuery.EffectsOptions<TElement>): this;
 
     /**
      * Animates the width of the current element to its preferred width.
      */
-    cssWidthToContentAnimated(options: JQuery.EffectsOptions<TElement>);
+    cssWidthToContentAnimated(options?: JQuery.EffectsOptions<TElement>);
 
     /**
      * Offset to a specific ancestor and not to the document as offset() would do.

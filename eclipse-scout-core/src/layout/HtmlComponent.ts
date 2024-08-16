@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -206,14 +206,19 @@ export class HtmlComponent {
   }
 
   protected _checkValidationPossible(): boolean {
-    // Don't layout components which don't exist anymore, are invisible or are detached from the DOM
+    // Don't valid layout of components which don't exist anymore, are invisible or are detached from the DOM
     if (!this.isAttachedAndVisible()) {
       return false;
     }
 
-    // Don't layout if component is currently animated
+    // Postpone the layout if there is an animation in progress, because measured sizes may be wrong during the animation.
     if (this.$comp.hasAnimationClass()) {
       this._validateLayoutAfterAnimation(this.$comp);
+      return false;
+    }
+    let animatePromise = this.$comp.data('animate-promise');
+    if (animatePromise) {
+      this._validateLayoutAfterPromise(animatePromise);
       return false;
     }
 
@@ -229,11 +234,15 @@ export class HtmlComponent {
         let $parent = $(this);
         if (!$parent.isVisible()) {
           everyParentVisible = false;
-          return false;
+          return false; // end loop
         }
         if ($parent.hasAnimationClass()) {
           $animatedParent = $parent;
-          return false;
+          return false; // end loop
+        }
+        animatePromise = $parent.data('animate-promise');
+        if (animatePromise) {
+          return false; // end loop
         }
         // continue loop
       });
@@ -241,9 +250,11 @@ export class HtmlComponent {
         return false;
       }
       if ($animatedParent) {
-        // Postpone the layout if there is a CSS animation in progress on one of the parent containers.
-        // Otherwise, wrong sizes might be measured (depending on the CSS animation, e.g. grow/shrink).
         this._validateLayoutAfterAnimation($animatedParent);
+        return false;
+      }
+      if (animatePromise) {
+        this._validateLayoutAfterPromise(animatePromise);
         return false;
       }
     }
@@ -252,6 +263,11 @@ export class HtmlComponent {
 
   protected _validateLayoutAfterAnimation($animatedElement: JQuery) {
     $animatedElement.oneAnimationEnd(this.validateLayout.bind(this));
+  }
+
+  protected _validateLayoutAfterPromise(promise: JQuery.Promise<any>) {
+    // Note: the always() callback is executed synchronously after the animation is done, regardless of whether it has been completed or aborted
+    promise.always(this.validateLayout.bind(this));
   }
 
   /**
