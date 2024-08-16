@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
-  App, CancelMenu, CloseMenu, Dimension, fields, Form, FormFieldMenu, FormModel, InitModelOf, Menu, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Popup, PopupBlockerHandler, Rectangle, ResetMenu,
-  SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
+  App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormModel, InitModelOf, Menu, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Popup, PopupBlockerHandler, Rectangle,
+  ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -772,6 +772,129 @@ describe('Form', () => {
         })
         .catch(fail)
         .always(done);
+    });
+
+    it('triggers propertyChange event if child form opens', async () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        displayHint: Form.DisplayHint.VIEW
+      });
+      form.open();
+
+      let childView = scout.create(Form, {
+        parent: session.desktop,
+        displayHint: Form.DisplayHint.VIEW,
+        displayParent: form
+      });
+      childView.open();
+      let event = await form.when('propertyChange:views');
+      expect(event.newValue).toEqual([childView]);
+      expect(form.views).toEqual([childView]);
+
+      let childView2 = scout.create(Form, {
+        parent: session.desktop,
+        displayHint: Form.DisplayHint.VIEW,
+        displayParent: form
+      });
+      childView2.open();
+      event = await form.when('propertyChange:views');
+      expect(event.newValue).toEqual([childView, childView2]);
+      expect(form.views).toEqual([childView, childView2]);
+
+      let childDialog = scout.create(Form, {
+        parent: session.desktop,
+        displayHint: Form.DisplayHint.DIALOG,
+        displayParent: form,
+        modal: false
+      });
+      childDialog.open();
+      event = await form.when('propertyChange:dialogs');
+      expect(event.newValue).toEqual([childDialog]);
+      expect(form.dialogs).toEqual([childDialog]);
+      expect(form.views).toEqual([childView, childView2]);
+
+      event = null;
+      form.on('propertyChange:views', e => {
+        event = e;
+      });
+      childView.close();
+      expect(event.newValue).toEqual([childView2]);
+      expect(form.views).toEqual([childView2]);
+      expect(form.dialogs).toEqual([childDialog]);
+
+      event = null;
+      form.on('propertyChange:views', e => {
+        event = e;
+      });
+      childView2.close();
+      expect(event.newValue).toEqual([]);
+      expect(form.views).toEqual([]);
+      expect(form.dialogs).toEqual([childDialog]);
+
+      event = null;
+      form.on('propertyChange:dialogs', e => {
+        event = e;
+      });
+      childDialog.close();
+      expect(event.newValue).toEqual([]);
+      expect(form.views).toEqual([]);
+      expect(form.dialogs).toEqual([]);
+    });
+
+    it('triggers propertyChange event if child message box opens', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        displayHint: Form.DisplayHint.VIEW
+      });
+      let messageBox = scout.create(MessageBox, {
+        parent: session.desktop,
+        displayParent: form
+      });
+      form.open();
+
+      let event;
+      form.on('propertyChange:messageBoxes', e => {
+        event = e;
+      });
+      messageBox.open();
+      expect(event.newValue).toEqual([messageBox]);
+      expect(form.messageBoxes).toEqual([messageBox]);
+
+      event = null;
+      form.on('propertyChange:messageBoxes', e => {
+        event = e;
+      });
+      messageBox.close();
+      expect(event.newValue).toEqual([]);
+      expect(form.messageBoxes).toEqual([]);
+    });
+
+    it('triggers propertyChange event if child file chooser opens', () => {
+      let form = scout.create(Form, {
+        parent: session.desktop,
+        displayHint: Form.DisplayHint.VIEW
+      });
+      let fileChooser = scout.create(FileChooser, {
+        parent: session.desktop,
+        displayParent: form
+      });
+      form.open();
+
+      let event;
+      form.on('propertyChange:fileChoosers', e => {
+        event = e;
+      });
+      fileChooser.open();
+      expect(event.newValue).toEqual([fileChooser]);
+      expect(form.fileChoosers).toEqual([fileChooser]);
+
+      event = null;
+      form.on('propertyChange:fileChoosers', e => {
+        event = e;
+      });
+      fileChooser.close();
+      expect(event.newValue).toEqual([]);
+      expect(form.fileChoosers).toEqual([]);
     });
   });
 

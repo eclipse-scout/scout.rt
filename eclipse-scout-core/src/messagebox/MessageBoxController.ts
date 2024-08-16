@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ export class MessageBoxController {
    */
   unregisterAndRemove(messageBox: MessageBox) {
     if (messageBox) {
-      arrays.remove(this.displayParent.messageBoxes, messageBox);
+      this._unregister(messageBox);
       this._remove(messageBox);
     }
   }
@@ -67,8 +67,8 @@ export class MessageBoxController {
     if (messageBox.rendered) {
       return;
     }
-    if (register && !arrays.contains(this.displayParent.messageBoxes, messageBox)) {
-      this.displayParent.messageBoxes.push(messageBox);
+    if (register) {
+      this._register(messageBox);
     }
     // Use parent's function or (if not implemented) our own.
     if (this.displayParent.acceptView) {
@@ -124,5 +124,21 @@ export class MessageBoxController {
 
   acceptView(view: MessageBox): boolean {
     return this.displayParent.rendered;
+  }
+
+  protected _register(messageBox: MessageBox) {
+    if (this.displayParent.messageBoxes.includes(messageBox)) {
+      return;
+    }
+    let messageBoxes = [...this.displayParent.messageBoxes, messageBox];
+    this.displayParent._setProperty('messageBoxes', messageBoxes);
+  }
+
+  protected _unregister(messageBox: MessageBox) {
+    let messageBoxes = this.displayParent.messageBoxes.filter(box => box !== messageBox);
+    if (arrays.equals(this.displayParent.messageBoxes, messageBoxes)) {
+      return;
+    }
+    this.displayParent._setProperty('messageBoxes', messageBoxes);
   }
 }

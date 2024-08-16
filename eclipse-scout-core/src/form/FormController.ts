@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,9 +45,9 @@ export class FormController implements FormControllerModel, ObjectWithType {
 
   isFormShown(form: Form): boolean {
     if (form.isView()) {
-      return this.displayParent.views.indexOf(form) > -1;
+      return this.displayParent.views.includes(form);
     }
-    return this.displayParent.dialogs.indexOf(form) > -1;
+    return this.displayParent.dialogs.includes(form);
   }
 
   protected _renderPopupWindow(form: Form, position?: number) {
@@ -139,12 +139,8 @@ export class FormController implements FormControllerModel, ObjectWithType {
     if (view.rendered || view.blockRendering) {
       return;
     }
-    if (register && !arrays.contains(this.displayParent.views, view)) {
-      if (position !== undefined) {
-        arrays.insert(this.displayParent.views, view, position);
-      } else {
-        this.displayParent.views.push(view);
-      }
+    if (register) {
+      this._registerView(view, position);
     }
 
     // Display parent may implement acceptView, if not implemented -> use default
@@ -181,8 +177,8 @@ export class FormController implements FormControllerModel, ObjectWithType {
       return;
     }
 
-    if (register && !arrays.contains(this.displayParent.dialogs, dialog)) {
-      this.displayParent.dialogs.push(dialog);
+    if (register) {
+      this._registerDialog(dialog);
     }
 
     // Display parent may implement acceptDialog, if not implemented -> use default
@@ -241,7 +237,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
   protected _removeView(view: Form, unregister?: boolean, showSiblingView?: boolean) {
     unregister = scout.nvl(unregister, true);
     if (unregister) {
-      arrays.remove(this.displayParent.views, view);
+      this._unregisterView(view);
     }
     // in COMPACT case views are already removed.
     if (this.session.desktop.bench) {
@@ -252,7 +248,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
   protected _removeDialog(dialog: Form, unregister?: boolean) {
     unregister = scout.nvl(unregister, true);
     if (unregister) {
-      arrays.remove(this.displayParent.dialogs, dialog);
+      this._unregisterDialog(dialog);
     }
     if (dialog.rendered) {
       dialog.remove();
@@ -324,7 +320,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
   attachDialogs() {
     this.displayParent.dialogs.forEach(dialog => {
       dialog.attach();
-    }, this);
+    });
   }
 
   /**
@@ -336,7 +332,46 @@ export class FormController implements FormControllerModel, ObjectWithType {
   detachDialogs() {
     this.displayParent.dialogs.forEach(dialog => {
       dialog.detach();
-    }, this);
+    });
+  }
+
+  protected _registerDialog(dialog: Form) {
+    this._register(dialog, this.displayParent.dialogs, 'dialogs');
+  }
+
+  protected _unregisterDialog(dialog: Form) {
+    this._unregister(dialog, this.displayParent.dialogs, 'dialogs');
+  }
+
+  protected _registerView(view: Form, position: number) {
+    this._register(view, this.displayParent.views, 'views', position);
+  }
+
+  protected _unregisterView(view: Form) {
+    this._unregister(view, this.displayParent.views, 'views');
+  }
+
+  protected _register(form: Form, forms: Form[], propertyName: string, position?: number) {
+    if (forms.includes(form)) {
+      return;
+    }
+    let newForms;
+    if (position !== undefined) {
+      newForms = [...forms];
+      arrays.insert(newForms, form, position);
+    } else {
+      newForms = [...forms, form];
+    }
+    // Using _setProperty to just set the property and trigger the event without calling _set[propertyName] or any render function
+    this.displayParent._setProperty(propertyName, newForms);
+  }
+
+  protected _unregister(form: Form, forms: Form[], propertyName: string) {
+    let newForms = forms.filter(f => f !== form);
+    if (arrays.equals(forms, newForms)) {
+      return;
+    }
+    this.displayParent._setProperty(propertyName, newForms);
   }
 
   protected _layoutDialog(dialog: Form) {
