@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, Form, Outline, OutlineContent, OutlineOverview, Page, PropertyChangeEvent, TableRow, TableRowDetail, TreeEventMap} from '../../index';
+import {Event, FileChooser, Form, MessageBox, Outline, OutlineContent, OutlineOverview, Page, PropertyChangeEvent, TableRow, TableRowDetail, TreeEventMap} from '../../index';
 
 export interface OutlinePageChangedEvent<T = Outline> extends Event<T> {
   page: Page;
@@ -30,9 +30,12 @@ export interface OutlineEventMap extends TreeEventMap {
   'propertyChange:defaultDetailForm': PropertyChangeEvent<Form>;
   'propertyChange:detailContent': PropertyChangeEvent<OutlineContent | TableRowDetail>;
   'propertyChange:detailMenuBarVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:dialogs': PropertyChangeEvent<Form[]>;
   'propertyChange:embedDetailContent': PropertyChangeEvent<boolean>;
+  'propertyChange:fileChoosers': PropertyChangeEvent<FileChooser[]>;
   'propertyChange:iconId': PropertyChangeEvent<string>;
   'propertyChange:iconVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:messageBoxes': PropertyChangeEvent<MessageBox[]>;
   'propertyChange:navigateButtonsVisible': PropertyChangeEvent<boolean>;
   'propertyChange:nodeMenuBarVisible': PropertyChangeEvent<boolean>;
   'propertyChange:outlineOverview': PropertyChangeEvent<OutlineOverview>;

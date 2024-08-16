@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DisplayHint, DisplayParent, DisplayViewId, Event, Form, FormValidator, GroupBox, PropertyChangeEvent, Status, ValidationResult, WidgetEventMap} from '../index';
+import {DisplayHint, DisplayParent, DisplayViewId, Event, FileChooser, Form, FormValidator, GroupBox, MessageBox, PropertyChangeEvent, Status, ValidationResult, WidgetEventMap} from '../index';
 
 export interface FormRevealInvalidFieldEvent<F extends Form = Form> extends Event<F> {
   validationResult: ValidationResult;
@@ -44,14 +44,17 @@ export interface FormEventMap extends WidgetEventMap {
   'propertyChange:askIfNeedSave': PropertyChangeEvent<boolean>;
   'propertyChange:closable': PropertyChangeEvent<boolean>;
   'propertyChange:data': PropertyChangeEvent<any>;
+  'propertyChange:dialogs': PropertyChangeEvent<Form[]>;
   'propertyChange:displayHint': PropertyChangeEvent<DisplayHint>;
   'propertyChange:displayParent': PropertyChangeEvent<DisplayParent>;
   'propertyChange:displayViewId': PropertyChangeEvent<DisplayViewId>;
   'propertyChange:exclusiveKey': PropertyChangeEvent<() => any>;
+  'propertyChange:fileChoosers': PropertyChangeEvent<FileChooser[]>;
   'propertyChange:formLoading': PropertyChangeEvent<boolean>;
   'propertyChange:headerVisible': PropertyChangeEvent<boolean>;
   'propertyChange:iconId': PropertyChangeEvent<string>;
   'propertyChange:maximized': PropertyChangeEvent<boolean>;
+  'propertyChange:messageBoxes': PropertyChangeEvent<MessageBox[]>;
   'propertyChange:modal': PropertyChangeEvent<boolean>;
   'propertyChange:movable': PropertyChangeEvent<boolean>;
   'propertyChange:resizable': PropertyChangeEvent<boolean>;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BenchColumnLayoutData, Desktop, DesktopDisplayStyle, DesktopHistoryState, Event, Form, KeyStroke, Menu, NativeNotificationDefaults, Popup, PropertyChangeEvent, ViewButton, Widget, WidgetEventMap} from '../index';
+import {
+  BenchColumnLayoutData, Desktop, DesktopDisplayStyle, DesktopHistoryState, Event, FileChooser, Form, KeyStroke, Menu, MessageBox, NativeNotificationDefaults, Popup, PropertyChangeEvent, ViewButton, Widget, WidgetEventMap
+} from '../index';
 
 export interface DesktopCancelFormsEvent<T = Desktop> extends Event<T> {
   forms: Form[];
@@ -33,12 +35,15 @@ export interface DesktopEventMap extends WidgetEventMap {
   'propertyChange:benchLayoutData': PropertyChangeEvent<BenchColumnLayoutData>;
   'propertyChange:benchVisible': PropertyChangeEvent<boolean>;
   'propertyChange:dense': PropertyChangeEvent<boolean>;
+  'propertyChange:dialogs': PropertyChangeEvent<Form[]>;
   'propertyChange:displayStyle': PropertyChangeEvent<DesktopDisplayStyle>;
+  'propertyChange:fileChoosers': PropertyChangeEvent<FileChooser[]>;
   'propertyChange:focusedElement': PropertyChangeEvent<Widget>;
   'propertyChange:headerVisible': PropertyChangeEvent<boolean>;
   'propertyChange:inBackground': PropertyChangeEvent<boolean>;
   'propertyChange:keyStrokes': PropertyChangeEvent<KeyStroke[]>;
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;
+  'propertyChange:messageBoxes': PropertyChangeEvent<MessageBox[]>;
   'propertyChange:nativeNotificationDefaults': PropertyChangeEvent<NativeNotificationDefaults>;
   'propertyChange:navigationHandleVisible': PropertyChangeEvent<boolean>;
   'propertyChange:navigationVisible': PropertyChangeEvent<boolean>;
