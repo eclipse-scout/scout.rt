@@ -322,5 +322,49 @@ describe('FocusManager', () => {
       expect(input1.selectionStart).toBe(0);
       expect(input1.selectionEnd).toBe(5);
     });
+
+    it('does not focus elements covered by a glasspane', () => {
+      let $container = session.$entryPoint.appendDiv();
+      let input1 = $container.appendElement('<input type="text">')[0];
+      let input2 = $container.appendElement('<input type="text">')[0];
+      let input3 = $container.appendElement('<input type="text">')[0];
+      focusManager.installFocusContext($container);
+
+      // Cover middle element
+      let glassPane = scout.create(GlassPane, {parent: session.desktop});
+      glassPane.render($(input2));
+      focusManager.requestFocus(input1);
+      expect(document.activeElement).toBe(input1);
+      focusManager.focusNextTabbable($container.activeElement());
+      expect(document.activeElement).toBe(input3);
+      focusManager.focusNextTabbable($container.activeElement(), false);
+      expect(document.activeElement).toBe(input1);
+
+      // Cover last element
+      glassPane.remove();
+      glassPane.render($(input3));
+      focusManager.focusNextTabbable($container.activeElement());
+      expect(document.activeElement).toBe(input2);
+      focusManager.focusNextTabbable($container.activeElement());
+      expect(document.activeElement).toBe(input1);
+      focusManager.focusNextTabbable($container.activeElement(), false);
+      expect(document.activeElement).toBe(input2);
+
+      // Cover first element
+      glassPane.remove();
+      glassPane.render($(input1));
+      focusManager.focusNextTabbable($container.activeElement(), false);
+      expect(document.activeElement).toBe(input3);
+      focusManager.focusNextTabbable($container.activeElement());
+      expect(document.activeElement).toBe(input2);
+
+      // Cover every element
+      let glassPane2 = scout.create(GlassPane, {parent: session.desktop});
+      glassPane2.render($(input2));
+      let glassPane3 = scout.create(GlassPane, {parent: session.desktop});
+      glassPane3.render($(input3));
+      focusManager.focusNextTabbable(input1);
+      expect(document.activeElement).toBe(session.$entryPoint[0]);
+    });
   });
 });

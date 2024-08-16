@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -94,7 +94,8 @@ export class FocusContext {
    * behavior).
    */
   focusNextTabbable(forward = true, event?: KeyDownEvent) {
-    let $focusableElements = this.$container.find(':tabbable:visible');
+    let $allFocusableElements = this.$container.find(':tabbable:visible');
+    let $focusableElements = $allFocusableElements.filter((index, elem) => !this.focusManager.isElementCovertByGlassPane(elem));
     if ($focusableElements.length === 0) {
       return; // no focusable elements -> nothing to do
     }
@@ -105,25 +106,29 @@ export class FocusContext {
     let activeElementIndex = $focusableElements.index(activeElement);
 
     let elementToFocus = null;
-    let wrap = false;
+    let explicitFocus = false;
 
     if (forward) {
       // --- FORWARD ---
       // If the last focusable element is currently focused, or the focus is on the container, set the focus to the first focusable element
       if (activeElement === lastFocusableElement || activeElement === this.$container[0]) {
         elementToFocus = firstFocusableElement;
-        wrap = true;
+        explicitFocus = true;
       } else if (activeElementIndex < $focusableElements.length - 1) {
         elementToFocus = $focusableElements.get(activeElementIndex + 1);
+        // Check if next element that would be focused by the browser is covered by a glass pane. If yes, don't let the browser focus it
+        explicitFocus = $allFocusableElements.get($allFocusableElements.index(activeElement) + 1) !== elementToFocus;
       }
     } else {
       // --- BACKWARD ---
       // If the first focusable element is currently focused, or the focus is on the container, set the focus to the last focusable element
       if (activeElement === firstFocusableElement || activeElement === this.$container[0]) {
         elementToFocus = lastFocusableElement;
-        wrap = true;
+        explicitFocus = true;
       } else if (activeElementIndex > 0) {
         elementToFocus = $focusableElements.get(activeElementIndex - 1);
+        // Check if next element that would be focused by the browser is covered by a glass pane. If yes, don't let the browser focus it
+        explicitFocus = $allFocusableElements.get($allFocusableElements.index(activeElement) - 1) !== elementToFocus;
       }
     }
 
@@ -133,7 +138,7 @@ export class FocusContext {
 
     // Set focus manually if the target element does not correspond to the next element according to the
     // DOM order, or if there is currently no keyboard event in progress that will
-    if (event && !wrap) {
+    if (event && !explicitFocus) {
       // Don't change the focus here --> will be handled by browser
     } else {
       // Set focus manually to the target element
