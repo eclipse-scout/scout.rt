@@ -10,7 +10,7 @@
 package org.eclipse.scout.rt.dataobject.id;
 
 import static org.eclipse.scout.rt.platform.security.SecurityUtility.createMac;
-import static org.eclipse.scout.rt.platform.util.Assertions.*;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import static org.eclipse.scout.rt.platform.util.Base64Utility.encodeUrlSafe;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashSet;
 import static org.eclipse.scout.rt.platform.util.ObjectUtility.isOneOf;
@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -69,9 +70,9 @@ public class IdCodec {
      */
     LENIENT,
     /**
-     * This will create a signature using the unqualified serialized
-     * {@link IId} and add it as a suffix. If this suffix is incorrect an error is thrown during deserialization.
-     * {@link IId}s can be excluded from using signature creation using {@link IdSignature}.
+     * This will create a signature using the unqualified serialized {@link IId} and add it as a suffix. If this suffix
+     * is incorrect an error is thrown during deserialization. {@link IId}s can be excluded from using signature
+     * creation using {@link IdSignature}.
      */
     SIGNATURE
   }
@@ -124,7 +125,7 @@ public class IdCodec {
         return StringUtility.join(ID_TYPENAME_DELIMITER, ((UnknownId) id).getIdTypeName(), toUnqualified(id, flags));
       }
       else {
-        throw new PlatformException("Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass());
+        throw new IdCodecException("Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass());
       }
     }
     return typeName + ID_TYPENAME_DELIMITER + toUnqualified(id, flags);
@@ -153,7 +154,7 @@ public class IdCodec {
       Object value = id.unwrap();
       Function<Object, String> mapper = m_rawTypeToStringMapper.get(value.getClass());
       if (mapper == null) {
-        throw new PlatformException("Missing raw type mapper for wrapped type {}, id type {}", value.getClass(), id.getClass());
+        throw new IdCodecException("Missing raw type mapper for wrapped type {}, id type {}", value.getClass(), id.getClass());
       }
       return addSignature(id.getClass(), mapper.apply(value), flags);
     }
@@ -207,8 +208,11 @@ public class IdCodec {
    * @return private key used to create a signature (see {@link #createSignature(String)}).
    */
   protected byte[] getIdSignaturePassword() {
-    return assertNotNull(CONFIG.getPropertyValue(IdSignaturePasswordProperty.class), "Password property {} not set.", BEANS.get(IdSignaturePasswordProperty.class).getKey())
-        .getBytes(StandardCharsets.UTF_8);
+    String password = CONFIG.getPropertyValue(IdSignaturePasswordProperty.class);
+    if (password == null) {
+      throw new IdCodecException("Password property {} not set.", BEANS.get(IdSignaturePasswordProperty.class).getKey());
+    }
+    return password.getBytes(StandardCharsets.UTF_8);
   }
 
   // ---------------- String to IId ----------------
@@ -247,7 +251,7 @@ public class IdCodec {
    */
   public <ID extends IId> ID fromUnqualified(Class<ID> idClass, String unqualifiedId, Set<IIdCodecFlag> flags) {
     if (idClass == null) {
-      throw new PlatformException("Missing id class to parse unqualified id {}", unqualifiedId);
+      throw new IdCodecException("Missing id class to parse unqualified id {}", unqualifiedId);
     }
     if (isNullOrEmpty(unqualifiedId)) {
       return null;
@@ -290,7 +294,7 @@ public class IdCodec {
    * Callback method to implement if the codec should be extended to handle qualification of unknown {@link IId} types.
    */
   protected String handleToUnqualifiedUnknownIdType(IId id, Set<IIdCodecFlag> flags) {
-    throw new PlatformException("Unsupported id type {}, cannot convert id {}", id.getClass(), id);
+    throw new IdCodecException("Unsupported id type {}, cannot convert id {}", id.getClass(), id);
   }
 
   /**
@@ -313,7 +317,7 @@ public class IdCodec {
         return UnknownId.of(null, qualifiedId);
       }
       else {
-        throw new PlatformException("Qualified id '{}' format is invalid", qualifiedId);
+        throw new IdCodecException("Qualified id '{}' format is invalid", qualifiedId);
       }
     }
     String typeName = tmp[0];
@@ -324,7 +328,7 @@ public class IdCodec {
         return UnknownId.of(typeName, tmp[1]);
       }
       else {
-        throw new PlatformException("No class found for type name '{}'", typeName);
+        throw new IdCodecException("No class found for type name '{}'", typeName);
       }
     }
 
@@ -382,11 +386,20 @@ public class IdCodec {
    */
   protected void assertSignature(Class<? extends IId> idClass, String[] unqualifiedIdSignatureParts, Set<IIdCodecFlag> flags) {
     if (!isOneOf(IdCodecFlag.SIGNATURE, flags) || !idInventory().isIdSignature(idClass)) {
-      assertEqual(unqualifiedIdSignatureParts.length, 1, "Unqualified id must not be signed.");
+      checkEquals(unqualifiedIdSignatureParts.length, 1, "Unqualified id must not be signed.");
       return;
     }
-    assertEqual(unqualifiedIdSignatureParts.length, 2, "Unqualified id must be signed.");
-    assertEqual(unqualifiedIdSignatureParts[1], createSignature(unqualifiedIdSignatureParts[0]), "Signature of unqualified id does not match.");
+    checkEquals(unqualifiedIdSignatureParts.length, 2, "Unqualified id must be signed.");
+    checkEquals(unqualifiedIdSignatureParts[1], createSignature(unqualifiedIdSignatureParts[0]), "Signature of unqualified id does not match.");
+  }
+
+  /**
+   * Checks if the two given {@link Object}s are equal and throws an {@link IdCodecException} with the given message if they are not equal.
+   */
+  protected void checkEquals(Object o1, Object o2, String message) {
+    if (!Objects.equals(o1, o2)) {
+      throw new IdCodecException(message);
+    }
   }
 
   /**
@@ -402,7 +415,7 @@ public class IdCodec {
   protected Object[] parseComponents(Class<? extends IId> idClass, String[] rawComponents, Set<IIdCodecFlag> flags) {
     List<Class<?>> componentTypes = idFactory().getRawTypes(idClass);
     if (!(componentTypes.size() == rawComponents.length)) {
-      throw new PlatformException("Wrong argument size, expected {} parameter, got {} raw components {}, idType={}", componentTypes.size(), rawComponents.length, Arrays.toString(rawComponents), idClass.getName());
+      throw new IdCodecException("Wrong argument size, expected {} parameter, got {} raw components {}, idType={}", componentTypes.size(), rawComponents.length, Arrays.toString(rawComponents), idClass.getName());
     }
 
     Object[] components = new Object[rawComponents.length];
@@ -410,7 +423,7 @@ public class IdCodec {
       Class<?> type = componentTypes.get(i);
       Function<String, ?> mapper = m_rawTypeFromStringMapper.get(type);
       if (mapper == null) {
-        throw new PlatformException("Missing raw type mapper for wrapped type {}, id type {}", type, idClass);
+        throw new IdCodecException("Missing raw type mapper for wrapped type {}, id type {}", type, idClass);
       }
       try {
         String raw = rawComponents[i];
@@ -422,7 +435,7 @@ public class IdCodec {
         }
       }
       catch (Exception e) {
-        throw new PlatformException("Failed to parse component value={}, rawType={}, idType={}", rawComponents[i], type.getName(), idClass.getName(), e);
+        throw new IdCodecException("Failed to parse component value={}, rawType={}, idType={}", rawComponents[i], type.getName(), idClass.getName(), e);
       }
     }
     return components;

@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IUuId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec.IdCodecFlag;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.dataobject.id.IdCodecException;
 import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.IdCodecFlags;
 import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.QualifiedIIdParamConverter;
 import org.eclipse.scout.rt.rest.param.IIdParamConverterProvider.UnqualifiedIIdParamConverter;
@@ -92,7 +92,7 @@ public class IIdParamConverterProviderTest {
     ParamConverter<FixtureUuId> conv = m_provider.getConverter(FixtureUuId.class, null, null);
 
     assertNull(conv.fromString(null));
-    assertThrows(PlatformException.class, () -> conv.fromString("invalid UUID"));
+    assertThrows(IdCodecException.class, () -> conv.fromString("invalid UUID"));
 
     assertNotNull(conv);
     FixtureUuId id = conv.fromString(TEST_UUID.unwrapAsString());
@@ -105,7 +105,7 @@ public class IIdParamConverterProviderTest {
     ParamConverter<IUuId> conv = m_provider.getConverter(IUuId.class, null, null);
 
     assertNull(conv.fromString(null));
-    assertThrows(PlatformException.class, () -> conv.fromString("invalid_type:invalid UUID"));
+    assertThrows(IdCodecException.class, () -> conv.fromString("invalid_type:invalid UUID"));
 
     assertNotNull(conv);
     IUuId id = conv.fromString("scout.FixtureUuId:" + TEST_UUID.unwrapAsString());
@@ -118,7 +118,7 @@ public class IIdParamConverterProviderTest {
     ParamConverter<FixtureCompositeId> conv = m_provider.getConverter(FixtureCompositeId.class, null, null);
 
     assertNull(conv.fromString(null));
-    assertThrows(PlatformException.class, () -> conv.fromString("invalid"));
+    assertThrows(IdCodecException.class, () -> conv.fromString("invalid"));
 
     assertNotNull(conv);
     FixtureCompositeId id = conv.fromString("abc;" + TEST_UUID.unwrapAsString());

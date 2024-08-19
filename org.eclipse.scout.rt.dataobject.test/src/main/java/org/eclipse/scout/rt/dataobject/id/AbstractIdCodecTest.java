@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.dataobject.id.IdCodec.IdCodecFlag;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.IDateProvider;
@@ -106,7 +105,7 @@ public abstract class AbstractIdCodecTest {
     FixtureCustomComparableRawDataId id = IIds.create(FixtureCustomComparableRawDataId.class, new CustomComparableRawDataType(100));
 
     // no type mapper registered
-    assertThrows(PlatformException.class, () -> getCodec().toQualified(id));
+    assertThrows(IdCodecException.class, () -> getCodec().toQualified(id));
 
     try {
       getCodec().registerRawTypeMapper(CustomComparableRawDataType.class, CustomComparableRawDataType::of, CustomComparableRawDataType::toString);
@@ -168,7 +167,7 @@ public abstract class AbstractIdCodecTest {
   @Test
   public void testToQualifiedIdUnsupportedType() {
     // no IdTypeName annotation
-    assertThrows(PlatformException.class, () -> getCodec().toQualified((IId) () -> null));
+    assertThrows(IdCodecException.class, () -> getCodec().toQualified((IId) () -> null));
   }
 
   @Test
@@ -231,7 +230,7 @@ public abstract class AbstractIdCodecTest {
     FixtureCustomComparableRawDataId id = IIds.create(FixtureCustomComparableRawDataId.class, new CustomComparableRawDataType(100));
 
     // no type mapper registered
-    assertThrows(PlatformException.class, () -> getCodec().toUnqualified(id));
+    assertThrows(IdCodecException.class, () -> getCodec().toUnqualified(id));
 
     try {
       getCodec().registerRawTypeMapper(CustomComparableRawDataType.class, CustomComparableRawDataType::of, CustomComparableRawDataType::toString);
@@ -299,7 +298,7 @@ public abstract class AbstractIdCodecTest {
   @Test
   public void testToUnqualifiedIdUnsupportedType() {
     // unsupported type to unwrap
-    assertThrows(PlatformException.class, () -> getCodec().toUnqualified((IId) () -> null));
+    assertThrows(IdCodecException.class, () -> getCodec().toUnqualified((IId) () -> null));
   }
 
   @Test
@@ -354,7 +353,7 @@ public abstract class AbstractIdCodecTest {
     FixtureCustomComparableRawDataId id1 = IIds.create(FixtureCustomComparableRawDataId.class, new CustomComparableRawDataType(100));
 
     // no type mapper registered
-    assertThrows(PlatformException.class, () -> getCodec().fromQualified("scout.FixtureCustomComparableRawDataId:100"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCustomComparableRawDataId:100"));
 
     try {
       getCodec().registerRawTypeMapper(CustomComparableRawDataType.class, CustomComparableRawDataType::of, CustomComparableRawDataType::toString);
@@ -444,10 +443,10 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromQualifiedCompositeIdWrongNumberOfComponents() {
-    assertThrows(PlatformException.class, () -> getCodec().fromQualified("scout.FixtureCompositeId:foo"));
-    assertThrows(PlatformException.class, () -> getCodec().fromQualified("scout.FixtureCompositeId:foo;" + TEST_UUID + ";foo"));
-    assertThrows(PlatformException.class, () -> getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;"));
-    assertThrows(PlatformException.class, () -> getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeId:foo"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeId:foo;" + TEST_UUID + ";foo"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;"));
   }
 
   @Test
@@ -478,7 +477,7 @@ public abstract class AbstractIdCodecTest {
     FixtureCustomComparableRawDataId id1 = IIds.create(FixtureCustomComparableRawDataId.class, new CustomComparableRawDataType(100));
 
     // no type mapper registered
-    assertThrows(PlatformException.class, () -> getCodec().fromUnqualified(FixtureCustomComparableRawDataId.class, "100"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCustomComparableRawDataId.class, "100"));
 
     try {
       getCodec().registerRawTypeMapper(CustomComparableRawDataType.class, CustomComparableRawDataType::of, CustomComparableRawDataType::toString);
@@ -506,8 +505,8 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromUnqualifiedNullIdClass() {
-    assertThrows(PlatformException.class, () -> getCodec().fromUnqualified(null, null));
-    assertThrows(PlatformException.class, () -> getCodec().fromUnqualified(null, "foo"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(null, null));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(null, "foo"));
   }
 
   @Test
@@ -562,33 +561,33 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromUnqualifiedCompositeIdWrongNumberOfComponents() {
-    assertThrows(PlatformException.class, () -> getCodec().fromUnqualified(FixtureCompositeId.class, "foo"));
-    assertThrows(PlatformException.class, () -> getCodec().fromUnqualified(FixtureCompositeId.class, "foo;" + TEST_UUID + ";foo"));
-    assertThrows(PlatformException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";"));
-    assertThrows(PlatformException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeId.class, "foo"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeId.class, "foo;" + TEST_UUID + ";foo"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;"));
   }
 
-  @Test(expected = PlatformException.class)
+  @Test(expected = IdCodecException.class)
   public void testFromQualified_InvalidType() {
     getCodec().fromQualified("scout.FixtureUuId:Other:" + TEST_UUID);
   }
 
-  @Test(expected = PlatformException.class)
+  @Test(expected = IdCodecException.class)
   public void testFromQualified_UnknownType() {
     getCodec().fromQualified("DoesNotExist:" + TEST_UUID);
   }
 
-  @Test(expected = PlatformException.class)
+  @Test(expected = IdCodecException.class)
   public void testFromQualified_InvalidFormat_noColon() {
     getCodec().fromQualified("DoesNotExist");
   }
 
-  @Test(expected = PlatformException.class)
+  @Test(expected = IdCodecException.class)
   public void testFromQualified_InvalidFormat_duplicateColon() {
     getCodec().fromQualified("DoesNotExist:d:d");
   }
 
-  @Test(expected = PlatformException.class)
+  @Test(expected = IdCodecException.class)
   public void testFromQualified_UnsupportedWrappedType() {
     getCodec().fromQualified("DoesNotExist:" + TEST_UUID);
   }
@@ -741,8 +740,8 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testEmptyIdWithSignature() {
-    assertThrows(AssertionException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
-    assertThrows(AssertionException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
   }
 
   @Test
@@ -756,10 +755,10 @@ public abstract class AbstractIdCodecTest {
     assertEquals(stringId, getCodec().fromUnqualified(FixtureStringId.class, "some", IdCodecFlag.SIGNATURE));
 
     var integerId = FixtureIntegerId.of(42);
-    assertThrows(AssertionException.class, () -> getCodec().toQualified(integerId, IdCodecFlag.SIGNATURE));
-    assertThrows(AssertionException.class, () -> getCodec().toUnqualified(integerId, IdCodecFlag.SIGNATURE));
-    assertThrows(AssertionException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
-    assertThrows(AssertionException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().toQualified(integerId, IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().toUnqualified(integerId, IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
   }
 
   @IdTypeName("scout.FixtureDateId")
