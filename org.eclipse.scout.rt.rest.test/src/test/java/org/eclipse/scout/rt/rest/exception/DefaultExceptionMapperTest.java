@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,6 +21,7 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.dataobject.exception.ResourceNotFoundException;
+import org.eclipse.scout.rt.dataobject.id.IdCodecException;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
@@ -165,6 +166,17 @@ public class DefaultExceptionMapperTest {
       assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatus());
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
       assertEquals(exception.getMessage(), error.getMessage());
+    }
+  }
+
+  @Test
+  public void testToResponseIdCodecException() {
+    var mapper = new IdCodecExceptionMapper();
+    var exception = new IdCodecException("foo {}", "bar", new Exception());
+    try (Response response = mapper.toResponse(exception)) {
+      assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+      assertEquals(Response.Status.BAD_REQUEST.getReasonPhrase(), error.getMessage());
     }
   }
 
