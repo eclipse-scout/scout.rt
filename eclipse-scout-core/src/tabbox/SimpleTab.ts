@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -137,9 +137,7 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
   }
 
   protected _renderTitle() {
-    if (this.title || this.subTitle) { // $title is always needed if subtitle is not empty
-      this.$title.textOrNbsp(this.title);
-    }
+    this.$title.textOrNbsp(this.title);
   }
 
   setSubTitle(subTitle: string) {
@@ -147,16 +145,7 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
   }
 
   protected _renderSubTitle() {
-    if (this.subTitle) {
-      if (!this.title) {
-        this._renderTitle();
-      }
-      this.$subTitle.textOrNbsp(this.subTitle);
-    } else {
-      if (!this.title) {
-        this._renderTitle();
-      }
-    }
+    this.$subTitle.text(this.subTitle);
   }
 
   setIconId(iconId: string) {
