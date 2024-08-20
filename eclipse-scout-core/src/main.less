@@ -83,6 +83,15 @@ body {
   height: 0;
 }
 
+// Override the default user-agent style for focused elements. Instead, custom styles will be added for each
+// focusable widget. The browser heuristics of :focus-visible (https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible)
+// does not seem to to work too well with the more complicated scout widgets (e.g. table), so we use special
+// classes like .focused and .keyboard-navigation instead.
+:focus,
+:focus-visible {
+  outline: none;
+}
+
 .disabled {
   &::-moz-selection {
     #scout.text-selection-disabled();
