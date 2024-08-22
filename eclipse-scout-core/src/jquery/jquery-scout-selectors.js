@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,19 +10,30 @@
 
 import $ from 'jquery';
 
-/**
+/*
  * This file extends jQuery with custom selectors required in Scout.
  * Part of this file is copied with some modifications from jQuery UI.
  */
-function focusable(element, isTabIndexNotNaN) {
+
+function focusable(element, requireTabbable, includeScrollables = false) {
+  let tabIndex = $.attr(element, 'tabindex');
+  let hasTabIndex = !isNaN(tabIndex);
+
+  // Elements with an explicit negative tabindex are never tabbable
+  if (requireTabbable && hasTabIndex && tabIndex < 0) {
+    return false;
+  }
+
+  // Some elements are focusable natively, others can be made focusable by adding a tabindex (positive or negative)
   let nodeName = element.nodeName.toLowerCase();
-  return (/input|select|textarea|button|object/.test(nodeName) ?
-    !element.disabled :
-    'a' === nodeName ?
-      element.href || isTabIndexNotNaN :
-      isTabIndexNotNaN) &&
-    // the element and all of its ancestors must be visible
-    visible(element);
+  let focusable = /^(input|select|textarea|button|object)$/.test(nodeName)
+    ? !element.disabled
+    : hasTabIndex || (nodeName === 'a' && element.href);
+
+  // https://developer.chrome.com/blog/keyboard-focusable-scrollers)
+  focusable = focusable || (includeScrollables && $.css(element, 'overflow') !== 'hidden');
+
+  return focusable && visible(element); // the element and all of its ancestors must be visible
 }
 
 function visible(element) {
@@ -34,11 +45,9 @@ function visible(element) {
 
 $.extend($.expr[':'], {
 
-  focusable: element => focusable(element, !isNaN($.attr(element, 'tabindex'))),
+  'focusable': element => focusable(element, false),
+  'tabbable': element => focusable(element, true),
 
-  tabbable: element => {
-    let tabIndex = $.attr(element, 'tabindex'),
-      isTabIndexNaN = isNaN(tabIndex);
-    return (isTabIndexNaN || tabIndex >= 0) && focusable(element, !isTabIndexNaN);
-  }
+  'focusable-native': element => focusable(element, false, true),
+  'tabbable-native': element => focusable(element, true, true)
 });

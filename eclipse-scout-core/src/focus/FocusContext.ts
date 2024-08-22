@@ -94,16 +94,18 @@ export class FocusContext {
    * behavior).
    */
   focusNextTabbable(forward = true, event?: KeyDownEvent) {
-    let $allFocusableElements = this.$container.find(':tabbable:visible');
-    let $focusableElements = $allFocusableElements.filter((index, elem) => !this.focusManager.isElementCovertByGlassPane(elem));
-    if ($focusableElements.length === 0) {
-      return; // no focusable elements -> nothing to do
+    // All elements that can technically receive the focus (either via keyboard navigation, click or programmatically)
+    let $focusableElements = this.$container.find(':focusable-native');
+    // All elements that we consider valid targets for keyboard navigation
+    let $tabbableElements = $focusableElements.filter((index, elem) => $(elem).is(':tabbable') && !this.focusManager.isElementCovertByGlassPane(elem));
+    if ($tabbableElements.length === 0) {
+      return; // no tabbable elements -> nothing to do
     }
 
     let activeElement = this.$container.activeElement(true);
-    let firstFocusableElement = $focusableElements.first()[0];
-    let lastFocusableElement = $focusableElements.last()[0];
     let activeElementIndex = $focusableElements.index(activeElement);
+    let firstTabbableElement = $tabbableElements.first()[0];
+    let lastTabbableElement = $tabbableElements.last()[0];
 
     let elementToFocus = null;
     let explicitFocus = false;
@@ -111,24 +113,32 @@ export class FocusContext {
     if (forward) {
       // --- FORWARD ---
       // If the last focusable element is currently focused, or the focus is on the container, set the focus to the first focusable element
-      if (activeElement === lastFocusableElement || activeElement === this.$container[0]) {
-        elementToFocus = firstFocusableElement;
+      if (activeElement === lastTabbableElement || activeElement === this.$container[0] || activeElementIndex === -1) {
+        elementToFocus = firstTabbableElement;
         explicitFocus = true;
-      } else if (activeElementIndex < $focusableElements.length - 1) {
-        elementToFocus = $focusableElements.get(activeElementIndex + 1);
-        // Check if next element that would be focused by the browser is covered by a glass pane. If yes, don't let the browser focus it
-        explicitFocus = $allFocusableElements.get($allFocusableElements.index(activeElement) + 1) !== elementToFocus;
+      } else {
+        let $candidateElements = $focusableElements.filter((index, elem) => index > activeElementIndex);
+        // The element we want to focus
+        let targetElement = $candidateElements.filter((index, elem) => $tabbableElements.is(elem)).first()[0];
+        elementToFocus = targetElement || firstTabbableElement;
+        // The element that will receive the focus if we let the browser chose -> focus explicitly if necessary
+        let nativeTargetElement = $candidateElements.filter((index, elem) => $(elem).is(':tabbable-native')).first()[0];
+        explicitFocus = elementToFocus !== nativeTargetElement;
       }
     } else {
       // --- BACKWARD ---
       // If the first focusable element is currently focused, or the focus is on the container, set the focus to the last focusable element
-      if (activeElement === firstFocusableElement || activeElement === this.$container[0]) {
-        elementToFocus = lastFocusableElement;
+      if (activeElement === firstTabbableElement || activeElement === this.$container[0] || activeElementIndex === -1) {
+        elementToFocus = lastTabbableElement;
         explicitFocus = true;
-      } else if (activeElementIndex > 0) {
-        elementToFocus = $focusableElements.get(activeElementIndex - 1);
-        // Check if next element that would be focused by the browser is covered by a glass pane. If yes, don't let the browser focus it
-        explicitFocus = $allFocusableElements.get($allFocusableElements.index(activeElement) - 1) !== elementToFocus;
+      } else {
+        let $candidateElements = $focusableElements.filter((index, elem) => index < activeElementIndex);
+        // The element we want to focus
+        let targetElement = $candidateElements.filter($tabbableElements).last()[0];
+        elementToFocus = targetElement || lastTabbableElement;
+        // The element that will receive the focus if we let the browser chose -> focus explicitly if necessary
+        let nativeTargetElement = $candidateElements.filter((index, elem) => $(elem).is(':tabbable-native')).last()[0];
+        explicitFocus = elementToFocus !== nativeTargetElement;
       }
     }
 
@@ -164,18 +174,24 @@ export class FocusContext {
    */
   protected _onFocusIn(event: FocusInEvent) {
     let $target = $(event.target);
+    if (!$target.is(':focusable')) {
+      // Sometimes, the browser focuses an element that we don't consider focusable.
+      // Try to redirect this to the proper focusable element of the widget.
+      $target = $(scout.widget($target)?.getFocusableElement());
+    }
     $target.on('remove', this._removeListener);
-    this.focusedElement = event.target;
+    let target = $target[0];
+    this.focusedElement = target;
 
     // Do not update current focus context nor validate focus if target is $entryPoint.
     // That is because focusing the $entryPoint is done whenever no control is currently focusable, e.g. due to glass panes.
-    if (event.target === this.$container.entryPoint(true)) {
+    if (target === this.$container.entryPoint(true)) {
       return;
     }
 
     // Make this context the active context (nothing done if already active) and validate the focus event.
     this.focusManager._pushIfAbsentElseMoveTop(this);
-    this.validateAndSetFocus(event.target);
+    this.validateAndSetFocus(target);
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
   }
 
