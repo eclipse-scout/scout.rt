@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,11 +13,13 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -181,7 +183,7 @@ public class AbstractTreeTest {
   }
 
   @Test
-  public void testDisposeRemovedTreeNodesInNonAutodiscardTree() {
+  public void testDisposeRemovedTreeNodesInNonAutoDiscardTree() {
     m_tree.setAutoDiscardOnDelete(false);
     m_tree.removeNode(m_node2);
     assertNotDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
@@ -191,7 +193,7 @@ public class AbstractTreeTest {
   }
 
   @Test
-  public void testDisposeRemovedTreeNodesInNonAutodiscardTreeExplicitlyClearingDeletedNodes() {
+  public void testDisposeRemovedTreeNodesInNonAutoDiscardTreeExplicitlyClearingDeletedNodes() {
     m_tree.setAutoDiscardOnDelete(false);
     m_tree.removeNode(m_node2);
     assertNotDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
@@ -257,7 +259,7 @@ public class AbstractTreeTest {
 
   private static void assertDisposed(ITestDisposable... disposables) {
     for (ITestDisposable disposable : disposables) {
-      assertTrue("should be desposed, but is not: " + disposable.getName(), disposable.isDisposed());
+      assertTrue("should be disposed, but is not: " + disposable.getName(), disposable.isDisposed());
     }
   }
 
@@ -495,6 +497,38 @@ public class AbstractTreeTest {
     assertTrue(d.isExpandedLazy());
   }
 
+  @Test
+  public void testEventHistory() {
+    P_Tree tree = new P_Tree() {
+      @Override
+      protected IEventHistory<TreeEvent> createEventHistory() {
+        return new DefaultTreeEventHistory(5000L) {
+          @Override
+          public void notifyEvent(TreeEvent event) {
+            if (event.getType() == -42) {
+              addToCache(event.getType(), event);
+            }
+            super.notifyEvent(event);
+          }
+        };
+      }
+    };
+    assertTrue(tree.getEventHistory().getRecentEvents().isEmpty());
+
+    TreeEvent customEvent = new TreeEvent(tree, -42);
+    TreeEvent anotherCustomEvent = new TreeEvent(tree, -43); // will be ignored
+    TreeEvent scrollToSelectionEvent = new TreeEvent(tree, TreeEvent.TYPE_SCROLL_TO_SELECTION);
+
+    tree.fireTreeEventInternal(customEvent);
+    tree.fireTreeEventInternal(anotherCustomEvent);
+    tree.fireTreeEventInternal(scrollToSelectionEvent);
+
+    Collection<TreeEvent> recentEvents = tree.getEventHistory().getRecentEvents();
+    assertEquals(2, recentEvents.size());
+    assertTrue(recentEvents.contains(customEvent));
+    assertTrue(recentEvents.contains(scrollToSelectionEvent));
+  }
+
   public static class P_Tree extends AbstractTree {
     ITreeNode m_currentDropNode;
     int m_execDropTargetChangedTimesCalled;
@@ -522,11 +556,10 @@ public class AbstractTreeTest {
     }
   }
 
-  private static interface ITestDisposable {
+  private interface ITestDisposable {
     boolean isDisposed();
 
     String getName();
-
   }
 
   public static class TreeNodeExtension extends AbstractTreeNodeExtension<P_TreeNode> {
@@ -603,5 +636,4 @@ public class AbstractTreeTest {
       m_disposed = true;
     }
   }
-
 }

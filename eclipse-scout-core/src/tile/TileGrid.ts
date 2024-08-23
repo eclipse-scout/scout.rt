@@ -1129,7 +1129,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
    * Brings the first selected tile into view by scrolling the first scrollable parent.
    */
   revealSelection() {
-    if (!this.rendered) {
+    if (!this.rendered || !this.htmlComp?.layouted) {
       // Execute delayed because tileGrid may be not layouted yet
       this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
       return;

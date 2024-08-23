@@ -2001,7 +2001,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   revealSelection() {
-    if (!this.rendered) {
+    if (!this.rendered || !this.htmlComp?.layouted) {
       // Execute delayed because tree may be not layouted yet
       this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
       return;

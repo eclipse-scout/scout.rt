@@ -101,8 +101,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   /**
    * Provides 4 boolean flags.<br>
-   * Currently used: {@link #AUTO_DISCARD_ON_DELETE}, {@link #AUTO_TITLE},
-   * {@link #ACTION_RUNNING}, {@link #SAVE_AND_RESTORE_SCROLLBARS}
+   * Currently used: {@link #AUTO_DISCARD_ON_DELETE}, {@link #AUTO_TITLE}, {@link #ACTION_RUNNING},
+   * {@link #SAVE_AND_RESTORE_SCROLLBARS}
    */
   private byte m_flags;
 
@@ -321,9 +321,9 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   /**
    * Configures whether this tree should save and restore its coordinates of the vertical and horizontal scrollbars. If
-   * this property is set to {@code true}, the tree saves its scrollbars coordinates to the {@link AbstractClientSession} upon
-   * detaching the UI component from Scout. The coordinates are restored (if the coordinates are available), when the UI
-   * component is attached to Scout.
+   * this property is set to {@code true}, the tree saves its scrollbars coordinates to the
+   * {@link AbstractClientSession} upon detaching the UI component from Scout. The coordinates are restored (if the
+   * coordinates are available), when the UI component is attached to Scout.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
    *
@@ -339,11 +339,11 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * When set to {@code true}, all children of a node will be checked/unchecked together with their parents.
    * <p>
    * The state of a node is a representation of its children.
-   *  <ul>
-   *  <li>When none of the children are checked, the node is unchecked</li>
-   *  <li>When some of the children are checked, the node is partly checked</li>
-   *  <li>When all of the children are checked, the node is also checked</li>
-   *  </ul>
+   * <ul>
+   * <li>When none of the children are checked, the node is unchecked</li>
+   * <li>When some of the children are checked, the node is partly checked</li>
+   * <li>When all of the children are checked, the node is also checked</li>
+   * </ul>
    * <p>
    * Only has an effect if the tree is checkable.
    * <p>
@@ -492,8 +492,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   /**
-   * this method should not be implemented if you support {@link #interceptDrag(Collection)} (drag of
-   * multiple nodes), as it takes precedence
+   * this method should not be implemented if you support {@link #interceptDrag(Collection)} (drag of multiple nodes),
+   * as it takes precedence
    *
    * @return a transferable object representing the given row
    */
@@ -613,80 +613,76 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     setToggleBreadcrumbStyleEnabled(getConfiguredToggleBreadcrumbStyleEnabled());
     setRootNode(new AbstractTreeNode() {
     });
-    // add Convenience observer for drag & drop callbacks and event history
-    addTreeListener(
-        e -> {
-          //event history
-          IEventHistory<TreeEvent> h = getEventHistory();
-          if (h != null) {
-            h.notifyEvent(e);
-          }
-          //dnd
-          switch (e.getType()) {
-            case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
-              m_lastSeenDropNode = null;
-              if (e.getDragObject() == null) {
-                try {
-                  TransferObject transferObject = interceptDrag(e.getNode());
-                  if (transferObject == null) {
-                    transferObject = interceptDrag(e.getNodes());
-                  }
-                  e.setDragObject(transferObject);
-                }
-                catch (Exception t) {
-                  LOG.error("Drag", t);
-                }
+
+    // add convenience observer for drag & drop callbacks and event history
+    addTreeListener(e -> {
+      //event history
+      IEventHistory<TreeEvent> h = getEventHistory();
+      if (h != null) {
+        h.notifyEvent(e);
+      }
+
+      //dnd
+      switch (e.getType()) {
+        case TreeEvent.TYPE_NODES_DRAG_REQUEST: {
+          m_lastSeenDropNode = null;
+          if (e.getDragObject() == null) {
+            try {
+              TransferObject transferObject = interceptDrag(e.getNode());
+              if (transferObject == null) {
+                transferObject = interceptDrag(e.getNodes());
               }
-              break;
+              e.setDragObject(transferObject);
             }
-            case TreeEvent.TYPE_NODE_DROP_ACTION: {
-              m_lastSeenDropNode = null;
-              if (e.getDropObject() != null) {
-                try {
-                  interceptDrop(e.getNode(), e.getDropObject());
-                }
-                catch (Exception t) {
-                  LOG.error("Drop", t);
-                }
-              }
-              break;
-            }
-            case TreeEvent.TYPE_NODES_SELECTED: {
-              rebuildKeyStrokesInternal();
-              break;
-            }
-            case TreeEvent.TYPE_NODES_CHECKED: {
-              try {
-                interceptNodesChecked(CollectionUtility.arrayList(e.getNodes()));
-              }
-              catch (RuntimeException ex) {
-                BEANS.get(ExceptionHandler.class).handle(ex);
-              }
-              break;
-            }
-            case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED: {
-              try {
-                if (m_lastSeenDropNode == null || m_lastSeenDropNode != e.getNode()) {
-                  m_lastSeenDropNode = e.getNode();
-                  interceptDropTargetChanged(e.getNode());
-                }
-              }
-              catch (RuntimeException ex) {
-                LOG.error("DropTargetChanged", ex);
-              }
-              break;
-            }
-            case TreeEvent.TYPE_DRAG_FINISHED: {
-              m_lastSeenDropNode = null;
+            catch (Exception t) {
+              LOG.error("Drag", t);
             }
           }
-        },
-        TreeEvent.TYPE_NODES_DRAG_REQUEST,
-        TreeEvent.TYPE_NODE_DROP_ACTION,
-        TreeEvent.TYPE_NODES_SELECTED,
-        TreeEvent.TYPE_NODES_CHECKED,
-        TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED,
-        TreeEvent.TYPE_DRAG_FINISHED);
+          break;
+        }
+        case TreeEvent.TYPE_NODE_DROP_ACTION: {
+          m_lastSeenDropNode = null;
+          if (e.getDropObject() != null) {
+            try {
+              interceptDrop(e.getNode(), e.getDropObject());
+            }
+            catch (Exception t) {
+              LOG.error("Drop", t);
+            }
+          }
+          break;
+        }
+        case TreeEvent.TYPE_NODES_SELECTED: {
+          rebuildKeyStrokesInternal();
+          break;
+        }
+        case TreeEvent.TYPE_NODES_CHECKED: {
+          try {
+            interceptNodesChecked(CollectionUtility.arrayList(e.getNodes()));
+          }
+          catch (RuntimeException ex) {
+            BEANS.get(ExceptionHandler.class).handle(ex);
+          }
+          break;
+        }
+        case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED: {
+          try {
+            if (m_lastSeenDropNode == null || m_lastSeenDropNode != e.getNode()) {
+              m_lastSeenDropNode = e.getNode();
+              interceptDropTargetChanged(e.getNode());
+            }
+          }
+          catch (RuntimeException ex) {
+            LOG.error("DropTargetChanged", ex);
+          }
+          break;
+        }
+        case TreeEvent.TYPE_DRAG_FINISHED: {
+          m_lastSeenDropNode = null;
+        }
+      }
+    });
+
     // key shortcuts
     List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
     List<IKeyStroke> ksList = new ArrayList<>(configuredKeyStrokes.size());
