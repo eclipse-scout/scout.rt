@@ -108,37 +108,24 @@ export class FocusContext {
     let lastTabbableElement = $tabbableElements.last()[0];
 
     let elementToFocus = null;
-    let explicitFocus = false;
 
     if (forward) {
       // --- FORWARD ---
       // If the last focusable element is currently focused, or the focus is on the container, set the focus to the first focusable element
       if (activeElement === lastTabbableElement || activeElement === this.$container[0] || activeElementIndex === -1) {
         elementToFocus = firstTabbableElement;
-        explicitFocus = true;
       } else {
-        let $candidateElements = $focusableElements.filter((index, elem) => index > activeElementIndex);
-        // The element we want to focus
-        let targetElement = $candidateElements.filter((index, elem) => $tabbableElements.is(elem)).first()[0];
+        let targetElement = $focusableElements.filter((index, elem) => index > activeElementIndex && $tabbableElements.is(elem)).first()[0];
         elementToFocus = targetElement || firstTabbableElement;
-        // The element that will receive the focus if we let the browser chose -> focus explicitly if necessary
-        let nativeTargetElement = $candidateElements.filter((index, elem) => $(elem).is(':tabbable-native')).first()[0];
-        explicitFocus = elementToFocus !== nativeTargetElement;
       }
     } else {
       // --- BACKWARD ---
       // If the first focusable element is currently focused, or the focus is on the container, set the focus to the last focusable element
       if (activeElement === firstTabbableElement || activeElement === this.$container[0] || activeElementIndex === -1) {
         elementToFocus = lastTabbableElement;
-        explicitFocus = true;
       } else {
-        let $candidateElements = $focusableElements.filter((index, elem) => index < activeElementIndex);
-        // The element we want to focus
-        let targetElement = $candidateElements.filter($tabbableElements).last()[0];
+        let targetElement = $focusableElements.filter((index, elem) => index < activeElementIndex && $tabbableElements.is(elem)).last()[0];
         elementToFocus = targetElement || lastTabbableElement;
-        // The element that will receive the focus if we let the browser chose -> focus explicitly if necessary
-        let nativeTargetElement = $candidateElements.filter((index, elem) => $(elem).is(':tabbable-native')).last()[0];
-        explicitFocus = elementToFocus !== nativeTargetElement;
       }
     }
 
@@ -146,17 +133,11 @@ export class FocusContext {
       return; // no valid element found
     }
 
-    // Set focus manually if the target element does not correspond to the next element according to the
-    // DOM order, or if there is currently no keyboard event in progress that will
-    if (event && !explicitFocus) {
-      // Don't change the focus here --> will be handled by browser
-    } else {
-      // Set focus manually to the target element
-      this.validateAndSetFocus(elementToFocus, null, {
-        selectText: elementToFocus.tagName === 'INPUT'
-      });
-      $.suppressEvent(event);
-    }
+    // Set focus manually to the target element
+    this.validateAndSetFocus(elementToFocus, null, {
+      selectText: elementToFocus.tagName === 'INPUT'
+    });
+    $.suppressEvent(event);
 
     let $focusableElement = $(elementToFocus);
     $focusableElement.addClass('keyboard-navigation');
