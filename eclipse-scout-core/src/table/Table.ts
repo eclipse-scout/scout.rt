@@ -3760,7 +3760,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   revealSelection() {
-    if (!this._isDataRendered()) {
+    if (!this._isDataRendered() || !this.htmlComp?.layouted) {
       // Execute delayed because table may be not layouted yet
       this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
       return;
