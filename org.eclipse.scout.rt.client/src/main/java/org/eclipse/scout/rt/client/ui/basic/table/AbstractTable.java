@@ -1074,81 +1074,77 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setCompactHandler(createCompactHandler());
     setCompact(getConfiguredCompact());
 
-    // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
-    addTableListener(new TableAdapter() {
-
-                       @Override
-                       public void tableChanged(TableEvent e) {
-                         //event history
-                         IEventHistory<TableEvent> h = getEventHistory();
-                         if (h != null) {
-                           h.notifyEvent(e);
-                         }
-                         //dnd
-                         switch (e.getType()) {
-                           case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
-                             if (e.getDragObject() == null) {
-                               try {
-                                 e.setDragObject(interceptDrag(e.getRows()));
-                               }
-                               catch (RuntimeException ex) {
-                                 BEANS.get(ExceptionHandler.class).handle(ex);
-                               }
-                             }
-                             break;
-                           }
-                           case TableEvent.TYPE_ROW_DROP_ACTION: {
-                             if (e.getDropObject() != null && isEnabled()) {
-                               try {
-                                 interceptDrop(e.getFirstRow(), e.getDropObject());
-                               }
-                               catch (RuntimeException ex) {
-                                 BEANS.get(ExceptionHandler.class).handle(ex);
-                               }
-                             }
-                             break;
-                           }
-                           case TableEvent.TYPE_ROWS_COPY_REQUEST: {
-                             if (e.getCopyObject() == null) {
-                               try {
-                                 e.setCopyObject(interceptCopy(e.getRows()));
-                               }
-                               catch (RuntimeException ex) {
-                                 BEANS.get(ExceptionHandler.class).handle(ex);
-                               }
-                             }
-                             break;
-                           }
-                           case TableEvent.TYPE_ALL_ROWS_DELETED:
-                           case TableEvent.TYPE_ROWS_DELETED:
-                           case TableEvent.TYPE_ROWS_INSERTED:
-                           case TableEvent.TYPE_ROWS_UPDATED: {
-                             if (isValueChangeTriggerEnabled()) {
-                               try {
-                                 interceptContentChanged();
-                               }
-                               catch (RuntimeException ex) {
-                                 BEANS.get(ExceptionHandler.class).handle(ex);
-                               }
-                             }
-                             break;
-                           }
-                           case TableEvent.TYPE_ROWS_CHECKED:
-                             try {
-                               interceptRowsChecked(e.getRows());
-                             }
-                             catch (RuntimeException ex) {
-                               BEANS.get(ExceptionHandler.class).handle(ex);
-                             }
-                             break;
-                           case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
-                           case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
-                             checkIfColumnPreventsUiSortForTable();
-                             break;
-                         }
-                       }
-                     }, TableEvent.TYPE_ROWS_DRAG_REQUEST, TableEvent.TYPE_ROW_DROP_ACTION, TableEvent.TYPE_ROWS_COPY_REQUEST, TableEvent.TYPE_ALL_ROWS_DELETED, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED,
-        TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_COLUMN_HEADERS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+    // add convenience observer for drag & drop callbacks, event history and ui sort possible check
+    addTableListener(e -> {
+          //event history
+          IEventHistory<TableEvent> h = getEventHistory();
+          if (h != null) {
+            h.notifyEvent(e);
+          }
+          //dnd
+          switch (e.getType()) {
+            case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
+              if (e.getDragObject() == null) {
+                try {
+                  e.setDragObject(interceptDrag(e.getRows()));
+                }
+                catch (RuntimeException ex) {
+                  BEANS.get(ExceptionHandler.class).handle(ex);
+                }
+              }
+              break;
+            }
+            case TableEvent.TYPE_ROW_DROP_ACTION: {
+              if (e.getDropObject() != null && isEnabled()) {
+                try {
+                  interceptDrop(e.getFirstRow(), e.getDropObject());
+                }
+                catch (RuntimeException ex) {
+                  BEANS.get(ExceptionHandler.class).handle(ex);
+                }
+              }
+              break;
+            }
+            case TableEvent.TYPE_ROWS_COPY_REQUEST: {
+              if (e.getCopyObject() == null) {
+                try {
+                  e.setCopyObject(interceptCopy(e.getRows()));
+                }
+                catch (RuntimeException ex) {
+                  BEANS.get(ExceptionHandler.class).handle(ex);
+                }
+              }
+              break;
+            }
+            case TableEvent.TYPE_ALL_ROWS_DELETED:
+            case TableEvent.TYPE_ROWS_DELETED:
+            case TableEvent.TYPE_ROWS_INSERTED:
+            case TableEvent.TYPE_ROWS_UPDATED: {
+              if (isValueChangeTriggerEnabled()) {
+                try {
+                  interceptContentChanged();
+                }
+                catch (RuntimeException ex) {
+                  BEANS.get(ExceptionHandler.class).handle(ex);
+                }
+              }
+              break;
+            }
+            case TableEvent.TYPE_ROWS_CHECKED:
+              try {
+                interceptRowsChecked(e.getRows());
+              }
+              catch (RuntimeException ex) {
+                BEANS.get(ExceptionHandler.class).handle(ex);
+              }
+              break;
+            case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
+            case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
+              checkIfColumnPreventsUiSortForTable();
+              break;
+          }
+        }
+    );
   }
 
   protected void initMenus() {
