@@ -83,10 +83,11 @@ body {
   height: 0;
 }
 
-// Override the default user-agent style for focused elements. Instead, custom styles will be added for each
-// focusable widget. The browser heuristics of :focus-visible (https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible)
-// does not seem to to work too well with the more complicated scout widgets (e.g. table), so we use special
-// classes like .focused and .keyboard-navigation instead.
+// Hide the default user-agent style for all focused elements. Instead, each focusable widget provides
+// its own focus style, e.g. using the scout mixins .focus-box-shadow() or .focus-border().
+// The browser heuristics for :focus-visible (https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible)
+// does not seem to to work too well with some of the more complex scout widgets (e.g. table), so we hide
+// it as well and use special classes like .focused and .keyboard-navigation instead.
 :focus,
 :focus-visible {
   outline: none;
@@ -492,7 +493,6 @@ a,
   }
 
   &:focus {
-    outline-color: @link-color;
     #scout.focus-box-shadow();
   }
 }
