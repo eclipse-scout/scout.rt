@@ -1673,24 +1673,26 @@ export class Form extends Widget implements FormModel, DisplayParent {
   }
 
   storeCacheBounds(bounds: Rectangle) {
-    if (this.cacheBounds) {
-      let storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
-      webstorage.setItemToLocalStorage(storageKey, JSON.stringify(bounds));
+    if (!this.cacheBounds) {
+      return;
     }
+    webstorage.setItemToLocalStorage(this._getCacheBoundsStorageKey(), JSON.stringify(bounds));
   }
 
   readCacheBounds(): Rectangle {
     if (!this.cacheBounds) {
       return null;
     }
-
-    let storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
-    let bounds: string | Rectangle = webstorage.getItemFromLocalStorage(storageKey);
-    if (!bounds) {
+    let storedBounds = webstorage.getItemFromLocalStorage(this._getCacheBoundsStorageKey());
+    if (!storedBounds) {
       return null;
     }
-    bounds = JSON.parse(bounds) as Rectangle;
+    let bounds = JSON.parse(storedBounds);
     return new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
+  }
+
+  protected _getCacheBoundsStorageKey(): string {
+    return 'scout:formBounds:' + this.cacheBoundsKey;
   }
 
   /** @see BusySupport.setBusy */
