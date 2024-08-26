@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -47,32 +46,22 @@ import org.mockito.Mockito;
 public class NotificationDispatcherTest {
 
   private List<IBean<?>> m_serviceReg;
-  private volatile GlobalNotificationHandler m_globalNotificationHanlder;
-  private volatile GroupNotificationHandler m_groupNotificationHanlder;
+  private volatile GlobalNotificationHandler m_globalNotificationHandler;
+  private volatile GroupNotificationHandler m_groupNotificationHandler;
 
   @Before
   public void before() {
-    m_globalNotificationHanlder = mock(GlobalNotificationHandler.class);
-    m_groupNotificationHanlder = mock(GroupNotificationHandler.class);
+    m_globalNotificationHandler = mock(GlobalNotificationHandler.class);
+    m_groupNotificationHandler = mock(GroupNotificationHandler.class);
     m_serviceReg = BeanTestingHelper.get().registerBeans(
-        new BeanMetaData(GlobalNotificationHandler.class).withInitialInstance(m_globalNotificationHanlder).withApplicationScoped(true),
-        new BeanMetaData(GroupNotificationHandler.class).withInitialInstance(m_groupNotificationHanlder).withApplicationScoped(true));
-
-    // ensure bean hander cache of notification dispatcher gets refreshed
-    IBeanManager beanManager = BEANS.getBeanManager();
-    IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);
-    beanManager.unregisterBean(bean);
-    beanManager.registerClass(NotificationHandlerRegistry.class);
+        new BeanMetaData(GlobalNotificationHandler.class).withInitialInstance(m_globalNotificationHandler).withApplicationScoped(true),
+        new BeanMetaData(GroupNotificationHandler.class).withInitialInstance(m_groupNotificationHandler).withApplicationScoped(true),
+        new BeanMetaData(NotificationHandlerRegistry.class));
   }
 
   @After
   public void after() {
     BeanTestingHelper.get().unregisterBeans(m_serviceReg);
-    // ensure bean hander cache of notification dispatcher gets refreshed
-    IBeanManager beanManager = BEANS.getBeanManager();
-    IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);
-    beanManager.unregisterBean(bean);
-    beanManager.registerClass(NotificationHandlerRegistry.class);
   }
 
   @Test
@@ -88,8 +77,8 @@ public class NotificationDispatcherTest {
         .withRunContext(ClientRunContexts.copyCurrent()))
         .whenDone(event -> cond.setBlocking(false), null);
     cond.waitFor();
-    Mockito.verify(m_globalNotificationHanlder, Mockito.times(1)).handleNotification(Mockito.any(Serializable.class));
-    Mockito.verify(m_groupNotificationHanlder, Mockito.times(0)).handleNotification(Mockito.any(INotificationGroup.class));
+    Mockito.verify(m_globalNotificationHandler, Mockito.times(1)).handleNotification(Mockito.any(Serializable.class));
+    Mockito.verify(m_groupNotificationHandler, Mockito.times(0)).handleNotification(Mockito.any(INotificationGroup.class));
   }
 
   @Test
@@ -106,8 +95,8 @@ public class NotificationDispatcherTest {
         .withRunContext(ClientRunContexts.copyCurrent()))
         .whenDone(event -> cond.setBlocking(false), null);
     cond.waitFor();
-    Mockito.verify(m_globalNotificationHanlder, Mockito.times(3)).handleNotification(Mockito.any(Serializable.class));
-    Mockito.verify(m_groupNotificationHanlder, Mockito.times(2)).handleNotification(Mockito.any(INotificationGroup.class));
+    Mockito.verify(m_globalNotificationHandler, Mockito.times(3)).handleNotification(Mockito.any(Serializable.class));
+    Mockito.verify(m_groupNotificationHandler, Mockito.times(2)).handleNotification(Mockito.any(INotificationGroup.class));
   }
 
   /**
@@ -141,7 +130,7 @@ public class NotificationDispatcherTest {
     private static final long serialVersionUID = 1L;
   }
 
-  public static interface INotificationGroup extends Serializable {
+  public interface INotificationGroup extends Serializable {
 
   }
 
