@@ -52,7 +52,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   }
 
   /**
-   * Default for {@link INumberColumnd#setMinValue(Number)}
+   * Default for {@link INumberColumn#setMinValue(Number)}
    */
   protected abstract NUMBER getConfiguredMinValue();
 
@@ -104,7 +104,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   }
 
   /**
-   * Default used for {@link INumberColumnd#setRoundingMode(RoundingMode)}
+   * Default used for {@link INumberColumn#setRoundingMode(RoundingMode)}
    * <p>
    * Sets the rounding mode used for formatting and parsing. When set to UNNECESSARY the parsing accepts only values
    * that can be assigned without rounding to the field's generic type and respect the maxFractionDigits property for
@@ -124,7 +124,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   /**
    * Configure the allowed aggregation functions for this column
    *
-   * @return constant values defined in {@link INumberColumn#AggregationFunction}
+   * @return constant values defined in {@link AggregationFunction()}
    * @since 5.2
    */
   protected Set<String> getConfiguredAllowedAggregationFunctions() {
@@ -138,7 +138,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   /**
    * Configure the aggregation function for this column
    *
-   * @return one of the constant values in {@link INumberColumn#AggregationFunction}
+   * @return one of the constant values in {@link AggregationFunction}
    * @since 5.2
    */
   protected String getConfiguredAggregationFunction() {
@@ -148,7 +148,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   /**
    * Configure the background effect for this column
    *
-   * @return one of the constant values in {@link INumberColumn#BackgroundEffect} or null
+   * @return one of the constant values in {@link BackgroundEffect} or null
    * @since 5.2
    */
   @ConfigProperty(ConfigProperty.STRING)

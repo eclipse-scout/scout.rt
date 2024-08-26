@@ -83,5 +83,4 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
   protected IBigDecimalColumnExtension<? extends AbstractBigDecimalColumn> createLocalExtension() {
     return new LocalBigDecimalColumnExtension<>(this);
   }
-
 }
