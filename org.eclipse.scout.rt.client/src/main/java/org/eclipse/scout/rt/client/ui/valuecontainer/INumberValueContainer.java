@@ -20,8 +20,8 @@ import java.text.DecimalFormat;
 public interface INumberValueContainer<T extends Number> {
 
   /**
-   * This property is fired on format changes. Can be triggerd either through {@link #setFormat(DecimalFormat)} directly
-   * or through a conveniece setter for DecimalFormat's properties (e.g. {@link #setGroupingUsed(boolean)})
+   * This property is fired on format changes. Can be triggered either through {@link #setFormat(DecimalFormat)} directly
+   * or through a convenience setter for DecimalFormat's properties (e.g. {@link #setGroupingUsed(boolean)})
    */
   String PROP_DECIMAL_FORMAT = "decimalFormat";
 
@@ -37,10 +37,9 @@ public interface INumberValueContainer<T extends Number> {
 
   /**
    * Sets the format used for formatting and parsing. (The properties of the provided format are applied to the internal
-   * DecimalFormat instance. Therefore changes on the provided formats instance after this method returns have no
+   * DecimalFormat instance. Therefore, changes on the provided formats instance after this method returns have no
    * influence to the internal instance.)
    *
-   * @param format
    * @throws IllegalArgumentException
    *           if format is null
    */
@@ -53,14 +52,14 @@ public interface INumberValueContainer<T extends Number> {
   DecimalFormat getFormat();
 
   /**
-   * Sets whether or not grouping will be used for formatting.
+   * Sets whether grouping will be used for formatting.
    */
   void setGroupingUsed(boolean b);
 
   boolean isGroupingUsed();
 
   /**
-   * Set the minimum value. Value <code>null</code> means no limitation if supported by generic type else the smallest
+   * Sets the minimum value. Value <code>null</code> means no limitation if supported by generic type else the smallest
    * possible value for the type.
    * <p>
    * If new value is bigger than {@link #getMaxValue()} maxValue is set to the same new value.
@@ -70,7 +69,7 @@ public interface INumberValueContainer<T extends Number> {
   T getMinValue();
 
   /**
-   * Set the maximum value. Value <code>null</code> means no limitation if supported by generic type else the biggest
+   * Sets the maximum value. Value <code>null</code> means no limitation if supported by generic type else the biggest
    * possible value for the type.
    * <p>
    * If new value is smaller than {@link #getMinValue()} minValue is set to the same new value.
@@ -80,9 +79,7 @@ public interface INumberValueContainer<T extends Number> {
   T getMaxValue();
 
   /**
-   * set the rounding mode used for formatting and parsing
-   *
-   * @param roundingMode
+   * Sets the rounding mode used for formatting and parsing.
    */
   void setRoundingMode(RoundingMode roundingMode);
 

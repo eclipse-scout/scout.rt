@@ -61,8 +61,7 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
   /**
    * Sets the number of fraction digits used for rounding. If the text represents a number with more fraction digits the
    * value is rounded to this number of digits according to {@link #getRoundingMode()}<br>
-   * <b>Note:</b> This property is only used when parsing text input from GUI, and not when setting the value over
-   * {@link #setValue(Object)}.
+   * <b>Note:</b> This property is only used when parsing text input from GUI, and not when setting the value.
    *
    * @param i
    */

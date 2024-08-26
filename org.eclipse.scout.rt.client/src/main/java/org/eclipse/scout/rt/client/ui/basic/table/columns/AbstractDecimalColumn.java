@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDecimalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -40,11 +39,6 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
   }
 
   @Override
-  protected int getConfiguredHorizontalAlignment() {
-    return 1;
-  }
-
-  @Override
   protected RoundingMode getConfiguredRoundingMode() {
     return RoundingMode.HALF_UP;
   }
@@ -56,11 +50,10 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
    * Configures the minimum number of fraction digits used to display the value. To use an exact number of fraction
    * digits, the same number as for {@link #getConfiguredMaxFractionDigits()} must be returned.
    * <p>
-   * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
-   * <p>
    * Subclasses can override this method. Default is {@code 2}.
    *
    * @return Minimum number of fraction digits of this column.
+   * @see DecimalFormat#getMinimumFractionDigits()
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(160)
@@ -72,11 +65,10 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
    * Configures the maximum number of fraction digits used to display the value. To use an exact number of fraction
    * digits, the same number as for {@link #getConfiguredMinFractionDigits()} must be returned.
    * <p>
-   * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
-   * <p>
    * Subclasses can override this method. Default is {@code 2}.
    *
    * @return maximum number of fraction digits of this column.
+   * @see DecimalFormat#getMaximumFractionDigits()
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(170)
@@ -164,26 +156,18 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
       format.setPositiveSuffix(percentDF.getPositiveSuffix());
       format.setNegativeSuffix(percentDF.getNegativeSuffix());
     }
-    else {
-      if (isPercent()) {
-        format.setPositiveSuffix("");
-        format.setNegativeSuffix("");
-      }
+    else if (isPercent()) {
+      format.setPositiveSuffix("");
+      format.setNegativeSuffix("");
     }
     setFormat(format);
   }
 
   @Override
   public boolean isPercent() {
-    NumberFormat percentNF = BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
-    if (percentNF instanceof DecimalFormat) {
-      DecimalFormat percentDF = (DecimalFormat) percentNF;
-      DecimalFormat internalDF = getFormatInternal();
-      return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
-    }
-    else {
-      throw new NumberFormatException();
-    }
+    DecimalFormat percentDF = BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
+    DecimalFormat internalDF = getFormatInternal();
+    return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
   }
 
   @Override
