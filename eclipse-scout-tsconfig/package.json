@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/tsconfig",
-  "version": "24.2.0-snapshot",
+  "version": "24.2.0-elementsbeta.2",
   "description": "TSConfig for scout projects",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
