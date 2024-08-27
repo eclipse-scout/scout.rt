@@ -394,7 +394,16 @@ public class HttpProxy {
     if (inputStream == null) {
       return;
     }
-    IOUtility.writeFromToStream(resp.getOutputStream(), inputStream);
+    try {
+      IOUtility.writeFromToStream(resp.getOutputStream(), inputStream);
+    }
+    catch (IOException e) {
+      // close the input stream in order to read the remaining message and to put the HTTP connection back to the pool
+      // See org.apache.hc.core5.http.nio.support.classic.AbstractClassicEntityConsumer#streamStart
+      // and org.apache.hc.core5.http.nio.support.classic.ContentInputStream#close
+      inputStream.close();
+      throw e;
+    }
   }
 
   protected void writeResponseHeaders(HttpServletResponse resp, HttpResponse httpResp) {
@@ -758,8 +767,9 @@ public class HttpProxy {
   }
 
   /**
-   * Cookie store which uses {@link #getDefaultCookieStore()} with all operations run for the specified {@link ISession}.
-   * May be used if async threads access the cookie store where {@link ISession#CURRENT} is not set correctly.
+   * Cookie store which uses {@link #getDefaultCookieStore()} with all operations run for the specified
+   * {@link ISession}. May be used if async threads access the cookie store where {@link ISession#CURRENT} is not set
+   * correctly.
    */
   private class SpecificSessionCookieStore implements CookieStore {
 
