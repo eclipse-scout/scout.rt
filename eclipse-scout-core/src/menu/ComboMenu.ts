@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventHandler, HtmlComponent, Menu, PropertyChangeEvent, widgets} from '../index';
+import {ColumnLayout, EventHandler, HtmlComponent, Menu, PropertyChangeEvent, widgets} from '../index';
 
 export class ComboMenu extends Menu {
   protected _childVisibleChangeHandler: EventHandler<PropertyChangeEvent<boolean>>;
@@ -24,6 +24,7 @@ export class ComboMenu extends Menu {
     }
     this.$container.unfocusable();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(new ColumnLayout());
   }
 
   protected override _renderProperties() {
