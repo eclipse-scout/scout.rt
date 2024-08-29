@@ -135,7 +135,8 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
   }
 
   protected void fireHybridEvent(String eventType, IDoEntity data) {
-    fireHybridEvent(eventType, data, null);
+    assertInitialized();
+    hybridManager().fireHybridEvent(getId(), eventType, data);
   }
 
   protected void fireHybridEvent(String eventType, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
@@ -149,7 +150,8 @@ public abstract class AbstractHybridAction<DO_ENTITY extends IDoEntity> implemen
   }
 
   protected void fireHybridActionEndEvent(IDoEntity data) {
-    fireHybridActionEndEvent(data, null);
+    assertInitialized();
+    hybridManager().fireHybridActionEndEvent(getId(), data);
   }
 
   protected void fireHybridActionEndEvent(IDoEntity data, Map<String, HybridActionContextElement> contextElements) {

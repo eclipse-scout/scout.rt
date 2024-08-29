@@ -222,6 +222,10 @@ public class HybridManager extends AbstractPropertyObserver {
     fireHybridEvent(id, eventType, null, null);
   }
 
+  public void fireHybridEvent(String id, String eventType, IDoEntity data) {
+    fireHybridEvent(id, eventType, data, null);
+  }
+
   public void fireHybridEvent(String id, String eventType, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
     fireHybridEvent(HybridEvent.createHybridEvent(this, id, eventType, data, contextElements));
   }
@@ -230,20 +234,25 @@ public class HybridManager extends AbstractPropertyObserver {
     fireHybridActionEndEvent(id, null, null);
   }
 
+  public void fireHybridActionEndEvent(String id, IDoEntity data) {
+    fireHybridActionEndEvent(id, data, null);
+  }
+
   public void fireHybridActionEndEvent(String id, IDoEntity data, Map<String, HybridActionContextElement> contextElements) {
     fireHybridEvent(HybridEvent.createHybridActionEndEvent(this, id, data, contextElements));
   }
+
 
   public void fireHybridWidgetEvent(String id, String eventType) {
     fireHybridWidgetEvent(id, eventType, null);
   }
 
-  public void fireHybridWidgetEvent(String id, String eventType, IDoEntity data) {
-    fireHybridEvent(HybridEvent.createHybridWidgetEvent(this, id, eventType, data));
-  }
-
   public void fireHybridWidgetEvent(IWidget widget, String eventType) {
     fireHybridWidgetEvent(widget, eventType, null);
+  }
+
+  public void fireHybridWidgetEvent(String id, String eventType, IDoEntity data) {
+    fireHybridEvent(HybridEvent.createHybridWidgetEvent(this, id, eventType, data));
   }
 
   public void fireHybridWidgetEvent(IWidget widget, String eventType, IDoEntity data) {
