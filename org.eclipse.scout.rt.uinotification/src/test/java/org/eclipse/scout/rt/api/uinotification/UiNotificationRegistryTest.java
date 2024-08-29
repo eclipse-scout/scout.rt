@@ -17,9 +17,11 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -34,6 +36,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
@@ -57,15 +61,12 @@ public class UiNotificationRegistryTest {
   @Test
   public void testGetListenerCount() {
     assertEquals(0, m_registry.getListenerCount("topic"));
-    m_registry.addListener("test", e -> {
-    });
+    m_registry.addListener("test", e -> {});
     assertEquals(0, m_registry.getListenerCount("topic"));
-    UiNotificationListener listener = e -> {
-    };
+    UiNotificationListener listener = e -> {};
     m_registry.addListener("topic", listener);
     assertEquals(1, m_registry.getListenerCount("topic"));
-    m_registry.addListener("topic", e -> {
-    });
+    m_registry.addListener("topic", e -> {});
     assertEquals(2, m_registry.getListenerCount("topic"));
     m_registry.removeListener("topic", listener);
     assertEquals(1, m_registry.getListenerCount("topic"));
@@ -474,6 +475,50 @@ public class UiNotificationRegistryTest {
 
     assertNull(m_registry.getListeners("topic"));
     assertEquals(true, completed.getValue());
+  }
+
+  /**
+   * This test makes sure, that a long-running notification listener does not block the registry (i.e. actually, that
+   * listeners are notified outside any locks).
+   */
+  @Test
+  public void testPutWithLongRunningNotificationListenerAndGet() {
+    CountDownLatch startConcurrentGetLatch = new CountDownLatch(1);
+    CountDownLatch concurrentGetFinishedLatch = new CountDownLatch(1);
+
+    IFuture<List<UiNotificationDo>> concurrentGetFuture = Jobs.schedule(() -> {
+      if (!startConcurrentGetLatch.await(5, TimeUnit.SECONDS)) {
+        return Collections.emptyList();
+      }
+      List<UiNotificationDo> notifications = m_registry.get(Arrays.asList(createGetAllTopic("topic")), null);
+      concurrentGetFinishedLatch.countDown();
+      return notifications;
+    }, Jobs.newInput());
+
+    CompletableFuture<List<UiNotificationDo>> listenerFuture = m_registry.getOrWait(Arrays.asList(createGetAllTopic("topic")), null)
+        .thenApply(notifications -> {
+          // this simulates a long-running listener, e.g. an async servlet request that wants to send the notifications as response
+          startConcurrentGetLatch.countDown();
+          try {
+            assertTrue("concurrent get did not finish. Check for deadlock", concurrentGetFinishedLatch.await(5, TimeUnit.SECONDS));
+          }
+          catch (InterruptedException e) {
+            fail("Test was interrupted");
+          }
+          return notifications;
+        });
+
+    // verify the listener is registered
+    assertEquals(1, m_registry.getListeners("topic").list().size());
+
+    IDoEntity message = createMessage();
+    m_registry.put("topic", message, noTransaction());
+    assertNull(m_registry.getListeners("topic"));
+
+    List<UiNotificationDo> putNotifications = listenerFuture.getNow(Collections.emptyList());
+    assertEquals(1, putNotifications.size());
+    assertEquals(message, putNotifications.get(0).getMessage());
+    assertEquals(putNotifications, concurrentGetFuture.awaitDoneAndGet(500, TimeUnit.MILLISECONDS));
   }
 
   @Test
