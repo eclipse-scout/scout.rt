@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeRequest;
 import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeContributor;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -107,10 +106,18 @@ public class CodeResource implements IRestResource {
     otherAppLanguages.stream()
         // order by language tag, within a language, locales without country come first ([de, en_US, de_DE, en, en_GB] -> [de, de_DE, en, en_GB, en_US])
         .sorted(Comparator.comparing(Locale::toLanguageTag))
-        .forEachOrdered(otherLanguage -> RunContexts.copyCurrent()
-            .withLocale(otherLanguage)
-            .call(() -> getCodeTypesById(ids)).values()
-            .forEach(otherCodeTypeDo -> mergeCodeTypeTexts(otherCodeTypeDo, codeTypeMap)));
+        .forEachOrdered(otherLanguage -> {
+          // switch locale without creating a new RunContext in order to share the current transaction, especially an
+          // already leased DB connection
+          final Locale backup = NlsLocale.get();
+          NlsLocale.set(otherLanguage);
+          try {
+            getCodeTypesById(ids).values().forEach(otherCodeTypeDo -> mergeCodeTypeTexts(otherCodeTypeDo, codeTypeMap));
+          }
+          finally {
+            NlsLocale.set(backup);
+          }
+        });
   }
 
   protected void mergeCodeTypeTexts(CodeTypeDo from, Map<String, CodeTypeDo> targetMap) {
