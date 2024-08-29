@@ -11,8 +11,10 @@ package org.eclipse.scout.rt.api.uinotification;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -59,7 +61,7 @@ public class UiNotificationRegistry {
   public static final String SUBSCRIPTION_START_ID = "-1";
 
   private IdGenerator m_idGenerator = new IdGenerator();
-  private ReadWriteLock m_lock = new ReentrantReadWriteLock();
+  private final ReadWriteLock m_lock = new ReentrantReadWriteLock();
   /**
    * Contains all notifications per topic including notifications that are created by other cluster nodes.
    * <p>
@@ -169,7 +171,7 @@ public class UiNotificationRegistry {
   protected List<UiNotificationDo> get(String topic, String user, final List<UiNotificationDo> lastKnownNotifications) {
     m_lock.readLock().lock();
     try {
-      Stream<UiNotificationDo> notificationStream = getNotifications().getOrDefault(topic, new ArrayList<>()).stream()
+      Stream<UiNotificationDo> notificationStream = getNotifications().getOrDefault(topic, Collections.emptyList()).stream()
           .filter(elem -> isNotificationRelevantForUser(elem, user))
           .map(elem -> elem.getNotification());
 
@@ -396,12 +398,12 @@ public class UiNotificationRegistry {
         LOG.info("Added new ui notification with id {} for topic {}. New size: {}", notification.getId(), topic, uiNotifications.size());
       }
 
-      triggerEvent(topic, notification);
       startCleanupJob(); // inside lock to ensure cleanup job will be started only once
     }
     finally {
       m_lock.writeLock().unlock();
     }
+    triggerEvent(topic, notification); // outside lock because it is (a) an open call and (b) not required to be synchronized
     if (options == null || ObjectUtility.nvl(options.getPublishOverCluster(), true)) {
       publishOverCluster(message);
     }
@@ -540,17 +542,20 @@ public class UiNotificationRegistry {
       LOG.debug("Cleaning up expired ui notifications. Topic count: {}.", getNotifications().size());
 
       long now = new Date().getTime();
-      for (Entry<String, List<UiNotificationMessageDo>> entry : getNotifications().entrySet()) {
+      for (Iterator<Entry<String, List<UiNotificationMessageDo>>> it = getNotifications().entrySet().iterator(); it.hasNext();) {
+        Entry<String, List<UiNotificationMessageDo>> entry = it.next();
         List<UiNotificationMessageDo> notifications = entry.getValue();
         int oldSize = notifications.size();
         if (notifications.removeIf(elem -> elem.getNotification().getCreationTime().getTime() + elem.getTimeout() < now)) {
           int newSize = notifications.size();
           LOG.info("Removed {} expired notifications for topic {}. New size: {}.", oldSize - newSize, entry.getKey(), newSize);
+          if (newSize == 0) {
+            // Remove topic if there are no notifications left
+            it.remove();
+          }
         }
       }
 
-      // Remove topic if there are no notifications left
-      getNotifications().entrySet().removeIf(entry -> entry.getValue().isEmpty());
       LOG.debug("Clean up finished. New topic count: {}.", getNotifications().size());
     }
     finally {
