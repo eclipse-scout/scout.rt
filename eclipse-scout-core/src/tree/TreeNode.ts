@@ -231,6 +231,10 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     this.text = text;
   }
 
+  setHtmlEnabled(htmlEnabled: boolean) {
+    this.htmlEnabled = !!htmlEnabled;
+  }
+
   /**
    * This functions renders sets the $node and $text properties.
    *
