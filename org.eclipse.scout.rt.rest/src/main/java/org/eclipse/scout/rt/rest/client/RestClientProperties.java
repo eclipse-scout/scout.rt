@@ -221,6 +221,52 @@ public final class RestClientProperties {
   public static final String SUPPRESS_DEFAULT_USER_AGENT = "scout.rest.client.suppressDefaultUserAgent";
 
   /**
+   * Specifies the maximum lifetime in milliseconds for kept alive connections of the REST HTTP client.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Long}.
+   * </p>
+   * <p>
+   * The default value is 30 * 60 * 1000 (e.g. 30 minutes).
+   * </p>
+   */
+  public static final String CONNECTION_KEEP_ALIVE = "scout.rest.client.http.connectionKeepAlive";
+
+  /**
+   * Specifies the default maximum connections per route of the REST HTTP client.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Integer}.
+   * </p>
+   * <p>
+   * The default value is 32.
+   * </p>
+   */
+  public static final String MAX_CONNECTIONS_PER_ROUTE = "scout.rest.client.http.maxConnectionsPerRoute";
+
+  /**
+   * Specifies the total maximum connections of the REST HTTP client
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Integer}.
+   * </p>
+   * <p>
+   * The default value is 128.
+   * </p>
+   */
+  public static final String MAX_CONNECTIONS_TOTAL = "scout.rest.client.http.maxConnectionsTotal";
+
+  /**
+   * Defines period of inactivity in milliseconds after which persistent connections must be re-validated prior to being
+   * leased to the consumer. Non-positive value passed to this method disables connection validation. This check helps
+   * detect connections that have become stale (half-closed) while kept inactive in the pool.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Integer}.
+   * </p>
+   * <p>
+   * The default value is 1 ms.
+   * </p>
+   */
+  public static final String VALIDATE_CONNECTION_AFTER_INACTIVITY = "scout.rest.client.http.validateAfterInactivity";
+
+  /**
    * Activates the new Scout apache connector implementation.
    * <p>
    * <b>Note:</b> The scout apache connector will become the default implementation with release 23.1 and this property
