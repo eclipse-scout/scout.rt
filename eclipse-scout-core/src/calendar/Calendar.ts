@@ -1599,6 +1599,9 @@ export class Calendar extends Widget implements CalendarModel {
     updatedResources.forEach(tuple => {
       this._updateResourcesVisibleProperty(tuple[0], tuple[1]);
     });
+    if (!this.rendered) {
+      return;
+    }
     if (!this.isDay()) {
       // No re-rendering required when on day -> component is hidden by layout
       this._renderComponents();

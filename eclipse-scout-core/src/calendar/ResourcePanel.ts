@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CalendarResourceLookupCall, HtmlComponent, InitModelOf, LookupRow, ObjectOrModel, ResourcePanelTreeNode, scout, SingleLayout, Tree, TreeBox, TreeBoxTreeNode, TreeNodesCheckedEvent, Widget} from '../index';
+import {arrays, CalendarResourceLookupCall, HtmlComponent, InitModelOf, LookupRow, ObjectOrModel, ResourcePanelTreeNode, scout, SingleLayout, Tree, TreeBox, TreeBoxTreeNode, TreeNode, TreeNodesCheckedEvent, Widget} from '../index';
 
 export class ResourcePanel extends Widget {
   treeBox: ResourcePanelTreeBox;
@@ -22,6 +22,7 @@ export class ResourcePanel extends Widget {
       statusVisible: false,
       tree: {
         objectType: ResourcePanelTree,
+        cssClass: 'resource-panel-tree',
         checkable: true,
         textFilterEnabled: false,
         _scrollDirections: 'y',
@@ -64,7 +65,12 @@ class ResourcePanelTreeBox extends TreeBox<string> {
     } else if (!this._populating) {
       // Reapply the value to the tree
       this._syncValueToTree(this.value);
+      this._triggerShakeAnimation(event.nodes[0]);
     }
+  }
+
+  protected _triggerShakeAnimation(node: TreeNode) {
+    node.$node.children('.tree-node-checkbox').addClassForAnimation('animate-unable-uncheck');
   }
 }
 
