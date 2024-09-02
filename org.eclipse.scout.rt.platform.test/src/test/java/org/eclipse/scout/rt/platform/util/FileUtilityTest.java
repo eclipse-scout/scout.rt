@@ -180,6 +180,13 @@ public class FileUtilityTest {
         FileUtility
             .toValidFilename(
                 "someReallyLongName01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123.doc"));
+
+    assertEquals("_.txt", FileUtility.toValidFilename("...txt"));
+    assertEquals("_.txt", FileUtility.toValidFilename("..txt"));
+    assertEquals("_.txt", FileUtility.toValidFilename(" .txt"));
+    assertEquals("_.txt", FileUtility.toValidFilename("  .txt"));
+    assertEquals("_.txt", FileUtility.toValidFilename(" _.txt"));
+
   }
 
   @Test
