@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -116,6 +117,17 @@ public final class MenuUtility {
    * {@link MenuWrapper#wrapMenu(IMenu, IMenuTypeMapper, Predicate)}) and its child menus are filtered as well.
    */
   public static List<IMenu> filterMenusRec(List<IMenu> menus, final Predicate<IMenu> filter) {
+    return filterMenus(menus, filter, m -> m.hasChildActions() ? MenuWrapper.wrapMenu(m, OutlineMenuWrapper.AUTO_MENU_TYPE_MAPPER, filter) : m);
+  }
+
+  /**
+   * Filters the given list of menus.
+   */
+  public static List<IMenu> filterMenus(List<IMenu> menus, final Predicate<IMenu> filter) {
+    return filterMenus(menus, filter, UnaryOperator.identity());
+  }
+
+  private static List<IMenu> filterMenus(List<IMenu> menus, final Predicate<IMenu> filter, final UnaryOperator<IMenu> menuMapper) {
     if (menus != null) {
       List<IMenu> result = new ArrayList<>(menus.size());
       for (IMenu m : menus) {
@@ -123,9 +135,7 @@ public final class MenuUtility {
           result.add(m);
         }
         else if (filter.test(m)) {
-          if (m.hasChildActions()) {
-            m = MenuWrapper.wrapMenu(m, OutlineMenuWrapper.AUTO_MENU_TYPE_MAPPER, filter);
-          }
+          m = menuMapper.apply(m);
           result.add(m);
         }
       }
