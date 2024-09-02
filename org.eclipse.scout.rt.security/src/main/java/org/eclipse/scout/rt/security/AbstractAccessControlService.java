@@ -36,6 +36,8 @@ import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Common logic for an {@link IAccessControlService} implementation. An Implementation has to override
@@ -54,11 +56,12 @@ import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
  * @since 4.3.0 (Mars-M5)
  */
 public abstract class AbstractAccessControlService<K> implements IAccessControlService {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractAccessControlService.class);
   public static final String ACCESS_CONTROL_SERVICE_CACHE_ID = AbstractAccessControlService.class.getName();
 
   private volatile Pattern[] m_userIdSearchPatterns;
   private volatile ICache<K, IPermissionCollection> m_cache;
-  private volatile IFastListenerList<Consumer<IAccessControlService>> m_invalidationListeners;
+  private volatile IFastListenerList<Consumer<ICacheEntryFilter<Object, IPermissionCollection>>> m_invalidationListeners;
 
   public AbstractAccessControlService() {
     m_userIdSearchPatterns = new Pattern[]{
@@ -133,27 +136,26 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
     @Override
     public void invalidate(ICacheEntryFilter<Object, IPermissionCollection> filter, boolean propagate) {
       super.invalidate(filter, propagate);
-      var accessControlService = BEANS.get(IAccessControlService.class);
-      accessControlService.getInvalidationListeners().forEach(l -> l.accept(accessControlService));
+      BEANS.get(IAccessControlService.class).getInvalidationListeners().forEach(l -> l.accept(filter));
     }
   }
 
   @Override
-  public void addInvalidationListener(Consumer<IAccessControlService> listener) {
+  public void addInvalidationListener(Consumer<ICacheEntryFilter<Object, IPermissionCollection>> listener) {
     if (listener != null) {
       m_invalidationListeners.add(listener);
     }
   }
 
   @Override
-  public void removeInvalidationListener(Consumer<IAccessControlService> listener) {
+  public void removeInvalidationListener(Consumer<ICacheEntryFilter<Object, IPermissionCollection>> listener) {
     if (listener != null) {
       m_invalidationListeners.remove(listener);
     }
   }
 
   @Override
-  public List<Consumer<IAccessControlService>> getInvalidationListeners() {
+  public List<Consumer<ICacheEntryFilter<Object, IPermissionCollection>>> getInvalidationListeners() {
     return m_invalidationListeners.list();
   }
 
@@ -184,6 +186,18 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
   @Override
   public String getUserIdOfCurrentSubject() {
     return getUserId(Subject.getSubject(AccessController.getContext()));
+  }
+
+  @Override
+  public String getUserIdForCacheKey(Object cacheKey) {
+    if (cacheKey instanceof String) {
+      // default implementation where the userId itself is the cache key
+      return (String) cacheKey;
+    }
+
+    // if another cache-key is used, subclasses must implement their own mapping
+    LOG.error("By default only userId cacheKeys are supported. Overwrite this method for custom cacheKeys.");
+    return null;
   }
 
   @Override
