@@ -11,6 +11,8 @@ package org.eclipse.scout.rt.server.services.common.security;
 
 import static org.eclipse.scout.rt.api.uinotification.UiNotificationPutOptions.noTransaction;
 
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import jakarta.annotation.PostConstruct;
@@ -21,10 +23,14 @@ import org.eclipse.scout.rt.api.uinotification.UiNotificationRegistry;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.security.IAccessControlService;
+import org.eclipse.scout.rt.security.IPermissionCollection;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 
 /**
  * Listens for permission cache invalidation and notifies the UI to update its cache.
@@ -32,7 +38,7 @@ import org.eclipse.scout.rt.security.IAccessControlService;
 @ApplicationScoped
 @CreateImmediately
 @SuppressWarnings("unchecked")
-public class PermissionsInvalidationNotificationListener implements Consumer<IAccessControlService> {
+public class PermissionsInvalidationNotificationListener implements Consumer<ICacheEntryFilter<Object, IPermissionCollection>> {
 
   @PostConstruct
   protected void init() {
@@ -45,16 +51,16 @@ public class PermissionsInvalidationNotificationListener implements Consumer<IAc
   }
 
   @Override
-  public void accept(IAccessControlService source) {
+  public void accept(ICacheEntryFilter<Object, IPermissionCollection> filter) {
     ITransaction transaction = ITransaction.CURRENT.get();
-    if (transaction == null) {
+    if (transaction == null || filter == null) {
       return;
     }
-    transaction.registerMemberIfAbsentAndNotCancelled(PermissionsUiNotificationTransactionMember.TRANSACTION_MEMBER_ID, this::createTransactionMember);
+    transaction.registerMemberIfAbsentAndNotCancelled(PermissionsUiNotificationTransactionMember.TRANSACTION_MEMBER_ID, id -> createTransactionMember(filter));
   }
 
-  protected PermissionsUiNotificationTransactionMember createTransactionMember(String memberId) {
-    return new PermissionsUiNotificationTransactionMember();
+  protected PermissionsUiNotificationTransactionMember createTransactionMember(ICacheEntryFilter<Object, IPermissionCollection> filter) {
+    return new PermissionsUiNotificationTransactionMember(filter);
   }
 
   /**
@@ -66,9 +72,11 @@ public class PermissionsInvalidationNotificationListener implements Consumer<IAc
 
     public static final String TOPIC = "permissionsUpdate";
     public static final String TRANSACTION_MEMBER_ID = "permissionsUiNotification.transactionMemberId";
+    private final ICacheEntryFilter<Object, IPermissionCollection> m_filter;
 
-    public PermissionsUiNotificationTransactionMember() {
+    public PermissionsUiNotificationTransactionMember(ICacheEntryFilter<Object, IPermissionCollection> filter) {
       super(TRANSACTION_MEMBER_ID);
+      m_filter = filter;
     }
 
     @Override
@@ -81,7 +89,22 @@ public class PermissionsInvalidationNotificationListener implements Consumer<IAc
       UiNotificationRegistry uiNotificationRegistry = BEANS.get(UiNotificationRegistry.class);
       long reloadDelayWindow = uiNotificationRegistry.computeNotificationHandlerDelayWindow(TOPIC);
       PermissionUpdateMessageDo updateDo = BEANS.get(PermissionUpdateMessageDo.class).withReloadDelayWindow(reloadDelayWindow);
-      uiNotificationRegistry.put(TOPIC, updateDo, noTransaction());
+      if (m_filter instanceof KeyCacheEntryFilter) {
+        IAccessControlService accessControlService = BEANS.get(IAccessControlService.class);
+        // only Permissions of specific users are invalidated: only inform the affected clients
+        Set<Object> cacheKeys = ((KeyCacheEntryFilter<Object, IPermissionCollection>) m_filter).getKeys();
+
+        // create new run context to ensure new transaction is available in case getUserIdForCacheKey requires one to map the cacheKey to the userId
+        ServerRunContexts.copyCurrent()
+            .run(() -> cacheKeys.stream()
+                .map(accessControlService::getUserIdForCacheKey)
+                .filter(Objects::nonNull)
+                .forEach(userId -> uiNotificationRegistry.put(TOPIC, userId, updateDo, noTransaction())));
+      }
+      else {
+        // update for all clients
+        uiNotificationRegistry.put(TOPIC, updateDo, noTransaction());
+      }
     }
   }
 }
