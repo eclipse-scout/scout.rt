@@ -76,6 +76,7 @@ import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ConnectionErrorDetector;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -100,6 +101,7 @@ public class HttpProxy {
   private final List<IHttpHeaderFilter> m_requestHeaderFilters;
   private final List<IHttpHeaderFilter> m_responseHeaderFilters;
   private final CookieStore m_defaultCookieStore;
+  private final LazyValue<ConnectionErrorDetector> m_connectionErrorDetector = new LazyValue<>(ConnectionErrorDetector.class);
   private Executor m_blockingOperationExecutor;
   private Function<ContextBuilder, HttpClientContext> m_httpClientContextInterceptor;
 
@@ -678,12 +680,10 @@ public class HttpProxy {
       @Override
       public void failed(Exception cause) {
         LOG.trace("Response consumer failed: ", cause);
-        try {
+        if (!m_connectionErrorDetector.get().isConnectionError(cause)) {
           BEANS.get(ExceptionHandler.class).handle(cause);
         }
-        finally {
-          releaseResources();
-        }
+        releaseResources();
       }
 
       @Override
@@ -727,7 +727,9 @@ public class HttpProxy {
       @Override
       public void failed(Exception ex) {
         LOG.trace("Request execution failed", ex);
-        BEANS.get(ExceptionHandler.class).handle(ex);
+        if (!m_connectionErrorDetector.get().isConnectionError(ex)) {
+          BEANS.get(ExceptionHandler.class).handle(ex);
+        }
         try {
           boolean alreadyCommitted = resp.isCommitted();
           if (!alreadyCommitted) {
@@ -755,7 +757,7 @@ public class HttpProxy {
       // includes e.g. org.apache.hc.client5.http.HttpHostConnectException
       return HttpStatus.SC_SERVICE_UNAVAILABLE;
     }
-    if (BEANS.get(ConnectionErrorDetector.class).isConnectionError(e)) {
+    if (m_connectionErrorDetector.get().isConnectionError(e)) {
       // on connection reset (e.g. if connection was successful but has been aborted).
       return HttpStatus.SC_SERVICE_UNAVAILABLE;
     }
