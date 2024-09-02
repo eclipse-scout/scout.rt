@@ -508,15 +508,31 @@ public final class FileUtility {
       }
       s = buf.toString();
     }
+    final String[] filenameParts = getFilenameParts(s);
+    String name = filenameParts[0];
+    //remove leading dots, whitespace from name part
+    name = PAT_FILENAME_REMOVE_LEADING_CHARACTERS.matcher(name).replaceAll("$1");
+    name = PAT_FILENAME_TRIM.matcher(name).replaceAll("");
 
-    //remove leading and trailing dots, whitespace
-    s = PAT_FILENAME_REMOVE_LEADING_CHARACTERS.matcher(s).replaceAll("$1");
-    s = PAT_FILENAME_REMOVE_TRAILING_CHARACTERS.matcher(s).replaceAll("$1");
-    s = PAT_FILENAME_TRIM.matcher(s).replaceAll("");
-
-    if (s.isEmpty()) {
-      return DEFAULT_FILENAME;
+    if (name.isEmpty()) {
+      name = DEFAULT_FILENAME;
     }
+
+    String ext = filenameParts[1];
+    if (StringUtility.isNullOrEmpty(ext)) {
+      //no extension found, remove trailing dots, whitespace from name part
+      name = PAT_FILENAME_REMOVE_TRAILING_CHARACTERS.matcher(name).replaceAll("$1");
+    }
+    else {
+      //remove trailing dots, whitespace from extension
+      ext = PAT_FILENAME_REMOVE_TRAILING_CHARACTERS.matcher(ext).replaceAll("$1");
+      ext = PAT_FILENAME_TRIM.matcher(ext).replaceAll("");
+    }
+
+    filenameParts[0] = name;
+    filenameParts[1] = ext;
+    s = StringUtility.join(".", filenameParts);
+    s = PAT_FILENAME_TRIM.matcher(s).replaceAll("");
 
     // on some operating systems, the name may not be longer than 250 characters
     if (s.length() > 250) {

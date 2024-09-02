@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -177,6 +174,12 @@ public class FileUtilityTest {
         FileUtility
             .toValidFilename(
                 "someReallyLongName01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123.doc"));
-  }
 
+    assertEquals("_.txt", FileUtility.toValidFilename("...txt"));
+    assertEquals("_.txt", FileUtility.toValidFilename("..txt"));
+    assertEquals("_.txt", FileUtility.toValidFilename(" .txt"));
+    assertEquals("_.txt", FileUtility.toValidFilename("  .txt"));
+    assertEquals("_.txt", FileUtility.toValidFilename(" _.txt"));
+
+  }
 }
