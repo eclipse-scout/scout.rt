@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2024 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -27,12 +27,12 @@
       <artifactId>org.eclipse.scout.rt.charsetdetect</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>jakarta.mail</artifactId>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-mail</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.activation</groupId>
-      <artifactId>jakarta.activation</artifactId>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-activation</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>

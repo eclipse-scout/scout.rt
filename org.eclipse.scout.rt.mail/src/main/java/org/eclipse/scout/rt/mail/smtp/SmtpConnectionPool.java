@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,6 +36,7 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.MimeMessage;
 
+import org.eclipse.angus.mail.smtp.SMTPSendFailedException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
@@ -53,8 +54,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
-
-import com.sun.mail.smtp.SMTPSendFailedException;
 
 /**
  * This class implements pooling for SMTP connections. It is intended to be used in conjunction with {@link SmtpHelper}
