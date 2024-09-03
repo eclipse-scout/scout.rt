@@ -12,6 +12,10 @@
   padding-bottom: 0;
   cursor: pointer;
 
+  &.label-hidden {
+    padding-top: 0; // Override FormFieldTile.less
+  }
+
   & > .field {
     position: relative;
     display: flex;
@@ -57,6 +61,10 @@
 
 .tile.dashboard.compact > .tile-button {
   padding-bottom: 0; // Override FormFieldTile.less
+
+  &.label-hidden {
+    padding-top: 0; // Override FormFieldTile.less
+  }
 
   & > .field {
     padding-top: 12px;
