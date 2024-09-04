@@ -19,6 +19,7 @@ import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
@@ -44,6 +45,9 @@ import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryStrategy;
 import org.eclipse.scout.rt.shared.http.transport.ApacheHttpTransport;
 
 import com.google.api.client.http.HttpTransport;
+
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.metrics.Meter;
 
 /**
  * Factory to create the {@link ApacheHttpTransport} instances.
@@ -148,7 +152,20 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     }
     interceptNewHttpClientConnectionManager(builder, manager);
 
-    return builder.build();
+    PoolingHttpClientConnectionManager connectionManager = builder.build();
+    initMetrics(manager, connectionManager);
+    return connectionManager;
+  }
+
+  /**
+   * Initializes metrics for this connection manager.
+   */
+  protected void initMetrics(IHttpTransportManager manager, PoolingHttpClientConnectionManager connectionManager) {
+    Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
+    BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, manager.getName(),
+        connectionManager.getTotalStats()::getAvailable,
+        connectionManager.getTotalStats()::getLeased,
+        connectionManager.getTotalStats()::getMax);
   }
 
   protected SSLConnectionSocketFactory createSSLConnectionSocketFactory() {

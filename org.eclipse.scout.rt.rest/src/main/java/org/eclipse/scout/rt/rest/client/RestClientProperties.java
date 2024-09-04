@@ -266,6 +266,17 @@ public final class RestClientProperties {
   public static final String VALIDATE_CONNECTION_AFTER_INACTIVITY = "scout.rest.client.http.validateAfterInactivity";
 
   /**
+   * Activates OpenTelemetry metrics for HTTP client connection pool using property value as HTTP client name.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.String}.
+   * </p>
+   * <p>
+   * The default value is {@code null} (deactivated).
+   * </p>
+   */
+  public static final String OTEL_HTTP_CLIENT_NAME = "scout.rest.client.http.otel.name";
+
+  /**
    * Connect timeout interval, in milliseconds. This property is supported either on rest client level (e.g. for all
    * calls) or on a request level (e.g. for a single call).
    * <p>

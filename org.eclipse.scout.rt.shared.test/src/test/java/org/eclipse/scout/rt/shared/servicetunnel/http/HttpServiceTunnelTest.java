@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
 import org.eclipse.scout.rt.shared.http.AbstractHttpTransportManager;
-import org.eclipse.scout.rt.shared.http.IHttpTransportBuilder;
 import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -86,6 +85,11 @@ public class HttpServiceTunnelTest {
               .build();
 
           @Override
+          public String getName() {
+            return "scout.transport.test-service-tunnel";
+          }
+
+          @Override
           public HttpTransport getHttpTransport() {
             return m_transport;
           }
@@ -94,12 +98,6 @@ public class HttpServiceTunnelTest {
           public HttpRequestFactory getHttpRequestFactory() {
             return m_transport.createRequestFactory(createHttpRequestInitializer());
           }
-
-          @Override
-          public void interceptNewHttpTransport(IHttpTransportBuilder builder) {
-            // nop
-          }
-
         };
       }
     };

@@ -21,6 +21,15 @@ import com.google.api.client.http.HttpTransport;
 public interface IHttpTransportManager {
 
   /**
+   * TODO 25.1 pbz Change this method to non-default
+   *
+   * @return Technical transport manager name used for metrics.
+   */
+  default String getName() {
+    return "scout.transport.default";
+  }
+
+  /**
    * Get the {@link HttpTransport} instance. This method may create new instances or return a previously created one.
    */
   HttpTransport getHttpTransport();

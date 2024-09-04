@@ -21,6 +21,11 @@ import org.apache.hc.core5.http2.HttpVersionPolicy;
 public class ForceHttp2DefaultAsyncHttpClientManager extends DefaultAsyncHttpClientManager {
 
   @Override
+  public String getName() {
+    return "scout.transport.async.forceHttp2";
+  }
+
+  @Override
   protected void interceptCreateConnectionManager(PoolingAsyncClientConnectionManagerBuilder builder) {
     // this setting seems to be used also for non-encrypted connections
     builder.setDefaultTlsConfig(TlsConfig.custom().setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_2).build());

@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.http.ApacheMultiSessionCookieStore;
+import org.eclipse.scout.rt.shared.http.HttpClientMetricsHelper;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportConnectionTimeToLiveProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportEvictExpiredConnectionsProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportEvictIdleConnectionsTimeoutProperty;
@@ -39,6 +40,9 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
 import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryStrategy;
+
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.metrics.Meter;
 
 /**
  * <p>
@@ -56,6 +60,13 @@ import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryStrategy;
  * @see ConfigurableProxySelector
  */
 public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManager<HttpAsyncClientBuilder> {
+
+  /**
+   * @return Technical transport manager name used for metrics.
+   */
+  protected String getName() {
+    return "scout.transport.async.default";
+  }
 
   @Override
   protected HttpAsyncClientBuilder createBuilder() {
@@ -156,7 +167,20 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
     }
 
     interceptCreateConnectionManager(builder);
-    return builder.build();
+    PoolingAsyncClientConnectionManager connectionManager = builder.build();
+    initMetrics(connectionManager);
+    return connectionManager;
+  }
+
+  /**
+   * Initializes metrics for this connection manager.
+   */
+  protected void initMetrics(PoolingAsyncClientConnectionManager connectionManager) {
+    Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
+    BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, getName(),
+        connectionManager.getTotalStats()::getAvailable,
+        connectionManager.getTotalStats()::getLeased,
+        connectionManager.getTotalStats()::getMax);
   }
 
   protected void interceptCreateConnectionManager(PoolingAsyncClientConnectionManagerBuilder builder) {
