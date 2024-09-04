@@ -17,9 +17,15 @@ import org.apache.hc.client5.http.impl.async.H2AsyncClientBuilder;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
+import io.opentelemetry.api.OpenTelemetry;
+
 /**
  * <p>
  * Use {@link HttpAsyncClients#customHttp2()} to initialize this client.
+ * </p>
+ * <p>
+ * Note: This {@link AbstractAsyncHttpClientManager} implementation does not provide any {@link OpenTelemetry} metrics
+ * since is uses only one HTTP connection per route.
  * </p>
  * <p>
  * <b>Use with care:</b> According to {@link H2AsyncClientBuilder} which is effectively used, all requests are
