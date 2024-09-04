@@ -267,6 +267,17 @@ public final class RestClientProperties {
   public static final String VALIDATE_CONNECTION_AFTER_INACTIVITY = "scout.rest.client.http.validateAfterInactivity";
 
   /**
+   * Activates OpenTelemetry metrics for HTTP client connection pool using property value as HTTP client name.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.String}.
+   * </p>
+   * <p>
+   * The default value is {@code null} (deactivated).
+   * </p>
+   */
+  public static final String OTEL_HTTP_CLIENT_NAME = "scout.rest.client.http.otel.name";
+
+  /**
    * Activates the new Scout apache connector implementation.
    * <p>
    * <b>Note:</b> The scout apache connector will become the default implementation with release 23.1 and this property
