@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory;
 import org.eclipse.scout.rt.shared.http.ApacheHttpTransportFactory.ApacheHttpTransportBuilder;
 import org.eclipse.scout.rt.shared.http.DefaultHttpTransportManager;
 import org.eclipse.scout.rt.shared.http.IHttpTransportBuilder;
+import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 
 import com.google.api.client.http.HttpTransport;
 
@@ -78,8 +79,8 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
     }
 
     @Override
-    protected HttpClientConnectionManager createHttpClientConnectionManager() {
-      PoolingHttpClientConnectionManager connManager = (PoolingHttpClientConnectionManager) super.createHttpClientConnectionManager();
+    protected HttpClientConnectionManager createHttpClientConnectionManager(IHttpTransportManager manager) {
+      PoolingHttpClientConnectionManager connManager = (PoolingHttpClientConnectionManager) super.createHttpClientConnectionManager(manager);
       connManager.setDefaultConnectionConfig(
           ConnectionConfig
               .custom()

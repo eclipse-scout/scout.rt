@@ -10,4 +10,9 @@
 package org.eclipse.scout.rt.shared.http;
 
 public class DefaultHttpTransportManager extends AbstractHttpTransportManager {
+
+  @Override
+  public String getName() {
+    return "scout.transport.default";
+  }
 }
