@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.core.Configuration;
@@ -72,11 +73,14 @@ import org.apache.hc.core5.http.io.entity.AbstractHttpEntity;
 import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 import org.apache.hc.core5.util.TimeValue;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
@@ -169,22 +173,22 @@ public class ScoutApacheConnector implements Connector {
             .register("http", PlainConnectionSocketFactory.getSocketFactory())
             .register("https", sslConnectionSocketFactory)
             .build(),
-        null, null, TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis()), connFactory);
+        null, null, TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis(config)), connFactory);
 
     Builder connectionConfigBuilder = ConnectionConfig.custom()
         .setTimeToLive(TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis()));
 
-    final int validateAfterInactivityMillis = getValidateAfterInactivityMillis();
+    final int validateAfterInactivityMillis = getValidateAfterInactivityMillis(config);
     if (validateAfterInactivityMillis > 0) {
       connectionConfigBuilder.setValidateAfterInactivity(validateAfterInactivityMillis, TimeUnit.MILLISECONDS);
     }
 
-    final int maxTotal = getMaxConnectionsTotal();
+    final int maxTotal = getMaxConnectionsTotal(config);
     if (maxTotal > 0) {
       connectionManager.setMaxTotal(maxTotal);
     }
 
-    final int defaultMaxPerRoute = getMaxConnectionsPerRoute();
+    final int defaultMaxPerRoute = getMaxConnectionsPerRoute(config);
     if (defaultMaxPerRoute > 0) {
       connectionManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
     }
@@ -209,26 +213,72 @@ public class ScoutApacheConnector implements Connector {
   }
 
   /**
-   * Max timeout in ms connections are kept open when idle (requires keep-alive support). Default is 30 minutes.
+   * @deprecated This method will be removed with Scout release 25.1. Use the configuration property to change this
+   * configuration or override method {@link #getKeepAliveTimeoutMillis(Configuration)}.
    */
+  @Deprecated
+  @SuppressWarnings("DeprecatedIsStillUsed")
   protected long getKeepAliveTimeoutMillis() {
-    return TimeUnit.MINUTES.toMillis(30);
+    return CONFIG.getPropertyValue(RestHttpTransportConnectionKeepAliveProperty.class);
+  }
+
+  /**
+   * Max timeout in ms connections are kept open when idle (requires keep-alive support).
+   */
+  protected long getKeepAliveTimeoutMillis(Configuration config) {
+    return ObjectUtility.nvl(
+        TypeCastUtility.castValue(config.getProperty(RestClientProperties.CONNECTION_KEEP_ALIVE), Long.class),
+        getKeepAliveTimeoutMillis());
+  }
+
+  /**
+   * @deprecated This method will be removed with Scout release 25.1. Use the configuration property to change this
+   *             configuration or override method {@link #getMaxConnectionsTotal(Configuration)}.
+   */
+  @Deprecated
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  protected int getMaxConnectionsTotal() {
+    return CONFIG.getPropertyValue(RestHttpTransportMaxConnectionsTotalProperty.class);
   }
 
   /**
    * Max number of total concurrent connections managed by the {@link HttpClientConnectionManager} returned by
-   * {@link #createConnectionManager(Client, Configuration, SSLContext)}. Default is 128.
+   * {@link #createConnectionManager(Client, Configuration, SSLContext)}.
    */
-  protected int getMaxConnectionsTotal() {
-    return 128;
+  protected int getMaxConnectionsTotal(Configuration config) {
+    return ObjectUtility.nvl(
+        TypeCastUtility.castValue(config.getProperty(RestClientProperties.MAX_CONNECTIONS_TOTAL), Integer.class),
+        getMaxConnectionsTotal());
+  }
+
+  /**
+   * @deprecated This method will be removed with Scout release 25.1. Use the configuration property to change this
+   * configuration or override method {@link #getMaxConnectionsPerRoute(Configuration)}.
+   */
+  @Deprecated
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  protected int getMaxConnectionsPerRoute() {
+    return CONFIG.getPropertyValue(RestHttpTransportMaxConnectionsPerRouteProperty.class);
   }
 
   /**
    * Max number of concurrent connections per route managed by the {@link HttpClientConnectionManager} returned by
-   * {@link #createConnectionManager(Client, Configuration, SSLContext)}. Default is 32.
+   * {@link #createConnectionManager(Client, Configuration, SSLContext)}.
    */
-  protected int getMaxConnectionsPerRoute() {
-    return 32;
+  protected int getMaxConnectionsPerRoute(Configuration config) {
+    return ObjectUtility.nvl(
+        TypeCastUtility.castValue(config.getProperty(RestClientProperties.MAX_CONNECTIONS_PER_ROUTE), Integer.class),
+        getMaxConnectionsPerRoute());
+  }
+
+  /**
+   * @deprecated This method will be removed with Scout release 25.1. Use the configuration property to change this
+   * configuration or override method {@link #getValidateAfterInactivityMillis(Configuration)}.
+   */
+  @Deprecated
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  protected int getValidateAfterInactivityMillis() {
+    return CONFIG.getPropertyValue(RestHttpTransportValidateAfterInactivityProperty.class);
   }
 
   /**
@@ -236,8 +286,10 @@ public class ScoutApacheConnector implements Connector {
    * leased to the consumer. Non-positive value passed to this method disables connection validation. This check helps
    * detect connections that have become stale (half-closed) while kept inactive in the pool.
    */
-  protected int getValidateAfterInactivityMillis() {
-    return 1;
+  protected int getValidateAfterInactivityMillis(Configuration config) {
+    return ObjectUtility.nvl(
+        TypeCastUtility.castValue(config.getProperty(RestClientProperties.VALIDATE_CONNECTION_AFTER_INACTIVITY), Integer.class),
+        getValidateAfterInactivityMillis());
   }
 
   /**
@@ -655,6 +707,80 @@ public class ScoutApacheConnector implements Connector {
         // (3) close response
         m_response.close();
       }
+    }
+  }
+
+  public static class RestHttpTransportConnectionKeepAliveProperty extends AbstractLongConfigProperty {
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.MINUTES.toMillis(30);
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the maximum life time in milliseconds for kept alive connections of the REST HTTP client. The default value is 30 minutes.";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.rest.client.http.connectionKeepAlive";
+    }
+  }
+
+  public static class RestHttpTransportMaxConnectionsPerRouteProperty extends AbstractIntegerConfigProperty {
+
+    @Override
+    public Integer getDefaultValue() {
+      return 32;
+    }
+
+    @Override
+    public String description() {
+      return "Configuration property to define the default maximum connections per route of the Apache HTTP client. The default value is " + getDefaultValue();
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.rest.client.http.maxConnectionsPerRoute";
+    }
+  }
+
+  public static class RestHttpTransportMaxConnectionsTotalProperty extends AbstractIntegerConfigProperty {
+
+    @Override
+    public Integer getDefaultValue() {
+      return 128;
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the total maximum connections of the Apache HTTP client. The default value is " + getDefaultValue();
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.rest.client.http.maxConnectionsTotal";
+    }
+  }
+
+  public static class RestHttpTransportValidateAfterInactivityProperty extends AbstractIntegerConfigProperty {
+
+    @Override
+    public Integer getDefaultValue() {
+      return 1;
+    }
+
+    @Override
+    public String description() {
+      return "Defines period of inactivity in milliseconds after which persistent connections must be re-validated prior to being"
+          + " leased to the consumer. Non-positive value passed to this method disables connection validation. This check helps"
+          + " detect connections that have become stale (half-closed) while kept inactive in the pool. The default value is " + getDefaultValue();
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.rest.client.http.validateAfterInactivity";
     }
   }
 }
