@@ -21,6 +21,11 @@ import com.google.api.client.http.HttpTransport;
 public interface IHttpTransportManager {
 
   /**
+   * @return Technical transport manager name used for metrics.
+   */
+  String getName();
+
+  /**
    * Get the {@link HttpTransport} instance. This method may create new instances or return a previously created one.
    */
   HttpTransport getHttpTransport();
