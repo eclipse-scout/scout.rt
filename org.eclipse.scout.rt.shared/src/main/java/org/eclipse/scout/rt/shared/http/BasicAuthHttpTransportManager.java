@@ -16,8 +16,14 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 
 public class BasicAuthHttpTransportManager extends AbstractHttpTransportManager {
+
   private String m_user;
   private String m_password;
+
+  @Override
+  public String getName() {
+    return "scout.transport.basic-auth";
+  }
 
   public BasicAuthHttpTransportManager withUser(String user) {
     m_user = user;

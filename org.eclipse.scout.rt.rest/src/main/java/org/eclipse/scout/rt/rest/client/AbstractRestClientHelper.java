@@ -123,6 +123,13 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
     configureClientBuilder(clientBuilder);
   }
 
+  /**
+   * Enables OpenTelemetry metrics for this HTTP client using given {@code httpClientName}.
+   */
+  protected void enableMetrics(ClientBuilder clientBuilder, String httpClientName) {
+    clientBuilder.property(RestClientProperties.OTEL_HTTP_CLIENT_NAME, httpClientName);
+  }
+
   protected void registerContextResolvers(ClientBuilder clientBuilder) {
     // Context resolver, e.g. resolver for ObjectMapper
     for (ContextResolver resolver : validateContextResolvers(getContextResolversToRegister())) {

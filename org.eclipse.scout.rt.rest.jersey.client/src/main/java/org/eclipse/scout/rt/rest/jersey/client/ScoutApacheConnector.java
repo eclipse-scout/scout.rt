@@ -84,6 +84,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.rest.IRestHttpRequestUriEncoder;
 import org.eclipse.scout.rt.rest.client.RestClientProperties;
+import org.eclipse.scout.rt.shared.http.HttpClientMetricsHelper;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientRequest;
@@ -96,6 +97,9 @@ import org.glassfish.jersey.message.internal.ReaderWriter;
 import org.glassfish.jersey.message.internal.Statuses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.metrics.Meter;
 
 /**
  * A {@link Connector} that utilizes the Apache HTTP Client to send and receive HTTP request and responses.
@@ -189,7 +193,23 @@ public class ScoutApacheConnector implements Connector {
       connectionManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
     }
 
+    initMetrics(config, connectionManager);
     return connectionManager;
+  }
+
+  /**
+   * Initializes metrics for this HTTP connection manager (if configured by setting a value for
+   * {@link RestClientProperties#OTEL_HTTP_CLIENT_NAME}).
+   */
+  protected void initMetrics(Configuration config, PoolingHttpClientConnectionManager connectionManager) {
+    Object httpClientName = config.getProperty(RestClientProperties.OTEL_HTTP_CLIENT_NAME);
+    if (httpClientName instanceof String) {
+      Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
+      BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, (String) httpClientName,
+          connectionManager.getTotalStats()::getAvailable,
+          connectionManager.getTotalStats()::getLeased,
+          connectionManager.getTotalStats()::getMax);
+    }
   }
 
   /**
