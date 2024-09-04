@@ -15,6 +15,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -23,6 +25,8 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import javax.net.ssl.SSLContext;
 
 import jakarta.ws.rs.RedirectionException;
 import jakarta.ws.rs.client.Client;
@@ -38,11 +42,14 @@ import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.core5.util.Timeout;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -54,6 +61,11 @@ import org.eclipse.scout.rt.rest.jersey.ProxyServletParameters;
 import org.eclipse.scout.rt.rest.jersey.RestClientHttpProxyServlet;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoResponse;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoServlet;
+import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportConnectionKeepAliveProperty;
+import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportMaxConnectionsPerRouteProperty;
+import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportMaxConnectionsTotalProperty;
+import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportValidateAfterInactivityProperty;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientRequest;
@@ -411,6 +423,116 @@ public class ScoutApacheConnectorTest {
     assertEquals(expectedUserAgent, entity.getReceivedHeaders().get(HttpHeaders.USER_AGENT));
 
     response.close();
+  }
+
+  @Test
+  public void testHttpTransportProperties_defaultValues() {
+    Client client = Mockito.mock(Client.class);
+    Configuration config = Mockito.mock(Configuration.class);
+    assertConnectionManager(client, config, 32, 128);
+  }
+
+  @Test
+  public void testHttpTransportProperties_byConfigProperties() {
+    List<IBean<?>> beans = new ArrayList<>();
+    try {
+      beans.add(BEANS.get(BeanTestingHelper.class).mockConfigProperty(RestHttpTransportMaxConnectionsPerRouteProperty.class, 100));
+      beans.add(BEANS.get(BeanTestingHelper.class).mockConfigProperty(RestHttpTransportMaxConnectionsTotalProperty.class, 200));
+      beans.add(BEANS.get(BeanTestingHelper.class).mockConfigProperty(RestHttpTransportValidateAfterInactivityProperty.class, 300));
+      Client client = Mockito.mock(Client.class);
+      Configuration config = Mockito.mock(Configuration.class);
+      assertConnectionManager(client, config, 100, 200);
+    }
+    finally {
+      beans.forEach(BeanTestingHelper.get()::unregisterBean);
+    }
+  }
+
+  @Test
+  public void testHttpTransportProperties_byClientProperties() {
+    Client client = Mockito.mock(Client.class);
+    Configuration config = Mockito.mock(Configuration.class);
+    when(config.getProperty(RestClientProperties.MAX_CONNECTIONS_PER_ROUTE)).thenReturn(100);
+    when(config.getProperty(RestClientProperties.MAX_CONNECTIONS_TOTAL)).thenReturn(200);
+    when(config.getProperty(RestClientProperties.VALIDATE_CONNECTION_AFTER_INACTIVITY)).thenReturn(300);
+    assertConnectionManager(client, config, 100, 200);
+  }
+
+  protected void assertConnectionManager(Client client, Configuration config, int maxPerRoute, int maxTotal) {
+    PoolingHttpClientConnectionManager[] httpClientConnectionManager = new PoolingHttpClientConnectionManager[1];
+    new ScoutApacheConnector(client, config) {
+      @Override
+      protected HttpClientConnectionManager createConnectionManager(Client client, Configuration config, SSLContext sslContext) {
+        httpClientConnectionManager[0] = (PoolingHttpClientConnectionManager) super.createConnectionManager(client, config, sslContext);
+        return httpClientConnectionManager[0];
+      }
+    };
+    assertEquals(maxTotal, httpClientConnectionManager[0].getMaxTotal());
+    assertEquals(maxPerRoute, httpClientConnectionManager[0].getDefaultMaxPerRoute());
+  }
+
+  @Test
+  public void testHttpConnectionKeepAlive_defaultValue() {
+    Client client = Mockito.mock(Client.class);
+    Configuration config = Mockito.mock(Configuration.class);
+    ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
+    assertEquals(30 * 60 * 1000, connector.getKeepAliveTimeoutMillis(config));
+  }
+
+  @Test
+  public void testHttpConnectionKeepAlive_byConfigProperty() {
+    List<IBean<?>> beans = new ArrayList<>();
+    try {
+      beans.add(BEANS.get(BeanTestingHelper.class).mockConfigProperty(RestHttpTransportConnectionKeepAliveProperty.class, 100L));
+      Client client = Mockito.mock(Client.class);
+      Configuration config = Mockito.mock(Configuration.class);
+      ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
+      assertEquals(100L, connector.getKeepAliveTimeoutMillis(config));
+    }
+    finally {
+      beans.forEach(BeanTestingHelper.get()::unregisterBean);
+    }
+  }
+
+  @Test
+  public void testHttpConnectionKeepAlive_byClientProperty() {
+    Client client = Mockito.mock(Client.class);
+    Configuration config = Mockito.mock(Configuration.class);
+    when(config.getProperty(RestClientProperties.CONNECTION_KEEP_ALIVE)).thenReturn(200L);
+    ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
+    assertEquals(200L, connector.getKeepAliveTimeoutMillis(config));
+  }
+
+  @Test
+  public void testHttpConnectionValidateAfterInactivity_defaultValue() {
+    Client client = Mockito.mock(Client.class);
+    Configuration config = Mockito.mock(Configuration.class);
+    ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
+    assertEquals(1, connector.getValidateAfterInactivityMillis(config));
+  }
+
+  @Test
+  public void testHttpConnectionValidateAfterInactivity_byConfigProperty() {
+    List<IBean<?>> beans = new ArrayList<>();
+    try {
+      beans.add(BEANS.get(BeanTestingHelper.class).mockConfigProperty(RestHttpTransportValidateAfterInactivityProperty.class, 300));
+      Client client = Mockito.mock(Client.class);
+      Configuration config = Mockito.mock(Configuration.class);
+      ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
+      assertEquals(300, connector.getValidateAfterInactivityMillis(config));
+    }
+    finally {
+      beans.forEach(BeanTestingHelper.get()::unregisterBean);
+    }
+  }
+
+  @Test
+  public void testHttpConnectionValidateAfterInactivity_byClientProperty() {
+    Client client = Mockito.mock(Client.class);
+    Configuration config = Mockito.mock(Configuration.class);
+    when(config.getProperty(RestClientProperties.VALIDATE_CONNECTION_AFTER_INACTIVITY)).thenReturn(300);
+    ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
+    assertEquals(300, connector.getValidateAfterInactivityMillis(config));
   }
 
   protected JerseyTestRestClientHelper newHelper(BiConsumer<JerseyTestRestClientHelper, ClientBuilder> clientBuilderCustomizer) {
