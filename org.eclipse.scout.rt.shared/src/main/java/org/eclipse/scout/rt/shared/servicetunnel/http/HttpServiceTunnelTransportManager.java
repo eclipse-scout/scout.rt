@@ -25,6 +25,11 @@ import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnelConfigura
 public class HttpServiceTunnelTransportManager extends AbstractHttpTransportManager {
 
   @Override
+  public String getName() {
+    return "scout.transport.service-tunnel";
+  }
+
+  @Override
   public void interceptNewHttpTransport(IHttpTransportBuilder builder0) {
     super.interceptNewHttpTransport(builder0);
 

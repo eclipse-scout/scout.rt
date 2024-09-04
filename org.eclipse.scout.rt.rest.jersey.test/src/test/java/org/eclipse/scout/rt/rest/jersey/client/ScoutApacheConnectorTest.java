@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.rest.jersey.client;
 
 import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -45,6 +46,7 @@ import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -61,12 +63,16 @@ import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTran
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportMaxConnectionsTotalProperty;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportValidateAfterInactivityProperty;
+import org.eclipse.scout.rt.shared.http.HttpClientMetricsHelper;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+
+import io.opentelemetry.api.metrics.Meter;
 
 @RunWith(PlatformTestRunner.class)
 public class ScoutApacheConnectorTest {
@@ -496,6 +502,49 @@ public class ScoutApacheConnectorTest {
     when(config.getProperty(RestClientProperties.CONNECTION_KEEP_ALIVE)).thenReturn(200L);
     ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
     assertEquals(200L, connector.getKeepAliveTimeoutMillis(config));
+  }
+
+  @Test
+  public void testMetricsDisabled() {
+    Client client = Mockito.mock(Client.class);
+    Configuration config = Mockito.mock(Configuration.class);
+    when(config.getProperty(RestClientProperties.OTEL_HTTP_CLIENT_NAME)).thenReturn(null);
+    List<IBean<?>> beans = new ArrayList<>();
+    try {
+      HttpClientMetricsHelper mock = Mockito.mock(HttpClientMetricsHelper.class);
+      beans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(HttpClientMetricsHelper.class, mock)));
+      new ScoutApacheConnector(client, config);
+      verify(mock, never()).initMetrics(any(Meter.class), any(), any(), any(), any());
+    }
+    finally {
+      beans.forEach(BeanTestingHelper.get()::unregisterBean);
+    }
+  }
+
+  @Test
+  public void testMetricsEnabled() {
+    Client client = Mockito.mock(Client.class);
+    Configuration config = Mockito.mock(Configuration.class);
+    when(config.getProperty(RestClientProperties.OTEL_HTTP_CLIENT_NAME)).thenReturn("mock-http-client-name");
+    when(config.getProperty(RestClientProperties.MAX_CONNECTIONS_TOTAL)).thenReturn(123);
+
+    List<IBean<?>> beans = new ArrayList<>();
+    try {
+      HttpClientMetricsHelper mock = Mockito.mock(HttpClientMetricsHelper.class);
+      @SuppressWarnings("unchecked") ArgumentCaptor<Supplier<Integer>> idleCaptor = ArgumentCaptor.forClass(Supplier.class);
+      @SuppressWarnings("unchecked") ArgumentCaptor<Supplier<Integer>> activeCaptor = ArgumentCaptor.forClass(Supplier.class);
+      @SuppressWarnings("unchecked") ArgumentCaptor<Supplier<Integer>> maxCaptor = ArgumentCaptor.forClass(Supplier.class);
+      beans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(HttpClientMetricsHelper.class, mock)));
+      new ScoutApacheConnector(client, config);
+
+      verify(mock, only()).initMetrics(any(Meter.class), eq("mock-http-client-name"), idleCaptor.capture(), activeCaptor.capture(), maxCaptor.capture());
+      assertEquals(Integer.valueOf(0), idleCaptor.getValue().get());
+      assertEquals(Integer.valueOf(0), activeCaptor.getValue().get());
+      assertEquals(Integer.valueOf(123), maxCaptor.getValue().get());
+    }
+    finally {
+      beans.forEach(BeanTestingHelper.get()::unregisterBean);
+    }
   }
 
   protected JerseyTestRestClientHelper newHelper(BiConsumer<JerseyTestRestClientHelper, ClientBuilder> clientBuilderCustomizer) {

@@ -46,6 +46,9 @@ import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.metrics.Meter;
+
 /**
  * Factory to create the {@link ApacheHttpTransport} instances.
  */
@@ -60,7 +63,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
 
     setConnectionKeepAliveAndRetrySettings(builder);
 
-    HttpClientConnectionManager cm = createHttpClientConnectionManager();
+    HttpClientConnectionManager cm = createHttpClientConnectionManager(manager);
     if (cm != null) {
       builder.setConnectionManager(cm);
     }
@@ -113,7 +116,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * {@link HttpClientBuilder}. Caution: Returning a custom connection manager overrides several properties of the
    * {@link HttpClientBuilder}.
    */
-  protected HttpClientConnectionManager createHttpClientConnectionManager() {
+  protected HttpClientConnectionManager createHttpClientConnectionManager(IHttpTransportManager manager) {
     final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
         RegistryBuilder.<ConnectionSocketFactory> create()
             .register("http", createPlainSocketFactory())
@@ -130,7 +133,19 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     if (defaultMaxPerRoute > 0) {
       connectionManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
     }
+    initMetrics(manager, connectionManager);
     return connectionManager;
+  }
+
+  /**
+   * Initializes metrics for this connection manager.
+   */
+  protected void initMetrics(IHttpTransportManager manager, PoolingHttpClientConnectionManager connectionManager) {
+    Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
+    BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, manager.getName(),
+        connectionManager.getTotalStats()::getAvailable,
+        connectionManager.getTotalStats()::getLeased,
+        connectionManager.getTotalStats()::getMax);
   }
 
   protected SSLConnectionSocketFactory createSSLConnectionSocketFactory() {
