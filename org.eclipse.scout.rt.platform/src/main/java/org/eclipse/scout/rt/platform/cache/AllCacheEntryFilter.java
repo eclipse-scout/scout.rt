@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,5 +27,10 @@ public final class AllCacheEntryFilter<K, V> implements ICacheEntryFilter<K, V> 
   @Override
   public ICacheEntryFilter<K, V> coalesce(ICacheEntryFilter<K, V> other) {
     return this;
+  }
+
+  @Override
+  public String toString() {
+    return "AllCacheEntryFilter";
   }
 }
