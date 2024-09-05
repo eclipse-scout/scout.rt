@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,6 +22,8 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.AbstractTransactionalMap;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic implementation of {@link ICache}.
@@ -36,6 +38,7 @@ import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
  * @since 5.2
  */
 public class BasicCache<K, V> implements ICache<K, V> {
+  private static final Logger LOG = LoggerFactory.getLogger(BasicCache.class);
 
   protected final String m_cacheId;
   protected final Supplier<String> m_labelSupplier;
@@ -46,7 +49,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
 
   /**
    * @deprecated Use constructor including label supplier as second argument. Label supplier can be retrieved via
-   * {@link CacheBuilder#getLabelSupplier()}.
+   *             {@link CacheBuilder#getLabelSupplier()}.
    */
   @Deprecated(forRemoval = true)
   public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap) {
@@ -174,6 +177,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
 
   @Override
   public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) {
+    LOG.debug("Invalidate cache '{}' [propagate={}, filter={}]", m_cacheId, propagate, filter);
     boolean markInsertsDirty = true;
 
     if (filter instanceof AllCacheEntryFilter) {
