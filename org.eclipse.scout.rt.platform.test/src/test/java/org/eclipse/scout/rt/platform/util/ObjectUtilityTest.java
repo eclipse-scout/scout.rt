@@ -12,8 +12,13 @@ package org.eclipse.scout.rt.platform.util;
 import static org.junit.Assert.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import org.junit.BeforeClass;
@@ -210,5 +215,59 @@ public class ObjectUtilityTest {
       }
     };
     assertEquals("object", ObjectUtility.toString(o));
+  }
+
+  @Test
+  public void testHasValue() {
+    assertFalse(ObjectUtility.hasValue(null));
+    assertTrue(ObjectUtility.hasValue(new Object()));
+
+    // common primitives
+    assertTrue(ObjectUtility.hasValue((byte) 0));
+    assertTrue(ObjectUtility.hasValue(' '));
+    assertTrue(ObjectUtility.hasValue(0));
+    assertTrue(ObjectUtility.hasValue(1));
+    assertTrue(ObjectUtility.hasValue(-10));
+    assertTrue(ObjectUtility.hasValue(Integer.MAX_VALUE));
+    assertTrue(ObjectUtility.hasValue(Integer.MIN_VALUE));
+    assertTrue(ObjectUtility.hasValue(Float.MAX_VALUE));
+    assertTrue(ObjectUtility.hasValue(Float.MIN_VALUE));
+    assertTrue(ObjectUtility.hasValue(0.0));
+    assertTrue(ObjectUtility.hasValue(1.0));
+    assertTrue(ObjectUtility.hasValue(true));
+    assertTrue(ObjectUtility.hasValue(false));
+
+    // optionals
+    assertFalse(ObjectUtility.hasValue(Optional.empty()));
+    assertTrue(ObjectUtility.hasValue(Optional.of(0)));
+    assertTrue(ObjectUtility.hasValue(Optional.of(true)));
+    assertTrue(ObjectUtility.hasValue(Optional.of("")));
+
+    // strings
+    assertFalse(ObjectUtility.hasValue(""));
+    assertFalse(ObjectUtility.hasValue(" "));
+    assertTrue(ObjectUtility.hasValue("abc"));
+
+    // collections
+    assertFalse(ObjectUtility.hasValue(List.of()));
+    assertTrue(ObjectUtility.hasValue(List.of(1)));
+    ArrayList<Object> listWithNullValue = new ArrayList<>();
+    listWithNullValue.add(null);
+    assertTrue(ObjectUtility.hasValue(listWithNullValue));
+    assertTrue(ObjectUtility.hasValue(List.of("")));
+
+    // maps
+    assertFalse(ObjectUtility.hasValue(Map.of()));
+    assertTrue(ObjectUtility.hasValue(Map.of(1, 2)));
+    HashMap<Object, Object> mapWithNullValue = new HashMap<>();
+    mapWithNullValue.put(null, null);
+    assertTrue(ObjectUtility.hasValue(mapWithNullValue));
+    assertTrue(ObjectUtility.hasValue(Map.of("", "")));
+
+    // arrays
+    assertFalse(ObjectUtility.hasValue(new int[]{}));
+    assertTrue(ObjectUtility.hasValue(new int[]{1, 2}));
+    assertTrue(ObjectUtility.hasValue(new Object[]{null}));
+    assertTrue(ObjectUtility.hasValue(new String[]{""}));
   }
 }

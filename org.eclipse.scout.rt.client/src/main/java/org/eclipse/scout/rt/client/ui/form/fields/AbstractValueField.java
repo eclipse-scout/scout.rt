@@ -180,12 +180,13 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
-  public void loadFromXml(Element x) {
-    super.loadFromXml(x);
-    loadValueFromXml(x);
+  public boolean loadFromXml(Element x) {
+    boolean success = super.loadFromXml(x);
+    success &= loadValueFromXml(x);
+    return success;
   }
 
-  protected void loadValueFromXml(Element x) {
+  protected boolean loadValueFromXml(Element x) {
     try {
       VALUE value = TypeCastUtility.castValue(XmlUtility.getObjectAttribute(x, "value"), getHolderType());
       setValue(value);
@@ -193,7 +194,9 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     catch (Exception e) {
       // be lenient, maybe the field was changed
       LOG.warn("Could not load form XML [{}]", getClass().getName(), e);
+      return false;
     }
+    return true;
   }
 
   @Override

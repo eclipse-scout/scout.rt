@@ -245,11 +245,21 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   String storeToXmlString();
 
-  void loadFromXmlString(String xml);
+  /**
+   * See {@link #loadFromXml(Element)}
+   */
+  boolean loadFromXmlString(String xml);
 
   void storeToXml(Element x);
 
-  void loadFromXml(Element x);
+  /**
+   * Imports the form field state from an XML element.
+   *
+   * @param x
+   *          The XML element that contains the field state
+   * @return True, if the XML element was loaded successfully
+   */
+  boolean loadFromXml(Element x);
 
   /**
    * add verbose information to the search filter
@@ -317,8 +327,8 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @return Returns the list of fields that are enclosing this field, starting with the furthermost (from outside to
-   * inside). An enclosing field is part of the enclosing classes path that is abstract or the outermost
-   * enclosing class. The latter is the primary type.
+   *         inside). An enclosing field is part of the enclosing classes path that is abstract or the outermost
+   *         enclosing class. The latter is the primary type.
    * @since 3.8.1
    */
   List<ICompositeField> getEnclosingFieldList();
@@ -339,14 +349,14 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @param pos
-   *     one of the LABEL_POSITION_* constants or a custom constant interpreted by the ui
+   *          one of the LABEL_POSITION_* constants or a custom constant interpreted by the ui
    * @since 19.11.2009
    */
   void setLabelPosition(byte pos);
 
   /**
-   * Sets whether the form-field label is HTML enabled (true) or plain-text (false). When label position
-   * is <code>LABEL_POSITION_ON_FIELD</code> this property has no effect, since we can only render plain text.
+   * Sets whether the form-field label is HTML enabled (true) or plain-text (false). When label position is
+   * <code>LABEL_POSITION_ON_FIELD</code> this property has no effect, since we can only render plain text.
    */
   void setLabelHtmlEnabled(boolean labelHtmlEnabled);
 
@@ -363,7 +373,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @param w
-   *     the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
+   *          the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
    * @since 19.11.2009
    */
   void setLabelWidthInPixel(int w);
@@ -376,22 +386,22 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @param labelUseUiWidth
-   *     {@code true} if this fields label should be as width as preferred by the ui, {@code false} otherwise
+   *          {@code true} if this fields label should be as width as preferred by the ui, {@code false} otherwise
    * @since 10.09.2020
    */
   void setLabelUseUiWidth(boolean labelUseUiWidth);
 
   /**
    * @return negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
-   * ui
+   *         ui
    * @since 19.11.2009
    */
   byte getLabelHorizontalAlignment();
 
   /**
    * @param a
-   *     negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
-   *     ui
+   *          negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
+   *          ui
    * @since 19.11.2009
    */
   void setLabelHorizontalAlignment(byte a);
@@ -424,13 +434,13 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @return null iff no status (e.g. error status) is set, non-null if a status is set, e.g. if the value has semantic
-   * errors.
+   *         errors.
    */
   IMultiStatus getErrorStatus();
 
   /**
    * @param status
-   *     Sets the error multi-status. Use {@link #addErrorStatus(IStatus)} to add a single error.
+   *          Sets the error multi-status. Use {@link #addErrorStatus(IStatus)} to add a single error.
    */
   void setErrorStatus(IMultiStatus status);
 
@@ -441,7 +451,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @return true if field content (value on value fields) is valid, no error status is set on field and mandatory
-   * property is met.
+   *         property is met.
    */
   boolean isContentValid();
 
@@ -495,7 +505,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @return the grid data hints used by the {@link org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder
-   * GridDataBuilder} to create the final grid data which can be accessed using {@link #getGridData()}.
+   *         GridDataBuilder} to create the final grid data which can be accessed using {@link #getGridData()}.
    */
   GridData getGridDataHints();
 
@@ -503,7 +513,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @return the resulting (validated) grid data which is also used by the ui layout manager to layout this field in a
-   * logical grid.
+   *         logical grid.
    */
   GridData getGridData();
 
@@ -572,7 +582,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Sets whether or not the status icon is visible.
    *
    * @param statusVisible
-   *     {@code true} if status icon should be visible, {@code false} otherwise
+   *          {@code true} if status icon should be visible, {@code false} otherwise
    */
   void setStatusVisible(boolean statusVisible);
 
@@ -583,16 +593,18 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   void setStatusPosition(String statusPosition);
 
   /**
-   * @return The {@link IValidateContentDescriptor} that will be used by {@link IForm#validateForm()} if this field contains invalid content (see {@link #validateContent()}). May be {@code null}.
-   * The resulting instance may be modified directly or replaced using {@link #setValidateContentDescriptor(IValidateContentDescriptor)}.
+   * @return The {@link IValidateContentDescriptor} that will be used by {@link IForm#validateForm()} if this field
+   *         contains invalid content (see {@link #validateContent()}). May be {@code null}. The resulting instance may
+   *         be modified directly or replaced using {@link #setValidateContentDescriptor(IValidateContentDescriptor)}.
    */
   IValidateContentDescriptor getValidateContentDescriptor();
 
   /**
-   * Sets the {@link IValidateContentDescriptor} to be used by {@link IForm#validateForm()} if this field contains invalid content (see {@link #validateContent()}).
+   * Sets the {@link IValidateContentDescriptor} to be used by {@link IForm#validateForm()} if this field contains
+   * invalid content (see {@link #validateContent()}).
    *
    * @param validateContentDescriptor
-   *     The new {@link IValidateContentDescriptor} or {@code null} if no descriptor is required.
+   *          The new {@link IValidateContentDescriptor} or {@code null} if no descriptor is required.
    */
   void setValidateContentDescriptor(IValidateContentDescriptor validateContentDescriptor);
 
@@ -603,7 +615,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @return If the label of this {@link IFormField} is visible. It is visible if all label-visibility dimensions are
-   * <code>true</code>.
+   *         <code>true</code>.
    */
   boolean isLabelVisible();
 
@@ -611,7 +623,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the value of the default label-visibility dimension to the given value.
    *
    * @param b
-   *     The new value specifying if the label of this {@link IFormField} is visible.
+   *          The new value specifying if the label of this {@link IFormField} is visible.
    */
   void setLabelVisible(boolean b);
 
@@ -619,16 +631,16 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Checks if the given label-visibility dimension is set to <code>true</code>.
    *
    * @param dimension
-   *     The dimension to check. Must not be <code>null</code>.
+   *          The dimension to check. Must not be <code>null</code>.
    * @return <code>true</code> if the given dimension is set to visible. By default all dimensions are visible.
    * @throws AssertionException
-   *     if the given dimension is <code>null</code>.
+   *           if the given dimension is <code>null</code>.
    * @throws IllegalStateException
-   *     if too many dimensions are used. This {@link IFormField} supports up to
-   *     {@link NamedBitMaskHelper#NUM_BITS} dimensions for label visibility. One dimension is already used by the
-   *     {@link IFormField} itself. Therefore 7 dimensions may be used by developers.<br>
-   *     <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
-   *     available by instance but by class!
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for label visibility. One dimension is already used by the
+   *           {@link IFormField} itself. Therefore 7 dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
    */
   boolean isLabelVisible(String dimension);
 
@@ -636,23 +648,23 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the label-visibility value of the given dimension.
    *
    * @param visible
-   *     The new value for the given dimension.
+   *          The new value for the given dimension.
    * @param dimension
-   *     The dimension to change. Must not be <code>null</code>.
+   *          The dimension to change. Must not be <code>null</code>.
    * @throws AssertionException
-   *     if the given dimension is <code>null</code>.
+   *           if the given dimension is <code>null</code>.
    * @throws IllegalStateException
-   *     if too many dimensions are used. This {@link IFormField} supports up to
-   *     {@link NamedBitMaskHelper#NUM_BITS} dimensions for label visibility. One dimension is already used by the
-   *     {@link IFormField} itself. Therefore 7 dimensions may be used by developers.<br>
-   *     <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
-   *     available by instance but by class!
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for label visibility. One dimension is already used by the
+   *           {@link IFormField} itself. Therefore 7 dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
    */
   void setLabelVisible(boolean visible, String dimension);
 
   /**
    * @return <code>true</code> if this {@link IFormField} and all parent {@link IFormField}s are visible (all
-   * dimensions).
+   *         dimensions).
    * @see #isVisible()
    */
   boolean isVisibleIncludingParents();
@@ -666,7 +678,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the visible property of this {@link IFormField} to the given value.
    *
    * @param visible
-   *     The new visible value.
+   *          The new visible value.
    */
   void setVisible(boolean visible);
 
@@ -674,10 +686,10 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the visible property of this {@link IFormField} to the given value.
    *
    * @param visible
-   *     The new visible value.
+   *          The new visible value.
    * @param updateParents
-   *     if <code>true</code> the visible property of all parent {@link IFormField}s are updated to same value as
-   *     well.
+   *          if <code>true</code> the visible property of all parent {@link IFormField}s are updated to same value as
+   *          well.
    */
   void setVisible(boolean visible, boolean updateParents);
 
@@ -685,13 +697,13 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the visible property of this {@link IFormField} to the given value.
    *
    * @param visible
-   *     The new visible value.
+   *          The new visible value.
    * @param updateParents
-   *     if <code>true</code> the visible property of all parent {@link IFormField}s are updated to same value as
-   *     well.
+   *          if <code>true</code> the visible property of all parent {@link IFormField}s are updated to same value as
+   *          well.
    * @param updateChildren
-   *     if <code>true</code> the visible property of all child {@link IFormField}s (recursive) are updated to same
-   *     value as well.
+   *          if <code>true</code> the visible property of all child {@link IFormField}s (recursive) are updated to same
+   *          value as well.
    */
   void setVisible(boolean visible, boolean updateParents, boolean updateChildren);
 
@@ -699,7 +711,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Sets a new visible-permission that is used to calculate the visible-granted property of this {@link IFormField}.
    *
    * @param p
-   *     The new {@link Permission} that is used to calculate the visible-granted value.
+   *          The new {@link Permission} that is used to calculate the visible-granted value.
    * @see ACCESS#check(Permission)
    * @see #setVisibleGranted(boolean)
    */
@@ -719,7 +731,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the visible-granted property of this {@link IFormField} to the given value.
    *
    * @param visibleGranted
-   *     The new visible-granted value.
+   *          The new visible-granted value.
    */
   void setVisibleGranted(boolean visibleGranted);
 
@@ -727,10 +739,10 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the visible-granted property of this {@link IFormField} to the given value.
    *
    * @param visible
-   *     The new visible-granted value.
+   *          The new visible-granted value.
    * @param updateParents
-   *     if <code>true</code> the visible-granted property of all parent {@link IFormField}s are updated to same
-   *     value as well.
+   *          if <code>true</code> the visible-granted property of all parent {@link IFormField}s are updated to same
+   *          value as well.
    */
   void setVisibleGranted(boolean visible, boolean updateParents);
 
@@ -738,13 +750,13 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the visible-granted property of this {@link IFormField} to the given value.
    *
    * @param visible
-   *     The new visible-granted value.
+   *          The new visible-granted value.
    * @param updateParents
-   *     if <code>true</code> the visible-granted property of all parent {@link IFormField}s are updated to same
-   *     value as well.
+   *          if <code>true</code> the visible-granted property of all parent {@link IFormField}s are updated to same
+   *          value as well.
    * @param updateChildren
-   *     if <code>true</code> the visible-granted property of all child {@link IFormField}s (recursive) are updated
-   *     to same value as well.
+   *          if <code>true</code> the visible-granted property of all child {@link IFormField}s (recursive) are updated
+   *          to same value as well.
    */
   void setVisibleGranted(boolean visible, boolean updateParents, boolean updateChildren);
 
@@ -752,18 +764,18 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the field-visibility value of the given dimension.
    *
    * @param visible
-   *     The new visibility value for the given dimension.
+   *          The new visibility value for the given dimension.
    * @param dimension
-   *     The dimension to change. Must not be <code>null</code>.
+   *          The dimension to change. Must not be <code>null</code>.
    * @throws AssertionException
-   *     if the given dimension is <code>null</code>.
+   *           if the given dimension is <code>null</code>.
    * @throws IllegalStateException
-   *     if too many dimensions are used. This {@link IFormField} supports up to
-   *     {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
-   *     {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
-   *     dimensions may be used by developers.<br>
-   *     <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
-   *     available by instance but by class!
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
+   *           {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
+   *           dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
    */
   @Override
   void setVisible(boolean visible, String dimension);
@@ -772,20 +784,20 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the field-visibility value of the given dimension.
    *
    * @param visible
-   *     The new visibility value for the given dimension.
+   *          The new visibility value for the given dimension.
    * @param updateParents
-   *     if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
+   *          if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
    * @param dimension
-   *     The dimension to change. Must not be <code>null</code>.
+   *          The dimension to change. Must not be <code>null</code>.
    * @throws AssertionException
-   *     if the given dimension is <code>null</code>.
+   *           if the given dimension is <code>null</code>.
    * @throws IllegalStateException
-   *     if too many dimensions are used. This {@link IFormField} supports up to
-   *     {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
-   *     {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
-   *     dimensions may be used by developers.<br>
-   *     <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
-   *     available by instance but by class!
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
+   *           {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
+   *           dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
    */
   void setVisible(boolean visible, boolean updateParents, String dimension);
 
@@ -793,22 +805,22 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Changes the field-visibility value of the given dimension.
    *
    * @param visible
-   *     The new visibility value for the given dimension.
+   *          The new visibility value for the given dimension.
    * @param updateParents
-   *     if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
+   *          if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
    * @param updateChildren
-   *     if <code>true</code> all child {@link IFormField}s (recursive) are updated to same value as well.
+   *          if <code>true</code> all child {@link IFormField}s (recursive) are updated to same value as well.
    * @param dimension
-   *     The dimension to change. Must not be <code>null</code>.
+   *          The dimension to change. Must not be <code>null</code>.
    * @throws AssertionException
-   *     if the given dimension is <code>null</code>.
+   *           if the given dimension is <code>null</code>.
    * @throws IllegalStateException
-   *     if too many dimensions are used. This {@link IFormField} supports up to
-   *     {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
-   *     {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
-   *     dimensions may be used by developers.<br>
-   *     <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
-   *     available by instance but by class!
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
+   *           {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
+   *           dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
    */
   void setVisible(boolean visible, boolean updateParents, boolean updateChildren, String dimension);
 
@@ -817,7 +829,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * During the initialization phase the children are not changed.
    *
    * @param fieldStyle
-   *     One of {@link #FIELD_STYLE_CLASSIC}, {@link #FIELD_STYLE_ALTERNATIVE}.
+   *          One of {@link #FIELD_STYLE_CLASSIC}, {@link #FIELD_STYLE_ALTERNATIVE}.
    */
   void setFieldStyle(String fieldStyle);
 
@@ -825,9 +837,9 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Sets the field style on this field and on every child field if requested.
    *
    * @param fieldStyle
-   *     One of {@link #FIELD_STYLE_CLASSIC}, {@link #FIELD_STYLE_ALTERNATIVE}.
+   *          One of {@link #FIELD_STYLE_CLASSIC}, {@link #FIELD_STYLE_ALTERNATIVE}.
    * @param recursive
-   *     {@code true} if the field style property of the children should be changed as well.
+   *          {@code true} if the field style property of the children should be changed as well.
    */
   void setFieldStyle(String fieldStyle, boolean recursive);
 
@@ -841,7 +853,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * During the initialization phase the children are not changed.
    *
    * @param disabledStyle
-   *     One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
+   *          One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
    */
   void setDisabledStyle(int disabledStyle);
 
@@ -849,9 +861,9 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * Sets the disabled style on this field and on every child field if requested.
    *
    * @param disabledStyle
-   *     One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
+   *          One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
    * @param recursive
-   *     {@code true} if the disabled style property of the children should be changed as well.
+   *          {@code true} if the disabled style property of the children should be changed as well.
    */
   void setDisabledStyle(int disabledStyle, boolean recursive);
 

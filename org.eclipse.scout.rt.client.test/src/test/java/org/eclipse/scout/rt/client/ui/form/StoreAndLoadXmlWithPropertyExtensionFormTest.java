@@ -37,7 +37,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Tests loading and storing to xml of forms with extensions.
+ * Tests loading and storing to xml of forms with extensions for properties.
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
@@ -73,7 +73,7 @@ public class StoreAndLoadXmlWithPropertyExtensionFormTest extends AbstractLocalE
     assertFalse(xml.contains("\"textFieldProperty\""));
 
     TestForm loadedForm = new TestForm();
-    loadedForm.loadFromXmlString(xml);
+    assertTrue(loadedForm.loadFromXmlString(xml));
     TestFormExtension loadedFormExtension = loadedForm.getExtension(TestFormExtension.class);
 
     assertEquals("staticPropertyValue", loadedForm.getProperty());
@@ -114,7 +114,7 @@ public class StoreAndLoadXmlWithPropertyExtensionFormTest extends AbstractLocalE
     assertFalse(xml.contains("\"textFieldProperty\""));
 
     TestForm loadedForm = new TestForm();
-    loadedForm.loadFromXmlString(xml);
+    assertFalse(loadedForm.loadFromXmlString(xml));
     TestFormExtension loadedFormExtension = loadedForm.getExtension(TestFormExtension.class);
 
     assertEquals("staticPropertyValue", loadedForm.getProperty());
@@ -157,7 +157,7 @@ public class StoreAndLoadXmlWithPropertyExtensionFormTest extends AbstractLocalE
     assertFalse(xml.contains("\"textFieldProperty\"")); // field properties are not stored in XML
 
     TestForm loadedForm = new TestForm();
-    loadedForm.loadFromXmlString(xml);
+    assertTrue(loadedForm.loadFromXmlString(xml));
 
     TestFormExtension loadedFormExtension = loadedForm.getExtension(TestFormExtension.class);
     OtherTestFormExtension loadedOtherFormExtension = loadedForm.getExtension(OtherTestFormExtension.class);
@@ -202,7 +202,7 @@ public class StoreAndLoadXmlWithPropertyExtensionFormTest extends AbstractLocalE
     assertFalse(xml.contains("name=\"extensionProperty\"")); // field extension properties are not stored in XML
 
     TestForm loadedForm = new TestForm();
-    loadedForm.loadFromXmlString(xml);
+    assertTrue(loadedForm.loadFromXmlString(xml));
 
     TestFormFieldExtension loadedFieldExtension = loadedForm.getTextField().getExtension(TestFormFieldExtension.class);
 
@@ -231,7 +231,7 @@ public class StoreAndLoadXmlWithPropertyExtensionFormTest extends AbstractLocalE
     }
 
     TestForm loadedForm = new TestForm();
-    loadedForm.loadFromXmlString(xml);
+    assertTrue(loadedForm.loadFromXmlString(xml));
 
     assertNull(loadedForm.getProperty());
     assertEquals("staticFieldValue", loadedForm.getTextField().getValue());
