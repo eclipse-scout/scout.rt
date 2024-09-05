@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -130,7 +130,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         .addClass(this.item.cssClass)
         .data('component', this)
         .data('partDay', partDay)
-        .on('mouseup', this._onMouseUp.bind(this))
+        .on('mousedown', this._onMouseDown.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
       $part.appendDiv('calendar-component-leftcolorborder');
       let $partContent = $part.appendDiv('content');
@@ -275,7 +275,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     this.parent._selectedComponentChanged(this, $part.data('partDay') as Date, updateScrollPosition);
   }
 
-  protected _onMouseUp(event: JQuery.MouseUpEvent) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     // don't show popup if dragging is in process
     if (this.parent._moveData && this.parent._moveData.moving) {
       return;

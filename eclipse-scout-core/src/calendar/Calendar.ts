@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -702,6 +702,12 @@ export class Calendar extends Widget implements CalendarModel {
   protected _onDayMouseDown(withTime: boolean, event: JQuery.MouseDownEvent) {
     let selectedDate = new Date($(event.delegateTarget).data('date')),
       timeChanged = false;
+
+    // Do not apply selection when clicked on calendar component
+    if ($(event.target).closest('.calendar-component').length > 0) {
+      return;
+    }
+
     if (withTime && (this.isDay() || this.isWeek() || this.isWorkWeek())) {
       let seconds = this._getSelectedSeconds(event);
       if (seconds < 60 * 60 * 24) {
