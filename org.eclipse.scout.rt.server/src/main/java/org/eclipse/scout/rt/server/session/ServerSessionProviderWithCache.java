@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +127,24 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
   }
 
   protected ConcurrentExpiringMap<CompositeObject, IServerSession> createSessionCache(final long ttl) {
-    return new ConcurrentExpiringMap<>(ttl, TimeUnit.MILLISECONDS, 1_000);
+    return new ConcurrentExpiringMap<>(ttl, TimeUnit.MILLISECONDS, 1_000) {
+      @Override
+      protected void execEntryEvicted(CompositeObject key, IServerSession session) {
+        if (session == null || !session.isActive() || session.isStopping()) {
+          return;
+        }
+
+        if (ServerSessionProvider.currentSession() == session) {
+          session.stop();
+        }
+        else {
+          ServerRunContexts
+              .copyCurrent(true)
+              .withSession(session)
+              .run(session::stop);
+        }
+      }
+    };
   }
 
   protected CompositeObject newSessionCacheKey(final String sessionId, final Subject subject) {
