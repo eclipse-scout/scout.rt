@@ -130,7 +130,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         .addClass(this.item.cssClass)
         .data('component', this)
         .data('partDay', partDay)
-        .on('mouseup', this._onMouseUp.bind(this))
+        .on('mousedown', this._onMouseDown.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
       $part.appendDiv('calendar-component-leftcolorborder');
       let $partContent = $part.appendDiv('content');
@@ -275,7 +275,11 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     this.parent._selectedComponentChanged(this, $part.data('partDay') as Date, updateScrollPosition);
   }
 
-  protected _onMouseUp(event: JQuery.MouseUpEvent) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
+    // Stop propagation, otherwise the selection would be overridden by the event listener on
+    // the calendar day (Calendar._onDayColumnMouseDown(...))
+    event.stopPropagation();
+
     // don't show popup if dragging is in process
     if (this.parent._moveData && this.parent._moveData.moving) {
       return;
