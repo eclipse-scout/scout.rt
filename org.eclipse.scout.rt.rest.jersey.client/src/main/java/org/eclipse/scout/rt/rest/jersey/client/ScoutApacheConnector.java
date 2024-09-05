@@ -176,7 +176,7 @@ public class ScoutApacheConnector implements Connector {
         null, null, TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis(config)), connFactory);
 
     Builder connectionConfigBuilder = ConnectionConfig.custom()
-        .setTimeToLive(TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis()));
+        .setTimeToLive(TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis(config)));
 
     final int validateAfterInactivityMillis = getValidateAfterInactivityMillis(config);
     if (validateAfterInactivityMillis > 0) {
