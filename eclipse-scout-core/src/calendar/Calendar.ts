@@ -1562,7 +1562,7 @@ export class Calendar extends Widget implements CalendarModel {
   protected _calculateContextMenuVisible(event: JQuery.ContextMenuEvent): boolean {
     let $target = $(event.currentTarget);
     let resourceId = this.defaultResource.resourceId;
-    if ($target.hasClass('calendar-component')) {
+    if ($target.hasClass('calendar-component') && this.selectedComponent) {
       resourceId = this.selectedComponent.getResourceId();
     } else {
       resourceId = $(event.target).closest('.resource-column').data('resourceId');
