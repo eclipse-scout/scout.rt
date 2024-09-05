@@ -92,7 +92,7 @@ export class Calendar extends Widget implements CalendarModel {
   protected _menuInjectionTargetMenusChangedHandler: EventHandler<PropertyChangeEvent<Menu[], GroupBox>>;
 
   /**
-   * Resources, which have do not have a child resources
+   * Resources, which do not have a child resources
    */
   protected _leafResources: CalendarResourceDo[];
 
@@ -548,7 +548,7 @@ export class Calendar extends Widget implements CalendarModel {
     let mousedownCallback = this._onDayColumnMouseDown.bind(this, false);
     this.$topGrid.find('.resource-column').on('mousedown', mousedownCallback);
 
-    // Only requred when rendering is triggered by setter
+    // Only required when rendering is triggered by setter
     if (!this.rendering) {
       this._renderComponents();
     }
@@ -566,7 +566,7 @@ export class Calendar extends Widget implements CalendarModel {
   protected _validateSelectedResource() {
     if (!arrays.contains(this.resources, this.selectedResource)) {
       this.selectedResource = this.defaultResource;
-      this.trigger('selectedResourceChange', {resouceId: this.selectedResource.resourceId});
+      this.trigger('selectedResourceChange', {resourceId: this.selectedResource.resourceId});
     }
   }
 
@@ -811,6 +811,11 @@ export class Calendar extends Widget implements CalendarModel {
       selectedResourceId = selectedDayColumn.data('resourceId'),
       selectedResourceChanged = selectedResourceId !== this.selectedResource.resourceId;
 
+    // Do not apply selection when clicked on calendar component
+    if (this._get$CalendarComponent($(event.target)).length > 0) {
+      return;
+    }
+
     // Check if date is valid
     if (!selectedDate.valueOf()) {
       return;
@@ -835,14 +840,15 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _getSelectedDate(event: JQuery.MouseEventBase): Date {
     let date = null;
-    if ($(event.target).hasClass('calendar-day')) {
-      date = $(event.target).data('date');
-    } else if ($(event.target).hasClass('resource-column')) {
-      date = $(event.target).parent().data('date');
-    } else if ($(event.target).hasClass('calendar-component')
-      || $(event.target).parents('.calendar-component').length > 0
-      || $(event.target).hasClass('calendar-range-selector')) {
-      date = $(event.target).closest('.calendar-day').data('date');
+    let $target = $(event.target);
+    if ($target.hasClass('calendar-day')) {
+      date = $target.data('date');
+    } else if ($target.hasClass('resource-column')) {
+      date = $target.parent().data('date');
+    } else if ($target.hasClass('calendar-component')
+      || $target.parents('.calendar-component').length > 0
+      || $target.hasClass('calendar-range-selector')) {
+      date = $target.closest('.calendar-day').data('date');
     }
     if (date) {
       return new Date(date);
@@ -853,10 +859,12 @@ export class Calendar extends Widget implements CalendarModel {
   protected _getSelectedSeconds(event: JQuery.MouseEventBase): number {
     // @ts-expect-error
     let y = event.originalEvent.layerY;
-    if ($(event.target).hasClass('calendar-component') || $(event.target).parents('.calendar-component').length > 0) {
-      y += $(event.target).closest('.calendar-component').position().top;
-    } else if ($(event.target).hasClass('calendar-range-selector')) {
-      y += $(event.target).position().top;
+    let $target = $(event.target);
+    let $component = this._get$CalendarComponent($target);
+    if ($component.length > 0) {
+      y += $component.position().top;
+    } else if ($target.hasClass('calendar-range-selector')) {
+      y += $target.position().top;
     }
     return Math.floor(y / this.heightPerDivision) / this.numberOfHourDivisions * 60 * 60;
   }
@@ -909,7 +917,7 @@ export class Calendar extends Widget implements CalendarModel {
       this.trigger('selectedResourceChange', {resourceId: newSelectedResource.resourceId});
     }
 
-    // selected component / part (may be null)
+    // selected component / part (maybe null)
     if (this.selectedComponent !== selectedComponent) {
       changed = true;
       if (this.selectedComponent) {
@@ -934,6 +942,10 @@ export class Calendar extends Widget implements CalendarModel {
     if (this.showCalendarSidebar) {
       this.yearPanel.selectDate(this.selectedDate);
     }
+  }
+
+  protected _get$CalendarComponent($element: JQuery) {
+    return $element.closest('.calendar-component');
   }
 
   /* --  set display mode and range ------------------------------------- */
@@ -1134,7 +1146,8 @@ export class Calendar extends Widget implements CalendarModel {
           $e.removeClass('hidden');
         }
         if (animate) {
-          $e.animateAVCSD('height', h, () => {
+          $e.animateAVCSD('height', h,
+            () => {
               if (h === 0) {
                 $e.addClass('hidden');
               }
@@ -1562,7 +1575,7 @@ export class Calendar extends Widget implements CalendarModel {
   protected _calculateContextMenuVisible(event: JQuery.ContextMenuEvent): boolean {
     let $target = $(event.currentTarget);
     let resourceId = this.defaultResource.resourceId;
-    if ($target.hasClass('calendar-component')) {
+    if ($target.hasClass('calendar-component') && this.selectedComponent) {
       resourceId = this.selectedComponent.getResourceId();
     } else {
       resourceId = $(event.target).closest('.resource-column').data('resourceId');
@@ -1587,7 +1600,7 @@ export class Calendar extends Widget implements CalendarModel {
       this._updateResourcesVisibleProperty(tuple[0], tuple[1]);
     });
     if (!this.isDay()) {
-      // No re-rendering required when on day -> component is hidden by layouyt
+      // No re-rendering required when on day -> component is hidden by layout
       this._renderComponents();
     } else {
       // Else only update list panel
@@ -1601,12 +1614,12 @@ export class Calendar extends Widget implements CalendarModel {
       // No update
       return;
     }
-    let rersource = this.findResourceForId(resourceId);
-    if (!rersource || rersource.visible === visible) {
+    let resource = this.findResourceForId(resourceId);
+    if (!resource || resource.visible === visible) {
       // No update
       return;
     }
-    rersource.visible = visible;
+    resource.visible = visible;
     this.trigger('resourceVisibilityChange', {
       resourceId: resourceId,
       visible: visible
@@ -1746,8 +1759,8 @@ export class Calendar extends Widget implements CalendarModel {
         columns = [];
       }
 
-      // replace an component that ends before and can be replaced
-      let k = this._findReplacableColumn(columns, r.from, day);
+      // replace a component that ends before and can be replaced
+      let k = this._findReplaceableColumn(columns, r.from, day);
 
       // insert
       if (k >= 0) {
@@ -1775,7 +1788,7 @@ export class Calendar extends Widget implements CalendarModel {
     return true;
   }
 
-  protected _findReplacableColumn(columns: CalendarComponent[], pos: number, day: Date): number {
+  protected _findReplaceableColumn(columns: CalendarComponent[], pos: number, day: Date): number {
     let j;
     for (j = 0; j < columns.length; j++) {
       if (this._endsBefore(columns[j], pos, day)) {
@@ -2203,8 +2216,8 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // No range selection when resource is not selectable
-    let currentResouceId = $(event.delegateTarget).data('resourceId');
-    let selectable = this.findResourceForId(currentResouceId).selectable;
+    let currentResourceId = $(event.delegateTarget).data('resourceId');
+    let selectable = this.findResourceForId(currentResourceId).selectable;
     if (!selectable) {
       return;
     }
@@ -2318,7 +2331,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _getHours(date: Date): number {
-    // round to number of hour devisions
+    // round to number of hour divisions
     return Math.round((date.getHours() + date.getMinutes() / 60) * this.numberOfHourDivisions) / this.numberOfHourDivisions;
   }
 
