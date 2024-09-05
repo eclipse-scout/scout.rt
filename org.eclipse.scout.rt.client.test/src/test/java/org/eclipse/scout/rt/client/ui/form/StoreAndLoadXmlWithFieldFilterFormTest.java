@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.ui.form;
 import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXml4FormTest.TestForm.MainBox.GroupBox.ExcludedStringField;
-import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXml4FormTest.TestForm.MainBox.GroupBox.IncludedStringField;
+import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXmlWithFieldFilterFormTest.TestForm.MainBox.GroupBox.ExcludedStringField;
+import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXmlWithFieldFilterFormTest.TestForm.MainBox.GroupBox.IncludedStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-public class StoreAndLoadXml4FormTest {
+public class StoreAndLoadXmlWithFieldFilterFormTest {
 
   static final String TEST_DATA = "testdata";
 

@@ -85,13 +85,23 @@ public final class BeanUtility {
   }
 
   /**
+   * Sets all given properties to the target object.
+   *
+   * @param to
+   *          The target object
+   * @param propertyMap
+   *          A map of property name to the value that should be set
    * @param lenient
    *          true just logs warnings on exceptions, false throws exceptions set all properties on to, filtering with
    *          filter
+   * @param filter
+   *          Filter that should be applied to properties
+   * @return <code>true</code> if all properties were set successfully. Otherwise <code>false</code>.
    */
-  public static void setProperties(Object to, Map<String, Object> map, boolean lenient, IPropertyFilter filter) {
+  public static boolean setProperties(Object to, Map<String, Object> propertyMap, boolean lenient, IPropertyFilter filter) {
+    boolean success = true;
     FastBeanInfo toInfo = getFastBeanInfo(to.getClass(), null);
-    for (Entry<String, Object> entry : map.entrySet()) {
+    for (Entry<String, Object> entry : propertyMap.entrySet()) {
       String name = entry.getKey();
       Object value = entry.getValue();
       try {
@@ -105,13 +115,15 @@ public final class BeanUtility {
       }
       catch (Exception e) {
         if (lenient) {
-          LOG.warn("Could not set property property '{}' to value '{}'", name, value, e);
+          LOG.warn("Could not set property '{}' to value '{}'", name, value, e);
+          success = false;
         }
         else {
           throw new ProcessingException("property " + name + " with value " + value, e);
         }
       }
     }
+    return success;
   }
 
   /**

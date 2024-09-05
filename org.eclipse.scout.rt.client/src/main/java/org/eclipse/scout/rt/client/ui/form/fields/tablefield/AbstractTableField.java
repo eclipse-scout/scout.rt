@@ -293,22 +293,24 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public void loadFromXml(Element x) {
-    super.loadFromXml(x);
+  public boolean loadFromXml(Element x) {
+    boolean success = super.loadFromXml(x);
     if (m_table != null) {
       int[] selectedRowIndices = null;
       try {
         selectedRowIndices = (int[]) XmlUtility.getObjectAttribute(x, "selectedRowIndices");
       }
       catch (Exception e) {
-        LOG.warn("reading attribute 'selectedRowIndices'", e);
+        LOG.warn("Could not read attribute 'selectedRowIndices'", e);
+        success = false;
       }
       Object[][] dataMatrix = null;
       try {
         dataMatrix = (Object[][]) XmlUtility.getObjectAttribute(x, "rows");
       }
       catch (Exception e) {
-        LOG.warn("reading attribute 'rows'", e);
+        LOG.warn("Could not read attribute 'rows'", e);
+        success = false;
       }
       m_table.discardAllRows();
       if (dataMatrix != null && dataMatrix.length > 0) {
@@ -318,6 +320,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         m_table.selectRows(m_table.getRows(selectedRowIndices));
       }
     }
+    return success;
   }
 
   @Override

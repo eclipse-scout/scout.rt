@@ -2217,12 +2217,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   @Override
-  public void loadFromXmlString(String xml) {
+  public boolean loadFromXmlString(String xml) {
     if (xml == null) {
-      return;
+      return true;
     }
     Document xmlDocument = XmlUtility.getXmlDocument(xml);
-    loadFromXml(xmlDocument.getDocumentElement());
+    return loadFromXml(xmlDocument.getDocumentElement());
   }
 
   @Override
@@ -2297,7 +2297,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   /**
    * Adds a &lt;property&gt; element for every given property to the parent element.
    *
-   * @see #loadPropertiesFromXml(Element)
+   * @see #loadPropertiesFromXml(Element, Map)
    */
   protected void storePropertiesToXml(Element parent, Map<String, Object> props) {
     for (Entry<String, Object> entry : props.entrySet()) {
@@ -2314,12 +2314,14 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   @Override
-  public void loadFromXml(Element root) {
+  public boolean loadFromXml(Element root) {
+    boolean success = true;
     // load properties
     Element xProps = XmlUtility.getFirstChildElement(root, "properties");
     if (xProps != null) {
-      Map<String, Object> props = loadPropertiesFromXml(xProps);
-      BeanUtility.setProperties(this, props, true, null);
+      Map<String, Object> props = new HashMap<>();
+      success &= loadPropertiesFromXml(xProps, props);
+      success &= BeanUtility.setProperties(this, props, true, null);
 
       // load extension properties
       for (Element xExtension : XmlUtility.getChildElements(xProps, "extension")) {
@@ -2329,8 +2331,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         if (extension == null) {
           continue;
         }
-        Map<String, Object> extensionProps = loadPropertiesFromXml(xExtension);
-        BeanUtility.setProperties(extension, extensionProps, true, null);
+        Map<String, Object> extensionProps = new HashMap<>();
+        success &= loadPropertiesFromXml(xExtension, extensionProps);
+        success &= BeanUtility.setProperties(extension, extensionProps, true, null);
       }
     }
 
@@ -2348,7 +2351,13 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         visit(v, IFormField.class);
         IFormField f = v.getField();
         if (f != null) {
-          f.loadFromXml(xField);
+          try {
+            success &= f.loadFromXml(xField);
+          }
+          catch (Exception e) {
+            LOG.warn("Could not load field {}", String.join(".", xmlFieldIds), e);
+            success = false; // error while loading value
+          }
         }
       }
     }
@@ -2365,6 +2374,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         }
       }
     }, ITabBox.class);
+    return success;
   }
 
   /**
@@ -2389,11 +2399,15 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   /**
    * Extracts properties from &lt;property&gt; child elements in the given parent element.
    *
-   * @return Map of property name to property value
+   * @param xProps
+   *          The parent element
+   * @param props
+   *          The properties map to which the properties should be added
+   * @return <code>true</code> if all properties were loaded successfully. Otherwise <code>false</code>.
    * @see #storePropertiesToXml(Element, Map)
    */
-  protected Map<String, Object> loadPropertiesFromXml(Element xProps) {
-    Map<String, Object> props = new HashMap<>();
+  protected boolean loadPropertiesFromXml(Element xProps, Map<String, Object> props) {
+    boolean success = true;
     for (Element xProp : XmlUtility.getChildElements(xProps, "property")) {
       String name = xProp.getAttribute("name");
       try {
@@ -2402,9 +2416,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       }
       catch (Exception e) {
         LOG.warn("Could not load XML property {}", name, e);
+        success = false;
       }
     }
-    return props;
+    return success;
   }
 
   @Override

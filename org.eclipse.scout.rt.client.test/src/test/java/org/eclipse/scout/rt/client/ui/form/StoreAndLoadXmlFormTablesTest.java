@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 
@@ -18,7 +18,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXml2FormTest.TestForm.MainBox.GroupBox.TableField;
+import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXmlFormTablesTest.FullTestForm.MainBox.GroupBox.FullTableField;
+import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXmlFormTablesTest.FullTestForm.MainBox.GroupBox.FullTableField.FullTestTable;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
@@ -35,12 +36,12 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-public class StoreAndLoadXml2FormTest {
+public class StoreAndLoadXmlFormTablesTest {
 
   static final Object[][] TABLE_DATA = new Object[][]{
       new Object[]{1L, "One", new java.util.Date()},
-      new Object[]{2L, "Two", new StoreAndLoadXml2FormTest.InnerClass()},
-      new Object[]{3L, "Three", new StoreAndLoadXml2FormTest.InnerClass.InnerInnerClass()}
+      new Object[]{2L, "Two", new StoreAndLoadXmlFormTablesTest.InnerClass()},
+      new Object[]{3L, "Three", new StoreAndLoadXmlFormTablesTest.InnerClass.InnerInnerClass()}
   };
 
   public static class InnerClass implements Serializable {
@@ -81,23 +82,63 @@ public class StoreAndLoadXml2FormTest {
     }
   }
 
-  public static class TestForm extends AbstractForm {
+  public static class AbstractTestTable extends AbstractTable {
 
-    public TestForm() {
-      super();
+    public AbstractTestTable.KeyColumn getKeyColumn() {
+      return getColumnSet().getColumnByClass(AbstractTestTable.KeyColumn.class);
     }
+
+    public AbstractTestTable.StringColumn getStringColumn() {
+      return getColumnSet().getColumnByClass(AbstractTestTable.StringColumn.class);
+    }
+
+    @Order(10)
+    public class KeyColumn extends AbstractLongColumn {
+      @Override
+      protected boolean getConfiguredPrimaryKey() {
+        return true;
+      }
+
+      @Override
+      protected boolean getConfiguredDisplayable() {
+        return false;
+      }
+    }
+
+    @Order(20)
+    public class StringColumn extends AbstractStringColumn {
+      @Override
+      protected String getConfiguredHeaderText() {
+        return "String";
+      }
+
+      @Override
+      protected int getConfiguredWidth() {
+        return 100;
+      }
+    }
+  }
+
+  public static class TestFormWithoutTable extends AbstractForm {
+
+    @Order(10)
+    public class MainBox extends AbstractGroupBox {
+    }
+  }
+
+  public static class FullTestForm extends AbstractForm {
 
     @Override
     protected String getConfiguredTitle() {
-      return "TestForm";
+      return "FullTestForm";
     }
 
     public void startModify() {
       startInternal(new ModifyHandler());
     }
 
-    public TableField getTableField() {
-      return getFieldByClass(TableField.class);
+    public FullTableField getFullTableField() {
+      return getFieldByClass(FullTableField.class);
     }
 
     public MainBox getMainBox() {
@@ -121,7 +162,7 @@ public class StoreAndLoadXml2FormTest {
         }
 
         @Order(10)
-        public class TableField extends AbstractTableField<TableField.Table> {
+        public class FullTableField extends AbstractTableField<FullTestTable> {
 
           @Override
           protected int getConfiguredGridW() {
@@ -140,44 +181,10 @@ public class StoreAndLoadXml2FormTest {
             super.execReloadTableData();
           }
 
-          public class Table extends AbstractTable {
+          public class FullTestTable extends AbstractTestTable {
 
-            public KeyColumn getKeyColumn() {
-              return getColumnSet().getColumnByClass(KeyColumn.class);
-            }
-
-            public StringColumn getStringColumn() {
-              return getColumnSet().getColumnByClass(StringColumn.class);
-            }
-
-            public CustomColumn getCustomColumn() {
-              return getColumnSet().getColumnByClass(CustomColumn.class);
-            }
-
-            @Order(10)
-            public class KeyColumn extends AbstractLongColumn {
-              @Override
-              protected boolean getConfiguredPrimaryKey() {
-                return true;
-              }
-
-              @Override
-              protected boolean getConfiguredDisplayable() {
-                return false;
-              }
-            }
-
-            @Order(20)
-            public class StringColumn extends AbstractStringColumn {
-              @Override
-              protected String getConfiguredHeaderText() {
-                return "String";
-              }
-
-              @Override
-              protected int getConfiguredWidth() {
-                return 100;
-              }
+            public FullTestTable.CustomColumn getCustomColumn() {
+              return getColumnSet().getColumnByClass(FullTestTable.CustomColumn.class);
             }
 
             @Order(30)
@@ -204,28 +211,67 @@ public class StoreAndLoadXml2FormTest {
     public class ModifyHandler extends AbstractFormHandler {
       @Override
       protected void execLoad() {
-        getTableField().reloadTableData();
+        getFullTableField().reloadTableData();
       }
     }
   }
 
   @Test
-  public void test() {
-    TestForm f = new TestForm();
+  public void testLoadTableData() {
+    FullTestForm f = new FullTestForm();
     try {
       f.startModify();
-      assertArrayEquals(TABLE_DATA, f.getTableField().getTable().getTableData());
+      assertArrayEquals(TABLE_DATA, f.getFullTableField().getTable().getTableData());
       //store xml and clear
       String xml = f.storeToXmlString();
-      f.getTableField().getTable().discardAllRows();
-      assertArrayEquals(new Object[0][0], f.getTableField().getTable().getTableData());
+      f.getFullTableField().getTable().discardAllRows();
+      assertArrayEquals(new Object[0][0], f.getFullTableField().getTable().getTableData());
       //load xml
-      f.loadFromXmlString(xml);
-      assertArrayEquals(TABLE_DATA, f.getTableField().getTable().getTableData());
+      assertTrue(f.loadFromXmlString(xml));
+      assertArrayEquals(TABLE_DATA, f.getFullTableField().getTable().getTableData());
     }
     finally {
       f.doClose();
     }
   }
 
+  @Test
+  public void testLoadUnknownTableWithValue() {
+    FullTestForm sourceForm = new FullTestForm();
+    TestFormWithoutTable targetForm = new TestFormWithoutTable();
+    try {
+      sourceForm.startModify();
+      assertArrayEquals(TABLE_DATA, sourceForm.getFullTableField().getTable().getTableData());
+      String xml = sourceForm.storeToXmlString();
+
+      //load xml
+      targetForm.start();
+      // unknown fields are ignored: import should be successful
+      assertTrue(targetForm.loadFromXmlString(xml));
+    }
+    finally {
+      targetForm.doClose();
+      sourceForm.doClose();
+    }
+  }
+
+  @Test
+  public void testLoadUnknownTableWithoutValue() {
+    FullTestForm sourceForm = new FullTestForm();
+    TestFormWithoutTable targetForm = new TestFormWithoutTable();
+    try {
+      sourceForm.start();
+      assertArrayEquals(new Object[0][0], sourceForm.getFullTableField().getTable().getTableData());
+      String xml = sourceForm.storeToXmlString();
+
+      //load xml
+      targetForm.start();
+      // unknown fields are ignored: import should be successful
+      assertTrue(targetForm.loadFromXmlString(xml));
+    }
+    finally {
+      targetForm.doClose();
+      sourceForm.doClose();
+    }
+  }
 }
