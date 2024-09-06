@@ -31,6 +31,7 @@ public class HtmlHelper {
   private static final Pattern MULTIPLE_SPACES = Pattern.compile("[ ]+");
   private static final Pattern SPACES_ADJACENT_LINEBREAKS = Pattern.compile("[ ]+\n[ ]?|[ ]?\n[ ]+");
   private static final Pattern DECIMAL_NCR = Pattern.compile("&#(\\d+);");
+  private static final Pattern HEX_NCR = Pattern.compile("&#x([0-9a-fA-F]+);");
 
   /**
    * Very basic HTML to plain text conversion, without parsing and building a model.
@@ -121,13 +122,29 @@ public class HtmlHelper {
     s = StringUtility.replaceNoCase(s, "&#x9;", "\t");
 
     // decimal numeric character reference
+    StringBuilder sb = new StringBuilder();
     s = StringUtility.replace(s, "&zwj;", Character.toString(0x200D)); //zero width joiner for combined characters
     Matcher matcher = DECIMAL_NCR.matcher(s);
-    StringBuilder sb = new StringBuilder();
     while (matcher.find()) {
       String decimalNcr = matcher.group(1);
       try {
         String character = Character.toString(Integer.parseInt(decimalNcr));
+        matcher.appendReplacement(sb, character);
+      }
+      catch (IllegalArgumentException e) {
+        matcher.appendReplacement(sb, decimalNcr);
+      }
+    }
+    matcher.appendTail(sb);
+    s = sb.toString();
+
+    // hexadecimal numeric characters
+    sb = new StringBuilder();
+    matcher = HEX_NCR.matcher(s);
+    while (matcher.find()) {
+      String decimalNcr = matcher.group(1);
+      try {
+        String character = Character.toString(Integer.parseInt(decimalNcr, 16));
         matcher.appendReplacement(sb, character);
       }
       catch (IllegalArgumentException e) {
