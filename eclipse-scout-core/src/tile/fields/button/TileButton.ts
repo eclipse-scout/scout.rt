@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,8 +34,10 @@ export class TileButton extends Button {
     this.htmlComp.setLayout(new NullLayout());
 
     this.$container
+      .on('mousedown', event => this._doubleClickSupport.mousedown(event))
       .on('click', this._onClick.bind(this))
       .unfocusable();
+    this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
   }
 
   protected override _remove() {
