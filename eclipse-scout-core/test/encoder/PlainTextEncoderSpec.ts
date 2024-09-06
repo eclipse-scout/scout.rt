@@ -137,6 +137,16 @@ describe('PlainTextEncoder', () => {
     );
   });
 
+  it('converts hexadecimal NCRs to unicode character', () => {
+    // Emojis
+    expect(encoder.encode('&#x1f600;')).toBe('\uD83D\uDE00'); // Grinning Face
+    expect(encoder.encode('&#x1f60e;')).toBe('\uD83D\uDE0E'); // Smiling Face with Sunglasses
+
+    // Other characters
+    expect(encoder.encode('&#39;&#x27;&apos;')).toBe('\u0027\u0027\u0027');
+    expect(encoder.encode('&#x68;&#x69;')).toBe('hi');
+  });
+
   it('removes font icons if configured', () => {
     let htmlText = '<span class="table-cell-icon font-icon"></span><span class="text">Text</span>';
     expect(encoder.encode(htmlText)).toBe('Text');

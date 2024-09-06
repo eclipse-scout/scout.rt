@@ -239,4 +239,17 @@ public class HtmlHelperTest {
     assertEquals("one &amp; two<br>three &amp; four", helper.escapeAndNewLineToBr("one & two\nthree & four"));
     assertEquals("&gt;&lt;script&gt;alert(&#39;hacker<br>attack&#39;);&lt;&#47;script&gt;&lt;", helper.escapeAndNewLineToBr("><script>alert('hacker\r\nattack');</script><"));
   }
+
+  @Test
+  public void testHexEncodedCharacters() {
+    HtmlHelper helper = BEANS.get(HtmlHelper.class);
+
+    // Emojis
+    assertEquals("\uD83D\uDE00", helper.toPlainText("&#x1f600;")); // Grinning Face
+    assertEquals("\uD83D\uDE0E", helper.toPlainText("&#x1f60e;")); // Smiling Face with Sunglasses
+
+    // Other characters
+    assertEquals("\u0027\u0027\u0027", helper.toPlainText("&#39;&#x27;&apos;"));
+    assertEquals("hi", helper.toPlainText("&#x68;&#x69;"));
+  }
 }
