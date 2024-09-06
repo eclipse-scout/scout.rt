@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -55,6 +56,7 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.EnumerationUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -98,9 +100,9 @@ public class HttpProxyTest {
   @Parameters
   public static List<IScoutTestParameter> getParameters() {
     return List.of(
-        new HttpProxyTestParameter(new DefaultAsyncHttpClientManager(), server -> new ServerConnector(server, new HttpConnectionFactory())),
-        new HttpProxyTestParameter(new H2AsyncHttpClientManager(), server -> new ServerConnector(server, new HTTP2CServerConnectionFactory(new HttpConfiguration()))),
-        new HttpProxyTestParameter(new ForceHttp2DefaultAsyncHttpClientManager(), server -> new ServerConnector(server, new HTTP2CServerConnectionFactory(new HttpConfiguration()))));
+        new HttpProxyTestParameter(DefaultAsyncHttpClientManager.class, server -> new ServerConnector(server, new HttpConnectionFactory())),
+        new HttpProxyTestParameter(H2AsyncHttpClientManager.class, server -> new ServerConnector(server, new HTTP2CServerConnectionFactory(new HttpConfiguration()))),
+        new HttpProxyTestParameter(ForceHttp2DefaultAsyncHttpClientManager.class, server -> new ServerConnector(server, new HTTP2CServerConnectionFactory(new HttpConfiguration()))));
   }
 
   public HttpProxyTest(HttpProxyTestParameter testParameter) {
@@ -535,6 +537,65 @@ public class HttpProxyTest {
     handledThrowables.clear(); // do not fail test because there were handled exceptions (see JUnitExceptionHandler)
   }
 
+  @Test
+  public void testUnexpectedCompletedAsyncContextDuringFailureMustNotAffectOtherRequests() {
+    AbstractHandler handler = new AbstractHandler() {
+      @Override
+      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+        baseRequest.setHandled(true);
+      }
+    };
+
+    try {
+      m_handlerCollection.addHandler(handler);
+      m_proxy.withRemoteBaseUrl(m_server.getURI().toString());
+
+      AsyncContext asyncContext = mock(AsyncContext.class);
+      IllegalStateException e2 = new IllegalStateException();
+      // first call of complete should throw, succeeding don't
+      doThrow(e2).doNothing().when(asyncContext).complete();
+
+      HttpServletRequest httpReq = prepareHttpRequest("/", asyncContext);
+
+      HttpServletResponse httpResp = mock(HttpServletResponse.class);
+      BufferedServletOutputStream outputStream = new BufferedServletOutputStream();
+      when(httpResp.getOutputStream()).thenReturn(outputStream);
+      AlreadyInvalidatedException e1 = new AlreadyInvalidatedException(null, null);
+      // first call of setHeader should throw, succeeding don't
+      doThrow(e1).doNothing().when(httpResp).setHeader(anyString(), anyString());
+
+      // first request (results in an error - expected)
+      m_proxy.proxy(httpReq, httpResp, mock(HttpProxyRequestOptions.class));
+      verify(asyncContext, timeout(3000L).times(1)).complete();
+      verify(httpResp).setStatus(eq(500));
+      List<Throwable> errors = BEANS.get(JUnitExceptionHandler.class).getErrors();
+      assertEquals(2, errors.size());
+      Stream.of(e1, e1).forEach(errors::remove);
+      BEANS.get(JUnitExceptionHandler.class).throwOnError(); // no more errors expected
+
+      int numOfRequests = 16;
+      IntStream.range(0, numOfRequests).parallel().forEach(i -> {
+        // more requests: one request seems to be not sufficient to cause an IOReactorShutdownException [only for some client managers]
+        // but with 16 requests an IOReactorShutdownException always happens if IllegalStateException is not handled properly
+        try {
+          m_proxy.proxy(httpReq, httpResp, mock(HttpProxyRequestOptions.class));
+        }
+        catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
+      BEANS.get(JUnitExceptionHandler.class).throwOnError(); // no errors expected for all requests
+      verify(asyncContext, timeout(3000L).times(1 /* see above */ + numOfRequests)).complete();
+      verify(httpResp, times(numOfRequests)).setStatus(eq(200));
+    }
+    catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
+    finally {
+      m_handlerCollection.removeHandler(handler);
+    }
+  }
+
   public HttpServletResponse testProxyRequestInternal(Handler handler, int numberOfRequests, String pathInfo) {
     return testProxyRequestInternal(handler, 30 * 1000L, numberOfRequests, pathInfo);
   }
@@ -546,11 +607,7 @@ public class HttpProxyTest {
 
       AsyncContext asyncContext = mock(AsyncContext.class);
 
-      HttpServletRequest httpReq = mock(HttpServletRequest.class);
-      when(httpReq.getMethod()).thenReturn(Method.GET.toString());
-      when(httpReq.getPathInfo()).thenReturn(pathInfo != null ? pathInfo : "/");
-      when(httpReq.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
-      when(httpReq.startAsync(any(), any())).thenReturn(asyncContext);
+      HttpServletRequest httpReq = prepareHttpRequest(pathInfo != null ? pathInfo : "/", asyncContext);
 
       HttpServletResponse httpResp = mock(HttpServletResponse.class);
       BufferedServletOutputStream outputStream = new BufferedServletOutputStream();
@@ -576,18 +633,30 @@ public class HttpProxyTest {
     }
   }
 
+  protected HttpServletRequest prepareHttpRequest(String pathInfo, AsyncContext asyncContext) {
+    HttpServletRequest httpReq = mock(HttpServletRequest.class);
+    when(httpReq.getMethod()).thenReturn(Method.GET.toString());
+    when(httpReq.getPathInfo()).thenReturn(pathInfo);
+    when(httpReq.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
+    when(httpReq.startAsync(any(), any())).thenReturn(asyncContext);
+    return httpReq;
+  }
+
   public static class HttpProxyTestParameter implements IScoutTestParameter {
 
-    private final AbstractAsyncHttpClientManager<?> m_clientManager;
+    private final Class<? extends AbstractAsyncHttpClientManager<?>> m_clientManagerClazz;
+    private final Supplier<? extends AbstractAsyncHttpClientManager<?>> m_clientManagerSupplier;
     private final Function<Server, ServerConnector> m_serverConnectorFunction;
 
-    public HttpProxyTestParameter(AbstractAsyncHttpClientManager<?> clientManager, Function<Server, ServerConnector> serverConnectorFunction) {
-      m_clientManager = clientManager;
+    public HttpProxyTestParameter(Class<? extends AbstractAsyncHttpClientManager<?>> clientManagerClazz, Function<Server, ServerConnector> serverConnectorFunction) {
+      m_clientManagerClazz = clientManagerClazz;
+      m_clientManagerSupplier = BeanInstanceUtil.beanInstanceCreator(clientManagerClazz);
       m_serverConnectorFunction = serverConnectorFunction;
     }
 
     public AbstractAsyncHttpClientManager<?> getClientManager() {
-      return m_clientManager;
+      // always use a new instance to avoid influencing other tests (if whole client gets corrupted)
+      return m_clientManagerSupplier.get();
     }
 
     public Function<Server, ServerConnector> getServerConnectorFunction() {
@@ -596,7 +665,7 @@ public class HttpProxyTest {
 
     @Override
     public String getName() {
-      return m_clientManager.getClass().getSimpleName();
+      return m_clientManagerClazz.getSimpleName();
     }
   }
 
