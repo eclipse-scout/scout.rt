@@ -739,7 +739,14 @@ public class HttpProxy {
         catch (AlreadyInvalidatedException e) {
           LOG.trace("Response is invalidated", e);
         }
-        asyncContext.complete();
+        try {
+          // this method is already called to handle an exception from within a http-client catch block
+          // it must not throw another exception again, otherwise caller may not handle this well again, it may even corrupt the whole connection pool
+          asyncContext.complete();
+        }
+        catch (Exception e) {
+          LOG.warn("Unable to complete async context, assuming already completed", e);
+        }
       }
 
       @Override
