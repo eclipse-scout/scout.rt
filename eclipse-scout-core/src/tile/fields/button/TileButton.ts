@@ -19,7 +19,7 @@ export class TileButton extends Button {
   }
 
   protected override _render() {
-    if ((this.parent as FormFieldTile).displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+    if (!this._isInDashboardTile()) {
       super._render();
       return;
     }
@@ -52,8 +52,12 @@ export class TileButton extends Button {
     super._remove();
   }
 
+  protected _isInDashboardTile() {
+    return (this.parent as FormFieldTile).displayStyle === FormFieldTile.DisplayStyle.DASHBOARD;
+  }
+
   protected override _renderIconId() {
-    if ((this.parent as FormFieldTile).displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+    if (!this._isInDashboardTile()) {
       super._renderIconId();
       return;
     }
@@ -73,6 +77,13 @@ export class TileButton extends Button {
     }
     // Invalidate layout because button may now be longer or shorter
     this.invalidateLayoutTree();
+  }
+
+  protected override _renderSubmenuIcon() {
+    if (!this._isInDashboardTile()) {
+      super._renderSubmenuIcon();
+    }
+    // Do not render sub menu icon
   }
 
   /** @internal */

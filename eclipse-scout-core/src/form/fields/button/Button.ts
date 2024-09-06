@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -132,10 +132,6 @@ export class Button extends FormField implements ButtonModel {
     });
   }
 
-  /**
-   * The button form-field has no label and no status. Additionally it also has no container.
-   * Container and field are the same thing.
-   */
   protected override _render() {
     let $button: JQuery;
     if (this.displayStyle === Button.DisplayStyle.LINK) {
@@ -166,19 +162,6 @@ export class Button extends FormField implements ButtonModel {
       .on('click', this._onClick.bind(this))
       .unfocusable();
 
-    if (this.menus && this.menus.length > 0) {
-      aria.hasPopup($button, 'menu');
-      this.menus.forEach(menu => this.keyStrokeContext.registerKeyStroke(menu));
-      if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
-        let icon = icons.parseIconId(Button.SUBMENU_ICON);
-        this.$submenuIcon = $button
-          .appendSpan('submenu-icon')
-          .text(icon.iconCharacter);
-        aria.hidden(this.$submenuIcon, true);
-      }
-    } else {
-      aria.hasPopup($button, null);
-    }
     this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 
     tooltips.installForEllipsis(this.$buttonLabel, {
@@ -198,6 +181,7 @@ export class Button extends FormField implements ButtonModel {
     this._renderIconId();
     this._renderSelected();
     this._renderDefaultButton();
+    this._updateLabelAndIconStyle();
   }
 
   protected override _renderForegroundColor() {
@@ -222,9 +206,33 @@ export class Button extends FormField implements ButtonModel {
 
   override _updateMenus() {
     super._updateMenus();
-    let hasMenus = this.menus && this.menus.length > 0;
+
+    let hasMenus = this.menus.length > 0;
     aria.hasPopup(this.$field, hasMenus ? 'menu' : null);
     aria.expanded(this.$field, hasMenus ? !objects.isNullOrUndefined(this.popup) : null);
+
+    this._renderSubmenuIcon();
+  }
+
+  protected _renderSubmenuIcon() {
+    let hasMenus = this.menus?.length > 0;
+    if (hasMenus && (this.label || !this.iconId)) { // no indicator when _only_ the icon is visible
+      if (!this.$submenuIcon) {
+        let icon = icons.parseIconId(Button.SUBMENU_ICON);
+        this.$submenuIcon = this.$field
+          .appendSpan('submenu-icon')
+          .text(icon.iconCharacter);
+        aria.hidden(this.$submenuIcon, true);
+        this.invalidateLayoutTree();
+      }
+    } else if (this.$submenuIcon) {
+      this.$submenuIcon.remove();
+      this.$submenuIcon = null;
+      this.invalidateLayoutTree();
+    }
+    if (!this.rendering) {
+      this._updateLabelAndIconStyle();
+    }
   }
 
   /**
@@ -305,7 +313,9 @@ export class Button extends FormField implements ButtonModel {
 
   protected override _renderLabel() {
     this.$buttonLabel.contentOrNbsp(this.labelHtmlEnabled, this.label, 'empty');
-    this._updateLabelAndIconStyle();
+    if (!this.rendering) {
+      this._renderSubmenuIcon();
+    }
 
     // Invalidate layout because button may now be longer or shorter
     this.invalidateLayoutTree();
@@ -339,7 +349,9 @@ export class Button extends FormField implements ButtonModel {
       }
     }
 
-    this._updateLabelAndIconStyle();
+    if (!this.rendering) {
+      this._renderSubmenuIcon();
+    }
     // Invalidate layout because button may now be longer or shorter
     this.invalidateLayoutTree();
 
@@ -359,7 +371,11 @@ export class Button extends FormField implements ButtonModel {
 
   protected _updateLabelAndIconStyle() {
     let hasText = !!this.label;
-    this.$buttonLabel.setVisible(hasText || !this.iconId);
+    let hasIcon = !!this.iconId;
+    let hasSubMenuIcon = !!this.$submenuIcon;
+    let hasAnyIcon = hasIcon || hasSubMenuIcon;
+    this.$buttonLabel.setVisible(hasText || !hasAnyIcon);
+    this.$submenuIcon?.toggleClass('with-label', hasText);
     this.get$Icon().toggleClass('with-label', hasText);
   }
 
