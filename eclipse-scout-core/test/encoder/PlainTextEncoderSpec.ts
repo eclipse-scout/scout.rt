@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -135,6 +135,16 @@ describe('PlainTextEncoder', () => {
       'Party Popper Emoji: \uD83C\uDF89\n' +
       'Man Technologist: Medium-light Skin Tone: \uD83D\uDC68\uD83C\uDFFC\u200D\uD83D\uDCBB\n'
     );
+  });
+
+  it('converts hexadecimal NCRs to unicode character', () => {
+    // Emojis
+    expect(encoder.encode('&#x1f600;')).toBe('\uD83D\uDE00'); // Grinning Face
+    expect(encoder.encode('&#x1f60e;')).toBe('\uD83D\uDE0E'); // Smiling Face with Sunglasses
+
+    // Other characters
+    expect(encoder.encode('&#39;&#x27;&apos;')).toBe('\u0027\u0027\u0027');
+    expect(encoder.encode('&#x68;&#x69;')).toBe('hi');
   });
 
   it('removes font icons if configured', () => {
