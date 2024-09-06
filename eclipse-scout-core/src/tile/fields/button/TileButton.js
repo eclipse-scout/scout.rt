@@ -33,8 +33,10 @@ export default class TileButton extends Button {
     this.htmlComp.setLayout(new NullLayout());
 
     this.$container
+      .on('mousedown', event => this._doubleClickSupport.mousedown(event))
       .on('click', this._onClick.bind(this))
       .unfocusable();
+    this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
   }
 
   _remove() {
