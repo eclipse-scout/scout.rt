@@ -36,6 +36,7 @@ export class TileButton extends Button {
     this.htmlComp.setLayout(new NullLayout());
 
     this.$container
+      .on('mousedown', event => this._doubleClickSupport.mousedown(event))
       .on('click', (event: JQuery.ClickEvent) => {
         if (this.fieldStatus.$container.isOrHas(event.target)) {
           return;
@@ -43,6 +44,7 @@ export class TileButton extends Button {
         this._onClick(event);
       })
       .unfocusable();
+    this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
   }
 
   protected override _remove() {
