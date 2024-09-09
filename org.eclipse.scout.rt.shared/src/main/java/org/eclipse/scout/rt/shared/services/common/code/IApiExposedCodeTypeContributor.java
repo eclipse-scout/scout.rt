@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.rt.api.data.code;
+package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.Set;
 
@@ -18,12 +18,12 @@ import org.eclipse.scout.rt.platform.Bean;
  * Contributor for CodeTypes that should be exposed by the Scout REST api.
  */
 @Bean
-public interface IApiExposedCodeTypeContributor extends IApiExposedItemContributor<CodeTypeDo> {
+public interface IApiExposedCodeTypeContributor extends IApiExposedItemContributor<ICodeType> {
   /**
    * @param codeTypes
-   *          Live {@link Set} of {@link CodeTypeDo} which are published in the Scout REST resource. The {@link Set} may
+   *          Live {@link Set} of {@link ICodeType} which are published in the Scout REST resource. The {@link Set} may
    *          be directly modified.
    */
   @Override
-  void contribute(Set<CodeTypeDo> codeTypes);
+  void contribute(Set<ICodeType> codeTypes);
 }

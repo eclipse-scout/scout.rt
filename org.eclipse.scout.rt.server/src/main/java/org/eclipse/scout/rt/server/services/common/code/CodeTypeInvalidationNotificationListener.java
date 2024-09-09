@@ -14,7 +14,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.rt.api.uinotification.UiNotificationPutOptions.noTransaction;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -26,7 +25,6 @@ import jakarta.annotation.PreDestroy;
 
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeUpdateMessageDo;
-import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeContributor;
 import org.eclipse.scout.rt.api.uinotification.UiNotificationRegistry;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -38,6 +36,7 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.shared.services.common.code.ApiExposedCodeTypeDoProvider;
 import org.eclipse.scout.rt.shared.services.common.code.CodeService;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheKey;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheUtility;
@@ -121,13 +120,12 @@ public class CodeTypeInvalidationNotificationListener implements Consumer<ICache
     }
 
     public void notifyInvalidatedCodeTypes() {
-      Set<String> exposedCodeTypeIds = getExposedCodeTypeIds(); // only notify for CodeTypes which are exposed!
       CodeTypeCacheUtility codeTypeCacheUtility = BEANS.get(CodeTypeCacheUtility.class);
-      List<CodeTypeDo> updatedAndExposedCodeTypes = BEANS.all(ICodeType.class).stream()
+      List<CodeTypeDo> updatedAndExposedCodeTypes = BEANS.get(ApiExposedCodeTypeDoProvider.class)
+          .getExposedCodeTypes().stream()
           .filter(codeType -> needsNotify(codeTypeCacheUtility.createCacheKey(codeType.getClass()), codeType))
           .map(ICodeType::toDo)
           .filter(Objects::nonNull)
-          .filter(codeTypeDo -> exposedCodeTypeIds.contains(codeTypeDo.getId()))
           .collect(Collectors.toList());
       notifyExposedCodeTypeUpdate(updatedAndExposedCodeTypes);
     }
@@ -160,14 +158,6 @@ public class CodeTypeInvalidationNotificationListener implements Consumer<ICache
 
     protected String getUserId() {
       return BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
-    }
-
-    public Set<String> getExposedCodeTypeIds() {
-      var codeTypes = new HashSet<CodeTypeDo>();
-      BEANS.all(IApiExposedCodeTypeContributor.class).forEach(contributor -> contributor.contribute(codeTypes));
-      return codeTypes.stream()
-          .map(CodeTypeDo::getId)
-          .collect(toSet());
     }
   }
 }
