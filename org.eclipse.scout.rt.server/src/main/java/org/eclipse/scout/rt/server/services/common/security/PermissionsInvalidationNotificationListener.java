@@ -13,7 +13,6 @@ import static org.eclipse.scout.rt.api.uinotification.UiNotificationPutOptions.n
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -24,6 +23,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
 import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 @ApplicationScoped
 @CreateImmediately
 @SuppressWarnings("unchecked")
-public class PermissionsInvalidationNotificationListener implements Consumer<ICacheEntryFilter<Object, IPermissionCollection>> {
+public class PermissionsInvalidationNotificationListener implements ICacheInvalidationListener<Object, IPermissionCollection> {
 
   @PostConstruct
   protected void init() {
@@ -51,9 +51,12 @@ public class PermissionsInvalidationNotificationListener implements Consumer<ICa
   }
 
   @Override
-  public void accept(ICacheEntryFilter<Object, IPermissionCollection> filter) {
+  public void invalidated(ICacheEntryFilter<Object, IPermissionCollection> filter, boolean propagate) {
+    if (filter == null) {
+      return; // nothing has been invalidated
+    }
     ITransaction transaction = ITransaction.CURRENT.get();
-    if (transaction == null || filter == null) {
+    if (transaction == null) {
       return;
     }
     transaction.registerMemberIfAbsentAndNotCancelled(PermissionsUiNotificationTransactionMember.TRANSACTION_MEMBER_ID, id -> createTransactionMember(filter));
@@ -99,11 +102,11 @@ public class PermissionsInvalidationNotificationListener implements Consumer<ICa
             .run(() -> cacheKeys.stream()
                 .map(accessControlService::getUserIdForCacheKey)
                 .filter(Objects::nonNull)
-                .forEach(userId -> uiNotificationRegistry.put(TOPIC, userId, updateDo, noTransaction())));
+                .forEach(userId -> uiNotificationRegistry.put(TOPIC, userId, updateDo, noTransaction().withPublishOverCluster(false))));
       }
       else {
         // update for all clients
-        uiNotificationRegistry.put(TOPIC, updateDo, noTransaction());
+        uiNotificationRegistry.put(TOPIC, updateDo, noTransaction().withPublishOverCluster(false));
       }
     }
   }
