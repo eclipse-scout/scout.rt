@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.api.code;
 
+import static java.util.Collections.emptySet;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,7 +32,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.eclipse.scout.rt.api.data.code.CodeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
 import org.eclipse.scout.rt.api.data.code.CodeTypeRequest;
-import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeContributor;
+import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeDoProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -67,11 +69,9 @@ public class CodeResource implements IRestResource {
   }
 
   protected Map<String, CodeTypeDo> getCodeTypesById(Set<String> ids) {
-    Set<CodeTypeDo> codeTypes = new HashSet<>();
-    BEANS.all(IApiExposedCodeTypeContributor.class).forEach(contributor -> contributor.contribute(codeTypes));
-    if (CollectionUtility.hasElements(ids)) {
-      codeTypes.removeIf(codeType -> !ids.contains(codeType.getId()));
-    }
+    Set<CodeTypeDo> codeTypes = BEANS.optional(IApiExposedCodeTypeDoProvider.class)
+        .map(provider -> provider.provide(ids))
+        .orElse(emptySet()); // if no provider is available, no CodeTypes can be available, because no shared is available.
     return convertToMap(codeTypes);
   }
 
