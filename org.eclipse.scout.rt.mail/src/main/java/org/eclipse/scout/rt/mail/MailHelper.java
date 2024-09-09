@@ -1046,7 +1046,7 @@ public class MailHelper {
               String s;
               while ((s = reader.readLine()) != null) {
                 s = s.trim();
-                if (s.startsWith("Message-ID:")) {
+                if (s.toLowerCase().startsWith("Message-ID:".toLowerCase())) {
                   replyToHeaders = new String[]{s.substring("Message-ID:".length()).trim()};
                   break;
                 }
