@@ -9,13 +9,10 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code;
 
-import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.scout.rt.api.data.ApiExposeHelper;
 import org.eclipse.scout.rt.api.data.ApiExposed;
-import org.eclipse.scout.rt.api.data.code.CodeTypeDo;
-import org.eclipse.scout.rt.api.data.code.IApiExposedCodeTypeContributor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
@@ -29,13 +26,10 @@ public class ApiExposedCodeTypeDoContributor implements IApiExposedCodeTypeContr
   private final ApiExposeHelper m_apiExposeHelper = BEANS.get(ApiExposeHelper.class);
 
   @Override
-  public void contribute(Set<CodeTypeDo> codeTypes) {
+  public void contribute(Set<ICodeType> codeTypes) {
     BEANS.getBeanManager().getBeans(ICodeType.class).stream()
         .filter(this::isApiExposedCodeType)
         .map(IBean::getInstance)
-        .map(ICodeType::toDo)
-        .filter(Objects::nonNull)
-        .filter(codeType -> codeType.getId() != null) // id is mandatory
         .forEach(codeTypes::add);
   }
 
