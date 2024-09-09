@@ -24,10 +24,12 @@ public class LogoutService implements ILogoutService {
 
   @Override
   public void logout() {
-    BEANS.get(IAccessControlService.class).clearCacheOfCurrentUser();
-
     HttpServletRequest httpRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     if (httpRequest != null) {
+      // clear permission cache only if logout is triggered by an external HTTP request (explicitly not when triggered
+      // by HTTP session invalidation)
+      BEANS.get(IAccessControlService.class).clearCacheOfCurrentUser();
+
       try {
         HttpSession session = httpRequest.getSession(false);
         if (session != null) {
