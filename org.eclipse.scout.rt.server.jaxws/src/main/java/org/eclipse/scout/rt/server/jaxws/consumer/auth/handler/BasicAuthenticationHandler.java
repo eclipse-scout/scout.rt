@@ -19,6 +19,7 @@ import jakarta.xml.ws.handler.MessageContext;
 import jakarta.xml.ws.handler.soap.SOAPHandler;
 import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
  * and the server is secure. The connection should be established either over a dedicated line or by using Secure
  * Sockets Layer (SSL) encryption and Transport Layer Security (TLS).
  */
+@ApplicationScoped
 public class BasicAuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 
   protected static final String AUTH_BASIC_PREFIX = "Basic ";
