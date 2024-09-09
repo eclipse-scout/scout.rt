@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
@@ -108,14 +109,15 @@ public abstract class AbstractHealthCheckServlet extends AbstractHttpServlet {
     resp.setContentType("text/plain");
     resp.setStatus(statusCode);
 
-    if (LOG.isDebugEnabled() || Platform.get().inDevelopmentMode()) {
-      String detailedOutput = generateOutput(statusCode, checks, failed, true);
-      LOG.debug(detailedOutput);
-      resp.getWriter().print(Platform.get().inDevelopmentMode() ? detailedOutput : output);
+    LazyValue<String> detailedOutput = new LazyValue<>(() -> generateOutput(statusCode, checks, failed, true));
+    boolean isDevelopmentMode = Platform.get().inDevelopmentMode();
+    if (statusCode != HttpServletResponse.SC_OK) {
+      LOG.warn(detailedOutput.get());
     }
-    else {
-      resp.getWriter().print(output);
+    else if (LOG.isDebugEnabled() || isDevelopmentMode) {
+      LOG.debug(detailedOutput.get());
     }
+    resp.getWriter().print(isDevelopmentMode ? detailedOutput.get() : output);
   }
 
   protected List<IHealthChecker> getActiveHealthCheckers() {
