@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import jakarta.annotation.PostConstruct;
 
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.platform.cache.AbstractCacheWrapper;
 import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
 import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -53,7 +53,7 @@ public class CodeService implements ICodeService {
   public static final String CODE_SERVICE_CACHE_ID = CodeService.class.getName();
 
   private volatile ICache<CodeTypeCacheKey, ICodeType<?, ?>> m_cache;
-  private volatile IFastListenerList<Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>>> m_invalidationListeners;
+  private volatile IFastListenerList<ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>>> m_invalidationListeners;
 
   /**
    * Creates and initializes a new cache. Executed in {@link PostConstruct} to ensure that the cache created exactly
@@ -90,7 +90,7 @@ public class CodeService implements ICodeService {
     @Override
     public void invalidate(ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> filter, boolean propagate) {
       super.invalidate(filter, propagate);
-      BEANS.get(CodeService.class).getInvalidationListeners().forEach(l -> l.accept(filter));
+      BEANS.get(CodeService.class).getInvalidationListeners().forEach(l -> l.invalidated(filter, propagate));
     }
   }
 
@@ -127,21 +127,21 @@ public class CodeService implements ICodeService {
   }
 
   @Override
-  public void addInvalidationListener(Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> listener) {
+  public void addInvalidationListener(ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>> listener) {
     if (listener != null) {
       m_invalidationListeners.add(listener);
     }
   }
 
   @Override
-  public void removeInvalidationListener(Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> listener) {
+  public void removeInvalidationListener(ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>> listener) {
     if (listener != null) {
       m_invalidationListeners.remove(listener);
     }
   }
 
   @Override
-  public List<Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>>> getInvalidationListeners() {
+  public List<ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>>> getInvalidationListeners() {
     return m_invalidationListeners.list();
   }
 

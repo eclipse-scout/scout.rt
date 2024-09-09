@@ -13,9 +13,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
 import org.eclipse.scout.rt.platform.service.IService;
 
 public interface ICodeService extends IService {
@@ -72,17 +72,17 @@ public interface ICodeService extends IService {
    *          The listener to add. All entries in the cache which accept the given {@link ICacheEntryFilter} have been
    *          invalidated.
    */
-  void addInvalidationListener(Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> listener);
+  void addInvalidationListener(ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>> listener);
 
   /**
    * Removes the given listener.
    */
-  void removeInvalidationListener(Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> listener);
+  void removeInvalidationListener(ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>> listener);
 
   /**
    * @return All registered invalidation listeners.
    */
-  List<Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>>> getInvalidationListeners();
+  List<ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>>> getInvalidationListeners();
 
   /**
    * @return all code type classes

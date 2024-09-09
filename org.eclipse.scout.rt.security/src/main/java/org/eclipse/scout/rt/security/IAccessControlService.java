@@ -10,12 +10,12 @@
 package org.eclipse.scout.rt.security;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
@@ -62,21 +62,21 @@ public interface IAccessControlService extends IService {
    *          The listener to add. The {@link ICacheEntryFilter} given to the listener is the filter passed to
    *          {@link ICache#invalidate(ICacheEntryFilter, boolean)}.
    */
-  void addInvalidationListener(Consumer<ICacheEntryFilter<Object, IPermissionCollection>> listener);
+  void addInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener);
 
   /**
    * Removes the given listener.
    */
-  void removeInvalidationListener(Consumer<ICacheEntryFilter<Object, IPermissionCollection>> listener);
+  void removeInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener);
 
   /**
    * @return All registered invalidation listeners.
    */
-  List<Consumer<ICacheEntryFilter<Object, IPermissionCollection>>> getInvalidationListeners();
+  List<ICacheInvalidationListener<Object, IPermissionCollection>> getInvalidationListeners();
 
   /**
    * @param cacheKey
-   *     A cacheKey used by the internal cache of this service.
+   *          A cacheKey used by the internal cache of this service.
    * @return The userId (username) of the given cacheKey.
    */
   String getUserIdForCacheKey(Object cacheKey);

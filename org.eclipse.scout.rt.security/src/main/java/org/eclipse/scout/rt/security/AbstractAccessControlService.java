@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +30,7 @@ import org.eclipse.scout.rt.platform.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
 import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -61,7 +61,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   private volatile Pattern[] m_userIdSearchPatterns;
   private volatile ICache<K, IPermissionCollection> m_cache;
-  private volatile IFastListenerList<Consumer<ICacheEntryFilter<Object, IPermissionCollection>>> m_invalidationListeners;
+  private volatile IFastListenerList<ICacheInvalidationListener<Object, IPermissionCollection>> m_invalidationListeners;
 
   public AbstractAccessControlService() {
     m_userIdSearchPatterns = new Pattern[]{
@@ -136,26 +136,26 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
     @Override
     public void invalidate(ICacheEntryFilter<Object, IPermissionCollection> filter, boolean propagate) {
       super.invalidate(filter, propagate);
-      BEANS.get(IAccessControlService.class).getInvalidationListeners().forEach(l -> l.accept(filter));
+      BEANS.get(IAccessControlService.class).getInvalidationListeners().forEach(l -> l.invalidated(filter, propagate));
     }
   }
 
   @Override
-  public void addInvalidationListener(Consumer<ICacheEntryFilter<Object, IPermissionCollection>> listener) {
+  public void addInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener) {
     if (listener != null) {
       m_invalidationListeners.add(listener);
     }
   }
 
   @Override
-  public void removeInvalidationListener(Consumer<ICacheEntryFilter<Object, IPermissionCollection>> listener) {
+  public void removeInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener) {
     if (listener != null) {
       m_invalidationListeners.remove(listener);
     }
   }
 
   @Override
-  public List<Consumer<ICacheEntryFilter<Object, IPermissionCollection>>> getInvalidationListeners() {
+  public List<ICacheInvalidationListener<Object, IPermissionCollection>> getInvalidationListeners() {
     return m_invalidationListeners.list();
   }
 
