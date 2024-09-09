@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.healthcheck.IHealthChecker.IHealthCheckCategory;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
@@ -80,14 +81,15 @@ public class HealthCheckServlet extends AbstractHttpServlet {
     resp.setContentType("text/plain");
     resp.setStatus(statusCode);
 
-    if (LOG.isDebugEnabled() || Platform.get().inDevelopmentMode()) {
-      String detailedOutput = generateOutput(statusCode, result, true);
-      LOG.debug("Status {}", StringUtility.replaceNewLines(detailedOutput, ", "));
-      resp.getWriter().print(Platform.get().inDevelopmentMode() ? detailedOutput : output);
+    LazyValue<String> detailedOutput = new LazyValue<>(() -> generateOutput(statusCode, result, true));
+    boolean isDevelopmentMode = Platform.get().inDevelopmentMode();
+    if (statusCode != HttpServletResponse.SC_OK) {
+      LOG.warn("Status {}", StringUtility.replaceNewLines(detailedOutput.get(), ", "));
     }
-    else {
-      resp.getWriter().print(output);
+    else if (LOG.isDebugEnabled() || isDevelopmentMode) {
+      LOG.debug("Status {}", StringUtility.replaceNewLines(detailedOutput.get(), ", "));
     }
+    resp.getWriter().print(isDevelopmentMode ? detailedOutput.get() : output);
   }
 
   /**
