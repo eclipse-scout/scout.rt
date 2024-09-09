@@ -23,6 +23,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.consumer.InvocationContext;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.server.jaxws.consumer.InvocationContext;
  * the server is secure. The connection should be established either over a dedicated line or by using Secure Sockets
  * Layer (SSL) encryption and Transport Layer Security (TLS).
  */
+@ApplicationScoped
 public class WsseUsernameTokenAuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 
   private static final String WSSE = "wsse";
