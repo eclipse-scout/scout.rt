@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
@@ -30,6 +29,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheInvalidationListener;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
@@ -47,7 +47,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
  */
 @ApplicationScoped
 @CreateImmediately
-public class CodeTypeInvalidationNotificationListener implements Consumer<ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>>> {
+public class CodeTypeInvalidationNotificationListener implements ICacheInvalidationListener<CodeTypeCacheKey, ICodeType<?, ?>> {
 
   @PostConstruct
   protected void init() {
@@ -60,7 +60,10 @@ public class CodeTypeInvalidationNotificationListener implements Consumer<ICache
   }
 
   @Override
-  public void accept(ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> filter) {
+  public void invalidated(ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> filter, boolean propagate) {
+    if (filter == null) {
+      return; // nothing has been invalidated
+    }
     ITransaction transaction = ITransaction.CURRENT.get();
     if (transaction == null) {
       return;
@@ -145,7 +148,7 @@ public class CodeTypeInvalidationNotificationListener implements Consumer<ICache
       // send message to current user directly including the new code types
       // this is required so that the caches are update to date very soon after the user applied the change
       CodeTypeUpdateMessageDo messageWithNewCodeTypes = BEANS.get(CodeTypeUpdateMessageDo.class).withCodeTypes(codeTypes);
-      uiNotificationRegistry.put(TOPIC, currentUserId, messageWithNewCodeTypes, noTransaction());
+      uiNotificationRegistry.put(TOPIC, currentUserId, messageWithNewCodeTypes, noTransaction().withPublishOverCluster(false));
 
       // send updated codeType ids to other users so that they can reload them
       Set<String> idsToUpdate = codeTypes.stream().map(CodeTypeDo::getId).collect(toSet());
@@ -153,7 +156,7 @@ public class CodeTypeInvalidationNotificationListener implements Consumer<ICache
       CodeTypeUpdateMessageDo messageWithCodeTypeIdsToUpdate = BEANS.get(CodeTypeUpdateMessageDo.class)
           .withCodeTypeIds(idsToUpdate)
           .withReloadDelayWindow(reloadDelayWindow);
-      uiNotificationRegistry.putExcept(TOPIC, singleton(currentUserId), messageWithCodeTypeIdsToUpdate, noTransaction());
+      uiNotificationRegistry.putExcept(TOPIC, singleton(currentUserId), messageWithCodeTypeIdsToUpdate, noTransaction().withPublishOverCluster(false));
     }
 
     protected String getUserId() {
