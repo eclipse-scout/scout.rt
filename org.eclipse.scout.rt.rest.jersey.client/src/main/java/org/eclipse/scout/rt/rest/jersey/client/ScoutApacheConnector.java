@@ -206,9 +206,9 @@ public class ScoutApacheConnector implements Connector {
     if (httpClientName instanceof String) {
       Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
       BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, (String) httpClientName,
-          connectionManager.getTotalStats()::getAvailable,
-          connectionManager.getTotalStats()::getLeased,
-          connectionManager.getTotalStats()::getMax);
+          () -> connectionManager.getTotalStats().getAvailable(),
+          () -> connectionManager.getTotalStats().getLeased(),
+          () -> connectionManager.getTotalStats().getMax());
     }
   }
 

@@ -142,9 +142,9 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   protected void initMetrics(IHttpTransportManager manager, PoolingHttpClientConnectionManager connectionManager) {
     Meter meter = GlobalOpenTelemetry.get().getMeter(getClass().getName());
     BEANS.get(HttpClientMetricsHelper.class).initMetrics(meter, manager.getName(),
-        connectionManager.getTotalStats()::getAvailable,
-        connectionManager.getTotalStats()::getLeased,
-        connectionManager.getTotalStats()::getMax);
+        () -> connectionManager.getTotalStats().getAvailable(),
+        () -> connectionManager.getTotalStats().getLeased(),
+        () -> connectionManager.getTotalStats().getMax());
   }
 
   protected SSLConnectionSocketFactory createSSLConnectionSocketFactory() {
