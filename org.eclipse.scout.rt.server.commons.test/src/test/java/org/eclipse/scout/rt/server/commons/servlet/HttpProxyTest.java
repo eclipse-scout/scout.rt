@@ -15,6 +15,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -55,6 +59,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.EnumerationUtility;
@@ -82,6 +88,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
 
 @RunWith(ParameterizedPlatformTestRunner.class)
 public class HttpProxyTest {
@@ -111,7 +118,7 @@ public class HttpProxyTest {
 
   @Before
   public void before() {
-    m_proxy = BEANS.get(HttpProxy.class);
+    m_proxy = spy(BEANS.get(HttpProxy.class));
 
     if (m_httpProxyTestParameter != null) {
       m_proxy.withHttpClientManager(m_httpProxyTestParameter.getClientManager());
@@ -403,6 +410,21 @@ public class HttpProxyTest {
   }
 
   @Test
+  public void testProxyRequest_postRequest() throws IOException {
+    HttpServletRequest httpReq = prepareHttpRequest("/");
+    when(httpReq.getMethod()).thenReturn(Method.POST.toString());
+    HttpServletResponse httpResp = testProxyRequestInternal(new AbstractHandler() {
+      @Override
+      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setStatus(200);
+        response.flushBuffer();
+      }
+    }, 30 * 1000L, 1, httpReq);
+
+    verify(httpResp, times(1)).setStatus(200);
+  }
+
+  @Test
   public void testProxyRequest_spaceInPath() throws IOException {
     testProxyRequestWithStatusCodeAndContent_Internal(200, new byte[]{0x02}, true, 1, "/a b/c d/lorem ipsum.htm");
   }
@@ -430,6 +452,56 @@ public class HttpProxyTest {
     new Random().nextBytes(content); // for tests alright not to use SecureRandom
     testProxyRequestWithStatusCodeAndContent_Internal(200, content, true);
     testProxyRequestWithStatusCodeAndContent_Internal(200, content, false);
+  }
+
+  @Test
+  public void testProxyRequestRunContextAndCorrelationId() throws IOException {
+    AtomicInteger hasBeenCalledCount = new AtomicInteger();
+    RunContexts.copyCurrent().withCorrelationId("foo").run(() -> {
+      doAnswer(invocation -> createProxyForTestRunContextAndCorrelationId(hasBeenCalledCount, invocation)).when(m_proxy).createAsyncResponseConsumer(any());
+      doAnswer(invocation -> createProxyForTestRunContextAndCorrelationId(hasBeenCalledCount, invocation)).when(m_proxy).createEntityConsumer(any());
+      doAnswer(invocation -> createProxyForTestRunContextAndCorrelationId(hasBeenCalledCount, invocation)).when(m_proxy).createEntityProducer(any());
+      doAnswer(invocation -> createProxyForTestRunContextAndCorrelationId(hasBeenCalledCount, invocation)).when(m_proxy).createExecuteCallback(any(), any());
+
+      testProxyRequest_postRequest();
+    });
+    assertEquals(4, hasBeenCalledCount.get()); // 4: see above, four classes are instrumented, expect for all at least one method call (which itself verified further assertions)
+  }
+
+  protected Object createProxyForTestRunContextAndCorrelationId(AtomicInteger hasBeenCalledCount, InvocationOnMock invocation) throws Throwable {
+    AtomicBoolean hasBeenCalled = new AtomicBoolean(false);
+    Object actualObject = invocation.callRealMethod();
+
+    boolean checkCorrelationId = true;
+    if (Proxy.isProxyClass(actualObject.getClass())) {
+      InvocationHandler invocationHandler = Proxy.getInvocationHandler(actualObject);
+      if (invocationHandler instanceof AbstractAsyncHttpClientManager.AsyncHttpInvocationHandler) {
+        AbstractAsyncHttpClientManager.AsyncHttpInvocationHandler asyncHttpInvocationHandler = (AbstractAsyncHttpClientManager.AsyncHttpInvocationHandler) invocationHandler;
+        RunContext runContext = asyncHttpInvocationHandler.getRunContext();
+        assertEquals("foo", runContext.getCorrelationId());
+        checkCorrelationId = false;
+      }
+    }
+
+    boolean f_checkCorrelationId = checkCorrelationId;
+    return Proxy.newProxyInstance(
+        HttpProxy.class.getClassLoader(),
+        new Class[]{invocation.getMethod().getReturnType()},
+        (proxy, method, args) -> {
+          if (hasBeenCalled.compareAndSet(false, true)) {
+            hasBeenCalledCount.incrementAndGet();
+          }
+          if (f_checkCorrelationId) {
+            //          assertEquals("foo", CorrelationId.CURRENT.get());
+            String correlationId = CorrelationId.CURRENT.get();
+            if (correlationId == null) {
+              new Exception("I_AM_NULL").printStackTrace();
+            }
+            System.err.println(method.getDeclaringClass() + " . " + method.getName() + ": " + correlationId);
+          }
+          return method.invoke(actualObject, args);
+        }
+    );
   }
 
   protected void testProxyRequestWithStatusCodeAndContent_Internal(int statusCode, byte[] content, boolean specifyContentLength) throws IOException {
@@ -515,7 +587,7 @@ public class HttpProxyTest {
       }
     };
 
-    HttpServletResponse resp = testProxyRequestInternal(handler, 6 * 60 * 1000L, 1, null);
+    HttpServletResponse resp = testProxyRequestInternal(handler, 6 * 60 * 1000L, 1, (String) null);
 
     verify(resp).setStatus(200);
     assertArrayEquals(new byte[]{0x42}, ((BufferedServletOutputStream) resp.getOutputStream()).getContent());
@@ -533,6 +605,7 @@ public class HttpProxyTest {
     verify(resp).setStatus(500);
 
     List<Throwable> handledThrowables = BEANS.get(JUnitExceptionHandler.class).getErrors();
+    handledThrowables.forEach(Throwable::printStackTrace); // for debug purposes
     assertTrue(handledThrowables.stream().allMatch(t -> t instanceof ConnectionClosedException));
     handledThrowables.clear(); // do not fail test because there were handled exceptions (see JUnitExceptionHandler)
   }
@@ -550,12 +623,12 @@ public class HttpProxyTest {
       m_handlerCollection.addHandler(handler);
       m_proxy.withRemoteBaseUrl(m_server.getURI().toString());
 
-      AsyncContext asyncContext = mock(AsyncContext.class);
+      HttpServletRequest httpReq = prepareHttpRequest("/");
+      AsyncContext asyncContext = httpReq.getAsyncContext();
+
       IllegalStateException e2 = new IllegalStateException();
       // first call of complete should throw, succeeding don't
       doThrow(e2).doNothing().when(asyncContext).complete();
-
-      HttpServletRequest httpReq = prepareHttpRequest("/", asyncContext);
 
       HttpServletResponse httpResp = mock(HttpServletResponse.class);
       BufferedServletOutputStream outputStream = new BufferedServletOutputStream();
@@ -596,18 +669,18 @@ public class HttpProxyTest {
     }
   }
 
-  public HttpServletResponse testProxyRequestInternal(Handler handler, int numberOfRequests, String pathInfo) {
+  protected HttpServletResponse testProxyRequestInternal(Handler handler, int numberOfRequests, String pathInfo) {
     return testProxyRequestInternal(handler, 30 * 1000L, numberOfRequests, pathInfo);
   }
 
-  public HttpServletResponse testProxyRequestInternal(Handler handler, long timeoutUntilCompletion, int numberOfRequests, String pathInfo) {
+  protected HttpServletResponse testProxyRequestInternal(Handler handler, long timeoutUntilCompletion, int numberOfRequests, String pathInfo) {
+    return testProxyRequestInternal(handler, timeoutUntilCompletion, numberOfRequests, prepareHttpRequest(pathInfo != null ? pathInfo : "/"));
+  }
+
+  protected HttpServletResponse testProxyRequestInternal(Handler handler, long timeoutUntilCompletion, int numberOfRequests, HttpServletRequest httpReq) {
     try {
       m_handlerCollection.addHandler(handler);
       m_proxy.withRemoteBaseUrl(m_server.getURI().toString());
-
-      AsyncContext asyncContext = mock(AsyncContext.class);
-
-      HttpServletRequest httpReq = prepareHttpRequest(pathInfo != null ? pathInfo : "/", asyncContext);
 
       HttpServletResponse httpResp = mock(HttpServletResponse.class);
       BufferedServletOutputStream outputStream = new BufferedServletOutputStream();
@@ -622,7 +695,7 @@ public class HttpProxyTest {
         }
       });
 
-      verify(asyncContext, timeout(timeoutUntilCompletion).times(numberOfRequests)).complete();
+      verify(httpReq.getAsyncContext(), timeout(timeoutUntilCompletion).times(numberOfRequests)).complete();
       return httpResp;
     }
     catch (Exception e) {
@@ -633,12 +706,16 @@ public class HttpProxyTest {
     }
   }
 
-  protected HttpServletRequest prepareHttpRequest(String pathInfo, AsyncContext asyncContext) {
+  protected HttpServletRequest prepareHttpRequest(String pathInfo) {
+    AsyncContext asyncContext = mock(AsyncContext.class);
     HttpServletRequest httpReq = mock(HttpServletRequest.class);
+
     when(httpReq.getMethod()).thenReturn(Method.GET.toString());
     when(httpReq.getPathInfo()).thenReturn(pathInfo);
     when(httpReq.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
     when(httpReq.startAsync(any(), any())).thenReturn(asyncContext);
+    when(httpReq.getAsyncContext()).thenReturn(asyncContext);
+
     return httpReq;
   }
 

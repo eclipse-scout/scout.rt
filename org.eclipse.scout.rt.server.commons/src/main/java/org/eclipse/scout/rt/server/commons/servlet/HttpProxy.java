@@ -629,7 +629,7 @@ public class HttpProxy {
    * </p>
    */
   protected AsyncEntityConsumer<Boolean> createEntityConsumer(HttpServletResponse resp) {
-    return new AbstractClassicEntityConsumer<>(getInitialBufferSize(resp), getBlockingOperationExecutor()) {
+    AsyncEntityConsumer<Boolean> entityConsumer = new AbstractClassicEntityConsumer<>(getInitialBufferSize(resp), getBlockingOperationExecutor()) {
       @Override
       protected Boolean consumeData(ContentType contentType, InputStream inputStream) throws IOException {
         LOG.trace("Consuming data with contentType {}", contentType);
@@ -637,6 +637,9 @@ public class HttpProxy {
         return true;
       }
     };
+
+    @SuppressWarnings("unchecked") AsyncEntityConsumer<Boolean> wrappedConsumer = (AsyncEntityConsumer<Boolean>) m_httpClientManager.createAsyncInvocationHandler(AsyncEntityConsumer.class, entityConsumer);
+    return wrappedConsumer;
   }
 
   /**
@@ -716,7 +719,7 @@ public class HttpProxy {
    * the outer proxied request) after request has either completed or failed.
    */
   protected FutureCallback<Boolean> createExecuteCallback(HttpServletResponse resp, AsyncContext asyncContext) {
-    return new FutureCallback<>() {
+    FutureCallback<Boolean> callback = new FutureCallback<>() {
       @Override
       public void completed(Boolean result) {
         LOG.trace("Request execution completed with result: {}", result);
@@ -755,6 +758,9 @@ public class HttpProxy {
         asyncContext.complete();
       }
     };
+
+    @SuppressWarnings("unchecked") FutureCallback<Boolean> wrappedCallback = (FutureCallback<Boolean>) m_httpClientManager.createAsyncInvocationHandler(FutureCallback.class, callback);
+    return wrappedCallback;
   }
 
   protected int computeStatusCodeForFailure(Exception e) {
