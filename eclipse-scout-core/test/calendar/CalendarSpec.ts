@@ -761,9 +761,10 @@ describe('Calendar', () => {
       let businessResources = createCalendarResource('Business calendar');
       let externalResources = createCalendarResource('External calendar', true, false);
       let calendar = initCalendar(businessResources, externalResources);
+      calendar.setDisplayMode(Calendar.DisplayMode.DAY);
 
       let businessComp = createCalendarComponent(calendar, stringDay, stringDay, businessResources.resourceId, true);
-      let secondBusniessComp = createCalendarComponent(calendar, stringDay, stringDay, businessResources.resourceId, true);
+      let secondBusinessComp = createCalendarComponent(calendar, stringDay, stringDay, businessResources.resourceId, true);
       let externalComp = createCalendarComponent(calendar, stringDay, stringDay, externalResources.resourceId, true);
 
       // Act
@@ -771,8 +772,28 @@ describe('Calendar', () => {
 
       // Assert
       expect(businessComp.fullDayIndex).toBe(0);
-      expect(secondBusniessComp.fullDayIndex).toBe(1);
+      expect(secondBusinessComp.fullDayIndex).toBe(1);
       expect(externalComp.fullDayIndex).toBe(0);
+    });
+
+    it('should correctly update full day indices on week', () => {
+      // Arrange
+      let businessResources = createCalendarResource('Business calendar');
+      let externalResources = createCalendarResource('External calendar', true, false);
+      let calendar = initCalendar(businessResources, externalResources);
+      calendar.setDisplayMode(Calendar.DisplayMode.WEEK);
+
+      let businessComp = createCalendarComponent(calendar, stringDay, stringDay, businessResources.resourceId, true);
+      let secondBusinessComp = createCalendarComponent(calendar, stringDay, stringDay, businessResources.resourceId, true);
+      let externalComp = createCalendarComponent(calendar, stringDay, stringDay, externalResources.resourceId, true);
+
+      // Act
+      calendar._updateFullDayIndices(calendar.components);
+
+      // Assert
+      expect(businessComp.fullDayIndex).toBe(0);
+      expect(secondBusinessComp.fullDayIndex).toBe(1);
+      expect(externalComp.fullDayIndex).toBe(2);
     });
 
     describe('resource panel visible', () => {
@@ -845,10 +866,10 @@ describe('Calendar', () => {
       calendar.setDisplayMode(Calendar.DisplayMode.DAY);
 
       // Act
-      let currentComponenteResourceId = getCurrentResourceIdFor(component);
+      let currentComponentResourceId = getCurrentResourceIdFor(component);
 
       // Assert
-      expect(currentComponenteResourceId).toBe(unnamedResource.resourceId);
+      expect(currentComponentResourceId).toBe(unnamedResource.resourceId);
     });
 
     describe('range selection on resources', () => {
