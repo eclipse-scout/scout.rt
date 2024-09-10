@@ -7,40 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DisplayParent, FileChooser, Form, scout, Session} from '../index';
+import {DisplayChildController, FileChooser} from '../index';
 
 /**
  * Controller with functionality to register and render file choosers.
  *
  * The file choosers are put into the list fileChoosers contained in 'displayParent'.
  */
-export class FileChooserController {
-  displayParent: DisplayParent;
-  session: Session;
-
-  constructor(displayParent: DisplayParent, session: Session) {
-    this.displayParent = displayParent;
-    this.session = session;
-  }
-
-  /**
-   * Adds the given file chooser to this controller and renders it.
-   */
-  registerAndRender(fileChooser: FileChooser) {
-    scout.assertProperty(fileChooser, 'displayParent');
-    this._render(fileChooser, true);
-  }
-
-  /**
-   * Removes the given file chooser from this controller and DOM. However, the file chooser's adapter is not destroyed. That only happens once the file chooser is closed.
-   */
-  unregisterAndRemove(fileChooser: FileChooser) {
-    if (fileChooser) {
-      this._unregister(fileChooser);
-      this._remove(fileChooser);
-    }
-  }
-
+export class FileChooserController extends DisplayChildController {
   /**
    * Removes all file choosers registered with this controller from DOM.
    */
@@ -56,51 +30,6 @@ export class FileChooserController {
       chooser.setDisplayParent(this.displayParent);
       this._render(chooser);
     });
-  }
-
-  protected _render(fileChooser: FileChooser, register?: boolean) {
-    // missing displayParent (when render is called by reload), use displayParent of FileChooserController
-    if (!fileChooser.displayParent) {
-      fileChooser._setProperty('displayParent', this.displayParent);
-    }
-    // Prevent "Already rendered" errors (see #162954).
-    if (fileChooser.rendered) {
-      return;
-    }
-    if (register) {
-      this._register(fileChooser);
-    }
-
-    // Use parent's function or (if not implemented) our own.
-    if (this.displayParent.acceptView) {
-      if (!this.displayParent.acceptView(fileChooser)) {
-        return;
-      }
-    } else if (!this.acceptView(fileChooser)) {
-      return;
-    }
-
-    // Open all file choosers in the center of the desktop, except the ones that belong to a popup-window
-    // Since the file chooser doesn't have a DOM element as parent when render is called, we must find the
-    // entryPoint by using the model.
-    let $parent;
-    if (this.displayParent instanceof Form && this.displayParent.isPopupWindow()) {
-      $parent = this.displayParent.popupWindow.$container;
-    } else {
-      $parent = this.session.desktop.$container;
-    }
-    // start focus tracking if not already started.
-    fileChooser.setTrackFocus(true);
-    fileChooser.render($parent);
-
-    // Only display the file chooser if its 'displayParent' is visible to the user.
-    if (!this.displayParent.inFront()) {
-      fileChooser.detach();
-    }
-  }
-
-  protected _remove(fileChooser: FileChooser) {
-    fileChooser.remove();
   }
 
   /**
@@ -123,23 +52,11 @@ export class FileChooserController {
     this.displayParent.fileChoosers.forEach(fileChooser => fileChooser.detach());
   }
 
-  acceptView(view: FileChooser): boolean {
-    return this.displayParent.rendered;
+  protected override _register(fileChooser: FileChooser) {
+    this._registerChild(fileChooser, this.displayParent.fileChoosers, 'fileChoosers');
   }
 
-  protected _register(fileChooser: FileChooser) {
-    if (this.displayParent.fileChoosers.includes(fileChooser)) {
-      return;
-    }
-    let fileChoosers = [...this.displayParent.fileChoosers, fileChooser];
-    this.displayParent._setProperty('fileChoosers', fileChoosers);
-  }
-
-  protected _unregister(fileChooser: FileChooser) {
-    let fileChoosers = this.displayParent.fileChoosers.filter(box => box !== fileChooser);
-    if (arrays.equals(this.displayParent.fileChoosers, fileChoosers)) {
-      return;
-    }
-    this.displayParent._setProperty('fileChoosers', fileChoosers);
+  protected override _unregister(fileChooser: FileChooser) {
+    this._unregisterChild(fileChooser, this.displayParent.fileChoosers, 'fileChoosers');
   }
 }
