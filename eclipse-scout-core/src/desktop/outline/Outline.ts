@@ -130,8 +130,14 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
       displayParent: this,
       session: this.session
     });
-    this.messageBoxController = new MessageBoxController(this, this.session);
-    this.fileChooserController = new FileChooserController(this, this.session);
+    this.messageBoxController = scout.create(MessageBoxController, {
+      displayParent: this,
+      session: this.session
+    });
+    this.fileChooserController = scout.create(FileChooserController, {
+      displayParent: this,
+      session: this.session
+    });
     this.resolveTextKeys(['title']);
 
     // menu bars

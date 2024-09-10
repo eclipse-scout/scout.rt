@@ -7,32 +7,21 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Desktop, DisplayParent, Form, FormControllerModel, InitModelOf, ObjectWithType, Outline, scout, Session, SomeRequired} from '../index';
+import {arrays, Desktop, DisplayChildController, DisplayParent, Form, Outline, scout} from '../index';
 
 /**
  * Controller with functionality to register and render views and dialogs.
  *
  * The forms are put into the list 'views' and 'dialogs' contained in 'displayParent'.
  */
-export class FormController implements FormControllerModel, ObjectWithType {
-  declare model: FormControllerModel;
-  declare initModel: SomeRequired<this['model'], 'displayParent' | 'session'>;
-
-  objectType: string;
-  displayParent: DisplayParent;
-  session: Session;
-
-  constructor(model: InitModelOf<FormController>) {
-    this.displayParent = model.displayParent;
-    this.session = model.session;
-  }
+export class FormController extends DisplayChildController {
 
   /**
    * Adds the given view or dialog to this controller and renders it.
    * position is only used if form is a view. this position determines at which position the tab is placed.
    * if select view is set the view rendered in _renderView is also selected.
    */
-  registerAndRender(form: Form, position?: number, selectView?: boolean) {
+  override registerAndRender(form: Form, position?: number, selectView?: boolean) {
     scout.assertProperty(form, 'displayParent');
     if (form.isPopupWindow()) {
       this._renderPopupWindow(form);
@@ -57,7 +46,7 @@ export class FormController implements FormControllerModel, ObjectWithType {
   /**
    * Removes the given view or dialog from this controller and DOM. However, the form's adapter is not destroyed. That only happens once the Form is closed.
    */
-  unregisterAndRemove(form: Form) {
+  override unregisterAndRemove(form: Form) {
     if (!form) {
       return;
     }
@@ -127,11 +116,6 @@ export class FormController implements FormControllerModel, ObjectWithType {
     } else {
       this._activateDialog(form);
     }
-  }
-
-  acceptView(view: Form, register?: boolean, position?: number, selectView?: boolean): boolean {
-    // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
-    return this.displayParent.rendered;
   }
 
   protected _renderView(view: Form, register: boolean, position?: number, selectView?: boolean) {
@@ -335,45 +319,6 @@ export class FormController implements FormControllerModel, ObjectWithType {
     });
   }
 
-  protected _registerDialog(dialog: Form) {
-    this._register(dialog, this.displayParent.dialogs, 'dialogs');
-  }
-
-  protected _unregisterDialog(dialog: Form) {
-    this._unregister(dialog, this.displayParent.dialogs, 'dialogs');
-  }
-
-  protected _registerView(view: Form, position: number) {
-    this._register(view, this.displayParent.views, 'views', position);
-  }
-
-  protected _unregisterView(view: Form) {
-    this._unregister(view, this.displayParent.views, 'views');
-  }
-
-  protected _register(form: Form, forms: Form[], propertyName: string, position?: number) {
-    if (forms.includes(form)) {
-      return;
-    }
-    let newForms;
-    if (position !== undefined) {
-      newForms = [...forms];
-      arrays.insert(newForms, form, position);
-    } else {
-      newForms = [...forms, form];
-    }
-    // Using _setProperty to just set the property and trigger the event without calling _set[propertyName] or any render function
-    this.displayParent._setProperty(propertyName, newForms);
-  }
-
-  protected _unregister(form: Form, forms: Form[], propertyName: string) {
-    let newForms = forms.filter(f => f !== form);
-    if (arrays.equals(forms, newForms)) {
-      return;
-    }
-    this.displayParent._setProperty(propertyName, newForms);
-  }
-
   protected _layoutDialog(dialog: Form) {
     dialog.htmlComp.validateLayout();
     dialog.position();
@@ -387,5 +332,21 @@ export class FormController implements FormControllerModel, ObjectWithType {
     if (dialog.animateOpening) {
       dialog.$container.addClassForAnimation('animate-open');
     }
+  }
+
+  protected _registerDialog(dialog: Form) {
+    this._registerChild(dialog, this.displayParent.dialogs, 'dialogs');
+  }
+
+  protected _unregisterDialog(dialog: Form) {
+    this._unregisterChild(dialog, this.displayParent.dialogs, 'dialogs');
+  }
+
+  protected _registerView(view: Form, position: number) {
+    this._registerChild(view, this.displayParent.views, 'views', position);
+  }
+
+  protected _unregisterView(view: Form) {
+    this._unregisterChild(view, this.displayParent.views, 'views');
   }
 }
