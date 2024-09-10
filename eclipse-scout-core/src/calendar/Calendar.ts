@@ -466,7 +466,6 @@ export class Calendar extends Widget implements CalendarModel {
     let dayContextMenuCallback = this._onDayContextMenu.bind(this);
     for (let dayBottom = 0; dayBottom < 7; dayBottom++) {
       $weekTopGridDays.appendDiv('calendar-day')
-        .addClass('calendar-scrollable-components')
         .data('day', dayBottom)
         .on('contextmenu', dayContextMenuCallback);
     }
@@ -527,7 +526,8 @@ export class Calendar extends Widget implements CalendarModel {
     $dayName.appendDiv('resource-column')
       .data('resourceId', this.defaultResource.resourceId);
     $fullDay.appendDiv('resource-column')
-      .data('resourceId', this.defaultResource.resourceId);
+      .data('resourceId', this.defaultResource.resourceId)
+      .addClass('calendar-scrollable-components');
     $day.appendDiv('resource-column')
       .data('resourceId', this.defaultResource.resourceId);
 
@@ -537,7 +537,8 @@ export class Calendar extends Widget implements CalendarModel {
         .data('resourceId', resources.resourceId)
         .attr('data-resource-name', resources.name);
       $fullDay.appendDiv('resource-column')
-        .data('resourceId', resources.resourceId);
+        .data('resourceId', resources.resourceId)
+        .addClass('calendar-scrollable-components');
       $day.appendDiv('resource-column')
         .data('resourceId', resources.resourceId);
     });
@@ -1234,7 +1235,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _updateScrollbars($parent: JQuery, animate: boolean) {
-    let $scrollables = $('.calendar-scrollable-components > .resource-column', $parent);
+    let $scrollables = $('.calendar-scrollable-components', $parent);
     $scrollables.each((i, elem) => {
       scrollbars.update($(elem), true);
     });
@@ -1243,7 +1244,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _uninstallComponentScrollbars($parent: JQuery) {
-    $parent.find('.calendar-scrollable-components > .resource-column').each((i, elem) => {
+    $parent.find('.calendar-scrollable-components').each((i, elem) => {
       scrollbars.uninstall($(elem), this.session);
     });
   }
@@ -1316,13 +1317,11 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _calculateFullDayIndexKey(component: CalendarComponent, date: Date): string {
-    let resourceId = this.defaultResource.resourceId;
-
-    if (component) {
-      resourceId = component.getResourceId();
+    let prefix = '';
+    if (this.isDay()) {
+      prefix = component.getResourceId();
     }
-
-    return resourceId + strings.asString(date.valueOf());
+    return prefix + date.valueOf();
   }
 
   layoutYearPanel() {
@@ -1492,6 +1491,7 @@ export class Calendar extends Widget implements CalendarModel {
   protected override _remove() {
     this._uninstallComponentScrollbars(this.$grid);
     this._uninstallComponentScrollbars(this.$topGrid);
+    scrollbars.uninstall(this.$list, this.session);
 
     this.$window
       .off('mousemove touchmove', this._mouseMoveHandler)
@@ -1698,7 +1698,7 @@ export class Calendar extends Widget implements CalendarModel {
         session: this.session,
         axis: 'y'
       });
-      this.$topGrid.find('.calendar-scrollable-components > .resource-column')
+      this.$topGrid.find('.calendar-scrollable-components')
         .each((i, elem) => {
           let $topDay = $(elem);
           if ($topDay.data('scrollable')) {
