@@ -10,6 +10,9 @@
 package org.eclipse.scout.rt.shared.http.async;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.function.BiConsumer;
 
 import org.apache.hc.client5.http.cookie.CookieStore;
@@ -19,7 +22,10 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.shared.http.ApacheMultiSessionCookieStore;
 
@@ -145,6 +151,47 @@ public abstract class AbstractAsyncHttpClientManager<BUILDER> implements IPlatfo
       m_active = false;
       m_client = null;
       m_initialized = false;
+    }
+  }
+
+  /**
+   * Proxy the actual object using the {@link RunContext} at time of proxy construction for all method calls. All method
+   * calls on the proxy are wrapped with the specific {@link RunContext} (which contains additional context information
+   * e.g. for logging).
+   */
+  public <T> T createAsyncInvocationHandler(Class<T> clazz, T actualObject) {
+    if (actualObject == null) {
+      return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new AsyncHttpInvocationHandler<>(actualObject));
+    return proxy;
+  }
+
+  public static class AsyncHttpInvocationHandler<T> implements InvocationHandler {
+
+    private final RunContext m_runContext;
+    private final T m_actualObject;
+
+    public AsyncHttpInvocationHandler(T actualObject) {
+      m_runContext = RunContexts.copyCurrent(true)
+          // async operation, do not hold transaction of initiator (also: sometimes the context might not even need a transaction at all)
+          .withTransactionScope(TransactionScope.REQUIRES_NEW);
+      m_actualObject = actualObject;
+    }
+
+    public RunContext getRunContext() {
+      return m_runContext;
+    }
+
+    public T getActualObject() {
+      return m_actualObject;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      return getRunContext().call(() -> method.invoke(getActualObject(), args));
     }
   }
 }
