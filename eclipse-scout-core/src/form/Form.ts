@@ -185,10 +185,14 @@ export class Form extends Widget implements FormModel, DisplayParent {
       displayParent: this,
       session: this.session
     });
-
-    this.messageBoxController = new MessageBoxController(this, this.session);
-    this.fileChooserController = new FileChooserController(this, this.session);
-
+    this.messageBoxController = scout.create(MessageBoxController, {
+      displayParent: this,
+      session: this.session
+    });
+    this.fileChooserController = scout.create(FileChooserController, {
+      displayParent: this,
+      session: this.session
+    });
     this._setRootGroupBox(this.rootGroupBox);
     this._setStatus(this.status);
     this.cacheBoundsKey = scout.nvl(model.cacheBoundsKey, this.objectType);
