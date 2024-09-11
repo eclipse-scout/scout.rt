@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator.IUndecorator;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -104,6 +105,9 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
     for (final ITransactionMember transactionMember : m_transactionMembers) {
       newTransaction.registerMember(transactionMember);
     }
+
+    // Update this RunContext's m_transaction field for consistency
+    RunContext.CURRENT.get().withTransaction(newTransaction);
 
     final IRegistrationHandle currentTransactionRegistration = registerAsCurrentTransaction(newTransaction);
     final IRegistrationHandle cancellationRegistration = registerTransactionForCancellation(newTransaction);

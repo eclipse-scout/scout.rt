@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,8 +21,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import jakarta.annotation.PostConstruct;
 import javax.security.auth.Subject;
+
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -330,8 +331,12 @@ public class RunContext implements IAdaptable {
   }
 
   /**
+   * @deprecated Use <code>ITransaction.CURRENT.get()</code> to access the current transaction. This method is only used
+   *             at build time of a {@link RunContext} when a specific transaction is to be used by a RunContext. This
+   *             is a rare case.
    * @see #withTransaction(ITransaction)
    */
+  @Deprecated
   public ITransaction getTransaction() {
     return m_transaction;
   }
@@ -571,6 +576,10 @@ public class RunContext implements IAdaptable {
 
   /**
    * Creates a copy of <code>this</code> context.
+   * <p>
+   * <b>NOTE</b> use {@link RunContexts#copyCurrent()} when creating a nested RunContext inside a running chain. This
+   * ensures that <code>ITransaction.CURRENT.get()</code> is used. This copy method is only used at build time of a
+   * RunContext outside a running chain and thus simply copies the transaction member of the {@link RunContext} object.
    */
   public RunContext copy() {
     final RunContext copy = BEANS.get(RunContext.class);
