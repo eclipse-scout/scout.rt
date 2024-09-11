@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -60,7 +61,7 @@ public class HttpRetryTest {
   private TestingHttpClient m_client;
   private TestingHttpServer m_server;
   private final List<String> servletGetLog = Collections.synchronizedList(new ArrayList<>());
-  private final List<String> servletPostLog = Collections.synchronizedList(new ArrayList<>());
+  private final LinkedBlockingDeque<String> servletPostLog = new LinkedBlockingDeque<>();
   private IServletRequestHandler servletFailOnce;
   private Exception servletPostError;
 
@@ -150,7 +151,7 @@ public class HttpRetryTest {
    * Expect retry on apache level
    */
   @Test
-  public void testPostWithUnsupportedRetryAndFailureWhileRetrievingResponse() throws IOException {
+  public void testPostWithUnsupportedRetryAndFailureWhileRetrievingResponse() throws IOException, InterruptedException {
     //emulate a header write error
     AtomicInteger count = new AtomicInteger(1);
     m_client.withExecuteInterceptor(
@@ -202,7 +203,10 @@ public class HttpRetryTest {
     assertEquals(text, "Post bar");
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
-    assertEquals(Arrays.asList("02", "02"), servletPostLog);
+    String e1 = servletPostLog.poll(30, TimeUnit.SECONDS);
+    String e2 = servletPostLog.poll(30, TimeUnit.SECONDS);
+    assertTrue(servletPostLog.isEmpty());
+    assertEquals(List.of("02", "02"), List.of(e1, e2));
     assertNull(servletPostError);
   }
 
@@ -250,7 +254,7 @@ public class HttpRetryTest {
       for (int i = 0; i < 100 && servletPostError == null; i++) {
         SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
       }
-      assertEquals(Arrays.asList("03"), servletPostLog);
+      assertArrayEquals(new String[]{"03"}, servletPostLog.toArray());
       assertNotNull(servletPostError);
       assertEquals(ProcessingException.class, servletPostError.getClass());
       assertEquals(org.eclipse.jetty.io.EofException.class, servletPostError.getCause().getClass());
@@ -302,7 +306,7 @@ public class HttpRetryTest {
       req.execute();
     }
     catch (NoHttpResponseException e) {
-      assertEquals(Arrays.asList(), servletPostLog);
+      assertTrue(servletPostLog.isEmpty());
       assertNull(servletPostError);
       return;
     }
@@ -356,7 +360,7 @@ public class HttpRetryTest {
     assertEquals(text, "Post bar");
     assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
     assertEquals(new String(bytes), 10, bytes.length);//text + CR + LF
-    assertEquals(Arrays.asList("05"), servletPostLog);
+    assertArrayEquals(new String[]{"05"}, servletPostLog.toArray());
     assertNull(servletPostError);
   }
 
@@ -393,7 +397,7 @@ public class HttpRetryTest {
     req.setThrowExceptionOnExecuteError(false);
     HttpResponse resp = req.execute();
     assertEquals(400, resp.getStatusCode());
-    assertEquals(Arrays.asList("06"), servletPostLog);
+    assertArrayEquals(new String[]{"06"}, servletPostLog.toArray());
     assertNull(servletPostError);
   }
 
@@ -432,7 +436,7 @@ public class HttpRetryTest {
     req.setThrowExceptionOnExecuteError(false);
     HttpResponse resp = req.execute();
     assertEquals(500, resp.getStatusCode());
-    assertEquals(Arrays.asList("07"), servletPostLog);
+    assertArrayEquals(new String[]{"07"}, servletPostLog.toArray());
     assertNull(servletPostError);
   }
 }
