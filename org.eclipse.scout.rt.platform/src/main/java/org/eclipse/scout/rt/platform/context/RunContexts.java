@@ -78,7 +78,8 @@ public final class RunContexts {
    * has no effect to the current (parent) monitor.
    * <p>
    * {@link ITransaction}<br>
-   * Uses the current {@link ITransaction} as of <code>ITransaction.CURRENT.get()</code>.
+   * Depending on the value of {@link RunContext#getTransactionScope()} of the new instance and the implementation of
+   * {@link RunContextFactory} the new {@link ITransaction} is created from <code>ITransaction.CURRENT.get()</code>
    * <p>
    * {@link TransactionScope}<br>
    * Uses the transaction scope {@link TransactionScope#REQUIRED} which starts a new transaction only if not running in

@@ -107,11 +107,16 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
     }
 
     // Update this RunContext's m_transaction field for consistency
-    RunContext.CURRENT.get().withTransaction(newTransaction);
-
+    ITransaction oldTransaction = null;
+    final RunContext callerContext = RunContext.CURRENT.get();
     final IRegistrationHandle currentTransactionRegistration = registerAsCurrentTransaction(newTransaction);
     final IRegistrationHandle cancellationRegistration = registerTransactionForCancellation(newTransaction);
     try {
+      if (callerContext != null) {
+        //noinspection deprecation
+        oldTransaction = callerContext.getTransaction();
+        callerContext.withTransaction(newTransaction);
+      }
       try {
         return chain.continueChain();
       }
@@ -129,6 +134,9 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
 
       for (final ITransactionMember transactionMember : m_transactionMembers) {
         newTransaction.unregisterMember(transactionMember);
+      }
+      if (callerContext != null) {
+        callerContext.withTransaction(oldTransaction);
       }
     }
   }

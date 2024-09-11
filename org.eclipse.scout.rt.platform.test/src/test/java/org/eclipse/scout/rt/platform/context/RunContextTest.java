@@ -871,7 +871,7 @@ public class RunContextTest {
         r3.run(() -> {
           LOG.info("3c {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
           expected.add("3c tx2");
-          actual.add("3c " + ITransaction.CURRENT.get());// not that this ony is using tx1(m_transaction member) and not tx2 (ITransaction.CURRENT.get())
+          actual.add("3c " + ITransaction.CURRENT.get());
         });
 
         LOG.info("2b {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
