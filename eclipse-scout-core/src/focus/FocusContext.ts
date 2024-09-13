@@ -94,16 +94,16 @@ export class FocusContext {
    * behavior).
    */
   focusNextTabbable(forward = true, event?: KeyDownEvent) {
-    let $allFocusableElements = this.$container.find(':tabbable:visible');
+    let $allFocusableElements = this.$container.find(':tabbable');
     let $focusableElements = $allFocusableElements.filter((index, elem) => !this.focusManager.isElementCovertByGlassPane(elem));
     if ($focusableElements.length === 0) {
       return; // no focusable elements -> nothing to do
     }
 
     let activeElement = this.$container.activeElement(true);
+    let activeElementIndex = $focusableElements.index(activeElement);
     let firstFocusableElement = $focusableElements.first()[0];
     let lastFocusableElement = $focusableElements.last()[0];
-    let activeElementIndex = $focusableElements.index(activeElement);
 
     let elementToFocus = null;
     let explicitFocus = false;
@@ -164,18 +164,28 @@ export class FocusContext {
    */
   protected _onFocusIn(event: FocusInEvent) {
     let $target = $(event.target);
+
+    // Sometimes, the browser focuses an element that we don't consider focusable (e.g. scrollable divs, https://developer.chrome.com/blog/keyboard-focusable-scrollers).
+    // Redirect the focus to the first focusable parent element.
+    if (!$target.is(':focusable')) {
+      // noinspection CssInvalidPseudoSelector (inspection seems to confuse $.fn.closest with the native Element.closest method)
+      $target = $target.parent().closest(':focusable');
+    }
+
     $target.on('remove', this._removeListener);
-    this.focusedElement = event.target;
+
+    let target = $target[0];
+    this.focusedElement = target;
 
     // Do not update current focus context nor validate focus if target is $entryPoint.
     // That is because focusing the $entryPoint is done whenever no control is currently focusable, e.g. due to glass panes.
-    if (event.target === this.$container.entryPoint(true)) {
+    if (target === this.$container.entryPoint(true)) {
       return;
     }
 
     // Make this context the active context (nothing done if already active) and validate the focus event.
     this.focusManager._pushIfAbsentElseMoveTop(this);
-    this.validateAndSetFocus(event.target);
+    this.validateAndSetFocus(target);
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
   }
 

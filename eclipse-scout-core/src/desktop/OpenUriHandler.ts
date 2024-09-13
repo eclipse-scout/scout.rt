@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -104,7 +104,7 @@ export class OpenUriHandler implements OpenUriHandlerModel, ObjectWithType {
   openUriInIFrame(uri: string) {
     // Create a hidden iframe and set the URI as src attribute value
     let $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
-      .attr('tabindex', -1)
+      .attr('tabindex', -2)
       .attr('src', uri);
 
     // Remove the iframe again after 10s (should be enough to get the download started)
