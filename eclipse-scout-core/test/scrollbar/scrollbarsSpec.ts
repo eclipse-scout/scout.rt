@@ -342,4 +342,83 @@ describe('scrollbars', () => {
       scrollbars.uninstall($container, session);
     });
   });
+
+  describe('install', () => {
+
+    it('js-only: does not add tabindex', () => {
+      let $container = createScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        nativeScrollbars: false,
+        hybridScrollbars: false
+      });
+      expect($container.attr('tabindex')).toBe(undefined);
+      scrollbars.uninstall($container, session);
+      expect($container.attr('tabindex')).toBe(undefined);
+    });
+
+    it('hybrid: adds tabindex', () => {
+      let $container = createScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        nativeScrollbars: false,
+        hybridScrollbars: true
+      });
+      expect($container.attr('tabindex')).toBe('-2');
+      scrollbars.uninstall($container, session);
+      expect($container.attr('tabindex')).toBe('-2'); // not removed on uninstall
+    });
+
+    it('native-only: adds tabindex', () => {
+      let $container = createScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        nativeScrollbars: true,
+        hybridScrollbars: false
+      });
+      expect($container.attr('tabindex')).toBe('-2');
+      scrollbars.uninstall($container, session);
+      expect($container.attr('tabindex')).toBe('-2'); // not removed on uninstall
+    });
+
+    it('never adds tabindex if already present', () => {
+      let $container = createScrollable();
+
+      $container.attr('tabindex', '1');
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        nativeScrollbars: false,
+        hybridScrollbars: false
+      });
+      expect($container.attr('tabindex')).toBe('1');
+      scrollbars.uninstall($container, session);
+      expect($container.attr('tabindex')).toBe('1');
+
+      $container.attr('tabindex', '2');
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        nativeScrollbars: false,
+        hybridScrollbars: true
+      });
+      expect($container.attr('tabindex')).toBe('2');
+      scrollbars.uninstall($container, session);
+      expect($container.attr('tabindex')).toBe('2');
+
+      $container.attr('tabindex', '3');
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session,
+        nativeScrollbars: true,
+        hybridScrollbars: false
+      });
+      expect($container.attr('tabindex')).toBe('3');
+      scrollbars.uninstall($container, session);
+      expect($container.attr('tabindex')).toBe('3');
+    });
+  });
 });
