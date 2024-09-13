@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -115,9 +115,11 @@ public final class SeleniumDriver {
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
     options.addArguments("--remote-allow-origins=*");
-    // The following two lines are a replacement for --disable-infobars since this option
-    // does not remove the "Chrome is being controlled..." info-bar anymore.
-    // See: https://stackoverflow.com/questions/49169990/disable-infobars-argument-unable-to-hide-the-infobar-with-the-message-chrome-is
+    // Hide "only for automated testing" banner in Chrome for Testing
+    // https://stackoverflow.com/questions/77379852/how-to-disable-chrome-for-testing-is-only-for-automated-testing-for-regular-br
+    options.addArguments("--disable-infobars");
+    // Hide "controlled by automated test software" banner in normal Chrome
+    // https://stackoverflow.com/questions/49169990/disable-infobars-argument-unable-to-hide-the-infobar-with-the-message-chrome-is
     options.setExperimentalOption("useAutomationExtension", false);
     options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
 
@@ -166,6 +168,7 @@ public final class SeleniumDriver {
       executor.execute(new Command(driver.getSessionId(), "setNetworkConditions", Collections.singletonMap("network_conditions", map)));
     }
     catch (IOException e) {
+      // noinspection CallToPrintStackTrace
       e.printStackTrace();
     }
   }
