@@ -1,29 +1,40 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 
 import $ from 'jquery';
 
-/**
+/*
  * This file extends jQuery with custom selectors required in Scout.
  * Part of this file is copied with some modifications from jQuery UI.
  */
-function focusable(element, isTabIndexNotNaN) {
+
+function focusable(element, requireTabbable) {
+  let tabIndex = Number($.attr(element, 'tabindex'));
+  let hasTabIndex = !isNaN(tabIndex);
+
+  // Elements with an explicit negative tabindex are never tabbable
+  if (tabIndex < 0 && requireTabbable) {
+    return false;
+  }
+  // SPECIAL CASE: we consider elements with tabindex="-2" to be _never_ focusable, not even programmatically!
+  if (tabIndex === -2) {
+    return false;
+  }
+
+  // Some elements are focusable natively, others can be made focusable by adding a tabindex (positive or negative)
   let nodeName = element.nodeName.toLowerCase();
-  return (/input|select|textarea|button|object/.test(nodeName) ?
-    !element.disabled :
-    'a' === nodeName ?
-      element.href || isTabIndexNotNaN :
-      isTabIndexNotNaN) &&
-    // the element and all of its ancestors must be visible
-    visible(element);
+  let focusable = /^(input|select|textarea|button|object)$/.test(nodeName)
+    ? !element.disabled
+    : hasTabIndex || (nodeName === 'a' && element.href);
+
+  return focusable && visible(element); // the element and all of its ancestors must be visible
 }
 
 function visible(element) {
@@ -33,13 +44,8 @@ function visible(element) {
     }).length;
 }
 
+// Register selectors
 $.extend($.expr[':'], {
-
-  focusable: element => focusable(element, !isNaN($.attr(element, 'tabindex'))),
-
-  tabbable: element => {
-    let tabIndex = $.attr(element, 'tabindex'),
-      isTabIndexNaN = isNaN(tabIndex);
-    return (isTabIndexNaN || tabIndex >= 0) && focusable(element, !isTabIndexNaN);
-  }
+  'focusable': element => focusable(element, false),
+  'tabbable': element => focusable(element, true)
 });

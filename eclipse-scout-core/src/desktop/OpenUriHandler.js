@@ -100,7 +100,7 @@ export default class OpenUriHandler {
   openUriInIFrame(uri) {
     // Create a hidden iframe and set the URI as src attribute value
     let $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
-      .attr('tabindex', -1)
+      .attr('tabindex', -2)
       .attr('src', uri);
 
     // Remove the iframe again after 10s (should be enough to get the download started)

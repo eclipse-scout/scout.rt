@@ -134,6 +134,12 @@ export function _installNativeInternal($container, options) {
     $container.css('overflow', 'auto');
   }
   $container.css('-webkit-overflow-scrolling', 'touch');
+  // Under certain circumstances, browsers automatically make scroll containers focusable, e.g. https://developer.chrome.com/blog/keyboard-focusable-scrollers.
+  // Because this interferes with Scout's focus management, we explicitly add a negative tabindex to disable this behavior.
+  // The value '-2' (instead of '-1') means that the element is ignored by  the ':focusable' selector, see jquery-scout-selectors.js.
+  if ($container.attr('tabindex') === undefined) {
+    $container.attr('tabindex', '-2');
+  }
 }
 
 export function installScrollShadow($container, session, options) {

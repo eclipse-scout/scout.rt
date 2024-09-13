@@ -1213,7 +1213,7 @@ export default class DateField extends ValueField {
     this.setSuppressStatus(FormField.SuppressStatus.ALL);
     let $predictionField = $inputField.clone()
       .addClass('predict')
-      .attr('tabIndex', '-1')
+      .attr('tabIndex', '-2')
       .insertBefore($inputField);
     if ($inputField.hasClass('has-error')) {
       $predictionField.addClass('has-error');
