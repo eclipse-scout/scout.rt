@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -689,7 +689,7 @@ describe('objects', () => {
       b['d'] = '2';
       b['c'] = '1';
       expect(objects.equalsRecursive(a, b)).toBe(true);
-    })
+    });
   });
 
   describe('Constant resolving from plain object / JSON model', () => {
@@ -883,6 +883,122 @@ describe('objects', () => {
         // @ts-expect-error shrinkable does not exist on Action
         expect(menu.shrinkable).toBe(false);
       }
+    });
+  });
+
+  describe('sortProperties', () => {
+
+    it('sorts properties alphabetically (recursive)', () => {
+      let obj = {
+        a: [3, 1, null, 2], // should not get sorted
+        '_id': 27,
+        c: {
+          d: 7,
+          D: '8',
+          B: 0,
+          b: 1
+        },
+        x: [
+          {r: 9, 'q': 9, 'W': 9},
+          {},
+          {z5: '5', z1: '1', z20: '20', 'z_': '_', z: ''}
+        ],
+        isNaN: isNaN
+      };
+      let sortedObj = objects.sortProperties(obj);
+      expect(sortedObj).not.toBe(obj);
+      expect(Object.keys(sortedObj)).toEqual(['_id', 'a', 'c', 'isNaN', 'x']);
+      expect(Object.keys(sortedObj.c)).toEqual(['b', 'B', 'd', 'D']);
+      expect(Object.keys(sortedObj.x[0])).toEqual(['q', 'r', 'W']);
+      expect(Object.keys(sortedObj.x[2])).toEqual(['z', 'z_', 'z1', 'z20', 'z5']);
+      expect(JSON.stringify(sortedObj)).toEqual(JSON.stringify({
+        _id: 27,
+        a: [3, 1, null, 2],
+        c: {
+          b: 1,
+          B: 0,
+          d: 7,
+          D: '8'
+        },
+        x: [
+          {q: 9, r: 9, W: 9},
+          {},
+          {z: '', z_: '_', z1: '1', z20: '20', z5: '5'}
+        ]
+      }));
+    });
+
+    it('sorts properties alphabetically (non-recursive)', () => {
+      let obj = {
+        a: [3, 1, null, 2], // should not get sorted
+        '_id': 27,
+        c: {
+          d: 7,
+          D: '8',
+          B: 0,
+          b: 1
+        },
+        x: [
+          {r: 9, 'q': 9, 'W': 9},
+          {},
+          {z5: '5', z1: '1', z20: '20', 'z_': '_', z: ''}
+        ],
+        isNaN: isNaN
+      };
+      let sortedObj = objects.sortProperties(obj, false); // <--
+      expect(sortedObj).not.toBe(obj);
+      expect(Object.keys(sortedObj)).toEqual(['_id', 'a', 'c', 'isNaN', 'x']);
+      expect(Object.keys(sortedObj.c)).toEqual(['d', 'D', 'B', 'b']);
+      expect(Object.keys(sortedObj.x[0])).toEqual(['r', 'q', 'W']);
+      expect(Object.keys(sortedObj.x[2])).toEqual(['z5', 'z1', 'z20', 'z_', 'z']);
+      expect(JSON.stringify(sortedObj)).toEqual(JSON.stringify({
+        _id: 27,
+        a: [3, 1, null, 2],
+        c: {
+          d: 7,
+          D: '8',
+          B: 0,
+          b: 1
+        },
+        x: [
+          {r: 9, 'q': 9, 'W': 9},
+          {},
+          {z5: '5', z1: '1', z20: '20', 'z_': '_', z: ''}
+        ]
+      }));
+    });
+
+    it('can handle non-object values', () => {
+      expect(objects.sortProperties(undefined)).toBe(undefined);
+      expect(objects.sortProperties(null)).toBe(null);
+      expect(objects.sortProperties(123)).toBe(123);
+      expect(objects.sortProperties('test')).toBe('test');
+      expect(objects.sortProperties('')).toBe('');
+      expect(objects.sortProperties(0)).toBe(0);
+      expect(objects.sortProperties(NaN)).toBeNaN();
+      expect(objects.sortProperties(false)).toBe(false);
+      expect(typeof objects.sortProperties((x, y) => x + y)).toBe('function');
+    });
+
+    it('can handle cyclic references', () => {
+      let array = [[3, 2], [6, 7], [1, 0]] as any;
+      array.push(array);
+      let sortedArray = objects.sortProperties(array);
+      expect(sortedArray).not.toBe(array);
+      expect(sortedArray.length).toBe(4);
+      expect(sortedArray[0]).toEqual([3, 2]);
+      expect(sortedArray[1]).toEqual([6, 7]);
+      expect(sortedArray[2]).toEqual([1, 0]);
+      expect(sortedArray[3]).toBe(sortedArray);
+
+      let obj = {c: 2, b: 1, a: {z: 99, y: 98, x: null}};
+      obj.a.x = obj;
+      let sortedObj = objects.sortProperties(obj);
+      expect(sortedObj).not.toBe(obj);
+      expect(Object.keys(sortedObj)).toEqual(['a', 'b', 'c']);
+      expect(Object.keys(sortedObj.a)).toEqual(['x', 'y', 'z']);
+      expect(sortedObj.a).not.toBe(obj.a);
+      expect(sortedObj.a.x).toBe(sortedObj);
     });
   });
 });
