@@ -155,6 +155,57 @@ export const objects = {
     });
   },
 
+  /**
+   * Creates a copy of the given object with the properties in alphabetic order. The characters in the property names are compared
+   * individually (no alphanumeric sorting). The names are first sorted by ascending length and then by character class: special
+   * characters (punctuation etc.), then numbers (0-9), then lowercase letters (a-z), then uppercase letters (A-Z).
+   *
+   * The order of elements in an array is preserved. Values that are not plain objects are left as is. This method detects cyclic
+   * references and does not throw an error. Instead, the cyclic reference is reassigned to the corresponding copy.
+   *
+   * @param recursive whether to recursively sort property names in nested objects. The default value is `true`.
+   */
+  sortProperties<T>(obj: T, recursive = true): T {
+    return sortPropertiesImpl(obj, recursive, new Map());
+
+    function sortPropertiesImpl(obj: any, recursive: boolean, seen: Map<any, any>): any {
+      // Check for cyclic references
+      if (seen.has(obj)) {
+        return seen.get(obj);
+      }
+
+      if (objects.isArray(obj)) {
+        let copy = [];
+        seen.set(obj, copy);
+        return obj.reduce((acc, elem) => {
+          if (recursive) {
+            acc.push(sortPropertiesImpl(elem, recursive, seen));
+          } else {
+            acc.push(elem);
+          }
+          return acc;
+        }, copy);
+      }
+
+      if (objects.isPlainObject(obj)) {
+        let copy = {};
+        seen.set(obj, copy);
+        return Object.keys(obj)
+          .sort((k1, k2) => k1.localeCompare(k2))
+          .reduce((acc, key) => {
+            if (recursive) {
+              acc[key] = sortPropertiesImpl(obj[key], recursive, seen);
+            } else {
+              acc[key] = obj[key];
+            }
+            return acc;
+          }, copy);
+      }
+
+      return obj;
+    }
+  },
+
   valueCopy<T>(obj: T): T {
     // Nothing to be done for immutable things
     if (obj === undefined || obj === null || typeof obj !== 'object') {
