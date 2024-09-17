@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -245,12 +245,12 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeTruthy();
 
-      JQueryTesting.triggerKeyDown(tree.$data, keys.SUBTRACT);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.LEFT);
       expect(node0.expanded).toBeFalsy();
     });
 
     it(' collapses a node and drill up', () => {
-      let model = helper.createModelFixture(3, 1, true);
+      let model = helper.createModelFixture(3, 2, true);
       let tree = helper.createTree(model);
 
       let node0 = tree.nodes[0],
@@ -260,7 +260,7 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0Child0]);
       expect(node0Child0.expanded).toBeTruthy();
 
-      JQueryTesting.triggerKeyDown(tree.$data, keys.SUBTRACT);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.LEFT);
       expect(node0Child0.expanded).toBeFalsy();
       JQueryTesting.triggerKeyDown(tree.$data, keys.SUBTRACT);
       helper.assertSelection(tree, [node0]);
@@ -282,7 +282,7 @@ describe('TreeKeyStrokes', () => {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeFalsy();
 
-      JQueryTesting.triggerKeyDown(tree.$data, keys.ADD);
+      JQueryTesting.triggerKeyDown(tree.$data, keys.RIGHT);
       expect(node0.expanded).toBeTruthy();
     });
 

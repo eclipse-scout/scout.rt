@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,15 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractTableNavigationKeyStroke, keys, ScoutKeyboardEvent, Table} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
+import {AbstractTableNavigationKeyStroke, ScoutKeyboardEvent, Table} from '../../index';
 
 export class TableNavigationCollapseKeyStroke extends AbstractTableNavigationKeyStroke {
 
-  constructor(table: Table) {
+  constructor(table: Table, key: number, displayText: string) {
     super(table);
-    this.which = [keys.SUBTRACT, keys.LEFT];
-    this.renderingHints.text = '-';
+    this.which = [key];
+    this.renderingHints.text = displayText;
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let row = this.field.selectedRows[0];
       if (row) {
@@ -42,7 +41,7 @@ export class TableNavigationCollapseKeyStroke extends AbstractTableNavigationKey
     return !!selectedRow.parentRow;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let selectedRow = this.field.selectedRows[0];
     if (!selectedRow) {
       return;

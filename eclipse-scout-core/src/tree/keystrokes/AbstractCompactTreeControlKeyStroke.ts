@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,6 +48,7 @@ export class AbstractCompactTreeControlKeyStroke extends KeyStroke {
   override handle(event: KeyboardEventBase & CompactTreeEventNode) {
     this.field.selectNodes(event._nextNode);
     this.field.checkNode(event._nextNode, true);
+    this.field.revealSelection();
   }
 
   protected _findNextNode($currentNode: JQuery, currentNode: CompactTreeNode): CompactTreeNode {
