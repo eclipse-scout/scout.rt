@@ -9,7 +9,7 @@
  */
 import {
   Action, aria, arrays, ContextMenuPopup, DesktopPopupOpenEvent, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DropType, EnumObject, EventHandler, Filter, Filterable, FilterOrFunction, FilterResult, FilterSupport,
-  FullModelOf, graphics, HtmlComponent, InitModelOf, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, Rectangle, scout,
+  FullModelOf, graphics, HtmlComponent, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuFilter, MenuItemsOrder, menus as menuUtil, ObjectOrModel, objects, Range, Rectangle, scout,
   scrollbars, ScrollDirection, ScrollToOptions, strings, tooltips, TreeBreadcrumbFilter, TreeCheckNodesResult, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeEventMap, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel,
   TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
@@ -293,9 +293,11 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       new TreeNavigationUpKeyStroke(this, modifierBitMask),
       new TreeNavigationDownKeyStroke(this, modifierBitMask),
       new TreeCollapseAllKeyStroke(this, modifierBitMask),
-      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
+      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.LEFT, '←'),
+      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.SUBTRACT, '-'),
       new TreeNavigationEndKeyStroke(this, modifierBitMask),
-      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
+      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.RIGHT, '→'),
+      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.ADD, '+')
     ]);
   }
 
@@ -2592,7 +2594,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       updatedNodes.add(uncheckedNodes);
 
       if (opts.checkChildren) {
-        // The configuration of this property and no muiltiCheck does not make sense.
+        // The configuration of this property and no multiCheck does not make sense.
         // All nodes will be unselected and no new node is selected.
         nodes = []; // Like a return but with render, does not run through the forEach
       }

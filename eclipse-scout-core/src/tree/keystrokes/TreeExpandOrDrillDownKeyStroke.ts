@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,15 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractTreeNavigationKeyStroke, keys, ScoutKeyboardEvent, Tree, TreeEventCurrentNode, TreeNode} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
+import {AbstractTreeNavigationKeyStroke, ScoutKeyboardEvent, Tree, TreeEventCurrentNode, TreeNode} from '../../index';
 
 export class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-  constructor(tree: Tree, modifierBitMask: number) {
+  constructor(tree: Tree, modifierBitMask: number, key: number, displayText: string) {
     super(tree, modifierBitMask);
-    this.which = [keys.ADD];
-    this.renderingHints.text = '+';
+    this.which = [key];
+    this.renderingHints.text = displayText;
     this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent & TreeEventCurrentNode) => {
       let currentNode = event._treeCurrentNode;
       if (this.isNodeExpandable(currentNode)) {
@@ -36,7 +35,7 @@ export class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigationKeyStr
     return !node.expanded && !node.leaf;
   }
 
-  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
+  override handle(event: JQuery.KeyboardEventBase & TreeEventCurrentNode) {
     let currentNode = event._treeCurrentNode;
     if (this.isNodeExpandable(currentNode)) {
       this.field.expandNode(currentNode, {

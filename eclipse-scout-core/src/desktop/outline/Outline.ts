@@ -9,10 +9,10 @@
  */
 import {
   arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, DisplayParent, DisplayViewId, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FullModelOf, GlassPaneTarget, GroupBox,
-  GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton,
-  ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel, PropertyChangeEvent,
-  scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke,
-  TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesSelectedEvent, TreeNodesUpdatedEvent, Widget
+  GroupBoxMenuItemsOrder, HtmlComponent, Icon, InitModelOf, keys, KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton,
+  NavigateUpButton, ObjectOrChildModel, ObjectOrModel, OutlineContent, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel,
+  PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree, TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeCollapseOrDrillUpKeyStroke,
+  TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodesDeletedEvent, TreeNodesInsertedEvent, TreeNodesSelectedEvent, TreeNodesUpdatedEvent, Widget
 } from '../../index';
 
 export class Outline extends Tree implements DisplayParent, OutlineModel {
@@ -217,8 +217,10 @@ export class Outline extends Tree implements DisplayParent, OutlineModel {
       new TreeNavigationDownKeyStroke(this, modifierBitMask),
       new OutlineNavigateToTopKeyStroke(this, modifierBitMask),
       new TreeNavigationEndKeyStroke(this, modifierBitMask),
-      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
-      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
+      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.LEFT, '←'),
+      new TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask, keys.SUBTRACT, '-'),
+      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.RIGHT, '→'),
+      new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask, keys.ADD, '+')
     ]);
 
     this.keyStrokeContext.$bindTarget = () => this.session.$entryPoint;

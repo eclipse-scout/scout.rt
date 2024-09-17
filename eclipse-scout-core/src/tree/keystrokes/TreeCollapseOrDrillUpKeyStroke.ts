@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,15 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractTreeNavigationKeyStroke, keys, ScoutKeyboardEvent, Tree, TreeEventCurrentNode} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
+import {AbstractTreeNavigationKeyStroke, ScoutKeyboardEvent, Tree, TreeEventCurrentNode} from '../../index';
 
 export class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-  constructor(tree: Tree, modifierBitMask: number) {
+  constructor(tree: Tree, modifierBitMask: number, key: number, displayText: string) {
     super(tree, modifierBitMask);
-    this.which = [keys.SUBTRACT];
-    this.renderingHints.text = '-';
+    this.which = [key];
+    this.renderingHints.text = displayText;
     this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent & TreeEventCurrentNode) => {
       let currentNode = event._treeCurrentNode;
       if (currentNode.expanded) {
@@ -32,9 +31,9 @@ export class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigationKeyStr
     return accepted && !!currentNode && (currentNode.expanded || !!currentNode.parentNode);
   }
 
-  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
+  override handle(event: JQuery.KeyboardEventBase & TreeEventCurrentNode) {
     let currentNode = event._treeCurrentNode;
-    if (currentNode.expanded) {
+    if (currentNode.expanded && currentNode.childNodes.length) {
       this.field.collapseNode(currentNode);
     } else if (currentNode.parentNode) {
       this.selectNodesAndReveal(currentNode.parentNode, true);
