@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,6 +32,8 @@ public class BeanUtilityTest {
 
   @Rule
   public ErrorCollector collector = new ErrorCollector();
+
+  private final boolean m_isJava21OrNewer = Runtime.version().feature() >= 21;
 
   @Test
   public void testGetConstructorNullAndDefault() throws Exception {
@@ -258,7 +260,14 @@ public class BeanUtilityTest {
     Iterator<Class<?>> it = hierarchy.iterator();
     assertEquals(Iterable.class, it.next());
     assertEquals(Collection.class, it.next());
+
+    if (m_isJava21OrNewer) {
+      assertEquals("java.util.SequencedCollection", it.next().getName());
+    }
     assertEquals(Set.class, it.next());
+    if (m_isJava21OrNewer) {
+      assertEquals("java.util.SequencedSet", it.next().getName());
+    }
     assertEquals(SortedSet.class, it.next());
     assertEquals(InterfaceWithHierarchy.class, it.next());
   }
@@ -268,6 +277,9 @@ public class BeanUtilityTest {
     List<Class<? extends Set>> hierarchy = BeanUtility.getInterfacesHierarchy(InterfaceWithHierarchy.class, Set.class);
     Iterator<Class<? extends Set>> it = hierarchy.iterator();
     assertEquals(Set.class, it.next());
+    if (m_isJava21OrNewer) {
+      assertEquals("java.util.SequencedSet", it.next().getName());
+    }
     assertEquals(SortedSet.class, it.next());
     assertEquals(InterfaceWithHierarchy.class, it.next());
   }

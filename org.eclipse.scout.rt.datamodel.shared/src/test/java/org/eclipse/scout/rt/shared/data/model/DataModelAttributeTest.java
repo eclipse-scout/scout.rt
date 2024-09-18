@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,6 +43,7 @@ import org.junit.runner.RunWith;
 /**
  * @since 3.8.0
  */
+@SuppressWarnings("deprecation")
 @RunWith(PlatformTestRunner.class)
 public class DataModelAttributeTest {
 
@@ -103,10 +104,14 @@ public class DataModelAttributeTest {
     assertNull(att.formatValue(null));
 
     NlsLocale.set(new Locale("de", "CH"));
-    assertEquals("14:03", att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss")));
+    String formattedDe = att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss"));
+    assertEquals("14:03", formattedDe);
 
     NlsLocale.set(new Locale("en", "US"));
-    assertEquals("2:03 PM", att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss")));
+    String formattedEn = att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss"));
+    assertTrue("2:03 PM".equals(formattedEn) // JDK < 21 uses normal whitespace
+        || "2:03\u202fPM".equals(formattedEn) // JDK >= 21 uses 'NARROW NO-BREAK SPACE' (U+202F)
+    );
   }
 
   @Test
