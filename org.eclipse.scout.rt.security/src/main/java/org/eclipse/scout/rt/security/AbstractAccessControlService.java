@@ -219,7 +219,12 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   @Override
   public IPermissionCollection getPermissions() {
-    IPermissionCollection permissions = getCache().get(getCurrentUserCacheKey());
+    K currentUserCacheKey = getCurrentUserCacheKey();
+    IPermissionCollection permissions = getCache().get(currentUserCacheKey);
+    LOG.trace("getPermissions() called for {}, returned {}", currentUserCacheKey, permissions);
+    if (permissions == null) {
+      LOG.error("getPermissions() called for {}, returned {}", currentUserCacheKey, permissions);
+    }
     return permissions == null ? BEANS.get(NonePermissionCollection.class) : permissions;
   }
 

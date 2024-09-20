@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,26 +16,36 @@ import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class AccessSupport {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AccessSupport.class);
+
   public boolean check(Permission p) {
-    return BEANS.get(IAccessControlService.class).getPermissions().implies(p);
+    boolean implies = BEANS.get(IAccessControlService.class).getPermissions().implies(p);
+    LOG.trace("check({}): {}", p, implies);
+    return implies;
   }
 
   public void checkAndThrow(Permission p) {
     if (!check(p)) {
+      LOG.debug("checkAndThrow(p) failed, throwing exception");
       throw getAccessCheckFailedException(p);
     }
   }
 
   public boolean checkAny(Permission... permissions) {
     if (permissions == null) {
+      LOG.trace("checkAny(null) failed, no permissions supplied");
       return false;
     }
     IPermissionCollection c = BEANS.get(IAccessControlService.class).getPermissions();
-    return Stream.of(permissions).anyMatch(c::implies);
+    boolean anyImplies = Stream.of(permissions).anyMatch(c::implies);
+    LOG.trace("checkAny({}): {}", permissions, anyImplies);
+    return anyImplies;
   }
 
   public void checkAnyAndThrow(Permission... permissions) {
@@ -51,10 +61,13 @@ public class AccessSupport {
 
   public boolean checkAll(Permission... permissions) {
     if (permissions == null) {
+      LOG.trace("checkAll(null) failed, no permissions supplied");
       return false;
     }
     IPermissionCollection c = BEANS.get(IAccessControlService.class).getPermissions();
-    return Stream.of(permissions).allMatch(c::implies);
+    boolean allImplies = Stream.of(permissions).allMatch(c::implies);
+    LOG.trace("checkAll({}): {}", permissions, allImplies);
+    return allImplies;
   }
 
   public void checkAllAndThrow(Permission... permissions) {
@@ -87,6 +100,8 @@ public class AccessSupport {
   }
 
   public PermissionLevel getGrantedPermissionLevel(IPermission permission) {
-    return BEANS.get(IAccessControlService.class).getPermissions().getGrantedPermissionLevel(permission);
+    PermissionLevel grantedPermissionLevel = BEANS.get(IAccessControlService.class).getPermissions().getGrantedPermissionLevel(permission);
+    LOG.trace("getGrantedPermissionLevel({}): {}", permission, grantedPermissionLevel);
+    return grantedPermissionLevel;
   }
 }

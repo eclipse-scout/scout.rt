@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,8 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.api.data.security.PermissionId;
 import org.eclipse.scout.rt.platform.util.EnumerationUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of an permission collection implementing {@link IPermissionCollection}.
@@ -32,6 +34,8 @@ import org.eclipse.scout.rt.platform.util.EnumerationUtility;
  */
 public class DefaultPermissionCollection extends AbstractPermissionCollection {
   private static final long serialVersionUID = 1L;
+
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultPermissionCollection.class);
 
   /** content is effective immutable and protected by {@link #isReadOnly()} */
   private final Map<PermissionId, List<IPermission>> m_permissions;
@@ -91,12 +95,15 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
     if (permission == null) {
       return false;
     }
-    return m_permissions.getOrDefault(permission.getId(), Collections.emptyList()).stream().anyMatch(def -> def.implies(permission));
+    boolean anyImplies = m_permissions.getOrDefault(permission.getId(), Collections.emptyList()).stream().anyMatch(def -> def.implies(permission));
+    LOG.trace("implies({}): {}", permission, anyImplies);
+    return anyImplies;
   }
 
   @Override
   public PermissionLevel getGrantedPermissionLevel(IPermission permission) {
     if (permission == null) {
+      LOG.warn("getGrantedPermissionLevel was called w/o a permission, returning undefined level");
       return PermissionLevel.UNDEFINED;
     }
 
@@ -106,10 +113,14 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
 
     switch (grantedLevels.size()) {
       case 0:
+        LOG.trace("getGrantedPermissionLevel({}): Not found", permission);
         return PermissionLevel.NONE; // no such permission was granted
       case 1:
-        return grantedLevels.iterator().next();
+        PermissionLevel level = grantedLevels.iterator().next();
+        LOG.trace("getGrantedPermissionLevel({}): Unique item found, returning level {}", permission, level);
+        return level;
       default:
+        LOG.trace("getGrantedPermissionLevel({}): Multiple levels found, data-depending - using undefined level", permission);
         return PermissionLevel.UNDEFINED; // there are multiple permissions matching - concrete level depends on a data
     }
   }
