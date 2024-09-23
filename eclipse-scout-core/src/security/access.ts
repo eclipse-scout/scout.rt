@@ -25,7 +25,7 @@ export const access = {
     if (!accessControl) {
       accessControl = scout.create(AccessControl, {permissionsUrl});
     }
-    return accessControl.whenSync();
+    return accessControl.bootstrap();
   },
 
   /**
@@ -40,7 +40,7 @@ export const access = {
     if (!accessControl) {
       return;
     }
-    accessControl.stopSync();
+    accessControl.destroy();
     accessControl = null;
   },
 

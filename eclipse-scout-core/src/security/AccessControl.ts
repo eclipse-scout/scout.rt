@@ -9,8 +9,8 @@
  */
 
 import {
-  ajax, AjaxCall, AjaxError, DoEntity, ErrorHandler, Event, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PropertyEventEmitter,
-  PropertyEventMap, scout, SomeRequired, UiNotificationEvent, uiNotifications
+  ajax, AjaxCall, AjaxError, DoEntity, ErrorHandler, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PropertyEventEmitter, scout, SomeRequired,
+  UiNotificationEvent, uiNotifications
 } from '../index';
 import $ from 'jquery';
 
@@ -18,7 +18,6 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
   declare self: AccessControl;
   declare model: AccessControlModel;
   declare initModel: SomeRequired<this['model'], 'permissionsUrl'>;
-  declare eventMap: AccessControlEventMap;
 
   permissionsUrl: string;
 
@@ -32,21 +31,20 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     this.permissionsUrl = null;
     this._call = null;
     this._reloadTimeoutId = -1;
-    this._permissionCollection = null;
+    this._permissionCollection = PermissionCollection.ensure({type: PermissionCollectionType.NONE});
     this._permissionUpdateEventHandler = this._onPermissionUpdateNotify.bind(this);
   }
 
   override init(model: InitModelOf<this>) {
     this.permissionsUrl = scout.assertParameter('permissionsUrl', model.permissionsUrl);
-    this.startSync();
   }
 
-  startSync() {
+  bootstrap(): JQuery.Promise<void> {
     this._subscribeForNotifications();
-    this._sync();
+    return this._load();
   }
 
-  stopSync() {
+  destroy() {
     this._unsubscribeFromNotifications();
   }
 
@@ -68,31 +66,22 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     }
     this._reloadTimeoutId = setTimeout(() => {
       this._reloadTimeoutId = -1;
-      this._sync();
+      this._load()
+        .catch((error: AjaxError) => {
+          // Log error
+          scout.create(ErrorHandler, {displayError: false}).handle(error);
+        });
     }, reloadDelay);
   }
 
-  protected _sync() {
-    this._loadPermissionCollection()
+  protected _load(): JQuery.Promise<void> {
+    return this._loadPermissionCollection()
       .always(() => {
         this._call = null; // call ended. Not necessary anymore
       })
-      .catch((error: AjaxError) => {
-        // handle error and return null
-        scout.create(ErrorHandler, {displayError: false}).handle(error);
-        this._onSyncError();
-        return null;
-      })
       .then((model: PermissionCollectionModel) => {
-        const sync = !!model;
-        // if no model was loaded keep last permission collection (or none collection if no permission collection is present)
-        model = model || this._permissionCollection || {type: PermissionCollectionType.NONE};
         // update permission collection
         this._permissionCollection = PermissionCollection.ensure(model);
-        if (sync) {
-          // notify listeners
-          this._onSyncSuccess();
-        }
       });
   }
 
@@ -107,38 +96,6 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
       retryIntervals: [300, 500, 1000, 5000]
     });
     return this._call.call();
-  }
-
-  /**
-   * @returns promise which is resolved if the next sync is successful and rejected if it results in an error.
-   */
-  whenSync(): JQuery.Promise<void> {
-    const success = $.Deferred();
-    this.whenSyncSuccess().then(e => success.resolve());
-    this.whenSyncError().then(e => success.reject('Permissions were not synchronized successfully.'));
-    return success.promise();
-  }
-
-  protected _onSyncSuccess() {
-    this.trigger('syncSuccess');
-  }
-
-  /**
-   * @returns promise which is resolved after the next successful sync.
-   */
-  whenSyncSuccess(): JQuery.Promise<Event<AccessControl>> {
-    return this.when('syncSuccess');
-  }
-
-  protected _onSyncError() {
-    this.trigger('syncError');
-  }
-
-  /**
-   * @returns promise which is resolved after the next sync error.
-   */
-  whenSyncError(): JQuery.Promise<Event<AccessControl>> {
-    return this.when('syncError');
   }
 
   /**
@@ -175,11 +132,6 @@ export interface AccessControlModel extends ObjectModel<AccessControl> {
    * URL pointing to a json resource that provides information about permissions (see {@link PermissionCollectionModel}).
    */
   permissionsUrl?: string;
-}
-
-export interface AccessControlEventMap extends PropertyEventMap {
-  'syncSuccess': Event<AccessControl>;
-  'syncError': Event<AccessControl>;
 }
 
 export interface PermissionUpdateMessageDo extends DoEntity {
