@@ -9,8 +9,8 @@
  */
 
 import {
-  ajax, AjaxCall, AjaxError, DoEntity, ErrorHandler, Event, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PropertyEventEmitter,
-  PropertyEventMap, scout, SomeRequired, UiNotificationEvent, uiNotifications
+  ajax, AjaxCall, AjaxError, DoEntity, Event, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PropertyEventEmitter, PropertyEventMap, scout,
+  SomeRequired, UiNotificationEvent, uiNotifications
 } from '../index';
 import $ from 'jquery';
 
@@ -77,22 +77,16 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
       .always(() => {
         this._call = null; // call ended. Not necessary anymore
       })
-      .catch((error: AjaxError) => {
-        // handle error and return null
-        scout.create(ErrorHandler, {displayError: false}).handle(error);
-        this._onSyncError();
-        return null;
-      })
       .then((model: PermissionCollectionModel) => {
-        const sync = !!model;
-        // if no model was loaded keep last permission collection (or none collection if no permission collection is present)
-        model = model || this._permissionCollection || {type: PermissionCollectionType.NONE};
+        model = model || {type: PermissionCollectionType.NONE};
         // update permission collection
         this._permissionCollection = PermissionCollection.ensure(model);
-        if (sync) {
-          // notify listeners
-          this._onSyncSuccess();
-        }
+        // notify listeners
+        this._onSyncSuccess();
+      })
+      .catch((error: any) => {
+        this._onSyncError(error);
+        return error;
       });
   }
 
@@ -115,7 +109,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
   whenSync(): JQuery.Promise<void> {
     const success = $.Deferred();
     this.whenSyncSuccess().then(e => success.resolve());
-    this.whenSyncError().then(e => success.reject('Permissions were not synchronized successfully.'));
+    this.whenSyncError().then(e => success.reject('Permissions were not synchronized successfully.', e.error));
     return success.promise();
   }
 
@@ -130,8 +124,8 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     return this.when('syncSuccess');
   }
 
-  protected _onSyncError() {
-    this.trigger('syncError');
+  protected _onSyncError(error: any) {
+    this.trigger('syncError', {error});
   }
 
   /**
