@@ -55,8 +55,8 @@ class StaticAccessControl extends AccessControl {
     this._permissionCollection = PermissionCollection.ensure(permissionCollectionModel);
   }
 
-  protected override _sync() {
-    // nop
+  protected override _load(): JQuery.Promise<void> {
+    return $.resolvedPromise();
   }
 
   protected override _subscribeForNotifications() {
@@ -65,9 +65,5 @@ class StaticAccessControl extends AccessControl {
 
   protected override _unsubscribeFromNotifications() {
     // nop
-  }
-
-  override whenSync(): JQuery.Promise<void> {
-    return $.resolvedPromise();
   }
 }
