@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextColumnUserFilte
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.hybrid.HybridManager;
+import org.eclipse.scout.rt.client.ui.desktop.hybrid.uicallback.UiCallbacks;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTileField;
@@ -147,6 +148,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.hybrid.JsonHybridManager;
+import org.eclipse.scout.rt.ui.html.json.desktop.hybrid.uicallback.JsonUiCallbacks;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.JsonTileOverviewForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
@@ -512,6 +514,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof HybridManager) {
       return new JsonHybridManager<>((HybridManager) model, session, id, parent);
+    }
+    if (model instanceof UiCallbacks) {
+      return new JsonUiCallbacks<>((UiCallbacks) model, session, id, parent);
     }
     return null;
   }

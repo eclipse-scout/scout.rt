@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,8 +39,8 @@ public interface IDesktopUIFacade {
    * The default case is to pass <code>false</code> as parameter.
    *
    * @param forcedClosing
-   *          If set to <code>true</code> all vetos to stop the closing process (see
-   *          {@link AbstractDesktop#doBeforeClosingInternal()} will be ignored. Otherwise if set to <code>false</code>
+   *          If set to {@code true} all vetos to stop the closing process (see
+   *          {@link AbstractDesktop#doBeforeClosingInternal()}) will be ignored. Otherwise, if set to {@code false}
    *          vetos are accepted.
    */
   void closeFromUI(boolean forcedClosing);
@@ -55,6 +55,11 @@ public interface IDesktopUIFacade {
    * GUI fires this event when the UiSession is disposing.
    */
   void fireGuiDetached();
+
+  /**
+   * UI Desktop has been initialized as well and is ready to handle events.
+   */
+  void readyFromUI();
 
   void activateForm(IForm form);
 
@@ -77,10 +82,6 @@ public interface IDesktopUIFacade {
   void setGeoLocationServiceAvailableFromUI(boolean available);
 
   void initStartupRequestParamsFromUI();
-
-  void fireGeolocationDetermined(String latitude, String longitude);
-
-  void fireGeolocationFailed(String errorCode, String errorMessage);
 
   void fireLogoAction();
 

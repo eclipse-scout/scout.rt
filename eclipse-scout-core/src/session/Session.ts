@@ -361,11 +361,13 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
     // ----- Helper methods -----
 
-    function onAjaxDone(data: SessionStartupResponse): void | JQuery.Promise<any> {
-      this._processStartupResponse(data);
-      if (data.error) {
-        return $.rejectedPromise(data);
-      }
+    function onAjaxDone(data: SessionStartupResponse): JQuery.Promise<any> {
+      return this._processStartupResponse(data).then(() => {
+        if (data.error) {
+          return $.rejectedPromise(data);
+        }
+        return data;
+      });
     }
 
     function onAjaxFail(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, ...args: any[]): JQuery.Promise<any> {
@@ -399,12 +401,12 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     return params;
   }
 
-  protected _processStartupResponse(data: SessionStartupResponse) {
+  protected _processStartupResponse(data: SessionStartupResponse): JQuery.Promise<any> {
     // Handle errors from server
     if (data.error) {
       let isFatalError = this._processErrorJsonResponse(data.error);
       if (isFatalError) {
-        return;
+        return $.resolvedPromise();
       }
     }
 
@@ -435,7 +437,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     // Special case: Page must be reloaded on startup (e.g. theme changed)
     if (data.startupData.reloadPage) {
       scout.reloadPage();
-      return;
+      return $.resolvedPromise();
     }
 
     // Enable inspector mode if server requests it (e.g. when server is running in development mode)
@@ -465,37 +467,40 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.desktop = this.getOrCreateWidget(clientSessionModel.desktop, this.rootAdapter.widget) as Desktop;
     App.get()._triggerDesktopReady(this.desktop);
 
-    let renderDesktopImpl = function() {
-      this._renderDesktop();
+    const def = $.Deferred();
+    this.render(() => this._renderDesktopImpl(data))
+      .then(() => this.onRequestsDone(() => def.resolve())); // wait for all remaining events to be processed
+    return def.promise();
+  }
 
-      // In case the server sent additional events, process them
-      if (data.events) {
-        this.processingEvents = true;
-        try {
-          this._processEvents(data.events);
-        } finally {
-          this.processingEvents = false;
-        }
+  protected _renderDesktopImpl(data: SessionStartupResponse) {
+    this._renderDesktop();
+
+    // In case the server sent additional events, process them
+    if (data.events) {
+      this.processingEvents = true;
+      try {
+        this._processEvents(data.events);
+      } finally {
+        this.processingEvents = false;
       }
+    }
 
-      // Ensure layout is valid (explicitly layout immediately and don't wait for setTimeout to run to make layouting invisible to the user)
-      this.layoutValidator.validate();
-      this.focusManager.validateFocus();
+    // Ensure layout is valid (explicitly layout immediately and don't wait for setTimeout to run to make layouting invisible to the user)
+    this.layoutValidator.validate();
+    this.focusManager.validateFocus();
 
-      // Start poller
-      this._resumeBackgroundJobPolling();
+    // Start poller
+    this._resumeBackgroundJobPolling();
 
-      this.ready = true;
-      App.get()._triggerSessionReady(this);
+    this.ready = true;
+    App.get()._triggerSessionReady(this);
 
-      $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
-      if ($.log.isDebugEnabled()) {
-        $.log.isDebugEnabled() && $.log.debug('size of _adapterDataCache after session has been initialized: ' + objects.countOwnProperties(this._adapterDataCache));
-        $.log.isDebugEnabled() && $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + objects.countOwnProperties(this.modelAdapterRegistry));
-      }
-    }.bind(this);
-
-    this.render(renderDesktopImpl);
+    $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
+    if ($.log.isDebugEnabled()) {
+      $.log.isDebugEnabled() && $.log.debug('size of _adapterDataCache after session has been initialized: ' + objects.countOwnProperties(this._adapterDataCache));
+      $.log.isDebugEnabled() && $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + objects.countOwnProperties(this.modelAdapterRegistry));
+    }
   }
 
   protected _storeClientSessionIdInStorage(clientSessionId: string) {
@@ -519,13 +524,13 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     return id;
   }
 
-  render(renderFunc: () => void) {
+  render(renderFunc: () => void): JQuery.Promise<any> {
     // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
     if (fonts.loadingComplete) {
       renderFunc();
-    } else {
-      fonts.preloader().then(renderFunc);
+      return $.resolvedPromise();
     }
+    return fonts.preloader().then(renderFunc);
   }
 
   protected _sendUnloadRequest() {

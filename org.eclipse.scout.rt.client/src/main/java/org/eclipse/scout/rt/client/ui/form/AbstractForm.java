@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -287,7 +287,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   protected void initConfigInternal() {
 
-    // Remember the initial ClientRunContext to not loose the Form from current calling context.
+    // Remember the initial ClientRunContext to not lose the Form from current calling context.
     m_callingModelContext = ModelContext.copyCurrent();
 
     // Run the initialization on behalf of this Form.
@@ -313,7 +313,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * @return the localized sub-title property of the form. Use {@link TEXTS}.
+   * @return the localized subtitle property of the form. Use {@link TEXTS}.
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(20)
@@ -486,7 +486,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * Whether or not a changed form should display the save needed state (dirty) in the dialog or view header.
+   * Whether a changed form should display the save needed state (dirty) in the dialog or view header.
    *
    * @return true to display the save needed state, false otherwise.
    */
@@ -520,7 +520,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * Initialize the form and all of its fields. By default any of the #start* methods of the form call this method
+   * Initialize the form and all of its fields. By default, any of the #start* methods of the form call this method
    * <p>
    * This method is called in the process of the initialization. The UI is not ready yet.
    */
@@ -562,7 +562,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * This method is called in order to update derived states like button enablings.<br>
+   * This method is called in order to update derived states like button enabled states.<br>
    * This method is called before {@link IFormHandler#onCheckFields()} and before the form is stored.
    *
    * @return true when validate is successful, false to silently cancel the current process
@@ -693,7 +693,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         FormFieldInjectionThreadLocal.push(injectedFields);
       }
 
-      // add mainbox if getter returns null
+      // add MainBox if getter returns null
       if (rootBox == null) {
         List<IGroupBox> contributedFields = m_contributionHolder.getContributionsByClass(IGroupBox.class);
         rootBox = CollectionUtility.firstElement(contributedFields);
@@ -780,7 +780,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       }
     };
     visit(v2, IButton.class);
-    getRootGroupBox().addPropertyChangeListener(new P_MainBoxPropertyChangeProxy());
+    IGroupBox rootGroupBox = getRootGroupBox();
+    if (rootGroupBox != null) {
+      rootGroupBox.addPropertyChangeListener(new P_MainBoxPropertyChangeProxy());
+    }
     setButtonsArmed(true);
   }
 
@@ -985,7 +988,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * This method is called from the implemented handler methods in a explicit form subclass
+   * This method is called from the implemented handler methods in an explicit form subclass
    */
   protected IForm startInternal(final IFormHandler handler) {
     ClientRunContexts.copyCurrent().withForm(this).run(() -> {
@@ -1160,7 +1163,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
       final IForm formOfField = field.getForm();
       if (formOfField == null) {
-        // either form has not been initialized or the field is part of a composite field, that does not override setForminternal -> skip
+        // either form has not been initialized or the field is part of a composite field, that does not override setFormInternal -> skip
         LOG.info("Extension properties are not exported for fields on which getForm() returns null. "
             + "Ensure that the form is initialized and that the field's parent invokes field.setFormInternal(IForm) [exportingForm={}, field={}]",
             AbstractForm.this.getClass().getName(), field.getClass().getName());
@@ -1512,15 +1515,15 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   protected Class<? extends AbstractFormData> getFormDataClass() {
     FormData formDataAnnotation = getClass().getAnnotation(FormData.class);
 
-    //look in superclasses for annotation
-    Class<?> superclazz = getClass().getSuperclass();
-    while (formDataAnnotation == null && superclazz != null) {
-      formDataAnnotation = superclazz.getAnnotation(FormData.class);
-      superclazz = superclazz.getSuperclass();
+    // look in superclasses for annotation
+    Class<?> superClazz = getClass().getSuperclass();
+    while (formDataAnnotation == null && superClazz != null) {
+      formDataAnnotation = superClazz.getAnnotation(FormData.class);
+      superClazz = superClazz.getSuperclass();
     }
 
     if (formDataAnnotation == null) {
-      //no annotation found..
+      // no annotation found.
       return null;
     }
 
@@ -1555,7 +1558,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * Mainbox getter
+   * MainBox getter
    */
   @Override
   public IGroupBox getRootGroupBox() {
@@ -1827,7 +1830,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       content.add(HTML.ul(mandatoryTextElements));
     }
     if (!invalidTexts.isEmpty()) {
-      if (content.size() > 0) {
+      if (!content.isEmpty()) {
         content.add(HTML.br());
       }
       content.add(HTML.div(TEXTS.get("FormInvalidFieldsMessage")));
@@ -2349,11 +2352,11 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         }
       }
     }
-    // in all tabboxes select the first tab that contains data, iff the current
+    // in all tab-boxes select the first tab that contains data, iff the current
     // tab has no values set
     getRootGroupBox().visit(tabBox -> {
-      IGroupBox selbox = tabBox.getSelectedTab();
-      if (selbox == null || !selbox.isSaveNeeded()) {
+      IGroupBox selBox = tabBox.getSelectedTab();
+      if (selBox == null || !selBox.isSaveNeeded()) {
         for (IGroupBox g : tabBox.getGroupBoxes()) {
           if (g.isSaveNeeded() && g.isVisible()) {
             tabBox.setSelectedTab(g);

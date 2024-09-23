@@ -75,7 +75,7 @@ export interface ErrorInfo {
   /**
    * The full message to log. Typically consists of the message and e.g. a stack trace.
    */
-  log: string;
+  log?: string;
   /**
    * Specifies the level errors are logged to the console (and sent to the backend for logging). Default is {@link LogLevel.ERROR}.
    */

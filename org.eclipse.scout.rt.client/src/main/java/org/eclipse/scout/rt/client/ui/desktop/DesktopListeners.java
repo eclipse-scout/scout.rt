@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,8 +31,7 @@ public final class DesktopListeners extends AbstractGroupedListenerList<DesktopL
       DesktopEvent.TYPE_OPEN_URI,
       DesktopEvent.TYPE_NOTIFICATION_ADDED,
       DesktopEvent.TYPE_NOTIFICATION_REMOVED,
-      DesktopEvent.TYPE_RELOAD_GUI,
-      DesktopEvent.TYPE_REQUEST_GEOLOCATION)));
+      DesktopEvent.TYPE_RELOAD_GUI)));
 
   @Override
   protected Integer eventType(DesktopEvent event) {

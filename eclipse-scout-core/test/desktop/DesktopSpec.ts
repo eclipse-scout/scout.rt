@@ -9,8 +9,8 @@
  */
 import {DummyLookupCall, FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
 import {
-  arrays, BusyIndicator, Button, DateField, DatePickerPopup, Desktop, DesktopNotification, DesktopTab, Device, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, ObjectOrChildModel, Outline, OutlineViewButton,
-  Popup, RemoteEvent, scout, SmartField, SmartFieldPopup, Status, StringField, strings, Tooltip, UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
+  arrays, BusyIndicator, Button, DateField, DatePickerPopup, Desktop, DesktopNotification, DesktopTab, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, ObjectOrChildModel, Outline, OutlineViewButton, Popup,
+  scout, SmartField, SmartFieldPopup, Status, StringField, strings, Tooltip, UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
 } from '../../src/index';
 
 describe('Desktop', () => {
@@ -569,56 +569,6 @@ describe('Desktop', () => {
       expect(tab.view).toBe(form);
       expect(tab.rendered).toBe(true);
       expect(tab.selected).toBe(true);
-    });
-
-  });
-
-  describe('geolocation', () => {
-
-    let browserImpl = navigator.geolocation.getCurrentPosition;
-    beforeEach(() => {
-      navigator.geolocation.getCurrentPosition = (success, error) => {
-        success({
-          timestamp: 0,
-          coords: {
-            accuracy: 0,
-            altitude: 0,
-            altitudeAccuracy: 0,
-            heading: 0,
-            latitude: 1,
-            longitude: 1,
-            speed: 0
-          }
-        });
-      };
-      jasmine.Ajax.install();
-      jasmine.clock().install();
-    });
-
-    it('asks the browser for its geographic location', () => {
-      expect(Device.get().supportsGeolocation()).toBe(true);
-      let message = {
-        events: [{
-          target: session.desktop.id,
-          type: 'requestGeolocation'
-        }]
-      };
-      linkWidgetAndAdapter(session.desktop, 'DesktopAdapter');
-      session._processSuccessResponse(message);
-      sendQueuedAjaxCalls();
-
-      let requestData = mostRecentJsonRequest();
-      let expectedEvent = new RemoteEvent(session.desktop.id, 'geolocationDetermined', {
-        latitude: 1,
-        longitude: 1
-      });
-      expect(requestData).toContainEvents(expectedEvent);
-    });
-
-    afterEach(() => {
-      navigator.geolocation.getCurrentPosition = browserImpl;
-      jasmine.Ajax.uninstall();
-      jasmine.clock().uninstall();
     });
 
   });

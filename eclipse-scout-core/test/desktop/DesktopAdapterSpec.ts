@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -174,7 +174,10 @@ describe('DesktopAdapter', () => {
       expect(desktop.activeForm).toBe(form);
 
       sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // only the desktop ready request is in the queue
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(jasmine.Ajax.requests.mostRecent().params.includes('desktopReady')).toBe(true);
     });
   });
 

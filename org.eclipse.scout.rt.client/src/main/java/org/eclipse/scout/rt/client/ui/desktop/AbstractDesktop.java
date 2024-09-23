@@ -68,6 +68,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
+import org.eclipse.scout.rt.client.ui.desktop.hybrid.uicallback.UiCallbacks;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.notification.NativeNotificationDefaults;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
@@ -109,7 +110,6 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -136,7 +136,7 @@ import org.slf4j.LoggerFactory;
  * <li>dialog stack of modal and non-modal dialogs (swing: dialogs as {@code JDialog}, {@code JFrame})
  * <li>active message box stack
  * <li>menubar menus
- * <li>toolbar and viewbar actions
+ * <li>toolbar and view bar actions
  * </ul>
  * The Eclipse Scout SDK creates a subclass of this class that can be used as initial desktop.
  */
@@ -170,7 +170,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
-  private final List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<>());
   private int m_attachedCount;
   private int m_attachedGuiCount;
   private boolean m_activatingDefaultView;
@@ -1738,6 +1737,15 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  public boolean isReady() {
+    return propertySupport.getPropertyBool(PROP_READY);
+  }
+
+  private void setReadyInternal(boolean b) {
+    propertySupport.setPropertyBool(PROP_READY, b);
+  }
+
+  @Override
   public boolean isGuiAvailable() {
     return propertySupport.getPropertyBool(PROP_GUI_AVAILABLE);
   }
@@ -1759,31 +1767,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public Future<Coordinates> requestGeolocation() {
-    synchronized (m_pendingPositionResponses) {
-      if (m_pendingPositionResponses.isEmpty()) {
-        fireRequestGeolocation();
-      }
-      ClientCallback<Coordinates> responseFuture = new ClientCallback<>() {
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-          removePendingResponse();
-          return super.cancel(mayInterruptIfRunning);
-        }
-
-        @Override
-        protected void timedOut() {
-          removePendingResponse();
-        }
-
-        private void removePendingResponse() {
-          synchronized (m_pendingPositionResponses) {
-            m_pendingPositionResponses.remove(this);
-          }
-        }
-      };
-      m_pendingPositionResponses.add(responseFuture);
-      return responseFuture;
-    }
+    return UiCallbacks.get().send(this, BEANS.get(GeoLocationUiCallbackHandler.class), null, "requestGeolocation");
   }
 
   @Override
@@ -1917,11 +1901,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   private void fireOpenUri(BinaryResource res, IOpenUriAction openUriAction) {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, res, openUriAction);
-    fireDesktopEvent(e);
-  }
-
-  private void fireRequestGeolocation() {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_REQUEST_GEOLOCATION);
     fireDesktopEvent(e);
   }
 
@@ -2070,8 +2049,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     internalCloseMessageBoxes(getMessageBoxes());
     internalCloseFileChoosers(getFileChoosers());
 
-    internalCloseClientCallbacks();
-
     fireDesktopClosed();
   }
 
@@ -2126,20 +2103,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         }
         finally {
           m_fileChooserStore.remove(f);
-        }
-      }
-    }
-  }
-
-  protected void internalCloseClientCallbacks() {
-    for (ClientCallback<?> c : CollectionUtility.arrayList(m_pendingPositionResponses)) {
-      if (c != null) {
-        try {
-          c.cancel(true);
-          c.failed(new ThreadInterruptedError("desktop is closing"));
-        }
-        catch (RuntimeException | PlatformError e) {
-          LOG.error("Exception while closing client callback", e);
         }
       }
     }
@@ -2323,6 +2286,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   private void detachGui() {
+    setReadyInternal(false);
     setAttachedGuiCount(m_attachedGuiCount - 1);
     if (m_attachedGuiCount == 0) {
       //this is the last call to detachGui, call extensions
@@ -2617,6 +2581,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
 
     @Override
+    public void readyFromUI() {
+      setReadyInternal(true);
+    }
+
+    @Override
     public void openFromUI() {
       setOpenedInternal(true);
       //extensions
@@ -2636,6 +2605,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     @Override
     public void closeFromUI(boolean forcedClosing) {
       setForcedClosing(forcedClosing);
+      setReadyInternal(false);
       // necessary so that no forms can be opened anymore.
       if (forcedClosing) {
         setOpenedInternal(false);
@@ -2692,33 +2662,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     @Override
     public void initStartupRequestParamsFromUI() {
       initStartupRequestParams();
-    }
-
-    @Override
-    public void fireGeolocationDetermined(String latitude, String longitude) {
-      Iterable<ClientCallback<Coordinates>> pendingCallbacks;
-      synchronized (m_pendingPositionResponses) {
-        pendingCallbacks = new ArrayList<>(m_pendingPositionResponses);
-        m_pendingPositionResponses.clear();
-      }
-      Coordinates location = new Coordinates(latitude, longitude);
-      for (ClientCallback<Coordinates> callback : pendingCallbacks) {
-        callback.done(location);
-      }
-    }
-
-    @Override
-    public void fireGeolocationFailed(String errorCode, String errorMessage) {
-      Iterable<ClientCallback<Coordinates>> pendingCallbacks;
-      synchronized (m_pendingPositionResponses) {
-        pendingCallbacks = new ArrayList<>(m_pendingPositionResponses);
-        m_pendingPositionResponses.clear();
-      }
-      setGeolocationServiceAvailable(false);
-      ProcessingException pe = new ProcessingException("Geolocation failed. ErrorCode: {}; ErrorMessage: {}", errorCode, errorMessage);
-      for (ClientCallback<Coordinates> callback : pendingCallbacks) {
-        callback.failed(pe);
-      }
     }
 
     @Override
@@ -2870,10 +2813,10 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     if (formSet == null || formSet.isEmpty()) {
       return;
     }
-    // Extend the form set with all depending forms (display parent hierarchy)
+    // Extend the form set with all dependant forms (display parent hierarchy)
     getUnsavedForms(formSet);
 
-    // Close the given forms including the depending forms
+    // Close the given forms including the dependant forms
     internalCloseForms(formSet);
   }
 

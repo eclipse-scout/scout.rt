@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,7 +42,7 @@ import org.junit.Test;
 
 /*
  * This test must be executed by a bare JUnit runner.
- * Reason: The PlatformTestRunner and its sub classes keep track of every job scheduled during test execution and verify that they are completed. The list of scheduled jobs
+ * Reason: The PlatformTestRunner and its subclasses keep track of every job scheduled during test execution and verify that they are completed. The list of scheduled jobs
  *         are referencing a JobInput which in turn references a RunContext and a session. The tests in this class will fail because they assert that the sessions are
  *         not referenced by any other object and therefore garbage collected.
  */
@@ -181,10 +181,11 @@ public class ClientSessionTest {
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
     //request a geo location
-    Future<Coordinates> geo = ModelJobs.schedule(() -> IDesktop.CURRENT.get().requestGeolocation(), ModelJobs
-        .newInput(ClientRunContexts
-            .empty()
-            .withSession(session, true)))
+    Future<Coordinates> geo = ModelJobs.schedule(() -> {
+          IDesktop desktop = IDesktop.CURRENT.get();
+          desktop.getUIFacade().readyFromUI();
+          return desktop.requestGeolocation();
+        }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
         .awaitDoneAndGet();
 
     assertFalse(geo.isDone());

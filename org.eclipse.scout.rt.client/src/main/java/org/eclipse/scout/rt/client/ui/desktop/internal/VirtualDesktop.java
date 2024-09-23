@@ -699,6 +699,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public boolean isReady() {
+    return getFromRealDesktopOrThrow(d -> d.isReady());
+  }
+
+  @Override
   public boolean isGuiAvailable() {
     return getFromRealDesktopOrThrow(d -> d.isGuiAvailable());
   }
