@@ -892,11 +892,16 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
     function onAjaxDone(data: RemoteResponse) {
       if (data.error) {
+        if (data.error.code === Session.JsonResponseError.SESSION_TIMEOUT) {
+          $.log.info('Session timeout, stopped polling for background jobs');
+          this.backgroundJobPollingSupport.setStopped();
+        } else {
+          $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
+          this.backgroundJobPollingSupport.setFailed();
+        }
         // Don't schedule a new polling request, when an error occurs
         // when the next user-initiated request succeeds, we re-enable polling
         // otherwise the polling would ping the server to death in case of an error
-        $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
-        this.backgroundJobPollingSupport.setFailed();
         if (this.areRequestsPending()) {
           // Add response to queue, handle later by _performUserAjaxRequest()
           this.responseQueue.add(data);
@@ -907,7 +912,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       } else if (data.sessionTerminated) {
         $.log.info('Session terminated, stopped polling for background jobs');
         this.backgroundJobPollingSupport.setStopped();
-        // If were are not yet logged out, redirect to the logout URL (the session that initiated the
+        // If we are not yet logged out, redirect to the logout URL (the session that initiated the
         // session invalidation will receive a dedicated logout event, redirect is handled there).
         if (!this.loggedOut && data.redirectUrl) {
           this.logout(data.redirectUrl);
