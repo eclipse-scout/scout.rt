@@ -145,6 +145,7 @@ export * from './code/CodeLookupCall';
 export * from './config/ConfigProperties';
 export * from './config/ConfigPropertyCache';
 export * from './dataobject/DoEntity';
+export * from './dataobject/dataObjects';
 export * from './dataobject/ValueDo';
 export * from './security/access';
 export * from './security/AccessControl';
