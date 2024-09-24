@@ -748,7 +748,7 @@ export class TableAdapter extends ModelAdapter {
         // cell properties, which is required because the Column checks, whether it should apply
         // defaults from the Column instance to a cell, or use the values from the cell.
         let model;
-        if (objects.isPlainObject(vararg)) {
+        if (objects.isObject(vararg)) {
           model = vararg;
           model.value = this._ensureValue(model.value);
           // Parse the value if a text but no value is provided. The server does only set the text if value and text are equal.

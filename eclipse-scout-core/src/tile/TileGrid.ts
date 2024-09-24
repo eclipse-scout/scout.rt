@@ -811,7 +811,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
     if (placeholder instanceof PlaceholderTile) {
       return placeholder;
     }
-    if (objects.isPlainObject(placeholder)) {
+    if (objects.isObject(placeholder)) {
       return scout.create($.extend(true, {}, {
         objectType: PlaceholderTile,
         parent: this

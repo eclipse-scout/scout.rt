@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {arrays, DoEntity, scout} from '..';
+import {arrays, DoEntity, objects, scout} from '..';
 
 export const dataObjects = {
   /**
@@ -31,7 +31,7 @@ export const dataObjects = {
       return;
     }
     scout.assertParameter('contribution', contribution);
-    if ($.isPlainObject(contribution)) {
+    if (objects.isPojo(contribution)) {
       scout.assertProperty(contribution, '_type');
       dataObjects.removeContribution(contribution._type, doEntity);
     } else {

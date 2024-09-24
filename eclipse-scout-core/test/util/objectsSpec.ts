@@ -573,18 +573,48 @@ describe('objects', () => {
     });
   });
 
-  describe('isPlainObject', () => {
+  describe('isObject', () => {
 
-    it('works as expected', () => {
-      expect(objects.isPlainObject({})).toBe(true);
-      expect(objects.isPlainObject({foo: 'bar'})).toBe(true);
-      expect(objects.isPlainObject([])).toBe(false);
-      expect(objects.isPlainObject(null)).toBe(false);
-      expect(objects.isPlainObject(undefined)).toBe(false);
-      expect(objects.isPlainObject(1)).toBe(false);
-      expect(objects.isPlainObject('foo')).toBe(false);
+    it('returns true for objects', () => {
+      expect(objects.isObject({})).toBe(true);
+      expect(objects.isObject({foo: 'bar'})).toBe(true);
+      expect(objects.isObject(Object.create(null))).toBe(true);
+      expect(objects.isObject(new Widget())).toBe(true);
+      // noinspection JSPrimitiveTypeWrapperUsage
+      expect(objects.isObject(new Object())).toBe(true);
     });
 
+    it('returns false for non-objects', () => {
+      expect(objects.isObject(Widget)).toBe(false);
+      expect(objects.isObject([])).toBe(false);
+      expect(objects.isObject(null)).toBe(false);
+      expect(objects.isObject(undefined)).toBe(false);
+      expect(objects.isObject(1)).toBe(false);
+      expect(objects.isObject('foo')).toBe(false);
+      expect(objects.isObject(true)).toBe(false);
+    });
+  });
+
+  describe('isPojo', () => {
+
+    it('returns true for plain objects', () => {
+      expect(objects.isPojo({})).toBe(true);
+      expect(objects.isPojo({foo: 'bar'})).toBe(true);
+      expect(objects.isPojo(Object.create(null))).toBe(true);
+      // noinspection JSPrimitiveTypeWrapperUsage
+      expect(objects.isPojo(new Object())).toBe(true);
+    });
+
+    it('returns false for non-plain objects', () => {
+      expect(objects.isPojo(new Widget())).toBe(false);
+      expect(objects.isPojo(Widget)).toBe(false);
+      expect(objects.isPojo([])).toBe(false);
+      expect(objects.isPojo(null)).toBe(false);
+      expect(objects.isPojo(undefined)).toBe(false);
+      expect(objects.isPojo(1)).toBe(false);
+      expect(objects.isPojo('foo')).toBe(false);
+      expect(objects.isPojo(true)).toBe(false);
+    });
   });
 
   describe('argumentsToArray', () => {
