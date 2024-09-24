@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Desktop, Form, graphics, keys, Menu, ObjectOrChildModel, Point, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget, WidgetPopup} from '../index';
+import {arrays, Desktop, Form, graphics, InitModelOf, keys, Menu, ObjectOrChildModel, Point, Rectangle, scout, scrollbars, Status, StatusSeverity, strings, TooltipEventMap, TooltipModel, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
 import KeyDownEvent = JQuery.KeyDownEvent;
 
@@ -76,6 +76,11 @@ export class Tooltip extends Widget implements TooltipModel {
 
     this._popup = null;
     this._openLater = false;
+  }
+
+  protected override _init(model: InitModelOf<this>) {
+    super._init(model);
+    this.resolveTextKeys(['text']);
   }
 
   override render($parent?: JQuery) {
