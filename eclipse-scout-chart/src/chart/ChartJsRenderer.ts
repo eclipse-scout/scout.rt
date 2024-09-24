@@ -907,11 +907,11 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }
     if (objects.isFunction(tooltipLabelValue)) {
       labelValue = tooltipLabelValue(tooltipItem);
-      labelValue = objects.isString(labelValue) || objects.isPlainObject(labelValue) ? labelValue : '';
+      labelValue = objects.isString(labelValue) || objects.isObject(labelValue) ? labelValue : '';
     }
     if (objects.isFunction(tooltipColor)) {
       labelColor = tooltipColor(tooltipItem);
-      labelColor = objects.isPlainObject(labelColor) ? (labelColor.backgroundColor || '') : '';
+      labelColor = objects.isObject(labelColor) ? (labelColor.backgroundColor || '') : '';
     }
     return {label, labelValue, labelColor};
   }
@@ -1110,7 +1110,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       value = dataset.data[dataIndex];
 
     if (this._isHorizontalBar(config)) {
-      if (objects.isPlainObject(value) && objects.isArray(value.x) && value.x.length === 2) {
+      if (objects.isObject(value) && objects.isArray(value.x) && value.x.length === 2) {
         let avg = (value.x[0] + value.x[1]) / 2;
         tooltipDirection = avg < 0 ? 'left' : 'right';
       } else {

@@ -246,7 +246,7 @@ export class App extends EventEmitter {
         this._handleBootstrapTimeoutError(vararg, url);
         return;
       }
-    } else if (objects.isPlainObject(vararg) && vararg.error) {
+    } else if (objects.isObject(vararg) && vararg.error) {
       // Json based error
       // Json errors (normally processed by Session.js) are returned with http status 200
       if (vararg.error.code === Session.JsonResponseError.SESSION_TIMEOUT) {

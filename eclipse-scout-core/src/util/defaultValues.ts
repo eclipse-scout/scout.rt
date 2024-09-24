@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -141,16 +141,16 @@ export const defaultValues = {
       // If property does not exist, set the default value and return.
       if (object[realProp] === undefined) {
         object[realProp] = objects.valueCopy(defaults[realProp]);
-      } else if (objects.isPlainObject(object[realProp]) && objects.isPlainObject(defaults[prop])) {
+      } else if (objects.isObject(object[realProp]) && objects.isObject(defaults[prop])) {
         // Special case: "default objects". If the property value is an object and default
         // value is also an object, extend the property value instead of replacing it.
         defaultValues._extendWithDefaults(object[realProp], defaults[prop]);
-      } else if (Array.isArray(object[realProp]) && objects.isPlainObject(defaults[prop])) {
+      } else if (Array.isArray(object[realProp]) && objects.isObject(defaults[prop])) {
         // Special case: "array of default objects": If the property value is an array of objects and
         // the default value is an object, extend each object in the array with the default value.
         let objectArray = object[realProp];
         for (let i = 0; i < objectArray.length; i++) {
-          if (objects.isPlainObject(objectArray[i])) {
+          if (objects.isObject(objectArray[i])) {
             defaultValues._extendWithDefaults(objectArray[i], defaults[prop]);
           }
         }

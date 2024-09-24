@@ -187,7 +187,7 @@ export const objects = {
         }, copy);
       }
 
-      if (objects.isPlainObject(obj)) {
+      if (objects.isObject(obj)) {
         let copy = {};
         seen.set(obj, copy);
         return Object.keys(obj)
@@ -368,12 +368,30 @@ export const objects = {
   },
 
   /**
-   * @returns true if the given object is an object: no primitive type (number, string, boolean, bigint, symbol), no array, not null and not undefined.
+   * @deprecated The method was renamed to {@link isObject}. Use the new name or consider using {@link isPojo} instead.
    */
   isPlainObject<T>(obj: T): obj is Exclude<typeof obj, Primitive | undefined | null | T[]> {
+    return objects.isObject(obj);
+  },
+
+  /**
+   * @returns true if the given object is an object: no primitive type (number, string, boolean, bigint, symbol), no array, not null and not undefined.
+   */
+  isObject<T>(obj: T): obj is Exclude<typeof obj, Primitive | undefined | null | T[]> {
     return typeof obj === 'object' &&
       !objects.isNullOrUndefined(obj) &&
       !Array.isArray(obj);
+  },
+
+  /**
+   * @returns true if the given object is a plain old JavaScript object, which is an object created by the object literal notation ({}) or using `new Object()`.
+   */
+  isPojo<T>(obj: T): obj is Exclude<typeof obj, Primitive | undefined | null | T[]> {
+    if (!objects.isObject(obj)) {
+      return false;
+    }
+    let prototype = Object.getPrototypeOf(obj);
+    return prototype === Object.prototype || prototype === null;
   },
 
   /**
@@ -526,7 +544,7 @@ export const objects = {
     if (objA === objB) {
       return true;
     }
-    if (objects.isPlainObject(objA) && objects.isPlainObject(objB)) {
+    if (objects.isObject(objA) && objects.isObject(objB)) {
       if (objects.isFunction(objA.equals) && objects.isFunction(objB.equals)) {
         return objA.equals(objB);
       }
@@ -670,7 +688,7 @@ export const objects = {
     if (objects.isNullOrUndefined(object)) {
       return object;
     }
-    if (!objects.isPlainObject(object)) {
+    if (!objects.isObject(object)) {
       throw new Error('Not an object: ' + object);
     }
     Object.keys(object).forEach(key => {
@@ -691,7 +709,7 @@ export const objects = {
     if (objects.isNullOrUndefined(obj)) {
       return true;
     }
-    if (!objects.isPlainObject(obj)) {
+    if (!objects.isObject(obj)) {
       return;
     }
     return Object.keys(obj).length === 0;

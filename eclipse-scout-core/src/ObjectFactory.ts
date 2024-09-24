@@ -151,7 +151,7 @@ export class ObjectFactory {
       options = options || {};
       model = modelOrOptions;
       objectType = objectTypeOrModel;
-    } else if (objects.isPlainObject(objectTypeOrModel)) {
+    } else if (objects.isObject(objectTypeOrModel)) {
       options = modelOrOptions || {};
       model = objectTypeOrModel;
       if (!model.objectType) {
