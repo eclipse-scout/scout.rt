@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, DoEntity, Table} from '../index';
+import {dataObjects, DoEntity, Table} from '../index';
 
 export class TableMaxResultsHelper {
 
@@ -32,10 +32,9 @@ export class TableMaxResultsHelper {
     if (maxRowCountContribution) {
       dataObject = dataObject || {} as T;
       // see ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME
-      dataObject._contributions = arrays.ensure(dataObject._contributions); // keep already existing contributions if present
-      dataObject._contributions.push(maxRowCountContribution);
+      dataObjects.addContribution(maxRowCountContribution, dataObject);
     }
-    return dataObject as T;
+    return dataObject;
   }
 
   /**

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, AutoLeafPageWithNodes, DoEntity, EventHandler, Form, FormTableControl, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent,
+  arrays, AutoLeafPageWithNodes, dataObjects, DoEntity, EventHandler, Form, FormTableControl, LimitedResultInfoContributionDo, ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, scout, Status, Table, TableAllRowsDeletedEvent,
   TableMaxResultsHelper, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
@@ -288,8 +288,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   protected _getLimitedResultInfoDo(tableData: any): LimitedResultInfoContributionDo {
-    return arrays.ensure(tableData?._contributions)
-      .find((contribution: DoEntity) => contribution._type === 'scout.LimitedResultInfoContribution') as LimitedResultInfoContributionDo;
+    return dataObjects.getContribution('scout.LimitedResultInfoContribution', tableData) as LimitedResultInfoContributionDo;
   }
 
   protected _onLoadTableDataFail(error: any, restoreSelectionInfo?: RestoreSelectionInfo) {
