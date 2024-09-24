@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, DropType, FormField, FormFieldLabelPosition, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor, GridData, Menu, ObjectOrChildModel, ObjectOrModel, StatusMenuMapping, StatusOrModel,
-  TooltipSupportOptions, WidgetModel
+  Action, DropType, FormField, FormFieldLabelPosition, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor, FormFieldValidationResultProvider, GridData, Menu, ObjectOrChildModel, ObjectOrModel,
+  ObjectType, StatusMenuMapping, StatusOrModel, TooltipSupportOptions, WidgetModel
 } from '../../index';
 
 export interface FormFieldModel extends WidgetModel {
@@ -222,4 +222,10 @@ export interface FormFieldModel extends WidgetModel {
    * The default is false.
    */
   lifecycleBoundary?: boolean;
+  /**
+   * Provides the validation result containing information about the validity of a form field.
+   *
+   * @see FormField.getValidationResult
+   */
+  validationResultProvider?: FormFieldValidationResultProvider | ObjectType<FormFieldValidationResultProvider>;
 }

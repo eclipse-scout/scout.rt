@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CheckBoxField, FormField, FormFieldMenu, FormFieldTile, GridData, GroupBox, Menu, RadioButton, RadioButtonGroup, scout, Status, StringField, TileField, TileGrid, TreeVisitResult, Widget} from '../../../src/index';
+import {
+  CheckBoxField, FormField, FormFieldMenu, FormFieldTile, FormFieldValidationResultProvider, GridData, GroupBox, Menu, RadioButton, RadioButtonGroup, scout, Status, StringField, TileField, TileGrid, TreeVisitResult, Widget
+} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 import {InitModelOf} from '../../../src/scout';
 
@@ -883,6 +885,41 @@ describe('FormField', () => {
       expect(formField.$field.attr('aria-label')).toBeTruthy();
       expect(formField.$field).toHaveAttr('aria-label', 'hello');
       expect(formField.$field.attr('aria-labelledby')).toBeFalsy();
+    });
+  });
+
+  describe('validationResultProvider', () => {
+    class CustomValidationResultProvider extends FormFieldValidationResultProvider {
+    }
+
+    it('can be replaced using init model', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop
+      });
+      expect(field.validationResultProvider).toBeInstanceOf(FormFieldValidationResultProvider);
+      expect(field.validationResultProvider).not.toBeInstanceOf(CustomValidationResultProvider);
+
+      field = scout.create(StringField, {
+        parent: session.desktop,
+        validationResultProvider: CustomValidationResultProvider
+      });
+      expect(field.validationResultProvider).toBeInstanceOf(CustomValidationResultProvider);
+    });
+
+    it('can be replaced using setter', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop
+      });
+      expect(field.validationResultProvider).not.toBeInstanceOf(CustomValidationResultProvider);
+      field.setValidationResultProvider(CustomValidationResultProvider);
+      expect(field.validationResultProvider).toBeInstanceOf(CustomValidationResultProvider);
+
+      field = scout.create(StringField, {
+        parent: session.desktop
+      });
+      let provider = scout.create(CustomValidationResultProvider, {field});
+      field.setValidationResultProvider(provider);
+      expect(field.validationResultProvider).toBe(provider);
     });
   });
 });
