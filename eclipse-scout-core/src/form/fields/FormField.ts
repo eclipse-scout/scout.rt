@@ -253,7 +253,7 @@ export class FormField extends Widget implements FormFieldModel {
   private _initGridDataHints(gridDataHints: GridData) {
     if (gridDataHints instanceof GridData) {
       this.gridDataHints = gridDataHints;
-    } else if (objects.isPlainObject(gridDataHints)) {
+    } else if (objects.isObject(gridDataHints)) {
       $.extend(this.gridDataHints, gridDataHints);
     } else {
       this.gridDataHints = gridDataHints;

@@ -4079,7 +4079,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
       return;
     }
     let returnValue = column.calculateOptimalWidth();
-    if (objects.isPlainObject(returnValue)) {
+    if (objects.isObject(returnValue)) {
       // Function returned a promise -> delay resizing
       returnValue.always(this._resizeToFit.bind(this, column, maxWidth));
     } else {
