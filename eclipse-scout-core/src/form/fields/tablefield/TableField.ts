@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Event, EventDelegator, FormField, InitModelOf, ObjectOrChildModel, objects, scout, Table, TableAllRowsDeletedEvent, TableFieldEventMap, TableFieldModel, TableRow, TableRowsCheckedEvent, TableRowsDeletedEvent,
-  TableRowsInsertedEvent, TableRowsUpdatedEvent, ValidationResult, Widget
+  Event, EventDelegator, FormField, InitModelOf, ObjectOrChildModel, objects, scout, Table, TableAllRowsDeletedEvent, TableFieldEventMap, TableFieldModel, TableFieldValidationResultProvider, TableRow, TableRowsCheckedEvent,
+  TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent, Widget
 } from '../../../index';
 
 export class TableField extends FormField implements TableFieldModel {
@@ -46,6 +46,10 @@ export class TableField extends FormField implements TableFieldModel {
     super._init(model);
 
     this._setTable(this.table);
+  }
+
+  protected override _createValidationResultProvider(): TableFieldValidationResultProvider {
+    return scout.create(TableFieldValidationResultProvider, {field: this});
   }
 
   protected override _render() {
@@ -172,59 +176,6 @@ export class TableField extends FormField implements TableFieldModel {
     this._updatedRows = objects.createMap();
     this._checkedRows = objects.createMap();
     this.table?.markRowsAsNonChanged();
-  }
-
-  override getValidationResult(): ValidationResult {
-    let desc = super.getValidationResult();
-    if (desc && !desc.valid) {
-      return desc;
-    }
-
-    let errorStatus = this.errorStatus;
-    let validByMandatory = !this.mandatory || !this.empty;
-
-    // check cells
-    let rows = arrays.ensure(this.table?.rows);
-    let columns = arrays.ensure(this.table?.columns);
-    let reveal = () => {
-      // nop
-    };
-    let label = this.label || '';
-
-    rows.some(row => {
-      return columns.some(column => {
-        let ret = column.isContentValid(row);
-        if (!ret.valid) {
-          reveal = () => {
-            desc.reveal();
-            this.table.focusCell(column, row);
-          };
-          if (label) {
-            label += ': ';
-          }
-          label += column.text;
-          if (!errorStatus) {
-            errorStatus = ret.errorStatus;
-          } else if (ret.errorStatus && ret.errorStatus.severity > errorStatus.severity) {
-            errorStatus = ret.errorStatus;
-          }
-          validByMandatory = validByMandatory && ret.validByMandatory;
-
-          return errorStatus && errorStatus.isError() && !validByMandatory;
-        }
-        return false;
-      });
-    });
-
-    const validByErrorStatus = !errorStatus || errorStatus.isValid();
-    return {
-      valid: validByErrorStatus && validByMandatory,
-      validByMandatory,
-      errorStatus,
-      field: this,
-      label: label,
-      reveal: reveal
-    };
   }
 
   override getDelegateScrollable(): Widget {

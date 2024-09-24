@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {TableField, TableModel, TableRow} from '../../../../src/index';
+import {Column, Status, Table, TableField, TableModel, TableRow} from '../../../../src/index';
 import {FormSpecHelper, SpecTable, TableModelWithCells, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('TableField', () => {
@@ -213,6 +213,114 @@ describe('TableField', () => {
       tableField.markAsSaved();
       expect(lastRow.status).toBe(TableRow.Status.NON_CHANGED);
       expect(tableField.saveNeeded).toBe(false);
+    });
+  });
+
+  describe('getValidationResult', () => {
+    let tableField: TableField;
+    let table: Table;
+    let column0: Column;
+    let column1: Column;
+
+    beforeEach(() => {
+      tableField = createTableFieldWithTable();
+      tableField.setLabel('Table Field');
+      table = tableField.table;
+      table.columns.forEach(c => c.setEditable(true));
+      column0 = table.columns[0];
+      column0.setText('First Col');
+      column1 = table.columns[1];
+      column1.setText('Second Col');
+    });
+
+    describe('valid', () => {
+      it('is false if there are cell errors', () => {
+        expect(tableField.getValidationResult().valid).toBe(true);
+
+        column0.setCellErrorStatus(table.rows[0], Status.error('error'));
+        expect(tableField.getValidationResult().valid).toBe(false);
+
+        column0.setCellErrorStatus(table.rows[0], null);
+        expect(tableField.getValidationResult().valid).toBe(true);
+      });
+
+      it('is false if mandatory cells are empty', () => {
+        column0.setMandatory(true);
+        expect(tableField.getValidationResult().valid).toBe(true);
+
+        column0.setCellValue(table.rows[0], null);
+        expect(tableField.getValidationResult().valid).toBe(false);
+
+        column0.setCellValue(table.rows[0], 'asdf');
+        expect(tableField.getValidationResult().valid).toBe(true);
+      });
+    });
+
+    describe('label', () => {
+      it('lists all columns containing cell errors', () => {
+        expect(tableField.getValidationResult().label).toBe('Table Field');
+
+        column0.setCellErrorStatus(table.rows[0], Status.error('error'));
+        expect(tableField.getValidationResult().label).toBe('Table Field: First Col');
+
+        // Don't add column name twice
+        column0.setCellErrorStatus(table.rows[1], Status.error('error'));
+        expect(tableField.getValidationResult().label).toBe('Table Field: First Col');
+
+        // Add name of second column
+        column1.setCellErrorStatus(table.rows[0], Status.error('error'));
+        expect(tableField.getValidationResult().label).toBe('Table Field: First Col, Second Col');
+
+        // Field doesn't have a label
+        tableField.setLabel(null);
+        expect(tableField.getValidationResult().label).toBe('First Col, Second Col');
+
+        // Columns don't have a label
+        tableField.setLabel('Field');
+        column0.setText(null);
+        column1.setText(null);
+        expect(tableField.getValidationResult().label).toBe('Field');
+      });
+
+      it('includes mandatory columns with missing values', () => {
+        expect(tableField.getValidationResult().label).toBe('Table Field');
+
+        column0.setMandatory(true);
+        column0.setCellValue(table.rows[0], null);
+        expect(tableField.getValidationResult().label).toBe('Table Field: First Col');
+
+        // Invalid columns are included
+        column1.setCellErrorStatus(table.rows[0], Status.error('error'));
+        expect(tableField.getValidationResult().label).toBe('Table Field: First Col, Second Col');
+      });
+    });
+
+    describe('errorStatus', () => {
+      it('contains no message if multiple cells are invalid and have different messages', () => {
+        column0.setCellErrorStatus(table.rows[0], Status.error('error'));
+        expect(tableField.getValidationResult().errorStatus.message).toBe('error');
+
+        // Another error with same message
+        column1.setCellErrorStatus(table.rows[1], Status.error('error'));
+        expect(tableField.getValidationResult().errorStatus.message).toBe('error');
+
+        // Another error with a different message
+        column1.setCellErrorStatus(table.rows[1], Status.error('another error'));
+        expect(tableField.getValidationResult().errorStatus.message).toBe('');
+      });
+
+      it('uses the highest severity of all cell errors', () => {
+        column0.setCellErrorStatus(table.rows[0], Status.warning('warning'));
+        expect(tableField.getValidationResult().errorStatus.severity).toBe(Status.Severity.WARNING);
+
+        // Another error with higher severity
+        column1.setCellErrorStatus(table.rows[1], Status.error('error'));
+        expect(tableField.getValidationResult().errorStatus.severity).toBe(Status.Severity.ERROR);
+
+        // Error is removed, warning is shown again
+        column1.setCellErrorStatus(table.rows[1], null);
+        expect(tableField.getValidationResult().errorStatus.severity).toBe(Status.Severity.WARNING);
+      });
     });
   });
 });

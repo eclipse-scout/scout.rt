@@ -9,8 +9,8 @@
  */
 import {
   AbstractLayout, Action, aria, arrays, clipboard, CloneOptions, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
-  FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel, ObjectOrModel, objects, Predicate,
-  PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
+  FormFieldEventMap, FormFieldLayout, FormFieldModel, FormFieldValidationResultProvider, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel,
+  ObjectOrModel, objects, ObjectType, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
 
@@ -64,6 +64,7 @@ export class FormField extends Widget implements FormFieldModel {
   tooltipAnchor: FormFieldTooltipAnchor;
   onFieldTooltipOptionsCreator: (this: FormField) => InitModelOf<TooltipSupport>;
   dragAndDropHandler: DragAndDropHandler;
+  validationResultProvider: FormFieldValidationResultProvider;
   /**
    * Some browsers don't support copying text from disabled input fields. If such a browser is detected
    * and this flag is true (default is false), an overlay DIV is rendered over disabled fields which
@@ -129,6 +130,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.tooltipText = null;
     this.tooltipAnchor = FormField.TooltipAnchor.DEFAULT;
     this.onFieldTooltipOptionsCreator = null;
+    this.validationResultProvider = this._createValidationResultProvider();
 
     this.$label = null;
     this.$field = null;
@@ -222,6 +224,7 @@ export class FormField extends Widget implements FormFieldModel {
       constType: FormField.LabelPosition
     }]);
     this.resolveTextKeys(['label', 'tooltipText']);
+    this._setValidationResultProvider(this.validationResultProvider);
     this._setKeyStrokes(this.keyStrokes);
     this._setMenus(this.menus);
     this._setErrorStatus(this.errorStatus);
@@ -1515,21 +1518,24 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   getValidationResult(): ValidationResult {
-    const errorStatus = this._errorStatus(),
-      validByErrorStatus = !errorStatus || errorStatus.isValid(),
-      validByMandatory = !this.mandatory || !this.empty,
-      valid = validByErrorStatus && validByMandatory;
-    return {
-      valid,
-      validByMandatory,
-      errorStatus,
-      field: this,
-      label: this.label,
-      reveal: () => {
-        fields.selectAllParentTabsOf(this);
-        this.focus();
-      }
-    };
+    return this.validationResultProvider.provide(this._errorStatus());
+  }
+
+  protected _createValidationResultProvider() {
+    return scout.create(FormFieldValidationResultProvider, {field: this});
+  }
+
+  /** @see FormFieldModel.validationResultProvider */
+  setValidationResultProvider(provider: FormFieldValidationResultProvider | ObjectType<FormFieldValidationResultProvider>) {
+    this.setProperty('validationResultProvider', provider);
+  }
+
+  protected _setValidationResultProvider(provider: FormFieldValidationResultProvider | ObjectType<FormFieldValidationResultProvider>) {
+    scout.assertParameter('provider', provider);
+    if (typeof provider === 'string' || typeof provider === 'function') {
+      provider = scout.create(provider, {field: this});
+    }
+    this._setProperty('validationResultProvider', provider);
   }
 
   protected _updateEmpty() {
