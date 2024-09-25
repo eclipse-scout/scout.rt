@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {keys, KeyStroke, TabArea} from '../../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TabAreaRightKeyStroke extends KeyStroke {
   declare field: TabArea;
@@ -23,7 +22,7 @@ export class TabAreaRightKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.selectNextTab(true);
     this.field.selectedTab.$container.addClass('keyboard-navigation');
   }

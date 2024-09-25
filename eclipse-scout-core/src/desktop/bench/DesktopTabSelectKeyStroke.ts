@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Desktop, DesktopTab, keys, RangeKeyStroke} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 /**
  * Composite keystroke to provide a numeric keystroke to select view tabs.
@@ -44,7 +43,7 @@ export class DesktopTabSelectKeyStroke extends RangeKeyStroke {
     return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let viewIndex = event.which - keys['1'];
 
     let tabs = this._viewTabs();

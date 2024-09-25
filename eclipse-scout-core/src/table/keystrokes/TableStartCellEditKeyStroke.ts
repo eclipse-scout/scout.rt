@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {keys, KeyStroke, ScoutKeyboardEvent, Table, TableCellPosition} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TableStartCellEditKeyStroke extends KeyStroke {
   declare field: Table;
@@ -23,7 +22,7 @@ export class TableStartCellEditKeyStroke extends KeyStroke {
       let editPosition = event._editPosition,
         columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
       if (columnIndex === 0) {
-        // Other key strokes like PageDown, Home etc. are displayed in the row -> make sure the cell edit key stroke will be displayed next to the other ones
+        // Other keystrokes like PageDown, Home etc. are displayed in the row -> make sure the cell edit keystroke will be displayed next to the other ones
         return editPosition.row.$row;
       }
       return this.field.$cell(columnIndex, editPosition.row.$row);
@@ -54,7 +53,7 @@ export class TableStartCellEditKeyStroke extends KeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase & { _editPosition?: TableCellPosition }) {
+  override handle(event: JQuery.KeyboardEventBase & { _editPosition?: TableCellPosition }) {
     let editPosition = event._editPosition;
     this.field.prepareCellEdit(editPosition.column, editPosition.row, true);
   }

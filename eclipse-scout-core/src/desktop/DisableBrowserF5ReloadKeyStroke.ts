@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Action, Desktop, keys, KeyStroke} from '../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 /**
- * Global key stroke on the desktop that prevents 'leaking' of the F5 keystroke to the browser.
+ * Global keystroke on the desktop that prevents 'leaking' of the F5 keystroke to the browser.
  *
  * F5 is used in Scout applications to reload table pages or invoke application-specific logic.
  * If the application does not consume the key, some browsers would reload the page. This can
@@ -20,7 +19,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
  * is active because of slow network connection), the browser would simply reload the page
  * (i.e. create a new UiSession) instead of updating the data from the database.
  *
- * To reload the page, the general key stroke 'Ctrl-R' ('Command-R' on Macintosh, respectively)
+ * To reload the page, the general keystroke 'Ctrl-R' ('Command-R' on Macintosh, respectively)
  * should be used instead.
  */
 export class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
@@ -37,7 +36,7 @@ export class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     // NOP
   }
 }

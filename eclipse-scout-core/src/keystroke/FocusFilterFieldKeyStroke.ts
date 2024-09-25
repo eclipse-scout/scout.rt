@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Key, keys, KeyStroke, scout, ScoutKeyboardEvent, Widget} from '../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 /**
  * Keystroke to move the cursor into filter field.
@@ -54,7 +53,7 @@ export class FocusFilterFieldKeyStroke extends KeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase & { _$filterInput?: JQuery<HTMLInputElement> }) {
+  override handle(event: JQuery.KeyboardEventBase & { _$filterInput?: JQuery<HTMLInputElement> }) {
     let $filterInput = event._$filterInput;
 
     // Focus the field and move cursor to the end.

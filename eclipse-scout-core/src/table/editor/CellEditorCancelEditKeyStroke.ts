@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {CellEditorPopup, keys, KeyStroke} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class CellEditorCancelEditKeyStroke extends KeyStroke {
   declare field: CellEditorPopup<any>;
@@ -20,7 +19,7 @@ export class CellEditorCancelEditKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.cancelEdit();
   }
 }

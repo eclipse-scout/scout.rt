@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,6 @@
  */
 
 import {keys, KeyStroke, ScoutKeyboardEvent, ViewMenuPopup} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class ViewMenuPopupEnterKeyStroke extends KeyStroke {
   declare field: ViewMenuPopup;
@@ -31,7 +30,7 @@ export class ViewMenuPopupEnterKeyStroke extends KeyStroke {
     return super.accept(event) && this.field.content.selectedTiles.length === 1 && this.field.content.selectedTiles[0].enabledComputed;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.activateTile(this.field.content.selectedTiles[0]);
   }
 }

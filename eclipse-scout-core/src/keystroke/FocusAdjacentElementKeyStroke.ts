@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {keys, KeyStroke, Session, Widget} from '../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class FocusAdjacentElementKeyStroke extends KeyStroke {
   session: Session;
@@ -23,7 +22,7 @@ export class FocusAdjacentElementKeyStroke extends KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let activeElement = this.field.$container.activeElement(true),
       $focusableElements = this.field.$container.find(':focusable');
 

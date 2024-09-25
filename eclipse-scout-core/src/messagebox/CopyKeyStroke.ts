@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {CopyableWidget, keys, KeyStroke, ScoutKeyboardEvent} from '../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class CopyKeyStroke extends KeyStroke {
   declare field: CopyableWidget;
@@ -23,7 +22,7 @@ export class CopyKeyStroke extends KeyStroke {
     this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent) => field.$container;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.copy();
   }
 }

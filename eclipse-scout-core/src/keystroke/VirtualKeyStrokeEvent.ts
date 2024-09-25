@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {KeyStrokeMode, ScoutKeyboardEvent} from '../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class VirtualKeyStrokeEvent implements ScoutKeyboardEvent {
   which: number;
@@ -23,7 +22,7 @@ export class VirtualKeyStrokeEvent implements ScoutKeyboardEvent {
   protected _immediatePropagationStopped: boolean;
   protected _defaultPrevented: boolean;
 
-  constructor(which: number, ctrl: boolean, alt: boolean, shift: boolean, keyStrokeMode: KeyStrokeMode, eventOrTarget: KeyboardEventBase | HTMLElement) {
+  constructor(which: number, ctrl: boolean, alt: boolean, shift: boolean, keyStrokeMode: KeyStrokeMode, eventOrTarget: JQuery.KeyboardEventBase | HTMLElement) {
     this.which = which;
     this.ctrlKey = ctrl;
     this.metaKey = false;

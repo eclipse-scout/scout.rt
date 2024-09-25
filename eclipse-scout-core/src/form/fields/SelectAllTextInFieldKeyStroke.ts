@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormField, keys, KeyStroke} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 /**
  * Selects all text in the field when pressing ctrl-a rather than selecting all text of the document.
@@ -24,7 +23,7 @@ export class SelectAllTextInFieldKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let widget = this.field;
     let selection = widget.$container.window(true).getSelection();
     let rangeCount = selection.rangeCount;

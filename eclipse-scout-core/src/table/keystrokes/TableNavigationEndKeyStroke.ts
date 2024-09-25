@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {AbstractTableNavigationKeyStroke, aria, arrays, keys, Table, TableRow} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TableNavigationEndKeyStroke extends AbstractTableNavigationKeyStroke {
 
@@ -24,7 +23,7 @@ export class TableNavigationEndKeyStroke extends AbstractTableNavigationKeyStrok
     };
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let table = this.field,
       rows = table.visibleRows,
       lastRow = arrays.last(rows),
@@ -54,7 +53,7 @@ export class TableNavigationEndKeyStroke extends AbstractTableNavigationKeyStrok
       table.focus();
     }
 
-    // Set active descendant to the new row. This should be done last so selection state/focus/etc is
+    // Set active descendant to the new row. This should be done last so selection state/focus/etc. is
     // all set correctly before the change of active descendant triggers the screen readers announcement.
     aria.linkElementWithActiveDescendant(this.field.$container, lastRow.$row);
   }
