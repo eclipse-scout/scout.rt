@@ -31,6 +31,8 @@ public class UiTextContributor implements IUiTextContributor {
         "CorrelationId",
         "DateIsNotAllowed",
         "ErrorWhileLoadingData",
+        "ExtendedSearchAddAdditionalOrMenu",
+        "ExtendedSearchAddEitherOrMenu",
         "FormEmptyMandatoryFieldsMessage",
         "FormInvalidFieldsMessage",
         "FormInvalidFieldsWarningMessage",
