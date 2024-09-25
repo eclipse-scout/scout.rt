@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {AbstractTreeNavigationKeyStroke, HAlign, keys, Outline, TreeEventCurrentNode} from '../../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class OutlineNavigateToTopKeyStroke extends AbstractTreeNavigationKeyStroke {
   declare field: Outline;
@@ -21,7 +20,7 @@ export class OutlineNavigateToTopKeyStroke extends AbstractTreeNavigationKeyStro
     this.renderingHints.$drawingArea = ($drawingArea, event) => this.field.$title || this.field.$data;
   }
 
-  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
+  override handle(event: JQuery.KeyboardEventBase & TreeEventCurrentNode) {
     this.field.navigateToTop();
   }
 }

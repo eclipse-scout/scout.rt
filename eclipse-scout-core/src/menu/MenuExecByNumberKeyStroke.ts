@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ContextMenuPopup, HAlign, keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes, ScoutKeyboardEvent} from '../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
 
@@ -36,7 +35,7 @@ export class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase & { $menuItem?: JQuery }) {
+  override handle(event: JQuery.KeyboardEventBase & { $menuItem?: JQuery }) {
     event.$menuItem.data('widget').doAction();
   }
 }

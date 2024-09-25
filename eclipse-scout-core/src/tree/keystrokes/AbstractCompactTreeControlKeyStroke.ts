@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {CompactTree, CompactTreeNode, KeyStroke, ScoutKeyboardEvent} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export type CompactTreeEventNode = {
   _nextNode?: CompactTreeNode;
@@ -45,7 +44,7 @@ export class AbstractCompactTreeControlKeyStroke extends KeyStroke {
     return false;
   }
 
-  override handle(event: KeyboardEventBase & CompactTreeEventNode) {
+  override handle(event: JQuery.KeyboardEventBase & CompactTreeEventNode) {
     this.field.selectNodes(event._nextNode);
     this.field.checkNode(event._nextNode, true);
     this.field.revealSelection();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {keys, KeyStroke, ViewMenuTab} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 /**
  * Keystroke to open the 'ViewMenuPopup' on 'F2'.
@@ -30,7 +29,7 @@ export class ViewMenuOpenKeyStroke extends KeyStroke {
     };
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     if (this.field.selected) {
       this.field.togglePopup();
     } else if (this.field.selectedButton) {

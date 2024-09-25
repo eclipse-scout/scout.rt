@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {AbstractTableNavigationKeyStroke, aria, arrays, keys, Table, TableRow} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKeyStroke {
 
@@ -24,7 +23,7 @@ export class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKey
     };
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let table = this.field,
       viewport = this._viewportInfo(),
       rows = table.visibleRows,
@@ -65,7 +64,7 @@ export class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKey
     }
 
     if (event.shiftKey && selectedRows.length > 0) {
-      // Using lastActionRow instead of lastSelectedRow is essential if the user does a multi selection using ctrl and presses shift-pagedown afterwards
+      // Using lastActionRow instead of lastSelectedRow is essential if the user does a multi selection using ctrl and presses shift-pagedown afterward
       newSelectedRows = rows.slice(lastActionRowIndex + 1, rows.indexOf(viewport.lastRow) + 1);
       newSelectedRows = arrays.union(selectedRows, newSelectedRows);
     } else {
@@ -78,7 +77,7 @@ export class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKey
       table.focus();
     }
 
-    // Set active descendant to the new row. This should be done last so selection state/focus/etc is
+    // Set active descendant to the new row. This should be done last so selection state/focus/etc. is
     // all set correctly before the change of active descendant triggers the screen readers announcement.
     aria.linkElementWithActiveDescendant(this.field.$container, viewport.lastRow.$row);
   }

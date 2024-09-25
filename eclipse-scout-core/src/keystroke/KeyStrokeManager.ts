@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,6 @@
  */
 import {Action, arrays, EventEmitter, filters, InitModelOf, Key, keys, KeyStroke, KeyStrokeContext, KeyStrokeManagerEventMap, KeyStrokeModel, ObjectModel, Session, SomeRequired, ValueField, VirtualKeyStrokeEvent} from '../index';
 import $ from 'jquery';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerModel {
   declare model: KeyStrokeManagerModel;
@@ -42,9 +41,9 @@ export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerMo
   installTopLevelKeyStrokeHandlers($container: JQuery) {
     let
       myWindow = $container.window(true),
-      // Swallow F1 (online help) key stroke
+      // Swallow F1 (online help) keystroke
       helpHandler = event => event.which !== keys.F1,
-      // Swallow Backspace (browser navigation) key stroke
+      // Swallow Backspace (browser navigation) keystroke
       backspaceHandler = event => event.which !== keys.BACKSPACE;
 
     if (this.swallowF1) {
@@ -163,7 +162,7 @@ export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerMo
   /**
    * Handles the keystroke event by the keyStrokeContext's keystroke handlers, but returns immediately once a keystroke requests immediate stop of propagation.
    */
-  protected _handleKeyStrokeEvent(keyStrokeContext: KeyStrokeContext, event: KeyboardEventBase) {
+  protected _handleKeyStrokeEvent(keyStrokeContext: KeyStrokeContext, event: JQuery.KeyboardEventBase) {
     if (!keyStrokeContext.accept(event)) {
       return;
     }
@@ -178,7 +177,7 @@ export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerMo
     }
 
     // We create a copy of the keyStrokes array, because when a widget is disposed in the handle function
-    // of a keystroke, all its keystrokes on the context are deleted. Which means no key stroke is processed
+    // of a keystroke, all its keystrokes on the context are deleted. Which means no keystroke is processed
     // anymore. However: creating a copy can be dangerous too, because the handle function must deal with
     // the situation that the widget to which the keystroke belongs, is suddenly destroyed.
     let keyStrokesCopy = keyStrokeContext.keyStrokes.slice();
@@ -222,11 +221,11 @@ export class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerMo
     return !keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField);
   }
 
-  protected _isHelpKeyStroke(event: KeyboardEventBase): boolean {
+  protected _isHelpKeyStroke(event: JQuery.KeyboardEventBase): boolean {
     return KeyStroke.acceptEvent(this.helpKeyStroke, event);
   }
 
-  protected _installHelpDisposeListener(event: KeyboardEventBase): boolean {
+  protected _installHelpDisposeListener(event: JQuery.KeyboardEventBase): boolean {
     let helpDisposeHandler,
       $currentTarget = $(event.currentTarget),
       $myWindow = $currentTarget.window(),
@@ -284,6 +283,6 @@ export interface KeyStrokeManagerModel extends ObjectModel<KeyStrokeManager> {
   session?: Session;
 }
 
-export interface KeyboardEventWithMetaData extends KeyboardEventBase {
+export interface KeyboardEventWithMetaData extends JQuery.KeyboardEventBase {
   originalEvent?: KeyboardEvent & { renderingHelp?: boolean; keyStrokeContexts?: KeyStrokeContext[] };
 }

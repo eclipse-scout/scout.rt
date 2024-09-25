@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Desktop, keys, RangeKeyStroke} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 /**
  * KeyStroke to prevent the browser from switching between browser tabs.
@@ -43,7 +42,7 @@ export class DisableBrowserTabSwitchingKeyStroke extends RangeKeyStroke {
     return enabled && this.field.selectViewTabsKeyStrokesEnabled;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     // NOP
   }
 }

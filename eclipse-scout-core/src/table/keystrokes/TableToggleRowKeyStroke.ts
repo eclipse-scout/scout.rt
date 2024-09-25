@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {keys, KeyStroke, ScoutKeyboardEvent, Table} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TableToggleRowKeyStroke extends KeyStroke {
   declare field: Table;
@@ -28,7 +27,7 @@ export class TableToggleRowKeyStroke extends KeyStroke {
       this.field.selectedRows.length > 0;
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let selectedRows = this.field.selectedRows.filter(row => row.enabled);
     // Toggle checked state to 'true', except if every row is already checked
     let checked = selectedRows.some(row => !row.checked);

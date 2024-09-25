@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {CellEditorPopup, keys, KeyStroke, ScoutKeyboardEvent} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class CellEditorTabKeyStroke extends KeyStroke {
   declare field: CellEditorPopup<any>;
@@ -25,7 +24,7 @@ export class CellEditorTabKeyStroke extends KeyStroke {
     return accepted && !this.field.isCompleteCellEditRequested(); // Make sure events (complete, prepare) don't get sent twice since it will lead to exceptions. This may happen if user presses and holds the tab key.
   }
 
-  override handle(event: KeyboardEventBase) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let backwards = event.shiftKey,
       table = this.field.table,
       column = this.field.column,

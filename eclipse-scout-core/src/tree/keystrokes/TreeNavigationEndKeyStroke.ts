@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {AbstractTreeNavigationKeyStroke, arrays, keys, ScoutKeyboardEvent, Tree, TreeEventCurrentNode, TreeNode} from '../../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKeyStroke {
 
@@ -23,7 +22,7 @@ export class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKeyStroke 
     };
   }
 
-  override handle(event: KeyboardEventBase & TreeEventCurrentNode) {
+  override handle(event: JQuery.KeyboardEventBase & TreeEventCurrentNode) {
     let newSelection = this._computeNewSelection(event._treeCurrentNode);
     if (newSelection) {
       this.selectNodesAndReveal(newSelection);
