@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
@@ -168,7 +167,10 @@ public class JsonHybridManager<T extends HybridManager> extends AbstractJsonProp
       getModel().getUIFacade().handleHybridActionFromUI(id, actionType, data);
     }
     catch (Exception e) {
-      throw new UiException("Handling hybrid action '" + actionType + "' failed", e);
+      // Exceptions are handled differently depending on their type (e.g. VetoExceptions are displayed to the user).
+      // Therefore, do not create a new exception with the error message but log an info and rethrow the original exception.
+      LOG.info("Handling hybrid action '{}' for id '{}' failed", actionType, id);
+      throw e;
     }
   }
 
