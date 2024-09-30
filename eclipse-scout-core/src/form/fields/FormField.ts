@@ -1539,7 +1539,17 @@ export class FormField extends Widget implements FormFieldModel {
   }
 
   protected _updateEmpty() {
-    // NOP
+    this.setProperty('empty', this._computeEmpty());
+  }
+
+  /**
+   * @returns true if the field is considered empty, false if not.
+   *          Mandatory fields that are empty will return a {@link ValidationResult} with {@link ValidationResult.valid} and {@link ValidationResult.validByMandatory} set to false.
+   *
+   * @see getValidationResult
+   */
+  protected _computeEmpty() {
+    return true;
   }
 
   requestInput() {
@@ -1633,6 +1643,9 @@ export type FormFieldAlignmentUpdateOptions = {
    */
   $fieldContainer?: JQuery;
 };
+/**
+ * Contains information about the validity of a form field and how to reveal it if it is invalid.
+ */
 export type ValidationResult = {
   valid: boolean;
   validByMandatory: boolean;

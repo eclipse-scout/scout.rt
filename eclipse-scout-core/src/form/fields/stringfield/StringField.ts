@@ -554,8 +554,8 @@ export class StringField extends BasicField<string> implements StringFieldModel 
     this.inputObfuscated = false;
   }
 
-  protected override _updateEmpty() {
-    this.empty = strings.empty(this.value);
+  protected override _computeEmpty() {
+    return strings.empty(this.value);
   }
 
   override acceptInput(whileTyping?: boolean) {
