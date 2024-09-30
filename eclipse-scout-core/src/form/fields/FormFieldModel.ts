@@ -99,9 +99,11 @@ export interface FormFieldModel extends WidgetModel {
    * Defines whether the user has to fill out this field.
    *
    * If set to true, an indicator is shown so the user knows he cannot leave it empty.
-   * {@link FormField.getValidationResult} also considers this property when the field is validated, e.g. by a {@link Form}.
+   * {@link FormField.getValidationResult} also considers this property together with {@link FormField.empty} when the field is validated, e.g. by a {@link Form}.
    *
    * Default is false.
+   *
+   * @see FormField._computeEmpty
    */
   mandatory?: boolean;
   /**

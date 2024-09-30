@@ -83,13 +83,6 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
     // NOP, don't add "focused" class. It doesn't look good when the label is highlighted but no cursor is visible.
   }
 
-  protected override _updateEmpty() {
-    super._updateEmpty();
-    if (this.rendered) {
-      this._renderEmpty();
-    }
-  }
-
   protected _renderEmpty() {
     this.$field.toggleClass('empty', this.empty);
   }

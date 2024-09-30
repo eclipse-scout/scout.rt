@@ -110,6 +110,10 @@ export class TableField extends FormField implements TableFieldModel {
       Object.keys(this._checkedRows).length > 0;
   }
 
+  protected override _computeEmpty(): boolean {
+    return !this.table || this.table.rows.length === 0;
+  }
+
   protected _onTableChanged(event: Event<Table>) {
     if (scout.isOneOf(event.type, 'rowsDeleted', 'allRowsDeleted')) {
       this._updateDeletedRows((event as TableRowsDeletedEvent | TableAllRowsDeletedEvent).rows);
@@ -135,6 +139,7 @@ export class TableField extends FormField implements TableFieldModel {
       this._deletedRows[row.id] = row;
     });
     this.updateSaveNeeded();
+    this._updateEmpty();
   }
 
   protected _updateInsertedRows(rows: TableRow[]) {
@@ -142,6 +147,7 @@ export class TableField extends FormField implements TableFieldModel {
       this._insertedRows[row.id] = row;
     });
     this.updateSaveNeeded();
+    this._updateEmpty();
   }
 
   protected _updateUpdatedRows(rows: TableRow[]) {

@@ -220,7 +220,7 @@ export class ProposalField extends SmartField<string> implements ProposalFieldMo
     this.setProperty('trimText', trimText);
   }
 
-  protected override _updateEmpty() {
-    this.empty = strings.empty(this.value);
+  protected override _computeEmpty() {
+    return strings.empty(this.value);
   }
 }

@@ -22,6 +22,7 @@ export interface FormFieldEventMap extends WidgetEventMap {
   'propertyChange:checkSaveNeeded': PropertyChangeEvent<boolean>;
   'propertyChange:dropMaximumSize': PropertyChangeEvent<number>;
   'propertyChange:dropType': PropertyChangeEvent<DropType>;
+  'propertyChange:empty': PropertyChangeEvent<boolean>;
   'propertyChange:errorStatus': PropertyChangeEvent<Status>;
   'propertyChange:fieldStyle': PropertyChangeEvent<FormFieldStyle>;
   'propertyChange:font': PropertyChangeEvent<string>;

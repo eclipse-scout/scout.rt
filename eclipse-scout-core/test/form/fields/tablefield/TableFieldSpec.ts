@@ -323,4 +323,27 @@ describe('TableField', () => {
       });
     });
   });
+
+  describe('empty', () => {
+    it('returns true if there are no rows', () => {
+      let tableField = createTableField({table: createTableModel(2, 0)});
+      expect(tableField.empty).toBe(true);
+    });
+
+    it('returns false if there are rows', () => {
+      let tableField = createTableField({table: createTableModel(2, 1)});
+      expect(tableField.empty).toBe(false);
+    });
+
+    it('is updated if rows change dynamically', () => {
+      let tableField = createTableField({table: createTableModel(2, 0)});
+      expect(tableField.empty).toBe(true);
+
+      tableField.table.insertRows([{cells: ['asdf']}]);
+      expect(tableField.empty).toBe(false);
+
+      tableField.table.deleteAllRows();
+      expect(tableField.empty).toBe(true);
+    });
+  });
 });
