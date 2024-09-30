@@ -176,6 +176,13 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       return 350;
     }
 
+    @Override
+    protected boolean execIsEmpty() {
+      // Changes on this form must not be propagated to the parent which eventually is a table.
+      // Otherwise, the table would be marked as non-empty as soon as the tables on this form are changed.
+      return true;
+    }
+
     @Order(10)
     @ClassId("abaf2e0c-1c14-4b99-81dc-8b83453f5766")
     public class GroupBox extends AbstractGroupBox {
