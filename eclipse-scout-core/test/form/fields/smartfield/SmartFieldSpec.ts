@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  fields, keys, LookupResult, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, StaticLookupCall, Status,
-  strings, ValidationFailedStatus
+  fields, keys, LookupResult, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, StaticLookupCall, Status, strings, ValidationFailedStatus
 } from '../../../../src/index';
 import {ColumnDescriptorDummyLookupCall, DelayedStaticLookupCall, DummyLookupCall, FormSpecHelper, JQueryTesting, MicrotaskStaticLookupCall} from '../../../../src/testing/index';
 import {LookupCall} from '../../../../src/lookup/LookupCall';
@@ -1306,6 +1305,58 @@ describe('SmartField', () => {
         lookupRows: [1, 2, 3, 4, 5]
       });
       expect((field.popup as SmartFieldPopup<number>).proposalChooser.content.selectionHandler.mouseMoveSelectionEnabled).toBeFalse();
+    });
+  });
+
+  describe('updateLookupRow', () => {
+
+    it('rebuilds the lookup row without triggering a value property change', () => {
+      const field = createFieldWithLookupCall(undefined, {
+        data: [
+          [10, 'Dog'],
+          [20, 'Cat'],
+          [30, 'Mouse']
+        ]
+      });
+      const lookupCall = field.lookupCall as StaticLookupCall<number>;
+      let propertyChangeEvents = [];
+      field.on('propertyChange', event => propertyChangeEvents.push(event));
+
+      field.setValue(20);
+      jasmine.clock().tick(500);
+      expect(field.displayText).toBe('Cat');
+
+      expect(propertyChangeEvents.map(event => event.propertyName)).toEqual([
+        'loading',
+        'saveNeeded',
+        'value',
+        'loading',
+        'lookupRow',
+        'cssClass',
+        'displayText'
+      ]);
+      propertyChangeEvents.splice(0); // clear list
+
+      lookupCall.refreshData([
+        [10, 'Hund'],
+        [20, 'Katze'],
+        [30, 'Maus']
+      ]);
+      field.updateLookupRow();
+      jasmine.clock().tick(500);
+      expect(field.displayText).toBe('Katze');
+      expect(propertyChangeEvents.map(event => event.propertyName)).toEqual([
+        // Remove old lookup row
+        'cssClass',
+        'lookupRow',
+        // Execute lookup call
+        'loading',
+        'loading',
+        // Apply new lookup row
+        'lookupRow',
+        'cssClass',
+        'displayText'
+      ]);
     });
   });
 });
