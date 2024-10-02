@@ -1559,6 +1559,17 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this.resetDisplayText();
   }
 
+  /**
+   * Rebuilds the cached {@link lookupRow} and updates the display text. The {@link lookupCall} is used to
+   * retrieve a fresh lookup row for the current {@link value}. This can be useful if the underlying data
+   * has been changed since first resolving the lookup row. This method does _not_ trigger a property change
+   * event for the `value` property.
+   */
+  updateLookupRow() {
+    this._setLookupRow(null); // reset cached lookup row
+    this.setValue(this.value); // rebuild lookup row and update display text
+  }
+
   override setDisplayText(displayText: string) {
     super.setDisplayText(displayText);
     this._userWasTyping = false;
