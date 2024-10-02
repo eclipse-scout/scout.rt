@@ -42,8 +42,13 @@ public class DoNode<T> {
    */
   public final DoNode<T> create() {
     if (m_lazyCreate != null) {
-      m_lazyCreate.accept(this);
-      m_lazyCreate = null;
+
+      synchronized (this) {
+        if (m_lazyCreate != null) {
+          m_lazyCreate.accept(this);
+          m_lazyCreate = null;
+        }
+      }
     }
     return this;
   }

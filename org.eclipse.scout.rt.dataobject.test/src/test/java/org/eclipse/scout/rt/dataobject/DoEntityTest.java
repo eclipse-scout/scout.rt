@@ -25,16 +25,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.FirstSimpleContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SecondSimpleContributionFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Test;
 
@@ -937,5 +946,28 @@ public class DoEntityTest {
     assertThrows(AssertionException.class, () -> entity.getListNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getValueNode("attribute"));
     assertThrows(AssertionException.class, () -> entity.getSetNode("attribute"));
+  }
+
+  @Test
+  public void testGet() {
+    CollectionFixtureDo entity = BEANS.get(CollectionFixtureDo.class);
+    CountDownLatch latch = new CountDownLatch(1);
+    List<IFuture<?>> jobs = new ArrayList<>();
+    for (int i = 0; i < 1000; i++) {
+      final int j = i;
+      jobs.add(Jobs.schedule(() -> {
+        SimpleFixtureDo fixture = BEANS.get(SimpleFixtureDo.class);
+        fixture.withName1("name" + j);
+//        System.out.println("awaiting for " + j);
+        latch.await();
+        entity.getSimpleDoCollection().add(fixture);
+        //assertEquals("name" + j, entity.getSimpleDoCollection().iterator().next().getName1());
+        assertFalse("no value set for j="+j, entity.getSimpleDoCollection().isEmpty());
+//        System.out.println("value for " + j + " OK");
+      }, Jobs.newInput()));
+    }
+    SleepUtil.sleepSafe(1000, TimeUnit.MILLISECONDS);
+    latch.countDown();
+    jobs.forEach(job -> job.awaitDoneAndGet());
   }
 }
