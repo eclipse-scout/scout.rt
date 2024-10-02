@@ -20,10 +20,6 @@ import org.eclipse.scout.rt.dataobject.TypeName;
 @TypeName("scout.MetaVersionInfo")
 public class MetaVersionInfoDo extends DoEntity {
 
-  public DoValue<String> apiVersion() {
-    return doValue("apiVersion");
-  }
-
   public DoValue<String> applicationName() {
     return doValue("applicationName");
   }
@@ -39,17 +35,6 @@ public class MetaVersionInfoDo extends DoEntity {
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public MetaVersionInfoDo withApiVersion(String apiVersion) {
-    apiVersion().set(apiVersion);
-    return this;
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public String getApiVersion() {
-    return apiVersion().get();
-  }
 
   @Generated("DoConvenienceMethodsGenerator")
   public MetaVersionInfoDo withApplicationName(String applicationName) {
