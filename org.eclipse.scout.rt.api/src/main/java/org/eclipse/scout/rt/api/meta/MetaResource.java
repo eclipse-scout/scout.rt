@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.api.meta;
 
+import java.util.Date;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -52,29 +53,34 @@ public class MetaResource implements IRestResource {
   @GET
   @Path("version")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiDocDescription(text = "Returns the API version and application meta data in JSON format.")
+  @ApiDocDescription(text = "Returns the application version and application meta data in JSON format.")
   public MetaVersionInfoDo getMetaVersionInfo() {
-    var apiVersion = BEANS.get(IApiVersion.class);
     return BEANS.get(MetaVersionInfoDo.class)
-        .withApiVersion(apiVersion.getVersion())
         .withApplicationName(CONFIG.getPropertyValue(ApplicationNameProperty.class))
         .withApplicationVersion(CONFIG.getPropertyValue(ApplicationVersionProperty.class))
-        .withBuildDate(BEANS.get(JarManifestHelper.class).getBuildDateAttribute(apiVersion.getClass()));
+        .withBuildDate(getBuildDate());
   }
 
   @GET
   @Path("version")
   @Produces(MediaType.TEXT_PLAIN)
-  @ApiDocDescription(text = "Returns the API version in text format. If 'verbose' is true, the application name and version are returned as well.")
-  public String getApiVersion(@QueryParam("verbose") boolean verbose) {
+  @ApiDocDescription(text = "Returns the application version in text format. If 'verbose' is true, the application name and module build date are returned as well.\")")
+  public String getVersion(@QueryParam("verbose") boolean verbose) {
     if (verbose) {
-      return StringUtility.join("",
-          "API version: " + BEANS.get(IApiVersion.class).getVersion(),
-          StringUtility.box(" (", StringUtility.join(" ",
-              CONFIG.getPropertyValue(ApplicationNameProperty.class),
-              CONFIG.getPropertyValue(ApplicationVersionProperty.class)), ")"));
+      return StringUtility.join(" ",
+          CONFIG.getPropertyValue(ApplicationNameProperty.class),
+          CONFIG.getPropertyValue(ApplicationVersionProperty.class),
+          getBuildDate());
     }
-    return BEANS.get(IApiVersion.class).getVersion();
+    return CONFIG.getPropertyValue(ApplicationVersionProperty.class);
+  }
+
+  /**
+   * @return Build date of module serving this resource by using {@link IModuleBuildDateProvider}.
+   */
+  protected Date getBuildDate() {
+    return BEANS.optional(IModuleBuildDateProvider.class).map(IModuleBuildDateProvider::getBuildDate)
+        .orElse(BEANS.get(JarManifestHelper.class).getBuildDateAttribute(getClass()));
   }
 
   @GET

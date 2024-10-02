@@ -9,16 +9,18 @@
  */
 package org.eclipse.scout.rt.api.meta;
 
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.Order;
+import java.util.Date;
 
-@Order(IBean.DEFAULT_BEAN_ORDER + 100)
-public class ApiVersion implements IApiVersion {
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
-  private static final String VERSION = "1.0.0";
+/**
+ * Optional provider for the build date of an application module.
+ */
+@ApplicationScoped
+public interface IModuleBuildDateProvider {
 
-  @Override
-  public String getVersion() {
-    return VERSION;
-  }
+  /**
+   * @return Build date of application module.
+   */
+  Date getBuildDate();
 }
