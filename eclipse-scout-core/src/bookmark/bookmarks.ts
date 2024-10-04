@@ -150,10 +150,10 @@ export const bookmarks = {
     return normalizedJson1 === normalizedJson2;
   },
 
-  // FIXME bsh [js-bookmark] move compare logic to dataobjects.ts
+  // FIXME bsh [js-bookmark] move compare logic to dataObjects.ts
   stringifyNormalized(object: any): string {
     return JSON.stringify(object, (key, value) => {
-      if (objects.isPlainObject(value)) {
+      if (objects.isPojo(value)) {
         if (value.objectType) {
           let json = Object.assign({}, value); // shallow copy to keep original object intact
           json._type = DoRegistry.get().toJsonType(value.objectType);

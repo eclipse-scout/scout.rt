@@ -7,11 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoDateSerializer, DoDeserializer, DoEntity, DoSerializer, JsonDeSerializer, ObjectType, scout} from '../index';
+import {
+  ArrayDoNodeSerializer, arrays, DateDoNodeSerializer, DoDeserializer, DoEntity, DoNodeSerializer, DoSerializer, doValueMetaData, IdDoNodeSerializer, MapDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
+} from '../index';
 
 export const dataObjects = {
 
-  jsonDeSerializers: [new DoDateSerializer()] as JsonDeSerializer<any>[],
+  serializers: [new DateDoNodeSerializer(), new IdDoNodeSerializer(), new MapDoNodeSerializer(), new SetDoNodeSerializer(), new ArrayDoNodeSerializer()] as DoNodeSerializer<any>[],
 
   equals(a: DoEntity, b: DoEntity): boolean {
     // FIXME mvi [js-bookmark] implement
@@ -45,8 +47,11 @@ export const dataObjects = {
     if (!obj) {
       return null;
     }
+    // convert string to constructor if possible as the datatype metadata would be on the constructor
+    const metaData = doValueMetaData.resolveFieldMetaData(objectType);
+
     const deserializer = scout.create(DoDeserializer);
-    return deserializer.deserialize(obj, objectType);
+    return deserializer.deserialize(obj, metaData);
   },
 
   /**

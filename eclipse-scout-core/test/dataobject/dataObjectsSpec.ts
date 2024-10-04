@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {dataObjects, DoEntity} from '../../src';
+import {dataObjects, DoEntity} from '../../src/index';
 
 describe('dataObjects', () => {
 
@@ -23,10 +23,10 @@ describe('dataObjects', () => {
 
   describe('addContribution', () => {
     it('adds a contribution to the DO', () => {
-      let doEntity: DoEntityWithContributions = {};
+      const doEntity: DoEntityWithContributions = {};
       expect(doEntity._contributions).toBeUndefined();
 
-      let contrib = new DoContrib();
+      const contrib = new DoContrib();
       dataObjects.addContribution(contrib, doEntity);
       expect(doEntity._contributions.length).toBe(1);
       expect(doEntity._contributions[0]).toBe(contrib);
@@ -35,7 +35,7 @@ describe('dataObjects', () => {
       expect(doEntity._contributions.length).toBe(1);
       expect(doEntity._contributions[0]).toBe(contrib);
 
-      let contrib2 = new AnotherDoContrib();
+      const contrib2 = new AnotherDoContrib();
       dataObjects.addContribution(contrib2, doEntity);
       expect(doEntity._contributions.length).toBe(2);
       expect(doEntity._contributions[0]).toBe(contrib);
@@ -47,21 +47,21 @@ describe('dataObjects', () => {
     });
 
     it('replaces an existing contribution with the same class', () => {
-      let doEntity: DoEntityWithContributions = {};
-      let contrib = new DoContrib();
+      const doEntity: DoEntityWithContributions = {};
+      const contrib = new DoContrib();
       dataObjects.addContribution(contrib, doEntity);
       expect(doEntity._contributions.length).toBe(1);
       expect(doEntity._contributions[0]).toBe(contrib);
 
-      let contrib2 = new DoContrib();
+      const contrib2 = new DoContrib();
       dataObjects.addContribution(contrib2, doEntity);
       expect(doEntity._contributions.length).toBe(1);
       expect(doEntity._contributions[0]).toBe(contrib2);
     });
 
     it('uses _type if contribution is a pojo', () => {
-      let doEntity: DoEntityWithContributions = {};
-      let contrib: DoEntity = {
+      const doEntity: DoEntityWithContributions = {};
+      const contrib: DoEntity = {
         _type: 'PojoContrib'
       };
       dataObjects.addContribution(contrib, doEntity);
@@ -73,14 +73,14 @@ describe('dataObjects', () => {
       expect(doEntity._contributions[0]).toBe(contrib);
 
       // Replaces first
-      let contrib2: DoEntity = {
+      const contrib2: DoEntity = {
         _type: 'PojoContrib'
       };
       dataObjects.addContribution(contrib2, doEntity);
       expect(doEntity._contributions.length).toBe(1);
       expect(doEntity._contributions[0]).toBe(contrib2);
 
-      let contrib3: DoEntity = {
+      const contrib3: DoEntity = {
         _type: 'PojoContrib2'
       };
       dataObjects.addContribution(contrib3, doEntity);
@@ -92,8 +92,8 @@ describe('dataObjects', () => {
 
   describe('getContribution', () => {
     it('returns the contribution for the given class', () => {
-      let doEntity: DoEntityWithContributions = {};
-      let contrib = new DoContrib();
+      const doEntity: DoEntityWithContributions = {};
+      const contrib = new DoContrib();
       dataObjects.addContribution(contrib, doEntity);
 
       expect(dataObjects.getContribution(DoContrib, doEntity)).toBe(contrib);
@@ -103,14 +103,14 @@ describe('dataObjects', () => {
     });
 
     it('returns the contribution for the given type', () => {
-      let doEntity: DoEntityWithContributions = {};
-      let contrib = new DoContrib();
+      const doEntity: DoEntityWithContributions = {};
+      const contrib = new DoContrib();
       dataObjects.addContribution(contrib, doEntity);
 
       expect(dataObjects.getContribution(contrib._type, doEntity)).toBe(contrib);
       expect(dataObjects.getContribution('AnotherDoContrib', doEntity)).toBeUndefined();
 
-      let contrib2: DoEntity = {
+      const contrib2: DoEntity = {
         _type: 'PojoContrib2'
       };
       dataObjects.addContribution(contrib2, doEntity);
@@ -120,9 +120,9 @@ describe('dataObjects', () => {
 
   describe('removeContribution', () => {
     it('removes the contribution for the given class', () => {
-      let doEntity: DoEntityWithContributions = {};
-      let contrib = new DoContrib();
-      let contrib2 = new AnotherDoContrib();
+      const doEntity: DoEntityWithContributions = {};
+      const contrib = new DoContrib();
+      const contrib2 = new AnotherDoContrib();
       dataObjects.addContribution(contrib, doEntity);
       dataObjects.addContribution(contrib2, doEntity);
       expect(doEntity._contributions.length).toBe(2);
@@ -142,11 +142,11 @@ describe('dataObjects', () => {
     });
 
     it('removes the contribution for the given type', () => {
-      let doEntity: DoEntityWithContributions = {};
-      let contrib: DoEntity = {
+      const doEntity: DoEntityWithContributions = {};
+      const contrib: DoEntity = {
         _type: 'PojoContrib'
       };
-      let contrib2: DoEntity = {
+      const contrib2: DoEntity = {
         _type: 'PojoContrib2'
       };
       dataObjects.addContribution(contrib, doEntity);

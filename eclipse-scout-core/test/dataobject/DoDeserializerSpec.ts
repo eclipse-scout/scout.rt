@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, dataobjects, dates, DoDeserializer, DoRegistry, ObjectFactory, typeName} from '../../src/index';
+import {BaseDoEntity, dataObjects, dates, DoDeserializer, DoRegistry, ObjectFactory, typeName} from '../../src/index';
 
 describe('DoDeserializer', () => {
 
@@ -65,7 +65,7 @@ describe('DoDeserializer', () => {
       }
     }
     `;
-    const dataobject = dataobjects.parse(json) as Fixture01Do; // do not pass type so that the detection is tested as well
+    const dataobject = dataObjects.parse(json) as Fixture01Do; // do not pass type so that the detection is tested as well
     expect(dataobject).toBeInstanceOf(Fixture01Do);
     expect(dataobject.propBool).toBeTrue();
     expect(dataobject.propNum).toBe(1234.5678);
@@ -95,7 +95,7 @@ describe('DoDeserializer', () => {
     expect(nested.nestedNestedDate).toBe('2024-07-09 13:51:39.708Z');
     expect(nested._type).toBe('not.existing.but.should.survive');
 
-    let expectedDateArray = [[[[dates.parseJsonDate('2024-07-02 13:51:39.708Z'), dates.parseJsonDate('2024-07-02 12:51:39.708Z')]],
+    const expectedDateArray = [[[[dates.parseJsonDate('2024-07-02 13:51:39.708Z'), dates.parseJsonDate('2024-07-02 12:51:39.708Z')]],
       [[dates.parseJsonDate('2024-07-02 11:51:39.708Z'), dates.parseJsonDate('2024-07-02 10:51:39.708Z')]]]];
     expect(dataobject.propArr2).toEqual(expectedDateArray); // is detected as array of Date with dimension 4
     expect(dataobject.propObj).toBeInstanceOf(Fixture03Do);
@@ -108,7 +108,7 @@ describe('DoDeserializer', () => {
       "nestedNestedDate": "2024-07-25 09:41:10.708Z"
     }
     `;
-    const resultFromStringObjectType = dataobjects.parse(withStringObjectType) as Fixture03Do;
+    const resultFromStringObjectType = dataObjects.parse(withStringObjectType) as Fixture03Do;
     expect(resultFromStringObjectType).toBeInstanceOf(Fixture03Do);
     expect(resultFromStringObjectType.nestedNestedDate).toEqual(dates.parseJsonDate('2024-07-25 09:41:10.708Z'));
 
@@ -122,7 +122,7 @@ describe('DoDeserializer', () => {
   });
 
   it('Uses BaseDoEntity if no type information is available', () => {
-    const result = dataobjects.parse('{"num":1234}') as any;
+    const result = dataObjects.parse('{"num":1234}') as any;
     expect(result).toBeInstanceOf(BaseDoEntity);
     expect(result.num).toBe(1234);
   });
@@ -133,8 +133,8 @@ describe('DoDeserializer', () => {
       "nestedNestedDate": "2024-07-25 07:41:10.708Z"
     }
     `;
-    expect(() => dataobjects.parse(json, Fixture03Do)).toThrow();
-    expect(() => dataobjects.parse(json, 'scout.Fixture03Do')).toThrow();
+    expect(() => dataObjects.parse(json, Fixture03Do)).toThrow();
+    expect(() => dataObjects.parse(json, 'scout.Fixture03Do')).toThrow();
   });
 
   it('can deserialize arrays', () => {
@@ -146,7 +146,7 @@ describe('DoDeserializer', () => {
       "nestedNestedDate": "2024-07-31 07:54:39.708Z"
     }]
     `;
-    const arr = dataobjects.parse(json) as Fixture03Do[];
+    const arr = dataObjects.parse(json) as Fixture03Do[];
     expect(Array.isArray(arr)).toBeTrue();
     expect(arr.length).toBe(2);
 

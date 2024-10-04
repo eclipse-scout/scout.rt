@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, AjaxCallModel, AjaxError, scout} from '../index';
+import {AjaxCall, AjaxCallModel, AjaxError, BaseDoEntity, dataObjects, DoEntity, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -197,6 +197,21 @@ export const ajax = {
       contentType: 'application/json; charset=UTF-8'
     }, options);
     return ajax.createCall(opts, model);
+  },
+
+  callDataObject<TDoIn extends BaseDoEntity, TDoOut extends BaseDoEntity>(dataObject: TDoIn, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    return ajax.createCallDataObject(dataObject, options, model).call();
+  },
+
+  createCallDataObject(dataObject: DoEntity, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): AjaxCall {
+    const json = dataObjects.stringify(dataObject);
+    const opts = $.extend({}, {
+      converters: {
+        'text json': data => dataObjects.parse(data)
+      },
+      data: json
+    }, options);
+    return this.createCallJson(opts, model);
   },
 
   /**

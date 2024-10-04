@@ -56,62 +56,68 @@ module.exports = class DataObjectTransformer {
 
   _createMetaDataAnnotationsFor(node) {
     const metaDataAnnotations = [];
-    let {type} = this._parseLeafType(node.type);
-    // FIXME mvi [js-bookmark] is array dimension required?
-    // if (dimension > 0) {
-    //   const arrayMetaAnnotation = this._createMetaDataAnnotation('a', ts.factory.createNumericLiteral(dimension));
-    //   metaDataAnnotations.push(arrayMetaAnnotation);
-    // }
-    // FIXME mvi [js-bookmark] only add types which are actually used at RT? e.g. skip Number, Boolean, String or Array, etc?
-    metaDataAnnotations.push(this._createMetaDataAnnotation('t', this._createTypeNode(type)));
+    metaDataAnnotations.push(this._createMetaDataAnnotation('t', this._createTypeNode(node.type)));
     return metaDataAnnotations;
   }
 
-  _parseLeafType(type) {
-    let dimension = 0;
-    let abort = false;
-    while (!abort) {
-      if (ts.isArrayTypeNode(type)) {
-        // Obj[]
-        dimension++;
-        type = type.elementType;
-      } else if (ts.isTypeReferenceNode(type) && type.typeName?.escapedText === 'Array' && type.typeArguments.length) {
-        // Array<Obj>
-        dimension++;
-        type = type.typeArguments[0];
-      } else {
-        abort = true;
-      }
-    }
-    return {type: type, dimension};
-  }
-
-  _createTypeNode(node) {
-    if (node.kind === ts.SyntaxKind.NumberKeyword) {
+  _createTypeNode(typeNode) {
+    if (typeNode.kind === ts.SyntaxKind.NumberKeyword) {
       // primitive number
       return ts.factory.createIdentifier('Number');
     }
-    if (node.kind === ts.SyntaxKind.StringKeyword) {
+    if (typeNode.kind === ts.SyntaxKind.StringKeyword) {
       // primitive string
       return ts.factory.createIdentifier('String');
     }
-    if (node.kind === ts.SyntaxKind.BooleanKeyword) {
+    if (typeNode.kind === ts.SyntaxKind.BooleanKeyword) {
       // primitive boolean
       return ts.factory.createIdentifier('Boolean');
     }
     // bigint is not yet supported as it is only part of ES2020 while Scout still supports ES2019
 
-    // FIXME mvi [js-bookmark] handle Record and Partial and other types?
-    if (ts.isTypeReferenceNode(node)) {
-      const name = node.typeName.escapedText;
-      if (global[name]) {
-        return ts.factory.createIdentifier(name); // e.g. Date, Number, String, Boolean
+    if (ts.isArrayTypeNode(typeNode)) {
+      // treat Obj[] like Array<Obj>
+      const objectType = ts.factory.createIdentifier('Array');
+      const elementType = this._createTypeNode(typeNode.elementType);
+      return this._createFieldMetaData(objectType, [elementType]);
+    }
+    if (ts.isTypeReferenceNode(typeNode)) {
+      const objectType = this._createTypeReferenceNode(typeNode);
+      if (!typeNode.typeArguments?.length) {
+        // no type arguments: directly use the type reference
+        return objectType;
       }
-      const namespace = this._detectNamespaceFor(node);
-      const qualifiedName = (!namespace || namespace === 'scout') ? name : namespace + '.' + name;
-      return ts.factory.createStringLiteral(qualifiedName); // use objectType as string because e.g. of TS interfaces (which do not exist at RT) and so that overwrites in ObjectFactory are taken into account.
+
+      // types with typeArguments like Map<string, number> or Array<MyObject>
+      const typeArgsNodes = typeNode.typeArguments.map(typeArg => this._createTypeNode(typeArg));
+      return this._createFieldMetaData(objectType, typeArgsNodes);
+    }
+    if (ts.isLiteralTypeNode(typeNode)) {
+      if (ts.isStringLiteral(typeNode.literal)) {
+        // literal types like e.g. in IDs: UuId<'scout.SimpleUuid'>
+        return ts.factory.createStringLiteral(typeNode.literal.text);
+      }
     }
     return ts.factory.createIdentifier('Object'); // e.g. any, void, unknown
+  }
+
+  _createFieldMetaData(objectType, typeArgsNodes) {
+    return ts.factory.createObjectLiteralExpression([
+      ts.factory.createPropertyAssignment('objectType', objectType),
+      ts.factory.createPropertyAssignment('typeArgs', ts.factory.createArrayLiteralExpression(typeArgsNodes, false))
+    ], false);
+  }
+
+  _createTypeReferenceNode(node) {
+    const name = node.typeName.escapedText;
+    if (global[name]) {
+      return ts.factory.createIdentifier(name); // Use directly the constructor for known types like Date, Number, String, Boolean, Map, Set, Array
+    }
+
+    const namespace = this._detectNamespaceFor(node);
+    const qualifiedName = (!namespace || namespace === 'scout') ? name : namespace + '.' + name;
+    // use objectType as string because e.g. of TS interfaces (which do not exist at RT) and that overwrites in ObjectFactory are taken into account.
+    return ts.factory.createStringLiteral(qualifiedName);
   }
 
   _detectNamespaceFor(typeNode) {

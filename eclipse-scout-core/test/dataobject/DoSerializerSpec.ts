@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BaseDoEntity, dataobjects, dates, DoRegistry, ObjectFactory, scout, typeName} from '../../src/index';
+import {BaseDoEntity, dataObjects, dates, DoRegistry, ObjectFactory, scout, typeName} from '../../src/index';
 import {Fixture01Do, Fixture02Do, Fixture03Do, FixtureDoIfc} from './DoDeserializerSpec';
 
 describe('DoSerializer', () => {
@@ -34,63 +34,75 @@ describe('DoSerializer', () => {
   });
 
   it('can serialize arrays', () => {
-    const serialized = dataobjects.serialize([_createFixture03Do('2024-07-30 07:51:39.708Z'), _createFixture03Do('2024-07-30 08:51:39.708Z')]);
+    const serialized = dataObjects.serialize([_createFixture03Do('2024-07-30 07:51:39.708'), _createFixture03Do('2024-07-30 08:51:39.708')]);
     expect(Array.isArray(serialized)).toBeTrue();
     expect(serialized.length).toBe(2);
     expect(serialized[0]).toEqual({
       _type: 'scout.Fixture03',
-      nestedNestedDate: '2024-07-30 07:51:39.708Z'
+      nestedNestedDate: '2024-07-30 07:51:39.708'
     });
     expect(serialized[1]).toEqual({
       _type: 'scout.Fixture03',
-      nestedNestedDate: '2024-07-30 08:51:39.708Z'
+      nestedNestedDate: '2024-07-30 08:51:39.708'
     });
+  });
+
+  it('fails on cycles', () => {
+    const obj1 = {c: null, objectType: 'obj1'};
+    const obj2 = {a: [obj1], objectType: 'obj2'};
+    const obj3 = {b: new Set([obj2]), objectType: 'obj3'};
+    obj1.c = obj3;
+    expect(() => dataObjects.serialize(obj3)).toThrowMatching((e: Error) => e.message.includes('[b,a,c]'));
+
+    const s = new Set();
+    s.add(s);
+    expect(() => dataObjects.serialize({s})).toThrowMatching((e: Error) => e.message.includes('[s]'));
   });
 
   it('can serialize based on instance type', () => {
     const fixture01 = _createFixture01Do([
-      _createFixture02Do('2024-07-05 13:51:39.708Z', _createFixture03Do('2024-07-05 12:51:39.708Z'), _createFixture03Do('2024-07-05 11:51:39.708Z')),
-      _createFixture02Do('2024-07-05 10:51:39.708Z', _createFixture03Do('2024-07-05 09:51:39.708Z'), _createFixture03Do('2024-07-05 08:51:39.708Z'))
-    ], _createFixture03Do('2024-07-05 07:51:39.708Z'));
+      _createFixture02Do('2024-07-05 13:51:39.708', _createFixture03Do('2024-07-05 12:51:39.708'), _createFixture03Do('2024-07-05 11:51:39.708')),
+      _createFixture02Do('2024-07-05 10:51:39.708', _createFixture03Do('2024-07-05 09:51:39.708'), _createFixture03Do('2024-07-05 08:51:39.708'))
+    ], _createFixture03Do('2024-07-05 07:51:39.708'));
 
-    const json = dataobjects.stringify(fixture01);
+    const json = dataObjects.stringify(fixture01);
     const expected = JSON.stringify(JSON.parse(`{
         "_type": "scout.Fixture01",
         "propBool": true,
         "propNum": 1234.5678,
         "propStr": "testString",
         "propNull": null,
-        "propDate": "2024-07-05 13:51:39.708Z",
+        "propDate": "2024-07-05 13:51:39.708",
         "propArr": [
           {
             "_type": "scout.Fixture02",
-            "nestedDate": "2024-07-05 13:51:39.708Z",
+            "nestedDate": "2024-07-05 13:51:39.708",
             "nestedObj": {
               "_type": "scout.Fixture03",
-              "nestedNestedDate": "2024-07-05 12:51:39.708Z"
+              "nestedNestedDate": "2024-07-05 12:51:39.708"
             },
             "nestedIfc": {
               "_type": "scout.Fixture03",
-              "nestedNestedDate": "2024-07-05 11:51:39.708Z"
+              "nestedNestedDate": "2024-07-05 11:51:39.708"
             }
           },
           {
             "_type": "scout.Fixture02",
-            "nestedDate": "2024-07-05 10:51:39.708Z",
+            "nestedDate": "2024-07-05 10:51:39.708",
             "nestedObj": {
               "_type": "scout.Fixture03",
-              "nestedNestedDate": "2024-07-05 09:51:39.708Z"
+              "nestedNestedDate": "2024-07-05 09:51:39.708"
             },
             "nestedIfc": {
               "_type": "scout.Fixture03",
-              "nestedNestedDate": "2024-07-05 08:51:39.708Z"
+              "nestedNestedDate": "2024-07-05 08:51:39.708"
             }
           }
         ],
-        "propArr2": [[[["2024-07-02 13:51:39.708Z", "2024-07-02 12:51:39.708Z"]],[["2024-07-02 11:51:39.708Z", "2024-07-02 10:51:39.708Z"]]]],
+        "propArr2": [[[["2024-07-02 13:51:39.708", "2024-07-02 12:51:39.708"]],[["2024-07-02 11:51:39.708", "2024-07-02 10:51:39.708"]]]],
         "propObj": {
           "_type": "scout.Fixture03",
-          "nestedNestedDate": "2024-07-05 07:51:39.708Z"
+          "nestedNestedDate": "2024-07-05 07:51:39.708"
         }
       }
     `));
@@ -106,7 +118,7 @@ describe('DoSerializer', () => {
     }
     `));
 
-    const json = dataobjects.stringify({
+    const json = dataObjects.stringify({
       _type: 'scout.Fixture01',
       propObj: {}
     });
@@ -122,13 +134,13 @@ describe('DoSerializer', () => {
     }
     `));
 
-    const json = dataobjects.stringify({
+    const json = dataObjects.stringify({
       objectType: 'scout.Fixture01Do', // with namespace
       propObj: {}
     });
     expect(json).toBe(expected);
 
-    const json2 = dataobjects.stringify({
+    const json2 = dataObjects.stringify({
       objectType: 'Fixture01Do', // without namespace
       propObj: {}
     });
@@ -139,17 +151,17 @@ describe('DoSerializer', () => {
     const expected = JSON.stringify(JSON.parse(`{
       "propObj": {
       "propObj2": {
-        "propDate": "2024-07-01 11:51:39.708Z",
+        "propDate": "2024-07-01 11:51:39.708",
         "_type": "scout.Fixture06"
       }
   }
     }
     `));
-    const json = dataobjects.stringify({
+    const json = dataObjects.stringify({
       objectType: 'Fixture04Do',
       propObj: {
         propObj2: {
-          propDate: dates.parseJsonDate('2024-07-01 11:51:39.708Z')
+          propDate: dates.parseJsonDate('2024-07-01 11:51:39.708')
         }
       }
     });
@@ -161,11 +173,11 @@ describe('DoSerializer', () => {
       propBool: true,
       propNum: 1234.5678,
       propStr: 'testString',
-      propDate: dates.parseJsonDate('2024-07-05 13:51:39.708Z'),
+      propDate: dates.parseJsonDate('2024-07-05 13:51:39.708'),
       propNull: null,
       propArr: arr,
-      propArr2: [[[[dates.parseJsonDate('2024-07-02 13:51:39.708Z'), dates.parseJsonDate('2024-07-02 12:51:39.708Z')]],
-        [[dates.parseJsonDate('2024-07-02 11:51:39.708Z'), dates.parseJsonDate('2024-07-02 10:51:39.708Z')]]]],
+      propArr2: [[[[dates.parseJsonDate('2024-07-02 13:51:39.708'), dates.parseJsonDate('2024-07-02 12:51:39.708')]],
+        [[dates.parseJsonDate('2024-07-02 11:51:39.708'), dates.parseJsonDate('2024-07-02 10:51:39.708')]]]],
       propObj: obj
     };
     return scout.create(Fixture01Do, model);

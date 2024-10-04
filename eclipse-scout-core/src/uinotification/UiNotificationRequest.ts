@@ -7,10 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, typeName, UiNotificationDo} from '../index';
+import {BaseDoEntity, TopicDo, typeName} from '../index';
 
-@typeName('scout.Topic')
-export class TopicDo extends BaseDoEntity {
-  name: string;
-  lastNotifications: UiNotificationDo[]; // Message is always empty
+@typeName('scout.UiNotificationRequest')
+export class UiNotificationRequest extends BaseDoEntity {
+  topics: TopicDo[];
 }

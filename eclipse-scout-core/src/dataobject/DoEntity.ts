@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Constructor, objects, ObjectWithType, scout} from '../index';
+import {Constructor, objects, ObjectType, ObjectWithType, scout} from '../index';
 
 /**
- * Base interface for all data object entities.
+ * Base interface for all data objects.
  *
  * @see "org.eclipse.scout.rt.dataobject.IDoEntity"
  */
@@ -20,14 +20,14 @@ export interface DoEntity {
   _typeVersion?: string;
 }
 
-export class BaseDoEntity implements ObjectWithType, DoEntity {
-  declare model: Partial<this>;
+export class BaseDoEntity implements ObjectWithType, DoEntity, BaseDoEntityModel {
+  declare model: Partial<this> | BaseDoEntityModel;
 
   _type?: string;
   objectType: string;
 
   init(model: any) {
-    if (objects.isPlainObject(model)) {
+    if (objects.isPojo(model)) {
       Object.keys(model).forEach(key => {
         this[key] = this._revive(model[key]);
       });
@@ -35,7 +35,7 @@ export class BaseDoEntity implements ObjectWithType, DoEntity {
   }
 
   protected _revive(value: any): any {
-    if (objects.isPlainObject(value) && value.objectType) {
+    if (objects.isPojo(value) && value.objectType) {
       return scout.create(value);
     }
     if (objects.isArray(value)) {
@@ -45,11 +45,16 @@ export class BaseDoEntity implements ObjectWithType, DoEntity {
   }
 }
 
+export interface BaseDoEntityModel {
+  objectType?: ObjectType;
+
+  [property: string]: any; // allow custom properties
+}
+
 export function typeName(typeName: string) {
   return <T extends Constructor>(BaseClass: T) => class extends BaseClass {
     constructor(...args: any[]) {
       super(...args);
-      // Object.getPrototypeOf(this.constructor)._type = typeName; // static
       Reflect.set(this, '_type', typeName); // instance
     }
   };

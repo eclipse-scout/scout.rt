@@ -43,7 +43,7 @@ export class DoRegistry {
     if (!DoClass) {
       return;
     }
-    for (let [key, value] of this._constructorByJsonType) {
+    for (const [key, value] of this._constructorByJsonType) {
       if (value === DoClass) {
         this.removeByJsonType(key);
       }
