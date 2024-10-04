@@ -29,8 +29,8 @@ public final class RestClientProperties {
   public static final String ENABLE_COOKIES = "scout.rest.client.enableCookies";
 
   /**
-   * Standard cookie specification used by underlying http client. See {@code org.apache.hc.client5.http.cookie.StandardCookieSpec}
-   * for details.
+   * Standard cookie specification used by underlying http client. See
+   * {@code org.apache.hc.client5.http.cookie.StandardCookieSpec} for details.
    * <p>
    * The value MUST be an instance convertible to {@link java.lang.String}.
    * </p>
@@ -220,7 +220,8 @@ public final class RestClientProperties {
   public static final String SUPPRESS_DEFAULT_USER_AGENT = "scout.rest.client.suppressDefaultUserAgent";
 
   /**
-   * Specifies the maximum lifetime in milliseconds for kept alive connections of the REST HTTP client.
+   * Specifies the maximum lifetime in milliseconds for kept alive connections of the REST HTTP client when not explicitly
+   * communicated by the origin server with a Keep-Alive response header.
    * <p>
    * The value MUST be an instance convertible to {@link java.lang.Long}.
    * </p>
@@ -264,6 +265,19 @@ public final class RestClientProperties {
    * </p>
    */
   public static final String VALIDATE_CONNECTION_AFTER_INACTIVITY = "scout.rest.client.http.validateAfterInactivity";
+
+  /**
+   * Specifies the total span of time in milliseconds connections can be kept alive or execute requests. May be zero if the
+   * connection does not have an expiry deadline.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Long}.
+   * </p>
+   * <p>
+   * The default value is defined by {@link org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportConnectionTimeToLiveProperty}
+   * having 30 * 60 * 1000 milliseconds (30 minutes) as default value.
+   * </p>
+   */
+  public static final String CONNECTION_TIME_TO_LIVE = "scout.rest.client.http.connectionTimeToLive";
 
   /**
    * Activates OpenTelemetry metrics for HTTP client connection pool using property value as HTTP client name.
