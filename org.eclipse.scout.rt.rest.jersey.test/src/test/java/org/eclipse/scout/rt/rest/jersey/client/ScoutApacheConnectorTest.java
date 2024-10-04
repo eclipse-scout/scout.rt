@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -44,6 +45,7 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.StandardCookieSpec;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
@@ -63,6 +65,7 @@ import org.eclipse.scout.rt.rest.jersey.RestClientHttpProxyServlet;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoResponse;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoServlet;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportConnectionKeepAliveProperty;
+import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportConnectionTimeToLiveProperty;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportMaxConnectionsTotalProperty;
 import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector.RestHttpTransportValidateAfterInactivityProperty;
@@ -477,22 +480,22 @@ public class ScoutApacheConnectorTest {
   }
 
   @Test
-  public void testHttpConnectionKeepAlive_defaultValue() {
+  public void testHttpConnectionTimeToLive_defaultValue() {
     Client client = Mockito.mock(Client.class);
     Configuration config = Mockito.mock(Configuration.class);
     ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
-    assertEquals(30 * 60 * 1000, connector.getKeepAliveTimeoutMillis(config));
+    assertEquals(30 * 60 * 1000, connector.getConnectionTimeToLiveMillis(config));
   }
 
   @Test
-  public void testHttpConnectionKeepAlive_byConfigProperty() {
+  public void testHttpConnectionTimeToLive_byConfigProperty() {
     List<IBean<?>> beans = new ArrayList<>();
     try {
-      beans.add(BEANS.get(BeanTestingHelper.class).mockConfigProperty(RestHttpTransportConnectionKeepAliveProperty.class, 100L));
+      beans.add(BEANS.get(BeanTestingHelper.class).mockConfigProperty(RestHttpTransportConnectionTimeToLiveProperty.class, 100L));
       Client client = Mockito.mock(Client.class);
       Configuration config = Mockito.mock(Configuration.class);
       ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
-      assertEquals(100L, connector.getKeepAliveTimeoutMillis(config));
+      assertEquals(100L, connector.getConnectionTimeToLiveMillis(config));
     }
     finally {
       beans.forEach(BeanTestingHelper.get()::unregisterBean);
@@ -500,12 +503,12 @@ public class ScoutApacheConnectorTest {
   }
 
   @Test
-  public void testHttpConnectionKeepAlive_byClientProperty() {
+  public void testHttpConnectionTimeToLive_byClientProperty() {
     Client client = Mockito.mock(Client.class);
     Configuration config = Mockito.mock(Configuration.class);
-    when(config.getProperty(RestClientProperties.CONNECTION_KEEP_ALIVE)).thenReturn(200L);
+    when(config.getProperty(RestClientProperties.CONNECTION_TIME_TO_LIVE)).thenReturn(200L);
     ScoutApacheConnector connector = new ScoutApacheConnector(client, config);
-    assertEquals(200L, connector.getKeepAliveTimeoutMillis(config));
+    assertEquals(200L, connector.getConnectionTimeToLiveMillis(config));
   }
 
   @Test
@@ -722,5 +725,51 @@ public class ScoutApacheConnectorTest {
     clientRequestConsumer.accept(clientRequest);
     connector.initSocketTimeout(clientRequest, requestConfigBuilder);
     assertEquals(expectedTimeout >= 0 ? Timeout.ofMilliseconds(expectedTimeout) : null, requestConfigBuilder.build().getResponseTimeout());
+  }
+
+  @Test
+  public void testConnectionKeepAlive_default() {
+    RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+    assertEquals(TimeValue.of(3, TimeUnit.MINUTES), requestConfigBuilder.build().getConnectionKeepAlive());
+    runTestConnectionKeepAlive(c -> {
+    }, -1);
+  }
+
+  @Test
+  public void testConnectionKeepAlive_null() {
+    // null value as property set
+    //noinspection CodeBlock2Expr
+    runTestConnectionKeepAlive(clientRequest -> {
+      when(clientRequest.resolveProperty(eq(RestClientProperties.CONNECTION_KEEP_ALIVE), any(Long.class))).thenReturn(null);
+    }, -1);
+  }
+
+  @Test
+  public void testConnectionKeepAlive_scoutPropertyValue() {
+    // value set by Scout property
+    //noinspection CodeBlock2Expr
+    runTestConnectionKeepAlive(clientRequest -> {
+      when(clientRequest.resolveProperty(eq(RestClientProperties.CONNECTION_KEEP_ALIVE), any(Long.class))).thenReturn(100L);
+    }, 100);
+  }
+
+  @Test
+  public void testConnectionKeepAlive_invalidScoutPropertyValue() {
+    // invalid value set by Scout property
+    //noinspection CodeBlock2Expr
+    runTestConnectionKeepAlive(clientRequest -> {
+      when(clientRequest.resolveProperty(eq(RestClientProperties.CONNECTION_CLOSE), any(Long.class))).thenReturn(-42L);
+    }, -1);
+  }
+
+  protected void runTestConnectionKeepAlive(Consumer<ClientRequest> clientRequestConsumer, int expected) {
+    RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+    Client client = Mockito.mock(Client.class);
+    Configuration configuration = Mockito.mock(Configuration.class);
+    ScoutApacheConnector connector = new ScoutApacheConnector(client, configuration);
+    ClientRequest clientRequest = Mockito.mock(ClientRequest.class);
+    clientRequestConsumer.accept(clientRequest);
+    connector.initKeepAliveTimeout(clientRequest, requestConfigBuilder);
+    assertEquals(expected >= 0 ? Timeout.ofMilliseconds(expected) : Timeout.of(BEANS.get(RestHttpTransportConnectionKeepAliveProperty.class).getDefaultValue(), TimeUnit.MILLISECONDS), requestConfigBuilder.build().getConnectionKeepAlive());
   }
 }
