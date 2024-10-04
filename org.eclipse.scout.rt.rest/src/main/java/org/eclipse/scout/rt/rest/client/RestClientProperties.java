@@ -29,8 +29,8 @@ public final class RestClientProperties {
   public static final String ENABLE_COOKIES = "scout.rest.client.enableCookies";
 
   /**
-   * Standard cookie specification used by underlying http client. See {@code org.apache.hc.client5.http.cookie.StandardCookieSpec}
-   * for details.
+   * Standard cookie specification used by underlying http client. See
+   * {@code org.apache.hc.client5.http.cookie.StandardCookieSpec} for details.
    * <p>
    * The value MUST be an instance convertible to {@link java.lang.String}.
    * </p>
@@ -264,6 +264,18 @@ public final class RestClientProperties {
    * </p>
    */
   public static final String VALIDATE_CONNECTION_AFTER_INACTIVITY = "scout.rest.client.http.validateAfterInactivity";
+
+  /**
+   * Specifies the maximum time to live of an HTTP connection within the HTTP connection pool. May be zero if the
+   * connection does not have an expiry deadline.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Long}.
+   * </p>
+   * <p>
+   * The default value is 30 * 60 * 1000 (e.g. 30 minutes).
+   * </p>
+   */
+  public static final String CONNECTION_TIME_TO_LIVE = "scout.rest.client.http.connectionTimeToLive";
 
   /**
    * Activates OpenTelemetry metrics for HTTP client connection pool using property value as HTTP client name.
