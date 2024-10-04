@@ -305,6 +305,30 @@ describe('tileUtil', () => {
       verify(gridDatas, 0, {x: 2, y: 1, w: 1, h: 2}, expGridDatas);
     });
 
+    it('moves wide tile on the bottom and tile on the right down ', () => {
+      /**
+       * |_||_|
+       * |__|
+       */
+      let gridDatas = [
+        {x: 1, y: 1, w: 1, h: 1},
+        {x: 2, y: 1, w: 1, h: 1},
+        {x: 1, y: 2, w: 2, h: 1}
+      ];
+      /**
+       * |  |
+       * |__|
+       *  |_|
+       * |__|
+       */
+      let expGridDatas = [
+        null,
+        {x: 2, y: 3, w: 1, h: 1},
+        {x: 1, y: 4, w: 2, h: 1}
+      ];
+      verify(gridDatas, 0, {x: 1, y: 1, w: 2, h: 2}, expGridDatas);
+    });
+
     it('moves tile on the bottom right of a tile below a tile down ', () => {
       /**
        *  |_|

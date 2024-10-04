@@ -113,7 +113,7 @@ export const tileUtil = {
             // Ignore tiles without explicit positions, they will be arranged automatically by the logical grid
             continue;
           }
-          let bottomGridData = bottomGridDataPerColumn[x];
+          let bottomGridData = lowestGridData(bottomGridDataPerColumn.slice(x, x + gridData.w));
           if (!bottomGridData) {
             // If tile is not inside the affected columns, skip it
             continue;
@@ -145,6 +145,18 @@ export const tileUtil = {
           bottomGridDataPerColumn[x] = gridData;
         }
       }
+    }
+
+    /**
+     * @returns the grid data with the largest y-value of the given gridDatas
+     */
+    function lowestGridData(gridDatas: GridData[]): GridData {
+      return gridDatas.reduce((prev, curr) => {
+        if (curr?.y > prev?.y) {
+          return curr;
+        }
+        return prev;
+      }, gridDatas[0]);
     }
   }
 };
