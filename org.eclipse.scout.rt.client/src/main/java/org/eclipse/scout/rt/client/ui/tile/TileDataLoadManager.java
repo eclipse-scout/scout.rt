@@ -39,7 +39,13 @@ import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 @ApplicationScoped
 public class TileDataLoadManager {
 
-  private static final String MANUAL_CANCELLATION_MARKER = "cancelledByTileDataLoadManager";
+  /**
+   * Execution hint for an async tile load job that should not call {@link ITile#onLoadDataCancel()} when cancelled.
+   * Intended to be added to {@link IFuture}s that are cancelled explicitly. A typical use case is a reload operation,
+   * where the current load job is cancelled and a new job is scheduled right away.
+   */
+  public static final String MANUAL_CANCELLATION_MARKER = "manualCancellationMarker";
+
   private final IExecutionSemaphore m_tileExecutionSemaphore = Jobs.newExecutionSemaphore(CONFIG.getPropertyValue(TileMaxConcurrentDataLoadThreadsProperty.class)).seal();
 
   public TileDataLoadManager() {
