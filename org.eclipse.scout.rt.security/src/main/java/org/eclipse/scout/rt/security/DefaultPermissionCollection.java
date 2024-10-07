@@ -103,7 +103,6 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
   @Override
   public PermissionLevel getGrantedPermissionLevel(IPermission permission) {
     if (permission == null) {
-      LOG.warn("getGrantedPermissionLevel was called w/o a permission, returning undefined level");
       return PermissionLevel.UNDEFINED;
     }
 
