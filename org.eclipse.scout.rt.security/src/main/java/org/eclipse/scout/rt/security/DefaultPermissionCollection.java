@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.rt.security;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.fail;
+
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,7 +105,7 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
   @Override
   public PermissionLevel getGrantedPermissionLevel(IPermission permission) {
     if (permission == null) {
-      LOG.warn("getGrantedPermissionLevel was called w/o a permission, returning undefined level");
+      fail("getGrantedPermissionLevel was called w/o a permission, returning undefined level");
       return PermissionLevel.UNDEFINED;
     }
 
