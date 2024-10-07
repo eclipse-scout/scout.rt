@@ -396,6 +396,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Override
   public void cancelLoading() {
     if (getLoadJobFuture() != null) {
+      getLoadJobFuture().addExecutionHint(TileDataLoadManager.MANUAL_CANCELLATION_MARKER);
       getLoadJobFuture().cancel(true);
     }
   }
