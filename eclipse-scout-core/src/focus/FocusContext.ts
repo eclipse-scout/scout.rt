@@ -169,7 +169,8 @@ export class FocusContext {
     // Redirect the focus to the first focusable parent element.
     if (!$target.is(':focusable')) {
       // noinspection CssInvalidPseudoSelector (inspection seems to confuse $.fn.closest with the native Element.closest method)
-      $target = $target.parent().closest(':focusable');
+      let $newTarget = $target.parent().closest(':focusable');
+      focusUtils.focusLater($newTarget, {preventScroll: true});
     }
 
     $target.on('remove', this._removeListener);
