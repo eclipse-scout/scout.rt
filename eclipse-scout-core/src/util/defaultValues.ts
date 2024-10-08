@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {objects, strings, TypeDescriptor} from '../index';
+import {App, objects, strings, TypeDescriptor} from '../index';
 import $ from 'jquery';
 
 export interface DefaultValuesBootstrapOptions {
@@ -35,7 +35,8 @@ export const defaultValues = {
     options = $.extend({}, defaultOptions, options);
     // Load default value configuration from server (and cache it)
     return $.ajaxJson(options.url)
-      .done(defaultValues.init.bind(this));
+      .then(response => App.handleJsonError(options.url, response))
+      .then(defaultValues.init.bind(this));
   },
 
   init(data: any) {

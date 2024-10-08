@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, ConfigProperties, DoEntity, ObjectModel, objects, System, systems} from '../index';
+import {App, arrays, ConfigProperties, DoEntity, ObjectModel, objects, System, systems} from '../index';
 import $ from 'jquery';
 
 /**
@@ -39,6 +39,7 @@ export class ConfigPropertyCache implements ObjectModel<ConfigPropertyCache> {
   bootstrap(urls: string | string[], system?: string): JQuery.Promise<void> {
     let promises = arrays.ensure(urls)
       .map(url => $.ajaxJson(url)
+        .then(response => App.handleJsonError(url, response))
         .then(properties => this._handleBootstrapResponse(properties, system)));
     return $.promiseAll(promises);
   }

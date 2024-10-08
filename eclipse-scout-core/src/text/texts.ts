@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Session, TextMap} from '../index';
+import {App, arrays, Session, TextMap} from '../index';
 import $ from 'jquery';
 
 export type TextMapType = Record<string, TextMap>;
@@ -41,14 +41,8 @@ export const texts = {
   },
 
   /** @internal */
-  _handleBootstrapResponse(url: string | string[], data: any) {
-    if (data && data.error) {
-      // The result may contain a json error (e.g. session timeout) -> abort processing
-      throw {
-        error: data.error,
-        url: url
-      };
-    }
+  _handleBootstrapResponse(url: string, data: any) {
+    App.handleJsonError(url, data);
     texts.init(data);
   },
 

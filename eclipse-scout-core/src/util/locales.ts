@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Locale, LocaleModel, objects, scout, texts} from '../index';
+import {App, arrays, Locale, LocaleModel, objects, scout, texts} from '../index';
 import $ from 'jquery';
 
 export const locales = {
@@ -20,13 +20,7 @@ export const locales = {
 
   /** @internal */
   _handleBootstrapResponse(url: string, data: any) {
-    if (data && data.error) {
-      // The result may contain a json error (e.g. session timeout) -> abort processing
-      throw {
-        error: data.error,
-        url: url
-      };
-    }
+    App.handleJsonError(url, data);
     locales.init(data);
   },
 
