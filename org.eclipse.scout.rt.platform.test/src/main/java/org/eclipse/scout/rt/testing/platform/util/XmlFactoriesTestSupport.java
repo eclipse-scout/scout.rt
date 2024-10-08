@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.testing.platform.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,30 +29,31 @@ import org.junit.Assert;
  * Testing helper class to detect XXE vulnerabilities because of direct use of the corresponding JRE factories instead
  * of using {@link XmlUtility} which provides hardened factory methods.
  *
- * @see https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
+ * @see <a href="https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html">XML
+ *      External Entity Prevention Cheat Sheet</a>
  */
 public class XmlFactoriesTestSupport {
 
   private final List<Pattern> m_searchPatterns;
   private final List<Pattern> m_pathExclusions;
-  private final List<String> m_errMsgs;
+  private final List<String> m_errMessages;
   private Path m_root;
 
   public XmlFactoriesTestSupport() {
     m_searchPatterns = new ArrayList<>();
-    m_searchPatterns.add(Pattern.compile("DocumentBuilderFactory\\.newInstance\\("));
-    m_searchPatterns.add(Pattern.compile("SAXParserFactory\\.newInstance\\("));
-    m_searchPatterns.add(Pattern.compile("XMLInputFactory\\.newInstance\\("));
-    m_searchPatterns.add(Pattern.compile("TransformerFactory\\.newInstance\\("));
-    m_searchPatterns.add(Pattern.compile("SchemaFactory\\.newInstance\\("));
-    m_searchPatterns.add(Pattern.compile("SAXTransformerFactory\\.newInstance\\("));
-    m_searchPatterns.add(Pattern.compile("XMLReaderFactory\\.createXMLReader\\("));
+    m_searchPatterns.add(Pattern.compile("DocumentBuilderFactory\\s*\\.\\s*newInstance\\s*\\("));
+    m_searchPatterns.add(Pattern.compile("SAXParserFactory\\s*\\.\\s*newInstance\\s*\\("));
+    m_searchPatterns.add(Pattern.compile("XMLInputFactory\\s*\\.\\s*newInstance\\s*\\("));
+    m_searchPatterns.add(Pattern.compile("TransformerFactory\\s*\\.\\s*newInstance\\s*\\("));
+    m_searchPatterns.add(Pattern.compile("SchemaFactory\\s*\\.\\s*newInstance\\s*\\("));
+    m_searchPatterns.add(Pattern.compile("SAXTransformerFactory\\s*\\.\\s*newInstance\\s*\\("));
+    m_searchPatterns.add(Pattern.compile("XMLReaderFactory\\s*\\.\\s*createXMLReader\\s*\\("));
 
     m_pathExclusions = new ArrayList<>();
     m_pathExclusions.add(buildFilePatternFor(XmlUtility.class));
     m_pathExclusions.add(buildFilePatternFor(XmlFactoriesTestSupport.class));
 
-    m_errMsgs = new ArrayList<>();
+    m_errMessages = new ArrayList<>();
     m_root = Paths.get("..").toAbsolutePath().normalize();
   }
 
@@ -70,11 +70,11 @@ public class XmlFactoriesTestSupport {
   }
 
   public void doTest() throws IOException {
-    Files.walkFileTree(getRoot(), new SimpleFileVisitor<Path>() {
+    Files.walkFileTree(getRoot(), new SimpleFileVisitor<>() {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         Path fileName = dir.getFileName();
-        if (fileName != null && (".git".equals(fileName.toString())  || "node_modules".equals(fileName.toString())) ) {
+        if (fileName != null && (".git".equals(fileName.toString()) || "node_modules".equals(fileName.toString()))) {
           return FileVisitResult.SKIP_SUBTREE;
         }
         return FileVisitResult.CONTINUE;
@@ -92,7 +92,7 @@ public class XmlFactoriesTestSupport {
   }
 
   public List<String> getErrorMessages() {
-    return Collections.unmodifiableList(m_errMsgs);
+    return Collections.unmodifiableList(m_errMessages);
   }
 
   public void failOnError() {
@@ -110,11 +110,11 @@ public class XmlFactoriesTestSupport {
   }
 
   private void checkFile(Path path) throws IOException {
-    String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+    String content = Files.readString(path);
     for (Pattern pat : m_searchPatterns) {
       if (pat.matcher(content).find()) {
         Path subpath = path.subpath(getRoot().getNameCount(), path.getNameCount());
-        m_errMsgs.add("Own XML factory usage ('" + pat.toString().replace("\\", "") + "') found in '" + subpath + "'. Use " + XmlUtility.class.getSimpleName() + " instead!");
+        m_errMessages.add("Own XML factory usage ('" + pat.toString().replace("\\", "") + "') found in '" + subpath + "'. Use " + XmlUtility.class.getSimpleName() + " instead!");
       }
     }
   }
