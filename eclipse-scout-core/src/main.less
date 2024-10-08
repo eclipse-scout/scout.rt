@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -81,6 +81,16 @@ body {
 ::-ms-reveal {
   width: 0;
   height: 0;
+}
+
+// Hide the default user-agent style for all focused elements. Instead, each focusable widget provides
+// its own focus style, e.g. using the scout mixins .focus-box-shadow() or .focus-border().
+// The browser heuristics for :focus-visible (https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible)
+// does not seem to to work too well with some of the more complex scout widgets (e.g. table), so we hide
+// it as well and use special classes like .focused and .keyboard-navigation instead.
+:focus,
+:focus-visible {
+  outline: none;
 }
 
 .disabled {
