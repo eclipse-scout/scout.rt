@@ -9,8 +9,8 @@
  */
 
 import {
-  access, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, ErrorInfo, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers, ObjectFactory,
-  objects, scout, Session, SessionModel, texts, webstorage, Widget
+  access, AjaxError, AppEventMap, aria, codes, config, Desktop, Device, ErrorHandler, ErrorInfo, Event, EventEmitter, EventHandler, EventListener, EventMapOf, FontDescriptor, fonts, InitModelOf, Locale, locales, logging, numbers,
+  ObjectFactory, objects, scout, Session, SessionModel, texts, webstorage, Widget
 } from './index';
 import $ from 'jquery';
 
@@ -34,6 +34,11 @@ export interface AppModel {
 export type JsonErrorResponse = {
   code: number;
   message: string;
+};
+
+export type JsonErrorResponseContainer = {
+  url: string;
+  error: JsonErrorResponse;
 };
 
 export interface AppBootstrapOptions {
@@ -95,6 +100,23 @@ export class App extends EventEmitter {
       throw new Error('Bootstrapper is already registered.');
     }
     bootstrappers.push(bootstrapper);
+  }
+
+  /**
+   * The response of a successful ajax call with status 200 may contain a {@link JsonErrorResponse}.
+   * This method detects this case and throws an error containing the error details of the response together with the given request url.
+   * @throws JsonErrorResponseContainer
+   * @returns the given data as it is if it does not contain an error
+   */
+  static handleJsonError(url: string, data: any): any {
+    if (data && data.error) {
+      // The result may contain a json error (e.g. session timeout) -> abort processing
+      throw {
+        error: data.error,
+        url: url
+      };
+    }
+    return data;
   }
 
   static get(): App {
@@ -227,8 +249,13 @@ export class App extends EventEmitter {
     $.log.isDebugEnabled() && $.log.debug('App bootstrapped');
   }
 
-  protected _bootstrapFail(options: AppBootstrapOptions, vararg: JQuery.jqXHR | { url?: string; error?: JsonErrorResponse }, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: JQuery.AjaxSettings)
-    : JQuery.Promise<any> | void {
+  /**
+   * @param vararg may either be
+   *               - an {@link AjaxError} for requests executed with {@link ajax} or {@link AjaxCall}
+   *               - a {@link JQuery.jqXHR} for requests executed with {@link $.ajax}. The parameters `textStatus`, `errorThrown` and `requestOptions` are only set in this case.
+   *               - a {@link JsonErrorResponseContainer} if a successful response contained a {@link JsonErrorResponse} which was transformed to an error (e.g. using {@link App.handleJsonError}).
+   */
+  protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: JQuery.AjaxSettings): JQuery.Promise<any> | void {
     $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
     // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
@@ -236,7 +263,12 @@ export class App extends EventEmitter {
     // The browser is allowed to display a page when navigating back without issuing a request even though cache-headers are set to must-revalidate.
     // The only way to prevent it would be the no-store header but then pressing back would always reload the page and not only on a session timeout.
     // Sometimes the JavaScript and therefore the ajax calls won't be executed in case the page is loaded from that cache, but sometimes they will nevertheless (we don't know the reasons).
-    // So, if it that happens, the server will return a session timeout and the best thing we can do is to reload the page hoping a request for the index.html will be done which eventually will be forwarded to the login page.
+    // So, if it that happens, the server will either return a session timeout or a status 401 (Unauthorized) and the best thing we can do is to reload the page hoping a request for the index.html
+    // will be done which eventually will be forwarded to the login page.
+    if (vararg instanceof AjaxError) {
+      requestOptions = vararg.requestOptions;
+      vararg = vararg.jqXHR;
+    }
     if ($.isJqXHR(vararg)) {
       // AJAX error
       // If a resource returns 401 (unauthorized) it is likely a session timeout.
