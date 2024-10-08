@@ -97,9 +97,33 @@ export function isActiveElement(element) {
   return activeElement === element;
 }
 
+/**
+ * Sets the focus to the given target element just before the next repaint (using requestAnimationFrame).
+ * This allows other event handlers to be fired before the focus is actually changed.
+ *
+ * @param target the element to be focused (html or jquery element)
+ * @param options options to be passed to the {@link HTMLElement#focus} call
+ */
+export function focusLater(target, options) {
+  let $target = $.ensure(target);
+  if (!$target.length) {
+    return; // nothing to do
+  }
+  let doc = $target.document(true);
+  let prevFocusedElement = doc.activeElement;
+  requestAnimationFrame(() => {
+    // Check if the active element is the same as before. If not, someone has changed the focus
+    // in the meantime and the scheduled "focusLater" request is probably obsolete.
+    if (doc.activeElement === prevFocusedElement) {
+      $target[0].focus(options);
+    }
+  });
+}
+
 export default {
   containsParentFocusableByMouse,
   isActiveElement,
   isFocusableByMouse,
-  isSelectableText
+  isSelectableText,
+  focusLater
 };
