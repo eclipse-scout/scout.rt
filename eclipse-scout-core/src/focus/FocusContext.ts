@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -164,7 +164,8 @@ export class FocusContext {
     // Redirect the focus to the first focusable parent element.
     if (!$target.is(':focusable')) {
       // noinspection CssInvalidPseudoSelector (inspection seems to confuse $.fn.closest with the native Element.closest method)
-      $target = $target.parent().closest(':focusable');
+      let $newTarget = $target.parent().closest(':focusable');
+      focusUtils.focusLater($newTarget, {preventScroll: true});
     }
 
     $target.on('remove', this._removeListener);

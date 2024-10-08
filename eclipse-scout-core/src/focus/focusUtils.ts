@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -94,5 +94,28 @@ export const focusUtils = {
       activeElement = ownerDocument.activeElement;
     }
     return activeElement === element;
+  },
+
+  /**
+   * Sets the focus to the given target element just before the next repaint (using requestAnimationFrame).
+   * This allows other event handlers to be fired before the focus is actually changed.
+   *
+   * @param target the element to be focused
+   * @param options options to be passed to the {@link HTMLElement#focus} call
+   */
+  focusLater(target: HTMLElement | JQuery, options?: FocusOptions) {
+    let $target = $.ensure(target);
+    if (!$target.length) {
+      return; // nothing to do
+    }
+    let doc = $target.document(true);
+    let prevFocusedElement = doc.activeElement;
+    requestAnimationFrame(() => {
+      // Check if the active element is the same as before. If not, someone has changed the focus
+      // in the meantime and the scheduled "focusLater" request is probably obsolete.
+      if (doc.activeElement === prevFocusedElement) {
+        $target[0].focus(options);
+      }
+    });
   }
 };
