@@ -327,6 +327,7 @@
 .calendar-component-title {
   font-weight: bold;
   font-size: @font-size-plus;
+  #scout.overflow-ellipsis-nowrap();
 }
 
 .calendar-component-intro {
@@ -365,6 +366,8 @@
   & > .text {
     display: inline-block;
     vertical-align: top;
+    word-wrap: break-word;
+    word-break: break-word;
   }
 
   &:not(.first) {
