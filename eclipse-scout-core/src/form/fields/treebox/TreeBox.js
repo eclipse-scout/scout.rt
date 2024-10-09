@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupBox, objects, scout, TreeBoxLayout} from '../../../index';
+import {arrays, logging, LookupBox, objects, RestLookupCall, scout, strings, TreeBoxLayout} from '../../../index';
 
 export default class TreeBox extends LookupBox {
 
@@ -100,11 +100,11 @@ export default class TreeBox extends LookupBox {
         }
 
         this.uncheckAll(opts);
-        objects.values(this.tree.nodesMap).forEach(function(node) {
+        objects.values(this.tree.nodesMap).forEach(node => {
           if (arrays.containsAny(newValue, node.id)) {
             this.tree.checkNode(node, true, opts);
           }
-        }, this);
+        });
       }
 
       this._updateDisplayText();
@@ -130,7 +130,8 @@ export default class TreeBox extends LookupBox {
   _populateTree(result) {
     let topLevelNodes = [];
     this._populating = true;
-    this._populateTreeRecursive(null, topLevelNodes, result.lookupRows);
+    let lookupRows = this._extractValidLookupRows(result);
+    this._populateTreeRecursive(null, topLevelNodes, lookupRows);
 
     this.tree.deleteAllNodes();
     this.tree.insertNodes(topLevelNodes);
@@ -139,16 +140,56 @@ export default class TreeBox extends LookupBox {
     this._syncValueToTree(this.value);
   }
 
-  _populateTreeRecursive(parentKey, nodesArray, lookupRows) {
-    let node;
-    lookupRows.forEach(function(lookupRow) {
-      if (lookupRow.parentKey === parentKey) {
-        node = this._createNode(lookupRow);
-        this._populateTreeRecursive(node.id, node.childNodes, lookupRows);
-        node.leaf = !node.childNodes.length;
-        nodesArray.push(node);
+  _extractValidLookupRows(result) {
+    let keys = new Set();
+    return result.lookupRows.filter(lookupRow => {
+      if (!lookupRow) {
+        return false; // not a valid lookup row
       }
-    }, this);
+      if (objects.isNullOrUndefined(lookupRow.key)) {
+        this._logWarning('Ignored lookup row without key');
+        return false; // invalid key (if null were allowed, the meaning of 'parentKey=null' would no longer be defined)
+      }
+      if (keys.has(lookupRow.key)) {
+        this._logWarning('Ignored lookup row with duplicate key: ' + lookupRow.key);
+        return false; // multiple lookup rows with the same key
+      }
+      if (lookupRow.parentKey === lookupRow.key) {
+        this._logWarning('Ignored self-referencing lookup row: ' + lookupRow.key);
+        return false; // lookup row referencing itself
+      }
+      keys.add(lookupRow.key);
+      return lookupRow;
+    });
+  }
+
+  _logWarning(message) {
+    let form = this.getForm();
+    let parentGroupBox = this.getParentGroupBox();
+    let parentField = this.getParentField();
+
+    let formInfo = form ? ('form=[' + strings.join('|', form.id, form.objectType, form.modelClass, strings.box('"', form.title, '"')) + ']') : '';
+    let parentGroupBoxInfo = parentGroupBox ? ('parentGroupBox=[' + strings.join('|', parentGroupBox.id, parentGroupBox.objectType, parentGroupBox.modelClass, strings.box('"', parentGroupBox.label, '"')) + ']') : '';
+    let parentFieldInfo = parentField ? ('parentField=[' + strings.join('|', parentField.id, parentField.objectType, parentField.modelClass, strings.box('"', parentField.label, '"')) + ']') : '';
+    let thisInfo = 'treeBox=[' + strings.join('|', this.id, this.objectType, this.modelClass) + ']';
+
+    let lookupCallInfo = '';
+    if (this.lookupCall) {
+      let resourceUrl = (this.lookupCall instanceof RestLookupCall ? this.lookupCall.resourceUrl : null);
+      lookupCallInfo = 'lookupCall=[' + strings.join('|', this.lookupCall.id, this.lookupCall.objectType, this.lookupCall.modelClass, resourceUrl) + ']';
+    }
+
+    this.session.sendLogRequest(message + ' [' + strings.join(', ', thisInfo, lookupCallInfo, parentFieldInfo, parentGroupBoxInfo, formInfo) + ']', logging.Level.WARN);
+  }
+
+  _populateTreeRecursive(parentKey, nodesArray, lookupRows) {
+    let currentLookupRows = lookupRows.filter(lookupRow => lookupRow.parentKey === parentKey);
+    currentLookupRows.forEach(currentLookupRow => {
+      let node = this._createNode(currentLookupRow);
+      this._populateTreeRecursive(currentLookupRow.key, node.childNodes, lookupRows);
+      node.leaf = !node.childNodes.length;
+      nodesArray.push(node);
+    });
   }
 
   /**
