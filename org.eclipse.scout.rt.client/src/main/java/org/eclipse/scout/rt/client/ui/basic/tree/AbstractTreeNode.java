@@ -72,8 +72,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private ITreeNode m_parentNode;
   private ITreeNode m_oldParentNode;
 
-  private final Object m_childNodeListLock;
-  private final Object m_filteredChildNodesLock;
   private final OptimisticLock m_childrenLoadedLock;
   private final Cell m_cell;
 
@@ -122,9 +120,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   public AbstractTreeNode(boolean callInitializer) {
     setFilterAccepted(true);
-    m_childNodeListLock = new Object();
     m_childNodeList = new ArrayList<>();
-    m_filteredChildNodesLock = new Object();
     m_childrenLoadedLock = new OptimisticLock();
     m_cell = new Cell(this);
     m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
@@ -388,9 +384,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public void resetFilterCache() {
-    synchronized (m_filteredChildNodesLock) {
-      m_filteredChildNodes = null;
-    }
+    m_filteredChildNodes = null;
   }
 
   @Override
@@ -818,18 +812,14 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @Override
   public List<ITreeNode> getFilteredChildNodes() {
     if (m_filteredChildNodes == null) {
-      synchronized (m_filteredChildNodesLock) {
-        if (m_filteredChildNodes == null) {
-          synchronized (m_childNodeListLock) {
-            List<ITreeNode> list = new ArrayList<>(m_childNodeList.size());
-            for (ITreeNode node : m_childNodeList) {
-              if (node.isFilterAccepted()) {
-                list.add(node);
-              }
-            }
-            m_filteredChildNodes = list;
+      if (m_filteredChildNodes == null) {
+        List<ITreeNode> list = new ArrayList<>(m_childNodeList.size());
+        for (ITreeNode node : m_childNodeList) {
+          if (node.isFilterAccepted()) {
+            list.add(node);
           }
         }
+        m_filteredChildNodes = list;
       }
     }
     return CollectionUtility.arrayList(m_filteredChildNodes);
@@ -848,34 +838,29 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public ITreeNode getChildNode(int childIndex) {
-    synchronized (m_childNodeListLock) {
-      if (childIndex >= 0 && childIndex < m_childNodeList.size()) {
-        return m_childNodeList.get(childIndex);
-      }
-      else {
-        return null;
-      }
+    if (childIndex >= 0 && childIndex < m_childNodeList.size()) {
+      return m_childNodeList.get(childIndex);
+    }
+    else {
+      return null;
+
     }
   }
 
   @Override
   public List<ITreeNode> getChildNodes() {
-    synchronized (m_childNodeListLock) {
-      return CollectionUtility.arrayList(m_childNodeList);
-    }
+    return CollectionUtility.arrayList(m_childNodeList);
   }
 
   @Override
   public void collectChildNodes(Set<ITreeNode> collector, boolean recursive) {
-    synchronized (m_childNodeListLock) {
-      for (ITreeNode node : m_childNodeList) {
-        if (node == null) {
-          continue;
-        }
-        collector.add(node);
-        if (recursive) {
-          node.collectChildNodes(collector, recursive);
-        }
+    for (ITreeNode node : m_childNodeList) {
+      if (node == null) {
+        continue;
+      }
+      collector.add(node);
+      if (recursive) {
+        node.collectChildNodes(collector, recursive);
       }
     }
   }
@@ -896,16 +881,14 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    * do not use this internal method
    */
   public final void setChildNodeOrderInternal(List<ITreeNode> nodes) {
-    synchronized (m_childNodeListLock) {
-      List<ITreeNode> newList = new ArrayList<>(m_childNodeList.size());
-      int index = 0;
-      for (ITreeNode n : nodes) {
-        n.setChildNodeIndexInternal(index);
-        newList.add(n);
-        index++;
-      }
-      m_childNodeList = newList;
+    List<ITreeNode> newList = new ArrayList<>(m_childNodeList.size());
+    int index = 0;
+    for (ITreeNode n : nodes) {
+      n.setChildNodeIndexInternal(index);
+      newList.add(n);
+      index++;
     }
+    m_childNodeList = newList;
     resetFilterCache();
   }
 
@@ -918,12 +901,11 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       node.setParentNodeInternal(this);
     }
 
-    synchronized (m_childNodeListLock) {
-      m_childNodeList.addAll(startIndex, nodes);
-      int endIndex = m_childNodeList.size() - 1;
-      for (int i = startIndex; i <= endIndex; i++) {
-        m_childNodeList.get(i).setChildNodeIndexInternal(i);
-      }
+    m_childNodeList.addAll(startIndex, nodes);
+    int endIndex = m_childNodeList.size() - 1;
+    for (int i = startIndex; i <= endIndex; i++) {
+      m_childNodeList.get(i).setChildNodeIndexInternal(i);
+
     }
     // traverse subtree for add / remove notify
     for (ITreeNode node : nodes) {
@@ -937,20 +919,19 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    */
   public final void removeChildNodesInternal(Collection<? extends ITreeNode> nodes, boolean includeSubtree, boolean disposeNodes) {
     List<ITreeNode> removedNodes = new ArrayList<>();
-    synchronized (m_childNodeListLock) {
-      for (ITreeNode node : nodes) {
-        if (m_childNodeList.remove(node)) {
-          removedNodes.add(node);
-        }
-        node.setTreeInternal(null, true);
-        node.setParentNodeInternal(null);
+    for (ITreeNode node : nodes) {
+      if (m_childNodeList.remove(node)) {
+        removedNodes.add(node);
       }
-      int startIndex = 0;
-      int endIndex = m_childNodeList.size() - 1;
-      for (int i = startIndex; i <= endIndex; i++) {
-        m_childNodeList.get(i).setChildNodeIndexInternal(i);
-      }
+      node.setTreeInternal(null, true);
+      node.setParentNodeInternal(null);
     }
+    int startIndex = 0;
+    int endIndex = m_childNodeList.size() - 1;
+    for (int i = startIndex; i <= endIndex; i++) {
+      m_childNodeList.get(i).setChildNodeIndexInternal(i);
+    }
+
     // inform nodes of remove
     for (ITreeNode removedNode : removedNodes) {
       postProcessRemoveRec(removedNode, getTree(), includeSubtree, disposeNodes);
@@ -963,17 +944,16 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    */
   public final void replaceChildNodeInternal(int index, ITreeNode newNode) {
     ITreeNode oldNode;
-    synchronized (m_childNodeListLock) {
-      //remove old
-      oldNode = m_childNodeList.get(index);
-      oldNode.setTreeInternal(null, true);
-      oldNode.setParentNodeInternal(null);
-      //add new
-      m_childNodeList.set(index, newNode);
-      newNode.setTreeInternal(m_tree, true);
-      newNode.setParentNodeInternal(this);
-      m_childNodeList.get(index).setChildNodeIndexInternal(index);
-    }
+    //remove old
+    oldNode = m_childNodeList.get(index);
+    oldNode.setTreeInternal(null, true);
+    oldNode.setParentNodeInternal(null);
+    //add new
+    m_childNodeList.set(index, newNode);
+    newNode.setTreeInternal(m_tree, true);
+    newNode.setParentNodeInternal(this);
+    m_childNodeList.get(index).setChildNodeIndexInternal(index);
+
     postProcessRemoveRec(oldNode, m_tree, true, true);
     postProcessAddRec(newNode, true);
     resetFilterCache();
@@ -1078,10 +1058,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       m_tree.setNodeExpandedInternal(this, true, isLazyExpandingEnabled());
     }
     if (includeSubtree) {
-      synchronized (m_childNodeListLock) {
-        for (ITreeNode aM_childNodeList : m_childNodeList) {
-          (aM_childNodeList).setTreeInternal(tree, includeSubtree);
-        }
+      for (ITreeNode aM_childNodeList : m_childNodeList) {
+        (aM_childNodeList).setTreeInternal(tree, includeSubtree);
       }
     }
   }
