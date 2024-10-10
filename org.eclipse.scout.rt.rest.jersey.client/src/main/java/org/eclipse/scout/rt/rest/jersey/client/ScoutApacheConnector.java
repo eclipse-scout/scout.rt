@@ -69,9 +69,11 @@ import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.http.impl.io.DefaultHttpRequestWriterFactory;
 import org.apache.hc.core5.http.io.HttpConnectionFactory;
+import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.AbstractHttpEntity;
 import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
@@ -172,15 +174,21 @@ public class ScoutApacheConnector implements Connector {
           .build();
     }
 
+    Timeout connectTimeout = getConnectTimeoutMillis(config);
+    Timeout socketTimeout = getReadTimeoutMillis(config);
+    TimeValue connectionTimeToLive = TimeValue.ofMilliseconds(getConnectionTimeToLiveMillis(config));
+
     final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
         RegistryBuilder.<ConnectionSocketFactory> create()
             .register("http", PlainConnectionSocketFactory.getSocketFactory())
             .register("https", sslConnectionSocketFactory)
             .build(),
-        null, null, TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis(config)), connFactory);
+        null, null, connectionTimeToLive, connFactory);
 
     Builder connectionConfigBuilder = ConnectionConfig.custom()
-        .setTimeToLive(TimeValue.ofMilliseconds(getKeepAliveTimeoutMillis(config)));
+        .setConnectTimeout(connectTimeout)
+        .setSocketTimeout(socketTimeout)
+        .setTimeToLive(connectionTimeToLive);
 
     final int validateAfterInactivityMillis = getValidateAfterInactivityMillis(config);
     if (validateAfterInactivityMillis > 0) {
@@ -197,9 +205,29 @@ public class ScoutApacheConnector implements Connector {
       connectionManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
     }
 
+    SocketConfig.Builder socketConfigBuilder = SocketConfig.custom()
+        .setSoTimeout(socketTimeout);
+
     connectionManager.setDefaultConnectionConfig(connectionConfigBuilder.build());
+    connectionManager.setDefaultSocketConfig(socketConfigBuilder.build());
     initMetrics(config, connectionManager);
     return connectionManager;
+  }
+
+  protected Timeout getConnectTimeoutMillis(Configuration config) {
+    Long timeout = TypeCastUtility.castValue(config.getProperty(RestClientProperties.CONNECT_TIMEOUT), Long.class);
+    if (timeout != null) {
+      return Timeout.of(timeout, TimeUnit.MILLISECONDS);
+    }
+    return Timeout.DISABLED;
+  }
+
+  protected Timeout getReadTimeoutMillis(Configuration config) {
+    Long timeout = TypeCastUtility.castValue(config.getProperty(RestClientProperties.READ_TIMEOUT), Long.class);
+    if (timeout != null) {
+      return Timeout.of(timeout, TimeUnit.MILLISECONDS);
+    }
+    return Timeout.DISABLED;
   }
 
   /**
@@ -233,22 +261,13 @@ public class ScoutApacheConnector implements Connector {
   }
 
   /**
-   * @deprecated This method will be removed with Scout release 25.1. Use the configuration property to change this
-   * configuration or override method {@link #getKeepAliveTimeoutMillis(Configuration)}.
+   * Specifies the maximum time to live of an HTTP connection within the HTTP connection pool. May be zero if the
+   * connection does not have an expiry deadline.
    */
-  @Deprecated
-  @SuppressWarnings("DeprecatedIsStillUsed")
-  protected long getKeepAliveTimeoutMillis() {
-    return CONFIG.getPropertyValue(RestHttpTransportConnectionKeepAliveProperty.class);
-  }
-
-  /**
-   * Max timeout in ms connections are kept open when idle (requires keep-alive support).
-   */
-  protected long getKeepAliveTimeoutMillis(Configuration config) {
+  protected long getConnectionTimeToLiveMillis(Configuration config) {
     return ObjectUtility.nvl(
-        TypeCastUtility.castValue(config.getProperty(RestClientProperties.CONNECTION_KEEP_ALIVE), Long.class),
-        getKeepAliveTimeoutMillis());
+        TypeCastUtility.castValue(config.getProperty(RestClientProperties.CONNECTION_TIME_TO_LIVE), Long.class),
+        CONFIG.getPropertyValue(RestHttpTransportConnectionTimeToLiveProperty.class));
   }
 
   /**
@@ -273,7 +292,7 @@ public class ScoutApacheConnector implements Connector {
 
   /**
    * @deprecated This method will be removed with Scout release 25.1. Use the configuration property to change this
-   * configuration or override method {@link #getMaxConnectionsPerRoute(Configuration)}.
+   *             configuration or override method {@link #getMaxConnectionsPerRoute(Configuration)}.
    */
   @Deprecated
   @SuppressWarnings("DeprecatedIsStillUsed")
@@ -293,7 +312,7 @@ public class ScoutApacheConnector implements Connector {
 
   /**
    * @deprecated This method will be removed with Scout release 25.1. Use the configuration property to change this
-   * configuration or override method {@link #getValidateAfterInactivityMillis(Configuration)}.
+   *             configuration or override method {@link #getValidateAfterInactivityMillis(Configuration)}.
    */
   @Deprecated
   @SuppressWarnings("DeprecatedIsStillUsed")
@@ -457,6 +476,7 @@ public class ScoutApacheConnector implements Connector {
 
     initConnectTimeout(clientRequest, requestConfigBuilder);
     initSocketTimeout(clientRequest, requestConfigBuilder);
+    initKeepAliveTimeout(clientRequest, requestConfigBuilder);
 
     boolean redirectsEnabled = BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.FOLLOW_REDIRECTS, m_requestConfig.isRedirectsEnabled()));
     requestConfigBuilder.setRedirectsEnabled(redirectsEnabled);
@@ -499,6 +519,18 @@ public class ScoutApacheConnector implements Connector {
     Integer jerseySocketTimeout = clientRequest.resolveProperty(ClientProperties.READ_TIMEOUT, -1);
     if (jerseySocketTimeout != null && jerseySocketTimeout >= 0) {
       requestConfigBuilder.setResponseTimeout(Math.toIntExact(jerseySocketTimeout), TimeUnit.MILLISECONDS);
+    }
+  }
+
+  protected void initKeepAliveTimeout(ClientRequest clientRequest, RequestConfig.Builder requestConfigBuilder) {
+    // check if keep alive timeout was set by Scout RestClientProperties on request
+    Long keepAliveTimeout = clientRequest.resolveProperty(RestClientProperties.CONNECTION_KEEP_ALIVE, -1L);
+    if (keepAliveTimeout != null && keepAliveTimeout >= 0) {
+      requestConfigBuilder.setDefaultKeepAlive(keepAliveTimeout, TimeUnit.MILLISECONDS);
+    }
+    else {
+      // use config property value as fallback
+      requestConfigBuilder.setDefaultKeepAlive(CONFIG.getPropertyValue(RestHttpTransportConnectionKeepAliveProperty.class), TimeUnit.MILLISECONDS);
     }
   }
 
@@ -803,4 +835,23 @@ public class ScoutApacheConnector implements Connector {
       return "scout.rest.client.http.validateAfterInactivity";
     }
   }
+
+  public static class RestHttpTransportConnectionTimeToLiveProperty extends AbstractLongConfigProperty {
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.MINUTES.toMillis(30);
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the maximum time to live of a HTTP connection within the HTTP connection pool. May be zero if the connection does not have an expiry deadline. The default value is 30 minutes.";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.rest.client.http.connectionTimeToLive";
+    }
+  }
+
 }
