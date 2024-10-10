@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
  * Abstract base class for lookup rows with generic key type T.
  *
  * @param <ID>
- *          Lookup row id type
+ *     Lookup row id type
  */
 public abstract class AbstractLookupRowDo<ID> extends DoEntity {
 
