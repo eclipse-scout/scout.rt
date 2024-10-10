@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -105,7 +105,7 @@ export const icons = {
   LONG_ARROW_LEFT_BOLD: 'font:\uF177',
   LONG_ARROW_RIGHT_BOLD: 'font:\uF178',
 
-  ICON_ID_REGEX: /\${iconId:([a-zA-Z0-9_.]*)}/,
+  ICON_ID_REGEX: /^\${iconId:([^}]+)}$/,
 
   /**
    * Returns an {@link IconDesc} object with structured info contained in the iconId string.
@@ -115,7 +115,7 @@ export const icons = {
 
     if (strings.startsWith(iconId, 'font:')) {
       icon.iconType = IconDesc.IconType.FONT_ICON;
-      iconId = iconId.substr(5);
+      iconId = iconId.substring(5); // remove 'font:' prefix
       if (strings.countCodePoints(iconId) === 1) {
         // default icon-font scoutIcons
         icon.font = IconDesc.DEFAULT_FONT;
@@ -134,26 +134,25 @@ export const icons = {
   },
 
   /**
-   * Resolves the value of an iconId property, where the value can contain a reference to
+   * Resolves the value of an iconId property, where the value can be a reference to
    * an icon constant in these formats:
-   * <ul>
-   *   <li><code>${iconId:ANGLE_UP}</code> references constant ANGLE_UP</li>
-   *   <li><code>${iconId:foo.BAR}</code> references constant foo.icons.BAR, this is used for custom objects with icon constants</li>
-   * </ul>
+   *
+   * - `${iconId:ANGLE_UP}` references the constant `scout.icons.ANGLE_UP`
+   * - `${iconId:foo.BAR}` references the constant `foo.icons.BAR`
+   *
+   * If the specified namespace does not have an `icons` object, an error will be thrown.
    */
   resolveIconId(value: string): string {
-    let iconId, tmp,
-      result = icons.ICON_ID_REGEX.exec(value);
-    if (result && result.length === 2) {
-      iconId = result[1];
-      tmp = iconId.split('.');
-      if (tmp.length === 1) {
-        // look for icon in [0]
-        value = icons[tmp];
-      } else if (tmp.length === 2) {
+    let match = icons.ICON_ID_REGEX.exec(value);
+    if (match) {
+      let iconId = match[1];
+      let parts = iconId.split('.');
+      if (parts.length === 1) {
+        // look for icon in global object scout.icons.[0]
+        value = window['scout']['icons'][parts[0]];
+      } else if (parts.length === 2) {
         // look for icon in global object [0].icons.[1]
-        // @ts-expect-error
-        value = window[tmp[0]].icons[tmp[1]];
+        value = window[parts[0]]['icons'][parts[1]];
       } else {
         $.log.warn('Invalid iconId: ' + value);
       }
@@ -162,14 +161,11 @@ export const icons = {
   },
 
   /**
-   * Resolves the value of an iconId property, where the value can contain a reference to
-   * an icon constant in these formats:
-   * <ul>
-   *   <li><code>${iconId:ANGLE_UP}</code> references constant ANGLE_UP</li>
-   *   <li><code>${iconId:foo.BAR}</code> references constant foo.icons.BAR, this is used for custom objects with icon constants</li>
-   * </ul>
-   * @param object object having an icon property which contains a iconId
-   * @param iconProperty name of the property where an iconId placeholder should be replaced by the actual iconId. By default, 'iconId' is used as property name.
+   * Converts the value of the specified property from the form `'${iconId:...}'` into a resolved iconId.
+   * The value remains unchanged if it does not match the {@linkplain icons#resolveIconId supported format}.
+   *
+   * @param object non-null object having an icon property which may contain an iconId
+   * @param iconProperty name of the property on the given object which may contain an iconId. By default, `'iconId'` is used as property name.
    */
   resolveIconProperty(object: object, iconProperty?: string) {
     iconProperty = iconProperty || 'iconId';

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -82,7 +82,6 @@ describe('texts', () => {
       // Texts which were registered but are part of the new model too are replaced
       expect(texts.get('de').get('theKey')).toBe('de');
     });
-
   });
 
   describe('get', () => {
@@ -121,7 +120,80 @@ describe('texts', () => {
       expect(Object.keys(textMap.map).length).toBe(0);
       expect(textMap.parent).toEqual(texts._get('de'));
     });
-
   });
 
+  describe('resolve', () => {
+
+    it('resolves text', () => {
+      texts.init(model);
+      expect(texts.resolveText('${textKey:theKey}', 'de')).toBe('de');
+      expect(texts.resolveText('${textKey:_DoesNotExist}', 'de')).toBe('[undefined text: _DoesNotExist]');
+      expect(texts.resolveText('foo ${textKey:theKey}', 'de')).toBe('foo ${textKey:theKey}');
+      expect(texts.resolveText('bar', 'de')).toBe('bar');
+    });
+
+    it('resolves text property', () => {
+      texts.init(model);
+
+      setFixtures(sandbox());
+      let session = sandboxSession();
+
+      // With session on object
+
+      let obj = {
+        session: session,
+        text: '${textKey:theKey}',
+        xyz: '${textKey:theKey}',
+        foo: 'bar'
+      };
+
+      texts.resolveTextProperty(obj);
+      expect(obj.text).toBe('deCH');
+      expect(obj.xyz).toBe('${textKey:theKey}');
+      expect(obj.foo).toBe('bar');
+
+      texts.resolveTextProperty(obj, 'xyz');
+      expect(obj.text).toBe('deCH');
+      expect(obj.xyz).toBe('deCH');
+      expect(obj.foo).toBe('bar');
+
+      texts.resolveTextProperty(obj, 'foo');
+      expect(obj.text).toBe('deCH');
+      expect(obj.xyz).toBe('deCH');
+      expect(obj.foo).toBe('bar');
+
+      texts.resolveTextProperty(obj, 'doesNotExist');
+      expect(obj.text).toBe('deCH');
+      expect(obj.xyz).toBe('deCH');
+      expect(obj.foo).toBe('bar');
+
+      // Without session on object
+
+      let obj2 = {
+        text: '${textKey:theKey}',
+        xyz: '${textKey:theKey}',
+        foo: 'bar'
+      };
+
+      texts.resolveTextProperty(obj2, null, session);
+      expect(obj2.text).toBe('deCH');
+      expect(obj2.xyz).toBe('${textKey:theKey}');
+      expect(obj2.foo).toBe('bar');
+
+      texts.resolveTextProperty(obj2, 'xyz', session);
+      expect(obj2.text).toBe('deCH');
+      expect(obj2.xyz).toBe('deCH');
+      expect(obj2.foo).toBe('bar');
+
+      texts.resolveTextProperty(obj2, 'foo', session);
+      expect(obj2.text).toBe('deCH');
+      expect(obj2.xyz).toBe('deCH');
+      expect(obj2.foo).toBe('bar');
+
+      texts.resolveTextProperty(obj2, 'doesNotExist', session);
+      expect(obj2.text).toBe('deCH');
+      expect(obj2.xyz).toBe('deCH');
+      expect(obj2.foo).toBe('bar');
+    });
+  });
 });

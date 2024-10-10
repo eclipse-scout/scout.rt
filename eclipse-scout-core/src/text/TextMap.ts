@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,8 +17,6 @@ export class TextMap {
   constructor(textMap?: Record<string, string>) {
     this.map = textMap || {};
   }
-
-  static TEXT_KEY_REGEX = /\${textKey:([a-zA-Z0-9.]*)}/;
 
   /**
    * Returns the text for the given key.
