@@ -24,12 +24,12 @@ public final class ClientNotificationProperties {
 
     @Override
     public Integer getDefaultValue() {
-      return 200;
+      return 10000;
     }
 
     @Override
     public String description() {
-      return "Capacity of the client notification queue. If maximum capacity is reached, notification messages are dropped. The default value is 200.";
+      return "Capacity of the client notification queue. If maximum capacity is reached, notification messages are dropped. The default value is 10000.";
     }
 
     @Override
@@ -60,12 +60,12 @@ public final class ClientNotificationProperties {
 
     @Override
     public Integer getDefaultValue() {
-      return 30;
+      return 100;
     }
 
     @Override
     public String description() {
-      return "The maximum number of client notifications that are consumed at once. The default is 30.";
+      return "The maximum number of client notifications that are consumed at once. The default is 100.";
     }
 
     @Override
