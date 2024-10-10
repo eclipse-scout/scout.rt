@@ -440,20 +440,43 @@ export class FocusManager implements FocusManagerOptions {
       return true;
     }
 
-    // Allow focus gain on elements with a focusable parent, e.g. when clicking on a row in a table.
-    if (focusUtils.containsParentFocusableByMouse($element, $element.entryPoint())) {
-      return true;
-    }
-
     // Allow dragstart event for draggable elements
     if (focusUtils.isDraggable($element)) {
       // PreventDefault() would not only prevent focus gain but also the dragstart event, so we need to return true to allow the dragstart event.
       // But now the browser tries to focus an element and since the draggable element is not focusable (otherwise it would have returned above), the desktop is likely to be focused.
       // Because we can't prevent dragstart and allow focus, we need to re-focus the currently focused element later.
+      // TODO Justin case würde jetzt hier landen, falls man row anklicken könnte, table data würde temporär fokus kriegen und später erst auf table gesetzt werden
       focusUtils.restoreFocusLater(this.session.$entryPoint);
       return true;
     }
 
+    // SPECIAL CASE: We consider elements with tabindex="-2" to be _never_ focusable, not even programmatically!
+    // Redirect the focus to the first focusable parent element.
+    // noinspection CssInvalidPseudoSelector (inspection seems to confuse $.fn.closest with the native Element.closest method)
+    let $focusableParentElements = $element
+      // TODO müsste closestUntil sein
+      .parentsUntil('.focus-boundary', ':focusable2') // Stay inside focus boundaries (e.g. search forms should not consider parent table)
+      .not(this.session.$entryPoint) /* Exclude $entryPoint as all elements are its descendants. However, the $entryPoint is only focusable to provide Portlet support. */
+      .filter(() => focusUtils.isFocusableByMouse(this));
+    let $focusableElement = $focusableParentElements.eq(0);
+    if (Number($focusableElement.attr('tabindex')) === -2) {
+      // TODO remove first, filter rest with :focusable, take first
+      $focusableParentElements
+      // noinspection CssInvalidPseudoSelector (inspection seems to confuse $.fn.closest with the native Element.closest method)
+      let $newTarget = $focusableElement.parent().closest(':focusable');
+      if ($newTarget.length > 0) {
+        focusUtils.focusLater($newTarget, {preventScroll: true});
+      }
+      // Empty area in a scrollable container (element with tabindex = -2)
+      return false;
+    }
+
+    // Allow focus gain on elements with a focusable parent, e.g. when clicking on a row in a table.
+    if (focusUtils.containsParentFocusableByMouse($element, $element.entryPoint())) {
+      return true;
+    }
+
+    // Click on an empty area should prevent the focus gain on the desktop
     return false;
   }
 

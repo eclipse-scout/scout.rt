@@ -37,6 +37,24 @@ function focusable(element, requireTabbable) {
   return focusable && visible(element); // the element and all of its ancestors must be visible
 }
 
+function focusable2(element, requireTabbable) {
+  let tabIndex = Number($.attr(element, 'tabindex'));
+  let hasTabIndex = !isNaN(tabIndex);
+
+  // Elements with an explicit negative tabindex are never tabbable
+  if (tabIndex < 0 && requireTabbable) {
+    return false;
+  }
+
+  // Some elements are focusable natively, others can be made focusable by adding a tabindex (positive or negative)
+  let nodeName = element.nodeName.toLowerCase();
+  let focusable = /^(input|select|textarea|button|object)$/.test(nodeName)
+    ? !element.disabled
+    : hasTabIndex || (nodeName === 'a' && element.href);
+
+  return focusable && visible(element); // the element and all of its ancestors must be visible
+}
+
 function visible(element) {
   return $.expr.filters.visible(element) &&
     !$(element).parents().addBack().filter(function() {
@@ -47,5 +65,6 @@ function visible(element) {
 // Register selectors
 $.extend($.expr[':'], {
   'focusable': element => focusable(element, false),
+  'focusable2': element => focusable2(element, false),
   'tabbable': element => focusable(element, true)
 });

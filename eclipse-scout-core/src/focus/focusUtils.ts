@@ -113,9 +113,11 @@ export const focusUtils = {
     // requestAnimationFrame also prevents flickering (compared to setTimeout)
     let doc = $entryPoint.document(true);
     let prevFocusedElement = doc.activeElement as HTMLElement;
+    console.log('restoreBefore')
     requestAnimationFrame(() => {
       let focusedElement = doc.activeElement;
-      if (focusedElement === $entryPoint[0]) {
+      console.log('restore. activeElement: ', focusedElement)
+      if (focusedElement === $entryPoint[0] || Number($(focusedElement).attr('tabindex')) === -2) {
         prevFocusedElement.focus();
       }
     });
@@ -135,9 +137,11 @@ export const focusUtils = {
     }
     let doc = $target.document(true);
     let prevFocusedElement = doc.activeElement;
+    console.log('focusLaterBefore. prevFocusedElement', prevFocusedElement)
     requestAnimationFrame(() => {
       // Check if the active element is the same as before. If not, someone has changed the focus
       // in the meantime and the scheduled "focusLater" request is probably obsolete.
+      console.log('focusLater. activeElement. prevFocusedElement', doc.activeElement, prevFocusedElement)
       if (doc.activeElement === prevFocusedElement) {
         $target[0].focus(options);
       }
