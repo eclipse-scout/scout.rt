@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, FormField, graphics, InitModelOf, KeyStroke,
-  KeyStrokeManagerKeyStrokeEvent, Point, Popup, Rectangle, scout, SomeRequired, Table, TableRow, TableRowOrderChangedEvent, ValueField
+  KeyStrokeManagerKeyStrokeEvent, Point, Popup, Rectangle, scout, SomeRequired, Table, TableRow, TableRowOrderChangedEvent, ValueField, widgets
 } from '../../index';
 import $ from 'jquery';
 
@@ -255,10 +255,19 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
       return false;
     }
-    if (this.$container.isOrHas(event.keyStrokeContext.$getScopeTarget())) {
+    let $target = event.keyStrokeContext.$getScopeTarget();
+    if (this.$container.isOrHas($target)) {
       // Don't interfere with keystrokes of the popup or children of the popup (otherwise pressing enter would close both the popup and the form at once)
       return false;
     }
+    // Not all elements created by the popup are necessarily descendants of the cell editor popup. An example
+    // would be a form that is opened from within the popup. To identify these kind of elements, we additionally
+    // check the widget hierarchy.
+    let target = widgets.get($target);
+    if (this.cell.field.isOrHas(target)) {
+      return false; // event target belongs to the cell editor popup -> don't close the popup
+    }
+
     return true;
   }
 
