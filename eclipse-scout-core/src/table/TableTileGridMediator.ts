@@ -301,7 +301,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   protected _createTileAccordion(): TileAccordion {
     return scout.create(TileAccordion, {
       parent: this.table,
-      virtual: true,
+      virtual: false,
       selectable: true,
       multiSelect: this.table.multiSelect,
       exclusiveExpand: this.exclusiveExpand,
