@@ -565,7 +565,7 @@ export class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
   }
 
   /** @internal */
-  _adjustTextAlignment($body?: JQuery<HTMLElement>) {
+  _adjustTextAlignment($body?: JQuery) {
     $body = $body || this.$body;
     let $menuItems = this.$visibleMenuItems($body);
     let textOffset = this._calcTextOffset($menuItems);
