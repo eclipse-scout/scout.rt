@@ -30,6 +30,9 @@ public class JUnitServerSessionProviderWithCache extends ServerSessionProviderWi
 
   @Override
   protected CompositeObject newSessionCacheKey(final String sessionId, final Subject subject) {
+    if (sessionId == null && subject == null) {
+      return null;
+    }
     final Object[] superComponents = super.newSessionCacheKey(sessionId, subject).getComponents();
     if (superComponents == null) {
       return null;
