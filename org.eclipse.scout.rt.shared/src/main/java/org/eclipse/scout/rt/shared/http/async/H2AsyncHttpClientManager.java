@@ -11,10 +11,12 @@ package org.eclipse.scout.rt.shared.http.async;
 
 import java.util.function.BiConsumer;
 
+import org.apache.hc.client5.http.async.AsyncExecCallback;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.H2AsyncClientBuilder;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 import io.opentelemetry.api.OpenTelemetry;
@@ -45,6 +47,11 @@ public class H2AsyncHttpClientManager extends AbstractAsyncHttpClientManager<H2A
   @Override
   protected void interceptCreateClient(H2AsyncClientBuilder builder) {
     builder.useSystemProperties();
+
+    builder.addExecInterceptorFirst(AsyncHttpInvocationHandler.class.getSimpleName(), (request, entityProducer, scope, chain, asyncExecCallback) -> chain.proceed(request,
+        createAsyncInvocationHandler(AsyncEntityProducer.class, entityProducer),
+        scope,
+        createAsyncInvocationHandler(AsyncExecCallback.class, asyncExecCallback)));
   }
 
   @Override

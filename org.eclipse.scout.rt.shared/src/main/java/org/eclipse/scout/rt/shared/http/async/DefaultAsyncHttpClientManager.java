@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.http.async;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
+import org.apache.hc.client5.http.async.AsyncExecCallback;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
@@ -23,6 +24,7 @@ import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.util.TimeValue;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -82,6 +84,11 @@ public class DefaultAsyncHttpClientManager extends AbstractAsyncHttpClientManage
     setConnectionEvictionSettings(builder);
 
     builder.setConnectionManager(createConnectionManager());
+
+    builder.addExecInterceptorFirst(AsyncHttpInvocationHandler.class.getSimpleName(), (request, entityProducer, scope, chain, asyncExecCallback) -> chain.proceed(request,
+        createAsyncInvocationHandler(AsyncEntityProducer.class, entityProducer),
+        scope,
+        createAsyncInvocationHandler(AsyncExecCallback.class, asyncExecCallback)));
   }
 
   protected void installConfigurableProxySelector(HttpAsyncClientBuilder builder) {
