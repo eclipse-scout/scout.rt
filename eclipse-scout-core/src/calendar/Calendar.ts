@@ -612,7 +612,7 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   updateScrollPosition(animate: boolean) {
-    if (!this.rendered) {
+    if (!this.rendered || !this.htmlComp?.layouted) {
       // Execute delayed because table may be not layouted yet
       this.session.layoutValidator.schedulePostValidateFunction(this._updateScrollPosition.bind(this, true, animate));
     } else {

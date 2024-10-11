@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,10 +13,12 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.basic.table.TableTest.P_Table.FirstColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -84,9 +86,9 @@ public class TableTest {
 
     final ITableRow insertedRow = table.addRow(row, true);
 
-    assertEquals(false, insertedRow.isChecked());
-    assertEquals(null, insertedRow.getCssClass());
-    assertEquals(null, insertedRow.getIconId());
+    assertFalse(insertedRow.isChecked());
+    assertNull(insertedRow.getCssClass());
+    assertNull(insertedRow.getIconId());
 
     row = new TableRow(cols);
 
@@ -100,7 +102,7 @@ public class TableTest {
 
     final ITableRow insertedRow2 = table.addRow(row, true);
 
-    assertEquals(true, insertedRow2.isChecked());
+    assertTrue(insertedRow2.isChecked());
     assertEquals("abc", insertedRow2.getCssClass());
     assertEquals(fontSpec, insertedRow2.getCell(0).getFont());
     assertEquals("iconId", insertedRow2.getIconId());
@@ -145,7 +147,7 @@ public class TableTest {
 
     table.discardDeletedRow(deletedRows.get(0));
     assertRowCount(0, 1, table);
-    asssertNoTable(deletedRows.get(0));
+    assertNoTable(deletedRows.get(0));
     assertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
     assertEquals(1, ta.getEvents().size());
     assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, ta.getEvents().get(0).getType());
@@ -172,7 +174,7 @@ public class TableTest {
 
     table.discardDeletedRow(row1);
     assertRowCount(1, 0, table);
-    asssertNoTable(row1);
+    assertNoTable(row1);
     assertStatusAndTable(table, ITableRow.STATUS_NON_CHANGED, row2);
 
   }
@@ -196,8 +198,8 @@ public class TableTest {
 
     table.discardAllDeletedRows();
     assertRowCount(0, 0, table);
-    asssertNoTable(deletedRows.get(0));
-    asssertNoTable(deletedRows.get(1));
+    assertNoTable(deletedRows.get(0));
+    assertNoTable(deletedRows.get(1));
   }
 
   /**
@@ -261,12 +263,12 @@ public class TableTest {
     table.setSortEnabled(false);
 
     //ensure table state:
-    assertEquals("SortEnabled", false, table.isSortEnabled());
+    assertFalse("SortEnabled", table.isSortEnabled());
     assertEquals("FirstColumn - sort index", -1, table.getFirstColumn().getSortIndex());
     assertEquals("SecondColumn - sort index", -1, table.getSecondColumn().getSortIndex());
     assertEquals("ThirdColumn - sort index", 0, table.getThirdColumn().getSortIndex());
     assertEquals("ThirdColumn - initial sort index", 20, table.getThirdColumn().getInitialSortIndex());
-    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
+    assertTrue("ThirdColumn - initial alwaysIncludeSortAtBegin", table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
 
     //fill the table and sort:
     fillTable(table);
@@ -286,7 +288,7 @@ public class TableTest {
   /**
    * Test of {@link AbstractTable#sort()}. Sorted by:
    * <ol>
-   * <li>ThridColumn (defined with AlwaysIncludeSortAtBegin in the column)
+   * <li>ThirdColumn (defined with AlwaysIncludeSortAtBegin in the column)
    * <li>FirstColumn descending.
    * </ol>
    */
@@ -299,13 +301,13 @@ public class TableTest {
     table.getColumnSet().setSortColumn(table.getFirstColumn(), false);
 
     //ensure table state:
-    assertEquals("SortEnabled", true, table.isSortEnabled());
+    assertTrue("SortEnabled", table.isSortEnabled());
     assertEquals("FirstColumn - sort index", 1, table.getFirstColumn().getSortIndex());
-    assertEquals("FirstColumn - sort ascending", false, table.getFirstColumn().isSortAscending());
+    assertFalse("FirstColumn - sort ascending", table.getFirstColumn().isSortAscending());
     assertEquals("SecondColumn - sort index", -1, table.getSecondColumn().getSortIndex());
     assertEquals("ThirdColumn - sort index", 0, table.getThirdColumn().getSortIndex());
     assertEquals("ThirdColumn - initial sort index", 20, table.getThirdColumn().getInitialSortIndex());
-    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
+    assertTrue("ThirdColumn - initial alwaysIncludeSortAtBegin", table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
     assertEquals("ColumnSet PermanentHeadSortColumns size", 1, table.getColumnSet().getPermanentHeadSortColumns().size());
     assertEquals("ColumnSet SortColumns size", 2, table.getColumnSet().getSortColumns().size());
 
@@ -325,7 +327,7 @@ public class TableTest {
   }
 
   /**
-   * Test of {@link AbstractTable#sort()}. Sorted by: - 1. ThridColumn (defined with AlwaysIncludeSortAtBegin in the
+   * Test of {@link AbstractTable#sort()}. Sorted by: - 1. ThirdColumn (defined with AlwaysIncludeSortAtBegin in the
    * column) - 2. SecondColumn descending - 3. FirstColumn ascending.
    */
   @Test
@@ -338,14 +340,14 @@ public class TableTest {
     table.getColumnSet().addSortColumn(table.getFirstColumn(), true);
 
     //ensure table state:
-    assertEquals("SortEnabled", true, table.isSortEnabled());
+    assertTrue("SortEnabled", table.isSortEnabled());
     assertEquals("FirstColumn - sort index", 2, table.getFirstColumn().getSortIndex());
-    assertEquals("FirstColumn - sort ascending", true, table.getFirstColumn().isSortAscending());
+    assertTrue("FirstColumn - sort ascending", table.getFirstColumn().isSortAscending());
     assertEquals("SecondColumn - sort index", 1, table.getSecondColumn().getSortIndex());
-    assertEquals("SecondColumn - sort ascending", false, table.getSecondColumn().isSortAscending());
+    assertFalse("SecondColumn - sort ascending", table.getSecondColumn().isSortAscending());
     assertEquals("ThirdColumn - sort index", 0, table.getThirdColumn().getSortIndex());
     assertEquals("ThirdColumn - initial sort index", 20, table.getThirdColumn().getInitialSortIndex());
-    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
+    assertTrue("ThirdColumn - initial alwaysIncludeSortAtBegin", table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
     assertEquals("ColumnSet PermanentHeadSortColumns size", 1, table.getColumnSet().getPermanentHeadSortColumns().size());
     assertEquals("ColumnSet SortColumns size", 3, table.getColumnSet().getSortColumns().size());
 
@@ -365,7 +367,7 @@ public class TableTest {
   }
 
   @Test
-  public void testgetRowByKey() {
+  public void testGetRowByKey() {
     P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
 
     Assert.assertNull(table.getRowByKey(null));
@@ -378,7 +380,7 @@ public class TableTest {
   }
 
   /**
-   * Test of {@link AbstractTable#sort()}. Only sorted by ThridColumn (defined with AlwaysIncludeSortAtBegin in the
+   * Test of {@link AbstractTable#sort()}. Only sorted by ThirdColumn (defined with AlwaysIncludeSortAtBegin in the
    * column).
    */
   @Test
@@ -387,12 +389,12 @@ public class TableTest {
     table.init();
 
     //ensure table state:
-    assertEquals("SortEnabled", true, table.isSortEnabled());
+    assertTrue("SortEnabled", table.isSortEnabled());
     assertEquals("FirstColumn - sort index", -1, table.getFirstColumn().getSortIndex());
     assertEquals("SecondColumn - sort index", -1, table.getSecondColumn().getSortIndex());
     assertEquals("ThirdColumn - sort index", 0, table.getThirdColumn().getSortIndex());
     assertEquals("ThirdColumn - initial sort index", 20, table.getThirdColumn().getInitialSortIndex());
-    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
+    assertTrue("ThirdColumn - initial alwaysIncludeSortAtBegin", table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
     assertEquals("ColumnSet PermanentHeadSortColumns size", 1, table.getColumnSet().getPermanentHeadSortColumns().size());
     assertEquals("ColumnSet SortColumns size", 1, table.getColumnSet().getSortColumns().size());
 
@@ -451,7 +453,7 @@ public class TableTest {
 
   /**
    * ResetColumnConfiguration disposes the column set and creates a new one. If there was a context column, it has to be
-   * set to null. Otherwise the UI would throw an error because the column is not known (anymore).
+   * set to null. Otherwise, the UI would throw an error because the column is not known (anymore).
    */
   @Test
   public void testResetContextColumn() {
@@ -682,10 +684,6 @@ public class TableTest {
     assertEquals("table", expectedTable, row.getTable());
   }
 
-  /**
-   * @param expectedStatus
-   * @return
-   */
   private static String decodeStatus(int status) {
     switch (status) {
       case ITableRow.STATUS_DELETED:
@@ -701,7 +699,7 @@ public class TableTest {
     }
   }
 
-  private static void asssertNoTable(ITableRow row) {
+  private static void assertNoTable(ITableRow row) {
     assertNull(row.getTable());
   }
 
@@ -903,5 +901,37 @@ public class TableTest {
     assertEquals("a  bc 12 3", table.unwrapText(" \t\n\ra\t bc\n\r \n\r \n\r  12\t3"));
     assertEquals("a  bc 12 3", table.unwrapText("a\t bc\n\r \n\r \n\r  12\t3\n\r\t "));
     assertEquals("a  bc 12 3", table.unwrapText(" \t\n\ra\t bc\n\r \n\r \n\r  12\t3\n\r\t "));
+  }
+
+  @Test
+  public void testEventHistory() {
+    P_Table table = new P_Table() {
+      @Override
+      protected IEventHistory<TableEvent> createEventHistory() {
+        return new DefaultTableEventHistory(5000L) {
+          @Override
+          public void notifyEvent(TableEvent event) {
+            if (event.getType() == -42) {
+              addToCache(event.getType(), event);
+            }
+            super.notifyEvent(event);
+          }
+        };
+      }
+    };
+    assertTrue(table.getEventHistory().getRecentEvents().isEmpty());
+
+    TableEvent customEvent = new TableEvent(table, -42);
+    TableEvent anotherCustomEvent = new TableEvent(table, -43); // will be ignored
+    TableEvent scrollToSelectionEvent = new TableEvent(table, TableEvent.TYPE_SCROLL_TO_SELECTION);
+
+    table.fireTableEventInternal(customEvent);
+    table.fireTableEventInternal(anotherCustomEvent);
+    table.fireTableEventInternal(scrollToSelectionEvent);
+
+    Collection<TableEvent> recentEvents = table.getEventHistory().getRecentEvents();
+    assertEquals(2, recentEvents.size());
+    assertTrue(recentEvents.contains(customEvent));
+    assertTrue(recentEvents.contains(scrollToSelectionEvent));
   }
 }

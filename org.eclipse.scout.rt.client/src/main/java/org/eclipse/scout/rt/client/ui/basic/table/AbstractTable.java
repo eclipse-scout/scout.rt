@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1075,16 +1075,14 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setCompactHandler(createCompactHandler());
     setCompact(getConfiguredCompact());
 
-    // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
-    addTableListener(new TableAdapter() {
-
-      @Override
-      public void tableChanged(TableEvent e) {
+    // add convenience observer for drag & drop callbacks, event history and ui sort possible check
+    addTableListener(e -> {
         //event history
         IEventHistory<TableEvent> h = getEventHistory();
         if (h != null) {
           h.notifyEvent(e);
         }
+
         //dnd
         switch (e.getType()) {
           case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
@@ -1147,10 +1145,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             checkIfColumnPreventsUiSortForTable();
             break;
         }
-      }
-
-    }, TableEvent.TYPE_ROWS_DRAG_REQUEST, TableEvent.TYPE_ROW_DROP_ACTION, TableEvent.TYPE_ROWS_COPY_REQUEST, TableEvent.TYPE_ALL_ROWS_DELETED, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED,
-        TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_COLUMN_HEADERS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+    });
   }
 
   protected void initMenus() {
