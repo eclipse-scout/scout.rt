@@ -167,15 +167,18 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
   }
 
   override position(switchIfNecessary?: boolean) {
-    let $tableData = this.table.$data,
-      $row = this.row.$row,
-      $cell = this.$anchor,
-      insetsLeft = $tableData.cssPaddingLeft() + $row.cssMarginLeft() + $row.cssBorderLeftWidth();
+    if (!this.rendered) {
+      return;
+    }
 
     this._alignWithSelection();
 
+    let $cell = this.$anchor;
     let cellBounds = graphics.bounds($cell);
+    let $row = this.row.$row;
     let rowBounds = graphics.bounds($row);
+    let $tableData = this.table.$data;
+    let insetsLeft = $tableData.cssPaddingLeft() + $row.cssMarginLeft() + $row.cssBorderLeftWidth();
     this.setLocation(new Point(insetsLeft + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
   }
 
