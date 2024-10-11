@@ -100,8 +100,8 @@ export class Tile extends Widget implements TileModel {
 
   /** @see TileModel.gridDataHints */
   setGridDataHints(gridData: ObjectOrModel<GridData>) {
-    this.setProperty('gridDataHints', gridData);
-    if (this.rendered) {
+    let changed = this.setProperty('gridDataHints', gridData);
+    if (changed && this.rendered) {
       // Do it here instead of _renderGridDataHints because grid does not need to be invalidated when rendering, only when hints change
       // Otherwise it forces too many unnecessary recalculations when tile grid is rendering tiles due to virtual scrolling
       this.parent.invalidateLogicalGrid();
