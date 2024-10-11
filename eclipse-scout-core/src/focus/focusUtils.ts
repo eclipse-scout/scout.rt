@@ -28,7 +28,7 @@ export const focusUtils = {
     let $focusableParentElements = $(element)
       .parentsUntil('.focus-boundary', ':focusable') // Stay inside focus boundaries (e.g. search forms should not consider parent table)
       .not(entryPoint) /* Exclude $entryPoint as all elements are its descendants. However, the $entryPoint is only focusable to provide Portlet support. */
-      .filter(() => focusUtils.isFocusableByMouse(this));
+      .filter((index, elem) => focusUtils.isFocusableByMouse(elem));
     return $focusableParentElements.length > 0;
   },
 
@@ -107,18 +107,20 @@ export const focusUtils = {
   /**
    * Stores the currently focused element and focuses this element again in the next animation frame if the focus changed to the entry point element.
    * This is useful if the current task would focus the entry point element which cannot be prevented.
+   *
+   * @param $entryPoint the entry point of the current ${@link Session}
+   * @param options options to be passed to the {@link HTMLElement#focus} call
    */
-  restoreFocusLater($entryPoint: JQuery) {
+  restoreFocusLater($entryPoint: JQuery, options?: FocusOptions) {
     // queueMicrotask does not work, it looks like the microtask will be executed before the focus change.
     // requestAnimationFrame also prevents flickering (compared to setTimeout)
     let doc = $entryPoint.document(true);
     let prevFocusedElement = doc.activeElement as HTMLElement;
-    console.log('restoreBefore')
     requestAnimationFrame(() => {
       let focusedElement = doc.activeElement;
-      console.log('restore. activeElement: ', focusedElement)
+      // Restore previous focus if the current active element is an element we don't want to be focused (the $entryPoint or tabindex="-2")
       if (focusedElement === $entryPoint[0] || Number($(focusedElement).attr('tabindex')) === -2) {
-        prevFocusedElement.focus();
+        prevFocusedElement.focus(options);
       }
     });
   },
@@ -137,12 +139,14 @@ export const focusUtils = {
     }
     let doc = $target.document(true);
     let prevFocusedElement = doc.activeElement;
-    console.log('focusLaterBefore. prevFocusedElement', prevFocusedElement)
     requestAnimationFrame(() => {
       // Check if the active element is the same as before. If not, someone has changed the focus
-      // in the meantime and the scheduled "focusLater" request is probably obsolete.
-      console.log('focusLater. activeElement. prevFocusedElement', doc.activeElement, prevFocusedElement)
-      if (doc.activeElement === prevFocusedElement) {
+      // in the meantime and the scheduled "focusLater" request is probably obsolete. If the current
+      // element is considered to be unfocusable via tabindex="-2", we always change the focus to
+      // the target element. (Can happen if the global mouse down handler did not suppress the default
+      // behavior to prevent cancelling other events, such das 'dragstart').
+      let focusedElement = doc.activeElement;
+      if (focusedElement === prevFocusedElement || Number($(focusedElement).attr('tabindex')) === -2) {
         $target[0].focus(options);
       }
     });

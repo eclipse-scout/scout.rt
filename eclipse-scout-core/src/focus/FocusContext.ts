@@ -164,7 +164,6 @@ export class FocusContext {
    */
   protected _onFocusIn(event: FocusInEvent) {
     let $target = $(event.target);
-
     $target.on('remove', this._removeListener);
 
     let target = $target[0];

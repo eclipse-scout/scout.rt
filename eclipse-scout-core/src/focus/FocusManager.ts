@@ -440,34 +440,43 @@ export class FocusManager implements FocusManagerOptions {
       return true;
     }
 
+    // Find the element which will most likely gain the focus if we let the browser do the default behavior
+    let $focusableParentElements = $element
+      .parentsUntil('.focus-boundary', ':focusable-native')
+      .not(this.session.$entryPoint) /* Exclude $entryPoint as all elements are its descendants. However, the $entryPoint is only focusable to provide Portlet support. */
+      .filter((index, el) => focusUtils.isFocusableByMouse(el));
+    let $target = $element.is(':focusable-native')
+      ? $element
+      : $focusableParentElements.first();
+    // SPECIAL CASE: we consider elements with tabindex="-2" to be _never_ focusable. In this case, set to the focus to the nearest focusable parent element.
+    let $newTarget = $();
+    if (Number($target.attr('tabindex')) === -2) {
+      $newTarget = $focusableParentElements
+        .not($target)
+        .filter(':focusable')
+        .first();
+    }
+
     // Allow dragstart event for draggable elements
     if (focusUtils.isDraggable($element)) {
-      // PreventDefault() would not only prevent focus gain but also the dragstart event, so we need to return true to allow the dragstart event.
-      // But now the browser tries to focus an element and since the draggable element is not focusable (otherwise it would have returned above), the desktop is likely to be focused.
-      // Because we can't prevent dragstart and allow focus, we need to re-focus the currently focused element later.
-      // TODO Justin case würde jetzt hier landen, falls man row anklicken könnte, table data würde temporär fokus kriegen und später erst auf table gesetzt werden
-      focusUtils.restoreFocusLater(this.session.$entryPoint);
+      // In order for the dragstart event to be fired, we have to allow the mousedown event, which means that
+      // the $target will receive the focus. To fix this, we manually change the focus again later.
+      // If the native target element is considered to be unfocusable (tabindex="-2"), we use the $newTarget
+      // if available. Otherwise, we simply change the focus back to the current active element.
+      if ($newTarget.length) {
+        focusUtils.focusLater($newTarget, {preventScroll: true});
+      } else {
+        focusUtils.restoreFocusLater(this.session.$entryPoint, {preventScroll: true});
+      }
       return true;
     }
 
-    // SPECIAL CASE: We consider elements with tabindex="-2" to be _never_ focusable, not even programmatically!
-    // Redirect the focus to the first focusable parent element.
-    // noinspection CssInvalidPseudoSelector (inspection seems to confuse $.fn.closest with the native Element.closest method)
-    let $focusableParentElements = $element
-      // TODO müsste closestUntil sein
-      .parentsUntil('.focus-boundary', ':focusable2') // Stay inside focus boundaries (e.g. search forms should not consider parent table)
-      .not(this.session.$entryPoint) /* Exclude $entryPoint as all elements are its descendants. However, the $entryPoint is only focusable to provide Portlet support. */
-      .filter(() => focusUtils.isFocusableByMouse(this));
-    let $focusableElement = $focusableParentElements.eq(0);
-    if (Number($focusableElement.attr('tabindex')) === -2) {
-      // TODO remove first, filter rest with :focusable, take first
-      $focusableParentElements
-      // noinspection CssInvalidPseudoSelector (inspection seems to confuse $.fn.closest with the native Element.closest method)
-      let $newTarget = $focusableElement.parent().closest(':focusable');
-      if ($newTarget.length > 0) {
+    // If we the clicked element is not draggable, we can safely prevent the default action for the mousedown event.
+    // This will prevent the focus from being set to $target. Instead, we transfer the focus to $newTarget (if present and necessary).
+    if ($newTarget.length) {
+      if (!$newTarget.is($element.activeElement())) {
         focusUtils.focusLater($newTarget, {preventScroll: true});
       }
-      // Empty area in a scrollable container (element with tabindex = -2)
       return false;
     }
 
