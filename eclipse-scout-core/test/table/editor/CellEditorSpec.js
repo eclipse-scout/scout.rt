@@ -339,6 +339,55 @@ describe('CellEditor', () => {
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
       expect(table.cellEditorPopup.cell.field).toBe(field);
     });
+
+    it('does nothing if cell is not rendered', () => {
+      table.columns[0].setEditable(true);
+      table.remove(); // Remove, so that filtering won't be animated and cells won't be rendered when editing starts
+      table.addFilter(() => false); // Don't accept any row
+      table.render();
+      helper.applyDisplayStyle(table);
+      let cancelEvent;
+      table.on('cancelCellEdit', event => {
+        cancelEvent = event;
+      });
+
+      let field = createStringField();
+      let popup = table.startCellEdit(table.columns[0], table.rows[0], field);
+      expect(popup.cell.field).toBe(field);
+      // Popup is not rendered because cell is not rendered
+      expect($findPopup().length).toBe(0);
+      // Expect cancel event so field will be disposed correctly
+      expect(cancelEvent.column).toBe(table.columns[0]);
+      expect(cancelEvent.row).toBe(table.rows[0]);
+      expect(cancelEvent.field).toBe(table.rows[0].cells[0].field);
+      expect(cancelEvent.field.destroyed).toBe(true);
+    });
+
+    it('does nothing if row is hiding', () => {
+      table.columns[0].setEditable(true);
+      table.addFilter(() => false); // Don't accept any row
+      expect(table.rows[0].$row).toHaveClass('hiding');
+
+      let cancelEvent;
+      table.on('cancelCellEdit', event => {
+        cancelEvent = event;
+      });
+
+      let field = createStringField();
+      let popup = table.startCellEdit(table.columns[0], table.rows[0], field);
+      expect(popup.cell.field).toBe(field);
+      // Popup is not rendered because row is hiding
+      // -> Popup would be positioned on the wrong row
+      // -> Repositioning initiated by table layout or scrolling could cause errors because there is no anchor
+      expect($findPopup().length).toBe(0);
+      // Expect cancel event so field will be disposed correctly
+      expect(cancelEvent.column).toBe(table.columns[0]);
+      expect(cancelEvent.row).toBe(table.rows[0]);
+      expect(cancelEvent.field).toBe(table.rows[0].cells[0].field);
+      expect(cancelEvent.field.destroyed).toBe(true);
+
+      popup.position(); // Must not fail if popup is not rendered
+    });
   });
 
   describe('completeCellEdit', () => {
