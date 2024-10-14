@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {arrays, graphics, MoveData, MoveSupport, objects, Rectangle, scout, Tile, TileGrid} from '../index';
+import {graphics, MoveData, MoveSupport, Rectangle, scout, Tile, TileGrid} from '../index';
 
 export class TileGridMoveSupport extends MoveSupport<Tile> {
   declare _moveData: TileMoveData;
@@ -43,15 +43,8 @@ export class TileGridMoveSupport extends MoveSupport<Tile> {
     let tileBelowCursor = this._moveData.tileBelowCursor;
     tileBelowCursor.$container.removeClass('dragover');
 
-    let newElements = [...this._moveData.elements];
-    let draggedTile: Tile = this._moveData.draggedElementInfo.element;
-    let draggedTileBounds = objects.extractProperties(draggedTile.gridDataHints, {}, ['x', 'y', 'w', 'h']);
-    let targetTile: Tile = tileBelowCursor;
-    let targetTileBounds = objects.extractProperties(targetTile.gridDataHints, {}, ['x', 'y', 'w', 'h']);
-    arrays.swap(newElements, targetTile, draggedTile);
-    targetTile.setGridDataHints(targetTile.gridDataHints.clone(draggedTileBounds));
-    draggedTile.setGridDataHints(draggedTile.gridDataHints.clone(targetTileBounds));
-    this.widget.setTiles(newElements);
+    let draggedTile = this._moveData.draggedElementInfo.element;
+    this.widget.swapTiles(draggedTile, tileBelowCursor);
 
     // Update element infos right after layout is done but BEFORE animation starts to get the final position of the tiles
     let deferred = $.Deferred();

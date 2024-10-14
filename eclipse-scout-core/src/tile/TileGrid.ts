@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, HorizontalGrid, HtmlComponent, InitModelOf,
-  KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects, PlaceholderTile, Predicate, Range,
-  Resizable, scout, ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke,
-  TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileMoveHandler, TileResizeHandler, TileTextFilter, UpdateFilteredElementsOptions,
-  VirtualScrolling, Widget
+  AbstractGrid, aria, arrays, Comparator, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, EnumObject, Filter, FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, GridData, HorizontalGrid, HtmlComponent,
+  InitModelOf, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuDestinations, MenuFilter, menus as menuUtil, numbers, ObjectOrChildModel, ObjectOrModel, objects,
+  PlaceholderTile, Point, Predicate, Range, Rectangle, Resizable, scout, ScrollToOptions, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridModel, TileGridSelectAllKeyStroke,
+  TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileMoveHandler, TileResizeHandler,
+  TileTextFilter, tileUtil, UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -1714,6 +1714,91 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
       }
     });
     return tiles;
+  }
+
+  swapTiles(tile1: TTile, tile2: TTile) {
+    let tile1Bounds = objects.extractProperties(tile1.gridDataHints, {}, ['x', 'y', 'w', 'h']);
+    let tile2Bounds = objects.extractProperties(tile2.gridDataHints, {}, ['x', 'y', 'w', 'h']);
+    let tiles = [...this.tiles];
+    arrays.swap(tiles, tile2, tile1);
+    tile2.setGridDataHints(tile2.gridDataHints.clone(tile1Bounds));
+    tile1.setGridDataHints(tile1.gridDataHints.clone(tile2Bounds));
+    this.setTiles(tiles);
+  }
+
+  resizeTile(tileToResize: TTile, logicalBounds: Rectangle, ignorer?: (tile: Tile) => boolean) {
+    let gridData = this._computeGridData(tileToResize, logicalBounds);
+    this._moveOtherTiles(tileToResize, gridData, logicalBounds, ignorer);
+    tileToResize.setGridDataHints(gridData);
+  }
+
+  protected _computeGridData(tileToResize: TTile, logicalBounds: Rectangle): GridData {
+    let gridData = tileToResize.gridDataHints.clone({
+      w: logicalBounds.width,
+      h: logicalBounds.height
+    });
+    let layoutInfo = (this.htmlComp?.layout as LogicalGridLayout)?.info;
+    if (!layoutInfo) {
+      return gridData;
+    }
+    // If x and y are less than 0 it will be automatically set by the Logical Grid -> don't override the values in that case
+    // The LogicalGridLayoutInfo removes empty rows and columns so the x/y values of the grid cells may not match the x/y values of the gridDataHints -> calculate the diffs
+    let logicalGridData = layoutInfo.gridDatas.find(gd => gd.widget === tileToResize);
+    if (tileToResize.gridDataHints.x >= 0) {
+      let diffX = tileToResize.gridDataHints.x - logicalGridData.gridx;
+      gridData.x = logicalBounds.x + diffX;
+    }
+    if (tileToResize.gridDataHints.y >= 0) {
+      let diffY = tileToResize.gridDataHints.y - logicalGridData.gridy;
+      gridData.y = logicalBounds.y + diffY;
+    }
+    return gridData;
+  }
+
+  protected _moveOtherTiles(tileToResize: TTile, gridData: GridData, logicalBounds: Rectangle, ignorer?: (tile: Tile) => boolean) {
+    if (tileToResize.gridDataHints.x >= 0 && tileToResize.gridDataHints.y >= 0) {
+      // If explicit x/y values are used, move the other tiles by adjusting their x/y values explicitly
+      this._moveOtherTilesExplicitly(tileToResize, gridData, ignorer);
+    } else {
+      // If the grid is automatically arranged, just move the resized tile to the new position and the other tiles will adjust automatically.
+      // The tile needs to be moved if the top left corner of the bounds was moved to a different position on the grid.
+      let topLeftTile = this._findTileBefore(logicalBounds.point(), t => t !== tileToResize);
+      if (!topLeftTile) {
+        let tiles = arrays.moveTo(this.tiles.slice(), tileToResize, 0);
+        this.setTiles(tiles);
+      } else if (topLeftTile !== tileToResize) {
+        this.moveTileAfter(tileToResize, topLeftTile);
+      }
+    }
+  }
+
+  protected _moveOtherTilesExplicitly(tileToResize: TTile, gridData: GridData, ignorer?: (tile: Tile) => boolean) {
+    tileUtil.moveOtherTilesDown(this.tiles, tileToResize, gridData, ignorer);
+  }
+
+  /**
+   * @returns the tile before the given position. Only tiles accepted by the filter are considered.
+   */
+  protected _findTileBefore(position: Point, filter?: Predicate<Tile>): TTile {
+    let tileBefore;
+    let matrix = tileUtil.buildMatrix(this.tiles);
+    for (let y = matrix.y; y < matrix.y + matrix.height; y++) {
+      for (let x = matrix.x; x < matrix.x + matrix.width; x++) {
+        let tile;
+        if (matrix[x] && matrix[x][y] && (!filter || filter(matrix[x][y]))) {
+          tile = matrix[x][y];
+        }
+        // If the searched position is reached, return the tile before that position.
+        // If the position is not reached yet but there is a tile spanning into that position, abort to return the tile before.
+        if (position.equals(new Point(x, y)) || (tile && tile.gridData.toRectangle().contains(position))) {
+          return tileBefore;
+        }
+        if (tile) {
+          tileBefore = matrix[x][y];
+        }
+      }
+    }
+    return tileBefore;
   }
 }
 
