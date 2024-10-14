@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, graphics, GridData, InitModelOf, Insets, LogicalGridLayout, Point, Predicate, Rectangle, Resizable, ResizableModel, scout, Tile, TileGrid, tileUtil} from '..';
+import {graphics, InitModelOf, Insets, LogicalGridLayout, Point, Rectangle, Resizable, ResizableModel, scout, Tile, TileGrid, tileUtil} from '..';
 
 export class TileResizeHandler extends Resizable implements TileResizeHandlerModel {
   declare model: TileResizeHandlerModel;
@@ -140,75 +140,7 @@ export class TileResizeHandler extends Resizable implements TileResizeHandlerMod
     }
     let resizedTile = scout.widget(this.$container) as Tile;
     let logicalBounds = this._computeLogicalBounds(newBounds);
-    let gridData = this._computeGridData(resizedTile, logicalBounds);
-    this._moveTiles(resizedTile, gridData, logicalBounds);
-    resizedTile.setGridDataHints(gridData);
-  }
-
-  protected _computeGridData(resizedTile: Tile, logicalBounds: Rectangle): GridData {
-    let gridData = resizedTile.gridDataHints.clone({
-      w: logicalBounds.width,
-      h: logicalBounds.height
-    });
-    // If x and y are less than 0 it will be automatically set by the Logical Grid -> don't override the values in that case
-    // The LogicalGridLayoutInfo removes empty rows and columns so the x/y values of the grid cells may not match the x/y values of the gridDataHints -> calculate the diffs
-    let logicalGridData = this.layout.info.gridDatas.find(gd => gd.widget === resizedTile);
-    if (resizedTile.gridDataHints.x >= 0) {
-      let diffX = resizedTile.gridDataHints.x - logicalGridData.gridx;
-      gridData.x = logicalBounds.x + diffX;
-    }
-    if (resizedTile.gridDataHints.y >= 0) {
-      let diffY = resizedTile.gridDataHints.y - logicalGridData.gridy;
-      gridData.y = logicalBounds.y + diffY;
-    }
-    return gridData;
-  }
-
-  protected _moveTiles(resizedTile: Tile, gridData: GridData, logicalBounds: Rectangle) {
-    if (resizedTile.gridDataHints.x >= 0 && resizedTile.gridDataHints.y >= 0) {
-      // If explicit x/y values are used, move the other tiles by adjusting their x/y values explicitly
-      this._moveOtherTilesExplicitly(resizedTile, gridData);
-    } else {
-      // If the grid is automatically arranged, just move the resized tile to the new position and the other tiles will adjust automatically.
-      // The tile needs to be moved if the top left corner of the bounds was moved to a different position on the grid.
-      let tiles = this.tileGrid.tiles.slice();
-      let topLeftTile = this._findTileBefore(tiles, logicalBounds.point(), t => t !== resizedTile);
-      if (!topLeftTile) {
-        tiles = arrays.moveTo(tiles, resizedTile, 0);
-        this.tileGrid.setTiles(tiles);
-      } else if (topLeftTile !== resizedTile) {
-        this.tileGrid.moveTileAfter(resizedTile, topLeftTile);
-      }
-    }
-  }
-
-  protected _moveOtherTilesExplicitly(resizedTile: Tile, gridData: GridData) {
-    tileUtil.moveOtherTilesDown(this.tileGrid.tiles, resizedTile, gridData, this.ignorer);
-  }
-
-  /**
-   * @returns the tile before the given position. Only tiles accepted by the filter are considered.
-   */
-  protected _findTileBefore(tiles: Tile[], position: Point, filter?: Predicate<Tile>): Tile {
-    let tileBefore;
-    let matrix = tileUtil.buildMatrix(tiles);
-    for (let y = matrix.y; y < matrix.y + matrix.height; y++) {
-      for (let x = matrix.x; x < matrix.x + matrix.width; x++) {
-        let tile;
-        if (matrix[x] && matrix[x][y] && (!filter || filter(matrix[x][y]))) {
-          tile = matrix[x][y];
-        }
-        // If the searched position is reached, return the tile before that position.
-        // If the position is not reached yet but there is a tile spanning into that position, abort to return the tile before.
-        if (position.equals(new Point(x, y)) || (tile && tile.gridData.toRectangle().contains(position))) {
-          return tileBefore;
-        }
-        if (tile) {
-          tileBefore = matrix[x][y];
-        }
-      }
-    }
-    return tileBefore;
+    this.tileGrid.resizeTile(resizedTile, logicalBounds, this.ignorer);
   }
 }
 
