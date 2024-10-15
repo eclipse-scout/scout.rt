@@ -440,20 +440,44 @@ export class FocusManager implements FocusManagerOptions {
       return true;
     }
 
-    // Allow focus gain on elements with a focusable parent, e.g. when clicking on a row in a table.
-    if (focusUtils.containsParentFocusableByMouse($element, $element.entryPoint())) {
-      return true;
+    // Find the element which will most likely gain the focus if we let the browser do the default behavior
+    let $entryPoint = $element.entryPoint();
+    let $target = focusUtils.closestFocusableByMouse($element, $entryPoint, true);
+    // The browser would focus elements with tabindex="-2" but we consider them to be _never_ focusable. In this case, set the focus to the nearest focusable parent element.
+    let $newTarget = $();
+    if (focusUtils.isFocusPrevented($target)) {
+      $newTarget = focusUtils.closestFocusableByMouse($target.parent(), $entryPoint);
     }
 
     // Allow dragstart event for draggable elements
     if (focusUtils.isDraggable($element)) {
-      // PreventDefault() would not only prevent focus gain but also the dragstart event, so we need to return true to allow the dragstart event.
-      // But now the browser tries to focus an element and since the draggable element is not focusable (otherwise it would have returned above), the desktop is likely to be focused.
-      // Because we can't prevent dragstart and allow focus, we need to re-focus the currently focused element later.
-      focusUtils.restoreFocusLater(this.session.$entryPoint);
+      // In order for the dragstart event to be triggered, we must not prevent the default action for the mousedown event, which means that
+      // the $target will receive the focus. To fix this, we need to change the focus again later.
+      // If the native target element is considered to be unfocusable (tabindex="-2"), we use the $newTarget
+      // if available. Otherwise, we simply change the focus back to the current active element.
+      if ($newTarget.length) {
+        focusUtils.focusLater($newTarget, {preventScroll: true});
+      } else {
+        focusUtils.restoreFocusLater($entryPoint, {preventScroll: true});
+      }
       return true;
     }
 
+    // If the clicked element is not draggable, we can safely prevent the default action for the mousedown event.
+    // This will prevent the focus from being set to $target. Instead, we transfer the focus to $newTarget (if present and necessary).
+    if ($newTarget.length) {
+      if (!$newTarget.is($element.activeElement())) {
+        focusUtils.focusLater($newTarget, {preventScroll: true});
+      }
+      return false;
+    }
+
+    // Allow focus gain on elements with a focusable parent, e.g. when clicking on the text element of a tab item
+    if (focusUtils.containsParentFocusableByMouse($element, $entryPoint)) {
+      return true;
+    }
+
+    // Click on an empty area should prevent the focus gain on the desktop
     return false;
   }
 

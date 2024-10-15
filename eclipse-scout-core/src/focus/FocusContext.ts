@@ -164,15 +164,6 @@ export class FocusContext {
    */
   protected _onFocusIn(event: FocusInEvent) {
     let $target = $(event.target);
-
-    // SPECIAL CASE: We consider elements with tabindex="-2" to be _never_ focusable, not even programmatically!
-    // Redirect the focus to the first focusable parent element.
-    if (Number($target.attr('tabindex')) === -2) {
-      // noinspection CssInvalidPseudoSelector (inspection seems to confuse $.fn.closest with the native Element.closest method)
-      let $newTarget = $target.parent().closest(':focusable');
-      focusUtils.focusLater($newTarget, {preventScroll: true});
-    }
-
     $target.on('remove', this._removeListener);
 
     let target = $target[0];

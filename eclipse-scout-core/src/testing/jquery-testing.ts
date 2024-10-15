@@ -212,7 +212,7 @@ export const JQueryTesting = {
    * @param $elem a text node or a html element containing a text node
    * @param customWindow Needs to be specified if a text inside an iframe should be selected. Otherwise, the regular window object will be used.
    */
-  selectText($elem: JQuery<HTMLElement>, begin: number, end: number, customWindow?: Window) {
+  selectText($elem: JQuery, begin: number, end: number, customWindow?: Window) {
     let win = customWindow || $elem.window(true);
     let range = document.createRange();
     let textNode;

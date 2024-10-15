@@ -15,7 +15,7 @@ import $ from 'jquery';
  * Part of this file is copied with some modifications from jQuery UI.
  */
 
-function focusable(element, requireTabbable) {
+function focusable(element, requireTabbable, excludeUnfocusable) {
   let tabIndex = Number($.attr(element, 'tabindex'));
   let hasTabIndex = !isNaN(tabIndex);
 
@@ -24,7 +24,7 @@ function focusable(element, requireTabbable) {
     return false;
   }
   // SPECIAL CASE: we consider elements with tabindex="-2" to be _never_ focusable, not even programmatically!
-  if (tabIndex === -2) {
+  if (tabIndex === -2 && excludeUnfocusable) {
     return false;
   }
 
@@ -46,6 +46,7 @@ function visible(element) {
 
 // Register selectors
 $.extend($.expr[':'], {
-  'focusable': element => focusable(element, false),
+  'focusable-native': element => focusable(element, false),
+  'focusable': element => focusable(element, false, true),
   'tabbable': element => focusable(element, true)
 });

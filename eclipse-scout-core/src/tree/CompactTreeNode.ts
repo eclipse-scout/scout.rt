@@ -43,7 +43,7 @@ export class CompactTreeNode extends TreeNode {
     }
 
     let formerClasses,
-      $node: JQuery<HTMLElement> = this.$node;
+      $node: JQuery = this.$node;
 
     if ($node.hasClass('section')) {
       $node = $node.children('title');
