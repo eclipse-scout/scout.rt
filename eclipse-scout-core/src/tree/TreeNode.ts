@@ -284,7 +284,7 @@ export class TreeNode implements TreeNodeModel, ObjectWithType, FilterElement {
     this.$node.icon(this.iconId, $icon => $icon.insertBefore(this.$text));
   }
 
-  $icon(): JQuery<HTMLElement> {
+  $icon(): JQuery {
     return this.$node.children('.icon');
   }
 
