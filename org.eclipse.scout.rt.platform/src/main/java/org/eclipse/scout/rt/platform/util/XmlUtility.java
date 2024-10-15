@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -367,8 +367,7 @@ public final class XmlUtility {
   private static void wellformDocument(Document document, Result result) {
     try {
       // format transformer
-      TransformerFactory tf = TransformerFactory.newInstance();
-      Transformer transformer = tf.newTransformer();
+      Transformer transformer = newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty(INDENT_AMOUNT_TRANSFORMER_PROPERTY, "2");
 
