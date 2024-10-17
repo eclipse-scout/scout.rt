@@ -461,14 +461,19 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   }
 
   startCellEdit(row: TableRow, field: ValueField<TValue>): CellEditorPopup<TValue> {
-    let $row = row.$row,
-      cell = this.cell(row),
-      $cell = this.table.$cell(this, $row);
-
+    let cell = this.cell(row);
     cell.field = field;
     // Override field alignment with the cell's alignment
     cell.field.gridData.horizontalAlignment = cell.horizontalAlignment;
     let popup = this._createEditorPopup(row, cell);
+    if (!row.$row || row.$row.hasClass('hiding')) {
+      // Don't open popup if row has been removed or is being removed
+      return popup;
+    }
+    let $cell = this.table.$cell(this, row.$row);
+    if (!$cell) {
+      return popup;
+    }
     popup.$anchor = $cell;
     popup.open(this.table.$data);
     return popup;

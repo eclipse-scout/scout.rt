@@ -3335,6 +3335,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     let popup = column.startCellEdit(row, field);
     this.cellEditorPopup = popup;
     this.$container.toggleClass('has-cell-editor-popup', !!popup);
+    if (!popup.rendered) {
+      this.cancelCellEdit();
+    }
     return popup;
   }
 
@@ -3367,7 +3370,17 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     field.destroy();
   }
 
+  /**
+   * Completes the cell editing with the following steps:
+   * - Triggers the `completeCellEdit` event. If `preventDefault()` is called on the event, the following steps are not executed.
+   * - Updates the cell value with the value from the cell editor.
+   * - Closes the cell editor.
+   */
   completeCellEdit() {
+    if (!this.cellEditorPopup) {
+      // No editing in progress
+      return;
+    }
     let field = this.cellEditorPopup.cell.field;
     let event = this.trigger('completeCellEdit', {
       field: field,
@@ -3377,11 +3390,20 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     });
 
     if (!event.defaultPrevented) {
-      return this.endCellEdit(field, true);
+      this.endCellEdit(field, true);
     }
   }
 
+  /**
+   * Cancels the cell editing with the following steps:
+   * - Triggers the `cancelCellEdit` event. If `preventDefault()` is called on the event, the following step is not executed.
+   * - Closes the cell editor without updating the cell's value.
+   */
   cancelCellEdit() {
+    if (!this.cellEditorPopup) {
+      // No editing in progress
+      return;
+    }
     let field = this.cellEditorPopup.cell.field;
     let event = this.trigger('cancelCellEdit', {
       field: field,
