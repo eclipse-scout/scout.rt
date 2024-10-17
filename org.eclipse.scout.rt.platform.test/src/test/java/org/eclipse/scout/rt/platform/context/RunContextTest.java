@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,13 +14,16 @@ import static org.mockito.Mockito.*;
 
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import javax.security.auth.Subject;
@@ -33,6 +36,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.transaction.BasicTransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
@@ -46,11 +50,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 @RunWith(PlatformTestRunner.class)
 public class RunContextTest {
-
+  private static final Logger LOG = LoggerFactory.getLogger(RunContextTest.class);
   private static final ThreadLocal<String> THREAD_LOCAL = new ThreadLocal<>();
 
   @Test
@@ -60,6 +66,7 @@ public class RunContextTest {
     assertNull(runContext.getLocale());
     assertTrue(toSet(runContext.getPropertyMap().iterator()).isEmpty());
     assertNull(runContext.getCorrelationId());
+    //noinspection deprecation
     assertNull(runContext.getTransaction());
     assertEquals(TransactionScope.REQUIRED, runContext.getTransactionScope());
 
@@ -102,6 +109,7 @@ public class RunContextTest {
     assertSame(runContext.getLocale(), copy.getLocale());
     assertSame(runContext.getRunMonitor(), copy.getRunMonitor());
     assertEquals("cid", runContext.getCorrelationId());
+    //noinspection deprecation
     assertSame(tx, runContext.getTransaction());
     assertEquals("thread-local", runContext.getThreadLocal(THREAD_LOCAL));
 
@@ -305,6 +313,7 @@ public class RunContextTest {
     RunContexts.empty().withTransactionScope(TransactionScope.REQUIRES_NEW).run(() -> assertEquals(TransactionScope.REQUIRED, RunContexts.copyCurrent().getTransactionScope()));
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testCopyCurrent_Transaction() {
     final ITransaction tx = mock(ITransaction.class);
@@ -314,9 +323,12 @@ public class RunContextTest {
     RunContexts.empty().withTransaction(null).run(() -> {
       assertNotNull(ITransaction.CURRENT.get());
       assertNotNull(RunContexts.copyCurrent().getTransaction());
-      assertNull(RunContext.CURRENT.get().getTransaction());
+      assertSame(RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
 
-      RunContexts.copyCurrent().run(() -> assertNotNull(ITransaction.CURRENT.get()));
+      RunContexts.copyCurrent().run(() -> {
+        assertNotNull(ITransaction.CURRENT.get());
+        assertSame(RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
+      });
     });
 
     RunContexts.empty().withTransaction(tx).run(() -> {
@@ -332,6 +344,7 @@ public class RunContextTest {
     });
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testCopyCurrent_newTransactionSupplier() {
     final ITransaction tx = mock(ITransaction.class);
@@ -801,6 +814,76 @@ public class RunContextTest {
 
     assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
     assertFalse("New run monitor must not be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
+  public void testNestedTransactions() {
+    AtomicInteger txSeq = new AtomicInteger();
+    Supplier<ITransaction> newTx = () -> new BasicTransaction() {
+      int id = txSeq.incrementAndGet();
+
+      @Override
+      public String toString() {
+        return "tx" + id;
+      }
+    };
+    List<String> expected = new ArrayList<>();
+    List<String> actual = new ArrayList<>();
+
+    RunContext r1 = RunContexts.empty()
+        .withNewTransactionSupplier(newTx)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW);
+    r1.run(() -> {
+      LOG.info("1a {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
+      expected.add("1a tx1");
+      actual.add("1a " + ITransaction.CURRENT.get());
+
+      RunContext r2 = RunContexts.copyCurrent()
+          .withNewTransactionSupplier(newTx)
+          .withTransactionScope(TransactionScope.REQUIRES_NEW);
+      r2.run(() -> {
+        LOG.info("2a {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
+        expected.add("2a tx2");
+        actual.add("2a " + ITransaction.CURRENT.get());
+
+        RunContext r3 = RunContexts.copyCurrent()
+            .withNewTransactionSupplier(newTx)
+            .withTransactionScope(TransactionScope.REQUIRES_NEW);
+        r3.run(() -> {
+          LOG.info("3a {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
+          expected.add("3a tx3");
+          actual.add("3a " + ITransaction.CURRENT.get());
+        });
+
+        r3 = RunContexts.copyCurrent()
+            .withNewTransactionSupplier(newTx)
+            .withTransactionScope(TransactionScope.REQUIRED);
+        r3.run(() -> {
+          LOG.info("3b {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
+          expected.add("3b tx2");
+          actual.add("3b " + ITransaction.CURRENT.get());
+        });
+
+        r3 = RunContext.CURRENT.get().copy()// using copy() instead of RunContexts.copyCurrent()
+            .withNewTransactionSupplier(newTx)
+            .withTransactionScope(TransactionScope.REQUIRED);
+        r3.run(() -> {
+          LOG.info("3c {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
+          expected.add("3c tx2");
+          actual.add("3c " + ITransaction.CURRENT.get());
+        });
+
+        LOG.info("2b {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
+        expected.add("2b tx2");
+        actual.add("2b " + ITransaction.CURRENT.get());
+      });
+
+      LOG.info("1b {} {}", RunContext.CURRENT.get().getTransaction(), ITransaction.CURRENT.get());
+      expected.add("1b tx1");
+      actual.add("1b " + ITransaction.CURRENT.get());
+    });
+    assertEquals(expected, actual);
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -76,6 +76,10 @@ public final class RunContexts {
    * of the new run context using a {@link RunMonitorCancellableProcessor} meaning that the context is cancelled upon
    * cancellation of the current (parent) monitor. Cancellation works top-down, so cancellation of the context's monitor
    * has no effect to the current (parent) monitor.
+   * <p>
+   * {@link ITransaction}<br>
+   * Depending on the value of {@link RunContext#getTransactionScope()} of the new instance and the implementation of
+   * {@link RunContextFactory} the new {@link ITransaction} is created from <code>ITransaction.CURRENT.get()</code>
    * <p>
    * {@link TransactionScope}<br>
    * Uses the transaction scope {@link TransactionScope#REQUIRED} which starts a new transaction only if not running in

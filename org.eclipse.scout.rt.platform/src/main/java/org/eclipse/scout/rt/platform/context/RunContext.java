@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,12 +21,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import jakarta.annotation.PostConstruct;
 import javax.security.auth.Subject;
+
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.context.RunContexts.RunContextFactory;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
@@ -330,8 +332,13 @@ public class RunContext implements IAdaptable {
   }
 
   /**
+   * @deprecated Use <code>ITransaction.CURRENT.get()</code> to access the current transaction. This member represents
+   *             the transaction that was set during the build time of a run context, either explicitly or via
+   *             {@link #copy()}. It may differ from the actual transaction used during the execution of the runnable,
+   *             e.g. when the transaction scope {@link TransactionScope#REQUIRES_NEW} is used.
    * @see #withTransaction(ITransaction)
    */
+  @Deprecated
   public ITransaction getTransaction() {
     return m_transaction;
   }
@@ -571,6 +578,14 @@ public class RunContext implements IAdaptable {
 
   /**
    * Creates a copy of <code>this</code> context.
+   * <p>
+   * <b>Important:</b> Be careful when using this method! It should only be used to create a shallow copy of a run
+   * context that you have under control, e.g. a template context. Avoid using it to create a copy of the current run
+   * context, as simply copying may not make sense for all values (e.g. transaction scope). In most cases, it is
+   * recommended to use {@link RunContexts#copyCurrent()} instead to create a new run context. Unlike this copy()
+   * method, it initializes the values according to the current thread state. For example, the transaction scope is
+   * reset to the default value of the active {@link RunContextFactory} and the transaction is taken from
+   * {@code ITransaction.CURRENT.get()}.
    */
   public RunContext copy() {
     final RunContext copy = BEANS.get(RunContext.class);
