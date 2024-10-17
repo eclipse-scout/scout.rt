@@ -9,16 +9,21 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
+import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox.InnerTestGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G1Box;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
@@ -33,7 +38,7 @@ import org.w3c.dom.Element;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("anna")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-public class StoreAndLoadXml3FormTest {
+public class StoreAndLoadXmlFormFieldTest {
 
   @Test
   public void testXmlFieldIds() {
@@ -98,7 +103,7 @@ public class StoreAndLoadXml3FormTest {
     String xml = f.storeToXmlString();
 
     f = new TestForm();
-    f.loadFromXmlString(xml);
+    assertTrue(f.loadFromXmlString(xml));
 
     //new form should contain the stored values
     assertEquals("t1", f.getText1Field().getValue());
@@ -110,6 +115,41 @@ public class StoreAndLoadXml3FormTest {
     assertEquals("g3g2", f.getG3G4Text2Field().getValue());
     assertEquals("g1L", CollectionUtility.firstElement(f.getG1Box().getTestListBox().getValue()));
     assertEquals("g2L", CollectionUtility.firstElement(f.getG2Box().getTestListBox().getValue()));
+  }
+
+  @Test
+  public void testLoadUnknownFieldWithValue() {
+    MissingFieldSourceTestForm source = new MissingFieldSourceTestForm();
+    source.getText1Field().setValue("t1");
+    source.getMyListBox().setValue(CollectionUtility.hashSet("test"));
+    String xml = source.storeToXmlString();
+
+    MissingFieldTargetTestForm target = new MissingFieldTargetTestForm();
+    assertFalse(target.loadFromXmlString(xml));
+    assertEquals("t1", target.getText1Field().getValue());
+  }
+
+  @Test
+  public void testLoadUnknownFieldWithoutValue() {
+    MissingFieldSourceTestForm source = new MissingFieldSourceTestForm();
+    source.getText1Field().setValue("t1");
+    source.getMyListBox().setValue(CollectionUtility.emptyHashSet());
+    String xml = source.storeToXmlString();
+
+    MissingFieldTargetTestForm target = new MissingFieldTargetTestForm();
+    assertTrue(target.loadFromXmlString(xml));
+    assertEquals("t1", target.getText1Field().getValue());
+  }
+
+  @Test
+  public void testLoadInvalidField() {
+    InvalidFieldSourceTestForm source = new InvalidFieldSourceTestForm();
+    source.getText1Field().setValue("t1");
+    String xml = source.storeToXmlString();
+
+    InvalidFieldTargetTestForm target = new InvalidFieldTargetTestForm();
+    assertFalse(target.loadFromXmlString(xml));
+    assertNull(target.getText1Field().getValue());
   }
 
   @Test
@@ -134,7 +174,7 @@ public class StoreAndLoadXml3FormTest {
 
     // value should be imported to first field found
     f = new TestForm();
-    f.loadFromXml(xml.getDocumentElement());
+    assertTrue(f.loadFromXml(xml.getDocumentElement()));
 
     assertEquals("t3", f.getText3Field().getValue());
 
@@ -181,6 +221,74 @@ public class StoreAndLoadXml3FormTest {
 
     public String getXmlFieldQname() {
       return m_xmlFieldQname;
+    }
+  }
+
+  public static final class MissingFieldSourceTestForm extends AbstractForm {
+
+    public MainBox.MyListBox getMyListBox() {
+      return getFieldByClass(MainBox.MyListBox.class);
+    }
+
+    public MainBox.Text1Field getText1Field() {
+      return getFieldByClass(MainBox.Text1Field.class);
+    }
+
+    @Order(10)
+    public class MainBox extends AbstractGroupBox {
+
+      @Order(10)
+      public class Text1Field extends AbstractStringField {
+      }
+
+      @Order(20)
+      public class MyListBox extends AbstractListBox<String> {
+      }
+    }
+  }
+
+  public static final class MissingFieldTargetTestForm extends AbstractForm {
+
+    public MainBox.Text1Field getText1Field() {
+      return getFieldByClass(MainBox.Text1Field.class);
+    }
+
+    @Order(10)
+    public class MainBox extends AbstractGroupBox {
+
+      @Order(10)
+      public class Text1Field extends AbstractStringField {
+      }
+    }
+  }
+
+  public static final class InvalidFieldSourceTestForm extends AbstractForm {
+
+    public MainBox.Text1Field getText1Field() {
+      return getFieldByClass(MainBox.Text1Field.class);
+    }
+
+    @Order(10)
+    public class MainBox extends AbstractGroupBox {
+
+      @Order(10)
+      public class Text1Field extends AbstractStringField {
+      }
+    }
+  }
+
+  public static final class InvalidFieldTargetTestForm extends AbstractForm {
+
+    public MainBox.Text1Field getText1Field() {
+      return getFieldByClass(MainBox.Text1Field.class);
+    }
+
+    @Order(10)
+    public class MainBox extends AbstractGroupBox {
+
+      @Order(10)
+      public class Text1Field extends AbstractLongField { // invalid type on purpose
+      }
     }
   }
 }

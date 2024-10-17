@@ -14,7 +14,9 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
@@ -204,5 +206,31 @@ public final class ObjectUtility {
       }
     }
     return false;
+  }
+
+  /**
+   * @return {@code true} if the given object represents an actual value as opposed to an empty value such as null,
+   *         empty optional, empty collection, empty string etc.
+   */
+  public static boolean hasValue(Object o) {
+    if (o == null) {
+      return false;
+    }
+    if (o instanceof Optional && ((Optional<?>) o).isEmpty()) {
+      return false;
+    }
+    if (o instanceof String && !StringUtility.hasText((String) o)) {
+      return false;
+    }
+    if (o instanceof Collection && ((Collection<?>) o).isEmpty()) {
+      return false;
+    }
+    if (o instanceof Map && ((Map<?, ?>) o).isEmpty()) {
+      return false;
+    }
+    if (o.getClass().isArray() && Array.getLength(o) == 0) {
+      return false;
+    }
+    return true;
   }
 }

@@ -1300,18 +1300,19 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   @Override
-  public void loadFromXml(Element x) {
+  public boolean loadFromXml(Element x) {
+    return true;
   }
 
   @Override
-  public final void loadFromXmlString(String xml) {
+  public final boolean loadFromXmlString(String xml) {
     if (xml == null) {
-      return;
+      return true;
     }
     try {
       Document doc = XmlUtility.getXmlDocument(xml);
       Element root = doc.getDocumentElement();
-      loadFromXml(root);
+      return loadFromXml(root);
     }
     catch (Exception e) {
       throw new ProcessingException("Error in AbstractFormField.setXML: ", e);

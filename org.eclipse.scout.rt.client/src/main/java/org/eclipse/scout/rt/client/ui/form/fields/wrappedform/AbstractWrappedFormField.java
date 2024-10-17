@@ -258,11 +258,12 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
-  public void loadFromXml(Element x) {
-    super.loadFromXml(x);
+  public boolean loadFromXml(Element x) {
+    boolean success = super.loadFromXml(x);
     if (getInnerForm() != null) {
-      getInnerForm().loadFromXml(x);
+      success &= getInnerForm().loadFromXml(x);
     }
+    return success;
   }
 
   @Override

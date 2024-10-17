@@ -130,6 +130,7 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.PreferredValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
@@ -2217,12 +2218,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   @Override
-  public void loadFromXmlString(String xml) {
+  public boolean loadFromXmlString(String xml) {
     if (xml == null) {
-      return;
+      return true;
     }
     Document xmlDocument = XmlUtility.getXmlDocument(xml);
-    loadFromXml(xmlDocument.getDocumentElement());
+    return loadFromXml(xmlDocument.getDocumentElement());
   }
 
   @Override
@@ -2297,7 +2298,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   /**
    * Adds a &lt;property&gt; element for every given property to the parent element.
    *
-   * @see #loadPropertiesFromXml(Element)
+   * @see #loadPropertiesFromXml(Element, Map)
    */
   protected void storePropertiesToXml(Element parent, Map<String, Object> props) {
     for (Entry<String, Object> entry : props.entrySet()) {
@@ -2314,12 +2315,14 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   @Override
-  public void loadFromXml(Element root) {
+  public boolean loadFromXml(Element root) {
+    boolean success = true;
     // load properties
     Element xProps = XmlUtility.getFirstChildElement(root, "properties");
     if (xProps != null) {
-      Map<String, Object> props = loadPropertiesFromXml(xProps);
-      BeanUtility.setProperties(this, props, true, null);
+      Map<String, Object> props = new HashMap<>();
+      success &= loadPropertiesFromXml(xProps, props);
+      success &= BeanUtility.setProperties(this, props, true, null);
 
       // load extension properties
       for (Element xExtension : XmlUtility.getChildElements(xProps, "extension")) {
@@ -2327,10 +2330,13 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         String extensionQname = xExtension.getAttribute("extensionQname");
         IFormExtension<? extends AbstractForm> extension = findFormExtensionById(extensionQname, extensionId);
         if (extension == null) {
+          LOG.warn("Could not find extension with id={}, qname={}", extensionId, extensionQname);
+          success = false; // unknown extension
           continue;
         }
-        Map<String, Object> extensionProps = loadPropertiesFromXml(xExtension);
-        BeanUtility.setProperties(extension, extensionProps, true, null);
+        Map<String, Object> extensionProps = new HashMap<>();
+        success &= loadPropertiesFromXml(xExtension, extensionProps);
+        success &= BeanUtility.setProperties(extension, extensionProps, true, null);
       }
     }
 
@@ -2348,7 +2354,17 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         visit(v, IFormField.class);
         IFormField f = v.getField();
         if (f != null) {
-          f.loadFromXml(xField);
+          try {
+            success &= f.loadFromXml(xField);
+          }
+          catch (Exception e) {
+            LOG.warn("Could not load field {}", String.join(".", xmlFieldIds), e);
+            success = false; // error while loading value
+          }
+        }
+        else if (isXmlFieldWithStoredValue(xField)) {
+          LOG.warn("Could not resolve field {}", String.join(".", xmlFieldIds));
+          success = false; // unknown field with stored value
         }
       }
     }
@@ -2365,6 +2381,31 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         }
       }
     }, ITabBox.class);
+    return success;
+  }
+
+  protected boolean isXmlFieldWithStoredValue(Element xField) {
+    // heuristic for inner forms: do not check recursively for field values. simply assume that an inner form has a value
+    return isXmlWrappedFormField(xField) ||
+    // value-fields: check if a non-empty value is set
+        isXmlFieldWithStoredValue(xField, "value") ||
+        // tables: check if rows are set or indices are selected
+        isXmlFieldWithStoredValue(xField, "rows") ||
+        isXmlFieldWithStoredValue(xField, "selectedRowIndices");
+  }
+
+  protected boolean isXmlWrappedFormField(Element xField) {
+    return StringUtility.hasText(xField.getAttribute("formId"));
+  }
+
+  protected boolean isXmlFieldWithStoredValue(Element xField, String attributeName) {
+    try {
+      return ObjectUtility.hasValue(XmlUtility.getObjectAttribute(xField, attributeName));
+    }
+    catch (Exception e) {
+      // cannot deserialize the value, so we assume that it contains actual data if something is serialized
+      return StringUtility.hasText(xField.getAttribute(attributeName));
+    }
   }
 
   /**
@@ -2389,22 +2430,27 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   /**
    * Extracts properties from &lt;property&gt; child elements in the given parent element.
    *
-   * @return Map of property name to property value
+   * @param xProps
+   *          The parent element
+   * @param properties
+   *          The properties map to which the properties should be added
+   * @return True if all properties were loaded successfully
    * @see #storePropertiesToXml(Element, Map)
    */
-  protected Map<String, Object> loadPropertiesFromXml(Element xProps) {
-    Map<String, Object> props = new HashMap<>();
+  protected boolean loadPropertiesFromXml(Element xProps, Map<String, Object> properties) {
+    boolean success = true;
     for (Element xProp : XmlUtility.getChildElements(xProps, "property")) {
       String name = xProp.getAttribute("name");
       try {
         Object o = XmlUtility.getObjectAttribute(xProp, "value");
-        props.put(name, o);
+        properties.put(name, o);
       }
       catch (Exception e) {
         LOG.warn("Could not load XML property {}", name, e);
+        success = false;
       }
     }
-    return props;
+    return success;
   }
 
   @Override

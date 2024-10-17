@@ -595,9 +595,9 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   boolean setProperty(String name, Object value);
 
   /**
-   * XML export/import of form state
+   * See {@link #loadFromXml(Element)}
    */
-  void loadFromXmlString(String xml);
+  boolean loadFromXmlString(String xml);
 
   String storeToXmlString();
 
@@ -605,7 +605,15 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   void storeToXml(Element root);
 
-  void loadFromXml(Element root);
+  /**
+   * Imports the form state from an XML document.
+   *
+   * @param root
+   *          The XML document that contains the form state.
+   * @return True, if the XML document was loaded successfully. All fields and properties in the XML document which
+   *         contain values were found on the form and loaded successfully.
+   */
+  boolean loadFromXml(Element root);
 
   /**
    * Wait until form is closed<br>
