@@ -24,11 +24,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("2a476704-dc92-435f-8d7f-32aafcae7840")
 public abstract class AbstractLabel extends AbstractWidget implements ILabel {
@@ -51,7 +51,7 @@ public abstract class AbstractLabel extends AbstractWidget implements ILabel {
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     super.initConfig();
     setHtmlEnabled(getConfiguredHtmlEnabled());
     setScrollable(getConfiguredScrollable());
@@ -200,5 +200,4 @@ public abstract class AbstractLabel extends AbstractWidget implements ILabel {
       doAppLinkAction(ref);
     }
   }
-
 }
