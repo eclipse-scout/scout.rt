@@ -246,13 +246,19 @@ describe('TableField', () => {
 
       it('is false if mandatory cells are empty', () => {
         column0.setMandatory(true);
-        expect(tableField.getValidationResult().valid).toBe(true);
+        let result = tableField.getValidationResult();
+        expect(result.valid).toBe(true);
+        expect(result.validByMandatory).toBe(true);
 
         column0.setCellValue(table.rows[0], null);
-        expect(tableField.getValidationResult().valid).toBe(false);
+        result = tableField.getValidationResult();
+        expect(result.valid).toBe(false);
+        expect(result.validByMandatory).toBe(false);
 
         column0.setCellValue(table.rows[0], 'asdf');
-        expect(tableField.getValidationResult().valid).toBe(true);
+        result = tableField.getValidationResult();
+        expect(result.valid).toBe(true);
+        expect(result.validByMandatory).toBe(true);
       });
     });
 
@@ -307,6 +313,24 @@ describe('TableField', () => {
         // Another error with a different message
         column1.setCellErrorStatus(table.rows[1], Status.error('another error'));
         expect(tableField.getValidationResult().errorStatus.message).toBe('');
+
+        // Column 2 has no error but is mandatory without a value -> also remove message
+        column1.setCellErrorStatus(table.rows[1], null);
+        column1.setMandatory(true);
+        column1.setCellValue(table.rows[0], null);
+        expect(tableField.getValidationResult().errorStatus.message).toBe('');
+      });
+
+      it('is null if only mandatory cells are empty', () => {
+        column0.setMandatory(true);
+        let result = tableField.getValidationResult();
+        expect(result.errorStatus).toBe(null);
+        expect(result.validByMandatory).toBe(true);
+
+        column0.setCellValue(table.rows[0], null);
+        result = tableField.getValidationResult();
+        expect(result.errorStatus).toBe(null);
+        expect(result.validByMandatory).toBe(false);
       });
 
       it('uses the highest severity of all cell errors', () => {
