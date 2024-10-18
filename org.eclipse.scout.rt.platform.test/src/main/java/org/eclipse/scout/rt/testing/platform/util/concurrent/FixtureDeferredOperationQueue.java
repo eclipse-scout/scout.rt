@@ -23,7 +23,11 @@ public class FixtureDeferredOperationQueue<E> extends DeferredOperationQueue<E> 
   private final AtomicBoolean m_scheduleFlushJobInvoked = new AtomicBoolean();
 
   public FixtureDeferredOperationQueue(String transactionMemberId, int batchSize, long maxDelayMillis, Consumer<List<E>> batchOperation) {
-    super(transactionMemberId, batchSize, maxDelayMillis, batchOperation);
+    this(transactionMemberId, batchSize, maxDelayMillis, batchOperation, null);
+  }
+
+  public FixtureDeferredOperationQueue(String transactionMemberId, int batchSize, long maxDelayMillis, Consumer<List<E>> batchOperation, String flushJobName) {
+    super(transactionMemberId, batchSize, maxDelayMillis, batchOperation, null, flushJobName);
   }
 
   @Override

@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,7 @@ public class DeferredOperationQueue<E> {
   private final String m_transactionMemberId;
   private final int m_batchSize;
   private final long m_maxDelayMillis;
+  private final String m_flushJobName;
   private final Consumer<List<E>> m_batchOperation;
   private final Supplier<RunContext> m_runContextSupplier;
   private final BlockingQueue<E> m_queue;
@@ -55,10 +57,14 @@ public class DeferredOperationQueue<E> {
   private volatile IFuture<?> m_flushJobFuture;
 
   public DeferredOperationQueue(String transactionMemberId, int batchSize, long maxDelayMillis, Consumer<List<E>> batchOperation) {
-    this(transactionMemberId, batchSize, maxDelayMillis, batchOperation, null);
+    this(transactionMemberId, batchSize, maxDelayMillis, batchOperation, null, null);
   }
 
   public DeferredOperationQueue(String transactionMemberId, int batchSize, long maxDelayMillis, Consumer<List<E>> batchOperation, Supplier<RunContext> runContextSupplier) {
+    this(transactionMemberId, batchSize, maxDelayMillis, batchOperation, runContextSupplier, null);
+  }
+
+  public DeferredOperationQueue(String transactionMemberId, int batchSize, long maxDelayMillis, Consumer<List<E>> batchOperation, Supplier<RunContext> runContextSupplier, String flushJobName) {
     m_transactionMemberId = assertNotNull(transactionMemberId, "transactionMemberId is required");
     assertTrue(batchSize > 0, "batchSize must be greater than 0 [given value:{}]", batchSize);
     assertTrue(maxDelayMillis >= 0, "maxDelayMillis must be positive [given value:{}]", batchSize);
@@ -69,6 +75,7 @@ public class DeferredOperationQueue<E> {
     m_queue = new LinkedBlockingQueue<>();
     m_flushJobScheduled = new AtomicBoolean();
     m_lock = new ReentrantReadWriteLock();
+    m_flushJobName = StringUtility.hasText(flushJobName) ? flushJobName : m_transactionMemberId;
   }
 
   public void add(E element) {
@@ -126,7 +133,8 @@ public class DeferredOperationQueue<E> {
   protected void scheduleFlushJob() {
     m_flushJobFuture = Jobs.schedule(
         () -> flushDeferred(false),
-        Jobs.newInput().withRunContext(getRunContextSupplier().get()));
+        Jobs.newInput().withRunContext(getRunContextSupplier().get())
+            .withName(m_flushJobName));
   }
 
   /**
