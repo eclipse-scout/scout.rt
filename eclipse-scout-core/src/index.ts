@@ -910,6 +910,7 @@ export * from './form/fields/wrappedform/WrappedFormFieldEventMap';
 export * from './form/fields/wrappedform/WrappedFormFieldAdapter';
 export * from './calendar/ResourcePanel';
 export * from './switch/Switch';
+export * from './switch/SwitchAdapter';
 export * from './switch/SwitchModel';
 export * from './switch/SwitchEventMap';
 export * from './switch/SwitchNavigationKeyStroke';
