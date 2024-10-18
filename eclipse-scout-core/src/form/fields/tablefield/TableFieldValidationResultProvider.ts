@@ -32,7 +32,7 @@ export class TableFieldValidationResultProvider extends FormFieldValidationResul
     let reveal = cellValidationResult.reveal || (() => {
       // nop
     });
-    let validByMandatory = !this.field.mandatory || !this.field.empty && cellValidationResult.validByMandatory;
+    let validByMandatory = (!this.field.mandatory || !this.field.empty) && cellValidationResult.validByMandatory;
     let validByErrorStatus = !errorStatus || errorStatus.isValid();
     return {
       valid: validByErrorStatus && validByMandatory,
@@ -83,8 +83,9 @@ export class TableFieldValidationResultProvider extends FormFieldValidationResul
       }
     }
     let label = arrays.format(Array.from(invalidCellLabels.values()), ', ');
-    if (invalidCellMessages.size > 1 || !validByMandatory) {
-      // If there are indistinct error message, clear the message to only show the column names
+    if (errorStatus && (invalidCellMessages.size > 1 || !validByMandatory)) {
+      // If there are indistinct error messages, clear the message to only show the column names.
+      // Also clear it if a mandatory cell is empty and another one invalid because the message only belongs to the invalid cell.
       errorStatus = scout.create(Status, $.extend({}, errorStatus, {message: ''}));
     }
     return {label, errorStatus, validByMandatory, reveal};
