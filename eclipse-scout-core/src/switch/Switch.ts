@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -188,7 +188,7 @@ export class Switch extends Widget implements SwitchModel {
 
   /**
    * @param originalEvent original event that caused the toggle
-   * @param newValue if set, the `activated` property is set to this value.
+   * @param activated if set, the `activated` property is set to this value.
    *           Otherwise, it is set to opposite of the current value.
    */
   toggleSwitch(originalEvent?: JQuery.Event, activated?: boolean) {
