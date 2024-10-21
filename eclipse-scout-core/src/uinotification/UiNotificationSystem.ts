@@ -7,16 +7,22 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventHandler, EventListener, EventSupport, scout, systems, UiNotificationDo, UiNotificationHandler, UiNotificationPoller} from '../index';
+import {Event, EventHandler, EventListener, EventSupport, InitModelOf, ObjectModel, ObjectWithType, scout, systems, UiNotificationDo, UiNotificationHandler, UiNotificationPoller} from '../index';
 
-export class UiNotificationSystem {
+export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWithType {
+  declare model: UiNotificationSystemModel;
+  declare initModel: UiNotificationSystemModel;
   poller: UiNotificationPoller;
   name: string;
   events: UiNotificationEventSupport;
+  objectType: string;
 
-  constructor(name: string) {
-    this.name = name;
+  constructor() {
     this.events = new UiNotificationEventSupport(this);
+  }
+
+  init(model: InitModelOf<this>) {
+    this.name = model.name;
   }
 
   subscribe(topic: string, handler: UiNotificationHandler): JQuery.Promise<string> {
@@ -130,4 +136,8 @@ class UiNotificationEventSupport extends EventSupport {
     super.off(type, func);
     this.system.updatePoller();
   }
+}
+
+export interface UiNotificationSystemModel extends ObjectModel<UiNotificationSystem> {
+  name?: string;
 }

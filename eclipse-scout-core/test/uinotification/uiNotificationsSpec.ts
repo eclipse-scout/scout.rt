@@ -7,9 +7,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, dates, DoEntity, JsonObject, Session, systems, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src';
+import {BackgroundJobPollingStatus, dates, DoEntity, JsonObject, Session, systems, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src/index';
+import {UiNotificationsMock} from '../../src/testing/index';
 
 describe('uiNotifications', () => {
+
+  beforeAll(() => {
+    // Unregister mock installed by JasmineScout
+    UiNotificationsMock.unregister();
+  });
+
+  afterAll(() => {
+    // re-register mock to disable polling for other specs
+    UiNotificationsMock.register();
+  });
 
   beforeEach(() => {
     jasmine.Ajax.install();
