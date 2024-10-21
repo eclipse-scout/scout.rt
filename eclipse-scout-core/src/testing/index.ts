@@ -46,6 +46,7 @@ export * from './scoutMatchers';
 export * from './table/SpecTable';
 export * from './table/SpecTableAdapter';
 export * from './tree/SpecTree';
+export * from './uinotification/UiNotificationsMock';
 
 export default self;
 ObjectFactory.get().registerNamespace('scout', self);
