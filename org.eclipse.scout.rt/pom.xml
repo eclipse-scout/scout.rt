@@ -123,7 +123,7 @@
     <scout.base.version>24.2.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
-    <jetty.version>11.0.18</jetty.version>
+    <jetty.version>11.0.24</jetty.version>
     <slf4j.version>2.0.9</slf4j.version>
     <logback.version>1.4.14</logback.version>
     <jackson.version>2.16.0</jackson.version>
