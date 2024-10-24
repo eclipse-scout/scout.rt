@@ -867,6 +867,7 @@ describe('objects', () => {
 
     it('uses a type predicate to narrow the type', () => {
       // compile time test, ifs are always false
+      expect(true).toBeTrue(); // suppress "spec has no expectations" warning
 
       let menuClass: new() => Menu;
       if (objects.isSameOrExtendsClass(menuClass, Action)) {

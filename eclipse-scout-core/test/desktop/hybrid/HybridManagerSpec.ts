@@ -90,6 +90,7 @@ describe('HybridManager', () => {
 
   describe('callActionAndWait', () => {
     it('calls a HybridAction and waits for its completion', done => {
+      expect(true).toBeTrue(); // suppress "spec has no expectations" warning
       const id = '42';
       UuidPool.get(session).uuids.push(id);
       HybridManager.get(session).callActionAndWait('Ping').then(() => done());
@@ -108,6 +109,7 @@ describe('HybridManager', () => {
 
   describe('openForm', () => {
     it('waits for a form to be opened and listens for form events', done => {
+      expect(true).toBeTrue(); // suppress "spec has no expectations" warning
       const id = '42';
       UuidPool.get(session).uuids.push(id);
       HybridManager.get(session).openForm('Dummy').then(form => {
