@@ -11,7 +11,7 @@ import {
   AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectFactory, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
   SessionStartupResponse, Widget, WidgetModel
 } from '../index';
-import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, TestingApp} from './index';
+import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, TestingApp, UiNotificationsMock} from './index';
 import 'jasmine-jquery';
 import $ from 'jquery';
 
@@ -263,13 +263,18 @@ export const JasmineScout = {
     context.keys().forEach(context);
   },
 
-  startApp(App: new() => App) {
+  startApp(AppClass: new() => App) {
     // App initialization uses promises which are executed asynchronously
     // -> Use the clock to make sure all promise callbacks are executed before any test starts.
     jasmine.clock().install();
     jasmine.Ajax.install();
 
-    new App().init();
+    App.addListener('prepare', () => {
+      JasmineScoutUtil.mockRestCall('api/permissions', {type: PermissionCollectionType.ALL});
+      JasmineScoutUtil.mockRestCall('api/codes', {});
+      UiNotificationsMock.register(); // Disable endless unsuccessful polling in specs if a component subscribes for ui notifications
+    });
+    new AppClass().init();
 
     jasmine.clock().tick(1000);
 
@@ -277,7 +282,3 @@ export const JasmineScout = {
     jasmine.clock().uninstall();
   }
 };
-
-JasmineScoutUtil.mockRestCall('api/permissions', {type: PermissionCollectionType.ALL});
-JasmineScoutUtil.mockRestCall('api/codes', {});
-JasmineScoutUtil.mockRestCall('api/parameters', []);
