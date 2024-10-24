@@ -2028,7 +2028,7 @@ export class Calendar extends Widget implements CalendarModel {
       moved = moved || !!diffX || !!diffY;
 
       if (moved) {
-        let appointmentToDate = dates.parseJsonDate(component.toDate);
+        let appointmentToDate = component.getUiToDate();
         let appointmentFromDate = dates.parseJsonDate(component.fromDate);
 
         let daysShift = diffX;
@@ -2045,7 +2045,10 @@ export class Calendar extends Widget implements CalendarModel {
         appointmentToDate = dates.shift(appointmentToDate, 0, 0, daysShift);
 
         component.fromDate = this._format(appointmentFromDate, 'yyyy-MM-dd HH:mm:ss.SSS');
-        component.toDate = this._format(appointmentToDate, 'yyyy-MM-dd HH:mm:ss.SSS');
+        if (component.toDate) {
+          // Only set a toDate, when a toDate was present before
+          component.toDate = this._format(appointmentToDate, 'yyyy-MM-dd HH:mm:ss.SSS');
+        }
         component.coveredDaysRange = new DateRange(dates.trunc(appointmentFromDate), dates.trunc(appointmentToDate));
         this._renderComponents();
 
@@ -2202,8 +2205,8 @@ export class Calendar extends Widget implements CalendarModel {
     if (diffFrom !== 0) {
       return diffFrom;
     }
-    let to1 = dates.parseJsonDate(c1.toDate);
-    let to2 = dates.parseJsonDate(c2.toDate);
+    let to1 = c1.getUiToDate();
+    let to2 = c2.getUiToDate();
     let diffTo = dates.compare(to1, to2);
     if (diffTo !== 0) {
       return diffTo;

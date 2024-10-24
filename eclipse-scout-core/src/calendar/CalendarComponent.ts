@@ -25,6 +25,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   item: CalendarItem;
   stack: Record<string, { x?: number; w?: number }>;
   coveredDaysRange: DateRange;
+  defaultComponentDuration: number;
 
   /** @internal */
   _$parts: JQuery[];
@@ -36,6 +37,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     this.fullDayIndex = -1;
     this.item = null;
     this._$parts = [];
+    this.defaultComponentDuration = 60;
   }
 
   /**
@@ -50,15 +52,22 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
-    this._syncCoveredDaysRange(model.coveredDaysRange as JsonDateRange);
+    this._setCoveredDaysRange(model.coveredDaysRange as JsonDateRange);
   }
 
-  protected _syncCoveredDaysRange(coveredDaysRange: JsonDateRange) {
-    if (coveredDaysRange) {
-      this.coveredDaysRange = new DateRange(
-        dates.parseJsonDate(coveredDaysRange.from),
-        dates.parseJsonDate(coveredDaysRange.to));
+  /**
+   * When no toDate is provided, add the {@link defaultComponentDuration} to the start date
+   * to get the default toDate which is shown in the UI.
+   */
+  getUiToDate(): Date {
+    return dates.parseJsonDate(this.toDate) || this._calculateDefaultToDate();
+  }
+
+  protected _setCoveredDaysRange(coveredDaysRange: JsonDateRange | DateRange) {
+    if (!coveredDaysRange.to) {
+      coveredDaysRange.to = this._calculateDefaultToDate(coveredDaysRange.from);
     }
+    this._setProperty('coveredDaysRange', DateRange.ensure(coveredDaysRange));
   }
 
   protected override _remove() {
@@ -94,7 +103,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     let loopDay = this._startLoopDay();
     let item = this.item || {} as CalendarItem;
 
-    let appointmentToDate: Date | string = dates.parseJsonDate(this.toDate);
+    let appointmentToDate = this.getUiToDate();
     let appointmentFromDate = dates.parseJsonDate(this.fromDate);
     let coveredDaysRangeTo = this.coveredDaysRange.to;
     let calendarCssClass = resource ? resource.cssClass : null;
@@ -106,7 +115,6 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         coveredDaysRangeTo = dates.shift(coveredDaysRangeTo, 0, 0, -1);
       }
     }
-    appointmentToDate = dates.toJsonDate(appointmentToDate);
 
     let lastComponentDay = dates.shift(coveredDaysRangeTo, 0, 0, 1);
 
@@ -174,9 +182,9 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         } else {
           let
             fromDate = dates.parseJsonDate(this.fromDate),
-            toDate = dates.parseJsonDate(appointmentToDate),
+            toDate = dates.parseJsonDate(dates.toJsonDate(appointmentToDate)),
             partFrom = this._getHours(this.fromDate),
-            partTo = this._getHours(appointmentToDate);
+            partTo = this._getHours(dates.toJsonDate(appointmentToDate));
 
           // position and height depending on start and end date
           $part.addClass('component-day');
@@ -200,13 +208,13 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     }
   }
 
-  protected _getHours(date: string): number {
-    let d = dates.parseJsonDate(date);
+  protected _getHours(date: string | Date): number {
+    let d = dates.ensure(date);
     return d.getHours() + d.getMinutes() / 60;
   }
 
   getLengthInHoursDecimal(): number {
-    let toTimestamp = dates.parseJsonDate(this.toDate);
+    let toTimestamp = this.getUiToDate();
     let fromTimestamp = dates.parseJsonDate(this.fromDate);
     return (toTimestamp.getTime() - fromTimestamp.getTime()) / (1000 * 60 * 60);
   }
@@ -250,8 +258,8 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   }
 
   protected _getHourRange(day: Date): Range {
-    let hourRange = new Range(this._getHours(this.fromDate), this._getHours(this.toDate));
-    let dateRange = new DateRange(dates.parseJsonDate(this.fromDate), dates.parseJsonDate(this.toDate));
+    let hourRange = new Range(this._getHours(this.fromDate), this._getHours(this.getUiToDate()));
+    let dateRange = new DateRange(dates.parseJsonDate(this.fromDate), this.getUiToDate());
 
     if (dates.isSameDay(day, dateRange.from) && dates.isSameDay(day, dateRange.to)) {
       return new Range(hourRange.from, hourRange.to);
@@ -263,6 +271,12 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       return new Range(0, hourRange.to);
     }
     return new Range(0, 24);
+  }
+
+  protected _calculateDefaultToDate(fromDate: string | Date = this.fromDate) {
+    fromDate = dates.ensure(fromDate);
+    fromDate.setMinutes(fromDate.getMinutes() + this.defaultComponentDuration);
+    return fromDate;
   }
 
   getPartDayPosition(day: Date): Range {
@@ -381,7 +395,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
     let range = null,
       $container = $('<div>'),
       fromDate = dates.parseJsonDate(this.fromDate),
-      toDate = dates.parseJsonDate(this.toDate),
+      toDate = this.getUiToDate(),
       descriptionAvailable = strings.hasText(this.item.description) || this.item.descriptionElements;
 
     let $header = $container.appendDiv('calendar-component-header');

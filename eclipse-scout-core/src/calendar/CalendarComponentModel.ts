@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,4 +21,9 @@ export interface CalendarComponentModel extends WidgetModel {
   fullDayIndex?: number;
   item?: CalendarItem;
   coveredDaysRange?: DateRange | JsonDateRange;
+  /**
+   * Specifies, how long (in minutes) a component should appear when no toDate is specified. Default is 60 (one hour).
+   * This is a GUI only property.
+   */
+  defaultComponentDuration?: number;
 }
