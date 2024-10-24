@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
 
@@ -613,5 +614,63 @@ public class BasicCacheTest {
     assertEquals("newValue_3", RunContexts.empty().call(() -> cache.get(3)));
     assertEquals("newValue_4", RunContexts.empty().call(() -> cache.get(4)));
     assertEquals("newValue_5", RunContexts.empty().call(() -> cache.get(5)));
+  }
+
+  @Test
+  public void testDirtyCache() {
+    String CACHE_KEY = "CACHE_KEY";
+    AtomicReference<Integer> value1 = new AtomicReference<>();
+    AtomicReference<Integer> value2 = new AtomicReference<>();
+
+    //noinspection unchecked
+    ICache<String, String> cache = BEANS.get(ICacheBuilder.class)
+        .withCacheId("BasicCacheTestCacheId#testDirtyCache")
+        .withValueResolver((ICacheValueResolver<String, String>) key -> "value_" + value1.get() + "_" + value2.get())
+        .withShared(true)
+        .withRemoteValueResolverEnabled(false)
+        .withClusterEnabled(true)
+        .withTransactional(true)
+        .withTransactionalFastForward(true)
+        .withMaxConcurrentResolve(3)
+        .build();
+
+    RunContexts.empty().run(() -> {
+      value1.set(0);
+      value2.set(0);
+      cache.get(CACHE_KEY);
+    });
+
+    CountDownLatch invalidateT1 = new CountDownLatch(1);
+    CountDownLatch invalidateT2_1 = new CountDownLatch(1);
+    CountDownLatch invalidateT2_2 = new CountDownLatch(1);
+
+    IFuture<Void> futureT1 = Jobs.schedule(() -> {
+      value1.set(1);
+      cache.invalidate(new KeyCacheEntryFilter<>(Collections.singleton(CACHE_KEY)), true);
+      invalidateT2_1.countDown();
+      invalidateT1.await();
+      value1.set(2);
+      cache.invalidate(new KeyCacheEntryFilter<>(Collections.singleton(CACHE_KEY)), true);
+      cache.get(CACHE_KEY);
+      Assertions.assertEquals(cache.get(CACHE_KEY), "value_2_0");
+    }, Jobs.newInput().withRunContext(RunContexts.empty()));
+
+    IFuture<Void> futureT2 = Jobs.schedule(() -> {
+      invalidateT2_1.await();
+      value2.set(1);
+      cache.invalidate(new KeyCacheEntryFilter<>(Collections.singleton(CACHE_KEY)), true);
+      cache.get(CACHE_KEY);
+      Assertions.assertEquals(cache.get(CACHE_KEY), "value_1_1");
+      invalidateT1.countDown();
+      invalidateT2_2.await();
+    }, Jobs.newInput().withRunContext(RunContexts.empty()));
+
+    futureT1.awaitDone();
+    invalidateT2_2.countDown();
+    futureT2.awaitDone();
+
+    RunContexts.empty().run(() -> {
+      Assertions.assertEquals(cache.get(CACHE_KEY), "value_2_1");
+    });
   }
 }
