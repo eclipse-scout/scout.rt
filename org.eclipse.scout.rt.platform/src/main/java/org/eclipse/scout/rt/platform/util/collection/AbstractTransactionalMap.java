@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -309,16 +309,29 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
         for (Entry<K, V> entry : m_removedMap.entrySet()) {
           K key = entry.getKey();
           V oldValue = entry.getValue();
-          if (oldValue != null) {
-            V insertedValue = m_insertedMap.remove(key);
+          V insertedValue = m_insertedMap.remove(key); // note: this map does not contain null-values
+          if (insertedValue != null) {
             if (!insertsValid) {
               failedCommittedChanges.add(key);
+              continue;
             }
-            else if (insertedValue != null) {
-              if (sharedMap.replace(key, oldValue, insertedValue)) {
-                successfulCommittedChanges.add(key);
-              }
-              else {
+            if (oldValue == null) {
+              // there is a remove and an insert operation - if oldValue of remove operation is null, then we cannot detect commit conflicts
+              failedCommittedChanges.add(key);
+              continue;
+            }
+            boolean replaceValueSuccess = sharedMap.replace(key, oldValue, insertedValue);
+            if (replaceValueSuccess) {
+              successfulCommittedChanges.add(key);
+            }
+            else {
+              failedCommittedChanges.add(key);
+            }
+          }
+          else {
+            if (oldValue == null) {
+              if (sharedMap.containsKey(key)) {
+                // remove entry, and there was no previous value in sharedMap but now there is one
                 failedCommittedChanges.add(key);
               }
             }
@@ -329,13 +342,6 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
               else {
                 failedCommittedChanges.add(key);
               }
-            }
-          }
-          else {
-            // if there must be a value inserted, the loop over insertedMap will handle this
-            if (sharedMap.containsKey(key)) {
-              // remove entry, and there was no previous value in sharedMap but now there is one. Commit failed.
-              failedCommittedChanges.add(key);
             }
           }
         }

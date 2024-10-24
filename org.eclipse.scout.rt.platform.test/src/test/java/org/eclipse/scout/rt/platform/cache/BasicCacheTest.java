@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,19 +14,29 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.AbstractTransactionalMap.AbstractMapTransactionMember;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 /**
@@ -35,7 +45,7 @@ import org.junit.Test;
 public class BasicCacheTest {
 
   protected ICache<Integer, String> createCache(String id) {
-    return createCache(id, new ICacheValueResolver<Integer, String>() {
+    return createCache(id, new ICacheValueResolver<>() {
       private int m_counter;
 
       @Override
@@ -613,5 +623,194 @@ public class BasicCacheTest {
     assertEquals("newValue_3", RunContexts.empty().call(() -> cache.get(3)));
     assertEquals("newValue_4", RunContexts.empty().call(() -> cache.get(4)));
     assertEquals("newValue_5", RunContexts.empty().call(() -> cache.get(5)));
+  }
+
+  @Test
+  public void testFuzzy_transactionalFastForward() {
+    testFuzzy(1000, true);
+  }
+
+  /**
+   * Tests concurrent calls of {@link AbstractMapTransactionMember#commitChanges}. Transactional data source provided by
+   * {@link P_TransactionalData}; in a real setup this is usually a database.
+   */
+  @SuppressWarnings("unchecked")
+  private void testFuzzy(int runs, boolean withTransactionalFastForward) {
+    String CACHE_KEY = "CACHE_KEY";
+
+    P_TransactionalData data = new P_TransactionalData();
+
+    ICache<String, String> cache = BEANS.get(ICacheBuilder.class)
+        .withCacheId("BasicCacheTestCacheId#testFuzzy[" + withTransactionalFastForward + "]")
+        .withValueResolver((ICacheValueResolver<String, String>) key -> data.getCacheValue())
+        .withTransactional(true)
+        .withTransactionalFastForward(withTransactionalFastForward)
+        .build();
+
+    RunContexts.empty().run(() -> assertEquals("value_0_0", cache.get(CACHE_KEY)));
+    Phaser startPhaser = new Phaser(4);
+
+    IFuture<Void> future1 = Jobs.schedule(() -> {
+      startPhaser.arriveAndAwaitAdvance();
+      int[] ii = new int[1];
+      for (int i = 0; i < runs; i++) {
+        ii[0] = i;
+        Jobs.schedule(() -> { // use jobs#schedule for randomness
+          data.setValue1(ii[0]);
+          cache.invalidate(new KeyCacheEntryFilter<>(Collections.singleton(CACHE_KEY)), true);
+          data.assertCacheValue(cache, CACHE_KEY, "T1");
+        }, Jobs.newInput().withThreadName("T1").withName("T1").withRunContext(RunContexts.empty())).awaitDoneAndGet();
+      }
+    }, Jobs.newInput().withRunContext(RunContexts.empty()));
+
+    IFuture<Void> future2 = Jobs.schedule(() -> {
+      startPhaser.arriveAndAwaitAdvance();
+      int[] ii = new int[1];
+      for (int i = 0; i < runs; i++) {
+        ii[0] = i;
+        Jobs.schedule(() -> { // use jobs#schedule for randomness
+          data.setValue2(ii[0] * 10 + 2);
+          cache.invalidate(new KeyCacheEntryFilter<>(Collections.singleton(CACHE_KEY)), true);
+        }, Jobs.newInput().withThreadName("T2").withName("T2").withRunContext(RunContexts.empty())).awaitDoneAndGet();
+      }
+    }, Jobs.newInput().withRunContext(RunContexts.empty()));
+
+    IFuture<Void> future3 = Jobs.schedule(() -> {
+      startPhaser.arriveAndAwaitAdvance();
+      for (int i = 0; i < runs; i++) {
+        List<IFuture<Void>> futures = IntStream.range(0, 3)
+            .mapToObj(ff -> Jobs.schedule(() -> data.assertCacheValue(cache, CACHE_KEY, "T3"), Jobs.newInput().withThreadName("T3").withName("T3").withRunContext(RunContexts.empty())))
+            .collect(Collectors.toList());
+        futures.forEach(IFuture::awaitDoneAndGet);
+      }
+    }, Jobs.newInput().withRunContext(RunContexts.empty()));
+
+    startPhaser.arriveAndAwaitAdvance();
+    future1.awaitDoneAndGet();
+    future2.awaitDoneAndGet();
+    future3.awaitDoneAndGet();
+  }
+
+  private static class P_TransactionalData {
+    private final Lock m_value1CommitLock = new ReentrantLock();
+    private final Lock m_value2CommitLock = new ReentrantLock();
+
+    private boolean m_canceled;
+    private int m_committedValue1;
+    private int m_committedValue2;
+
+    public void setValue1(int value1) {
+      getTransactionMember(true).m_value1 = value1;
+    }
+
+    public void setValue2(int value2) {
+      getTransactionMember(true).m_value2 = value2;
+    }
+
+    public String getCacheValue() {
+      m_value1CommitLock.lock();
+      m_value2CommitLock.lock();
+      try {
+        return getCacheValueWithoutLock();
+      }
+      finally {
+        m_value2CommitLock.unlock();
+        m_value1CommitLock.unlock();
+      }
+    }
+
+    public void assertCacheValue(ICache<String, String> cache, String key, String context) {
+      m_value1CommitLock.lock();
+      m_value2CommitLock.lock();
+      try {
+        if (m_canceled) {
+          throw new FutureCancelledError("canceled");
+        }
+        String expected = getCacheValueWithoutLock();
+        String actual = cache.get(key);
+        if (!expected.equals(actual)) {
+          m_canceled = true;
+          throw new ComparisonFailure("[" + context + "]", expected, actual);
+        }
+      }
+      finally {
+        m_value2CommitLock.unlock();
+        m_value1CommitLock.unlock();
+      }
+    }
+
+    private String getCacheValueWithoutLock() {
+      int value1 = m_committedValue1;
+      int value2 = m_committedValue2;
+      P_TransactionalDataTransactionMember tm = getTransactionMember(false);
+      if (tm != null) {
+        if (tm.m_value1 != null) {
+          value1 = tm.m_value1;
+        }
+        if (tm.m_value2 != null) {
+          value2 = tm.m_value2;
+        }
+      }
+      return "value_" + value1 + "_" + value2;
+    }
+
+    public P_TransactionalDataTransactionMember getTransactionMember(boolean createIfNotExist) {
+      ITransaction t = ITransaction.CURRENT.get();
+      if (t == null) {
+        return null;
+      }
+      P_TransactionalDataTransactionMember m = (P_TransactionalDataTransactionMember) t.getMember(P_TransactionalDataTransactionMember.TRANSACTION_MEMBER_ID);
+      if (m == null && createIfNotExist) {
+        m = new P_TransactionalDataTransactionMember();
+        t.registerMember(m);
+      }
+      return m;
+    }
+
+    private class P_TransactionalDataTransactionMember extends AbstractTransactionMember {
+      private static final String TRANSACTION_MEMBER_ID = "P_TransactionalDataTransactionMember";
+      private Integer m_value1;
+      private Integer m_value2;
+      private boolean m_committed;
+
+      public P_TransactionalDataTransactionMember() {
+        super(TRANSACTION_MEMBER_ID);
+      }
+
+      @Override
+      public boolean needsCommit() {
+        return true;
+      }
+
+      @Override
+      public boolean commitPhase1() {
+        if (m_value1 != null) {
+          m_value1CommitLock.lock();
+          m_committedValue1 = m_value1;
+        }
+        if (m_value2 != null) {
+          m_value2CommitLock.lock();
+          m_committedValue2 = m_value2;
+        }
+        m_committed = true;
+        return true;
+      }
+
+      @Override
+      public void release() {
+        if (!m_committed) {
+          return;
+        }
+        if (m_value1 != null) {
+          m_value1CommitLock.unlock();
+        }
+        if (m_value2 != null) {
+          m_value2CommitLock.unlock();
+        }
+        if (m_canceled) {
+          throw new FutureCancelledError("canceled");
+        }
+      }
+    }
   }
 }
