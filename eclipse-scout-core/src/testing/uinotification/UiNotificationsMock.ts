@@ -12,6 +12,7 @@ import {ObjectFactory, UiNotificationHandler, uiNotifications, UiNotificationSys
 import $ from 'jquery';
 
 export class UiNotificationsMock {
+
   static register() {
     // Remove systems so a call to uiNotifications.subscribe() will create new mocked systems.
     uiNotifications.tearDown();
@@ -28,12 +29,13 @@ export class UiNotificationsMock {
 }
 
 export class UiNotificationSystemMock extends UiNotificationSystem {
+
   override subscribe(topic: string, handler: UiNotificationHandler): JQuery.Promise<string> {
-    return $.Deferred().promise();
+    return $.resolvedPromise(topic);
   }
 
   override subscribeOne(topic: string, handler: UiNotificationHandler): JQuery.Promise<string> {
-    return $.Deferred().promise();
+    return $.resolvedPromise(topic);
   }
 
   override unsubscribe(topic: string, handler?: UiNotificationHandler) {
