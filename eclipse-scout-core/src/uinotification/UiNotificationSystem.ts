@@ -12,6 +12,7 @@ import {Event, EventHandler, EventListener, EventSupport, InitModelOf, ObjectMod
 export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWithType {
   declare model: UiNotificationSystemModel;
   declare initModel: UiNotificationSystemModel;
+
   poller: UiNotificationPoller;
   name: string;
   events: UiNotificationEventSupport;

@@ -75,10 +75,11 @@ export class UiNotifications {
     return Math.ceil(Math.random() * 1000 * reloadDelayWindow); // randomly delay the reload within the necessary time window (milliseconds)
   }
 
+  /**
+   * Unregisters all systems and closes the pending connections, if there are any.
+   */
   tearDown() {
-    for (const system of this.systems.values()) {
-      system.destroy();
-    }
+    this.systems.forEach(system => system.destroy());
     this.systems.clear();
   }
 
