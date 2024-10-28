@@ -11,12 +11,14 @@ package org.eclipse.scout.rt.platform.util.concurrent;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -32,6 +34,8 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -151,52 +155,81 @@ public class DeferredOperationQueueTest {
 
   @Test(timeout = 1000)
   public void testFlushDeferredQueueHasBatchSizeElements() {
-    List<String> batch = new ArrayList<>();
-    FixtureDeferredOperationQueue<String> queue = new FixtureDeferredOperationQueue<>(QUEUE_TRANSACTION_MEMBER_ID, 2, TimeUnit.HOURS.toMillis(10), batch::addAll);
-    RunContexts.empty().run(() -> {
-      queue.add("first");
-      queue.add("second");
-    });
-    queue.flushDeferred(true);
-    assertEquals(asList("first", "second"), batch);
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), false, queue -> {
+      queue.add("A");
+      queue.add("B");
+    }, List.of(List.of("A", "B")));
+  }
+
+  @Test(timeout = 1000)
+  public void testFlushDeferredQueueHasBatchSizeElementsSingleRun() {
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), true, queue -> {
+      queue.add("A");
+      queue.add("B");
+    }, List.of(List.of("A", "B")));
   }
 
   @Test(timeout = 1000)
   public void testFlushDeferredQueueHasBatchSizeElementsUsingAddAll() {
-    List<String> batch = new ArrayList<>();
-    FixtureDeferredOperationQueue<String> queue = new FixtureDeferredOperationQueue<>(QUEUE_TRANSACTION_MEMBER_ID, 2, TimeUnit.HOURS.toMillis(10), batch::addAll);
-    RunContexts.empty().run(() -> queue.addAll(Stream.of("first", "second")));
-    queue.flushDeferred(true);
-    assertEquals(asList("first", "second"), batch);
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), false, queue -> queue.addAll(Stream.of("A", "B")), List.of(List.of("A", "B")));
+  }
+
+  @Test(timeout = 1000)
+  public void testFlushDeferredQueueHasBatchSizeElementsUsingAddAllSingleRun() {
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), true, queue -> queue.addAll(Stream.of("A", "B")), List.of(List.of("A", "B")));
   }
 
   @Test(timeout = 1000)
   public void testFlushDeferredQueueHasBatchSizeElementsUsingAddAndAddAll() {
-    List<String> batch = new ArrayList<>();
-    FixtureDeferredOperationQueue<String> queue = new FixtureDeferredOperationQueue<>(QUEUE_TRANSACTION_MEMBER_ID, 2, TimeUnit.HOURS.toMillis(10), batch::addAll);
-    RunContexts.empty().run(() -> {
-      queue.add("first");
-      queue.addAll(Stream.of("second"));
-    });
-    queue.flushDeferred(true);
-    assertEquals(asList("first", "second"), batch);
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), false, queue -> {
+      queue.add("A");
+      queue.addAll(Stream.of("B"));
+    }, List.of(List.of("A", "B")));
   }
 
   @Test(timeout = 1000)
+  public void testFlushDeferredQueueHasBatchSizeElementsUsingAddAndAddAllSingleRun() {
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), true, queue -> {
+      queue.add("A");
+      queue.addAll(Stream.of("B"));
+    }, List.of(List.of("A", "B")));
+  }
+
+  @Test(timeout = 750)
   public void testFlushDeferredQueueHasLessThanBatchSizeElements() {
-    List<String> batch = new ArrayList<>();
-    FixtureDeferredOperationQueue<String> queue = new FixtureDeferredOperationQueue<>(QUEUE_TRANSACTION_MEMBER_ID, 2, 100, batch::addAll);
-    RunContexts.empty().run(() -> queue.add("single"));
-    queue.flushDeferred(true);
-    assertEquals(asList("single"), batch);
+    testFlushDeferredQueue(2, 500, false, (queue) -> queue.add("A"), List.of(List.of("A")));
+  }
+
+  @Test(timeout = 750)
+  public void testFlushDeferredQueueHasLessThanBatchSizeElementsSingleRun() {
+    testFlushDeferredQueue(2, 500, true, (queue) -> queue.add("A"), List.of(List.of("A")));
+  }
+
+  @Test(timeout = 750)
+  public void testFlushDeferredQueueHasMoreThanBatchSizeElements() {
+    testFlushDeferredQueue(2, 500, false, (queue) -> queue.addAll(Stream.of("A", "B", "C", "D", "E")), List.of(List.of("A", "B"), List.of("C", "D"), List.of("E")));
+  }
+
+  @Test(timeout = 1000)
+  public void testFlushDeferredQueueHasMoreThanBatchSizeElementsSingleRun() {
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), true, (queue) -> queue.addAll(Stream.of("A", "B", "C", "D", "E")), List.of(List.of("A", "B")));
   }
 
   @Test(timeout = 1000)
   public void testFlushDeferredQueueHasNoElements() {
-    List<String> batch = new ArrayList<>();
-    FixtureDeferredOperationQueue<String> queue = new FixtureDeferredOperationQueue<>(QUEUE_TRANSACTION_MEMBER_ID, 2, 100, batch::addAll);
-    queue.flushDeferred(true);
-    assertEquals(emptyList(), batch);
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), true, nop(), List.of());
+  }
+
+  @Test(timeout = 1000)
+  public void testFlushDeferredQueueHasNoElementsSingleRun() {
+    testFlushDeferredQueue(2, TimeUnit.HOURS.toMillis(10), true, nop(), List.of());
+  }
+
+  private <T> void testFlushDeferredQueue(int batchSize, long maxDelayMillis, boolean singleRun, Consumer<DeferredOperationQueue<T>> addElements, List<List<T>> expectedBatches) {
+    FixtureDeferredOperationQueue<T> queue = new FixtureDeferredOperationQueue<>(QUEUE_TRANSACTION_MEMBER_ID, batchSize, maxDelayMillis, b -> {});
+    RunContexts.empty().run(() -> addElements.accept(queue));
+    queue.flushDeferred(singleRun);
+    assertEquals(expectedBatches, queue.getExecutedBatches());
   }
 
   @Test(timeout = 3000)
@@ -325,6 +358,69 @@ public class DeferredOperationQueueTest {
 
     assertTrue(flushedLatch.await(2, TimeUnit.SECONDS));
     assertEquals(asList("first element", "second element"), batch);
+  }
+
+  @Test
+  public void testTransactionalBatchOperation() throws Exception {
+    List<List<String>> batches = new ArrayList<>();
+    CountDownLatch flushedLatch = new CountDownLatch(1);
+
+    DeferredOperationQueue<String> queue = new DeferredOperationQueue<>(QUEUE_TRANSACTION_MEMBER_ID, 2, 1000, batch -> getOrCreateTransactionMember(batches).addAll(batch)) {
+      @Override
+      protected void flushDeferred(boolean singleRun) {
+        super.flushDeferred(singleRun);
+        flushedLatch.countDown();
+      }
+    };
+
+    RunContexts.empty().run(() -> queue.addAll(Stream.of("A", "B", "C", "D", "E", "F")));
+
+    assertTrue(flushedLatch.await(1, TimeUnit.SECONDS));
+    assertEquals(List.of(
+        List.of("A", "B"),
+        List.of("C", "D"),
+        List.of("E", "F")), batches);
+  }
+
+  protected P_FixtureTransactionMember getOrCreateTransactionMember(List<List<String>> batches) {
+    ITransaction transaction = assertNotNull(ITransaction.CURRENT.get(), "Not running within a transaction");
+    P_FixtureTransactionMember transactionMember = (P_FixtureTransactionMember) transaction.getMember(P_FixtureTransactionMember.ID);
+    if (transactionMember == null) {
+      transactionMember = new P_FixtureTransactionMember(batches);
+      transaction.registerMember(transactionMember);
+    }
+    return transactionMember;
+  }
+
+  protected class P_FixtureTransactionMember extends AbstractTransactionMember {
+
+    public static final String ID = "P_FixtureTransactionMember";
+
+    private final List<List<String>> m_batches;
+    private final List<String> m_elements = new ArrayList<>();
+
+    public P_FixtureTransactionMember(List<List<String>> batches) {
+      super(ID);
+      m_batches = assertNotNull(batches);
+    }
+
+    public void add(String element) {
+      m_elements.add(element);
+    }
+
+    public void addAll(Collection<String> element) {
+      m_elements.addAll(element);
+    }
+
+    @Override
+    public boolean needsCommit() {
+      return !m_elements.isEmpty();
+    }
+
+    @Override
+    public void commitPhase2() {
+      m_batches.add(m_elements);
+    }
   }
 
   protected static <T> Consumer<T> nop() {
