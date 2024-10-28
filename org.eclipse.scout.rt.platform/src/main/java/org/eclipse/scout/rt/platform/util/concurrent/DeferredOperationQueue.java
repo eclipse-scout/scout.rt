@@ -126,7 +126,7 @@ public class DeferredOperationQueue<E> {
   protected void scheduleFlushJob() {
     m_flushJobFuture = Jobs.schedule(
         () -> flushDeferred(false),
-        Jobs.newInput().withRunContext(getRunContextSupplier().get()));
+        Jobs.newInput().withRunContext(RunContexts.empty()));
   }
 
   /**
@@ -144,6 +144,11 @@ public class DeferredOperationQueue<E> {
       List<E> nextBatch = new ArrayList<>(batchSize);
       // get at most batchSize elements at once
       m_queue.drainTo(nextBatch, batchSize);
+
+      // do not wait another maxDelayMillis
+      if (nextBatch.isEmpty()) {
+        break;
+      }
 
       if (nextBatch.size() < batchSize) {
         // wait maxDelayMillis for additional elements
@@ -166,16 +171,17 @@ public class DeferredOperationQueue<E> {
         }
       }
 
-      if (nextBatch.isEmpty()) {
-        break;
-      }
-
-      try {
-        getBatchOperation().accept(nextBatch);
-      }
-      catch (RuntimeException e) {
-        LOG.error("Exception occurred while execution batch operation", e);
-      }
+      // Use a new run context for each execution. Consider e.g. transactional ClientNotifications sent after each
+      // batch. If there is only one run context for all batches the notifications will not be sent until the queue is
+      // completely empty (which may never be the case).
+      getRunContextSupplier().get().run(() -> {
+        try {
+          getBatchOperation().accept(nextBatch);
+        }
+        catch (RuntimeException e) {
+          LOG.error("Exception occurred while execution batch operation", e);
+        }
+      });
     }
     while (!interrupted && !singleRun);
 
