@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,9 @@
  */
 package org.eclipse.scout.rt.testing.platform.util.concurrent;
 
+import static java.util.Collections.unmodifiableList;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -21,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.DeferredOperationQueue;
 public class FixtureDeferredOperationQueue<E> extends DeferredOperationQueue<E> {
 
   private final AtomicBoolean m_scheduleFlushJobInvoked = new AtomicBoolean();
+  private final List<List<E>> m_executedBatches = new ArrayList<>();
 
   public FixtureDeferredOperationQueue(String transactionMemberId, int batchSize, long maxDelayMillis, Consumer<List<E>> batchOperation) {
     this(transactionMemberId, batchSize, maxDelayMillis, batchOperation, null);
@@ -38,5 +42,21 @@ public class FixtureDeferredOperationQueue<E> extends DeferredOperationQueue<E> 
 
   public boolean getAndResetScheduleFlushJobWasInvoked() {
     return m_scheduleFlushJobInvoked.getAndSet(false);
+  }
+
+  @Override
+  protected Consumer<List<E>> getBatchOperation() {
+    return (List<E> batch) -> {
+      m_executedBatches.add(batch);
+      super.getBatchOperation().accept(batch);
+    };
+  }
+
+  public List<List<E>> getExecutedBatches() {
+    return unmodifiableList(m_executedBatches);
+  }
+
+  public void resetExecutedBatches() {
+    m_executedBatches.clear();
   }
 }
