@@ -178,24 +178,21 @@ public class BasicCache<K, V> implements ICache<K, V> {
   @Override
   public void invalidate(ICacheEntryFilter<K, V> filter, boolean propagate) {
     LOG.debug("Invalidate cache '{}' [propagate={}, filter={}]", m_cacheId, propagate, filter);
-    boolean markInsertsDirty = true;
 
     if (filter instanceof AllCacheEntryFilter) {
       m_cacheMap.clear();
     }
     else if (filter instanceof KeyCacheEntryFilter) {
-      markInsertsDirty = false; // if all remove operations find a previous value, we do not need to mark inserts of other transactions as dirty
       KeyCacheEntryFilter<K, V> keyCacheEntryFilter = (KeyCacheEntryFilter<K, V>) filter;
       for (K key : keyCacheEntryFilter.getKeys()) {
-        boolean valueNotRemoved = m_cacheMap.remove(key) == null;
-        markInsertsDirty = markInsertsDirty | valueNotRemoved;
+        m_cacheMap.remove(key);
       }
     }
     else if (filter != null) {
       m_cacheMap.entrySet().removeIf(entry -> filter.accept(entry.getKey(), entry.getValue()));
     }
 
-    if (markInsertsDirty && m_transactionalMap != null) {
+    if (m_transactionalMap != null) {
       m_transactionalMap.markInsertsDirty();
     }
   }

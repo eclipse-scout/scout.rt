@@ -626,6 +626,11 @@ public class BasicCacheTest {
   }
 
   @Test
+  public void testFuzzy() {
+    testFuzzy(1000, false);
+  }
+
+  @Test
   public void testFuzzy_transactionalFastForward() {
     testFuzzy(1000, true);
   }
