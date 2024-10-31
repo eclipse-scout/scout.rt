@@ -62,6 +62,15 @@ public final class SecurityUtility {
    * See {@link ISecurityProvider#encrypt(InputStream, OutputStream, EncryptionKey)}
    */
   public static void encrypt(InputStream clearTextData, OutputStream encryptedData, EncryptionKey key) {
+    byte[] compatibilityHeader = key.getCompatibilityHeader();
+    if (compatibilityHeader != null) {
+      try {
+        encryptedData.write(compatibilityHeader);
+      }
+      catch (IOException e) {
+        throw new ProcessingException("Unable to add compatibility header", e);
+      }
+    }
     SECURITY_PROVIDER.get().encrypt(clearTextData, encryptedData, key);
   }
 
@@ -71,7 +80,13 @@ public final class SecurityUtility {
    */
   public static void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key) {
     PushbackInputStream input = new PushbackInputStream(encryptedData, 6);
-    extractCompatibilityHeader(input);
+    byte[] compatibilityHeader = extractCompatibilityHeader(input);// fast-forward inputStream to skip compatibility header
+    if (compatibilityHeader != null) {
+      byte[] keyCompatibilityHeader = key.getCompatibilityHeader();
+      if (keyCompatibilityHeader != null) {
+        Assertions.assertTrue(Arrays.equals(compatibilityHeader, keyCompatibilityHeader), "Key compatibility header mismatch.");
+      }
+    }
     SECURITY_PROVIDER.get().decrypt(input, clearTextData, key);
   }
 
@@ -176,7 +191,7 @@ public final class SecurityUtility {
     Assertions.assertNotNull(clearTextData, "no data provided");
     ByteArrayInputStream input = new ByteArrayInputStream(clearTextData);
     int aesBlockSize = 16;
-    int expectedOutSize = ((input.available() / aesBlockSize) + 2) * aesBlockSize;
+    int expectedOutSize = ((input.available() / aesBlockSize) + 2) * aesBlockSize + 9 /* compatibility header size */;
     ByteArrayOutputStream result = new ByteArrayOutputStream(expectedOutSize);
     encrypt(input, result, key);
     return result.toByteArray();

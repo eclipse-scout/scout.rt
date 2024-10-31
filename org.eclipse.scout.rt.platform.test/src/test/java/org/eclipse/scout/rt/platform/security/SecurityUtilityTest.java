@@ -316,13 +316,23 @@ public class SecurityUtilityTest {
   }
 
   @Test
-  public void testDecryptionApiStability() {
+  public void testDecryptionApiStability_2023() {
     final byte[] encrypted = Base64Utility.decode("43aysPcKhTvyzZIWa6d1wwntGobQOXT38VU=");
     final byte[] salt = Base64Utility.decode("iPENJpMTU8MxarL8ZMHxXw==");
     Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));
     EncryptionKey key = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(encrypted), 6), PASSWORD, salt, 128, null);
-    Assert.assertEquals("[1:128-PBKDF2WithHmacSHA256-AES-SunJCE-16-128-3557]", new String(key.getCompatibilityHeader(), StandardCharsets.US_ASCII));
+    Assert.assertEquals("[2023:v1]", new String(key.getCompatibilityHeader(), StandardCharsets.US_ASCII));
     Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, key), ENCODING));
+  }
+
+  @Test
+  public void testDecryptionApiStability_2024() {
+    final byte[] encrypted = Base64Utility.decode("WzIwMjQ6djFdU1rrQiSnCSBlPEk7SZayaYngVKYszy7EbjV1RGUq0CsaJyOHtXZwCp+ogg==");
+    final byte[] salt = "salty".getBytes(ENCODING);
+    Assert.assertEquals("This is an encrypted string", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));
+    EncryptionKey key = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(encrypted), 6), PASSWORD, salt, 128, null);
+    Assert.assertEquals("[2024:v1]", new String(key.getCompatibilityHeader(), StandardCharsets.US_ASCII));
+    Assert.assertEquals("This is an encrypted string", new String(SecurityUtility.decrypt(encrypted, key), ENCODING));
   }
 
   @Test
@@ -346,5 +356,41 @@ public class SecurityUtilityTest {
     in = new PushbackInputStream(new ByteArrayInputStream(new byte[]{'[', '1', '2', '3', '0', ':', 0, ']', 78, 79}), 6);
     Assert.assertArrayEquals(new byte[]{'[', '1', '2', '3', '0', ':', 0, ']'}, SecurityUtility.extractCompatibilityHeader(in));
     Assert.assertArrayEquals(new byte[]{78, 79}, IOUtility.readBytes(in));
+  }
+
+  @Test
+  public void testCompatibilityHeaderKeyGeneration() {
+    byte[] salt = "salty".getBytes(StandardCharsets.US_ASCII);
+
+    EncryptionKey currentKey = SecurityUtility.createEncryptionKey(PASSWORD, salt, 128);
+
+    // encryption key w/o compatibility header must match current version decryption key
+    EncryptionKey decryptionKey = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(ISecurityProvider.ENCRYPTION_COMPATIBILITY_HEADER_2024_V1.getBytes(StandardCharsets.US_ASCII)), 9), PASSWORD, salt, 128, null);
+    Assert.assertEquals(decryptionKey.get(), currentKey.get());
+    Assert.assertArrayEquals(ISecurityProvider.ENCRYPTION_COMPATIBILITY_HEADER_2024_V1.getBytes(StandardCharsets.US_ASCII), decryptionKey.getCompatibilityHeader());
+
+    // old decryption key differs from current version
+    EncryptionKey oldDecryptionKey = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(ISecurityProvider.ENCRYPTION_COMPATIBILITY_HEADER_2023_V1.getBytes(StandardCharsets.US_ASCII)), 9), PASSWORD, salt, 128, null);
+    Assert.assertNotEquals(oldDecryptionKey.get(), currentKey.get());
+    Assert.assertArrayEquals(ISecurityProvider.ENCRYPTION_COMPATIBILITY_HEADER_2023_V1.getBytes(StandardCharsets.US_ASCII), oldDecryptionKey.getCompatibilityHeader());
+
+    EncryptionKey evenOlderDecryptionKey = SecurityUtility.createDecryptionKey(new PushbackInputStream(new ByteArrayInputStream(ISecurityProvider.ENCRYPTION_COMPATIBILITY_HEADER_2021_V1.getBytes(StandardCharsets.US_ASCII)), 9), PASSWORD, salt, 128, null);
+    Assert.assertNotEquals(evenOlderDecryptionKey.get(), currentKey.get());
+    Assert.assertEquals(oldDecryptionKey.get(), evenOlderDecryptionKey.get());
+    Assert.assertArrayEquals(ISecurityProvider.ENCRYPTION_COMPATIBILITY_HEADER_2023_V1.getBytes(StandardCharsets.US_ASCII), evenOlderDecryptionKey.getCompatibilityHeader());
+
+    // fallback
+    EncryptionKey withoutCompatibilityHeaderDecryptionKey = SecurityUtility.createDecryptionKey(new PushbackInputStream(InputStream.nullInputStream(), 9), PASSWORD, salt, 128, null);
+    Assert.assertNotEquals(withoutCompatibilityHeaderDecryptionKey.get(), currentKey.get());
+    Assert.assertEquals(oldDecryptionKey.get(), withoutCompatibilityHeaderDecryptionKey.get());
+    Assert.assertArrayEquals(ISecurityProvider.ENCRYPTION_COMPATIBILITY_HEADER_2023_V1.getBytes(StandardCharsets.US_ASCII), withoutCompatibilityHeaderDecryptionKey.getCompatibilityHeader());
+  }
+
+  @Test
+  public void testDifferentKeyLengths() {
+    Assert.assertThrows(AssertionException.class, () -> SecurityUtility.createEncryptionKey(PASSWORD, "salty".getBytes(StandardCharsets.US_ASCII), 42));
+
+    SecurityUtility.createEncryptionKey(PASSWORD, "salty".getBytes(StandardCharsets.US_ASCII), 192);
+    SecurityUtility.createEncryptionKey(PASSWORD, "salty".getBytes(StandardCharsets.US_ASCII), 256);
   }
 }

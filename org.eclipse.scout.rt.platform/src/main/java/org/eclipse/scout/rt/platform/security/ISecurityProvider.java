@@ -59,7 +59,16 @@ public interface ISecurityProvider {
    * </pre>
    */
   String ENCRYPTION_COMPATIBILITY_HEADER_2023_V1 = "[2023:v1]";
-  String ENCRYPTION_COMPATIBILITY_HEADER = ENCRYPTION_COMPATIBILITY_HEADER_2023_V1;
+  /**
+   * <pre>
+   * secretKeyAlgorithm: PBKDF2WithHmacSHA256
+   * cipherAlgorithm/Provider: AES/SunJCE
+   * GCM init vector length: 16
+   * GCM auth tag bit length: 128
+   * key derivation iteration count: 10000
+   * </pre>
+   */
+  String ENCRYPTION_COMPATIBILITY_HEADER_2024_V1 = "[2024:v1]";
 
   /**
    * Create a Message Authentication Code (MAC) for the given data and password.
