@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -82,8 +82,8 @@ public class IdFactory {
       }
     }
     // (2) fallback to of method by generic type
-    if (IRootId.class.isAssignableFrom(idClass)) {
-      Class<?> parameterType = TypeCastUtility.getGenericsParameterClass(idClass, IRootId.class);
+    if (AbstractRootId.class.isAssignableFrom(idClass)) {
+      Class<?> parameterType = TypeCastUtility.getGenericsParameterClass(idClass, AbstractRootId.class);
       return findOfMethod(idClass, parameterType);
     }
     throw new PlatformException("Cannot find a static method 'of({})' on id class {}.", idClass.getName(), idClass);
