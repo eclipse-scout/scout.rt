@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
-public class AbstractTableCustomizerWrapper implements ITableCustomizer {
+public abstract class AbstractTableCustomizerWrapper implements ITableCustomizer {
 
   private final ITableCustomizer m_delegate;
 
