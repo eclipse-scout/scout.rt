@@ -410,7 +410,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     return tableRow;
   }
 
-  protected _createRow(rowModel: TableRowModel): TableRow {
+  protected _createRow(rowModel?: TableRowModel): TableRow {
     let model = (rowModel || {}) as FullModelOf<TableRow>;
     model.objectType = scout.nvl(model.objectType, TableRow);
     model.parent = this;
