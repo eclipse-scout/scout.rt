@@ -125,7 +125,7 @@ public class StreamUtilityTest {
 
   @Test
   public void testToMapWithDuplicatedKeyReplacingValue() {
-    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Pair<String, String>[] items = new Pair[]{ImmutablePair.of("key1", "valueA"), ImmutablePair.of("key2", "valueB"), ImmutablePair.of("key1", "valueC")};
     Map<String, String> result = Stream.of(items).collect(StreamUtility.toMap(Pair::getLeft, Pair::getRight, StreamUtility.replacingMerger()));
     assertEquals(2, result.size());
     assertEquals("valueC", result.get("key1"));
@@ -134,7 +134,7 @@ public class StreamUtilityTest {
 
   @Test
   public void testToMapWithDuplicatedKeyDefaultRemappingFunction() {
-    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Pair<String, String>[] items = new Pair[]{ImmutablePair.of("key1", "valueA"), ImmutablePair.of("key2", "valueB"), ImmutablePair.of("key1", "valueC")};
     Map<String, String> result = Stream.of(items).collect(StreamUtility.toMap(Pair::getLeft, Pair::getRight));
     assertEquals(2, result.size());
     assertEquals("valueC", result.get("key1"));
@@ -150,7 +150,7 @@ public class StreamUtilityTest {
 
   @Test
   public void testToLinkedHashMapDuplicatedKey() {
-    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Pair<String, String>[] items = new Pair[]{ImmutablePair.of("key1", "valueA"), ImmutablePair.of("key2", "valueB"), ImmutablePair.of("key1", "valueC")};
     Map<String, String> map = Stream.of(items).collect(StreamUtility.toLinkedHashMap(Pair::getLeft, Pair::getRight));
     assertEquals("valueC", map.get("key1"));
     assertEquals("valueB", map.get("key2"));
@@ -230,5 +230,17 @@ public class StreamUtilityTest {
     assertEquals(2, map.size());
     assertEquals("3", map.get("a").getRight()); // <--
     assertEquals("2", map.get("b").getRight());
+  }
+
+  @Test
+  public void testConcat() {
+    assertEquals(0, StreamUtility.concat().count());
+    assertEquals(0, StreamUtility.concat((Stream<?>[]) null).count());
+    assertEquals(0, StreamUtility.concat((Stream<?>) null).count());
+    assertEquals(0, StreamUtility.concat(null, null).count());
+
+    assertEquals(List.of(10, 20, 30, 12, 11, 10), StreamUtility.concat(IntStream.of(10, 20, 30).boxed(), IntStream.of(12, 11, 10).boxed()).collect(Collectors.toList()));
+    assertEquals(List.of(10, 20, 33, 44, 5, 6), StreamUtility.concat(IntStream.of(10, 20).boxed(), IntStream.of(33, 44).boxed(), IntStream.of(5, 6).boxed()).collect(Collectors.toList()));
+    assertEquals(List.of(10, 20, 5, 6), StreamUtility.concat(IntStream.of(10, 20).boxed(), Stream.empty(), null, IntStream.of(5, 6).boxed()).collect(Collectors.toList()));
   }
 }

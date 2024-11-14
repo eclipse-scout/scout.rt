@@ -275,9 +275,12 @@ public final class StreamUtility {
    *           {@link Stream#concat(Stream, Stream)} for more details
    */
   @SafeVarargs
-  public static <T> Stream<T> concat(Stream<T>... streams) {
+  public static <T> Stream<T> concat(Stream<? extends T>... streams) {
+    if (streams == null) {
+      return Stream.empty();
+    }
     return Arrays.stream(streams)
-        .reduce(Stream::concat)
-        .orElse(Stream.empty());
+        .filter(Objects::nonNull)
+        .reduce(Stream.empty(), Stream::concat, Stream::concat);
   }
 }
