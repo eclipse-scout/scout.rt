@@ -139,6 +139,10 @@ export const focusUtils = {
   restoreFocusLater($entryPoint: JQuery, options?: FocusOptions) {
     // queueMicrotask does not work, it looks like the microtask will be executed before the focus change.
     // requestAnimationFrame also prevents flickering (compared to setTimeout)
+    $entryPoint = $.ensure($entryPoint);
+    if (!$entryPoint.length) {
+      return; // nothing to do
+    }
     let doc = $entryPoint.document(true);
     let prevFocusedElement = doc.activeElement as HTMLElement;
     requestAnimationFrame(() => {
