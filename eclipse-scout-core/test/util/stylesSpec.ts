@@ -192,6 +192,23 @@ describe('styles', () => {
     expect($el.attr('style')).toBe('background-color: purple;');
   });
 
+  describe('get css colors', () => {
+    it('can get css class colors', () => {
+      expect(styles.getCssColor('inner-class')).toEqual('rgb(255, 0, 0)');
+      expect(styles.getCssColor('outer-class', 'borderColor')).toEqual('rgb(0, 0, 0)');
+    });
+
+    it('can handle unknown CSS classes and attributes', () => {
+      let computedStyle = window.getComputedStyle(styles.element);
+      expect(styles.getCssColor('invalid-class')).toBe(computedStyle.backgroundColor);
+      expect(styles.getCssColor('invalid-class', 'anyAttribute')).toBe(undefined);
+    });
+
+    it('can handle invalid rgba values', () => {
+      expect(styles.rgb(styles.getCssColor('inner-class', 'height'))).toBe(undefined);
+    });
+  });
+
   describe('rgb', () => {
     it('parses an rgb string', () => {
       expect(styles.rgb('rgb(255,100,200)')).toEqual({
