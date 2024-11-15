@@ -155,6 +155,20 @@ export const styles = {
     styles.styleMap = {};
   },
 
+  /**
+   * Extracts the given attribute from the given CSS class and returns its value.
+   *
+   * If the provided class does not exist, the computed element style of the provided
+   * attribute is returned. If the extracted value is unset, `null` is returned.
+   *
+   * @param cssClass any CSS class
+   * @param attribute optional CSS attribute to extract the color from, default is _backgroundColor_
+   */
+  getCssColor(cssClass: string, attribute = 'backgroundColor'): string {
+    let color = styles.get(cssClass, attribute)[attribute];
+    return color === 'unset' ? null : color;
+  },
+
   RGB_BLACK: {
     red: 0,
     green: 0,
