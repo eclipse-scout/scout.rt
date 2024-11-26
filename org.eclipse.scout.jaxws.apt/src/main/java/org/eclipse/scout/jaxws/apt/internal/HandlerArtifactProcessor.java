@@ -226,7 +226,7 @@ public class HandlerArtifactProcessor {
     // Create the XML content. For webservice providers, handlers are to be registered in the reverse order (JAX-WS JSR 224).
     final Document xmlDocument = builder.newDocument();
     xmlDocument.appendChild(xmlDocument.createComment(comment.toString()));
-    final Node xmlHandlerChains = xmlDocument.appendChild(xmlDocument.createElementNS("http://java.sun.com/xml/ns/javaee", "handler-chains"));
+    final Node xmlHandlerChains = xmlDocument.appendChild(xmlDocument.createElementNS("https://jakarta.ee/xml/ns/jakartaee", "handler-chains"));
     for (int i = handlers.size() - 1; i >= 0; i--) {
       final Node xmlHandlerChain = xmlHandlerChains.appendChild(xmlDocument.createElement("handler-chain"));
       xmlHandlerChain.appendChild(xmlDocument.createComment(format(" Executed as %s. handler", i + 1)));
