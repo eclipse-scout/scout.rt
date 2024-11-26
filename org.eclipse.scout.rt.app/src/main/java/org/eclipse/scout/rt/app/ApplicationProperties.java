@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -338,6 +338,24 @@ public final class ApplicationProperties {
     @Override
     public String description() {
       return "HTTPS certificate alias of the key in the keystore to use.";
+    }
+  }
+
+  public static class ScoutApplicationContextHandlerExtendedResourceLookup extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.contextHandlerExtendedResourceLookup";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.FALSE;
+    }
+
+    @Override
+    public String description() {
+      return "Specifies whether the application context handler should also lookup resources w/o base resource. The default value is false.";
     }
   }
 }

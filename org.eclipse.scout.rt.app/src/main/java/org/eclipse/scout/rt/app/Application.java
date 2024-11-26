@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,6 +45,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationCertificateAliasProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationConsoleInputHandlerEnabledProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationContextHandlerExtendedResourceLookup;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationContextPathProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationHttpRequestMaxHeaderSizeProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationHttpSessionEnabledProperty;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCoo
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionCookieConfigSecureProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationSessionTimeoutProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
+import org.eclipse.scout.rt.app.servlet.ScoutServletContextHandler;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -71,6 +73,7 @@ import org.eclipse.scout.rt.platform.config.PropertiesHelper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.ICertificateProvider;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -328,7 +331,11 @@ public class Application {
     boolean sessionEnabled = CONFIG.getPropertyValue(ScoutApplicationHttpSessionEnabledProperty.class);
     LOG.info("Creating servlet context handler with {}", sessionEnabled ? "sessions" : "no sessions");
 
-    ServletContextHandler handler = new ServletContextHandler(sessionEnabled ? ServletContextHandler.SESSIONS : ServletContextHandler.NO_SESSIONS);
+    ScoutServletContextHandler handler = new ScoutServletContextHandler(sessionEnabled ? ServletContextHandler.SESSIONS : ServletContextHandler.NO_SESSIONS);
+
+    boolean handlerExtendedResourceLookup = BooleanUtility.nvl(CONFIG.getPropertyValue(ScoutApplicationContextHandlerExtendedResourceLookup.class));
+    handler.withExtendedResourceLookup(handlerExtendedResourceLookup);
+    LOG.trace("Extended resource lookup enabled = {}", handlerExtendedResourceLookup);
 
     if (sessionEnabled) {
       // See https://github.com/jetty/jetty.project/blob/jetty-11.0.18/jetty-webapp/src/main/java/org/eclipse/jetty/webapp/StandardDescriptorProcessor.java#L650
