@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
  * Custom serializer for {@link Locale} using {@link Locale#toLanguageTag()} instead of {@link Locale#toString()}
  * default Jackson behavior.
  * <p>
- * TODO [23.0] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
+ * TODO pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
  *
  * @see <a href="https://github.com/FasterXML/jackson-databind/issues/1600">Issue</a>
  */

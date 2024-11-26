@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * Custom serializer for map keys of type {@link Locale} using {@link Locale#toLanguageTag()} instead of
  * {@link Locale#toString()} default Jackson behavior.
  * <p>
- * TODO [23.0] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
+ * TODO pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
  */
 public class LocaleMapKeySerializer extends JsonSerializer<Locale> {
 
