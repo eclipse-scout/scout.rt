@@ -9,8 +9,6 @@
  */
 import {LookupCallColumnEventMap, PropertyChangeEvent} from '../../index';
 
-export interface SmartColumnEventMap<TValue> extends LookupCallColumnEventMap<TValue> {
-  'propertyChange:activeFilterEnabled': PropertyChangeEvent<boolean>;
-  'propertyChange:browseAutoExpandAll': PropertyChangeEvent<boolean>;
-  'propertyChange:browseLoadIncremental': PropertyChangeEvent<boolean>;
+export interface LookupColumnEventMap<TValue> extends LookupCallColumnEventMap<TValue[], TValue> {
+  'propertyChange:distinct': PropertyChangeEvent<boolean>;
 }

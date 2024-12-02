@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, CodeLookupCall, codes, CodeType, Column, InitModelOf, LookupCall, LookupCallOrModel, LookupRow, objects, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
+import {Cell, codes, CodeType, LookupCallColumn, LookupCallOrModel, LookupRow, objects, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
 
 /**
  * Column where each cell fetches its value using a lookup call.
@@ -17,15 +17,11 @@ import {Cell, CodeLookupCall, codes, CodeType, Column, InitModelOf, LookupCall, 
  * It should be used instead of the property selectedRows from Table.js which must not be used here.
  * 'row' can be null or undefined in some cases. Hence, some care is needed when listening to this event.
  */
-export class SmartColumn<TValue> extends Column<TValue> {
+export class SmartColumn<TValue> extends LookupCallColumn<TValue> {
   declare model: SmartColumnModel<TValue>;
   declare eventMap: SmartColumnEventMap<TValue>;
   declare self: SmartColumn<any>;
 
-  codeType: string | (new() => CodeType<TValue>);
-  lookupCall: LookupCall<TValue>;
-  browseHierarchy: boolean;
-  browseMaxRowCount: number;
   browseAutoExpandAll: boolean;
   browseLoadIncremental: boolean;
   activeFilterEnabled: boolean;
@@ -34,20 +30,10 @@ export class SmartColumn<TValue> extends Column<TValue> {
 
   constructor() {
     super();
-    this.codeType = null;
-    this.lookupCall = null;
-    this.browseHierarchy = false;
-    this.browseMaxRowCount = SmartField.DEFAULT_BROWSE_MAX_COUNT;
     this.browseAutoExpandAll = true;
     this.browseLoadIncremental = false;
     this.activeFilterEnabled = false;
     this._lookupCallBatchContext = null;
-  }
-
-  protected override _init(model: InitModelOf<this>) {
-    super._init(model);
-    this._setLookupCall(this.lookupCall);
-    this._setCodeType(this.codeType);
   }
 
   protected override _initCell(cell: Cell<TValue>): Cell<TValue> {
@@ -72,42 +58,18 @@ export class SmartColumn<TValue> extends Column<TValue> {
     this.table.rows.map(row => this.cell(row)).forEach(cell => cell.setSortCode(this._calculateCellSortCode(cell)));
   }
 
-  setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
-    this.setProperty('lookupCall', lookupCall);
-  }
-
-  protected _setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
-    let call = LookupCall.ensure(lookupCall, this.session);
-    this._setProperty('lookupCall', call);
+  protected override _setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
+    super._setLookupCall(lookupCall);
     if (this.initialized) {
       this._updateAllCellSortCodes();
     }
   }
 
-  setCodeType(codeType: string | (new() => CodeType<TValue>)) {
-    this.setProperty('codeType', codeType);
-  }
-
-  protected _setCodeType(codeType: string | (new() => CodeType<TValue>)) {
-    this._setProperty('codeType', codeType);
-    if (codeType) {
-      let codeLookupCall = CodeLookupCall<TValue>;
-      this.lookupCall = scout.create(codeLookupCall, {
-        session: this.session,
-        codeType: codeType
-      });
-    }
+  protected override _setCodeType(codeType: string | (new() => CodeType<TValue>)) {
+    super._setCodeType(codeType);
     if (this.initialized) {
       this._updateAllCellSortCodes();
     }
-  }
-
-  setBrowseHierarchy(browseHierarchy: boolean) {
-    this.setProperty('browseHierarchy', browseHierarchy);
-  }
-
-  setBrowseMaxRowCount(browseMaxRowCount: number) {
-    this.setProperty('browseMaxRowCount', browseMaxRowCount);
   }
 
   setBrowseAutoExpandAll(browseAutoExpandAll: boolean) {
@@ -224,35 +186,6 @@ export class SmartColumn<TValue> extends Column<TValue> {
     });
 
     return field;
-  }
-
-  protected override _updateCellFromValidEditor(row: TableRow, field: SmartField<TValue>) {
-    // The following code is only necessary to prevent flickering because the text is updated async.
-    // Instead of only calling setCellValue which itself would update the display text, we set the text manually before calling setCellValue.
-    // This works because in most of the cases the text computed by the column will be the same as the one computed by the editor field.
-
-    // Clear error status first (regular behavior)
-    this.setCellErrorStatus(row, null);
-
-    // Update cell text
-    // We cannot use setCellText to not trigger updateRows yet -> it has to be done after the value and row.status are updated correctly.
-    let cell = this.cell(row);
-    let oldText = cell.text;
-    let newText = field.displayText;
-    cell.setText(newText);
-
-    // Update cell value
-    // We cannot use setCellValue since it would add the update event to the updateBuffer, but we need the row update to be sync to prevent the flickering
-    this._setCellValue(row, field.value, cell);
-
-    // Update row -> Render row, trigger update event
-    // Only trigger update row event if text has changed (same as setCellText would do)
-    if (row.initialized && oldText !== newText && cell.text === newText) {
-      this.table.updateRow(row);
-    }
-
-    // Ensure display text is correct (for the rare case that the column computes a different text than the editor field).
-    this._updateCellText(row, cell);
   }
 
   /**

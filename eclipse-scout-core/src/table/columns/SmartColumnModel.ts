@@ -7,29 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CodeType, ColumnModel, LookupCallOrModel} from '../../index';
+import {LookupCallColumnModel} from '../../index';
 
-export interface SmartColumnModel<TValue> extends ColumnModel<TValue> {
-  /**
-   * Configures the {@link LookupCall} that is used to resolve the values and to load the proposals if the column is editable.
-   */
-  lookupCall?: LookupCallOrModel<TValue>;
-  /**
-   * If set, a {@link CodeLookupCall} is created and used for the property {@link lookupCall}.
-   *
-   * The property accepts a {@link CodeType} class or a {@link CodeType.id} (see {@link CodeTypeCache.get}).
-   */
-  codeType?: string | (new() => CodeType<TValue>);
-  /**
-   * Configures the {@link SmartFieldModel.browseHierarchy} of the cell editor if the column is editable.
-   * Does not have an effect otherwise.
-   */
-  browseHierarchy?: boolean;
-  /**
-   * Configures the {@link SmartFieldModel.browseMaxRowCount} of the cell editor if the column is editable.
-   * Does not have an effect otherwise.
-   */
-  browseMaxRowCount?: number;
+export interface SmartColumnModel<TValue> extends LookupCallColumnModel<TValue> {
   /**
    * Configures the {@link SmartFieldModel.browseAutoExpandAll} of the cell editor if the column is editable.
    * Does not have an effect otherwise.

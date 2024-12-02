@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+.lookup-cell-editor-popup {
+  #scout.chooser-popup();
+  max-height: 350px;
+
+  & > .list-box {
+    border-radius: inherit;
+
+    & > .field > .table {
+      border: none;
+      display: inline-block;
+
+      & > .table-data {
+        display: inline-block;
+        padding: @proposal-chooser-padding-y @proposal-chooser-padding-x;
+
+        & > .table-row {
+          min-width: 150px;
+        }
+      }
+    }
+  }
+
+  & > .tree-box {
+    border-radius: inherit;
+
+    & > .field > .tree {
+      border: none;
+      display: inline-block;
+
+      & > .tree-data {
+        display: inline-block;
+        padding: @proposal-chooser-padding-y @proposal-chooser-padding-x;
+
+        & > .tree-node {
+          min-width: 150px;
+        }
+      }
+    }
+  }
+
+  &.animate-open {
+    #scout.transform(scaleY(0.5));
+    #scout.animation-name(grow-y);
+    #scout.animation-duration(0.125s);
+
+    &.bottom {
+      #scout.transform-origin(top);
+    }
+
+    &.top {
+      #scout.transform-origin(bottom);
+    }
+  }
+}

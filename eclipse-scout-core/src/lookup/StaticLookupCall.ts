@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -181,6 +181,24 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
       this._deferred.resolve({
         queryBy: QueryBy.KEY,
         lookupRows: [lookupRow]
+      });
+    } else {
+      this._deferred.reject();
+    }
+  }
+
+  protected override _getByKeys(keys: TKey[]): JQuery.Promise<LookupResult<TKey>> {
+    this._deferred = $.Deferred();
+    setTimeout(() => this._queryByKeys(keys), this.delay);
+    return this._deferred.promise();
+  }
+
+  protected _queryByKeys(keys: TKey[]) {
+    const lookupRows = arrays.ensure(keys).map(key => this._lookupRowByKey(key)).filter(row => !!row);
+    if (lookupRows.length) {
+      this._deferred.resolve({
+        queryBy: QueryBy.KEY,
+        lookupRows
       });
     } else {
       this._deferred.reject();

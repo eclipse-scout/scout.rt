@@ -2370,7 +2370,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    *          an optional options object. Shorthand version: If a string is passed instead
    *          of an object, the value is automatically converted to the option {@link ScrollToOptions.align}.
    */
-  reveal(options: ScrollToOptions | string) {
+  reveal(options?: ScrollToOptions | string) {
     if (!this.rendered) {
       return;
     }
