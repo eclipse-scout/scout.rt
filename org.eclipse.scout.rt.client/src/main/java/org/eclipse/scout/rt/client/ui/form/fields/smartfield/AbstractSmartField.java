@@ -196,8 +196,6 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   /**
    * variant B: lookup by backend lookup service<br>
-   * 3.0: no support for {@code<eval>} tags anymore<br>
-   * 3.0: still valid are {@code<text><key><all><rec>} tags in lookup statements in the backend
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(250)
@@ -212,8 +210,11 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
-   * @return true: inactive rows are display together with active rows<br>
-   *         false: inactive rows ae only displayed when selected by the model
+   * Configures whether the popup should show an active filter group.
+   * <p>
+   * If the group is shown, the user can choose whether all, only the active or only the inactive proposals should be displayed.
+   * <p>
+   * Default is false.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
@@ -872,12 +873,12 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public void lookupByRec(VALUE parentKey) {
-    doSearch(QueryParam.<VALUE> createByRec(parentKey), false);
+    doSearch(QueryParam.createByRec(parentKey), false);
   }
 
   @Override
   public void lookupByKey(VALUE key) {
-    doSearch(QueryParam.<VALUE> createByKey(key), false);
+    doSearch(QueryParam.createByKey(key), false);
   }
 
   @Override
@@ -1227,7 +1228,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * @see LookupCall#getDataByAllInBackground(RunContext, ILookupRowFetchedCallback)
    */
   protected ILookupRowProvider<VALUE> newByKeyLookupRowProvider(final VALUE key) {
-    return new ILookupRowProvider<VALUE>() {
+    return new ILookupRowProvider<>() {
 
       @Override
       public void beforeProvide(ILookupCall<VALUE> lookupCall) {
@@ -1274,7 +1275,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * @see LookupCall#getDataByAllInBackground(RunContext, ILookupRowFetchedCallback)
    */
   protected ILookupRowProvider<VALUE> newByAllLookupRowProvider(final TriState activeState) {
-    return new ILookupRowProvider<VALUE>() {
+    return new ILookupRowProvider<>() {
 
       @Override
       public void beforeProvide(ILookupCall<VALUE> lookupCall) {
@@ -1311,7 +1312,6 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
             .attr("activeState", activeState)
             .toString();
       }
-
     };
   }
 
@@ -1322,7 +1322,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * @see LookupCall#getDataByAllInBackground(RunContext, ILookupRowFetchedCallback)
    */
   protected ILookupRowProvider<VALUE> newByTextLookupRowProvider(final String text) {
-    return new ILookupRowProvider<VALUE>() {
+    return new ILookupRowProvider<>() {
 
       @Override
       public void beforeProvide(ILookupCall<VALUE> lookupCall) {
@@ -1366,7 +1366,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * @see LookupCall#getDataByRec()
    */
   protected ILookupRowProvider<VALUE> newByRecLookupRowProvider(final VALUE parentKey, final TriState activeState) {
-    return new ILookupRowProvider<VALUE>() {
+    return new ILookupRowProvider<>() {
 
       @SuppressWarnings("unchecked")
       @Override
@@ -1427,7 +1427,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     lookupCall.setMaxRowCount(maxRowCount > 0 ? maxRowCount : getBrowseMaxRowCount());
 
     // Prepare processing of the fetched rows.
-    final ILookupRowFetchedCallback<VALUE> internalCallback = new ILookupRowFetchedCallback<VALUE>() {
+    final ILookupRowFetchedCallback<VALUE> internalCallback = new ILookupRowFetchedCallback<>() {
 
       @Override
       public void onSuccess(final List<? extends ILookupRow<VALUE>> rows) {
@@ -1452,7 +1452,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
               return;
             }
             ModelJobs.schedule(() -> updateField(rows, exception), ModelJobs.newInput(callerRunContext)
-                .withName("Updating {}", AbstractSmartField.this.getClass().getName()))
+                    .withName("Updating {}", AbstractSmartField.this.getClass().getName()))
                 .awaitDone(); // block the current thread until completed
           }
           catch (ThreadInterruptedError e) { // NOSONAR

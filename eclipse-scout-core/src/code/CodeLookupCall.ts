@@ -11,7 +11,7 @@ import {Code, codes, CodeType, LookupCallModel, LookupRow, Predicate, scout, Sta
 
 export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
   declare model: CodeLookupCallModel<TCodeId>;
-  codeType: string | (new() => CodeType<any>);
+  codeType: string | (new() => CodeType<TCodeId>);
 
   constructor() {
     super();
@@ -78,7 +78,7 @@ export class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
 
 export interface CodeLookupCallModel<TCodeId> extends LookupCallModel<TCodeId> {
   /**
-   * CodeTypeId {@link CodeType.id} or CodeType ref. See {@link codes.get}.
+   * The property accepts a {@link CodeType} class or a {@link CodeType.id} (see {@link CodeTypeCache.get}).
    */
-  codeType: string | (new() => CodeType<any>);
+  codeType: string | (new() => CodeType<TCodeId>);
 }

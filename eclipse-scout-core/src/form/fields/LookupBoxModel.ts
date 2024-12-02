@@ -7,9 +7,21 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupCallOrModel, ObjectOrChildModel, ValueFieldModel, Widget} from '../../index';
+import {CodeType, LookupCallOrModel, ObjectOrChildModel, ValueFieldModel, Widget} from '../../index';
 
 export interface LookupBoxModel<TValue> extends ValueFieldModel<TValue[], TValue | TValue[]> {
+  /**
+   * Configures a box that is shown below the list box and can be used to display filter options.
+   */
   filterBox?: ObjectOrChildModel<Widget>;
+  /**
+   * Configures the {@link LookupCall} that is used to load the data.
+   */
   lookupCall?: LookupCallOrModel<TValue>;
+  /**
+   * If set, a {@link CodeLookupCall} is created and used for the property {@link lookupCall}.
+   *
+   * The property accepts a {@link CodeType} class or a {@link CodeType.id} (see {@link CodeTypeCache.get}).
+   */
+  codeType?: string | (new() => CodeType<TValue>);
 }

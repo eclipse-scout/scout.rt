@@ -68,7 +68,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
       if (row.checked) {
         valueArray.push(row.lookupRow.key);
       }
-    }, this);
+    });
 
     this.setValue(valueArray);
     this._valueSyncing = false;
@@ -125,9 +125,9 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
       tableRows = [],
       lookupRows = result.lookupRows;
 
-    lookupRows.forEach(function(lookupRow) {
+    lookupRows.forEach(lookupRow => {
       tableRows.push(this._createTableRow(lookupRow));
-    }, this);
+    });
 
     this.table.deleteAllRows();
     this.table.insertRows(tableRows);

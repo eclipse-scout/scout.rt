@@ -21,7 +21,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
 
   popup: SmartFieldTouchPopup<TValue> | SmartFieldPopup<TValue>;
   lookupCall: LookupCall<TValue>;
-  codeType: string | (new() => CodeType<any>);
+  codeType: string | (new() => CodeType<TValue>);
   lookupRow: LookupRow<TValue>;
   browseHierarchy: boolean;
   browseMaxRowCount: number;
@@ -674,6 +674,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this.maxLengthHandler.render();
   }
 
+  /** @see SmartFieldModel.lookupCall */
   setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this.setProperty('lookupCall', lookupCall);
   }
@@ -683,16 +684,21 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     this._syncBrowseMaxRowCountWithLookupCall();
   }
 
-  protected _setCodeType(codeType: string | (new() => CodeType<any>)) {
+  /** @see SmartFieldModel.codeType */
+  setCodeType(codeType: string | (new() => CodeType<TValue>)) {
+    this.setProperty('codeType', codeType);
+  }
+
+  protected _setCodeType(codeType: string | (new() => CodeType<TValue>)) {
     this._setProperty('codeType', codeType);
     if (!codeType) {
       return;
     }
-    let lookupCall = scout.create(CodeLookupCall, {
+    let lookupCall = scout.create(CodeLookupCall<TValue>, {
       session: this.session,
       codeType: codeType
     });
-    this.setProperty('lookupCall', lookupCall);
+    this.setLookupCall(lookupCall);
   }
 
   protected override _formatValue(value: TValue): string | JQuery.Promise<string> {
@@ -930,7 +936,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     // 'No data' case
     if (empty && result.byAll) {
       // When active filter is enabled we must always show the popup, because the user
-      // must be able to switch the filter properties. Otherwise a user could set the filter
+      // must be able to switch the filter properties. Otherwise, a user could set the filter
       // to 'inactive', and receives an empty result for that query, the popup is closed
       // and the user can not switch the filter back to 'active' again because the filter
       // control is not visible.

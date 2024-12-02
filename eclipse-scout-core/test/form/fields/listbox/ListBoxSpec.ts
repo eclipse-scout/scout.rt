@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ListBox, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
+import {Code, CodeLookupCall, codes, CodeType, ListBox, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
 import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
 import {InitModelOf, ObjectOrModel} from '../../../../src/scout';
 import $ from 'jquery';
@@ -21,10 +21,32 @@ describe('ListBox', () => {
     field = new ListBox();
     helper = new FormSpecHelper(session);
     jasmine.clock().install();
+    codes.add([{
+      id: 'ListBoxSpec_CodeType',
+      objectType: CodeType,
+      codes: [
+        {
+          id: 1,
+          objectType: Code,
+          texts: {
+            'de': 'value 1'
+          }
+        },
+        {
+          id: 2,
+          objectType: Code,
+          texts: {
+            'de': 'value 2'
+          }
+        }
+      ]
+    }
+    ]);
   });
 
   afterEach(() => {
     jasmine.clock().uninstall();
+    codes.remove('ListBoxSpec_CodeType');
   });
 
   class SpecListBox extends ListBox<any> {
@@ -291,6 +313,31 @@ describe('ListBox', () => {
       expect(field.displayText).toBe('Baz' + preparedPropertyValue);
 
       expect(eventCounter).toBe(1);
+    });
+
+    it('is set to CodeLookupCall if a codeType is set', async () => {
+      jasmine.clock().uninstall();
+      let listBox = scout.create(ListBox, {
+        parent: session.desktop,
+        codeType: 'ListBoxSpec_CodeType'
+      });
+      listBox.render();
+      await listBox.when('lookupCallDone');
+      expect(listBox.lookupCall).toBeInstanceOf(CodeLookupCall);
+      expect(listBox.table.rows.length).toBe(2);
+    });
+
+    it('is set to CodeLookupCall if a codeType is set, even dynamically', async () => {
+      jasmine.clock().uninstall();
+      let listBox = scout.create(ListBox, {
+        parent: session.desktop,
+        lookupCall: 'DummyLookupCall'
+      });
+      listBox.setCodeType('ListBoxSpec_CodeType');
+      listBox.render();
+      await listBox.when('lookupCallDone');
+      expect(listBox.lookupCall).toBeInstanceOf(CodeLookupCall);
+      expect(listBox.table.rows.length).toBe(2);
     });
   });
 

@@ -7,17 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Popup, ValueFieldModel} from '../../../index';
+import {ValueFieldModel} from '../../../index';
 
 export interface DateFieldModel extends ValueFieldModel<Date, Date | string> {
-  popup?: Popup;
-  touchMode?: boolean;
   /**
-   * Configure the time picker steps. E.g. 15 for 15 minute steps starting with every full hour.
+   * Configures the time picker steps. E.g. 15 for 15 minute steps starting with every full hour.
+   *
    * If 60 % resolution != 0, the minute steps starts every hour with 00 and rise in resolution steps.
+   *
+   * Default is 30 minutes.
    */
   timePickerResolution?: number;
-  embedded?: boolean;
   /**
    * Date to be used when setting a value "automatically", e.g. when the date picker is opened initially or when a date or time is entered and the other component has to be filled.
    * If no auto date is set (which is the default), the current date (with time part "00:00:00.000") is used.
@@ -30,14 +30,13 @@ export interface DateFieldModel extends ValueFieldModel<Date, Date | string> {
    * If the list is empty or null, all dates are available again.
    */
   allowedDates?: (string | Date)[];
-
   hasDate?: boolean;
   dateHasText?: boolean;
   dateFocused?: boolean;
   dateFormatPattern?: string;
-
   hasTime?: boolean;
   timeHasText?: boolean;
   timeFocused?: boolean;
   timeFormatPattern?: string;
+  touchMode?: boolean;
 }

@@ -22,7 +22,7 @@ export class SmartColumn<TValue> extends Column<TValue> {
   declare eventMap: SmartColumnEventMap<TValue>;
   declare self: SmartColumn<any>;
 
-  codeType: string | (new() => CodeType<any>);
+  codeType: string | (new() => CodeType<TValue>);
   lookupCall: LookupCall<TValue>;
   browseHierarchy: boolean;
   browseMaxRowCount: number;
@@ -84,11 +84,11 @@ export class SmartColumn<TValue> extends Column<TValue> {
     }
   }
 
-  setCodeType(codeType: string | (new() => CodeType<any>)) {
+  setCodeType(codeType: string | (new() => CodeType<TValue>)) {
     this.setProperty('codeType', codeType);
   }
 
-  protected _setCodeType(codeType: string | (new() => CodeType<any>)) {
+  protected _setCodeType(codeType: string | (new() => CodeType<TValue>)) {
     this._setProperty('codeType', codeType);
     if (codeType) {
       let codeLookupCall = CodeLookupCall<TValue>;

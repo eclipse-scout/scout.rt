@@ -7,7 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractLayout, arrays, HtmlComponent, InitModelOf, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupCallOrModel, LookupResult, LookupRow, objects, PropertyChangeEvent, Status, strings, ValueField, Widget} from '../../index';
+import {
+  AbstractLayout, arrays, CodeLookupCall, CodeType, HtmlComponent, InitModelOf, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupCallOrModel, LookupResult, LookupRow, objects, PropertyChangeEvent, scout, Status, strings, ValueField,
+  Widget
+} from '../../index';
 import $ from 'jquery';
 
 export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
@@ -17,6 +20,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
 
   filterBox: Widget;
   lookupCall: LookupCall<TValue>;
+  codeType: string | (new() => CodeType<TValue>);
   lookupStatus: Status;
 
   protected _currentLookupCall: LookupCall<TValue>;
@@ -56,6 +60,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     if (this.lookupCall) {
       this._setLookupCall(this.lookupCall);
     }
+    this._setCodeType(this.codeType);
     this._initStructure(value);
     super._initValue(value);
   }
@@ -168,6 +173,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     this.setLookupStatus(null);
   }
 
+  /** @see LookupBoxModel.lookupCall */
   setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this.setProperty('lookupCall', lookupCall);
   }
@@ -178,6 +184,23 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     if (this.rendered) {
       this._ensureLookupCallExecuted();
     }
+  }
+
+  /** @see LookupBoxModel.codeType */
+  setCodeType(codeType: string | (new() => CodeType<TValue>)) {
+    this.setProperty('codeType', codeType);
+  }
+
+  protected _setCodeType(codeType: string | (new() => CodeType<TValue>)) {
+    this._setProperty('codeType', codeType);
+    if (!codeType) {
+      return;
+    }
+    let lookupCall = scout.create(CodeLookupCall<TValue>, {
+      session: this.session,
+      codeType: codeType
+    });
+    this.setLookupCall(lookupCall);
   }
 
   refreshLookup() {
