@@ -944,11 +944,6 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
 
     @Override
-    protected boolean getConfiguredMultiSelect() {
-      return false;
-    }
-
-    @Override
     protected boolean getConfiguredCheckable() {
       return true;
     }
