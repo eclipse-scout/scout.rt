@@ -576,14 +576,17 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _setComponents(components: CalendarComponent[]) {
+    let layoutRequired = false;
+
     if (this.isDay()) {
-      let defaultResourceVisibleChanged = this._defaultResourceVisible() !== this._defaultResourceVisible(components);
-      this._setProperty('components', components);
-      if (defaultResourceVisibleChanged) {
-        this.layoutSize(true);
-      }
-    } else {
-      this._setProperty('components', components);
+      // Re-layout required when visibility of default resource will change when setting new components
+      layoutRequired = this._defaultResourceVisible() !== this._defaultResourceVisible(components);
+    }
+
+    this._setProperty('components', components);
+
+    if (this.rendered && layoutRequired) {
+      this.layoutSize(true);
     }
   }
 
