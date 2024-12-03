@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Event, EventHandler, EventListener, EventMapOf, Form, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, Session, UuidPool, Widget
+  Event, EventHandler, EventListener, EventMapOf, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent, HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, Session, UuidPool,
+  Widget
 } from '../../index';
 
 /**
@@ -99,8 +100,8 @@ export class HybridManager extends Widget {
   // hybrid events (java to js)
 
   /** @internal */
-  onHybridEvent(id: string, eventType: string, data: object) {
-    this.trigger(`${eventType}:${id}`, {data});
+  onHybridEvent(id: string, eventType: string, data: object, contextElements: HybridActionContextElements) {
+    this.trigger(`${eventType}:${id}`, {data, contextElements});
   }
 
   /** @internal */
@@ -141,41 +142,45 @@ export class HybridManager extends Widget {
   }
 
   /**
-   * @deprecated use {@link callAction} instead.
-   */
-  triggerHybridAction(eventType: string, data?: object): string {
-    return this.callAction(eventType, data);
-  }
-
-  /**
    * Calls the hybrid action that matches the given action type.
    *
    * @returns the id of the triggered hybrid action
    * @see IHybridAction.java
    */
-  callAction(actionType: string, data?: object): string {
+  callAction(actionType: string, data?: object, contextElements?: HybridActionContextElements): string {
     const id = this._createEventId();
-    this.trigger('hybridAction', {data: {id, actionType, data}} as HybridActionEvent);
+    this.trigger('hybridAction', {data: {id, actionType, contextElements, data}} as HybridActionEvent);
     return id;
   }
 
   /**
-   * @deprecated use {@link callActionAndWait} instead.
+   * Calls the hybrid action that matches the given action type and returns a promise that will be resolved once the corresponding hybridActionEnd event arrives.
+   * The resolved value consist of the `data` value sent back from the server. To access the `contextElements`, use {@link callActionAndWaitWithContext} instead.
+   *
+   * @returns a promise that will be resolved with the result `data` once the corresponding hybridActionEnd event arrives.
+   * @see IHybridAction
+   * @see AbstractHybridAction.fireHybridActionEndEvent
    */
-  async triggerHybridActionAndWait(eventType: string, data?: object): Promise<object> {
-    return this.callActionAndWait(eventType, data);
+  callActionAndWait(actionType: string, data?: object, contextElements?: HybridActionContextElements): JQuery.Promise<object> {
+    return this.callActionAndWaitWithContext(actionType, data, contextElements)
+      .then(result => result.data);
   }
 
   /**
    * Calls the hybrid action that matches the given action type and returns a promise that will be resolved once the corresponding hybridActionEnd event arrives.
+   * The resolved value is an object with the `data` and `contextElements` values sent back from the user. {@link callActionAndWait} can be used instead if only
+   * the content of the `data` attribute is relevant.
    *
-   * @returns a promise that will be resolved once the corresponding hybridActionEnd event arrives.
+   * @returns a promise that will be resolved with the entire result object once the corresponding hybridActionEnd event arrives.
    * @see IHybridAction
    * @see AbstractHybridAction.fireHybridActionEndEvent
    */
-  callActionAndWait(actionType: string, data?: object): JQuery.Promise<object> {
-    const id = this.callAction(actionType, data);
-    return this.when(`hybridActionEnd:${id}`).then(event => event.data);
+  callActionAndWaitWithContext(actionType: string, data?: object, contextElements?: HybridActionContextElements): JQuery.Promise<HybridManagerActionEndEventResult> {
+    const id = this.callAction(actionType, data, contextElements);
+    return this.when(`hybridActionEnd:${id}`).then(event => ({
+      data: event.data,
+      contextElements: event.contextElements
+    }));
   }
 
   /**
@@ -219,4 +224,9 @@ export class HybridManager extends Widget {
   override when<K extends string & keyof EventMapOf<this['self']>>(type: K | `${K}:${string}`): JQuery.Promise<EventMapOf<this>[K] & Event<this>> {
     return super.when(type as K);
   }
+}
+
+export interface HybridManagerActionEndEventResult {
+  data: object;
+  contextElements?: HybridActionContextElements;
 }

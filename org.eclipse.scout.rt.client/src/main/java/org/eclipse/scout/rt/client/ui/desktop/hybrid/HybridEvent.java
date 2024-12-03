@@ -24,34 +24,35 @@ public class HybridEvent extends EventObject implements IModelEvent {
 
   public static final String HYBRID_ACTION_END = "hybridActionEnd";
 
-  private int m_type;
+  private final int m_type;
+  private final String m_id;
+  private final String m_eventType;
+  private final IDoEntity m_data;
+  private final HybridActionContextElements m_contextElements;
 
-  private String m_id;
-  private String m_eventType;
-  private IDoEntity m_data;
-
-  protected HybridEvent(Object source, int type, String id, String eventType, IDoEntity data) {
+  protected HybridEvent(Object source, int type, String id, String eventType, IDoEntity data, HybridActionContextElements contextElements) {
     super(source);
     m_type = type;
     m_id = id;
     m_eventType = eventType;
     m_data = data;
+    m_contextElements = contextElements;
   }
 
   public static HybridEvent createHybridEvent(Object source, String id, String eventType) {
-    return createHybridEvent(source, id, eventType, null);
+    return createHybridEvent(source, id, eventType, null, null);
   }
 
-  public static HybridEvent createHybridEvent(Object source, String id, String eventType, IDoEntity data) {
-    return new HybridEvent(source, HybridEvent.TYPE_EVENT, id, eventType, data);
+  public static HybridEvent createHybridEvent(Object source, String id, String eventType, IDoEntity data, HybridActionContextElements contextElements) {
+    return new HybridEvent(source, HybridEvent.TYPE_EVENT, id, eventType, data, contextElements);
   }
 
   public static HybridEvent createHybridActionEndEvent(Object source, String id) {
-    return createHybridActionEndEvent(source, id, null);
+    return createHybridActionEndEvent(source, id, null, null);
   }
 
-  public static HybridEvent createHybridActionEndEvent(Object source, String id, IDoEntity data) {
-    return createHybridEvent(source, id, HYBRID_ACTION_END, data);
+  public static HybridEvent createHybridActionEndEvent(Object source, String id, IDoEntity data, HybridActionContextElements contextElements) {
+    return createHybridEvent(source, id, HYBRID_ACTION_END, data, contextElements);
   }
 
   public static HybridEvent createHybridWidgetEvent(Object source, String id, String eventType) {
@@ -59,7 +60,7 @@ public class HybridEvent extends EventObject implements IModelEvent {
   }
 
   public static HybridEvent createHybridWidgetEvent(Object source, String id, String eventType, IDoEntity data) {
-    return new HybridEvent(source, HybridEvent.TYPE_WIDGET_EVENT, id, eventType, data);
+    return new HybridEvent(source, HybridEvent.TYPE_WIDGET_EVENT, id, eventType, data, null);
   }
 
   @Override
@@ -79,54 +80,25 @@ public class HybridEvent extends EventObject implements IModelEvent {
     return m_data;
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(source, m_type, m_id, m_eventType, m_data);
+  public HybridActionContextElements getContextElements() {
+    return m_contextElements;
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (obj == null) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    HybridEvent other = (HybridEvent) obj;
-    if (!source.equals(other.source)) {
-      return false;
-    }
-    if (m_type != other.m_type) {
-      return false;
-    }
-    if (m_id == null) {
-      if (other.m_id != null) {
-        return false;
-      }
-    }
-    else if (!m_id.equals(other.m_id)) {
-      return false;
-    }
-    if (m_eventType == null) {
-      if (other.m_eventType != null) {
-        return false;
-      }
-    }
-    else if (!m_eventType.equals(other.m_eventType)) {
-      return false;
-    }
-    if (m_data == null) {
-      if (other.m_data != null) {
-        return false;
-      }
-    }
-    else if (!m_data.equals(other.m_data)) {
-      return false;
-    }
-    return true;
+    HybridEvent that = (HybridEvent) o;
+    return m_type == that.m_type && Objects.equals(m_id, that.m_id) && Objects.equals(m_eventType, that.m_eventType) && Objects.equals(m_data, that.m_data) && Objects.equals(m_contextElements, that.m_contextElements);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_type, m_id, m_eventType, m_data, m_contextElements);
   }
 
   @Override
@@ -143,6 +115,9 @@ public class HybridEvent extends EventObject implements IModelEvent {
     }
     if (m_data != null) {
       builder.append(", ").append("data=").append(m_data);
+    }
+    if (m_contextElements != null) {
+      builder.append(", ").append("contextElements=").append(m_contextElements);
     }
     builder.append("]");
     return builder.toString();

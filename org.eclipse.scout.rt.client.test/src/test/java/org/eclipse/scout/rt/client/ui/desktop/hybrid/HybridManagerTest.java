@@ -9,13 +9,23 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -99,5 +109,51 @@ public class HybridManagerTest {
     form.start();
     form.doOk();
     assertEquals(0, hybridManager.getWidgets().size());
+  }
+
+  @Test
+  public void testEventWithContextElement() {
+    IForm form = new AbstractForm() {
+    };
+    ITree tree = new AbstractTree() {
+    };
+    ITreeNode treeNode = new AbstractTreeNode() {
+    };
+
+    HybridManager hybridManager = BEANS.get(HybridManager.class);
+    List<HybridEvent> eventCollector = new ArrayList<>();
+    hybridManager.addHybridEventListener(event -> eventCollector.add(event));
+
+    // ----------
+
+    String id = createId();
+    String eventType = "foo";
+    IDoEntity data = BEANS.get(DoEntityBuilder.class).put("n", 1).build();
+    HybridActionContextElements contextElements = BEANS.get(HybridActionContextElements.class)
+        .withElement("form", form)
+        .withElement("node", tree, treeNode);
+    hybridManager.fireHybridEvent(id, eventType, data, contextElements);
+
+    assertEquals(1, eventCollector.size());
+    HybridEvent event = eventCollector.get(0);
+    assertSame(id, event.getId());
+    assertSame(eventType, event.getEventType());
+    assertSame(data, event.getData());
+    assertSame(contextElements, event.getContextElements());
+
+    // ----------
+
+    String id2 = createId();
+    HybridActionContextElements contextElements2 = BEANS.get(HybridActionContextElements.class)
+        .withElement("form", form)
+        .withElement("node", tree, treeNode);
+    hybridManager.fireHybridActionEndEvent(id2, contextElements2);
+
+    assertEquals(2, eventCollector.size());
+    HybridEvent event2 = eventCollector.get(1);
+    assertSame(id2, event2.getId());
+    assertSame(HybridEvent.HYBRID_ACTION_END, event2.getEventType());
+    assertNull(event2.getData());
+    assertSame(contextElements2, event2.getContextElements());
   }
 }

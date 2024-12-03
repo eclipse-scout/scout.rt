@@ -39,9 +39,15 @@ public class UiSessionMock extends UiSession {
     if (isSpyOnJsonAdapter()) {
       String id = createUniqueId();
       @SuppressWarnings("unchecked")
-      A adapter = (A) spy(MainJsonObjectFactory.get().createJsonAdapter(model, this, id, parent));
-      adapter.init();
-      return adapter;
+      A adapter = (A) MainJsonObjectFactory.get().createJsonAdapter(model, this, id, parent);
+      // The new adapter automatically registered itself in the registry (see constructor of AbstractJsonAdapter).
+      // To prevent the "real" instance (instead of the spy) from being returned when resolving the adapter ID, we
+      // have to manually update the registry.
+      unregisterJsonAdapter(adapter);
+      A adapterSpy = spy(adapter);
+      registerJsonAdapter(adapterSpy);
+      adapterSpy.init();
+      return adapterSpy;
     }
     return super.newJsonAdapter(model, parent);
   }

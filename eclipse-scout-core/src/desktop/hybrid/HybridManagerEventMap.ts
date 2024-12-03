@@ -8,18 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Event, HybridManager, PropertyChangeEvent, Widget, WidgetEventMap} from '../../index';
+import {Event, HybridActionContextElements, HybridManager, PropertyChangeEvent, Widget, WidgetEventMap} from '../../index';
 
 export interface HybridActionEvent<TObject = object, T = HybridManager> extends Event<T> {
   data: {
     id: string;
     actionType: string;
     data: TObject;
+    contextElements: HybridActionContextElements;
   };
 }
 
 export interface HybridActionEndEvent<TObject = object, T = HybridManager> extends Event<T> {
   data: TObject;
+  contextElements: HybridActionContextElements;
 }
 
 export interface HybridManagerWidgetAddEvent<TWidget = Widget, T = HybridManager> extends Event<T> {

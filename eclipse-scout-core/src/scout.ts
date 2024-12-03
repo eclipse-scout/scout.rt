@@ -41,6 +41,9 @@ export type ObjectOrModel<T> = T | ModelOf<T>;
  */
 export type ObjectOrChildModel<T> = T | ChildModelOf<T>;
 
+export type Constructor<T = object> = new(...args: any[]) => T;
+export type AbstractConstructor<T = object> = abstract new(...args: any[]) => T;
+
 export interface ObjectWithType {
   objectType: string;
 }
@@ -67,7 +70,7 @@ export interface ReloadPageOptions {
   redirectUrl?: string;
 }
 
-function create<T>(objectType: new() => T, model?: InitModelOf<T>, options?: ObjectFactoryOptions): T;
+function create<T>(objectType: Constructor<T>, model?: InitModelOf<T>, options?: ObjectFactoryOptions): T;
 function create<T>(model: FullModelOf<T>, options?: ObjectFactoryOptions): T;
 function create(objectType: string, model?: object, options?: ObjectFactoryOptions): any;
 function create(model: { objectType: string; [key: string]: any }, options?: ObjectFactoryOptions): any;
@@ -82,7 +85,7 @@ function create<T extends object>(objectType: ObjectType<T> | FullModelOf<T>, mo
   return ObjectFactory.get().create(objectType, model, options);
 }
 
-function widget<T extends Widget>(widgetIdOrElement: string | number | HTMLElement | JQuery, partIdOrType?: string | (new() => T)): T;
+function widget<T extends Widget>(widgetIdOrElement: string | number | HTMLElement | JQuery, partIdOrType?: string | Constructor<T>): T;
 function widget(widgetIdOrElement: string | number | HTMLElement | JQuery, partId?: string): Widget;
 
 /**
@@ -98,7 +101,7 @@ function widget(widgetIdOrElement: string | number | HTMLElement | JQuery, partI
  *          argument is a widget ID). If omitted, the first session is used.
  * @returns the widget for the given element or id
  */
-function widget<T extends Widget>(widgetIdOrElement: string | number | HTMLElement | JQuery, partIdOrType?: string | (new() => T)): T {
+function widget<T extends Widget>(widgetIdOrElement: string | number | HTMLElement | JQuery, partIdOrType?: string | Constructor<T>): T {
   if (objects.isNullOrUndefined(widgetIdOrElement)) {
     return null;
   }
@@ -116,7 +119,7 @@ function widget<T extends Widget>(widgetIdOrElement: string | number | HTMLEleme
 }
 
 export const scout = {
-  objectFactories: new Map<string | { new(): object }, ObjectCreator>(),
+  objectFactories: new Map<string | Constructor, ObjectCreator>(),
 
   /**
    * Returns the first of the given arguments that is not null or undefined. If no such element
@@ -140,7 +143,7 @@ export const scout = {
    * @param type if this optional parameter is set, the given value must be of this type (instanceof check)
    * @returns the value (for direct assignment)
    */
-  assertParameter<T>(parameterName: string, value?: T, type?: abstract new(...args) => any): T {
+  assertParameter<T>(parameterName: string, value?: T, type?: AbstractConstructor | Constructor): T {
     if (objects.isNullOrUndefined(value)) {
       throw new Error('Missing required parameter \'' + parameterName + '\'');
     }
@@ -156,7 +159,7 @@ export const scout = {
    * @param type if this parameter is set, the value must be of this type (instanceof check)
    * @returns the value (for direct assignment)
    */
-  assertProperty(object: object, propertyName: string, type?: abstract new(...args) => any) {
+  assertProperty(object: object, propertyName: string, type?: AbstractConstructor) {
     let value = object[propertyName];
     if (objects.isNullOrUndefined(value)) {
       throw new Error('Missing required property \'' + propertyName + '\'');
@@ -187,7 +190,7 @@ export const scout = {
    * @param type type to check against with "instanceof"
    * @param msg optional error message when the assertion fails
    */
-  assertInstance<T>(value: any, type: abstract new(...args) => T, msg?: string): T {
+  assertInstance<T>(value: any, type: AbstractConstructor<T>, msg?: string): T {
     if (!(value instanceof type)) {
       throw new Error(msg || 'Value has wrong type');
     }

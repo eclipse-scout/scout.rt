@@ -12,5 +12,5 @@ package org.eclipse.scout.rt.client.ui.desktop.hybrid;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 public interface IHybridManagerUIFacade {
-  void handleHybridActionFromUI(String id, String actionType, IDoEntity data);
+  void handleHybridActionFromUI(String id, String actionType, IDoEntity data, HybridActionContextElements contextElements);
 }

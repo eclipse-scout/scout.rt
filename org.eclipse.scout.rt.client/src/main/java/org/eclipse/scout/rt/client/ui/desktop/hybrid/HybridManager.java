@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StreamUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 
 @Bean
@@ -219,31 +221,47 @@ public class HybridManager extends AbstractPropertyObserver {
   }
 
   public void fireHybridEvent(String id, String eventType) {
-    fireHybridEvent(id, eventType, null);
+    fireHybridEvent(id, eventType, null, null);
   }
 
   public void fireHybridEvent(String id, String eventType, IDoEntity data) {
-    fireHybridEvent(HybridEvent.createHybridEvent(this, id, eventType, data));
+    fireHybridEvent(id, eventType, data, null);
+  }
+
+  public void fireHybridEvent(String id, String eventType, HybridActionContextElements contextElements) {
+    fireHybridEvent(id, eventType, null, contextElements);
+  }
+
+  public void fireHybridEvent(String id, String eventType, IDoEntity data, HybridActionContextElements contextElements) {
+    fireHybridEvent(HybridEvent.createHybridEvent(this, id, eventType, data, contextElements));
   }
 
   public void fireHybridActionEndEvent(String id) {
-    fireHybridActionEndEvent(id, null);
+    fireHybridActionEndEvent(id, null, null);
   }
 
   public void fireHybridActionEndEvent(String id, IDoEntity data) {
-    fireHybridEvent(HybridEvent.createHybridActionEndEvent(this, id, data));
+    fireHybridActionEndEvent(id, data, null);
+  }
+
+  public void fireHybridActionEndEvent(String id, HybridActionContextElements contextElements) {
+    fireHybridActionEndEvent(id, null, contextElements);
+  }
+
+  public void fireHybridActionEndEvent(String id, IDoEntity data, HybridActionContextElements contextElements) {
+    fireHybridEvent(HybridEvent.createHybridActionEndEvent(this, id, data, contextElements));
   }
 
   public void fireHybridWidgetEvent(String id, String eventType) {
     fireHybridWidgetEvent(id, eventType, null);
   }
 
-  public void fireHybridWidgetEvent(String id, String eventType, IDoEntity data) {
-    fireHybridEvent(HybridEvent.createHybridWidgetEvent(this, id, eventType, data));
-  }
-
   public void fireHybridWidgetEvent(IWidget widget, String eventType) {
     fireHybridWidgetEvent(widget, eventType, null);
+  }
+
+  public void fireHybridWidgetEvent(String id, String eventType, IDoEntity data) {
+    fireHybridEvent(HybridEvent.createHybridWidgetEvent(this, id, eventType, data));
   }
 
   public void fireHybridWidgetEvent(IWidget widget, String eventType, IDoEntity data) {
@@ -252,15 +270,15 @@ public class HybridManager extends AbstractPropertyObserver {
 
   // hybrid actions (js to java)
 
-  private void handleHybridAction(String id, String actionType, IDoEntity data) {
+  private void handleHybridAction(String id, String actionType, IDoEntity data, HybridActionContextElements contextElements) {
     if (m_hybridActionMap == null) {
       m_hybridActionMap = BEANS.getBeanManager().getBeans(IHybridAction.class).stream()
           .filter(bean -> bean.hasAnnotation(HybridActionType.class))
-          .collect(Collectors.toMap(bean -> bean.getBeanAnnotation(HybridActionType.class).value(), IBean::getBeanClazz));
+          .collect(StreamUtility.toMap(TreeMap::new, bean -> bean.getBeanAnnotation(HybridActionType.class).value(), IBean::getBeanClazz)); // use TreeMap for easier debugging
     }
     Optional.ofNullable(m_hybridActionMap.get(actionType))
         .map(BEANS::get)
-        .ifPresent(hybridAction -> hybridAction.execute(id, data));
+        .ifPresent(hybridAction -> hybridAction.execute(id, data, contextElements));
   }
 
   public IHybridManagerUIFacade getUIFacade() {
@@ -274,8 +292,8 @@ public class HybridManager extends AbstractPropertyObserver {
   protected class P_UIFacade implements IHybridManagerUIFacade {
 
     @Override
-    public void handleHybridActionFromUI(String id, String actionType, IDoEntity data) {
-      handleHybridAction(id, actionType, data);
+    public void handleHybridActionFromUI(String id, String actionType, IDoEntity data, HybridActionContextElements contextElements) {
+      handleHybridAction(id, actionType, data, contextElements);
     }
   }
 

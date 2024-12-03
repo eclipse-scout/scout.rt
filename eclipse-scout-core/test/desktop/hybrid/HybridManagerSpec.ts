@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {HybridManager, LabelField, scout, StringField, UuidPool, Widget} from '../../../src';
-import {FormSpecHelper} from '../../../src/testing';
+import {Form, FormAdapter, HybridActionContextElements, HybridManager, HybridManagerAdapter, LabelField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget} from '../../../src';
+import {FormSpecHelper, TreeSpecHelper} from '../../../src/testing';
 
 describe('HybridManager', () => {
   let session: SandboxSession, formHelper: FormSpecHelper;
@@ -137,6 +137,126 @@ describe('HybridManager', () => {
           }
         ]
       });
+    });
+  });
+
+  describe('context elements', () => {
+
+    let form: Form;
+    let formAdapter: FormAdapter;
+    let tree: Tree;
+    let treeAdapter: TreeAdapter;
+    let treeNode: TreeNode;
+    let hybridManager: HybridManager;
+    let hybridManagerAdapter: HybridManagerAdapter;
+
+    beforeEach(() => {
+      jasmine.Ajax.install();
+      jasmine.clock().install();
+
+      let formSpecHelper = new FormSpecHelper(session);
+      let treeSpecHelper = new TreeSpecHelper(session);
+
+      form = formSpecHelper.createFormWithOneField();
+      tree = treeSpecHelper.createTree(treeSpecHelper.createModelFixture(1));
+      treeNode = tree.nodes[0];
+      hybridManager = HybridManager.get(session);
+
+      linkWidgetAndAdapter(form, FormAdapter);
+      formAdapter = form.modelAdapter as FormAdapter;
+      linkWidgetAndAdapter(tree, TreeAdapter);
+      treeAdapter = tree.modelAdapter as TreeAdapter;
+      hybridManagerAdapter = hybridManager.modelAdapter as HybridManagerAdapter;
+
+      expect(form).toBeTruthy();
+      expect(tree).toBeTruthy();
+      expect(treeNode).toBeTruthy();
+      expect(hybridManager).toBeTruthy();
+
+      expect(formAdapter).toBeTruthy();
+      expect(treeAdapter).toBeTruthy();
+      expect(hybridManagerAdapter).toBeTruthy();
+
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
+    afterEach(() => {
+      jasmine.Ajax.uninstall();
+      jasmine.clock().uninstall();
+    });
+
+    it('can send context elements to the server', () => {
+      hybridManager.callActionAndWait('foo', {customData: 123}, scout.create(HybridActionContextElements)
+        .withElement('form', form)
+        .withElement('node', tree, treeNode));
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      let requestData = mostRecentJsonRequest();
+
+      expect(requestData).toContainEventTypesExactly(['hybridAction']);
+      let hybridActionEvent = requestData.events[0];
+      expect(hybridActionEvent.actionType).toBe('foo');
+      expect(hybridActionEvent.id).toBeTruthy();
+      expect(hybridActionEvent.data).toEqual({customData: 123});
+      expect(hybridActionEvent.contextElements).toEqual({
+        form: [{widget: formAdapter.id}],
+        node: [{widget: treeAdapter.id, element: treeNode.id}]
+      });
+    });
+
+    it('only sends context elements when needed', () => {
+      hybridManager.callActionAndWait('foo', {customData: 123});
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      let requestData = mostRecentJsonRequest();
+
+      expect(requestData).toContainEventTypesExactly(['hybridAction']);
+      let hybridActionEvent = requestData.events[0];
+      expect(hybridActionEvent.actionType).toBe('foo');
+      expect(hybridActionEvent.id).toBeTruthy();
+      expect(hybridActionEvent.data).toEqual({customData: 123});
+      expect(hybridActionEvent.contextElements).toBeUndefined();
+    });
+
+    it('can receive context elements from the server', () => {
+      // Uninstall jasmine clock, since it seems to interfere with promises (spec will not complete without this)
+      jasmine.clock().uninstall();
+
+      let promise = hybridManager.when('hybridActionEnd:767676767').then(event => {
+        expect(event.data).toEqual({customData: 123});
+        expect(event.contextElements).toBeInstanceOf(HybridActionContextElements);
+        expect(event.contextElements.isEmpty()).toBe(false);
+        expect(event.contextElements.getList('form').length).toBe(1);
+        expect(event.contextElements.getSingle('form').getWidget()).toBe(form);
+        expect(event.contextElements.getSingle('form').optElement()).toBe(null);
+        expect(event.contextElements.getList('node').length).toBe(1);
+        expect(event.contextElements.getSingle('node').getWidget()).toBe(tree);
+        expect(event.contextElements.getSingle('node').getElement()).toBe(treeNode);
+
+        expect(event.contextElements.optList('doesNotExist')).toBe(undefined);
+        expect(event.contextElements.optSingle('doesNotExist')).toBe(undefined);
+        expect(() => event.contextElements.getList('doesNotExist')).toThrow();
+        expect(() => event.contextElements.getSingle('doesNotExist')).toThrow();
+      });
+
+      session._processSuccessResponse({
+        events: [
+          {
+            target: hybridManagerAdapter.id,
+            type: 'hybridEvent',
+            eventType: 'hybridActionEnd',
+            id: '767676767',
+            data: {customData: 123},
+            contextElements: {
+              form: [{widget: formAdapter.id}],
+              node: [{widget: treeAdapter.id, element: treeNode.id}]
+            }
+          }
+        ]
+      });
+      return promise;
     });
   });
 });
