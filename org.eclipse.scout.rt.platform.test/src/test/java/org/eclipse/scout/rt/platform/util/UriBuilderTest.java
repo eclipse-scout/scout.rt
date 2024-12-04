@@ -35,7 +35,7 @@ public class UriBuilderTest {
   private static final String PATH = "/";
   private static final String SIMPLE_URL = HTTP + "://" + HOST;
   private static final String SIMPLE_URL_PATH = HTTP + "://" + HOST + PATH;
-  private static final String TEST_URI_PATH = "http://acme.com:1234/scout";
+  private static final String TEST_URI_PATH = "https://acme.com:1234/scout";
 
   private static final String NAME1 = "name1";
   private static final String NAME2 = "name2";
@@ -138,7 +138,7 @@ public class UriBuilderTest {
     String query = "?a=%3D";
     UriBuilder builder = new UriBuilder(TEST_URI_PATH + query);
     final String url = builder.createURL().toString();
-    assertTrue(url.toString(), url.toString().endsWith(query));
+    assertTrue(url, url.endsWith(query));
   }
 
   @Test
@@ -152,7 +152,7 @@ public class UriBuilderTest {
     assertEquals("ftp", builder.getScheme());
     //
     builder = new UriBuilder(TEST_URI_PATH);
-    assertEquals("http", builder.getScheme());
+    assertEquals("https", builder.getScheme());
   }
 
   @Test
@@ -189,7 +189,7 @@ public class UriBuilderTest {
     builder.port(-15);
     assertEquals(-1, builder.getPort());
     //
-    builder = new UriBuilder("http://www.ecipse.org:1234/scout");
+    builder = new UriBuilder("https://www.ecipse.org:1234/scout");
     assertEquals(1234, builder.getPort());
     //
     builder.port(42);
@@ -207,7 +207,7 @@ public class UriBuilderTest {
     builder.path(path);
     assertEquals(path, builder.getPath());
     //
-    builder = new UriBuilder("http://acme.com:1234/scout/test/3");
+    builder = new UriBuilder("https://acme.com:1234/scout/test/3");
     assertEquals("/scout/test/3", builder.getPath());
   }
 
@@ -225,11 +225,11 @@ public class UriBuilderTest {
     builder.addPath(path);
     assertEquals(path, builder.getPath());
     //
-    builder = new UriBuilder("http://acme.com:1234/scout/test/3");
+    builder = new UriBuilder("https://acme.com:1234/scout/test/3");
     builder.addPath("test");
     assertEquals("/scout/test/3/test", builder.getPath());
     //
-    builder = new UriBuilder("http://acme.com:1234");
+    builder = new UriBuilder("https://acme.com:1234");
     builder.addPath("test");
     assertEquals("/test", builder.getPath());
   }
@@ -245,7 +245,7 @@ public class UriBuilderTest {
     builder.fragment(fragment);
     assertEquals(fragment, builder.getFragment());
     //
-    builder = new UriBuilder("http://acme.com:1234/scout/test/3#bottomPart");
+    builder = new UriBuilder("https://acme.com:1234/scout/test/3#bottomPart");
     assertEquals("bottomPart", builder.getFragment());
   }
 
@@ -266,7 +266,7 @@ public class UriBuilderTest {
     //
     assertSame(builder, builder.parameter(null, null));
     //
-    builder = new UriBuilder("http://acme.com:1234/scout?name1=value1&name2=value2");
+    builder = new UriBuilder("https://acme.com:1234/scout?name1=value1&name2=value2");
     assertEquals(2, builder.getParameters().size());
     assertEquals(VALUE1, builder.getParameters().get(NAME1));
     assertEquals(VALUE2, builder.getParameters().get(NAME2));
@@ -340,7 +340,7 @@ public class UriBuilderTest {
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
     assertEquals("scheme://host/path/to?key=%E4%F6%FC#anchor", builder.createURI(StandardCharsets.ISO_8859_1.name()).toASCIIString());
     //
-    URI baseUri = new URI("http://www.eclipse.org/scout");
+    URI baseUri = new URI("https://eclipse.dev/scout/");
     builder = new UriBuilder(baseUri);
     assertEquals(baseUri, builder.createURI());
   }
@@ -368,7 +368,7 @@ public class UriBuilderTest {
         .parameter("five", " x ");
 
     String s = builder.createURL().toString();
-    assertEquals("http://acme.com:1234/scout?one=x&three&four=+&five=+x+", s);
+    assertEquals("https://acme.com:1234/scout?one=x&three&four=+&five=+x+", s);
   }
 
   @Test

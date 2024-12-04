@@ -25,7 +25,7 @@
 
   <name>Scout JaxWs Module</name>
   <description>Maven Archetype which creates an empty Scout JaxWs Module</description>
-  <url>https://eclipse.org/scout</url>
+  <url>https://eclipse.dev/scout/</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

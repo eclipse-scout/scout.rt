@@ -64,7 +64,7 @@ public class JsonBrowserFieldTest extends BaseFormFieldTest {
 
   @Test
   public void testPostMessage() throws JSONException {
-    String origin = "https://eclipse.org/scout/";
+    String origin = "https://eclipse.dev/scout/";
     String data = "42";
     Map<String, String> map = new HashMap<>();
     map.put("origin", origin);

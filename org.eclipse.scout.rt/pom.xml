@@ -1138,7 +1138,7 @@
       </plugin>
     </plugins>
   </reporting>
-  <url>https://eclipse.org/scout</url>
+  <url>https://eclipse.dev/scout/</url>
 
   <!-- primarily for license header generation -->
   <inceptionYear>2010</inceptionYear>

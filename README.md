@@ -1,12 +1,12 @@
 # Eclipse Scout - RT
 
-[Eclipse Scout](https://www.eclipse.org/scout/) is a mature and open framework for modern business applications on the web. It substantially boosts developer productivity and is simple to learn.
+[Eclipse Scout](https://eclipse.dev/scout/) is a mature and open framework for modern business applications on the web. It substantially boosts developer productivity and is simple to learn.
 
 This repository contains the source code of the runtime components, the actual framework code.
 
 ## Getting Started
 
-If you are completely new and wondering what Eclipse Scout is, please visit our [website](https://www.eclipse.org/scout/).
+If you are completely new and wondering what Eclipse Scout is, please visit our [website](https://eclipse.dev/scout/).
 
 To get started with Scout, follow our [Get Started Guide](https://eclipsescout.github.io/stable/getstarted.html).
 

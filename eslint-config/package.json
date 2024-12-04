@@ -3,7 +3,7 @@
   "version": "25.1.0-snapshot",
   "description": "ESLint shareable config for the Scout style",
   "author": "BSI Business Systems Integration AG",
-  "homepage": "https://www.eclipse.org/scout",
+  "homepage": "https://eclipse.dev/scout/",
   "repository": {
     "type": "git",
     "url": "https://github.com/eclipse-scout/scout.rt.git"

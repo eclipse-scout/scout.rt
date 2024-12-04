@@ -26,7 +26,7 @@ describe('HtmlField', () => {
       field.render();
       field.setValue('<ul>\n' +
         '  <li>AppLink: <span class="app-link" data-ref="param1=XY&param2=YZ">Click me</span></li>\n' +
-        '  <li>HTML Link: <a href="https://www.eclipse.org/scout" target="_blank">eclipse.org/scout</a></li>\n' +
+        '  <li>HTML Link: <a href="https://eclipse.dev/scout/" target="_blank">eclipse.dev/scout/</a></li>\n' +
         '</ul>\n' +
         '<!-- This is an invisible comment -->\n');
       let origValue = field.value;
