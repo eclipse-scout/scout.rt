@@ -69,7 +69,7 @@
   "dependencies": {
     "@eclipse-scout/core": ">=25.1.0-snapshot <25.1.0",
     "jquery": "3.7.1",
-    "chart.js": "4.4.0",
+    "chart.js": "4.4.6",
     "chartjs-plugin-datalabels": "2.2.0"
   }
 }

@@ -130,8 +130,8 @@
     <io.netty-version>4.1.114.Final</io.netty-version>
     <apache.tika-version>2.9.1</apache.tika-version>
     <batik.version>1.17</batik.version>
-    <activemq.version>6.0.0</activemq.version>
-    <artemis.version>2.31.2</artemis.version>
+    <activemq.version>6.1.4</activemq.version>
+    <artemis.version>2.38.0</artemis.version>
     <com.google.http-client.version>1.43.3</com.google.http-client.version>
     <org.apache.httpcomponents.version>5.2.1</org.apache.httpcomponents.version>
     <opentelemetry.version>1.34.1</opentelemetry.version>
@@ -748,7 +748,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.7.0</version>
+        <version>5.14.2</version>
       </dependency>
 
       <dependency>
