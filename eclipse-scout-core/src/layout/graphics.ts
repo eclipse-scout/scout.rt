@@ -48,7 +48,7 @@ export interface PrefSizeOptions {
   /**
    * By default, the $elem's scrolling position is saved and restored during the execution of this method (because applying
    * intermediate styles for measurement might change the current position). If the calling method does that itself, you should
-   * set this option to false to prevent overriding the stored scrolling position in $elem's data attributes. Default is true.
+   * set this option to false in order to prevent overriding the stored scrolling position in $elem's data attributes. Default is true.
    */
   restoreScrollPositions?: boolean;
 
@@ -279,7 +279,7 @@ export const graphics = {
     let $clone = $elem
       .clone()
       .removeClass(animateClassesStr)
-      .appendTo($elem.parent());
+      .appendTo($elem.parent<HTMLElement>());
     let prefSizeResult = graphics.prefSize($clone, options);
     $clone.remove();
     return prefSizeResult;
@@ -499,7 +499,7 @@ export const graphics = {
     }
     $comp = $.ensure($comp);
     if ($comp.length === 0) {
-      return '$comp doesn\t match any elements';
+      return '$comp doesn\'t match any elements';
     }
     let attrs = '';
     if ($comp.attr('id')) {

@@ -32,7 +32,7 @@
     "version:release": "node bin/releng-scripts version:release"
   },
   "dependencies": {
-    "axios": "1.6.2",
+    "axios": "1.7.9",
     "yargs": "17.7.2",
     "@pnpm/find-workspace-packages": "6.0.9"
   },

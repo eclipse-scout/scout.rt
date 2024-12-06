@@ -17,12 +17,12 @@ let $activeElements = null;
  * The minimal model declaration (usually extends {@link ObjectModel}) as it would be used in a nested declaration (e.g. a {@link FormField} within a {@link GroupBox}).
  * The {@link objectType} is optional as sometimes it might be already given by the context (e.g. when passing a {@link MenuModel} to a method {@link insertMenu()} where the method sets a default {@link objectType} if missing).
  */
-export type ModelOf<TObject> = TObject extends { model: infer TModel } ? TModel : object;
+export type ModelOf<TObject> = TObject extends { model?: infer TModel } ? TModel : object;
 /**
  * Model used to initialize an object instance. Usually the same as {@link ModelOf} but with some minimal required properties (mandatory properties).
  * Typically, adds an e.g. {@link parent} or {@link session} property which needs to be present when initializing an already created instance.
  */
-export type InitModelOf<TObject> = TObject extends { initModel: infer TInitModel } ? TInitModel : ModelOf<TObject>;
+export type InitModelOf<TObject> = TObject extends { initModel?: infer TInitModel } ? TInitModel : ModelOf<TObject>;
 /**
  * Model required to create a new object as child of an existing. To identify the object an {@link objectType} is mandatory.
  * But as the properties required to initialize the instance are derived from the parent, no other mandatory properties are required.
@@ -265,13 +265,15 @@ export const scout = {
    * active state across all browsers.
    *
    * Typically, you'd write something like this in your CSS:
+   * ```
    *   button:active, button.active { ... }
+   * ```
    */
   installSyntheticActiveStateHandler(myDocument: Document) {
     if (Device.get().requiresSyntheticActiveState()) {
       $activeElements = [];
       $(myDocument)
-        .on('mousedown', event => {
+        .on('mousedown', (event: JQuery.MouseDownEvent) => {
           let $element = $(event.target);
           while ($element.length) {
             $activeElements.push($element.addClass('active'));

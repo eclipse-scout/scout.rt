@@ -29,7 +29,7 @@ To set up the tool, do the following:
 ```json
 {
   "devDependencies": {
-    "@eclipse-scout/migrate": "~24.2.0"
+    "@eclipse-scout/migrate": "~25.1.0"
   }
 }
 ```
@@ -45,7 +45,7 @@ Some migrations require a `tsconfig.json`. You can add it as follows (do it only
 ```json
 {
   "devDependencies": {
-    "@eclipse-scout/tsconfig": "~24.2.0"
+    "@eclipse-scout/tsconfig": "~25.1.0"
   }
 }
 ```
@@ -150,7 +150,7 @@ In order to run the TypeScript migration, do the following:
   },
   "pnpm": {
     "overrides": {
-      "typescript": "5.3.2"
+      "typescript": "5.4.5"
     }
   }
 }

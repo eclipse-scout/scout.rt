@@ -861,7 +861,6 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _getSelectedSeconds(event: JQuery.MouseEventBase): number {
-    // @ts-expect-error
     let y = event.originalEvent.layerY;
     let $target = $(event.target);
     let $component = this._get$CalendarComponent($target);
