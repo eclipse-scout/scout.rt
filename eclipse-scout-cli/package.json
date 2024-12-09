@@ -68,7 +68,7 @@
     "fork-ts-checker-notifier-webpack-plugin": "9.0.0"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^24.1.0"
+    "@eclipse-scout/releng": "^25.1.0"
   },
   "bin": {
     "scout-scripts": "./bin/scout-scripts.js"

@@ -30,7 +30,7 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^24.1.0",
+    "@eclipse-scout/releng": "^25.1.0",
     "@eclipse-scout/cli": ">=25.1.0-snapshot <25.1.0",
     "@eclipse-scout/tsconfig": ">=25.1.0-snapshot <25.1.0",
     "jasmine-core": "5.5.0",

@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@eclipse-scout/cli": ">=25.1.0-snapshot <25.1.0",
-    "@eclipse-scout/releng": "^24.1.0"
+    "@eclipse-scout/releng": "^25.1.0"
   },
   "dependencies": {
     "@eclipse-scout/core": ">=25.1.0-snapshot <25.1.0",

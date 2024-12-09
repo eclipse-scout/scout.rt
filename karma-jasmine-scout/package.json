@@ -26,7 +26,7 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^24.1.0",
+    "@eclipse-scout/releng": "^25.1.0",
     "jasmine-core": "5.5.0",
     "jasmine-ajax": "4.0.0"
   },

@@ -46,7 +46,7 @@
     "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^24.1.0",
+    "@eclipse-scout/releng": "^25.1.0",
     "eslint": "8.57.1"
   },
   "dependencies": {
