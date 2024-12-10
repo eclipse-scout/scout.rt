@@ -10,27 +10,25 @@
 package org.eclipse.scout.rt.dataobject.fixture;
 
 import org.eclipse.scout.rt.dataobject.id.AbstractLongId;
-import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 
-@IdTypeName("scout.FixtureLongId")
-public final class FixtureLongId extends AbstractLongId {
+public final class FixtureLongIdWithoutTypeName extends AbstractLongId {
   private static final long serialVersionUID = 1L;
 
-  private FixtureLongId(Long id) {
+  private FixtureLongIdWithoutTypeName(Long id) {
     super(id);
   }
 
-  public static FixtureLongId of(Long id) {
+  public static FixtureLongIdWithoutTypeName of(Long id) {
     if (id == null || id.longValue() == 0L) {
       return null;
     }
-    return new FixtureLongId(id);
+    return new FixtureLongIdWithoutTypeName(id);
   }
 
-  public static FixtureLongId of(String id) {
+  public static FixtureLongIdWithoutTypeName of(String id) {
     if (id == null) {
       return null;
     }
-    return new FixtureLongId(Long.parseLong(id));
+    return new FixtureLongIdWithoutTypeName(Long.parseLong(id));
   }
 }
