@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.dataobject.id;
 import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureLongIdWithoutTypeName;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -35,14 +36,16 @@ public class IdInventoryTest {
   @Test
   public void testGetTypeNameByClass() {
     assertEquals("scout.FixtureUuId", m_inventory.getTypeName(FixtureUuId.class));
-    assertNull(m_inventory.getTypeName(FixtureLongId.class));
+    assertEquals("scout.FixtureLongId", m_inventory.getTypeName(FixtureLongId.class));
+    assertNull(m_inventory.getTypeName(FixtureLongIdWithoutTypeName.class));
     assertNull(m_inventory.getTypeName((Class<? extends IId>) null));
   }
 
   @Test
   public void testGetTypeNameByInstance() {
     assertEquals("scout.FixtureUuId", m_inventory.getTypeName(FixtureUuId.of("3c5a66be-12b4-45c6-9e59-8c31cf92dcfb")));
-    assertNull(m_inventory.getTypeName(FixtureLongId.of(100L)));
+    assertEquals("scout.FixtureLongId", m_inventory.getTypeName(FixtureLongId.of(42L)));
+    assertNull(m_inventory.getTypeName(FixtureLongIdWithoutTypeName.of(100L)));
     assertNull(m_inventory.getTypeName((FixtureLongId) null));
   }
 
