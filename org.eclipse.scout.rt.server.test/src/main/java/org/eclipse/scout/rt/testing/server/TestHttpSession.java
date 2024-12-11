@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,7 +18,6 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionBindingEvent;
 import jakarta.servlet.http.HttpSessionBindingListener;
-import jakarta.servlet.http.HttpSessionContext;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -75,18 +74,8 @@ public class TestHttpSession implements HttpSession {
   }
 
   @Override
-  public HttpSessionContext getSessionContext() {
-    return null;
-  }
-
-  @Override
   public Object getAttribute(String name) {
     return m_sessionAttributes.get(name);
-  }
-
-  @Override
-  public Object getValue(String name) {
-    return null;
   }
 
   @Override
@@ -96,18 +85,8 @@ public class TestHttpSession implements HttpSession {
   }
 
   @Override
-  public String[] getValueNames() {
-    return new String[]{};
-  }
-
-  @Override
   public void setAttribute(String name, Object value) {
     m_sessionAttributes.put(name, value);
-  }
-
-  @Override
-  public void putValue(String name, Object value) {
-    //NOP
   }
 
   @Override
@@ -115,10 +94,6 @@ public class TestHttpSession implements HttpSession {
     m_sessionAttributes.remove(name);
   }
 
-  @Override
-  public void removeValue(String name) {
-    //NOP
-  }
 
   @Override
   public void invalidate() {

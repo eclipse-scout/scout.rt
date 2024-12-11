@@ -213,7 +213,7 @@
     "superclass" : null
   }, {
     "_type" : "scout.ClassSignature",
-    "interfaces" : [ "jakarta.ws.rs.core.Configurable" ],
+    "interfaces" : [ "jakarta.ws.rs.core.Configurable", "java.lang.AutoCloseable" ],
     "methods" : [ {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1025,
@@ -1617,6 +1617,12 @@
       "name" : "getInstances",
       "parameterTypes" : [ ],
       "returnType" : "java.util.Set<java.lang.Object>"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "hasProperty",
+      "parameterTypes" : [ "java.lang.String" ],
+      "returnType" : "boolean"
     } ],
     "modifier" : 1537,
     "name" : "jakarta.ws.rs.core.Configuration",
@@ -2300,6 +2306,12 @@
       "name" : "close",
       "parameterTypes" : [ ],
       "returnType" : "void"
+    }, {
+      "_type" : "scout.MethodSignature",
+      "modifiers" : 1,
+      "name" : "isClosed",
+      "parameterTypes" : [ ],
+      "returnType" : "boolean"
     }, {
       "_type" : "scout.MethodSignature",
       "modifiers" : 1,

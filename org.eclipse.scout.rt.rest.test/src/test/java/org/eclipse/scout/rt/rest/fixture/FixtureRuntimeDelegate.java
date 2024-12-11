@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,13 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.util.concurrent.CompletionStage;
+
+import jakarta.ws.rs.SeBootstrap.Configuration;
+import jakarta.ws.rs.SeBootstrap.Instance;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.Link.Builder;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
@@ -68,5 +73,27 @@ public class FixtureRuntimeDelegate extends RuntimeDelegate {
   @Override
   public Builder createLinkBuilder() {
     return mock(Builder.class);
+  }
+
+  @Override
+  public Configuration.Builder createConfigurationBuilder() {
+    return mock(Configuration.Builder.class);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public CompletionStage<Instance> bootstrap(Application application, Configuration configuration) {
+    return (CompletionStage<Instance>) mock(CompletionStage.class);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public CompletionStage<Instance> bootstrap(Class<? extends Application> clazz, Configuration configuration) {
+    return (CompletionStage<Instance>) mock(CompletionStage.class);
+  }
+
+  @Override
+  public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
+    return mock(EntityPart.Builder.class);
   }
 }
