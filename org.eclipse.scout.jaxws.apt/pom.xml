@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2024 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>codemodel</artifactId>
-      <version>4.0.4</version>
+      <version>4.0.5</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>

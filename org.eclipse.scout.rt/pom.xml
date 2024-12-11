@@ -127,13 +127,13 @@
     <slf4j.version>2.0.9</slf4j.version>
     <logback.version>1.4.14</logback.version>
     <jackson.version>2.18.2</jackson.version>
-    <io.netty-version>4.1.114.Final</io.netty-version>
+    <io.netty-version>4.1.115.Final</io.netty-version>
     <apache.tika-version>3.0.0</apache.tika-version>
     <batik.version>1.18</batik.version>
     <activemq.version>6.1.4</activemq.version>
     <artemis.version>2.38.0</artemis.version>
-    <com.google.http-client.version>1.43.3</com.google.http-client.version>
-    <org.apache.httpcomponents.version>5.2.1</org.apache.httpcomponents.version>
+    <com.google.http-client.version>1.45.2</com.google.http-client.version>
+    <org.apache.httpcomponents.version>5.4.1</org.apache.httpcomponents.version>
     <opentelemetry.version>1.44.1</opentelemetry.version>
     <opentelemetry.instrumentation.version>2.10.0-alpha</opentelemetry.instrumentation.version>
     <selenium.version>4.27.0</selenium.version>
@@ -251,7 +251,7 @@
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.5.1</version>
+        <version>7.1.0</version>
       </dependency>
 
       <dependency>
@@ -623,7 +623,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.16.0</version>
+        <version>1.17.1</version>
       </dependency>
 
       <dependency>
@@ -683,7 +683,7 @@
       <dependency>
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
       </dependency>
 
       <!-- OAuth -->
@@ -705,7 +705,7 @@
       <dependency>
         <groupId>org.glassfish.jersey.media</groupId>
         <artifactId>jersey-media-json-jackson</artifactId>
-        <version>3.0.12</version>
+        <version>3.1.9</version>
         <exclusions>
           <exclusion>
             <groupId>com.sun.activation</groupId>
@@ -814,11 +814,6 @@
         <groupId>jakarta.annotation</groupId>
         <artifactId>jakarta.annotation-api</artifactId>
         <version>2.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.jws</groupId>
-        <artifactId>jakarta.jws-api</artifactId>
-        <version>3.0.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
@@ -972,6 +967,12 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- enforce grpc-context version 1.68.2 since google-http-client version 1.45.2 has transitive dependencies to grpc-context 1.68.2 and 1.27.2 -->
+      <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-context</artifactId>
+        <version>1.68.2</version>
+      </dependency>
       <dependency>
         <groupId>com.google.http-client</groupId>
         <artifactId>google-http-client-apache-v2</artifactId>
@@ -980,17 +981,17 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>33.0.0-jre</version>
+        <version>33.3.1-jre</version>
       </dependency>
       <dependency>
         <groupId>com.google.errorprone</groupId>
         <artifactId>error_prone_annotations</artifactId>
-        <version>2.23.0</version>
+        <version>2.36.0</version>
       </dependency>
       <dependency>
         <groupId>com.google.j2objc</groupId>
         <artifactId>j2objc-annotations</artifactId>
-        <version>2.8</version>
+        <version>3.0.0</version>
       </dependency>
 
       <!-- Kotlin is not directly used by Scout but referenced transitively by some third-party libraries (e.g. okhttp, okio, okio-jvm). -->
@@ -1058,7 +1059,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.15.0</version>
+        <version>2.18.0</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>

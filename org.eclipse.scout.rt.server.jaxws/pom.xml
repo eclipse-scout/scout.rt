@@ -36,9 +36,5 @@
       <groupId>org.eclipse.angus</groupId>
       <artifactId>angus-activation</artifactId>
     </dependency>
-    <dependency>
-      <groupId>jakarta.jws</groupId>
-      <artifactId>jakarta.jws-api</artifactId>
-    </dependency>
   </dependencies>
 </project>
