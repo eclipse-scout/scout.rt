@@ -1,6 +1,5 @@
 {
   "_type" : "pojo-with-locale-property",
-  "locale1" : "",
   "locale2" : "de_CH",
   "localeStringMap" : {
     "" : "Root",

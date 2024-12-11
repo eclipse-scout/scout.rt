@@ -644,7 +644,7 @@ public class JsonDataObjectsSerializationTest {
       String serializedDefaultJackson = s_defaultJacksonObjectMapper.writeValueAsString(pojo);
       TestPojoWithLocaleProperties deserializedDefaultJackson = s_defaultJacksonObjectMapper.readValue(serializedDefaultJackson, TestPojoWithLocaleProperties.class);
       assertJsonEquals("TestSerializeDeserialize_ROOT_Locale_defaultJackson.json", serializedDefaultJackson);
-      assertThat(deserializedDefaultJackson.getLocale1(), is(Locale.ROOT));
+      assertNull(deserializedDefaultJackson.getLocale1()); // Include.NO_DEFAULT removes empty properties
       assertThat(deserializedDefaultJackson.getLocale2(), is(Locale.forLanguageTag("de-CH")));
       assertThat(deserializedDefaultJackson.getLocaleStringMap(), is(localeMap));
 
