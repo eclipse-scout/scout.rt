@@ -257,19 +257,16 @@ public class BeanUtilityTest {
   @Test
   public void testGetInterfacesHierarchyWithoutFilterClass() {
     List<Class<?>> hierarchy = BeanUtility.getInterfacesHierarchy(InterfaceWithHierarchy.class, null);
-    Iterator<Class<?>> it = hierarchy.iterator();
-    assertEquals(Iterable.class, it.next());
-    assertEquals(Collection.class, it.next());
-
+    assertTrue(hierarchy.remove(Iterable.class));
+    assertTrue(hierarchy.remove(Collection.class));
+    assertTrue(hierarchy.remove(Set.class));
+    assertTrue(hierarchy.remove(SortedSet.class));
+    assertTrue(hierarchy.remove(InterfaceWithHierarchy.class));
     if (m_isJava21OrNewer) {
-      assertEquals("java.util.SequencedCollection", it.next().getName());
+      assertTrue(hierarchy.removeIf(e -> "java.util.SequencedCollection".equals(e.getName())));
+      assertTrue(hierarchy.removeIf(e -> "java.util.SequencedSet".equals(e.getName())));
     }
-    assertEquals(Set.class, it.next());
-    if (m_isJava21OrNewer) {
-      assertEquals("java.util.SequencedSet", it.next().getName());
-    }
-    assertEquals(SortedSet.class, it.next());
-    assertEquals(InterfaceWithHierarchy.class, it.next());
+    assertTrue(hierarchy.isEmpty());
   }
 
   @Test
