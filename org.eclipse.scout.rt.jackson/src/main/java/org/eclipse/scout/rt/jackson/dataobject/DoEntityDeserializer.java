@@ -274,6 +274,10 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       // deserialize floating point numbers as BigDecimal
       return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(BigDecimal.class));
     }
+    if (currentToken == JsonToken.VALUE_NUMBER_INT) {
+      // deserialize floating point numbers as BigDecimal
+      return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(Long.class));
+    }
     // JSON scalar values are deserialized as raw object using default jackson typing
     return AttributeType.ofDoValue(TypeFactory.unknownType());
   }

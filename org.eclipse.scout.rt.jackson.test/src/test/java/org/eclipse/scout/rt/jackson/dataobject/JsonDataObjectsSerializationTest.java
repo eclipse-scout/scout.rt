@@ -4242,4 +4242,11 @@ public class JsonDataObjectsSerializationTest {
     doEntity.contribution(contributionClass);
     s_dataObjectMapper.writeValueAsString(doEntity);
   }
+
+  @Test
+  public void test80CloneNumbers() {
+    IDoEntity doEntity = BEANS.get(DoEntityBuilder.class).put("n", BigDecimal.valueOf(1000L)).build();
+    IDoEntity clonedDoEntity = BEANS.get(DataObjectHelper.class).clone(doEntity);  // transforms BigDecimal to Integer...
+    assertEquals(doEntity, clonedDoEntity); // fails
+  }
 }
