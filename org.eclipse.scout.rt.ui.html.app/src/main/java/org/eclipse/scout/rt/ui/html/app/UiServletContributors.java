@@ -15,10 +15,10 @@ import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletHolder.Registration;
+import org.eclipse.jetty.ee10.servlet.ServletApiRequest;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletHolder.Registration;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
@@ -40,10 +40,10 @@ public final class UiServletContributors {
   /**
    * First filter to be registered (low order on purpose); if the filter would be registered using
    * {@link Registration#setMultipartConfig(MultipartConfigElement)} it would as well be registered before any filters
-   * are applied, see {@link ServletHolder#prepare(Request, ServletRequest, ServletResponse)}.
+   * are applied, see {@link ServletHolder#prepare(ServletRequest, ServletResponse)}.
    * <p>
    * Early registration is also necessary as filter may already call {@link ServletRequest#getParameter(String)} which
-   * would evaluate the multipart config property in {@link Request#extractContentParameters()}.
+   * would evaluate the multipart config property in {@link ServletApiRequest#extractContentParameters()}.
    *
    * @see UiServletMultipartConfigFilter
    */

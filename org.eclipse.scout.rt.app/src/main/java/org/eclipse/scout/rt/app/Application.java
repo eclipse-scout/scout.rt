@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,27 +20,27 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.util.concurrent.atomic.AtomicReference;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.SessionHandler;
 import org.eclipse.jetty.http.HttpCookie.SameSite;
+import org.eclipse.jetty.http.HttpField;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ErrorHandler;
-import org.eclipse.jetty.server.handler.HandlerWrapper;
-import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationCertificateAliasProperty;
@@ -318,7 +318,6 @@ public class Application {
    */
   protected void installErrorHandler(Server server) {
     ErrorHandler handler = new ErrorHandler();
-    handler.setShowServlet(false);
     handler.setShowMessageInTitle(false);
     handler.setShowStacks(false);
     server.setErrorHandler(handler);
@@ -472,7 +471,7 @@ public class Application {
    * </tr>
    * </table>
    */
-  protected static class P_RedirectToContextPathHandler extends HandlerWrapper {
+  protected static class P_RedirectToContextPathHandler extends Handler.Wrapper {
 
     protected final String m_contextPath;
 
@@ -482,34 +481,35 @@ public class Application {
     }
 
     @Override
-    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public boolean handle(Request request, Response response, Callback callback) throws Exception {
       // No redirection for non-GET requests
       if (!"GET".equals(request.getMethod())) {
-        super.handle(target, baseRequest, request, response);
-        return;
+        return super.handle(request, response, callback);
       }
 
       // If requestURI starts with context path, redirect is not necessary -> delegate to original context handler
-      String requestURI = ObjectUtility.nvl(request.getRequestURI(), "/");
+      String requestURI = ObjectUtility.nvl(Request.getPathInContext(request), "/");
       if (!"GET".equals(request.getMethod()) || requestURI.startsWith(m_contextPath)) {
-        super.handle(target, baseRequest, request, response);
-        return;
+        return super.handle(request, response, callback);
       }
 
       // Otherwise, redirect to the specified context path (while preserving all other parts of the URI)
       StringBuilder redirectUri = new StringBuilder();
-      redirectUri.append(request.getScheme()).append("://").append(request.getServerName());
-      if (("http".equals(request.getScheme()) && request.getServerPort() != 80) || ("https".equals(request.getScheme()) && request.getServerPort() != 443)) {
-        redirectUri.append(":").append(request.getServerPort());
+      redirectUri.append(request.getHttpURI().getScheme()).append("://").append(request.getHttpURI().getHost());
+      if (("http".equals(request.getHttpURI().getScheme()) && request.getHttpURI().getPort() != 80) || ("https".equals(request.getHttpURI().getScheme()) && request.getHttpURI().getPort() != 443)) {
+        redirectUri.append(":").append(request.getHttpURI().getPort());
       }
       redirectUri.append(m_contextPath);
       if (!"/".equals(requestURI)) {
         redirectUri.append(requestURI);
       }
-      if (request.getQueryString() != null) {
-        redirectUri.append("?").append(request.getQueryString());
+      if (request.getHttpURI().getQuery() != null) {
+        redirectUri.append("?").append(request.getHttpURI().getQuery());
       }
-      response.sendRedirect(redirectUri.toString());
+      response.setStatus(HttpStatus.MOVED_TEMPORARILY_302);
+      response.getHeaders().add(new HttpField(HttpHeader.LOCATION, redirectUri.toString()));
+      callback.succeeded();
+      return true;
     }
   }
 }

@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.rest.jersey;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
@@ -145,7 +145,7 @@ public class JerseyTestApplication {
 
   protected Handler createHandler(boolean proxy) {
     final ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-    handler.setResourceBase(System.getProperty("java.io.tmpdir"));
+    handler.setBaseResourceAsString(System.getProperty("java.io.tmpdir"));
     handler.setContextPath("/");
 
     handler.setDisplayName("Scout REST Integration Test");

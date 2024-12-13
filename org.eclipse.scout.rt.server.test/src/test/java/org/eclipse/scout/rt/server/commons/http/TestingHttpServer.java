@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,11 +18,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.HttpChannel;
+import org.eclipse.jetty.ee10.servlet.ServletHandler;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.io.Connection;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
@@ -45,13 +48,13 @@ public class TestingHttpServer {
   }
 
   @FunctionalInterface
-  public interface IChannelCall {
-    void call() throws IOException, ServletException;
+  public interface IConnectionCall {
+    boolean call() throws Exception;
   }
 
   @FunctionalInterface
-  public interface IChannelInterceptor {
-    void intercept(HttpChannel channel, IChannelCall superCall) throws IOException, ServletException;
+  public interface IConnectionInterceptor {
+    boolean intercept(Connection connection, IConnectionCall superCall) throws Exception;
   }
 
   /**
@@ -75,7 +78,7 @@ public class TestingHttpServer {
 
   private final Server m_server;
   private final URL m_servletUrl;
-  private IChannelInterceptor m_channelInterceptor;
+  private IConnectionInterceptor m_connectionInterceptor;
 
   /**
    * default webapp with servlet at /servlet that calls the fixture set by
@@ -99,16 +102,17 @@ public class TestingHttpServer {
     FixtureServlet.fixtureGet = null;
     FixtureServlet.fixturePost = null;
 
-    WebAppContext webAppContext = new WebAppContext(Resource.newResource(resourceBaseUrl), contextPath);
+    ResourceFactory.Closeable resourceFactory = ResourceFactory.closeable();
+    WebAppContext webAppContext = new WebAppContext(resourceFactory.newResource(resourceBaseUrl), contextPath);
     webAppContext.setThrowUnavailableOnStartupException(true);
     m_server = new Server(port) {
       @Override
-      public void handle(HttpChannel channel) throws IOException, ServletException {
-        if (m_channelInterceptor != null) {
-          m_channelInterceptor.intercept(channel, () -> super.handle(channel));
+      public boolean handle(Request request, Response response, Callback callback) throws Exception {
+        if (m_connectionInterceptor != null) {
+          return m_connectionInterceptor.intercept(request.getConnectionMetaData().getConnection(), () -> super.handle(request, response, callback));
         }
         else {
-          super.handle(channel);
+          return super.handle(request, response, callback);
         }
       }
     };
@@ -143,11 +147,11 @@ public class TestingHttpServer {
   }
 
   /**
-   * Install a handler that intercepts all incoming requests on a channel. Can be used to simulate network interruptions
+   * Install a handler that intercepts all incoming requests on a connection. Can be used to simulate network interruptions
    * or socket errors.
    */
-  public TestingHttpServer withChannelInterceptor(IChannelInterceptor channelInterceptor) {
-    m_channelInterceptor = channelInterceptor;
+  public TestingHttpServer withConnectionInterceptor(IConnectionInterceptor connectionInterceptor) {
+    m_connectionInterceptor = connectionInterceptor;
     return this;
   }
 

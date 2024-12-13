@@ -20,9 +20,10 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletHolder.Registration;
+import org.eclipse.jetty.ee10.servlet.ServletApiRequest;
+import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletHolder.Registration;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiServletMultipartConfigProperty;
 import org.eclipse.scout.rt.ui.html.json.UploadRequestHandler;
@@ -36,9 +37,9 @@ import org.eclipse.scout.rt.ui.html.json.UploadRequestHandler;
  *
  * @see <a href="https://github.com/jetty/jetty.project/issues/1175">jetty/jetty.project issue #1175</a>
  * @see HttpServletRequest#getParameter(String)
- * @see Request#extractContentParameters()
+ * @see ServletApiRequest#extractContentParameters()
  * @see Registration#setMultipartConfig(MultipartConfigElement)
- * @see ServletHolder#prepare(Request, ServletRequest, ServletResponse)
+ * @see ServletHolder#prepare(ServletRequest, ServletResponse)
  */
 public class UiServletMultipartConfigFilter implements Filter {
 
@@ -56,7 +57,7 @@ public class UiServletMultipartConfigFilter implements Filter {
     HttpServletRequest req = (HttpServletRequest) req0;
 
     if (isMultipartConfigRequired(req)) {
-      req.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, CONFIG.getPropertyValue(UiServletMultipartConfigProperty.class));
+      req.setAttribute(ServletContextRequest.MULTIPART_CONFIG_ELEMENT, CONFIG.getPropertyValue(UiServletMultipartConfigProperty.class));
     }
   }
 

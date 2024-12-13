@@ -121,15 +121,15 @@ public class HttpRetryTest {
    * Expect retry on apache level
    */
   @Test
-  public void testGetRetry() throws IOException {
+  public void testGetRetry() throws Exception {
     //emulate a socket close before data is received
     AtomicInteger count = new AtomicInteger(1);
-    m_server.withChannelInterceptor((channel, superCall) -> {
+    m_server.withConnectionInterceptor((connection, superCall) -> {
       if (count.getAndIncrement() < 2) {
-        channel.getHttpTransport().abort(new SocketException("TEST:cannot write"));
-        return;
+        connection.close();
+        return false;
       }
-      superCall.call();
+      return superCall.call();
     });
 
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
@@ -257,7 +257,7 @@ public class HttpRetryTest {
       assertArrayEquals(new String[]{"03"}, servletPostLog.toArray());
       assertNotNull(servletPostError);
       assertEquals(ProcessingException.class, servletPostError.getClass());
-      assertEquals(org.eclipse.jetty.io.EofException.class, servletPostError.getCause().getClass());
+      assertTrue(org.eclipse.jetty.io.EofException.class.isAssignableFrom(servletPostError.getCause().getClass()));
       return;
     }
     fail("Expected to fail");
@@ -267,16 +267,16 @@ public class HttpRetryTest {
    * Expect no-retry on apache and google level
    */
   @Test
-  public void testPostWithUnsupportedRetryAndFailureAfterRequestIsSent() throws IOException {
+  public void testPostWithUnsupportedRetryAndFailureAfterRequestIsSent() throws Exception {
     //emulate a socket close before data is received
     AtomicInteger count = new AtomicInteger(1);
-    m_server.withChannelInterceptor((channel, superCall) -> {
+    m_server.withConnectionInterceptor((connection, superCall) -> {
       //2 failures in a row, the first would have been retried by the CustomHttpRequestRetryHandler
       if (count.getAndIncrement() < 3) {
-        channel.getHttpTransport().abort(new IOException("TEST:cannot write"));
-        return;
+        connection.close();
+        return false;
       }
-      superCall.call();
+      return superCall.call();
     });
 
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
@@ -317,15 +317,15 @@ public class HttpRetryTest {
    * Expect no-retry on apache but retry on google level
    */
   @Test
-  public void testPostWithSupportedRetryAndFailureAfterRequestIsSent() throws IOException {
+  public void testPostWithSupportedRetryAndFailureAfterRequestIsSent() throws Exception {
     //emulate a socket close before data is received
     AtomicInteger count = new AtomicInteger(1);
-    m_server.withChannelInterceptor((channel, superCall) -> {
+    m_server.withConnectionInterceptor((connection, superCall) -> {
       if (count.getAndIncrement() < 2) {
-        channel.getHttpTransport().abort(new SocketException("TEST:cannot write"));
-        return;
+        connection.close();
+        return false;
       }
-      superCall.call();
+      return superCall.call();
     });
 
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();

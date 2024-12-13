@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,8 +34,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -47,16 +46,18 @@ import org.apache.hc.core5.http.Method;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.http.message.BasicHttpResponse;
 import org.apache.hc.core5.http.support.BasicRequestBuilder;
+import org.eclipse.jetty.http.HttpCookie;
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
@@ -95,7 +96,7 @@ public class HttpProxyTest {
 
   private HttpProxy m_proxy;
   private Server m_server;
-  private HandlerCollection m_handlerCollection;
+  private Handler.Collection m_handlerCollection;
 
   private HttpProxyTestParameter m_httpProxyTestParameter;
 
@@ -136,7 +137,7 @@ public class HttpProxyTest {
     }
 
     m_server = new Server();
-    m_handlerCollection = new HandlerCollection(true);
+    m_handlerCollection = new Handler.Sequence();
     m_server.setHandler(m_handlerCollection);
     @SuppressWarnings("resource")
     ServerConnector connector = m_httpProxyTestParameter.getServerConnectorFunction().apply(m_server);
@@ -413,11 +414,12 @@ public class HttpProxyTest {
   public void testProxyRequest_postRequest() {
     HttpServletRequest httpReq = prepareHttpRequest("/");
     when(httpReq.getMethod()).thenReturn(Method.POST.toString());
-    HttpServletResponse httpResp = testProxyRequestInternal(new AbstractHandler() {
+    HttpServletResponse httpResp = testProxyRequestInternal(new Handler.Abstract() {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+      public boolean handle(Request request, Response response, Callback callback) {
         response.setStatus(200);
-        response.flushBuffer();
+        response.write(true, null, callback); // flush buffer
+        return true;
       }
     }, 30 * 1000L, 1, httpReq);
 
@@ -504,18 +506,16 @@ public class HttpProxyTest {
   }
 
   protected void testProxyRequestWithStatusCodeAndContent_Internal(int statusCode, byte[] content, boolean specifyContentLength, int numberOfRequests, String pathInfo) throws IOException {
-    AbstractHandler handler = new AbstractHandler() {
+    Handler.Abstract handler = new Handler.Abstract() {
+
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+      public boolean handle(Request request, Response response, Callback callback) {
         response.setStatus(statusCode);
         if (specifyContentLength) {
-          response.setContentLength(content.length);
+          response.getHeaders().put(HttpHeader.CONTENT_LENGTH, content.length);
         }
-        ServletOutputStream outputStream = response.getOutputStream();
-        outputStream.write(content);
-        outputStream.flush();
-        baseRequest.setHandled(true);
-        response.flushBuffer();
+        response.write(true, ByteBuffer.wrap(content), callback);
+        return true;
       }
     };
 
@@ -543,13 +543,12 @@ public class HttpProxyTest {
     CookieStore defaultCookieStore = COOKIE_STORE.m_defaultCookieStore;
     int previousDefaultCount = defaultCookieStore.getCookies().size();
 
-    AbstractHandler handler = new AbstractHandler() {
+    Handler.Abstract handler = new Handler.Abstract() {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // yummy: there is a cookie
-        response.addCookie(new Cookie("snickers", "bar"));
-        baseRequest.setHandled(true);
-        response.flushBuffer();
+      public boolean handle(Request request, Response response, Callback callback) {
+        Response.addCookie(response, HttpCookie.from("snickers", "bar"));
+        response.write(true, null, callback); // flush buffer
+        return true;
       }
     };
 
@@ -569,16 +568,14 @@ public class HttpProxyTest {
   @Ignore // do not run this (long) test on CI (at least as long as we do not run tests in parallel), however can be used for testing locally
   @Test
   public void testProxyRequest_longDuration() throws IOException {
-    AbstractHandler handler = new AbstractHandler() {
+    Handler.Abstract handler = new Handler.Abstract() {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+      public boolean handle(Request request, Response response, Callback callback) {
         response.setStatus(HttpStatus.SC_OK);
         SleepUtil.sleepElseLog(3, TimeUnit.MINUTES);
-        ServletOutputStream outputStream = response.getOutputStream();
-        outputStream.write(0x42);
-        outputStream.flush();
-        baseRequest.setHandled(true);
-        response.flushBuffer();
+        ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[]{0x42});
+        response.write(true, byteBuffer, callback);
+        return true;
       }
     };
 
@@ -590,9 +587,9 @@ public class HttpProxyTest {
 
   @Test
   public void testProxyRequest_Failure() {
-    HttpServletResponse resp = testProxyRequestInternal(new AbstractHandler() {
+    HttpServletResponse resp = testProxyRequestInternal(new Handler.Abstract() {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+      public boolean handle(Request request, Response response, Callback callback) throws Exception {
         throw new IOException();
       }
     }, 1, null);
@@ -607,10 +604,11 @@ public class HttpProxyTest {
 
   @Test
   public void testUnexpectedCompletedAsyncContextDuringFailureMustNotAffectOtherRequests() {
-    AbstractHandler handler = new AbstractHandler() {
+    Handler.Abstract handler = new Handler.Abstract() {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-        baseRequest.setHandled(true);
+      public boolean handle(Request request, Response response, Callback callback) {
+        callback.succeeded();
+        return true;
       }
     };
 
