@@ -322,6 +322,10 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
   }
 
   protected _onMouseDown(event: JQuery.MouseDownEvent) {
+    this.applySelection($(event.delegateTarget), event.button === 0, event.originalEvent.clientY);
+  }
+
+  applySelection($part: JQuery, openPopup: boolean, popupY: number) {
     // don't show popup if dragging is in process
     if (this.parent._moveData && this.parent._moveData.moving) {
       return;
@@ -332,10 +336,11 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
       return;
     }
 
-    let $part = $(event.delegateTarget);
     this.updateSelectedComponent($part, false);
 
-    if (event.button === 0) {
+    this.parent.setSelectedRange(null);
+
+    if (openPopup) {
       let popup = scout.create((WidgetPopup<Label>), {
         parent: this.parent,
         $anchor: $part,
@@ -352,7 +357,7 @@ export class CalendarComponent extends Widget implements CalendarComponentModel 
         cssClass: 'popup',
         scrollType: 'remove',
         location: {
-          y: event.originalEvent.clientY
+          y: popupY
         },
         content: {
           objectType: Label,
