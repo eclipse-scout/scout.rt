@@ -41,7 +41,7 @@ public class HttpSessionHelper {
    */
   @SuppressWarnings("findbugs:J2EE_STORE_OF_NON_SERIALIZABLE_OBJECT_INTO_SESSION")
   public ISessionStore getSessionStore(HttpSession httpSession) {
-    ISessionStore sessionStore = getSessionStoreFromHttpSession(assertNotNull(httpSession));
+    ISessionStore sessionStore = optSessionStore(httpSession);
     if (sessionStore != null) {
       return sessionStore;
     }
@@ -58,6 +58,22 @@ public class HttpSessionHelper {
 
       return sessionStore;
     }
+  }
+
+  /**
+   * Gets an existing session store from the given HTTP session. If there is no store available for the given session no new one
+   * will be created.
+   *
+   * @return The {@link ISessionStore}. If there is no {@link ISessionStore} registered for the given
+   * {@link HttpSession} {@code null} will be returned.
+   * @throws AssertionException
+   *     if the given HTTP session is <code>null</code>.
+   * @throws IllegalStateException
+   *     if the given HTTP session is invalid.
+   */
+  public ISessionStore optSessionStore(HttpSession httpSession) {
+    assertNotNull(httpSession);
+    return getSessionStoreFromHttpSession(httpSession);
   }
 
   /**

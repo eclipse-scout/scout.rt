@@ -231,6 +231,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     Assertions.assertNotNull(uiSession);
     String uiSessionId = uiSession.getUiSessionId();
     Assertions.assertNotNull(uiSessionId);
+    Assertions.assertTrue(m_httpSessionValid, "Preregister UI session with ID {} to an already used http session with ID {} is not supported.", uiSessionId, m_httpSessionId);
     LOG.debug("Pre-register UI session with ID {}", uiSessionId);
     m_writeLock.lock();
     try {
@@ -270,6 +271,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   @Override
   public void registerUiSession(final IUiSession uiSession) {
     Assertions.assertNotNull(uiSession);
+    Assertions.assertTrue(m_httpSessionValid, "Register UI session with ID {} to an already used http session with ID {} is not supported.", uiSession.getUiSessionId(), m_httpSessionId);
     LOG.debug("Register UI session with ID {} in store (clientSessionId={})", uiSession.getUiSessionId(), uiSession.getClientSessionId());
     m_writeLock.lock();
     try {
@@ -443,7 +445,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
   @Override
   public void valueBound(HttpSessionBindingEvent event) {
-    // ignore notifications about being bound to an HTTP session
+    Assertions.assertTrue(m_httpSessionValid, "Binding to new HTTP session {} is not supported (was already bound to {})", event.getSession().getId(), m_httpSessionId);
   }
 
   @Override
