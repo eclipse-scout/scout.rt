@@ -1994,7 +1994,7 @@ export class Calendar extends Widget implements CalendarModel {
 
     // top and height
     let startPosition = fromTime ? this._dayPosition(this._getHours(fromTime), 0) : 0;
-    let endPosition = toTime ? this._dayPosition(this._getHours(toTime) + 0.5, 0) : 100;
+    let endPosition = toTime ? this._dayPosition(this._getHours(toTime) + (1 / this.numberOfHourDivisions), 0) : 100;
 
     $parent.appendDiv('calendar-range-selector')
       .css('top', startPosition + '%')
@@ -2003,7 +2003,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _getHours(date: Date): number {
     // round to 0.5h
-    return Math.round((date.getHours() + date.getMinutes() / 60) * 2) / 2;
+    return Math.round((date.getHours() + date.getMinutes() / 60) * this.numberOfHourDivisions) / this.numberOfHourDivisions;
   }
 
   protected _onMouseMoveRangeSelection(event: JQuery.MouseMoveEvent) {
@@ -2045,7 +2045,7 @@ export class Calendar extends Widget implements CalendarModel {
       }
 
       start.setHours(0, this._getHours(start) * 60);
-      end.setHours(0, this._getHours(end) * 60 + 30);
+      end.setHours(0, this._getHours(end) * 60 + (60 / this.numberOfHourDivisions));
 
       this.selectedRange = new DateRange(start, end);
     } else {
