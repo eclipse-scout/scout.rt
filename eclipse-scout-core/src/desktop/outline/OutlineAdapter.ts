@@ -268,7 +268,8 @@ export class OutlineAdapter extends TreeAdapter {
         id: nodeModel.id,
         parent: nodeModel.parent,
         owner: nodeModel.owner,
-        objectType: nodeModel.jsPageObjectType
+        objectType: nodeModel.jsPageObjectType,
+        text: nodeModel.text // because summary column might come from Java parent page
       };
 
       if (nodeModel.jsPageModel) {
