@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, BaseDoEntity, Constructor, DoRegistry, ObjectFactory, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, strings} from '../../../index';
+import {App, BaseDoEntity, Constructor, DataObjectInventory, ObjectFactory, Outline, Page, PageIdDummyPageParamDo, PageParamDo, scout, strings} from '../../../index';
 import $ from 'jquery';
 
 export class PageResolver {
@@ -49,7 +49,7 @@ export class PageResolver {
     if (pageParamOrModel instanceof BaseDoEntity) {
       return pageParamOrModel.constructor as Constructor<PageParamDo>;
     }
-    return DoRegistry.get().toConstructor(pageParamOrModel._type);
+    return DataObjectInventory.get().toConstructor(pageParamOrModel._type);
   }
 
   protected _findObjectTypeForPageParamConstructor(paramConstructor: Constructor<PageParamDo>): string {
