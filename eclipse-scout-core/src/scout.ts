@@ -8,7 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AdapterData, App, Device, GroupBox, Locale, locales, LogicalGridLayout, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, ObjectUuidProvider, Session, strings, ValueField, Widget, widgets} from './index';
+import {
+  AdapterData, App, Device, GroupBox, Locale, locales, LogicalGridLayout, ModelAdapterLike, ObjectCreator, ObjectFactory, ObjectFactoryOptions, objects, ObjectType, ObjectUuidProvider, Session, strings, TileGrid, ValueField, Widget, widgets
+} from './index';
 import $ from 'jquery';
 
 let $activeElements = null;
