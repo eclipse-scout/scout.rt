@@ -2380,7 +2380,7 @@ export class Calendar extends Widget implements CalendarModel {
       }
 
       start.setHours(0, this._getHours(start) * 60);
-      end.setHours(0, this._getHours(end) * 60 + 30);
+      end.setHours(0, this._getHours(end) * 60 + (60 / this.numberOfHourDivisions));
 
       this.selectedRange = new DateRange(start, end);
     } else {
