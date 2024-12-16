@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AggregateTableRow, Alignment, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, InitModelOf, objects,
-  ObjectWithType, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent, TableHeader, TableHeaderMenu, TableRow, texts, ValueField, widgets
+  AggregateTableRow, Alignment, BookmarkAdapter, Cell, CellEditorPopup, ColumnComparator, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, DefaultBookmarkAdapter, Event, EventHandler, FormField,
+  GridData, icons, InitModelOf, objects, ObjectUuidProvider, ObjectWithBookmarkAdapter, ObjectWithType, ObjectWithUuid, PropertyEventEmitter, scout, Session, SomeRequired, Status, StringField, strings, styles, Table, TableColumnMovedEvent,
+  TableHeader, TableHeaderMenu, TableRow, texts, ValueField
 } from '../../index';
 import $ from 'jquery';
 
-export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType {
+export class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue>, ObjectWithType, ObjectWithUuid, ObjectWithBookmarkAdapter {
   declare model: ColumnModel<TValue>;
   declare initModel: SomeRequired<this['model'], 'session'>;
   declare eventMap: ColumnEventMap;
@@ -21,6 +22,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
 
   objectType: string;
   id: string;
+  uuid: string;
   autoOptimizeWidth: boolean;
   /** true if content of the column changed and width has to be optimized */
   autoOptimizeWidthRequired: boolean;
@@ -73,6 +75,11 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   tableNodeLevel0CellPadding: number;
   expandableIconLevel0CellPadding: number;
   nodeColumnCandidate: boolean;
+
+  // Inspector infos (are only available for remote columns)
+  modelClass: string;
+  classId: string;
+
   /** Set by TableHeader */
   $header: JQuery;
   $separator: JQuery;
@@ -83,10 +90,13 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    */
   _realWidth: number;
 
+  protected _bookmarkAdapter: BookmarkAdapter;
   protected _tableColumnsChangedHandler: EventHandler<TableColumnMovedEvent | Event<Table>>;
 
   constructor() {
     super();
+    this.id = null;
+    this.uuid = null;
     this.autoOptimizeWidth = false;
     this.autoOptimizeWidthRequired = false;
     this.autoOptimizeMaxWidth = -1;
@@ -130,9 +140,12 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     this.tableNodeLevel0CellPadding = 28;
     this.expandableIconLevel0CellPadding = 13;
     this.nodeColumnCandidate = true;
+    this.modelClass = null;
+    this.classId = null;
 
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
     this._realWidth = null;
+    this._bookmarkAdapter = null;
 
     this.$header = null;
     this.$separator = null;
@@ -175,6 +188,21 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
    */
   protected _destroy() {
     // NOP
+  }
+
+  uuidPath(useFallback?: boolean): string {
+    return ObjectUuidProvider.get().uuidPath(this, {
+      parent: this.table,
+      appendParent: true, // append the uuid of the table even when having a classId as the classId does not include its parent yet (see InspectorObjectIdProvider.getIdForColumn)
+      useFallback
+    });
+  }
+
+  getBookmarkAdapter(): BookmarkAdapter {
+    if (!this._bookmarkAdapter) {
+      this._bookmarkAdapter = new DefaultBookmarkAdapter(this, false);
+    }
+    return this._bookmarkAdapter;
   }
 
   /** @internal */
@@ -345,7 +373,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     // to reference, we do not need to reference the cell either, because screen readers will announce the cell
     // content naturally if there is no aria-labelledby
     if (this.table.header && strings.hasText(this.table.header.headerLabelId)) {
-      let cellLabelId = widgets.createUniqueId('lbl');
+      let cellLabelId = ObjectUuidProvider.createUiId();
       ariaAttributes += ' aria-labelledBy="' + this.table.header.headerLabelId + ' ' + cellLabelId + '" ' + 'id="' + cellLabelId + '"';
     }
     return '<div' + ariaAttributes + ' class="' + cssClass + '" style="' + style + '">' + content + '</div>';

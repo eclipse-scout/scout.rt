@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,10 +23,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.IOrdered;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
-public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayParent, IVisibleDimension {
+public interface IOutline extends ITree, IOrdered, IDisplayParent, IVisibleDimension {
 
   /**
    * The {@link IOutline} which is currently associated with the current thread.

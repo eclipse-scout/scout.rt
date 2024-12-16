@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -195,7 +195,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       json.put(PROP_SHOW_TILE_OVERVIEW, page.isShowTileOverview());
       json.put(PROP_COMPACT_ROOT, page.isCompactRoot());
     }
-    BEANS.get(InspectorInfo.class).put(getUiSession(), json, page);
+    BEANS.get(InspectorInfo.class).put(getUiSession().currentHttpRequest(), json, page, p -> INSPECTOR_ID_PROVIDER.get().getIdForPage(p));
     JsonObjectUtility.filterDefaultValues(json, "Page");
     return json;
   }
