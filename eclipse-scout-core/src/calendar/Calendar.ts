@@ -316,11 +316,11 @@ export class Calendar extends Widget implements CalendarModel {
   protected _setRangeSelectionAllowed(rangeSelectionAllowed: boolean) {
     this.rangeSelectionAllowed = rangeSelectionAllowed;
     if (!this.rangeSelectionAllowed) {
-      this._setSelectedRange(null);
+      this.setSelectedRange(null);
     }
   }
 
-  protected _setSelectedRange(range: DateRange | JsonDateRange) {
+  setSelectedRange(range: DateRange | JsonDateRange) {
     let selectedRange = DateRange.ensure(range);
     if (selectedRange && selectedRange.from && selectedRange.to) {
       this.selectorStart = new Date(selectedRange.from);
@@ -820,6 +820,17 @@ export class Calendar extends Widget implements CalendarModel {
       return;
     }
 
+    // When left click on component was made, which was covered by a range selection, apply the selection on the component
+    let componentPartElement = document.elementsFromPoint(event.pageX, event.pageY).find(e => e.classList.contains('calendar-component'));
+    if (event.button === 0 && componentPartElement) {
+      let $part = $(componentPartElement as HTMLElement);
+      let component = $part.data('component') as CalendarComponent;
+      if (component) {
+        component.applySelection($part, true, event.originalEvent.clientY);
+        return;
+      }
+    }
+
     // Check if date is valid
     if (!selectedDate.valueOf()) {
       return;
@@ -979,7 +990,7 @@ export class Calendar extends Widget implements CalendarModel {
       this._updateTopGrid();
     }
 
-    this._setSelectedRange(this.selectedRange);
+    this.setSelectedRange(this.selectedRange);
   }
 
   layoutSize(animate?: boolean) {
