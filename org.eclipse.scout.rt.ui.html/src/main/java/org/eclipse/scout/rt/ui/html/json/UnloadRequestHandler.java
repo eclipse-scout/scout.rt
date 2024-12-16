@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +19,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
@@ -38,13 +38,11 @@ import org.slf4j.LoggerFactory;
 public class UnloadRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(UnloadRequestHandler.class);
 
-  public static final Pattern UNLOAD_PATH_PATTERN = Pattern.compile("^/unload/(.+)$");
-
   @Override
   public boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     final String pathInfo = req.getPathInfo();
 
-    final Matcher matcher = UNLOAD_PATH_PATTERN.matcher(pathInfo);
+    final Matcher matcher = ServletFilterHelper.UNLOAD_PATH_PATTERN.matcher(pathInfo);
     if (!matcher.matches()) {
       return false;
     }
@@ -57,19 +55,29 @@ public class UnloadRequestHandler extends AbstractUiServletRequestHandler {
   protected void handleUnloadRequest(HttpServletRequest req, HttpServletResponse resp, String uiSessionId) {
     LOG.info("Unloading UI session with ID {} (requested by UI)", uiSessionId);
 
-    final HttpSession httpSession = req.getSession();
-    final ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    final HttpSession httpSession = req.getSession(false);
+    if (httpSession == null) {
+      LOG.info("Unloading UI session with ID {} skipped (no existing http session).", uiSessionId);
+      return;
+    }
+    final ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).optSessionStore(httpSession);
+    if (sessionStore == null) {
+      LOG.info("Unloading UI session with ID {} skipped (no existing http session store).", uiSessionId);
+      return;
+    }
     IUiSession uiSession = sessionStore.getUiSession(uiSessionId);
+    if (uiSession == null) {
+      LOG.info("Unloading UI session with ID {} skipped (no existing ui session).", uiSessionId);
+      return;
+    }
 
-    if (uiSession != null) {
-      final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
-      uiSessionLock.lock();
-      try {
-        uiSession.dispose();
-      }
-      finally {
-        uiSessionLock.unlock();
-      }
+    final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
+    uiSessionLock.lock();
+    try {
+      uiSession.dispose();
+    }
+    finally {
+      uiSessionLock.unlock();
     }
   }
 }
