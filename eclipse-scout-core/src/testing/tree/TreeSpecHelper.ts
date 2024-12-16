@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, CompactTree, InitModelOf, ModelAdapter, ObjectFactory, ObjectType, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
+import {arrays, CompactTree, InitModelOf, ModelAdapter, ObjectType, ObjectUuidProvider, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
 import {SpecTree} from '../index';
 import $ from 'jquery';
 
@@ -33,7 +33,7 @@ export class TreeSpecHelper {
 
   createModelNode(id?: string, text?: string, model?: TreeNodeModel): TreeNodeModel {
     return $.extend({
-      id: id + '' || ObjectFactory.get().createUniqueId(),
+      id: id || ObjectUuidProvider.createUiId(),
       text: text
     }, model);
   }

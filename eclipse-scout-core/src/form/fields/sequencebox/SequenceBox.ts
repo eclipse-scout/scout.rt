@@ -9,7 +9,7 @@
  */
 import {
   Button, CheckBoxField, CloneOptions, CompositeField, DateField, dates, EventHandler, FormField, FormFieldSuppressStatus, HorizontalGrid, HtmlComponent, InitModelOf, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig,
-  Menu, ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, strings, ValueField, Widget
+  Menu, ObjectOrChildModel, ObjectOrModel, ObjectUuidProvider, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, strings, ValueField, Widget
 } from '../../../index';
 
 export class SequenceBox extends CompositeField implements SequenceBoxModel {
@@ -423,3 +423,5 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
     return clone;
   }
 }
+
+ObjectUuidProvider.UuidPathSkipWidgets.add(SequenceBox);

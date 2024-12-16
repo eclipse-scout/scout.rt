@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BooleanColumn, Cell, Column, DefaultTableAccessibilityRenderer, ListBoxTableAccessibilityRenderer, NumberColumn, scout, Table} from '../../../src/index';
-import {JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
+import {BooleanColumn, Cell, Column, DefaultTableAccessibilityRenderer, ListBoxTableAccessibilityRenderer, NumberColumn, scout, Table, Widget} from '../../../src/index';
+import {JQueryTesting, SpecTable, TableSpecHelper} from '../../../src/testing/index';
 
 describe('Column', () => {
   let session: SandboxSession;
@@ -774,5 +774,71 @@ describe('Column', () => {
       table.render();
       expect(table.$cell(table.columns[0], table.rows[0].$row)).not.toHaveAttr('role');
     });
+  });
+
+  describe('uuid', () => {
+
+    it('uuidPath for remote column includes parent', () => {
+      const remoteTable = getRemoteTable();
+      const remoteCol = remoteTable.columns[0];
+
+      // remote case (Scout Classic): classId is sent from backend
+      expect(remoteCol.classId).toBe('column-class-id'); // must be the own id only (without table or its parents)
+      expect(remoteTable.classId).toBe('table-class-id_parent-widget-class-id'); // table contains the ids of its parents
+      expect(remoteCol.uuidPath()).toBe('column-class-id|table-class-id_parent-widget-class-id'); // uuidPath of the column should include the parent table
+      expect(remoteTable.uuidPath()).toBe('table-class-id_parent-widget-class-id'); // uuidPath of the table should include its parent
+    });
+
+    function getRemoteTable(): SpecTable {
+      const remoteParent = scout.create(Widget, {
+        parent: session.desktop,
+        classId: 'parent-widget-class-id' // root widget classId
+      });
+      return helper.createTable({
+        parent: remoteParent,
+        classId: 'table-class-id_parent-widget-class-id', // classId of the table includes its parents (see AbstractTable.classId)
+        columns: [{
+          objectType: Column,
+          classId: 'column-class-id' // classId without parent Table is sent from backend (see InspectorObjectIdProvider.getIdForColumn)
+        }]
+      });
+    }
+
+    it('uuidPath for local column includes parent', () => {
+      // Scout JS: uuid is part of the model
+      const localTable = getLocalTable();
+      const localCol = localTable.columns[0];
+      expect(localCol.uuid).toBe('column-uuid'); // must be the own uuid only (without table or its parents)
+      expect(localTable.uuid).toBe('table-uuid'); // must be the own uuid only (without table or its parents)
+      expect(localCol.uuidPath()).toBe('column-uuid|table-uuid|parent-widget-uuid'); // uuidPath of the column should include the parents
+      expect(localTable.uuidPath()).toBe('table-uuid|parent-widget-uuid'); // uuidPath of the table should include its parent
+    });
+
+    it('BookmarkAdapter.buildId returns id without parent for local and remote case', () => {
+      const localTable = getLocalTable();
+      const localCol = localTable.columns[0];
+      const remoteTable = getRemoteTable();
+      const remoteCol = remoteTable.columns[0];
+
+      expect(remoteCol.getBookmarkAdapter().buildId()).toBe('column-class-id'); // must be the column classId only without its parents
+      expect(remoteTable.getBookmarkAdapter().buildId()).toBe('table-class-id_parent-widget-class-id'); // must be with parent classIds
+      expect(localCol.getBookmarkAdapter().buildId()).toBe('column-uuid'); // must be the column uuid only without its parents
+      expect(localTable.getBookmarkAdapter().buildId()).toBe('table-uuid|parent-widget-uuid'); // must be with parent classIds
+    });
+
+    function getLocalTable(): SpecTable {
+      const localParent = scout.create(Widget, {
+        parent: session.desktop,
+        uuid: 'parent-widget-uuid' // root widget uuid
+      });
+      return helper.createTable({
+        parent: localParent,
+        uuid: 'table-uuid', // uuid of the table
+        columns: [{
+          objectType: Column,
+          uuid: 'column-uuid' // uuid of the column
+        }]
+      });
+    }
   });
 });
