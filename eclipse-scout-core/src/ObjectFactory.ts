@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractConstructor, BaseDoEntity, Constructor, FullModelOf, InitModelOf, ModelOf, ObjectModel, objects, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
+import {AbstractConstructor, BaseDoEntity, Constructor, FullModelOf, InitModelOf, ModelAdapter, ModelOf, ObjectModel, objects, ObjectUuidProvider, scout, TableRow, TreeNode, TypeDescriptor, TypeDescriptorOptions, Widget} from './index';
 import $ from 'jquery';
 
 export type ObjectCreator = (model?: any) => object;
@@ -38,15 +38,12 @@ export interface RegisterNamespaceOptions {
  * @singleton
  */
 export class ObjectFactory {
-  /** use {@link createUniqueId} to generate a new ID */
-  uniqueIdSeqNo: number;
   initialized: boolean;
 
   protected _registry: Map<ObjectType, ObjectCreator>;
   protected _objectTypeMap: Map<Constructor, string>;
 
   constructor() {
-    this.uniqueIdSeqNo = 0;
     this.initialized = false;
     this._registry = new Map();
     this._objectTypeMap = new Map();
@@ -170,18 +167,17 @@ export class ObjectFactory {
     if (objects.isFunction(scoutObject.init)) {
       if (model) {
         if (model.id === undefined && ensureUniqueId) {
-          model.id = this.createUniqueId();
+          model.id = ObjectUuidProvider.createUiId();
         }
         if (ensureObjectType) {
           model.objectType = this.getObjectType(objectType);
         }
       }
-      // Initialize object
       scoutObject.init(model);
     }
 
     if (scoutObject.id === undefined && ensureUniqueId) {
-      scoutObject.id = this.createUniqueId();
+      scoutObject.id = ObjectUuidProvider.createUiId();
     }
     if (scoutObject.objectType === undefined && ensureObjectType) {
       scoutObject.objectType = this.getObjectType(objectType);
@@ -190,21 +186,20 @@ export class ObjectFactory {
     return scoutObject;
   }
 
-  protected _ensureObjectType(scoutObject: any) {
+  protected _ensureObjectType(scoutObject: any): boolean {
     return !(scoutObject instanceof BaseDoEntity); // don't create objectType attribute for DOs
   }
 
   protected _ensureUniqueId(scoutObject: any, options?: ObjectFactoryOptions): boolean {
-    return scout.nvl(options.ensureUniqueId, !(scoutObject instanceof BaseDoEntity) /* don't create unique IDs for DOs by default */);
+    // FIXME bsh [js-bookmark] How can we determine whether an ID should be generated? Is this even needed for widgets? (TreeNodes and TableRows seem to need it because of Maps in Tree/Table, but this could probably changed to ES6-Maps)
+    return scout.nvl(options.ensureUniqueId, scoutObject instanceof Widget || scoutObject instanceof TreeNode || scoutObject instanceof TableRow || scoutObject instanceof ModelAdapter);
   }
 
   /**
-   * Returns a new unique ID to be used for Widgets/Adapters created by the UI
-   * without a model delivered by the server-side client.
-   * @returns ID with prefix 'ui'
+   * @deprecated Use {@link ObjectUuidProvider.createUiId} instead.
    */
   createUniqueId(): string {
-    return 'ui' + (++this.uniqueIdSeqNo).toString();
+    return ObjectUuidProvider.createUiId();
   }
 
   resolveTypedObjectType<T>(objectType: ObjectType<T>): ObjectType<T> {

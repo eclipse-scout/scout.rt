@@ -10,7 +10,7 @@
 import {
   AbstractLayout, Action, aria, arrays, Button, ButtonAdapterMenu, CloneOptions, CompositeField, EnumObject, fields, Form, FormField, FormFieldStatusPosition, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder,
   GroupBoxModel, GroupBoxResponsiveHandler, HAlign, HtmlComponent, InitModelOf, KeyStrokeRenderingHints, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, MenuBarEllipsisPosition, Notification,
-  ObjectOrChildModel, ObjectOrModel, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid, WrappedFormField
+  ObjectOrChildModel, ObjectOrModel, ObjectUuidProvider, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid, WrappedFormField
 } from '../../../index';
 import $ from 'jquery';
 
@@ -865,3 +865,5 @@ export class GroupBox extends CompositeField implements GroupBoxModel {
 
 export type GroupBoxBorderDecoration = EnumObject<typeof GroupBox.BorderDecoration>;
 export type GroupBoxMenuBarPosition = EnumObject<typeof GroupBox.MenuBarPosition>;
+
+ObjectUuidProvider.UuidPathSkipWidgets.add(GroupBox);

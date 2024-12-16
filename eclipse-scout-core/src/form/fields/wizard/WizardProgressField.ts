@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel} from '../../../index';
+import {
+  aria, Device, Form, FormField, FormFieldLayout, GroupBox, icons, InitModelOf, inspector, ObjectWithUuidModel, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel
+} from '../../../index';
 import $ from 'jquery';
 
 export class WizardProgressField extends FormField implements WizardProgressFieldModel {
@@ -112,8 +114,8 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
       this._updateStepClasses(step);
 
       // Inspector info
+      inspector.applyInfo(step, $step, this.session);
       if (this.session.inspector) {
-        inspector.applyInfo(step, $step);
         $step.attr('data-step-index', step.index);
       }
 
@@ -298,7 +300,7 @@ export class WizardProgressField extends FormField implements WizardProgressFiel
   }
 }
 
-export interface WizardStep {
+export interface WizardStep extends ObjectWithUuidModel<WizardStep> {
   index?: number;
   title?: string;
   subTitle?: string;
