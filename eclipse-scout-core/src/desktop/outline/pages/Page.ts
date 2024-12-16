@@ -411,16 +411,6 @@ export class Page extends TreeNode implements PageModel {
   }
 
   /**
-   * @deprecated Use {@link TableRow#page} instead. Will be removed in 25.1
-   */
-  pageForTableRow(row: TableRow): Page {
-    if (!row.page) {
-      throw new Error('Table-row is not linked to a page');
-    }
-    return row.page;
-  }
-
-  /**
    * @param form The new form
    */
   setDetailForm(form: Form) {

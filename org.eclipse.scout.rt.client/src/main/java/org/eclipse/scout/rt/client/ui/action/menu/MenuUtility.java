@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
@@ -19,7 +20,6 @@ import java.util.function.UnaryOperator;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
-import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -45,7 +45,7 @@ public final class MenuUtility {
 
   /**
    * @return true if the menu is a visible leaf in the menu tree or the menu is a menu group (has child menus) and at
-   *         least one of the recursive child menus is a visible leaf.
+   * least one of the recursive child menus is a visible leaf.
    */
   public static <T extends IActionNode<?>> boolean isVisible(T menu) {
     if (!menu.isVisible()) {
@@ -69,10 +69,10 @@ public final class MenuUtility {
 
   /**
    * @return the sub-menu of the given context menu owner that implements the given type. If no implementation is found,
-   *         <code>null</code> is returned. Note: This method uses instance-of checks, hence the menu replacement
-   *         mapping is not required.
+   * <code>null</code> is returned. Note: This method uses instance-of checks, hence the menu replacement
+   * mapping is not required.
    * @throws IllegalArgumentException
-   *           when no context menu owner is provided.
+   *     when no context menu owner is provided.
    */
   public static <T extends IMenu> T getMenuByClass(IContextMenuOwner contextMenuOwner, final Class<T> menuType) {
     if (contextMenuOwner == null) {
@@ -94,12 +94,17 @@ public final class MenuUtility {
   /**
    * Removes invisible menus. Also removes leading and trailing separators as well as multiple consecutive separators.
    *
-   * @since 3.8.1
+   * @return normalized list of menus, does not modify the original list
    */
   public static List<IMenu> visibleNormalizedMenus(List<IMenu> menus) {
     return normalizedMenus(menus, createVisibleFilter());
   }
 
+  /**
+   * Removes menus not matching the given filter predicate. Also removes leading and trailing separators as well as multiple consecutive separators.
+   *
+   * @return normalized list of menus, does not modify the original list
+   */
   public static List<IMenu> normalizedMenus(List<IMenu> menus, final Predicate<IMenu> filter) {
     if (menus == null) {
       return CollectionUtility.emptyArrayList();
@@ -108,8 +113,35 @@ public final class MenuUtility {
     // only visible
     List<IMenu> cleanedMenus = filterMenusRec(menus, filter);
 
-    ActionUtility.normalizeSeparators(cleanedMenus);
+    normalizeSeparators(cleanedMenus);
     return cleanedMenus;
+  }
+
+  /**
+   * Removes leading and trailing separators as well as multiple consecutive separators from the given list of menus (in-place).
+   */
+  public static void normalizeSeparators(List<IMenu> menus) {
+    // remove multiple and leading separators
+    IMenu prevMenu = null;
+    ListIterator<IMenu> it = menus.listIterator();
+    while (it.hasNext()) {
+      IMenu currentMenu = it.next();
+      if (currentMenu.isSeparator() && (prevMenu == null || prevMenu.isSeparator())) {
+        it.remove();
+        continue;
+      }
+      prevMenu = currentMenu;
+    }
+    // remove trailing separators
+    while (it.hasPrevious()) {
+      IMenu previous = it.previous();
+      if (previous.isSeparator()) {
+        it.remove();
+      }
+      else {
+        break;
+      }
+    }
   }
 
   /**
@@ -168,10 +200,10 @@ public final class MenuUtility {
    * (having at least one of the given menu types) are updated according to the value of the supplier.
    *
    * @param contextMenu
-   *          The {@link AbstractContextMenu} to update. Must not be {@code null}.
+   *     The {@link AbstractContextMenu} to update. Must not be {@code null}.
    * @param selectionEnabledStateSupplier
-   *          Only invoked if the container of the context menu itself is enabled. Returns if all selected elements of
-   *          the container are enabled ({@code true}) or not.
+   *     Only invoked if the container of the context menu itself is enabled. Returns if all selected elements of
+   *     the container are enabled ({@code true}) or not.
    * @see #updateEnabledStateOfMenus(IWidget, boolean, IMenuType...)
    * @see UpdateMenuEnabledStateVisitor
    */
@@ -188,11 +220,11 @@ public final class MenuUtility {
    * the given menu types) of the given {@link IWidget}.
    *
    * @param widget
-   *          The {@link IWidget} whose {@link IMenu menus} should be changed (recursively). Must not be {@code null}.
+   *     The {@link IWidget} whose {@link IMenu menus} should be changed (recursively). Must not be {@code null}.
    * @param enabled
-   *          The new enabled state of the {@link IMenu menus} found.
+   *     The new enabled state of the {@link IMenu menus} found.
    * @param menuTypes
-   *          The menu types to update
+   *     The menu types to update
    */
   public static void updateEnabledStateOfMenus(IWidget widget, boolean enabled, IMenuType... menuTypes) {
     Predicate<IMenu> menusToUpdate = createMenuFilterMenuTypes(false, menuTypes);
