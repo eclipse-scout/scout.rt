@@ -268,7 +268,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
     ITypeWithClassId container = getContainer();
-    if (container instanceof ITypeWithClassId) {
+    if (container != null) {
       return simpleClassId + ID_CONCAT_SYMBOL + container.classId();
     }
     return simpleClassId;

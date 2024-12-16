@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  aria, arrays, CompositeField, EnumObject, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectOrChildModel, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap, TabBoxHeader, TabBoxLayout,
-  TabBoxModel, TabItem
+  aria, arrays, CompositeField, EnumObject, fields, FormField, HtmlComponent, InitModelOf, Menu, ObjectOrChildModel, ObjectUuidProvider, PropertyChangeEvent, scout, SingleLayout, Tab, TabArea, TabAreaStyle, TabBoxEventMap, TabBoxHeader,
+  TabBoxLayout, TabBoxModel, TabItem
 } from '../../../index';
 import $ from 'jquery';
 
@@ -309,3 +309,5 @@ export class TabBox extends CompositeField implements TabBoxModel {
 }
 
 export type TabBoxMenuType = EnumObject<typeof TabBox.MenuType>;
+
+ObjectUuidProvider.UuidPathSkipWidgets.add(TabBox);
