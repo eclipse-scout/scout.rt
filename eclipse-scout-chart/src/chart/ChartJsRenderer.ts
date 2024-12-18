@@ -10,8 +10,8 @@
 import {AbstractChartRenderer, CartesianChartScale, Chart, ChartAxis, ChartColorMode, ChartConfig, ChartData, chartJsDateAdapter, ChartType, ClickObject, NumberFormatter, RadialChartScale} from '../index';
 import {
   _adapters as chartJsAdapters, ActiveElement, ArcElement, BarElement, BubbleDataPoint, CartesianScaleOptions, CategoryScale, Chart as ChartJs, ChartArea, ChartConfiguration, ChartDataset, ChartEvent, ChartType as ChartJsType, Color,
-  DefaultDataPoint, FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, PointElement, PointHoverOptions, RadialLinearScaleOptions, Scale, ScatterDataPoint, Scriptable, ScriptableContext, TooltipCallbacks, TooltipItem,
-  TooltipLabelStyle, TooltipModel, TooltipOptions
+  DefaultDataPoint, FontSpec, LegendElement, LegendItem, LegendOptions, LinearScaleOptions, Point as ChartJsPoint, PointElement, PointHoverOptions, RadialLinearScaleOptions, Scale, ScatterDataPoint, Scriptable, ScriptableContext,
+  TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
 } from 'chart.js';
 import 'chart.js/auto'; // Import from auto to register charts
 import {aria, arrays, colorSchemes, graphics, numbers, objects, Point, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
@@ -2348,6 +2348,9 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     defaultLegendClick.call(this.chartJs, e, legendItem, legend);
     this._onLegendLeave(e, legendItem, legend);
     this._onLegendHoverPointer(e, legendItem, legend);
+
+    this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
+    this.refresh();
   }
 
   protected _onLegendHover(e: ChartEvent, legendItem: LegendItem, legend: LegendElement<any>) {
@@ -2566,20 +2569,47 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
+    // do not use 0 as default as the max-min-range might not include 0, e.g. all values are greater than 10.000
     let maxValue, minValue;
     if (config.type === Chart.Type.SCATTER && identifier === 'r') {
       // do not move the grid boundaries because of the radii of the points (would look weird)
       maxValue = 0;
       minValue = 0;
     } else {
+      // check if chart is stacked
+      const sums = [];
+      let calculateSum = false;
+      if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.BAR)) {
+        calculateSum = !!config.options.scales.y.stacked;
+      } else if (config.type === Chart.Type.BAR_HORIZONTAL) {
+        calculateSum = !!config.options.scales.x.stacked;
+      }
+
+      const extractValue = (data: (number | [number, number] | ChartJsPoint | BubbleDataPoint)) => {
+        if (identifier) {
+          return data[identifier];
+        }
+        return data;
+      };
+
       for (let i = 0; i < datasets.length; i++) {
+        // do not consider hidden datasets
+        if (!scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA) && !this.chartJs.getDatasetMeta(i).visible) {
+          continue;
+        }
+
         for (let j = 0; j < datasets[i].data.length; j++) {
-          let value;
-          if (identifier) {
-            value = datasets[i].data[j][identifier];
-          } else {
-            value = datasets[i].data[j];
+          const value = extractValue(datasets[i].data[j]);
+
+          if (calculateSum) {
+            if (!sums[j]) {
+              sums[j] = 0;
+            }
+            sums[j] += value;
+
+            continue;
           }
+
           if (isNaN(maxValue)) {
             maxValue = value;
           } else {
@@ -2591,6 +2621,12 @@ export class ChartJsRenderer extends AbstractChartRenderer {
             minValue = Math.min(value, minValue);
           }
         }
+      }
+
+      // update maxValue/minValue with max/min sum
+      if (calculateSum) {
+        maxValue = Math.max(arrays.max(sums), 0);
+        minValue = Math.min(arrays.min(sums), 0);
       }
     }
 

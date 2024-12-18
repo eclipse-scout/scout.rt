@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Chart, ChartConfig, ChartJsRenderer} from '../../src/index';
-import {scout} from '@eclipse-scout/core';
+import {Chart, ChartConfig, ChartJsChart, ChartJsRenderer} from '../../src/index';
+import {arrays, scout} from '@eclipse-scout/core';
 import {ChartArea} from 'chart.js';
 
 describe('ChartJsRendererSpec', () => {
@@ -36,7 +36,8 @@ describe('ChartJsRendererSpec', () => {
       chartArea: ChartArea,
       defaultConfig: Partial<ChartConfig>,
       defaultScalesConfig: Partial<ChartConfig>,
-      defaultScaleConfig: Partial<ChartConfig>;
+      defaultScaleConfig: Partial<ChartConfig>,
+      hiddenDatasets: number[] = [];
 
     beforeEach(() => {
       renderer = new SpecChartJsRenderer(scout.create(Chart, {parent: session.desktop}));
@@ -78,6 +79,12 @@ describe('ChartJsRendererSpec', () => {
           }
         }
       });
+
+      renderer.chartJs = {
+        getDatasetMeta: i => ({
+          visible: !arrays.contains(hiddenDatasets, i)
+        })
+      } as unknown as ChartJsChart;
     });
 
     it('bar chart, min/max is set on y axis', () => {
@@ -247,6 +254,156 @@ describe('ChartJsRendererSpec', () => {
         }
       });
     });
+
+    it('stacked bar chart, values are summed up before min/max is calculated', () => {
+      const config = $.extend(true, {}, defaultScalesConfig, {
+        type: Chart.Type.BAR,
+        options: {
+          scales: {
+            x: {
+              stacked: true
+            },
+            y: {
+              stacked: true
+            }
+          }
+        }
+      });
+
+      // only one dataset, so nothing to sum up
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        stacked: true, // default value, not part of this test
+        minSpaceBetweenTicks: 150 // default value, not part of this test
+      });
+      expect(config.options.scales.y).toEqual({
+        stacked: true, // default value, not part of this test
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 45,
+        suggestedMin: 0,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
+        }
+      });
+
+      // multiple datasets -> values need to be summed up
+      config.data.datasets = [
+        {data: [11], label: 'Dataset 1'},
+        {data: [13], label: 'Dataset 2'},
+        {data: [17], label: 'Dataset 3'},
+        {data: [31], label: 'Dataset 4'},
+        {data: [37], label: 'Dataset 5'},
+        {data: [41], label: 'Dataset 6'},
+        {data: [43], label: 'Dataset 7'}
+      ];
+
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        stacked: true, // default value, not part of this test
+        minSpaceBetweenTicks: 150 // default value, not part of this test
+      });
+      expect(config.options.scales.y).toEqual({
+        stacked: true, // default value, not part of this test
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 200,
+        suggestedMin: 0,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
+        }
+      });
+    });
+
+    it('only considers visible datasets', () => {
+      const config = $.extend(true, {}, defaultScalesConfig, {type: Chart.Type.BAR});
+      config.data.datasets = [
+        {data: [11, 13], label: 'Dataset 1'},
+        {data: [31, 43], label: 'Dataset 2'},
+        {data: [41, 17], label: 'Dataset 3'}
+      ];
+
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150 // default value, not part of this test
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 45,
+        suggestedMin: 10,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
+        }
+      });
+
+      hiddenDatasets = [2];
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150 // default value, not part of this test
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 45,
+        suggestedMin: 10,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
+        }
+      });
+
+      hiddenDatasets = [1, 2];
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150 // default value, not part of this test
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 15,
+        suggestedMin: 10,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: 1 // range is very small and there are only integer values -> stepSize is set to 1 to prevent rational numbers as tick labels
+        }
+      });
+
+      hiddenDatasets = [0];
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150 // default value, not part of this test
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 45,
+        suggestedMin: 15,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
+        }
+      });
+
+      hiddenDatasets = [0, 2];
+      renderer._adjustGridMaxMin(config, chartArea);
+
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150 // default value, not part of this test
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 45,
+        suggestedMin: 30,
+        ticks: {
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
+        }
+      });
+    });
   });
 
   describe('_adjustBubbleSizes', () => {
@@ -280,6 +437,10 @@ describe('ChartJsRendererSpec', () => {
           bubble: {}
         }
       };
+
+      renderer.chartJs = {
+        getDatasetMeta: i => ({visible: true})
+      } as unknown as ChartJsChart;
     });
 
     it('neither sizeOfLargestBubble nor minBubbleSize is set', () => {
