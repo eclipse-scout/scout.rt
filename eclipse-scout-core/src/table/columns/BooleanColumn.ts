@@ -120,18 +120,40 @@ export class BooleanColumn extends Column<boolean> {
    * @see TableAdapter
    */
   protected _toggleCellValue(row: TableRow, cell: Cell<boolean>) {
+    let prepareEvent = this.table.trigger('prepareCellEdit', {
+      column: this,
+      row: row
+    });
+    if (prepareEvent.defaultPrevented) {
+      return;
+    }
+
     let value = cell.value as boolean;
-    if (!this.triStateEnabled) {
-      this.setCellValue(row, !value);
-    } else {
+    let newValue = !value;
+    if (this.triStateEnabled) {
       if (value === false) {
-        this.setCellValue(row, true);
+        newValue = true;
       } else if (value === true) {
-        this.setCellValue(row, null);
+        newValue = null;
       } else if (value === null) {
-        this.setCellValue(row, false);
+        newValue = false;
       }
     }
+
+    let dummyField = scout.create(CheckBoxField, {
+      parent: this.table,
+      value: newValue
+    });
+    let completeEvent = this.table.trigger('completeCellEdit', {
+      field: dummyField,
+      row: row,
+      column: this,
+      cell: cell
+    });
+    if (!completeEvent.defaultPrevented) {
+      this.setCellValue(row, newValue);
+    }
+    dummyField.destroy();
   }
 
   protected override _createEditor(row: TableRow): CheckBoxField {
