@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,20 +26,14 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  */
 public class SharedVariableMap implements Serializable, Map<String, Object> {
   private static final long serialVersionUID = 1L;
+  public static final String PROP_VALUES = "values";
 
-  private int m_version;
-  private Map<String, Object> m_variables;
+  private final Map<String, Object> m_variables;
   private transient BasicPropertySupport m_propertySupport;
 
   public SharedVariableMap() {
-    m_version = 0;
     m_variables = new HashMap<>();
     m_propertySupport = new BasicPropertySupport(this);
-  }
-
-  public SharedVariableMap(SharedVariableMap map) {
-    m_version = map.m_version;
-    m_variables = CollectionUtility.copyMap(map.m_variables);
   }
 
   private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
@@ -56,48 +50,28 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   }
 
   /**
-   * Update values of this variable map with the new one if version of new map is newer <br>
-   * Does not fire a change event
+   * Update values of this variable map with the new one.
    */
-  public void updateInternal(SharedVariableMap newMap) {
-    if (newMap.getVersion() != getVersion()) {
-      var different = !m_variables.equals(newMap.m_variables);
-      m_variables = CollectionUtility.copyMap(newMap.m_variables);
-      m_version = newMap.getVersion();
-      if (different) {
-        mapChanged();
-      }
+  public void updateInternal(Map<String, Object> newMap) {
+    if (m_variables.equals(newMap)) {
+      return; // nothing changed
     }
+
+    m_variables.clear();
+    putAll(newMap); // fires a value changed event
   }
 
-  /**
-   * @return The version seq of the map state. This version number is changed every time the variable map changes.
-   *         <p>
-   *         Note that even a different number means that the version changed, it must not be higher, just different.
-   *         <p>
-   *         See <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=358344">Bug 358344</a>.
-   */
-  public int getVersion() {
-    return m_version;
+  private void fireValuesChanged() {
+    m_propertySupport.firePropertyChange(PROP_VALUES, null, CollectionUtility.copyMap(m_variables));
   }
 
-  private void mapChanged() {
-    m_version++;
-    if (m_propertySupport != null) {
-      m_propertySupport.firePropertyChange("values", null, CollectionUtility.copyMap(m_variables));
-    }
-  }
-
-  /*
-   * Map implementation
-   */
   /**
    * Fires a change event
    */
   @Override
   public void clear() {
     m_variables.clear();
-    mapChanged();
+    fireValuesChanged();
   }
 
   @Override
@@ -136,7 +110,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   @Override
   public Object put(String key, Object value) {
     Object o = m_variables.put(key, value);
-    mapChanged();
+    fireValuesChanged();
     return o;
   }
 
@@ -146,7 +120,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   @Override
   public void putAll(Map<? extends String, ?> m) {
     m_variables.putAll(m);
-    mapChanged();
+    fireValuesChanged();
   }
 
   /**
@@ -155,7 +129,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   @Override
   public Object remove(Object key) {
     Object o = m_variables.remove(key);
-    mapChanged();
+    fireValuesChanged();
     return o;
   }
 

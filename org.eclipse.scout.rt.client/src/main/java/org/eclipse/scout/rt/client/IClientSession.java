@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client;
 
 import java.net.URI;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.security.auth.Subject;
@@ -20,7 +21,6 @@ import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public interface IClientSession extends ISession, IPropertyObserver {
@@ -125,7 +125,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
    */
   void setMemoryPolicy(IMemoryPolicy memoryPolicy);
 
-  void replaceSharedVariableMapInternal(SharedVariableMap newMap);
+  void replaceSharedVariableMapInternal(Map<String, Object> newMap);
 
   /**
    * Returns the <em>one-permit</em> {@link IExecutionSemaphore} to run model jobs of this session in sequence, meaning

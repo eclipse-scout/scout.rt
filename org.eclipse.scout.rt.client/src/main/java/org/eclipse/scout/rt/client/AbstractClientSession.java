@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -245,7 +245,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
     setMemoryPolicy(resolveMemoryPolicy());
     m_sharedVariableMap.addPropertyChangeListener(e -> {
-      if ("values".equals(e.getPropertyName())) {
+      if (SharedVariableMap.PROP_VALUES.equals(e.getPropertyName())) {
         ModelJobs.schedule(() -> propertySupport.firePropertyChange(PROP_SHARED_VARIABLE_MAP, e.getOldValue(), e.getNewValue()),
             ModelJobs.newInput(ClientRunContexts.copyCurrent()));
       }
@@ -296,7 +296,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    *          map to replace the current one with
    */
   @Override
-  public void replaceSharedVariableMapInternal(SharedVariableMap newMap) {
+  public void replaceSharedVariableMapInternal(Map<String, Object> newMap) {
     m_sharedVariableMap.updateInternal(newMap);
   }
 
