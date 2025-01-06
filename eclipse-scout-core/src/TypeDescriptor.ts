@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, ObjectFactory, scout, strings} from './index';
+import {arrays, Constructor, ObjectFactory, scout, strings} from './index';
 
 export interface ObjectTypePart {
   name: string;
@@ -48,7 +48,7 @@ export class TypeDescriptor {
     }
   }
 
-  resolve(options?: TypeDescriptorOptions): new() => object {
+  resolve(options?: TypeDescriptorOptions): Constructor {
     let namespace = window['scout']; // default namespace
     options = options || {};
 
@@ -81,9 +81,15 @@ export class TypeDescriptor {
     return this.error('Could not find "' + this.className + '" in namespace "' + this.namespaces.join('.') + '"');
   }
 
-  static resolveType(typeDescriptor: string, options?: TypeDescriptorOptions): new() => object {
+  static resolveType<T>(typeDescriptor: string | Constructor<T>, options?: TypeDescriptorOptions): Constructor<T> {
+    if (!typeDescriptor) {
+      return null;
+    }
+    if (typeof typeDescriptor === 'function') {
+      return typeDescriptor as Constructor<T>;
+    }
     let info = TypeDescriptor.parse(typeDescriptor);
-    return info.resolve(options);
+    return info.resolve(options) as Constructor<T>;
   }
 
   static parse(typeDescriptor: string): TypeDescriptor {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, HybridActionContextElement, HybridActionContextElementConverters, HybridActionContextElements, HybridActionEvent, HybridManager, ModelAdapter, RemoteEvent, scout, Widget} from '../../index';
+import {AnyDoEntity, dataObjects, Event, HybridActionContextElement, HybridActionContextElementConverters, HybridActionContextElements, HybridActionEvent, HybridManager, ModelAdapter, RemoteEvent, scout, Widget} from '../../index';
 
 export class HybridManagerAdapter extends ModelAdapter {
   declare widget: HybridManager;
@@ -24,11 +24,13 @@ export class HybridManagerAdapter extends ModelAdapter {
 
   protected _onHybridEvent(event: HybridRemoteEvent) {
     let contextElements = this._jsonToContextElements(event.contextElements);
-    this.widget.onHybridEvent(event.id, event.eventType, event.data, contextElements);
+    let dataobject = dataObjects.deserialize(event.data);
+    this.widget.onHybridEvent(event.id, event.eventType, dataobject, contextElements);
   }
 
   protected _onHybridWidgetEvent(event: HybridRemoteEvent) {
-    this.widget.onHybridWidgetEvent(event.id, event.eventType, event.data);
+    let dataobject = dataObjects.deserialize(event.data);
+    this.widget.onHybridWidgetEvent(event.id, event.eventType, dataobject);
   }
 
   protected override _onWidgetEvent(event: Event<HybridManager>) {
@@ -40,10 +42,11 @@ export class HybridManagerAdapter extends ModelAdapter {
   }
 
   protected _onWidgetHybridAction(event: HybridActionEvent) {
+    let dataobject = dataObjects.serialize(event.data.data);
     this._send('hybridAction', {
       actionType: event.data.actionType, // add as first property (devtools sometimes show properties in that order)
       id: event.data.id,
-      data: event.data.data,
+      data: dataobject,
       contextElements: this._contextElementsToJson(event.data.contextElements) || undefined
     });
   }
@@ -144,7 +147,7 @@ export class HybridManagerAdapter extends ModelAdapter {
   }
 }
 
-interface HybridRemoteEvent<TObject = object> extends RemoteEvent {
+interface HybridRemoteEvent<TObject extends AnyDoEntity = AnyDoEntity> extends RemoteEvent {
   id: string;
   eventType: string;
   data: TObject;

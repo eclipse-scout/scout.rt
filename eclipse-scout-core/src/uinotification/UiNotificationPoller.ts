@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ajax, AjaxCall, AjaxError, arrays, BackgroundJobPollingStatus, config, ConfigProperties, dates, ErrorHandler, InitModelOf, JsonErrorResponse, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo, UiNotificationDo,
-  UiNotificationPollerEventMap, UiNotificationResponse, UiNotificationSystem
+  ajax, AjaxCall, AjaxError, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, InitModelOf, JsonErrorResponse, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo, UiNotificationDo,
+  UiNotificationPollerEventMap, UiNotificationRequest, UiNotificationResponse, UiNotificationSystem
 } from '../index';
 import $ from 'jquery';
 
@@ -72,15 +72,15 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     // Create an array of TopicDOs containing the last notification of each topic per node
     return Array.from(this.notifications.entries())
       .map(([name, notificationsByNode]) => {
-        let lastNotifications = Array.from(notificationsByNode.values()).map(notifications => {
-          let lastNotification = arrays.last(notifications);
-          return {
+        const lastNotifications = Array.from(notificationsByNode.values()).map(notifications => {
+          const lastNotification = arrays.last(notifications);
+          return scout.create(UiNotificationDo, {
             id: lastNotification.id,
             creationTime: lastNotification.creationTime,
             nodeId: lastNotification.nodeId
-          } as UiNotificationDo;
+          });
         });
-        return {name, lastNotifications: lastNotifications.length === 0 ? undefined : lastNotifications};
+        return scout.create(TopicDo, {name, lastNotifications: lastNotifications.length === 0 ? undefined : lastNotifications});
       });
   }
 
@@ -123,16 +123,8 @@ export class UiNotificationPoller extends PropertyEventEmitter {
 
   protected _poll() {
     this._call?.abort(); // abort in case there is already a call running
-    this._call = ajax.createCallJson({
-      url: this.url,
-      timeout: this.requestTimeout,
-      converters: {
-        'text json': data => objects.parseJson(data, dates.parseJsonDateMapper('creationTime'))
-      },
-      data: objects.stringifyJson({
-        topics: this.topicsWithLastNotifications
-      }, dates.stringifyJsonDateMapper())
-    });
+    const request = scout.create(UiNotificationRequest, {topics: this.topicsWithLastNotifications});
+    this._call = ajax.createCallDataObject({url: this.url, timeout: this.requestTimeout}, request);
     this._call.call()
       .then((response: UiNotificationResponse) => this._onSuccess(response))
       .catch(error => this._onError(error));

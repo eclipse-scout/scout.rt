@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Form, FormAdapter, HybridActionContextElements, HybridManager, HybridManagerAdapter, LabelField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget} from '../../../src';
+import {BaseDoEntity, Form, FormAdapter, HybridActionContextElements, HybridManager, HybridManagerAdapter, LabelField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget} from '../../../src';
 import {FormSpecHelper, TreeSpecHelper} from '../../../src/testing';
 
 describe('HybridManager', () => {
@@ -225,7 +225,7 @@ describe('HybridManager', () => {
       jasmine.clock().uninstall();
 
       let promise = hybridManager.when('hybridActionEnd:767676767').then(event => {
-        expect(event.data).toEqual({customData: 123});
+        expect(event.data).toEqual(scout.create(BaseDoEntity, {customData: 123} as any));
         expect(event.contextElements).toBeInstanceOf(HybridActionContextElements);
         expect(event.contextElements.isEmpty()).toBe(false);
         expect(event.contextElements.getList('form').length).toBe(1);

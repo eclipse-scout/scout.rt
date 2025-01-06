@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, dates, DoEntity, JsonObject, Session, systems, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src/index';
+import {BackgroundJobPollingStatus, dataObjects, dates, DoEntity, JsonObject, scout, Session, systems, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src/index';
 import {UiNotificationsMock} from '../../src/testing/index';
 
 describe('uiNotifications', () => {
@@ -57,25 +57,25 @@ describe('uiNotifications', () => {
 
       let poller = pollers().get('main');
       expect(Array.from(poller.topics)).toEqual(['aaa']);
-      expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}]);
+      expect(mostRecentRequestData()['topics']).toEqual([{_type: 'scout.Topic', name: 'aaa'}]);
 
       uiNotifications.subscribe('aaa', () => undefined);
       expect(Array.from(poller.topics)).toEqual(['aaa']); // unchanged
 
       uiNotifications.subscribe('bbb', () => undefined);
       expect(Array.from(poller.topics)).toEqual(['aaa', 'bbb']);
-      expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}, {name: 'bbb'}]);
+      expect(mostRecentRequestData()['topics']).toEqual([{_type: 'scout.Topic', name: 'aaa'}, {_type: 'scout.Topic', name: 'bbb'}]);
     });
 
     it('restarts the poller if a new topic is subscribed', () => {
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
-      expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}]);
+      expect(mostRecentRequestData()['topics']).toEqual([{_type: 'scout.Topic', name: 'aaa'}]);
 
       poller.one('propertyChange:status', event => event.newValue === BackgroundJobPollingStatus.STOPPED);
       uiNotifications.subscribe('bbb', () => undefined);
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
-      expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}, {name: 'bbb'}]);
+      expect(mostRecentRequestData()['topics']).toEqual([{_type: 'scout.Topic', name: 'aaa'}, {_type: 'scout.Topic', name: 'bbb'}]);
     });
 
     it('executes the handlers for the received notifications', async () => {
@@ -92,7 +92,7 @@ describe('uiNotifications', () => {
         receivedMsgCcc = event.message;
       });
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '1',
           topic: 'aaa',
@@ -118,20 +118,16 @@ describe('uiNotifications', () => {
             z: 'zzz'
           } as JsonObject
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
 
-      expect(receivedMsgAaa).toEqual({
-        a: 'aaa'
-      } as DoEntity);
-      expect(receivedMsgBbb).toEqual({
-        b: 'bbb'
-      } as DoEntity);
+      expect(receivedMsgAaa['a']).toBe('aaa');
+      expect(receivedMsgBbb['b']).toBe('bbb');
       expect(receivedMsgCcc).toBeUndefined();
     });
 
@@ -142,7 +138,7 @@ describe('uiNotifications', () => {
       });
       let poller = pollers().get('main');
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'aaa',
@@ -152,17 +148,17 @@ describe('uiNotifications', () => {
             id: '1'
           } as JsonObject
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
       expect(poller.notifications.get('aaa').get('node1').length).toBe(1);
       expect(receivedMessages.length).toBe(1);
 
-      response = {
+      response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'aaa',
@@ -180,10 +176,10 @@ describe('uiNotifications', () => {
             id: '2'
           } as JsonObject
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
@@ -199,7 +195,7 @@ describe('uiNotifications', () => {
         receivedMsg = event.message;
       });
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'aaa',
@@ -207,17 +203,18 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000'),
           subscriptionStart: true
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
       // New request started with lastNotifications set
       expect(mostRecentRequestData()['topics']).toEqual([{
+        _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [
-          {id: '100', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'}
+          {_type: 'scout.UiNotification', id: '100', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'}
         ]
       }]);
 
@@ -230,7 +227,7 @@ describe('uiNotifications', () => {
         receivedMessages.push(event.message);
       });
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'aaa',
@@ -254,19 +251,17 @@ describe('uiNotifications', () => {
             a: '2'
           } as JsonObject
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
 
-      expect(receivedMessages).toEqual([{
-        a: '1'
-      }, {
-        a: '2'
-      }]);
+      expect(receivedMessages.length).toBe(2);
+      expect(receivedMessages[0]['a']).toBe('1');
+      expect(receivedMessages[1]['a']).toBe('2');
     });
 
     it('resolves the return value as soon as the subscriptionStart notification arrives', done => {
@@ -275,7 +270,7 @@ describe('uiNotifications', () => {
         done();
       });
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'aaa',
@@ -283,10 +278,10 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000'),
           subscriptionStart: true
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
     });
 
@@ -297,7 +292,7 @@ describe('uiNotifications', () => {
         called = false;
       });
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'bbb',
@@ -305,10 +300,10 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000'),
           subscriptionStart: true
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(50);
@@ -318,7 +313,7 @@ describe('uiNotifications', () => {
     it('is resolved if there are already notifications in the history', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'aaa',
@@ -326,10 +321,10 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000'),
           subscriptionStart: true
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       const topic = await uiNotifications.subscribe('aaa', () => undefined);
@@ -364,9 +359,9 @@ describe('uiNotifications', () => {
 
     it('sends the last received notifications per topic and node', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
-      expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}]);
+      expect(mostRecentRequestData()['topics']).toEqual([{_type: 'scout.Topic', name: 'aaa'}]);
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '1',
           topic: 'aaa',
@@ -374,31 +369,34 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000'),
           message: {}
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
       expect(mostRecentRequestData()['topics']).toEqual([{
+        _type: 'scout.Topic',
         name: 'aaa',
         lastNotifications: [
-          {id: '1', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'}
+          {_type: 'scout.UiNotification', id: '1', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'}
         ]
       }]);
 
       uiNotifications.subscribe('bbb', () => undefined);
       expect(mostRecentRequestData()['topics']).toEqual([{
+        _type: 'scout.Topic',
         name: 'aaa',
         lastNotifications: [
-          {id: '1', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'}
+          {_type: 'scout.UiNotification', id: '1', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'}
         ]
       }, {
+        _type: 'scout.Topic',
         name: 'bbb'
       }]);
 
-      let response2: UiNotificationResponse = {
+      let response2 = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '4',
           topic: 'bbb',
@@ -412,25 +410,27 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:44:50.000'),
           message: {}
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response2, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response2)
       });
 
       await sleep(1);
       expect(mostRecentRequestData()['topics']).toEqual([{
+        _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [{
-          id: '1', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'
+          _type: 'scout.UiNotification', id: '1', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'
         }]
       }, {
+        _type: 'scout.Topic',
         name: 'bbb',
         lastNotifications: [{
-          id: '5', creationTime: '2023-09-16 21:44:50.000', nodeId: 'node1'
+          _type: 'scout.UiNotification', id: '5', creationTime: '2023-09-16 21:44:50.000', nodeId: 'node1'
         }]
       }]);
 
-      let response3: UiNotificationResponse = {
+      let response3 = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '7',
           topic: 'bbb',
@@ -444,23 +444,25 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:46:10.000'),
           message: {}
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response3, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response3)
       });
 
       await sleep(1);
       expect(mostRecentRequestData()['topics']).toEqual([{
+        _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [{
-          id: '1', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'
+          _type: 'scout.UiNotification', id: '1', creationTime: '2023-09-16 21:44:13.000', nodeId: 'node1'
         }]
       }, {
+        _type: 'scout.Topic',
         name: 'bbb',
         lastNotifications: [{
-          id: '5', creationTime: '2023-09-16 21:44:50.000', nodeId: 'node1'
+          _type: 'scout.UiNotification', id: '5', creationTime: '2023-09-16 21:44:50.000', nodeId: 'node1'
         }, {
-          id: '8', creationTime: '2023-09-16 21:46:10.000', nodeId: 'node2'
+          _type: 'scout.UiNotification', id: '8', creationTime: '2023-09-16 21:46:10.000', nodeId: 'node2'
         }]
       }]);
     });
@@ -471,7 +473,7 @@ describe('uiNotifications', () => {
       let poller = pollers().get('main');
       expect(poller.notifications.get('aaa').get('node1')).toBeUndefined();
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '1',
           topic: 'aaa',
@@ -479,17 +481,17 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:44:50.000'),
           message: {}
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
       expect(poller.notifications.get('aaa').get('node1').length).toBe(1);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('1');
 
-      let response2: UiNotificationResponse = {
+      let response2 = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '2',
           topic: 'aaa',
@@ -509,10 +511,10 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 22:09:00.000'),
           message: {}
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response2, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response2)
       });
 
       await sleep(1);
@@ -530,12 +532,12 @@ describe('uiNotifications', () => {
       let poller = pollers().get('main');
       expect(poller.notifications.get('aaa').get('node1')).toBeUndefined();
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: (createNotifications(1, UiNotificationPoller.HISTORY_COUNT + 5))
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
@@ -543,12 +545,12 @@ describe('uiNotifications', () => {
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('6');
       expect(poller.notifications.get('aaa').get('node1')[9].id).toBe('15');
 
-      response = {
+      response = scout.create(UiNotificationResponse, {
         notifications: (createNotifications(UiNotificationPoller.HISTORY_COUNT + 6, 3))
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
@@ -560,15 +562,15 @@ describe('uiNotifications', () => {
     function createNotifications(start: number, count: number): UiNotificationDo[] {
       let notifications = [];
       for (let i = start; i < start + count; i++) {
-        notifications.push({
+        notifications.push(scout.create(UiNotificationDo, {
           id: i + '',
           topic: 'aaa',
           nodeId: 'node1',
           creationTime: new Date(),
           message: {
             id: i
-          }
-        } as UiNotificationDo);
+          } as JsonObject
+        }));
       }
       return notifications;
     }
@@ -627,7 +629,7 @@ describe('uiNotifications', () => {
       expect(pollers().size).toBe(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'aaa',
@@ -635,10 +637,10 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000'),
           subscriptionStart: true
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       // Execute UiNotificationPoller._onSuccess handler which schedules a new poll request but don't execute scheduled poll yet (setTimeout / sleep would do that)
@@ -655,16 +657,16 @@ describe('uiNotifications', () => {
 
       let poller = pollers().get('main');
       expect(Array.from(poller.topics)).toEqual(['aaa']);
-      expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}]);
+      expect(mostRecentRequestData()['topics']).toEqual([{_type: 'scout.Topic', name: 'aaa'}]);
 
       let bbbHandler = () => undefined;
       uiNotifications.subscribe('bbb', bbbHandler);
       expect(Array.from(poller.topics)).toEqual(['aaa', 'bbb']);
-      expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}, {name: 'bbb'}]);
+      expect(mostRecentRequestData()['topics']).toEqual([{_type: 'scout.Topic', name: 'aaa'}, {_type: 'scout.Topic', name: 'bbb'}]);
 
       uiNotifications.unsubscribe('bbb', bbbHandler);
       expect(Array.from(poller.topics)).toEqual(['aaa']);
-      expect(mostRecentRequestData()['topics']).toEqual([{name: 'aaa'}]);
+      expect(mostRecentRequestData()['topics']).toEqual([{_type: 'scout.Topic', name: 'aaa'}]);
 
       uiNotifications.unsubscribe('aaa', aaaHandler);
       expect(Array.from(poller.topics)).toEqual([]);
@@ -678,7 +680,7 @@ describe('uiNotifications', () => {
       uiNotifications.subscribe('bbb', bbbHandler);
 
       let poller = pollers().get('main');
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '1',
           topic: 'aaa',
@@ -704,10 +706,10 @@ describe('uiNotifications', () => {
           creationTime: dates.parseJsonDate('2023-09-16 22:00:00.000'),
           message: {}
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
@@ -739,7 +741,7 @@ describe('uiNotifications', () => {
       const poller = pollers().values().next().value;
       expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '1',
           topic: 'aaa',
@@ -749,16 +751,14 @@ describe('uiNotifications', () => {
             a: 'aaa'
           } as JsonObject
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       await sleep(1);
-      expect(receivedMsg).toEqual({
-        a: 'aaa'
-      } as DoEntity);
+      expect(receivedMsg['a']).toBe('aaa');
       expect(pollers().size).toBe(0);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
     });
@@ -820,17 +820,17 @@ describe('uiNotifications', () => {
       });
       let poller = pollers().get('main');
 
-      let response: UiNotificationResponse = {
+      let response = scout.create(UiNotificationResponse, {
         notifications: [{
           id: '100',
           topic: 'aaa',
           nodeId: 'node1',
           creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000')
         }]
-      };
+      });
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200,
-        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+        responseText: dataObjects.stringify(response)
       });
 
       poller.stop();

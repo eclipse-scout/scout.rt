@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -317,7 +317,7 @@ export const arrays = {
    * Merges the two given arrays and removes duplicate entries in O(n).
    * If the arrays contain objects instead of primitives, it uses their id to check for equality.
    */
-  union<T extends number | string | { id: string }>(array1: T[], array2: T[]): T[] {
+  union<T extends number | string | { id?: string }>(array1: T[], array2: T[]): T[] {
     let result = [];
     let map = {};
 

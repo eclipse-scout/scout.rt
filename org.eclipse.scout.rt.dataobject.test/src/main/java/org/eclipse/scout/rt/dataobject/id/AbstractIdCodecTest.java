@@ -537,6 +537,37 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromUnqualifiedHavingTypeName() {
+    FixtureUuId id = IIds.create(FixtureUuId.class, TEST_UUID);
+    String typeName = BEANS.get(IdInventory.class).getTypeName(id);
+    assertEquals("scout.FixtureUuId", typeName);
+
+    FixtureUuId deserialized = getCodec().fromUnqualified(FixtureUuId.class, typeName + IdCodec.ID_TYPENAME_DELIMITER + TEST_UUID);
+    assertEquals(id, deserialized);
+    assertEquals(id.unwrap(), deserialized.unwrap());
+  }
+
+  @Test
+  public void testFromQualifiedHavingTwoTypeNames() {
+    String typeName = BEANS.get(IdInventory.class).getTypeName(FixtureStringId.class);
+    FixtureStringId id = FixtureStringId.of(typeName + IdCodec.ID_TYPENAME_DELIMITER + TEST_STRING);
+    assertEquals("scout.FixtureStringId", typeName);
+
+    IId deserialized = getCodec().fromQualified(typeName + IdCodec.ID_TYPENAME_DELIMITER + typeName + IdCodec.ID_TYPENAME_DELIMITER + TEST_STRING);
+    assertEquals(id.unwrap(), deserialized.unwrap());
+  }
+
+  @Test
+  public void testFromUnqualifiedHavingTwoTypeNames() {
+    String typeName = BEANS.get(IdInventory.class).getTypeName(FixtureStringId.class);
+    FixtureStringId id = FixtureStringId.of(typeName + IdCodec.ID_TYPENAME_DELIMITER + TEST_STRING);
+    assertEquals("scout.FixtureStringId", typeName);
+
+    IId deserialized = getCodec().fromUnqualified(FixtureStringId.class, typeName + IdCodec.ID_TYPENAME_DELIMITER + typeName + IdCodec.ID_TYPENAME_DELIMITER + TEST_STRING);
+    assertEquals(id.unwrap(), deserialized.unwrap());
+  }
+
+  @Test
   public void testFromUnqualifiedNullIdClass() {
     assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(null, null));
     assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(null, "foo"));

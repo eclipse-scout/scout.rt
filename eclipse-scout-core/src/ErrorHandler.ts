@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -310,7 +310,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       }
     }
 
-    let ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '');
+    let ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.method || requestOptions.type, requestOptions.url) : '');
     let ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status + '', errorThrown) : 'Connection error');
 
     errorInfo.httpStatus = jqXHR.status || 0;

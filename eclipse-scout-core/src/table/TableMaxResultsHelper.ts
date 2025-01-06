@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {dataObjects, DoEntity, Table} from '../index';
+import {BaseDoEntity, dataObjects, DoEntity, scout, Table, typeName} from '../index';
 
 export class TableMaxResultsHelper {
 
@@ -44,10 +44,9 @@ export class TableMaxResultsHelper {
   buildMaxRowCountContribution(table: Table): MaxRowCountContributionDo {
     const maxOutlineRowCount = this.getMaxTableRowCount(table);
     if (maxOutlineRowCount > 0) {
-      return {
-        _type: 'scout.MaxRowCountContribution',
+      return scout.create(MaxRowCountContributionDo, {
         hint: maxOutlineRowCount
-      };
+      });
     }
     return null;
   }
@@ -60,7 +59,8 @@ export class TableMaxResultsHelper {
   }
 }
 
-export interface MaxRowCountContributionDo extends DoEntity {
+@typeName('scout.MaxRowCountContribution')
+export class MaxRowCountContributionDo extends BaseDoEntity {
   override?: number;
   hint?: number;
 }

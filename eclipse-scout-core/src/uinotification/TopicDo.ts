@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoEntity, UiNotificationDo} from '../index';
+import {BaseDoEntity, typeName, UiNotificationDo} from '../index';
 
-export interface TopicDo extends DoEntity {
+@typeName('scout.Topic')
+export class TopicDo extends BaseDoEntity {
   name: string;
   lastNotifications: UiNotificationDo[]; // Message is always empty
 }

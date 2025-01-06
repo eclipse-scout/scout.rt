@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -48,19 +48,22 @@ describe('AccessControl', () => {
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: JSON.stringify({
+          _type: 'scout.PermissionCollection',
           permissions: {
             some: [{
+              _type: 'scout.Permission',
               objectType: 'Permission',
               id: 'some'
             }],
             other: [{
+              _type: 'scout.Permission',
               objectType: 'Permission',
               id: 'other'
             }]
           }
         })
       });
-      jasmine.clock().tick(1);
+      jasmine.clock().tick(1000);
       jasmine.clock().uninstall();
 
       expect(accessControl._permissionCollection).not.toBeNull();
@@ -83,12 +86,15 @@ describe('AccessControl', () => {
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: JSON.stringify({
+          _type: 'scout.PermissionCollection',
           permissions: {
             some: [{
+              _type: 'scout.Permission',
               objectType: 'Permission',
               id: 'some'
             }],
             other: [{
+              _type: 'scout.Permission',
               objectType: 'Permission',
               id: 'other'
             }]

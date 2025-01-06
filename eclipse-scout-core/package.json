@@ -76,6 +76,7 @@
   },
   "dependencies": {
     "jquery": "3.7.1",
+    "reflect-metadata": "0.2.2",
     "sourcemapped-stacktrace": "1.1.11"
   }
 }

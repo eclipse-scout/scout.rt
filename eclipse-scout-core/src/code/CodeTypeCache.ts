@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ajax, AjaxCall, arrays, CodeType, CodeTypeCacheEventMap, CodeTypeChangeEvent, CodeTypeRemoveEvent, DoEntity, EventEmitter, ObjectModel, ObjectOrModel, objects, systems, UiNotificationEvent, uiNotifications} from '../index';
+import {
+  ajax, AjaxCall, App, arrays, BaseDoEntity, CodeType, CodeTypeCacheEventMap, CodeTypeChangeEvent, CodeTypeDo, CodeTypeRemoveEvent, EventEmitter, ObjectModel, ObjectOrModel, objects, scout, systems, typeName, UiNotificationEvent,
+  uiNotifications
+} from '../index';
 import $ from 'jquery';
 
 /**
@@ -70,16 +73,12 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
     if (!this.url) {
       return $.resolvedPromise([]);
     }
-    const request: CodeTypeRequest = codeTypeIds?.length ? {
-      _type: 'scout.CodeTypeRequest',
-      codeTypeIds
-    } : null;
+    const request = codeTypeIds?.length ? scout.create(CodeTypeRequest, {codeTypeIds}) : null;
     this._call?.abort(); // abort in case there is already a call running
-    this._call = ajax.createCallJson({
+    this._call = ajax.createCallDataObject({
       url: this.url,
-      type: 'PUT',
-      data: JSON.stringify(request)
-    }, {
+      method: 'PUT'
+    }, request, {
       maxRetries: -1, // unlimited retries, ensure the cache will be updated eventually in case of network errors
       retryIntervals: [300, 500, 1000, 5000]
     });
@@ -91,17 +90,7 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
   }
 
   protected _handleCodesResponse(data: any): CodeType<any, any, any>[] {
-    if (!data) {
-      return [];
-    }
-    if (data.error) {
-      // The result may contain a json error (e.g. session timeout) -> abort processing
-      throw {
-        error: data.error,
-        url: this.url
-      };
-    }
-    return this.add(data);
+    return this.add(App.handleJsonError(this.url, data));
   }
 
   protected _onCodeTypeUpdateNotify(event: UiNotificationEvent) {
@@ -189,13 +178,15 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
   }
 }
 
-export interface CodeTypeUpdateMessageDo extends DoEntity {
-  codeTypes?: ObjectOrModel<CodeType<any, any, any>>[];
+@typeName('scout.CodeTypeUpdateMessage')
+export class CodeTypeUpdateMessageDo extends BaseDoEntity {
+  codeTypes?: CodeTypeDo[];
   codeTypeIds?: string[];
   reloadDelayWindow?: number;
 }
 
-export interface CodeTypeRequest extends DoEntity {
+@typeName('scout.CodeTypeRequest')
+export class CodeTypeRequest extends BaseDoEntity {
   codeTypeIds?: string[];
 }
 
