@@ -13,17 +13,17 @@ import {
 } from '../../index';
 import $ from 'jquery';
 
-export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
-  declare model: LookupBoxModel<TValue>;
-  declare eventMap: LookupBoxEventMap<TValue>;
+export abstract class LookupBox<TLookup, TValue = TLookup[]> extends ValueField<TValue, TLookup | TValue> implements LookupBoxModel<TLookup, TValue> {
+  declare model: LookupBoxModel<TLookup, TValue>;
+  declare eventMap: LookupBoxEventMap<TLookup, TValue>;
   declare self: LookupBox<any>;
 
   filterBox: Widget;
-  lookupCall: LookupCall<TValue>;
-  codeType: string | (new() => CodeType<TValue>);
+  lookupCall: LookupCall<TLookup>;
+  codeType: string | (new() => CodeType<TLookup>);
   lookupStatus: Status;
 
-  protected _currentLookupCall: LookupCall<TValue>;
+  protected _currentLookupCall: LookupCall<TLookup>;
   protected _lookupExecuted: boolean;
   /** true when value is either syncing to table or table to value */
   protected _valueSyncing: boolean;
@@ -33,7 +33,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     this.filterBox = null;
     this.gridDataHints.weightY = 1.0;
     this.gridDataHints.h = 2;
-    this.value = [];
+    this.value = [] as TValue;
     this.clearable = ValueField.Clearable.NEVER;
     this.lookupCall = null;
     this._currentLookupCall = null;
@@ -56,7 +56,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     }
   }
 
-  protected override _initValue(value: TValue[]) {
+  protected override _initValue(value: TValue) {
     if (this.lookupCall) {
       this._setLookupCall(this.lookupCall);
     }
@@ -65,7 +65,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     super._initValue(value);
   }
 
-  protected abstract _initStructure(value: TValue[]);
+  protected abstract _initStructure(value: TValue);
 
   protected override _render() {
     this.addContainer(this.$parent, 'lookup-box');
@@ -97,16 +97,16 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     this.filterBox.render(this.$fieldContainer);
   }
 
-  protected override _ensureValue(value: TValue | TValue[]): TValue[] {
-    return arrays.ensure(value);
+  protected override _ensureValue(value: TLookup | TValue): TValue {
+    return arrays.ensure(value) as TValue;
   }
 
-  protected _lookupByAll(): JQuery.Promise<LookupResult<TValue>> {
+  protected _lookupByAll(): JQuery.Promise<LookupResult<TLookup>> {
     if (!this.lookupCall) {
       return;
     }
 
-    let deferred = $.Deferred<LookupResult<TValue>>();
+    let deferred = $.Deferred<LookupResult<TLookup>>();
 
     this._executeLookup(this.lookupCall.cloneForAll(), true)
       .done(result => {
@@ -117,7 +117,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return deferred.promise();
   }
 
-  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting?: boolean): JQuery.Promise<LookupResult<TValue>> {
+  protected _executeLookup(lookupCall: LookupCall<TLookup>, abortExisting?: boolean): JQuery.Promise<LookupResult<TLookup>> {
     this.setLoading(true);
 
     if (abortExisting && this._currentLookupCall) {
@@ -138,7 +138,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
       });
   }
 
-  protected _lookupByAllDone(result: LookupResult<TValue>) {
+  protected _lookupByAllDone(result: LookupResult<TLookup>) {
     try {
       if (result.exception) {
         // Oops! Something went wrong while the lookup has been processed.
@@ -174,11 +174,11 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
   }
 
   /** @see LookupBoxModel.lookupCall */
-  setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
+  setLookupCall(lookupCall: LookupCallOrModel<TLookup>) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  protected _setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
+  protected _setLookupCall(lookupCall: LookupCallOrModel<TLookup>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._lookupExecuted = false;
     if (this.rendered) {
@@ -187,16 +187,16 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
   }
 
   /** @see LookupBoxModel.codeType */
-  setCodeType(codeType: string | (new() => CodeType<TValue>)) {
+  setCodeType(codeType: string | (new() => CodeType<TLookup>)) {
     this.setProperty('codeType', codeType);
   }
 
-  protected _setCodeType(codeType: string | (new() => CodeType<TValue>)) {
+  protected _setCodeType(codeType: string | (new() => CodeType<TLookup>)) {
     this._setProperty('codeType', codeType);
     if (!codeType) {
       return;
     }
-    let lookupCall = scout.create(CodeLookupCall<TValue>, {
+    let lookupCall = scout.create(CodeLookupCall<TLookup>, {
       session: this.session,
       codeType: codeType
     });
@@ -219,7 +219,7 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return true;
   }
 
-  protected override _formatValue(value: TValue[]): string | JQuery.Promise<string> {
+  protected override _formatValue(value: TValue): string | JQuery.Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return '';
     }
@@ -227,9 +227,9 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return this._formatLookupRows(this.getCheckedLookupRows());
   }
 
-  abstract getCheckedLookupRows(): LookupRow<TValue>[];
+  abstract getCheckedLookupRows(): LookupRow<TLookup>[];
 
-  protected _formatLookupRows(lookupRows: LookupRow<TValue>[]): string {
+  protected _formatLookupRows(lookupRows: LookupRow<TLookup>[]): string {
     lookupRows = arrays.ensure(lookupRows);
     if (lookupRows.length === 0) {
       return '';

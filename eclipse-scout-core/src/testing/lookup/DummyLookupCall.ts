@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,19 +12,21 @@ import {LookupRow, StaticLookupCall} from '../../index';
 export class DummyLookupCall extends StaticLookupCall<number> {
   multiline: boolean;
   showText: boolean;
+  inactive: boolean;
 
   constructor() {
     super();
     this.multiline = false;
     this.showText = true;
+    this.inactive = false;
     this.setDelay(250);
   }
 
   protected override _data(): any[] {
     return [
-      [1, 'Foo'],
-      [2, 'Bar', 1],
-      [3, 'Baz', 1]
+      [1, 'Foo', null, true],
+      [2, 'Bar', 1, false],
+      [3, 'Baz', 1, true]
     ];
   }
 
@@ -35,6 +37,9 @@ export class DummyLookupCall extends StaticLookupCall<number> {
       lookupRow.text = null;
     } else if (this.multiline) {
       lookupRow.text = '1:' + lookupRow.text + '\n2:' + lookupRow.text;
+    }
+    if (this.inactive) {
+      lookupRow.active = data[3];
     }
     return lookupRow;
   }
