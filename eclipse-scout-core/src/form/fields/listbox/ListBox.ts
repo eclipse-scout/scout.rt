@@ -8,20 +8,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupBox, lookupField, LookupResult, LookupRow, ObjectOrChildModel, objects, scout, Table, TableModel, TableRowModel, TableRowsCheckedEvent,
-  Widget
+  arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupBox, lookupField, LookupResult, LookupRow, ObjectOrChildModel, objects, scout, Table, TableModel, TableRow, TableRowModel,
+  TableRowsCheckedEvent, Widget
 } from '../../../index';
 import $ from 'jquery';
 
-export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
-  declare model: ListBoxModel<TValue>;
+export class ListBox<TLookup, TValue = TLookup[]> extends LookupBox<TLookup, TValue> {
+  declare model: ListBoxModel<TLookup, TValue>;
 
   table: Table;
+  tableLinesVisible: boolean;
 
   constructor() {
     super();
 
     this.table = null;
+    this.tableLinesVisible = false;
 
     this._addWidgetProperties(['table', 'filterBox']);
   }
@@ -32,7 +34,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     this.table.setScrollTop(this.scrollTop);
   }
 
-  protected _initStructure(value: TValue[]) {
+  protected _initStructure(value: TValue) {
     if (!this.table) {
       this.table = this._createDefaultListBoxTable();
     }
@@ -49,6 +51,11 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     this.$container.addClass('list-box');
   }
 
+  protected override _renderProperties() {
+    super._renderProperties();
+    this._renderTableLinesVisible();
+  }
+
   protected _createFieldContainerLayout(): ListBoxLayout {
     return new ListBoxLayout(this, this.table, this.filterBox);
   }
@@ -56,6 +63,14 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
   protected _renderStructure() {
     this.table.render(this.$fieldContainer);
     this.addField(this.table.$container);
+  }
+
+  setTableLinesVisible(hideTableLines: boolean) {
+    this.setProperty('tableLinesVisible', hideTableLines);
+  }
+
+  protected _renderTableLinesVisible() {
+    this.$container.toggleClass('no-table-lines', !this.tableLinesVisible);
   }
 
   protected _onTableRowsChecked(event: TableRowsCheckedEvent) {
@@ -67,14 +82,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
       return;
     }
     this._valueSyncing = true;
-    let valueArray = [];
-    this.table.rows.forEach(row => {
-      if (row.checked) {
-        valueArray.push(row.lookupRow.key);
-      }
-    });
-
-    this.setValue(valueArray);
+    this.setValue(this._tableToValue());
     this._valueSyncing = false;
   }
 
@@ -83,18 +91,19 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     this._syncValueToTable(this.value);
   }
 
-  protected _syncValueToTable(newValue: TValue[]) {
+  protected _resetTable() {
+    this.table.uncheckRows(this.table.rows, {checkOnlyEnabled: false});
+  }
+
+  protected _syncValueToTable(newValue: TValue) {
     if (!this.lookupCall || this._valueSyncing || !this.initialized) {
       return;
     }
 
     this._valueSyncing = true;
-    let opts = {
-      checkOnlyEnabled: false
-    };
     try {
-      if (arrays.empty(newValue)) {
-        this.table.uncheckRows(this.table.rows, opts);
+      if (this._isValueEmpty(newValue)) {
+        this._resetTable();
       } else {
         // if lookup was not executed yet: do it now.
         let lookupScheduled = this._ensureLookupCallExecuted();
@@ -102,15 +111,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
           return; // was the first lookup: table has no rows yet. cancel sync. Will be executed again after lookup execution.
         }
 
-        let rowsToCheck = [];
-
-        this.table.uncheckRows(this.table.rows, opts);
-        this.table.rows.forEach(row => {
-          if (arrays.containsAny(newValue, row.lookupRow.key)) {
-            rowsToCheck.push(row);
-          }
-        }, this);
-        this.table.checkRows(rowsToCheck, opts);
+        this._valueToTable(newValue);
       }
 
       this._updateDisplayText();
@@ -119,19 +120,13 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     }
   }
 
-  protected override _lookupByAllDone(result: LookupResult<TValue>) {
+  protected override _lookupByAllDone(result: LookupResult<TLookup>) {
     super._lookupByAllDone(result);
     this._populateTable(result);
   }
 
-  protected _populateTable(result: LookupResult<TValue>) {
-    let
-      tableRows = [],
-      lookupRows = result.lookupRows;
-
-    lookupRows.forEach(lookupRow => {
-      tableRows.push(this._createTableRow(lookupRow));
-    });
+  protected _populateTable(result: LookupResult<TLookup>) {
+    const tableRows = result.lookupRows.map(lookupRow => this._createTableRow(lookupRow));
 
     this.table.deleteAllRows();
     this.table.insertRows(tableRows);
@@ -142,7 +137,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
   /**
    * Returns a lookup row for each value currently checked.
    */
-  getCheckedLookupRows(): LookupRow<TValue>[] {
+  getCheckedLookupRows(): LookupRow<TLookup>[] {
     if (this.value === null || arrays.empty(this.value) || this.table.rows.length === 0) {
       return [];
     }
@@ -152,7 +147,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
       .map(row => row.lookupRow);
   }
 
-  protected _createTableRow(lookupRow: LookupRow<TValue>): TableRowModel {
+  protected _createTableRow(lookupRow: LookupRow<TLookup>): TableRowModel {
     let cell = lookupField.createTableCell(lookupRow);
     let row: TableRowModel = {
       cells: [cell],
@@ -204,5 +199,49 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
 
   override getDelegateScrollable(): Widget {
     return this.table;
+  }
+
+  /* **********************************************************************
+   * Value handling methods
+   * ********************************************************************** */
+
+  protected _isValueEmpty(value: TValue): boolean {
+    return this._isValueEmptyDefault(value as TLookup[]);
+  }
+
+  protected _valueToTable(newValue: TValue) {
+    this._valueToTableDefault(newValue as TLookup[]);
+  }
+
+  protected _tableToValue(): TValue {
+    return this._tableToValueDefault() as TValue;
+  }
+
+  /* **********************************************************************
+   * Default implementations of value handling methods (TValue = TLookup[])
+   * ********************************************************************** */
+
+  protected _isValueEmptyDefault(value: TLookup[]): boolean {
+    return arrays.empty(value as TLookup[]);
+  }
+
+  protected _valueToTableDefault(newValue: TLookup[]) {
+    const opts = {checkOnlyEnabled: false};
+
+    const rowsToCheck: TableRow[] = [];
+
+    this.table.uncheckRows(this.table.rows, opts);
+    this.table.rows.forEach(row => {
+      if (arrays.containsAny(newValue, row.lookupRow.key)) {
+        rowsToCheck.push(row);
+      }
+    }, this);
+    this.table.checkRows(rowsToCheck, opts);
+  }
+
+  protected _tableToValueDefault(): TLookup[] {
+    return this.table.rows
+      .filter(r => r.checked)
+      .map(r => r.lookupRow.key);
   }
 }
