@@ -63,6 +63,14 @@ $.extend(true, ChartJs.overrides, {
         radius: 3
       }
     }
+  },
+  bubble: {
+    layout: {
+      // Enabled auto padding would cause Chart.js to automatically add padding, in the size of the largest bubble
+      // (defined by 'sizeOfLargestBubble'), around the chart. This wastes spaces and is not necessary, as we adjust
+      // the axes already with the bubble size in mind.
+      autoPadding: false
+    }
   }
 });
 
