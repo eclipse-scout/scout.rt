@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Chart, ChartConfig, ChartJsChart, ChartJsRenderer} from '../../src/index';
+import {Chart, ChartConfig, ChartJsRenderer, ChartJsRendererAdjustSizeOptions} from '../../src/index';
 import {arrays, scout} from '@eclipse-scout/core';
 import {ChartArea} from 'chart.js';
 
@@ -22,12 +22,12 @@ describe('ChartJsRendererSpec', () => {
 
   class SpecChartJsRenderer extends ChartJsRenderer {
 
-    override _adjustGridMaxMin(config: ChartConfig, chartArea: ChartArea) {
-      super._adjustGridMaxMin(config, chartArea);
+    override _adjustGridMaxMin(config: ChartConfig, chartArea: ChartArea, options?: ChartJsRendererAdjustSizeOptions) {
+      super._adjustGridMaxMin(config, chartArea, options);
     }
 
-    override _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea) {
-      super._adjustBubbleSizes(config, chartArea);
+    override _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea, options?: ChartJsRendererAdjustSizeOptions) {
+      super._adjustBubbleSizes(config, chartArea, options);
     }
   }
 
@@ -36,8 +36,7 @@ describe('ChartJsRendererSpec', () => {
       chartArea: ChartArea,
       defaultConfig: Partial<ChartConfig>,
       defaultScalesConfig: Partial<ChartConfig>,
-      defaultScaleConfig: Partial<ChartConfig>,
-      hiddenDatasets: number[] = [];
+      defaultScaleConfig: Partial<ChartConfig>;
 
     beforeEach(() => {
       renderer = new SpecChartJsRenderer(scout.create(Chart, {parent: session.desktop}));
@@ -79,12 +78,6 @@ describe('ChartJsRendererSpec', () => {
           }
         }
       });
-
-      renderer.chartJs = {
-        getDatasetMeta: i => ({
-          visible: !arrays.contains(hiddenDatasets, i)
-        })
-      } as unknown as ChartJsChart;
     });
 
     it('bar chart, min/max is set on y axis', () => {
@@ -340,8 +333,7 @@ describe('ChartJsRendererSpec', () => {
         }
       });
 
-      hiddenDatasets = [2];
-      renderer._adjustGridMaxMin(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea, {isDatasetVisible: i => i !== 2});
 
       expect(config.options.scales.x).toEqual({
         minSpaceBetweenTicks: 150 // default value, not part of this test
@@ -356,8 +348,7 @@ describe('ChartJsRendererSpec', () => {
         }
       });
 
-      hiddenDatasets = [1, 2];
-      renderer._adjustGridMaxMin(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea, {isDatasetVisible: i => !arrays.contains([1, 2], i)});
 
       expect(config.options.scales.x).toEqual({
         minSpaceBetweenTicks: 150 // default value, not part of this test
@@ -372,8 +363,7 @@ describe('ChartJsRendererSpec', () => {
         }
       });
 
-      hiddenDatasets = [0];
-      renderer._adjustGridMaxMin(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea, {isDatasetVisible: i => i !== 0});
 
       expect(config.options.scales.x).toEqual({
         minSpaceBetweenTicks: 150 // default value, not part of this test
@@ -388,8 +378,7 @@ describe('ChartJsRendererSpec', () => {
         }
       });
 
-      hiddenDatasets = [0, 2];
-      renderer._adjustGridMaxMin(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea, {isDatasetVisible: i => !arrays.contains([0, 2], i)});
 
       expect(config.options.scales.x).toEqual({
         minSpaceBetweenTicks: 150 // default value, not part of this test
@@ -437,10 +426,6 @@ describe('ChartJsRendererSpec', () => {
           bubble: {}
         }
       };
-
-      renderer.chartJs = {
-        getDatasetMeta: i => ({visible: true})
-      } as unknown as ChartJsChart;
     });
 
     it('neither sizeOfLargestBubble nor minBubbleSize is set', () => {

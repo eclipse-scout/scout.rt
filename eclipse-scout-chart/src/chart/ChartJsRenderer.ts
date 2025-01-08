@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,7 @@ import {
   TooltipCallbacks, TooltipItem, TooltipLabelStyle, TooltipModel, TooltipOptions
 } from 'chart.js';
 import 'chart.js/auto'; // Import from auto to register charts
-import {aria, arrays, colorSchemes, graphics, numbers, objects, Point, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
+import {aria, arrays, colorSchemes, graphics, numbers, objects, Point, scout, SomeRequired, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
 import ChartDataLabels, {Context} from 'chartjs-plugin-datalabels';
 import $ from 'jquery';
 
@@ -256,7 +256,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     config.options.animation.duration = this.animationDuration;
 
     this.chartJs = new ChartJs(this.$canvas[0].getContext('2d'), config as ChartConfiguration) as ChartJsChart;
-    this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
+    this._adjustSize(this.chartJs.config, this.chartJs.chartArea, {isDatasetVisible: i => this.chartJs.getDatasetMeta(i).visible});
     this.refresh();
   }
 
@@ -437,7 +437,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
     this.refresh();
 
-    this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
+    this._adjustSize(this.chartJs.config, this.chartJs.chartArea, {isDatasetVisible: i => this.chartJs.getDatasetMeta(i).visible});
     this.refresh();
   }
 
@@ -2349,7 +2349,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     this._onLegendLeave(e, legendItem, legend);
     this._onLegendHoverPointer(e, legendItem, legend);
 
-    this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
+    this._adjustSize(this.chartJs.config, this.chartJs.chartArea, {isDatasetVisible: i => this.chartJs.getDatasetMeta(i).visible});
     this.refresh();
   }
 
@@ -2489,15 +2489,15 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
   protected _onResize(chart: ChartJsChart, size: { width: number; height: number }) {
     chart.update();
-    this._adjustSize(chart.config, chart.chartArea);
+    this._adjustSize(chart.config, chart.chartArea, {isDatasetVisible: i => chart.getDatasetMeta(i).visible});
   }
 
-  protected _adjustSize(config: ChartConfig, chartArea: ChartArea) {
-    this._adjustBubbleSizes(config, chartArea);
-    this._adjustGridMaxMin(config, chartArea);
+  protected _adjustSize(config: ChartConfig, chartArea: ChartArea, options?: ChartJsRendererAdjustSizeOptions) {
+    this._adjustBubbleSizes(config, chartArea, options);
+    this._adjustGridMaxMin(config, chartArea, options);
   }
 
-  protected _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea) {
+  protected _adjustBubbleSizes(config: ChartConfig, chartArea: ChartArea, options?: ChartJsRendererAdjustSizeOptions) {
     if (config.type !== Chart.Type.BUBBLE) {
       return;
     }
@@ -2510,7 +2510,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         data.r = Math.sqrt(data.z);
       }
     }));
-    let maxMinR = this._computeMaxMinValue(config, datasets, 'r', true),
+    let maxMinR = this._computeMaxMinValue(config, datasets, {...options, identifier: 'r', exact: true}),
       maxR = maxMinR.maxValue,
       minR = maxMinR.minValue,
       // Compute a scalingFactor and an offset to get the new radius newR = r * scalingFactor + offset.
@@ -2564,10 +2564,13 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }));
   }
 
-  protected _computeMaxMinValue(config: ChartConfig, datasets: ChartDataset[], identifier?: string, exact?: boolean, boundRange?: boolean, padding?: number, space?: number): Boundary {
+  protected _computeMaxMinValue(config: ChartConfig, datasets: ChartDataset[], options?: ChartJsRendererComputeMaxMinValueOptions): Boundary {
     if (!datasets) {
       return;
     }
+
+    const {identifier, exact, boundRange, padding, space} = options || {};
+    const isDatasetVisible = options?.isDatasetVisible || (i => true);
 
     // do not use 0 as default as the max-min-range might not include 0, e.g. all values are greater than 10.000
     let maxValue, minValue;
@@ -2594,7 +2597,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
       for (let i = 0; i < datasets.length; i++) {
         // do not consider hidden datasets
-        if (!scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA) && !this.chartJs.getDatasetMeta(i).visible) {
+        if (!scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA) && !isDatasetVisible(i)) {
           continue;
         }
 
@@ -2704,7 +2707,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     return value;
   }
 
-  protected _adjustGridMaxMin(config: ChartConfig, chartArea: ChartArea) {
+  protected _adjustGridMaxMin(config: ChartConfig, chartArea: ChartArea, options?: ChartJsRendererAdjustSizeOptions) {
     if (!config || !config.type || !config.options || !config.options.adjustGridMaxMin || !config.options.scales || !chartArea) {
       return;
     }
@@ -2731,7 +2734,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       maxXTicks = Math.max(Math.floor(width / minSpaceBetweenXTicks) + 1, 3),
       maxYTicks = Math.max(Math.floor(height / minSpaceBetweenYTicks) + 1, 3);
 
-    let yBoundaries = this._computeYBoundaries(config, height),
+    let yBoundaries = this._computeYBoundaries(config, {...options, space: height}),
       yBoundary = yBoundaries.yBoundary,
       yBoundaryDiffType = yBoundaries.yBoundaryDiffType;
 
@@ -2753,11 +2756,12 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
-    let xBoundary = this._computeXBoundaryPointElement(config, width);
+    let xBoundary = this._computeXBoundaryPointElement(config, {...options, space: width});
     this._adjustAxisMaxMin(xAxis, maxXTicks, xBoundary);
   }
 
-  protected _computeBoundaryPointElement(config: ChartConfig, identifier: string, space: number): Boundary {
+  protected _computeBoundaryPointElement(config: ChartConfig, options: SomeRequired<ChartJsRendererComputeBoundaryWithIdentifierOptions, 'identifier' | 'space'>): Boundary {
+    const {identifier, space} = options;
     if (!config || !config.type || !scout.isOneOf(config.type, Chart.Type.BUBBLE, Chart.Type.SCATTER) || !config.data || !config.options || !config.options.scales || !(identifier === 'x' || identifier === 'y') || !space) {
       return;
     }
@@ -2768,16 +2772,16 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       labelMap = config.options[identifier + 'LabelMap'],
       boundary;
 
-    let maxR = this._computeMaxMinValue(config, datasets, 'r', true).maxValue,
+    let maxR = this._computeMaxMinValue(config, datasets, {...options, identifier: 'r', exact: true, space: null}).maxValue,
       padding = maxR;
     if (config.options.elements && config.options.elements.point && config.options.elements.point.hoverRadius) {
       padding = padding + (config.options.elements.point.hoverRadius as number);
     }
 
     if (offset) {
-      boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true);
+      boundary = this._computeMaxMinValue(config, datasets, {...options, exact: !!labelMap, boundRange: true, space: null});
     } else {
-      boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true, padding, space);
+      boundary = this._computeMaxMinValue(config, datasets, {...options, exact: !!labelMap, boundRange: true, padding});
     }
     if (labelMap) {
       boundary.maxValue = Math.ceil(boundary.maxValue);
@@ -2786,15 +2790,15 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     return boundary;
   }
 
-  protected _computeXBoundaryPointElement(config: ChartConfig, width: number): Boundary {
-    return this._computeBoundaryPointElement(config, 'x', width);
+  protected _computeXBoundaryPointElement(config: ChartConfig, options: SomeRequired<ChartJsRendererComputeBoundaryOptions, 'space'>): Boundary {
+    return this._computeBoundaryPointElement(config, {...options, identifier: 'x'});
   }
 
-  protected _computeYBoundaryPointElement(config: ChartConfig, height: number): Boundary {
-    return this._computeBoundaryPointElement(config, 'y', height);
+  protected _computeYBoundaryPointElement(config: ChartConfig, options: SomeRequired<ChartJsRendererComputeBoundaryOptions, 'space'>): Boundary {
+    return this._computeBoundaryPointElement(config, {...options, identifier: 'y'});
   }
 
-  protected _computeYBoundaries(config: ChartConfig, height: number): { yBoundary?: Boundary; yBoundaryDiffType?: Boundary } {
+  protected _computeYBoundaries(config: ChartConfig, options: SomeRequired<ChartJsRendererComputeBoundaryOptions, 'space'>): { yBoundary?: Boundary; yBoundaryDiffType?: Boundary } {
     if (!config || !config.type) {
       return {};
     }
@@ -2804,7 +2808,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
       yBoundaryDiffType;
 
     if (scout.isOneOf(type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
-      yBoundary = this._computeYBoundaryPointElement(config, height);
+      yBoundary = this._computeYBoundaryPointElement(config, options);
     } else {
       let datasets = [],
         datasetsDiffType = [];
@@ -2818,10 +2822,10 @@ export class ChartJsRenderer extends AbstractChartRenderer {
         });
       }
 
-      yBoundary = this._computeMaxMinValue(config, datasets);
+      yBoundary = this._computeMaxMinValue(config, datasets, {...options, space: null});
 
       if (datasets.length && datasetsDiffType.length) {
-        yBoundaryDiffType = this._computeMaxMinValue(config, datasetsDiffType);
+        yBoundaryDiffType = this._computeMaxMinValue(config, datasetsDiffType, {...options, space: null});
         let yBoundaryRange = yBoundary.maxValue - yBoundary.minValue,
           yBoundaryRangeDiffType = yBoundaryDiffType.maxValue - yBoundaryDiffType.minValue;
         if (yBoundaryRange && yBoundaryRangeDiffType && (yBoundaryRange / yBoundaryRangeDiffType > 10 || yBoundaryRangeDiffType / yBoundaryRange > 10)) {
@@ -2935,6 +2939,20 @@ export type TooltipLabelGenerator = (tooltipItem: TooltipItem<any>) => string | 
 export type TooltipLabelValueGenerator = (tooltipItem: TooltipItem<any>) => string | { x: string; y: string };
 export type TooltipLabelColorGenerator = (tooltipItem: TooltipItem<any>) => TooltipLabelStyle | void;
 export type TooltipRenderer = (context: { chart: ChartJs; tooltip: TooltipModel<any> }) => void;
+export type ChartJsRendererAdjustSizeOptions = {
+  isDatasetVisible?: (number) => boolean;
+};
+export type ChartJsRendererComputeBoundaryOptions = ChartJsRendererAdjustSizeOptions & {
+  space?: number;
+};
+export type ChartJsRendererComputeBoundaryWithIdentifierOptions = ChartJsRendererComputeBoundaryOptions & {
+  identifier?: string;
+};
+export type ChartJsRendererComputeMaxMinValueOptions = ChartJsRendererComputeBoundaryWithIdentifierOptions & {
+  exact?: boolean;
+  boundRange?: boolean;
+  padding?: number;
+};
 
 export type DatasetColors = {
   backgroundColors?: (string | string[])[];
