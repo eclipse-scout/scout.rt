@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -86,6 +86,7 @@ public class IdCodec {
     registerRawTypeMapper(Integer.class, Integer::parseInt, Object::toString);
     registerRawTypeMapper(Date.class, d -> new Date(Long.parseLong(d)), d -> String.valueOf(d.getTime()));
     registerRawTypeMapper(Locale.class, Locale::forLanguageTag, Locale::toLanguageTag);
+    registerRawTypeMapper(Boolean.class, Boolean::valueOf, Object::toString);
   }
 
   protected IdFactory idFactory() {

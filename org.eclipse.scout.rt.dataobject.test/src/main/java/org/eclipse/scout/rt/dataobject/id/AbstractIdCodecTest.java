@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import org.eclipse.scout.rt.dataobject.fixture.FixtureBooleanId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureCompositeId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureDateId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureIntegerId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
@@ -93,6 +95,13 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testToQualifiedBooleanId() {
+    FixtureBooleanId id1 = IIds.create(FixtureBooleanId.class, true);
+    String ext1 = getCodec().toQualified(id1);
+    assertEquals("scout.FixtureBooleanId:true", ext1);
+  }
+
+  @Test
   public void testToQualifiedLocaleId() {
     Locale locale = Locale.ITALY;
     FixtureLocaleId id = FixtureLocaleId.of(locale);
@@ -151,12 +160,13 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testToQualifiedCompositeIdPartialNullAllTypes() {
-    assertEquals("scout.FixtureCompositeWithAllTypesId:foo;;;;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null)));
-    assertEquals("scout.FixtureCompositeWithAllTypesId:;5833aae1-c813-4d7c-a342-56a53772a3ea;;;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null)));
-    assertEquals("scout.FixtureCompositeWithAllTypesId:;;42;;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null)));
-    assertEquals("scout.FixtureCompositeWithAllTypesId:;;;43;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null)));
-    assertEquals("scout.FixtureCompositeWithAllTypesId:;;;;123456789;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null)));
-    assertEquals("scout.FixtureCompositeWithAllTypesId:;;;;;de-DE", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY)));
+    assertEquals("scout.FixtureCompositeWithAllTypesId:foo;;;;;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null, null)));
+    assertEquals("scout.FixtureCompositeWithAllTypesId:;5833aae1-c813-4d7c-a342-56a53772a3ea;;;;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null, null)));
+    assertEquals("scout.FixtureCompositeWithAllTypesId:;;42;;;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null, null)));
+    assertEquals("scout.FixtureCompositeWithAllTypesId:;;;43;;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null, null)));
+    assertEquals("scout.FixtureCompositeWithAllTypesId:;;;;123456789;;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null, null)));
+    assertEquals("scout.FixtureCompositeWithAllTypesId:;;;;;de-DE;", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY, null)));
+    assertEquals("scout.FixtureCompositeWithAllTypesId:;;;;;;true", getCodec().toQualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, null, true)));
   }
 
   @Test
@@ -218,6 +228,13 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testToUnqualifiedBooleanId() {
+    FixtureBooleanId id1 = IIds.create(FixtureBooleanId.class, true);
+    String ext1 = getCodec().toUnqualified(id1);
+    assertEquals("true", ext1);
+  }
+
+  @Test
   public void testToUnqualifiedLocaleId() {
     Locale locale = Locale.US;
     FixtureLocaleId id = FixtureLocaleId.of(locale);
@@ -276,18 +293,19 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testToUnqualifiedCompositeIdPartialNullAllTypes() {
-    assertEquals("foo;;;;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null)));
-    assertEquals(";5833aae1-c813-4d7c-a342-56a53772a3ea;;;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null)));
-    assertEquals(";;42;;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null)));
-    assertEquals(";;;43;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null)));
-    assertEquals(";;;;123456789;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null)));
-    assertEquals(";;;;;de-DE", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY)));
+    assertEquals("foo;;;;;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null, null)));
+    assertEquals(";5833aae1-c813-4d7c-a342-56a53772a3ea;;;;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null, null)));
+    assertEquals(";;42;;;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null, null)));
+    assertEquals(";;;43;;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null, null)));
+    assertEquals(";;;;123456789;;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null, null)));
+    assertEquals(";;;;;de-DE;", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY, null)));
+    assertEquals(";;;;;;false", getCodec().toUnqualified(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, null, false)));
   }
 
   @Test
   public void testCompositeIdAllNullAllTypes() {
-    assertNull(FixtureCompositeWithAllTypesId.of((String) null, null, null, null, null, null));
-    assertNull(FixtureCompositeWithAllTypesId.of((FixtureStringId) null, null, null, null, null, null));
+    assertNull(FixtureCompositeWithAllTypesId.of((String) null, null, null, null, null, null, null));
+    assertNull(FixtureCompositeWithAllTypesId.of((FixtureStringId) null, null, null, null, null, null, null));
   }
 
   @Test
@@ -338,6 +356,13 @@ public abstract class AbstractIdCodecTest {
     FixtureDateId id1 = IIds.create(FixtureDateId.class, date);
     IId id2 = getCodec().fromQualified("scout.FixtureDateId:123456789");
     assertEquals(id1, id2);
+  }
+
+  @Test
+  public void testFromQualifiedBooleanId() {
+    FixtureBooleanId id1 = IIds.create(FixtureBooleanId.class, false);
+    assertEquals(id1, getCodec().fromQualified("scout.FixtureBooleanId:false"));
+    assertNotEquals(id1, getCodec().fromQualified("scout.FixtureBooleanId:true"));
   }
 
   @Test
@@ -433,12 +458,13 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromQualifiedCompositeIdPartialNullAllTypes() {
-    assertEquals(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:foo;;;;;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;5833aae1-c813-4d7c-a342-56a53772a3ea;;;;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;42;;;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;43;;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;;123456789;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;;;de-DE"));
+    assertEquals(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:foo;;;;;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;5833aae1-c813-4d7c-a342-56a53772a3ea;;;;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;42;;;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;43;;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;;123456789;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY, null), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;;;de-DE;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, null, true), getCodec().fromQualified("scout.FixtureCompositeWithAllTypesId:;;;;;;true"));
   }
 
   @Test
@@ -462,6 +488,13 @@ public abstract class AbstractIdCodecTest {
     FixtureDateId id1 = IIds.create(FixtureDateId.class, date);
     IId id2 = getCodec().fromUnqualified(FixtureDateId.class, "123456789");
     assertEquals(id1, id2);
+  }
+
+  @Test
+  public void testFromUnqualifiedBooleanId() {
+    FixtureBooleanId id1 = IIds.create(FixtureBooleanId.class, true);
+    assertEquals(id1, getCodec().fromUnqualified(FixtureBooleanId.class, "true"));
+    assertNotEquals(id1, getCodec().fromUnqualified(FixtureBooleanId.class, "false"));
   }
 
   @Test
@@ -551,12 +584,13 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromUnqualifiedCompositeIdPartialNullAllTypes() {
-    assertEquals(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, "foo;;;;;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";5833aae1-c813-4d7c-a342-56a53772a3ea;;;;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;42;;;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;43;;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;;123456789;"));
-    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;;;de-DE"));
+    assertEquals(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, "foo;;;;;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";5833aae1-c813-4d7c-a342-56a53772a3ea;;;;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;42;;;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;43;;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;;123456789;;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY, null), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;;;de-DE;"));
+    assertEquals(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, null, false), getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;;;;false"));
   }
 
   @Test
@@ -730,12 +764,13 @@ public abstract class AbstractIdCodecTest {
     ids.add(FixtureCompositeWithNullValuesId.of(null, UUID.fromString("711dc5d6-0a42-4f54-b79c-50110b9e742a")));
     ids.add(FixtureCompositeWithNullStringValuesId.of("foo", ""));
     ids.add(FixtureCompositeWithNullStringValuesId.of("", "bar"));
-    ids.add(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null));
-    ids.add(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null));
-    ids.add(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null));
-    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null));
-    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null));
-    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY));
+    ids.add(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, 43, null, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, TEST_DATE, null, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, Locale.GERMANY, null));
+    ids.add(FixtureCompositeWithAllTypesId.of(null, null, null, null, null, null, true));
   }
 
   @Test
@@ -759,22 +794,6 @@ public abstract class AbstractIdCodecTest {
     assertThrows(IdCodecException.class, () -> getCodec().toUnqualified(integerId, IdCodecFlag.SIGNATURE));
     assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
     assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
-  }
-
-  @IdTypeName("scout.FixtureDateId")
-  protected static final class FixtureDateId extends AbstractRootId<Date> {
-    private static final long serialVersionUID = 1L;
-
-    private FixtureDateId(Date id) {
-      super(id);
-    }
-
-    public static FixtureDateId of(Date date) {
-      if (date == null) {
-        return null;
-      }
-      return new FixtureDateId(date);
-    }
   }
 
   @IdTypeName("scout.FixtureCompositeWithNullStringValuesId")
@@ -829,23 +848,23 @@ public abstract class AbstractIdCodecTest {
   protected static final class FixtureCompositeWithAllTypesId extends AbstractCompositeId {
     private static final long serialVersionUID = 1L;
 
-    private FixtureCompositeWithAllTypesId(FixtureStringId c1, FixtureUuId c2, FixtureLongId c3, FixtureIntegerId c4, FixtureDateId c5, FixtureLocaleId c6) {
-      super(c1, c2, c3, c4, c5, c6);
+    private FixtureCompositeWithAllTypesId(FixtureStringId c1, FixtureUuId c2, FixtureLongId c3, FixtureIntegerId c4, FixtureDateId c5, FixtureLocaleId c6, FixtureBooleanId c7) {
+      super(c1, c2, c3, c4, c5, c6, c7);
     }
 
     @RawTypes
-    public static FixtureCompositeWithAllTypesId of(String c1, UUID c2, Long c3, Integer c4, Date c5, Locale c6) {
-      if (StringUtility.isNullOrEmpty(c1) && c2 == null && c3 == null && c4 == null && c5 == null && c6 == null) {
+    public static FixtureCompositeWithAllTypesId of(String c1, UUID c2, Long c3, Integer c4, Date c5, Locale c6, Boolean c7) {
+      if (StringUtility.isNullOrEmpty(c1) && c2 == null && c3 == null && c4 == null && c5 == null && c6 == null && c7 == null) {
         return null;
       }
-      return new FixtureCompositeWithAllTypesId(FixtureStringId.of(c1), FixtureUuId.of(c2), FixtureLongId.of(c3), FixtureIntegerId.of(c4), FixtureDateId.of(c5), FixtureLocaleId.of(c6));
+      return new FixtureCompositeWithAllTypesId(FixtureStringId.of(c1), FixtureUuId.of(c2), FixtureLongId.of(c3), FixtureIntegerId.of(c4), FixtureDateId.of(c5), FixtureLocaleId.of(c6), FixtureBooleanId.of(c7));
     }
 
-    public static FixtureCompositeWithAllTypesId of(FixtureStringId c1, FixtureUuId c2, FixtureLongId c3, FixtureIntegerId c4, FixtureDateId c5, FixtureLocaleId c6) {
-      if (c1 == null && c2 == null && c3 == null && c4 == null && c5 == null && c6 == null) {
+    public static FixtureCompositeWithAllTypesId of(FixtureStringId c1, FixtureUuId c2, FixtureLongId c3, FixtureIntegerId c4, FixtureDateId c5, FixtureLocaleId c6, FixtureBooleanId c7) {
+      if (c1 == null && c2 == null && c3 == null && c4 == null && c5 == null && c6 == null && c7 == null) {
         return null;
       }
-      return new FixtureCompositeWithAllTypesId(c1, c2, c3, c4, c5, c6);
+      return new FixtureCompositeWithAllTypesId(c1, c2, c3, c4, c5, c6, c7);
     }
   }
 

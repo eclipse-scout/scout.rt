@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -177,6 +177,9 @@ public abstract class AbstractIdStructureTest {
     }
     else if (clazz == Locale.class) {
       return Locale.US;
+    }
+    else if (clazz == Boolean.class) {
+      return Boolean.FALSE;
     }
     return getCustomMockValue(clazz);
   }

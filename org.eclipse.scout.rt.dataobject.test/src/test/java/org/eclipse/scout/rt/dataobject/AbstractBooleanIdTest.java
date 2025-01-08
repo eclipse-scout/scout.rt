@@ -11,14 +11,13 @@ package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
-import org.eclipse.scout.rt.dataobject.fixture.FixtureLongIdWithoutTypeName;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureBooleanId;
 import org.junit.Test;
 
-public class AbstractLongIdTest {
+public class AbstractBooleanIdTest {
 
-  protected static final Long TEST_ID = 42L;
-  protected static final FixtureLongId FIXTURE_ID_1 = FixtureLongId.of(TEST_ID);
+  protected static final Boolean TEST_ID = false;
+  protected static final FixtureBooleanId FIXTURE_ID_1 = FixtureBooleanId.of(TEST_ID);
 
   @Test
   public void testCompareTo_null() {
@@ -27,14 +26,13 @@ public class AbstractLongIdTest {
 
   @Test
   public void testCompareTo_sameValue() {
-    assertEquals(0, FIXTURE_ID_1.compareTo(FixtureLongId.of(TEST_ID)));
-    assertEquals(0, FIXTURE_ID_1.compareTo(FixtureLongIdWithoutTypeName.of(TEST_ID)));
+    assertEquals(0, FIXTURE_ID_1.compareTo(FixtureBooleanId.of(TEST_ID)));
   }
 
   @Test
   public void testCompareTo_otherValue() {
-    FixtureLongId id1 = FixtureLongId.of(-42L);
-    FixtureLongId id2 = FixtureLongId.of(42L);
+    FixtureBooleanId id1 = FixtureBooleanId.of(false);
+    FixtureBooleanId id2 = FixtureBooleanId.of(true);
     assertTrue(id1.compareTo(id2) < 0);
     assertTrue(id2.compareTo(id1) > 0);
   }
