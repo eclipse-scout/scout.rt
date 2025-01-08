@@ -11,14 +11,16 @@ package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
-import org.eclipse.scout.rt.dataobject.fixture.FixtureLongIdWithoutTypeName;
+import java.util.Date;
+
+import org.eclipse.scout.rt.dataobject.fixture.FixtureDateId;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.Test;
 
-public class AbstractLongIdTest {
+public class AbstractDateIdTest {
 
-  protected static final Long TEST_ID = 42L;
-  protected static final FixtureLongId FIXTURE_ID_1 = FixtureLongId.of(TEST_ID);
+  protected static final Date TEST_ID = DateUtility.parse("2012-10-01", "yyyy-MM-dd");
+  protected static final FixtureDateId FIXTURE_ID_1 = FixtureDateId.of(TEST_ID);
 
   @Test
   public void testCompareTo_null() {
@@ -27,14 +29,13 @@ public class AbstractLongIdTest {
 
   @Test
   public void testCompareTo_sameValue() {
-    assertEquals(0, FIXTURE_ID_1.compareTo(FixtureLongId.of(TEST_ID)));
-    assertEquals(0, FIXTURE_ID_1.compareTo(FixtureLongIdWithoutTypeName.of(TEST_ID)));
+    assertEquals(0, FIXTURE_ID_1.compareTo(FixtureDateId.of(TEST_ID)));
   }
 
   @Test
   public void testCompareTo_otherValue() {
-    FixtureLongId id1 = FixtureLongId.of(-42L);
-    FixtureLongId id2 = FixtureLongId.of(42L);
+    FixtureDateId id1 = FixtureDateId.of(DateUtility.parse("2015-07-01", "yyyy-MM-dd"));
+    FixtureDateId id2 = FixtureDateId.of(DateUtility.parse("2024-01-01", "yyyy-MM-dd"));
     assertTrue(id1.compareTo(id2) < 0);
     assertTrue(id2.compareTo(id1) > 0);
   }
