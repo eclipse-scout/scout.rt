@@ -86,6 +86,7 @@ public class IdCodec {
     registerRawTypeMapper(Integer.class, Integer::parseInt, Object::toString);
     registerRawTypeMapper(Date.class, d -> new Date(Long.parseLong(d)), d -> String.valueOf(d.getTime()));
     registerRawTypeMapper(Locale.class, Locale::forLanguageTag, Locale::toLanguageTag);
+    registerRawTypeMapper(Boolean.class, Boolean::valueOf, Object::toString);
   }
 
   protected IdFactory idFactory() {
