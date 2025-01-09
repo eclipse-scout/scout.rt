@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupCall, LookupCallModel, LookupResult, LookupRow, QueryBy, scout, Status, TreeBox, TreeBoxModel} from '../../../../src/index';
+import {LookupCall, LookupCallModel, LookupResult, LookupRow, QueryBy, scout, Status, Tree, TreeBox, TreeBoxModel} from '../../../../src/index';
 import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
 import {InitModelOf} from '../../../../src/scout';
 
@@ -440,6 +440,28 @@ describe('TreeBox', () => {
       jasmine.clock().tick(300);
       expect(treeBox.value).toEqual([]);
       expect(treeBox.displayText).toBe('');
+    });
+  });
+
+  describe('tree', () => {
+    it('uses tree box specific default values', () => {
+      let treeBox = scout.create(TreeBox, {
+        parent: session.desktop
+      });
+      expect(treeBox.tree.checkable).toBe(true);
+      expect(treeBox.tree.checkableStyle).toBe(Tree.CheckableStyle.CHECKBOX_TREE_NODE);
+    });
+
+    it('can be customized', () => {
+      let treeBox = scout.create(TreeBox, {
+        parent: session.desktop,
+        tree: {
+          objectType: Tree,
+          checkableStyle: Tree.CheckableStyle.CHECKBOX
+        }
+      });
+      expect(treeBox.tree.checkable).toBe(true); // Must stay true
+      expect(treeBox.tree.checkableStyle).toBe(Tree.CheckableStyle.CHECKBOX);
     });
   });
 

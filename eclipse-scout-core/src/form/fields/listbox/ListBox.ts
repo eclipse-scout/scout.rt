@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupBox, lookupField, LookupResult, LookupRow, scout, Table, TableRowModel, TableRowsCheckedEvent, Widget} from '../../../index';
+import {
+  arrays, Column, InitModelOf, ListBoxLayout, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupBox, lookupField, LookupResult, LookupRow, ObjectOrChildModel, objects, scout, Table, TableModel, TableRowModel, TableRowsCheckedEvent,
+  Widget
+} from '../../../index';
+import $ from 'jquery';
 
 export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
   declare model: ListBoxModel<TValue>;
@@ -168,9 +172,25 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
     return row;
   }
 
+  protected override _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget>): Widget;
+  protected override _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget>[]): Widget[];
+  protected override _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget> | ObjectOrChildModel<Widget>[]): Widget | Widget[] {
+    if (propertyName === 'table' && objects.isPojo(models)) {
+      // Enhance given model with list box specific defaults
+      models = $.extend(this._createDefaultListBoxTableModel(), models);
+    }
+    return super._prepareWidgetProperty(propertyName, models as ObjectOrChildModel<Widget>);
+  }
+
   protected _createDefaultListBoxTable(): Table {
     return scout.create(Table, {
       parent: this,
+      ...this._createDefaultListBoxTableModel()
+    });
+  }
+
+  protected _createDefaultListBoxTableModel(): TableModel {
+    return {
       autoResizeColumns: true,
       checkable: true,
       checkableStyle: Table.CheckableStyle.CHECKBOX_TABLE_ROW,
@@ -179,7 +199,7 @@ export class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<T
       columns: [{
         objectType: Column
       }]
-    });
+    };
   }
 
   override getDelegateScrollable(): Widget {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Code, CodeLookupCall, codes, CodeType, ListBox, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
+import {Code, CodeLookupCall, codes, CodeType, ListBox, ListBoxModel, ListBoxTableAccessibilityRenderer, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status, Table} from '../../../../src/index';
 import {DummyLookupCall, EmptyDummyLookupCall, ErroneousLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
 import {InitModelOf, ObjectOrModel} from '../../../../src/scout';
 import $ from 'jquery';
@@ -478,7 +478,28 @@ describe('ListBox', () => {
       expect(listBox.value).toEqual([]);
       expect(listBox.displayText).toBe('');
     });
+  });
 
+  describe('table', () => {
+    it('uses list box specific default values', () => {
+      let listBox = scout.create(ListBox, {
+        parent: session.desktop
+      });
+      expect(listBox.table.checkable).toBe(true);
+      expect(listBox.table.headerVisible).toBe(false);
+    });
+
+    it('can be customized', () => {
+      let listBox = scout.create(ListBox, {
+        parent: session.desktop,
+        table: {
+          objectType: Table,
+          headerVisible: true
+        }
+      });
+      expect(listBox.table.checkable).toBe(true); // Must stay true
+      expect(listBox.table.headerVisible).toBe(true);
+    });
   });
 
   describe('aria properties', () => {

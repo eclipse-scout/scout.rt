@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -152,7 +152,6 @@ export class LookupEditor<TValue> extends ValueField<TValue[]> implements Lookup
         statusVisible: false,
         tree: {
           objectType: Tree,
-          checkable: true,
           autoCheckChildren: true
         }
       };
@@ -166,11 +165,6 @@ export class LookupEditor<TValue> extends ValueField<TValue[]> implements Lookup
       statusVisible: false,
       table: {
         objectType: Table,
-        parent: this,
-        checkable: true,
-        checkableStyle: Table.CheckableStyle.CHECKBOX_TABLE_ROW,
-        headerVisible: false,
-        footerVisible: false,
         columns: [{
           objectType: Column,
           autoOptimizeWidth: true,

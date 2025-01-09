@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, InitModelOf, LookupBox, LookupResult, LookupRow, objects, scout, Tree, TreeBoxLayout, TreeBoxModel, TreeNode, TreeNodesCheckedEvent, TreeNodeUncheckOptions, Widget} from '../../../index';
+import {arrays, InitModelOf, LookupBox, LookupResult, LookupRow, ObjectOrChildModel, objects, scout, Tree, TreeBoxLayout, TreeBoxModel, TreeModel, TreeNode, TreeNodesCheckedEvent, TreeNodeUncheckOptions, Widget} from '../../../index';
+import $ from 'jquery';
 
 export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<TValue> {
   tree: Tree;
@@ -194,11 +195,27 @@ export class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<T
     return node;
   }
 
+  protected override _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget>): Widget;
+  protected override _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget>[]): Widget[];
+  protected override _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget> | ObjectOrChildModel<Widget>[]): Widget | Widget[] {
+    if (propertyName === 'tree' && objects.isPojo(models)) {
+      // Enhance given model with tree box specific defaults
+      models = $.extend(this._createDefaultTreeBoxTreeModel(), models);
+    }
+    return super._prepareWidgetProperty(propertyName, models as ObjectOrChildModel<Widget>);
+  }
+
   protected _createDefaultTreeBoxTree(): Tree {
     return scout.create(Tree, {
       parent: this,
-      checkable: true
+      ...this._createDefaultTreeBoxTreeModel()
     });
+  }
+
+  protected _createDefaultTreeBoxTreeModel(): TreeModel {
+    return {
+      checkable: true
+    };
   }
 
   override getDelegateScrollable(): Widget {
