@@ -294,8 +294,15 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
       options.menuFilter = this.table._filterMenusHandler;
       origShowContextMenu.call(tileGrid, options);
     };
-    // use the table's keyStrokeContext bindTarget for each tileGrid as well to ensure that the tileGrid's keyStrokes are active when the table is active
+    // Use the table's keyStrokeContext $bindTarget for each tileGrid as well, to ensure that in tileMode the tileGrids
+    // keyStrokes work when the focus is in the tableHeader/Footer (or just outside the actual TileGrid).
+    // Adapt all keyStrokes to stop propagation. This is necessary since several tileGrids now use the same $bindTarget and the keyStroke
+    // should only be executed once. The TileGridSelectionHandler takes care of the correct selection behaviour.
     tileGrid.keyStrokeContext.$bindTarget = this.table.keyStrokeContext.$bindTarget;
+    tileGrid.keyStrokeContext.keyStrokes.forEach(ks => {
+      ks.stopPropagation = true;
+      ks.stopImmediatePropagation = true;
+    });
   }
 
   protected _createTileAccordion(): TileAccordion {
