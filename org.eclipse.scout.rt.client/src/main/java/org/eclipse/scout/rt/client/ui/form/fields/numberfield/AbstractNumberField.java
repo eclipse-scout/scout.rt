@@ -96,7 +96,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * (before the decimal separator).<br>
    * Corresponds to {@link DecimalFormat#setMaximumIntegerDigits(int)}
    * <p>
-   *
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(280)
@@ -191,9 +190,9 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
 
   /**
    * @return the internal {@link DecimalFormat} instance.
-   *         <p>
-   *         <b> use with care:</b> Only use for read-access. Never change a property directly on the returned instance
-   *         and never pass a reference outside subclasses!
+   * <p>
+   * <b> use with care:</b> Only use for read-access. Never change a property directly on the returned instance
+   * and never pass a reference outside subclasses!
    */
   protected DecimalFormat getFormatInternal() {
     return ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT));
@@ -518,7 +517,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * Rounds the parsed value according {@link #getRoundingMode()}.
    *
    * @throws ArithmeticException
-   *           if roundingMode is {@link RoundingMode#UNNECESSARY} but rounding would be needed
+   *     if roundingMode is {@link RoundingMode#UNNECESSARY} but rounding would be needed
    */
   protected BigDecimal roundParsedValue(BigDecimal valBeforeRounding) {
     int precision = valBeforeRounding.toBigInteger().toString().length();
@@ -543,20 +542,20 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * Checks whether the given string modification still fulfills the given {@link DecimalFormat} max length constraints.
    *
    * @param format
-   *          The {@link DecimalFormat} holding the constraints: {@link DecimalFormat#getMaximumIntegerDigits()},
-   *          {@link DecimalFormat#getMaximumFractionDigits()}.
+   *     The {@link DecimalFormat} holding the constraints: {@link DecimalFormat#getMaximumIntegerDigits()},
+   *     {@link DecimalFormat#getMaximumFractionDigits()}.
    * @param curText
-   *          The current text (before the modification).
+   *     The current text (before the modification).
    * @param offset
-   *          The offset of the modification relative to the curText parameter.
+   *     The offset of the modification relative to the curText parameter.
    * @param replaceLen
-   *          How many characters that will be replaced starting at the given offset.
+   *     How many characters that will be replaced starting at the given offset.
    * @param insertText
-   *          The new text that should be inserted at the given replace range.
+   *     The new text that should be inserted at the given replace range.
    * @return <code>true</code> if the given {@link DecimalFormat} length constraints are still fulfilled after the
-   *         string modification has been applied or if the resulting string is no valid number. <code>false</code>
-   *         otherwise. Also returns <code>true</code> if the String can not be parsed as number (e.g. when it contains
-   *         alpha-numerical characters) or is <code>null</code>
+   * string modification has been applied or if the resulting string is no valid number. <code>false</code>
+   * otherwise. Also returns <code>true</code> if the String can not be parsed as number (e.g. when it contains
+   * alpha-numerical characters) or is <code>null</code>
    */
   public static boolean isWithinNumberFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
     if (insertText == null || insertText.isEmpty()) {
@@ -600,16 +599,16 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * cut off, no exception is thrown.
    *
    * @param format
-   *          The {@link DecimalFormat} holding the constraints: {@link DecimalFormat#getMaximumIntegerDigits()},
-   *          {@link DecimalFormat#getMaximumFractionDigits()}.
+   *     The {@link DecimalFormat} holding the constraints: {@link DecimalFormat#getMaximumIntegerDigits()},
+   *     {@link DecimalFormat#getMaximumFractionDigits()}.
    * @param curText
-   *          The current text (before the modification).
+   *     The current text (before the modification).
    * @param offset
-   *          The offset of the modification relative to the curText parameter.
+   *     The offset of the modification relative to the curText parameter.
    * @param replaceLen
-   *          How many characters that will be replaced starting at the given offset.
+   *     How many characters that will be replaced starting at the given offset.
    * @param insertText
-   *          The new text that should be inserted at the given replace range.
+   *     The new text that should be inserted at the given replace range.
    * @return String that fulfills the given {@link DecimalFormat} length constraints
    */
   public static String createNumberWithinFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {

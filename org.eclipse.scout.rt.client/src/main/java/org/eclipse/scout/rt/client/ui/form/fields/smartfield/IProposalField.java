@@ -23,7 +23,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
  * There's no validation logic that checks for duplicates between manually entered text and the proposal list.
  *
  * @param <VALUE>
- *          generic parameter type of lookup key
+ *     generic parameter type of lookup key
  */
 public interface IProposalField<VALUE> extends ISmartField<VALUE> {
 
@@ -35,11 +35,12 @@ public interface IProposalField<VALUE> extends ISmartField<VALUE> {
   String PROP_TRIM_TEXT_ON_VALIDATE = "trimText";
 
   String getValueAsString();
+
   void setValueAsString(String value);
 
   /**
    * @param b
-   *          true if the entered text should pass through {@link String#trim()}
+   *     true if the entered text should pass through {@link String#trim()}
    * @since 6.1
    */
   void setTrimText(boolean b);
@@ -52,5 +53,4 @@ public interface IProposalField<VALUE> extends ISmartField<VALUE> {
 
   @Override
   IProposalFieldUIFacade<VALUE> getUIFacade();
-
 }

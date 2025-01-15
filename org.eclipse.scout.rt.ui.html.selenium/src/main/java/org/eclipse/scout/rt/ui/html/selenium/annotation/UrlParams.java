@@ -24,5 +24,4 @@ import java.lang.annotation.Target;
 public @interface UrlParams {
 
   String value();
-
 }

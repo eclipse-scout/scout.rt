@@ -23,5 +23,4 @@ public class DoubleArrayHolder extends Holder<Double[]> {
   public DoubleArrayHolder(Double[] value) {
     super(Double[].class, value);
   }
-
 }

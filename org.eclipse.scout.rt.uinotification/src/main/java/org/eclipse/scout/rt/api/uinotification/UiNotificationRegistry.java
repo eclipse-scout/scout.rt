@@ -100,7 +100,7 @@ public class UiNotificationRegistry {
    * registry. Once this happens, the future will be completed with the new notifications.
    *
    * @return a future that will be completed when new a notification is put into the registry for the given topics. It
-   *         will also complete with an empty list of notifications if the given timeout expires.
+   * will also complete with an empty list of notifications if the given timeout expires.
    */
   public CompletableFuture<List<UiNotificationDo>> getOrWait(List<TopicDo> topics, String user, long timeout) {
     List<String> topicNames = topics.stream().map(topic -> topic.getName()).collect(Collectors.toList());
@@ -139,7 +139,7 @@ public class UiNotificationRegistry {
 
   /**
    * @return the notifications for the given topics since the {@link UiNotificationDo#creationTime()} of the
-   *         {@link TopicDo#lastNotifications}.
+   * {@link TopicDo#lastNotifications}.
    */
   public List<UiNotificationDo> get(List<TopicDo> topics, String user) {
     List<UiNotificationDo> notifications = new ArrayList<>();
@@ -154,7 +154,7 @@ public class UiNotificationRegistry {
    * this time frame to delay requests back to the server to flatten the peak load.
    *
    * @param topic
-   *          The topic for which the delay should be computed.
+   *     The topic for which the delay should be computed.
    * @return The delay window (maximum time) in seconds. Is in the range [0, 60].
    */
   public long computeNotificationHandlerDelayWindow(String topic) {
@@ -289,13 +289,13 @@ public class UiNotificationRegistry {
    * Puts a message into the registry for a specific topic and user with custom options.
    *
    * @param topic
-   *          A notification must be assigned to a topic. Must not be {@code null}.
+   *     A notification must be assigned to a topic. Must not be {@code null}.
    * @param userId
-   *          If specified, only the user with this id will get the notification. May be {@code null}.
+   *     If specified, only the user with this id will get the notification. May be {@code null}.
    * @param message
-   *          The message part of the {@link UiNotificationDo}. May be {@code null}.
+   *     The message part of the {@link UiNotificationDo}. May be {@code null}.
    * @param options
-   *          Optional {@link UiNotificationPutOptions}. May be {@code null}.
+   *     Optional {@link UiNotificationPutOptions}. May be {@code null}.
    */
   public void put(String topic, String userId, IDoEntity message, UiNotificationPutOptions options) {
     putMessage(topic, userId, null, message, options);
@@ -305,13 +305,13 @@ public class UiNotificationRegistry {
    * Puts a message into the registry of all users except the ones provided.
    *
    * @param topic
-   *          A notification must be assigned to a topic. Must not be {@code null}.
+   *     A notification must be assigned to a topic. Must not be {@code null}.
    * @param excludedUserIds
-   *          {@link Collection} of userIds which should NOT receive the message.
+   *     {@link Collection} of userIds which should NOT receive the message.
    * @param message
-   *          The message part of the {@link UiNotificationDo}. May be {@code null}.
+   *     The message part of the {@link UiNotificationDo}. May be {@code null}.
    * @param options
-   *          Optional {@link UiNotificationPutOptions}. May be {@code null}.
+   *     Optional {@link UiNotificationPutOptions}. May be {@code null}.
    */
   public void putExcept(String topic, Collection<String> excludedUserIds, IDoEntity message, UiNotificationPutOptions options) {
     if (CollectionUtility.isEmpty(excludedUserIds)) {
@@ -452,7 +452,7 @@ public class UiNotificationRegistry {
    * requests again.
    *
    * @param topic
-   *          The topic for which the listener count should be returned.
+   *     The topic for which the listener count should be returned.
    * @return The number of listeners for the given topic.
    */
   protected int getListenerCount(String topic) {
@@ -542,7 +542,7 @@ public class UiNotificationRegistry {
       LOG.debug("Cleaning up expired ui notifications. Topic count: {}.", getNotifications().size());
 
       long now = new Date().getTime();
-      for (Iterator<Entry<String, List<UiNotificationMessageDo>>> it = getNotifications().entrySet().iterator(); it.hasNext();) {
+      for (Iterator<Entry<String, List<UiNotificationMessageDo>>> it = getNotifications().entrySet().iterator(); it.hasNext(); ) {
         Entry<String, List<UiNotificationMessageDo>> entry = it.next();
         List<UiNotificationMessageDo> notifications = entry.getValue();
         int oldSize = notifications.size();
@@ -569,7 +569,7 @@ public class UiNotificationRegistry {
    * The property needs to be set before the cleanup job is scheduled, which is, before the first notification is put.
    *
    * @param cleanupJobInterval
-   *          The interval in seconds between job runs. 0 to disable the job.
+   *     The interval in seconds between job runs. 0 to disable the job.
    */
   public void setCleanupJobInterval(long cleanupJobInterval) {
     m_cleanupJobInterval = cleanupJobInterval;
@@ -589,7 +589,7 @@ public class UiNotificationRegistry {
 
   /**
    * @return the hash of the current node id. Because it will be sent to the UI and may contain the name of the server,
-   *         a hash is used instead of the plain node id.
+   * a hash is used instead of the plain node id.
    */
   public String currentNodeId() {
     return Base64Utility.encode(SecurityUtility.hash(NodeId.current().toString().getBytes()));

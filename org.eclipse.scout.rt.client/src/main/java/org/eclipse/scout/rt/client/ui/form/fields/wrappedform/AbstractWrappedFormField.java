@@ -77,7 +77,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
 
   /**
    * @return {@code true} if the inner form should request the initial focus once loaded, {@code false} otherwise.
-   *         Default is {@code false}.
+   * Default is {@code false}.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(210)
@@ -283,9 +283,9 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
    * Method invoked once the inner Form is changed.
    *
    * @param oldInnerForm
-   *          the old inner {@link IForm}; might be <code>null</code>.
+   *     the old inner {@link IForm}; might be <code>null</code>.
    * @param newInnerForm
-   *          the new inner {@link IForm}; might be <code>null</code>.
+   *     the new inner {@link IForm}; might be <code>null</code>.
    */
   @ConfigOperation
   protected void execInnerFormChanged(FORM oldInnerForm, FORM newInnerForm) {

@@ -124,7 +124,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
     if (!m_injectingFields.isEmpty() && !m_replacingFields.isEmpty()) {
       Set<Class<? extends IFormField>> replacingInjectedFields = new HashSet<>();
       for (Class<? extends IFormField> replacingField : m_replacingFields) {
-        for (Iterator<Class<? extends IFormField>> it = m_injectingFields.iterator(); it.hasNext();) {
+        for (Iterator<Class<? extends IFormField>> it = m_injectingFields.iterator(); it.hasNext(); ) {
           Class<? extends IFormField> injectedField = it.next();
           if (injectedField.isAssignableFrom(replacingField)) {
             it.remove();
@@ -151,7 +151,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
 
     Set<Class<? extends IFormField>> replacingFields = new HashSet<>();
     // remove all replaced classes
-    for (Iterator<Class<? extends IFormField>> it = fieldList.iterator(); it.hasNext();) {
+    for (Iterator<Class<? extends IFormField>> it = fieldList.iterator(); it.hasNext(); ) {
       Class<? extends IFormField> field = it.next();
       for (Class<? extends IFormField> replacingField : m_replacingFields) {
         if (field.isAssignableFrom(replacingField)) {

@@ -39,7 +39,7 @@ public final class FormattingUtility {
    * </ul>
    *
    * @param o
-   *          object to format
+   *     object to format
    * @return Returns formatted string representation, never <code>null</code>.
    */
   public static String formatObject(Object o) {

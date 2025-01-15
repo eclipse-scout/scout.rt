@@ -20,5 +20,4 @@ public interface IClusterNotificationMessage extends Serializable, IClusterPrope
   IClusterNotificationProperties getProperties();
 
   Serializable getNotification();
-
 }

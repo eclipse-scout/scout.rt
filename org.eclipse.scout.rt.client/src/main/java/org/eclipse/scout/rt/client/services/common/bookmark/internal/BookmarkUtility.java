@@ -89,9 +89,9 @@ public final class BookmarkUtility {
 
   /**
    * @param columns
-   *          is the set of available columns to search in
+   *     is the set of available columns to search in
    * @param identifier
-   *          is the columnId, simple class name or class name of the columns to find
+   *     is the columnId, simple class name or class name of the columns to find
    */
   public static IColumn resolveColumn(List<? extends IColumn> columns, String identifier) {
     if (identifier == null) {
@@ -377,9 +377,9 @@ public final class BookmarkUtility {
    * .
    *
    * @param table
-   *          The table with the columns to back-up.
+   *     The table with the columns to back-up.
    * @return A {@link List} of {@link TableColumnState} objects that can be restored via
-   *         {@link #restoreTableColumns(ITable, List)}
+   * {@link #restoreTableColumns(ITable, List)}
    */
   public static List<TableColumnState> backupTableColumns(ITable table) {
     List<TableColumnState> allColumns = new ArrayList<>();
@@ -417,10 +417,10 @@ public final class BookmarkUtility {
    * Restores a tables columns from the given list of {@link TableColumnState} objects.
    *
    * @param table
-   *          The table to be restored.
+   *     The table to be restored.
    * @param oldColumns
-   *          A {@link List} of {@link TableColumnState} objects to restore. Such can be retrieved by the
-   *          {@link #backupTableColumns(ITable)} method.
+   *     A {@link List} of {@link TableColumnState} objects to restore. Such can be retrieved by the
+   *     {@link #backupTableColumns(ITable)} method.
    */
   public static void restoreTableColumns(ITable table, List<TableColumnState> oldColumns) {
     if (oldColumns != null && !oldColumns.isEmpty() && table != null) {
@@ -890,5 +890,4 @@ public final class BookmarkUtility {
       return -1L;
     }
   }
-
 }

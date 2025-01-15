@@ -173,7 +173,7 @@ public final class AnnotationUtil {
    * Resolves the qualified class name of the given {@link Clazz} annotation mirror.
    *
    * @throws IllegalArgumentException
-   *           is thrown if the class could not be resolved.
+   *     is thrown if the class could not be resolved.
    */
   public static String resolveClass(final AnnotationMirror clazzAnnotationMirror, final ProcessingEnvironment env) {
     // 1. Try resolve by qualified name.

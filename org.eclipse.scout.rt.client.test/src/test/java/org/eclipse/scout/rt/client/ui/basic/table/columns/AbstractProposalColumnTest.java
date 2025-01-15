@@ -200,5 +200,4 @@ public class AbstractProposalColumnTest {
       lastRow = row;
     }
   }
-
 }

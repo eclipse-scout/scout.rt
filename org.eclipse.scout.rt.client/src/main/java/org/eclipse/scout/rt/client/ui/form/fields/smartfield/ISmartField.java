@@ -144,7 +144,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
 
   /**
    * @param maxLength
-   *          of the text in this field. Negative values are automatically converted to 0.
+   *     of the text in this field. Negative values are automatically converted to 0.
    */
   void setMaxLength(int maxLength);
 
@@ -194,11 +194,12 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   void doSearch(IQueryParam<VALUE> param, boolean synchronous);
 
   // blocking lookups
+
   /**
    * Lookup rows by key using {@link ILookupCall#getDataByKey()}. Blocks until the result is available.
    *
    * @param key
-   *          lookup key
+   *     lookup key
    * @return rows not <code>null</code>
    */
   List<? extends ILookupRow<VALUE>> callKeyLookup(VALUE key);
@@ -207,7 +208,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    * Lookup rows by text {@link ILookupCall#getDataByText()}. Blocks until the result is available.
    *
    * @param text
-   *          search text
+   *     search text
    * @return rows not <code>null</code>
    */
   List<? extends ILookupRow<VALUE>> callTextLookup(String text, int maxRowCount);
@@ -248,8 +249,8 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    * Lookup rows asynchronously by text {@link ILookupCall#getDataByText()}.
    *
    * @param cancelRunningJobs
-   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
-   *          the new lookup job.
+   *     if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *     the new lookup job.
    * @return {@link IFuture} to cancel data fetching.
    */
   IFuture<List<ILookupRow<VALUE>>> callTextLookupInBackground(String text, boolean cancelRunningJobs);
@@ -259,8 +260,8 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    * jobs of this field, before starting the lookup job.
    *
    * @param cancelRunningJobs
-   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
-   *          the new lookup job.
+   *     if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *     the new lookup job.
    * @return {@link IFuture} to cancel data fetching
    */
   IFuture<List<ILookupRow<VALUE>>> callBrowseLookupInBackground(boolean cancelRunningJobs);
@@ -269,8 +270,8 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    * Lookup child rows of a given parent key asynchronously using {@link ILookupCall#getDataByRec()}.
    *
    * @param cancelRunningJobs
-   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
-   *          the new lookup job.
+   *     if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *     the new lookup job.
    * @return {@link IFuture} to cancel data fetching
    */
   IFuture<List<ILookupRow<VALUE>>> callSubTreeLookupInBackground(final VALUE parentKey, boolean cancelRunningJobs);
@@ -279,13 +280,14 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    * Lookup child rows of a given parent key asynchronously using {@link ILookupCall#getDataByRec()}.
    *
    * @param cancelRunningJobs
-   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
-   *          the new lookup job.
+   *     if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *     the new lookup job.
    * @return {@link IFuture} to cancel data fetching
    */
   IFuture<List<ILookupRow<VALUE>>> callSubTreeLookupInBackground(final VALUE parentKey, final TriState activeState, boolean cancelRunningJobs);
 
   // non-blocking lookups using callbacks (legacy)
+
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
    * <p>
@@ -345,13 +347,14 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   /**
    * Sets the value by using the key of the given lookup row. The property <code>lookupRow</code> will be set too.
    *
-   * @param lookupRow Lookup row to resolve the value to be set
+   * @param lookupRow
+   *     Lookup row to resolve the value to be set
    */
   void setValueByLookupRow(ILookupRow<VALUE> lookupRow);
 
   /**
    * @return {@code true} if the smartfield should only show a proposal list if a search text is entered by the user.
-   *         {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   * {@code false} (which is the default) if all proposals should be shown if no text search is done.
    */
   boolean isSearchRequired();
 
@@ -360,9 +363,8 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    * Set this property to {@code true} if you expect a large amount of data for an unconstrained search.
    *
    * @param searchRequired
-   *          {@code true} if the smartfield should only show a proposal list if a search text is entered by the user.
-   *          {@code false} (which is the default) if all proposals should be shown if no text search is done.
+   *     {@code true} if the smartfield should only show a proposal list if a search text is entered by the user.
+   *     {@code false} (which is the default) if all proposals should be shown if no text search is done.
    */
   void setSearchRequired(boolean searchRequired);
-
 }

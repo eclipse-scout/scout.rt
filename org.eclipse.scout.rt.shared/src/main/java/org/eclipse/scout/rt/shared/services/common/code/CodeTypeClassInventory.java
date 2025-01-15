@@ -34,5 +34,4 @@ public class CodeTypeClassInventory extends FilteredClassInventory<ICodeType<?, 
   public CodeTypeClassInventory(Predicate<IClassInfo> filter) {
     super(filter, ICodeType.class);
   }
-
 }

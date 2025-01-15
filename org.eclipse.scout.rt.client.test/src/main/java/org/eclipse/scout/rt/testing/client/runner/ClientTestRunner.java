@@ -59,7 +59,7 @@ import org.junit.runners.model.Statement;
  *    ...
  * }
  * </pre>
- *
+ * <p>
  * Execution:
  * <ul>
  * <li>By default, client sessions are shared among same users. This can be changed by setting the

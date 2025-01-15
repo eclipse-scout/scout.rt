@@ -34,5 +34,4 @@ public class JsonBooleanColumn<T extends IBooleanColumn> extends JsonColumn<T> {
     json.put(IBooleanColumn.PROP_TRI_STATE_ENABLED, getColumn().isTriStateEnabled());
     return json;
   }
-
 }

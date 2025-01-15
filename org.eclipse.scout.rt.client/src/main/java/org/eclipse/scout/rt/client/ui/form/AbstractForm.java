@@ -303,6 +303,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   /*
    * Configuration
    */
+
   /**
    * @return the localized title property of the form. Use {@link TEXTS}.
    */
@@ -325,7 +326,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * The header contains the title, subtitle, icon, save needed status and close action.
    *
    * @return true, to show a header, false to not show a header. Null, to let the UI decide what to do, which means:
-   *         show a header if it is a dialog, otherwise don't show one.
+   * show a header if it is a dialog, otherwise don't show one.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(25)
@@ -366,7 +367,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * </ul>
    *
    * @return like {@link IDesktop}, {@link IOutline} or {@link IForm}, or <code>null</code> to derive from the calling
-   *         context.
+   * context.
    */
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(50)
@@ -410,8 +411,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * dialogs, it is <code>true</code>, for views <code>false</code>.
    *
    * @return {@link #MODALITY_HINT_MODAL} to make this {@link IForm} modal in respect to its {@link IDisplayParent}, or
-   *         {@link #MODALITY_HINT_MODELESS} otherwise, or {@link #MODALITY_HINT_AUTO} to derive modality from the
-   *         <code>display-hint</code>.
+   * {@link #MODALITY_HINT_MODELESS} otherwise, or {@link #MODALITY_HINT_AUTO} to derive modality from the
+   * <code>display-hint</code>.
    * @see #MODALITY_HINT_MODAL
    * @see #MODALITY_HINT_MODELESS
    * @see #MODALITY_HINT_AUTO
@@ -511,8 +512,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *
-   * @see AbstractDesktop#getSimilarForms(IForm)
    * @return null for exclusive form behavior an exclusive key to ensure similar handling.
+   * @see AbstractDesktop#getSimilarForms(IForm)
    */
   @Override
   public Object computeExclusiveKey() {
@@ -553,7 +554,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    *
    * @return true when this check is done and further checks can continue, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user notification such as a dialog
+   *     to cancel the current process with error handling and user notification such as a dialog
    */
   @ConfigOperation
   @Order(13)
@@ -567,7 +568,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    *
    * @return true when validate is successful, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user notification such as a dialog
+   *     to cancel the current process with error handling and user notification such as a dialog
    */
   @ConfigOperation
   @Order(14)
@@ -592,7 +593,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   /**
    * @throws ProcessingException
-   *           / {@link VetoException} if the exception should produce further info messages (default)
+   *     / {@link VetoException} if the exception should produce further info messages (default)
    */
   @ConfigOperation
   @Order(17)
@@ -602,10 +603,10 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   /**
    * @param kill
-   *          true if the form should be closed immediately (no matter what system button was pressed)
+   *     true if the form should be closed immediately (no matter what system button was pressed)
    * @param enabledButtonSystemTypes
-   *          set of all <code>IButton#SYSTEM_TYPE_*</code> of all enabled and visible buttons of this form (never
-   *          <code>null</code>)
+   *     set of all <code>IButton#SYSTEM_TYPE_*</code> of all enabled and visible buttons of this form (never
+   *     <code>null</code>)
    */
   @ConfigOperation
   @Order(18)
@@ -1165,7 +1166,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       if (formOfField == null) {
         // either form has not been initialized or the field is part of a composite field, that does not override setFormInternal -> skip
         LOG.info("Extension properties are not exported for fields on which getForm() returns null. "
-            + "Ensure that the form is initialized and that the field's parent invokes field.setFormInternal(IForm) [exportingForm={}, field={}]",
+                + "Ensure that the form is initialized and that the field's parent invokes field.setFormInternal(IForm) [exportingForm={}, field={}]",
             AbstractForm.this.getClass().getName(), field.getClass().getName());
         return;
       }
@@ -1193,7 +1194,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   private void removeNotSetProperties(IPropertyHolder dto, Map<String, Object> properties) {
-    for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
+    for (Iterator<String> it = properties.keySet().iterator(); it.hasNext(); ) {
       String propertyId = it.next();
       AbstractPropertyData pd = dto.getPropertyById(propertyId);
       if (pd != null && !pd.isValueSet()) {
@@ -1470,7 +1471,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * Attaches a filled form data to the search filter if {@link #execCreateFormData()} returns a value.
    *
    * @param searchFilter
-   *          is never null
+   *     is never null
    */
   @ConfigOperation
   @Order(10)
@@ -2400,9 +2401,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * Extracts properties from &lt;property&gt; child elements in the given parent element.
    *
    * @param xProps
-   *          The parent element
+   *     The parent element
    * @param props
-   *          The properties map to which the properties should be added
+   *     The properties map to which the properties should be added
    * @return <code>true</code> if all properties were loaded successfully. Otherwise <code>false</code>.
    * @see #storePropertiesToXml(Element, Map)
    */
@@ -2480,7 +2481,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   /**
    * @return Returns a map having old field classes as keys and replacement field classes as values. <code>null</code>
-   *         is returned if no form fields are replaced. Do not use this internal method.
+   * is returned if no form fields are replaced. Do not use this internal method.
    * @since 3.8.2
    */
   public Map<Class<?>, Class<? extends IFormField>> getFormFieldReplacementsInternal() {
@@ -2491,7 +2492,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * Registers the given form field replacements on this form. Do not use this internal method.
    *
    * @param replacements
-   *          Map having old field classes as key and replacing field classes as values.
+   *     Map having old field classes as key and replacing field classes as values.
    * @since 3.8.2
    */
   public void registerFormFieldReplacementsInternal(Map<Class<?>, Class<? extends IFormField>> replacements) {

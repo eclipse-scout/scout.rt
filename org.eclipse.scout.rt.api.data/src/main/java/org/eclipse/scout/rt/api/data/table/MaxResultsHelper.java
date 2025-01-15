@@ -33,9 +33,9 @@ public class MaxResultsHelper {
    * {@link IDoEntity}.
    *
    * @param dataObject
-   *          The {@link IDoEntity} in which the {@link MaxRowCountContributionDo} is searched.
+   *     The {@link IDoEntity} in which the {@link MaxRowCountContributionDo} is searched.
    * @return A {@link ResultLimiter} which respects the hints given in a {@link MaxRowCountContributionDo} attached to
-   *         the given {@link IDoEntity}. If no limit is given, the {@link #DEFAULT_MAX_RESULTS} is used.
+   * the given {@link IDoEntity}. If no limit is given, the {@link #DEFAULT_MAX_RESULTS} is used.
    */
   public ResultLimiter limiter(IDoEntity dataObject) {
     return limiter(getMaxResultsHintFromContribution(dataObject));
@@ -45,9 +45,9 @@ public class MaxResultsHelper {
    * Extracts the {@link MaxRowCountContributionDo#getHint()} from the given {@link IDoEntity}.
    *
    * @param dataObject
-   *          The {@link IDoEntity} in which the {@link MaxRowCountContributionDo} should be searched.
+   *     The {@link IDoEntity} in which the {@link MaxRowCountContributionDo} should be searched.
    * @return The value of {@link MaxRowCountContributionDo#getHint()} attached to ghe given {@link IDoEntity} as
-   *         contribution or -1 if no such contribution is present.
+   * contribution or -1 if no such contribution is present.
    */
   public int getMaxResultsHintFromContribution(IDoEntity dataObject) {
     if (dataObject != null) {
@@ -67,8 +67,8 @@ public class MaxResultsHelper {
    * smaller that the requested value.
    *
    * @param requestedMaxResults
-   *          The maximum number of rows as requested by the client. {@code null} or <= 0 means no limit. In that case
-   *          the limit is given by {@link #getMaxResultLimit()}.
+   *     The maximum number of rows as requested by the client. {@code null} or <= 0 means no limit. In that case
+   *     the limit is given by {@link #getMaxResultLimit()}.
    * @return The created {@link ResultLimiter}
    */
   public ResultLimiter limiter(Integer requestedMaxResults) {
@@ -81,7 +81,7 @@ public class MaxResultsHelper {
 
   /**
    * @return The default upper limit for the number of rows. Used if no row limit is requested or the requested limit
-   *         value is too high.
+   * value is too high.
    */
   public int getMaxResultLimit() {
     return DEFAULT_MAX_RESULTS;
@@ -95,7 +95,7 @@ public class MaxResultsHelper {
 
     /**
      * @param maxResultsLimit
-     *          The maximum number of results (hard limit). Must be > 0.
+     *     The maximum number of results (hard limit). Must be > 0.
      */
     public ResultLimiter(int maxResultsLimit) {
       this(maxResultsLimit, -1);
@@ -103,10 +103,10 @@ public class MaxResultsHelper {
 
     /**
      * @param maxResultsLimit
-     *          The maximum number of results (hard limit). Must be > 0.
+     *     The maximum number of results (hard limit). Must be > 0.
      * @param requestedMaxResults
-     *          The maximum number of results as requested by the client (client limit). May be <= 0 if the client has
-     *          no preference.
+     *     The maximum number of results as requested by the client (client limit). May be <= 0 if the client has
+     *     no preference.
      */
     public ResultLimiter(int maxResultsLimit, int requestedMaxResults) {
       this(maxResultsLimit, requestedMaxResults, -1);
@@ -114,12 +114,12 @@ public class MaxResultsHelper {
 
     /**
      * @param maxResultsLimit
-     *          The maximum number of results (hard limit). Must be > 0.
+     *     The maximum number of results (hard limit). Must be > 0.
      * @param requestedMaxResults
-     *          The maximum number of results as requested by the client (client limit). May be <= 0 if the client has
-     *          no preference.
+     *     The maximum number of results as requested by the client (client limit). May be <= 0 if the client has
+     *     no preference.
      * @param estimatedRowCount
-     *          The estimated number of results that would be available in total. May be <= 0 in case it is unknown.
+     *     The estimated number of results that would be available in total. May be <= 0 in case it is unknown.
      */
     public ResultLimiter(int maxResultsLimit, int requestedMaxResults, int estimatedRowCount) {
       setMaxResultsLimit(maxResultsLimit);
@@ -136,8 +136,8 @@ public class MaxResultsHelper {
 
     /**
      * @return the maximum number of rows that are allowed in this limiter. Either defined by a requested limit
-     *         ({@link #getRequestedMaxResults()}), or the hard limit {@link #getMaxResultLimit()} in case there is no
-     *         requested limit or the requested limit is too high.
+     * ({@link #getRequestedMaxResults()}), or the hard limit {@link #getMaxResultLimit()} in case there is no
+     * requested limit or the requested limit is too high.
      */
     public int getMaxResults() {
       int requestedMaxResults = getRequestedMaxResults();
@@ -166,9 +166,9 @@ public class MaxResultsHelper {
      * (limited) input list.
      *
      * @param data
-     *          The list in which the surplus items should be removed. Therefore, the list must be modifiable!
+     *     The list in which the surplus items should be removed. Therefore, the list must be modifiable!
      * @param response
-     *          The {@link IDoEntity} to which the {@link LimitedResultInfoContributionDo} should be attached.
+     *     The {@link IDoEntity} to which the {@link LimitedResultInfoContributionDo} should be attached.
      * @return The input data {@link List} with all surplus items removed.
      */
     public <E, L extends List<E>> L limit(L data, IDoEntity response) {
@@ -196,9 +196,9 @@ public class MaxResultsHelper {
      * (limited) input list.
      *
      * @param data
-     *          The list in which the surplus items should be removed. Therefore, the list must be modifiable!
+     *     The list in which the surplus items should be removed. Therefore, the list must be modifiable!
      * @param limitedResultsConsumer
-     *          An optional consumer to report if the list has been limited (modified) or not. May be {@code null}.
+     *     An optional consumer to report if the list has been limited (modified) or not. May be {@code null}.
      * @return The input data {@link List} with all surplus items removed.
      */
     public <E, L extends List<E>> L limit(L data, Consumer<Boolean> limitedResultsConsumer) {
@@ -241,7 +241,7 @@ public class MaxResultsHelper {
 
     /**
      * @param requestedMaxResults
-     *          The maximum number of results as requested by the client.
+     *     The maximum number of results as requested by the client.
      */
     public void setRequestedMaxResults(int requestedMaxResults) {
       m_requestedMaxResults = requestedMaxResults;

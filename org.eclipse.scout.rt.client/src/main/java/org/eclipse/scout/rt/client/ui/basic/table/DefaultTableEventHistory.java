@@ -43,5 +43,4 @@ public class DefaultTableEventHistory extends AbstractEventHistory<TableEvent> {
       }
     }
   }
-
 }

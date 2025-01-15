@@ -27,10 +27,10 @@ public class PreferredValue<VALUE> {
    * overwritten by respective preferred values.
    *
    * @param value
-   *          the value to be set.
+   *     the value to be set.
    * @param preferred
-   *          <code>true</code> to set the given value as preferred value. If <code>false</code>, the value is only set
-   *          if the current value is not a preferred value yet.
+   *     <code>true</code> to set the given value as preferred value. If <code>false</code>, the value is only set
+   *     if the current value is not a preferred value yet.
    * @return <code>true</code> if the current value was overwritten.
    */
   public boolean set(final VALUE value, final boolean preferred) {

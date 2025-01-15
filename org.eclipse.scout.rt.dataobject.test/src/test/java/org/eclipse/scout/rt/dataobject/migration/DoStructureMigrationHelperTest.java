@@ -93,7 +93,7 @@ public class DoStructureMigrationHelperTest {
 
     // Single data object
     Assert.assertEquals(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)),
+            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)),
         helper.collectRawDataObjectTypeVersions(
             BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.HouseFixture")
@@ -102,9 +102,9 @@ public class DoStructureMigrationHelperTest {
 
     // Data object containing another data objects (house owner attribute not set here)
     Assert.assertEquals(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-        new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION),
-        new ImmutablePair<>("charlieFixture.PostalAddressFixture", CharlieFixture_2.VERSION)),
+            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+            new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION),
+            new ImmutablePair<>("charlieFixture.PostalAddressFixture", CharlieFixture_2.VERSION)),
         helper.collectRawDataObjectTypeVersions(
             BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.HouseFixture")
@@ -123,8 +123,8 @@ public class DoStructureMigrationHelperTest {
 
     // Data object with a subclass but using origin class (different type version) [not a real case]
     Assert.assertEquals(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-        new ImmutablePair<>("alfaFixture.CustomerFixture", AlfaFixture_3.VERSION)),
+            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+            new ImmutablePair<>("alfaFixture.CustomerFixture", AlfaFixture_3.VERSION)),
         helper.collectRawDataObjectTypeVersions(
             BEANS.get(DoEntityBuilder.class)
                 .put("_type", "charlieFixture.HouseFixture")
@@ -138,8 +138,8 @@ public class DoStructureMigrationHelperTest {
 
     // Data object with a subclass using replaced class
     Assert.assertEquals(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
-        new ImmutablePair<>("alfaFixture.CustomerFixture", CharlieFixture_3.VERSION)),
+            new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
+            new ImmutablePair<>("alfaFixture.CustomerFixture", CharlieFixture_3.VERSION)),
 
         helper.collectRawDataObjectTypeVersions(
             BEANS.get(DoEntityBuilder.class)

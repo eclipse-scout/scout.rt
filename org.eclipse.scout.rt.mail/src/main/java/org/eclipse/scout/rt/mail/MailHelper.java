@@ -100,7 +100,7 @@ public class MailHelper {
    * Returns a list of body parts.
    *
    * @param message
-   *          Message to look for body parts.
+   *     Message to look for body parts.
    */
   public List<Part> getBodyParts(Part message) {
     List<Part> bodyCollector = new ArrayList<>();
@@ -112,7 +112,7 @@ public class MailHelper {
    * Returns a list of attachments parts.
    *
    * @param message
-   *          Message to look for attachment parts.
+   *     Message to look for attachment parts.
    */
   public List<Part> getAttachmentParts(Part message) {
     List<Part> attachmentCollector = new ArrayList<>();
@@ -126,13 +126,13 @@ public class MailHelper {
    * A single collector can be null in order to collect only the relevant parts.
    *
    * @param part
-   *          Part
+   *     Part
    * @param bodyCollector
-   *          Body collector (optional)
+   *     Body collector (optional)
    * @param attachmentCollector
-   *          Attachment collector (optional)
+   *     Attachment collector (optional)
    * @param inlineAttachmentCollector
-   *          Inline attachment collector (optional)
+   *     Inline attachment collector (optional)
    */
   public void collectMailParts(Part part, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) {
     if (part == null) {
@@ -328,9 +328,9 @@ public class MailHelper {
 
   /**
    * @param message
-   *          Message to look for html body part and read content from.
+   *     Message to look for html body part and read content from.
    * @return Content from html body part encoded with the encoding given in the MIME header or UTF-8 encoded or null if
-   *         the html part is not given.
+   * the html part is not given.
    */
   public String getHtmlBody(Part message) {
     List<Part> bodyParts = getBodyParts(message);
@@ -340,9 +340,9 @@ public class MailHelper {
 
   /**
    * @param message
-   *          Message to look for plain text body part and read content from.
+   *     Message to look for plain text body part and read content from.
    * @return Content from plain text part encoded with the encoding given in the MIME header or UTF-8 encoded or null if
-   *         the plainText Part is not given
+   * the plainText Part is not given
    */
   public String getPlainText(Part message) {
     List<Part> bodyParts = getBodyParts(message);
@@ -417,9 +417,9 @@ public class MailHelper {
 
   /**
    * @param fileName
-   *          e.g. "file.txt"
+   *     e.g. "file.txt"
    * @param fileExtension
-   *          e.g. "txt", "jpg"
+   *     e.g. "txt", "jpg"
    */
   public DataSource createDataSource(InputStream inStream, String fileName, String fileExtension) {
     try {
@@ -440,7 +440,7 @@ public class MailHelper {
    * Creates a mime message according to the mail message provided.
    *
    * @param mailMessage
-   *          Definition of mime message properties.
+   *     Definition of mime message properties.
    * @return Mime message
    */
   // See methods testCreateMimeMessage*Structure within MailHelperCreateMimeMessageTest for the various content structures created by this method.
@@ -549,7 +549,7 @@ public class MailHelper {
 
   /**
    * @param inline
-   *          <code>true</code> if it's an inline attachment, <code>false</code> otherwise.
+   *     <code>true</code> if it's an inline attachment, <code>false</code> otherwise.
    */
   protected MimeBodyPart createAttachmentPart(MailAttachment attachment, boolean inline, String charset) throws MessagingException {
     MimeBodyPart part = new MimeBodyPart();
@@ -599,9 +599,9 @@ public class MailHelper {
    * Creates a single mime body part.
    *
    * @param bodyText
-   *          Body text
+   *     Body text
    * @param contentType
-   *          Content type
+   *     Content type
    */
   protected void setSingleBodyPart(MimePart part, String bodyText, String contentType) throws MessagingException {
     part.setText(bodyText, StandardCharsets.UTF_8.name());
@@ -648,9 +648,9 @@ public class MailHelper {
    * When working with {@link BinaryResource}, use {@link #addResourcesAsAttachments(MimeMessage, List)} instead.
    *
    * @param msg
-   *          Mime message to attach files to
+   *     Mime message to attach files to
    * @param attachments
-   *          List of attachments (files).
+   *     List of attachments (files).
    * @since 4.1
    */
   public void addAttachmentsToMimeMessage(MimeMessage msg, List<File> attachments) {
@@ -681,9 +681,9 @@ public class MailHelper {
    * When working with {@link File}, use {@link #addAttachmentsToMimeMessage(MimeMessage, List)} instead.
    *
    * @param msg
-   *          Mime message to attach files to
+   *     Mime message to attach files to
    * @param attachments
-   *          List of attachments (binary resources).
+   *     List of attachments (binary resources).
    * @since 6.0
    */
   public void addResourcesAsAttachments(MimeMessage msg, List<BinaryResource> attachments) {
@@ -712,7 +712,7 @@ public class MailHelper {
    * Prepares the mime message so that attachments can be added to the returned {@link Multipart}.
    *
    * @param msg
-   *          Mime message to prepare
+   *     Mime message to prepare
    * @return Multipart to which attachments can be added
    */
   protected Multipart prepareMessageForAttachments(MimeMessage msg) throws IOException, MessagingException {
@@ -866,10 +866,10 @@ public class MailHelper {
    * detected, UTF-8 is used.
    *
    * @param part
-   *          The part for which the {@link Charset} should be parsed. May be {@code null}.
+   *     The part for which the {@link Charset} should be parsed. May be {@code null}.
    * @return The best {@link Charset} to read the content of the {@link Part} given.
    * @throws MessagingException
-   *           if the content-type of the {@link Part} cannot be retrieved.
+   *     if the content-type of the {@link Part} cannot be retrieved.
    */
   protected Charset getPartCharsetSafely(Part part) throws MessagingException {
     // 1. try to use charset declared in part (if present)
@@ -992,9 +992,9 @@ public class MailHelper {
    * prefix.
    *
    * @param message
-   *          Message to add the prefix to ({@link MimeMessage#getSubject()}.
+   *     Message to add the prefix to ({@link MimeMessage#getSubject()}.
    * @param subjectPrefix
-   *          Subject prefix to add.
+   *     Subject prefix to add.
    */
   public void addPrefixToSubject(MimeMessage message, String subjectPrefix) {
     if (message == null) {
@@ -1073,7 +1073,7 @@ public class MailHelper {
    * Retrieves the value of the 'Message-Id' header field of the message, without throwing an exception.
    *
    * @param mimeMessage
-   *          message
+   *     message
    * @return Message-Id or {@code null}
    */
   public String getMessageIdSafely(MimeMessage mimeMessage) {
@@ -1096,9 +1096,9 @@ public class MailHelper {
    * file extension (or {@code null} if none could be guessed).
    *
    * @param part
-   *          Attachment part
+   *     Attachment part
    * @param defaultFilenameFunction
-   *          Mandatory function called with guessed file extension (might be null) if no filename was found.
+   *     Mandatory function called with guessed file extension (might be null) if no filename was found.
    * @return Filename of the given attachment part.
    */
   public String getAttachmentFilename(Part part, Function<String, String> defaultFilenameFunction) {
@@ -1143,7 +1143,7 @@ public class MailHelper {
    * Used internal by {@link #getAttachmentFilename(Part, Function)}.
    *
    * @param filename
-   *          Filename as provided by {@link Part#getFileName()}.
+   *     Filename as provided by {@link Part#getFileName()}.
    */
   protected String decodeAttachmentFilename(String filename) {
     if (filename == null) {
@@ -1185,7 +1185,7 @@ public class MailHelper {
    * Used internal by {@link #getAttachmentFilename(Part, Function)} if not filename is available.
    *
    * @param contentType
-   *          Content type as provided by {@link Part#getContentType()}.
+   *     Content type as provided by {@link Part#getContentType()}.
    * @return File extension for content type (e.g. txt, eml, ...) if one is found, {@code null} otherwise.
    */
   protected String guessAttachmentFileExtension(String contentType) {

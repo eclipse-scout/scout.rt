@@ -140,7 +140,6 @@ public final class SeleniumDriver {
           + " browser.name=" + caps.getBrowserName()
           + " browser.version=" + caps.getBrowserVersion());
       return driver;
-
     }
     catch (SessionNotCreatedException e) {
       System.out.println("* Most likely your Chrome browser version is not supported by the ChromeDriver version configured in the pom.xml.");

@@ -22,5 +22,4 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public interface ITableOrganizerProvider {
 
   ITableOrganizer createTableOrganizer(ITable table);
-
 }

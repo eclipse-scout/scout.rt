@@ -13,5 +13,4 @@ package org.eclipse.scout.rt.client.ui.group;
 public interface IGroupUIFacade {
 
   void setCollapsedFromUI(boolean collapsed);
-
 }

@@ -121,5 +121,4 @@ public class BinaryResourceUrlUtilityTest {
     assertEquals(filename, filenameAndFingerprint.getLeft());
     assertEquals(fingerprint, filenameAndFingerprint.getRight());
   }
-
 }

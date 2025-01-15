@@ -105,10 +105,10 @@ public class HtmlHelperTest {
 
     //Emojis
     assertEquals(""
-        + "Emojis\n"
-        + "Face with Tears of Joy Emoji: \uD83D\uDE02\n"
-        + "Party Popper Emoji: \uD83C\uDF89\n"
-        + "Man Technologist: Medium-light Skin Tone: \uD83D\uDC68\uD83C\uDFFC\u200D\uD83D\uDCBB",
+            + "Emojis\n"
+            + "Face with Tears of Joy Emoji: \uD83D\uDE02\n"
+            + "Party Popper Emoji: \uD83C\uDF89\n"
+            + "Man Technologist: Medium-light Skin Tone: \uD83D\uDC68\uD83C\uDFFC\u200D\uD83D\uDCBB",
         helper.toPlainText(""
             + "<h1>Emojis</h1>\n"
             + "<p>Face with Tears of Joy Emoji: &#128514;</p>\n"

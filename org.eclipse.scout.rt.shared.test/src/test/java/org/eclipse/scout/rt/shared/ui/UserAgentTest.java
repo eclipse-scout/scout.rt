@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.ui;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -48,5 +47,4 @@ public class UserAgentTest {
     assertFalse(userAgentHtmlChrome.equals(userAgentHtmlFirefox));
     assertFalse(userAgentHtmlChrome.hashCode() == userAgentHtmlFirefox.hashCode());
   }
-
 }

@@ -27,9 +27,9 @@ public interface ICallableDecorator extends IChainable {
    * Method invoked prior to executing the {@link Callable command}.
    *
    * @return the {@link IUndecorator} to be invoked after execution in order to revert decoration, or <code>null</code>
-   *         to do nothing upon return of the command.
+   * to do nothing upon return of the command.
    * @throws Exception
-   *           throw exception to stop chain processing. The exception is propagated to the caller.
+   *     throw exception to stop chain processing. The exception is propagated to the caller.
    */
   @SuppressWarnings("squid:S00112")
   IUndecorator decorate() throws Exception;

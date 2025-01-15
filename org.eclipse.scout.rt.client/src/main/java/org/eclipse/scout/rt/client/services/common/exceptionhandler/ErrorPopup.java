@@ -144,7 +144,7 @@ public class ErrorPopup {
 
   /**
    * @return <code>true</code> for exceptions of the type {@link UndeclaredThrowableException},
-   *         {@link InvocationTargetException} and {@link ExecutionException}.
+   * {@link InvocationTargetException} and {@link ExecutionException}.
    */
   protected boolean isWrapperException(final Throwable t) {
     return t instanceof UndeclaredThrowableException

@@ -51,7 +51,7 @@ public final class SerializationTestUtility {
    * Note to developers: A call to this method must not start the Platform, thus not using {@link BEANS}
    *
    * @return a CSV table with the headers <code>Very dark | Dark | Custom blocked | Not whitelisted | Classname</code>
-   *         listing all vulnerable classes. Very dark and dark are sub categorizations of the default blacklist
+   * listing all vulnerable classes. Very dark and dark are sub categorizations of the default blacklist
    */
   public static String createVulnerabilityReport(Collection<String> serializableClasses, Predicate<String> whitelist) {
     DefaultSerializerBlacklist blacklist = new DefaultSerializerBlacklist();

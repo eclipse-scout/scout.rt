@@ -63,7 +63,7 @@ public class StrictSimpleDateFormatTest {
    * {@link StrictSimpleDateFormat}.
    *
    * @see <a href=
-   *      "https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON">Date.toJSON()</a>
+   * "https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON">Date.toJSON()</a>
    */
   @Test
   public void testJavaScriptJsonString() throws ParseException {

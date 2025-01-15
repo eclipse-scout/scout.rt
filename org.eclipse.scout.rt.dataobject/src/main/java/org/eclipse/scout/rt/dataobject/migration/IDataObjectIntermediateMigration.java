@@ -33,11 +33,11 @@ public interface IDataObjectIntermediateMigration<T extends IDataObject> {
    * Applies an intermediate migration.
    *
    * @param ctx
-   *          Migration context
+   *     Migration context
    * @param typedDataObject
-   *          Typed data object (before value migration but after structure migration was applied)
+   *     Typed data object (before value migration but after structure migration was applied)
    * @return Result with typed data object and a flag if a migration was applied. Returned typed data object is used
-   *         even if changed flag is <code>false</code>.
+   * even if changed flag is <code>false</code>.
    */
   DataObjectMigratorResult<T> applyMigration(DataObjectMigrationContext ctx, T typedDataObject);
 }

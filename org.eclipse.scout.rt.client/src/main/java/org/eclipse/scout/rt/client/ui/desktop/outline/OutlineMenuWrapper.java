@@ -76,10 +76,10 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
 
   /**
    * @param menu
-   *          the menu to wrap
+   *     the menu to wrap
    * @param menuTypeMapper
-   *          the menuTypes for the menu and for each menu in the sub-hierarchy are individually computed with this
-   *          mapper
+   *     the menuTypes for the menu and for each menu in the sub-hierarchy are individually computed with this
+   *     mapper
    */
   protected OutlineMenuWrapper(IMenu menu, IMenuTypeMapper menuTypeMapper, Predicate<IMenu> menuFilter) {
     m_wrappedMenu = menu;

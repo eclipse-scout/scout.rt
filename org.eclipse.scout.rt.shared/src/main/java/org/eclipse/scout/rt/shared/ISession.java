@@ -39,7 +39,7 @@ public interface ISession {
 
   /**
    * @return the shared variable map. Shared variables are automatically updated on the client by client notifications
-   *         when changed on the server.
+   * when changed on the server.
    */
   Map<String, Object> getSharedVariableMap();
 
@@ -50,7 +50,7 @@ public interface ISession {
 
   /**
    * @return <code>true</code> if session shutdown is in progress (i.g. {@link #stop()} was called). While shutting
-   *         down, the session is still considered "active".
+   * down, the session is still considered "active".
    */
   boolean isStopping();
 
@@ -81,7 +81,7 @@ public interface ISession {
    * Invoke this method to initialize the session. The session is active just after this method returns.
    *
    * @param sessionId
-   *          unique id
+   *     unique id
    */
   void start(String sessionId);
 
@@ -89,5 +89,4 @@ public interface ISession {
    * Invoke this method to stop the session. This is the last call on the session.
    */
   void stop();
-
 }

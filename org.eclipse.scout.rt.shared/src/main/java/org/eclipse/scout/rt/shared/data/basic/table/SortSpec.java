@@ -76,5 +76,4 @@ public class SortSpec implements Serializable {
     }
     return -1;
   }
-
 }

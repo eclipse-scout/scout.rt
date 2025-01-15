@@ -51,10 +51,9 @@ public interface IRemoteCacheService {
    *
    * @param cacheId
    * @param filter
-   *          used to match entries that should be invalidated
+   *     used to match entries that should be invalidated
    * @param propagate
-   *          true if the invalidation should be propagated to other cluster nodes
+   *     true if the invalidation should be propagated to other cluster nodes
    */
   <K, V> void invalidate(String cacheId, ICacheEntryFilter<K, V> filter, boolean propagate);
-
 }

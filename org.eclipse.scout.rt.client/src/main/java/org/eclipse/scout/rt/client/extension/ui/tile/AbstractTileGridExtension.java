@@ -26,5 +26,4 @@ public abstract class AbstractTileGridExtension<T extends ITile, TILES extends A
   public void execTilesSelected(TilesSelectedChain<T> chain, List<T> tiles) {
     chain.execTilesSelected(tiles);
   }
-
 }

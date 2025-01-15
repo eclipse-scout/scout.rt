@@ -82,7 +82,7 @@ public final class MessageBoxes {
    * Convenience function for simple delete confirmation message box
    *
    * @param items
-   *          one item or array of multiple items
+   *     one item or array of multiple items
    * @return <code>true</code> if the user confirmed the deletion, <code>false</code> otherwise
    */
   public static boolean showDeleteConfirmationMessage(Object items) {
@@ -93,7 +93,7 @@ public final class MessageBoxes {
    * Convenience function for simple delete confirmation message box
    *
    * @param items
-   *          a list of multiple items
+   *     a list of multiple items
    * @return <code>true</code> if the user confirmed the deletion, <code>false</code> otherwise
    * @since Scout 4.0.1
    */
@@ -105,9 +105,9 @@ public final class MessageBoxes {
    * Convenience function for simple delete confirmation message box
    *
    * @param itemType
-   *          display text in plural such as "Persons", "Relations", "Tickets", ...
+   *     display text in plural such as "Persons", "Relations", "Tickets", ...
    * @param items
-   *          one item or array of multiple items
+   *     one item or array of multiple items
    * @return <code>true</code> if the user confirmed the deletion, <code>false</code> otherwise
    */
   public static boolean showDeleteConfirmationMessage(String itemType, Object items) {
@@ -129,9 +129,9 @@ public final class MessageBoxes {
    * Convenience function for simple delete confirmation message box
    *
    * @param itemType
-   *          display text in plural such as "Persons", "Relations", "Tickets", ...
+   *     display text in plural such as "Persons", "Relations", "Tickets", ...
    * @param items
-   *          a list of multiple items
+   *     a list of multiple items
    * @return <code>true</code> if the user confirmed the deletion, <code>false</code> otherwise
    * @since Scout 4.0.1
    */
@@ -144,7 +144,7 @@ public final class MessageBoxes {
    * Convenience function for simple delete confirmation message box
    *
    * @param items
-   *          a list of multiple items
+   *     a list of multiple items
    * @return <code>IMessageBox</code>
    * @since Scout 22.0
    */
@@ -156,9 +156,9 @@ public final class MessageBoxes {
    * Convenience function for simple delete confirmation message box
    *
    * @param itemType
-   *          display text in plural such as "Persons", "Relations", "Tickets", ...
+   *     display text in plural such as "Persons", "Relations", "Tickets", ...
    * @param items
-   *          a list of multiple items
+   *     a list of multiple items
    * @return <code>IMessageBox</code>
    * @since Scout 22.0
    */

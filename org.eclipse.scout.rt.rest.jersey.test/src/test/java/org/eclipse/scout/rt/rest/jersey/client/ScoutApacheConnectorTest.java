@@ -386,8 +386,8 @@ public class ScoutApacheConnectorTest {
   public void testCustomUserAgentNullDefaultAgentSuppressed() {
     //noinspection CodeBlock2Expr
     runTestUserAgent((helper, clientBuilder) -> {
-      clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
-    },
+          clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
+        },
         builder -> builder.header(HttpHeaders.USER_AGENT, null),
         null);
   }
@@ -396,8 +396,8 @@ public class ScoutApacheConnectorTest {
   public void testCustomUserAgentDefaultAgentSuppressed() {
     //noinspection CodeBlock2Expr
     runTestUserAgent((helper, clientBuilder) -> {
-      clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
-    },
+          clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
+        },
         builder -> builder.header(HttpHeaders.USER_AGENT, "mockAgent"),
         "mockAgent");
   }

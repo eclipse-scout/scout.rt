@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.navigation;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 

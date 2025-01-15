@@ -20,5 +20,4 @@ public interface ITableRowCustomValueContributor {
   void enrichCustomValues(ITableRow row, Map<String, Object> customValues);
 
   Set<String> getConfiguredContributedValueIds();
-
 }

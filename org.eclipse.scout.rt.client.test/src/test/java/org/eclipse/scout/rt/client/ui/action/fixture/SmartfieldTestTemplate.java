@@ -24,5 +24,4 @@ public abstract class SmartfieldTestTemplate extends AbstractSmartField<Long> {
   @ClassId(TEST_MENU_ID)
   public class TestMenu extends AbstractMenu {
   }
-
 }

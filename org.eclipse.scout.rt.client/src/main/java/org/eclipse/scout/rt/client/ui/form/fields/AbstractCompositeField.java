@@ -183,7 +183,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * The default implementation removes fields replaced by another field annotated with {@link Replace}.
    *
    * @param fieldList
-   *          live and mutable list of configured field classes (i.e. yet not instantiated)
+   *     live and mutable list of configured field classes (i.e. yet not instantiated)
    * @since 3.8.2
    */
   protected void filterFieldsInternal(List<Class<? extends IFormField>> fieldList) {
@@ -196,7 +196,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * implementation checks for {@link InjectFieldTo} annotations in the enclosing (runtime) classes.
    *
    * @param fields
-   *          live and mutable collection of configured fields, not yet initialized and added to composite field
+   *     live and mutable collection of configured fields, not yet initialized and added to composite field
    */
   protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
     FormFieldInjectionThreadLocal.injectFields(this, fields);
@@ -336,7 +336,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * Registers the given form field replacements on this composite field.
    *
    * @param replacements
-   *          Map having old field classes as key and replacing field classes as values.
+   *     Map having old field classes as key and replacing field classes as values.
    * @since 4.0.1
    */
   private void registerFormFieldReplacements(Map<Class<?>, Class<? extends IFormField>> replacements) {

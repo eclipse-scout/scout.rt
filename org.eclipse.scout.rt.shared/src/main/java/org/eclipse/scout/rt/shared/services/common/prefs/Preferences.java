@@ -91,14 +91,14 @@ public class Preferences implements IPreferences {
    * Gets the {@link IPreferences} for the given <code>nodeId</code> and the given <code>userScope</code>
    *
    * @param userScope
-   *          The {@link ISession} for which the settings should be retrieved. Must not be <code>null</code>.
+   *     The {@link ISession} for which the settings should be retrieved. Must not be <code>null</code>.
    * @param nodeId
-   *          The id of the node to retrieve. Must not be <code>null</code>.
+   *     The id of the node to retrieve. Must not be <code>null</code>.
    * @return The {@link IPreferences} for the given node and scope.
    * @throws ProcessingException
-   *           On an error while loading the preferences.
+   *     On an error while loading the preferences.
    * @throws IllegalArgumentException
-   *           if the session or nodeId is <code>null</code>.
+   *     if the session or nodeId is <code>null</code>.
    */
   public static IPreferences get(ISession userScope, String nodeId) {
     IUserPreferencesService service = BEANS.get(IUserPreferencesService.class);

@@ -26,5 +26,4 @@ public class JsonFormFieldTile<T extends IFormFieldTile> extends JsonWidgetTile<
   public String getObjectType() {
     return "FormFieldTile";
   }
-
 }

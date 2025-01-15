@@ -92,7 +92,7 @@ public abstract class AbstractCodeTypeToDoFunction<EXPLICIT_SOURCE extends ICode
    * wide.
    *
    * @param idConverter
-   *          The new conversion {@link Function}. {@code null} values are ignored.
+   *     The new conversion {@link Function}. {@code null} values are ignored.
    */
   public void setIdConverter(Function<Object, String> idConverter) {
     if (idConverter == null) {

@@ -181,7 +181,6 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
     assertTrue(isPercent());
     assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88) + " %"));
     assertComparableEquals(BigDecimal.valueOf(59.88), parseValueInternal(m_formatter.format(59.88)));
-
   }
 
   @Test
@@ -358,5 +357,4 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
     setValue(BigDecimal.valueOf(50));
     assertEquals(TEXTS.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
   }
-
 }

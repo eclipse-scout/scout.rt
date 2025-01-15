@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -132,5 +131,4 @@ public class BinaryServiceTunnelContentHandlerTest {
     assertEquals(testValue, readResponse.getData());
     assertTrue(String.format("sizeUncompressed: %s, sizeCompressed: %s", sizeUncompressed, sizeCompressed), sizeUncompressed > sizeCompressed);
   }
-
 }

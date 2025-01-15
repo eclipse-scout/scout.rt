@@ -44,13 +44,13 @@ public class CharsetDetector {
    * {@link Charset} is known or the user has the possibility to correct the encoding if necessary.
    *
    * @param in
-   *          The {@link InputStream} to get the raw bytes for which the {@link Charset} should be detected. Must not be
-   *          {@code null}. The stream is reset to its original position after the {@link Charset} detection. Therefore,
-   *          it must support mark and reset (check* {@link InputStream#markSupported()}).
+   *     The {@link InputStream} to get the raw bytes for which the {@link Charset} should be detected. Must not be
+   *     {@code null}. The stream is reset to its original position after the {@link Charset} detection. Therefore,
+   *     it must support mark and reset (check* {@link InputStream#markSupported()}).
    * @return The detected {@link Charset}. Never returns {@code null}. If no {@link Charset} could be detected at all,
-   *         UTF-8 is returned.
+   * UTF-8 is returned.
    * @throws IOException
-   *           when reading from the {@link InputStream}.
+   *     when reading from the {@link InputStream}.
    */
   public Charset guessCharset(InputStream in) throws IOException {
     return guessCharset(in, true);
@@ -63,19 +63,19 @@ public class CharsetDetector {
    * {@link Charset} is known or the user has the possibility to correct the encoding if necessary.
    *
    * @param in
-   *          The {@link InputStream} to get the raw bytes for which the {@link Charset} should be detected. Must not be
-   *          {@code null}.
+   *     The {@link InputStream} to get the raw bytes for which the {@link Charset} should be detected. Must not be
+   *     {@code null}.
    * @param resetStream
-   *          Specifies if the {@link InputStream} given should be reset to the original position after the charset
-   *          detection. If {@code true} this allows to reuse the stream to read the content after it was already used
-   *          to detect the {@link Charset}. In this case the {@link InputStream} must support mark and reset (check
-   *          {@link InputStream#markSupported()}). If {@code false}, the stream is not reset and will continue to read
-   *          from the last position read to detect the {@link Charset}. This may be handy if the stream is not needed
-   *          after {@link Charset} detection anymore.
+   *     Specifies if the {@link InputStream} given should be reset to the original position after the charset
+   *     detection. If {@code true} this allows to reuse the stream to read the content after it was already used
+   *     to detect the {@link Charset}. In this case the {@link InputStream} must support mark and reset (check
+   *     {@link InputStream#markSupported()}). If {@code false}, the stream is not reset and will continue to read
+   *     from the last position read to detect the {@link Charset}. This may be handy if the stream is not needed
+   *     after {@link Charset} detection anymore.
    * @return The detected {@link Charset}. Never returns {@code null}. If no {@link Charset} could be detected at all,
-   *         UTF-8 is returned.
+   * UTF-8 is returned.
    * @throws IOException
-   *           when reading from the {@link InputStream}.
+   *     when reading from the {@link InputStream}.
    */
   public Charset guessCharset(InputStream in, boolean resetStream) throws IOException {
     return guessCharset(in, resetStream, DEFAULT_READ_LIMIT);
@@ -88,22 +88,22 @@ public class CharsetDetector {
    * {@link Charset} is known or the user has the possibility to correct the encoding if necessary.
    *
    * @param in
-   *          The {@link InputStream} to get the raw bytes for which the {@link Charset} should be detected. Must not be
-   *          {@code null}.
+   *     The {@link InputStream} to get the raw bytes for which the {@link Charset} should be detected. Must not be
+   *     {@code null}.
    * @param resetStream
-   *          Specifies if the {@link InputStream} given should be reset to the original position after the charset
-   *          detection. If {@code true} this allows to reuse the stream to read the content after it was already used
-   *          to detect the {@link Charset}. In this case the {@link InputStream} must support mark and reset (check
-   *          {@link InputStream#markSupported()}). If {@code false}, the stream is not reset and will continue to read
-   *          from the last position read to detect the {@link Charset}. This may be handy if the stream is not needed
-   *          after {@link Charset} detection anymore.
+   *     Specifies if the {@link InputStream} given should be reset to the original position after the charset
+   *     detection. If {@code true} this allows to reuse the stream to read the content after it was already used
+   *     to detect the {@link Charset}. In this case the {@link InputStream} must support mark and reset (check
+   *     {@link InputStream#markSupported()}). If {@code false}, the stream is not reset and will continue to read
+   *     from the last position read to detect the {@link Charset}. This may be handy if the stream is not needed
+   *     after {@link Charset} detection anymore.
    * @param limit
-   *          The number of bytes to read from the given {@link InputStream} to detect the {@link Charset}. More bytes
-   *          give better results, but is slower.
+   *     The number of bytes to read from the given {@link InputStream} to detect the {@link Charset}. More bytes
+   *     give better results, but is slower.
    * @return The detected {@link Charset}. Never returns {@code null}. If no {@link Charset} could be detected at all,
-   *         UTF-8 is returned.
+   * UTF-8 is returned.
    * @throws IOException
-   *           when reading from the {@link InputStream}.
+   *     when reading from the {@link InputStream}.
    */
   public Charset guessCharset(InputStream in, boolean resetStream, int limit) throws IOException {
     byte[] data = readNBytes(in, resetStream, limit);
@@ -117,9 +117,9 @@ public class CharsetDetector {
    * to correct the encoding if necessary.
    *
    * @param data
-   *          The raw bytes to use to detect the {@link Charset}. Must not be {@code null}.
+   *     The raw bytes to use to detect the {@link Charset}. Must not be {@code null}.
    * @return The detected {@link Charset}. Never returns {@code null}. If no {@link Charset} could be detected at all,
-   *         UTF-8 is returned.
+   * UTF-8 is returned.
    */
   public Charset guessCharset(byte[] data) {
     return guessCharset(data, DEFAULT_READ_LIMIT);
@@ -132,12 +132,12 @@ public class CharsetDetector {
    * to correct the encoding if necessary.
    *
    * @param data
-   *          The raw bytes to use to detect the {@link Charset}. Must not be {@code null}.
+   *     The raw bytes to use to detect the {@link Charset}. Must not be {@code null}.
    * @param limit
-   *          Specifies the number of bytes from the given array to use for the detection. More bytes give better
-   *          results, but is slower.
+   *     Specifies the number of bytes from the given array to use for the detection. More bytes give better
+   *     results, but is slower.
    * @return The detected {@link Charset}. Never returns {@code null}. If no {@link Charset} could be detected at all,
-   *         UTF-8 is returned.
+   * UTF-8 is returned.
    */
   public Charset guessCharset(byte[] data, int limit) {
     org.apache.tika.parser.txt.CharsetDetector detector = new org.apache.tika.parser.txt.CharsetDetector(limit);

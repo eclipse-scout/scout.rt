@@ -68,7 +68,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    * Creates a new status with severity {@link IStatus#ERROR}.
    *
    * @param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</code>
+   *     a human-readable message, localized to the current locale, is never <code>null</code>
    */
   public ProcessingStatus(String messageBody) {
     this(messageBody, IStatus.ERROR);
@@ -78,9 +78,9 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    * Creates a new status without child-statuses.
    *
    * @param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</code>
+   *     a human-readable message, localized to the current locale, is never <code>null</code>
    * @param severity
-   *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
+   *     the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
   public ProcessingStatus(String messageBody, int severity) {
     this(null, messageBody, severity);
@@ -90,11 +90,11 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    * Creates a new status without child-statuses.
    *
    * @param messageTitle
-   *          a human-readable title, localized to the current locale, can be <code>null</code>
+   *     a human-readable title, localized to the current locale, can be <code>null</code>
    * @param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</code>
+   *     a human-readable message, localized to the current locale, is never <code>null</code>
    * @param severity
-   *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
+   *     the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
   public ProcessingStatus(String messageTitle, String messageBody, int severity) {
     this(messageTitle, messageBody, null, 0, severity);
@@ -104,12 +104,12 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    * Creates a new status without child-statuses.
    *
    * @param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</code> &#64;param cause a
-   *          low-level exception, or <code>null</code> if not applicable
+   *     a human-readable message, localized to the current locale, is never <code>null</code> &#64;param cause a
+   *     low-level exception, or <code>null</code> if not applicable
    * @param code
-   *          the custom status code
+   *     the custom status code
    * @param severity
-   *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
+   *     the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
   public ProcessingStatus(String messageBody, Throwable cause, int code, int severity) {
     this(null, messageBody, cause, code, severity);
@@ -119,13 +119,13 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    * Creates a new status without child-statuses.
    *
    * @param messageTitle
-   *          a human-readable title, localized to the current locale, can be <code>null</code> &#64;param messageBody a
-   *          human-readable message, localized to the current locale, is never <code>null</code> &#64;param cause a
-   *          low-level exception, or <code>null</code> if not applicable
+   *     a human-readable title, localized to the current locale, can be <code>null</code> &#64;param messageBody a
+   *     human-readable message, localized to the current locale, is never <code>null</code> &#64;param cause a
+   *     low-level exception, or <code>null</code> if not applicable
    * @param code
-   *          the custom status code
+   *     the custom status code
    * @param severity
-   *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
+   *     the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
   public ProcessingStatus(String messageTitle, String messageBody, Throwable cause, int code, int severity) {
     super(null, checkSeverity(severity), code);
@@ -180,7 +180,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    * Sets the exception.
    *
    * @param exception
-   *          a low-level exception, or <code>null</code> if not applicable
+   *     a low-level exception, or <code>null</code> if not applicable
    */
   public void setException(Throwable exception) {
     m_exception = exception;
@@ -190,7 +190,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    * Sets the message.
    *
    * @param title
-   *          a human-readable message, localized to the current locale
+   *     a human-readable message, localized to the current locale
    */
   public void setTitle(String title) {
     m_messageTitle = title;
@@ -200,7 +200,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
    * Sets the message.
    *
    * @param messageBody
-   *          a human-readable message, localized to the current locale
+   *     a human-readable message, localized to the current locale
    */
   public void setBody(String messageBody) {
     m_messageBody = messageBody;
@@ -208,8 +208,8 @@ public class ProcessingStatus extends Status implements IProcessingStatus {
 
   /**
    * @param severity
-   *          the severity; one of <code>OK</code>, <code>ERROR</code>, <code>INFO</code>, <code>WARNING</code>, or
-   *          <code>CANCEL</code>
+   *     the severity; one of <code>OK</code>, <code>ERROR</code>, <code>INFO</code>, <code>WARNING</code>, or
+   *     <code>CANCEL</code>
    */
   private static int checkSeverity(int severity) {
     switch (severity) {

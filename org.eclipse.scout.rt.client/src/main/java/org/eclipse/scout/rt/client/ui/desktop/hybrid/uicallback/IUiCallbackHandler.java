@@ -35,7 +35,7 @@ public interface IUiCallbackHandler<TResponse extends IDoEntity, TResult> {
 
   /**
    * @return The ObjectType of the UI (browser) side callback handler class. By default the {@link ObjectType}
-   *         annotation of this class is used. Then there is no need to overwrite this method.
+   * annotation of this class is used. Then there is no need to overwrite this method.
    */
   default String uiCallbackHandlerObjectType() {
     // use @ObjectType annotation by default
@@ -46,9 +46,9 @@ public interface IUiCallbackHandler<TResponse extends IDoEntity, TResult> {
    * Executed in case the UI callback was successful.
    *
    * @param response
-   *          The {@link IDoEntity} returned from the UI. Might be {@code null} in case the callback has no result.
+   *     The {@link IDoEntity} returned from the UI. Might be {@code null} in case the callback has no result.
    * @return The result of the callback. If the {@link Pair#getRight()} returns a {@link Throwable}, the callback is
-   *         considered failed. If the {@link Throwable} is {@code null}, {@link Pair#getLeft()} is used as result.
+   * considered failed. If the {@link Throwable} is {@code null}, {@link Pair#getLeft()} is used as result.
    */
   Pair<TResult, ? extends Throwable> onCallbackDone(TResponse response);
 
@@ -56,14 +56,14 @@ public interface IUiCallbackHandler<TResponse extends IDoEntity, TResult> {
    * Executed in case the UI callback was not successful.
    *
    * @param exception
-   *          A prepared {@link ProcessingException} holding the message and code returned in the error from the UI
-   *          (UiCallbackErrorDo).
+   *     A prepared {@link ProcessingException} holding the message and code returned in the error from the UI
+   *     (UiCallbackErrorDo).
    * @param message
-   *          The message of the error as returned in the UiCallbackErrorDo returned from the UI.
+   *     The message of the error as returned in the UiCallbackErrorDo returned from the UI.
    * @param code
-   *          The optional code of the error as returned in the UiCallbackErrorDo returned from the UI.
+   *     The optional code of the error as returned in the UiCallbackErrorDo returned from the UI.
    * @return The result of the callback. If the {@link Pair#getRight()} returns a {@link Throwable}, the callback is
-   *         considered failed. If the {@link Throwable} is {@code null}, {@link Pair#getLeft()} is used as result.
+   * considered failed. If the {@link Throwable} is {@code null}, {@link Pair#getLeft()} is used as result.
    */
   default Pair<TResult, ? extends Throwable> onCallbackFailed(ProcessingException exception, String message, String code) {
     return ImmutablePair.of(null, exception);

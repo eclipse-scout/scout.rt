@@ -27,16 +27,16 @@ public class JsonEvent implements IJsonObject {
 
   /**
    * @param target
-   *          Event target (usually, an adapter ID)
+   *     Event target (usually, an adapter ID)
    * @param type
-   *          See {@link JsonEventType} enum for a list of often used event types.
+   *     See {@link JsonEventType} enum for a list of often used event types.
    * @param reference
-   *          Optional reference value, used to clean up events in the JSON response (see
-   *          {@link JsonResponse#removeJsonAdapter(String)}. Should be of the same type as the 'target' attribute.
+   *     Optional reference value, used to clean up events in the JSON response (see
+   *     {@link JsonResponse#removeJsonAdapter(String)}. Should be of the same type as the 'target' attribute.
    * @param data
-   *          Event data (or <code>null</code>). <b><font color=red>Important:</font></b> Do not use the reserved
-   *          property names <code>'target'</code> and <code>'type'</code> in this object, as they will be overridden by
-   *          the corresponding first two arguments.
+   *     Event data (or <code>null</code>). <b><font color=red>Important:</font></b> Do not use the reserved
+   *     property names <code>'target'</code> and <code>'type'</code> in this object, as they will be overridden by
+   *     the corresponding first two arguments.
    */
   public JsonEvent(String target, String type, String reference, JSONObject data) {
     if (target == null) {
@@ -56,14 +56,14 @@ public class JsonEvent implements IJsonObject {
 
   /**
    * @param target
-   *          Event target (usually, an adapter ID)
+   *     Event target (usually, an adapter ID)
    * @param type
-   *          See {@link JsonEventType} enum for a list of often used event types. Do not construct a {@link JsonEvent}
-   *          with type {@link JsonEventType#PROPERTY} directly, create {@link JsonPropertyChangeEvent} instead.
+   *     See {@link JsonEventType} enum for a list of often used event types. Do not construct a {@link JsonEvent}
+   *     with type {@link JsonEventType#PROPERTY} directly, create {@link JsonPropertyChangeEvent} instead.
    * @param data
-   *          Event data (or <code>null</code>). <b><font color=red>Important:</font></b> Do not use the reserved
-   *          property names <code>'target'</code> and <code>'type'</code> in this object, as they will be overridden by
-   *          the corresponding first two arguments.
+   *     Event data (or <code>null</code>). <b><font color=red>Important:</font></b> Do not use the reserved
+   *     property names <code>'target'</code> and <code>'type'</code> in this object, as they will be overridden by
+   *     the corresponding first two arguments.
    */
   public JsonEvent(String target, String type, JSONObject data) {
     this(target, type, null, data);

@@ -126,8 +126,8 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *
-   * @see AbstractDesktop#getSimilarForms(IForm)
    * @return null for exclusive form behavior an exclusive key to ensure similar handling.
+   * @see AbstractDesktop#getSimilarForms(IForm)
    */
   Object computeExclusiveKey();
 
@@ -221,11 +221,11 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   /**
    * @param wizardStep
-   *          the step that starts this form. The form can then access the step with {@link #getWizardStep()}.
+   *     the step that starts this form. The form can then access the step with {@link #getWizardStep()}.
    * @param handlerType
-   *          the inner handler type used to load / store the form. An instance of this handler type is created
-   *          automatically and set to the form using {@link #setHandler(IFormHandler)}. If this parameter is
-   *          <code>null</code>, the current handler is used instead.
+   *     the inner handler type used to load / store the form. An instance of this handler type is created
+   *     automatically and set to the form using {@link #setHandler(IFormHandler)}. If this parameter is
+   *     <code>null</code>, the current handler is used instead.
    */
   void startWizardStep(IWizardStep wizardStep, Class<? extends IFormHandler> handlerType);
 
@@ -239,13 +239,13 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * Starts the form using {@link #getHandler()}.
    *
    * @throws ProcessingException
-   *           if an error occurs in the handler.
+   *     if an error occurs in the handler.
    */
   void start();
 
   /**
    * @return <code>true</code> if this {@link IForm} is currently attached to the {@link IDesktop} and displayed.
-   *         However, a value of <code>true</code> does not imply that it is the currently active {@link IForm}.
+   * However, a value of <code>true</code> does not imply that it is the currently active {@link IForm}.
    * @see IDesktop#showForm(IForm)
    */
   boolean isShowing();
@@ -257,15 +257,15 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   /**
    * @return <code>true</code> if this {@link IForm} is started with a {@link IFormHandler}. However, it does not imply
-   *         that it is attached to the {@link IDesktop} and displayed in the UI.
+   * that it is attached to the {@link IDesktop} and displayed in the UI.
    */
   boolean isFormStarted();
 
   /**
    * @return <code>true</code> if it is allowed to call the start() method of this form, false otherwise. This method
-   *         checks two things: 1 - is the form started yet? 2 - is the blocking condition of the form blocking? Use
-   *         this method when you must call the start method of the form, and you're not completely sure in which state
-   *         the form currently is.
+   * checks two things: 1 - is the form started yet? 2 - is the blocking condition of the form blocking? Use
+   * this method when you must call the start method of the form, and you're not completely sure in which state
+   * the form currently is.
    */
   boolean isFormStartable();
 
@@ -290,7 +290,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * apply FormData to this form
    *
    * @param source
-   *          the FormData to import
+   *     the FormData to import
    */
   void importFormData(AbstractFormData source);
 
@@ -298,10 +298,10 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * apply FormData to this form
    *
    * @param source
-   *          the FormData to import
+   *     the FormData to import
    * @param valueChangeTriggersEnabled
-   *          specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
-   *          caused by this import.
+   *     specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
+   *     caused by this import.
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled);
 
@@ -309,12 +309,12 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * apply FormData to this form
    *
    * @param source
-   *          the FormData to import
+   *     the FormData to import
    * @param valueChangeTriggersEnabled
-   *          specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
-   *          caused by this import.
+   *     specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
+   *     caused by this import.
    * @param filter
-   *          a filter that can be used to specify which form properties should be imported
+   *     a filter that can be used to specify which form properties should be imported
    * @see IPropertyFilter
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter);
@@ -323,14 +323,14 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * apply FormData to this form
    *
    * @param source
-   *          the FormData to import
+   *     the FormData to import
    * @param valueChangeTriggersEnabled
-   *          specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
-   *          caused by this import.
+   *     specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
+   *     caused by this import.
    * @param filter
-   *          a filter that can be used to specify which form properties should be imported
+   *     a filter that can be used to specify which form properties should be imported
    * @param formFieldFilter
-   *          a filter that can be used to specify which form fields should be imported
+   *     a filter that can be used to specify which form fields should be imported
    * @see IPropertyFilter#accept(FastPropertyDescriptor)
    * @see IFormFieldFilter#accept(IFormField)
    */
@@ -418,7 +418,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * displayed. By default, this property is set to <code>true</code>.
    *
    * @param showOnStart
-   *          <code>true</code> to show this {@link IForm} on startup, <code>false</code> otherwise.
+   *     <code>true</code> to show this {@link IForm} on startup, <code>false</code> otherwise.
    * @see IDesktop#showForm(IForm)
    */
   void setShowOnStart(boolean showOnStart);
@@ -486,7 +486,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   /**
    * @return <code>true</code> to make this {@link IForm} modal in respect to its {@link IDisplayParent}, or
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   boolean isModal();
 
@@ -540,8 +540,8 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * This property can be changed even if the {@link IForm} is showing.
    *
    * @param displayParent
-   *          like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to use the
-   *          {@link IDisplayParent} resolved from the current calling context during initialization.
+   *     like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to use the
+   *     {@link IDisplayParent} resolved from the current calling context during initialization.
    */
   void setDisplayParent(IDisplayParent displayParent);
 
@@ -609,7 +609,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * Imports the form state from an XML document.
    *
    * @param root
-   *          The XML document that contains the form state.
+   *     The XML document that contains the form state.
    * @return <code>true</code>, if the XML document was loaded successfully. Otherwise <code>false</code>.
    */
   boolean loadFromXml(Element root);
@@ -632,8 +632,8 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   /**
    * @return life reference to the filter (never null)<br>
-   *         For search filter validity check {@link SearchFilter#isCompleted()} in combination with
-   *         {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable#isSearchRequired()}
+   * For search filter validity check {@link SearchFilter#isCompleted()} in combination with
+   * {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable#isSearchRequired()}
    */
   SearchFilter getSearchFilter();
 
@@ -658,7 +658,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * loading, after loading, before storing, after storing, when the structure changes, when it is printed, etc.
    *
    * @param eventTypes
-   *          of {@link FormEvent} TYPE_*
+   *     of {@link FormEvent} TYPE_*
    */
   default void addFormListener(FormListener listener, Integer... eventTypes) {
     formListeners().add(listener, false, eventTypes);
@@ -677,7 +677,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * Use {@link #addFormListener(FormListener, Integer...)}
    *
    * @param eventTypes
-   *          of {@link FormEvent} TYPE_*
+   *     of {@link FormEvent} TYPE_*
    */
   default void addUIFormListener(FormListener listener, Integer... eventTypes) {
     formListeners().addLastCalled(listener, false, eventTypes);
@@ -685,15 +685,14 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   /**
    * @return the {@link IEventHistory} associated with this form
-   *         <p>
-   *         The default implementation is a {@link DefaultFormEventHistory} and created by
-   *         {@link AbstractForm#createEventHistory()}
-   *         <p>
-   *         This method is thread safe.
+   * <p>
+   * The default implementation is a {@link DefaultFormEventHistory} and created by
+   * {@link AbstractForm#createEventHistory()}
+   * <p>
+   * This method is thread safe.
    * @since 3.8
    */
   IEventHistory<FormEvent> getEventHistory();
 
   IFormUIFacade getUIFacade();
-
 }

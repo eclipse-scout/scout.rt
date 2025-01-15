@@ -41,9 +41,9 @@ public final class CollectionUtility {
    * and pass <code>false</code> as last argument.
    *
    * @param c1
-   *          first collection
+   *     first collection
    * @param c2
-   *          second collection
+   *     second collection
    * @return <code>true</code> if the two collections contains the same elements <i>in any order</i>.
    */
   public static <T> boolean equalsCollection(Collection<? extends T> c1, Collection<? extends T> c2) {
@@ -52,14 +52,14 @@ public final class CollectionUtility {
 
   /**
    * @param c1
-   *          first collection
+   *     first collection
    * @param c2
-   *          second collection
+   *     second collection
    * @param considerElementPosition
-   *          If <code>true</code>, the order of the elements in the two collections must match. If <code>false</code>,
-   *          the order is not relevant (only the elements must be the same).
+   *     If <code>true</code>, the order of the elements in the two collections must match. If <code>false</code>,
+   *     the order is not relevant (only the elements must be the same).
    * @return <code>true</code> if the two collections contains the same elements <i>in any <b>or</b> the same order</i>
-   *         (depending on the value of 'considerElementPosition').
+   * (depending on the value of 'considerElementPosition').
    */
   public static <T> boolean equalsCollection(Collection<? extends T> c1, Collection<? extends T> c2, boolean considerElementPosition) {
     if (c1 == c2) {
@@ -114,7 +114,7 @@ public final class CollectionUtility {
    * {@link #equalsCollection}.
    *
    * @return If the size of the collection is <= 1, a hashCode equivalent to Set#hashCode will be returned. Otherwise, a
-   *         custom hashCode based on the histogram will be returned.
+   * custom hashCode based on the histogram will be returned.
    */
   public static <T> int hashCodeCollection(Collection<? extends T> c) {
     return hashCodeCollection(c, false);
@@ -130,8 +130,8 @@ public final class CollectionUtility {
    * considerElementPosition true, or if the size of the collection is always <= 1.
    *
    * @return If the size of the collection is == 1, a hashCode equivalent to Set#hashCode will be returned. When
-   *         considerElementPosition is true and the size of the collection is > 1, a hashCode equivalent to
-   *         List#hashCode will be returned. Otherwise, a custom hashCode based on the histogram will be returned.
+   * considerElementPosition is true and the size of the collection is > 1, a hashCode equivalent to
+   * List#hashCode will be returned. Otherwise, a custom hashCode based on the histogram will be returned.
    * @see #equalsCollection(Collection, Collection, boolean)
    */
   public static <T> int hashCodeCollection(Collection<? extends T> c, boolean considerElementPosition) {
@@ -168,9 +168,9 @@ public final class CollectionUtility {
    * {@link #equalsCollection(Collection, Collection)}.
    *
    * @param c1
-   *          first list
+   *     first list
    * @param c2
-   *          second list
+   *     second list
    * @return <code>true</code> if the two lists contains the same elements <i>in the same order</i>.
    */
   public static <T> boolean equalsCollection(List<? extends T> c1, List<? extends T> c2) {
@@ -434,7 +434,7 @@ public final class CollectionUtility {
    * {@link HashSet} is modifiable and never null.
    *
    * @return an {@link HashSet} containing the given collection's elements without <code>null</code> elements. Never
-   *         null.
+   * null.
    */
   public static <T> HashSet<T> hashSetWithoutNullElements(Collection<? extends T> c) {
     HashSet<T> set = hashSet(c);
@@ -460,7 +460,7 @@ public final class CollectionUtility {
    * returned {@link LinkedHashSet} is modifiable and never null.
    *
    * @return an {@link LinkedHashSet} containing the given collection's elements without <code>null</code> elements.
-   *         Never null.
+   * Never null.
    */
   public static <T> LinkedHashSet<T> orderedHashSetWithoutNullElements(Collection<? extends T> c) {
     LinkedHashSet<T> set = orderedHashSet(c);
@@ -814,9 +814,9 @@ public final class CollectionUtility {
    * {@code null} elements.
    *
    * @param collections
-   *          The {@link Collection}s to flatten.
+   *     The {@link Collection}s to flatten.
    * @return A {@link List} holding all non-{@code null} elements of the specified {@link Collection}s. Is never
-   *         {@code null}.
+   * {@code null}.
    * @see #combine(Collection...)
    */
   public static <T> List<T> flatten(Collection<? extends Collection<? extends T>> collections) {
@@ -942,11 +942,11 @@ public final class CollectionUtility {
    * To get a string representation of a collection.
    *
    * @param list
-   *          input list
+   *     input list
    * @param delimiter
-   *          the separator used between elements
+   *     the separator used between elements
    * @param quoteStrings
-   *          <code>true</code> to get quoted representations of all not numbers.
+   *     <code>true</code> to get quoted representations of all not numbers.
    * @return a string representation of the given collection.
    */
   public static <T> String format(Collection<T> list, String delimiter, boolean quoteStrings) {
@@ -984,9 +984,9 @@ public final class CollectionUtility {
    * Partition a list into fixed size of sublist.
    *
    * @param collection
-   *          input collection
+   *     input collection
    * @param batchSize
-   *          max size of a sublist
+   *     max size of a sublist
    * @return a list with sublist
    */
   public static <T> List<List<T>> partition(Collection<T> collection, int batchSize) {
@@ -1005,7 +1005,7 @@ public final class CollectionUtility {
    * {@link Object#equals(Object) equals}. {@code null} elements are allowed.
    *
    * @param collection
-   *          collection to check for duplicate values
+   *     collection to check for duplicate values
    * @return set of duplicate values
    */
   public static <T> Set<T> findDuplicates(Collection<T> collection) {

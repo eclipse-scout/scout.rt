@@ -26,5 +26,4 @@ public interface ITileGridExtension<T extends ITile, TG extends AbstractTileGrid
   void execTileClick(TileClickChain<T> chain, T tile, MouseButton mouseButton);
 
   void execTileAction(TileActionChain<T> chain, T tile);
-
 }

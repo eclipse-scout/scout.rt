@@ -80,5 +80,4 @@ public class JsonBeanField<BEAN_FIELD extends IBeanField<?>> extends JsonValueFi
   public BinaryResourceHolder provideBinaryResource(String filename) {
     return m_binaryResourceMediator.getBinaryResourceHolder(filename);
   }
-
 }

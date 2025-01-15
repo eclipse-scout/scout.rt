@@ -40,10 +40,10 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * digital signatures.<br>
  * The {@link Base64Utility} or {@link HexUtility} can be used to encode the bytes returned by this class.
  *
- * @since 5.1
  * @see Base64Utility
  * @see HexUtility
  * @see ISecurityProvider
+ * @since 5.1
  */
 public final class SecurityUtility {
 
@@ -110,19 +110,19 @@ public final class SecurityUtility {
    * See {@link ISecurityProvider#createDecryptionKey(char[], byte[], int, byte[])}
    *
    * @param cipherStream
-   *          must be capable to push back 8 bytes.
+   *     must be capable to push back 8 bytes.
    * @param password
-   *          The password to use to create the key. Must not be {@code null} or empty.
+   *     The password to use to create the key. Must not be {@code null} or empty.
    * @param salt
-   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
-   *          random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
-   *          generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
    * @param keyLen
-   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
    * @param optKey
-   *          may be null. For performance optimization this may be pre-built key. However, in order to guarantee
-   *          backward compatibility this optKey is only used when its parameters match those of the encrypted stream.
-   *          See {@link EncryptionKey#getCompatibilityHeader()}
+   *     may be null. For performance optimization this may be pre-built key. However, in order to guarantee
+   *     backward compatibility this optKey is only used when its parameters match those of the encrypted stream.
+   *     See {@link EncryptionKey#getCompatibilityHeader()}
    * @return the key
    */
   public static EncryptionKey createDecryptionKey(PushbackInputStream cipherStream, char[] password, byte[] salt, int keyLen, EncryptionKey optKey) {
@@ -139,9 +139,9 @@ public final class SecurityUtility {
    * After this call the {@link PushbackInputStream} starts at the encrypted data.
    *
    * @param cipherStream
-   *          which can unread 6 charcters
+   *     which can unread 6 charcters
    * @return extracted header <code>[yyyy:version]</code> or null of not found. yyyy is the 4-digit year and version is
-   *         freetext without the ']' character
+   * freetext without the ']' character
    */
   public static byte[] extractCompatibilityHeader(PushbackInputStream cipherStream) {
     try {
@@ -178,14 +178,14 @@ public final class SecurityUtility {
    * Use {@link #createEncryptionKey(char[], byte[], int)} to create a key instance.
    *
    * @param clearTextData
-   *          The clear text data. Must not be {@code null}.
+   *     The clear text data. Must not be {@code null}.
    * @param key
-   *          The {@link EncryptionKey} to use. Must not be {@code null}.
+   *     The {@link EncryptionKey} to use. Must not be {@code null}.
    * @return The encrypted bytes
    * @throws AssertionException
-   *           on invalid input.
+   *     on invalid input.
    * @throws ProcessingException
-   *           if there is an error during encryption.
+   *     if there is an error during encryption.
    */
   public static byte[] encrypt(byte[] clearTextData, EncryptionKey key) {
     Assertions.assertNotNull(clearTextData, "no data provided");
@@ -202,14 +202,14 @@ public final class SecurityUtility {
    * {@link #createDecryptionKey(PushbackInputStream, char[], byte[], int, EncryptionKey)}
    *
    * @param encryptedData
-   *          The encrypted bytes. Must not be {@code null}.
+   *     The encrypted bytes. Must not be {@code null}.
    * @param key
-   *          The {@link EncryptionKey} to use. Must not be {@code null}.
+   *     The {@link EncryptionKey} to use. Must not be {@code null}.
    * @return The clear text data.
    * @throws AssertionException
-   *           on invalid input
+   *     on invalid input
    * @throws ProcessingException
-   *           if there is an error during decryption.
+   *     if there is an error during decryption.
    */
   public static byte[] decrypt(byte[] encryptedData, EncryptionKey key) {
     Assertions.assertNotNull(encryptedData, "no data provided");
@@ -222,20 +222,20 @@ public final class SecurityUtility {
 
   /**
    * @param encryptedData
-   *          The encrypted bytes. Must not be {@code null}.
+   *     The encrypted bytes. Must not be {@code null}.
    * @param password
-   *          The password to use to create the key. Must not be {@code null} or empty.
+   *     The password to use to create the key. Must not be {@code null} or empty.
    * @param salt
-   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
-   *          random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
-   *          generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
    * @param keyLen
-   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
    * @return The clear text bytes.
    * @throws AssertionException
-   *           on invalid input
+   *     on invalid input
    * @throws ProcessingException
-   *           if there is an error during decryption.
+   *     if there is an error during decryption.
    */
   public static byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen) {
     return decrypt(encryptedData, password, salt, keyLen, null);
@@ -243,23 +243,23 @@ public final class SecurityUtility {
 
   /**
    * @param encryptedData
-   *          The encrypted bytes. Must not be {@code null}.
+   *     The encrypted bytes. Must not be {@code null}.
    * @param password
-   *          The password to use to create the key. Must not be {@code null} or empty.
+   *     The password to use to create the key. Must not be {@code null} or empty.
    * @param salt
-   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
-   *          random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
-   *          generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
    * @param keyLen
-   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
    * @param optKey
-   *          may be null. For performance optimization this may be pre-built key. However, in order to guarantee
-   *          backward compatibility this optKey is only used when its parameters match those of the encrypted stream.
+   *     may be null. For performance optimization this may be pre-built key. However, in order to guarantee
+   *     backward compatibility this optKey is only used when its parameters match those of the encrypted stream.
    * @return The clear text bytes.
    * @throws AssertionException
-   *           on invalid input
+   *     on invalid input
    * @throws ProcessingException
-   *           if there is an error during decryption.
+   *     if there is an error during decryption.
    */
   public static byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen, EncryptionKey optKey) {
     Assertions.assertNotNull(encryptedData, "no data provided");
@@ -275,20 +275,20 @@ public final class SecurityUtility {
    * Encrypts the given clear text bytes using the given password and salt.
    *
    * @param clearTextData
-   *          The clear text data. Must not be {@code null}.
+   *     The clear text data. Must not be {@code null}.
    * @param password
-   *          The password to use to create the key. Must not be {@code null} or empty.
+   *     The password to use to create the key. Must not be {@code null} or empty.
    * @param salt
-   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
-   *          random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
-   *          generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   *     The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *     random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *     generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
    * @param keyLen
-   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   *     The length of the key (in bits). Must be one of 128, 192 or 256.
    * @return The encrypted bytes.
    * @throws AssertionException
-   *           on invalid input
+   *     on invalid input
    * @throws ProcessingException
-   *           if there is an error during encryption.
+   *     if there is an error during encryption.
    */
   public static byte[] encrypt(byte[] clearTextData, char[] password, byte[] salt, int keyLen) {
     EncryptionKey key = createEncryptionKey(password, salt, keyLen);
@@ -307,7 +307,7 @@ public final class SecurityUtility {
    *
    * @return the created random bytes.
    * @throws ProcessingException
-   *           If the current platform does not support the random number generation algorithm.
+   *     If the current platform does not support the random number generation algorithm.
    * @see ISecurityProvider#createSecureRandomBytes(int)
    */
   public static byte[] createRandomBytes() {
@@ -334,7 +334,7 @@ public final class SecurityUtility {
    * case the iteration count is increased yearly, this method checks if the hash is valid
    *
    * @return true if calculated password hash created with {@link #hashPassword(char[], byte[])} matches the expected
-   *         hash.
+   * hash.
    * @since 11.0
    */
   public static boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
@@ -348,12 +348,12 @@ public final class SecurityUtility {
    * </p>
    *
    * @param data
-   *          The data to hash. Must not be {@code null}.
+   *     The data to hash. Must not be {@code null}.
    * @return the hash
    * @throws ProcessingException
-   *           If there is an error creating the hash
+   *     If there is an error creating the hash
    * @throws AssertionException
-   *           If data is {@code null}.
+   *     If data is {@code null}.
    * @see ISecurityProvider#toHashingStream(InputStream)
    * @see ISecurityProvider#createPasswordHash(char[], byte[])
    */
@@ -402,14 +402,14 @@ public final class SecurityUtility {
    * Compatible keys can be generated using {@link #generateKeyPair()}.
    *
    * @param privateKey
-   *          The private key bytes.
+   *     The private key bytes.
    * @param data
-   *          The data for which the signature should be created.
+   *     The data for which the signature should be created.
    * @return The signature bytes.
    * @throws ProcessingException
-   *           When there is an error creating the signature.
+   *     When there is an error creating the signature.
    * @throws AssertionException
-   *           if the private key or data is {@code null}.
+   *     if the private key or data is {@code null}.
    * @see ISecurityProvider#createSignature(byte[], InputStream)
    */
   public static byte[] createSignature(byte[] privateKey, byte[] data) {
@@ -429,16 +429,16 @@ public final class SecurityUtility {
    * Compatible public keys can be generated using {@link #generateKeyPair()}.
    *
    * @param publicKey
-   *          The public key bytes.
+   *     The public key bytes.
    * @param data
-   *          The data for which the signature should be validated. Must not be {@code null}
+   *     The data for which the signature should be validated. Must not be {@code null}
    * @param signatureToVerify
-   *          The signature that should be verified against.
+   *     The signature that should be verified against.
    * @return {@code true} if the given signature is valid for the given data and public key. {@code false} otherwise.
    * @throws ProcessingException
-   *           If there is an error validating the signature.
+   *     If there is an error validating the signature.
    * @throws AssertionException
-   *           if one of the arguments is {@code null}.
+   *     if one of the arguments is {@code null}.
    * @see ISecurityProvider#verifySignature(byte[], InputStream, byte[])
    */
   public static boolean verifySignature(byte[] publicKey, byte[] data, byte[] signatureToVerify) {
@@ -457,14 +457,14 @@ public final class SecurityUtility {
    * Create a Message Authentication Code (MAC) for the given data and password.
    *
    * @param password
-   *          The password to create the authentication code.
+   *     The password to create the authentication code.
    * @param data
-   *          The data for which the code should be created. Must not be {@code null}.
+   *     The data for which the code should be created. Must not be {@code null}.
    * @return The created authentication code.
    * @throws ProcessingException
-   *           if there is an error creating the MAC
+   *     if there is an error creating the MAC
    * @throws AssertionException
-   *           if the password or data is {@code null}.
+   *     if the password or data is {@code null}.
    * @see ISecurityProvider#createMac(byte[], InputStream)
    */
   public static byte[] createMac(byte[] password, byte[] data) {
@@ -474,7 +474,7 @@ public final class SecurityUtility {
 
   /**
    * @return the principal names of the given {@link Subject}, or {@code null} if the given {@link Subject} is
-   *         {@code null}. Multiple principal names are separated by comma.
+   * {@code null}. Multiple principal names are separated by comma.
    */
   public static String getPrincipalNames(Subject subject) {
     if (subject == null) {
@@ -491,11 +491,11 @@ public final class SecurityUtility {
 
   /**
    * @param keyStorePath
-   *          url
+   *     url
    * @param storePass
-   *          keystore password
+   *     keystore password
    * @param keyPass
-   *          private key password. Optional.
+   *     private key password. Optional.
    * @see #keyStoreToHumanReadableText(InputStream, String, String)
    * @since 10.0
    */
@@ -510,11 +510,11 @@ public final class SecurityUtility {
 
   /**
    * @param keyStoreInput
-   *          stream
+   *     stream
    * @param storePass
-   *          keystore password
+   *     keystore password
    * @param keyPass
-   *          private key password. Optional.
+   *     private key password. Optional.
    * @return human-readable text of the keystore content
    * @since 10.0
    */

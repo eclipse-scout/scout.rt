@@ -9,7 +9,7 @@
  */
 import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
 import {
-  App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormModel, InitModelOf, Menu, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Popup, PopupBlockerHandler, Rectangle,
+  App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Popup, PopupBlockerHandler, Rectangle,
   ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';

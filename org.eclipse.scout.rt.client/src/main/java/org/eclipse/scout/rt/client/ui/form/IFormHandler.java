@@ -53,7 +53,7 @@ public interface IFormHandler {
    *
    * @return true when this check is done and further checks can continue, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user notification such as a dialog
+   *     to cancel the current process with error handling and user notification such as a dialog
    */
   boolean onCheckFields();
 
@@ -63,7 +63,7 @@ public interface IFormHandler {
    *
    * @return true when validate is successful, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user notification such as a dialog
+   *     to cancel the current process with error handling and user notification such as a dialog
    */
   boolean onValidate();
 
@@ -86,5 +86,4 @@ public interface IFormHandler {
    * called to dispose of resources or deallocate services
    */
   void onFinally();
-
 }

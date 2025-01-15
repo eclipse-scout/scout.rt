@@ -18,7 +18,7 @@ public interface IRestHttpRequestUriEncoder {
    * Encode URI in HTTP request line before it's sent over the socket.
    *
    * @param uri
-   *          Default encoded request URI (RFC 3986), not {@code null}
+   *     Default encoded request URI (RFC 3986), not {@code null}
    * @return (potentially) modified request URI to be sent over the socket as part of the HTTP header, not {@code null}
    */
   String encodeRequestUri(String uri);

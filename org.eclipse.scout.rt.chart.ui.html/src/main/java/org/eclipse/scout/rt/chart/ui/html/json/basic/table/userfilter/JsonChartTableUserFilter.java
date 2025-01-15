@@ -43,5 +43,4 @@ public class JsonChartTableUserFilter<T extends ChartTableUserFilterState> exten
     json.put(ATTRIBUTE_COLUMN_ID_Y, getJsonTable().getColumnId(getFilterState().getColumnY()));
     return json;
   }
-
 }

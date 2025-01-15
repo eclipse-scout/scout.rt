@@ -31,5 +31,4 @@ public abstract class AbstractAlphanumericSortingStringColumn extends AbstractSt
   public int compareTableRows(ITableRow r1, ITableRow r2) {
     return StringUtility.ALPHANUMERIC_COMPARATOR_IGNORE_CASE.compare(getValue(r1), getValue(r2));
   }
-
 }

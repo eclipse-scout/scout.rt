@@ -42,11 +42,17 @@ public class RunMonitorCancelRegistry {
   protected final IndexedStore<RegistryEntry> m_registry;
   private final Object m_registryLock = new Object();
 
-  /** Index by {@link RunMonitor} object */
+  /**
+   * Index by {@link RunMonitor} object
+   */
   protected final P_RunMonitorIndex m_runMonitorIndex = new P_RunMonitorIndex();
-  /** Index by session ID */
+  /**
+   * Index by session ID
+   */
   protected final P_SessionIdIndex m_sessionIdIndex = new P_SessionIdIndex();
-  /** Index by client-server request ID */
+  /**
+   * Index by client-server request ID
+   */
   protected final P_SessionIdRequestIdIndex m_sessionIdRequestIdIndex = new P_SessionIdRequestIdIndex();
 
   public RunMonitorCancelRegistry() {
@@ -60,7 +66,7 @@ public class RunMonitorCancelRegistry {
    * Adds a {@link RunMonitor} to this registry, which will be cancelled upon shutdown of the platform.
    *
    * @param runMonitor
-   *          the monitor to be registered.
+   *     the monitor to be registered.
    * @see #cancelAll()
    */
   public IRegistrationHandle register(final RunMonitor runMonitor) {
@@ -72,11 +78,11 @@ public class RunMonitorCancelRegistry {
    * specified), or shutdown of the session (if specified) or platform.
    *
    * @param runMonitor
-   *          the monitor to be registered.
+   *     the monitor to be registered.
    * @param sessionId
-   *          the sessionId under which to register the monitor, unless <code>null</code> is provided.
+   *     the sessionId under which to register the monitor, unless <code>null</code> is provided.
    * @param requestId
-   *          the requestId under which to register the monitor, unless <code>null</code> is provided.
+   *     the requestId under which to register the monitor, unless <code>null</code> is provided.
    * @see #cancelAllBySessionId(String)
    * @see #cancelAllBySessionIdAndRequestId(String, long)
    */
@@ -99,7 +105,7 @@ public class RunMonitorCancelRegistry {
    * Cancels all registered monitors.
    *
    * @return <code>true</code> if all monitors could be cancelled, or <code>false</code> if no monitor is registered, or
-   *         if at least one monitor was already cancelled or failed to be cancelled.
+   * if at least one monitor was already cancelled or failed to be cancelled.
    */
   public boolean cancelAll() {
     final List<RegistryEntry> registryEntries;
@@ -117,7 +123,7 @@ public class RunMonitorCancelRegistry {
    * invoking this method (to ensure that the calling {@link RunMonitor} is not cancelled).
    *
    * @return <code>true</code> if all monitors matching the given 'sessionId' could be cancelled, or <code>false</code>
-   *         if no monitor is registered, or if at least one monitor was already cancelled or failed to be cancelled.
+   * if no monitor is registered, or if at least one monitor was already cancelled or failed to be cancelled.
    */
   public boolean cancelAllBySessionId(final String sessionId) {
     final List<RegistryEntry> registryEntries;
@@ -136,8 +142,8 @@ public class RunMonitorCancelRegistry {
    * Cancels all registered monitors associated with the given 'sessionId' and 'requestId'.
    *
    * @return <code>true</code> if all monitors matching the given 'sessionId' and 'requestId' could be cancelled, or
-   *         <code>false</code> if no monitor is registered, or if at least one monitor was already cancelled or failed
-   *         to be cancelled.
+   * <code>false</code> if no monitor is registered, or if at least one monitor was already cancelled or failed
+   * to be cancelled.
    */
   public boolean cancelAllBySessionIdAndRequestId(final String sessionId, final long requestId) {
     final List<RegistryEntry> entries;

@@ -24,10 +24,10 @@ public interface IInternalExtensionRegistry extends IExtensionRegistry {
    * Gets all contribution classes that exist for the given container.
    *
    * @param container
-   *          The container class. Must no be null.
+   *     The container class. Must no be null.
    * @return A {@link Set} holding all contribution classes that exist for the given container.
    * @throws IllegalArgumentException
-   *           if the container is null.
+   *     if the container is null.
    */
   Set<Class<?>> getContributionsFor(Class<?> container);
 
@@ -36,12 +36,12 @@ public interface IInternalExtensionRegistry extends IExtensionRegistry {
    * filter uses <code>instanceof</code> to check if a contribution is valid.
    *
    * @param container
-   *          The container for which the contributions should be returned.
+   *     The container for which the contributions should be returned.
    * @param filterType
-   *          The filter class or null if all contributions should be created and returned.
+   *     The filter class or null if all contributions should be created and returned.
    * @return The created contributions for the given container matching the given filter.
    * @throws IllegalArgumentException
-   *           if the container is null.
+   *     if the container is null.
    */
   <T> List<T> createContributionsFor(Object container, Class<T> filterType);
 
@@ -52,10 +52,10 @@ public interface IInternalExtensionRegistry extends IExtensionRegistry {
    * <code>instanceof</code> {@link ICodeType}.
    *
    * @param owner
-   *          The owner of the extensions.
+   *     The owner of the extensions.
    * @return a {@link List} with all {@link IExtension}s for the given owner.
    * @throws IllegalArgumentException
-   *           if the owner is null.
+   *     if the owner is null.
    */
   <T extends IExtension<?>> List<T> createExtensionsFor(Object owner);
 
@@ -68,13 +68,13 @@ public interface IInternalExtensionRegistry extends IExtensionRegistry {
    * {@link ClassIdentifier}).
    *
    * @param modelObject
-   *          The model object a move descriptor should be created for.
+   *     The model object a move descriptor should be created for.
    * @param parentModelObjectIterator
-   *          Optional iterator that is going through the list of parent model objects. It is used for evaluating
-   *          deep-linked move operations (i.e. those registered by
-   *          {@link IExtensionRegistry#registerMove(ClassIdentifier, Double, Class)} ). May be <code>null</code>.
+   *     Optional iterator that is going through the list of parent model objects. It is used for evaluating
+   *     deep-linked move operations (i.e. those registered by
+   *     {@link IExtensionRegistry#registerMove(ClassIdentifier, Double, Class)} ). May be <code>null</code>.
    * @return <code>null</code> if no move operations were registered for the given model object or one
-   *         {@link MoveDescriptor}.
+   * {@link MoveDescriptor}.
    */
   <T> MoveDescriptor<T> createModelMoveDescriptorFor(T modelObject, Iterator<?> parentModelObjectIterator);
 

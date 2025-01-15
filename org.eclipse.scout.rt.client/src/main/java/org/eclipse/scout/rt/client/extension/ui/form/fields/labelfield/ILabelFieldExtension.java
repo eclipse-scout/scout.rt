@@ -16,5 +16,4 @@ import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 public interface ILabelFieldExtension<OWNER extends AbstractLabelField> extends IValueFieldExtension<String, OWNER> {
 
   void execAppLinkAction(LabelFieldAppLinkActionChain chain, String ref);
-
 }

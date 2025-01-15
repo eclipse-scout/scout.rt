@@ -49,7 +49,7 @@ public class PrimaryMimeTypeDetector implements IMimeTypeDetector {
 
   /**
    * @param ext
-   *          is not null and lowercase
+   *     is not null and lowercase
    * @return the mime type or null if not known
    */
   protected String fileExtensionToMimeType(String ext) {

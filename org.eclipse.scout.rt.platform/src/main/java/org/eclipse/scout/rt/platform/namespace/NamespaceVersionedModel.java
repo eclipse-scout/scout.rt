@@ -173,7 +173,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
 
           NamespaceVersion v = td.getVersion();
           boolean hasLaterVersion = false;
-          for (Iterator<T> it = dependencies.iterator(); it.hasNext();) {
+          for (Iterator<T> it = dependencies.iterator(); it.hasNext(); ) {
             T dtd = it.next();
             NamespaceVersion nv = dtd.getVersion();
             if (!nv.namespaceEquals(v)) {
@@ -379,9 +379,9 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
    * returned.
    *
    * @param fromVersions
-   *          not null without null elements
+   *     not null without null elements
    * @param toVersions
-   *          not null without null elements
+   *     not null without null elements
    * @return non-null {@link VersionedItems}
    */
   public VersionedItems<T> getItems(Collection<NamespaceVersion> fromVersions, Collection<NamespaceVersion> toVersions) {
@@ -390,7 +390,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
 
   /**
    * @param name
-   *          non-null valid version name
+   *     non-null valid version name
    * @return non-null modifiable list with all items for the given version name.
    */
   public List<T> getAllItems(String name) {

@@ -82,5 +82,4 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
   protected IBigIntegerFieldExtension<? extends AbstractBigIntegerField> createLocalExtension() {
     return new LocalBigIntegerFieldExtension<>(this);
   }
-
 }

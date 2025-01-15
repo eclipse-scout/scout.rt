@@ -240,7 +240,7 @@ public final class MatrixUtility {
    * @param locale
    * @param data
    * @param sortColumns
-   *          0-bases column indices
+   *     0-bases column indices
    */
   public static void sort(Locale locale, Object[][] data, int... sortColumns) {
     if (data != null && data.length >= 2 && sortColumns != null && sortColumns.length > 0) {
@@ -300,5 +300,4 @@ public final class MatrixUtility {
     }
     return null;
   }
-
 }

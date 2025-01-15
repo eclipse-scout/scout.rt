@@ -38,5 +38,4 @@ public class NumberColumnUserFilterState extends ColumnUserFilterState {
   public void setNumberTo(BigDecimal numberTo) {
     m_numberTo = numberTo;
   }
-
 }

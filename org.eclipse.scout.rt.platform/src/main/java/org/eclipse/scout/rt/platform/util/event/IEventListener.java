@@ -15,7 +15,7 @@ import java.util.EventObject;
  * Represents an action that is triggered by an {@link IEventEmitter} when an event is fired.
  *
  * @param <EVENT>
- *          Event type that is fired.
+ *     Event type that is fired.
  * @since 22.0
  */
 @FunctionalInterface

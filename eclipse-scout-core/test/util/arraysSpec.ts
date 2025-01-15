@@ -340,7 +340,7 @@ describe('arrays', () => {
 
   describe('moveBefore', () => {
     it('moves element before the given sibling', () => {
-      let arr = arrays.moveBefore( ['a', 'b', 'c', 'd'], 'b', 'd');
+      let arr = arrays.moveBefore(['a', 'b', 'c', 'd'], 'b', 'd');
       expect(arr).toEqual(['a', 'c', 'b', 'd']);
 
       arr = arrays.moveBefore(['a', 'b', 'c', 'd'], 'd', 'a');

@@ -206,7 +206,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
    *       .withUseUiHeight(true);
    * }
    * </pre>
-   *
+   * <p>
    * The most common methods are also available as separate getConfigured methods (e.g. {@link #getConfiguredGridW()},
    * {@link #getConfiguredGridH()}).
    */
@@ -486,7 +486,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
      * Method to set the data for the tile field. Executed within a model job.
      *
      * @param data
-     *          Data loaded by {@link #loadDataAsync()}
+     *     Data loaded by {@link #loadDataAsync()}
      */
     protected abstract void setTileData(DATA data);
 
@@ -519,7 +519,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
         }, tileGridParent != null
             ? tileGridParent.createAsyncLoadJobInput(AbstractTile.this)
             : ModelJobs.newInput(ClientRunContexts.copyCurrent()
-                .withForm(formParent != null ? formParent : IForm.CURRENT.get())));
+            .withForm(formParent != null ? formParent : IForm.CURRENT.get())));
       }
       catch (RuntimeException e) {
         setLoading(false);

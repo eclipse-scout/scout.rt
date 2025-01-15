@@ -41,5 +41,4 @@ public abstract class AbstractActionExtension<OWNER extends AbstractAction> exte
   public void execDispose(ActionDisposeChain chain) {
     chain.execDispose();
   }
-
 }

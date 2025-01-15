@@ -60,7 +60,6 @@ public class ApacheHttpRequest extends LowLevelHttpRequest {
     configBuilder.setConnectTimeout(connectTimeout, TimeUnit.MILLISECONDS);
     configBuilder.setResponseTimeout(readTimeout, TimeUnit.MILLISECONDS);
     m_request.setConfig(configBuilder.build());
-
   }
 
   @Override
@@ -116,5 +115,4 @@ public class ApacheHttpRequest extends LowLevelHttpRequest {
       throw new IOException("Unable to determine host for request", e);
     }
   }
-
 }

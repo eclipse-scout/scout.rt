@@ -106,7 +106,7 @@ public abstract class AbstractMultiValuesIndex<INDEX, ELEMENT> implements IMulti
    * Method invoked to calculate the index values for the given element.
    *
    * @param element
-   *          the element to calculate its index values.
+   *     the element to calculate its index values.
    * @return the index values, or <code>null</code> or an empty {@link Set} to not add the element to this index.
    */
   protected abstract Set<INDEX> calculateIndexesFor(final ELEMENT element);

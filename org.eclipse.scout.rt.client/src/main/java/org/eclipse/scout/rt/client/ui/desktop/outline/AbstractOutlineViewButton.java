@@ -144,5 +144,4 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
   protected IOutlineViewButtonExtension<? extends AbstractOutlineViewButton> createLocalExtension() {
     return new LocalOutlineViewButtonExtension<>(this);
   }
-
 }

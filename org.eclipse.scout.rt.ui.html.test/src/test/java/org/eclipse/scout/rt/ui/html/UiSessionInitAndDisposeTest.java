@@ -368,7 +368,7 @@ public class UiSessionInitAndDisposeTest {
         Arrays.asList(
             "UiSession.init",
             "UiSession.getOrCreateClientSession"
-        // "Desktop.execGuiAttached" -> this is not called because there is already uiSessionA attached to the clientSession
+            // "Desktop.execGuiAttached" -> this is not called because there is already uiSessionA attached to the clientSession
         ),
         m_protocol);
     m_protocol.clear();
@@ -473,7 +473,7 @@ public class UiSessionInitAndDisposeTest {
         Arrays.asList(
             "UiSession.init",
             "UiSession.getOrCreateClientSession"
-        // "Desktop.execGuiAttached" -> this is not called because there is already uiSessionA attached to the clientSession
+            // "Desktop.execGuiAttached" -> this is not called because there is already uiSessionA attached to the clientSession
         ),
         m_protocol);
     m_protocol.clear();
@@ -501,7 +501,7 @@ public class UiSessionInitAndDisposeTest {
     assertEquals(
         Arrays.asList(
             "UiSession.dispose"
-        //"Desktop.execGuiDetached" // -> this is not called because there is still uiSessionB attached to the clientSession
+            //"Desktop.execGuiDetached" // -> this is not called because there is still uiSessionB attached to the clientSession
         ),
         m_protocol);
     m_protocol.clear();

@@ -33,11 +33,11 @@ public class HttpSessionHelper {
    * will be created.
    *
    * @return The {@link ISessionStore}. If there is no {@link ISessionStore} registered for the given
-   *         {@link HttpSession} a new one will be created and registered. Never returns {@code null}.
+   * {@link HttpSession} a new one will be created and registered. Never returns {@code null}.
    * @throws AssertionException
-   *           if the given HTTP session is <code>null</code>.
+   *     if the given HTTP session is <code>null</code>.
    * @throws IllegalStateException
-   *           if the given HTTP session is invalid.
+   *     if the given HTTP session is invalid.
    */
   @SuppressWarnings("findbugs:J2EE_STORE_OF_NON_SERIALIZABLE_OBJECT_INTO_SESSION")
   public ISessionStore getSessionStore(HttpSession httpSession) {
@@ -64,9 +64,9 @@ public class HttpSessionHelper {
    * Gets the {@link ISessionStore} associated with the given {@link HttpSession}.
    *
    * @param httpSession
-   *          The {@link HttpSession} for which the store should be returned.
+   *     The {@link HttpSession} for which the store should be returned.
    * @return The {@link ISessionStore} for the given {@link HttpSession} or {@code null} if there is no store associated
-   *         yet.
+   * yet.
    */
   protected ISessionStore getSessionStoreFromHttpSession(HttpSession httpSession) {
     return (ISessionStore) httpSession.getAttribute(SESSION_STORE_ATTRIBUTE_NAME);

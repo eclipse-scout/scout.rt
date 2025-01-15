@@ -34,7 +34,7 @@ public final class NumberUtility {
    * Converts a Number to a Double.
    *
    * @param n
-   *          Number to be converted.
+   *     Number to be converted.
    * @return The converted Double. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
   public static Double toDouble(Number n) {
@@ -57,12 +57,12 @@ public final class NumberUtility {
    * using floating point arithmetics.
    *
    * @param dividend
-   *          The dividend
+   *     The dividend
    * @param divisor
-   *          The divisor. Must not be zero!
+   *     The divisor. Must not be zero!
    * @return {@code (int)ceil(dividend / divisor)}
    * @throws ArithmeticException
-   *           if divisor is zero.
+   *     if divisor is zero.
    */
   public static int divideAndCeil(int dividend, int divisor) {
     return (dividend + divisor - 1) / divisor;
@@ -72,7 +72,7 @@ public final class NumberUtility {
    * Converts a Number to an Integer.
    *
    * @param n
-   *          Number to be converted.
+   *     Number to be converted.
    * @return The converted Integer. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
   public static Integer toInteger(Number n) {
@@ -86,7 +86,7 @@ public final class NumberUtility {
    * Converts a Number to a Long.
    *
    * @param n
-   *          Number to be converted.
+   *     Number to be converted.
    * @return The converted Long. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
   public static Long toLong(Number n) {
@@ -122,7 +122,7 @@ public final class NumberUtility {
    * Converts a Double to a BigDecimal.
    *
    * @param d
-   *          Double to be converted.
+   *     Double to be converted.
    * @return The converted BigDecimal. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
   public static BigDecimal toBigDecimal(Double d) {
@@ -136,7 +136,7 @@ public final class NumberUtility {
    * Converts a Long to a BigInteger.
    *
    * @param l
-   *          Long to be converted.
+   *     Long to be converted.
    * @return The converted BigInteger. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
   public static BigInteger toBigInteger(Long l) {
@@ -150,7 +150,7 @@ public final class NumberUtility {
    * Computes the median of a vararg of doubles.
    *
    * @param a
-   *          vararg of doubles.
+   *     vararg of doubles.
    * @return The median. Returns 0 if the parameter is null or an empty array.
    */
   public static double median(double... a) {
@@ -221,7 +221,7 @@ public final class NumberUtility {
    * Computes the minimum value of a vararg of doubles.
    *
    * @param a
-   *          vararg of doubles.
+   *     vararg of doubles.
    * @return The minimum. Returns 0 if the parameter is null or the length of the vararg is 0.
    */
   public static double min(double... a) {
@@ -242,7 +242,7 @@ public final class NumberUtility {
    * Computes the maximum value of a vararg of doubles.
    *
    * @param a
-   *          vararg of doubles.
+   *     vararg of doubles.
    * @return The maximum. Returns 0 if the parameter is null or the length of the vararg is 0.
    */
   public static double max(double... a) {
@@ -261,7 +261,7 @@ public final class NumberUtility {
 
   /**
    * @return an insecure random long using <code>{@link Random#nextLong()}</code><br>
-   *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
+   * For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static long randomLong() {
     return INSECURE_RANDOM.nextLong();
@@ -269,7 +269,7 @@ public final class NumberUtility {
 
   /**
    * @return an insecure random integer using <code>{@link Random#nextInt()}</code><br>
-   *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
+   * For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static int randomInt() {
     return INSECURE_RANDOM.nextInt();
@@ -277,7 +277,7 @@ public final class NumberUtility {
 
   /**
    * @return an insecure random integer using <code>{@link Random#nextInt(int)}</code><br>
-   *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
+   * For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static int randomInt(int size) {
     return INSECURE_RANDOM.nextInt(size);
@@ -285,7 +285,7 @@ public final class NumberUtility {
 
   /**
    * @return an insecure random double using <code>{@link Random#nextDouble()}</code><br>
-   *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
+   * For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static double randomDouble() {
     return INSECURE_RANDOM.nextDouble();
@@ -401,11 +401,11 @@ public final class NumberUtility {
    * </ul>
    *
    * @param d1
-   *          The first double value
+   *     The first double value
    * @param d2
-   *          The second double value
+   *     The second double value
    * @param epsilon
-   *          The difference between the two to be considered equal.
+   *     The difference between the two to be considered equal.
    * @return {@code false} if the difference between the two values is less or equal to the given epsilon.
    */
   public static boolean isDoubleDifferent(double d1, double d2, double epsilon) {
@@ -470,8 +470,8 @@ public final class NumberUtility {
    * Converts a Long to an int with special attention to overflow issues.
    *
    * @return The converted int. If the Long is larger than Integer.MAX_VALUE, it returns Integer.MAX_VALUE. If the Long
-   *         is smaller than Integer.MIN_VALUE, it returns Integer.MIN_VALUE. If the parameter is <code>null</code>, it
-   *         returns 0.
+   * is smaller than Integer.MIN_VALUE, it returns Integer.MIN_VALUE. If the parameter is <code>null</code>, it
+   * returns 0.
    */
   public static int longToInt(Long l) {
     if (l != null) {
@@ -490,7 +490,7 @@ public final class NumberUtility {
    * Converts an object to a BigDecimal using the string representation of the object.
    *
    * @return The converted BigDecimal. Returns <code>null</code> if the object is <code>null</code> or the string
-   *         representation of the object is a zero length string.
+   * representation of the object is a zero length string.
    */
   public static BigDecimal getBigDecimalValue(Object o) {
     if (o != null && !o.toString().isEmpty()) {
@@ -505,11 +505,11 @@ public final class NumberUtility {
    * Returns <code>true</code> if, and only if the given String is a valid number according to the given separators
    *
    * @param str
-   *          {@link String}
+   *     {@link String}
    * @param decimalSeparator
-   *          {@link String}
+   *     {@link String}
    * @param thousandsSeparator
-   *          {@link String}
+   *     {@link String}
    * @return {@code true} if, and only if the given String is a valid number according to the given separators
    */
   public static boolean isValidDouble(String str, String decimalSeparator, String thousandsSeparator) {

@@ -145,5 +145,4 @@ public class OutlineMediator {
       pageWithNodes.getTree().getUIFacade().fireNodeDropActionFromUI(node, e.getDropObject());
     }
   }
-
 }

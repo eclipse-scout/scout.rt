@@ -112,7 +112,7 @@ public class RestClientProxyFactory {
 
   /**
    * @return {@code true} if the given method is not completely supported by this proxy factory. Otherwise
-   *         {@code false}.
+   * {@code false}.
    */
   protected boolean isDiscouraged(Method method) {
     return m_invocationCallbackMethods.get().contains(method);

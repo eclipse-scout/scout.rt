@@ -9,10 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -88,7 +85,6 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
     DecimalFormat format = getFormat();
     assertNotSame("public getter should not return internal instance", getFormatInternal(), format);
     assertEquals("internal instance and copy returned by public getter should be equal", getFormatInternal(), format);
-
   }
 
   @Test
@@ -136,7 +132,6 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
 
     assertTrue("expected tracker to be notified, when value changed", formatTracker.m_notified);
     assertFalse("expected new setting in property change notification", ((DecimalFormat) formatTracker.m_cachedProperty).isGroupingUsed());
-
   }
 
   @Test
@@ -188,7 +183,6 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
     DecimalFormat newFormat = (DecimalFormat) ((DecimalFormat) formatTracker.m_cachedProperty).clone();
     newFormat.setGroupingUsed(true);
     assertEquals("expected no other difference in new format", oldFormat, newFormat);
-
   }
 
   @Test
@@ -210,7 +204,6 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
     DecimalFormat newFormat = (DecimalFormat) ((DecimalFormat) formatTracker.m_cachedProperty).clone();
     newFormat.setRoundingMode(RoundingMode.HALF_UP);
     assertEquals("expected no other difference in new format", oldFormat, newFormat);
-
   }
 
   @Test
@@ -252,7 +245,5 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
     @Order(10)
     public class TestNumberColumn extends AbstractBigDecimalColumn {
     }
-
   }
-
 }

@@ -23,9 +23,9 @@ public class RunMonitorCancellableProcessor implements ICallableDecorator {
 
   /**
    * @param parentRunMonitor
-   *          may be <code>null</code> if none available (in this case {@link #decorate()} does nothing)
+   *     may be <code>null</code> if none available (in this case {@link #decorate()} does nothing)
    * @param runMonitor
-   *          the run monitor to be registered with the parent, may never be <code>null</code>
+   *     the run monitor to be registered with the parent, may never be <code>null</code>
    */
   public RunMonitorCancellableProcessor(RunMonitor parentRunMonitor, RunMonitor runMonitor) {
     m_runMonitor = Assertions.assertNotNull(runMonitor);
@@ -59,5 +59,4 @@ public class RunMonitorCancellableProcessor implements ICallableDecorator {
       m_runMonitor.addCleanupRunMonitor(m_parentRunMonitor);
     };
   }
-
 }

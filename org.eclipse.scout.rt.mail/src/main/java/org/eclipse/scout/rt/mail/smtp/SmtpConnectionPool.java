@@ -160,12 +160,12 @@ public class SmtpConnectionPool {
    * This method provides means of sending the provided {@link MimeMessage} via a pooled smtp connection.
    *
    * @param smtpServerConfig
-   *          An {@link SmtpServerConfig} object containing all the necessary information to create a new connection or
-   *          find a matching one in the pool.
+   *     An {@link SmtpServerConfig} object containing all the necessary information to create a new connection or
+   *     find a matching one in the pool.
    * @param message
-   *          The {@link MimeMessage} to want to send.
+   *     The {@link MimeMessage} to want to send.
    * @param recipients
-   *          Provide a list of all the intended recipients of the message (to, cc and bcc).
+   *     Provide a list of all the intended recipients of the message (to, cc and bcc).
    */
   public void sendMessage(SmtpServerConfig smtpServerConfig, MimeMessage message, Address[] recipients) throws MessagingException {
     SmtpConnectionPoolEntry poolEntry = leaseConnection(smtpServerConfig);
@@ -200,8 +200,8 @@ public class SmtpConnectionPool {
    * {@link #releaseConnection(SmtpConnectionPoolEntry)} in order to return the connection to the pool.
    *
    * @param smtpServerConfig
-   *          An {@link SmtpServerConfig} object containing all the necessary information to create a new connection or
-   *          find a matching one in the pool.
+   *     An {@link SmtpServerConfig} object containing all the necessary information to create a new connection or
+   *     find a matching one in the pool.
    */
   protected SmtpConnectionPoolEntry leaseConnection(SmtpServerConfig smtpServerConfig) {
     assertGreater(smtpServerConfig.getPoolSize(), 0, "Pool size of provided SmtpServerConfig must be greater 0.");
@@ -414,9 +414,9 @@ public class SmtpConnectionPool {
    * sending might work with a fresh connection.
    *
    * @param oldEntry
-   *          The {@link SmtpConnectionPoolEntry} you wish to exchange for a new one.
+   *     The {@link SmtpConnectionPoolEntry} you wish to exchange for a new one.
    * @return Returns the just created {@link SmtpConnectionPoolEntry} using the same {@link SmtpServerConfig} as the
-   *         provided entry.
+   * provided entry.
    */
   protected SmtpConnectionPoolEntry exchangeConnection(SmtpConnectionPoolEntry oldEntry) throws MessagingException {
     SmtpServerConfig smtpServerConfig = oldEntry.getSmtpServerConfig();
@@ -457,13 +457,13 @@ public class SmtpConnectionPool {
     // 1. MessagingException with a next SocketException as next exception
     // 2. SMTPSendFailedException with "[EOF]" as message
     return e != null && (e.getNextException() instanceof SocketException ||
-        (e instanceof SMTPSendFailedException && "[EOF]".equals(e.getMessage())));
+                             (e instanceof SMTPSendFailedException && "[EOF]".equals(e.getMessage())));
   }
 
   protected void closeIdleConnections() {
     runWithPoolLock(() -> {
       try {
-        for (Iterator<SmtpConnectionPoolEntry> it = m_idleEntries.iterator(); it.hasNext();) {
+        for (Iterator<SmtpConnectionPoolEntry> it = m_idleEntries.iterator(); it.hasNext(); ) {
           SmtpConnectionPoolEntry idleEntry = it.next();
           IDateProvider dateProvider = BEANS.get(IDateProvider.class);
           if (dateProvider.currentMillis().getTime() - idleEntry.getIdleSince() >= m_maxIdleTime ||

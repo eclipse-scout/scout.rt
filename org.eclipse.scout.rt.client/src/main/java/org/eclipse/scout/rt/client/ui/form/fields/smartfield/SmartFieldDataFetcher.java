@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.services.lookup.IQueryParam;
-import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
 import org.eclipse.scout.rt.client.services.lookup.IQueryParam.QueryBy;
+import org.eclipse.scout.rt.client.services.lookup.LookupCallResult;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 

@@ -28,13 +28,13 @@ public final class NlsUtility {
 
   /**
    * @param text
-   *          nls text key
+   *     nls text key
    * @param messageArguments
-   *          the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
-   *          with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
-   *          with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
-   *          getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
-   *          nicht gefunden werden
+   *     the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
+   *     with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
+   *     with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
+   *     getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
+   *     nicht gefunden werden
    */
   public static String bindText(String text, String... messageArguments) {
     if (text == null) {
@@ -72,11 +72,11 @@ public final class NlsUtility {
    * given. It is assumed that the given text uses the {@link NlsLocale}.
    *
    * @param textKey
-   *          The text key of the text to post-process. May be {@code null}.
+   *     The text key of the text to post-process. May be {@code null}.
    * @param text
-   *          The text to post-process. May be {@code null}.
+   *     The text to post-process. May be {@code null}.
    * @param messageArguments
-   *          Values of possible placeholders, as used in {@link #bindText}.
+   *     Values of possible placeholders, as used in {@link #bindText}.
    * @return The text with all post-processing applied.
    * @see #postProcessText(Locale, String, String, Collection, String...)
    */
@@ -89,11 +89,11 @@ public final class NlsUtility {
    * given.
    *
    * @param textLocale
-   *          The locale of the text given. May be {@code null}.
+   *     The locale of the text given. May be {@code null}.
    * @param textKey
-   *          The text key of the text to post-process. May be {@code null}.
+   *     The text key of the text to post-process. May be {@code null}.
    * @param text
-   *          The text to post-process. May be {@code null}.
+   *     The text to post-process. May be {@code null}.
    * @return The text with all post-processing applied.
    * @see #postProcessText(Locale, String, String, Collection, String...)
    */
@@ -106,13 +106,13 @@ public final class NlsUtility {
    * uses the {@link NlsLocale}.
    *
    * @param textKey
-   *          The text key of the text to post-process. May be {@code null}.
+   *     The text key of the text to post-process. May be {@code null}.
    * @param text
-   *          The text to post-process. May be {@code null}.
+   *     The text to post-process. May be {@code null}.
    * @param postProcessors
-   *          The post processors to execute. May be {@code null}.
+   *     The post processors to execute. May be {@code null}.
    * @param messageArguments
-   *          Values of possible placeholders, as used in {@link #bindText}.
+   *     Values of possible placeholders, as used in {@link #bindText}.
    * @return The text with all post-processing applied.
    * @see #postProcessText(Locale, String, String, Collection, String...)
    */
@@ -124,15 +124,15 @@ public final class NlsUtility {
    * Applies the {@link ITextPostProcessor text post processors} given to the text given.
    *
    * @param textLocale
-   *          The locale of the text given. May be {@code null}.
+   *     The locale of the text given. May be {@code null}.
    * @param textKey
-   *          The text key of the text to post-process. May be {@code null}.
+   *     The text key of the text to post-process. May be {@code null}.
    * @param text
-   *          The text to post-process. May be {@code null}.
+   *     The text to post-process. May be {@code null}.
    * @param postProcessors
-   *          The post processors to execute. May be {@code null}.
+   *     The post processors to execute. May be {@code null}.
    * @param messageArguments
-   *          Values of possible placeholders, as used in {@link #bindText}.
+   *     Values of possible placeholders, as used in {@link #bindText}.
    * @return The text with all post-processing applied.
    */
   public static String postProcessText(Locale textLocale, @NlsKey String textKey, String text, Collection<? extends ITextPostProcessor> postProcessors, String... messageArguments) {

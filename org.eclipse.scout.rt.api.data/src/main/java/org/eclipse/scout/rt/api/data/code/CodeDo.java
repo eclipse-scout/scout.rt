@@ -95,7 +95,7 @@ public class CodeDo extends DoEntity {
 
   /**
    * @return The texts as {@link Map}. Key is the {@link Locale#toLanguageTag() languageTag}, value the text for this
-   *         language.
+   * language.
    */
   public DoValue<Map<String, String>> texts() {
     return doValue("texts");

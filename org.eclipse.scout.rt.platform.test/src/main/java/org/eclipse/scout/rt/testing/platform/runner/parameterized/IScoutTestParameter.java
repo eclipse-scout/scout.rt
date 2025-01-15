@@ -17,6 +17,8 @@ package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 @FunctionalInterface
 public interface IScoutTestParameter {
 
-  /** Get the name of the parameter. It is used in the test result. */
+  /**
+   * Get the name of the parameter. It is used in the test result.
+   */
   String getName();
 }

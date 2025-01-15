@@ -10,10 +10,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 import static org.eclipse.scout.rt.platform.util.NumberUtility.divideAndCeil;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

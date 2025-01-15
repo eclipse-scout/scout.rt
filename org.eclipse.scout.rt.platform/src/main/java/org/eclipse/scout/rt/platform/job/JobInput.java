@@ -66,9 +66,9 @@ public class JobInput {
    * the respective argument.
    *
    * @param name
-   *          the name with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the name with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
-   *          optional arguments to substitute <em>formatting anchors</em> in the name.
+   *     optional arguments to substitute <em>formatting anchors</em> in the name.
    */
   public JobInput withName(final String name, final Object... args) {
     m_name = MessageFormatter.arrayFormat(name, args).getMessage();
@@ -161,9 +161,9 @@ public class JobInput {
    * is evaluated just before starting execution.
    *
    * @param time
-   *          the maximal expiration time until the job must commence execution.
+   *     the maximal expiration time until the job must commence execution.
    * @param timeUnit
-   *          the time unit of the <code>time</code> argument.
+   *     the time unit of the <code>time</code> argument.
    */
   public JobInput withExpirationTime(final long time, final TimeUnit timeUnit) {
     m_expirationTime = timeUnit.toMillis(time);
@@ -207,11 +207,11 @@ public class JobInput {
    * execution upon an uncaught exception. If set to <code>false</code>, the execution would exit.
    *
    * @param exceptionHandler
-   *          optional handler to handle an uncaught exception, or <code>null</code> to not handle the exception. By
-   *          default, {@link ExceptionHandler} bean is used.
+   *     optional handler to handle an uncaught exception, or <code>null</code> to not handle the exception. By
+   *     default, {@link ExceptionHandler} bean is used.
    * @param swallowException
-   *          <code>true</code> to swallow an uncaught exception, meaning that the exception is not propagated to the
-   *          submitter. By default, exceptions are not swallowed and propagated to the submitter.
+   *     <code>true</code> to swallow an uncaught exception, meaning that the exception is not propagated to the
+   *     submitter. By default, exceptions are not swallowed and propagated to the submitter.
    */
   public JobInput withExceptionHandling(final ExceptionHandler exceptionHandler, final boolean swallowException) {
     m_exceptionHandler = exceptionHandler;
@@ -253,9 +253,9 @@ public class JobInput {
    * sets the hint only if the condition is <code>true</code>, and is used to ease fluent usage of {@link JobInput}.
    *
    * @param hint
-   *          the execution hint to be set.
+   *     the execution hint to be set.
    * @param setExecutionHint
-   *          <code>true</code> to set the execution hint, or <code>false</code> otherwise.
+   *     <code>true</code> to set the execution hint, or <code>false</code> otherwise.
    * @see #withExecutionHint(String)
    */
   public JobInput withExecutionHint(final String hint, final boolean setExecutionHint) {

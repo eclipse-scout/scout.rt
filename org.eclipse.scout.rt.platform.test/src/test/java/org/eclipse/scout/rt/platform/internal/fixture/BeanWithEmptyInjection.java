@@ -21,5 +21,4 @@ public class BeanWithEmptyInjection {
   @InjectBean
   public BeanWithEmptyInjection() {
   }
-
 }

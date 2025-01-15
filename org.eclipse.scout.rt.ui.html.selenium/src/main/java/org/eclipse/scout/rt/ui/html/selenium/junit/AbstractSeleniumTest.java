@@ -487,7 +487,7 @@ public abstract class AbstractSeleniumTest {
 
   /**
    * @return the OS dependent "control key" for use in key combinations like <code>Ctrl-C</code> ({@link Keys#COMMAND}
-   *         on Mac OS X, {@link Keys#CONTROL} on all other systems).
+   * on Mac OS X, {@link Keys#CONTROL} on all other systems).
    */
   public Keys getOsDependentCtrlKey() {
     // MacOS uses command key instead of ctrl
@@ -595,8 +595,8 @@ public abstract class AbstractSeleniumTest {
    * SmartFields it makes a difference.
    *
    * @param withPause
-   *          whether a short pause should be made after the field has been cleared, this may be necessary for some
-   *          SmartFields
+   *     whether a short pause should be made after the field has been cleared, this may be necessary for some
+   *     SmartFields
    */
   public void clearInput(WebElement input, boolean withPause) {
     selectAll(input);
@@ -610,9 +610,9 @@ public abstract class AbstractSeleniumTest {
    * Fails when the given element does not contain all the given CSS classes.
    *
    * @param expectedCssClass
-   *          A single CSS class-name or multiple CSS class-names separated by space. Example: <code>'menu-item'</code>
-   *          or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
-   *          all of these classes, otherwise the assertion will fail.
+   *     A single CSS class-name or multiple CSS class-names separated by space. Example: <code>'menu-item'</code>
+   *     or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
+   *     all of these classes, otherwise the assertion will fail.
    */
   public void assertCssClass(WebElement element, String expectedCssClass) {
     waitUntil(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass));

@@ -39,7 +39,7 @@ public interface IHtmlElement extends IHtmlContent {
    * Add an application local link.
    *
    * @param ref
-   *          Reference to identify what the link is referring to
+   *     Reference to identify what the link is referring to
    */
   IHtmlElement appLink(CharSequence ref);
 
@@ -47,9 +47,9 @@ public interface IHtmlElement extends IHtmlContent {
    * Add an application local link.
    *
    * @param ref
-   *          Reference to identify what the link is referring to
+   *     Reference to identify what the link is referring to
    * @param cssClass
-   *          CSS class to add to the generated link element
+   *     CSS class to add to the generated link element
    */
   IHtmlElement appLink(CharSequence ref, CharSequence cssClass);
 
@@ -57,9 +57,9 @@ public interface IHtmlElement extends IHtmlContent {
    * Add a HTML attribute to the element.
    *
    * @param name
-   *          of the attribute
+   *     of the attribute
    * @param value
-   *          of the attribute
+   *     of the attribute
    */
   IHtmlElement addAttribute(String name, CharSequence value);
 
@@ -67,10 +67,9 @@ public interface IHtmlElement extends IHtmlContent {
    * Add a boolean HTML attribute to the element.
    *
    * @param name
-   *          of the attribute
+   *     of the attribute
    * @see <a href="https://www.w3.org/TR/html5/infrastructure.html#boolean-attributes">HTML 5 spec - Boolean
-   *      attributes<a/>
+   * attributes<a/>
    */
   IHtmlElement addBooleanAttribute(String name);
-
 }

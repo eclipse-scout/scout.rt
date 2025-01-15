@@ -46,6 +46,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
   /*
    * Configuration
    */
+
   /**
    * Configures the minimum number of fraction digits used to display the value. To use an exact number of fraction
    * digits, the same number as for {@link #getConfiguredMaxFractionDigits()} must be returned.

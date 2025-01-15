@@ -122,5 +122,4 @@ public class JsonTagField extends JsonValueField<ITagField> {
   protected void setValueFromUI(Object value) {
     getModel().getUIFacade().setValueFromUI((Set<String>) value);
   }
-
 }

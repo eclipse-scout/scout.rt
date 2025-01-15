@@ -46,7 +46,6 @@ public abstract class AbstractDataModelOp implements IDataModelAttributeOp, Data
   public static String buildText(Integer aggregationType, String attributeText, String opText) {
     List<String> valueTexts = CollectionUtility.emptyArrayList();
     return buildText(aggregationType, attributeText, opText, valueTexts);
-
   }
 
   public static String buildText(Integer aggregationType, String attributeText, String opText, String valueTexts) {

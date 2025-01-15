@@ -48,7 +48,7 @@ public class MailMessage {
    * Adds the recipient to the TO list.
    *
    * @param toRecipient
-   *          TO recipient to add
+   *     TO recipient to add
    */
   public MailMessage addToRecipient(MailParticipant toRecipient) {
     m_toRecipients.add(toRecipient);
@@ -59,7 +59,7 @@ public class MailMessage {
    * Adds the recipients to the TO list.
    *
    * @param toRecipients
-   *          TO recipients to add
+   *     TO recipients to add
    */
   public MailMessage addToRecipients(Collection<MailParticipant> toRecipients) {
     if (toRecipients != null) {
@@ -87,7 +87,7 @@ public class MailMessage {
    * Adds the recipient to the CC list.
    *
    * @param ccRecipient
-   *          CC recipient to add
+   *     CC recipient to add
    */
   public MailMessage addCcRecipient(MailParticipant ccRecipient) {
     m_ccRecipients.add(ccRecipient);
@@ -98,7 +98,7 @@ public class MailMessage {
    * Adds the recipients to the CC list.
    *
    * @param ccRecipients
-   *          CC recipients to add
+   *     CC recipients to add
    */
   public MailMessage addCcRecipients(Collection<MailParticipant> ccRecipients) {
     if (ccRecipients != null) {
@@ -126,7 +126,7 @@ public class MailMessage {
    * Adds the recipient to the BCC list.
    *
    * @param bccRecipient
-   *          BCC recipient to add
+   *     BCC recipient to add
    */
   public MailMessage addBccRecipient(MailParticipant bccRecipient) {
     m_bccRecipients.add(bccRecipient);
@@ -137,7 +137,7 @@ public class MailMessage {
    * Adds the recipients to the BCC list.
    *
    * @param bccRecipients
-   *          BCC recipients to add
+   *     BCC recipients to add
    */
   public MailMessage addBccRecipients(Collection<MailParticipant> bccRecipients) {
     if (bccRecipients != null) {
@@ -165,7 +165,7 @@ public class MailMessage {
    * Set sender.
    *
    * @param sender
-   *          Sender
+   *     Sender
    */
   public MailMessage withSender(MailParticipant sender) {
     m_sender = sender;
@@ -183,7 +183,7 @@ public class MailMessage {
    * Adds the recipient to the reply TO list.
    *
    * @param replyTo
-   *          TO recipient to add
+   *     TO recipient to add
    */
   public MailMessage addReplyTo(MailParticipant replyTo) {
     m_replyTos.add(replyTo);
@@ -194,7 +194,7 @@ public class MailMessage {
    * Adds the recipients to the reply TO list.
    *
    * @param replyTos
-   *          reply TO recipients to add
+   *     reply TO recipients to add
    */
   public MailMessage addReplyTos(Collection<MailParticipant> replyTos) {
     if (replyTos != null) {

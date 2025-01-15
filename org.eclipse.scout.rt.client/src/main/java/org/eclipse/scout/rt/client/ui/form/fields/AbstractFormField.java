@@ -243,7 +243,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * @return One of the <code>LABEL_HORIZONTAL_*</code> constants. Default is
-   *         {@link #LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
+   * {@link #LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
    */
   @Order(18)
   @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
@@ -706,8 +706,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * @return <code>false</code> if this field can get the initial focus when the form is opened (default). Set to
-   *         <code>true</code> to prevent this field from getting the initial focus. In both cases, the field will still
-   *         be manually focusable by the user.
+   * <code>true</code> to prevent this field from getting the initial focus. In both cases, the field will still
+   * be manually focusable by the user.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(195)
@@ -999,10 +999,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * In this scenario this method would return field A and D.
    *
    * @param limitToSameFieldTree
-   *          Specifies if only the same-field-tree should be considered. A same-field-tree is a tree that only consists
-   *          of {@link IFormField}s and {@link IForm}s. So if this parameter is {@code true}, {@link IFormField}s in
-   *          e.g. menus are not returned because they don't belong to the same-field-tree according to the
-   *          specification above.
+   *     Specifies if only the same-field-tree should be considered. A same-field-tree is a tree that only consists
+   *     of {@link IFormField}s and {@link IForm}s. So if this parameter is {@code true}, {@link IFormField}s in
+   *     e.g. menus are not returned because they don't belong to the same-field-tree according to the
+   *     specification above.
    * @return A {@link List} with the child {@link IFormField}s. Is never {@code null}.
    */
   protected List<IFormField> getFirstChildFormFields(boolean limitToSameFieldTree) {
@@ -2098,7 +2098,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -2174,7 +2174,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     public boolean isFound() {
       return m_found;
     }
-
   }
 
   /**
@@ -2265,7 +2264,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     public boolean execIsSaveNeeded(FormFieldIsSaveNeededChain chain) {
       return getOwner().execIsSaveNeeded();
     }
-
   }
 
   protected final void interceptDataChanged(Object... dataTypes) {

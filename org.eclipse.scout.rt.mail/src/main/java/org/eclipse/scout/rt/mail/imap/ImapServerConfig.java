@@ -42,7 +42,7 @@ public class ImapServerConfig {
 
   /**
    * @param host
-   *          SMTP server host name.
+   *     SMTP server host name.
    */
   public ImapServerConfig withHost(String host) {
     m_host = host;
@@ -55,7 +55,7 @@ public class ImapServerConfig {
 
   /**
    * @param port
-   *          The port to connect to the server.
+   *     The port to connect to the server.
    */
   public ImapServerConfig withPort(Integer port) {
     m_port = port;
@@ -68,7 +68,7 @@ public class ImapServerConfig {
 
   /**
    * @param username
-   *          SMTP server username.
+   *     SMTP server username.
    */
   public ImapServerConfig withUsername(String username) {
     m_username = username;
@@ -81,7 +81,7 @@ public class ImapServerConfig {
 
   /**
    * @param password
-   *          SMTP server password.
+   *     SMTP server password.
    */
   public ImapServerConfig withPassword(String password) {
     m_password = password;
@@ -94,7 +94,7 @@ public class ImapServerConfig {
 
   /**
    * @param useSsl
-   *          Specifies if a secure connection should be used.
+   *     Specifies if a secure connection should be used.
    */
   public ImapServerConfig withUseSsl(boolean useSsl) {
     m_useSsl = useSsl;
@@ -107,9 +107,9 @@ public class ImapServerConfig {
 
   /**
    * @param sslProtocols
-   *          Specifies the SSL protocols that will be enabled for SSL connections. The property value is a whitespace
-   *          separated list of tokens acceptable to the {@link javax.net.ssl.SSLSocket#setEnabledProtocols(String[])}
-   *          method.
+   *     Specifies the SSL protocols that will be enabled for SSL connections. The property value is a whitespace
+   *     separated list of tokens acceptable to the {@link javax.net.ssl.SSLSocket#setEnabledProtocols(String[])}
+   *     method.
    */
   public ImapServerConfig withSslProtocols(String sslProtocols) {
     m_sslProtocols = sslProtocols;
@@ -126,7 +126,7 @@ public class ImapServerConfig {
    * Office365).
    *
    * @param customStoreProtocol
-   *          Protocol use in {@link Session#getStore(String)}. If none is provided, 'imap' is used.
+   *     Protocol use in {@link Session#getStore(String)}. If none is provided, 'imap' is used.
    */
   public ImapServerConfig withCustomStoreProtocol(String customStoreProtocol) {
     m_customStoreProtocol = customStoreProtocol;
@@ -151,7 +151,7 @@ public class ImapServerConfig {
    * or user.
    *
    * @param additionalSessionProperties
-   *          Additional properties used to create {@link Session} for IMAP server connection.
+   *     Additional properties used to create {@link Session} for IMAP server connection.
    */
   public ImapServerConfig withAdditionalSessionProperties(Map<String, String> additionalSessionProperties) {
     m_additionalSessionProperties = additionalSessionProperties;

@@ -180,5 +180,4 @@ public class AttributeNode extends AbstractComposerNode {
       getTree().removeNode(AttributeNode.this);
     }
   }
-
 }

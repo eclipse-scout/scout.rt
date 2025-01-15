@@ -23,5 +23,4 @@ public class JsonComboMenu<MENU extends IComboMenu> extends JsonMenu<MENU> {
   public String getObjectType() {
     return "ComboMenu";
   }
-
 }

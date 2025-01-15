@@ -51,11 +51,11 @@ public interface ICredentialVerifier {
    * Attempts to verify the given credentials.
    *
    * @param username
-   *          the user to verify
+   *     the user to verify
    * @param password
-   *          the password to verify
+   *     the password to verify
    * @return Result of the verification; one of {@link #AUTH_OK}, {@link #AUTH_FORBIDDEN},
-   *         {@link #AUTH_CREDENTIALS_REQUIRED}, {@link #AUTH_FAILED}
+   * {@link #AUTH_CREDENTIALS_REQUIRED}, {@link #AUTH_FAILED}
    * @throws IOException
    */
   int verify(String username, char[] password) throws IOException;

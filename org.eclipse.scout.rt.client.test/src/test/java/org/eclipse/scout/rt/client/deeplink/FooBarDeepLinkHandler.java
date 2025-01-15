@@ -37,5 +37,4 @@ public class FooBarDeepLinkHandler extends AbstractDeepLinkHandler {
   public String getLastMatch() {
     return m_lastMatch;
   }
-
 }

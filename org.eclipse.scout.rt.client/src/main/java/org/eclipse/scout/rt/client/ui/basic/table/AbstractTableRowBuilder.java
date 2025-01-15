@@ -160,5 +160,4 @@ public abstract class AbstractTableRowBuilder<T> {
   }
 
   protected abstract ITableRow createEmptyTableRow();
-
 }

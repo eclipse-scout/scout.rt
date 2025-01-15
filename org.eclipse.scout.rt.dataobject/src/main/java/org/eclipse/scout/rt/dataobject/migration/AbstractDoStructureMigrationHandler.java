@@ -49,9 +49,9 @@ public abstract class AbstractDoStructureMigrationHandler implements IDoStructur
    * If special type version update handling is required, override {@link #updateTypeVersion(IDoEntity)}
    *
    * @param ctx
-   *          Context
+   *     Context
    * @param doEntity
-   *          Do entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
+   *     Do entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
    * @return <code>true</code> if data object was changed in any way, <code>false</code> otherwise.
    */
   protected abstract boolean migrate(DataObjectMigrationContext ctx, IDoEntity doEntity);
@@ -60,7 +60,7 @@ public abstract class AbstractDoStructureMigrationHandler implements IDoStructur
    * Updates the type version of the data object to {@link #toTypeVersion()}.
    *
    * @return <code>true</code> if the new type version was set, <code>false</code> if the type version was already
-   *         up-to-date (equal).
+   * up-to-date (equal).
    */
   protected boolean updateTypeVersion(IDoEntity doEntity) {
     return BEANS.get(DoStructureMigrationHelper.class).updateTypeVersion(doEntity, toTypeVersion());

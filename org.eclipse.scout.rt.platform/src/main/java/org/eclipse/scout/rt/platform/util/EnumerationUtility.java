@@ -74,7 +74,7 @@ public final class EnumerationUtility {
    * Otherwise the resulting {@link Stream} only processes the remaining elements of the {@link Enumeration}.
    *
    * @param e
-   *          The {@link Enumeration} to convert. Must not be {@code null}.
+   *     The {@link Enumeration} to convert. Must not be {@code null}.
    * @return A non-parallel, ordered {@link Stream} backed by the {@link Enumeration} given.
    */
   public static <T> Stream<T> asStream(Enumeration<T> e) {

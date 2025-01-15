@@ -29,5 +29,4 @@ public abstract class AbstractOutlineTileField extends AbstractFormField impleme
   public void setOutline(IOutline outline) {
     setProperty(PROP_OUTLINE, outline);
   }
-
 }

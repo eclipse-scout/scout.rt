@@ -31,5 +31,4 @@ public interface ICompositeFieldGrid<T extends ICompositeField> {
    * @return the row count of the calculated grid
    */
   int getGridRowCount();
-
 }

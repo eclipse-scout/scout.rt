@@ -31,7 +31,7 @@ public class FlexboxLayoutData {
    * </pre>
    *
    * @param relative
-   *          true for relative size false for absolute (pixel) size
+   *     true for relative size false for absolute (pixel) size
    * @return this fluent api
    */
   public FlexboxLayoutData withRelative(boolean relative) {
@@ -51,7 +51,7 @@ public class FlexboxLayoutData {
    * distributed to all parts considering their grow values.
    *
    * @param grow
-   *          0 for not growing, > 0 for growing in relative to other parts grow values.
+   *     0 for not growing, > 0 for growing in relative to other parts grow values.
    * @return this fluent api
    */
   public FlexboxLayoutData withGrow(double grow) {
@@ -71,7 +71,7 @@ public class FlexboxLayoutData {
    * relation it should shrink in relative to other parts.
    *
    * @param shrink
-   *          0 for not shrinking, > 0 for shrinking in relative to other parts shrink values.
+   *     0 for not shrinking, > 0 for shrinking in relative to other parts shrink values.
    * @return this fluent api
    */
   public FlexboxLayoutData withShrink(double shrink) {
@@ -91,10 +91,10 @@ public class FlexboxLayoutData {
    * size in relation to relative sibling parts. If the part is not relative the initial value is a absolute pixel
    * value.
    *
-   * @see FlexboxLayoutData#withRelative(boolean)
    * @param initial
-   *          the initial size for the part.
+   *     the initial size for the part.
    * @return
+   * @see FlexboxLayoutData#withRelative(boolean)
    */
   public FlexboxLayoutData withInitial(double initial) {
     m_initial = initial;

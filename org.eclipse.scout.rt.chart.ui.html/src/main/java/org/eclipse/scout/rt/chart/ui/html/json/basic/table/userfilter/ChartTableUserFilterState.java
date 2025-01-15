@@ -93,5 +93,4 @@ public class ChartTableUserFilterState extends AbstractUserFilterState implement
       setColumnY(col);
     }
   }
-
 }

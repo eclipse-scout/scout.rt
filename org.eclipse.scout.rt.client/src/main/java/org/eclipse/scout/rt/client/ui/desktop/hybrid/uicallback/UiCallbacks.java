@@ -89,12 +89,12 @@ public class UiCallbacks extends AbstractPropertyObserver {
    * Calls the UI handler with given ObjectType.
    *
    * @param owner
-   *          The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
-   *          UI callback. E.g. if the callback should be performed as long as the user is logged in, use
-   *          {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
-   *          {@link IWidget} is disposed.
+   *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
+   *     UI callback. E.g. if the callback should be performed as long as the user is logged in, use
+   *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
+   *     {@link IWidget} is disposed.
    * @param jsHandlerObjectType
-   *          The ObjectType of the handler in the browser to answer the callback.
+   *     The ObjectType of the handler in the browser to answer the callback.
    * @return The {@link IDoEntity} as returned by the UI handler on the browser.
    */
   public <R extends IDoEntity> Future<R> send(IWidget owner, String jsHandlerObjectType) {
@@ -105,14 +105,14 @@ public class UiCallbacks extends AbstractPropertyObserver {
    * Calls the UI handler with given ObjectType and input data.
    *
    * @param owner
-   *          The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
-   *          UI callback. E.g. if the callback should be performed as long as the user is logged in, use
-   *          {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
-   *          {@link IWidget} is disposed.
+   *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
+   *     UI callback. E.g. if the callback should be performed as long as the user is logged in, use
+   *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
+   *     {@link IWidget} is disposed.
    * @param jsHandlerObjectType
-   *          The ObjectType of the handler in the browser to answer the callback.
+   *     The ObjectType of the handler in the browser to answer the callback.
    * @param dataToSendToUi
-   *          An optional {@link IDoEntity} to send to the UI handler on the browser.
+   *     An optional {@link IDoEntity} to send to the UI handler on the browser.
    * @return The {@link IDoEntity} as returned by the UI handler on the browser.
    */
   public <R extends IDoEntity> Future<R> send(IWidget owner, String jsHandlerObjectType, IDoEntity dataToSendToUi) {
@@ -123,17 +123,17 @@ public class UiCallbacks extends AbstractPropertyObserver {
    * Calls the UI handler with given ObjectType and input data.
    *
    * @param owner
-   *          The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
-   *          UI callback. E.g. if the callback should be performed as long as the user is logged in, use
-   *          {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
-   *          {@link IWidget} is disposed.
+   *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
+   *     UI callback. E.g. if the callback should be performed as long as the user is logged in, use
+   *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
+   *     {@link IWidget} is disposed.
    * @param jsHandlerObjectType
-   *          The ObjectType of the handler in the browser to answer the callback.
+   *     The ObjectType of the handler in the browser to answer the callback.
    * @param dataToSendToUi
-   *          An optional {@link IDoEntity} to send to the UI handler on the browser.
+   *     An optional {@link IDoEntity} to send to the UI handler on the browser.
    * @param callbackId
-   *          An optional callbackId. All callbacks with the same ID are only sent once to the UI and on a response all
-   *          pending callbacks with this ID are resolved at once. By default, each callback has its own unique ID.
+   *     An optional callbackId. All callbacks with the same ID are only sent once to the UI and on a response all
+   *     pending callbacks with this ID are resolved at once. By default, each callback has its own unique ID.
    * @return The {@link IDoEntity} as returned by the UI handler on the browser.
    */
   public <R extends IDoEntity> Future<R> send(IWidget owner, String jsHandlerObjectType, IDoEntity dataToSendToUi, String callbackId) {
@@ -145,13 +145,13 @@ public class UiCallbacks extends AbstractPropertyObserver {
    * returns its result as processed by the given {@link IUiCallbackHandler}.
    *
    * @param owner
-   *          The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
-   *          UI callback. E.g. if the callback should be performed as long as the user is logged in, use
-   *          {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
-   *          {@link IWidget} is disposed.
+   *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
+   *     UI callback. E.g. if the callback should be performed as long as the user is logged in, use
+   *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
+   *     {@link IWidget} is disposed.
    * @param handler
-   *          An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
-   *          of the response.
+   *     An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
+   *     of the response.
    * @return The result as processed by the {@link IUiCallbackHandler}.
    */
   public <R> Future<R> send(IWidget owner, IUiCallbackHandler<?, R> handler) {
@@ -163,15 +163,15 @@ public class UiCallbacks extends AbstractPropertyObserver {
    * returns its result as processed by the given {@link IUiCallbackHandler}.
    *
    * @param owner
-   *          The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
-   *          UI callback. E.g. if the callback should be performed as long as the user is logged in, use
-   *          {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
-   *          {@link IWidget} is disposed.
+   *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
+   *     UI callback. E.g. if the callback should be performed as long as the user is logged in, use
+   *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
+   *     {@link IWidget} is disposed.
    * @param handler
-   *          An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
-   *          of the response.
+   *     An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
+   *     of the response.
    * @param dataToSendToUi
-   *          An optional {@link IDoEntity} to send to the UI handler on the browser.
+   *     An optional {@link IDoEntity} to send to the UI handler on the browser.
    * @return The result as processed by the {@link IUiCallbackHandler}.
    */
   public <R> Future<R> send(IWidget owner, IUiCallbackHandler<?, R> handler, IDoEntity dataToSendToUi) {
@@ -183,18 +183,18 @@ public class UiCallbacks extends AbstractPropertyObserver {
    * returns its result as processed by the given {@link IUiCallbackHandler}.
    *
    * @param owner
-   *          The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
-   *          UI callback. E.g. if the callback should be performed as long as the user is logged in, use
-   *          {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
-   *          {@link IWidget} is disposed.
+   *     The {@link IWidget} this request belongs to. Pass the {@link IWidget} that specifies the lifetime of this
+   *     UI callback. E.g. if the callback should be performed as long as the user is logged in, use
+   *     {@code IDesktop.CURRENT.get()}. The callback will automatically be cancelled as soon as this
+   *     {@link IWidget} is disposed.
    * @param handler
-   *          An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
-   *          of the response.
+   *     An {@link IUiCallbackHandler} implementation that specifies the UI handler ObjectType and the processing
+   *     of the response.
    * @param dataToSendToUi
-   *          An optional {@link IDoEntity} to send to the UI handler on the browser.
+   *     An optional {@link IDoEntity} to send to the UI handler on the browser.
    * @param callbackId
-   *          An optional callbackId. All callbacks with the same ID are only sent once to the UI and on a response all
-   *          pending callbacks with this ID are resolved at once. By default, each callback has its own unique ID.
+   *     An optional callbackId. All callbacks with the same ID are only sent once to the UI and on a response all
+   *     pending callbacks with this ID are resolved at once. By default, each callback has its own unique ID.
    * @return The result as processed by the {@link IUiCallbackHandler}.
    */
   public <R> Future<R> send(IWidget owner, IUiCallbackHandler<?, R> handler, IDoEntity dataToSendToUi, String callbackId) {
@@ -353,8 +353,8 @@ public class UiCallbacks extends AbstractPropertyObserver {
    * Cancels all callbacks with given ID.
    *
    * @param mayInterruptIfRunning
-   *          {@code true} if the thread executing this task should be interrupted. Otherwise, in-progress tasks are
-   *          allowed to complete.
+   *     {@code true} if the thread executing this task should be interrupted. Otherwise, in-progress tasks are
+   *     allowed to complete.
    */
   public void cancelUiCallbacks(String callbackId, boolean mayInterruptIfRunning) {
     getCallbacksInternal(callbackId).forEach(c -> c.cancel(mayInterruptIfRunning));
@@ -364,8 +364,8 @@ public class UiCallbacks extends AbstractPropertyObserver {
    * Cancels all callbacks.
    *
    * @param mayInterruptIfRunning
-   *          {@code true} if the thread executing this task should be interrupted. Otherwise, in-progress tasks are
-   *          allowed to complete.
+   *     {@code true} if the thread executing this task should be interrupted. Otherwise, in-progress tasks are
+   *     allowed to complete.
    */
   public void cancelAllUiCallbacks(boolean mayInterruptIfRunning) {
     getCallbacksInternal((Predicate<P_UiCallback<?>>) null).forEach(c -> cancelCallback(c, mayInterruptIfRunning));

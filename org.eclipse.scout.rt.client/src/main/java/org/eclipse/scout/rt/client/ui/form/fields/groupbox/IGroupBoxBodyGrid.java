@@ -19,10 +19,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmar
  * fields {@link IGroupBox#getGridDataHints()} the {@link IGroupBox#setGridDataInternal(GridData)} must be set.
  *
  * @author Andreas Hoegger
- * @since 4.0.0 M6 25.02.2014
+ * @author awe
  * @see VerticalSmartGroupBoxBodyGrid
  * @see HorizontalGroupBoxBodyGrid
- * @author awe
+ * @since 4.0.0 M6 25.02.2014
  */
 public interface IGroupBoxBodyGrid extends ICompositeFieldGrid<IGroupBox> {
 

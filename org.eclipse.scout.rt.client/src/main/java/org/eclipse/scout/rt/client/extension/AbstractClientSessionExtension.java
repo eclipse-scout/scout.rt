@@ -29,5 +29,4 @@ public abstract class AbstractClientSessionExtension<OWNER extends AbstractClien
   public void execLoadSession(ClientSessionLoadSessionChain chain) {
     chain.execLoadSession();
   }
-
 }

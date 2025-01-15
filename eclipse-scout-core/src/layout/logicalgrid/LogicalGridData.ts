@@ -11,6 +11,7 @@ import {CompositeField, FormField, FormFieldLabelPosition, graphics, GridData, L
 
 export interface LogicalGridWidget extends Widget {
   _setGridData(gridData: GridData);
+
   gridData: GridData;
   gridDataHints?: GridData;
   label?: string;

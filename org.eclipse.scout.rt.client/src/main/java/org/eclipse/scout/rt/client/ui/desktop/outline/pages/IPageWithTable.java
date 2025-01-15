@@ -35,8 +35,8 @@ public interface IPageWithTable<T extends ITable> extends IPage<T> {
 
   /**
    * @return search form that is used to filter table rows<br>
-   *         Note that the form will be started at latest after being added to the outline tree inside
-   *         {@link IPage#initPage()} resps in {@link IPage#execInitPage()}
+   * Note that the form will be started at latest after being added to the outline tree inside
+   * {@link IPage#initPage()} resps in {@link IPage#execInitPage()}
    */
   ISearchForm getSearchFormInternal();
 
@@ -69,5 +69,4 @@ public interface IPageWithTable<T extends ITable> extends IPage<T> {
    * @return A list (non-null) of empty space menus.
    */
   List<IMenu> computeTableEmptySpaceMenus();
-
 }

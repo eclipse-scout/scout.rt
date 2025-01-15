@@ -31,7 +31,7 @@ public final class CustomDataModelExtension {
    *
    * @param entityInstance
    * @param attributes
-   *          Attribute collection to inject attributes to
+   *     Attribute collection to inject attributes to
    */
   public static void injectAttributes(IDataModelEntity entityInstance, OrderedCollection<IDataModelAttribute> attributes) {
     if (!ENABLED) {
@@ -45,7 +45,7 @@ public final class CustomDataModelExtension {
    *
    * @param entityInstance
    * @param entities
-   *          Entity collection to inject entities to
+   *     Entity collection to inject entities to
    */
   public static void injectEntities(IDataModelEntity entityInstance, OrderedCollection<IDataModelEntity> entities) {
     if (!ENABLED) {
@@ -59,7 +59,7 @@ public final class CustomDataModelExtension {
    *
    * @param entityInstance
    * @param attributes
-   *          Attribute collection to inject attributes to
+   *     Attribute collection to inject attributes to
    */
   private static void injectMetadataAttributes(long[] idList, OrderedCollection<IDataModelAttribute> attributes) {
     for (long id : idList) {

@@ -80,10 +80,10 @@ public interface ISessionStore {
    * therefore only intended to be used while creating and registering a new UI session.
    *
    * @param uiSession
-   *          is the new UI session that runs
-   *          {@link UiSession#init(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse, org.eclipse.scout.rt.ui.html.json.JsonStartupRequest)}
+   *     is the new UI session that runs
+   *     {@link UiSession#init(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse, org.eclipse.scout.rt.ui.html.json.JsonStartupRequest)}
    * @param queryClientSessionId
-   *          is the id of a possibly existing and still valid clientSession
+   *     is the id of a possibly existing and still valid clientSession
    * @return the associated and still valid, active {@link IClientSession} or null
    */
   IClientSession preregisterUiSession(IUiSession uiSession, String queryClientSessionId);

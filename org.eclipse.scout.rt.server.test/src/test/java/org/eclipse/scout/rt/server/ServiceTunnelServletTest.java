@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -234,5 +235,4 @@ public class ServiceTunnelServletTest {
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
         .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp));
   }
-
 }

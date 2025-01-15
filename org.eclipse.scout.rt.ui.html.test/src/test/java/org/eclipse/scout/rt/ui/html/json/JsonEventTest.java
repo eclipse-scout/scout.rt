@@ -62,5 +62,4 @@ public class JsonEventTest {
     assertEquals("bar", event.getType());
     assertEquals("myValue", event.getData().getString("myProp"));
   }
-
 }

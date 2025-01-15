@@ -54,7 +54,7 @@ public interface IUiSession {
 
   /**
    * @return <code>true</code> if {@link #init(HttpServletRequest, HttpServletResponse, JsonStartupRequest)} was been
-   *         called. Note: This will also be <code>true</code> after the session has been disposed.
+   * called. Note: This will also be <code>true</code> after the session has been disposed.
    */
   boolean isInitialized();
 
@@ -86,8 +86,8 @@ public interface IUiSession {
 
   /**
    * @return the last access time in millis since 01.01.1970 of a request, except polling requests
-   *         <p>
-   *         see {@link #touch()}
+   * <p>
+   * see {@link #touch()}
    */
   long getLastAccessedTime();
 
@@ -107,8 +107,8 @@ public interface IUiSession {
 
   /**
    * @return the current UI response that is collecting changes for the next
-   *         {@link #processJsonRequest(HttpServletRequest, HttpServletResponse, JsonRequest)} cycle. This is never
-   *         <code>null</code>, <b>except</b> when the UI session is disposed (see {@link #isDisposed()}).
+   * {@link #processJsonRequest(HttpServletRequest, HttpServletResponse, JsonRequest)} cycle. This is never
+   * <code>null</code>, <b>except</b> when the UI session is disposed (see {@link #isDisposed()}).
    */
   JsonResponse currentJsonResponse();
 
@@ -135,7 +135,7 @@ public interface IUiSession {
    * Used to verify if the {@link Subject} we're running in should be replaced on the {@link IClientSession}.
    *
    * @param request
-   *          the request that is checked if the update of the Subject has been requested
+   *     the request that is checked if the update of the Subject has been requested
    */
   void verifySubject(HttpServletRequest request);
 
@@ -146,13 +146,13 @@ public interface IUiSession {
 
   /**
    * @param req
-   *          the HTTP request
+   *     the HTTP request
    * @param uploadable
-   *          the target adapter that receives the uploaded files
+   *     the target adapter that receives the uploaded files
    * @param uploadResources
-   *          list of uploaded files
+   *     list of uploaded files
    * @param uploadProperties
-   *          a map of all other submitted string properties (usually not needed)
+   *     a map of all other submitted string properties (usually not needed)
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
    */
   JSONObject processFileUpload(HttpServletRequest req, HttpServletResponse resp, IUploadable uploadable,

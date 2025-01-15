@@ -44,8 +44,8 @@ public class CodeResourceTest {
         .withText("en", "t1")
         .withTextPlural("en", "p1")
         .withCodes(BEANS.get(CodeDo.class)
-            .withId("1.1")
-            .withText("en", "t1.1"),
+                .withId("1.1")
+                .withText("en", "t1.1"),
             BEANS.get(CodeDo.class)
                 .withId("1.2")
                 .withText("en", "t1.2"));
@@ -59,7 +59,7 @@ public class CodeResourceTest {
         .withTextPlural("en-US", "p1")
         .withTextPlural("en-UK", "p1-uk")
         .withCodes(BEANS.get(CodeDo.class)
-            .withId("1.1")
+                .withId("1.1")
                 .withText("de", "t1.1-de")
                 .withText("en-US", "t1.1-us")
                 .withText("en-UK", "t1.1"),

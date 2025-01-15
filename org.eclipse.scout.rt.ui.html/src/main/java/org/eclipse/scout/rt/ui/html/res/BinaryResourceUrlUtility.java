@@ -68,15 +68,15 @@ public final class BinaryResourceUrlUtility {
 
   /**
    * @return a relative URL for a configured logical icon-name or a font-based icon. For instance:
-   *         <ul>
-   *         <li>input: <code>"bookmark"</code>, output: <code>"icon/bookmark.png"</code> (the file extension is
-   *         included to support auto-detection of the MIME type without looking at the file contents)</li>
-   *         <li>input: <code>"font:X"</code>, output: <code>"font:X"</code></li>
-   *         <li>input: <code>"url:/api/create-image/foo"</code>, output: <code>"/api/create-image/foo"</code></li>
-   *         </ul>
-   *         The file extension is included to be able to auto-detect the MIME type based on it.
-   *         <p>
-   *         Use this method for image-files located in the /resource/icons directories of all jars on the classpath.
+   * <ul>
+   * <li>input: <code>"bookmark"</code>, output: <code>"icon/bookmark.png"</code> (the file extension is
+   * included to support auto-detection of the MIME type without looking at the file contents)</li>
+   * <li>input: <code>"font:X"</code>, output: <code>"font:X"</code></li>
+   * <li>input: <code>"url:/api/create-image/foo"</code>, output: <code>"/api/create-image/foo"</code></li>
+   * </ul>
+   * The file extension is included to be able to auto-detect the MIME type based on it.
+   * <p>
+   * Use this method for image-files located in the /resource/icons directories of all jars on the classpath.
    */
   public static String createIconUrl(String iconId) {
     if (!StringUtility.hasText(iconId) || AbstractIcons.Null.equals(iconId)) {
@@ -121,8 +121,8 @@ public final class BinaryResourceUrlUtility {
 
   /**
    * @return a relative URL for a resource handled by an adapter, see {@link DynamicResourceLoader}.
-   *         <p>
-   *         The calling adapter must implement {@link IBinaryResourceProvider}.
+   * <p>
+   * The calling adapter must implement {@link IBinaryResourceProvider}.
    */
   public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, String filename) {
     if (!checkDynamicAdapterResourceUrlArguments(jsonAdapter, filename)) {
@@ -147,7 +147,7 @@ public final class BinaryResourceUrlUtility {
 
   /**
    * @param path
-   *          decoded path (non URL encoded)
+   *     decoded path (non URL encoded)
    */
   public static String getFilenameWithFingerprint(IJsonAdapter<?> jsonAdapter, String path) {
     if (!checkDynamicAdapterResourceUrlArguments(jsonAdapter, path)) {

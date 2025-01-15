@@ -20,5 +20,4 @@ public class SimpleBeanDecorationFactory implements IBeanDecorationFactory {
   public <T> IBeanDecorator<T> decorate(IBean<T> bean, Class<? extends T> queryType) {
     return null;
   }
-
 }

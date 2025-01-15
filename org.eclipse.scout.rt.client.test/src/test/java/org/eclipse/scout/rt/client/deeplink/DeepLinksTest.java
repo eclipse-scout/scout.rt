@@ -63,5 +63,4 @@ public class DeepLinksTest {
   public void testOutlineDeepLinkHandler() {
     assertTrue(m_deepLinks.canHandleDeepLink("outline-123"));
   }
-
 }

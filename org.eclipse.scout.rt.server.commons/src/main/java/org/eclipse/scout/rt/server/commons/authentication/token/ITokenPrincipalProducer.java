@@ -20,7 +20,7 @@ public interface ITokenPrincipalProducer {
 
   /**
    * @param tokenParts
-   *          all parts of the token
+   *     all parts of the token
    * @return a principal based on the token parts
    */
   Principal produce(List<byte[]> tokenParts);

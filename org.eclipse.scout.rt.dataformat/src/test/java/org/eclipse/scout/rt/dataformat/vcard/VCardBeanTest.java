@@ -105,6 +105,5 @@ public class VCardBeanTest {
     assertTrue(bean.getProperty(VCardProperties.PROP_NAME_ADR).hasParameter(VCardProperties.PARAM_NAME_TYPE));
     assertEquals(VCardProperties.PARAM_VALUE_HOME, bean.getProperty(VCardProperties.PROP_NAME_ADR).getParameter(VCardProperties.PARAM_NAME_TYPE).getValue());
     assertEquals(VCardProperties.PROP_VALUE_VCARD, bean.getProperty(VCardProperties.PROP_NAME_END).getValue());
-
   }
 }

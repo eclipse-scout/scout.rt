@@ -51,7 +51,7 @@ public final class DataModelUtility {
 
   /**
    * @return the external id (foo/bar/foo) for an entity using {@link Class#getSimpleName()} and
-   *         {@link IDataModelEntity#getMetaDataOfEntity()}
+   * {@link IDataModelEntity#getMetaDataOfEntity()}
    * @since 3.8.0
    */
   public static String entityPathToExternalId(IDataModel dataModel, EntityPath entityPath) {
@@ -83,7 +83,7 @@ public final class DataModelUtility {
    * Computes the given attribute's external id along the given path of entities.
    *
    * @return the external id (foo/bar/foo) for an attribute using {@link Class#getSimpleName()} and
-   *         {@link IDataModelEntity#getMetaDataOfEntity()}, {@link IDataModelAttribute#getMetaDataOfAttribute()}
+   * {@link IDataModelEntity#getMetaDataOfEntity()}, {@link IDataModelAttribute#getMetaDataOfAttribute()}
    * @since 3.8.0
    */
   public static String attributePathToExternalId(IDataModel dataModel, AttributePath attributePath) {
@@ -115,9 +115,9 @@ public final class DataModelUtility {
    * Returns the path of entities starting by the root, which is described by the external ID.
    *
    * @param dataModel
-   *          the data model
+   *     the data model
    * @param externalId
-   *          string representation of an entity
+   *     string representation of an entity
    * @return
    * @since 3.8.0
    */
@@ -130,7 +130,7 @@ public final class DataModelUtility {
 
   /**
    * @return the attribute for an external id (foo/bar/foo) using
-   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
+   * {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    * @since 3.8.0
    */
   public static AttributePath externalIdToAttributePath(IDataModel dataModel, String externalId) {
@@ -143,9 +143,9 @@ public final class DataModelUtility {
   /**
    * Recursively resolves the path of entities described by the given external Id.
    *
-   * @return the list of all entities starting from the root entity.
    * @param parentEntity
-   *          is the entity on which to start resolving or null to start on top of the entity/attribute tree
+   *     is the entity on which to start resolving or null to start on top of the entity/attribute tree
+   * @return the list of all entities starting from the root entity.
    * @since 3.8.0
    */
   private static EntityPath resolveEntityPathRec(IDataModel dataModel, String externalId, EntityPath inputPath) {
@@ -216,7 +216,7 @@ public final class DataModelUtility {
 
   /**
    * @return the entity for an external id part (no '/' characters) using
-   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
+   * {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
   public static IDataModelEntity findEntity(List<? extends IDataModelEntity> entities, String simpleName, Map<String, String> metaData) {
     if (entities != null) {
@@ -231,7 +231,7 @@ public final class DataModelUtility {
 
   /**
    * @return the attribute for an external id part (no '/' characters) using
-   *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
+   * {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    */
   public static IDataModelAttribute findAttribute(List<? extends IDataModelAttribute> attributes, String simpleName, Map<String, String> metaData) {
     if (attributes != null) {

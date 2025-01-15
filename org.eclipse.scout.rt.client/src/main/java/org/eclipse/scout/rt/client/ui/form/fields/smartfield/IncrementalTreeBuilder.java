@@ -45,7 +45,7 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
   /**
    * @param lookupRows
    * @param selectedKey
-   *          selected key or null
+   *     selected key or null
    * @param existingTree
    * @return
    */
@@ -64,7 +64,6 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
             allRows.add(row.getKey());
             res.add(row);
           }
-
         }
       }
     }
@@ -166,5 +165,4 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
     tree.visitTree(v);
     return map;
   }
-
 }

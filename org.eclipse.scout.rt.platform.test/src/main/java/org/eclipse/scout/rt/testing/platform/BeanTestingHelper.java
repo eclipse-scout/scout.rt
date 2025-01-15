@@ -99,7 +99,7 @@ public class BeanTestingHelper {
    * Unregisters the given beans
    *
    * @param beans
-   *          The {@link IBean beans} to remove from the {@link IBeanManager}.
+   *     The {@link IBean beans} to remove from the {@link IBeanManager}.
    */
   public void unregisterBeans(List<? extends IBean<?>> beans) {
     if (beans == null) {

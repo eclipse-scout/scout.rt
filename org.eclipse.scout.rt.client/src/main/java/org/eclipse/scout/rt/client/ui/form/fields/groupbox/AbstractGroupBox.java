@@ -249,7 +249,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * Subclasses can override this method. Default is {@link TriState#UNDEFINED}.
    *
    * @return {@link TriState#TRUE} if the group box should be scrollable, {@link TriState#FALSE} if not,
-   *         {@link TriState#UNDEFINED} if default logic should be applied
+   * {@link TriState#UNDEFINED} if default logic should be applied
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
@@ -332,7 +332,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * Subclasses can override this method. Default is {@link TriState#UNDEFINED}.
    *
    * @return {@link TriState#TRUE} if the group box should be responsive, {@link TriState#FALSE} if not,
-   *         {@link TriState#UNDEFINED} if default logic should be applied
+   * {@link TriState#UNDEFINED} if default logic should be applied
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(320)

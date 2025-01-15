@@ -13,5 +13,4 @@ package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 public interface IFileChooserFieldUIFacade {
 
   void parseAndSetValueFromUI(String value);
-
 }

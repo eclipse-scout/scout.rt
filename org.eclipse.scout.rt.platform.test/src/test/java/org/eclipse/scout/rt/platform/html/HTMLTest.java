@@ -340,7 +340,6 @@ public class HTMLTest {
       rows.add(createRowString(prefix, i));
     }
     return "<table>" + CollectionUtility.format(rows, "") + "</table>";
-
   }
 
   private String createRowString(String prefix, int i) {

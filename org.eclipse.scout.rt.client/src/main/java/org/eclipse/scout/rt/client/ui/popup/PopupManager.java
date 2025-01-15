@@ -9,11 +9,11 @@
  */
 package org.eclipse.scout.rt.client.ui.popup;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-
-import java.util.Set;
 
 /**
  * @since 9.0

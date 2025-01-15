@@ -29,8 +29,8 @@ public class AssertNoRunningJobStatementTest {
   @Test
   public void testJobCompletesWithinTest() {
     assertTrue(Jobs.schedule(() -> true,
-        Jobs.newInput()
-            .withRunContext(RunContexts.empty()))
+            Jobs.newInput()
+                .withRunContext(RunContexts.empty()))
         .awaitDoneAndGet(500, TimeUnit.MILLISECONDS));
     // not expecting 'job did not complete' warning in log
   }

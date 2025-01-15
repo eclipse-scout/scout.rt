@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.rt.svg.client;
 
-import java.awt.EventQueue;
+import java.awt.*;
 
 import org.apache.batik.css.engine.CSSEngine;
 import org.apache.batik.swing.JSVGCanvas;

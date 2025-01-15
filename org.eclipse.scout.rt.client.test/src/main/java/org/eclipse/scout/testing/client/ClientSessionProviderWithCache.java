@@ -72,10 +72,10 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
    * <em>sessionId</em> is created via {@link ClientSessionProvider}.
    *
    * @param clientRunContext
-   *          applied during session start, and to get the session's {@link Subject}.
+   *     applied during session start, and to get the session's {@link Subject}.
    * @return session found in cache, or a new session on cache miss.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    */
   @Override
   public <SESSION extends IClientSession> SESSION provide(final ClientRunContext clientRunContext) {
@@ -87,14 +87,14 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
    * <em>sessionId</em> is not specified. On cache miss, a new session is created via {@link ClientSessionProvider}.
    *
    * @param sessionId
-   *          unique session ID to identify the cached session. If <code>null</code>, the context's {@link Subject} is
-   *          used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a
-   *          random UUID if <code>null</code>.
+   *     unique session ID to identify the cached session. If <code>null</code>, the context's {@link Subject} is
+   *     used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a
+   *     random UUID if <code>null</code>.
    * @param clientRunContext
-   *          applied during session start, and to get the session's {@link Subject}.
+   *     applied during session start, and to get the session's {@link Subject}.
    * @return session found in cache, or a new session on cache miss.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    */
   @Override
   public <SESSION extends IClientSession> SESSION provide(final String sessionId, final ClientRunContext clientRunContext) {
@@ -117,8 +117,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     clientSession = super.provide(sessionId, clientRunContext);
 
     // 4. Cache the new client session, or return present session if created by another thread in the meantime (optimistic locking).
-    @SuppressWarnings("unchecked")
-    final SESSION cachedClientSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, clientSession);
+    @SuppressWarnings("unchecked") final SESSION cachedClientSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, clientSession);
     if (cachedClientSession != null) {
       stopSession(clientSession);
       clientSession = cachedClientSession;

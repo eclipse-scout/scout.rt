@@ -64,6 +64,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   /*
    * Configuration
    */
+
   /**
    * Configures the system type of this button. See {@code IButton.SYSTEM_TYPE_* } constants for valid values. System
    * buttons are buttons with pre-defined behavior (such as an 'Ok' button or a 'Cancel' button).
@@ -100,8 +101,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * Subclasses can override this method. Default is {@code null}.
    *
    * @return {@code Boolean.TRUE} if this button is a default button, {@code Boolean.FALSE} if this button is never a
-   *         default button and {@code null} if the button look should be calculated with respect to
-   *         {@link AbstractButton#getConfiguredKeyStroke()}
+   * default button and {@code null} if the button look should be calculated with respect to
+   * {@link AbstractButton#getConfiguredKeyStroke()}
    * @see IButton
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -239,7 +240,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * Called whenever the selection (of toggle-button) is changed.
    *
    * @param selection
-   *          the new selection state
+   *     the new selection state
    */
   @ConfigOperation
   @Order(210)

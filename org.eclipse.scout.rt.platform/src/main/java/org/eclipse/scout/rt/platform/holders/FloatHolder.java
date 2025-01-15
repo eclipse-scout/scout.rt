@@ -23,5 +23,4 @@ public class FloatHolder extends Holder<Float> {
   public FloatHolder(Float value) {
     super(Float.class, value);
   }
-
 }

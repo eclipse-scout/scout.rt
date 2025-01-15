@@ -23,5 +23,4 @@ public interface IStatementCache {
   CallableStatement getCallableStatement(Connection conn, String s) throws SQLException;
 
   void releaseCallableStatement(CallableStatement cs);
-
 }

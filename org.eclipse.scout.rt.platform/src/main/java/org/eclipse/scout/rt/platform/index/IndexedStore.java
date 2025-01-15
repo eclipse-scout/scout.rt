@@ -160,7 +160,7 @@ public class IndexedStore<ELEMENT> implements Iterable<ELEMENT> {
    * those are indexed as well.
    *
    * @param index
-   *          the index to be registered to index elements.
+   *     the index to be registered to index elements.
    * @return the index as given to this method.
    */
   public <INDEX extends IIndex<?, ELEMENT>> INDEX registerIndex(final INDEX index) {
@@ -178,7 +178,7 @@ public class IndexedStore<ELEMENT> implements Iterable<ELEMENT> {
    * Removes the given index and clears the index.
    *
    * @param index
-   *          the index to be unregistered.
+   *     the index to be unregistered.
    * @return the index as given to this method.
    */
   public <INDEX extends IIndex<?, ELEMENT>> INDEX unregisterIndex(final INDEX index) {

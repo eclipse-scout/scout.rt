@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.dataobject.enumeration.Enums;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;

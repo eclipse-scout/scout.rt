@@ -46,7 +46,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   /**
    * @return false to open a new form anytime, true to open a form<br>
-   *         with a same {@link IForm#computeExclusiveKey()} only once.
+   * with a same {@link IForm#computeExclusiveKey()} only once.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
@@ -83,7 +83,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    *
    * @return true when this check is done and further checks can continue, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user notification such as a dialog
+   *     to cancel the current process with error handling and user notification such as a dialog
    */
   @ConfigOperation
   @Order(40)
@@ -97,7 +97,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    *
    * @return true when validate is successful, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user notification such as a dialog
+   *     to cancel the current process with error handling and user notification such as a dialog
    */
   @ConfigOperation
   @Order(50)
@@ -266,7 +266,6 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     public void execFinally(FormHandlerFinallyChain chain) {
       getOwner().execFinally();
     }
-
   }
 
   protected final void interceptPostLoad() {

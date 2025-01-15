@@ -61,7 +61,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
       m_sessionIdToSession.remove(session.getId());
       List<WeakReference<IClientSession>> userSessions = m_userToSessions.get(userId);
       if (userSessions != null) {
-        for (Iterator<WeakReference<IClientSession>> it = userSessions.iterator(); it.hasNext();) {
+        for (Iterator<WeakReference<IClientSession>> it = userSessions.iterator(); it.hasNext(); ) {
           WeakReference<IClientSession> ref = it.next();
           IClientSession clientSession = ref.get();
           if (clientSession == null || ObjectUtility.equals(clientSession.getId(), session.getId())) {
@@ -216,5 +216,4 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
       }
     }
   }
-
 }

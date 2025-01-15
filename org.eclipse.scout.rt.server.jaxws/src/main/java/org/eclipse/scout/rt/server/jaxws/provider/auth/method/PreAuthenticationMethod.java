@@ -15,9 +15,10 @@ import java.util.Collections;
 import java.util.Set;
 
 import javax.security.auth.Subject;
+import javax.xml.namespace.QName;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import javax.xml.namespace.QName;
 import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -46,9 +47,9 @@ public class PreAuthenticationMethod implements IAuthenticationMethod {
    * invoked.
    *
    * @param servletRequest
-   *          current servlet request.
+   *     current servlet request.
    * @param principalProducer
-   *          used to produce {@link Principal} objects for authenticated users.
+   *     used to produce {@link Principal} objects for authenticated users.
    * @return authenticated {@link Subject}, or <code>null</code> if not authenticated yet.
    */
   public Subject getRequestSubject(final HttpServletRequest servletRequest, final IPrincipalProducer principalProducer) {

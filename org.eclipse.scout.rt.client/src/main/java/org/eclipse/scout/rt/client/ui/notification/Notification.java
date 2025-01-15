@@ -49,7 +49,7 @@ public class Notification extends AbstractWidget implements INotification {
    * Creates a notification with the given attributes.
    *
    * @param closable
-   *          see {@link #isClosable()}
+   *     see {@link #isClosable()}
    */
   public Notification(IStatus status, boolean closable) {
     this(status, closable, false);
@@ -59,9 +59,9 @@ public class Notification extends AbstractWidget implements INotification {
    * Creates a notification with the given attributes.
    *
    * @param closable
-   *          see {@link #isClosable()}
+   *     see {@link #isClosable()}
    * @param htmlEnabled
-   *          see {@link #isHtmlEnabled()}
+   *     see {@link #isHtmlEnabled()}
    */
   public Notification(IStatus status, boolean closable, boolean htmlEnabled) {
     this(status, closable, htmlEnabled, null);
@@ -69,9 +69,9 @@ public class Notification extends AbstractWidget implements INotification {
 
   /**
    * @param closable
-   *          see {@link #isClosable()}
+   *     see {@link #isClosable()}
    * @param htmlEnabled
-   *          see {@link #isHtmlEnabled()}
+   *     see {@link #isHtmlEnabled()}
    */
   public Notification(IStatus status, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
     m_status = status;

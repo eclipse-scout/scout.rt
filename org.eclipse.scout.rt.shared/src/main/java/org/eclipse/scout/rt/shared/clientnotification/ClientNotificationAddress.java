@@ -48,7 +48,7 @@ public class ClientNotificationAddress implements IClientNotificationAddress {
    * Create an address for a notification that should to be handled once for each of the given sessions.
    *
    * @param sessionIds
-   *          the ids of the users for this address see <code>ISession.getId()</code>
+   *     the ids of the users for this address see <code>ISession.getId()</code>
    * @return notification address
    */
   public static ClientNotificationAddress createSessionAddress(final Set<String> sessionIds) {
@@ -59,7 +59,7 @@ public class ClientNotificationAddress implements IClientNotificationAddress {
    * Create an address for a notification that should to be handled once for each of the given users.
    *
    * @param userIds
-   *          the ids of the users for this address see <code>ISession.getUserId()</code>
+   *     the ids of the users for this address see <code>ISession.getUserId()</code>
    * @return notification address
    */
   public static ClientNotificationAddress createUserAddress(final Set<String> userIds) {

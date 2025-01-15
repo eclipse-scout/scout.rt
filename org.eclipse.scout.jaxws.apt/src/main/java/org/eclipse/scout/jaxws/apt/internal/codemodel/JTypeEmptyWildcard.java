@@ -68,5 +68,4 @@ public final class JTypeEmptyWildcard extends JClass {
   public void generate(JFormatter f) {
     f.p(name());
   }
-
 }

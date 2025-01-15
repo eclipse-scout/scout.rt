@@ -92,6 +92,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   /*
    * Configuration
    */
+
   /**
    * Called to (re)load children of a node.
    * <p>
@@ -173,7 +174,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   /**
    * @return true: a filter is added to the treebox tree that only accepts nodes that are active or checked.<br>
-   *         Affects {@link ITreeNode#getFilteredChildNodes()}
+   * Affects {@link ITreeNode#getFilteredChildNodes()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(290)
@@ -183,7 +184,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   /**
    * @return true: a filter is added to the treebox tree that only accepts checked nodes<br>
-   *         Affects {@link ITreeNode#getFilteredChildNodes()}
+   * Affects {@link ITreeNode#getFilteredChildNodes()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(300)
@@ -251,10 +252,10 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   /**
    * @param call
-   *          that produced this result
+   *     that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
-   *          supported
+   *     live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *     supported
    */
   @ConfigOperation
   @Order(240)
@@ -263,12 +264,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   /**
    * @param newNode
-   *          a new node that was created for the tree, but not yet attached to the tree
+   *     a new node that was created for the tree, but not yet attached to the tree
    * @param treeLevel
-   *          Since {@link ITreeNode#getTreeLevel()} is not yet valid, treeLevel is the level where the node will be
-   *          attached at
-   *          <p>
-   *          Can be useful for example to disable nodes on some levels so they cannot be checked.
+   *     Since {@link ITreeNode#getTreeLevel()} is not yet valid, treeLevel is the level where the node will be
+   *     attached at
+   *     <p>
+   *     Can be useful for example to disable nodes on some levels so they cannot be checked.
    */
   @ConfigOperation
   @Order(250)
@@ -974,9 +975,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
   }
 
-/*
- * Implementation of ICompositeField
- */
+  /*
+   * Implementation of ICompositeField
+   */
 
   @Override
   public <F extends IFormField> F getFieldByClass(Class<F> fieldToFind) {
@@ -1075,7 +1076,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       treeNode.setActive(lookupRow.isActive());
       return treeNode;
     }
-
   }
 
   @ClassId("abc77329-ab0d-484c-9027-d517de928b76")
@@ -1147,5 +1147,4 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   protected ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> createLocalExtension() {
     return new LocalTreeBoxExtension<>(this);
   }
-
 }

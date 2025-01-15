@@ -62,7 +62,6 @@ public class AbstractBeanColumnTest {
     table.sort();
     ComparableBean firstComparableBean = table.getTestComparableBeanColumn().getValue(0);
     assertTrue(StringUtility.equalsIgnoreCase(firstComparableBean.m_line1, "b testLine"));
-
   }
 
   public class TestTable extends AbstractTable {

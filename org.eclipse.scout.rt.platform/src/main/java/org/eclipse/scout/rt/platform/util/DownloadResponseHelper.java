@@ -50,12 +50,12 @@ public class DownloadResponseHelper {
    * name.
    *
    * @param filename
-   *          The name of the downloaded file. The filename is sanitized to conform to the relevant RFCs. In case it
-   *          does not contain any usable characters (or is null), the default value of {@value #DEFAULT_FILENAME} is
-   *          used.
+   *     The name of the downloaded file. The filename is sanitized to conform to the relevant RFCs. In case it
+   *     does not contain any usable characters (or is null), the default value of {@value #DEFAULT_FILENAME} is
+   *     used.
    * @return Returns a {@link Map} containing the values for the {@value #HEADER_CONTENT_DISPOSITION} and
-   *         {@value #HEADER_X_CONTENT_TYPE_OPTIONS} headers. The keys in the map are the names of the respective
-   *         headers.
+   * {@value #HEADER_X_CONTENT_TYPE_OPTIONS} headers. The keys in the map are the names of the respective
+   * headers.
    */
   public Map<String, String> getDownloadHeaders(String filename) {
     Map<String, String> downloadHeaders = new HashMap<>();
@@ -69,9 +69,9 @@ public class DownloadResponseHelper {
    * of a file with the provided name.
    *
    * @param originalFilename
-   *          The name of the downloaded file. The filename is sanitized to conform to the relevant RFCs. In case it
-   *          does not contain any usable characters (or is null), the default value of {@value #DEFAULT_FILENAME} is
-   *          used.
+   *     The name of the downloaded file. The filename is sanitized to conform to the relevant RFCs. In case it
+   *     does not contain any usable characters (or is null), the default value of {@value #DEFAULT_FILENAME} is
+   *     used.
    * @return Returns the constructed header value.
    */
   public String getContentDispositionHeaderValue(String originalFilename) {

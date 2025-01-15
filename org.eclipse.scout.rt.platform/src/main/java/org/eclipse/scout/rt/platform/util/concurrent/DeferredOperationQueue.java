@@ -142,8 +142,8 @@ public class DeferredOperationQueue<E> {
    * elements are available before invoking the {@link #getBatchOperation()}.
    *
    * @param singleRun
-   *          if {@code true}, exactly one batch (either terminated by time or size restrictions) is executed and the
-   *          method completes. Otherwise, another round is performed if the batch of the current one was not empty.
+   *     if {@code true}, exactly one batch (either terminated by time or size restrictions) is executed and the
+   *     method completes. Otherwise, another round is performed if the batch of the current one was not empty.
    */
   protected void flushDeferred(boolean singleRun) {
     final int batchSize = getBatchSize();

@@ -242,7 +242,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
 
   /**
    * @param activity
-   *          may be null
+   *     may be null
    */
   @ConfigOperation
   @Order(70)
@@ -251,7 +251,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
 
   /**
    * @param activity
-   *          may be null
+   *     may be null
    */
   @ConfigOperation
   @Order(80)
@@ -390,7 +390,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -1076,7 +1076,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     public void execDisplayModeChanged(PlannerDisplayModeChangedChain<RI, AI> plannerDisplayModeChangedChain, int displayMode) {
       getOwner().execDisplayModeChanged(displayMode);
     }
-
   }
 
   protected final void interceptResourcesSelected(List<Resource<RI>> resources) {
@@ -1126,5 +1125,4 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     PlannerInitPlannerChain<RI, AI> chain = new PlannerInitPlannerChain<>(extensions);
     chain.execInitPlanner();
   }
-
 }

@@ -140,11 +140,11 @@ export class Rectangle {
   }
 
   /**
-     * Moves the rectangle to the new point.
-     *
-     * @param xOrPoint the new position on the x-axis or a point object containing the new position.
-     * @param y the new position on the y-axis.
-     */
+   * Moves the rectangle to the new point.
+   *
+   * @param xOrPoint the new position on the x-axis or a point object containing the new position.
+   * @param y the new position on the y-axis.
+   */
   moveTo(xOrPoint: number | Point, y?: number): Rectangle {
     let point = new Point(xOrPoint, y);
     return new Rectangle(

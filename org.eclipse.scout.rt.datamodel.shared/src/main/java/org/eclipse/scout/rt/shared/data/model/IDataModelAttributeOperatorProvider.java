@@ -23,9 +23,9 @@ public interface IDataModelAttributeOperatorProvider {
    * Inject operators for the provided attribute.
    *
    * @param attribute
-   *          Data model attribute.
+   *     Data model attribute.
    * @param operatorList
-   *          Live and mutable list of operators.
+   *     Live and mutable list of operators.
    */
   void injectOperators(IDataModelAttribute attribute, List<IDataModelAttributeOp> operatorList);
 
@@ -33,13 +33,13 @@ public interface IDataModelAttributeOperatorProvider {
    * Create a data model attribute operation for the given operator.
    *
    * @param operator
-   *          Operator
+   *     Operator
    * @param shortText
-   *          Short text (optional, otherwise default will be used)
+   *     Short text (optional, otherwise default will be used)
    * @param text
-   *          Text (optional, otherwise default will be used)
+   *     Text (optional, otherwise default will be used)
    * @param explanationText
-   *          Text (optional)
+   *     Text (optional)
    * @return Data model attribute operation
    */
   IDataModelAttributeOp createOperator(int operator, String shortText, String text, String explanationText);

@@ -51,5 +51,4 @@ public abstract class AbstractTransactionMember implements ITransactionMember {
   @Override
   public void cancel() {
   }
-
 }

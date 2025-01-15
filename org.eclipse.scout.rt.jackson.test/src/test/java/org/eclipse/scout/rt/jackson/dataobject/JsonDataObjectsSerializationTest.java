@@ -958,8 +958,7 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerializeDeserialize_PojoWithJacksonAnnotations() throws Exception {
     // custom DoObjectMapper configured like default object mapper
-    @SuppressWarnings("deprecation")
-    final ObjectMapper customDoObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).createObjectMapperInstance(false)
+    @SuppressWarnings("deprecation") final ObjectMapper customDoObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).createObjectMapperInstance(false)
         .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
         .setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN));
 
@@ -1837,7 +1836,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_RawEntityWithDouble() throws  Exception {
+  public void testSerializeDeserialize_RawEntityWithDouble() throws Exception {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute", 45.69);
     String json = s_dataObjectMapper.writeValueAsString(entity);
@@ -1846,7 +1845,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_RawEntityWithDoubleList() throws  Exception {
+  public void testSerializeDeserialize_RawEntityWithDoubleList() throws Exception {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute", List.of(45.69));
     String json = s_dataObjectMapper.writeValueAsString(entity);
@@ -2346,15 +2345,15 @@ public class JsonDataObjectsSerializationTest {
 
   /**
    * <pre>
-                +--------------------+
-                | AbstractAddressDo  |
-                +---------^----------+
-                          |
-              +-----------+--------------+
-              |                          |
-     +--------+-----------+   +----------+---------+
-     |ElectronicAddressDo |   | PhysicalAddressDo  |
-     +--------------------+   +--------------------+
+   * +--------------------+
+   * | AbstractAddressDo  |
+   * +---------^----------+
+   * |
+   * +-----------+--------------+
+   * |                          |
+   * +--------+-----------+   +----------+---------+
+   * |ElectronicAddressDo |   | PhysicalAddressDo  |
+   * +--------------------+   +--------------------+
    * </pre>
    */
   @Test
@@ -2428,19 +2427,19 @@ public class JsonDataObjectsSerializationTest {
 
   /**
    * <pre>
-                +--------------------+
-                | AbstractAddressDo  |
-                +---------^----------+
-                          |
-              +-----------+--------------+
-              |                          |
-     +--------+-----------+   +----------+---------+
-     |ElectronicAddressDo |   | PhysicalAddressDo  |
-     +--------------------+   +----------+---------+
-                                         |
-                              +----------+---------+
-                              |PhysicalAddressExDo |  (@Replace)
-                              +--------------------+
+   * +--------------------+
+   * | AbstractAddressDo  |
+   * +---------^----------+
+   * |
+   * +-----------+--------------+
+   * |                          |
+   * +--------+-----------+   +----------+---------+
+   * |ElectronicAddressDo |   | PhysicalAddressDo  |
+   * +--------------------+   +----------+---------+
+   * |
+   * +----------+---------+
+   * |PhysicalAddressExDo |  (@Replace)
+   * +--------------------+
    * </pre>
    */
   @Test
@@ -2462,13 +2461,13 @@ public class JsonDataObjectsSerializationTest {
    * Test case 1: Core DO replaced with Project DO, keeping the assigned core TypeName
    *
    * <pre>
-    +--------------------+
-    |  TestCoreExampleDo |     (@TypeName("TestCoreExample"))
-    +---------+----------+
-              |
-    +--------------------+
-    |TestProjectExampleDo|    (@Replace)
-    +--------------------+
+   * +--------------------+
+   * |  TestCoreExampleDo |     (@TypeName("TestCoreExample"))
+   * +---------+----------+
+   * |
+   * +--------------------+
+   * |TestProjectExampleDo|    (@Replace)
+   * +--------------------+
    * </pre>
    */
   @Test
@@ -2500,13 +2499,13 @@ public class JsonDataObjectsSerializationTest {
    * Test case 2: Core DO replaced with Project DO, changing the assigned core TypeName
    *
    * <pre>
-    +---------------------+
-    |  TestCoreExample2Do |     (@TypeName("TestCoreExample2"))
-    +---------+-----------+
-              |
-    +---------------------+
-    |TestProjectExample2Do|    (@Replace), (@TypeName("TestProjectExample2"))
-    +---------------------+
+   * +---------------------+
+   * |  TestCoreExample2Do |     (@TypeName("TestCoreExample2"))
+   * +---------+-----------+
+   * |
+   * +---------------------+
+   * |TestProjectExample2Do|    (@Replace), (@TypeName("TestProjectExample2"))
+   * +---------------------+
    * </pre>
    */
   @Test
@@ -2538,13 +2537,13 @@ public class JsonDataObjectsSerializationTest {
    * Test case 3: Core DO extended in Project DO, changing the assigned core TypeName
    *
    * <pre>
-    +---------------------+
-    |  TestCoreExample3Do |     (@TypeName("TestCoreExample3"))
-    +---------+-----------+
-              |
-    +---------------------+
-    |TestProjectExample3Do|    (@TypeName("TestProjectExample3"))
-    +---------------------+
+   * +---------------------+
+   * |  TestCoreExample3Do |     (@TypeName("TestCoreExample3"))
+   * +---------+-----------+
+   * |
+   * +---------------------+
+   * |TestProjectExample3Do|    (@TypeName("TestProjectExample3"))
+   * +---------------------+
    * </pre>
    */
   @Test

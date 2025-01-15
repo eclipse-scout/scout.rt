@@ -9,8 +9,9 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
-import jakarta.annotation.PostConstruct;
 import javax.security.auth.Subject;
+
+import jakarta.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
@@ -29,5 +30,4 @@ public interface IRunContextChainInterceptorProducer<T extends RunContext> {
    * @return
    */
   <RESULT> IRunContextChainInterceptor<RESULT> create();
-
 }

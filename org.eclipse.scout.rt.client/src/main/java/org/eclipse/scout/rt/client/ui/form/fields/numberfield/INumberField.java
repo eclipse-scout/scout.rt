@@ -40,5 +40,4 @@ public interface INumberField<NUMBER extends Number> extends IBasicField<NUMBER>
   void setLenientGroupingSeparators(Set<Character> lenientGroupingSeparators);
 
   Set<Character> getLenientGroupingSeparators();
-
 }

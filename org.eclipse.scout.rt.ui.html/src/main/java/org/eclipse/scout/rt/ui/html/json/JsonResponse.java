@@ -93,11 +93,11 @@ public class JsonResponse {
 
   /**
    * @param id
-   *          Adapter ID
+   *     Adapter ID
    * @param propertyName
-   *          property name
+   *     property name
    * @param newValue
-   *          property value
+   *     property value
    */
   public JsonEvent addPropertyChangeEvent(String id, String propertyName, Object newValue) {
     assertWritable();
@@ -225,11 +225,11 @@ public class JsonResponse {
    * Marks this JSON response as "error" (default is "success").
    *
    * @param errorCode
-   *          An arbitrary number indicating the type of error.
+   *     An arbitrary number indicating the type of error.
    * @param errorMessage
-   *          A message describing the error. This message is mostly useful for debugging purposes. Usually, it is not
-   *          shown to the user, because it is not language-dependent. If possible, the displayed message is translated
-   *          by the client using the <code>errorCode</code> parameter (see Session.js).
+   *     A message describing the error. This message is mostly useful for debugging purposes. Usually, it is not
+   *     shown to the user, because it is not language-dependent. If possible, the displayed message is translated
+   *     by the client using the <code>errorCode</code> parameter (see Session.js).
    */
   public void markAsError(int errorCode, String errorMessage) {
     assertWritable();
@@ -245,8 +245,8 @@ public class JsonResponse {
 
   /**
    * @return <code>true</code> if this response is still writable (e.g. new adapters and events can be added). After
-   *         {@link #toJson()} was called and the resulting JSON was sent to the UI, this method will return
-   *         <code>false</code> forever.
+   * {@link #toJson()} was called and the resulting JSON was sent to the UI, this method will return
+   * <code>false</code> forever.
    */
   public boolean isWritable() {
     return m_writable;
@@ -379,7 +379,7 @@ public class JsonResponse {
    * unregistered automatically. Any deferred model event for this adapter will therefore not be handled.
    *
    * @param id
-   *          Adapter ID to be removed
+   *     Adapter ID to be removed
    */
   public void removeJsonAdapter(String id) {
     assertWritable();
@@ -388,7 +388,7 @@ public class JsonResponse {
     IJsonAdapter<?> removedAdapter = m_adapterMap.remove(id);
 
     // Remove all related events
-    for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
+    for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext(); ) {
       JsonEvent event = it.next();
       if (ObjectUtility.equals(event.getTarget(), id)) {
         // Event is targeted to the removed adapter

@@ -111,18 +111,18 @@ public class DataObjectMigrator {
    * Migrates the raw data object.
    *
    * @param dataObject
-   *          Raw data object, might be a partial non-raw data object (i.e. _type info on certain entities). Only raw
-   *          data object parts are migrated.
+   *     Raw data object, might be a partial non-raw data object (i.e. _type info on certain entities). Only raw
+   *     data object parts are migrated.
    * @param valueType
-   *          The migrated object is converted to {@code valueType}. Can be {@link IDataObject} or a more specific
-   *          sub-class.
+   *     The migrated object is converted to {@code valueType}. Can be {@link IDataObject} or a more specific
+   *     sub-class.
    * @param toVersion
-   *          Versions to migrate to, <code>null</code> if migrating to latest version.
+   *     Versions to migrate to, <code>null</code> if migrating to latest version.
    * @param initialLocalContextData
-   *          Initial local context data to use.
+   *     Initial local context data to use.
    * @param localIntermediateMigrations
-   *          Local intermediate migrations to use for this data object. These intermediate migrations will be applied
-   *          after the intermediate migrations defined on the {@link DataObjectMigrationContext}.
+   *     Local intermediate migrations to use for this data object. These intermediate migrations will be applied
+   *     after the intermediate migrations defined on the {@link DataObjectMigrationContext}.
    */
   public <T extends IDataObject> DataObjectMigratorResult<T> migrateDataObject(
       DataObjectMigrationContext ctx,

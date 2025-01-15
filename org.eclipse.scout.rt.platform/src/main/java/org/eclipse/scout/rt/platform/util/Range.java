@@ -91,5 +91,4 @@ public class Range<VALUE_TYPE> implements Serializable {
   public String toString() {
     return "Range [m_from=" + m_from + ", m_to=" + m_to + "]";
   }
-
 }

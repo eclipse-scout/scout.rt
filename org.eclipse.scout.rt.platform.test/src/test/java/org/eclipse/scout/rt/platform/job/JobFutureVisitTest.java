@@ -171,11 +171,11 @@ public class JobFutureVisitTest {
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
-//    expected.add("mutex1_job3"); // waiting for execution
+    //    expected.add("mutex1_job3"); // waiting for execution
     expected.add("mutex2_job1"); // completed
     expected.add("mutex2_job2"); // re-acquiring mutex
     expected.add("mutex2_job3"); // waiting on the latch
-//    expected.add("mutex2_job4"); // waiting for execution
+    //    expected.add("mutex2_job4"); // waiting for execution
     expected.add("mutex3_job1"); // waiting on the latch
 
     assertEquals(expected, protocol);
@@ -189,7 +189,7 @@ public class JobFutureVisitTest {
     expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
     expected.add("mutex1_job3"); // waiting for execution
-//    expected.add("mutex2_job1"); // completed
+    //    expected.add("mutex2_job1"); // completed
     expected.add("mutex2_job2"); // // re-acquiring mutex
     expected.add("mutex2_job3"); // waiting on the latch
     expected.add("mutex2_job4"); // waiting for execution
@@ -207,7 +207,7 @@ public class JobFutureVisitTest {
     expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
     expected.add("mutex1_job3"); // waiting for execution
-//    expected.add("mutex2_job1"); // completed
+    //    expected.add("mutex2_job1"); // completed
     expected.add("mutex2_job2"); // // re-acquiring mutex
     expected.add("mutex2_job3"); // waiting on the latch
     expected.add("mutex2_job4"); // waiting for execution
@@ -223,13 +223,13 @@ public class JobFutureVisitTest {
 
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
-//    expected.add("mutex1_job2"); // waiting on the latch
-//    expected.add("mutex1_job3"); // waiting for execution
-//    expected.add("mutex2_job1"); // completed
-//    expected.add("mutex2_job2"); // // re-acquiring mutex
-//    expected.add("mutex2_job3"); // waiting on the latch
-//    expected.add("mutex2_job4"); // waiting for execution
-//    expected.add("mutex3_job1"); // waiting on the latch
+    //    expected.add("mutex1_job2"); // waiting on the latch
+    //    expected.add("mutex1_job3"); // waiting for execution
+    //    expected.add("mutex2_job1"); // completed
+    //    expected.add("mutex2_job2"); // // re-acquiring mutex
+    //    expected.add("mutex2_job3"); // waiting on the latch
+    //    expected.add("mutex2_job4"); // waiting for execution
+    //    expected.add("mutex3_job1"); // waiting on the latch
     assertEquals(expected, extractJobNames(futures));
   }
 
@@ -241,10 +241,10 @@ public class JobFutureVisitTest {
         .toFilter());
 
     Set<String> expected = new HashSet<>();
-//    expected.add("mutex1_job1"); // blocked
+    //    expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
     expected.add("mutex1_job3"); // waiting for execution
-//    expected.add("mutex2_job1"); // completed
+    //    expected.add("mutex2_job1"); // completed
     expected.add("mutex2_job2"); // // re-acquiring mutex
     expected.add("mutex2_job3"); // waiting on the latch
     expected.add("mutex2_job4"); // waiting for execution
@@ -262,11 +262,11 @@ public class JobFutureVisitTest {
     expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
     expected.add("mutex1_job3"); // waiting for execution
-//    expected.add("mutex2_job1"); // completed
-//    expected.add("mutex2_job2"); // // re-acquiring mutex
-//    expected.add("mutex2_job3"); // waiting on the latch
-//    expected.add("mutex2_job4"); // waiting for execution
-//    expected.add("mutex3_job1"); // waiting on the latch
+    //    expected.add("mutex2_job1"); // completed
+    //    expected.add("mutex2_job2"); // // re-acquiring mutex
+    //    expected.add("mutex2_job3"); // waiting on the latch
+    //    expected.add("mutex2_job4"); // waiting for execution
+    //    expected.add("mutex3_job1"); // waiting on the latch
     assertEquals(expected, extractJobNames(futures));
   }
 
@@ -277,14 +277,14 @@ public class JobFutureVisitTest {
         .toFilter());
 
     Set<String> expected = new HashSet<>();
-//    expected.add("mutex1_job1"); // blocked
-//    expected.add("mutex1_job2"); // waiting on the latch
-//    expected.add("mutex1_job3"); // waiting for execution
-//    expected.add("mutex2_job1"); // completed
+    //    expected.add("mutex1_job1"); // blocked
+    //    expected.add("mutex1_job2"); // waiting on the latch
+    //    expected.add("mutex1_job3"); // waiting for execution
+    //    expected.add("mutex2_job1"); // completed
     expected.add("mutex2_job2"); // // re-acquiring mutex
     expected.add("mutex2_job3"); // waiting on the latch
     expected.add("mutex2_job4"); // waiting for execution
-//    expected.add("mutex3_job1"); // waiting on the latch
+    //    expected.add("mutex3_job1"); // waiting on the latch
     assertEquals(expected, extractJobNames(futures));
   }
 
@@ -296,13 +296,13 @@ public class JobFutureVisitTest {
         .toFilter());
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
-//    expected.add("mutex1_job2"); // waiting on the latch
-//    expected.add("mutex1_job3"); // waiting for execution
-//    expected.add("mutex2_job1"); // completed
-//    expected.add("mutex2_job2"); // // re-acquiring mutex
-//    expected.add("mutex2_job3"); // waiting on the latch
-//    expected.add("mutex2_job4"); // waiting for execution
-//    expected.add("mutex3_job1"); // waiting on the latch
+    //    expected.add("mutex1_job2"); // waiting on the latch
+    //    expected.add("mutex1_job3"); // waiting for execution
+    //    expected.add("mutex2_job1"); // completed
+    //    expected.add("mutex2_job2"); // // re-acquiring mutex
+    //    expected.add("mutex2_job3"); // waiting on the latch
+    //    expected.add("mutex2_job4"); // waiting for execution
+    //    expected.add("mutex3_job1"); // waiting on the latch
     assertEquals(expected, extractJobNames(futures));
   }
 

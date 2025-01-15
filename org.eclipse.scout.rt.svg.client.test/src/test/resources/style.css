@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 circle.circleClass {
-           fill:   yellow;
+  fill: yellow;
 }
 
 rect.rectangleClass {
-           fill:   orange;
+  fill: orange;
 }

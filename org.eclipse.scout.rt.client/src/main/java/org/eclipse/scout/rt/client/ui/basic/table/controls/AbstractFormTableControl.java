@@ -189,6 +189,5 @@ public abstract class AbstractFormTableControl extends AbstractTableControl impl
     public void execInitForm(TableControlInitFormChain chain) {
       getOwner().execInitForm();
     }
-
   }
 }

@@ -92,5 +92,4 @@ public class BeanProxyImplementor<T> implements IInstanceInvocationHandler<T> {
     };
     return m_interceptor.invoke(ic);
   }
-
 }

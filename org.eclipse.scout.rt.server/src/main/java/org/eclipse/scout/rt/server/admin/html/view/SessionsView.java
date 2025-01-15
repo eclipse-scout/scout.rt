@@ -232,7 +232,7 @@ public class SessionsView extends DefaultView {
    * Formats a timestamp according to the format "dd.MM.yyyy HH:mm:ss"
    *
    * @param timestamp
-   *          possibly {@code null}
+   *     possibly {@code null}
    * @return a formatted timestamp
    */
   protected String formatTime(Long timestamp) {

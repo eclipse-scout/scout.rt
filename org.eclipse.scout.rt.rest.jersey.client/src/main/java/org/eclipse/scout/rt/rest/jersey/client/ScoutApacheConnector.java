@@ -120,9 +120,9 @@ public class ScoutApacheConnector implements Connector {
    * Create Scout Apache HTTP Client connector.
    *
    * @param client
-   *          JAX-RS client instance for which the connector is being created.
+   *     JAX-RS client instance for which the connector is being created.
    * @param config
-   *          client configuration.
+   *     client configuration.
    */
   public ScoutApacheConnector(Client client, Configuration config) {
     HttpClientBuilder clientBuilder = HttpClientBuilder.create();

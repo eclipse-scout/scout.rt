@@ -48,5 +48,4 @@ public interface IClipboardService extends IService {
    * @param textContents
    */
   void setTextContents(String textContents);
-
 }

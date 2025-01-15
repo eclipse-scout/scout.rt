@@ -21,8 +21,8 @@ import io.opentelemetry.api.metrics.ObservableLongMeasurement;
  * Helper to provide metrics for Scout's HTTP clients.
  *
  * @see <a href=
- *      "https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-metrics.md#metric-httpclientopen_connections">
- *      OpenTelemetry: Semantic Conventions for HTTP Metrics</a>
+ * "https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-metrics.md#metric-httpclientopen_connections">
+ * OpenTelemetry: Semantic Conventions for HTTP Metrics</a>
  */
 @ApplicationScoped
 public class HttpClientMetricsHelper {
@@ -51,11 +51,11 @@ public class HttpClientMetricsHelper {
 
     //noinspection resource
     meter.batchCallback(() -> {
-      PoolStats stats = poolStatsSupplier.get();
-      connectionsUsage.record(stats.getLeased(), activeConnectionsAttributes);
-      connectionsUsage.record(stats.getAvailable(), idleConnectionsAttributes);
-      maxConnections.record(stats.getMax(), defaultAttributes);
-    },
+          PoolStats stats = poolStatsSupplier.get();
+          connectionsUsage.record(stats.getLeased(), activeConnectionsAttributes);
+          connectionsUsage.record(stats.getAvailable(), idleConnectionsAttributes);
+          maxConnections.record(stats.getMax(), defaultAttributes);
+        },
         connectionsUsage,
         maxConnections);
   }

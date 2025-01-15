@@ -19,5 +19,4 @@ public class NodePage extends AbstractPageWithNodes {
   protected String getConfiguredTitle() {
     return "Node";
   }
-
 }

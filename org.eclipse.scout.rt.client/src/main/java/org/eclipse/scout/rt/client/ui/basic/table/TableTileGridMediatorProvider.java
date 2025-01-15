@@ -20,5 +20,4 @@ public class TableTileGridMediatorProvider implements ITableTileGridMediatorProv
   public ITableTileGridMediator createTableTileGridMediator(ITable table) {
     return new TableTileGridMediator(table);
   }
-
 }

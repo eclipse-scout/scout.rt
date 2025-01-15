@@ -300,7 +300,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @return <code>true</code> if the request is still valid after polling and response should be sent back to the UI.
-   *         <code>false</code> when the polling was interrupted and the processing should be stopped immediately.
+   * <code>false</code> when the polling was interrupted and the processing should be stopped immediately.
    */
   @SuppressWarnings("UnnecessaryLocalVariable")
   protected boolean handlePollRequest(IUiSession uiSession, JsonRequest jsonRequest) {

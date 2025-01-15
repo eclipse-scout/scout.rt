@@ -185,5 +185,4 @@ public final class UserAgent implements Serializable {
     }
     return true;
   }
-
 }

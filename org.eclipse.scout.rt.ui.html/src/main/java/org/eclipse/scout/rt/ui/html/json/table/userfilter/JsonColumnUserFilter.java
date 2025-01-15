@@ -73,5 +73,4 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
   public String toString() {
     return getObjectType() + ", " + getFilterState().getColumn();
   }
-
 }

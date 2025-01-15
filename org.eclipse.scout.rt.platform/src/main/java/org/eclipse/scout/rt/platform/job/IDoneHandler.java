@@ -14,8 +14,8 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 /**
  * Handler to be invoked upon transition into 'done' state, which is either due to cancellation, or upon completion.
  *
- * @since 5.1
  * @see IFuture#whenDone(IDoneHandler, RunContext)
+ * @since 5.1
  */
 @FunctionalInterface
 public interface IDoneHandler<RESULT> {

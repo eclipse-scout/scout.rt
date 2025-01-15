@@ -59,8 +59,8 @@ public interface IAccessControlService extends IService {
    * the entries have already been removed.
    *
    * @param listener
-   *          The listener to add. The {@link ICacheEntryFilter} given to the listener is the filter passed to
-   *          {@link ICache#invalidate(ICacheEntryFilter, boolean)}.
+   *     The listener to add. The {@link ICacheEntryFilter} given to the listener is the filter passed to
+   *     {@link ICache#invalidate(ICacheEntryFilter, boolean)}.
    */
   void addInvalidationListener(ICacheInvalidationListener<Object, IPermissionCollection> listener);
 
@@ -76,7 +76,7 @@ public interface IAccessControlService extends IService {
 
   /**
    * @param cacheKey
-   *          A cacheKey used by the internal cache of this service.
+   *     A cacheKey used by the internal cache of this service.
    * @return The userId (username) of the given cacheKey.
    */
   String getUserIdForCacheKey(Object cacheKey);

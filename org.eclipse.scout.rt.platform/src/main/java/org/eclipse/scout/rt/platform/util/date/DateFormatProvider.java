@@ -201,7 +201,7 @@ public class DateFormatProvider {
    *
    * default  "HH:mm"
    * </pre>
-   *
+   * <p>
    * If pattern style requests seconds and/or milliseconds, :ss or :ss[decimal separator]SSS is added after :mm.
    */
   protected String getIsolatedTimeFormatPattern(int patternStyle, Locale locale) {

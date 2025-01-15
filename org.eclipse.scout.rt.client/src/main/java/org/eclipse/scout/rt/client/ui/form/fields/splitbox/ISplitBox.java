@@ -95,8 +95,8 @@ public interface ISplitBox extends ICompositeField, IPreferenceField {
 
   /**
    * @return {@code true} if collapsible field (@see {@link #getCollapsibleField()}) is reduced to its minimal splitter
-   *         position {@link #getMinSplitterPosition()}. If no minimal splitter position is configured, or
-   *         {@link #isMinimizeEnabled()} is set to {@code false}, the minimized field state is ignored.
+   * position {@link #getMinSplitterPosition()}. If no minimal splitter position is configured, or
+   * {@link #isMinimizeEnabled()} is set to {@code false}, the minimized field state is ignored.
    */
   boolean isFieldMinimized();
 

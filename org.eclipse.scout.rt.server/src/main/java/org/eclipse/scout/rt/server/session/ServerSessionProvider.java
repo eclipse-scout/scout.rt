@@ -35,10 +35,10 @@ public class ServerSessionProvider {
    * {@link #provide(String, ServerRunContext)} instead.
    *
    * @param serverRunContext
-   *          applied during session start.
+   *     applied during session start.
    * @return the new session, is not <code>null</code>.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    */
   public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) {
     return provide(null, serverRunContext);
@@ -48,14 +48,14 @@ public class ServerSessionProvider {
    * Creates and initializes a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
    *
    * @param sessionId
-   *          unique session ID, or <code>null</code> to use a random id (see {@link Sessions#randomSessionId()}).
+   *     unique session ID, or <code>null</code> to use a random id (see {@link Sessions#randomSessionId()}).
    * @param serverRunContext
-   *          applied during session start.
+   *     applied during session start.
    * @return the new session, is not <code>null</code>.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    * @throws AssertionException
-   *           if no server session class could be found on the class-path.
+   *     if no server session class could be found on the class-path.
    */
   public <SESSION extends IServerSession> SESSION provide(final String sessionId, final ServerRunContext serverRunContext) {
     return assertNotNull(opt(sessionId, serverRunContext), "No session class implementing {} could be found on the classpath.", IServerSession.class.getName());
@@ -65,12 +65,12 @@ public class ServerSessionProvider {
    * Creates and initializes a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
    *
    * @param sessionId
-   *          unique session ID, or <code>null</code> to use a random id (see {@link Sessions#randomSessionId()}).
+   *     unique session ID, or <code>null</code> to use a random id (see {@link Sessions#randomSessionId()}).
    * @param serverRunContext
-   *          applied during session start.
+   *     applied during session start.
    * @return the new session or {@code null} if no session class could be found.
    * @throws RuntimeException
-   *           if session creation failed.
+   *     if session creation failed.
    */
   public <SESSION extends IServerSession> SESSION opt(final String sessionId, final ServerRunContext serverRunContext) {
     final String sid = sessionId != null ? sessionId : Sessions.randomSessionId();
@@ -81,8 +81,7 @@ public class ServerSessionProvider {
         .withTransactionScope(TransactionScope.REQUIRES_NEW) // enforce a new transaction
         .call(() -> {
           // 1. Create an empty session instance.
-          @SuppressWarnings("unchecked")
-          final SESSION session = (SESSION) BEANS.opt(IServerSession.class);
+          @SuppressWarnings("unchecked") final SESSION session = (SESSION) BEANS.opt(IServerSession.class);
           if (session == null) {
             return null;
           }

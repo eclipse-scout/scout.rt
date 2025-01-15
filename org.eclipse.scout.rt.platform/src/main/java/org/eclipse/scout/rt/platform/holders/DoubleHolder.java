@@ -23,5 +23,4 @@ public class DoubleHolder extends Holder<Double> {
   public DoubleHolder(Double value) {
     super(Double.class, value);
   }
-
 }

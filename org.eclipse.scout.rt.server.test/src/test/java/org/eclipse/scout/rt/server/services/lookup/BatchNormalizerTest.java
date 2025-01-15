@@ -52,7 +52,6 @@ public class BatchNormalizerTest {
     Mockito.doAnswer(answer).when(m_lookupService).getDataByAll(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByText(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByRec(Mockito.<ILookupCall<Object>> any());
-
   }
 
   /**

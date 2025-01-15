@@ -24,5 +24,4 @@ public abstract class AbstractServerSessionExtension<OWNER extends AbstractServe
   public void execLoadSession(ServerSessionLoadSessionChain chain) {
     chain.execLoadSession();
   }
-
 }

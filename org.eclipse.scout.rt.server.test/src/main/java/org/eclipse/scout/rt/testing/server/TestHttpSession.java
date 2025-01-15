@@ -94,7 +94,6 @@ public class TestHttpSession implements HttpSession {
     m_sessionAttributes.remove(name);
   }
 
-
   @Override
   public void invalidate() {
     for (Object v : m_sessionAttributes.values()) {

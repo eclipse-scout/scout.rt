@@ -14,6 +14,7 @@ import java.security.Principal;
 import java.util.Date;
 
 import javax.security.auth.Subject;
+
 import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;

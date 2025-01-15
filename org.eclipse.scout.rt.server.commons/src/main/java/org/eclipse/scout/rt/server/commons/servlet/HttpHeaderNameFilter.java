@@ -46,5 +46,4 @@ public class HttpHeaderNameFilter implements IHttpHeaderFilter {
   public String getReplacement() {
     return m_replacement;
   }
-
 }

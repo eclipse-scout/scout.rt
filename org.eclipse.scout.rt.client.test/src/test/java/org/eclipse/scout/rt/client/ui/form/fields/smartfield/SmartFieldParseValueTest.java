@@ -134,5 +134,4 @@ public class SmartFieldParseValueTest {
       return null;
     }
   }
-
 }

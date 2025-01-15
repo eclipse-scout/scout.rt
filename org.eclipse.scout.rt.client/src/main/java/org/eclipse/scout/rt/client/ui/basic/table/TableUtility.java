@@ -166,27 +166,27 @@ public final class TableUtility {
 
   /**
    * @return matrix[rowCount][columnCount] with cell as CSV cells
-   *         <p>
-   *         The returned csv will be:
-   *         <ul>
-   *         <li>Optional row: column names (Strings)</li>
-   *         <li>Optional row: column types (Classes)</li>
-   *         <li>Optional row: column formats (Strings)</li>
-   *         <li>Data row (Objects)</li>
-   *         <li>Data row (Objects)</li>
-   *         <li>...</li>
-   *         </ul>
-   *         <p>
-   *         valid exported csv types include:
-   *         <ul>
-   *         <li>java.lang.String</li>
-   *         <li>java.lang.Long</li>
-   *         <li>java.lang.Integer</li>
-   *         <li>java.lang.Float</li>
-   *         <li>java.lang.Double</li>
-   *         <li>java.lang.Boolean</li>
-   *         <li>java.util.Date</li>
-   *         </ul>
+   * <p>
+   * The returned csv will be:
+   * <ul>
+   * <li>Optional row: column names (Strings)</li>
+   * <li>Optional row: column types (Classes)</li>
+   * <li>Optional row: column formats (Strings)</li>
+   * <li>Data row (Objects)</li>
+   * <li>Data row (Objects)</li>
+   * <li>...</li>
+   * </ul>
+   * <p>
+   * valid exported csv types include:
+   * <ul>
+   * <li>java.lang.String</li>
+   * <li>java.lang.Long</li>
+   * <li>java.lang.Integer</li>
+   * <li>java.lang.Float</li>
+   * <li>java.lang.Double</li>
+   * <li>java.lang.Boolean</li>
+   * <li>java.util.Date</li>
+   * </ul>
    */
   public static Object[][] exportRowsAsCSV(List<? extends ITableRow> rows, List<? extends IColumn> columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormats) {
     final HtmlHelper htmlHelper = BEANS.get(HtmlHelper.class);

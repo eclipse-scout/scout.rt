@@ -34,7 +34,7 @@ public class TableEventFilterCondition {
 
   /**
    * @param type
-   *          event type (see {@link TableEvent})
+   *     event type (see {@link TableEvent})
    */
   public TableEventFilterCondition(int type) {
     m_type = type;

@@ -46,5 +46,4 @@ public final class HolderUtility {
     }
     return new Holder<>(h.getHolderType(), h.getValue());
   }
-
 }

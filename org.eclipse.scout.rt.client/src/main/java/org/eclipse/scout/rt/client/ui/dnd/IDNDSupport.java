@@ -10,11 +10,11 @@
 package org.eclipse.scout.rt.client.ui.dnd;
 
 /**
- * @since 3.1.12 24.07.2008
  * @see TextTransferObject
  * @see JavaTransferObject
  * @see ImageTransferObject
  * @see ResourceListTransferObject
+ * @since 3.1.12 24.07.2008
  */
 public interface IDNDSupport {
   /*
@@ -38,33 +38,33 @@ public interface IDNDSupport {
 
   /**
    * @param dragType
-   *          one of {@link IDNDSupport#TYPE_FILE_TRANSFER}, {@link IDNDSupport#TYPE_IMAGE_TRANSFER},
-   *          {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
+   *     one of {@link IDNDSupport#TYPE_FILE_TRANSFER}, {@link IDNDSupport#TYPE_IMAGE_TRANSFER},
+   *     {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
    */
   void setDragType(int dragType);
 
   /**
    * @return one of {@link IDNDSupport#TYPE_FILE_TRANSFER}, {@link IDNDSupport#TYPE_IMAGE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
+   * {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
    */
   int getDragType();
 
   /**
    * @param dropType
-   *          one of {@link IDNDSupport#TYPE_FILE_TRANSFER}, {@link IDNDSupport#TYPE_IMAGE_TRANSFER},
-   *          {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
+   *     one of {@link IDNDSupport#TYPE_FILE_TRANSFER}, {@link IDNDSupport#TYPE_IMAGE_TRANSFER},
+   *     {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
    */
   void setDropType(int dropType);
 
   /**
    * @return one of {@link IDNDSupport#TYPE_FILE_TRANSFER}, {@link IDNDSupport#TYPE_IMAGE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
+   * {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
    */
   int getDropType();
 
   /**
    * @param dropMaximumSize
-   *          maximum size for drop in bytes.
+   *     maximum size for drop in bytes.
    */
   void setDropMaximumSize(long dropMaximumSize);
 
@@ -72,5 +72,4 @@ public interface IDNDSupport {
    * @return maximum size for drop in bytes
    */
   long getDropMaximumSize();
-
 }

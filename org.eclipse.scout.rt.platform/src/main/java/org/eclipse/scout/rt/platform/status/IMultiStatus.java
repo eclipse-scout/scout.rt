@@ -42,7 +42,7 @@ public interface IMultiStatus extends IStatus {
    * Removes all equal status in its direct or indirect children. Using {@link Object#equals(Object)}
    *
    * @param status
-   *          the status to remove
+   *     the status to remove
    */
   void removeAll(IStatus status);
 
@@ -53,23 +53,23 @@ public interface IMultiStatus extends IStatus {
 
   /**
    * @param status
-   *          not <code>null<code>
+   *     not <code>null<code>
    * @return <code>true</code>, if any of the direct or indirect children is equals the the given status,
-   *         <code>false</code> otherwise.
+   * <code>false</code> otherwise.
    */
   boolean containsStatus(IStatus status);
 
   /**
    * @param clazz
-   *          not <code>null<code>
+   *     not <code>null<code>
    * @return <code>true</code>, if any of the direct or indirect children is of the given type, <code>false</code>
-   *         otherwise.
+   * otherwise.
    */
   boolean containsStatus(Class<? extends IStatus> clazz);
 
   /**
    * @param childPredicate
-   *          not <code>null<code>
+   *     not <code>null<code>
    * @return all direct or indirect children for the given predicate
    */
   Collection<IStatus> findChildStatuses(Predicate<IStatus> childPredicate);
@@ -85,5 +85,4 @@ public interface IMultiStatus extends IStatus {
    */
   @Override
   double getOrder();
-
 }

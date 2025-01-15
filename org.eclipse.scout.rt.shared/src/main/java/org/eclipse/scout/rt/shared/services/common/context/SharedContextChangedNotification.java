@@ -32,5 +32,4 @@ public class SharedContextChangedNotification implements Serializable {
     b.append("]");
     return b.toString();
   }
-
 }

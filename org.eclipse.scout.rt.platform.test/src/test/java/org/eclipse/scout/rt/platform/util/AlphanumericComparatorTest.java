@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -159,5 +158,4 @@ public class AlphanumericComparatorTest {
   private void assertConsistentWithEquals(String s1, String s2) {
     assertTrue("Comparison method violates its general contract", (StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) == 0) == s1.equals(s2));
   }
-
 }

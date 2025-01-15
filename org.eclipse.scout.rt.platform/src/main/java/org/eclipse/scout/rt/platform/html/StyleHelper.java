@@ -32,10 +32,10 @@ public class StyleHelper {
    * classes are not removed, while duplicates from the list of classes to be added are removed.
    *
    * @param cssClasses
-   *          Existing class string (consisting of one or more CSS classes separated by space). Classes are added to
-   *          this string.
+   *     Existing class string (consisting of one or more CSS classes separated by space). Classes are added to
+   *     this string.
    * @param cssClassesToAdd
-   *          Class string (consisting of one or more CSS classes separated by space) to add to the existing classes.
+   *     Class string (consisting of one or more CSS classes separated by space) to add to the existing classes.
    * @return never <code>null</code>
    */
   public String addCssClass(String cssClasses, String cssClassesToAdd) {
@@ -64,11 +64,11 @@ public class StyleHelper {
    * occurrences are removed).
    *
    * @param cssClasses
-   *          Existing class string (consisting of one or more CSS classes separated by space). Classes are removed from
-   *          this string.
+   *     Existing class string (consisting of one or more CSS classes separated by space). Classes are removed from
+   *     this string.
    * @param cssClassToRemove
-   *          Class string (consisting of one or more CSS classes separated by space) to remove from the existing
-   *          classes.
+   *     Class string (consisting of one or more CSS classes separated by space) to remove from the existing
+   *     classes.
    * @return never <code>null</code>
    */
   public String removeCssClass(String cssClasses, String cssClassToRemove) {
@@ -89,13 +89,13 @@ public class StyleHelper {
    * Toggles a class on a given class string, i.e. adds or removes the class depending on the {@code condition} flag.
    *
    * @param cssClasses
-   *          Existing class string (consisting of one or more CSS classes separated by space). Classes are added or
-   *          removed from this string.
+   *     Existing class string (consisting of one or more CSS classes separated by space). Classes are added or
+   *     removed from this string.
    * @param cssClass
-   *          Class string (consisting of one or more CSS classes separated by space) to add or remove from the existing
-   *          classes.
+   *     Class string (consisting of one or more CSS classes separated by space) to add or remove from the existing
+   *     classes.
    * @param condition
-   *          Class is added when this is <code>true</code>, otherwise it is removed.
+   *     Class is added when this is <code>true</code>, otherwise it is removed.
    * @return never <code>null</code>
    * @see #addCssClass(String, String)
    * @see #removeCssClass(String, String)
@@ -108,10 +108,10 @@ public class StyleHelper {
    * Checks if a class exists in a given class string.
    *
    * @param cssClasses
-   *          Existing class string (consisting of one or more CSS classes separated by space). Existence is checked in
-   *          this string.
+   *     Existing class string (consisting of one or more CSS classes separated by space). Existence is checked in
+   *     this string.
    * @param cssClass
-   *          Class string (consisting of one or more CSS classes separated by space) to find in the existing classes.
+   *     Class string (consisting of one or more CSS classes separated by space) to find in the existing classes.
    * @return <code>true</code> if all of the given classes are contained in the list of existing classes.
    */
   public boolean hasCssClass(String cssClasses, String cssClass) {
@@ -146,5 +146,4 @@ public class StyleHelper {
     }
     return cssClasses;
   }
-
 }

@@ -101,13 +101,13 @@ public class VirtualDesktop implements IDesktop {
    * desktop directly.
    *
    * @param realDesktop
-   *          Must not be {@code null} and must not be a {@link VirtualDesktop}.
+   *     Must not be {@code null} and must not be a {@link VirtualDesktop}.
    * @throws IllegalArgumentException
-   *           if the realDesktop is null or a {@link VirtualDesktop}.
+   *     if the realDesktop is null or a {@link VirtualDesktop}.
    * @throws IllegalStateException
-   *           if a different real desktop has already been set
+   *     if a different real desktop has already been set
    * @throws WrongThreadException
-   *           if this method is not called from a model thread.
+   *     if this method is not called from a model thread.
    */
   public void setRealDesktop(IDesktop realDesktop) {
     if (realDesktop == null) {

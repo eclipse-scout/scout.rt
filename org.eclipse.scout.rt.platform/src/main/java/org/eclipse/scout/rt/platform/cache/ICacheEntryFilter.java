@@ -15,18 +15,18 @@ import java.io.Serializable;
  * Filter applied to {@link ICache} entries.
  *
  * @param <K>
- *          the type of keys maintained by the cache
+ *     the type of keys maintained by the cache
  * @param <V>
- *          the type of mapped values in the cache
+ *     the type of mapped values in the cache
  * @since 5.2
  */
 public interface ICacheEntryFilter<K, V> extends Serializable {
 
   /**
    * @param key
-   *          of an entry; not null
+   *     of an entry; not null
    * @param value
-   *          of the same entry; not null
+   *     of the same entry; not null
    * @return true if the filter matches
    */
   boolean accept(K key, V value);
@@ -35,10 +35,10 @@ public interface ICacheEntryFilter<K, V> extends Serializable {
    * Merge with another cache entry filter. This function is in general <b>not</b> symmetric.
    *
    * @param other
-   *          filter to merge with
+   *     filter to merge with
    * @return null if this filter can not be merged with the other filter. Else a (maybe new) filter is returned so that
-   *         this new filter matches the same entries as the old filter and additionally matches the entries from the
-   *         other filter.
+   * this new filter matches the same entries as the old filter and additionally matches the entries from the
+   * other filter.
    */
   ICacheEntryFilter<K, V> coalesce(ICacheEntryFilter<K, V> other);
 }

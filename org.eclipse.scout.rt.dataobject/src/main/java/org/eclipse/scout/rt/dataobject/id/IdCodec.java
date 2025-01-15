@@ -223,7 +223,7 @@ public class IdCodec {
    *
    * @return {@code IId} parsed from {@code qualifiedId}
    * @throws PlatformException
-   *           if the given string does not match the expected format or the referenced class is not found.
+   *     if the given string does not match the expected format or the referenced class is not found.
    */
   public IId fromQualified(String qualifiedId, IIdCodecFlag... flags) {
     return fromQualified(qualifiedId, hashSet(flags));
@@ -241,7 +241,7 @@ public class IdCodec {
    *
    * @return {@code IId} parsed from {@code qualifiedId} or {@code null} if the given class or string is {@code null}
    * @throws PlatformException
-   *           if the given string does not match the expected format
+   *     if the given string does not match the expected format
    */
   public <ID extends IId> ID fromUnqualified(Class<ID> idClass, String unqualifiedId, IIdCodecFlag... flags) {
     return fromUnqualified(idClass, unqualifiedId, hashSet(flags));
@@ -302,8 +302,8 @@ public class IdCodec {
    * Parses a string in the format {@code [type-name]:[raw-id;raw-id;...]}.
    *
    * @param flags
-   *          If the structure of the given {@code qualifiedId} is invalid and {@code IdCodecFlag.LENIENT} flag is set,
-   *          value {@code null} is returned. If {@code IdCodecFlag.LENIENT} flag is not set, an exception is thrown.
+   *     If the structure of the given {@code qualifiedId} is invalid and {@code IdCodecFlag.LENIENT} flag is set,
+   *     value {@code null} is returned. If {@code IdCodecFlag.LENIENT} flag is not set, an exception is thrown.
    * @return {@code IId} parsed from {@code qualifiedId}
    */
   protected IId fromQualifiedInternal(String qualifiedId, Set<IIdCodecFlag> flags) {
@@ -352,7 +352,7 @@ public class IdCodec {
    *
    * @return {@code IId} parsed from {@code qualifiedId} or {@code null} if the given class or string is {@code null}
    * @throws PlatformException
-   *           if the given string does not match the expected format
+   *     if the given string does not match the expected format
    */
   protected <ID extends IId> ID fromUnqualifiedUnchecked(Class<ID> idClass, String unqualifiedId, Set<IIdCodecFlag> flags) {
     unqualifiedId = removeSignature(idClass, unqualifiedId, flags);

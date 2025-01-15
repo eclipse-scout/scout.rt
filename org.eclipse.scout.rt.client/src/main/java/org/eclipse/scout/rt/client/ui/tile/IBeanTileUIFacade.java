@@ -13,5 +13,4 @@ package org.eclipse.scout.rt.client.ui.tile;
 public interface IBeanTileUIFacade {
 
   void fireAppLinkActionFromUI(String ref);
-
 }

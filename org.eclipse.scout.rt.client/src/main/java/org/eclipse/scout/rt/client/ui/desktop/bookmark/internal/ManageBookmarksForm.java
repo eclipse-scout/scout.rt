@@ -171,7 +171,6 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     @ClassId("f8d566ec-58b6-4499-b435-e43bc3bd5268")
     public class CancelButton extends AbstractCancelButton {
     }
-
   }// end main box
 
   public class ModifyHandler extends AbstractFormHandler {
@@ -210,5 +209,4 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
       service.removeBookmarkServiceListener(ManageBookmarksForm.this);
     }
   }
-
 }

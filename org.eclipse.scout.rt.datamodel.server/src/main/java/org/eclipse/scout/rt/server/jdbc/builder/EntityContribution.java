@@ -63,10 +63,10 @@ public class EntityContribution {
 
   /**
    * @return the life list Note that when adding a non-aggregated part to this list, also add it to the
-   *         {@link #getGroupByParts()}
-   *         <p>
-   *         The entity builder checks if the size of {@link #getSelectParts()} and {@link #getGroupByParts()} is
-   *         different. If yes, it activates the groupBy clause otherwise it hides it.
+   * {@link #getGroupByParts()}
+   * <p>
+   * The entity builder checks if the size of {@link #getSelectParts()} and {@link #getGroupByParts()} is
+   * different. If yes, it activates the groupBy clause otherwise it hides it.
    */
   public List<String> getSelectParts() {
     return m_selectParts;
@@ -107,9 +107,9 @@ public class EntityContribution {
    * <b>Note</b>: The given expression represents exactly one column in the result set and it must not define an alias.
    *
    * @param expression
-   *          SQL expression representing a single column in the result set without an attribute alias
+   *     SQL expression representing a single column in the result set without an attribute alias
    * @param aggregating
-   *          <code>true</code> if the given expression uses a SQL aggregation, <code>false</code> otherwise.
+   *     <code>true</code> if the given expression uses a SQL aggregation, <code>false</code> otherwise.
    * @since 3.8.1
    */
   public void addSelectExpression(String expression, boolean aggregating) {
@@ -123,7 +123,7 @@ public class EntityContribution {
    * Adds the given expression to the list of from parts.
    *
    * @param expression
-   *          SQL table expression (e.g. table name or subquery)
+   *     SQL table expression (e.g. table name or subquery)
    * @since 3.8.1
    */
   public void addFromExpression(String expression) {
@@ -134,7 +134,7 @@ public class EntityContribution {
    * Adds the given constraint to the list of where parts.
    *
    * @param constraint
-   *          SQL where constraint
+   *     SQL where constraint
    * @since 3.8.1
    */
   public void addWhereConstraint(String constraint) {
@@ -147,7 +147,7 @@ public class EntityContribution {
    * <b>Note</b>: The given expression represents exactly one column in the result set.
    *
    * @param expression
-   *          SQL expression representing a single column in the result set
+   *     SQL expression representing a single column in the result set
    * @since 3.8.1
    */
   public void addGroupByExpression(String expression) {
@@ -158,7 +158,7 @@ public class EntityContribution {
    * Adds the given constraint to the list of having parts.
    *
    * @param constraint
-   *          SQL having constraint
+   *     SQL having constraint
    * @since 3.8.1
    */
   public void addHavingConstraint(String constraint) {

@@ -29,10 +29,10 @@ public interface IRestClientExceptionTransformer {
    * Transforms the given {@link RuntimeException} and optional {@link Response}.
    *
    * @param e
-   *          {@link WebApplicationException} or {@link jakarta.ws.rs.ProcessingException} caught during REST service
-   *          invocation.
+   *     {@link WebApplicationException} or {@link jakarta.ws.rs.ProcessingException} caught during REST service
+   *     invocation.
    * @param response
-   *          optional response extracted from the given exception. <b>Note:</b> Could be null.
+   *     optional response extracted from the given exception. <b>Note:</b> Could be null.
    */
   RuntimeException transform(RuntimeException e, Response response);
 }

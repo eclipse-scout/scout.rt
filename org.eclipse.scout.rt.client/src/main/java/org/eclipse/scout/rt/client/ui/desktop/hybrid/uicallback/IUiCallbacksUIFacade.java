@@ -27,11 +27,11 @@ public interface IUiCallbacksUIFacade {
    * Called if the UI returned an error (UiCallbackErrorDo).
    *
    * @param callbackId
-   *          The id of the callback
+   *     The id of the callback
    * @param message
-   *          The optional error message.
+   *     The optional error message.
    * @param code
-   *          The optional error code.
+   *     The optional error code.
    */
   void fireCallbackFailed(String callbackId, String message, String code);
 }

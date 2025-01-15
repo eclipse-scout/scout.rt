@@ -76,5 +76,4 @@ public class ServiceTunnelResponse implements Serializable {
     tsb.attr("notifications", getNotifications());
     return tsb.toString();
   }
-
 }

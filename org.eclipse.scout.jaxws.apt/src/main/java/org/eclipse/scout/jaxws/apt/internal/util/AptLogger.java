@@ -38,9 +38,9 @@ public class AptLogger {
    * Logs as <em>info</em>.
    *
    * @param msg
-   *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
-   *          optional arguments to substitute <em>formatting anchors</em> in the message.
+   *     optional arguments to substitute <em>formatting anchors</em> in the message.
    */
   public void info(final String msg, final Object... args) {
     final String message = SLF4JMessageFormatter.format(msg, args).getMessage();
@@ -56,9 +56,9 @@ public class AptLogger {
    * Logs as <em>warning</em>.
    *
    * @param msg
-   *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
-   *          optional arguments to substitute <em>formatting anchors</em> in the message.
+   *     optional arguments to substitute <em>formatting anchors</em> in the message.
    */
   public void warn(final String msg, final Object... args) {
     final String message = SLF4JMessageFormatter.format(msg, args).getMessage();
@@ -74,10 +74,10 @@ public class AptLogger {
    * Logs as <em>error</em>.
    *
    * @param msg
-   *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
-   *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
-   *          as the exception's cause if of type {@link Throwable} and not referenced in the message.
+   *     optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
+   *     as the exception's cause if of type {@link Throwable} and not referenced in the message.
    */
   public void error(final String msg, final Object... args) {
     final FormattingTuple format = SLF4JMessageFormatter.format(msg, args);

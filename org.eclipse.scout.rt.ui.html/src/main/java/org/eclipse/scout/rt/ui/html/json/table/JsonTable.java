@@ -1193,7 +1193,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
    * Returns a tableRow for the given rowId.
    *
    * @throws UiException
-   *           when no row is found for the given rowId
+   *     when no row is found for the given rowId
    */
   protected ITableRow getTableRow(String rowId) {
     ITableRow row = optTableRow(rowId);
@@ -1694,7 +1694,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   /**
    * @return returns a new list with all columns of the given list that are attached to the model adapter. If a column
-   *         is not (yet) attached, it will not be returned.
+   * is not (yet) attached, it will not be returned.
    */
   protected List<IColumn<?>> filterAttachedColumns(Collection<IColumn<?>> columns) {
     if (columns == null) {

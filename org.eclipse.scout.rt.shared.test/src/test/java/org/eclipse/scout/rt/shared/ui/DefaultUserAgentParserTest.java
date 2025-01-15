@@ -76,7 +76,5 @@ public class DefaultUserAgentParserTest {
     UserAgent parsedAgent = UserAgents.createByIdentifier(parser, id);
     assertEquals(testUserAgent.getUiDeviceType(), parsedAgent.getUiDeviceType());
     assertEquals(testUserAgent.getUiLayer(), parsedAgent.getUiLayer());
-
   }
-
 }

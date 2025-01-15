@@ -30,7 +30,7 @@ public interface IAccordion extends IWidget {
 
   /**
    * @param groups
-   *          the new list of groups to be set.
+   *     the new list of groups to be set.
    */
   void setGroups(List<? extends IGroup> groups);
 
@@ -76,5 +76,4 @@ public interface IAccordion extends IWidget {
    * you need to call this method by yourself.
    */
   void sort();
-
 }

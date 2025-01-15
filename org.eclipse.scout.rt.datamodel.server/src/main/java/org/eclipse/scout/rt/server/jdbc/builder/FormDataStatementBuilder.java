@@ -128,7 +128,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     *
+     * <p>
      * this strategy only creates the contraint of the attribute part
      *
      * <pre>
@@ -143,7 +143,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     *
+     * <p>
      * this strategy only creates the contraint of the context (excluding the attribute)
      *
      * <pre>
@@ -158,7 +158,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     *
+     * <p>
      * this strategy creates the contraint of the context and the attribute
      *
      * <pre>
@@ -173,7 +173,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     *
+     * <p>
      * this strategy creates the select query part of the attribute and adds constraints for the context
      *
      * <pre>
@@ -234,9 +234,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   /**
    * @return true to consume child contributions by this entity. Default returns true. If the entity is a 1:1 or 1:0
-   *         relation to its base and its sql contribution is just a join clause or similar, this method must return
-   *         false to let the parent entity collect all parts. Use <code>return
-   *         {@link IDataModelEntity#isOneToMany()}</code> when such behaviour is implemented.
+   * relation to its base and its sql contribution is just a join clause or similar, this method must return
+   * false to let the parent entity collect all parts. Use <code>return
+   * {@link IDataModelEntity#isOneToMany()}</code> when such behaviour is implemented.
    */
   protected boolean isConsumeChildContributions(EntityPath ePath) {
     return true;
@@ -303,7 +303,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   /**
    * @return the reference to the sequence provider to be used outside for additional sequenced items or sub statemet
-   *         builders
+   * builders
    */
   public AtomicInteger getSequenceProvider() {
     return m_sequenceProvider;
@@ -512,10 +512,10 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * {@link #getWhereConstraints()} are added as well.
    *
    * @param stm
-   *          base statement with &lt;selectParts/&gt;, &lt;fromParts/&gt;, &lt;whereParts/&gt;, &lt;groupByParts/&gt;
-   *          or &lt;havingParts/&gt; place holders.
+   *     base statement with &lt;selectParts/&gt;, &lt;fromParts/&gt;, &lt;whereParts/&gt;, &lt;groupByParts/&gt;
+   *     or &lt;havingParts/&gt; place holders.
    * @param contributions
-   *          entity contributions that are used to replace markers in the given base statement.
+   *     entity contributions that are used to replace markers in the given base statement.
    * @return Returns given base statement having all place holders replaced by the given entity contributions.
    * @since 3.8.1
    */
@@ -1144,18 +1144,18 @@ public class FormDataStatementBuilder implements DataModelConstants {
    *
    * @param entityStrategy
    * @param entityPartWithTags
-   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
-   *          <br/>
-   *          as well as the contributing selectPart, fromPart, wherePart, groupByPart, havingPart for the outer calling
-   *          part.
+   *     may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
+   *     <br/>
+   *     as well as the contributing selectPart, fromPart, wherePart, groupByPart, havingPart for the outer calling
+   *     part.
    * @param childContributions
-   *          is the set of tags collected by all children
+   *     is the set of tags collected by all children
    * @param consumeChildContributions
-   *          true: consume the child tags inside the entity statement. The returned entity contributions will not
-   *          contain any of these tags
-   *          <p>
-   *          false: don't consume the child tags inside the entity statement. The returned entity contribution contains
-   *          its onw plus all of these child tags (proxy)
+   *     true: consume the child tags inside the entity statement. The returned entity contributions will not
+   *     contain any of these tags
+   *     <p>
+   *     false: don't consume the child tags inside the entity statement. The returned entity contribution contains
+   *     its onw plus all of these child tags (proxy)
    */
   public EntityContribution createEntityPart(EntityStrategy entityStrategy, String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) {
     if (consumeChildContributions) {
@@ -1213,7 +1213,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * {@link EntityContributionUtility#checkGroupByPart(String)}
    *
    * @throws ProcessingException
-   *           with {@link IStatus#getCode()} = X
+   *     with {@link IStatus#getCode()} = X
    * @since 3.8
    */
   protected void checkGroupByPart(String groupByPart) {
@@ -1226,7 +1226,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * Evaluates the tags in the attribute statement and creates an {@link EntityContribution} based on it.
    *
    * @param stm
-   *          may contain attribute, fromPart and wherePart tags
+   *     may contain attribute, fromPart and wherePart tags
    */
   @SuppressWarnings({"bsiRulesDefinition:htmlInString", "squid:S00107"})
   public EntityContribution createAttributePart(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind,
@@ -1418,7 +1418,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    *
    * @param stm
-   *          may contain attribute, fromPart and wherePart tags
+   *     may contain attribute, fromPart and wherePart tags
    */
   @SuppressWarnings("squid:S00107")
   public String createAttributePartSimple(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind, Map<String, String> parentAliasMap) {

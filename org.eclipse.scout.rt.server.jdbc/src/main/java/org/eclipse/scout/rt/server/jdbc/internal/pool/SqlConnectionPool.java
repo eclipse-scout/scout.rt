@@ -97,8 +97,8 @@ public class SqlConnectionPool {
 
   /**
    * @see <a href=
-   *      "https://opentelemetry.io/docs/specs/otel/metrics/semantic_conventions/database-metrics/">OpenTelemetry:
-   *      Semantic Conventions for Database Metrics</a>
+   * "https://opentelemetry.io/docs/specs/otel/metrics/semantic_conventions/database-metrics/">OpenTelemetry:
+   * Semantic Conventions for Database Metrics</a>
    */
   private void initMetrics() {
     Meter meter = GlobalOpenTelemetry.get().getMeter("scout.SqlConnectionPool");
@@ -121,10 +121,10 @@ public class SqlConnectionPool {
     Attributes usedConnectionsAttributes = m_defaultAttributes.toBuilder().put(CONNECTION_STATE, "used").build();
     //noinspection resource
     meter.batchCallback(() -> {
-      connectionsUsage.record(m_idleEntries.size(), idleConnectionsAttributes);
-      connectionsUsage.record(m_busyEntries.size(), usedConnectionsAttributes);
-      maxConnections.record(m_poolSize, m_defaultAttributes);
-    },
+          connectionsUsage.record(m_idleEntries.size(), idleConnectionsAttributes);
+          connectionsUsage.record(m_busyEntries.size(), usedConnectionsAttributes);
+          maxConnections.record(m_poolSize, m_defaultAttributes);
+        },
         connectionsUsage,
         maxConnections);
   }
@@ -181,7 +181,7 @@ public class SqlConnectionPool {
           }
         }
       }// end while
-       // move to busy pool
+      // move to busy pool
       m_idleEntries.remove(candidate);
       candidate.leaseBegin = System.currentTimeMillis();
       candidate.leaseCount++;
@@ -199,7 +199,7 @@ public class SqlConnectionPool {
       Assertions.assertFalse(isDestroyed(), "{} not available because destroyed.", getClass().getSimpleName());
 
       PoolEntry candidate = null;
-      for (Iterator it = m_busyEntries.iterator(); it.hasNext();) {
+      for (Iterator it = m_busyEntries.iterator(); it.hasNext(); ) {
         PoolEntry e = (PoolEntry) it.next();
         if (e.conn == conn) {
           candidate = e;
@@ -291,7 +291,7 @@ public class SqlConnectionPool {
         }
 
         // close old idle connections
-        for (Iterator it = m_idleEntries.iterator(); it.hasNext();) {
+        for (Iterator it = m_idleEntries.iterator(); it.hasNext(); ) {
           PoolEntry e = (PoolEntry) it.next();
           if (System.currentTimeMillis() - e.createTime > m_connectionLifetime) {
             closeConnectionAsync(e.conn, "expired idle connection");
@@ -300,7 +300,7 @@ public class SqlConnectionPool {
           }
         }
         // close timed out busy connections
-        for (Iterator it = m_busyEntries.iterator(); it.hasNext();) {
+        for (Iterator it = m_busyEntries.iterator(); it.hasNext(); ) {
           PoolEntry e = (PoolEntry) it.next();
           if (System.currentTimeMillis() - e.leaseBegin > m_connectionBusyTimeout) {
             closeConnectionAsync(e.conn, "timed out busy connection");

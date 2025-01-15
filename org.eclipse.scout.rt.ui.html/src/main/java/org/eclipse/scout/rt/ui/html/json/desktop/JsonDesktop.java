@@ -379,7 +379,6 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       public Object prepareValueForToJson(Object value) {
         return JsonBenchLayoutData.toJson((BenchLayoutData) value);
       }
-
     });
     putJsonProperty(new JsonProperty<>(IDesktop.PROP_DISPLAY_STYLE, model) {
       @Override
@@ -535,7 +534,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
    * For further information see:
    * - <a href="https://serverfault.com/questions/874726/apache-decoding-semicolon-mod-proxy">ServerFault</a>
    * - <a href=
-   "https://security.stackexchange.com/questions/251723/semicolons-relation-with-reverse-proxy">StackExchange</a>
+   * "https://security.stackexchange.com/questions/251723/semicolons-relation-with-reverse-proxy">StackExchange</a>
    * </pre>
    */
   protected String cleanFilename(String fileName) {

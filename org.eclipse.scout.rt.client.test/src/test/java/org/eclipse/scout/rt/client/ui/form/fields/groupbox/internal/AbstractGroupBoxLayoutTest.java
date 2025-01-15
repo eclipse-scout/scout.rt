@@ -29,7 +29,6 @@ public class AbstractGroupBoxLayoutTest {
     assertEquals("GridData[y]:", y, gd.y);
     assertEquals("GridData[w]:", w, gd.w);
     assertEquals("GridData[h]:", h, gd.h);
-
   }
 
   protected void assertGridData(int x, int y, int w, int h, double weightX, double weightY, GridData gd) {

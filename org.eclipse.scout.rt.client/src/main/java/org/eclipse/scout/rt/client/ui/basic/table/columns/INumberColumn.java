@@ -28,7 +28,6 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
     String AVG = "avg";
     String MIN = "min";
     String MAX = "max";
-
   }
 
   /**
@@ -64,7 +63,7 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
    * Set the aggregation function for this column
    *
    * @param effect
-   *          one of the constant values in {@link AggregationFunction}
+   *     one of the constant values in {@link AggregationFunction}
    * @since 5.2
    */
   void setAggregationFunction(String f);
@@ -75,7 +74,7 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
    * Set the possible aggregation functions for this column.
    *
    * @param functions
-   *          functions defined in {@link AggregationFunction}
+   *     functions defined in {@link AggregationFunction}
    * @since 6.1
    */
   void setAllowedAggregationFunctions(Set<String> functions);
@@ -84,7 +83,7 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
    * Set the background effect for this column
    *
    * @param effect
-   *          one of the constant values in {@link BackgroundEffect} or <code>null</code>
+   *     one of the constant values in {@link BackgroundEffect} or <code>null</code>
    * @since 5.2
    */
   void setBackgroundEffect(String effect);
@@ -97,5 +96,4 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
   void setInitialBackgroundEffect(String effect);
 
   String getInitialBackgroundEffect();
-
 }

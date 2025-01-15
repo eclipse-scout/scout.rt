@@ -178,7 +178,6 @@ public class PageWithTable3Test {
           return false;
         }
       }
-
     }
   }
 }

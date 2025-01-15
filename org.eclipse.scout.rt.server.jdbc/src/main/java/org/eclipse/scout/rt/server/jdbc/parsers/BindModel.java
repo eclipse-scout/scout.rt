@@ -63,5 +63,4 @@ public class BindModel {
     }
     return b.toString();
   }
-
 }

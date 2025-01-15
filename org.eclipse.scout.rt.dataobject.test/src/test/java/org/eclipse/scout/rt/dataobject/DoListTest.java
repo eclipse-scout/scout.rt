@@ -71,7 +71,8 @@ public class DoListTest {
   }
 
   protected Consumer<DoNode<List<String>>> m_lazyCreate = attribute -> {
-    /* nop */ };
+    /* nop */
+  };
 
   @Test
   public void testCreateExists() {

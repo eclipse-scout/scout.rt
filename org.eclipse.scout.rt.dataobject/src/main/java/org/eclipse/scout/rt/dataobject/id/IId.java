@@ -30,7 +30,7 @@ public interface IId extends Serializable {
 
   /**
    * @return the raw id. Use this method carefully. The value of the id should only be used by serialization and
-   *         persistence layers.
+   * persistence layers.
    */
   Object unwrap();
 }

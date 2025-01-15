@@ -219,7 +219,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
         return getModel().isActivitySelectable();
       }
     });
-
   }
 
   @Override

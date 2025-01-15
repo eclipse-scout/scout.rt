@@ -30,6 +30,8 @@ import org.eclipse.scout.rt.platform.annotations.DtoRelevant;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ClassId {
-  /** unique id */
+  /**
+   * unique id
+   */
   String value();
 }

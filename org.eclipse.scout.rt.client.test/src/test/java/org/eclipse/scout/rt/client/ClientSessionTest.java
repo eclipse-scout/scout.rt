@@ -83,9 +83,9 @@ public class ClientSessionTest {
 
     //run a job
     String jobResult = ModelJobs.schedule(() -> "OK", ModelJobs
-        .newInput(ClientRunContexts
-            .empty()
-            .withSession(session, true)))
+            .newInput(ClientRunContexts
+                .empty()
+                .withSession(session, true)))
         .awaitDoneAndGet();
 
     assertEquals("OK", jobResult);
@@ -120,9 +120,9 @@ public class ClientSessionTest {
 
     //close from ui
     ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs
-        .newInput(ClientRunContexts
-            .empty()
-            .withSession(session, true)))
+            .newInput(ClientRunContexts
+                .empty()
+                .withSession(session, true)))
         .awaitDone();
   }
 
@@ -159,9 +159,9 @@ public class ClientSessionTest {
 
     //close from ui
     ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs
-        .newInput(ClientRunContexts
-            .empty()
-            .withSession(session, true)))
+            .newInput(ClientRunContexts
+                .empty()
+                .withSession(session, true)))
         .awaitDone();
 
     assertEquals(JobState.DONE, f.getState());
@@ -192,9 +192,9 @@ public class ClientSessionTest {
 
     //close from ui
     ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs
-        .newInput(ClientRunContexts
-            .empty()
-            .withSession(session, true)))
+            .newInput(ClientRunContexts
+                .empty()
+                .withSession(session, true)))
         .awaitDone();
 
     assertTrue(geo.isCancelled());

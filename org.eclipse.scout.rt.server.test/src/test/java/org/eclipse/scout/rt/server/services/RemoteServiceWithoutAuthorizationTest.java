@@ -174,5 +174,4 @@ public class RemoteServiceWithoutAuthorizationTest {
     public void interna3() {
     }
   }
-
 }

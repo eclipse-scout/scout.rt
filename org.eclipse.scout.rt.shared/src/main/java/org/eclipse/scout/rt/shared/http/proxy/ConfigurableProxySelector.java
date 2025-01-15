@@ -204,7 +204,7 @@ public class ConfigurableProxySelector extends ProxySelector {
     public void stateChanged(PlatformEvent event) {
       if (event.getState() == State.BeanManagerPrepared) {
         ProxySelector.setDefault(createProxySelector());
-        LOG.trace("Installed default proxy selector");;
+        LOG.trace("Installed default proxy selector");
       }
     }
 

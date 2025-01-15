@@ -114,7 +114,7 @@ public class AssertNoRunningJobsStatement extends Statement {
 
       if (!reported && nanosWaited > REPORT_THRESHOLD_NANOS) {
         LOG.warn("The job '{}' did not complete within {}ms [took {}ms].\n"
-            + "Hint: in case of deferred background operations that do not impact the test execution, consider using JobInput.EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB",
+                + "Hint: in case of deferred background operations that do not impact the test execution, consider using JobInput.EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB",
             next.getJobInput().getName(), TimeUnit.NANOSECONDS.toMillis(REPORT_THRESHOLD_NANOS), TimeUnit.NANOSECONDS.toMillis(nanosWaited));
         reported = true;
       }
@@ -157,7 +157,7 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     /**
      * @return Returns <code>true</code> if the initial statement was not executed by a job and the current thread is
-     *         the initial thread.
+     * the initial thread.
      */
     private boolean isScheduledByInitialThread() {
       return m_initialThread != null && m_initialThread == Thread.currentThread();
@@ -165,7 +165,7 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     /**
      * @return Returns <code>true</code> if the initial statement was executed by a job and the currently running job is
-     *         the initial job.
+     * the initial job.
      */
     private boolean isScheduledByInitialJob() {
       return m_initialJobFuture != null && m_initialJobFuture == IFuture.CURRENT.get();
@@ -173,7 +173,7 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     /**
      * @return Returns <code>true</code> if the currently running job has been directly or indirectly scheduled by the
-     *         initial thread or the initial job.
+     * initial thread or the initial job.
      */
     private boolean isScheduledByDescendantJob() {
       final IFuture<?> future = IFuture.CURRENT.get();

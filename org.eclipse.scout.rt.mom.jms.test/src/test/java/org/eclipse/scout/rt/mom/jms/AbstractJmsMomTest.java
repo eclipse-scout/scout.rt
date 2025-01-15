@@ -147,7 +147,6 @@ public abstract class AbstractJmsMomTest {
         if (applicationScopedAnnotation != null) {
           registeredBeans.append(", ApplicationScoped");
         }
-
       }
       fail("IJmsMessageHandler mock registration unsuccessful. Registered mock is not returned from BEANS.get. Available beans:" + registeredBeans);
     }

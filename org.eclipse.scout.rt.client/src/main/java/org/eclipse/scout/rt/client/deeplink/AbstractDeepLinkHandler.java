@@ -65,5 +65,4 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
   }
 
   protected abstract void handleImpl(Matcher matcher) throws DeepLinkException;
-
 }

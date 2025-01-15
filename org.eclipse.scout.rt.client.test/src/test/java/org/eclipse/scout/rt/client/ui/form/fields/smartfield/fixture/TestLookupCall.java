@@ -22,5 +22,4 @@ public class TestLookupCall extends LookupCall<Long> {
   protected Class<? extends ILookupService<Long>> getConfiguredService() {
     return ITestLookupService.class;
   }
-
 }

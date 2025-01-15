@@ -31,5 +31,4 @@ public class UserTableRowFilter implements ITableRowFilter, IUserFilter {
   public boolean accept(ITableRow row) {
     return m_rows.contains(row);
   }
-
 }

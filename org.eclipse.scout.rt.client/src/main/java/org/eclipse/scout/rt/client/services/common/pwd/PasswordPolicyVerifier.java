@@ -36,9 +36,9 @@ public class PasswordPolicyVerifier {
    * the application (scout session).
    *
    * @param warnInAdvanceDays
-   *          number of days before the expiry when a warning shall occur, -1 to omit this feature
+   *     number of days before the expiry when a warning shall occur, -1 to omit this feature
    * @return true if the password is not expired, false if - after all - the password has expired. Normally when
-   *         returned false, the application quits.
+   * returned false, the application quits.
    */
   public boolean verify(String userId, int warnInAdvanceDays) {
     IPasswordManagementService service = BEANS.get(IPasswordManagementService.class);
@@ -105,5 +105,4 @@ public class PasswordPolicyVerifier {
     form.startChange();
     form.waitFor();
   }
-
 }

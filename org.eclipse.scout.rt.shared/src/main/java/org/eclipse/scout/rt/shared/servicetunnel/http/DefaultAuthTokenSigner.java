@@ -59,7 +59,7 @@ public class DefaultAuthTokenSigner {
    * Creates new token, sets {@link DefaultAuthToken#getUserId()} to user id of current subject and signs token.
    *
    * @param tokenClazz
-   *          not null
+   *     not null
    * @return null if not enabled or no userId could be determined else serialized token
    */
   public <T extends DefaultAuthToken> T createDefaultSignedToken(Class<T> tokenClazz) {
@@ -82,7 +82,7 @@ public class DefaultAuthTokenSigner {
    * are implemented by default.
    *
    * @param token
-   *          the token in creation
+   *     the token in creation
    * @since 10.0
    */
   protected void appendCustomArgs(DefaultAuthToken token) {
@@ -116,7 +116,7 @@ public class DefaultAuthTokenSigner {
    * Sets {@link DefaultAuthToken#getValidUntil()} and signs token.
    *
    * @param token
-   *          to be signed
+   *     to be signed
    * @return token for method chaining
    */
   public <T extends DefaultAuthToken> T sign(T token) {

@@ -351,7 +351,7 @@ public final class PlatformConfigProperties {
 
   /**
    * @since 2022, issue with some realtime scanners that have a delay until the file is scanned or are blocking the file
-   *        until scanned. For these cases this delay can be set (issue 322661).
+   * until scanned. For these cases this delay can be set (issue 322661).
    */
   public static class MalwareScannerDelayProperty extends AbstractIntegerConfigProperty {
 

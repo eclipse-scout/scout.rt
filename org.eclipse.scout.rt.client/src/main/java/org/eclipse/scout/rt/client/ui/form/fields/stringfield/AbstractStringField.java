@@ -79,7 +79,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   /**
    * @return true if all characters should be transformed to lower case when typing text into the string field. default
-   *         is false.
+   * is false.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
@@ -101,7 +101,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   /**
    * @return true if all characters should be transformed to upper case when typing text into the string field. default
-   *         is false.
+   * is false.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(300)
@@ -111,7 +111,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   /**
    * @return true if leading and trailing whitespace should be stripped from the entered text while validating the
-   *         value. default is true.
+   * value. default is true.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
@@ -163,8 +163,8 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * Subclasses can override this method. Default is {@code 0} (no drop support).
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
-   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   * {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   * {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(400)
@@ -181,8 +181,8 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * </p>
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
-   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   * {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   * {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(410)
@@ -592,7 +592,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     public TransferObject execDragRequest(StringFieldDragRequestChain chain) {
       return getOwner().execDragRequest();
     }
-
   }
 
   protected final void interceptDropRequest(TransferObject transferObject) {
@@ -612,5 +611,4 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     StringFieldDragRequestChain chain = new StringFieldDragRequestChain(extensions);
     return chain.execDragRequest();
   }
-
 }

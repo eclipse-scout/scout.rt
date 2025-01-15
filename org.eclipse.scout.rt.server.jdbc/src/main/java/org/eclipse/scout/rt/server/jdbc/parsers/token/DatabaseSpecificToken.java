@@ -54,5 +54,4 @@ public class DatabaseSpecificToken implements IToken {
   public String getName() {
     return m_name;
   }
-
 }

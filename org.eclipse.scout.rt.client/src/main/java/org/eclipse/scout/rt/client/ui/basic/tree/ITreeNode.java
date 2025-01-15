@@ -230,7 +230,7 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
 
   /**
    * @return <code>true</code> if nodes should be shown lazily when a parent node gets expanded, i.e. only after the
-   *         user explicitly requests them with the "show all" function. <code>false</code> otherwise.
+   * user explicitly requests them with the "show all" function. <code>false</code> otherwise.
    */
   boolean isLazyExpandingEnabled();
 
@@ -312,7 +312,7 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
 
   /**
    * @return the node's nesting level in the tree (counting upwards from the root node). The root node has level 0, no
-   *         matter whether it is visible or invisible.
+   * matter whether it is visible or invisible.
    */
   int getTreeLevel();
 

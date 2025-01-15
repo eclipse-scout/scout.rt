@@ -153,7 +153,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
       protected Boolean modelValue() {
         return getModel().isClosable();
       }
-
     });
     putJsonProperty(new JsonProperty<IForm>(PROP_SAVE_NEEDED_VISIBLE, model) {
       @Override

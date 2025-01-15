@@ -25,7 +25,7 @@ public final class TEXTS {
    * thread locale is null.
    *
    * @param key
-   *          The nls text key
+   *     The nls text key
    * @return The translation.
    * @see ScoutTexts
    * @see NlsUtility
@@ -50,9 +50,9 @@ public final class TEXTS {
    * </ul>
    *
    * @param key
-   *          The nls text key
+   *     The nls text key
    * @param messageArguments
-   *          The arguments (can be null) to replace in the returned text.
+   *     The arguments (can be null) to replace in the returned text.
    * @return
    * @see ScoutTexts
    * @see NlsUtility
@@ -75,11 +75,11 @@ public final class TEXTS {
    * </ul>
    *
    * @param locale
-   *          The locale of the text
+   *     The locale of the text
    * @param key
-   *          The nls text key
+   *     The nls text key
    * @param messageArguments
-   *          The arguments (can be null) to replace in the returned text.
+   *     The arguments (can be null) to replace in the returned text.
    * @return
    * @see ScoutTexts
    * @see Locale
@@ -95,7 +95,7 @@ public final class TEXTS {
    *
    * @param key
    * @param fallback
-   *          The fallback is returned when the text for the given key is undefinded.
+   *     The fallback is returned when the text for the given key is undefinded.
    * @return
    */
   public static String getWithFallback(@NlsKey String key, String fallback, String... messageArguments) {

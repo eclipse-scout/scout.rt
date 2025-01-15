@@ -20,5 +20,4 @@ public interface IPropertyFilter {
    * @see AbstractForm.updateForm(...)
    */
   boolean accept(FastPropertyDescriptor descriptor);
-
 }

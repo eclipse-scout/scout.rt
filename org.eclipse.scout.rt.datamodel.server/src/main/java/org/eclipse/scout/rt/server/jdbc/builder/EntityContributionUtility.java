@@ -44,9 +44,9 @@ public final class EntityContributionUtility {
    * inside an EXISTS (SELECT 1 FROM ... WHERE ... ) clause.
    *
    * @return a where constraint or null if the {@link EntityContribution} is empty.
-   *         <p>
-   *         The constraint does not start with "AND" and can be added with {@link #addWhere(String, NVPair...)} by
-   *         prepending "AND"
+   * <p>
+   * The constraint does not start with "AND" and can be added with {@link #addWhere(String, NVPair...)} by
+   * prepending "AND"
    */
   public static String contributionToConstraintText(EntityContribution contrib) {
     // if there are no where parts, do nothing
@@ -65,7 +65,7 @@ public final class EntityContributionUtility {
    * EXISTS (SELECT 1 FROM ... WHERE ... GROUP BY ... HAVING ...) clause.
    *
    * @return Returns an {@link EntityContribution} with constraints or null if the given {@link EntityContribution} is
-   *         empty.
+   * empty.
    */
   public static EntityContribution createConstraintsContribution(EntityContribution contrib) {
     // if there are no where or having parts, do nothing
@@ -113,18 +113,18 @@ public final class EntityContributionUtility {
    *
    * @param entityStrategy
    * @param entityPartWithTags
-   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
-   *          <br/>
-   *          as well as the contributing selectPart, fromPart, wherePart, groupByPart, havingPart for the outer calling
-   *          part.
+   *     may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
+   *     <br/>
+   *     as well as the contributing selectPart, fromPart, wherePart, groupByPart, havingPart for the outer calling
+   *     part.
    * @param childContributions
-   *          is the set of tags collected by all children
+   *     is the set of tags collected by all children
    * @param consumeChildContributions
-   *          true: consume the child tags inside the entity statement. The returned entity contributions will not
-   *          contain any of these tags
-   *          <p>
-   *          false: don't consume the child tags inside the entity statement. The returned entity contribution contains
-   *          its onw plus all of these child tags (proxy)
+   *     true: consume the child tags inside the entity statement. The returned entity contributions will not
+   *     contain any of these tags
+   *     <p>
+   *     false: don't consume the child tags inside the entity statement. The returned entity contribution contains
+   *     its onw plus all of these child tags (proxy)
    */
   @SuppressWarnings({"bsiRulesDefinition:htmlInString", "squid:S138"})
   public static EntityContribution mergeContributions(EntityStrategy entityStrategy, final String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) {
@@ -331,7 +331,7 @@ public final class EntityContributionUtility {
    * Check if a group by part is valid, i.e. ist not a SELECT clause.
    *
    * @throws ProcessingException
-   *           with {@link IStatus#getCode()} = X
+   *     with {@link IStatus#getCode()} = X
    * @since 3.8
    */
   public static void checkGroupByPart(String groupByPart) {
@@ -349,5 +349,4 @@ public final class EntityContributionUtility {
     }
     return s;
   }
-
 }

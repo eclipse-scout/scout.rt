@@ -112,5 +112,4 @@ public final class SeleniumJavaScript {
   public static void setResponsiveEnabled(AbstractSeleniumTest test, boolean enabled) {
     executeScript(test, "scout.ResponsiveManager.get().setActive(" + ((enabled) ? "true" : "false") + ");");
   }
-
 }

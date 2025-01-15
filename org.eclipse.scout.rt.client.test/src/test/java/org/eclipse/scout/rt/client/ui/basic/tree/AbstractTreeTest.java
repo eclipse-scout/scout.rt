@@ -526,7 +526,6 @@ public class AbstractTreeTest {
     boolean isDisposed();
 
     String getName();
-
   }
 
   public static class TreeNodeExtension extends AbstractTreeNodeExtension<P_TreeNode> {
@@ -603,5 +602,4 @@ public class AbstractTreeTest {
       m_disposed = true;
     }
   }
-
 }

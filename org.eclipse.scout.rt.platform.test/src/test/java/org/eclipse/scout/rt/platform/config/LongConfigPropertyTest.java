@@ -51,5 +51,4 @@ public class LongConfigPropertyTest {
       return "testKey";
     }
   }
-
 }

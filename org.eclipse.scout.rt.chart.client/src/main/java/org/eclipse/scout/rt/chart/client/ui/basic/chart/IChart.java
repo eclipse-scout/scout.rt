@@ -53,9 +53,9 @@ public interface IChart extends IWidget {
    * Extends the current config with the given {@link IChartConfig}.
    *
    * @param config
-   *          An {@link IChartConfig} object whose properties should be copied to the current config.
+   *     An {@link IChartConfig} object whose properties should be copied to the current config.
    * @param override
-   *          Whether properties in the current config should be overridden or not.
+   *     Whether properties in the current config should be overridden or not.
    */
   void extendConfig(IChartConfig config, boolean override);
 

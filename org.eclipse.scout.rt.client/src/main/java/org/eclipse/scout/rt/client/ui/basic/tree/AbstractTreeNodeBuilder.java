@@ -86,5 +86,4 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
     }
     return treeNode;
   }
-
 }

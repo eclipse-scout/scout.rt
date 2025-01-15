@@ -24,5 +24,4 @@ public interface IOpenBookmarkCommand {
    * <p>
    */
   void openBookmark(Bookmark bookmark);
-
 }

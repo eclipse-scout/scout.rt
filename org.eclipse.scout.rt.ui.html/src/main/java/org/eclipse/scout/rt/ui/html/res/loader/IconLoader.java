@@ -45,5 +45,4 @@ public class IconLoader extends AbstractResourceLoader {
         .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
         .build();
   }
-
 }

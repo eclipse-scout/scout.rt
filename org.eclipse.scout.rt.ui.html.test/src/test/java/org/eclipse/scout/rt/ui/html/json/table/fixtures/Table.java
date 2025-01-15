@@ -25,7 +25,6 @@ public class Table extends AbstractTable {
     protected String getConfiguredHeaderText() {
       return "col1";
     }
-
   }
 
   public void fill(int rowCount) {

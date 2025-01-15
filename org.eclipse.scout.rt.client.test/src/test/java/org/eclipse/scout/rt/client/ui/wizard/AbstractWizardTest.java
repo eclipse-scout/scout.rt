@@ -199,7 +199,6 @@ public class AbstractWizardTest {
       }
       getWizard().setWizardForm(f);
     }
-
   }
 
   private class P_StepForm extends AbstractForm {

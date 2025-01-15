@@ -178,14 +178,14 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
 
   protected static byte[] generateCompatibilityHeader(int keyLen, String secretKeyAlgorithm, String cipherAlgorithm, String cipherAlgorithmProvider, int gcmInitVecLen, int gcmAuthTagBitLen, int keyDerivationIterationCount) {
     String headerStr = "[1:"
-                       + keyLen
-                       + "-" + secretKeyAlgorithm
-                       + "-" + cipherAlgorithm
-                       + "-" + cipherAlgorithmProvider
-                       + "-" + gcmInitVecLen
-                       + "-" + gcmAuthTagBitLen
-                       + "-" + keyDerivationIterationCount
-                       + "]";
+        + keyLen
+        + "-" + secretKeyAlgorithm
+        + "-" + cipherAlgorithm
+        + "-" + cipherAlgorithmProvider
+        + "-" + gcmInitVecLen
+        + "-" + gcmAuthTagBitLen
+        + "-" + keyDerivationIterationCount
+        + "]";
     if ("PBKDF2WithHmacSHA256".equals(secretKeyAlgorithm) && "AES".equals(cipherAlgorithm) && "SunJCE".equals(cipherAlgorithmProvider) && 16 == gcmInitVecLen && 128 == gcmAuthTagBitLen) {
       switch (keyDerivationIterationCount) {
         case 10000:
@@ -419,7 +419,7 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
     }
     catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | IOException e) {
       throw new ProcessingException("Unable to create signature. If the curve is not supported (see cause below), consider creating a new key-pair"
-                                    + " by running '{}' on the command line and configure the properties (e.g. 'scout.auth.publicKey' and 'scout.auth.privateKey') with the new values.", SecurityUtility.class.getName(), e);
+          + " by running '{}' on the command line and configure the properties (e.g. 'scout.auth.publicKey' and 'scout.auth.privateKey') with the new values.", SecurityUtility.class.getName(), e);
     }
   }
 
@@ -689,21 +689,21 @@ public class SunSecurityProvider implements ISecurityProvider, ILegacySecurityPr
   @Override
   public String toString() {
     return "Implementor: " + getClass().getName() + "\n"
-           + "MinPasswordHashIterations: " + MIN_PASSWORD_HASH_ITERATIONS + "\n"
-           + "MacAlgorithm: " + getMacAlgorithm() + "\n"
-           + "MacAlgorithmProvider: " + getMacAlgorithmProvider() + "\n"
-           + "KeyDerivationIterationCount (PBE): " + getKeyDerivationIterationCount() + "\n"
-           + "SignatureAlgorithm: " + getSignatureAlgorithm() + "\n"
-           + "SignatureProvider: " + getSignatureProvider() + "\n"
-           + "KeyPairGenerationAlgorithm: " + getKeyPairGenerationAlgorithm() + "\n"
-           + "EllipticCurveName: " + getEllipticCurveName() + "\n"
-           + "DigestAlgorithm: " + getDigestAlgorithm() + "\n"
-           + "DigestAlgorithmProvider: " + getDigestAlgorithmProvider() + "\n"
-           + "SecretKeyAlgorithm: " + getSecretKeyAlgorithm() + "\n"
-           + "PasswordHashSecretKeyAlgorithm: " + getPasswordHashSecretKeyAlgorithm() + "\n"
-           + "CipherAlgorithm: " + getCipherAlgorithm() + "\n"
-           + "CipherAlgorithmProvider: " + getCipherAlgorithmProvider() + "\n"
-           + "CipherAlgorithmMode: " + getCipherAlgorithmMode() + "\n"
-           + "CipherAlgorithmPadding: " + getCipherAlgorithmPadding() + "\n";
+        + "MinPasswordHashIterations: " + MIN_PASSWORD_HASH_ITERATIONS + "\n"
+        + "MacAlgorithm: " + getMacAlgorithm() + "\n"
+        + "MacAlgorithmProvider: " + getMacAlgorithmProvider() + "\n"
+        + "KeyDerivationIterationCount (PBE): " + getKeyDerivationIterationCount() + "\n"
+        + "SignatureAlgorithm: " + getSignatureAlgorithm() + "\n"
+        + "SignatureProvider: " + getSignatureProvider() + "\n"
+        + "KeyPairGenerationAlgorithm: " + getKeyPairGenerationAlgorithm() + "\n"
+        + "EllipticCurveName: " + getEllipticCurveName() + "\n"
+        + "DigestAlgorithm: " + getDigestAlgorithm() + "\n"
+        + "DigestAlgorithmProvider: " + getDigestAlgorithmProvider() + "\n"
+        + "SecretKeyAlgorithm: " + getSecretKeyAlgorithm() + "\n"
+        + "PasswordHashSecretKeyAlgorithm: " + getPasswordHashSecretKeyAlgorithm() + "\n"
+        + "CipherAlgorithm: " + getCipherAlgorithm() + "\n"
+        + "CipherAlgorithmProvider: " + getCipherAlgorithmProvider() + "\n"
+        + "CipherAlgorithmMode: " + getCipherAlgorithmMode() + "\n"
+        + "CipherAlgorithmPadding: " + getCipherAlgorithmPadding() + "\n";
   }
 }

@@ -57,5 +57,4 @@ public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<O
   void execDecorateCell(TreeDecorateCellChain chain, ITreeNode node, Cell cell);
 
   TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node);
-
 }

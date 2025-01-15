@@ -337,5 +337,4 @@ public class JsonDesktopTest {
         .andMatchExecutionHint(DownloadHandlerStorage.RESOURCE_CLEANUP_JOB_MARKER)
         .toFilter(), true);
   }
-
 }

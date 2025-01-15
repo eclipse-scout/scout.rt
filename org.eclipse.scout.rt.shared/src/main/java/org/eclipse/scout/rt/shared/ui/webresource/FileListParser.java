@@ -39,7 +39,7 @@ public class FileListParser {
 
   /**
    * @param url
-   *          The {@link URL} pointing to the file list to parse. Must not be {@code null}.
+   *     The {@link URL} pointing to the file list to parse. Must not be {@code null}.
    * @return The valid {@link FileListEntry entries} found at the given {@link URL}.
    */
   public Stream<FileListEntry> parse(URL url) {

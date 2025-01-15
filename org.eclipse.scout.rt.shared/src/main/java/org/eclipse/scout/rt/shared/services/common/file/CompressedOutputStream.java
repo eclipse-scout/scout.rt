@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.file;
 /**
  * @version 3.x
  */
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

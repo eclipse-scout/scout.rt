@@ -203,8 +203,8 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
       try {
         s_beanInitializingLatch.countDown();
         m_otherBean = Jobs.schedule((Callable<AbstractConcurrentSelfReferencingTestBean>) () -> BEANS.get(AbstractConcurrentSelfReferencingTestBean.this.getClass()), Jobs
-            .newInput()
-            .withExceptionHandling(new ExceptionHandler(), false))
+                .newInput()
+                .withExceptionHandling(new ExceptionHandler(), false))
             .awaitDoneAndGet();
         fail("job is not expected to complete");
       }

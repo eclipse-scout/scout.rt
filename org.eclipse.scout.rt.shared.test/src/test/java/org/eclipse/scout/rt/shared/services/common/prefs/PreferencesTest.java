@@ -172,6 +172,5 @@ public class PreferencesTest {
     public void flush(IPreferences prefs) {
       m_flushed = true;
     }
-
   }
 }

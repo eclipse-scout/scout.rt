@@ -51,10 +51,10 @@ public class FindFieldByFormDataIdVisitor implements Function<IFormField, TreeVi
 
   /**
    * @param fieldId
-   *          The field Id of the {@link IFormField} to find
+   *     The field Id of the {@link IFormField} to find
    * @param searchContextRootForm
-   *          Optional form the visitor starts on. If <code>null</code>, the form is derived from the first field
-   *          visited.
+   *     Optional form the visitor starts on. If <code>null</code>, the form is derived from the first field
+   *     visited.
    * @since 3.8.2
    */
   public FindFieldByFormDataIdVisitor(String fieldId, IForm searchContextRootForm) {
@@ -128,8 +128,8 @@ public class FindFieldByFormDataIdVisitor implements Function<IFormField, TreeVi
 
   /**
    * @return Returns the rank of the given field's enclosing field path and the one that is requested by this visitor. A
-   *         perfect match yields 0. Every mismatch increases the rank by 1. Hence the greatest number has the worst
-   *         match.
+   * perfect match yields 0. Every mismatch increases the rank by 1. Hence the greatest number has the worst
+   * match.
    */
   private int getEnclosingFieldPathRank(IFormField f) {
     int rank = 0;

@@ -86,7 +86,7 @@ public class PeriodicAsyncMeasurement<V> implements AutoCloseable {
 
   /**
    * @return <code>null</code> or the currently available measurement and trigger the next async measurement if required
-   *         (see interval).
+   * (see interval).
    */
   public V getAndNext() {
     if (requiresAsyncMeasurement()) {

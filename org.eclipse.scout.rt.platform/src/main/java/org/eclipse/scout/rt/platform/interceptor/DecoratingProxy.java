@@ -36,9 +36,9 @@ public class DecoratingProxy<INSTANCE> {
    * {@link IInstanceInvocationHandler}. The instance parameter of this handler will receive {@code null}.
    *
    * @param handler
-   *          The {@link IInstanceInvocationHandler} callback.
+   *     The {@link IInstanceInvocationHandler} callback.
    * @param interfaces
-   *          The interface classes the created proxy should implement.
+   *     The interface classes the created proxy should implement.
    * @return The created decorating proxy.
    */
   public static <T> DecoratingProxy<T> newInstance(IInstanceInvocationHandler<T> handler, Class... interfaces) {
@@ -52,12 +52,12 @@ public class DecoratingProxy<INSTANCE> {
    * {@link Callable}.
    *
    * @param handler
-   *          The {@link IInstanceInvocationHandler} callback.
+   *     The {@link IInstanceInvocationHandler} callback.
    * @param targetInstanceProvider
-   *          The instance provider {@link Callable}.
+   *     The instance provider {@link Callable}.
    * @param interfaces
-   *          the interfaces the proxy should implement. Should be super interfaces of the instance provided by the
-   *          targetInstanceProvider.
+   *     the interfaces the proxy should implement. Should be super interfaces of the instance provided by the
+   *     targetInstanceProvider.
    * @return The created decorating proxy.
    */
   public static <T> DecoratingProxy<T> newInstance(IInstanceInvocationHandler<T> handler, Callable<T> targetInstanceProvider, Class... interfaces) {
@@ -173,5 +173,4 @@ public class DecoratingProxy<INSTANCE> {
       return m_decoratingProxy;
     }
   }
-
 }

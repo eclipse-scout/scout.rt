@@ -38,5 +38,4 @@ public final class TimingUtility {
   public static long nanosToMs(long nanos) {
     return TimeUnit.NANOSECONDS.toMillis(nanos);
   }
-
 }

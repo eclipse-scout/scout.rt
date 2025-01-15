@@ -176,7 +176,7 @@ public interface ISqlService extends IService {
    * </p>
    *
    * @return a two dimensional array, the first index referencing the rows, the second referencing the column. Cannot be
-   *         <code>null</code>
+   * <code>null</code>
    */
   Object[][] select(String s, Object... bindBases);
 
@@ -187,9 +187,9 @@ public interface ISqlService extends IService {
    * </p>
    *
    * @param maxRowCount
-   *          the maximum number of rows returned
+   *     the maximum number of rows returned
    * @return a two dimensional array, the first index referencing the rows, the second referencing the column. Cannot be
-   *         <code>null</code>
+   * <code>null</code>
    */
   Object[][] selectLimited(String s, int maxRowCount, Object... bindBases);
 
@@ -220,7 +220,7 @@ public interface ISqlService extends IService {
    * </p>
    *
    * @param handler
-   *          callback to handle individual rows
+   *     callback to handle individual rows
    * @see #select(String, Object...)
    */
   void selectStreaming(String s, ISelectStreamHandler handler, Object... bindBases);
@@ -232,7 +232,7 @@ public interface ISqlService extends IService {
    * </p>
    *
    * @param handler
-   *          callback to handle individual rows
+   *     callback to handle individual rows
    * @see #selectLimited(String, int, Object...)
    */
   void selectStreamingLimited(String s, ISelectStreamHandler handler, int maxRowCount, Object... bindBases);
@@ -314,8 +314,7 @@ public interface ISqlService extends IService {
 
   /**
    * @return current connection from {@link org.eclipse.scout.rt.platform.transaction.ITransactionMember} that is
-   *         registered inside the {@link org.eclipse.scout.rt.platform.transaction.ITransaction}.
+   * registered inside the {@link org.eclipse.scout.rt.platform.transaction.ITransaction}.
    */
   Connection getConnection();
-
 }

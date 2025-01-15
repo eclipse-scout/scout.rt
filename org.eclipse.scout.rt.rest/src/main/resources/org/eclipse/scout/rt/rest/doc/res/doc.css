@@ -167,7 +167,7 @@ h2 {
   color: #999;
 }
 
-.consumes-produces > .line >.v {
+.consumes-produces > .line > .v {
   font-family: monospace;
 }
 

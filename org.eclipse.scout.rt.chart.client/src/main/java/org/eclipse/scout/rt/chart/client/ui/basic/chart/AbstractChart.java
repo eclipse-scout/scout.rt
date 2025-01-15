@@ -270,5 +270,4 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
       getOwner().execValueClick(xIndex, yIndex, datasetIndex);
     }
   }
-
 }

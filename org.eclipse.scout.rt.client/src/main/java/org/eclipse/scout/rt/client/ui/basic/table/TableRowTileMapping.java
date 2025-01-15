@@ -37,5 +37,4 @@ public class TableRowTileMapping extends AbstractPropertyObserver implements ITa
     propertySupport.setProperty(PROP_TILE, tile);
     return this;
   }
-
 }

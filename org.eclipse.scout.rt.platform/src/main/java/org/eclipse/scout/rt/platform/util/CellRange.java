@@ -219,5 +219,4 @@ public class CellRange implements Serializable {
       m_col1 = t;
     }
   }
-
 }

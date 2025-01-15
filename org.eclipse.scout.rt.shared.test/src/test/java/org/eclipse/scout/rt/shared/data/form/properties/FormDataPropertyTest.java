@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form.properties;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  * listener is created before the event emitter is known or if the event emitter changes dynamically.
  *
  * @param <EVENT>
- *          Event type that is fired.
+ *     Event type that is fired.
  * @since 22.0
  */
 public class EventBinding<EVENT extends EventObject> {
@@ -32,13 +32,13 @@ public class EventBinding<EVENT extends EventObject> {
    * Attached an event listener to the given event emitter and notifies the given event handler when an event is fired.
    *
    * @param target
-   *          event emitter to attach this binding to
+   *     event emitter to attach this binding to
    * @param eventHandler
-   *          consumer for events that are emitted by the {@code target}
+   *     consumer for events that are emitted by the {@code target}
    * @throws AssertionException
-   *           if any of the given arguments is {@code null}
+   *     if any of the given arguments is {@code null}
    * @throws IllegalStateException
-   *           if this binding instance is already attached to an event emitter.
+   *     if this binding instance is already attached to an event emitter.
    */
   public void attach(IEventEmitter<EVENT> target, Consumer<EVENT> eventHandler) {
     Assertions.assertNotNull(target, "Missing target");
@@ -55,7 +55,7 @@ public class EventBinding<EVENT extends EventObject> {
    * Detaches the binding from the previously attached event emitter.
    *
    * @throws IllegalStateException
-   *           if this binding instance is not attached. The attach status can be checked with {@link #isAttached()}.
+   *     if this binding instance is not attached. The attach status can be checked with {@link #isAttached()}.
    */
   public void detach() {
     if (!isAttached()) {

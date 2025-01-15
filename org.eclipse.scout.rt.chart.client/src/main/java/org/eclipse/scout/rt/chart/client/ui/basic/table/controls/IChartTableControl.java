@@ -61,5 +61,4 @@ public interface IChartTableControl extends ITableControl {
    * configuration for the aggregated data for the chart
    */
   IChartColumnParam getAggregation();
-
 }

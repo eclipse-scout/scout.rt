@@ -49,7 +49,7 @@ public class ServerSessionEntry {
 
   /**
    * @return {@code true} if this {@link ServerSessionEntry} did not already contain the specified HTTP session id.
-   *         {@code false} otherwise.
+   * {@code false} otherwise.
    */
   protected boolean addHttpSessionId(String httpSessionId) {
     return m_httpSessionSet.add(httpSessionId);

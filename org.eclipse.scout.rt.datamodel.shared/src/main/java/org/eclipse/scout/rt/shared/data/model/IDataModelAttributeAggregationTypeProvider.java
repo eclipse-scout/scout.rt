@@ -24,9 +24,9 @@ public interface IDataModelAttributeAggregationTypeProvider {
    * Inject aggregation types for the provided attribute
    *
    * @param attribute
-   *          Data model attribute.
+   *     Data model attribute.
    * @param aggregationTypeList
-   *          Live and mutable list of aggregation types.
+   *     Live and mutable list of aggregation types.
    */
   void injectAggregationTypes(IDataModelAttribute attribute, List<Integer> aggregationTypeList);
 }

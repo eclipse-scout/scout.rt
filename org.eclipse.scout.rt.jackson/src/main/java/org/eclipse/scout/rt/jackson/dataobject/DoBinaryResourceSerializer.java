@@ -50,5 +50,4 @@ public class DoBinaryResourceSerializer extends StdSerializer<BinaryResource> {
       gen.writeBinaryField(fieldName, data);
     }
   }
-
 }

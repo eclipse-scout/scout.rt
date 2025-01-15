@@ -215,7 +215,6 @@ public class ClipboardForm extends AbstractForm {
         doClose();
       }
     }
-
   }
 
   public class CopyHandler extends AbstractFormHandler {
@@ -241,5 +240,4 @@ public class ClipboardForm extends AbstractForm {
       checkOkButtonEnabled();
     }
   }
-
 }

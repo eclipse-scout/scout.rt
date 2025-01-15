@@ -25,7 +25,6 @@ public final class TileChains {
     public AbstractTileChain(List<? extends ITileExtension<? extends AbstractTile>> extensions) {
       super(extensions, ITileExtension.class);
     }
-
   }
 
   public static class TileDisposeTileChain extends AbstractTileChain {

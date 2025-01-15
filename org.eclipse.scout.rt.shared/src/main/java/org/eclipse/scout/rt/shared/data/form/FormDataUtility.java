@@ -44,7 +44,7 @@ public final class FormDataUtility {
    * <b>Note:</b> This method behaves exactly the same as the generate FormData operation in Scout SDK.
    *
    * @return Returns the corresponding field data ID for the given form field ID. The result is <code>null</code> if the
-   *         field ID is <code>null</code> or if it contains white spaces only.
+   * field ID is <code>null</code> or if it contains white spaces only.
    */
   public static String getFieldDataId(String formFieldId) {
     String s = StringUtility.trim(formFieldId);
@@ -71,7 +71,7 @@ public final class FormDataUtility {
   /**
    * @param formData
    * @param includeEmptyData
-   *          true to include null and empty properties and fields, false to ignore them
+   *     true to include null and empty properties and fields, false to ignore them
    * @return
    */
   public static String toString(AbstractFormData formData, boolean includeEmptyData) {
@@ -87,7 +87,7 @@ public final class FormDataUtility {
   /**
    * @param field
    * @param includeEmptyData
-   *          true to include null and empty properties and fields, false to ignore them
+   *     true to include null and empty properties and fields, false to ignore them
    * @return
    */
   public static String toString(AbstractFormFieldData field, boolean includeEmptyData) {
@@ -103,7 +103,7 @@ public final class FormDataUtility {
   /**
    * @param prop
    * @param includeEmptyData
-   *          true to include null and empty properties and fields, false to ignore them
+   *     true to include null and empty properties and fields, false to ignore them
    * @return
    */
   public static String toString(AbstractPropertyData<?> prop, boolean includeEmptyData) {
@@ -263,7 +263,7 @@ public final class FormDataUtility {
     }
 
     public void removeEmptyData() {
-      for (Iterator<DataNode> it = m_children.iterator(); it.hasNext();) {
+      for (Iterator<DataNode> it = m_children.iterator(); it.hasNext(); ) {
         DataNode c = it.next();
         c.removeEmptyData();
         if (!c.hasContent && c.m_children.isEmpty()) {
@@ -299,5 +299,4 @@ public final class FormDataUtility {
       }
     }
   }
-
 }

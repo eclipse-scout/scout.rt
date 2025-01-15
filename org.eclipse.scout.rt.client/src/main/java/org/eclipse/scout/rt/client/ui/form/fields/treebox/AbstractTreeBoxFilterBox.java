@@ -358,5 +358,4 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
   public CheckedStateRadioButtonGroup getCheckedStateRadioButtonGroup() {
     return getFieldByClass(CheckedStateRadioButtonGroup.class);
   }
-
 }

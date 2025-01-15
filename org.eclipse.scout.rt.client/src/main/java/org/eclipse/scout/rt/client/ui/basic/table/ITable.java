@@ -322,7 +322,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   /**
    * @return the context in which the table and column settings (order, width, visible,...) are loaded and stored from
-   *         the {@link ClientUIPreferences ClientUIPreferences}
+   * the {@link ClientUIPreferences ClientUIPreferences}
    */
   String getUserPreferenceContext();
 
@@ -476,8 +476,8 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   /**
    * @param b
-   *          true: advices the attached ui to make the current selection visible. The current selection will be
-   *          scrolled to visible (again, whenever the table size changes).
+   *     true: advices the attached ui to make the current selection visible. The current selection will be
+   *     scrolled to visible (again, whenever the table size changes).
    */
   void setScrollToSelection(boolean b);
 
@@ -662,7 +662,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   /**
    * @param eventTypes
-   *          of {@link TableEvent} TYPE_*
+   *     of {@link TableEvent} TYPE_*
    */
   default void addTableListener(TableListener listener, Integer... eventTypes) {
     tableListeners().add(listener, false, eventTypes);
@@ -678,7 +678,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Use {@link #addTableListener(TableListener, Integer...)} in all other cases
    *
    * @param eventTypes
-   *          of {@link TableEvent} TYPE_*
+   *     of {@link TableEvent} TYPE_*
    */
   default void addUITableListener(TableListener listener, Integer... eventTypes) {
     tableListeners().addLastCalled(listener, false, eventTypes);
@@ -686,11 +686,11 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   /**
    * @return the {@link IEventHistory} associated with this table
-   *         <p>
-   *         The default implementation is a {@link DefaultTableEventHistory} and created by
-   *         {@link AbstractTable#createEventHistory()}
-   *         <p>
-   *         This method is thread safe.
+   * <p>
+   * The default implementation is a {@link DefaultTableEventHistory} and created by
+   * {@link AbstractTable#createEventHistory()}
+   * <p>
+   * This method is thread safe.
    * @since 3.8
    */
   IEventHistory<TableEvent> getEventHistory();
@@ -756,8 +756,8 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   /**
    * @param append
-   *          true if the row should be appended to the existing selection, false if not. True has only an effect if
-   *          {@link ITable#isMultiSelect()} is true.
+   *     true if the row should be appended to the existing selection, false if not. True has only an effect if
+   *     {@link ITable#isMultiSelect()} is true.
    */
   void selectRow(ITableRow row, boolean append);
 
@@ -796,19 +796,19 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   /**
    * @param value
-   *          true if the row should be checked, false if not
+   *     true if the row should be checked, false if not
    */
   void checkRow(int rowIndex, boolean value);
 
   /**
    * @param value
-   *          true if the row should be checked, false if not
+   *     true if the row should be checked, false if not
    */
   void checkRow(ITableRow row, boolean value);
 
   /**
    * @param value
-   *          true if the row should be checked, false if not
+   *     true if the row should be checked, false if not
    */
   void checkRows(Collection<? extends ITableRow> rows, boolean value);
 
@@ -843,8 +843,8 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Adds a new {@link ITableRow}
    *
    * @param markAsInserted
-   *          if <code>true</code>, the status of the new row is {@link ITableRow#STATUS_INSERTED}, otherwise the status
-   *          {@link ITableRow#STATUS_NON_CHANGED}
+   *     if <code>true</code>, the status of the new row is {@link ITableRow#STATUS_INSERTED}, otherwise the status
+   *     {@link ITableRow#STATUS_NON_CHANGED}
    */
   ITableRow addRow(boolean markAsInserted);
 
@@ -973,8 +973,8 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   /**
    * Container of this table, {@link IPage IPage}, {@link ITableField ITableField}, {@link IListBox IListBox}, etc.
    *
-   * @since 3.8.1
    * @see #getParent()
+   * @since 3.8.1
    */
   ITypeWithClassId getContainer();
 
@@ -1043,7 +1043,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * removed as well.
    *
    * @param store
-   *          true if the settings should be stored in the {@link ClientUIPreferences}, false if not.
+   *     true if the settings should be stored in the {@link ClientUIPreferences}, false if not.
    */
   void reset(boolean store);
 
@@ -1106,7 +1106,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * </p>
    *
    * @param dataMatrixOrReference
-   *          Can be an Object[][] or an <code>AtomicReference&lt;Object&gt;</code>(that holds Object[][])
+   *     Can be an Object[][] or an <code>AtomicReference&lt;Object&gt;</code>(that holds Object[][])
    * @return the list of the created table rows
    */
   List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference);
@@ -1123,7 +1123,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * </p>
    *
    * @param rowStatus
-   *          The row status to be set for each created table row
+   *     The row status to be set for each created table row
    * @return the list of the created table rows
    */
   List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus);
@@ -1139,7 +1139,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Creates a new table row from the <code>rowValues</code> argument. The created row is not added to the table yet.
    *
    * @param rowValues
-   *          The values to be filled into the new table row. Must be an array.
+   *     The values to be filled into the new table row. Must be an array.
    * @return the created table row
    */
   ITableRow createRow(Object rowValues);
@@ -1148,7 +1148,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Creates new table rows from the given (one dimensional) array. The created rows are not added to the table yet.
    *
    * @param dataArray
-   *          The values to be filled into the new table rows.
+   *     The values to be filled into the new table rows.
    * @return the list of the created table rows
    */
   List<ITableRow> createRowsByArray(Object dataArray);
@@ -1158,9 +1158,9 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * row state of each created row is set according to the <code>rowStatus</code> parameter.
    *
    * @param dataArray
-   *          The values to be filled into the new table rows.
+   *     The values to be filled into the new table rows.
    * @param rowStatus
-   *          The row status to be set for each created table row
+   *     The row status to be set for each created table row
    * @return the list of the created table rows
    */
   List<ITableRow> createRowsByArray(Object dataArray, int rowStatus);
@@ -1197,7 +1197,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   /**
    * @return the data fetching/loading status, warnings and other general messages related with data currently loaded
-   *         into this table
+   * into this table
    * @since 5.1.0
    */
   IStatus getTableStatus();
@@ -1251,8 +1251,8 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   ITableOrganizer getTableOrganizer();
 
   /**
-   * @since 5.2.0
    * @return True if the table has a table-customizer and the {@link CreateCustomColumnPermission}, false otherwise.
+   * @since 5.2.0
    */
   boolean isCustomizable();
 

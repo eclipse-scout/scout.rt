@@ -29,19 +29,19 @@ public interface IHealthChecker {
 
   /**
    * @param category
-   *          the {@link IHealthCheckCategory} if provided, <code>null</code> if none is provided
+   *     the {@link IHealthCheckCategory} if provided, <code>null</code> if none is provided
    * @param context
-   *          {@link RunContext} used to run the check in.
+   *     {@link RunContext} used to run the check in.
    * @return <code>true</code> if check was successful, <code>false</code> otherwise.
    */
   boolean checkHealth(RunContext context, HealthCheckCategoryId category);
 
   /**
    * @param category
-   *          non-null category; if no category is available all checks are considered which are marked as
-   *          {@link #isActive()}
+   *     non-null category; if no category is available all checks are considered which are marked as
+   *     {@link #isActive()}
    * @return <code>true</code> if this <code>IHealthChecker</code> accepts the provided category; <code>false</code> to
-   *         exclude this check for this category
+   * exclude this check for this category
    */
   default boolean acceptCategory(HealthCheckCategoryId category) {
     return true;

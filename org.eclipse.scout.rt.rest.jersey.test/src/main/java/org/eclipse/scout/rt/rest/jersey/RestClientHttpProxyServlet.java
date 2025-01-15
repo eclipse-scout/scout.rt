@@ -42,7 +42,7 @@ public class RestClientHttpProxyServlet extends HttpServlet {
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder("HTTP Headers:");
-      for (Enumeration<String> headers = req.getHeaderNames(); headers.hasMoreElements();) {
+      for (Enumeration<String> headers = req.getHeaderNames(); headers.hasMoreElements(); ) {
         String header = headers.nextElement();
         sb.append(String.format("%n  %s: '%s'", header, req.getHeader(header)));
       }

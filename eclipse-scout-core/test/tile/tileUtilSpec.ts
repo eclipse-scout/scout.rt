@@ -40,7 +40,6 @@ describe('tileUtil', () => {
     return tileGrid.tiles;
   }
 
-
   /**
    * Creates placeholders at the positions in the given matrix where no tiles are.
    */

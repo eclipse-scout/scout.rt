@@ -69,5 +69,4 @@ public abstract class AbstractColumnExtension<VALUE, OWNER extends AbstractColum
   public void execDisposeColumn(ColumnDisposeColumnChain<VALUE> chain) {
     chain.execDisposeColumn();
   }
-
 }

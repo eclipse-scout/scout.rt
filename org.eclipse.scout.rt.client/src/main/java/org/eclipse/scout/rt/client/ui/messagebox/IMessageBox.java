@@ -54,8 +54,8 @@ public interface IMessageBox extends IWidget {
    * </ul>
    *
    * @param displayParent
-   *          like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to derive the
-   *          {@link IDisplayParent} from the current calling context.
+   *     like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to derive the
+   *     {@link IDisplayParent} from the current calling context.
    */
   IMessageBox withDisplayParent(IDisplayParent displayParent);
 
@@ -90,7 +90,7 @@ public interface IMessageBox extends IWidget {
    * Sets the severity.
    *
    * @param severity
-   *          One of the {@link IStatus} constants.
+   *     One of the {@link IStatus} constants.
    */
   IMessageBox withSeverity(int severity);
 
@@ -184,7 +184,7 @@ public interface IMessageBox extends IWidget {
    * the message box.
    *
    * @param autoCloseMillis
-   *          timeout [ms]
+   *     timeout [ms]
    */
   IMessageBox withAutoCloseMillis(long autoCloseMillis);
 
@@ -221,7 +221,7 @@ public interface IMessageBox extends IWidget {
    * Opens a message box. This call blocks until the message box is closed.
    *
    * @param defaultResult
-   *          default result to return if not closed by the user (e.g. by auto-close timer).
+   *     default result to return if not closed by the user (e.g. by auto-close timer).
    * @return The close result ({@link #YES_OPTION}, {@link #NO_OPTION}, {@link #CANCEL_OPTION}).
    */
   int show(int defaultResult);

@@ -50,11 +50,11 @@ public class FilesystemWebResourceResolver extends AbstractWebResourceResolver {
    * was found.
    *
    * @param root
-   *          The root directory in which the given relative path should be resolved.
+   *     The root directory in which the given relative path should be resolved.
    * @param relPath
-   *          The relative path to resolve.
+   *     The relative path to resolve.
    * @return The {@link URL} pointing to the file found in the given root or an empty {@link Stream} if the file could
-   *         not be found.
+   * not be found.
    */
   protected static Stream<URL> resolveUrls(Path root, String relPath) {
     return resolveUrls(singleton(root), relPath);
@@ -65,9 +65,9 @@ public class FilesystemWebResourceResolver extends AbstractWebResourceResolver {
    * to existing files.
    *
    * @param roots
-   *          The root directories in which the given relative path should be resolved.
+   *     The root directories in which the given relative path should be resolved.
    * @param relPath
-   *          The relative path to resolve.
+   *     The relative path to resolve.
    * @return {@link URL Urls} pointing to all files found for the given relative path within the given roots.
    */
   protected static Stream<URL> resolveUrls(Collection<Path> roots, String relPath) {

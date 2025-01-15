@@ -34,9 +34,9 @@ public final class SleepUtil {
    * If interrupted, the thread's interruption status is not cleared.
    *
    * @param time
-   *          the length of time to sleep.
+   *     the length of time to sleep.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    */
   public static void sleepSafe(final long time, final TimeUnit unit) {
     try {
@@ -53,9 +53,9 @@ public final class SleepUtil {
    * If interrupted, the thread's interruption status is not cleared.
    *
    * @param time
-   *          the length of time to sleep.
+   *     the length of time to sleep.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    */
   public static void sleepElseLog(final long time, final TimeUnit unit) {
     sleepElseLog(time, unit, "Interrupted");
@@ -67,15 +67,15 @@ public final class SleepUtil {
    * If interrupted, the thread's interruption status is not cleared.
    *
    * @param time
-   *          the length of time to sleep.
+   *     the length of time to sleep.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    * @param msg
-   *          the log message with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the log message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          optional arguments to substitute <em>formatting anchors</em> in the message.
+   *     optional arguments to substitute <em>formatting anchors</em> in the message.
    * @throws ThreadInterruptedError
-   *           if the sleeping thread is interrupted.
+   *     if the sleeping thread is interrupted.
    */
   public static void sleepElseLog(final long time, final TimeUnit unit, final String msg, final Object... msgArgs) {
     try {
@@ -96,11 +96,11 @@ public final class SleepUtil {
    * If interrupted, the thread's interruption status is not cleared.
    *
    * @param time
-   *          the length of time to sleep.
+   *     the length of time to sleep.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    * @throws ThreadInterruptedError
-   *           if the sleeping thread is interrupted.
+   *     if the sleeping thread is interrupted.
    */
   public static void sleepElseThrow(final long time, final TimeUnit unit) {
     sleepElseThrow(time, unit, "Interrupted");
@@ -112,15 +112,15 @@ public final class SleepUtil {
    * If interrupted, the thread's interruption status is not cleared.
    *
    * @param time
-   *          the length of time to sleep.
+   *     the length of time to sleep.
    * @param unit
-   *          unit of the timeout.
+   *     unit of the timeout.
    * @param msg
-   *          the exception message with support for <em>formatting anchors</em> in the form of {} pairs.
+   *     the exception message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
-   *          optional arguments to substitute <em>formatting anchors</em> in the message.
+   *     optional arguments to substitute <em>formatting anchors</em> in the message.
    * @throws ThreadInterruptedError
-   *           if the sleeping thread is interrupted.
+   *     if the sleeping thread is interrupted.
    */
   public static void sleepElseThrow(final long time, final TimeUnit unit, final String msg, final Object... msgArgs) {
     try {

@@ -25,7 +25,7 @@ public final class BasicFieldChains {
 
     /**
      * @param extensions
-     *          the list of all extension sorted reverse considering the execution order. The list must be immutable.
+     *     the list of all extension sorted reverse considering the execution order. The list must be immutable.
      */
     public BasicFieldExecChangedDisplayTextChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);

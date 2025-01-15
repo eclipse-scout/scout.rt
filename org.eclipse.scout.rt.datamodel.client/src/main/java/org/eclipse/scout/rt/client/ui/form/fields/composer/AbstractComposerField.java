@@ -228,8 +228,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * Override this method to decorate or enhance new nodes whenever they are created
    *
    * @return the new node, must not be null
-   *         <p>
-   *         Normally overrides call super. {@link #interceptCreateRootNode()}
+   * <p>
+   * Normally overrides call super. {@link #interceptCreateRootNode()}
    */
   @ConfigOperation
   @Order(100)
@@ -241,9 +241,9 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * Override this method to decorate or enhance new nodes whenever they are created
    *
    * @return the new node or null to ignore the add of a new node of this type
-   *         <p>
-   *         Normally overrides call super. {@link #execCreateEntityNode(ITreeNode, IDataModelEntity, boolean, Object[],
-   *         List<String>)}
+   * <p>
+   * Normally overrides call super. {@link #execCreateEntityNode(ITreeNode, IDataModelEntity, boolean, Object[],
+   * List<String>)}
    */
   @ConfigOperation
   @Order(110)
@@ -264,9 +264,9 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * Override this method to decorate or enhance new nodes whenever they are created
    *
    * @return the new node or null to ignore the add of a new node of this type
-   *         <p>
-   *         Normally overrides call super. {@link #execCreateAttributeNode(ITreeNode, IDataModelAttribute, Integer,
-   *         IComposerOp, Object[], List<String>)}
+   * <p>
+   * Normally overrides call super. {@link #execCreateAttributeNode(ITreeNode, IDataModelAttribute, Integer,
+   * IComposerOp, Object[], List<String>)}
    */
   @ConfigOperation
   @Order(120)
@@ -291,8 +291,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * Override this method to decorate or enhance new nodes whenever they are created
    *
    * @return the new node or null to ignore the add of a new node of this type
-   *         <p>
-   *         Normally overrides call super.{@link #interceptCreateEitherNode(ITreeNode, boolean)}
+   * <p>
+   * Normally overrides call super.{@link #interceptCreateEitherNode(ITreeNode, boolean)}
    */
   @ConfigOperation
   @Order(130)
@@ -311,8 +311,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * Override this method to decorate or enhance new nodes whenever they are created
    *
    * @return the new node or null to ignore the add of a new node of this type
-   *         <p>
-   *         Normally overrides call super.{@link #interceptCreateAdditionalOrNode(ITreeNode, boolean)}
+   * <p>
+   * Normally overrides call super.{@link #interceptCreateAdditionalOrNode(ITreeNode, boolean)}
    */
   @ConfigOperation
   @Order(140)

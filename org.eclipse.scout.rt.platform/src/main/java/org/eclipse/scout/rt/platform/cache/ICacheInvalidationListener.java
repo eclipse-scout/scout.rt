@@ -18,12 +18,12 @@ public interface ICacheInvalidationListener<K, V> {
    * Called when {@link ICache#invalidate(ICacheEntryFilter, boolean)} has been called.
    *
    * @param filter
-   *          The {@link ICacheEntryFilter} which was used in the invalidation. May be {@code null} (which means nothing
-   *          was invalidated).
+   *     The {@link ICacheEntryFilter} which was used in the invalidation. May be {@code null} (which means nothing
+   *     was invalidated).
    * @param propagate
-   *          {@code true} indicates that the event occurred on this node and will be forwarded to other cluster nodes,
-   *          {@code false} indicates that the event occurred on another node and was propagated to the current node
-   *          through the cluster.
+   *     {@code true} indicates that the event occurred on this node and will be forwarded to other cluster nodes,
+   *     {@code false} indicates that the event occurred on another node and was propagated to the current node
+   *     through the cluster.
    */
   void invalidated(ICacheEntryFilter<K, V> filter, boolean propagate);
 }

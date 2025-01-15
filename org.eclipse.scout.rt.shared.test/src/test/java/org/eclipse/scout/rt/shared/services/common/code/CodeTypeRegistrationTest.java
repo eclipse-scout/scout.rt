@@ -36,5 +36,4 @@ public class CodeTypeRegistrationTest {
     MatcherAssert.assertThat(BEANS.get(TestCodeType3.class), instanceOf(TestCodeType4.class));
     MatcherAssert.assertThat(BEANS.get(TestCodeType4.class), instanceOf(TestCodeType4.class));
   }
-
 }

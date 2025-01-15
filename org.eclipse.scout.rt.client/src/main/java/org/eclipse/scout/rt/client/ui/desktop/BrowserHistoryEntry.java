@@ -27,16 +27,16 @@ public class BrowserHistoryEntry {
 
   /**
    * @param path
-   *          relative path which is displayed in the address bar of the browser. Example
-   *          <code>./?deeplink=outline-12345</code>
+   *     relative path which is displayed in the address bar of the browser. Example
+   *     <code>./?deeplink=outline-12345</code>
    * @param title
-   *          displayed in the browser window
+   *     displayed in the browser window
    * @param deepLinkPath
-   *          stored in the History.state object of the browser. This path is sent back to the UI server when the user
-   *          clicks on the navigate buttons in the browser. Example <code>outline-12345</code>
+   *     stored in the History.state object of the browser. This path is sent back to the UI server when the user
+   *     clicks on the navigate buttons in the browser. Example <code>outline-12345</code>
    * @param pathVisible
-   *          flag to show or hide the path in the URL. In some cases we want to suppress deep-link parameters
-   *          on startup, but we still need the deep-link-path.
+   *     flag to show or hide the path in the URL. In some cases we want to suppress deep-link parameters
+   *     on startup, but we still need the deep-link-path.
    */
   public BrowserHistoryEntry(URI path, String title, String deepLinkPath, boolean pathVisible) {
     m_path = path;
@@ -74,14 +74,13 @@ public class BrowserHistoryEntry {
     }
     BrowserHistoryEntry that = (BrowserHistoryEntry) o;
     return m_pathVisible == that.m_pathVisible &&
-      m_title.equals(that.m_title) &&
-      m_path.equals(that.m_path) &&
-      m_deepLinkPath.equals(that.m_deepLinkPath);
+        m_title.equals(that.m_title) &&
+        m_path.equals(that.m_path) &&
+        m_deepLinkPath.equals(that.m_deepLinkPath);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(m_title, m_path, m_deepLinkPath, m_pathVisible);
   }
-
 }

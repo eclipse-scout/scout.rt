@@ -309,7 +309,6 @@ public class SelectInputBindTest {
     formData.getRoles().setValue(Collections.<Long> emptySet());
     sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", formData);
     assertEquals("", sql.getProtocol().toString());
-
   }
 
   private static final String PREPARE_STATEMENT = "Connection.prepareStatement(UDPATE this_table SET v = ? where r = ? and p = ?)\n";

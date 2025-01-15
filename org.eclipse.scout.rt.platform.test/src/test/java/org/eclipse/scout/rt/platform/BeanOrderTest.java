@@ -66,5 +66,4 @@ public class BeanOrderTest {
   private static class TestBean02 implements ITestBean {
 
   }
-
 }

@@ -89,7 +89,6 @@ public class CodeRowTest {
   public void testCreateWithArray() {
     ICodeRow<String> row = new CodeRow<>(OBJECT_ARRAY, String.class);
     assertCodeRowCreatedWithObjectArray(row);
-
   }
 
   private void assertCodeRowCreatedWithObjectArray(ICodeRow<String> row) {
@@ -120,5 +119,4 @@ public class CodeRowTest {
       super(cells);
     }
   }
-
 }

@@ -21,7 +21,6 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpEntityContainer;
 import org.apache.hc.core5.http.HttpRequest;
 
-
 /**
  * A Proxy class for {@link org.apache.http.HttpEntity} that supports retry regardless of the enclosed
  * {@link HttpEntity#isRepeatable()}

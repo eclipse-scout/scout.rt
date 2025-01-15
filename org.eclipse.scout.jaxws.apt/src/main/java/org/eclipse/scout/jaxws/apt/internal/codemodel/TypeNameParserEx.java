@@ -122,6 +122,5 @@ public final class TypeNameParserEx {
       }
       m_idx++;
     }
-
   }
 }

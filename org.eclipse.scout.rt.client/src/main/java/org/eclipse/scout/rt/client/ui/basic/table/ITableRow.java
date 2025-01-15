@@ -195,7 +195,7 @@ public interface ITableRow {
 
   /**
    * @return set of column indexes that have been updated on the current table row (only valid during "rowChanging", by
-   *         default only on InternalTableRow). Return value is never <code>null</code>.
+   * default only on InternalTableRow). Return value is never <code>null</code>.
    */
   Set<Integer> getUpdatedColumnIndexes();
 
@@ -207,7 +207,7 @@ public interface ITableRow {
 
   /**
    * @return set of column indexes that have changed the value of the given changeBit. (only valid during "rowChanging",
-   *         by default only on InternalTableRow). Return value is never <code>null</code>.
+   * by default only on InternalTableRow). Return value is never <code>null</code>.
    */
   Set<Integer> getUpdatedColumnIndexes(int changedBit);
 
@@ -234,5 +234,4 @@ public interface ITableRow {
    * move this row one down this method has no effect if sorting is activated on the table
    */
   void moveDown();
-
 }

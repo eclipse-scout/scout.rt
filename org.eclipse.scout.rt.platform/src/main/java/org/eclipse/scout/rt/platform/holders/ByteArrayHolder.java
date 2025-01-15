@@ -23,5 +23,4 @@ public class ByteArrayHolder extends Holder<byte[]> {
   public ByteArrayHolder(byte[] value) {
     super(byte[].class, value);
   }
-
 }

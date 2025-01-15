@@ -51,5 +51,4 @@ public interface IKeyStroke extends IAction {
 
   String COMMA = "comma";
   String POINT = "point";
-
 }

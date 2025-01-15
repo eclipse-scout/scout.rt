@@ -61,7 +61,6 @@ public class JobStateTest {
 
     IFuture<Void> future = Jobs.schedule(() -> {
       runningLatch.countDownAndBlock();
-
     }, Jobs.newInput());
 
     assertTrue(runningLatch.await());

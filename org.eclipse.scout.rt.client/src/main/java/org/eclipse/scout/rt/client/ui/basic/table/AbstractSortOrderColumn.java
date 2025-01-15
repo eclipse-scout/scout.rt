@@ -28,5 +28,4 @@ public abstract class AbstractSortOrderColumn extends AbstractColumn<IColumn> im
   protected ISortOrderColumnExtension<? extends AbstractSortOrderColumn> createLocalExtension() {
     return new LocalSortOrderColumnExtension<>(this);
   }
-
 }

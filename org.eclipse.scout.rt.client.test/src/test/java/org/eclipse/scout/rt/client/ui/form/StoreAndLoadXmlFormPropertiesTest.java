@@ -82,6 +82,7 @@ public class StoreAndLoadXmlFormPropertiesTest {
       target.doClose();
     }
   }
+
   @Test
   public void testUnknownPropertyWithoutValue() {
     DynamicGroupBox mainBox = new DynamicGroupBox(new DynamicCancelButton());

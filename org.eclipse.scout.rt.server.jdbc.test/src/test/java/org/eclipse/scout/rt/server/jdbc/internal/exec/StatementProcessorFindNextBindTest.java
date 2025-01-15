@@ -66,5 +66,4 @@ public class StatementProcessorFindNextBindTest {
     int actual = (Integer) m.invoke(null, s, start);
     assertEquals(expected, actual);
   }
-
 }

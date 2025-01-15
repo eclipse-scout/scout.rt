@@ -9,20 +9,10 @@
  */
 package org.eclipse.scout.rt.shared.csv;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.nio.charset.StandardCharsets.UTF_16BE;
-import static java.nio.charset.StandardCharsets.UTF_16LE;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static java.nio.charset.StandardCharsets.*;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

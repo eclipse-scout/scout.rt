@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * certain session.
  *
  * @param <T>
- *          the type of the notification
+ *     the type of the notification
  * @see org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry
  */
 @FunctionalInterface

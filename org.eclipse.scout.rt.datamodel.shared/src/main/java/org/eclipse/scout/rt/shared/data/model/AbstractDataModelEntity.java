@@ -82,8 +82,8 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
   /**
    * @param callInitConfig
-   *          true if {@link #callInitializer()} should automatically be invoked, false if the subclass invokes
-   *          {@link #callInitializer()} itself
+   *     true if {@link #callInitializer()} should automatically be invoked, false if the subclass invokes
+   *     {@link #callInitializer()} itself
    */
   public AbstractDataModelEntity(boolean callInitConfig) {
     m_attributes = new ArrayList<>();
@@ -503,7 +503,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * To change the order or specify the insert position use {@link IDataModelAttribute#setOrder(double)}.
    *
    * @param attributes
-   *          live and mutable collection of configured attributes
+   *     live and mutable collection of configured attributes
    */
   protected void injectAttributesInternal(OrderedCollection<IDataModelAttribute> attributes) {
   }
@@ -515,7 +515,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * Note that {@link #initializeChildEntities(Map)} is also called on injected entities
    *
    * @param entities
-   *          live and mutable collection of configured entities
+   *     live and mutable collection of configured entities
    */
   protected void injectEntitiesInternal(OrderedCollection<IDataModelEntity> entities) {
   }
@@ -535,7 +535,6 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     public void execInitEntity(DataModelEntityInitEntityChain chain) {
       getOwner().execInitEntity();
     }
-
   }
 
   protected final void interceptInitEntity() {

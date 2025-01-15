@@ -301,7 +301,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> {
 
     /**
      * @return A live list holding all {@link ILookupRow LookupRows} that fulfill all filters sorted by
-     *         {@link CodeLookupCall#getSortComparator()}.
+     * {@link CodeLookupCall#getSortComparator()}.
      */
     public List<ILookupRow<CODE_ID>> getLookupRows() {
       if (m_list.size() > 1) {

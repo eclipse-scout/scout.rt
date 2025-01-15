@@ -76,7 +76,7 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
 
   /**
    * @param tiles
-   *          the new list of tiles to be set.
+   *     the new list of tiles to be set.
    */
   void setTiles(List<T> tiles);
 
@@ -87,7 +87,7 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
 
   /**
    * @param gridColumnCount
-   *          the preferred number of grid columns.
+   *     the preferred number of grid columns.
    */
   void setGridColumnCount(int gridColumnCount);
 

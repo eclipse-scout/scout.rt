@@ -109,7 +109,7 @@ public final class SeleniumUtil {
 
   /**
    * @return An attribute from the given DOM element <em>or</em> when the attribute does not exist on the element, the
-   *         same attribute from the parent of the given element (which is convenient for tests with form-fields).
+   * same attribute from the parent of the given element (which is convenient for tests with form-fields).
    */
   public static String getAttribute(WebElement element, String attributeName) {
     // find attribute on element (buttons)
@@ -161,7 +161,7 @@ public final class SeleniumUtil {
 
   /**
    * @return a CSS selector for the given model class, with double-quoted strings. Example:<br>
-   *         <code>data-modelclass="com.bsiag.widgets.FooBar$MainBox"</code>
+   * <code>data-modelclass="com.bsiag.widgets.FooBar$MainBox"</code>
    */
   public static String getModelClassCssSelector(Class<?> modelClass) {
     return ATTR_DATA_MODELCLASS + "=\"" + modelClass.getName() + "\"";
@@ -253,8 +253,8 @@ public final class SeleniumUtil {
 
   /**
    * @return the inner text of the given element. Unlike Selenium's {@link WebElement#getText()}, this method returns
-   *         the text even if the element is currently not visible on screen. If there is no text, <code>null</code> is
-   *         returned (instead of the empty string).
+   * the text even if the element is currently not visible on screen. If there is no text, <code>null</code> is
+   * returned (instead of the empty string).
    */
   public static String getText(WebElement element) {
     if (element == null) {

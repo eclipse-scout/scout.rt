@@ -29,5 +29,4 @@ public class JsonColorField<COLOR_FIELD extends IColorField> extends JsonValueFi
   public String getObjectType() {
     return "ColorField";
   }
-
 }

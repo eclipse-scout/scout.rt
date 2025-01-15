@@ -9,10 +9,7 @@
  */
 package org.eclipse.scout.rt.platform.index;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Set;
@@ -53,7 +50,6 @@ public class IndexedStoreTest {
     assertSame(m_frank, m_store.getById(5));
     assertSame(m_tom, m_store.getById(6));
     assertNull(m_store.getById(7));
-
   }
 
   @Test

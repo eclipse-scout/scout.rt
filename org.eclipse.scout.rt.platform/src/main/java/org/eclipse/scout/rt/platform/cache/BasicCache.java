@@ -49,7 +49,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
 
   /**
    * @deprecated Use constructor including label supplier as second argument. Label supplier can be retrieved via
-   *             {@link CacheBuilder#getLabelSupplier()}.
+   * {@link CacheBuilder#getLabelSupplier()}.
    */
   @Deprecated(forRemoval = true)
   public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap) {
@@ -74,7 +74,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
 
   /**
    * @deprecated Use constructor including label supplier as second argument. Label supplier can be retrieved via
-   *             {@link CacheBuilder#getLabelSupplier()}.
+   * {@link CacheBuilder#getLabelSupplier()}.
    */
   @Deprecated(forRemoval = true)
   public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, AbstractTransactionalMap<K, ?> transactionalMap) {
@@ -141,7 +141,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
       return CollectionUtility.emptyHashMap();
     }
     Map<K, V> result = new HashMap<>();
-    for (Iterator<K> iterator = keys.iterator(); iterator.hasNext();) {
+    for (Iterator<K> iterator = keys.iterator(); iterator.hasNext(); ) {
       K key = iterator.next();
       V value = m_cacheMap.get(key);
       if (value != null) {
@@ -158,7 +158,7 @@ public class BasicCache<K, V> implements ICache<K, V> {
       m_transactionalMap.getTransactionMember(true); // enforce creation of transaction member before resolve
     }
     Map<K, V> resolvedValues = m_resolver.resolveAll(keys);
-    for (Iterator<Entry<K, V>> iterator = resolvedValues.entrySet().iterator(); iterator.hasNext();) {
+    for (Iterator<Entry<K, V>> iterator = resolvedValues.entrySet().iterator(); iterator.hasNext(); ) {
       Entry<K, V> entry = iterator.next();
       // remove any null values from the resolved values map
       if (entry.getKey() == null || entry.getValue() == null) {

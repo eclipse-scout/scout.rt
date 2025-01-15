@@ -52,7 +52,7 @@ public final class NamedBitMaskHelper {
    * Creates a new instance of this helper with the given bit names already consumed in the order provided.
    *
    * @param usedBitNames
-   *          The bit names to consume eagerly.
+   *     The bit names to consume eagerly.
    */
   public NamedBitMaskHelper(String... usedBitNames) {
     m_masksByBitName = new ConcurrentHashMap<>(NUM_BITS);
@@ -83,17 +83,17 @@ public final class NamedBitMaskHelper {
    * </code>
    *
    * @param bitName
-   *          The name of the bit. Must not be <code>null</code>.
+   *     The name of the bit. Must not be <code>null</code>.
    * @param newBitValue
-   *          <code>true</code> if the bit should be set, <code>false</code> if the bit should be cleared.
+   *     <code>true</code> if the bit should be set, <code>false</code> if the bit should be cleared.
    * @param holder
-   *          The holder of the bits.
+   *     The holder of the bits.
    * @return The new value with the given bit value changed.
    * @throws AssertionException
-   *           if the given bitName is <code>null</code>.
+   *     if the given bitName is <code>null</code>.
    * @throws IllegalStateException
-   *           if too many distinct bitNames are used in the application. Currently {@value #NUM_BITS} different
-   *           bitNames are supported.
+   *     if too many distinct bitNames are used in the application. Currently {@value #NUM_BITS} different
+   *     bitNames are supported.
    * @see #setBit(String, byte)
    * @see #clearBit(String, byte)
    * @see #NUM_BITS
@@ -117,15 +117,15 @@ public final class NamedBitMaskHelper {
    * </code>
    *
    * @param bitName
-   *          The name of the bit. Must not be <code>null</code>.
+   *     The name of the bit. Must not be <code>null</code>.
    * @param holder
-   *          The holder of the bits.
+   *     The holder of the bits.
    * @return The new value with the given bit value set.
    * @throws AssertionException
-   *           if the given bitName is <code>null</code>.
+   *     if the given bitName is <code>null</code>.
    * @throws IllegalStateException
-   *           if too many distinct bitNames are used in the application. Currently {@value #NUM_BITS} different
-   *           bitNames are supported.
+   *     if too many distinct bitNames are used in the application. Currently {@value #NUM_BITS} different
+   *     bitNames are supported.
    * @see #changeBit(String, boolean, byte)
    * @see #clearBit(String, byte)
    * @see #NUM_BITS
@@ -145,15 +145,15 @@ public final class NamedBitMaskHelper {
    * </code>
    *
    * @param bitName
-   *          The name of the bit. Must not be <code>null</code>.
+   *     The name of the bit. Must not be <code>null</code>.
    * @param holder
-   *          The holder of the bits.
+   *     The holder of the bits.
    * @return The new value with the given bit cleared.
    * @throws AssertionException
-   *           if the given bitName is <code>null</code>.
+   *     if the given bitName is <code>null</code>.
    * @throws IllegalStateException
-   *           if too many distinct bitNames are used in the application. Currently {@value #NUM_BITS} different
-   *           bitNames are supported.
+   *     if too many distinct bitNames are used in the application. Currently {@value #NUM_BITS} different
+   *     bitNames are supported.
    * @see #changeBit(String, boolean, byte)
    * @see #setBit(String, byte)
    * @see #NUM_BITS
@@ -174,9 +174,9 @@ public final class NamedBitMaskHelper {
    * </code>
    *
    * @param bitName
-   *          The name of the bit. Must not be <code>null</code>.
+   *     The name of the bit. Must not be <code>null</code>.
    * @param holder
-   *          The holder of the bits.
+   *     The holder of the bits.
    * @return <code>true</code> if the bit with the given name is set. <code>false</code> otherwise.
    */
   public boolean isBitSet(String bitName, byte holder) {
@@ -196,11 +196,11 @@ public final class NamedBitMaskHelper {
    * </code>
    *
    * @param bitName
-   *          The name of the bit. Must not be <code>null</code>.
+   *     The name of the bit. Must not be <code>null</code>.
    * @param holder
-   *          The holder of the bits.
+   *     The holder of the bits.
    * @param expectedValue
-   *          the value to check against.
+   *     the value to check against.
    * @return <code>true</code> if the bit in given position has the given value. <code>false</code> otherwise.
    */
   public boolean isBit(String bitName, byte holder, boolean expectedValue) {
@@ -211,7 +211,7 @@ public final class NamedBitMaskHelper {
    * Checks if the given byte has all bits set.
    *
    * @param holder
-   *          The value holder to check.
+   *     The value holder to check.
    * @return <code>true</code> if all bits are set on the given holder.<code>false</code> otherwise.
    */
   public static boolean allBitsSet(byte holder) {

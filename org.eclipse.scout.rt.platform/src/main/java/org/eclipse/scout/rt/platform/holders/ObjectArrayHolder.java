@@ -23,5 +23,4 @@ public class ObjectArrayHolder extends Holder<Object[]> {
   public ObjectArrayHolder(Object[] value) {
     super(Object[].class, value);
   }
-
 }

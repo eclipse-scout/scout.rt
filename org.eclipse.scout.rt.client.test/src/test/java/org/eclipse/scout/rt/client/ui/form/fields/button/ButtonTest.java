@@ -119,7 +119,6 @@ public class ButtonTest {
 
     Assert.assertEquals("TestMenu2", pushButton1Menus.get(1).getText());
     Assert.assertEquals("control-alternate-f11", pushButton1Menus.get(1).getKeyStroke());
-
   }
 
   @Test

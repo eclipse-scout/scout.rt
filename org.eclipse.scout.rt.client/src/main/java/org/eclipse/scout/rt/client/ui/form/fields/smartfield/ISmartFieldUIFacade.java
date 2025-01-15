@@ -18,5 +18,4 @@ public interface ISmartFieldUIFacade<VALUE> extends IValueFieldUIFacade<VALUE> {
   void setActiveFilterFromUI(TriState activeFilter);
 
   void setLookupRowFromUI(ILookupRow<VALUE> lookupRow);
-
 }

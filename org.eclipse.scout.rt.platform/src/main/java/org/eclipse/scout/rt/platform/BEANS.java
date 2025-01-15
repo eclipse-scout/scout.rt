@@ -32,10 +32,10 @@ public final class BEANS {
    * See {@link IBeanManager#getBean(Class)} for details.
    *
    * @param beanClazz
-   *          The query {@link Class}.
+   *     The query {@link Class}.
    * @return The bean instance. Never returns <code>null</code>.
    * @throws AssertionException
-   *           When no instance is available or when multiple instances are registered.
+   *     When no instance is available or when multiple instances are registered.
    */
   public static <T> T get(Class<T> beanClazz) {
     return Assertions.assertNotNull(opt(beanClazz), "no instance found for query: {}", beanClazz);
@@ -46,10 +46,10 @@ public final class BEANS {
    * See {@link IBeanManager#getBean(Class)} for details.
    *
    * @param beanClazz
-   *          The query {@link Class}.
+   *     The query {@link Class}.
    * @return The bean instance or <code>null</code> if no {@link IBean} could be found.
    * @throws AssertionException
-   *           When multiple instances are registered
+   *     When multiple instances are registered
    */
   public static <T> T opt(Class<T> beanClazz) {
     IBean<T> bean = Platform.get().getBeanManager().optBean(beanClazz);
@@ -64,10 +64,10 @@ public final class BEANS {
    * See {@link IBeanManager#getBean(Class)} for details.
    *
    * @param beanClass
-   *          The query {@link Class}.
+   *     The query {@link Class}.
    * @return An {@link Optional} holding the bean instance or an empty {@link Optional} if no instance could be found.
    * @throws AssertionException
-   *           if multiple instances are registered
+   *     if multiple instances are registered
    */
   public static <T> Optional<T> optional(Class<T> beanClass) {
     return Optional.ofNullable(opt(beanClass));

@@ -93,5 +93,4 @@ public class ApacheHttpTransport extends HttpTransport {
       ((Closeable) httpClient).close();
     }
   }
-
 }

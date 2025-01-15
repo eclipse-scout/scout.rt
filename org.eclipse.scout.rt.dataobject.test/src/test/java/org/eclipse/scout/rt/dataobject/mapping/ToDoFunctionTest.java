@@ -41,23 +41,23 @@ public class ToDoFunctionTest {
   @Test
   public void testToDoFunctionWithCorrectOrder() {
     runWithBeans(() -> {
-      ToDoFunctionHelper toDoFunctionHelper = BEANS.get(ToDoFunctionHelper.class);
+          ToDoFunctionHelper toDoFunctionHelper = BEANS.get(ToDoFunctionHelper.class);
 
-      TestObject test = new TestObject();
-      test.setTest("test1");
-      TestDo testDo = toDoFunctionHelper.toDo(test, IToTestDoFunction.class);
-      assertTrue(testDo instanceof TestDo);
-      assertEquals("test1", testDo.getTest());
+          TestObject test = new TestObject();
+          test.setTest("test1");
+          TestDo testDo = toDoFunctionHelper.toDo(test, IToTestDoFunction.class);
+          assertTrue(testDo instanceof TestDo);
+          assertEquals("test1", testDo.getTest());
 
-      SubTestObject subTest = new SubTestObject();
-      subTest.setTest("test2");
-      subTest.setSubTest("subTest2");
-      testDo = toDoFunctionHelper.toDo(subTest, IToTestDoFunction.class);
-      assertTrue(testDo instanceof SubTestDo);
-      SubTestDo subTestDo = (SubTestDo) testDo;
-      assertEquals("test2", subTestDo.getTest());
-      assertEquals("subTest2", subTestDo.getSubTest());
-    },
+          SubTestObject subTest = new SubTestObject();
+          subTest.setTest("test2");
+          subTest.setSubTest("subTest2");
+          testDo = toDoFunctionHelper.toDo(subTest, IToTestDoFunction.class);
+          assertTrue(testDo instanceof SubTestDo);
+          SubTestDo subTestDo = (SubTestDo) testDo;
+          assertEquals("test2", subTestDo.getTest());
+          assertEquals("subTest2", subTestDo.getSubTest());
+        },
         beanMetaData(TestDo.class),
         beanMetaData(ToTestDoFunction.class)
             .withOrder(2),
@@ -69,21 +69,21 @@ public class ToDoFunctionTest {
   @Test
   public void testToDoFunctionWithIncorrectOrder() {
     runWithBeans(() -> {
-      ToDoFunctionHelper toDoFunctionHelper = BEANS.get(ToDoFunctionHelper.class);
+          ToDoFunctionHelper toDoFunctionHelper = BEANS.get(ToDoFunctionHelper.class);
 
-      TestObject test = new TestObject();
-      test.setTest("test1");
-      TestDo testDo = toDoFunctionHelper.toDo(test, IToTestDoFunction.class);
-      assertTrue(testDo instanceof TestDo);
-      assertEquals("test1", testDo.getTest());
+          TestObject test = new TestObject();
+          test.setTest("test1");
+          TestDo testDo = toDoFunctionHelper.toDo(test, IToTestDoFunction.class);
+          assertTrue(testDo instanceof TestDo);
+          assertEquals("test1", testDo.getTest());
 
-      SubTestObject subTest = new SubTestObject();
-      subTest.setTest("test2");
-      subTest.setSubTest("subTest2");
-      testDo = toDoFunctionHelper.toDo(subTest, IToTestDoFunction.class);
-      assertFalse(testDo instanceof SubTestDo);
-      assertEquals("test2", testDo.getTest());
-    },
+          SubTestObject subTest = new SubTestObject();
+          subTest.setTest("test2");
+          subTest.setSubTest("subTest2");
+          testDo = toDoFunctionHelper.toDo(subTest, IToTestDoFunction.class);
+          assertFalse(testDo instanceof SubTestDo);
+          assertEquals("test2", testDo.getTest());
+        },
         beanMetaData(TestDo.class),
         beanMetaData(ToTestDoFunction.class)
             .withOrder(1),

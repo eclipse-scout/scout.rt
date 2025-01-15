@@ -53,13 +53,13 @@ public class EncryptionKey {
 
   /**
    * @return a byte array that can be used by implementors to support backwards compatibility. This header may be
-   *         prefixed to the encrypted stream.
-   *         <p>
-   *         The format of such a header is <code>[yyyy:version]</code> encoded in US ASCII. yyyy is the 4-digit year
-   *         and version is * freetext without the ']' character. Example: [2023:v1]
-   *         <p>
-   *         See {@link SecurityUtility#createEncryptionKey(char[], byte[], int)} and
-   *         {@link SecurityUtility#createDecryptionKey(PushbackInputStream, char[], byte[], int, EncryptionKey)}
+   * prefixed to the encrypted stream.
+   * <p>
+   * The format of such a header is <code>[yyyy:version]</code> encoded in US ASCII. yyyy is the 4-digit year
+   * and version is * freetext without the ']' character. Example: [2023:v1]
+   * <p>
+   * See {@link SecurityUtility#createEncryptionKey(char[], byte[], int)} and
+   * {@link SecurityUtility#createDecryptionKey(PushbackInputStream, char[], byte[], int, EncryptionKey)}
    */
   public byte[] getCompatibilityHeader() {
     return m_compatibilityHeader;

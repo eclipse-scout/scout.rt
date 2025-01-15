@@ -123,7 +123,7 @@ public class SubscribeInput {
 
   /**
    * @return the name of a <i>durable</i> subscription. A value of <code>null</code> indicates a non-durable
-   *         subscription (this is the default). Any other value indicates a durable subscription.
+   * subscription (this is the default). Any other value indicates a durable subscription.
    * @see {@link #withDurableSubscription(String)}
    */
   public String getDurableSubscriptionName() {

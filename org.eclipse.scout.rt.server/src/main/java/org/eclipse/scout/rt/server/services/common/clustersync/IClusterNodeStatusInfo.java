@@ -42,5 +42,4 @@ public interface IClusterNodeStatusInfo {
    * @return number of received messages
    */
   long getReceivedMessageCount();
-
 }

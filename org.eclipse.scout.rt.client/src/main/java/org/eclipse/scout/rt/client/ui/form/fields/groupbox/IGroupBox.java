@@ -221,8 +221,8 @@ public interface IGroupBox extends ICompositeField, IPreferenceField {
 
   /**
    * @param c
-   *          column count for this composite box<br>
-   *          see {@value #GRID_COLUMN_COUNT_INHERITED} for inherited column count
+   *     column count for this composite box<br>
+   *     see {@value #GRID_COLUMN_COUNT_INHERITED} for inherited column count
    */
   void setGridColumnCount(int c);
 
@@ -246,7 +246,7 @@ public interface IGroupBox extends ICompositeField, IPreferenceField {
 
   /**
    * @return true if the group <i>can</i> be collapsed see {@link #isExpanded()} to see if border is effectively
-   *         expanded or collapsed
+   * expanded or collapsed
    */
   boolean isExpandable();
 
@@ -330,5 +330,4 @@ public interface IGroupBox extends ICompositeField, IPreferenceField {
    * Calls {@link #setResponsive(TriState)}
    */
   void setResponsive(boolean responsive);
-
 }

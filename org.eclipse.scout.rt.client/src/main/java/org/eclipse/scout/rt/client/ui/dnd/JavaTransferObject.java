@@ -61,7 +61,6 @@ public class JavaTransferObject extends TransferObject {
           if (type.isInstance(o)) {
             result.add((T) o);
           }
-
         }
       }
     }

@@ -71,17 +71,17 @@ public final class StreamUtility {
    * differently, use {@link #toMap(Function, Function, BiFunction)} instead.
    *
    * @param <T>
-   *          the type of the input elements
+   *     the type of the input elements
    * @param <K>
-   *          the output type of the key mapping function
+   *     the output type of the key mapping function
    * @param <U>
-   *          the output type of the value mapping function
+   *     the output type of the value mapping function
    * @param keyMapper
-   *          a mapping function to produce keys
+   *     a mapping function to produce keys
    * @param valueMapper
-   *          a mapping function to produce values
+   *     a mapping function to produce values
    * @return a {@code Collector} which collects elements into a {@code HashMap} whose keys and values are the result of
-   *         applying mapping functions to the input elements
+   * applying mapping functions to the input elements
    * @see StreamUtility#toMap(Supplier, Function, Function, BiFunction, Characteristics...)
    */
   public static <T, K, U> Collector<T, ?, Map<K, U>> toMap(
@@ -102,21 +102,21 @@ public final class StreamUtility {
    * differently, use {@link #toMap(Supplier, Function, Function, BiFunction, Characteristics...)} instead.
    *
    * @param <T>
-   *          the type of the input elements
+   *     the type of the input elements
    * @param <K>
-   *          the output type of the key mapping function
+   *     the output type of the key mapping function
    * @param <U>
-   *          the output type of the value mapping function
+   *     the output type of the value mapping function
    * @param <M>
-   *          the type of the resulting {@link Map}
+   *     the type of the resulting {@link Map}
    * @param mapSupplier
-   *          a supplier for the resulting map, e.g. <code>HashMap::new</code>
+   *     a supplier for the resulting map, e.g. <code>HashMap::new</code>
    * @param keyMapper
-   *          a function to produce map keys from stream elements
+   *     a function to produce map keys from stream elements
    * @param valueMapper
-   *          a function to produce map values from stream elements
+   *     a function to produce map values from stream elements
    * @return a {@code Collector} which collects elements into a {@code Map} whose keys and values are the result of
-   *         applying mapping functions to the input elements
+   * applying mapping functions to the input elements
    */
   public static <T, K, U, M extends Map<K, U>> Collector<T, ?, M> toMap(
       Supplier<M> mapSupplier,
@@ -135,19 +135,19 @@ public final class StreamUtility {
    * Duplicate keys are merged by applying the specified {@code remappingFunction}.
    *
    * @param <T>
-   *          the type of the input elements
+   *     the type of the input elements
    * @param <K>
-   *          the output type of the key mapping function
+   *     the output type of the key mapping function
    * @param <U>
-   *          the output type of the value mapping function
+   *     the output type of the value mapping function
    * @param keyMapper
-   *          a mapping function to produce keys
+   *     a mapping function to produce keys
    * @param valueMapper
-   *          a mapping function to produce values
+   *     a mapping function to produce values
    * @param remappingFunction
-   *          a function to handle duplicate keys, e.g. {@link #replacingMerger()} or {@link #throwingMerger()}
+   *     a function to handle duplicate keys, e.g. {@link #replacingMerger()} or {@link #throwingMerger()}
    * @return a {@code Collector} which collects elements into a {@code HashMap} whose keys and values are the result of
-   *         applying mapping functions to the input elements
+   * applying mapping functions to the input elements
    * @see StreamUtility#toMap(Supplier, Function, Function, BiFunction, Characteristics...)
    */
   public static <T, K, U> Collector<T, ?, Map<K, U>> toMap(
@@ -167,25 +167,25 @@ public final class StreamUtility {
    * Duplicate keys are merged by applying the specified {@code remappingFunction}.
    *
    * @param <T>
-   *          the type of the input elements
+   *     the type of the input elements
    * @param <K>
-   *          the output type of the key mapping function
+   *     the output type of the key mapping function
    * @param <U>
-   *          the output type of the value mapping function
+   *     the output type of the value mapping function
    * @param <M>
-   *          the type of the resulting {@link Map}
+   *     the type of the resulting {@link Map}
    * @param mapSupplier
-   *          a supplier for the resulting map, e.g. <code>HashMap::new</code>
+   *     a supplier for the resulting map, e.g. <code>HashMap::new</code>
    * @param keyMapper
-   *          a function to produce map keys from stream elements
+   *     a function to produce map keys from stream elements
    * @param valueMapper
-   *          a function to produce map values from stream elements
+   *     a function to produce map values from stream elements
    * @param remappingFunction
-   *          a function to handle duplicate keys, e.g. {@link #throwingMerger()}
+   *     a function to handle duplicate keys, e.g. {@link #throwingMerger()}
    * @param characteristics
-   *          the collector characteristics for the new collector
+   *     the collector characteristics for the new collector
    * @return a {@code Collector} which collects elements into a {@code Map} whose keys and values are the result of
-   *         applying mapping functions to the input elements
+   * applying mapping functions to the input elements
    */
   public static <T, K, U, M extends Map<K, U>> Collector<T, ?, M> toMap(
       Supplier<M> mapSupplier,
@@ -202,7 +202,7 @@ public final class StreamUtility {
 
   /**
    * @return Resulting merged map after putting all elements of {@code map2} into {@code map1}, applying the
-   *         {@code remappingFunction} for duplicated keys.
+   * {@code remappingFunction} for duplicated keys.
    */
   private static <K, U, M extends Map<K, U>> M mergeMap(M map1, M map2, BiFunction<? super U, ? super U, ? extends U> remappingFunction) {
     map2.forEach((k, u) -> putEntry(map1, k, u, remappingFunction));
@@ -271,8 +271,8 @@ public final class StreamUtility {
    * concatenate the streams.
    *
    * @implNote Use caution when concatenating a large number of streams as repeated concatenation will result in a
-   *           perfectly unbalanced tree of streams result in deep call chains, or even StackOverflowError. see
-   *           {@link Stream#concat(Stream, Stream)} for more details
+   * perfectly unbalanced tree of streams result in deep call chains, or even StackOverflowError. see
+   * {@link Stream#concat(Stream, Stream)} for more details
    */
   @SafeVarargs
   public static <T> Stream<T> concat(Stream<? extends T>... streams) {

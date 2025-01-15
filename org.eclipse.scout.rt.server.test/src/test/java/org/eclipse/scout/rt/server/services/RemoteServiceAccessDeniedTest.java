@@ -196,5 +196,4 @@ public class RemoteServiceAccessDeniedTest {
     public void interna3() {
     }
   }
-
 }

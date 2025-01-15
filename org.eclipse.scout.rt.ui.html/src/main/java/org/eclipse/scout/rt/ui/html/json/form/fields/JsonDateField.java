@@ -170,5 +170,4 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
       addPropertyChangeEvent(IValueField.PROP_ERROR_STATUS, JsonStatus.toJson(getModel().getErrorStatus()));
     }
   }
-
 }

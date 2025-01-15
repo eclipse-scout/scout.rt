@@ -147,8 +147,8 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
 
   /**
    * @param force
-   *          If <code>true</code>, title properties are always copied from the wizard. Otherwise, they are only copied
-   *          if their value is not <code>null</code>.
+   *     If <code>true</code>, title properties are always copied from the wizard. Otherwise, they are only copied
+   *     if their value is not <code>null</code>.
    */
   protected void updateTitleFromWizard(boolean force) {
     if (getWizard() != null) {

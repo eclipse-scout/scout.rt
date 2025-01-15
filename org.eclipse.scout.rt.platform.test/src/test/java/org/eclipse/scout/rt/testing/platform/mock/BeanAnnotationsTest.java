@@ -70,5 +70,4 @@ public class BeanAnnotationsTest {
   @Bean
   interface TA {
   }
-
 }

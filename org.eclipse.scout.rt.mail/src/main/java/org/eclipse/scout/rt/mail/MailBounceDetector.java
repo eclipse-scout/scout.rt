@@ -136,15 +136,15 @@ public class MailBounceDetector implements IMailBounceDetector {
    * Decision function for bounce recognition heuristic.
    *
    * @param senderMatches
-   *          Whether the sender address indicates a bounce
+   *     Whether the sender address indicates a bounce
    * @param hasNoReturnPathHeader
-   *          Whether bounce is indicated by missing return path
+   *     Whether bounce is indicated by missing return path
    * @param isAutoReply
-   *          Whether the message is an auto-reply
+   *     Whether the message is an auto-reply
    * @param subjectMatches
-   *          Whether the subject indicates a bounce
+   *     Whether the subject indicates a bounce
    * @param contentMatches
-   *          Whether the content indicates a bounce
+   *     Whether the content indicates a bounce
    * @return <tt>true</tt> if the message should be considered as bounce
    */
   protected boolean isNonStandardBounce(boolean senderMatches, boolean hasNoReturnPathHeader, boolean isAutoReply, boolean subjectMatches, boolean contentMatches) {

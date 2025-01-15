@@ -72,7 +72,6 @@ public class ColorFieldTest {
     field.getUIFacade().parseAndSetValueFromUI("#5989A4E");
     assertEquals("#7887A0", field.getValue());
     assertNotNull(field.getErrorStatus());
-
   }
 
   @Test
@@ -155,7 +154,6 @@ public class ColorFieldTest {
             return "alternate-2";
           }
         }
-
       }
 
       @Order(100)
@@ -167,5 +165,4 @@ public class ColorFieldTest {
       }
     }
   }
-
 }

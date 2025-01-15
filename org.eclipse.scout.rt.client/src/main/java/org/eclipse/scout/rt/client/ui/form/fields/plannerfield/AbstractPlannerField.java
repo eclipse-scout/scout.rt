@@ -92,7 +92,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
    * Object[][] data = execLoadResourceTableData();
    * getResourceTable().replaceRowsByMatrix(data);
    * </pre>
-   *
+   * <p>
    * Load activity data<br>
    * By default loads data using {@link #interceptLoadPlannerData(List, List)}, transforms to {@link Activity}, maps to
    * resources using the resourceId, and sets the {@link Activity}s on the corresponding activtyRow.
@@ -169,5 +169,4 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   protected IPlannerFieldExtension<P, RI, AI, ? extends AbstractPlannerField<P, RI, AI>> createLocalExtension() {
     return new LocalPlannerFieldExtension<>(this);
   }
-
 }

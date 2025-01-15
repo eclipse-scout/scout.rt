@@ -146,7 +146,6 @@ public class FutureFinishedTest {
       Jobs.getJobManager().awaitFinished(Jobs.newFutureFilterBuilder()
           .andMatchFuture(future)
           .toFilter(), 1, TimeUnit.NANOSECONDS);
-
     }
     else {
       assertFalse(future.isFinished());

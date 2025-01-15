@@ -77,7 +77,7 @@ public class BinaryRefSupport implements IPlatformListener {
    * Looks up handler for a binref URI. URI must be a binref URI. At least the root handler is returned.
    *
    * @param uri
-   *          non null binref {@link URI} (see {@link BinaryRefs#isBinaryRef})
+   *     non null binref {@link URI} (see {@link BinaryRefs#isBinaryRef})
    * @return non null handler for URI
    */
   protected IBinaryRefHandler lookupHandlerUnsafe(URI uri) {

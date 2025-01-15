@@ -19,9 +19,8 @@ public interface IPingService extends IService {
    * Simple ping request (echo).
    *
    * @param s
-   *          Text to transmit
+   *     Text to transmit
    * @return Return value, as provided in argument
    */
   String ping(String s);
-
 }

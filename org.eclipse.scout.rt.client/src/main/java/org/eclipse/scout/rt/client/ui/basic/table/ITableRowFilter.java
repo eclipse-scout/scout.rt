@@ -20,7 +20,7 @@ public interface ITableRowFilter {
 
   /**
    * @return <code>true</code> if the given row is accepted by the filter and should therefore remain in the table's
-   *         "filtered rows" set. Usually, the UI hides unaccepted rows.
+   * "filtered rows" set. Usually, the UI hides unaccepted rows.
    */
   boolean accept(ITableRow row);
 }

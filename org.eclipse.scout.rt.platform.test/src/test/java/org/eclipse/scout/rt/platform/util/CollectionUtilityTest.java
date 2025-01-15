@@ -203,7 +203,7 @@ public class CollectionUtilityTest {
     assertNull(CollectionUtility.firstElement((SortedMap<?, ?>) null));
     // empty
     assertNull(CollectionUtility.firstElement((Collections
-        .unmodifiableSortedMap(new TreeMap<>()))));
+                                                   .unmodifiableSortedMap(new TreeMap<>()))));
     // one element
     assertEquals("ABC", CollectionUtility.firstElement(new TreeMap<Integer, String>() {
       private static final long serialVersionUID = 1L;
@@ -563,7 +563,7 @@ public class CollectionUtilityTest {
     assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(null));
     assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(new ArrayList<>()));
     assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "B", "C")));
-    assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(CollectionUtility.<Object>arrayList(0, false, null)));
+    assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(CollectionUtility.<Object> arrayList(0, false, null)));
     assertEquals(setWithNullElement, CollectionUtility.findDuplicates(CollectionUtility.arrayList(null, null)));
     assertEquals(CollectionUtility.hashSet("C"), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "C", "D", "C")));
     assertEquals(CollectionUtility.hashSet("0", "C"), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "C", "D", "C", "0", "1", "0", "0")));

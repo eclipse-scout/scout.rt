@@ -21,5 +21,4 @@ public class DesktopWithOutlineForms extends DesktopWithOneOutline {
     IOutline firstOutline = CollectionUtility.firstElement(getAvailableOutlines());
     activateOutline(firstOutline);
   }
-
 }

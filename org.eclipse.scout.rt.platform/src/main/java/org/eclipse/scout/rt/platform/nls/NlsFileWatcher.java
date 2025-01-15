@@ -61,13 +61,13 @@ public class NlsFileWatcher {
    * bundle is changed.
    *
    * @param resourceBundleName
-   *          name of the resource bundle
+   *     name of the resource bundle
    * @param onFileChangeConsumer
-   *          called once a file has changed.
+   *     called once a file has changed.
    * @param cl
-   *          class loader that can load the resource bundle.
+   *     class loader that can load the resource bundle.
    * @throws IOException
-   *           if unable to watch the desired directory.
+   *     if unable to watch the desired directory.
    */
   public void watch(String resourceBundleName, Consumer<Path> onFileChangeConsumer, ClassLoader cl) throws IOException {
     String fileName = resourceBundleName.replace('.', '/') + '.' + TEXT_RESOURCE_EXTENSION;

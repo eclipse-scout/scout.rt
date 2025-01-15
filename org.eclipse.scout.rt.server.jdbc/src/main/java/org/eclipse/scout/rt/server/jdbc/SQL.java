@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
  * Long firstPersonNr = queryResult[0][0];
  * Long thirdPersonName = queryResult[2][1];
  * </pre>
- *
+ * <p>
  * Without this class the necessary code would look like this
  *
  * <pre>

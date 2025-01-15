@@ -17,5 +17,4 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 public interface IChartExtension<CHART extends AbstractChart> extends IExtension<CHART> {
 
   void execValueClick(ChartValueClickChain chain, BigDecimal xIndex, BigDecimal yIndex, Integer datasetIndex);
-
 }

@@ -41,5 +41,4 @@ public class CodeTypeRegistrator implements IPlatformListener {
       LOG.info("{} code type classes registered.", classes.size());
     }
   }
-
 }

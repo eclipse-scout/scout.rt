@@ -210,7 +210,6 @@ public class DataModelAttributeTest {
     assertEquals("-1,000.46", att.formatValue(Double.valueOf(-1000.46)));
     assertEquals("1,000.50", att.formatValue(Double.valueOf(1000.495)));
     assertEquals("-1,000.50", att.formatValue(Double.valueOf(-1000.495)));
-
   }
 
   @Test

@@ -162,8 +162,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
    * Subclasses can override this method. Default is {@code 0} (no drop support).
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
-   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   * {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   * {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(400)
@@ -180,8 +180,8 @@ public abstract class AbstractImageField extends AbstractFormField implements II
    * </p>
    *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
-   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
-   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   * {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   * {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
    */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(410)
@@ -501,7 +501,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
       }
       interceptDropRequest(scoutTransferable);
     }
-
   }// end private class
 
   protected final TransferObject interceptDragRequest() {
@@ -537,5 +536,4 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   protected IImageFieldExtension<? extends AbstractImageField> createLocalExtension() {
     return new LocalImageFieldExtension<>(this);
   }
-
 }

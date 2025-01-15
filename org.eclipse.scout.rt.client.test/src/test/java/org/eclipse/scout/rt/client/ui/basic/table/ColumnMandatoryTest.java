@@ -9,8 +9,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnMandatoryTest.MandatoryTestTable.NonMandatoryTestColumn;

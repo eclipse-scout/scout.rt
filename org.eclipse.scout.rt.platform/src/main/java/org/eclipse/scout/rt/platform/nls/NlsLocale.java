@@ -34,7 +34,7 @@ public final class NlsLocale {
 
   /**
    * @param defaultLocale
-   *          {@link #CURRENT} locale or default, if <code>null</code>
+   *     {@link #CURRENT} locale or default, if <code>null</code>
    * @return locale of current thread or the default
    */
   public static Locale getOrElse(Locale defaultLocale) {

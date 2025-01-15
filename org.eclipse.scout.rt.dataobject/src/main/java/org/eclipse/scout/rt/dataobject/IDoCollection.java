@@ -121,25 +121,25 @@ public interface IDoCollection<V, COLLECTION extends Collection<V>> extends Iter
 
   /**
    * @return the first collection element which attribute given by the method reference is equal to the given value.
-   *         <code>null</code> is returned if there is no such collection element.
+   * <code>null</code> is returned if there is no such collection element.
    */
   <VALUE> V findFirst(Function<V, DoValue<VALUE>> accessor, VALUE value);
 
   /**
    * @return the first collection element that evaluates to <code>true</code> when applied to the given
-   *         {@link Predicate}. <code>null</code> is returned if there is no such collection element.
+   * {@link Predicate}. <code>null</code> is returned if there is no such collection element.
    */
   V findFirst(Predicate<V> predicate);
 
   /**
    * @return all collection elements which attribute given by the method reference is equal to the given value. An empty
-   *         collection is returned if there are no such elements.
+   * collection is returned if there are no such elements.
    */
   <VALUE> List<V> find(Function<V, DoValue<VALUE>> accessor, VALUE value);
 
   /**
    * @return all collection elements that are evaluating to <code>true</code> when applied to the given
-   *         {@link Predicate}. An empty collection is returned if there are no such elements.
+   * {@link Predicate}. An empty collection is returned if there are no such elements.
    */
   List<V> find(Predicate<V> predicate);
 }

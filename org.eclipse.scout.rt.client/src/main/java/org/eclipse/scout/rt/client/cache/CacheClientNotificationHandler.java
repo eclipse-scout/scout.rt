@@ -38,5 +38,4 @@ public class CacheClientNotificationHandler extends AbstractObservableNotificati
     m_basicHandler.handleNotification(notification);
     super.handleNotification(notification, address);
   }
-
 }

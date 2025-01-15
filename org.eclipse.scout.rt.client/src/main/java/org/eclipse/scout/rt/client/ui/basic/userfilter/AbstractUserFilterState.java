@@ -42,5 +42,4 @@ public abstract class AbstractUserFilterState implements IUserFilterState {
   public boolean notifyDeserialized(Object obj) {
     return true;
   }
-
 }

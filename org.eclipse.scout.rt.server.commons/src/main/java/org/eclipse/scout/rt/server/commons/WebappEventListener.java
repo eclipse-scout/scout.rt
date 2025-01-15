@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.Platform;
  * If an even earlier platform start is required, check the javadoc of {@link Platform}.
  *
  * @deprecated Deploying to an application server is a legacy operation only, this class might be removed in a future
- *             release.
+ * release.
  */
 @Deprecated
 public class WebappEventListener implements ServletContextListener {

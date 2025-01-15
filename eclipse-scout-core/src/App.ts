@@ -255,7 +255,8 @@ export class App extends EventEmitter {
    *               - a {@link JQuery.jqXHR} for requests executed with {@link $.ajax}. The parameters `textStatus`, `errorThrown` and `requestOptions` are only set in this case.
    *               - a {@link JsonErrorResponseContainer} if a successful response contained a {@link JsonErrorResponse} which was transformed to an error (e.g. using {@link App.handleJsonError}).
    */
-  protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: JQuery.AjaxSettings): JQuery.Promise<any> | void {
+  protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string,
+    requestOptions?: JQuery.AjaxSettings): JQuery.Promise<any> | void {
     $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
     // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.

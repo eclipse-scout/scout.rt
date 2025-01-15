@@ -33,8 +33,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * @see io.opentelemetry.sdk.metrics.View
  * @see <a href="https://opentelemetry.io/docs/specs/otel/metrics/sdk/#view">OpenTelemetry Metrics: View</a>
  * @see <a href=
- *      "https://opentelemetry.io/docs/specs/otel/metrics/sdk/#explicit-bucket-histogram-aggregation">OpenTelemetry
- *      Metrics: Explicit Bucket Histogram Aggregation</a>
+ * "https://opentelemetry.io/docs/specs/otel/metrics/sdk/#explicit-bucket-histogram-aggregation">OpenTelemetry
+ * Metrics: Explicit Bucket Histogram Aggregation</a>
  */
 @ApplicationScoped
 public interface IHistogramViewHintProvider {

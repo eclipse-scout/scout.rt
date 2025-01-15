@@ -245,7 +245,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @return <code>true</code> if the given {@link IForm} is currently displayed. However, a value of <code>true</code>
-   *         does not imply that the {@link IForm} is the currently active {@link IForm}.
+   * does not imply that the {@link IForm} is the currently active {@link IForm}.
    * @see #showForm(IForm)
    */
   boolean isShowing(IForm form);
@@ -284,13 +284,13 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @param formClass
-   *          - class of the form to be searched
+   *     - class of the form to be searched
    * @param handlerClass
-   *          - class of the expected active form handler
+   *     - class of the expected active form handler
    * @param exclusiveKey
-   *          - exclusive key of the form, returned by {@link IForm#computeExclusiveKey}
+   *     - exclusive key of the form, returned by {@link IForm#computeExclusiveKey}
    * @return a list (maybe empty, but never null) of forms that match the above criteria <br/>
-   *         <b>note:</b> if either argument is null, an empty list is returned.
+   * <b>note:</b> if either argument is null, an empty list is returned.
    */
   <F extends IForm, H extends IFormHandler> List<F> findAllOpenViews(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey);
 
@@ -324,10 +324,10 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * dialogs come before their parent dialog, and child dialogs of the same parent in the order as inserted.
    *
    * @param displayParent
-   *          'displayParent' like {@link IDesktop}, {@link IOutline} or {@link IForm}.
+   *     'displayParent' like {@link IDesktop}, {@link IOutline} or {@link IForm}.
    * @param includeChildDialogs
-   *          <code>true</code> to include child dialogs, or <code>false</code> to only include direct children of the
-   *          given {@link IDisplayParent}.
+   *     <code>true</code> to include child dialogs, or <code>false</code> to only include direct children of the
+   *     given {@link IDisplayParent}.
    */
   List<IForm> getDialogs(IDisplayParent displayParent, boolean includeChildDialogs);
 
@@ -350,7 +350,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @return <code>true</code> if the given {@link IMessageBox} is currently displayed. However, a value of
-   *         <code>true</code> does not imply that the message box is the currently active message box.
+   * <code>true</code> does not imply that the message box is the currently active message box.
    * @see #showMessageBox(IMessageBox)
    */
   boolean isShowing(IMessageBox messageBox);
@@ -413,7 +413,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @param pageTypes
-   *          Must be classes that implement {@link IPage}.
+   *     Must be classes that implement {@link IPage}.
    * @see IDesktop#refreshPages(List)
    */
   void refreshPages(Class<?>... pageTypes);
@@ -443,7 +443,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @param eventTypes
-   *          of {@link DesktopEvent} TYPE_*
+   *     of {@link DesktopEvent} TYPE_*
    */
   default void addDesktopListener(DesktopListener listener, Integer... eventTypes) {
     desktopListeners().add(listener, false, eventTypes);
@@ -459,7 +459,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Use {@link #addDesktopListener(DesktopListener, Integer...)} in all other cases
    *
    * @param eventTypes
-   *          of {@link DesktopEvent} TYPE_*
+   *     of {@link DesktopEvent} TYPE_*
    */
   default void addUIDesktopListener(DesktopListener listener, Integer... eventTypes) {
     desktopListeners().addLastCalled(listener, false, eventTypes);
@@ -492,8 +492,8 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * These might include pages, forms, fields etc.<br>
    *
    * @param dataTypes
-   *          accepts objects that act as {@link DataChangeEvent#getDataType()} in implicitly created
-   *          {@link DataChangeEvent}s.
+   *     accepts objects that act as {@link DataChangeEvent#getDataType()} in implicitly created
+   *     {@link DataChangeEvent}s.
    * @see AbstractForm#execDataChanged(Object...)
    * @see AbstractForm#execDataChanged(Object...)
    * @see AbstractFormField#execDataChanged(Object...)
@@ -552,7 +552,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @return the detail form of the active (selected) page {@link IPage#getDetailForm()} of the active outline
-   *         {@link IOutline#getDetailForm()}
+   * {@link IOutline#getDetailForm()}
    */
   IForm getPageDetailForm();
 
@@ -563,7 +563,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @return the detail table of the active (selected) page {@link IPage#getTable()} of the active outline
-   *         {@link IOutline#getDetailTable()}
+   * {@link IOutline#getDetailTable()}
    */
   ITable getPageDetailTable();
 
@@ -574,7 +574,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @return the search form of the active (selected) page {@link IPageWithTable#getSearchFormInternal()} of the active
-   *         outline {@link IOutline#getSearchForm()}
+   * outline {@link IOutline#getSearchForm()}
    */
   IForm getPageSearchForm();
 
@@ -594,20 +594,20 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @param selectViewTabsKeyStrokesEnabled
-   *          <code>true</code> to enable UI keystrokes to select view tabs, <code>false</code> to disable them.
+   *     <code>true</code> to enable UI keystrokes to select view tabs, <code>false</code> to disable them.
    */
   void setSelectViewTabsKeyStrokesEnabled(boolean selectViewTabsKeyStrokesEnabled);
 
   /**
    * @return optional modifier to use for UI keystrokes to select view tabs (only relevant when
-   *         {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
+   * {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
    */
   String getSelectViewTabsKeyStrokeModifier();
 
   /**
    * @param selectViewTabsKeyStrokeModifier
-   *          optional modifier to use for UI keystrokes to select view tabs (only relevant when
-   *          {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
+   *     optional modifier to use for UI keystrokes to select view tabs (only relevant when
+   *     {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
    */
   void setSelectViewTabsKeyStrokeModifier(String selectViewTabsKeyStrokeModifier);
 
@@ -636,7 +636,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @return <code>true</code> if the given {@link IFileChooser} is currently displayed. However, a value of
-   *         <code>true</code> does not imply that the {@link IFileChooser} is the currently active model element.
+   * <code>true</code> does not imply that the {@link IFileChooser} is the currently active model element.
    * @see #showFileChooser(IFileChooser)
    */
   boolean isShowing(IFileChooser fileChooser);
@@ -667,9 +667,9 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Opens the given URI (http:, tel:, mailto:, etc.).
    *
    * @param uri
-   *          URI to handle on the UI using the given action. Must not be <code>null</code>.
+   *     URI to handle on the UI using the given action. Must not be <code>null</code>.
    * @param openUriAction
-   *          The action to be performed on the UI for the URI. Must not be <code>null</code>.
+   *     The action to be performed on the UI for the URI. Must not be <code>null</code>.
    */
   void openUri(String uri, IOpenUriAction openUriAction);
 
@@ -678,7 +678,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Downloads the given {@link BinaryResource}. Download handler is valid for 1 minute.
    *
    * @param binaryResource
-   *          The binary resource that should be opened on the UI using a temporary URI. Must not be <code>null</code>.
+   *     The binary resource that should be opened on the UI using a temporary URI. Must not be <code>null</code>.
    */
   void openUri(BinaryResource binaryResource);
 
@@ -686,9 +686,9 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Downloads the given {@link BinaryResource}. Download handler is valid for 1 minute.
    *
    * @param binaryResource
-   *          The binary resource that should be opened on the UI using a temporary URI. Must not be <code>null</code>.
+   *     The binary resource that should be opened on the UI using a temporary URI. Must not be <code>null</code>.
    * @param openUriAction
-   *          The action to be performed on the UI for the URI. Must not be <code>null</code>.
+   *     The action to be performed on the UI for the URI. Must not be <code>null</code>.
    */
   void openUri(BinaryResource binaryResource, IOpenUriAction openUriAction);
 
@@ -760,7 +760,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Subclasses can override this method.
    *
    * @return <code>true</code> to allow the desktop to proceed with closing. Otherwise <code>false</code> to veto the
-   *         closing process.
+   * closing process.
    */
   boolean doBeforeClosingInternal();
 
@@ -786,7 +786,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * used instead of a boolean to ensure the state is not accidentally changed by another widget.
    *
    * @param trackFocus
-   *          true to enable the focus tracking, false to disable it.
+   *     true to enable the focus tracking, false to disable it.
    * @see WidgetEvent#TYPE_FOCUS_IN
    * @see WidgetEvent#TYPE_FOCUS_OUT
    */
@@ -805,7 +805,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * class any one is returned (nondeterministic, see {@link java.util.stream.Stream#findAny}).
    *
    * @param addOnClass
-   *          The add-on class or a super-class/interface of the add-on
+   *     The add-on class or a super-class/interface of the add-on
    * @return The add-on instance
    * @since 9.0
    */
@@ -863,7 +863,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @param theme
-   *          name of the theme to activate or null when default theme should be active.
+   *     name of the theme to activate or null when default theme should be active.
    * @since 5.2.0
    */
   void setTheme(String theme);
@@ -927,18 +927,18 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * @return {@code true} if the desktop in the UI (i.e. web browser) is in the background. <b>Note:</b> The outline
-   *         tree may still be visible.
+   * tree may still be visible.
    * @since 6.1
    */
   boolean isInBackground();
 
   /**
    * @return the {@link IEventHistory} associated with this desktop (might be <code>null</code>).
-   *         <p>
-   *         The default implementation is a {@link DefaultDesktopEventHistory} and created by
-   *         {@link AbstractDesktop#createEventHistory()}
-   *         <p>
-   *         This method is thread safe.
+   * <p>
+   * The default implementation is a {@link DefaultDesktopEventHistory} and created by
+   * {@link AbstractDesktop#createEventHistory()}
+   * <p>
+   * This method is thread safe.
    * @since 6.0
    */
   IEventHistory<DesktopEvent> getEventHistory();
@@ -994,9 +994,9 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * {@link UnsavedFormChangesForm}.
    *
    * @param formSet
-   *          {@link Set} of {@link IForm}s that should be canceled. Can be null or empty.
+   *     {@link Set} of {@link IForm}s that should be canceled. Can be null or empty.
    * @return <code>true</code> if all forms were closed (and saved) successfully or false if the saving dialog was
-   *         cancelled.
+   * cancelled.
    * @since 9.0
    */
   boolean cancelForms(Set<IForm> formSet);
@@ -1007,12 +1007,12 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * will be asked if they should be saved or not with a specific dialog (see {@link UnsavedFormChangesForm}).
    *
    * @param formSet
-   *          {@link Set} of {@link IForm}s that should be canceled. Can be null or empty.
+   *     {@link Set} of {@link IForm}s that should be canceled. Can be null or empty.
    * @param alwaysShowUnsavedChangesForm
-   *          true, if the {@link UnsavedFormChangesForm} should be shown even if there is only one form to be saved,
-   *          false, if the regular confirmation message box should be shown in that case
+   *     true, if the {@link UnsavedFormChangesForm} should be shown even if there is only one form to be saved,
+   *     false, if the regular confirmation message box should be shown in that case
    * @return <code>true</code> if all forms were closed (and saved) successfully or false if the saving dialog was
-   *         cancelled.
+   * cancelled.
    * @since 9.0
    */
   boolean cancelForms(Set<IForm> formSet, boolean alwaysShowUnsavedChangesForm);
@@ -1023,7 +1023,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * user won't be asked to save unsaved changes.
    *
    * @param formSet
-   *          {@link Set} of {@link IForm}s that should be closed.
+   *     {@link Set} of {@link IForm}s that should be closed.
    * @since 9.0
    */
   void closeForms(Set<IForm> formSet);

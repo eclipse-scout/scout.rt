@@ -20,5 +20,4 @@ public class TreeWithOneNode extends AbstractTree {
     super.execInitTree();
     addChildNode(getRootNode(), new TreeNode());
   }
-
 }

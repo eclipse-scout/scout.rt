@@ -11,6 +11,7 @@
 // Copied from https://github.com/airbnb/ts-migrate (MIT License)
 import ts from 'typescript';
 import path from 'path';
+
 const __dirname = path.resolve();
 
 export function mockPluginParams(params) {

@@ -42,9 +42,9 @@ public class PropertyParameter implements Serializable {
 
   /**
    * @param name
-   *          of the property, stored upper case
+   *     of the property, stored upper case
    * @param values
-   *          values of the property, stored in the given case
+   *     values of the property, stored in the given case
    */
   public PropertyParameter(String name, String... values) {
     Assertions.assertNotNull(name); // name must not be null
@@ -132,5 +132,4 @@ public class PropertyParameter implements Serializable {
   public String toString() {
     return "PropertyParameter [m_name=" + m_name + ", m_value=" + getValue() + "]";
   }
-
 }

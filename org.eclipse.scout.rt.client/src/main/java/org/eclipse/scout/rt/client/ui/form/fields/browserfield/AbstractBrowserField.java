@@ -84,7 +84,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * This property is only relevant when sandbox is enabled (see {@link #getConfiguredSandboxEnabled()}).
    *
    * @return Sandbox permissions to enabled or {@code null} / {@link SandboxPermission#none()} if no permissions should
-   *         be enabled.
+   * be enabled.
    */
   @Order(220)
   @ConfigProperty(ConfigProperty.OBJECT)
@@ -94,7 +94,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
 
   /**
    * @return a list of origin URIs from which this field will receive messages posted via <i>postMessage</i>. If this is
-   *         {@code null} or empty, messages from all origins are accepted. The default is empty.
+   * {@code null} or empty, messages from all origins are accepted. The default is empty.
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
    */
   protected List<String> getConfiguredTrustedMessageOrigins() {
@@ -181,10 +181,10 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * </ul>
    *
    * @param data
-   *          Message received from the {@code iframe}. Can be a {@link String}, a {@link Number}, a {@link Boolean} or
-   *          an {@link IDataObject}
+   *     Message received from the {@code iframe}. Can be a {@link String}, a {@link Number}, a {@link Boolean} or
+   *     an {@link IDataObject}
    * @param origin
-   *          The origin of the window that sent the message.
+   *     The origin of the window that sent the message.
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
    */
   @ConfigOperation
@@ -197,8 +197,8 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * re-opened) and closed.
    *
    * @param windowState
-   *          <code>true</code> for external window has been opened (also should be called immediately after the page is
-   *          displayed), <code>false</code> for external window has been closed.
+   *     <code>true</code> for external window has been opened (also should be called immediately after the page is
+   *     displayed), <code>false</code> for external window has been closed.
    * @see #getConfiguredShowInExternalWindow()
    */
   @ConfigOperation

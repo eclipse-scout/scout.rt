@@ -39,7 +39,7 @@ public interface IBinaryRefHandler {
    * Gets resource to given URI as {@link BinaryResource}. Returns null if resource not found.
    *
    * @param uri
-   *          non null URI with a path matching {@link #getRegistrationPath()}
+   *     non null URI with a path matching {@link #getRegistrationPath()}
    * @return BinaryResource of URI
    */
   BinaryResource loadBinaryResource(URI uri);
@@ -49,9 +49,9 @@ public interface IBinaryRefHandler {
    * URI collection must contain only URIs for which this handler is registered.
    *
    * @param resultCollector
-   *          collector map in which implementor puts resolved display texts
+   *     collector map in which implementor puts resolved display texts
    * @param uris
-   *          non null collection of {@link URI} for this handler to resolve display texts
+   *     non null collection of {@link URI} for this handler to resolve display texts
    */
   default void getDisplayTexts(Map<URI, String> resultCollector, Collection<URI> uris) {
     // use as display texts the filenames
@@ -63,9 +63,9 @@ public interface IBinaryRefHandler {
    * collection must contain only URIs for which this handler is registered.
    *
    * @param resultCollector
-   *          collector map in which implementor puts resolved filenames
+   *     collector map in which implementor puts resolved filenames
    * @param uris
-   *          non null collection of {@link URI} for this handler to resolve filenames
+   *     non null collection of {@link URI} for this handler to resolve filenames
    */
   void getFilenames(Map<URI, String> resultCollector, Collection<URI> uris);
 
@@ -74,9 +74,9 @@ public interface IBinaryRefHandler {
    * collection must contain only URIs for which this handler is registered.
    *
    * @param resultCollector
-   *          collector map in which implementor puts resolved filenames
+   *     collector map in which implementor puts resolved filenames
    * @param uris
-   *          non null collection of {@link URI} for this handler to resolve content types
+   *     non null collection of {@link URI} for this handler to resolve content types
    */
   default void getContentTypes(Map<URI, String> resultCollector, Collection<URI> uris) {
     // get content types from filenames

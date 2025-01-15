@@ -15,5 +15,4 @@ import java.util.EventListener;
 public interface BookmarkServiceListener extends EventListener {
 
   void bookmarksChanged(BookmarkServiceEvent e);
-
 }

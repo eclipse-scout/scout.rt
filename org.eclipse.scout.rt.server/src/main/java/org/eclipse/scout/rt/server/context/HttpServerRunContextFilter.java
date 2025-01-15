@@ -60,10 +60,10 @@ import org.eclipse.scout.rt.server.commons.context.HttpRunContextProducer;
  * &lt;/filter&gt;
  * </pre>
  *
- * @since 9.0
  * @see HttpServerRunContextProducer
  * @see HttpRunContextProducer
  * @see HttpRunContextFilter
+ * @since 9.0
  */
 public class HttpServerRunContextFilter implements Filter {
 

@@ -60,11 +60,11 @@ public class TestingResourceHelper {
    * Writes the data object to the test resources.
    *
    * @param resourceBaseClass
-   *          Resource base class is used to determine to directory, see {@link #getTestResourceDirectory(Class)}.
+   *     Resource base class is used to determine to directory, see {@link #getTestResourceDirectory(Class)}.
    * @param filename
-   *          Filename
+   *     Filename
    * @param dataObject
-   *          Data object
+   *     Data object
    */
   public void writeTestResource(Class<?> resourceBaseClass, String filename, IDataObject dataObject) {
     File outputFile = new File(getTestResourceDirectory(resourceBaseClass), filename);

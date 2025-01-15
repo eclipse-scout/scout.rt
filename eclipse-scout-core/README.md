@@ -12,7 +12,6 @@
   <a href="https://eclipse.dev/scout/" target="_blank" rel="noopener noreferrer"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Feclipse.dev%2Fscout%2F"></a>
 </p>
 
-
 # Eclipse Scout - Core
 
 [Eclipse Scout](https://eclipse.dev/scout/) is a mature and open framework for modern business applications on the web. It substantially boosts developer productivity and is simple to learn.
@@ -25,7 +24,6 @@ If you are completely new and wondering what Eclipse Scout is, please visit our 
 
 To get started with Scout, follow our [Get Started Guide](https://eclipsescout.github.io/scout-docs/25.1/getstarted/getstarted.html).
 
-
 ## Documentation
 
 To learn more about Scout and how to use it, you should have a look at our [documentation platform](https://eclipsescout.github.io/). There you will find tutorials, best practices and architecture details.
@@ -37,7 +35,6 @@ Please see our [contribution guide](https://github.com/eclipse-scout/scout.rt#co
 ## Get in Touch
 
 To get in touch with the Eclipse Scout community, please open a thread in the [Eclipse Scout Forum](https://www.eclipse.org/forums/index.php?t=thread&frm_id=174) or on [Stack Overflow](https://stackoverflow.com/tags/eclipse-scout).
-
 
 ## License
 

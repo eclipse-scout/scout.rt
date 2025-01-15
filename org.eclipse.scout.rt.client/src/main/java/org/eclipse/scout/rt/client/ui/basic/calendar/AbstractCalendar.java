@@ -223,17 +223,17 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
    * Filter and resolve item conflicts after some {@link ICalendarItemProvider} changed their items
    *
    * @param changedProviderTypes
-   *          is the list of provider types that changed their provided items
+   *     is the list of provider types that changed their provided items
    * @param componentsByProvider
-   *          is the life map of all provider types with their provided items.
-   *          <p>
-   *          Changes to the componentsByProvider map are life applied to the calendar model.<br>
-   *          Often the convenience method {@link #findConflictingItems(Map, Class...)} is used to calculate conflicting
-   *          items of two or more providers for removal from the map.
-   *          <p>
-   *          The {@link ICalendarItem}s are wrapped into {@link CalendarComponent}s to hold their originating provider
-   *          and other common info.<br>
-   *          Use {@link CalendarComponent#getItem()} to access the {@link ICalendarItem}.
+   *     is the life map of all provider types with their provided items.
+   *     <p>
+   *     Changes to the componentsByProvider map are life applied to the calendar model.<br>
+   *     Often the convenience method {@link #findConflictingItems(Map, Class...)} is used to calculate conflicting
+   *     items of two or more providers for removal from the map.
+   *     <p>
+   *     The {@link ICalendarItem}s are wrapped into {@link CalendarComponent}s to hold their originating provider
+   *     and other common info.<br>
+   *     Use {@link CalendarComponent#getItem()} to access the {@link ICalendarItem}.
    */
   @ConfigOperation
   @Order(20)
@@ -331,7 +331,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *     live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -757,7 +757,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
 
   /**
    * @param providerTypes
-   *          {@link ICalendarItemProvider} classes
+   *     {@link ICalendarItemProvider} classes
    */
   public Collection<CalendarItemConflict> findConflictingItems(Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider, Class<?>... providerTypes) {
     if (providerTypes != null && providerTypes.length >= 2) {
