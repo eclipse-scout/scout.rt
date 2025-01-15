@@ -11,7 +11,6 @@ import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.rest.RestApplication;
 import org.eclipse.scout.rt.server.context.HttpServerRunContextFilter;
-import org.eclipse.scout.rt.ui.html.app.UiServletContributors.GzipFilterContributor;
 import org.eclipse.scout.rt.ui.html.app.UiServletContributors.UiServletContributor;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -31,8 +30,6 @@ public final class AppServletContributors {
 
   /**
    * Filters for API access.
-   * <p>
-   * After {@link GzipFilterContributor}.
    */
   @Order(4000)
   public static class RestAuthFilterContributor implements IServletFilterContributor {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,6 +25,10 @@ import org.eclipse.scout.rt.server.commons.BufferedServletInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated will be removed in a future release.
+ */
+@Deprecated
 public class GzipServletRequestWrapper extends HttpServletRequestWrapper {
   private static final Logger LOG = LoggerFactory.getLogger(GzipServletRequestWrapper.class);
 

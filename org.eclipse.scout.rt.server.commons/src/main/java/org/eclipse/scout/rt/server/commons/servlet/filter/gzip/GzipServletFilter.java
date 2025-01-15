@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,7 +40,10 @@ import org.slf4j.LoggerFactory;
  * <li><b>enable_empty_content_type_logging:</b> enables logging of empty content type of the response. (default value =
  * <code>true</code>)
  * </ul>
+ *
+ * @deprecated will be removed in a future release.
  */
+@Deprecated
 public class GzipServletFilter implements Filter {
   private static final Logger LOG = LoggerFactory.getLogger(GzipServletFilter.class);
 
@@ -59,6 +62,8 @@ public class GzipServletFilter implements Filter {
     m_minSize = Integer.parseInt(ObjectUtility.nvl(config.getInitParameter("min_size"), "256"));
     m_contentTypes = CollectionUtility.hashSet(StringUtility.split(ObjectUtility.nvl(config.getInitParameter("content_types"), CONTENT_TYPES), ","));
     m_enableEmptyContentTypeLogging = Boolean.parseBoolean(ObjectUtility.nvl(config.getInitParameter("enable_empty_content_type_logging"), "true"));
+
+    LOG.warn("Using deprecated {}", this.getClass().getName());
   }
 
   @Override
