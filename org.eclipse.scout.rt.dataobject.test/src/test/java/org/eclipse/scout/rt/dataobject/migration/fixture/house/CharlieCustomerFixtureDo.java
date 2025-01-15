@@ -73,4 +73,11 @@ public class CharlieCustomerFixtureDo extends CustomerFixtureDo {
     lastName().set(lastName);
     return this;
   }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public CharlieCustomerFixtureDo withGender(CustomerGenderFixtureEnum gender) {
+    gender().set(gender);
+    return this;
+  }
 }
