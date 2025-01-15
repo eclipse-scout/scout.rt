@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.http.HttpCookie.SameSite;
 import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPortConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractStringListConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -356,6 +358,192 @@ public final class ApplicationProperties {
     @Override
     public String description() {
       return "Specifies whether the application context handler should also lookup resources w/o base resource. The default value is false.";
+    }
+  }
+
+  /**
+   * @see GzipHandler
+   */
+  public static class ScoutApplicationGzipEnabled extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.enabled";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies whether " + GzipHandler.class.getName() + " is used. Default value is " + getDefaultValue() + ".";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return true;
+    }
+  }
+
+  /**
+   * @see GzipHandler#setExcludedInflatePaths(String...)
+   */
+  public static class ScoutApplicationGzipExcludedInflatePaths extends AbstractStringListConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.excluded.inflate.paths";
+    }
+
+    @Override
+    public String description() {
+      return "Excluded inflate paths for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setExcludedMethods(String...)
+   */
+  public static class ScoutApplicationGzipExcludedMethods extends AbstractStringListConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.excluded.methods";
+    }
+
+    @Override
+    public String description() {
+      return "Excluded methods for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setExcludedMimeTypes(String...)
+   */
+  public static class ScoutApplicationGzipExcludedMimeTypes extends AbstractStringListConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.excluded.mimeTypes";
+    }
+
+    @Override
+    public String description() {
+      return "Excluded MIME types for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setExcludedPaths(String...)
+   */
+  public static class ScoutApplicationGzipExcludedPaths extends AbstractStringListConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.excluded.paths";
+    }
+
+    @Override
+    public String description() {
+      return "Excluded paths for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setIncludedInflatePaths(String...)
+   */
+  public static class ScoutApplicationGzipIncludedInflatePaths extends AbstractStringListConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.included.inflate.paths";
+    }
+
+    @Override
+    public String description() {
+      return "Included inflate paths for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setIncludedMethods(String...)
+   */
+  public static class ScoutApplicationGzipIncludedMethods extends AbstractStringListConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.included.methods";
+    }
+
+    @Override
+    public String description() {
+      return "Included methods for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setIncludedMimeTypes(String...)
+   */
+  public static class ScoutApplicationGzipIncludedMimeTypes extends AbstractStringListConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.included.mimeTypes";
+    }
+
+    @Override
+    public String description() {
+      return "Included MIME types for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setIncludedPaths(String...)
+   */
+  public static class ScoutApplicationGzipIncludedPaths extends AbstractStringListConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.included.paths";
+    }
+
+    @Override
+    public String description() {
+      return "Included paths for " + GzipHandler.class.getName() + " (respected only if at least one is set otherwise Jetty default is used).";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setMinGzipSize(int)
+   */
+  public static class ScoutApplicationGzipMinSize extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.minSize";
+    }
+
+    @Override
+    public String description() {
+      return "Minimum size to trigger compression for " + GzipHandler.class.getName() + ". If not set Jetty default value will be used.";
+    }
+  }
+
+  /**
+   * @see GzipHandler#setSyncFlush(boolean)
+   */
+  public static class ScoutApplicationGzipSyncFlush extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.app.gzip.syncFlush";
+    }
+
+    @Override
+    public String description() {
+      return "Enables sync flush for " + GzipHandler.class.getName() + ". Default value is " + getDefaultValue() + ".";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return true;
     }
   }
 }

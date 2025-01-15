@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,7 +39,10 @@ import org.slf4j.LoggerFactory;
  * <li><b>post_pattern:</b> regex of pathInfo that is compressed for POST requests (default value =
  * <code>.{@literal *}/json</code>)
  * </ul>
+ *
+ * @deprecated will be removed in a future release.
  */
+@Deprecated
 public class LegacyGzipServletFilter implements Filter {
   private static final Logger LOG = LoggerFactory.getLogger(LegacyGzipServletFilter.class);
 
@@ -58,6 +61,8 @@ public class LegacyGzipServletFilter implements Filter {
     m_getMinSize = Integer.parseInt(ObjectUtility.nvl(config.getInitParameter("get_min_size"), "256"));
     m_postMinSize = Integer.parseInt(ObjectUtility.nvl(config.getInitParameter("post_min_size"), "256"));
     m_contentTypes = CollectionUtility.hashSet(StringUtility.split(ObjectUtility.nvl(config.getInitParameter("content_types"), CONTENT_TYPES), ","));
+
+    LOG.warn("Using deprecated {}", this.getClass().getName());
   }
 
   @Override

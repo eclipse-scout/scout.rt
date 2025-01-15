@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.server.commons.healthcheck.HealthCheckServlet;
-import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.app.filter.UiServletMultipartConfigFilter;
 
@@ -102,15 +101,6 @@ public final class UiServletContributors {
       return CollectionUtility.arrayList(
           "/status" // see StatusServletContributor
       );
-    }
-  }
-
-  @Order(3000)
-  public static class GzipFilterContributor implements IServletFilterContributor {
-
-    @Override
-    public void contribute(ServletContextHandler handler) {
-      handler.addFilter(GzipServletFilter.class, "/*", null);
     }
   }
 

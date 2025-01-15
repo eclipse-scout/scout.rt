@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,10 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
 
+/**
+ * @deprecated will be removed in a future release.
+ */
+@Deprecated
 public class LegacyGzipServletResponseWrapper extends HttpServletResponseWrapper {
 
   private BufferedServletOutputStream m_buf;

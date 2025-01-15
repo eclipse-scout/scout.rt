@@ -18,7 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
@@ -40,6 +43,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ErrorHandler;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
@@ -47,6 +51,17 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationCertificat
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationConsoleInputHandlerEnabledProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationContextHandlerExtendedResourceLookup;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationContextPathProperty;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipEnabled;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipExcludedInflatePaths;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipExcludedMethods;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipExcludedMimeTypes;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipExcludedPaths;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipIncludedInflatePaths;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipIncludedMethods;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipIncludedMimeTypes;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipIncludedPaths;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipMinSize;
+import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationGzipSyncFlush;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationHttpRequestMaxHeaderSizeProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationHttpSessionEnabledProperty;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationJvmShutdownHookEnabledProperty;
@@ -68,12 +83,14 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PropertiesHelper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.ICertificateProvider;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -380,7 +397,45 @@ public class Application {
       return new P_RedirectToContextPathHandler(handler);
     }
 
+    if (BooleanUtility.nvl(CONFIG.getPropertyValue(ScoutApplicationGzipEnabled.class), true)) {
+      return createGzipHandler(handler);
+    }
     return handler;
+  }
+
+  /**
+   * Create a {@link GzipHandler} and wrap the input handler with it.
+   *
+   * @param handler
+   *     original handler (to be wrapped)
+   * @return original handler wrapped by {@link GzipHandler}
+   */
+  protected Handler createGzipHandler(Handler handler) {
+    GzipHandler gzipHandler = new GzipHandler();
+
+    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedInflatePaths.class, gzipHandler::setExcludedInflatePaths);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedMethods.class, gzipHandler::setExcludedMethods);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedMimeTypes.class, gzipHandler::setExcludedMimeTypes);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipExcludedPaths.class, gzipHandler::setExcludedPaths);
+
+    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedInflatePaths.class, gzipHandler::setIncludedInflatePaths);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedMethods.class, gzipHandler::setIncludedMethods);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedMimeTypes.class, gzipHandler::setIncludedMimeTypes);
+    setStringPropertyValueIfFilled(ScoutApplicationGzipIncludedPaths.class, gzipHandler::setIncludedPaths);
+
+    Optional.ofNullable(CONFIG.getPropertyValue(ScoutApplicationGzipMinSize.class)).ifPresent(gzipHandler::setMinGzipSize);
+    gzipHandler.setSyncFlush(CONFIG.getPropertyValue(ScoutApplicationGzipSyncFlush.class));
+
+    // wrap the original handler
+    gzipHandler.setHandler(handler);
+    return gzipHandler;
+  }
+
+  protected void setStringPropertyValueIfFilled(Class<? extends IConfigProperty<List<String>>> propertyClass, Consumer<String[]> setter) {
+    List<String> propertyValue = CONFIG.getPropertyValue(propertyClass);
+    if (!CollectionUtility.isEmpty(propertyValue)) {
+      setter.accept(propertyValue.toArray(n -> new String[n]));
+    }
   }
 
   protected void startConsoleInputHandler() {
