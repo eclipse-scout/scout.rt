@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Event, HybridActionContextElements, HybridManager, PropertyChangeEvent, Widget, WidgetEventMap} from '../../index';
+import {AnyDoEntity, Event, HybridActionContextElements, HybridManager, PropertyChangeEvent, Widget, WidgetEventMap} from '../../index';
 
-export interface HybridActionEvent<TObject = object, T = HybridManager> extends Event<T> {
+export interface HybridActionEvent<TObject extends AnyDoEntity = AnyDoEntity, T = HybridManager> extends Event<T> {
   data: {
     id: string;
     actionType: string;
@@ -19,7 +19,7 @@ export interface HybridActionEvent<TObject = object, T = HybridManager> extends 
   };
 }
 
-export interface HybridActionEndEvent<TObject = object, T = HybridManager> extends Event<T> {
+export interface HybridActionEndEvent<TObject extends AnyDoEntity = AnyDoEntity, T = HybridManager> extends Event<T> {
   data: TObject;
   contextElements: HybridActionContextElements;
 }

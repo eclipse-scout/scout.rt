@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, arrays, ConfigProperties, DoEntity, ObjectModel, objects, System, systems} from '../index';
+import {ajax, App, arrays, BaseDoEntity, ConfigProperties, ObjectModel, objects, System, systems, typeName} from '../index';
 import $ from 'jquery';
 
 /**
@@ -38,7 +38,7 @@ export class ConfigPropertyCache implements ObjectModel<ConfigPropertyCache> {
    */
   bootstrap(urls: string | string[], system?: string): JQuery.Promise<void> {
     let promises = arrays.ensure(urls)
-      .map(url => $.ajaxJson(url)
+      .map(url => ajax.getDataObject(url)
         .then(response => App.handleJsonError(url, response))
         .then(properties => this._handleBootstrapResponse(properties, system)));
     return $.promiseAll(promises);
@@ -49,11 +49,11 @@ export class ConfigPropertyCache implements ObjectModel<ConfigPropertyCache> {
    * @param data The properties to add.
    * @param system The optional system name to which the properties belong. By default, {@link System.MAIN_SYSTEM} is used.
    */
-  protected _handleBootstrapResponse(data?: ConfigProperty<any> | ConfigProperty<any>[], system?: string) {
+  protected _handleBootstrapResponse(data?: ConfigPropertyDo | ConfigPropertyDo[], system?: string) {
     arrays.ensure(data).forEach(property => this._handleBootstrapProperty(property, system));
   }
 
-  protected _handleBootstrapProperty(property?: ConfigProperty<any>, system?: string) {
+  protected _handleBootstrapProperty(property?: ConfigPropertyDo, system?: string) {
     if (!property?.key) {
       return; // property key is required
     }
@@ -113,7 +113,13 @@ export class ConfigPropertyCache implements ObjectModel<ConfigPropertyCache> {
   }
 }
 
-export interface ConfigProperty<TValue> extends DoEntity {
+@typeName('scout.ConfigProperty')
+export class ConfigPropertyDo extends BaseDoEntity implements ConfigProperty<any> {
+  key: string;
+  value: any;
+}
+
+export interface ConfigProperty<TValue> {
   key: string;
   value: TValue;
 }

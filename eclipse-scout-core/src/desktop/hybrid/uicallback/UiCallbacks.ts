@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, DoEntity, scout, UiCallbacksEventMap, Widget} from '../../../index';
+import {App, BaseDoEntity, scout, typeName, UiCallbacksEventMap, Widget} from '../../../index';
 
 /**
  * Processes UI callback requests from the client backend.
@@ -17,7 +17,7 @@ export class UiCallbacks extends Widget {
   declare eventMap: UiCallbacksEventMap;
   declare self: UiCallbacks;
 
-  onUiCallbackRequest(handlerObjectType: string, callbackId: string, owner: Widget, request: DoEntity) {
+  onUiCallbackRequest(handlerObjectType: string, callbackId: string, owner: Widget, request: BaseDoEntity) {
     const handler = scout.create(handlerObjectType) as UiCallbackHandler;
     try {
       handler.handle(callbackId, owner, request)
@@ -36,22 +36,22 @@ export class UiCallbacks extends Widget {
     }
     return App.get().errorHandler.analyzeError(error)
       .then(info => {
-        const errorDo: UiCallbackErrorDo = {
-          _type: 'scout.UiCallbackError',
+        const errorDo = scout.create(UiCallbackErrorDo, {
           message: info.message,
           code: info.code
-        };
+        });
         this._triggerUiResponse(callbackId, null, errorDo);
       });
   }
 
-  protected _triggerUiResponse(callbackId: string, data: DoEntity, error: UiCallbackErrorDo) {
-    const eventData: UiCallbackResponse = {id: callbackId, data, error};
+  protected _triggerUiResponse(callbackId: string, data: BaseDoEntity, error: UiCallbackErrorDo) {
+    const eventData = scout.create(UiCallbackResponse, {id: callbackId, data, error});
     this.trigger('uiResponse', {data: eventData});
   }
 }
 
-export interface UiCallbackErrorDo extends DoEntity {
+@typeName('scout.UiCallbackError')
+export class UiCallbackErrorDo extends BaseDoEntity {
   message: string;
   code: string;
 }
@@ -64,14 +64,15 @@ export interface UiCallbackHandler {
    * Called when a UiCallback is sent from the client backend.
    * @param callbackId The ID of the callback (as sent from the client backend).
    * @param owner The owner {@link Widget} the call belongs to.
-   * @param request The optional callback request data as sent from the client backend. May be null.
-   * @returns {JQuery.Promise} holding the resulting {@link DoEntity} in case it is resolved or the {@link UiCallbackErrorDo} in case it is rejected.
+   * @param request The optional callback request {@link BaseDoEntity} as sent from the client backend. May be null.
+   * @returns {JQuery.Promise} holding the resulting {@link BaseDoEntity} in case it is resolved or the {@link UiCallbackErrorDo} in case it is rejected.
    */
-  handle(callbackId: string, owner: Widget, request: DoEntity): JQuery.Promise<DoEntity, UiCallbackErrorDo>;
+  handle(callbackId: string, owner: Widget, request: BaseDoEntity): JQuery.Promise<BaseDoEntity, UiCallbackErrorDo>;
 }
 
-export interface UiCallbackResponse<TObject extends DoEntity = DoEntity> {
+@typeName('scout.UiCallbackResponse')
+export class UiCallbackResponse<TObject extends BaseDoEntity = BaseDoEntity> extends BaseDoEntity {
   id: string;
   error?: UiCallbackErrorDo;
-  data?: TObject | TObject[];
+  data?: TObject;
 }

@@ -48,6 +48,7 @@ public class IdCodec {
 
   protected static final String ID_TYPENAME_DELIMITER = ":";
   protected static final String SIGNATURE_DELIMITER = "_-~SIG~-_";
+  protected static final String COMPOSITE_ID_DELIMITER = ";";
 
   protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
   protected final LazyValue<IdInventory> m_idInventory = new LazyValue<>(IdInventory.class);
@@ -168,7 +169,7 @@ public class IdCodec {
       return addSignature(id.getClass(), components.stream()
           .map(comp -> toUnqualified(comp, flagsWithoutSignature))
           .map(s -> s == null ? "" : s) // empty string if component is null just in case of composite id
-          .collect(Collectors.joining(";")), flags);
+          .collect(Collectors.joining(COMPOSITE_ID_DELIMITER)), flags);
     }
     else if (id instanceof UnknownId) {
       return addSignature(UnknownId.class, ((UnknownId) id).getId(), flags);
@@ -317,10 +318,9 @@ public class IdCodec {
         //noinspection deprecation
         return UnknownId.of(null, qualifiedId);
       }
-      else {
-        throw new IdCodecException("Qualified id '{}' format is invalid", qualifiedId);
-      }
+      throw new IdCodecException("Qualified id '{}' format is invalid", qualifiedId);
     }
+
     String typeName = tmp[0];
     Class<? extends IId> idClass = idInventory().getIdClass(typeName);
     if (idClass == null) {
@@ -328,9 +328,7 @@ public class IdCodec {
         //noinspection deprecation
         return UnknownId.of(typeName, tmp[1]);
       }
-      else {
-        throw new IdCodecException("No class found for type name '{}'", typeName);
-      }
+      throw new IdCodecException("No class found for type name '{}'", typeName);
     }
 
     try {
@@ -356,7 +354,7 @@ public class IdCodec {
    */
   protected <ID extends IId> ID fromUnqualifiedUnchecked(Class<ID> idClass, String unqualifiedId, Set<IIdCodecFlag> flags) {
     unqualifiedId = removeSignature(idClass, unqualifiedId, flags);
-    String[] rawComponents = unqualifiedId.split(";", -1 /* force empty strings for empty components */);
+    String[] rawComponents = unqualifiedId.split(COMPOSITE_ID_DELIMITER, -1 /* force empty strings for empty components */);
     Object[] components = parseComponents(idClass, rawComponents, flags);
     return idFactory().createInternal(idClass, components);
   }
