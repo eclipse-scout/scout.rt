@@ -10,10 +10,13 @@
 const fs = require('fs');
 const path = require('path');
 const scoutBuildConstants = require('./constants');
+const DataObjectTransformer = require('./DataObjectTransformer');
+const ModuleNamespaceResolver = require('./ModuleNamespaceResolver');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
 const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('webpack');
+const ts = require('typescript');
 
 /**
  * @param {string} args.mode development or production
@@ -79,13 +82,22 @@ module.exports = (env, args) => {
   };
 
   const transpileOnly = typeCheck === 'fork' ? true : !typeCheck;
+  const namespaceResolver = new ModuleNamespaceResolver();
+  const getCustomTransformers = program => ({
+    before: [ctx => {
+      const doTransformer = new DataObjectTransformer(program, ctx, namespaceResolver);
+      return node => ts.visitNode(node, node => doTransformer.transform(node));
+    }]
+  });
+  getCustomTransformers.namespaceResolver = namespaceResolver; // for setDoTransformerOwnModuleNamespace below
   const tsOptions = {
     ...args.tsOptions,
     transpileOnly: transpileOnly,
     compilerOptions: {
       noEmit: false,
       ...args.tsOptions?.compilerOptions
-    }
+    },
+    getCustomTransformers
   };
 
   const config = {
@@ -320,6 +332,19 @@ function toExternals(src, dest) {
     obj[current] = current;
     return obj;
   }, dest);
+}
+
+/**
+ * Sets the Scout JS module namespace for the root module currently built.
+ * @param config The build config to modify.
+ * @param namespace The namespace of this module.
+ */
+function setDoTransformerOwnModuleNamespace(config, namespace) {
+  config.module.rules
+    .flatMap(r => r.use || [])
+    .find(l => l.loader?.indexOf('ts-loader') >= 0)
+    .options.getCustomTransformers.namespaceResolver
+    .ownModuleNamespace = namespace;
 }
 
 /**
@@ -607,4 +632,5 @@ function computeTypeCheck(typeCheck, devMode, watchMode) {
 module.exports.addThemes = addThemes;
 module.exports.libraryConfig = libraryConfig;
 module.exports.markExternals = markExternals;
+module.exports.setDoTransformerOwnModuleNamespace = setDoTransformerOwnModuleNamespace;
 module.exports.rewriteIndexImports = rewriteIndexImports;

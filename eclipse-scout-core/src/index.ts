@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-
+import 'reflect-metadata/lite';
 import {ObjectFactory} from './ObjectFactory';
 
+export * from './dataobject/DataObjectInventory';
 export * from './scout';
 export * from './events/Event';
 export * from './events/EventEmitter';
@@ -110,6 +111,20 @@ export * from './util/webstorage';
 export * from './util/cookies';
 export * from './util/ViewportScroller';
 export * from './util/ViewportScrollerModel';
+export * from './id/idCodec';
+export * from './dataobject/DoEntity';
+export * from './dataobject/serialize/doValueMetaData';
+export * from './dataobject/serialize/DoNodeSerializer';
+export * from './dataobject/serialize/DateDoNodeSerializer';
+export * from './dataobject/serialize/MapDoNodeSerializer';
+export * from './dataobject/serialize/ArrayDoNodeSerializer';
+export * from './dataobject/serialize/NumberDoNodeSerializer';
+export * from './dataobject/serialize/SetDoNodeSerializer';
+export * from './dataobject/serialize/DataObjectDeserializer';
+export * from './dataobject/serialize/DataObjectSerializer';
+export * from './dataobject/dataObjects';
+export * from './dataobject/BaseDoEntity';
+export * from './dataobject/ValueDo';
 export * from './ajax/ajax';
 export * from './ajax/AjaxCall';
 export * from './ajax/AjaxError';
@@ -117,6 +132,7 @@ export * from './uinotification/TopicDo';
 export * from './uinotification/uiNotifications';
 export * from './uinotification/UiNotificationDo';
 export * from './uinotification/UiNotificationResponse';
+export * from './uinotification/UiNotificationRequest';
 export * from './uinotification/UiNotificationEvent';
 export * from './uinotification/UiNotificationSystem';
 export * from './uinotification/UiNotificationPoller';
@@ -136,17 +152,16 @@ export * from './lookup/StaticLookupCallModel';
 export * from './lookup/PrepopulatedLookupCall';
 export * from './lookup/HierarchicalLookupResultBuilder';
 export * from './code/Code';
+export * from './code/CodeDo';
 export * from './code/CodeModel';
 export * from './code/CodeType';
+export * from './code/CodeTypeDo';
 export * from './code/CodeTypeModel';
 export * from './code/CodeTypeCache';
 export * from './code/CodeTypeCacheEventMap';
 export * from './code/CodeLookupCall';
 export * from './config/ConfigProperties';
 export * from './config/ConfigPropertyCache';
-export * from './dataobject/DoEntity';
-export * from './dataobject/dataObjects';
-export * from './dataobject/ValueDo';
 export * from './security/access';
 export * from './security/AccessControl';
 export * from './security/Permission';

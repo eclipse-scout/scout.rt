@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DoEntity} from '../..';
+import {BaseDoEntity, typeName} from '../..';
 
-export interface DisposeWidgetsHybridActionDo extends DoEntity {
+@typeName('scout.DisposeWidgetsHybridAction')
+export class DisposeWidgetsHybridActionDo extends BaseDoEntity {
   ids: string[];
 }

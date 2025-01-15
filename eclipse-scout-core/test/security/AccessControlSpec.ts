@@ -48,19 +48,22 @@ describe('AccessControl', () => {
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: JSON.stringify({
+          _type: 'scout.PermissionCollection',
           permissions: {
             some: [{
+              _type: 'scout.Permission',
               objectType: 'Permission',
               id: 'some'
             }],
             other: [{
+              _type: 'scout.Permission',
               objectType: 'Permission',
               id: 'other'
             }]
           }
         })
       });
-      jasmine.clock().tick(1);
+      jasmine.clock().tick(1000);
       jasmine.clock().uninstall();
 
       expect(accessControl._permissionCollection).not.toBeNull();
@@ -83,12 +86,15 @@ describe('AccessControl', () => {
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: JSON.stringify({
+          _type: 'scout.PermissionCollection',
           permissions: {
             some: [{
+              _type: 'scout.Permission',
               objectType: 'Permission',
               id: 'some'
             }],
             other: [{
+              _type: 'scout.Permission',
               objectType: 'Permission',
               id: 'other'
             }]

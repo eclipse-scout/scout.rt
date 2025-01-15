@@ -132,7 +132,7 @@ export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWi
   }
 }
 
-class UiNotificationEventSupport extends EventSupport {
+export class UiNotificationEventSupport extends EventSupport {
   system: UiNotificationSystem;
 
   constructor(system: UiNotificationSystem) {

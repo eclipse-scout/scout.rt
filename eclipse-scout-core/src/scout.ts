@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,6 +43,10 @@ export type ObjectOrChildModel<T> = T | ChildModelOf<T>;
 
 export type Constructor<T = object> = new(...args: any[]) => T;
 export type AbstractConstructor<T = object> = abstract new(...args: any[]) => T;
+
+export type DeepPartial<T> = T extends object ? {
+  [P in keyof T]?: DeepPartial<T[P]>;
+} : T;
 
 export interface ObjectWithType {
   objectType: string;
@@ -143,7 +147,7 @@ export const scout = {
    * @param type if this optional parameter is set, the given value must be of this type (instanceof check)
    * @returns the value (for direct assignment)
    */
-  assertParameter<T>(parameterName: string, value?: T, type?: AbstractConstructor | Constructor): T {
+  assertParameter<T>(parameterName: string, value?: T, type?: Constructor | AbstractConstructor): T {
     if (objects.isNullOrUndefined(value)) {
       throw new Error('Missing required parameter \'' + parameterName + '\'');
     }
@@ -159,7 +163,7 @@ export const scout = {
    * @param type if this parameter is set, the value must be of this type (instanceof check)
    * @returns the value (for direct assignment)
    */
-  assertProperty(object: object, propertyName: string, type?: AbstractConstructor) {
+  assertProperty(object: object, propertyName: string, type?: Constructor | AbstractConstructor) {
     let value = object[propertyName];
     if (objects.isNullOrUndefined(value)) {
       throw new Error('Missing required property \'' + propertyName + '\'');
@@ -190,7 +194,7 @@ export const scout = {
    * @param type type to check against with "instanceof"
    * @param msg optional error message when the assertion fails
    */
-  assertInstance<T>(value: any, type: AbstractConstructor<T>, msg?: string): T {
+  assertInstance<T>(value: any, type: Constructor<T> | AbstractConstructor<T>, msg?: string): T {
     if (!(value instanceof type)) {
       throw new Error(msg || 'Value has wrong type');
     }

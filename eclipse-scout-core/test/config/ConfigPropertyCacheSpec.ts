@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {config, ConfigProperties, ConfigProperty, ConfigPropertyCache, System} from '../../src/index';
+import {config, ConfigProperties, ConfigProperty, ConfigPropertyCache, ConfigPropertyDo, scout, System} from '../../src/index';
 
 describe('config', () => {
 
   let origConfigMap: Map<string, Map<string, ConfigProperty<any>>>;
 
   class TestingConfigPropertyCache extends ConfigPropertyCache {
-    override _handleBootstrapResponse(data?: ConfigProperty<any> | ConfigProperty<any>[], system?: string) {
+    override _handleBootstrapResponse(data?: ConfigPropertyDo | ConfigPropertyDo[], system?: string) {
       super._handleBootstrapResponse(data, system);
     }
   }
@@ -30,21 +30,16 @@ describe('config', () => {
 
   describe('_handleBootstrapResponse', () => {
     it('adds properties to the correct system', () => {
+
       let configPropertyCache = config as TestingConfigPropertyCache;
-      configPropertyCache._handleBootstrapResponse([{
-        key: 'scout.devMode',
-        value: true
-      }, {
-        key: 'scout.ui.backgroundPollingMaxWaitTime',
-        value: 2
-      }]);
-      configPropertyCache._handleBootstrapResponse([{
-        key: 'scout.devMode',
-        value: false
-      }, {
-        key: 'scout.uinotification.waitTimeout',
-        value: 4
-      }], 'test');
+      configPropertyCache._handleBootstrapResponse([
+        scout.create(ConfigPropertyDo, {key: 'scout.devMode', value: true}),
+        scout.create(ConfigPropertyDo, {key: 'scout.ui.backgroundPollingMaxWaitTime', value: 2})
+      ]);
+      configPropertyCache._handleBootstrapResponse([
+        scout.create(ConfigPropertyDo, {key: 'scout.devMode', value: false}),
+        scout.create(ConfigPropertyDo, {key: 'scout.uinotification.waitTimeout', value: 4})
+      ], 'test');
 
       let testSystem = 'test' as keyof ConfigProperties;
       expect(config.configMap.size).toBe(2);
@@ -66,17 +61,11 @@ describe('config', () => {
 
     it('overwrites already existing properties', () => {
       let configPropertyCache = config as TestingConfigPropertyCache;
-      configPropertyCache._handleBootstrapResponse([{
-        key: 'scout.devMode',
-        value: true
-      }, {
-        key: 'scout.ui.backgroundPollingMaxWaitTime',
-        value: 2
-      }]);
-      configPropertyCache._handleBootstrapResponse([{
-        key: 'scout.devMode',
-        value: false // overwrites
-      }]);
+      configPropertyCache._handleBootstrapResponse([
+        scout.create(ConfigPropertyDo, {key: 'scout.devMode', value: true}),
+        scout.create(ConfigPropertyDo, {key: 'scout.ui.backgroundPollingMaxWaitTime', value: 2})
+      ]);
+      configPropertyCache._handleBootstrapResponse(scout.create(ConfigPropertyDo, {key: 'scout.devMode', value: false /* overwrites */}));
       expect(config.configMap.size).toBe(1);
       expect(config.configMap.get(System.MAIN_SYSTEM).size).toBe(2);
       expect(config.get('scout.devMode')?.value).toBeFalse();
