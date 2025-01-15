@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DateField, dates, FormField, LabelField, Menu, scout, SequenceBox, SequenceBoxGridConfig, SequenceBoxModel, Status, StringField} from '../../../../src/index';
+import {Button, CheckBoxField, DateField, dates, FormField, LabelField, Menu, ModelOf, scout, SequenceBox, SequenceBoxGridConfig, SequenceBoxModel, Status, StringField} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, JQueryTesting, MenuSpecHelper} from '../../../../src/testing/index';
 
 describe('SequenceBox', () => {
@@ -883,6 +883,129 @@ describe('SequenceBox', () => {
       expect(dateField.$timeField.attr('aria-labelledby')).toBeTruthy();
       expect(dateField.$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + dateField.$label.attr('id'));
       expect(dateField.$timeField.attr('aria-label')).toBeFalsy();
+    });
+  });
+
+  describe('focused', () => {
+
+    function testFields(fields: ModelOf<FormField>[] | Partial<ModelOf<SequenceBox>>, expectSequenceBoxToBeFocused: boolean[]) {
+      const sequenceBox = helper.createField(SequenceBox, session.desktop, Array.isArray(fields) ? {fields} : fields);
+      sequenceBox.render(); // required, because field listener is attached in _render
+
+      const focusField = (field: FormField) => {
+        // Use setFocused() instead of focus(), so the test will also work if the browser window does not have the focus
+        sequenceBox.fields.forEach(f => f.setFocused(false));
+        field?.setFocused(true);
+      };
+
+      expect(sequenceBox.focused).toBe(false);
+      sequenceBox.fields.forEach((field, index) => {
+        focusField(field);
+        expect(sequenceBox.focused).withContext(`field index ${index}`).toBe(expectSequenceBoxToBeFocused[index]);
+      });
+      focusField(null);
+      expect(sequenceBox.focused).toBe(false);
+
+      sequenceBox.destroy();
+    }
+
+    it('marks sequence box as focused when focused field does not have a label', () => {
+      testFields([
+        {objectType: StringField, label: 'From', labelVisible: false},
+        {objectType: StringField, label: 'To', labelVisible: false}
+      ], [true, true]);
+      testFields([
+        {objectType: StringField, label: 'From', labelVisible: false},
+        {objectType: StringField, label: 'To', labelVisible: true}
+      ], [true, false]);
+      testFields([
+        {objectType: StringField, label: 'From', labelVisible: true},
+        {objectType: StringField, label: 'To', labelVisible: false}
+      ], [false, false]);
+      testFields([
+        {objectType: StringField, label: 'From', labelPosition: FormField.LabelPosition.ON_FIELD},
+        {objectType: StringField, label: 'To', labelPosition: FormField.LabelPosition.ON_FIELD}
+      ], [true, true]);
+    });
+
+    it('does not mark sequence box as focused when focused field is a button or a check box', () => {
+      testFields([
+        {objectType: Button, label: 'A', labelVisible: false},
+        {objectType: StringField, label: 'B', labelVisible: false}
+      ], [false, false]);
+      testFields([
+        {objectType: StringField, label: 'A', labelVisible: false},
+        {objectType: CheckBoxField, label: 'B', labelVisible: false},
+        {objectType: StringField, label: 'C', labelVisible: false}
+      ], [true, false, false]);
+    });
+
+    it('ignores invisible fields', () => {
+      testFields([
+        {objectType: StringField, label: 'A', labelVisible: false},
+        {objectType: StringField, label: 'B', visible: false},
+        {objectType: StringField, label: 'C', labelVisible: false}
+      ], [true, false, true]);
+    });
+
+    it('only marks the sequence box up to the first field with a label', () => {
+      testFields([
+        {objectType: StringField, label: 'A', labelPosition: FormField.LabelPosition.ON_FIELD},
+        {objectType: StringField, label: 'B', labelVisible: false},
+        {objectType: StringField},
+        {objectType: StringField, label: 'D'},
+        {objectType: StringField, label: 'E', labelPosition: FormField.LabelPosition.ON_FIELD},
+        {objectType: StringField, label: 'F', labelVisible: false}
+      ], [true, true, true, false, false, false]);
+    });
+
+    it('ignores short labels that only contain punctuation', () => {
+      testFields([
+        {objectType: StringField, labelVisible: false},
+        {objectType: StringField, label: ''}
+      ], [true, true]);
+      testFields([
+        {objectType: StringField, labelVisible: false},
+        {objectType: StringField, label: '  '}
+      ], [true, true]);
+      testFields([
+        {objectType: StringField, labelVisible: false},
+        {objectType: StringField, label: '-'}
+      ], [true, true]);
+      testFields([
+        {objectType: StringField, labelVisible: false},
+        {objectType: StringField, label: '->'}
+      ], [true, false]);
+    });
+
+    it('allows overriding the default behavior with special marker classes', () => {
+      testFields([
+        {objectType: StringField, label: 'A', cssClass: 'consider-for-outer-focus'},
+        {objectType: CheckBoxField, cssClass: 'consider-for-outer-focus'},
+        {objectType: StringField, label: 'C', labelVisible: false},
+        {objectType: StringField, labelVisible: false, cssClass: 'never-consider-for-outer-focus'},
+        {objectType: StringField, label: 'E', labelVisible: false}
+      ], [true, true, true, false, false]);
+      testFields({
+        cssClass: 'consider-inner-focus',
+        fields: [
+          {objectType: StringField, label: 'A', cssClass: 'never-consider-for-outer-focus'},
+          {objectType: StringField, label: 'B'},
+          {objectType: Button, label: 'C'},
+          {objectType: CheckBoxField, label: 'D'},
+          {objectType: StringField, label: 'E', labelPosition: FormField.LabelPosition.RIGHT}
+        ]
+      }, [true, true, true, true, true]);
+      testFields({
+        cssClass: 'never-consider-inner-focus',
+        fields: [
+          {objectType: StringField, label: 'A', cssClass: 'never-consider-for-outer-focus'},
+          {objectType: StringField, label: 'B', labelVisible: false},
+          {objectType: StringField, label: 'C', labelPosition: FormField.LabelPosition.ON_FIELD},
+          {objectType: StringField, label: '-'},
+          {objectType: StringField, cssClass: 'consider-for-outer-focus'}
+        ]
+      }, [false, false, false, false, false]);
     });
   });
 });

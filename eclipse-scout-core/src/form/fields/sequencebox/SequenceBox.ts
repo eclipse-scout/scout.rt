@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  CheckBoxField, CloneOptions, CompositeField, DateField, dates, EventHandler, FormField, FormFieldSuppressStatus, HorizontalGrid, HtmlComponent, InitModelOf, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu,
-  ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, ValueField, Widget
+  Button, CheckBoxField, CloneOptions, CompositeField, DateField, dates, EventHandler, FormField, FormFieldSuppressStatus, HorizontalGrid, HtmlComponent, InitModelOf, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig,
+  Menu, ObjectOrChildModel, ObjectOrModel, PropertyChangeEvent, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxModel, StatusOrModel, strings, ValueField, Widget
 } from '../../../index';
 
 export class SequenceBox extends CompositeField implements SequenceBoxModel {
@@ -145,9 +145,10 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
     let visibilityChanged = (event.propertyName === 'visible');
     if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
       this._handleStatus(visibilityChanged);
-    }
-    if (event.propertyName === 'value') {
+    } else if (event.propertyName === 'value') {
       this._onFieldValueChange(event as PropertyChangeEvent<any, ValueField<any>>);
+    } else if (event.propertyName === 'focused') {
+      this._updateFocusedFromField(event.source);
     }
   }
 
@@ -213,6 +214,59 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
         this._lastVisibleField._renderTooltipText();
         this._lastVisibleField._renderMenus();
       }
+    }
+  }
+
+  /**
+   * Marks the sequence box as "focused" when the given inner field is focused but does not have a visible label.
+   * This allows the focus to be indicated on the sequence box label instead.
+   */
+  protected _updateFocusedFromField(field: FormField) {
+    if (field.visible && field.focused) {
+      this.setFocused(this._computeSequenceBoxFocused(field));
+    } else {
+      this.setFocused(false);
+    }
+  }
+
+  /**
+   * Called when the given inner field gained the focus. Computes whether the sequence box should be marked as "focused" as well.
+   * Normally, we want to do this when the inner field does not have a visible label.
+   */
+  protected _computeSequenceBoxFocused(focusedField: FormField) {
+    // Special marker classes to override the default behavior
+    if (this.hasCssClass('consider-inner-focus')) {
+      return true;
+    }
+    if (this.hasCssClass('never-consider-inner-focus')) {
+      return false;
+    }
+
+    // Traverse the list of visible inner fields until we reach the focused field. If we did not encounter a field with a visible
+    // label until that point, mark the sequence box as focused.
+    for (let field of this.fields.filter(f => f.visible)) {
+      if (hasLabel(field)) {
+        return false;
+      }
+      if (field === focusedField) {
+        return true;
+      }
+    }
+    return false;
+
+    function hasLabel(field: FormField) {
+      // Special marker classes to override the default behavior
+      if (field.hasCssClass('consider-for-outer-focus')) {
+        return false;
+      }
+      if (field.hasCssClass('never-consider-for-outer-focus') || field instanceof Button || field instanceof CheckBoxField) {
+        return true;
+      }
+      if (!field.labelVisible || field.labelPosition === FormField.LabelPosition.ON_FIELD) {
+        return false;
+      }
+      // Consider a label with only a single punctuation character as empty
+      return strings.hasText(field.label) && !/^\s*\p{Punctuation}?\s*$/u.test(field.label);
     }
   }
 
