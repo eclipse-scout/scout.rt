@@ -764,6 +764,11 @@ public abstract class AbstractIdCodecTest {
     ids.add(FixtureCompositeWithNullValuesId.of(null, UUID.fromString("711dc5d6-0a42-4f54-b79c-50110b9e742a")));
     ids.add(FixtureCompositeWithNullStringValuesId.of("foo", ""));
     ids.add(FixtureCompositeWithNullStringValuesId.of("", "bar"));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("foo", "bar"));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("_-~SIG~-_foo", "bar"));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("foo_-~SIG~-_", "bar"));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("foo", "_-~SIG~-_bar"));
+    ids.add(FixtureCompositeWithNullStringValuesId.of("foo", "bar_-~SIG~-_"));
     ids.add(FixtureCompositeWithAllTypesId.of("foo", null, null, null, null, null, null));
     ids.add(FixtureCompositeWithAllTypesId.of(null, TEST_UUID, null, null, null, null, null));
     ids.add(FixtureCompositeWithAllTypesId.of(null, null, 42L, null, null, null, null));
@@ -775,8 +780,41 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testEmptyIdWithSignature() {
-    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
-    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:_-~SIG~-_CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "_-~SIG~-_CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+  }
+
+  @Test
+  public void testUnsignedIdContainingSignatureDelimiter() {
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureStringId:foo_-~SIG~-_bar", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureStringId:_-~SIG~-_bar", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureStringId:foo_-~SIG~-_", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureStringId:_-~SIG~-_", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, "foo_-~SIG~-_bar", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, "_-~SIG~-_bar", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, "foo_-~SIG~-_", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, "_-~SIG~-_", IdCodecFlag.SIGNATURE));
+
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureStringId:foo_-~SIG~-_bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureStringId:_-~SIG~-_bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureStringId:foo_-~SIG~-_"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureStringId:_-~SIG~-_"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, "foo_-~SIG~-_bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, "_-~SIG~-_bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, "foo_-~SIG~-_"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, "_-~SIG~-_"));
+  }
+
+  @Test
+  public void testSignedIdContainingSignatureDelimiter() {
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeWithNullStringValuesId:_-~SIG~-_foo;bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeWithNullStringValuesId:foo_-~SIG~-_;bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeWithNullStringValuesId:foo;_-~SIG~-_bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeWithNullStringValuesId:foo;bar_-~SIG~-_"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithNullStringValuesId.class, "_-~SIG~-_foo;bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithNullStringValuesId.class, "foo_-~SIG~-_;bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithNullStringValuesId.class, "foo;_-~SIG~-_bar"));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithNullStringValuesId.class, "foo;bar_-~SIG~-_"));
   }
 
   @Test
@@ -792,8 +830,8 @@ public abstract class AbstractIdCodecTest {
     var integerId = FixtureIntegerId.of(42);
     assertThrows(IdCodecException.class, () -> getCodec().toQualified(integerId, IdCodecFlag.SIGNATURE));
     assertThrows(IdCodecException.class, () -> getCodec().toUnqualified(integerId, IdCodecFlag.SIGNATURE));
-    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
-    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "42###CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureIntegerId:42_-~SIG~-_CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
+    assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureIntegerId.class, "42_-~SIG~-_CNCgkNhEN4PEpNkWvRPY/jEIwn49f1xGLgmXyi6SdlI=", IdCodecFlag.SIGNATURE));
   }
 
   @IdTypeName("scout.FixtureCompositeWithNullStringValuesId")

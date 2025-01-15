@@ -47,7 +47,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public class IdCodec {
 
   protected static final String ID_TYPENAME_DELIMITER = ":";
-  protected static final String SIGNATURE_DELIMITER = "###";
+  protected static final String SIGNATURE_DELIMITER = "_-~SIG~-_";
 
   protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
   protected final LazyValue<IdInventory> m_idInventory = new LazyValue<>(IdInventory.class);
@@ -371,7 +371,7 @@ public class IdCodec {
    */
   public String removeSignature(Class<? extends IId> idClass, String unqualifiedId, Set<IIdCodecFlag> flags) {
     String[] unqualifiedIdSignatureParts = splitToSignatureParts(unqualifiedId);
-    assertSignature(idClass, unqualifiedIdSignatureParts, flags);
+    assertSignature(idClass, unqualifiedId, unqualifiedIdSignatureParts, flags);
     return unqualifiedIdSignatureParts[0];
   }
 
@@ -385,9 +385,10 @@ public class IdCodec {
    * This will check the presence and a signature if the id needs to be signed and the absence of such a signature if
    * the id needs to be unsigned. In addition, the signature is verified for a signed id.
    */
-  protected void assertSignature(Class<? extends IId> idClass, String[] unqualifiedIdSignatureParts, Set<IIdCodecFlag> flags) {
+  protected void assertSignature(Class<? extends IId> idClass, String unqualifiedId, String[] unqualifiedIdSignatureParts, Set<IIdCodecFlag> flags) {
     if (!isOneOf(IdCodecFlag.SIGNATURE, flags) || !idInventory().isIdSignature(idClass)) {
       checkEquals(unqualifiedIdSignatureParts.length, 1, "Unqualified id must not be signed.");
+      checkEquals(unqualifiedIdSignatureParts[0], unqualifiedId, "Unqualified id must not be signed.");
       return;
     }
     checkEquals(unqualifiedIdSignatureParts.length, 2, "Unqualified id must be signed.");
@@ -395,7 +396,8 @@ public class IdCodec {
   }
 
   /**
-   * Checks if the two given {@link Object}s are equal and throws an {@link IdCodecException} with the given message if they are not equal.
+   * Checks if the two given {@link Object}s are equal and throws an {@link IdCodecException} with the given message if
+   * they are not equal.
    */
   protected void checkEquals(Object o1, Object o2, String message) {
     if (!Objects.equals(o1, o2)) {
@@ -407,7 +409,14 @@ public class IdCodec {
    * Split the given unqualifiedId into id and signature using the {@link #SIGNATURE_DELIMITER}.
    */
   protected String[] splitToSignatureParts(String unqualifiedId) {
-    return unqualifiedId.split(SIGNATURE_DELIMITER);
+    int i = unqualifiedId.lastIndexOf(SIGNATURE_DELIMITER);
+    if (i < 0) {
+      return new String[]{unqualifiedId};
+    }
+    if (i + SIGNATURE_DELIMITER.length() == unqualifiedId.length()) {
+      return new String[]{unqualifiedId.substring(0, i)};
+    }
+    return new String[]{unqualifiedId.substring(0, i), unqualifiedId.substring(i + SIGNATURE_DELIMITER.length())};
   }
 
   /**
