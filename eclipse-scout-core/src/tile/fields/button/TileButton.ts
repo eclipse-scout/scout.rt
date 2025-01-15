@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -79,6 +79,13 @@ export class TileButton extends Button {
     this.invalidateLayoutTree();
   }
 
+  override get$Icon(): JQuery {
+    if (this.$iconContainer) {
+      return this.$iconContainer.children('.icon');
+    }
+    return super.get$Icon();
+  }
+
   protected override _renderSubmenuIcon() {
     if (!this._isInDashboardTile()) {
       super._renderSubmenuIcon();
@@ -101,6 +108,16 @@ export class TileButton extends Button {
 
   protected override _renderLabelVisible() {
     super._renderLabelVisible();
+    this._updateLabelAndIconStyle();
+  }
+
+  protected override _updateLabelAndIconStyle() {
+    if (!this._isInDashboardTile()) {
+      super._updateLabelAndIconStyle();
+      return;
+    }
+    // Because dashboard tile buttons don't use $icon or $submenuIcon, we can simply toggle
+    // the visibility of the $buttonLabel depending on the labelVisible property.
     this._renderChildVisible(this.$buttonLabel, this.labelVisible);
   }
 }
