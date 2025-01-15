@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -119,7 +119,7 @@ describe('ErrorHandler', () => {
       fakeXHR.status = 500;
       fakeXHR.statusText = 'Internal Server Error';
       promises.push(errorHandler.analyzeError(fakeXHR, 'error', 'Internal Server Error', {
-        type: 'POST',
+        method: 'POST',
         url: 'http://server.example/service'
       }).then(errorInfo => {
         expect(errorInfo.code).toBe('X500');

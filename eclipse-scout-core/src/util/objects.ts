@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, JsonValueMapper, ObjectFactory, Primitive, scout} from '../index';
+import {arrays, dates, ObjectFactory, Primitive, scout, Widget} from '../index';
 import $ from 'jquery';
 
 const CONST_REGEX = /\${const:([^}]*)}/;
@@ -206,28 +206,27 @@ export const objects = {
     }
   },
 
-  valueCopy<T>(obj: T): T {
-    // Nothing to be done for immutable things
-    if (obj === undefined || obj === null || typeof obj !== 'object') {
-      return obj;
-    }
-    let copy;
-    // Arrays
-    if (Array.isArray(obj)) {
-      copy = [];
-      for (let i = 0; i < obj.length; i++) {
-        copy[i] = objects.valueCopy(obj[i]);
+  /**
+   * Creates deep clones of given value.
+   * The following types are supported:
+   * * Pojo
+   * * `Array`
+   * * `Date`
+   * * `Map`
+   * * `Set`
+   * * All objects (except Widget) having a `clone` function (expected to create a deep clone without taking any arguments). These are classes like `BaseDoEntity`, `Dimension`, `GridData`, `Insets`, `Point`, `Status`, `URL`, ...
+   * @param val The value to deep clone.
+   * @returns The deep clone if supported, the input value otherwise.
+   */
+  valueCopy<T>(val: T): T {
+    if (objects.isPojo(val)) {
+      const pojoCopy = {};
+      for (const [k, v] of Object.entries(val)) {
+        pojoCopy[k] = objects.valueCopy(v);
       }
-      return copy;
+      return pojoCopy as T;
     }
-    // All other objects
-    copy = {};
-    for (let prop in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-        copy[prop] = objects.valueCopy(obj[prop]);
-      }
-    }
-    return copy;
+    return deepCloneClass(val); // handles all class types
   },
 
   /**
@@ -516,50 +515,63 @@ export const objects = {
   },
 
   /**
-   * Java-like equals method. Compares the given objects by checking with ===, if that fails, the function
-   * checks if both objects have an equals function and use the equals function to compare the two objects
-   * by value.
-   * @returns true if both objects are equals by reference or by value
+   * Java-like equals method.
+   *
+   * The two values are considered equal if one of the following rules applies:
+   *
+   * * They are the same objects (===).
+   * * They are Dates having the same value.
+   * * They are both zero-length collections (Array, Map or Set).
+   * * They have both an `equals` method, are of the same Class type and this `equals` method returns `true`.
+   *
+   * @returns true if both values are equal.
    */
   equals(objA: any, objB: any): boolean {
-    if (objA === objB) {
-      return true;
-    }
-    // both objects have an equals() method
-    if (objA && objB && (objA.equals && objB.equals)) {
-      return objA.equals(objB);
-    }
-    if (objects.isArray(objA) && objects.isArray(objB) && !objA.length && !objB.length) {
-      return true;
-    }
-    return false;
+    return !!equalsImpl(objA, objB); // equalsImpl might return null which means false.
   },
 
   /**
-   * Compares two objects and all its child elements recursively ignoring the order of the keys.
+   * Compares two objects and all its child elements recursively using value equality as defined by {@link #equals}. Order of the property keys is ignored.
    *
-   * @returns true if both objects and all child elements are equals by value or implemented equals method
+   * @param objA The first value to compare.
+   * @param objB The second value to compare.
+   * @param skipRootEquals An optional boolean indicating if the equals method should be ignored for the given two objects. Default is false.
+   * It might be handy to set this to true if it is called from within an equals method to prevent stack overflows.
+   * @returns true if both objects and all child elements are equals by value or implemented equals method.
+   * @see objects.equals
    */
-  equalsRecursive(objA: any, objB: any): boolean {
-    if (objA === objB) {
-      return true;
+  equalsRecursive(objA: any, objB: any, skipRootEquals = false): boolean {
+    const equalsResult = equalsImpl(objA, objB, !skipRootEquals);
+    if (equalsResult !== null) {
+      return equalsResult;
     }
+
+    // Map
+    if (objA instanceof Map && objB instanceof Map) {
+      return objects.equalsMap(objA, objB);
+    }
+
+    // Set
+    if (objA instanceof Set && objB instanceof Set) {
+      return objects.equalsSet(objA, objB, true);
+    }
+
+    // Objects
     if (objects.isObject(objA) && objects.isObject(objB)) {
-      if (objects.isFunction(objA.equals) && objects.isFunction(objB.equals)) {
-        return objA.equals(objB);
-      }
-      let keysA = Object.keys(objA);
-      let keysB = Object.keys(objB);
+      const keysA = Object.keys(objA);
+      const keysB = Object.keys(objB);
       if (!arrays.equalsIgnoreOrder(keysA, keysB)) {
         return false;
       }
-      for (let key of keysA) {
+      for (const key of keysA) {
         if (!objects.equalsRecursive(objA[key], objB[key])) {
           return false;
         }
       }
       return true;
     }
+
+    // Arrays
     if (objects.isArray(objA) && objects.isArray(objB)) {
       if (objA.length !== objB.length) {
         return false;
@@ -571,6 +583,7 @@ export const objects = {
       }
       return true;
     }
+
     return false;
   },
 
@@ -680,7 +693,7 @@ export const objects = {
    *
    * The object is modified *in-place* and is also returned.
    *
-   * If the given object is set but not a {@link isPlainObject plain object}, an error is thrown.
+   * If the given object is set but not a {@link isObject plain object}, an error is thrown.
    *
    * @see isNullOrUndefinedOrEmpty
    */
@@ -759,29 +772,161 @@ export const objects = {
   },
 
   /**
-   * Parses the given JSON string and creates a JavaScript object using JSON.parse.
-   * One or more mapping functions can be passed to transform the properties of the object before it is returned.
-   * Compared to JSON.parse, there won't be an error if data is an empty string or undefined. Instead, data is returned as it is.
+   * Compares two Sets for equality using {@link equals}.
+   *
+   * @param setA First Set.
+   * @param setB Second Set.
+   * @param deep Specifies if a deep comparison should be performed (recursively). If the Set value is a non-primitive type the equals steps into these structures (Objects, Arrays, Maps, Sets). Default is false.
    */
-  parseJson(data: string, ...mappers: JsonValueMapper[]) {
-    if (!data) {
-      return data;
+  equalsSet(setA: Set<any>, setB: Set<any>, deep = false) {
+    if (setA === setB) {
+      return true;
     }
-    return JSON.parse(data, (key, value) => {
-      for (const mapper of mappers) {
-        value = mapper(key, value);
-      }
-      return value;
-    });
+    if (!setA || !setB) {
+      return false;
+    }
+    if (setA.size !== setB.size) {
+      return false;
+    }
+    return equalsIterable(setA, setB, deep ? objects.equalsRecursive : objects.equals);
   },
 
-  stringifyJson(json: object, ...mappers: JsonValueMapper[]) {
-    // Must NOT be an arrow function to maintain 'this'
-    return JSON.stringify(json, function(key, value) {
-      for (const mapper of mappers) {
-        value = mapper.call(this, key, value);
-      }
-      return value;
-    });
+  /**
+   * Compares two Maps for equality using {@link equals} on keys and values.
+   *
+   * @param setA First Map.
+   * @param setB Second Map.
+   * @param deep Specifies if a deep comparison should be performed (recursively). If the Map key or value is a non-primitive type the equals steps into these structures (Objects, Arrays, Maps, Sets). Default is false.
+   */
+  equalsMap(mapA: Map<any, any>, mapB: Map<any, any>, deep = false): boolean {
+    if (mapA === mapB) {
+      return true;
+    }
+    if (!mapA || !mapB) {
+      return false;
+    }
+    if (mapA.size !== mapB.size) {
+      return false;
+    }
+    const equalsEntriesFunc = deep ? equalsMapEntriesRecursive : equalsMapEntries;
+    return equalsIterable(mapA.entries(), mapB.entries(), equalsEntriesFunc);
   }
 };
+
+/**
+ * Deep clone implementation for special classes. The following classes are supported:
+ * * `Array`
+ * * `Date`
+ * * `Map`
+ * * `Set`
+ * * All objects having a `clone` function (expected to create a deep clone without taking any arguments). Widgets are excluded.
+ * These are classes like `BaseDoEntity`, `Dimension`, `GridData`, `Insets`, `Point`, `Status`, `URL`, ...
+ */
+function deepCloneClass(val: any): any {
+  if (!val) {
+    return val;
+  }
+
+  // Array
+  if (objects.isArray(val)) {
+    return val.map(e => objects.valueCopy(e));
+  }
+
+  // Date
+  if (val instanceof Date) {
+    return new Date(val.getTime());
+  }
+
+  // Map
+  if (val instanceof Map) {
+    const mapCopy = new Map();
+    for (const [key, value] of val) {
+      mapCopy.set(objects.valueCopy(key), objects.valueCopy(value));
+    }
+    return mapCopy;
+  }
+
+  // Set
+  if (val instanceof Set) {
+    const setCopy = new Set();
+    for (const item of val) {
+      setCopy.add(objects.valueCopy(item));
+    }
+    return setCopy;
+  }
+
+  if (!(val instanceof Widget)) { // clone for widgets makes no sense here so their clone() function is ignored
+    // with clone() function. E.g. for BaseDoEntity, Dimension, GridData, Insets, Point, Status, URL, etc.
+    const cloneFunction = val['clone'];
+    if (objects.isFunction(cloneFunction)) {
+      return cloneFunction.call(val); // expected to work without arguments and to create a deep clone.
+    }
+  }
+
+  return val;
+}
+
+function equalsImpl(objA: any, objB: any, useEqualsFunc = true): boolean | null {
+  if (objA === objB) {
+    return true;
+  }
+
+  // both values are of the same type (which may be null)
+  if (protoTypeOf(objA) !== protoTypeOf(objB)) {
+    return false; // cannot be equal if different type
+  }
+
+  // dates
+  if (objA instanceof Date) {
+    return dates.equals(objA, objB);
+  }
+
+  // two empty arrays are equal
+  if (objects.isArray(objA) && !objA.length && !objB.length) {
+    return true;
+  }
+
+  // two empty maps/sets are equal
+  if ((objA instanceof Map || objA instanceof Set) && !objA.size && !objB.size) {
+    return true;
+  }
+
+  // both objects have an equals() function
+  if (useEqualsFunc && objects.isFunction(objA?.equals) && objects.isFunction(objB?.equals)) {
+    return objA.equals(objB);
+  }
+
+  return null; // = false
+}
+
+function equalsMapEntries(entryA: [any, any], entryB: [any, any]): boolean {
+  const keyA = entryA[0];
+  const valueA = entryA[1];
+  const keyB = entryB[0];
+  const valueB = entryB[1];
+  return objects.equals(keyA, keyB) && objects.equals(valueA, valueB);
+}
+
+function equalsMapEntriesRecursive(entryA: [any, any], entryB: [any, any]): boolean {
+  const keyA = entryA[0];
+  const valueA = entryA[1];
+  const keyB = entryB[0];
+  const valueB = entryB[1];
+  return objects.equalsRecursive(keyA, keyB) && objects.equalsRecursive(valueA, valueB);
+}
+
+function protoTypeOf(obj: any): any {
+  return objects.isNullOrUndefined(obj) ? null : Object.getPrototypeOf(obj);
+}
+
+function equalsIterable<T>(setA: Iterable<T>, setB: Iterable<T>, equalsFunction: (a: T, b: T) => boolean): boolean {
+  const copyB = Array.from(setB);
+  for (const entry of setA) {
+    const foundAt = arrays.findIndex(copyB, e => equalsFunction(entry, e));
+    if (foundAt < 0) {
+      return false;
+    }
+    copyB.splice(foundAt, 1); // remove item found
+  }
+  return true;
+}

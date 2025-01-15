@@ -109,7 +109,7 @@ export class App extends EventEmitter {
    * @returns the given data as it is if it does not contain an error
    */
   static handleJsonError(url: string, data: any): any {
-    if (data && data.error) {
+    if (data?.error) {
       // The result may contain a json error (e.g. session timeout) -> abort processing
       throw {
         error: data.error,

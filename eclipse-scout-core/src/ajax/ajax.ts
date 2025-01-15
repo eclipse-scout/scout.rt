@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, AjaxCallModel, AjaxError, scout} from '../index';
+import {AjaxCall, AjaxCallModel, AjaxError, BaseDoEntity, dataObjects, DoEntity, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -26,7 +26,7 @@ export const ajax = {
   get(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
-      type: 'GET'
+      method: 'GET'
     }, options);
     return ajax.call(opts, model);
   },
@@ -43,7 +43,7 @@ export const ajax = {
   post(url: string, data?: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
-      type: 'POST',
+      method: 'POST',
       data: data
     }, options);
     return ajax.call(opts, model);
@@ -61,7 +61,7 @@ export const ajax = {
   put(url: string, data?: any, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
-      type: 'PUT',
+      method: 'PUT',
       data: data
     }, options);
     return ajax.call(opts, model);
@@ -78,7 +78,7 @@ export const ajax = {
   remove(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
-      type: 'DELETE'
+      method: 'DELETE'
     }, options);
     return ajax.call(opts, model);
   },
@@ -94,7 +94,7 @@ export const ajax = {
   getJson(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
-      type: 'GET'
+      method: 'GET'
     }, options);
     return ajax.callJson(opts, model);
   },
@@ -114,7 +114,7 @@ export const ajax = {
     }
     let opts = $.extend({}, {
       url: url,
-      type: 'POST',
+      method: 'POST',
       data: data
     }, options);
     return ajax.callJson(opts, model);
@@ -135,7 +135,7 @@ export const ajax = {
     }
     let opts = $.extend({}, {
       url: url,
-      type: 'PUT',
+      method: 'PUT',
       data: data
     }, options);
     return ajax.callJson(opts, model);
@@ -152,7 +152,7 @@ export const ajax = {
   removeJson(url: string, options?: JQuery.AjaxSettings, model?: AjaxCallModel): JQuery.Promise<any, AjaxError> {
     let opts = $.extend({}, {
       url: url,
-      type: 'DELETE'
+      method: 'DELETE'
     }, options);
     return ajax.callJson(opts, model);
   },
@@ -192,11 +192,104 @@ export const ajax = {
    */
   createCallJson(options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): AjaxCall {
     let opts = $.extend({}, {
-      type: 'POST',
+      method: 'POST',
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8'
     }, options);
     return ajax.createCall(opts, model);
+  },
+
+  /**
+   * Performs an HTTP GET request to the URL given and converts the response to a data object.
+   * @param url The URL of the request.
+   * @param options additional settings for the request. Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
+   */
+  getDataObject<TDoOut extends BaseDoEntity>(url: string, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+      url: url,
+      method: 'GET'
+    }, options);
+    return ajax.callDataObject(opts, null, model);
+  },
+
+  /**
+   * Sends the given data object with an HTTP POST request to the URL given. The result is expected to be a dataobject as well.
+   * @param url The URL of the request.
+   * @param dataObject The data object to send or null.
+   * @param options additional settings for the request. Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
+   */
+  postDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+      url: url,
+      method: 'POST'
+    }, options);
+    return ajax.callDataObject(opts, dataObject, model);
+  },
+
+  /**
+   * Sends the given data object with an HTTP PUT request to the URL given. The result is expected to be a dataobject as well.
+   * @param url The URL of the request.
+   * @param dataObject The data object to send or null.
+   * @param options additional settings for the request. Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
+   */
+  putDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+      url: url,
+      method: 'PUT'
+    }, options);
+    return ajax.callDataObject(opts, dataObject, model);
+  },
+
+  /**
+   * Sends the given data object with an HTTP DELETE request to the URL given. The result is expected to be a dataobject as well.
+   * @param url The URL of the request.
+   * @param dataObject The data object to send or null.
+   * @param options additional settings for the request. Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
+   */
+  removeDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(url: string, dataObject?: TDoIn, options?: JQuery.UrlAjaxSettings, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+      url: url,
+      method: 'DELETE'
+    }, options);
+    return ajax.callDataObject(opts, dataObject, model);
+  },
+
+  /**
+   * Sends the given data object with an HTTP request. The result is expected to be a dataobject as well.
+   * @param options Settings for the request. Must contain the property 'url' and 'method'. Since jQuery is used to perform the request, all other jQuery Ajax settings are accepted as well.
+   * @param dataObject The data object to send or null.
+   * @param model additional properties for the {@link AjaxCall} which is created to perform the request.
+   * @returns A promise which is resolved when the request succeeds. The response is automatically converted to a {@link BaseDoEntity} or null.
+   */
+  callDataObject<TDoIn extends BaseDoEntity | void, TDoOut extends BaseDoEntity | void>(options: JQuery.UrlAjaxSettings, dataObject?: TDoIn, model?: AjaxCallModel): JQuery.Promise<TDoOut, AjaxError> {
+    return ajax.createCallDataObject(options, dataObject, model).call();
+  },
+
+  /**
+   * Creates an {@link AjaxCall} which sends the given data object as json.
+   *
+   * @param options Settings for the request. Must contain the property 'url' and 'method'. Since jQuery is used to perform the request, all other jQuery Ajax settings are accepted as well.
+   * @param dataObject The data object to send or null.
+   * @param model Properties for the {@link AjaxCall} which is created.
+   * @returns an {@link AjaxCall} which sends the given data object, pre-configured using the given options and model. The result of the call be converted to a dataobject automatically.
+   */
+  createCallDataObject(options: JQuery.UrlAjaxSettings, dataObject?: DoEntity | void, model?: AjaxCallModel): AjaxCall {
+    const json = dataObjects.stringify(dataObject);
+    const opts: JQuery.UrlAjaxSettings = $.extend({}, {
+      converters: {
+        'text json': data => dataObjects.parse(data)
+      },
+      data: json || undefined
+    }, options);
+    return this.createCallJson(opts, model);
   },
 
   /**

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "strictBindCallApply": true,
+    "noImplicitOverride": true,
+    "useDefineForClassFields": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "lib": [
+      "dom",
+      "ES2019"
+    ],
+    "types": []
+  }
+}

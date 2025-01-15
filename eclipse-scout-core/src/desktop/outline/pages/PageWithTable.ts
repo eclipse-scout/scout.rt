@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -166,12 +166,11 @@ export class PageWithTable extends Page implements PageWithTableModel {
    * The contribution is only added if there is a row limit. Otherwise, the request remains untouched.
    * @example
    * protected override _loadTableData(searchFilter: MyRestrictionDo): JQuery.Promise<MyResponseDo> {
-   *   const request: MyRequestDo = {
-   *     id: '1',
-   *     ...
-   *     restriction: searchFilter
-   *   };
-   *   return ajax.postJson(url, this._withMaxRowCountContribution(request));
+   *   const request = scout.create(MyRequestDo, {
+   *       ...
+   *       restriction: searchFilter
+   *   });
+   *   return ajax.postDataObject(url, this._withMaxRowCountContribution(request));
    * }
    * @param dataObject The {@link DoEntity} to which the contribution should be added.
    * @returns the resulting request with the added contribution.

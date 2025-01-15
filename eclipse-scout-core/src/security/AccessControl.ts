@@ -9,8 +9,8 @@
  */
 
 import {
-  ajax, AjaxCall, AjaxError, DoEntity, ErrorHandler, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PropertyEventEmitter, scout, SomeRequired,
-  UiNotificationEvent, uiNotifications
+  ajax, AjaxCall, AjaxError, BaseDoEntity, ErrorHandler, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PermissionModel, PropertyEventEmitter,
+  scout, SomeRequired, typeName, UiNotificationEvent, uiNotifications
 } from '../index';
 import $ from 'jquery';
 
@@ -79,19 +79,19 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
       .always(() => {
         this._call = null; // call ended. Not necessary anymore
       })
-      .then((model: PermissionCollectionModel) => {
+      .then(model => {
         // update permission collection
         this._permissionCollection = PermissionCollection.ensure(model);
       });
   }
 
-  protected _loadPermissionCollection(): JQuery.Promise<PermissionCollectionModel, AjaxError> {
+  protected _loadPermissionCollection(): JQuery.Promise<PermissionCollectionDo, AjaxError> {
     this._call?.abort(); // abort in case there is already a call running
-    this._call = ajax.createCallJson({
+    this._call = ajax.createCallDataObject({
       url: this.permissionsUrl,
-      type: 'GET',
+      method: 'GET',
       cache: true
-    }, {
+    }, null, {
       maxRetries: -1, // unlimited retries
       retryIntervals: [300, 500, 1000, 5000]
     });
@@ -134,6 +134,20 @@ export interface AccessControlModel extends ObjectModel<AccessControl> {
   permissionsUrl?: string;
 }
 
-export interface PermissionUpdateMessageDo extends DoEntity {
+@typeName('scout.PermissionUpdateMessage')
+export class PermissionUpdateMessageDo extends BaseDoEntity {
   reloadDelayWindow: number;
+}
+
+@typeName('scout.Permission')
+export class PermissionDo extends BaseDoEntity implements PermissionModel {
+  id?: string;
+  objectType?: string;
+  level?: PermissionLevel;
+}
+
+@typeName('scout.PermissionCollection')
+export class PermissionCollectionDo extends BaseDoEntity implements PermissionCollectionModel {
+  permissions?: Record<string, PermissionDo[]>;
+  type?: PermissionCollectionType;
 }

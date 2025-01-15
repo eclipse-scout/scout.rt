@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FullModelOf, InitModelOf, ModelOf, ObjectModel, objects, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
+import {AbstractConstructor, BaseDoEntity, Constructor, FullModelOf, InitModelOf, ModelOf, ObjectModel, objects, scout, TypeDescriptor, TypeDescriptorOptions} from './index';
 import $ from 'jquery';
 
 export type ObjectCreator = (model?: any) => object;
@@ -43,7 +43,7 @@ export class ObjectFactory {
   initialized: boolean;
 
   protected _registry: Map<ObjectType, ObjectCreator>;
-  protected _objectTypeMap: Map<new() => object, string>;
+  protected _objectTypeMap: Map<Constructor, string>;
 
   constructor() {
     this.uniqueIdSeqNo = 0;
@@ -164,26 +164,38 @@ export class ObjectFactory {
     options.model = model;
 
     // Create object
-    let scoutObject = this._createObjectByType(objectType, options);
+    const scoutObject = this._createObjectByType(objectType, options);
+    const ensureUniqueId = this._ensureUniqueId(scoutObject, options);
+    const ensureObjectType = this._ensureObjectType(scoutObject);
     if (objects.isFunction(scoutObject.init)) {
       if (model) {
-        if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
+        if (model.id === undefined && ensureUniqueId) {
           model.id = this.createUniqueId();
         }
-        model.objectType = this.getObjectType(objectType);
+        if (ensureObjectType) {
+          model.objectType = this.getObjectType(objectType);
+        }
       }
       // Initialize object
       scoutObject.init(model);
     }
 
-    if (scoutObject.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
+    if (scoutObject.id === undefined && ensureUniqueId) {
       scoutObject.id = this.createUniqueId();
     }
-    if (scoutObject.objectType === undefined) {
+    if (scoutObject.objectType === undefined && ensureObjectType) {
       scoutObject.objectType = this.getObjectType(objectType);
     }
 
     return scoutObject;
+  }
+
+  protected _ensureObjectType(scoutObject: any) {
+    return !(scoutObject instanceof BaseDoEntity); // don't create objectType attribute for DOs
+  }
+
+  protected _ensureUniqueId(scoutObject: any, options?: ObjectFactoryOptions): boolean {
+    return scout.nvl(options.ensureUniqueId, !(scoutObject instanceof BaseDoEntity) /* don't create unique IDs for DOs by default */);
   }
 
   /**
@@ -195,11 +207,11 @@ export class ObjectFactory {
     return 'ui' + (++this.uniqueIdSeqNo).toString();
   }
 
-  resolveTypedObjectType(objectType: ObjectType): ObjectType {
+  resolveTypedObjectType<T>(objectType: ObjectType<T>): ObjectType<T> {
     if (typeof objectType !== 'string') {
       return objectType;
     }
-    let Class = TypeDescriptor.resolveType(objectType);
+    let Class = TypeDescriptor.resolveType(objectType) as Constructor<T>;
     if (Class) {
       return Class;
     }
@@ -235,11 +247,29 @@ export class ObjectFactory {
   /**
    * Returns the object type as string for the given class.
    */
-  getObjectType(Class: ObjectType): string {
-    if (typeof Class === 'string') {
-      return Class;
+  getObjectType(objectType: ObjectType): string {
+    if (typeof objectType === 'string') {
+      return objectType;
     }
-    return this._objectTypeMap.get(Class);
+    return this._objectTypeMap.get(objectType);
+  }
+
+  /**
+   * @param baseClass The base class (exclusive) for which all known subclasses should be returned.
+   * @returns All classes that have the given class in their super hierarchy. The given baseClass is not part of the result.
+   * More formally: all constructors known to this factory that have the given class in their prototype chain.
+   */
+  getSubClassesOf<T extends object>(baseClass: Constructor<T> | AbstractConstructor<T>): Constructor<T>[] {
+    const result: Constructor<T>[] = [];
+    if (!baseClass) {
+      return result;
+    }
+    for (let obj of this._objectTypeMap.keys()) {
+      if (baseClass.isPrototypeOf(obj)) {
+        result.push(obj as Constructor<T>);
+      }
+    }
+    return result;
   }
 
   /**
@@ -286,7 +316,8 @@ export class ObjectFactory {
         // ignore elements which have no value (e.g. exported variables which are null)
         continue;
       }
-      if (window[namespace][name] && !options.allowedReplacements.includes(name)) {
+      let existing = window[namespace][name];
+      if (existing && existing !== object && !options.allowedReplacements.includes(name)) {
         throw new Error(`${name} is already registered on namespace ${namespace || 'scout'}. Use objectFactories if you want to replace the existing obj.`);
       }
 

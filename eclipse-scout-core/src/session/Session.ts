@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -646,7 +646,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     let url = this._decorateUrl(this.remoteUrl, request);
 
     let ajaxOptions: JQuery.UrlAjaxSettings = {
-      type: 'POST',
+      method: 'POST',
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8',
       cache: false,
@@ -1203,7 +1203,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
 
     let uploadAjaxOptions: JQuery.UrlAjaxSettings = {
-      type: 'POST',
+      method: 'POST',
       url: 'upload/' + this.uiSessionId + '/' + target.id,
       cache: false,
       // Don't touch the data (do not convert it to string)

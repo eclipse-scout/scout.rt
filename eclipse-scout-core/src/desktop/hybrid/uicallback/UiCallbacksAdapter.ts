@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoEntity, Event, ModelAdapter, RemoteEvent, UiCallbackResponseEvent, UiCallbacks, Widget} from '../../../index';
+import {BaseDoEntity, dataObjects, Event, ModelAdapter, RemoteEvent, UiCallbackResponseEvent, UiCallbacks, Widget} from '../../../index';
 
 export class UiCallbacksAdapter extends ModelAdapter {
   declare widget: UiCallbacks;
@@ -37,16 +37,16 @@ export class UiCallbacksAdapter extends ModelAdapter {
       }
       owner = ownerAdapter.widget;
     }
-    this.widget.onUiCallbackRequest(event.handlerObjectType, event.id, owner, event.data);
+    this.widget.onUiCallbackRequest(event.handlerObjectType, event.id, owner, dataObjects.deserialize(event.data));
   }
 
   protected _onUiResponse(event: UiCallbackResponseEvent) {
     let response = event.data;
-    this._send('uiResponse', response);
+    this._send('uiResponse', dataObjects.serialize(response));
   }
 }
 
-interface UiCallbackRemoteEvent<TObject extends DoEntity = DoEntity> extends RemoteEvent {
+interface UiCallbackRemoteEvent<TObject extends BaseDoEntity = BaseDoEntity> extends RemoteEvent {
   id: string;
   handlerObjectType: string;
   owner: string;
