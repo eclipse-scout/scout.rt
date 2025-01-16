@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -50,6 +50,10 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureDo
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureStringId;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypesCollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypesFixture;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.StreetNameStringId;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.StreetNameStringIdValueMigrationHandlerByMap_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.StreetNameWrapperDo;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.StreetNamesFixture;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -92,7 +96,8 @@ public class DataObjectMigratorValueMigrationTest {
             new CustomerGenderFixtureDoValueMigrationHandler_2(),
             new HouseTypeFixtureDoValueMigrationHandler_2(),
             new HouseFixtureDoValueMigrationHandler_1(),
-            new OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2()));
+            new OldHouseTypeFixtureStringIdTypeNameRenameMigrationHandler_2(),
+            new StreetNameStringIdValueMigrationHandlerByMap_1()));
 
     TEST_BEANS.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestDataObjectMigrationInventory.class, inventory).withReplace(true)));
 
@@ -629,5 +634,24 @@ public class DataObjectMigratorValueMigrationTest {
     assertTrue(result.isChanged());
     assertTrue(result.getDataObject().getId() instanceof HouseTypeFixtureStringId);
     assertEquals(HouseTypesFixture.DETACHED_HOUSE, result.getDataObject().getId());
+  }
+
+  /**
+   * Test for {@link AbstractDoValueMigrationHandlerByMap}
+   */
+  @Test
+  public void testDoValueMigrationHandlerByMap() {
+    StreetNameStringId mainStreet = StreetNamesFixture.MAIN_STREET;
+    DataObjectMigratorResult<StreetNameWrapperDo> result = s_migrator.applyValueMigration(s_migrationContext, BEANS.get(StreetNameWrapperDo.class).withValue(mainStreet));
+    assertEquals(mainStreet, result.getDataObject().getValue());
+
+    result = s_migrator.applyValueMigration(s_migrationContext, BEANS.get(StreetNameWrapperDo.class).withValue(StreetNameStringId.of("Old Street")));
+    assertEquals(StreetNamesFixture.NEW_STREET, result.getDataObject().getValue());
+
+    result = s_migrator.applyValueMigration(s_migrationContext, BEANS.get(StreetNameWrapperDo.class).withValue(StreetNamesFixture.EVERGREEN_STREET));
+    assertEquals(StreetNamesFixture.EVERGREEN_STREET, result.getDataObject().getValue());
+
+    result = s_migrator.applyValueMigration(s_migrationContext, BEANS.get(StreetNameWrapperDo.class).withValue(StreetNameStringId.of("Evergreen Terrace")));
+    assertEquals(StreetNamesFixture.WEST_57TH_STREET, result.getDataObject().getValue());
   }
 }
