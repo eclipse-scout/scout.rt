@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.ui.html.selenium.junit;
 
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -21,13 +20,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Catches browser log and prints it to STDOUT. Requires setup of selenium logging preferences, see
- * {@link SeleniumDriver}.
+ * Catches browser log and prints it. Requires setup of selenium logging preferences, see {@link SeleniumDriver}.
  */
 public class BrowserLogRule extends TestWatcher {
+  private static final Logger LOG = LoggerFactory.getLogger(BrowserLogRule.class);
 
+  private final SimpleDateFormat m_dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
   private final WebDriver m_driver;
   private Date m_start;
 
@@ -38,9 +40,7 @@ public class BrowserLogRule extends TestWatcher {
   @Override
   protected void starting(Description description) {
     m_start = new Date();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-    System.out.println(MessageFormat.format("v | {1}.{2} [{0}]",
-        sdf.format(m_start), description.getClassName(), description.getMethodName()));
+    LOG.info("starting {}.{}", description.getClassName(), description.getMethodName());
   }
 
   @Override
@@ -48,12 +48,10 @@ public class BrowserLogRule extends TestWatcher {
     Date end = new Date();
     long duration = end.getTime() - m_start.getTime();
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     LogEntries logEntries = m_driver.manage().logs().get(LogType.BROWSER);
     for (LogEntry logEntry : logEntries) {
-      System.out.println(sdf.format(new Date(logEntry.getTimestamp())) + " " + logEntry.getLevel() + " " + logEntry.getMessage());
+      LOG.info(m_dateFormat.format(new Date(logEntry.getTimestamp())) + " " + logEntry.getLevel() + " " + logEntry.getMessage());
     }
-    System.out.println(MessageFormat.format("^ | {1}.{2} [{0}] (took {3} ms)",
-        sdf.format(end), description.getClassName(), description.getMethodName(), duration));
+    LOG.info("finished {}.{} (took {} ms)", description.getClassName(), description.getMethodName(), duration);
   }
 }

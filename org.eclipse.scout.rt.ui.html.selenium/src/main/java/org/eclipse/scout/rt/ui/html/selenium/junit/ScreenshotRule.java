@@ -23,12 +23,15 @@ import org.junit.runners.model.Statement;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test rule that takes a screenshot of the current state when a test fails and the system property
  * "take.screenshot.on.failure" is set to "true".
  */
 public class ScreenshotRule implements TestRule {
+  private static final Logger LOG = LoggerFactory.getLogger(ScreenshotRule.class);
 
   private final WebDriver m_driver;
   private final boolean m_active;
@@ -37,7 +40,7 @@ public class ScreenshotRule implements TestRule {
     m_driver = test.getDriver();
     boolean active = SeleniumUtil.takeScreenShotOnFailure();
     if (active && !(m_driver instanceof TakesScreenshot)) {
-      System.err.println("WARNING: Cannot take screenshots on failure because driver cannot take screenshots (" + m_driver + ")");
+      LOG.warn("Cannot take screenshots on failure because driver cannot take screenshots ({})", m_driver);
       active = false;
     }
     m_active = active;
@@ -72,12 +75,12 @@ public class ScreenshotRule implements TestRule {
       File screenshotFile = new File(screenshotDir, "screenshot-" + timestamp + "-" + className + "." + methodName + ".png");
 
       try (FileOutputStream out = new FileOutputStream(screenshotFile)) {
-        System.out.println("Test failed, took as screenshot: " + screenshotFile);
+        LOG.info("Test failed, took as screenshot: " + screenshotFile);
         out.write(((TakesScreenshot) m_driver).getScreenshotAs(OutputType.BYTES));
       }
     }
     catch (IOException e) { // NOSONAR
-      System.err.println("Could not take a screenshot because of: " + e.getMessage());
+      LOG.error("Could not take a screenshot because of: {}", e.getMessage(), e);
     }
   }
 }

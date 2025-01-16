@@ -13,11 +13,15 @@ package org.eclipse.scout.rt.ui.html.selenium.util;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumQueryParamsProperty;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumScreenshotOnFailureProperty;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumWebAppUrlProperty;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -26,10 +30,6 @@ import org.openqa.selenium.WebElement;
  * Utility methods for Selenium tests
  */
 public final class SeleniumUtil {
-
-  private static final String DEFAULT_WEB_APP_URL = "http://localhost:8082/";
-
-  private static final String DEFAULT_QUERY_PARAMS = "debug=true"; // /&logging=1
 
   /**
    * DOM attribute as used by Scout widgets to identify the Scout Java model class.
@@ -233,18 +233,12 @@ public final class SeleniumUtil {
   }
 
   public static boolean takeScreenShotOnFailure() {
-    return TypeCastUtility.castValue(System.getProperty("take.screenshot.on.failure"), boolean.class);
+    return TypeCastUtility.castValue(CONFIG.getPropertyValue(SeleniumScreenshotOnFailureProperty.class), boolean.class);
   }
 
   public static URL getWebAppUrl() {
-    String webAppUrl = System.getProperty("web.app.url");
-    if (webAppUrl == null) {
-      webAppUrl = DEFAULT_WEB_APP_URL;
-    }
-    String webQueryParams = System.getProperty("query.params");
-    if (webQueryParams == null) {
-      webQueryParams = DEFAULT_QUERY_PARAMS;
-    }
+    String webAppUrl = CONFIG.getPropertyValue(SeleniumWebAppUrlProperty.class);
+    String webQueryParams = CONFIG.getPropertyValue(SeleniumQueryParamsProperty.class);
     UriBuilder builder = new UriBuilder(webAppUrl);
     builder.queryString(webQueryParams);
     return builder.createURL();
