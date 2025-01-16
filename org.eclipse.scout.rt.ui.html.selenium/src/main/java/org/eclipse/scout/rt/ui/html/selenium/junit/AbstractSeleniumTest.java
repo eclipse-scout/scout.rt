@@ -37,8 +37,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSeleniumTest {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractSeleniumTest.class);
 
   public static final int DEFAULT_WAIT_UNTIL_TIMEOUT = 20; // seconds
 
@@ -77,7 +80,7 @@ public abstract class AbstractSeleniumTest {
     }
     else {
       s_driver = SeleniumDriver.setUpDriver();
-      System.out.println("Selenium driver started by AbstractSeleniumTest");
+      LOG.info("Selenium driver started by AbstractSeleniumTest");
     }
   }
 
@@ -91,7 +94,7 @@ public abstract class AbstractSeleniumTest {
       if (s_driver != null) {
         s_driver.quit();
       }
-      System.out.println("Selenium driver terminated by AbstractSeleniumTest");
+      LOG.info("Selenium driver terminated by AbstractSeleniumTest");
     }
     s_driver = null;
   }
