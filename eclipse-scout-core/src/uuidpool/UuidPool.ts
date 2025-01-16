@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -106,6 +106,7 @@ export class UuidPool extends Widget implements UuidPoolModel {
    * Otherwise, a new instance is created.
    *
    * @param session Session object providing a desktop. If this is omitted, the first session of the app is used.
+   * If the app does not have any active sessions (e.g. during unit testing), this argument is mandatory.
    */
   static get(session?: Session): UuidPool {
     session = session || App.get().sessions[0];
