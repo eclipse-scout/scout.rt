@@ -52,7 +52,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -237,12 +236,13 @@ public class SeleniumDriver {
     // Set logging preferences (see BrowserLogRule)
     LoggingPreferences logPrefs = new LoggingPreferences();
     logPrefs.enable(LogType.BROWSER, Level.ALL);
-    options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+    // FIXME rst options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 
     // Add command line arguments
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
     options.addArguments("--remote-allow-origins=*");
+    options.addArguments("--window-size=" + getWindowWidth() + "," + getWindowHeight());
     // With ChromeDriver v75 W3C mode was introduced. This breaks several existing tests, because of two reasons:
     // 1. all offsets are now calculated from the center of an element, and not from the upper-left corner
     // 2. copy command (CTRL + C) does not work anymore. This may be related to a bug in ChromeDriver, but the bugfix
