@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,15 @@ package org.eclipse.scout.rt.ui.html.selenium.util;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumScreenshotOnFailureProperty;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumWebAppUrlProperty;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumWebQueryParamsProperty;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -25,10 +29,6 @@ import org.openqa.selenium.WebElement;
  * Utility methods for Selenium tests
  */
 public final class SeleniumUtil {
-
-  private static final String DEFAULT_WEB_APP_URL = "http://localhost:8082/";
-
-  private static final String DEFAULT_QUERY_PARAMS = "debug=true"; // /&logging=1
 
   /**
    * DOM attribute used by Scout widgets to identify the Scout Java model class.
@@ -87,7 +87,8 @@ public final class SeleniumUtil {
   /**
    * This query solves the problem that we don't want to find partial matches for a CSS class-name when we query 'class'
    * attribute in the DOM. See
-   * https://stackoverflow.com/questions/1604471/how-can-i-find-an-element-by-css-class-with-xpath
+   * <a href="https://stackoverflow.com/questions/1604471/how-can-i-find-an-element-by-css-class-with-xpath">
+   *   how-can-i-find-an-element-by-css-class-with-xpath</a>
    */
   private static String cssClassQuery(String cssClass) {
     return "contains(concat(' ', normalize-space(@class), ' '), ' " + cssClass + " ')";
@@ -228,18 +229,12 @@ public final class SeleniumUtil {
   }
 
   public static boolean takeScreenShotOnFailure() {
-    return TypeCastUtility.castValue(System.getProperty("take.screenshot.on.failure"), boolean.class);
+    return TypeCastUtility.castValue(CONFIG.getPropertyValue(SeleniumScreenshotOnFailureProperty.class), boolean.class);
   }
 
   public static URL getWebAppUrl() {
-    String webAppUrl = System.getProperty("web.app.url");
-    if (webAppUrl == null) {
-      webAppUrl = DEFAULT_WEB_APP_URL;
-    }
-    String webQueryParams = System.getProperty("query.params");
-    if (webQueryParams == null) {
-      webQueryParams = DEFAULT_QUERY_PARAMS;
-    }
+    String webAppUrl = CONFIG.getPropertyValue(SeleniumWebAppUrlProperty.class);
+    String webQueryParams = CONFIG.getPropertyValue(SeleniumWebQueryParamsProperty.class);
     UriBuilder builder = new UriBuilder(webAppUrl);
     builder.queryString(webQueryParams);
     return builder.createURL();

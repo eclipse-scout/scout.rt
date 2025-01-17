@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,45 +11,140 @@ package org.eclipse.scout.rt.ui.html.selenium.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.OS;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumDriverConfigProperty;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumDriverProperty;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumDriverRemoteServerUrlProperty;
+import org.eclipse.scout.rt.ui.html.selenium.SeleniumProperties.SeleniumSimulateSlowNetworkProperty;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.http.ClientConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public final class SeleniumDriver {
-
-  static final int WINDOW_HEIGHT = 900;
-  static final int WINDOW_WIDTH = 1200;
-
-  private SeleniumDriver() {
-  }
-
-  private static void logProperty(String property, String value) {
-    System.out.println("set property '" + property + "': " + ObjectUtility.nvl(value, "[not set]"));
-  }
+@ApplicationScoped
+public class SeleniumDriver {
+  private static final Logger LOG = LoggerFactory.getLogger(SeleniumDriver.class);
 
   public static WebDriver setUpDriver() {
+    return BEANS.get(SeleniumDriver.class).createDriver();
+  }
+
+  public WebDriver createDriver() {
+    if (CONFIG.getPropertyValue(SeleniumDriverConfigProperty.class) != null) {
+      loadDriverProperties();
+    }
+    else {
+      legacySetup();
+    }
+
+    // ensure proxy properties do not contain an empty string
+    String proxyHostProperty = "http.proxyHost";
+    String proxyHost = System.getProperty(proxyHostProperty);
+    if (!StringUtility.hasText(proxyHost)) {
+      System.clearProperty(proxyHostProperty);
+    }
+    String proxyPortProperty = "http.proxyPort";
+    String proxyPort = System.getProperty(proxyPortProperty);
+    if (!StringUtility.hasText(proxyPort)) {
+      System.clearProperty(proxyPortProperty);
+    }
+
+    // If remote server URL is set, then the driver connects to selenium driver instance usually deployed with docker
+    // see also https://github.com/SeleniumHQ/docker-selenium
+    RemoteWebDriver driver;
+    if (StringUtility.hasText(getRemoteServerUrl())) {
+      driver = createRemoteDriver();
+    }
+    else {
+      driver = createLocalDriver();
+    }
+
+    driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10000));
+    // Set window size roughly to the minimal supported screen size
+    // (1280x1024 minus some borders for browser toolbar and windows taskbar)
+    driver.manage().window().setPosition(new Point(0, 0));
+    driver.manage().window().setSize(new Dimension(getWindowWidth(), getWindowHeight()));
+
+    if (BooleanUtility.nvl(CONFIG.getPropertyValue(SeleniumSimulateSlowNetworkProperty.class))) {
+      setSlowNetwork(driver);
+    }
+
+    Capabilities caps = driver.getCapabilities();
+    LOG.info("Selenium driver configured with driver={} browser.name={} browser.version={}", driver.getClass().getName(), caps.getBrowserName(), caps.getBrowserVersion());
+    return driver;
+  }
+
+  protected int getWindowHeight() {
+    return 900;
+  }
+
+  protected int getWindowWidth() {
+    return 1200;
+  }
+
+  protected void loadDriverProperties() {
+    Map<String, String> driverProperties = CONFIG.getPropertyValue(SeleniumDriverConfigProperty.class);
+    if (CollectionUtility.hasElements(driverProperties)) {
+      for (Entry<String, String> entry : driverProperties.entrySet()) {
+        String key = entry.getKey();
+        String value = entry.getValue();
+        if (StringUtility.hasText(key) && StringUtility.hasText(value)) {
+          System.setProperty(key, value);
+        }
+      }
+    }
+  }
+
+  protected String getRemoteServerUrl() {
+    return CONFIG.getPropertyValue(SeleniumDriverRemoteServerUrlProperty.class);
+  }
+
+  protected ClientConfig getClientConfig() {
+    try {
+      return ClientConfig.defaultConfig().baseUrl(new URL(getRemoteServerUrl()));
+    }
+    catch (MalformedURLException e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
+  }
+
+  /**
+   * Old legacy code which will be used if no scout selenium config properties are set.
+   */
+  protected void legacySetup() {
     // web-driver executable
     String webdriverChromeDriver = System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY);
     if (StringUtility.isNullOrEmpty(webdriverChromeDriver)) {
@@ -58,7 +153,7 @@ public final class SeleniumDriver {
 
     File chromeDriver = new File(webdriverChromeDriver);
     if (!chromeDriver.exists()) {
-      System.out.println("Chrome driver executable not found at path: " + chromeDriver);
+      LOG.info("Chrome driver executable not found at path: {}", chromeDriver);
       URL webdriverChromeDriverResource = SeleniumDriver.class.getResource(webdriverChromeDriver);
       if (webdriverChromeDriverResource != null) {
         chromeDriver = new File(webdriverChromeDriverResource.getFile());
@@ -73,38 +168,48 @@ public final class SeleniumDriver {
     }
 
     System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, webdriverChromeDriver);
-    logProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, webdriverChromeDriver);
+    LOG.info("set property '" + ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY + "': " + webdriverChromeDriver);
 
     // log-file for web-driver
     File tmpDir = new File(System.getProperty("java.io.tmpdir"));
     File logFile = new File(tmpDir, "webdriver.log");
     String logFilePath = logFile.getAbsolutePath();
     System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, logFilePath);
-    logProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, logFilePath);
+    LOG.info("set property '" + ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY + "': " + logFilePath);
 
     // set web-driver in verbose mode
     System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
-    logProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
+  }
 
-    // ensure proxy properties do not contain an empty string
-    String proxyHostProperty = "http.proxyHost";
-    String proxyHost = System.getProperty(proxyHostProperty);
-    if (!StringUtility.hasText(proxyHost)) {
-      System.clearProperty(proxyHostProperty);
-    }
-    String proxyPortProperty = "http.proxyPort";
-    String proxyPort = System.getProperty(proxyPortProperty);
-    if (!StringUtility.hasText(proxyPort)) {
-      System.clearProperty(proxyPortProperty);
-    }
+  protected RemoteWebDriver createRemoteDriver() {
+    return (RemoteWebDriver) RemoteWebDriver.builder()
+        .oneOf(getDriverOptions())
+        .config(getClientConfig())
+        .build();
+  }
 
-    // Prepare options
+  protected RemoteWebDriver createLocalDriver() {
+    return (RemoteWebDriver) RemoteWebDriver.builder()
+        .oneOf(getDriverOptions())
+        .build();
+  }
+
+  protected MutableCapabilities getDriverOptions() {
+    String driver = ObjectUtility.nvl(CONFIG.getPropertyValue(SeleniumDriverProperty.class), SeleniumProperties.DRIVER_CHROME);
+    switch (driver) {
+      case SeleniumProperties.DRIVER_CHROME:
+        return getChromeOptions();
+      case SeleniumProperties.DRIVER_FIREFOX:
+        return getFirefoxOptions();
+      case SeleniumProperties.DRIVER_EDGE:
+        return getEdgeOptions();
+      default:
+        throw new IllegalArgumentException("Unknown driver " + driver);
+    }
+  }
+
+  protected ChromeOptions getChromeOptions() {
     ChromeOptions options = new ChromeOptions();
-    String chromeBinary = System.getProperty("chrome.binary");
-    logProperty("chrome.binary", chromeBinary);
-    if (StringUtility.hasText(chromeBinary)) {
-      options.setBinary(chromeBinary);
-    }
 
     // Set logging preferences (see BrowserLogRule)
     LoggingPreferences logPrefs = new LoggingPreferences();
@@ -120,52 +225,34 @@ public final class SeleniumDriver {
     // See: https://stackoverflow.com/questions/49169990/disable-infobars-argument-unable-to-hide-the-infobar-with-the-message-chrome-is
     options.setExperimentalOption("useAutomationExtension", false);
     options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+    return options;
+  }
 
-    try {
-      RemoteWebDriver driver = new ChromeDriver(options);
-      driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10000));
-      // Set window size roughly to the minimal supported screen size
-      // (1280x1024 minus some borders for browser toolbar and windows taskbar)
-      driver.manage().window().setPosition(new Point(0, 0));
-      driver.manage().window().setSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+  protected FirefoxOptions getFirefoxOptions() {
+    return new FirefoxOptions();
+  }
 
-      // Start unit tests with the following VM property to simulate slow network:
-      // -Dslow.network=true
-      if (System.getProperty("slow.network") != null) {
-        setSlowNetwork(driver);
-      }
-
-      Capabilities caps = driver.getCapabilities();
-      System.out.println("Selenium driver configured with driver=" + driver.getClass().getName()
-          + " browser.name=" + caps.getBrowserName()
-          + " browser.version=" + caps.getBrowserVersion());
-      return driver;
-    }
-    catch (SessionNotCreatedException e) {
-      System.out.println("* Most likely your Chrome browser version is not supported by the ChromeDriver version configured in the pom.xml.");
-      System.out.println("* Update the properties 'chromedriver_base_url' and 'chromedriver_hash_*' in your local pom.xml to run Selenium tests in your browser, but don't commit that change.");
-      System.out.println("* Look for a suitable ChromeDriver version here: https://chromedriver.storage.googleapis.com/index.html");
-      throw new RuntimeException(e);
-    }
+  protected EdgeOptions getEdgeOptions() {
+    return new EdgeOptions();
   }
 
   /**
    * Set slow network conditions. You can do the same thing in the Chrome developer tools.
    */
-  private static void setSlowNetwork(RemoteWebDriver driver) {
+  protected void setSlowNetwork(RemoteWebDriver driver) {
     Map<String, Object> map = new HashMap<>();
     map.put("offline", false);
     map.put("latency", 199); // ms
     map.put("download_throughput", 200 * 1024); // bytes
     map.put("upload_throughput", 50 * 1024); // bytes
-    System.out.println("Simulate slow network conditions. Config=" + map);
+    LOG.info("Simulate slow network conditions. Config={}", map);
 
     try {
       CommandExecutor executor = driver.getCommandExecutor();
       executor.execute(new Command(driver.getSessionId(), "setNetworkConditions", Collections.singletonMap("network_conditions", map)));
     }
     catch (IOException e) {
-      e.printStackTrace();
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
   }
 }

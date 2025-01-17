@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.ui.html.selenium.junit;
 
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -20,13 +19,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Catches browser log and prints it to STDOUT. Requires setup of selenium logging preferences, see
- * {@link SeleniumDriver}.
+ * Captures and outputs the browser log. Requires setup of selenium logging preferences, see {@link SeleniumDriver}.
  */
 public class BrowserLogRule extends TestWatcher {
+  private static final Logger LOG = LoggerFactory.getLogger(BrowserLogRule.class);
 
+  private final SimpleDateFormat m_dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
   private final WebDriver m_driver;
   private Date m_start;
 
@@ -37,9 +39,7 @@ public class BrowserLogRule extends TestWatcher {
   @Override
   protected void starting(Description description) {
     m_start = new Date();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-    System.out.println(MessageFormat.format("v | {1}.{2} [{0}]",
-        sdf.format(m_start), description.getClassName(), description.getMethodName()));
+    LOG.info("starting {}.{}", description.getClassName(), description.getMethodName());
   }
 
   @Override
@@ -47,12 +47,15 @@ public class BrowserLogRule extends TestWatcher {
     Date end = new Date();
     long duration = end.getTime() - m_start.getTime();
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    StringBuilder sb = new StringBuilder();
     LogEntries logEntries = m_driver.manage().logs().get(LogType.BROWSER);
     for (LogEntry logEntry : logEntries) {
-      System.out.println(sdf.format(new Date(logEntry.getTimestamp())) + " " + logEntry.getLevel() + " " + logEntry.getMessage());
+      sb.append(m_dateFormat.format(new Date(logEntry.getTimestamp()))).append(" ").append(logEntry.getLevel()).append(" ").append(logEntry.getMessage()).append("\n");
     }
-    System.out.println(MessageFormat.format("^ | {1}.{2} [{0}] (took {3} ms)",
-        sdf.format(end), description.getClassName(), description.getMethodName(), duration));
+    if (sb.length() > 0) {
+      sb.setLength(sb.length() - 1);
+      LOG.info("browser log:\n{}", sb);
+    }
+    LOG.info("finished {}.{} (took {} ms)", description.getClassName(), description.getMethodName(), duration);
   }
 }
