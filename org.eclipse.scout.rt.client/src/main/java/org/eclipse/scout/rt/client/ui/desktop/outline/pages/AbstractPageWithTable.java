@@ -687,8 +687,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    *
    * @since 3.10.0-M3
    */
-  protected boolean isLimitedResult() {
+  public boolean isLimitedResult() {
     return FLAGS_BIT_HELPER.isBitSet(LIMITED_RESULT, m_flags);
+  }
+
+  public void setLimitedResult(boolean limitedResult) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(LIMITED_RESULT, limitedResult, m_flags);
   }
 
   @Override
@@ -732,7 +736,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
 
     table.importFromTableBeanData(tablePageData);
-    m_flags = FLAGS_BIT_HELPER.changeBit(LIMITED_RESULT, tablePageData.isLimitedResult(), m_flags);
+    setLimitedResult(tablePageData.isLimitedResult());
     table.setEstimatedRowCount(tablePageData.getEstimatedRowCount());
     table.setMaxRowCount(tablePageData.getMaxRowCount());
   }
