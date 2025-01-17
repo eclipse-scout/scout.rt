@@ -504,13 +504,16 @@ a,
 }
 
 .startup-error {
+  position: relative;
   #scout.user-select(text);
-  #scout.drop-shadow();
   margin: 100px 50px;
-  padding: 20px;
-  border: 1px solid @error-border-color;
+  padding: @notification-no-icon-padding-y @notification-no-icon-padding-right @notification-no-icon-padding-y @notification-no-icon-padding-left;
   background-color: @error-background-color;
-  border-radius: @border-radius-large;
+  border-radius: @border-radius-medium;
+
+  &::before {
+    .notification-severity-marker(@error-color, 9px);
+  }
 }
 
 .startup-error-title {

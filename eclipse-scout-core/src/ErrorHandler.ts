@@ -310,8 +310,8 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       }
     }
 
-    let ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '');
-    let ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status + '', errorThrown) : 'Connection error');
+    let ajaxRequest = this.formatAjaxRequest(requestOptions);
+    let ajaxStatus = this.formatAjaxStatus(jqXHR, errorThrown);
 
     errorInfo.httpStatus = jqXHR.status || 0;
     errorInfo.code = 'X' + errorInfo.httpStatus;
@@ -336,6 +336,14 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       log.push(errorInfo.debugInfo);
     }
     errorInfo.log = arrays.format(log, '\n');
+  }
+
+  formatAjaxStatus(jqXHR: JQuery.jqXHR, errorThrown: string): string {
+    return jqXHR.status ? strings.join(' ', jqXHR.status + '', errorThrown) : 'Connection error';
+  }
+
+  formatAjaxRequest(requestOptions: JQuery.AjaxSettings): string {
+    return requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '';
   }
 
   protected _severityToLogLevel(severity: string): LogLevel {

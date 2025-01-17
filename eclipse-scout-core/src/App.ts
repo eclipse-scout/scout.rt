@@ -242,7 +242,7 @@ export class App extends EventEmitter {
   }
 
   protected _bootstrapDone(options: AppBootstrapOptions) {
-    webstorage.removeItemFromSessionStorage('scout:timeoutPageReload');
+    webstorage.removeItemFromSessionStorage('scout:bootstrapErrorPageReload');
     this.trigger('bootstrap', {
       options: options
     });
@@ -256,7 +256,7 @@ export class App extends EventEmitter {
    *               - a {@link JsonErrorResponseContainer} if a successful response contained a {@link JsonErrorResponse} which was transformed to an error (e.g. using {@link App.handleJsonError}).
    */
   protected _bootstrapFail(options: AppBootstrapOptions, vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string,
-    requestOptions?: JQuery.AjaxSettings): JQuery.Promise<any> | void {
+    requestOptions?: JQuery.AjaxSettings): JQuery.Promise<any> {
     $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
     // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
@@ -266,27 +266,18 @@ export class App extends EventEmitter {
     // Sometimes the JavaScript and therefore the ajax calls won't be executed in case the page is loaded from that cache, but sometimes they will nevertheless (we don't know the reasons).
     // So, if it that happens, the server will either return a session timeout or a status 401 (Unauthorized) and the best thing we can do is to reload the page hoping a request for the index.html
     // will be done which eventually will be forwarded to the login page.
-    if (vararg instanceof AjaxError) {
-      requestOptions = vararg.requestOptions;
-      vararg = vararg.jqXHR;
+    // Additionally, requests may fail due to other various reasons, e.g. Chrome may report ERR_NETWORK_CHANGED or ERR_CERT_VERIFER_CHANGED.
+    // Since a page reload normally solves these issues as well, the reload is done on any error not just session timeouts.
+    let {url, message} = this._analyzeBootstrapError(vararg, textStatus, errorThrown, requestOptions);
+    $.log.isInfoEnabled() && $.log.info(`Error for resource ${url}. Reloading page...`);
+    if (webstorage.getItemFromSessionStorage('scout:bootstrapErrorPageReload')) {
+      // Prevent loop in case reloading did not solve the problem
+      $.log.isWarnEnabled() && $.log.warn('Prevented automatic reload, startup will likely fail.');
+      webstorage.removeItemFromSessionStorage('scout:bootstrapErrorPageReload');
+      throw new Error(`Bootstrap resource ${url} could not be loaded: ${message}`);
     }
-    if ($.isJqXHR(vararg)) {
-      // AJAX error
-      // If a resource returns 401 (unauthorized) it is likely a session timeout.
-      // This may happen if no Scout backend is used or a reverse proxy returned the response, otherwise status 200 with an error object would be returned, see below
-      if (this._isSessionTimeoutStatus(vararg.status)) {
-        let url = requestOptions ? requestOptions.url : '';
-        this._handleBootstrapTimeoutError(vararg, url);
-        return;
-      }
-    } else if (objects.isObject(vararg) && vararg.error) {
-      // Json based error
-      // Json errors (normally processed by Session.js) are returned with http status 200
-      if (vararg.error.code === Session.JsonResponseError.SESSION_TIMEOUT) {
-        this._handleBootstrapTimeoutError(vararg.error, vararg.url);
-        return;
-      }
-    }
+    webstorage.setItemToSessionStorage('scout:bootstrapErrorPageReload', 'true');
+    scout.reloadPage();
 
     // Make sure promise will be rejected with all original arguments so that it can be eventually handled by this._fail
     // eslint-disable-next-line prefer-rest-params
@@ -294,22 +285,35 @@ export class App extends EventEmitter {
     return $.rejectedPromise(...args);
   }
 
-  protected _isSessionTimeoutStatus(httpStatus: number): boolean {
-    return httpStatus === 401;
-  }
-
-  protected _handleBootstrapTimeoutError(error: JQuery.jqXHR | JsonErrorResponse, url: string) {
-    $.log.isInfoEnabled() && $.log.info('Timeout error for resource ' + url + '. Reloading page...');
-    if (webstorage.getItemFromSessionStorage('scout:timeoutPageReload')) {
-      // Prevent loop in case reloading did not solve the problem
-      $.log.isWarnEnabled() && $.log.warn('Prevented automatic reload, startup will likely fail', error, url);
-      webstorage.removeItemFromSessionStorage('scout:timeoutPageReload');
-      throw new Error('Resource ' + url + ' could not be loaded due to a session timeout, even after a page reload');
+  protected _analyzeBootstrapError(vararg: AjaxError | JQuery.jqXHR | JsonErrorResponseContainer, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: JQuery.AjaxSettings) {
+    let ajaxError: AjaxError;
+    let jsonError: JsonErrorResponseContainer;
+    if (vararg instanceof AjaxError) {
+      ajaxError = vararg;
+    } else if ($.isJqXHR(vararg)) {
+      ajaxError = new AjaxError({jqXHR: vararg, textStatus: textStatus, errorThrown: errorThrown, requestOptions: requestOptions});
+    } else if (objects.isObject(vararg) && vararg.error) {
+      jsonError = vararg;
     }
-    webstorage.setItemToSessionStorage('scout:timeoutPageReload', true + '');
-
-    // See comment in _bootstrapFail for the reasons why to reload here
-    scout.reloadPage();
+    let url;
+    let message;
+    if (ajaxError) {
+      // AJAX error
+      // If a resource returns 401 (unauthorized) it is likely a session timeout.
+      // This may happen for REST resources or if a reverse proxy returned the response
+      url = ajaxError.requestOptions?.url || '';
+      message = `${ajaxError.errorDo?.message || ''}`;
+      let httpStatus = `${this.errorHandler.formatAjaxStatus(ajaxError.jqXHR, ajaxError.errorThrown)}`;
+      if (!message.includes(httpStatus)) {
+        message = `${message} [${this.errorHandler.formatAjaxStatus(ajaxError.jqXHR, ajaxError.errorThrown)}]`.trim();
+      }
+    } else if (jsonError) {
+      // Json based error
+      // Json errors (normally processed by Session.js) are returned with http status 200
+      url = jsonError.url;
+      message = `${jsonError.error.message} [Code ${jsonError.error.code}]`;
+    }
+    return {url, message};
   }
 
   /**
@@ -589,7 +593,9 @@ export class App extends EventEmitter {
     this.setLoading(false);
 
     let promises = [];
-    if (this.sessions.length === 0) {
+    if (webstorage.getItemFromSessionStorage('scout:bootstrapErrorPageReload')) {
+      // Do not append a message, page is about to be reloaded
+    } else if (this.sessions.length === 0) {
       promises.push(this.errorHandler.handle(error, ...args)
         .then(errorInfo => {
           this._appendStartupError($('body'), errorInfo);
