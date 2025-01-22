@@ -1,0 +1,38 @@
+{
+  "_type" : "scout.DataObjectSignature",
+  "entities" : [ {
+    "_type" : "scout.EntityDataObjectSignature",
+    "attributes" : [ {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "cssClass",
+      "valueType" : "CLASS[java.lang.String]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "name",
+      "valueType" : "CLASS[java.lang.String]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "order",
+      "valueType" : "CLASS[java.lang.Long]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "parentId",
+      "valueType" : "CLASS[java.lang.String]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "resourceId",
+      "valueType" : "CLASS[java.lang.String]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "selectable",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "visible",
+      "valueType" : "CLASS[java.lang.Boolean]"
+    } ],
+    "typeName" : "scout.CalendarResource",
+    "typeVersion" : "scout-24.2.001"
+  } ],
+  "enums" : [ ]
+}
