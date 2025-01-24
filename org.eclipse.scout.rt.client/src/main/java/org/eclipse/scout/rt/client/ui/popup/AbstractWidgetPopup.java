@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -107,7 +107,13 @@ public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPop
   }
 
   public void setContent(T content) {
+    if (m_content != null) {
+      m_content.setParentInternal(null);
+    }
     m_content = content;
+    if (m_content != null) {
+      m_content.setParentInternal(this);
+    }
   }
 
   @Override
