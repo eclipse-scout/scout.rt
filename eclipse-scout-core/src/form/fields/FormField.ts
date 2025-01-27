@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, aria, arrays, clipboard, CloneOptions, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
+  AbstractLayout, Action, aria, arrays, clipboard, CloneOptions, Column, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, DragAndDropOptions, DropType, EnumObject, EventHandler, fields, FieldStatus, FormFieldClipboardExportEvent,
   FormFieldEventMap, FormFieldLayout, FormFieldModel, FormFieldValidationResultProvider, GridData, GroupBox, HierarchyChangeEvent, HtmlComponent, InitModelOf, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, ObjectOrChildModel,
-  ObjectOrModel, objects, ObjectType, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
+  ObjectOrModel, objects, ObjectType, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, StatusOrModel, strings, styles, TableRow, Tooltip, tooltips, TooltipSupport, TreeVisitor, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
 
@@ -1321,6 +1321,9 @@ export class FormField extends Widget implements FormFieldModel {
     }
   }
 
+  /**
+   * Called by the {@link CellEditorPopup} after having rendered this field.
+   */
   prepareForCellEdit(opts?: AddCellEditorFieldCssClassesOptions) {
     opts = opts || {};
 
@@ -1337,6 +1340,29 @@ export class FormField extends Widget implements FormFieldModel {
     }
     if (this.$field) {
       this.addCellEditorFieldCssClasses(this.$field, opts);
+    }
+  }
+
+  /**
+   * Adjusts the field for use as a cell editor field. This operation is irreversible.
+   * The {@link #mode} property is set to {@link FormField.Mode.CELLEDITOR}.
+   *
+   * Unlike {@link #prepareForCellEdit}, this method does not depend on the "rendered" state.
+   * It is called by an editable column just before the cell editor popup is created, see
+   * {@link Column#startCellEdit}.
+   *
+   * @param options
+   *          When called by an editable column, this object holds information about the
+   *          column and row being edited.
+   */
+  activateCellEditorMode(options?: FormFieldActivateCellEditorModeOptions) {
+    // Set hint that this field is used within a cell-editor
+    this.mode = FormField.Mode.CELLEDITOR;
+
+    if (options?.column && options?.row) {
+      let cell = options.column.cell(options.row);
+      // Override field alignment with the cell's alignment
+      this.gridData.horizontalAlignment = cell.horizontalAlignment;
     }
   }
 
@@ -1656,6 +1682,10 @@ export type ValidationResult = {
   visitResult?: TreeVisitResult;
 };
 export type AddCellEditorFieldCssClassesOptions = { cssClass?: string };
+export type FormFieldActivateCellEditorModeOptions = {
+  column?: Column<any>;
+  row?: TableRow;
+};
 
 export interface VisitParentFieldsOptions {
   /**
