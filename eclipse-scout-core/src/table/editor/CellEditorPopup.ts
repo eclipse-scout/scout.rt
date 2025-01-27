@@ -258,9 +258,17 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
     if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
       return false;
     }
-    if (this.$container.isOrHas(event.keyStrokeContext.$getScopeTarget())) {
+    let $target = event.keyStrokeContext.$getScopeTarget();
+    if (this.$container.isOrHas($target)) {
       // Don't interfere with keystrokes of the popup or children of the popup (otherwise pressing enter would close both the popup and the form at once)
       return false;
+    }
+    // Not all elements created by the popup are necessarily descendants of the cell editor popup. An example
+    // would be a form that is opened from within the popup. To identify these kind of elements, we additionally
+    // check the widget hierarchy.
+    let target = widgets.get($target);
+    if (this.cell.field.isOrHas(target)) {
+      return false; // event target belongs to the cell editor popup -> don't close the popup
     }
     return true;
   }
