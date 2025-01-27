@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, CellEditorPopup, Column, keys, scout, SmartColumn, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
+import {Cell, CellEditorPopup, Column, FormField, keys, scout, SmartColumn, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
 import {FormSpecHelper, JQueryTesting, TableSpecHelper} from '../../../src/testing/index';
 
 describe('CellEditor', () => {
@@ -296,6 +296,24 @@ describe('CellEditor', () => {
       table.startCellEdit(table.columns[0], table.rows[0], field);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
       expect(table.cellEditorPopup.cell.field).toBe(field);
+    });
+
+    it('activates cell editor mode', () => {
+      table.columns[0].setEditable(true);
+      table.columns[0].setHorizontalAlignment(1);
+
+      let field = createStringField();
+      expect(field.mode).toBe(FormField.Mode.DEFAULT);
+      expect(field.gridData.horizontalAlignment).toBe(-1);
+      spyOn(field, 'activateCellEditorMode').and.callThrough();
+
+      table.startCellEdit(table.columns[0], table.rows[0], field);
+      expect(field.mode).toBe(FormField.Mode.CELLEDITOR);
+      expect(field.gridData.horizontalAlignment).toBe(1);
+      expect(field.activateCellEditorMode).toHaveBeenCalledOnceWith({
+        column: table.columns[0],
+        row: table.rows[0]
+      });
     });
 
     it('triggers startCellEdit event', () => {

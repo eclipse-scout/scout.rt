@@ -463,8 +463,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
   startCellEdit(row: TableRow, field: ValueField<TValue>): CellEditorPopup<TValue> {
     let cell = this.cell(row);
     cell.field = field;
-    // Override field alignment with the cell's alignment
-    cell.field.gridData.horizontalAlignment = cell.horizontalAlignment;
+    cell.field.activateCellEditorMode({column: this, row: row});
     let popup = this._createEditorPopup(row, cell);
     if (!row.$row || row.$row.hasClass('hiding')) {
       // Don't open popup if row has been removed or is being removed

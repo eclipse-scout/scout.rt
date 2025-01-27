@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, FormField, graphics, InitModelOf, KeyStroke,
-  KeyStrokeManagerKeyStrokeEvent, Point, Popup, Rectangle, scout, SomeRequired, Table, TableRow, TableRowOrderChangedEvent, ValueField
+  AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, graphics, InitModelOf, KeyStroke,
+  KeyStrokeManagerKeyStrokeEvent, Point, Popup, Rectangle, scout, SomeRequired, Table, TableRow, TableRowOrderChangedEvent, ValueField, widgets
 } from '../../index';
 import $ from 'jquery';
 
@@ -88,7 +88,6 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
       .data('popup', this);
 
     let field = this.cell.field;
-    field.mode = FormField.Mode.CELLEDITOR; // hint that this field is used within a cell-editor
     field.render();
     field.prepareForCellEdit({
       cssClass: cssClass
