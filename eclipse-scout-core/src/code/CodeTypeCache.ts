@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -57,8 +57,8 @@ export class CodeTypeCache extends EventEmitter implements ObjectModel<CodeTypeC
       return $.resolvedPromise();
     }
     this.url = url;
-    uiNotifications.subscribe('codeTypeUpdate', event => this._onCodeTypeUpdateNotify(event));
-    return this.loadCodeTypes().then(codes => undefined);
+    return uiNotifications.subscribe('codeTypeUpdate', event => this._onCodeTypeUpdateNotify(event))
+      .then(() => this.loadCodeTypes().then(codes => undefined));
   }
 
   /**

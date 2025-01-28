@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, dates, DoEntity, JsonObject, Session, systems, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src/index';
+import {BackgroundJobPollingStatus, dates, DoEntity, JsonObject, Session, System, systems, UiNotificationDo, UiNotificationPoller, UiNotificationResponse, uiNotifications} from '../../src/index';
 import {UiNotificationsMock} from '../../src/testing/index';
 
 describe('uiNotifications', () => {
@@ -27,7 +27,6 @@ describe('uiNotifications', () => {
   });
 
   afterEach(() => {
-    uiNotifications.tearDown();
     jasmine.Ajax.uninstall();
   });
 
@@ -334,6 +333,57 @@ describe('uiNotifications', () => {
 
       const topic = await uiNotifications.subscribe('aaa', () => undefined);
       expect(topic).toEqual('aaa');
+    });
+
+    it('rejects if an error is returned', done => {
+      uiNotifications.subscribe('aaa', () => undefined).catch(error => {
+        expect(error).toBeDefined();
+        done();
+      });
+
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 500
+      });
+    });
+
+    it('rejects if server does not allow it', done => {
+      let errors = [];
+      uiNotifications.subscribe('aaa', () => undefined).catch(error => {
+        errors.push(error);
+      });
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 403
+      });
+
+      uiNotifications.subscribe('aaa', () => undefined).catch(error => {
+        errors.push(error);
+        if (errors.length === 2) {
+          done();
+        }
+      });
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 401
+      });
+    });
+
+    it('does not register the handler on errors', () => {
+      jasmine.clock().install();
+      let handler = () => undefined;
+
+      uiNotifications.subscribe('aaa', handler).catch(error => {
+        expect(error).toBeDefined();
+      });
+
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 500
+      });
+      jasmine.clock().tick(1);
+
+      // Handler must not be registered and poller must not be running after an unsuccessful subscribe
+      let system = uiNotifications.systems.get(System.MAIN_SYSTEM);
+      expect(system.events.count()).toBe(0);
+      expect(system.poller).toBe(null);
+      jasmine.clock().uninstall();
     });
 
     it('starts a poller per system', () => {
@@ -773,17 +823,62 @@ describe('uiNotifications', () => {
       jasmine.clock().uninstall();
     });
 
-    it('automatically restarts on error', () => {
+    it('automatically restarts on connection error', () => {
+      uiNotifications.subscribe('aaa', () => undefined);
+      let poller = pollers().get('main');
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 503
+      });
+      jasmine.clock().tick(1);
+      // Connection errors don't change state because they are handled by AjaxCall directly without calling UiNotificationPoller._onError
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+
+      jasmine.clock().tick(UiNotificationPoller.CONNECTION_ERROR_RETRY_INTERVALS[0] + 1000);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+    });
+
+    it('automatically restarts on response error if other topics are subscribed', () => {
+      uiNotifications.subscribe('aaa', () => undefined);
+
+      let response: UiNotificationResponse = {
+        notifications: [{
+          id: '100',
+          topic: 'aaa',
+          nodeId: 'node1',
+          creationTime: dates.parseJsonDate('2023-09-16 21:44:13.000'),
+          subscriptionStart: true
+        }]
+      };
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 200,
+        responseText: JSON.stringify(response, dates.stringifyJsonDateMapper())
+      });
+      jasmine.clock().tick(1);
+
+      uiNotifications.subscribe('bbb', () => undefined);
+      let poller = pollers().get('main');
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 500
+      });
+      jasmine.clock().tick(1);
+      // UiNotificationSystem.unsubscribe triggers a restart of the poller after the error, so it is already running again
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+
+      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+    });
+
+    it('does not restart if subscription fails and no other topics are subscribed', () => {
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
       });
       jasmine.clock().tick(1);
-      expect(poller.status).toBe(BackgroundJobPollingStatus.FAILURE);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RETRY_INTERVAL + 1000);
-      expect(poller.status).toBe(BackgroundJobPollingStatus.RUNNING);
+      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
     });
 
     it('does not restart if operation is not allowed', () => {
@@ -795,7 +890,7 @@ describe('uiNotifications', () => {
       jasmine.clock().tick(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RETRY_INTERVAL + 1000);
+      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED); // still stopped
     });
 
@@ -809,7 +904,7 @@ describe('uiNotifications', () => {
       jasmine.clock().tick(1);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
 
-      jasmine.clock().tick(UiNotificationPoller.RETRY_INTERVAL + 1000);
+      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL + 1000);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED); // still stopped
     });
 
@@ -853,6 +948,27 @@ describe('uiNotifications', () => {
       uiNotifications.tearDown();
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
       expect(poller2.status).toBe(BackgroundJobPollingStatus.STOPPED);
+    });
+
+    it('stops every poller even if tearDown was called during retries', () => {
+      jasmine.clock().install();
+      uiNotifications.subscribe('aaa', () => undefined);
+      let poller = pollers().get('main');
+      jasmine.Ajax.requests.mostRecent().respondWith({
+        status: 503
+      });
+
+      jasmine.clock().tick(UiNotificationPoller.CONNECTION_ERROR_RETRY_INTERVALS[0] + 50);
+      uiNotifications.tearDown();
+
+      // Assert UiNotificationPoller._onError handled abort case correctly and did not change state to FAILURE
+      jasmine.clock().tick(1);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
+
+      // Assert UiNotificationPoller._onError did not schedule poll again
+      jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
+      expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
+      jasmine.clock().uninstall();
     });
   });
 });

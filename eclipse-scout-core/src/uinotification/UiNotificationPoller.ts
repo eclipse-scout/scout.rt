@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,17 +18,22 @@ export class UiNotificationPoller extends PropertyEventEmitter {
   declare self: UiNotificationPoller;
 
   /**
+   * Configures in milliseconds the time to wait after an error occurs, before the polling will be retried.
+   */
+  static RESPONSE_ERROR_RETRY_INTERVAL = 30_000;
+
+  /**
    * Configures in milliseconds the time to wait after a connection error occurs, before the polling will be retried.
    */
-  static RETRY_INTERVAL = 5000;
+  static CONNECTION_ERROR_RETRY_INTERVALS = [300, 500, 1000, 5000];
 
   /**
    * The number of notifications per topic that should be kept until the topic is unsubscribed.
    */
   static HISTORY_COUNT = 10;
 
-  protected static DEFAULT_BACKEND_TIMEOUT = 60_000;
-  protected static BACKEND_TIMEOUT_OFFSET = 15_000;
+  static DEFAULT_BACKEND_TIMEOUT = 60_000;
+  static BACKEND_TIMEOUT_OFFSET = 15_000;
 
   /**
    * Configures in milliseconds how long the connection is allowed to stay open before it will be aborted.
@@ -132,6 +137,9 @@ export class UiNotificationPoller extends PropertyEventEmitter {
       data: objects.stringifyJson({
         topics: this.topicsWithLastNotifications
       }, dates.stringifyJsonDateMapper())
+    }, {
+      maxRetries: -1, // unlimited retries on connection errors
+      retryIntervals: UiNotificationPoller.CONNECTION_ERROR_RETRY_INTERVALS
     });
     this._call.call()
       .then((response: UiNotificationResponse) => this._onSuccess(response))
@@ -199,24 +207,36 @@ export class UiNotificationPoller extends PropertyEventEmitter {
   }
 
   protected _onError(error: AjaxError) {
-    if (error.textStatus === 'abort' && this.status === BackgroundJobPollingStatus.STOPPED || this._call.pendingCall) {
-      // When poller is stopped, call is aborted. PendingCall is set if poller has already been restarted.
+    if (this._call.pendingCall || this._call.callTimeoutId) {
+      // Poller has probably been aborted but already been restarted or scheduled for a retry (callTimeoutId is set) -> ignore error and don't reschedule poll
+      return;
+    }
+    if (error.textStatus === 'abort' || this._call.aborted) {
+      // Don't report errors if polling was aborted.
+      // Checking the aborted flag is necessary because textStatus may be wrong if AjaxCall was aborted between two retries (textStatus is only set to aborted if the actual request was aborted).
+      // This ensures no error is reported even if poller was stopped between two retries.
+      if (this.status === BackgroundJobPollingStatus.STOPPED) {
+        return;
+      }
+      this.setStatus(BackgroundJobPollingStatus.FAILURE);
+
+      // If poller is supposed to run, reschedule it
+      this._schedulePoll(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
       return;
     }
     this.setStatus(BackgroundJobPollingStatus.FAILURE);
 
     if (scout.isOneOf(error.jqXHR.status, 401, 403)) {
+      // Stop polling on session timeout
       $.log.isInfoEnabled() && $.log.info(`Stopping ui notification poller because operation is not permitted (${error.jqXHR.status})`);
+      this.trigger('error', {error});
       this.stop();
       return;
     }
 
-    if (AjaxCall.isOfflineError(error.jqXHR, error.textStatus, error.errorThrown)) {
-      $.log.isInfoEnabled() && $.log.info('Connection failed', error);
-    } else {
-      scout.create(ErrorHandler, {displayError: false}).handle(error);
-    }
-    this._schedulePoll(UiNotificationPoller.RETRY_INTERVAL);
+    this.trigger('error', {error});
+    scout.create(ErrorHandler, {displayError: false, sendError: true}).handle(error);
+    this._schedulePoll(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
   }
 
   setStatus(status: BackgroundJobPollingStatus) {

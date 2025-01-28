@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 import {
   AdapterData, App, arrays, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectFactory, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
-  SessionStartupResponse, Widget, WidgetModel
+  SessionStartupResponse, uiNotifications, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, TestingApp, UiNotificationsMock} from './index';
 import 'jasmine-jquery';
@@ -256,8 +256,9 @@ export const JasmineScout = {
         (session.layoutValidator as { _postValidateFunctions: (() => void)[] })._postValidateFunctions = [];
         session.layoutValidator.desktop = null;
       }
-      // Remove every handler to avoid a memory leak because widgets are not destroyed properly after tests, so they won't unregister their handlers
+      // Cleanup global objects and remove every handler to avoid a memory leak because widgets are not destroyed properly after tests, so they won't unregister their handlers
       HtmlEnvironment.get().off('propertyChange');
+      uiNotifications.tearDown();
     });
 
     context.keys().forEach(context);
