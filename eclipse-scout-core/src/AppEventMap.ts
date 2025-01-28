@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,6 +25,10 @@ export interface AppSessionReadyEvent<T = App> extends Event<T> {
   session: Session;
 }
 
+export interface AppFailEvent<T = App> extends Event<T> {
+  error: any;
+}
+
 export interface AppEventMap extends EventMap {
   'prepare': AppInitEvent;
   'init': AppInitEvent;
@@ -36,4 +40,5 @@ export interface AppEventMap extends EventMap {
   'bootstrap': AppBootstrapEvent;
   'desktopReady': AppDesktopReadyEvent;
   'sessionReady': AppSessionReadyEvent;
+  'fail': AppFailEvent;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,14 +30,20 @@ export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWi
     scout.assertParameter('topic', topic);
     scout.assertParameter('handler', handler);
     this.events.on(topic, handler);
-    return this.whenSubscriptionStart(topic);
+    return this.whenSubscriptionStart(topic).catch(error => {
+      this.unsubscribe(topic, handler);
+      throw error;
+    });
   }
 
   subscribeOne(topic: string, handler: UiNotificationHandler): JQuery.Promise<string> {
     scout.assertParameter('topic', topic);
     scout.assertParameter('handler', handler);
     this.events.one(topic, handler);
-    return this.whenSubscriptionStart(topic);
+    return this.whenSubscriptionStart(topic).catch(error => {
+      this.unsubscribe(topic, handler);
+      throw error;
+    });
   }
 
   unsubscribe(topic: string, handler?: UiNotificationHandler) {
@@ -52,13 +58,20 @@ export class UiNotificationSystem implements UiNotificationSystemModel, ObjectWi
       return $.resolvedPromise(topic);
     }
     let deferred = $.Deferred();
-    let handler = event => {
+    let subscriptionStartHandler = event => {
       if (event.notification.topic === topic) {
         deferred.resolve(topic);
-        this.poller.off('subscriptionStart', handler);
+        this.poller.off('subscriptionStart', subscriptionStartHandler);
+        this.poller.off('error', errorHandler);
       }
     };
-    this.poller.on('subscriptionStart', handler);
+    let errorHandler = event => {
+      deferred.reject(event.error);
+      this.poller?.off('subscriptionStart', subscriptionStartHandler);
+      this.poller?.off('error', errorHandler);
+    };
+    this.poller.on('subscriptionStart', subscriptionStartHandler);
+    this.poller.on('error', errorHandler);
     return deferred.promise();
   }
 
