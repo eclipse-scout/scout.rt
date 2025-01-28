@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {objects, scout, System, systems, UiNotificationHandler, UiNotificationSystem} from '../index';
+import {App, objects, scout, System, systems, UiNotificationHandler, UiNotificationSystem} from '../index';
 
 export class UiNotifications {
   systems = new Map<string, UiNotificationSystem>();
@@ -105,3 +105,8 @@ export class UiNotifications {
 }
 
 export const uiNotifications: UiNotifications = objects.createSingletonProxy(UiNotifications);
+
+App.addListener('fail', event => {
+  // Stop polling if application could not be started
+  uiNotifications.tearDown();
+});
