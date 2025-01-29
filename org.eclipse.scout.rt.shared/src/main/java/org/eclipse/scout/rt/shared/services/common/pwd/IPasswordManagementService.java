@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,8 +21,6 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
  * However, the use of external existing user administration for single-sign-in and password management is highly
  * recommended. <br>
  * This common definition solely is used when no on-site solution is available.
- * <p>
- * In order to use, register it in the extension "org.eclipse.scout.rt.client.serviceProxy"
  */
 @TunnelToServer
 public interface IPasswordManagementService extends IService {
@@ -48,5 +46,5 @@ public interface IPasswordManagementService extends IService {
    */
   void resetPassword(String userId, char[] newPassword);
 
-  public String getUsernameFor(String userId);
+  String getUsernameFor(String userId);
 }
