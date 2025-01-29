@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,17 +42,13 @@ public class PasswordPolicyVerifier {
    */
   public boolean verify(String userId, int warnInAdvanceDays) {
     IPasswordManagementService service = BEANS.get(IPasswordManagementService.class);
-    if (service == null) {
-      LOG.error("missing client service proxy for {}. Check registered beans.", IPasswordManagementService.class.getName());
-      return false;
-    }
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null) {
       LOG.error("desktop is null");
       return false;
     }
     if (!desktop.isOpened()) {
-      LOG.error("desktop is available, but there is not yet a GUI attached. Make sure to calll this verifier at earliest in the Desktop.execGuiAvailable callback");
+      LOG.error("desktop is available, but there is not yet a GUI attached. Make sure to call this verifier at earliest in the Desktop.execGuiAvailable callback");
       return false;
     }
     try {
