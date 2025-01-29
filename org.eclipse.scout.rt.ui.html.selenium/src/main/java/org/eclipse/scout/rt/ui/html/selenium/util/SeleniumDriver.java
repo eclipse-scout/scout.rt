@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.ui.html.selenium.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,14 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
 
-import org.apache.commons.exec.OS;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -41,7 +37,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -58,17 +53,8 @@ import org.slf4j.LoggerFactory;
 public class SeleniumDriver {
   private static final Logger LOG = LoggerFactory.getLogger(SeleniumDriver.class);
 
-  public static WebDriver setUpDriver() {
-    return BEANS.get(SeleniumDriver.class).createDriver();
-  }
-
   public WebDriver createDriver() {
-    if (CONFIG.getPropertyValue(SeleniumDriverConfigProperty.class) != null) {
-      loadDriverProperties();
-    }
-    else {
-      legacySetup();
-    }
+    loadDriverProperties();
 
     // ensure proxy properties do not contain an empty string
     String proxyHostProperty = "http.proxyHost";
@@ -139,46 +125,6 @@ public class SeleniumDriver {
     catch (MalformedURLException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
-  }
-
-  /**
-   * Old legacy code which will be used if no scout selenium config properties are set.
-   */
-  protected void legacySetup() {
-    // web-driver executable
-    String webdriverChromeDriver = System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY);
-    if (StringUtility.isNullOrEmpty(webdriverChromeDriver)) {
-      webdriverChromeDriver = OS.isFamilyWindows() ? "/seleniumDrivers/chromedriver.exe" : "/seleniumDrivers/chromedriver";
-    }
-
-    File chromeDriver = new File(webdriverChromeDriver);
-    if (!chromeDriver.exists()) {
-      LOG.info("Chrome driver executable not found at path: {}", chromeDriver);
-      URL webdriverChromeDriverResource = SeleniumDriver.class.getResource(webdriverChromeDriver);
-      if (webdriverChromeDriverResource != null) {
-        chromeDriver = new File(webdriverChromeDriverResource.getFile());
-        webdriverChromeDriver = chromeDriver.getAbsolutePath();
-      }
-    }
-    if (!StringUtility.matches(webdriverChromeDriver, ".+\\.exe", Pattern.CASE_INSENSITIVE) && chromeDriver.exists() && !chromeDriver.canExecute()) {
-      boolean success = chromeDriver.setExecutable(true);
-      if (!success) {
-        throw new PlatformException("Error making '{}' executable.", chromeDriver);
-      }
-    }
-
-    System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, webdriverChromeDriver);
-    LOG.info("set property '" + ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY + "': " + webdriverChromeDriver);
-
-    // log-file for web-driver
-    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-    File logFile = new File(tmpDir, "webdriver.log");
-    String logFilePath = logFile.getAbsolutePath();
-    System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, logFilePath);
-    LOG.info("set property '" + ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY + "': " + logFilePath);
-
-    // set web-driver in verbose mode
-    System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
   }
 
   protected RemoteWebDriver createRemoteDriver() {

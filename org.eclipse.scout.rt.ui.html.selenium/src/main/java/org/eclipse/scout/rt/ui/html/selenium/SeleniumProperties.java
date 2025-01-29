@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.selenium;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.firefox.FirefoxDriverService;
@@ -90,12 +89,6 @@ public class SeleniumProperties {
     public String description() {
       return "If set, unit tests simulate slow network";
     }
-
-    @Override
-    public Boolean getDefaultValue() {
-      // support for legacy system property
-      return System.getProperty("slow.network") != null;
-    }
   }
 
   public static class SeleniumWebAppUrlProperty extends AbstractStringConfigProperty {
@@ -108,12 +101,6 @@ public class SeleniumProperties {
     @Override
     public String description() {
       return "URL to web application under test";
-    }
-
-    @Override
-    public String getDefaultValue() {
-      // support for legacy system property
-      return System.getProperty("web.app.url", "http://localhost:8082/");
     }
   }
 
@@ -128,12 +115,6 @@ public class SeleniumProperties {
     public String description() {
       return "Query params appended to web application under test";
     }
-
-    @Override
-    public String getDefaultValue() {
-      // support for legacy system property
-      return System.getProperty("query.params", "debug=true");
-    }
   }
 
   public static class SeleniumScreenshotOnFailureProperty extends AbstractBooleanConfigProperty {
@@ -146,12 +127,6 @@ public class SeleniumProperties {
     @Override
     public String description() {
       return "If set, then a screenshot is taken in case of a failed test";
-    }
-
-    @Override
-    public Boolean getDefaultValue() {
-      // support for legacy system property
-      return TypeCastUtility.castValue(System.getProperty("take.screenshot.on.failure"), boolean.class);
     }
   }
 }

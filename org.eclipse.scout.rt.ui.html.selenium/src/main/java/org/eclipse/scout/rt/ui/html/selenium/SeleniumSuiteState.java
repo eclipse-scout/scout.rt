@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.ui.html.selenium;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumDriver;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public final class SeleniumSuiteState {
   }
 
   public static void setUpBeforeClass() {
-    s_driver = SeleniumDriver.setUpDriver();
+    s_driver = BEANS.get(SeleniumDriver.class).createDriver();
     s_suiteStarted = true;
     LOG.info("Selenium driver started by {}", SeleniumSuiteState.class.getSimpleName());
   }

@@ -287,13 +287,6 @@ public final class SeleniumUtil {
     }
   }
 
-  /**
-   * @return Whether the VM runs on Windows 8.x.
-   */
-  public static boolean isWindows8() {
-    return StringUtility.containsString(System.getProperty("os.name"), "Windows 8");
-  }
-
   public static boolean isMacOS() {
     return StringUtility.containsString(System.getProperty("os.name"), "Mac OS");
   }

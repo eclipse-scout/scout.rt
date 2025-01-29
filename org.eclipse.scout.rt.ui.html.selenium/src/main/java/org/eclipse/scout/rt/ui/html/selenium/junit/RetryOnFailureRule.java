@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.ui.html.selenium.junit;
 
+import org.eclipse.scout.rt.ui.html.selenium.annotation.RetryOnFailure;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;

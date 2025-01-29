@@ -19,6 +19,7 @@ import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.selenium.SeleniumSuiteState;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumDriver;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumExpectedConditions;
@@ -79,7 +80,7 @@ public abstract class AbstractSeleniumTest {
       s_driver = SeleniumSuiteState.getDriver();
     }
     else {
-      s_driver = SeleniumDriver.setUpDriver();
+      s_driver = BEANS.get(SeleniumDriver.class).createDriver();
       LOG.info("Selenium driver started by AbstractSeleniumTest");
     }
   }
