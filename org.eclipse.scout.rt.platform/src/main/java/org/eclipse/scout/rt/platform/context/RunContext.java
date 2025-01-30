@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.opentelemetry.OpenTelemetryContextProcessor;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
@@ -48,6 +49,8 @@ import org.eclipse.scout.rt.platform.util.concurrent.Callables;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.MDC;
+
+import io.opentelemetry.context.Context;
 
 /**
  * A {@link RunContext} represents a "snapshot" of the current calling state and is always associated with a
@@ -75,6 +78,7 @@ public class RunContext implements IAdaptable {
   protected Locale m_locale;
   protected String m_correlationId;
   protected PropertyMap m_propertyMap = new PropertyMap();
+  protected Context m_openTelemetryContext;
 
   protected Map<ThreadLocal<?>, ThreadLocalProcessor<?>> m_threadLocalProcessors = new HashMap<>();
   protected Map<String, DiagnosticContextValueProcessor> m_diagnosticProcessors = new HashMap<>();
@@ -185,6 +189,7 @@ public class RunContext implements IAdaptable {
     return new CallableChain<RESULT>()
         .add(new RunMonitorCancellableProcessor(m_parentRunMonitor, m_runMonitor))
         .add(new ThreadLocalProcessor<>(CURRENT, this))
+        .add(new OpenTelemetryContextProcessor())
         .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
         .add(new SubjectProcessor<>(m_subject))
@@ -489,6 +494,25 @@ public class RunContext implements IAdaptable {
     return this;
   }
 
+  /**
+   * Attaches a OpenTelemetry {@link Context} with the RunContext
+   *
+   * @param context
+   *     Context to be attached
+   * @return the RunContext with an OpenTelemetry Context
+   */
+  public RunContext withOpenTelemetryContext(final Context context) {
+    m_openTelemetryContext = context;
+    return this;
+  }
+
+  /**
+   * @return the OpenTelemetry context of the RunContext
+   */
+  public Context getOpenTelemetryContext() {
+    return m_openTelemetryContext;
+  }
+
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -522,6 +546,7 @@ public class RunContext implements IAdaptable {
     m_locale = origin.m_locale;
     m_correlationId = origin.m_correlationId;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
+    m_openTelemetryContext = origin.m_openTelemetryContext;
     m_transactionScope = origin.m_transactionScope;
     m_transaction = origin.m_transaction;
     m_newTransactionSupplier = origin.m_newTransactionSupplier;
@@ -543,6 +568,7 @@ public class RunContext implements IAdaptable {
     m_locale = NlsLocale.CURRENT.get();
     m_correlationId = CorrelationId.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
+    m_openTelemetryContext = Context.current();
     m_transactionScope = currentRunContext.m_transactionScope;
     m_transaction = ITransaction.CURRENT.get();
     m_newTransactionSupplier = currentRunContext.m_newTransactionSupplier;

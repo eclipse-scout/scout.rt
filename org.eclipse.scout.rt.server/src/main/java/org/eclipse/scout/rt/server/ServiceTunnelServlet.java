@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.server;
+
+import static org.eclipse.scout.rt.server.commons.opentelemetry.SpanNamePropagationFromDownstream.addNameToContext;
 
 import java.io.IOException;
 import java.security.AccessController;
@@ -178,6 +180,17 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
   }
 
   protected ServiceTunnelResponse doPost(ServiceTunnelRequest serviceRequest) {
+    addNameToContext(() -> buildSpanName(serviceRequest));
+    return doPostInternal(serviceRequest);
+  }
+
+  protected String buildSpanName(ServiceTunnelRequest serviceRequest) {
+    String fullName = serviceRequest.getServiceInterfaceClassName();
+    String serviceName = fullName.substring(fullName.lastIndexOf('.') + 1);
+    return serviceName + "." + serviceRequest.getOperation();
+  }
+
+  protected ServiceTunnelResponse doPostInternal(ServiceTunnelRequest serviceRequest) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("requestSequence {} {}.{}", serviceRequest.getRequestSequence(), serviceRequest.getServiceInterfaceClassName(), serviceRequest.getOperation());
     }
