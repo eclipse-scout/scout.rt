@@ -74,7 +74,8 @@ public abstract class AbstractDataObjectVisitor {
   protected void caseDoEntity(IDoEntity entity) {
     applyVisitorExtension(entity);
     caseDoEntityNodes(entity.allNodes().values());
-    caseDoEntityContributions(entity.getContributions());
+    //noinspection deprecation
+    caseDoEntityContributions(entity.getAllContributions());
   }
 
   protected void caseDoEntityNodes(Collection<DoNode<?>> nodes) {
@@ -99,8 +100,8 @@ public abstract class AbstractDataObjectVisitor {
     }
   }
 
-  protected void caseDoEntityContributions(Collection<IDoEntityContribution> contributions) {
-    for (IDoEntityContribution contribution : contributions) {
+  protected void caseDoEntityContributions(Collection<IDoEntity> contributions) {
+    for (IDoEntity contribution : contributions) {
       visit(contribution);
     }
   }

@@ -51,7 +51,7 @@ public abstract class AbstractReplacingDataObjectVisitor extends AbstractDataObj
   }
 
   @Override
-  protected void caseDoEntityContributions(Collection<IDoEntityContribution> contributions) {
+  protected void caseDoEntityContributions(Collection<IDoEntity> contributions) {
     updateCollection(contributions);
   }
 

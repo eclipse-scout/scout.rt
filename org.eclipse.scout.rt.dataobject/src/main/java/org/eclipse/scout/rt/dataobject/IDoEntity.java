@@ -350,13 +350,25 @@ public interface IDoEntity extends IDataObject {
   boolean hasContributions();
 
   /**
+   * A read-only collection of the known contributions. It's recommended to call {@link #hasContributions()} before calling this method because this
+   * method might create an internal representation to store contributions which is usually not necessary if used
+   * read-only.
+   *
+   * @return An immutable collection of known DO entity contributions (never <code>null</code>).
+   */
+  Collection<IDoEntityContribution> getContributions();
+
+  /**
    * For read-only calls it's recommended to call {@link #hasContributions()} before calling this method because this
    * method might create an internal representation to store contributions which is usually not necessary if used
    * read-only.
    *
-   * @return An mutable collection of DO entity contributions (never <code>null</code>).
+   * @return A mutable collection of DO all entity contributions (never <code>null</code>).
+   * @deprecated This method returns ALL contributions of the DO, including the unknown ones, that may not implement {@link IDoEntityContribution}.
+   * This method should only be used internally or for special DO migrations that need to access ALL contributions. To get the known contributions use {@link #getContributions} instead.
    */
-  Collection<IDoEntityContribution> getContributions();
+  @Deprecated
+  Collection<IDoEntity> getAllContributions();
 
   /**
    * @return Existing DO entity contribution for this contribution class if available, otherwise creates a new DO entity
@@ -404,7 +416,7 @@ public interface IDoEntity extends IDataObject {
   default void putContribution(IDoEntityContribution contribution) {
     assertNotNull(contribution, "contribution is required");
     removeContribution(contribution.getClass());
-    getContributions().add(contribution);
+    getAllContributions().add(contribution);
   }
 
   /**
@@ -414,6 +426,6 @@ public interface IDoEntity extends IDataObject {
     if (!hasContributions()) {
       return false;
     }
-    return getContributions().removeIf(contribution -> contributionClass.equals(contribution.getClass()));
+    return getAllContributions().removeIf(contribution -> contributionClass.equals(contribution.getClass()));
   }
 }
