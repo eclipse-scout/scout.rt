@@ -38,6 +38,8 @@ import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
 import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
+import io.opentelemetry.context.Context;
+
 /**
  * The <code>ServerRunContext</code> controls propagation of server-side state.
  * <p>
@@ -90,6 +92,12 @@ public class ServerRunContext extends RunContext {
   @Override
   public ServerRunContext withCorrelationId(final String correlationId) {
     super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
+  public ServerRunContext withOpenTelemetryContext(Context context) {
+    super.withOpenTelemetryContext(context);
     return this;
   }
 

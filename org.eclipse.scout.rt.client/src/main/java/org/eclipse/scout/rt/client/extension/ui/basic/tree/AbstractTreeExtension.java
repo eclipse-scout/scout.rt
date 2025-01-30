@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeHyperl
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeInitTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesSelectedChain;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -96,5 +97,10 @@ public abstract class AbstractTreeExtension<OWNER extends AbstractTree> extends 
   @Override
   public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
     chain.execAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
+  }
+
+  @Override
+  public void execNodesChecked(TreeNodesCheckedChain chain, List<ITreeNode> nodes) {
+    chain.execNodesChecked(nodes);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 package org.eclipse.scout.rt.ui.html.json;
+
+import static org.eclipse.scout.rt.server.commons.opentelemetry.SpanNamePropagationFromDownstream.addNameToContext;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -37,6 +39,10 @@ public class JsonEventProcessor {
     }
   }
 
+  protected String buildSpanName(JsonEvent event, IJsonAdapter<?> jsonAdapter) {
+    return jsonAdapter.getModel().getClass().getSimpleName() + "." + event.getType();
+  }
+
   protected void processEvent(JsonEvent event, JsonResponse response) {
     final IJsonAdapter<?> jsonAdapter = m_uiSession.getJsonAdapter(event.getTarget());
     if (jsonAdapter == null) {
@@ -48,6 +54,7 @@ public class JsonEventProcessor {
         LOG.debug("Handling event '{}' for adapter with ID {}", event.getType(), event.getTarget());
       }
 
+      addNameToContext(() -> buildSpanName(event, jsonAdapter));
       jsonAdapter.handleUiEvent(event);
       jsonAdapter.cleanUpEventFilters();
     }

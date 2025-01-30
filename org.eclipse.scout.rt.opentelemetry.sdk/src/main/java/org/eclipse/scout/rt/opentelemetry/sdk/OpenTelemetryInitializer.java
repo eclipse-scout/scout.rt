@@ -111,18 +111,26 @@ public class OpenTelemetryInitializer implements IPlatformListener {
 
   protected Map<String, String> getDefaultProperties() {
     String defaultExporter = CONFIG.getPropertyValue(OpenTelemetryDefaultExporterProperty.class);
-    Map<String, String> defaultConfig = new HashMap<>();
-    defaultConfig.put("otel.traces.exporter", "none");
-    defaultConfig.put("otel.logs.exporter", "none");
-    defaultConfig.put("otel.metrics.exporter", defaultExporter);
-    defaultConfig.put("otel.exporter.otlp.protocol", "http/protobuf");
-    defaultConfig.put("otel.metric.export.interval", "30000"); // 30s
 
+    Map<String, String> defaultConfig = new HashMap<>();
     defaultConfig.put("otel.service.name", CONFIG.getPropertyValue(ApplicationNameProperty.class));
     defaultConfig.put("otel.resource.attributes", String.join(",",
         toResourceAttribute("service.instance.id", NodeId.current().unwrapAsString()),
         toResourceAttribute("scout.platform.version", CONFIG.getPropertyValue(PlatformVersionProperty.class)),
         toResourceAttribute("scout.application.version", CONFIG.getPropertyValue(ApplicationVersionProperty.class))));
+
+    defaultConfig.put("otel.exporter.otlp.protocol", "http/protobuf");
+
+    // Traces
+    defaultConfig.put("otel.traces.exporter", defaultExporter);
+
+    // Metrics
+    defaultConfig.put("otel.metrics.exporter", defaultExporter);
+    defaultConfig.put("otel.metric.export.interval", "30000"); // 30s
+
+    // Logs
+    defaultConfig.put("otel.logs.exporter", "none");
+
     return defaultConfig;
   }
 

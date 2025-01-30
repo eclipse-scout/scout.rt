@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,6 @@ import org.mockito.Mockito;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.events.GlobalEventEmitterProvider;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 
 @RunWith(PlatformTestRunner.class)
@@ -48,7 +47,6 @@ public class OpenTelemetryInitializerTest {
   @Before
   public void before() {
     GlobalOpenTelemetry.resetForTest();
-    GlobalEventEmitterProvider.resetForTest();
     // OpenTelemetryInitializer is excluded in testing platform and initialized manually by test methods
     OpenTelemetryInitializer initializer = BEANS.opt(OpenTelemetryInitializer.class);
     assertNull(initializer);
