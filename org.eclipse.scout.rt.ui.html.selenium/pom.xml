@@ -36,6 +36,20 @@
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.platform</artifactId>
+      <!-- Dependency convergence:
+      Selenium depends on io.opentelemetry.semconv:opentelemetry-semconv
+      in a different version than what we use here.
+      Since we do not use OpenTelemetry in this module, we exclude it -->
+      <exclusions>
+        <exclusion>
+          <groupId>io.opentelemetry.instrumentation</groupId>
+          <artifactId>opentelemetry-instrumentation-api-incubator</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.opentelemetry.instrumentation</groupId>
+          <artifactId>opentelemetry-instrumentation-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
