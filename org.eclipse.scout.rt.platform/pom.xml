@@ -21,7 +21,6 @@
   <artifactId>org.eclipse.scout.rt.platform</artifactId>
   <packaging>jar</packaging>
 
-
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
@@ -77,6 +76,14 @@
     <dependency>
       <groupId>io.opentelemetry</groupId>
       <artifactId>opentelemetry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry.instrumentation</groupId>
+      <artifactId>opentelemetry-instrumentation-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry.instrumentation</groupId>
+      <artifactId>opentelemetry-instrumentation-api-incubator</artifactId>
     </dependency>
   </dependencies>
 
