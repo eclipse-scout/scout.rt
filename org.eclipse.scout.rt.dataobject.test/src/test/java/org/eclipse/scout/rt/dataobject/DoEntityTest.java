@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -419,8 +419,8 @@ public class DoEntityTest {
   @Test
   public void testGetList() {
     DoEntity entity = BEANS.get(DoEntity.class);
-    entity.putList("bar", Arrays.asList("foo", 1, true));
-    assertEquals(Arrays.asList("foo", 1, true), entity.getList("bar"));
+    entity.putList("bar", Arrays.<Object> asList("foo", 1, true));
+    assertEquals(Arrays.<Object> asList("foo", 1, true), entity.getList("bar"));
   }
 
   @Test
@@ -510,7 +510,7 @@ public class DoEntityTest {
   @Test(expected = AssertionException.class)
   public void testGetBooleanList_notInstanceOf() {
     DoEntity entity = BEANS.get(DoEntity.class);
-    entity.putList("bar", Arrays.asList("true", 0, false));
+    entity.putList("bar", Arrays.<Object> asList("true", 0, false));
     entity.getBooleanList("bar");
   }
 
@@ -574,7 +574,7 @@ public class DoEntityTest {
   @Test(expected = AssertionException.class)
   public void testGetDecimalList_notInstanceOf() {
     DoEntity entity = BEANS.get(DoEntity.class);
-    entity.putList("bar", Arrays.asList("true", 0, false));
+    entity.putList("bar", Arrays.<Object> asList("true", 0, false));
     entity.getDecimalList("bar");
   }
 

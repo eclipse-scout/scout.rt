@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -563,7 +563,7 @@ public class CollectionUtilityTest {
     assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(null));
     assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(new ArrayList<>()));
     assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "B", "C")));
-    assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(CollectionUtility.arrayList(0, false, null)));
+    assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(CollectionUtility.<Object> arrayList(0, false, null)));
     assertEquals(setWithNullElement, CollectionUtility.findDuplicates(CollectionUtility.arrayList(null, null)));
     assertEquals(CollectionUtility.hashSet("C"), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "C", "D", "C")));
     assertEquals(CollectionUtility.hashSet("0", "C"), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "C", "D", "C", "0", "1", "0", "0")));
