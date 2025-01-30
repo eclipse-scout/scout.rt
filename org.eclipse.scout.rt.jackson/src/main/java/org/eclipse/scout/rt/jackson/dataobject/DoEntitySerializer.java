@@ -93,7 +93,8 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
 
   protected void serializeContributions(JsonGenerator gen, IDoEntity entity, SerializerProvider provider) throws IOException {
     if (entity.hasContributions()) {
-      Collection<IDoEntityContribution> contributions = entity.getContributions();
+      //noinspection deprecation
+      Collection<IDoEntity> contributions = entity.getAllContributions();
       validateContributions(entity, contributions);
       gen.writeObjectField(m_context.getContributionsAttributeName(), contributions);
     }
@@ -235,8 +236,12 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
         .filter(AttributeType::isKnown); // filter completely unknown types, forcing to use the default behavior for unknown types
   }
 
-  protected void validateContributions(IDoEntity doEntity, Collection<IDoEntityContribution> contributions) {
-    for (IDoEntityContribution contribution : contributions) {
+  protected void validateContributions(IDoEntity doEntity, Collection<IDoEntity> contributions) {
+    for (IDoEntity contribution0 : contributions) {
+      if (!(contribution0 instanceof IDoEntityContribution)) {
+        continue; // Skip validation for unknown contributions
+      }
+      IDoEntityContribution contribution = (IDoEntityContribution) contribution0;
       Set<Class<? extends IDoEntity>> containerClasses = m_dataObjectInventory.get().getContributionContainers(contribution.getClass());
       Class<? extends IDoEntityContribution> contributionClass = contribution.getClass();
       assertTrue(containerClasses.stream().anyMatch(containerClass -> containerClass.isInstance(doEntity)), "{} is not a valid container class of {}", doEntity.getClass().getSimpleName(), contributionClass.getSimpleName());

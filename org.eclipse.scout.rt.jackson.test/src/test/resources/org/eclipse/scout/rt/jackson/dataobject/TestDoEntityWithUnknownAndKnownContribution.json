@@ -1,0 +1,11 @@
+{
+  "_type" : "TestItem",
+  "id" : "123456789",
+  "_contributions" : [ {
+    "_type" : "scout.TestUnknownContribution",
+    "name" : "dolor"
+  }, {
+    "_type" : "scout.TestItemContributionOne",
+    "name" : "sid"
+  } ]
+}

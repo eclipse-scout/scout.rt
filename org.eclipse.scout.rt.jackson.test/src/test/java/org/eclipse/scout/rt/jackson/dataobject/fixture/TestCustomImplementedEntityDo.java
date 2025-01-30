@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public class TestCustomImplementedEntityDo implements IDoEntity {
 
   private final Map<String, DoNode<?>> m_attributes = new LinkedHashMap<>();
-  private List<IDoEntityContribution> m_contributions;
+  private List<IDoEntity> m_contributions;
 
   // attributes
   private static final String DATE_ATTRIBUTE = "dateAttribute";
@@ -128,6 +128,15 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
 
   @Override
   public Collection<IDoEntityContribution> getContributions() {
+    return getAllContributions().stream()
+        .filter(IDoEntityContribution.class::isInstance)
+        .map(IDoEntityContribution.class::cast)
+        .collect(Collectors.toUnmodifiableList());
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  public Collection<IDoEntity> getAllContributions() {
     if (m_contributions == null) {
       m_contributions = new ArrayList<>();
     }

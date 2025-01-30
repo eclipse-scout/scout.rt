@@ -140,6 +140,13 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 public interface IDoValueMigrationHandler<T> {
 
   /**
+   * Primary sort order for value migrations removing contributions, used by {@link AbstractRemoveDoEntityContributionValueMigrationHandler}.
+   *
+   * @see #primarySortOrder()
+   */
+  double REMOVE_CONTRIBUTION_PRIMARY_SORT_ORDER = 500.0;
+
+  /**
    * Primary sort order for untyped value migrations, used by {@link AbstractDoValueUntypedMigrationHandler}.
    *
    * @see #primarySortOrder()
