@@ -15,7 +15,6 @@ import java.util.Optional;
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -59,8 +58,9 @@ public class DefaultDoEntityDeserializerTypeStrategy implements IDoEntityDeseria
     }
     else {
       // add contributions to corresponding list in do entity
-      //noinspection unchecked
-      doEntity.getContributions().addAll((Collection<? extends IDoEntityContribution>) contributions);
+      //noinspection deprecation,unchecked
+      doEntity.getAllContributions()
+          .addAll((Collection<? extends IDoEntity>) contributions);
     }
   }
 }

@@ -252,7 +252,7 @@ public class DataObjectHelper {
     }
 
     @Override
-    protected void caseDoEntityContributions(Collection<IDoEntityContribution> contributions) {
+    protected void caseDoEntityContributions(Collection<IDoEntity> contributions) {
       super.caseDoEntityContributions(contributions); // deep first
       normalizeInternal(contributions);
     }
@@ -322,7 +322,8 @@ public class DataObjectHelper {
       entity.removeIf(emptyNodes::contains);
 
       // (2) clean all contributions (i.e. itself implementations of DoEntity)
-      caseDoEntityContributions(entity.getContributions());
+      //noinspection deprecation
+      caseDoEntityContributions(entity.getAllContributions());
     }
   }
 

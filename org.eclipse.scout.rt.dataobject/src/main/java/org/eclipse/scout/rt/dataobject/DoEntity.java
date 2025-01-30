@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -51,7 +52,7 @@ public class DoEntity implements IDoEntity {
 
   private final Map<String, DoNode<?>> m_attributes = new LinkedHashMap<>();
 
-  private List<IDoEntityContribution> m_contributions; // lazy init, because contributions are used rarely
+  private List<IDoEntity> m_contributions; // lazy init, because contributions are used rarely
 
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.
@@ -180,6 +181,16 @@ public class DoEntity implements IDoEntity {
 
   @Override
   public Collection<IDoEntityContribution> getContributions() {
+    return getAllContributions().stream()
+        .filter(IDoEntityContribution.class::isInstance)
+        .map(IDoEntityContribution.class::cast)
+        .collect(Collectors.toUnmodifiableList());
+  }
+
+  @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public Collection<IDoEntity> getAllContributions() {
     if (m_contributions == null) {
       m_contributions = new ArrayList<>(); // create on first access
     }
@@ -202,8 +213,8 @@ public class DoEntity implements IDoEntity {
     }
 
     // handle null and empty contributions the same way (lazy init of m_contributions)
-    List<IDoEntityContribution> contributions = hasContributions() ? m_contributions : null;
-    List<IDoEntityContribution> otherContributions = doEntity.hasContributions() ? doEntity.m_contributions : null;
+    List<IDoEntity> contributions = hasContributions() ? m_contributions : null;
+    List<IDoEntity> otherContributions = doEntity.hasContributions() ? doEntity.m_contributions : null;
     if (!CollectionUtility.equalsCollection(contributions, otherContributions, false)) { // element order is not relevant
       return false;
     }
@@ -214,7 +225,7 @@ public class DoEntity implements IDoEntity {
   @Override
   public int hashCode() {
     int result = m_attributes.hashCode();
-    Collection<? extends IDoEntityContribution> contributions = hasContributions() ? m_contributions : null; // handle null and empty contributions the same way (lazy init of m_contributions)
+    Collection<? extends IDoEntity> contributions = hasContributions() ? m_contributions : null; // handle null and empty contributions the same way (lazy init of m_contributions)
     result = 31 * result + CollectionUtility.hashCodeCollection(contributions); // element order is not relevant
     return result;
   }

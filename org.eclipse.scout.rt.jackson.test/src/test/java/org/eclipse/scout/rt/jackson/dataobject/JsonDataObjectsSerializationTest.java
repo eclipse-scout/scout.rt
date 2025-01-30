@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoCollection;
@@ -2832,10 +2833,59 @@ public class JsonDataObjectsSerializationTest {
 
     // no node for contributions in typed mode
     assertFalse(marshalledDoEntity.has(ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME));
-    // doesn't fail even if internal instance is of type IDoEntity instead of IDoEntityContribution due to unknown type name
+    // no known contributions
+    assertTrue(marshalledDoEntity.getContributions().isEmpty());
+    //noinspection deprecation
+    assertEquals(1, marshalledDoEntity.getAllContributions().size());
+    //noinspection deprecation
+    IDoEntity contribution = CollectionUtility.firstElement(marshalledDoEntity.getAllContributions());
+    assertSame("Unknown contribution is not loaded raw", DoEntity.class, contribution.getClass());
+    assertEquals("two", contribution.getString("name"));
+
+    String unmarshalledJson = s_dataObjectMapper.writeValueAsString(marshalledDoEntity);
+    s_testHelper.assertJsonEquals(json, unmarshalledJson);
+  }
+
+  @Test
+  public void testDeserialize_DoEntityWithUnknownAndKnownContribution() throws Exception {
+    String json = readResourceAsString("TestDoEntityWithUnknownAndKnownContribution.json");
+    TestItemDo marshalledDoEntity = s_dataObjectMapper.readValue(json, TestItemDo.class);
+    assertEquals("123456789", marshalledDoEntity.getId());
+
+    // no node for contributions in typed mode
+    assertFalse(marshalledDoEntity.has(ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME));
+
     assertEquals(1, marshalledDoEntity.getContributions().size());
-    // throws due to tried casting
-    assertThrows(ClassCastException.class, () -> CollectionUtility.firstElement(marshalledDoEntity.getContributions()).getString("name"));
+    TestItemContributionOneDo knownContribution = marshalledDoEntity.getContribution(TestItemContributionOneDo.class);
+    assertEquals(knownContribution, CollectionUtility.firstElement(marshalledDoEntity.getContributions()));
+    assertEquals("sid", knownContribution.getName());
+
+    // doesn't fail even if internal instance is of type IDoEntity instead of IDoEntityContribution due to unknown type name
+    //noinspection deprecation
+    assertEquals(2, marshalledDoEntity.getAllContributions().size());
+
+    // get the known contribution
+    //noinspection deprecation
+    TestItemContributionOneDo contribution1 = marshalledDoEntity.getAllContributions().stream()
+        .filter(TestItemContributionOneDo.class::isInstance)
+        .map(TestItemContributionOneDo.class::cast)
+        .findFirst()
+        .orElse(null);
+    assertNotNull("Known contribution is missing", contribution1);
+    assertSame(knownContribution, contribution1);
+
+    // get the unknown contribution
+    //noinspection deprecation
+    IDoEntity contribution2 = marshalledDoEntity.getAllContributions().stream()
+        .filter(Predicate.not(TestItemContributionOneDo.class::isInstance))
+        .findFirst()
+        .orElse(null);
+
+    assertNotNull("Unknown contribution is missing", contribution2);
+    assertSame("Unknown contribution is not loaded raw", DoEntity.class, contribution2.getClass());
+
+    String unmarshalledJson = s_dataObjectMapper.writeValueAsString(marshalledDoEntity);
+    s_testHelper.assertJsonEquals(json, unmarshalledJson);
   }
 
   @Test
