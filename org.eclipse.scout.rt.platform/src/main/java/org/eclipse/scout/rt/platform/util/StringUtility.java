@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1653,6 +1653,38 @@ public final class StringUtility {
     }
 
     return out.toString();
+  }
+
+  /**
+   * Adds the given prefix to the start of the given string and returns the result.
+   * If either of the given arguments is null or empty, the original string is returned unchanged, i.e. without prefix.
+   */
+  public static String addPrefix(String s, String prefix) {
+    return isNullOrEmpty(s) || isNullOrEmpty(prefix) ? s : prefix + s;
+  }
+
+  /**
+   * Adds the given suffix to the end of the given string and returns the result.
+   * If either of the given arguments is null or empty, the original string is returned unchanged, i.e. without suffix.
+   */
+  public static String addSuffix(String s, String suffix) {
+    return isNullOrEmpty(s) || isNullOrEmpty(suffix) ? s : s + suffix;
+  }
+
+  /**
+   * If the given string starts with the given prefix, the prefix is removed and the remaining string is returned.
+   * Otherwise, the string is returned unchanged. This method is case-sensitive and null-safe.
+   */
+  public static String removePrefix(String s, String prefix) {
+    return startsWith(s, prefix) ? s.substring(prefix.length()) : s;
+  }
+
+  /**
+   * If the given string ends with the given suffix, the suffix is removed and the remaining string is returned.
+   * Otherwise, the string is returned unchanged. This method is case-sensitive and null-safe.
+   */
+  public static String removeSuffix(String s, String suffix) {
+    return endsWith(s, suffix) ? s.substring(0, s.length() - suffix.length()) : s;
   }
 
   /**

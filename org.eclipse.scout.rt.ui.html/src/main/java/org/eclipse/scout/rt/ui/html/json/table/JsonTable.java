@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1159,7 +1159,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return m_columns.get(columnId);
   }
 
-  protected IColumn<?> getColumn(String columnId) {
+  public IColumn<?> getColumn(String columnId) {
     IColumn<?> column = m_columns.get(columnId);
     if (column == null) {
       throw new UiException("No column found for id " + columnId);
@@ -1185,7 +1185,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   /**
    * Returns a tableRow for the given rowId, or null when no row is found for the given rowId.
    */
-  protected ITableRow optTableRow(String rowId) {
+  public ITableRow optTableRow(String rowId) {
     return m_tableRows.get(rowId);
   }
 
@@ -1195,7 +1195,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
    * @throws UiException
    *     when no row is found for the given rowId
    */
-  protected ITableRow getTableRow(String rowId) {
+  public ITableRow getTableRow(String rowId) {
     ITableRow row = optTableRow(rowId);
     if (row == null) {
       throw new UiException("No table-row found for ID " + rowId);
@@ -1500,6 +1500,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       return;
     }
     Collection<ITableRow> disposedRows = null;
+    // noinspection SizeReplaceableByIsEmpty
     if (m_listeners.list(JsonTableEvent.TYPE_ROWS_DELETED).size() > 0) {
       disposedRows = new ArrayList<>(m_tableRows.values());
     }

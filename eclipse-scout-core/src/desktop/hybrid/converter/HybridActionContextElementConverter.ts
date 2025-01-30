@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 import {HybridActionContextElementConverters, ModelAdapter} from '../../../index';
 
 /**
- * Instances of this class are used to convert a model element to a JSON representation and vice-versa. Each
+ * Instances of this class are used to convert a model element to a JSON representation and vice versa. Each
  * instance typically only handles a specific type of element. Because elements have no common structure, they are
  * always accompanied by the widget that owns them (here represented by the corresponding {@link ModelAdapter}).
  *

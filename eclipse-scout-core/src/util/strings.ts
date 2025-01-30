@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -379,20 +379,36 @@ export const strings = {
     return strings.equals(a, b, true);
   },
 
-  removePrefix(string: string, prefix: string): string {
-    let s = string;
-    if (strings.startsWith(string, prefix)) {
-      s = string.substring(prefix.length);
-    }
-    return s;
+  /**
+   * Adds the given prefix to the start of the given string and returns the result.
+   * If either of the given arguments is null or empty, the original string is returned unchanged, i.e. without prefix.
+   */
+  addPrefix(string: string, prefix: string): string {
+    return string && prefix ? prefix + string : string;
   },
 
+  /**
+   * Adds the given suffix to the end of the given string and returns the result.
+   * If either of the given arguments is null or empty, the original string is returned unchanged, i.e. without suffix.
+   */
+  addSuffix(string: string, suffix: string): string {
+    return string && suffix ? string + suffix : string;
+  },
+
+  /**
+   * If the given string starts with the given prefix, the prefix is removed and the remaining string is returned.
+   * Otherwise, the string is returned unchanged. This method is case-sensitive and null-safe.
+   */
+  removePrefix(string: string, prefix: string): string {
+    return strings.startsWith(string, prefix) ? string.substring(prefix.length) : string;
+  },
+
+  /**
+   * If the given string ends with the given suffix, the suffix is removed and the remaining string is returned.
+   * Otherwise, the string is returned unchanged. This method is case-sensitive and null-safe.
+   */
   removeSuffix(string: string, suffix: string): string {
-    let s = string;
-    if (strings.endsWith(string, suffix)) {
-      s = string.substring(0, string.length - suffix.length);
-    }
-    return s;
+    return strings.endsWith(string, suffix) ? string.substring(0, string.length - suffix.length) : string;
   },
 
   /**

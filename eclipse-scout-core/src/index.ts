@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1028,6 +1028,8 @@ export * from './desktop/hybrid/HybridActionContextElement';
 export * from './desktop/hybrid/HybridActionContextElements';
 export * from './desktop/hybrid/converter/HybridActionContextElementConverters';
 export * from './desktop/hybrid/converter/HybridActionContextElementConverter';
+export * from './desktop/hybrid/converter/TableColumnContextElementConverter';
+export * from './desktop/hybrid/converter/TableRowContextElementConverter';
 export * from './desktop/hybrid/converter/TreeNodeContextElementConverter';
 export * from './desktop/navigation/DesktopNavigation';
 export * from './desktop/navigation/DesktopNavigationModel';

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -320,7 +320,7 @@ public class StringUtilityTest {
         + "<meta name=\"date.modified\" content=\"20130314\"/>";
     assertEquals("", StringUtility.replaceTags(input, "meta", "").trim());
 
-    // ingore case test
+    // ignore case test
     assertEquals("xbybz", StringUtility.replaceTags("x<A>asdf</A>y<a>jkl</a>z", "a", true, "b"));
   }
 
@@ -329,14 +329,16 @@ public class StringUtilityTest {
    */
   @Test
   public void testNewLines() {
-    String text = "lorem " + '\n' + "ipsum";
-    assertTrue(StringUtility.containsNewLines(text));
-    text = "lorem" + System.getProperty("line.separator") + "ipsum";
-    assertTrue(StringUtility.containsNewLines(text));
-    text = "";
-    assertFalse(StringUtility.containsNewLines(text));
-    text = null;
-    assertFalse(StringUtility.containsNewLines(text));
+    assertTrue(StringUtility.containsNewLines("lorem " + '\n' + "ipsum"));
+    assertTrue(StringUtility.containsNewLines("lorem" + System.lineSeparator() + "ipsum"));
+    assertTrue(StringUtility.containsNewLines("lorem\nipsum"));
+    assertTrue(StringUtility.containsNewLines("lorem\n\nipsum"));
+    assertTrue(StringUtility.containsNewLines("lorem\ripsum"));
+    assertTrue(StringUtility.containsNewLines("lorem\r\nipsum"));
+    assertTrue(StringUtility.containsNewLines("\n"));
+    assertFalse(StringUtility.containsNewLines("lorem ipsum"));
+    assertFalse(StringUtility.containsNewLines(""));
+    assertFalse(StringUtility.containsNewLines(null));
   }
 
   /**
@@ -793,5 +795,71 @@ public class StringUtilityTest {
 
     assertEquals("Company", StringUtility.removeSuffixes("CompanyFormData", "Form", "Data"));
     assertEquals("CompanyForm", StringUtility.removeSuffixes("CompanyFormData", "Data", "Form"));
+  }
+
+  @Test
+  public void testAddPrefix() {
+    assertEquals(null, StringUtility.addPrefix(null, "prefix"));
+    assertEquals(null, StringUtility.addPrefix(null, null));
+    assertEquals("", StringUtility.addPrefix("", null));
+    assertEquals("", StringUtility.addPrefix("", "prefix"));
+    assertEquals("  ", StringUtility.addPrefix(" ", " "));
+    assertEquals("prefix ", StringUtility.addPrefix(" ", "prefix"));
+    assertEquals("test", StringUtility.addPrefix("test", null));
+    assertEquals("test", StringUtility.addPrefix("test", ""));
+    assertEquals("prefix-test", StringUtility.addPrefix("test", "prefix-"));
+    assertEquals("testtest", StringUtility.addPrefix("test", "test"));
+    assertEquals("foo.CodeType", StringUtility.addPrefix("CodeType", "foo."));
+  }
+
+  @Test
+  public void testAddSuffix() {
+    assertEquals(null, StringUtility.addSuffix(null, "suffix"));
+    assertEquals(null, StringUtility.addSuffix(null, null));
+    assertEquals("", StringUtility.addSuffix("", null));
+    assertEquals("", StringUtility.addSuffix("", "suffix"));
+    assertEquals("  ", StringUtility.addSuffix(" ", " "));
+    assertEquals(" suffix", StringUtility.addSuffix(" ", "suffix"));
+    assertEquals("test-suffix", StringUtility.addSuffix("test", "-suffix"));
+    assertEquals("test", StringUtility.addSuffix("test", null));
+    assertEquals("test", StringUtility.addSuffix("test", ""));
+    assertEquals("testtest", StringUtility.addSuffix("test", "test"));
+    assertEquals("avatar.jpg", StringUtility.addSuffix("avatar", ".jpg"));
+  }
+
+  @Test
+  public void testRemovePrefix() {
+    assertEquals(null, StringUtility.removePrefix(null, "prefix"));
+    assertEquals(null, StringUtility.removePrefix(null, null));
+    assertEquals("", StringUtility.removePrefix("", "prefix"));
+    assertEquals("test", StringUtility.removePrefix("test", null));
+    assertEquals("test", StringUtility.removePrefix("test", ""));
+    assertEquals("test", StringUtility.removePrefix("test", "abc"));
+    assertEquals("test", StringUtility.removePrefix("test", "tester"));
+    assertEquals("test", StringUtility.removePrefix("test", "T"));
+    assertEquals("est", StringUtility.removePrefix("test", "t"));
+    assertEquals("st", StringUtility.removePrefix("test", "te"));
+    assertEquals("", StringUtility.removePrefix("test", "test"));
+    assertEquals("CodeType", StringUtility.removePrefix("foo.CodeType", "foo."));
+    assertEquals("foo.CodeType", StringUtility.removePrefix("foo.CodeType", "bar."));
+    assertEquals("CodeType", StringUtility.removePrefix("CodeType", "codeType"));
+  }
+
+  @Test
+  public void testRemoveSuffix() {
+    assertEquals(null, StringUtility.removeSuffix(null, "suffix"));
+    assertEquals(null, StringUtility.removeSuffix(null, null));
+    assertEquals("", StringUtility.removeSuffix("", "suffix"));
+    assertEquals("test", StringUtility.removeSuffix("test", null));
+    assertEquals("test", StringUtility.removeSuffix("test", ""));
+    assertEquals("test", StringUtility.removeSuffix("test", "abc"));
+    assertEquals("test", StringUtility.removeSuffix("test", "tester"));
+    assertEquals("test", StringUtility.removeSuffix("test", "T"));
+    assertEquals("tes", StringUtility.removeSuffix("test", "t"));
+    assertEquals("te", StringUtility.removeSuffix("test", "st"));
+    assertEquals("", StringUtility.removeSuffix("test", "test"));
+    assertEquals("avatar", StringUtility.removeSuffix("avatar.jpg", ".jpg"));
+    assertEquals("avatar.jpg", StringUtility.removePrefix("avatar.jpg", ".gif"));
+    assertEquals("avatar.jpg", StringUtility.removePrefix("avatar.jpg", ".JPG"));
   }
 }

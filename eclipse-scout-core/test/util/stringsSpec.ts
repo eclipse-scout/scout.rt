@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -447,18 +447,82 @@ describe('strings', () => {
 
   });
 
-  describe('removePrefix and removeSuffix', () => {
-
-    it('removePrefix', () => {
-      expect(strings.removePrefix('crm.CodeType', 'crm.')).toBe('CodeType');
-      expect(strings.removePrefix('crm.CodeType', 'foo.')).toBe('crm.CodeType');
+  describe('prefixes and suffixes', () => {
+    it('addPrefix adds a prefix', () => {
+      expect(strings.addPrefix(null, 'prefix')).toBe(null);
+      expect(strings.addPrefix(undefined, 'prefix')).toBe(undefined);
+      expect(strings.addPrefix(null, null)).toBe(null);
+      expect(strings.addPrefix(undefined, null)).toBe(undefined);
+      expect(strings.addPrefix('', null)).toBe('');
+      expect(strings.addPrefix('', undefined)).toBe('');
+      expect(strings.addPrefix('', 'prefix')).toBe('');
+      expect(strings.addPrefix(' ', ' ')).toBe('  ');
+      expect(strings.addPrefix(' ', 'prefix')).toBe('prefix ');
+      expect(strings.addPrefix('test', null)).toBe('test');
+      expect(strings.addPrefix('test', undefined)).toBe('test');
+      expect(strings.addPrefix('test', '')).toBe('test');
+      expect(strings.addPrefix('test', 'prefix-')).toBe('prefix-test');
+      expect(strings.addPrefix('test', 'test')).toBe('testtest');
+      expect(strings.addPrefix('CodeType', 'foo.')).toBe('foo.CodeType');
     });
 
-    it('removeSuffix', () => {
-      expect(strings.removeSuffix('avatar.gif', '.gif')).toBe('avatar');
-      expect(strings.removeSuffix('avatar.gif', '.exe')).toBe('avatar.gif');
+    it('addSuffix adds a suffix', () => {
+      expect(strings.addSuffix(null, 'suffix')).toBe(null);
+      expect(strings.addSuffix(undefined, 'suffix')).toBe(undefined);
+      expect(strings.addSuffix(null, null)).toBe(null);
+      expect(strings.addSuffix(undefined, null)).toBe(undefined);
+      expect(strings.addSuffix('', null)).toBe('');
+      expect(strings.addSuffix('', undefined)).toBe('');
+      expect(strings.addSuffix('', 'suffix')).toBe('');
+      expect(strings.addSuffix(' ', ' ')).toBe('  ');
+      expect(strings.addSuffix(' ', 'suffix')).toBe(' suffix');
+      expect(strings.addSuffix('test', null)).toBe('test');
+      expect(strings.addSuffix('test', undefined)).toBe('test');
+      expect(strings.addSuffix('test', '')).toBe('test');
+      expect(strings.addSuffix('test', '-suffix')).toBe('test-suffix');
+      expect(strings.addSuffix('test', 'test')).toBe('testtest');
+      expect(strings.addSuffix('avatar', '.jpg')).toBe('avatar.jpg');
     });
 
+    it('removePrefix removes a prefix', () => {
+      expect(strings.removePrefix(null, 'prefix')).toBe(null);
+      expect(strings.removePrefix(undefined, 'prefix')).toBe(undefined);
+      expect(strings.removePrefix(null, null)).toBe(null);
+      expect(strings.removePrefix(undefined, null)).toBe(undefined);
+      expect(strings.removePrefix('', 'prefix')).toBe('');
+      expect(strings.removePrefix('test', null)).toBe('test');
+      expect(strings.removePrefix('test', undefined)).toBe('test');
+      expect(strings.removePrefix('test', '')).toBe('test');
+      expect(strings.removePrefix('test', 'abc')).toBe('test');
+      expect(strings.removePrefix('test', 'tester')).toBe('test');
+      expect(strings.removePrefix('test', 'T')).toBe('test');
+      expect(strings.removePrefix('test', 't')).toBe('est');
+      expect(strings.removePrefix('test', 'te')).toBe('st');
+      expect(strings.removePrefix('test', 'test')).toBe('');
+      expect(strings.removePrefix('foo.CodeType', 'foo.')).toBe('CodeType');
+      expect(strings.removePrefix('foo.CodeType', 'bar.')).toBe('foo.CodeType');
+      expect(strings.removePrefix('CodeType', 'codeType')).toBe('CodeType');
+    });
+
+    it('removeSuffix removes a suffix', () => {
+      expect(strings.removeSuffix(null, 'suffix')).toBe(null);
+      expect(strings.removeSuffix(undefined, 'suffix')).toBe(undefined);
+      expect(strings.removeSuffix(null, null)).toBe(null);
+      expect(strings.removeSuffix(undefined, null)).toBe(undefined);
+      expect(strings.removeSuffix('', 'suffix')).toBe('');
+      expect(strings.removeSuffix('test', null)).toBe('test');
+      expect(strings.removeSuffix('test', undefined)).toBe('test');
+      expect(strings.removeSuffix('test', '')).toBe('test');
+      expect(strings.removeSuffix('test', 'abc')).toBe('test');
+      expect(strings.removeSuffix('test', 'tester')).toBe('test');
+      expect(strings.removeSuffix('test', 'T')).toBe('test');
+      expect(strings.removeSuffix('test', 't')).toBe('tes');
+      expect(strings.removeSuffix('test', 'st')).toBe('te');
+      expect(strings.removeSuffix('test', 'test')).toBe('');
+      expect(strings.removeSuffix('avatar.jpg', '.jpg')).toBe('avatar');
+      expect(strings.removeSuffix('avatar.jpg', '.gif')).toBe('avatar.jpg');
+      expect(strings.removeSuffix('avatar.jpg', '.JPG')).toBe('avatar.jpg');
+    });
   });
 
   describe('truncateText', () => {

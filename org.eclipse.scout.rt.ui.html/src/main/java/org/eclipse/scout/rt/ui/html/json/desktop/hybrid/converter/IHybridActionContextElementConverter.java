@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 /**
- * Instances of this interface are used to convert a model element to a JSON representation and vice-versa. Each
+ * Instances of this interface are used to convert a model element to a JSON representation and vice versa. Each
  * instance typically only handles a specific type of element. Because elements have no common structure, they are
  * always accompanied by the widget that owns them (here represented by the corresponding {@link IJsonAdapter}).
  * <p>
@@ -21,7 +21,8 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
  * <ul>
  * <li>Create a subclass of the abstract class {@link AbstractHybridActionContextElementConverter}.
  * <li>Specify the types of the generic parameters {@link ADAPTER}, {@link JSON_ELEMENT} and {@link MODEL_ELEMENT}.
- * <li>Implement the abstract methods `jsonToElement` and `elementToJson`.
+ * <li>Implement the abstract methods `jsonToElement` and `elementToJson`. They are only called if the arguments were
+ * accepted by the corresponding methods. Otherwise, the task is delegated to the next converter.
  * </ul>
  *
  * @param <ADAPTER>

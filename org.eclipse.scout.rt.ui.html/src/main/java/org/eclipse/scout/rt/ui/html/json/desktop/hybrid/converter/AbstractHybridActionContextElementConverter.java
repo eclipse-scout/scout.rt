@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -61,15 +61,27 @@ public abstract class AbstractHybridActionContextElementConverter<ADAPTER extend
   }
 
   protected boolean acceptAdapter(IJsonAdapter<?> adapter) {
-    return getAdapterClass().isInstance(adapter);
+    return getAdapterClass().isInstance(adapter) && acceptAdapterImpl(getAdapterClass().cast(adapter));
+  }
+
+  protected boolean acceptAdapterImpl(ADAPTER adapter) {
+    return true;
   }
 
   protected boolean acceptJsonElement(Object jsonElement) {
-    return getJsonElementClass().isInstance(jsonElement);
+    return getJsonElementClass().isInstance(jsonElement) && acceptJsonElementImpl(getJsonElementClass().cast(jsonElement));
+  }
+
+  protected boolean acceptJsonElementImpl(JSON_ELEMENT jsonElement) {
+    return true;
   }
 
   protected boolean acceptModelElement(Object modelElement) {
-    return getModelElementClass().isInstance(modelElement);
+    return getModelElementClass().isInstance(modelElement) && acceptModelElementImpl(getModelElementClass().cast(modelElement));
+  }
+
+  protected boolean acceptModelElementImpl(MODEL_ELEMENT element) {
+    return true;
   }
 
   /**
