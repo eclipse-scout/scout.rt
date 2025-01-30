@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.app;
 import java.util.List;
 
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.scout.rt.app.filter.ExceptionFilter;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
@@ -27,6 +28,15 @@ public final class ServerServletContributors {
   private ServerServletContributors() {
   }
 
+  @Order(1000)
+  public static class ExceptionFilterContributor implements IServletFilterContributor {
+
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(ExceptionFilter.class, "/*", null);
+    }
+  }
+
   /**
    * Subclasses must register a filter on `"/*"` that takes care of authentication. If no such filter is registered, all
    * resources provided by registered servlets (e.g. {@link ServiceTunnelServletContributor}) are accessible without
@@ -34,7 +44,7 @@ public final class ServerServletContributors {
    * <p>
    * The paths provided by {@link #getFilterExcludes()} should be excluded from authentication.
    */
-  @Order(1000)
+  @Order(2000)
   public static class AuthFilterContributor implements IServletFilterContributor {
 
     /**

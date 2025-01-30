@@ -19,6 +19,7 @@ import org.eclipse.jetty.ee10.servlet.ServletApiRequest;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.servlet.ServletHolder.Registration;
+import org.eclipse.scout.rt.app.filter.ExceptionFilter;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
@@ -35,6 +36,15 @@ import org.eclipse.scout.rt.ui.html.app.filter.UiServletMultipartConfigFilter;
 public final class UiServletContributors {
 
   private UiServletContributors() {
+  }
+
+  @Order(50)
+  public static class ExceptionFilterContributor implements IServletFilterContributor {
+
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(ExceptionFilter.class, "/*", null);
+    }
   }
 
   /**
