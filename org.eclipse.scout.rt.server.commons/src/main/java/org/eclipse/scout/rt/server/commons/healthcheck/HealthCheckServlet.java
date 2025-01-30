@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.server.commons.healthcheck.IHealthChecker.IHealthChe
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
+import org.eclipse.scout.rt.server.commons.servlet.filter.LogFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,8 @@ public class HealthCheckServlet extends AbstractHttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    req.setAttribute(LogFilter.NO_LOG_REQUEST_ATTRIBUTE, "X"); // prevent logging of calls to health servlet in LogFilter
+
     disableCaching(req, resp);
     BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
 
