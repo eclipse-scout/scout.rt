@@ -33,7 +33,6 @@ import org.mockito.Mockito;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.incubator.events.GlobalEventLoggerProvider;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 
 @RunWith(PlatformTestRunner.class)
@@ -48,7 +47,6 @@ public class OpenTelemetryInitializerTest {
   @Before
   public void before() {
     GlobalOpenTelemetry.resetForTest();
-    GlobalEventLoggerProvider.resetForTest();
     // OpenTelemetryInitializer is excluded in testing platform and initialized manually by test methods
     OpenTelemetryInitializer initializer = BEANS.opt(OpenTelemetryInitializer.class);
     assertNull(initializer);

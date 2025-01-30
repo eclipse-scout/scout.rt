@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeHyperl
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeInitTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesSelectedChain;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -89,5 +91,10 @@ public abstract class AbstractTreeExtension<OWNER extends AbstractTree> extends 
   @Override
   public TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node) {
     return chain.execDrag(node);
+  }
+
+  @Override
+  public void execNodesChecked(TreeNodesCheckedChain chain, List<ITreeNode> nodes) {
+    chain.execNodesChecked(nodes);
   }
 }
